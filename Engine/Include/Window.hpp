@@ -1,10 +1,22 @@
 namespace ae3d
 {
-    enum class WindowEventType { Close = 0 };
+    enum class WindowEventType
+    {
+        None = 0,
+        Close,
+        KeyDown
+    };
+
+    enum WindowCreateFlags : unsigned
+    {
+        Windowed = 1 << 0,
+        Fullscreen = 1 << 1
+    };
 
     struct WindowEvent
     {
-        WindowEventType type;
+        WindowEventType type = WindowEventType::None;
+        int keyCode = 0;
     };
     
     class Window
@@ -16,7 +28,14 @@ namespace ae3d
             return instance;
         }
 
-        void Create(int width, int height );
+        /**
+          Creates a window and rendering context.
+
+          \param width Width in pixels or 0 to use desktop width.
+          \param height Height in pixels or 0 to use desktop height.
+          \param flags Bitmask of creation flags.
+        */
+        void Create( int width, int height, WindowCreateFlags flags );
         void CreateRenderer();
         bool IsOpen();
         void PumpEvents();

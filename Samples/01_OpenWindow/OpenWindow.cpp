@@ -2,7 +2,7 @@
 
 int main()
 {
-    ae3d::Window::Instance().Create( 640, 400 );
+    ae3d::Window::Instance().Create( 640, 480, ae3d::WindowCreateFlags::Windowed );
 
     bool quit = false;
     
@@ -16,6 +16,18 @@ int main()
             if (event.type == ae3d::WindowEventType::Close)
             {
                 quit = true;
+            }
+            
+            if (event.type == ae3d::WindowEventType::KeyDown)
+            {
+                int keyCode = event.keyCode;
+
+                const int escape = 27;
+
+                if (keyCode == escape)
+                {
+                    quit = true;
+                }
             }
         }
     }
