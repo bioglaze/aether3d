@@ -1,5 +1,4 @@
 #include "Window.hpp"
-#include <iostream>
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/CVDisplayLink.h>
 #import <OpenGL/OpenGL.h>
@@ -18,7 +17,8 @@ namespace WindowGlobal
 @class View;
 static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, const CVTimeStamp*, CVOptionFlags, CVOptionFlags*, void*);
 
-@interface View : NSOpenGLView <NSWindowDelegate> {
+@interface View : NSOpenGLView <NSWindowDelegate>
+{
 @public
     CVDisplayLinkRef displayLink;
     NSRect windowRect;
@@ -30,8 +30,8 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
 
 @implementation View
 // Initialize
-- (id) initWithFrame: (NSRect) frame {
-    
+- (id) initWithFrame: (NSRect) frame
+{
     running = true;
     
     // No multisampling
@@ -55,20 +55,26 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     // Try to choose a supported pixel format
     NSOpenGLPixelFormat* pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:windowedAttrs];
     
-    if (!pf) {
+    if (!pf)
+    {
         bool valid = false;
-        while (!pf && samples > 0) {
+
+        while (!pf && samples > 0)
+        {
             samples /= 2;
             windowedAttrs[2] = samples ? 1 : 0;
             windowedAttrs[4] = samples;
             pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:windowedAttrs];
-            if (pf) {
+            
+            if (pf)
+            {
                 valid = true;
                 break;
             }
         }
         
-        if (!valid) {
+        if (!valid)
+        {
             NSLog(@"OpenGL pixel format not supported.");
             return nil;
         }
@@ -80,7 +86,8 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     return self;
 }
 
-- (void) prepareOpenGL {
+- (void) prepareOpenGL
+{
     [super prepareOpenGL];
     
     [[self window] setLevel: NSNormalWindowLevel];
@@ -121,95 +128,114 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     CVDisplayLinkStart(displayLink);
 }
 
-- (BOOL)acceptsFirstResponder {
+- (BOOL)acceptsFirstResponder
+{
     return YES;
 }
 
-- (void)mouseMoved:(NSEvent*) event {
+- (void)mouseMoved:(NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Mouse pos: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void) mouseDragged: (NSEvent*) event {
+- (void) mouseDragged: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Mouse pos: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void)scrollWheel: (NSEvent*) event  {
+- (void)scrollWheel: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Mouse wheel at: %lf, %lf. Delta: %lf", point.x, point.y, [event deltaY]);
     [appLock unlock];
 }
 
-- (void) mouseDown: (NSEvent*) event {
+- (void) mouseDown: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void) mouseUp: (NSEvent*) event {
+- (void) mouseUp: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void) rightMouseDown: (NSEvent*) event {
+- (void) rightMouseDown: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Right mouse down: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void) rightMouseUp: (NSEvent*) event {
+- (void) rightMouseUp: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Right mouse up: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void)otherMouseDown: (NSEvent*) event {
+- (void)otherMouseDown: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Middle mouse down: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void)otherMouseUp: (NSEvent*) event {
+- (void)otherMouseUp: (NSEvent*) event
+{
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Middle mouse up: %lf, %lf", point.x, point.y);
     [appLock unlock];
 }
 
-- (void) mouseEntered: (NSEvent*)event {
+- (void) mouseEntered: (NSEvent*)event
+{
     [appLock lock];
     NSLog(@"Mouse entered");
     [appLock unlock];
 }
 
-- (void) mouseExited: (NSEvent*)event {
+- (void) mouseExited: (NSEvent*)event
+{
     [appLock lock];
     NSLog(@"Mouse left");
     [appLock unlock];
 }
 
-- (void) keyDown: (NSEvent*) event {
+- (void) keyDown: (NSEvent*) event
+{
     [appLock lock];
-    if ([event isARepeat] == NO) {
+    if ([event isARepeat] == NO)
+    {
         NSLog(@"Key down: %d", [event keyCode]);
         //osx_process_key_event(&state, [event keyCode], true);
+        ++WindowGlobal::eventIndex;
+        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyDown;
+        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
     }
+    
     [appLock unlock];
 }
 
-- (void) keyUp: (NSEvent*) event {
+- (void) keyUp: (NSEvent*) event
+{
     [appLock lock];
     NSLog(@"Key up: %d", [event keyCode]);
     //osx_process_key_event(&state, [event keyCode], false);
@@ -217,7 +243,8 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
 }
 
 // Update
-- (CVReturn) getFrameForTime:(const CVTimeStamp*)outputTime {
+- (CVReturn) getFrameForTime:(const CVTimeStamp*)outputTime
+{
     [appLock lock];
     
     [[self openGLContext] makeCurrentContext];
@@ -239,7 +266,8 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
 }
 
 // Resize
-- (void)windowDidResize:(NSNotification*)notification {
+- (void)windowDidResize:(NSNotification*)notification
+{
     NSSize size = [ [ _window contentView ] frame ].size;
     [appLock lock];
     [[self openGLContext] makeCurrentContext];
@@ -254,21 +282,25 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     [appLock unlock];
 }
 
-- (void)resumeDisplayRenderer  {
+- (void)resumeDisplayRenderer
+{
     [appLock lock];
     CVDisplayLinkStop(displayLink);
     [appLock unlock];
 }
 
-- (void)haltDisplayRenderer  {
+- (void)haltDisplayRenderer
+{
     [appLock lock];
     CVDisplayLinkStop(displayLink);
     [appLock unlock];
 }
 
 // Terminate window when the red X is pressed
--(void)windowWillClose:(NSNotification *)notification {
-    if (running) {
+-(void)windowWillClose:(NSNotification *)notification
+{
+    if (running)
+    {
         running = false;
         
         [appLock lock];
@@ -284,24 +316,26 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
 }
 
 // Cleanup
-- (void) dealloc {
+- (void) dealloc
+{
     [appLock release];
     [super dealloc];
 }
 @end
 
-static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext) {
+static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime,
+                                          CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext)
+{
     CVReturn result = [(View*)displayLinkContext getFrameForTime:outputTime];
     return result;
 }
-namespace ae3d
+
+bool ae3d::Window::IsOpen()
 {
-    bool Window::IsOpen()
-    {
-        return WindowGlobal::isOpen;
-    }
-    
-void Window::Create(int width, int height)
+    return WindowGlobal::isOpen;
+}
+
+void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
@@ -358,30 +392,27 @@ void Window::Create(int width, int height)
     [window setDelegate:view];
     
     [window setTitle:appName];
-    
     [window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
-    
     [window orderFrontRegardless];
-    [NSApp run]; 
     
+    [NSApp run];
     [pool drain]; 
 
     WindowGlobal::isOpen = true;
 }
 
-    void Window::PumpEvents()
+void ae3d::Window::PumpEvents()
+{
+}
+    
+bool ae3d::Window::PollEvent( WindowEvent& outEvent )
+{
+    if (WindowGlobal::eventIndex == -1)
     {
+        return false;
     }
     
-    bool Window::PollEvent( WindowEvent& outEvent )
-    {
-        if (WindowGlobal::eventIndex == -1)
-        {
-            return false;
-        }
-        
-        outEvent = WindowGlobal::eventStack[ WindowGlobal::eventIndex ];
-        --WindowGlobal::eventIndex;
-        return true;
-    }
+    outEvent = WindowGlobal::eventStack[ WindowGlobal::eventIndex ];
+    --WindowGlobal::eventIndex;
+    return true;
 }

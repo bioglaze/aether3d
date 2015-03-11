@@ -24,6 +24,7 @@ namespace WindowGlobal
     Display* display;
     xcb_connection_t *connection = nullptr;
     xcb_key_symbols_t *key_symbols;
+    GLXDrawable drawable = 0;
 }
 
 int setup_and_run(Display* display, xcb_connection_t *connection, int default_screen, xcb_screen_t *screen)
@@ -33,6 +34,7 @@ int setup_and_run(Display* display, xcb_connection_t *connection, int default_sc
     GLXFBConfig *fb_configs = 0;
     int num_fb_configs = 0;
     fb_configs = glXGetFBConfigs(display, default_screen, &num_fb_configs);
+    
     if(!fb_configs || num_fb_configs == 0)
     {
         fprintf(stderr, "glXGetFBConfigs failed\n");
@@ -44,6 +46,7 @@ int setup_and_run(Display* display, xcb_connection_t *connection, int default_sc
     glXGetFBConfigAttrib(display, fb_config, GLX_VISUAL_ID , &visualID);
     
     GLXContext context = glXCreateNewContext(display, fb_config, GLX_RGBA_TYPE, 0, True);
+    
     if(!context)
     {
         fprintf(stderr, "glXCreateNewContext failed\n");
@@ -84,18 +87,9 @@ int setup_and_run(Display* display, xcb_connection_t *connection, int default_sc
     
     
     // NOTE: window must be mapped before glXMakeContextCurrent
-    xcb_map_window(connection, window); 
+    xcb_map_window( connection, window );
     
-    /* Create GLX Window */
-    GLXDrawable drawable = 0;
-    
-    GLXWindow glxwindow = 
-            glXCreateWindow(
-                display,
-                fb_config,
-                window,
-                0
-                );
+    GLXWindow glxwindow = glXCreateWindow( display, fb_config, window, 0 );
 
     if(!window)
     {
@@ -106,9 +100,9 @@ int setup_and_run(Display* display, xcb_connection_t *connection, int default_sc
         return -1;
     }
     
-    drawable = glxwindow;
+    WindowGlobal::drawable = glxwindow;
     
-    if(!glXMakeContextCurrent(display, drawable, drawable, context))
+    if(!glXMakeContextCurrent(display, WindowGlobal::drawable, WindowGlobal::drawable, context))
     {
         xcb_destroy_window(connection, window);
         glXDestroyContext(display, context);
@@ -120,131 +114,129 @@ int setup_and_run(Display* display, xcb_connection_t *connection, int default_sc
     return 0;
 }
 
-namespace ae3d
+bool ae3d::Window::IsOpen()
 {
-    bool Window::IsOpen()
+    return WindowGlobal::isOpen;
+}
+
+void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
+{
+    WindowGlobal::display = XOpenDisplay(0);
+    if(!WindowGlobal::display)
     {
-        return WindowGlobal::isOpen;
+        std::cerr << "Can't open display" << std::endl;
+        return;
     }
+    
+    int default_screen = DefaultScreen( WindowGlobal::display );
+    
+    WindowGlobal::connection = XGetXCBConnection( WindowGlobal::display );
 
-    void Window::Create(int width, int height)
+    if(!WindowGlobal::connection)
     {
-        int default_screen;
-
-        /* Open Xlib Display */ 
-        WindowGlobal::display = XOpenDisplay(0);
-        if(!WindowGlobal::display)
-        {
-            std::cerr << "Can't open display" << std::endl;
-            return;
-        }
-
-        default_screen = DefaultScreen(WindowGlobal::display);
-
-        WindowGlobal::connection = XGetXCBConnection(WindowGlobal::display);
-        if(!WindowGlobal::connection)
-        {
-            XCloseDisplay(WindowGlobal::display);
-            std::cerr << "Can't get xcb connection from display" << std::endl;
-            return;
-        }
-
-        /* Acquire event queue ownership */
-        XSetEventQueueOwner(WindowGlobal::display, XCBOwnsEventQueue);
-
-        /* Find XCB screen */
-        xcb_screen_t *screen = 0;
-        xcb_screen_iterator_t screen_iter = 
-            xcb_setup_roots_iterator(xcb_get_setup(WindowGlobal::connection));
-        for(int screen_num = default_screen;
-            screen_iter.rem && screen_num > 0;
-            --screen_num, xcb_screen_next(&screen_iter));
-        screen = screen_iter.data;
-        
-        WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
-
-        /* Initialize window and OpenGL context, run main loop and deinitialize */  
-        int retval = setup_and_run(WindowGlobal::display, WindowGlobal::connection, default_screen, screen);
-
-        /* run main loop */
-        //int retval = main_loop(display, connection, window, drawable);
-
-        /* Cleanup */
-        //glXDestroyWindow(display, glxwindow);
-
-        //xcb_destroy_window(connection, window);
-
-        //glXDestroyContext(display, context);
-
-        //XCloseDisplay(display);
-        WindowGlobal::isOpen = true;
+        XCloseDisplay(WindowGlobal::display);
+        std::cerr << "Can't get xcb connection from display" << std::endl;
+        return;
     }
+    
+    /* Acquire event queue ownership */
+    XSetEventQueueOwner(WindowGlobal::display, XCBOwnsEventQueue);
 
-    void Window::PumpEvents()
+    /* Find XCB screen */
+    xcb_screen_t *screen = 0;
+    xcb_screen_iterator_t screen_iter =
+    xcb_setup_roots_iterator(xcb_get_setup(WindowGlobal::connection));
+    for(int screen_num = default_screen;
+        screen_iter.rem && screen_num > 0;
+        --screen_num, xcb_screen_next(&screen_iter));
+    screen = screen_iter.data;
+    
+    WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
+    
+    /* Initialize window and OpenGL context, run main loop and deinitialize */
+    int retval = setup_and_run( WindowGlobal::display, WindowGlobal::connection, default_screen, screen );
+    
+    /* run main loop */
+    //int retval = main_loop(display, connection, window, drawable);
+    
+    /* Cleanup */
+    //glXDestroyWindow(display, glxwindow);
+    
+    //xcb_destroy_window(connection, window);
+    
+    //glXDestroyContext(display, context);
+    
+    //XCloseDisplay(display);
+    WindowGlobal::isOpen = true;
+}
+
+void ae3d::Window::PumpEvents()
+{
+    xcb_generic_event_t* event;
+    
+    while ((event = xcb_poll_for_event(WindowGlobal::connection)))
     {
-        xcb_generic_event_t *event;
-        while ((event = xcb_poll_for_event(WindowGlobal::connection)))
+        // NOTE(nbm): The high-order bit of response_type is whether the event
+        // is synthetic. I'm not sure I care, but let's grab it in case.
+        bool synthetic_event = (event->response_type & 0x80) != 0;
+        uint8_t response_type = event->response_type & ~0x80;
+        switch(response_type)
+        {
+            case XCB_KEY_PRESS:
+            case XCB_KEY_RELEASE:
             {
-                // NOTE(nbm): The high-order bit of response_type is whether the event
-                // is synthetic. I'm not sure I care, but let's grab it in case.
-                bool synthetic_event = (event->response_type & 0x80) != 0;
-                uint8_t response_type = event->response_type & ~0x80;
-                switch(response_type)
-                    {
-                    case XCB_KEY_PRESS:
-                    case XCB_KEY_RELEASE:
-                        {
-                            xcb_key_press_event_t *e = (xcb_key_press_event_t *)event;
-                            bool is_down = (response_type == XCB_KEY_PRESS);
-                            xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
-                            if (keysym == XK_w)
-                                {
-                                    std::cout << "pressed w" << std::endl;
-                                }
-                            if (keysym == XK_Up)
-                                {
-                                    std::cout << "pressed up" << std::endl;
-                                }
-                        }
-                    case XCB_MOTION_NOTIFY:
-                        {
-                            xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
-                            //std::cout << "mouse x: " << e->event_x;
-                            //std::cout << "mouse y: " << e->event_y;
-                            break;
-                        }
-                    case XCB_CLIENT_MESSAGE:
-                        {
-                            /*xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
-                            if (client_message_event->type == context.wm_protocols)
-                                {
-                                    if (client_message_event->data.data32[0] == context.wm_delete_window)
-                                        {
-                                            std::cout << "Quitting" << std::endl;
-                                            exit(1);
-                                            break;
-                                        }
-                                        }*/
-                            break;
-                        }
-                    case XCB_EXPOSE:
-                        {
-                            //glXSwapBuffers(WindowGlobal::display, drawable);
-                        }
-                        break;
-                    }
+                xcb_key_press_event_t *e = (xcb_key_press_event_t *)event;
+                bool is_down = (response_type == XCB_KEY_PRESS);
+                xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
+                
+                if (keysym == XK_w)
+                {
+                    std::cout << "pressed w" << std::endl;
+                }
+                if (keysym == XK_Up)
+                {
+                    std::cout << "pressed up" << std::endl;
+                }
             }
-    }
-
-    bool Window::PollEvent( WindowEvent& outEvent )
-    {
-        if (WindowGlobal::eventIndex == -1)
-        {
-            return false;
+            case XCB_MOTION_NOTIFY:
+            {
+                xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
+                //std::cout << "mouse x: " << e->event_x;
+                //std::cout << "mouse y: " << e->event_y;
+                break;
+            }
+            case XCB_CLIENT_MESSAGE:
+            {
+                /*xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
+                 if (client_message_event->type == context.wm_protocols)
+                 {
+                 if (client_message_event->data.data32[0] == context.wm_delete_window)
+                 {
+                 std::cout << "Quitting" << std::endl;
+                 exit(1);
+                 break;
+                 }
+                 }*/
+                break;
+            }
+            case XCB_EXPOSE:
+            {
+                glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
+            }
+                break;
         }
-        
-        outEvent = WindowGlobal::eventStack[ WindowGlobal::eventIndex ];
-        --WindowGlobal::eventIndex;
-        return true;
     }
 }
+
+bool ae3d::Window::PollEvent( WindowEvent& outEvent )
+{
+    if (WindowGlobal::eventIndex == -1)
+    {
+        return false;
+    }
+    
+    outEvent = WindowGlobal::eventStack[ WindowGlobal::eventIndex ];
+    --WindowGlobal::eventIndex;
+    return true;
+}
+
