@@ -1,9 +1,11 @@
 #include "Window.hpp"
+#include "System.hpp"
 
 int main()
 {
-    ae3d::Window::Instance().Create( 640, 480, ae3d::WindowCreateFlags::Windowed );
-
+    ae3d::System::EnableWindowsMemleakDetection();
+    ae3d::Window::Instance().Create( 640, 480, ae3d::WindowCreateFlags::Empty );
+    
     bool quit = false;
     
     while (ae3d::Window::Instance().IsOpen() && !quit)

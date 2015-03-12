@@ -2,6 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\Video\WindowWin32.cpp" />
+    <ClCompile Include="..\Core\System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -12,5 +13,6 @@
     <ClInclude Include="..\Include\Window.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\System.hpp" />
   </ItemGroup>
 </Project>

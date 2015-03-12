@@ -1,3 +1,6 @@
+#ifndef WINDOW_H
+#define WINDOW_H
+
 namespace ae3d
 {
     enum class WindowEventType
@@ -9,7 +12,7 @@ namespace ae3d
 
     enum WindowCreateFlags : unsigned
     {
-        Windowed = 1 << 0,
+        Empty = 1 << 0,
         Fullscreen = 1 << 1
     };
 
@@ -45,4 +48,4 @@ namespace ae3d
         Window() {}
     };
 }
-
+#endif

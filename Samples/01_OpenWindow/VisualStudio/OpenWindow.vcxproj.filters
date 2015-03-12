@@ -12,5 +12,8 @@
     <ClInclude Include="..\..\..\Engine\Include\Window.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\System.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

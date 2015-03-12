@@ -88,10 +88,16 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\..\aether3d_build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Aether3D_GL45_d.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy builtin assets</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -104,10 +110,16 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\..\aether3d_build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Aether3D_GL45_d.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy builtin assets</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -128,6 +140,12 @@
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy builtin assets</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -148,11 +166,18 @@
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy builtin assets</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\OpenWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Engine\Include\System.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Window.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

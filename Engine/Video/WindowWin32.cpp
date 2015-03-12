@@ -1,7 +1,7 @@
 #include "Window.hpp"
 #include <iostream>
-#include <cassert>
 #define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
 #include <Windows.h>
 //#include <GL/glcorearb.h>
 #include <GL/GL.h>
@@ -82,7 +82,7 @@ namespace ae3d
         const int finalHeight = height == 0 ? GetSystemMetrics(SM_CYSCREEN) : height;
 
         const HINSTANCE hInstance = GetModuleHandle(nullptr);
-        const bool fullscreen = flags & WindowCreateFlags::Fullscreen;
+        const bool fullscreen = (flags & WindowCreateFlags::Fullscreen) != 0;
 
         WNDCLASSEX wc;
         ZeroMemory(&wc, sizeof(WNDCLASSEX));
@@ -169,24 +169,28 @@ namespace ae3d
         
         if (pixelFormat == 0)
         {
-            assert(!"Failed to find suitable pixel format!");
+            OutputDebugStringA("Failed to find suitable pixel format!");
+            return;
         }
 
         if (!SetPixelFormat(hdc, pixelFormat, &pfd))
         {
-            assert(!"Failed to set pixel format!");
+            OutputDebugStringA("Failed to set pixel format!");
+            return;
         }
 
         // Create temporary context and make sure we have support
         HGLRC tempContext = wglCreateContext(hdc);
         if (!tempContext)
         {
-            assert(!"Failed to create temporary context!");
+            OutputDebugStringA("Failed to create temporary context!");
+            return;
         }
 
         if (!wglMakeCurrent(hdc, tempContext))
         {
-            assert(!"Failed to activate temporary context!");
+            OutputDebugStringA("Failed to activate temporary context!");
+            return;
         }
 
         const int attribs[] =
@@ -198,17 +202,20 @@ namespace ae3d
             0
         };
 
-        PFNWGLCREATEBUFFERREGIONARBPROC wglCreateContextAttribsARB = (PFNWGLCREATEBUFFERREGIONARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+        PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+
         if (!wglCreateContextAttribsARB)
         {
-            assert(!"Failed to find pointer to wglCreateContextAttribsARB function!");
+            OutputDebugStringA("Failed to find pointer to wglCreateContextAttribsARB function!");
+            return;
         }
 
-        HANDLE context = wglCreateContextAttribsARB(hdc, 0, (UINT)attribs);
+        HANDLE context = wglCreateContextAttribsARB( hdc, 0, attribs );
 
         if (context == 0)
         {
-            assert(!"Failed to create OpenGL context!");
+            OutputDebugStringA("Failed to create OpenGL context!");
+            return;
         }
 
         // Remove temporary context and activate forward compatible context
@@ -216,7 +223,8 @@ namespace ae3d
         wglDeleteContext(tempContext);
         if (!wglMakeCurrent(hdc, (HGLRC)context))
         {
-            assert(!"Failed to activate forward compatible context!");
+            OutputDebugStringA("Failed to activate forward compatible context!");
+            return;
         }
 
         MessageBoxA(0, (char*)glGetString(GL_VERSION), "OPENGL VERSION", 0);
