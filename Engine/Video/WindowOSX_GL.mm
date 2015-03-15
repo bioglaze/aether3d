@@ -5,6 +5,7 @@
 #include <OpenGL/gl.h>
 
 // Based on https://github.com/nxsy/hajonta/blob/master/source/hajonta/platform/osx.mm
+// TODO [2015-03-14]: ARC
 
 namespace WindowGlobal
 {
@@ -58,7 +59,7 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     if (!pf)
     {
         bool valid = false;
-
+        
         while (!pf && samples > 0)
         {
             samples /= 2;
@@ -162,6 +163,9 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
+
     [appLock unlock];
 }
 
@@ -170,6 +174,9 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     [appLock lock];
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
+
     [appLock unlock];
 }
 
@@ -225,7 +232,6 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     if ([event isARepeat] == NO)
     {
         NSLog(@"Key down: %d", [event keyCode]);
-        //osx_process_key_event(&state, [event keyCode], true);
         ++WindowGlobal::eventIndex;
         WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyDown;
         WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
@@ -238,7 +244,9 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
 {
     [appLock lock];
     NSLog(@"Key up: %d", [event keyCode]);
-    //osx_process_key_event(&state, [event keyCode], false);
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyUp;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
     [appLock unlock];
 }
 
@@ -249,7 +257,7 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     
     [[self openGLContext] makeCurrentContext];
     CGLLockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
-
+    
     glClearColor(1, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -257,8 +265,8 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     CGLUnlockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
     
     /*if (state.stopping) {
-        [NSApp terminate:self];
-    }*/
+     [NSApp terminate:self];
+     }*/
     
     [appLock unlock];
     
@@ -323,11 +331,10 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
 }
 @end
 
-static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime,
-                                          CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext)
+static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef /*displayLink*/, const CVTimeStamp* /*now*/, const CVTimeStamp* outputTime,
+                                          CVOptionFlags /*flagsIn*/, CVOptionFlags* /*flagsOut*/, void* displayLinkContext)
 {
-    CVReturn result = [(View*)displayLinkContext getFrameForTime:outputTime];
-    return result;
+    return [(View*)displayLinkContext getFrameForTime:outputTime];
 }
 
 bool ae3d::Window::IsOpen()
@@ -349,16 +356,16 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     // Window bounds (x, y, width, height)
     NSRect screenRect = [[NSScreen mainScreen] frame];
-    NSRect viewRect = NSMakeRect(0, 0, 960, 540);
+    NSRect viewRect = NSMakeRect(0, 0, width, height);
     NSRect windowRect = NSMakeRect(NSMidX(screenRect) - NSMidX(viewRect),
                                    NSMidY(screenRect) - NSMidY(viewRect),
                                    viewRect.size.width,
                                    viewRect.size.height);
     
-    NSWindow * window = [[NSWindow alloc] initWithContentRect:windowRect
+    NSWindow* window = [[NSWindow alloc] initWithContentRect:windowRect
                                                     styleMask:windowStyle
                                                       backing:NSBackingStoreBuffered
-                                                        defer:NO]; 
+                                                        defer:NO];
     [window autorelease];
     
     // Window controller
@@ -396,15 +403,15 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     [window orderFrontRegardless];
     
     [NSApp run];
-    [pool drain]; 
-
+    [pool drain];
+    
     WindowGlobal::isOpen = true;
 }
 
 void ae3d::Window::PumpEvents()
 {
 }
-    
+
 bool ae3d::Window::PollEvent( WindowEvent& outEvent )
 {
     if (WindowGlobal::eventIndex == -1)

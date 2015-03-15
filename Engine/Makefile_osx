@@ -1,4 +1,0 @@
-all:
-	mkdir -p ../../aether3d_build
-	clang++ -IInclude -c Video/WindowOSX_GL.mm -std=c++11 -stdlib=libc++ -o ../../aether3d_build/aether3d_osx.o
-

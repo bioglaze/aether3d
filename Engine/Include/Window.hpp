@@ -7,7 +7,10 @@ namespace ae3d
     {
         None = 0,
         Close,
-        KeyDown
+        KeyDown,
+        KeyUp,
+        Mouse1Down,
+        Mouse1Up
     };
 
     enum WindowCreateFlags : unsigned

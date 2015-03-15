@@ -1,6 +1,0 @@
-WARNINGS := -ansi -pedantic -Wextra
-
-all:
-	mkdir -p ../../aether3d_build
-	g++ $(WARNINGS) -IInclude -c Video/WindowXCB.cpp -std=c++11 -o ../../aether3d_build/aether3d_linux.o
-
