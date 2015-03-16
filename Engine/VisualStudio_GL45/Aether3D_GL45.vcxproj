@@ -144,10 +144,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Components\CameraComponent.cpp" />
+    <ClCompile Include="..\Components\GameObject.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\Include\GameObject.hpp" />
     <ClInclude Include="..\Include\System.hpp" />
     <ClInclude Include="..\Include\Window.hpp" />
   </ItemGroup>

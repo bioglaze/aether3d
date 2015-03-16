@@ -3,16 +3,31 @@
   <ItemGroup>
     <ClCompile Include="..\Video\WindowWin32.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
+    <ClCompile Include="..\Components\CameraComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
       <UniqueIdentifier>{c7f38af8-43e6-45a3-974a-08cdaad37d56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{6332e609-ebf2-4709-8adf-1dfd9336bdfa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\Window.hpp">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\System.hpp" />
+    <ClInclude Include="..\Include\System.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\CameraComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GameObject.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

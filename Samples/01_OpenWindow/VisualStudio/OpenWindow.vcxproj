@@ -177,6 +177,8 @@
     <ClCompile Include="..\OpenWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\System.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Window.hpp" />
   </ItemGroup>

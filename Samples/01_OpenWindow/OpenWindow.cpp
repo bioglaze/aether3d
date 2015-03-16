@@ -1,14 +1,16 @@
 #include "Window.hpp"
 #include "System.hpp"
+#include "GameObject.hpp"
+#include "CameraComponent.hpp"
 
 int main()
 {
     ae3d::System::EnableWindowsMemleakDetection();
     ae3d::Window::Instance().Create( 640, 480, ae3d::WindowCreateFlags::Empty );
     
-    //GameObject camera;
-    //camera.AddComponent<CameraComponent>();
-    //camera.GetComponent<CameraComponent>().SetProjection( 0, 0, 640, 480, 0, 1 );
+    ae3d::GameObject camera;
+    camera.AddComponent<ae3d::CameraComponent>();
+    camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, 0, 640, 480, 0, 1);
     
     /*GameObject sprite;
     sprite.AddComponent<MeshComponent>( ae3d::BuiltinMesh::Quad );
