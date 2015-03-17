@@ -14,6 +14,12 @@ WARNINGS := -Wall -ansi -pedantic
 all:
 	mkdir -p ../../aether3d_build
 	$(COMPILER) -IInclude $(WARNINGS) $(STD_LIB) -c Core/System.cpp -o ../../aether3d_build/System.o
+	$(COMPILER) -IInclude $(WARNINGS) $(STD_LIB) -c Components/GameObject.cpp -o ../../aether3d_build/GameObject.o
+	$(COMPILER) -IInclude $(WARNINGS) $(STD_LIB) -c Components/CameraComponent.cpp -o ../../aether3d_build/CameraComponent.o
+ifeq ($(UNAME), Darwin)
 	$(COMPILER) -IInclude $(WARNINGS) $(STD_LIB) -c Video/WindowOSX_GL.mm -o ../../aether3d_build/Window.o
+else
+	$(COMPILER) -IInclude $(WARNINGS) $(STD_LIB) -c Video/WindowXCB.cpp -o ../../aether3d_build/Window.o
+endif
 	ar rcs ../../aether3d_build/$(ENGINE_LIB) ../../aether3d_build/*.o
 
