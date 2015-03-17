@@ -10,16 +10,11 @@ int main()
     
     ae3d::GameObject camera;
     camera.AddComponent<ae3d::CameraComponent>();
-    camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, 0, 640, 480, 0, 1);
-    
-    /*GameObject sprite;
-    sprite.AddComponent<MeshComponent>( ae3d::BuiltinMesh::Quad );
-    sprite.AddComponent<MeshRendererComponent>();
-    sprite.GetComponent<TransformComponent>().SetPosition( Vec3( 20, 0, 0 ) );*/
+    //camera.GetComponent<TransformComponent>().SetPosition(Vec3(20, 0, 0)); */
+    camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, 640, 0, 480, 0, 1);
     
     //Scene scene;
     //scene.Add( camera );
-    //scene.Add( sprite );
     
     bool quit = false;
     

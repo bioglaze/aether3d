@@ -9,20 +9,27 @@ namespace ae3d
     class GameObject
     {
     public:
+        static const int InvalidComponentIndex = -1;
+
         template< class T > void AddComponent()
         {
-            components[GetNextComponentIndex()].handle = T::New();
-            components[GetNextComponentIndex()].type = T::Type();
+            const int index = GetNextComponentIndex();
+            
+            if (index != InvalidComponentIndex)
+            {
+                components[index].handle = T::New();
+                components[index].type = T::Type();
+            }
         }
 
         // \return The first component of type T or null if there is no such component.
         template< class T > T* GetComponent()
         {
-            for (auto component : components)
+            for (const auto& component : components)
             {
                 if (T::Type() == component.type)
                 {
-                    return T::Get(component);
+                    return T::Get(component.handle);
                 }
             }
 
