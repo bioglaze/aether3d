@@ -423,3 +423,9 @@ bool ae3d::Window::PollEvent( WindowEvent& outEvent )
     --WindowGlobal::eventIndex;
     return true;
 }
+
+void ae3d::Window::SwapBuffers() const
+{
+
+}
+
