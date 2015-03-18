@@ -3,6 +3,8 @@
 
 namespace ae3d
 {
+    struct Vec3;
+
     /**
       Camera views the scene.
     */
@@ -20,7 +22,11 @@ namespace ae3d
 
         void SetProjection( int left, int right, int bottom, int top, float near, float far );
 
+        // \param color Color in range 0-1.
+        void SetClearColor( const Vec3& color );
+
     private:
+        static ae3d::CameraComponent cameraComponents[100];
     };
 }
 #endif

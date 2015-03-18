@@ -1,6 +1,7 @@
 #include "CameraComponent.hpp"
+#include "Vec3.hpp"
 
-ae3d::CameraComponent cameraComponents[100];
+ae3d::CameraComponent ae3d::CameraComponent::cameraComponents[100];
 
 int ae3d::CameraComponent::New()
 {
@@ -15,3 +16,9 @@ void ae3d::CameraComponent::SetProjection( int left, int right, int bottom, int 
 {
 
 }
+
+void ae3d::CameraComponent::SetClearColor(const Vec3& color)
+{
+
+}
+

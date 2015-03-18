@@ -146,13 +146,16 @@
   <ItemGroup>
     <ClCompile Include="..\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Components\GameObject.cpp" />
+    <ClCompile Include="..\Core\Math.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\CameraComponent.hpp" />
     <ClInclude Include="..\Include\GameObject.hpp" />
+    <ClInclude Include="..\Include\Math.hpp" />
     <ClInclude Include="..\Include\System.hpp" />
+    <ClInclude Include="..\Include\Vec3.hpp" />
     <ClInclude Include="..\Include\Window.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

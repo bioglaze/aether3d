@@ -2,35 +2,39 @@
 #include "System.hpp"
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
+#include "Vec3.hpp"
+
+using namespace ae3d;
 
 int main()
 {
-    ae3d::System::EnableWindowsMemleakDetection();
-    ae3d::Window::Instance().Create( 640, 480, ae3d::WindowCreateFlags::Empty );
+    System::EnableWindowsMemleakDetection();
+    Window::Instance().Create( 640, 480, WindowCreateFlags::Empty );
     
-    ae3d::GameObject camera;
+    GameObject camera;
     camera.AddComponent<ae3d::CameraComponent>();
     //camera.GetComponent<TransformComponent>().SetPosition(Vec3(20, 0, 0)); */
-    camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, 640, 0, 480, 0, 1);
-    
+    camera.GetComponent<CameraComponent>()->SetProjection(0, 640, 0, 480, 0, 1);
+    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 1, 0 ) );
+
     //Scene scene;
     //scene.Add( camera );
     
     bool quit = false;
     
-    while (ae3d::Window::Instance().IsOpen() && !quit)
+    while (Window::Instance().IsOpen() && !quit)
     {
-        ae3d::Window::Instance().PumpEvents();
-        ae3d::WindowEvent event;
+        Window::Instance().PumpEvents();
+        WindowEvent event;
 
-        while (ae3d::Window::Instance().PollEvent( event ))
+        while (Window::Instance().PollEvent( event ))
         {
-            if (event.type == ae3d::WindowEventType::Close)
+            if (event.type == WindowEventType::Close)
             {
                 quit = true;
             }
             
-            if (event.type == ae3d::WindowEventType::KeyDown)
+            if (event.type == WindowEventType::KeyDown)
             {
                 int keyCode = event.keyCode;
 
@@ -42,7 +46,5 @@ int main()
                 }
             }
         }
-        
-        //ae3d::Window::Instance().GetRenderer().Render( scene );
     }
 }

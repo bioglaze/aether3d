@@ -7,6 +7,9 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Components\GameObject.cpp" />
+    <ClCompile Include="..\Core\Math.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -14,6 +17,9 @@
     </Filter>
     <Filter Include="Components">
       <UniqueIdentifier>{6332e609-ebf2-4709-8adf-1dfd9336bdfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{61d70ac0-972c-4dc0-8caf-33e80e21c274}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -27,6 +33,12 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\GameObject.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Vec3.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Math.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
