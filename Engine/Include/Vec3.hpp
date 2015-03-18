@@ -1,7 +1,6 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include <utility>
 #include "Math.hpp"
 
 namespace ae3d
@@ -13,6 +12,9 @@ namespace ae3d
     struct Vec3
     {
         float x = 0, y = 0, z = 0;
+        
+        /** Copy constructor. */
+        Vec3(const Vec3& other) = default;
 
         /**
            \brief Cross product.
@@ -76,17 +78,8 @@ namespace ae3d
          */
         static Vec3 Reflect(const Vec3& vec, const Vec3& normal) { return vec - normal * Dot(normal, vec) * 2; }
 
-        /// Copy constructor.
-        Vec3(const Vec3& other) = default;
-
-        /// Move constructor.
-        Vec3(Vec3&& other)
-        {
-            *this = std::move(other);
-        }
-
-        /// Constructor.
-        Vec3() : x(0), y(0), z(0) {}
+        // Default constructor
+        Vec3() {}
 
         /**
          Constructor.
@@ -161,28 +154,6 @@ namespace ae3d
         Vec3 operator+(float f) const
         {
             return Vec3(x + f, y + f, z + f);
-        }
-
-        /**
-           Equality operator
-
-           \param v Vector that is tested for equality.
-           \return True, if component-wise values are equal, false otherwise.
-           */
-        bool operator==(const Vec3& v) const
-        {
-            return x == v.x && y == v.y && z == v.z;
-        }
-
-        /**
-           Inequality operator
-
-           \param v Vector that is tested for equality.
-           \return True, if component-wise values are not equal, false otherwise.
-           */
-        bool operator!=(const Vec3& v) const
-        {
-            return x != v.x || y != v.y || z != v.z;
         }
 
         /**

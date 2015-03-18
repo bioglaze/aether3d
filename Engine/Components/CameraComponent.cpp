@@ -7,6 +7,7 @@ int ae3d::CameraComponent::New()
 {
     return 0;
 }
+
 ae3d::CameraComponent* ae3d::CameraComponent::Get(int index)
 {
     return &cameraComponents[index];
@@ -19,6 +20,6 @@ void ae3d::CameraComponent::SetProjection( int left, int right, int bottom, int 
 
 void ae3d::CameraComponent::SetClearColor(const Vec3& color)
 {
-
+    clearColor = color;
 }
 

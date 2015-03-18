@@ -1,10 +1,10 @@
 #ifndef CAMERA_COMPONENT_H
 #define CAMERA_COMPONENT_H
 
+#include "Vec3.hpp"
+
 namespace ae3d
 {
-    struct Vec3;
-
     /**
       Camera views the scene.
     */
@@ -22,11 +22,15 @@ namespace ae3d
 
         void SetProjection( int left, int right, int bottom, int top, float near, float far );
 
+        // \return clear color.
+        Vec3 GetClearColor() const { return clearColor; }
+
         // \param color Color in range 0-1.
         void SetClearColor( const Vec3& color );
 
     private:
         static ae3d::CameraComponent cameraComponents[100];
+        Vec3 clearColor;
     };
 }
 #endif

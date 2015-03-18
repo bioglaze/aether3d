@@ -1,11 +1,11 @@
 #include "Window.hpp"
-#include <iostream>
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <Windows.h>
-//#include <GL/glcorearb.h>
 #include <GL/GL.h>
 #include <GL/wglext.h>
+
+// TODO: Separate all GL stuff from this source file so it can be used also with D3D.
 
 namespace WindowGlobal
 {
@@ -14,6 +14,7 @@ namespace WindowGlobal
     ae3d::WindowEvent eventStack[eventStackSize];
     int eventIndex = -1;
     HWND hwnd;
+    HDC hdc;
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -150,7 +151,6 @@ namespace ae3d
         return WindowGlobal::isOpen;
     }
 
-    // TODO: Separate from this source file.
     void Window::CreateRenderer()
     {
         // Choose pixel format
@@ -164,8 +164,8 @@ namespace ae3d
         pfd.cDepthBits = 32;
         pfd.iLayerType = PFD_MAIN_PLANE;
 
-        const HDC hdc = GetDC(WindowGlobal::hwnd);
-        const int pixelFormat = ChoosePixelFormat(hdc, &pfd);
+        WindowGlobal::hdc = GetDC(WindowGlobal::hwnd);
+        const int pixelFormat = ChoosePixelFormat(WindowGlobal::hdc, &pfd);
         
         if (pixelFormat == 0)
         {
@@ -173,21 +173,21 @@ namespace ae3d
             return;
         }
 
-        if (!SetPixelFormat(hdc, pixelFormat, &pfd))
+        if (!SetPixelFormat(WindowGlobal::hdc, pixelFormat, &pfd))
         {
             OutputDebugStringA("Failed to set pixel format!");
             return;
         }
 
         // Create temporary context and make sure we have support
-        HGLRC tempContext = wglCreateContext(hdc);
+        HGLRC tempContext = wglCreateContext(WindowGlobal::hdc);
         if (!tempContext)
         {
             OutputDebugStringA("Failed to create temporary context!");
             return;
         }
 
-        if (!wglMakeCurrent(hdc, tempContext))
+        if (!wglMakeCurrent(WindowGlobal::hdc, tempContext))
         {
             OutputDebugStringA("Failed to activate temporary context!");
             return;
@@ -210,7 +210,7 @@ namespace ae3d
             return;
         }
 
-        HANDLE context = wglCreateContextAttribsARB( hdc, 0, attribs );
+        HANDLE context = wglCreateContextAttribsARB(WindowGlobal::hdc, 0, attribs);
 
         if (context == 0)
         {
@@ -221,12 +221,17 @@ namespace ae3d
         // Remove temporary context and activate forward compatible context
         wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(tempContext);
-        if (!wglMakeCurrent(hdc, (HGLRC)context))
+        if (!wglMakeCurrent(WindowGlobal::hdc, (HGLRC)context))
         {
             OutputDebugStringA("Failed to activate forward compatible context!");
             return;
         }
 
         MessageBoxA(0, (char*)glGetString(GL_VERSION), "OPENGL VERSION", 0);
+    }
+
+    void Window::SwapBuffers() const
+    {
+        ::SwapBuffers(WindowGlobal::hdc);
     }
 }

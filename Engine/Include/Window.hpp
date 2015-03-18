@@ -42,13 +42,14 @@ namespace ae3d
           \param flags Bitmask of creation flags.
         */
         void Create( int width, int height, WindowCreateFlags flags );
-        void CreateRenderer();
         bool IsOpen();
         void PumpEvents();
         bool PollEvent( WindowEvent& outEvent );
-        
+        void SwapBuffers() const;
+
     private:
         Window() {}
+        void CreateRenderer();
     };
 }
 #endif

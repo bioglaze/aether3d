@@ -180,6 +180,7 @@
     <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Math.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Scene.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\System.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Vec3.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Window.hpp" />

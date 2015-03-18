@@ -1,8 +1,9 @@
-#include "Window.hpp"
-#include "System.hpp"
-#include "GameObject.hpp"
 #include "CameraComponent.hpp"
+#include "GameObject.hpp"
+#include "Scene.hpp"
+#include "System.hpp"
 #include "Vec3.hpp"
+#include "Window.hpp"
 
 using namespace ae3d;
 
@@ -12,13 +13,13 @@ int main()
     Window::Instance().Create( 640, 480, WindowCreateFlags::Empty );
     
     GameObject camera;
-    camera.AddComponent<ae3d::CameraComponent>();
+    camera.AddComponent<CameraComponent>();
     //camera.GetComponent<TransformComponent>().SetPosition(Vec3(20, 0, 0)); */
-    camera.GetComponent<CameraComponent>()->SetProjection(0, 640, 0, 480, 0, 1);
+    camera.GetComponent<CameraComponent>()->SetProjection( 0, 640, 0, 480, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 1, 0 ) );
 
-    //Scene scene;
-    //scene.Add( camera );
+    Scene scene;
+    scene.Add( &camera );
     
     bool quit = false;
     
@@ -46,5 +47,10 @@ int main()
                 }
             }
         }
+
+        scene.Update();
+        scene.Render();
+
+        Window::Instance().SwapBuffers();
     }
 }
