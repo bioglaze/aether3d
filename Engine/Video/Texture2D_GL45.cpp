@@ -13,4 +13,6 @@ void ae3d::Texture2D::Load(const System::FileContentsData& fileContents)
         const std::string reason(stbi_failure_reason());
         //Log::Print("%s failed to load. stb_image's reason: %s", fileContents.path.c_str(), reason.c_str());
     }
+    
+    stbi_image_free(data);
 }

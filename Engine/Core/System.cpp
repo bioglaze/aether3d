@@ -6,6 +6,7 @@
 #include <Windows.h>
 #endif
 #include <cstdarg>
+#include <cassert>
 
 void ae3d::System::EnableWindowsMemleakDetection()
 {
@@ -57,7 +58,6 @@ void ae3d::System::Assert(bool condition, const char* message)
 #ifdef _MSC_VER
         __debugbreak();
 #else
-        // Linux: raise(SIGTRAP)
         assert(false);
 #endif
     }

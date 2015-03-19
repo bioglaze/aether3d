@@ -258,8 +258,9 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
     [[self openGLContext] makeCurrentContext];
     CGLLockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
     
-    glClearColor(1, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // FIXME [2015-03-19]: Find out why clearing in Camera code doesn't work.
+    //glClearColor(1, 0, 0, 1);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     CGLFlushDrawable((CGLContextObj)[[self openGLContext] CGLContextObj]);
     CGLUnlockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
@@ -312,7 +313,6 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
         running = false;
         
         [appLock lock];
-        NSLog(@"Cleanup");
         
         CVDisplayLinkStop(displayLink);
         CVDisplayLinkRelease(displayLink);

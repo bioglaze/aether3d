@@ -5,7 +5,7 @@ namespace ae3d
 {
     namespace System
     {
-        class FileContentsData;
+        struct FileContentsData;
     }
 
     class Texture2D
