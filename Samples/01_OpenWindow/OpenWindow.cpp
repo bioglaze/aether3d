@@ -1,9 +1,11 @@
 #include "CameraComponent.hpp"
+#include "SpriteRendererComponent.hpp"
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
 #include "Window.hpp"
+#include "Texture2D.hpp"
 
 using namespace ae3d;
 
@@ -18,9 +20,17 @@ int main()
     camera.GetComponent<CameraComponent>()->SetProjection( 0, 640, 0, 480, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 1, 0 ) );
 
+    Texture2D spriteTex;
+    spriteTex.Load(System::FileContents("glider.png"));
+
+    GameObject sprite;
+    sprite.AddComponent<SpriteRendererComponent>();
+    sprite.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex );
+
     Scene scene;
     scene.Add( &camera );
-    
+    scene.Add( &sprite );
+
     bool quit = false;
     
     while (Window::Instance().IsOpen() && !quit)

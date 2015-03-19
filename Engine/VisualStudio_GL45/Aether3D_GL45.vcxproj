@@ -146,10 +146,13 @@
   <ItemGroup>
     <ClCompile Include="..\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Components\GameObject.cpp" />
+    <ClCompile Include="..\Components\SpriteRendererComponent.cpp" />
     <ClCompile Include="..\Core\Math.cpp" />
     <ClCompile Include="..\Core\Scene.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
+    <ClCompile Include="..\ThirdParty\stb_image.c" />
     <ClCompile Include="..\Video\GfxDeviceGL45.cpp" />
+    <ClCompile Include="..\Video\Texture2D_GL45.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,7 +160,9 @@
     <ClInclude Include="..\Include\GameObject.hpp" />
     <ClInclude Include="..\Include\Math.hpp" />
     <ClInclude Include="..\Include\Scene.hpp" />
+    <ClInclude Include="..\Include\SpriteRendererComponent.hpp" />
     <ClInclude Include="..\Include\System.hpp" />
+    <ClInclude Include="..\Include\Texture2D.hpp" />
     <ClInclude Include="..\Include\Vec3.hpp" />
     <ClInclude Include="..\Include\Window.hpp" />
     <ClInclude Include="..\ThirdParty\GL\glcorearb.h" />

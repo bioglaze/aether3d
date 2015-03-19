@@ -18,6 +18,15 @@
     <ClCompile Include="..\Video\GfxDeviceGL45.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\SpriteRendererComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\Texture2D_GL45.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\stb_image.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -69,6 +78,12 @@
     </ClInclude>
     <ClInclude Include="..\ThirdParty\GL\wglext.h">
       <Filter>ThirdParty\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpriteRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture2D.hpp">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

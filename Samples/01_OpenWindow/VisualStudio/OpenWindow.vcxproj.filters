@@ -30,5 +30,11 @@
     <ClInclude Include="..\..\..\Engine\Include\Scene.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\SpriteRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\Texture2D.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
