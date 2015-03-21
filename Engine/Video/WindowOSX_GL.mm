@@ -7,6 +7,11 @@
 // Based on https://github.com/nxsy/hajonta/blob/master/source/hajonta/platform/osx.mm
 // TODO [2015-03-14]: ARC
 
+void nsLog(const char* msg)
+{
+    NSLog(@"%s", msg);
+}
+
 namespace WindowGlobal
 {
     bool isOpen = false;
@@ -49,7 +54,7 @@ static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, 
         NSOpenGLPFAColorSize, 32,
         NSOpenGLPFADepthSize, 24,
         NSOpenGLPFAAlphaSize, 8,
-        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion4_1Core,
         0
     };
     
@@ -426,6 +431,6 @@ bool ae3d::Window::PollEvent( WindowEvent& outEvent )
 
 void ae3d::Window::SwapBuffers() const
 {
-
+    // Handled by displaylink.
 }
 

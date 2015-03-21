@@ -1,0 +1,125 @@
+#include "Shader.hpp"
+#include <OpenGL/GL.h>
+#include "System.hpp"
+
+// TODO [2015-03-21] Find a better place for this, avoid global scope.
+ae3d::BuiltinShaders builtinShaders;
+
+void ae3d::BuiltinShaders::Load()
+{
+    const char* vertexSource =
+    "#version 410 core\n \
+    \
+    layout (location = 0) in vec4 aPosition;\
+    layout (location = 1) in vec2 aTexCoord;\
+    uniform mat4 _ProjectionMatrix;\
+    uniform vec4 textureMap_ST;\
+    \
+    out vec2 vTexCoord;\
+    \
+    void main()\
+    {\
+        gl_Position = _ProjectionMatrix * position;\
+        vTexCoord = aTexCoord * textureMap_ST.xy + textureMap_ST.zw;\
+    }";
+    
+    const char* fragmentSource =
+    "#version 410 core\
+    \
+    in vec2 vTexCoord;\
+    out vec4 fragColor;\
+    \
+    uniform sampler2D textureMap;\
+    \
+    void main()\
+    {\
+        fragColor = texture( textureMap, vTexCoord );\
+    }";
+    
+    spriteRendererShader.Load( vertexSource, fragmentSource );
+}
+
+enum class InfoLogType
+{
+    Program,
+    Shader
+};
+
+static void PrintInfoLog( GLuint shader, InfoLogType logType )
+{
+    GLint logLength = 0;
+    
+    if (logType == InfoLogType::Program)
+    {
+        glGetProgramiv( shader, GL_INFO_LOG_LENGTH, &logLength );
+    }
+    else
+    {
+        glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logLength );
+    }
+
+    if (logLength > 0)
+    {
+        GLchar* log = new GLchar[ (std::size_t)logLength + 1 ];
+        GLsizei charsWritten = 0;
+        
+        if (logType == InfoLogType::Program)
+        {
+            glGetProgramInfoLog( shader, logLength, &charsWritten, log );
+        }
+        else
+        {
+            glGetShaderInfoLog( shader, logLength, &charsWritten, log );
+        }
+        
+        if (charsWritten > 0)
+        {
+            ae3d::System::Print( log );
+        }
+        
+        delete[] log;
+    }
+}
+
+static GLuint CompileShader( const char* source, GLenum shaderType )
+{
+    const GLuint shader = glCreateShader( shaderType );
+    glShaderSource( shader, 1, &source, nullptr );
+    glCompileShader( shader );
+    
+    GLint compiled;
+    
+    glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
+    
+    if (!compiled)
+    {
+        ae3d::System::Print( "Shader compile error in source: \n%s", source );
+        PrintInfoLog( shader, InfoLogType::Shader );
+        return 0;
+    }
+
+    return shader;
+}
+
+void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
+{
+    GLuint vertexShader = CompileShader( vertexSource, GL_VERTEX_SHADER );
+    GLuint fragmentShader = CompileShader( fragmentSource, GL_FRAGMENT_SHADER );
+
+    GLuint program = glCreateProgram();
+    glAttachShader( program, vertexShader );
+    glAttachShader( program, fragmentShader );
+
+    glLinkProgram( program );
+    GLint wasLinked;
+    glGetProgramiv( program, GL_LINK_STATUS, &wasLinked );
+    
+    if (!wasLinked)
+    {
+        ae3d::System::Print("Link failed.");
+        PrintInfoLog( program, InfoLogType::Program );
+        return;
+    }
+
+    id = program;
+}

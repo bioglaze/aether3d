@@ -8,6 +8,9 @@
 #include <cstdarg>
 #include <cassert>
 
+// Implemented in WindowOSX_GL.mm
+extern void nsLog(const char* msg);
+
 void ae3d::System::EnableWindowsMemleakDetection()
 {
 #if _MSC_VER
@@ -42,9 +45,12 @@ void ae3d::System::Print(const char* format, ...)
 #endif
     va_end(ap);
     std::printf("%s\n", msg);
-#ifdef _MSC_VER
+#if _MSC_VER
     OutputDebugStringA(msg);
     OutputDebugStringA("\n");
+#endif
+#if __APPLE__
+    nsLog(msg);
 #endif
     std::fflush(stdout);
 }

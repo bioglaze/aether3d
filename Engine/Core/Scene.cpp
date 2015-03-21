@@ -1,6 +1,8 @@
 #include "Scene.hpp"
 #include "CameraComponent.hpp"
+#include "SpriteRendererComponent.hpp"
 #include "GfxDevice.hpp"
+#include "System.hpp"
 
 void ae3d::Scene::Add( GameObject* gameObject )
 {
@@ -16,13 +18,29 @@ void ae3d::Scene::Add( GameObject* gameObject )
 
 void ae3d::Scene::Render()
 {
-    if (mainCamera)
+    ae3d::System::Print("mutsis");
+    
+    if (mainCamera == nullptr)
     {
-        CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
+        ae3d::System::Print("mainCamera is null.");
+        return;
+    }
+    
+    CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
 
-        Vec3 color = camera->GetClearColor();
-        GfxDevice::SetClearColor( color.x, color.y, color.z );
-        GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+    Vec3 color = camera->GetClearColor();
+    GfxDevice::SetClearColor( color.x, color.y, color.z );
+    GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+    ae3d::System::Print("Cleared screen");
+    
+    for (auto gameObject : gameObjects)
+    {
+        if (gameObject->GetComponent<SpriteRendererComponent>())
+        {
+            // set sprite shader.
+            // upload uniforms.
+            // draw quad.
+        }
     }
 }
 

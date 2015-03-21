@@ -27,6 +27,8 @@
 		AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */; };
 		AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B061ABB4FDE005BA86D /* GameObject.cpp */; };
 		AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */; };
+		AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB949D341ABC8DDF007D561E /* Shader.hpp */; };
+		AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB949D361ABC8E44007D561E /* ShaderGL.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +53,8 @@
 		AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CameraComponent.cpp; path = ../Components/CameraComponent.cpp; sourceTree = "<group>"; };
 		AB889B061ABB4FDE005BA86D /* GameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameObject.cpp; path = ../Components/GameObject.cpp; sourceTree = "<group>"; };
 		AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpriteRendererComponent.cpp; path = ../Components/SpriteRendererComponent.cpp; sourceTree = "<group>"; };
+		AB949D341ABC8DDF007D561E /* Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = ../Include/Shader.hpp; sourceTree = "<group>"; };
+		AB949D361ABC8E44007D561E /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/ShaderGL.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +83,7 @@
 			children = (
 				AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */,
 				AB889AE91ABB4C3B005BA86D /* GfxDeviceGL41.cpp */,
+				AB949D361ABC8E44007D561E /* ShaderGL.cpp */,
 				AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */,
 				AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */,
 			);
@@ -112,6 +117,7 @@
 				AB889AF31ABB4C5B005BA86D /* GameObject.hpp */,
 				AB889AF41ABB4C5B005BA86D /* Math.hpp */,
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
+				AB949D341ABC8DDF007D561E /* Shader.hpp */,
 				AB889AF61ABB4C5B005BA86D /* SpriteRendererComponent.hpp */,
 				AB889AF71ABB4C5B005BA86D /* Texture2D.hpp */,
 				AB889AF81ABB4C5B005BA86D /* Vec3.hpp */,
@@ -148,6 +154,7 @@
 			files = (
 				AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */,
 				AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */,
+				AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */,
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
 				AB3FD4961AB4330C00D28653 /* System.hpp in Headers */,
 				AB889AFE1ABB4C5B005BA86D /* Texture2D.hpp in Headers */,
@@ -219,6 +226,7 @@
 				AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */,
 				AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
+				AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */,
 				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB889AEC1ABB4C3B005BA86D /* GfxDeviceGL41.cpp in Sources */,
@@ -322,6 +330,7 @@
 					Include,
 					../ThirdParty,
 				);
+				INSTALL_PATH = ../../../aether3d_build;
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
 			};
@@ -340,6 +349,7 @@
 					Include,
 					../ThirdParty,
 				);
+				INSTALL_PATH = ../../../aether3d_build;
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
 			};

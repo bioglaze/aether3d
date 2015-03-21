@@ -14,6 +14,7 @@ WARNINGS := -Wall -ansi -pedantic
 
 all:
 	mkdir -p ../../aether3d_build
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/ShaderGL.cpp -o ../../aether3d_build/ShaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/Texture2D_GL45.cpp -o ../../aether3d_build/Texture2D_GL45.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/SpriteRendererComponent.cpp -o ../../aether3d_build/SpriteRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Math.cpp -o ../../aether3d_build/Math.o

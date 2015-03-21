@@ -21,6 +21,7 @@ namespace ae3d
 
     private:
         static ae3d::SpriteRendererComponent spriteRendererComponents[100];
+        Texture2D* texture;
     };
 }
 #endif
