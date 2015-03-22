@@ -29,6 +29,8 @@
 		AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */; };
 		AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB949D341ABC8DDF007D561E /* Shader.hpp */; };
 		AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB949D361ABC8E44007D561E /* ShaderGL.cpp */; };
+		ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */; };
+		ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +57,8 @@
 		AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpriteRendererComponent.cpp; path = ../Components/SpriteRendererComponent.cpp; sourceTree = "<group>"; };
 		AB949D341ABC8DDF007D561E /* Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = ../Include/Shader.hpp; sourceTree = "<group>"; };
 		AB949D361ABC8E44007D561E /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/ShaderGL.cpp; sourceTree = "<group>"; };
+		ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../Core/Matrix.cpp; sourceTree = "<group>"; };
+		ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Matrix.hpp; path = ../Include/Matrix.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +75,7 @@
 		AB3A77DB1AB448580081864C /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
 				AB889AEE1ABB4C49005BA86D /* Math.cpp */,
 				AB889AEF1ABB4C49005BA86D /* Scene.cpp */,
 				AB3A77D91AB448500081864C /* System.cpp */,
@@ -116,6 +121,7 @@
 				AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */,
 				AB889AF31ABB4C5B005BA86D /* GameObject.hpp */,
 				AB889AF41ABB4C5B005BA86D /* Math.hpp */,
+				ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */,
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
 				AB949D341ABC8DDF007D561E /* Shader.hpp */,
 				AB889AF61ABB4C5B005BA86D /* SpriteRendererComponent.hpp */,
@@ -153,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */,
+				ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */,
 				AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */,
 				AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */,
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
@@ -222,6 +229,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */,
 				AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */,
 				AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */,
 				AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */,
@@ -321,6 +329,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)";
 				EXECUTABLE_PREFIX = "";
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
@@ -330,7 +339,7 @@
 					Include,
 					../ThirdParty,
 				);
-				INSTALL_PATH = ../../../aether3d_build;
+				INSTALL_PATH = "";
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
 			};
@@ -340,6 +349,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)";
 				EXECUTABLE_PREFIX = "";
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
@@ -349,7 +359,7 @@
 					Include,
 					../ThirdParty,
 				);
-				INSTALL_PATH = ../../../aether3d_build;
+				INSTALL_PATH = "";
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
 			};

@@ -1,6 +1,7 @@
 #include "Shader.hpp"
 #include <OpenGL/GL.h>
 #include "System.hpp"
+#include "Texture2D.hpp"
 
 // TODO [2015-03-21] Find a better place for this, avoid global scope.
 ae3d::BuiltinShaders builtinShaders;
@@ -122,4 +123,27 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     }
 
     id = program;
+}
+
+void ae3d::Shader::Use()
+{
+    glUseProgram( id );
+}
+
+void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
+{
+    // TODO [2014-03-22] Uniform location cache.
+    glUniformMatrix4fv( glGetUniformLocation( id, name ), 1, GL_FALSE, matrix4x4 );
+}
+
+void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
+{
+    glActiveTexture( GL_TEXTURE0 + textureUnit );
+    glBindTexture( GL_TEXTURE_2D, texture->GetID() );
+    SetInt( name, textureUnit );
+}
+
+void ae3d::Shader::SetInt( const char* name, int value )
+{
+    glUniform1i( glGetUniformLocation( id, name ), value );
 }

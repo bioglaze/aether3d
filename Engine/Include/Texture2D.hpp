@@ -12,7 +12,8 @@ namespace ae3d
     {
     public:
         void Load( const System::FileContentsData& textureData );
-
+        unsigned GetID() const { return id; }
+        
     private:
         int width = 0;
         int height = 0;

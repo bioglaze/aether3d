@@ -1,10 +1,8 @@
 #include "Window.hpp"
 #import <Cocoa/Cocoa.h>
-#import <QuartzCore/CVDisplayLink.h>
-#import <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 
-// Based on https://github.com/nxsy/hajonta/blob/master/source/hajonta/platform/osx.mm
+// Based on https://github.com/vbo/handmadehero_osx_platform_layer/blob/day_29/code/osx_handmade.m
 // TODO [2015-03-14]: ARC
 
 void nsLog(const char* msg)
@@ -18,328 +16,7 @@ namespace WindowGlobal
     const int eventStackSize = 10;
     ae3d::WindowEvent eventStack[eventStackSize];
     int eventIndex = -1;
-}
-
-@class View;
-static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef, const CVTimeStamp*, const CVTimeStamp*, CVOptionFlags, CVOptionFlags*, void*);
-
-@interface View : NSOpenGLView <NSWindowDelegate>
-{
-@public
-    CVDisplayLinkRef displayLink;
-    NSRect windowRect;
-    NSRecursiveLock* appLock;
-    
-    bool running;
-}
-@end
-
-@implementation View
-// Initialize
-- (id) initWithFrame: (NSRect) frame
-{
-    running = true;
-    
-    // No multisampling
-    uint32_t samples = 0;
-    
-    // Keep multisampling attributes at the start of the attribute lists since code below assumes they are array elements 0 through 4.
-    NSOpenGLPixelFormatAttribute windowedAttrs[] =
-    {
-        NSOpenGLPFAMultisample,
-        NSOpenGLPFASampleBuffers, (uint32_t)(samples ? 1 : 0),
-        NSOpenGLPFASamples, samples,
-        NSOpenGLPFAAccelerated,
-        NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFAColorSize, 32,
-        NSOpenGLPFADepthSize, 24,
-        NSOpenGLPFAAlphaSize, 8,
-        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion4_1Core,
-        0
-    };
-    
-    // Try to choose a supported pixel format
-    NSOpenGLPixelFormat* pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:windowedAttrs];
-    
-    if (!pf)
-    {
-        bool valid = false;
-        
-        while (!pf && samples > 0)
-        {
-            samples /= 2;
-            windowedAttrs[2] = samples ? 1 : 0;
-            windowedAttrs[4] = samples;
-            pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:windowedAttrs];
-            
-            if (pf)
-            {
-                valid = true;
-                break;
-            }
-        }
-        
-        if (!valid)
-        {
-            NSLog(@"OpenGL pixel format not supported.");
-            return nil;
-        }
-    }
-    
-    self = [super initWithFrame:frame pixelFormat:[pf autorelease]];
-    appLock = [[NSRecursiveLock alloc] init];
-    
-    return self;
-}
-
-- (void) prepareOpenGL
-{
-    [super prepareOpenGL];
-    
-    [[self window] setLevel: NSNormalWindowLevel];
-    [[self window] makeKeyAndOrderFront: self];
-    
-    // Make all the OpenGL calls to setup rendering and build the necessary rendering objects
-    [[self openGLContext] makeCurrentContext];
-    // Synchronize buffer swaps with vertical refresh rate
-    GLint swapInt = 1; // Vsynch on!
-    [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
-    
-    // Create a display link capable of being used with all active displays
-    CVDisplayLinkCreateWithActiveCGDisplays(&displayLink);
-    
-    // Set the renderer output callback function
-    CVDisplayLinkSetOutputCallback(displayLink, &GlobalDisplayLinkCallback, self);
-    
-    CGLContextObj cglContext = (CGLContextObj)[[self openGLContext] CGLContextObj];
-    CGLPixelFormatObj cglPixelFormat = (CGLPixelFormatObj)[[self pixelFormat] CGLPixelFormatObj];
-    CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext(displayLink, cglContext, cglPixelFormat);
-    
-    GLint dim[2] = {(int32_t)windowRect.size.width, (int32_t)windowRect.size.height};
-    CGLSetParameter(cglContext, kCGLCPSurfaceBackingSize, dim);
-    CGLEnable(cglContext, kCGLCESurfaceBackingSize);
-    
-    [appLock lock];
-    CGLLockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
-    
-    NSLog(@"GL version:   %s", glGetString(GL_VERSION));
-    NSLog(@"GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    
-    glViewport(0, 0, windowRect.size.width, windowRect.size.height);
-    
-    CGLUnlockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
-    [appLock unlock];
-    
-    // Activate the display link
-    CVDisplayLinkStart(displayLink);
-}
-
-- (BOOL)acceptsFirstResponder
-{
-    return YES;
-}
-
-- (void)mouseMoved:(NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Mouse pos: %lf, %lf", point.x, point.y);
-    [appLock unlock];
-}
-
-- (void) mouseDragged: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Mouse pos: %lf, %lf", point.x, point.y);
-    [appLock unlock];
-}
-
-- (void)scrollWheel: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Mouse wheel at: %lf, %lf. Delta: %lf", point.x, point.y, [event deltaY]);
-    [appLock unlock];
-}
-
-- (void) mouseDown: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
-    ++WindowGlobal::eventIndex;
-    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
-
-    [appLock unlock];
-}
-
-- (void) mouseUp: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
-    ++WindowGlobal::eventIndex;
-    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
-
-    [appLock unlock];
-}
-
-- (void) rightMouseDown: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Right mouse down: %lf, %lf", point.x, point.y);
-    [appLock unlock];
-}
-
-- (void) rightMouseUp: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Right mouse up: %lf, %lf", point.x, point.y);
-    [appLock unlock];
-}
-
-- (void)otherMouseDown: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Middle mouse down: %lf, %lf", point.x, point.y);
-    [appLock unlock];
-}
-
-- (void)otherMouseUp: (NSEvent*) event
-{
-    [appLock lock];
-    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Middle mouse up: %lf, %lf", point.x, point.y);
-    [appLock unlock];
-}
-
-- (void) mouseEntered: (NSEvent*)event
-{
-    [appLock lock];
-    NSLog(@"Mouse entered");
-    [appLock unlock];
-}
-
-- (void) mouseExited: (NSEvent*)event
-{
-    [appLock lock];
-    NSLog(@"Mouse left");
-    [appLock unlock];
-}
-
-- (void) keyDown: (NSEvent*) event
-{
-    [appLock lock];
-    if ([event isARepeat] == NO)
-    {
-        NSLog(@"Key down: %d", [event keyCode]);
-        ++WindowGlobal::eventIndex;
-        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyDown;
-        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
-    }
-    
-    [appLock unlock];
-}
-
-- (void) keyUp: (NSEvent*) event
-{
-    [appLock lock];
-    NSLog(@"Key up: %d", [event keyCode]);
-    ++WindowGlobal::eventIndex;
-    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyUp;
-    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
-    [appLock unlock];
-}
-
-// Update
-- (CVReturn) getFrameForTime:(const CVTimeStamp*)outputTime
-{
-    [appLock lock];
-    
-    [[self openGLContext] makeCurrentContext];
-    CGLLockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
-    
-    // FIXME [2015-03-19]: Find out why clearing in Camera code doesn't work.
-    //glClearColor(1, 0, 0, 1);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    CGLFlushDrawable((CGLContextObj)[[self openGLContext] CGLContextObj]);
-    CGLUnlockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
-    
-    /*if (state.stopping) {
-     [NSApp terminate:self];
-     }*/
-    
-    [appLock unlock];
-    
-    return kCVReturnSuccess;
-}
-
-// Resize
-- (void)windowDidResize:(NSNotification*)notification
-{
-    NSSize size = [ [ _window contentView ] frame ].size;
-    [appLock lock];
-    [[self openGLContext] makeCurrentContext];
-    CGLLockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
-    NSLog(@"Window resize: %lf, %lf", size.width, size.height);
-    // Temp
-    windowRect.size.width = size.width;
-    windowRect.size.height = size.height;
-    glViewport(0, 0, windowRect.size.width, windowRect.size.height);
-    // End temp
-    CGLUnlockContext((CGLContextObj)[[self openGLContext] CGLContextObj]);
-    [appLock unlock];
-}
-
-- (void)resumeDisplayRenderer
-{
-    [appLock lock];
-    CVDisplayLinkStop(displayLink);
-    [appLock unlock];
-}
-
-- (void)haltDisplayRenderer
-{
-    [appLock lock];
-    CVDisplayLinkStop(displayLink);
-    [appLock unlock];
-}
-
-// Terminate window when the red X is pressed
--(void)windowWillClose:(NSNotification *)notification
-{
-    if (running)
-    {
-        running = false;
-        
-        [appLock lock];
-        
-        CVDisplayLinkStop(displayLink);
-        CVDisplayLinkRelease(displayLink);
-        
-        [appLock unlock];
-    }
-    
-    [NSApp terminate:self];
-}
-
-// Cleanup
-- (void) dealloc
-{
-    [appLock release];
-    [super dealloc];
-}
-@end
-
-static CVReturn GlobalDisplayLinkCallback(CVDisplayLinkRef /*displayLink*/, const CVTimeStamp* /*now*/, const CVTimeStamp* outputTime,
-                                          CVOptionFlags /*flagsIn*/, CVOptionFlags* /*flagsOut*/, void* displayLinkContext)
-{
-    return [(View*)displayLinkContext getFrameForTime:outputTime];
+    NSOpenGLContext* glContext;
 }
 
 bool ae3d::Window::IsOpen()
@@ -347,74 +24,265 @@ bool ae3d::Window::IsOpen()
     return WindowGlobal::isOpen;
 }
 
+@interface ApplicationDelegate
+: NSObject <NSApplicationDelegate, NSWindowDelegate> @end
+
+@implementation ApplicationDelegate : NSObject
+- (void)applicationDidFinishLaunching: (NSNotification *)notification
+{
+    // Stop the event loop after app initialization:
+    // I'll make my own loop later.
+    [NSApp stop: nil];
+    // Post empty event: without it we can't put application to front
+    // for some reason (I get this technique from GLFW source).
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    NSEvent* event =
+    [NSEvent otherEventWithType: NSApplicationDefined
+                       location: NSMakePoint(0, 0)
+                  modifierFlags: 0
+                      timestamp: 0
+                   windowNumber: 0
+                        context: nil
+                        subtype: 0
+                          data1: 0
+                          data2: 0];
+    [NSApp postEvent: event atStart: YES];
+    [pool drain];
+}
+
+- (NSApplicationTerminateReply)
+applicationShouldTerminate: (NSApplication *)sender
+{
+    return NSApplicationTerminateReply::NSTerminateNow;
+}
+
+- (void)dealloc
+{
+    [super dealloc];
+}
+@end
+
+@interface WindowDelegate:
+NSObject <NSWindowDelegate> @end
+
+@implementation WindowDelegate : NSObject
+- (BOOL)windowShouldClose: (id)sender
+{
+    //globalApplicationState.isRunning = false;
+    return NO;
+}
+
+- (void)windowDidBecomeKey: (NSNotification *)notification
+{
+}
+
+- (void)windowDidResignKey: (NSNotification *)notification
+{
+    //NSWindow *window = [notification object];
+}
+@end
+
+NSApplication *application;
+NSWindow *window;
+
+@interface OpenGLView: NSOpenGLView @end
+@implementation OpenGLView : NSOpenGLView
+- (void)reshape
+{
+    glViewport(0, 0, 640, 480);
+}
+
+- (void) mouseDown: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
+}
+
+- (void) mouseUp: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
+}
+
+@end
+
 void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    // Init application begin
+    application = [NSApplication sharedApplication];
+    // In Snow Leopard, programs without application bundles and
+    // Info.plist files don't get a menubar and can't be brought
+    // to the front unless the presentation option is changed.
+    [application setActivationPolicy: NSApplicationActivationPolicyRegular];
+    // Specify application delegate impl.
+    ApplicationDelegate *delegate = [[ApplicationDelegate alloc] init];
+    [application setDelegate: delegate];
+    // Normally this function would block, so if we want
+    // to make our own main loop we need to stop it just
+    // after initialization (see ApplicationDelegate implementation).
+    [application run];
+    // Init application end
     
-    // Create a shared app instance.
-    // This will initialize the global variable
-    // 'NSApp' with the application instance.
-    [NSApplication sharedApplication];
+    // Create window begin
+    int windowStyleMask;
+    NSRect windowRect;
+    windowRect = NSMakeRect(0, 0, width, height);
+    windowStyleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
+    window =
+    [[NSWindow alloc] initWithContentRect: windowRect
+                                styleMask: windowStyleMask
+                                  backing: NSBackingStoreBuffered
+                                    defer: YES];
+    [window setOpaque: YES];
+    WindowDelegate *windowDelegate = [[WindowDelegate alloc] init];
+    [window setDelegate: windowDelegate];
+    id appName = @"Aether3D";
+    NSMenu *menubar = [NSMenu alloc];
+    [window setTitle: appName];
+    NSMenuItem *appMenuItem = [NSMenuItem alloc];
+    [menubar addItem: appMenuItem];
+    [application setMainMenu: menubar];
+    NSMenu *appMenu = [NSMenu alloc];
+    id quitTitle = [@"Quit " stringByAppendingString: appName];
+    // Make menu respond to cmd+q
+    id quitMenuItem =
+    [[NSMenuItem alloc] initWithTitle: quitTitle
+                               action: @selector(terminate:)
+                        keyEquivalent: @"q"];
+    [appMenu addItem: quitMenuItem];
+    [appMenuItem setSubmenu: appMenu];
+    // When running from console we need to manually steal focus
+    // from the terminal window for some reason.
+    [application activateIgnoringOtherApps:YES];
+    // Create window end
     
-    // Style flags
-    NSUInteger windowStyle = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
-    
-    // Window bounds (x, y, width, height)
-    NSRect screenRect = [[NSScreen mainScreen] frame];
-    NSRect viewRect = NSMakeRect(0, 0, width, height);
-    NSRect windowRect = NSMakeRect(NSMidX(screenRect) - NSMidX(viewRect),
-                                   NSMidY(screenRect) - NSMidY(viewRect),
-                                   viewRect.size.width,
-                                   viewRect.size.height);
-    
-    NSWindow* window = [[NSWindow alloc] initWithContentRect:windowRect
-                                                    styleMask:windowStyle
-                                                      backing:NSBackingStoreBuffered
-                                                        defer:NO];
-    [window autorelease];
-    
-    // Window controller
-    NSWindowController * windowController = [[NSWindowController alloc] initWithWindow:window];
-    [windowController autorelease];
-    
-    // Since Snow Leopard, programs without application bundles and Info.plist files don't get a menubar
-    // and can't be brought to the front unless the presentation option is changed
-    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-    
-    id menubar = [[NSMenu new] autorelease];
-    id appMenuItem = [[NSMenuItem new] autorelease];
-    [menubar addItem:appMenuItem];
-    [NSApp setMainMenu:menubar];
-    
-    // Then we add the quit item to the menu. Fortunately the action is simple since terminate: is
-    // already implemented in NSApplication and the NSApplication is always in the responder chain.
-    id appMenu = [[NSMenu new] autorelease];
-    id appName = [[NSProcessInfo processInfo] processName];
-    id quitTitle = [@"Quit " stringByAppendingString:appName];
-    id quitMenuItem = [[[NSMenuItem alloc] initWithTitle:quitTitle
-                                                  action:@selector(terminate:) keyEquivalent:@"q"] autorelease];
-    [appMenu addItem:quitMenuItem];
-    [appMenuItem setSubmenu:appMenu];
-    
-    // Create app delegate to handle system events
-    View* view = [[[View alloc] initWithFrame:windowRect] autorelease];
-    view->windowRect = windowRect;
-    // [window setAcceptsMouseMovedEvents:YES];
-    [window setContentView:view];
-    [window setDelegate:view];
-    
-    [window setTitle:appName];
-    [window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
-    [window orderFrontRegardless];
-    
-    [NSApp run];
-    [pool drain];
-    
+    // A cryptic way to ask window to open.
+    [window makeKeyAndOrderFront: application];
     WindowGlobal::isOpen = true;
+
+    // Init OpenGL context.
+    
+    NSOpenGLPixelFormatAttribute attributes[] =
+    {
+        NSOpenGLPFAClosestPolicy,
+        NSOpenGLPFASampleBuffers, 0,
+        NSOpenGLPFAAccelerated,
+        NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAClosestPolicy,
+        NSOpenGLPFAColorSize, 32,
+        NSOpenGLPFADepthSize, 24,
+        NSOpenGLPFAAlphaSize, 8,
+        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+        0
+    };
+    
+    NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+
+    WindowGlobal::glContext =
+    [[NSOpenGLContext alloc] initWithFormat: pixelFormat
+                               shareContext: 0];
+    if (!WindowGlobal::glContext)
+    {
+        NSLog(@"Could not create OpenGL context!");
+        return;
+    }
+
+    [WindowGlobal::glContext makeCurrentContext];
+    
+    GLint vsync = 1;
+    [WindowGlobal::glContext setValues: &vsync
+                forParameter: NSOpenGLCPSwapInterval];
+    OpenGLView *view = [[OpenGLView alloc] init];
+    [window setContentView: view];
+    [view setOpenGLContext: WindowGlobal::glContext];
+    [view setPixelFormat: pixelFormat];
+    
+    NSLog(@"GL version:   %s", glGetString(GL_VERSION));
+    NSLog(@"GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+    [WindowGlobal::glContext setView: view];
+}
+
+void cocoaProcessEvents(
+                        NSApplication *application,
+                        NSWindow *window
+                        ) {
+    NSAutoreleasePool *eventsAutoreleasePool = [[NSAutoreleasePool alloc] init];
+    while (true) {
+        NSEvent* event =
+        [application nextEventMatchingMask: NSAnyEventMask
+                                 untilDate: [NSDate distantPast]
+                                    inMode: NSDefaultRunLoopMode
+                                   dequeue: YES];
+        if (!event) {
+            break;
+        }
+        switch ([event type]) {
+            case NSKeyUp:
+            case NSKeyDown: {
+                int hotkeyMask = NSCommandKeyMask
+                | NSAlternateKeyMask
+                | NSControlKeyMask
+                | NSAlphaShiftKeyMask;
+                if ([event modifierFlags] & hotkeyMask) {
+                    // Handle events like cmd+q etc
+                    [application sendEvent:event];
+                    break;
+                }
+                // Handle normal keyboard events in place.
+                int isDown = ([event type] == NSKeyDown);
+                switch ([event keyCode]) {
+                    case 13: { // W
+                        NSLog(@"w down nslog");
+                    } break;
+                    case 0: { // A
+                    } break;
+                    case 1: { // S
+                    } break;
+                    case 2: { // D
+                    } break;
+                    case 12: { // Q
+                    } break;
+                    case 14: { // E
+                    } break;
+                    case 126: { // Up
+                    } break;
+                    case 123: { // Left
+                    } break;
+                    case 125: { // Down
+                    } break;
+                    case 124: { // Right
+                    } break;
+                    case 53: { // Esc
+                    } break;
+                    case 49: { // Space
+                    } break;
+                    case 122: { // F1
+                    } break;
+                    case 35: { // P
+                    } break;
+                    default: {
+                        // Uncomment to learn your keys:
+                        //NSLog(@"Unhandled key: %d", [event keyCode]);
+                    } break;
+                }
+            } break;
+            default: {
+                // Handle events like app focus/unfocus etc
+                [application sendEvent:event];
+            } break;
+        }
+    }
+    [eventsAutoreleasePool drain];
 }
 
 void ae3d::Window::PumpEvents()
 {
+    cocoaProcessEvents(application, window);
 }
 
 bool ae3d::Window::PollEvent( WindowEvent& outEvent )
@@ -431,6 +299,7 @@ bool ae3d::Window::PollEvent( WindowEvent& outEvent )
 
 void ae3d::Window::SwapBuffers() const
 {
-    // Handled by displaylink.
+    //glClear( GL_COLOR_BUFFER_BIT );
+    [WindowGlobal::glContext flushBuffer];
 }
 

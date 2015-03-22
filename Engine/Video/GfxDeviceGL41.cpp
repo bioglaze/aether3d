@@ -1,5 +1,5 @@
 #include "GfxDevice.hpp"
-#include <OpenGL/GL.h>
+#include <OpenGL/gl.h>
 
 void ae3d::GfxDevice::ClearScreen(unsigned clearFlags)
 {
@@ -14,7 +14,7 @@ void ae3d::GfxDevice::ClearScreen(unsigned clearFlags)
         mask |= GL_DEPTH_BUFFER_BIT;
     }
 
-    glClear( mask );
+    glClear( GL_COLOR_BUFFER_BIT );
 }
 
 void ae3d::GfxDevice::SetClearColor(float red, float green, float blue)

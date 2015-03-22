@@ -2,6 +2,7 @@
 #define CAMERA_COMPONENT_H
 
 #include "Vec3.hpp"
+#include "Matrix.hpp"
 
 namespace ae3d
 {
@@ -20,6 +21,19 @@ namespace ae3d
         // \return Component at index or null if index is invalid.
         static CameraComponent* Get(int index);
 
+        // \return Projection matrix.
+        const Matrix44& GetProjection() const { return projectionMatrix; }
+        
+        /**
+          Sets an orthographic projection matrix.
+         
+         \param left Left.
+         \param right Right.
+         \param bottom Bottom.
+         \param top Top.
+         \param near Near plane distance.
+         \param far Far plane distance.
+         */
         void SetProjection( int left, int right, int bottom, int top, float near, float far );
 
         // \return clear color.
@@ -30,6 +44,8 @@ namespace ae3d
 
     private:
         static ae3d::CameraComponent cameraComponents[100];
+        Matrix44 projectionMatrix;
+        Matrix44 viewMatrix;
         Vec3 clearColor;
     };
 }

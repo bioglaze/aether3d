@@ -10,6 +10,7 @@ namespace ae3d
     class Scene
     {
     public:
+        Scene();
         void Add( GameObject* gameObject );
         void Render();
         void Update();
