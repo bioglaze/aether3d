@@ -17,14 +17,6 @@ namespace ae3d
 
     private:
         unsigned id = 0;
-    };
-    
-    // TODO: Move into a more appropriate place when found.
-    struct BuiltinShaders
-    {
-        void Load();
-
-        Shader spriteRendererShader;
     };    
 }
 #endif

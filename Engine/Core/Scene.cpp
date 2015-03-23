@@ -5,10 +5,10 @@
 #include "System.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
+#include "Renderer.hpp"
 
-// Temporary solution for prototyping.
-extern ae3d::BuiltinShaders builtinShaders;
-ae3d::VertexBuffer quadBuffer;
+// TODO [2015-03-23]: Move somewhere else.
+ae3d::Renderer renderer;
 
 ae3d::Scene::Scene()
 {
@@ -17,9 +17,9 @@ ae3d::Scene::Scene()
         gameObjects[ i ] = nullptr;
     }
 
-    // TODO [2015-03-23] These clearly need to be moved but there is no proper place yet.
-    builtinShaders.Load();
-    quadBuffer.GenerateQuad();
+    // TODO [2015-03-23] These clearly need to be moved out but there is no proper place yet.
+    renderer.builtinShaders.Load();
+    renderer.quadBuffer.GenerateQuad();
 }
 
 void ae3d::Scene::Add( GameObject* gameObject )
@@ -52,11 +52,10 @@ void ae3d::Scene::Render()
     {
         if (gameObject && gameObject->GetComponent<SpriteRendererComponent>())
         {
-            builtinShaders.spriteRendererShader.Use();
-            builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionMatrix", camera->GetProjection().m );
-            builtinShaders.spriteRendererShader.SetTexture("textureMap", gameObject->GetComponent<SpriteRendererComponent>()->GetTexture(), 0);
-            // draw quad.
-            quadBuffer.Draw();
+            renderer.builtinShaders.spriteRendererShader.Use();
+            renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionMatrix", camera->GetProjection().m );
+            renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", gameObject->GetComponent<SpriteRendererComponent>()->GetTexture(), 0);
+            renderer.quadBuffer.Draw();
         }
     }
 }

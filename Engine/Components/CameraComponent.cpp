@@ -1,11 +1,12 @@
 #include "CameraComponent.hpp"
-#include "Vec3.hpp"
 
-ae3d::CameraComponent ae3d::CameraComponent::cameraComponents[100];
+const int CameraComponentMax = 100;
+ae3d::CameraComponent ae3d::CameraComponent::cameraComponents[CameraComponentMax];
+int nextFreeCameraComponent = 0;
 
 int ae3d::CameraComponent::New()
 {
-    return 0;
+    return nextFreeCameraComponent++;
 }
 
 ae3d::CameraComponent* ae3d::CameraComponent::Get(int index)

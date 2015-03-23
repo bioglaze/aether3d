@@ -1,3 +1,5 @@
+OUTPUT_DIR := ../../aether3d_build
+
 UNAME := $(shell uname)
 COMPILER := g++
 ENGINE_LIB := libaether3d_linux.a
@@ -14,19 +16,21 @@ WARNINGS := -Wall -ansi -pedantic
 
 all:
 	mkdir -p ../../aether3d_build
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/ShaderGL.cpp -o ../../aether3d_build/ShaderGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/Texture2D_GL45.cpp -o ../../aether3d_build/Texture2D_GL45.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/SpriteRendererComponent.cpp -o ../../aether3d_build/SpriteRendererComponent.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Math.cpp -o ../../aether3d_build/Math.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Scene.cpp -o ../../aether3d_build/Scene.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/System.cpp -o ../../aether3d_build/System.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/GameObject.cpp -o ../../aether3d_build/GameObject.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/CameraComponent.cpp -o ../../aether3d_build/CameraComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c ThirdParty/GL/glxw.c -o $(OUTPUT_DIR)/glxw.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/Texture2D_GL45.cpp -o $(OUTPUT_DIR)/Texture2D_GL45.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Math.cpp -o $(OUTPUT_DIR)/Math.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/GameObject.cpp -o $(OUTPUT_DIR)/GameObject.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
 ifeq ($(UNAME), Darwin)
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/GfxDeviceGL41.cpp -o ../../aether3d_build/GfxDeviceGL41.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/WindowOSX_GL.mm -o ../../aether3d_build/Window.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/GfxDeviceGL41.cpp -o $(OUTPUT_DIR)/GfxDeviceGL41.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/WindowOSX_GL.mm -o $(OUTPUT_DIR)/Window.o
 else
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/WindowXCB.cpp -o ../../aether3d_build/Window.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/WindowXCB.cpp -o $(OUTPUT_DIR)/Window.o
 endif
-	ar rcs ../../aether3d_build/$(ENGINE_LIB) ../../aether3d_build/*.o
+	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
 

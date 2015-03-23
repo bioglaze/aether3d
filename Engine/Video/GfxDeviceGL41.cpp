@@ -1,5 +1,5 @@
 #include "GfxDevice.hpp"
-#include <OpenGL/gl.h>
+#include <GL/glxw.h>
 
 void ae3d::GfxDevice::ClearScreen(unsigned clearFlags)
 {

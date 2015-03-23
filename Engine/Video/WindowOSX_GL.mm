@@ -1,6 +1,6 @@
 #include "Window.hpp"
 #import <Cocoa/Cocoa.h>
-#include <OpenGL/gl.h>
+#include <GL/glxw.h>
 
 // Based on https://github.com/vbo/handmadehero_osx_platform_layer/blob/day_29/code/osx_handmade.m
 // TODO [2015-03-14]: ARC
@@ -30,11 +30,9 @@ bool ae3d::Window::IsOpen()
 @implementation ApplicationDelegate : NSObject
 - (void)applicationDidFinishLaunching: (NSNotification *)notification
 {
-    // Stop the event loop after app initialization:
-    // I'll make my own loop later.
+    // Stop the event loop after app initialization because we have our own loop.
     [NSApp stop: nil];
-    // Post empty event: without it we can't put application to front
-    // for some reason (I get this technique from GLFW source).
+    // Post empty event to get the app visible.
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     NSEvent* event =
     [NSEvent otherEventWithType: NSApplicationDefined
@@ -201,8 +199,12 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     [view setOpenGLContext: WindowGlobal::glContext];
     [view setPixelFormat: pixelFormat];
     
+    if (glxwInit() != 0)
+    {
+        NSLog(@"Failed to load OpenGL function pointers using GLXW!");
+    }
+
     NSLog(@"GL version:   %s", glGetString(GL_VERSION));
-    NSLog(@"GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     [WindowGlobal::glContext setView: view];
 }
@@ -218,26 +220,37 @@ void cocoaProcessEvents(
                                  untilDate: [NSDate distantPast]
                                     inMode: NSDefaultRunLoopMode
                                    dequeue: YES];
-        if (!event) {
+        if (!event)
+        {
             break;
         }
-        switch ([event type]) {
+        
+        switch ([event type])
+        {
             case NSKeyUp:
-            case NSKeyDown: {
+            case NSKeyDown:
+            {
+                const int isDown = ([event type] == NSKeyDown);
+                const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
+                
+                ++WindowGlobal::eventIndex;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
+                
                 int hotkeyMask = NSCommandKeyMask
                 | NSAlternateKeyMask
                 | NSControlKeyMask
                 | NSAlphaShiftKeyMask;
-                if ([event modifierFlags] & hotkeyMask) {
+                if ([event modifierFlags] & hotkeyMask)
+                {
                     // Handle events like cmd+q etc
                     [application sendEvent:event];
                     break;
                 }
-                // Handle normal keyboard events in place.
-                int isDown = ([event type] == NSKeyDown);
-                switch ([event keyCode]) {
+
+                switch ([event keyCode])
+                {
                     case 13: { // W
-                        NSLog(@"w down nslog");
                     } break;
                     case 0: { // A
                     } break;
@@ -265,13 +278,15 @@ void cocoaProcessEvents(
                     } break;
                     case 35: { // P
                     } break;
-                    default: {
+                    default:
+                    {
                         // Uncomment to learn your keys:
                         //NSLog(@"Unhandled key: %d", [event keyCode]);
                     } break;
                 }
             } break;
-            default: {
+            default:
+            {
                 // Handle events like app focus/unfocus etc
                 [application sendEvent:event];
             } break;
@@ -299,7 +314,6 @@ bool ae3d::Window::PollEvent( WindowEvent& outEvent )
 
 void ae3d::Window::SwapBuffers() const
 {
-    //glClear( GL_COLOR_BUFFER_BIT );
     [WindowGlobal::glContext flushBuffer];
 }
 

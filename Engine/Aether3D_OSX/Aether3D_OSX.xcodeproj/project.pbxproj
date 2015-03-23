@@ -31,12 +31,18 @@
 		AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB949D361ABC8E44007D561E /* ShaderGL.cpp */; };
 		ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */; };
 		ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */; };
+		ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */; };
+		ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */; };
+		ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */; };
+		ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0CA21AC06A4000F9EC53 /* glxw.c */; };
+		ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0CA31AC06A4000F9EC53 /* glxw.h */; };
+		ABCE0CA91AC08BD700F9EC53 /* RendererGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WindowOSX_GL.mm; path = ../Video/WindowOSX_GL.mm; sourceTree = "<group>"; };
 		AB3A77D91AB448500081864C /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = System.cpp; path = ../Core/System.cpp; sourceTree = "<group>"; };
-		AB3FD4751AB432A500D28653 /* libaether3d_osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libaether3d_osx.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB3FD4751AB432A500D28653 /* libaether3d_osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libaether3d_osx.a; path = /Users/glaze/Documents/src/aether3d/Engine/Aether3D_OSX/build/libaether3d_osx.a; sourceTree = "<absolute>"; };
 		AB3FD4941AB4330C00D28653 /* System.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = System.hpp; path = ../Include/System.hpp; sourceTree = "<group>"; };
 		AB3FD4951AB4330C00D28653 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../Include/Window.hpp; sourceTree = "<group>"; };
 		AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GfxDevice.hpp; path = ../Video/GfxDevice.hpp; sourceTree = "<group>"; };
@@ -59,6 +65,13 @@
 		AB949D361ABC8E44007D561E /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/ShaderGL.cpp; sourceTree = "<group>"; };
 		ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../Core/Matrix.cpp; sourceTree = "<group>"; };
 		ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Matrix.hpp; path = ../Include/Matrix.hpp; sourceTree = "<group>"; };
+		ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
+		ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VertexBufferGL.cpp; path = ../Video/VertexBufferGL.cpp; sourceTree = "<group>"; };
+		ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glcorearb.h; path = ../ThirdParty/GL/glcorearb.h; sourceTree = "<group>"; };
+		ABCE0CA21AC06A4000F9EC53 /* glxw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = glxw.c; path = ../ThirdParty/GL/glxw.c; sourceTree = "<group>"; };
+		ABCE0CA31AC06A4000F9EC53 /* glxw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glxw.h; path = ../ThirdParty/GL/glxw.h; sourceTree = "<group>"; };
+		ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Renderer.hpp; path = ../Video/Renderer.hpp; sourceTree = "<group>"; };
+		ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererGL.cpp; path = ../Video/RendererGL.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +103,11 @@
 				AB889AE91ABB4C3B005BA86D /* GfxDeviceGL41.cpp */,
 				AB949D361ABC8E44007D561E /* ShaderGL.cpp */,
 				AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */,
+				ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */,
+				ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */,
 				AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */,
+				ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */,
+				ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */,
 			);
 			name = Video;
 			sourceTree = "<group>";
@@ -103,16 +120,7 @@
 				AB3A77DC1AB4486A0081864C /* Video */,
 				AB3A77DB1AB448580081864C /* Core */,
 				AB3FD4931AB432FD00D28653 /* Include */,
-				AB3FD4761AB432A500D28653 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		AB3FD4761AB432A500D28653 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				AB3FD4751AB432A500D28653 /* libaether3d_osx.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		AB3FD4931AB432FD00D28653 /* Include */ = {
@@ -136,6 +144,7 @@
 		AB889B001ABB4C61005BA86D /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				ABCE0CA01AC06A3100F9EC53 /* GL */,
 				AB889B011ABB4C70005BA86D /* stb_image.c */,
 			);
 			name = ThirdParty;
@@ -151,6 +160,16 @@
 			name = Components;
 			sourceTree = "<group>";
 		};
+		ABCE0CA01AC06A3100F9EC53 /* GL */ = {
+			isa = PBXGroup;
+			children = (
+				ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */,
+				ABCE0CA21AC06A4000F9EC53 /* glxw.c */,
+				ABCE0CA31AC06A4000F9EC53 /* glxw.h */,
+			);
+			name = GL;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -161,11 +180,14 @@
 				AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */,
 				ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */,
 				AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */,
+				ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */,
 				AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */,
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
+				ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */,
 				AB3FD4961AB4330C00D28653 /* System.hpp in Headers */,
 				AB889AFE1ABB4C5B005BA86D /* Texture2D.hpp in Headers */,
 				AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */,
+				ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */,
 				AB889AFB1ABB4C5B005BA86D /* Math.hpp in Headers */,
 				AB889AFA1ABB4C5B005BA86D /* GameObject.hpp in Headers */,
 				AB889AFC1ABB4C5B005BA86D /* Scene.hpp in Headers */,
@@ -215,7 +237,7 @@
 				en,
 			);
 			mainGroup = AB3FD46C1AB432A500D28653;
-			productRefGroup = AB3FD4761AB432A500D28653 /* Products */;
+			productRefGroup = AB3FD46C1AB432A500D28653;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -231,10 +253,13 @@
 			files = (
 				ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */,
 				AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */,
+				ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */,
+				ABCE0CA91AC08BD700F9EC53 /* RendererGL.cpp in Sources */,
 				AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */,
 				AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
 				AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */,
+				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,
 				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB889AEC1ABB4C3B005BA86D /* GfxDeviceGL41.cpp in Sources */,

@@ -1,49 +1,7 @@
 #include "Shader.hpp"
-#if __APPLE__
-#include <OpenGL/GL.h>
-#endif
-#if _MSC_VER
 #include <GL/glxw.h>
-#endif
 #include "System.hpp"
 #include "Texture2D.hpp"
-
-// TODO [2015-03-21] Find a better place for this, avoid global scope.
-ae3d::BuiltinShaders builtinShaders;
-
-void ae3d::BuiltinShaders::Load()
-{
-    const char* vertexSource =
-        "#version 410 core\n \
-            \
-                layout (location = 0) in vec3 aPosition;\
-                    layout (location = 1) in vec2 aTexCoord;\
-                        uniform mat4 _ProjectionMatrix;\
-                            uniform vec4 textureMap_ST;\
-                                \
-                                    out vec2 vTexCoord;\
-                                        \
-                                            void main()\
-                                                {\
-                                                        gl_Position = _ProjectionMatrix * vec4(aPosition.xyz, 1.0);\
-                                                                vTexCoord = aTexCoord;\
-    }";
-    
-    const char* fragmentSource =
-    "#version 410 core\n\
-    \
-    in vec2 vTexCoord;\
-    out vec4 fragColor;\
-    \
-    uniform sampler2D textureMap;\
-    \
-    void main()\
-    {\
-        fragColor = texture( textureMap, vTexCoord );\
-    }";
-    
-    spriteRendererShader.Load( vertexSource, fragmentSource );
-}
 
 enum class InfoLogType
 {

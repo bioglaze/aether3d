@@ -2,12 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
 #include "System.hpp"
-#if __APPLE__
-#include <OpenGL/GL.h>
-#endif
-#if _MSC_VER
 #include <GL/glxw.h>
-#endif
 
 void ae3d::Texture2D::Load(const System::FileContentsData& fileContents)
 {
