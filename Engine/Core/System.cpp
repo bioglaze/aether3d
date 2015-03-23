@@ -37,7 +37,7 @@ void ae3d::System::Print(const char* format, ...)
     va_list ap;
     va_start(ap, format);
 
-    static char msg[256];
+    static char msg[512];
 #if _MSC_VER
     vsnprintf_s(msg, sizeof(msg), format, ap);
 #else

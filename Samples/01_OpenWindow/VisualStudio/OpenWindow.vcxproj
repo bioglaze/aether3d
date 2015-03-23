@@ -180,7 +180,9 @@
     <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Math.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Scene.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Shader.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\SpriteRendererComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\System.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Texture2D.hpp" />

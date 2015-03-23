@@ -2,7 +2,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <Windows.h>
-#include <GL/GL.h>
+#include <GL/glxw.h>
 #include <GL/wglext.h>
 
 // TODO: Separate all GL stuff from this source file so it can be used also with D3D.
@@ -225,6 +225,11 @@ namespace ae3d
         {
             OutputDebugStringA("Failed to activate forward compatible context!");
             return;
+        }
+
+        if (glxwInit() != 0)
+        {
+            OutputDebugStringA("Failed to load OpenGL function pointers using GLXW!");
         }
 
         MessageBoxA(0, (char*)glGetString(GL_VERSION), "OPENGL VERSION", 0);

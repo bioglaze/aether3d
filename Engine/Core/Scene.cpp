@@ -4,9 +4,11 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
+#include "VertexBuffer.hpp"
 
 // Temporary solution for prototyping.
 extern ae3d::BuiltinShaders builtinShaders;
+ae3d::VertexBuffer quadBuffer;
 
 ae3d::Scene::Scene()
 {
@@ -14,6 +16,10 @@ ae3d::Scene::Scene()
     {
         gameObjects[ i ] = nullptr;
     }
+
+    // TODO [2015-03-23] These clearly need to be moved but there is no proper place yet.
+    builtinShaders.Load();
+    quadBuffer.GenerateQuad();
 }
 
 void ae3d::Scene::Add( GameObject* gameObject )
@@ -48,7 +54,9 @@ void ae3d::Scene::Render()
         {
             builtinShaders.spriteRendererShader.Use();
             builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionMatrix", camera->GetProjection().m );
+            builtinShaders.spriteRendererShader.SetTexture("textureMap", gameObject->GetComponent<SpriteRendererComponent>()->GetTexture(), 0);
             // draw quad.
+            quadBuffer.Draw();
         }
     }
 }

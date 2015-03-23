@@ -1,0 +1,682 @@
+#include <GL/glxw.h>
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN 1
+#include <windows.h>
+
+static void* open_libgl(void)
+{
+    HMODULE libgl;
+    libgl = LoadLibraryA("opengl32.dll");
+    return (void*)libgl;
+}
+
+static void close_libgl(void* libgl)
+{
+    FreeLibrary((HMODULE)libgl);
+}
+
+static void *get_proc(void *libgl, const char *proc)
+{
+    void *res;
+
+    res = wglGetProcAddress(proc);
+    if (!res)
+        res = GetProcAddress((HMODULE)libgl, proc);
+    return res;
+}
+#else
+#include <dlfcn.h>
+
+#ifndef __APPLE__
+typedef void (*__GLXextFuncPtrX)(void);
+extern __GLXextFuncPtrX glXGetProcAddress (const GLubyte *);
+#endif
+
+static void* open_libgl(void)
+{
+    void *libgl = dlopen(
+#ifdef __APPLE__
+        "/System/Library/Frameworks/OpenGL.framework/OpenGL"
+#else
+        "libGL.so.1"
+#endif
+        , RTLD_LAZY | RTLD_GLOBAL);
+    return (void*)libgl;
+}
+
+static void close_libgl(void* libgl)
+{
+    dlclose(libgl);
+}
+
+static void *get_proc(void *libgl, const char *proc)
+{
+    void *res = 0;
+
+#ifndef __APPLE__
+    res = glXGetProcAddress((const unsigned char *) proc);
+#endif
+    if (!res)
+        res = dlsym(libgl, proc);
+    return res;
+}
+#endif
+
+static void load_procs(void *libgl, struct glxw *ctx);
+struct glxw *glxw = 0;
+
+int glxwInitCtx(struct glxw *ctx)
+{
+    void *libgl;
+    if((libgl = open_libgl()))
+    {
+        load_procs(libgl, ctx);
+        close_libgl(libgl);
+        return 0;
+    }
+    return -1;
+}
+
+int glxwInit(void)
+{
+    static struct glxw ctx;
+    if(glxw || glxwInitCtx(&ctx) == 0)
+    {
+        glxw = &ctx;
+        return 0;
+    }
+
+    return -1;
+}
+
+static void load_procs(void *libgl, struct glxw *ctx)
+{
+ctx->_glCullFace = (PFNGLCULLFACEPROC)get_proc(libgl, "glCullFace");
+ctx->_glFrontFace = (PFNGLFRONTFACEPROC)get_proc(libgl, "glFrontFace");
+ctx->_glHint = (PFNGLHINTPROC)get_proc(libgl, "glHint");
+ctx->_glLineWidth = (PFNGLLINEWIDTHPROC)get_proc(libgl, "glLineWidth");
+ctx->_glPointSize = (PFNGLPOINTSIZEPROC)get_proc(libgl, "glPointSize");
+ctx->_glPolygonMode = (PFNGLPOLYGONMODEPROC)get_proc(libgl, "glPolygonMode");
+ctx->_glScissor = (PFNGLSCISSORPROC)get_proc(libgl, "glScissor");
+ctx->_glTexParameterf = (PFNGLTEXPARAMETERFPROC)get_proc(libgl, "glTexParameterf");
+ctx->_glTexParameterfv = (PFNGLTEXPARAMETERFVPROC)get_proc(libgl, "glTexParameterfv");
+ctx->_glTexParameteri = (PFNGLTEXPARAMETERIPROC)get_proc(libgl, "glTexParameteri");
+ctx->_glTexParameteriv = (PFNGLTEXPARAMETERIVPROC)get_proc(libgl, "glTexParameteriv");
+ctx->_glTexImage1D = (PFNGLTEXIMAGE1DPROC)get_proc(libgl, "glTexImage1D");
+ctx->_glTexImage2D = (PFNGLTEXIMAGE2DPROC)get_proc(libgl, "glTexImage2D");
+ctx->_glDrawBuffer = (PFNGLDRAWBUFFERPROC)get_proc(libgl, "glDrawBuffer");
+ctx->_glClear = (PFNGLCLEARPROC)get_proc(libgl, "glClear");
+ctx->_glClearColor = (PFNGLCLEARCOLORPROC)get_proc(libgl, "glClearColor");
+ctx->_glClearStencil = (PFNGLCLEARSTENCILPROC)get_proc(libgl, "glClearStencil");
+ctx->_glClearDepth = (PFNGLCLEARDEPTHPROC)get_proc(libgl, "glClearDepth");
+ctx->_glStencilMask = (PFNGLSTENCILMASKPROC)get_proc(libgl, "glStencilMask");
+ctx->_glColorMask = (PFNGLCOLORMASKPROC)get_proc(libgl, "glColorMask");
+ctx->_glDepthMask = (PFNGLDEPTHMASKPROC)get_proc(libgl, "glDepthMask");
+ctx->_glDisable = (PFNGLDISABLEPROC)get_proc(libgl, "glDisable");
+ctx->_glEnable = (PFNGLENABLEPROC)get_proc(libgl, "glEnable");
+ctx->_glFinish = (PFNGLFINISHPROC)get_proc(libgl, "glFinish");
+ctx->_glFlush = (PFNGLFLUSHPROC)get_proc(libgl, "glFlush");
+ctx->_glBlendFunc = (PFNGLBLENDFUNCPROC)get_proc(libgl, "glBlendFunc");
+ctx->_glLogicOp = (PFNGLLOGICOPPROC)get_proc(libgl, "glLogicOp");
+ctx->_glStencilFunc = (PFNGLSTENCILFUNCPROC)get_proc(libgl, "glStencilFunc");
+ctx->_glStencilOp = (PFNGLSTENCILOPPROC)get_proc(libgl, "glStencilOp");
+ctx->_glDepthFunc = (PFNGLDEPTHFUNCPROC)get_proc(libgl, "glDepthFunc");
+ctx->_glPixelStoref = (PFNGLPIXELSTOREFPROC)get_proc(libgl, "glPixelStoref");
+ctx->_glPixelStorei = (PFNGLPIXELSTOREIPROC)get_proc(libgl, "glPixelStorei");
+ctx->_glReadBuffer = (PFNGLREADBUFFERPROC)get_proc(libgl, "glReadBuffer");
+ctx->_glReadPixels = (PFNGLREADPIXELSPROC)get_proc(libgl, "glReadPixels");
+ctx->_glGetBooleanv = (PFNGLGETBOOLEANVPROC)get_proc(libgl, "glGetBooleanv");
+ctx->_glGetDoublev = (PFNGLGETDOUBLEVPROC)get_proc(libgl, "glGetDoublev");
+ctx->_glGetError = (PFNGLGETERRORPROC)get_proc(libgl, "glGetError");
+ctx->_glGetFloatv = (PFNGLGETFLOATVPROC)get_proc(libgl, "glGetFloatv");
+ctx->_glGetIntegerv = (PFNGLGETINTEGERVPROC)get_proc(libgl, "glGetIntegerv");
+ctx->_glGetString = (PFNGLGETSTRINGPROC)get_proc(libgl, "glGetString");
+ctx->_glGetTexImage = (PFNGLGETTEXIMAGEPROC)get_proc(libgl, "glGetTexImage");
+ctx->_glGetTexParameterfv = (PFNGLGETTEXPARAMETERFVPROC)get_proc(libgl, "glGetTexParameterfv");
+ctx->_glGetTexParameteriv = (PFNGLGETTEXPARAMETERIVPROC)get_proc(libgl, "glGetTexParameteriv");
+ctx->_glGetTexLevelParameterfv = (PFNGLGETTEXLEVELPARAMETERFVPROC)get_proc(libgl, "glGetTexLevelParameterfv");
+ctx->_glGetTexLevelParameteriv = (PFNGLGETTEXLEVELPARAMETERIVPROC)get_proc(libgl, "glGetTexLevelParameteriv");
+ctx->_glIsEnabled = (PFNGLISENABLEDPROC)get_proc(libgl, "glIsEnabled");
+ctx->_glDepthRange = (PFNGLDEPTHRANGEPROC)get_proc(libgl, "glDepthRange");
+ctx->_glViewport = (PFNGLVIEWPORTPROC)get_proc(libgl, "glViewport");
+ctx->_glDrawArrays = (PFNGLDRAWARRAYSPROC)get_proc(libgl, "glDrawArrays");
+ctx->_glDrawElements = (PFNGLDRAWELEMENTSPROC)get_proc(libgl, "glDrawElements");
+ctx->_glGetPointerv = (PFNGLGETPOINTERVPROC)get_proc(libgl, "glGetPointerv");
+ctx->_glPolygonOffset = (PFNGLPOLYGONOFFSETPROC)get_proc(libgl, "glPolygonOffset");
+ctx->_glCopyTexImage1D = (PFNGLCOPYTEXIMAGE1DPROC)get_proc(libgl, "glCopyTexImage1D");
+ctx->_glCopyTexImage2D = (PFNGLCOPYTEXIMAGE2DPROC)get_proc(libgl, "glCopyTexImage2D");
+ctx->_glCopyTexSubImage1D = (PFNGLCOPYTEXSUBIMAGE1DPROC)get_proc(libgl, "glCopyTexSubImage1D");
+ctx->_glCopyTexSubImage2D = (PFNGLCOPYTEXSUBIMAGE2DPROC)get_proc(libgl, "glCopyTexSubImage2D");
+ctx->_glTexSubImage1D = (PFNGLTEXSUBIMAGE1DPROC)get_proc(libgl, "glTexSubImage1D");
+ctx->_glTexSubImage2D = (PFNGLTEXSUBIMAGE2DPROC)get_proc(libgl, "glTexSubImage2D");
+ctx->_glBindTexture = (PFNGLBINDTEXTUREPROC)get_proc(libgl, "glBindTexture");
+ctx->_glDeleteTextures = (PFNGLDELETETEXTURESPROC)get_proc(libgl, "glDeleteTextures");
+ctx->_glGenTextures = (PFNGLGENTEXTURESPROC)get_proc(libgl, "glGenTextures");
+ctx->_glIsTexture = (PFNGLISTEXTUREPROC)get_proc(libgl, "glIsTexture");
+ctx->_glDrawRangeElements = (PFNGLDRAWRANGEELEMENTSPROC)get_proc(libgl, "glDrawRangeElements");
+ctx->_glTexImage3D = (PFNGLTEXIMAGE3DPROC)get_proc(libgl, "glTexImage3D");
+ctx->_glTexSubImage3D = (PFNGLTEXSUBIMAGE3DPROC)get_proc(libgl, "glTexSubImage3D");
+ctx->_glCopyTexSubImage3D = (PFNGLCOPYTEXSUBIMAGE3DPROC)get_proc(libgl, "glCopyTexSubImage3D");
+ctx->_glActiveTexture = (PFNGLACTIVETEXTUREPROC)get_proc(libgl, "glActiveTexture");
+ctx->_glSampleCoverage = (PFNGLSAMPLECOVERAGEPROC)get_proc(libgl, "glSampleCoverage");
+ctx->_glCompressedTexImage3D = (PFNGLCOMPRESSEDTEXIMAGE3DPROC)get_proc(libgl, "glCompressedTexImage3D");
+ctx->_glCompressedTexImage2D = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)get_proc(libgl, "glCompressedTexImage2D");
+ctx->_glCompressedTexImage1D = (PFNGLCOMPRESSEDTEXIMAGE1DPROC)get_proc(libgl, "glCompressedTexImage1D");
+ctx->_glCompressedTexSubImage3D = (PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC)get_proc(libgl, "glCompressedTexSubImage3D");
+ctx->_glCompressedTexSubImage2D = (PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC)get_proc(libgl, "glCompressedTexSubImage2D");
+ctx->_glCompressedTexSubImage1D = (PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC)get_proc(libgl, "glCompressedTexSubImage1D");
+ctx->_glGetCompressedTexImage = (PFNGLGETCOMPRESSEDTEXIMAGEPROC)get_proc(libgl, "glGetCompressedTexImage");
+ctx->_glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)get_proc(libgl, "glBlendFuncSeparate");
+ctx->_glMultiDrawArrays = (PFNGLMULTIDRAWARRAYSPROC)get_proc(libgl, "glMultiDrawArrays");
+ctx->_glMultiDrawElements = (PFNGLMULTIDRAWELEMENTSPROC)get_proc(libgl, "glMultiDrawElements");
+ctx->_glPointParameterf = (PFNGLPOINTPARAMETERFPROC)get_proc(libgl, "glPointParameterf");
+ctx->_glPointParameterfv = (PFNGLPOINTPARAMETERFVPROC)get_proc(libgl, "glPointParameterfv");
+ctx->_glPointParameteri = (PFNGLPOINTPARAMETERIPROC)get_proc(libgl, "glPointParameteri");
+ctx->_glPointParameteriv = (PFNGLPOINTPARAMETERIVPROC)get_proc(libgl, "glPointParameteriv");
+ctx->_glBlendColor = (PFNGLBLENDCOLORPROC)get_proc(libgl, "glBlendColor");
+ctx->_glBlendEquation = (PFNGLBLENDEQUATIONPROC)get_proc(libgl, "glBlendEquation");
+ctx->_glGenQueries = (PFNGLGENQUERIESPROC)get_proc(libgl, "glGenQueries");
+ctx->_glDeleteQueries = (PFNGLDELETEQUERIESPROC)get_proc(libgl, "glDeleteQueries");
+ctx->_glIsQuery = (PFNGLISQUERYPROC)get_proc(libgl, "glIsQuery");
+ctx->_glBeginQuery = (PFNGLBEGINQUERYPROC)get_proc(libgl, "glBeginQuery");
+ctx->_glEndQuery = (PFNGLENDQUERYPROC)get_proc(libgl, "glEndQuery");
+ctx->_glGetQueryiv = (PFNGLGETQUERYIVPROC)get_proc(libgl, "glGetQueryiv");
+ctx->_glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC)get_proc(libgl, "glGetQueryObjectiv");
+ctx->_glGetQueryObjectuiv = (PFNGLGETQUERYOBJECTUIVPROC)get_proc(libgl, "glGetQueryObjectuiv");
+ctx->_glBindBuffer = (PFNGLBINDBUFFERPROC)get_proc(libgl, "glBindBuffer");
+ctx->_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)get_proc(libgl, "glDeleteBuffers");
+ctx->_glGenBuffers = (PFNGLGENBUFFERSPROC)get_proc(libgl, "glGenBuffers");
+ctx->_glIsBuffer = (PFNGLISBUFFERPROC)get_proc(libgl, "glIsBuffer");
+ctx->_glBufferData = (PFNGLBUFFERDATAPROC)get_proc(libgl, "glBufferData");
+ctx->_glBufferSubData = (PFNGLBUFFERSUBDATAPROC)get_proc(libgl, "glBufferSubData");
+ctx->_glGetBufferSubData = (PFNGLGETBUFFERSUBDATAPROC)get_proc(libgl, "glGetBufferSubData");
+ctx->_glMapBuffer = (PFNGLMAPBUFFERPROC)get_proc(libgl, "glMapBuffer");
+ctx->_glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)get_proc(libgl, "glUnmapBuffer");
+ctx->_glGetBufferParameteriv = (PFNGLGETBUFFERPARAMETERIVPROC)get_proc(libgl, "glGetBufferParameteriv");
+ctx->_glGetBufferPointerv = (PFNGLGETBUFFERPOINTERVPROC)get_proc(libgl, "glGetBufferPointerv");
+ctx->_glBlendEquationSeparate = (PFNGLBLENDEQUATIONSEPARATEPROC)get_proc(libgl, "glBlendEquationSeparate");
+ctx->_glDrawBuffers = (PFNGLDRAWBUFFERSPROC)get_proc(libgl, "glDrawBuffers");
+ctx->_glStencilOpSeparate = (PFNGLSTENCILOPSEPARATEPROC)get_proc(libgl, "glStencilOpSeparate");
+ctx->_glStencilFuncSeparate = (PFNGLSTENCILFUNCSEPARATEPROC)get_proc(libgl, "glStencilFuncSeparate");
+ctx->_glStencilMaskSeparate = (PFNGLSTENCILMASKSEPARATEPROC)get_proc(libgl, "glStencilMaskSeparate");
+ctx->_glAttachShader = (PFNGLATTACHSHADERPROC)get_proc(libgl, "glAttachShader");
+ctx->_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)get_proc(libgl, "glBindAttribLocation");
+ctx->_glCompileShader = (PFNGLCOMPILESHADERPROC)get_proc(libgl, "glCompileShader");
+ctx->_glCreateProgram = (PFNGLCREATEPROGRAMPROC)get_proc(libgl, "glCreateProgram");
+ctx->_glCreateShader = (PFNGLCREATESHADERPROC)get_proc(libgl, "glCreateShader");
+ctx->_glDeleteProgram = (PFNGLDELETEPROGRAMPROC)get_proc(libgl, "glDeleteProgram");
+ctx->_glDeleteShader = (PFNGLDELETESHADERPROC)get_proc(libgl, "glDeleteShader");
+ctx->_glDetachShader = (PFNGLDETACHSHADERPROC)get_proc(libgl, "glDetachShader");
+ctx->_glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)get_proc(libgl, "glDisableVertexAttribArray");
+ctx->_glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)get_proc(libgl, "glEnableVertexAttribArray");
+ctx->_glGetActiveAttrib = (PFNGLGETACTIVEATTRIBPROC)get_proc(libgl, "glGetActiveAttrib");
+ctx->_glGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)get_proc(libgl, "glGetActiveUniform");
+ctx->_glGetAttachedShaders = (PFNGLGETATTACHEDSHADERSPROC)get_proc(libgl, "glGetAttachedShaders");
+ctx->_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)get_proc(libgl, "glGetAttribLocation");
+ctx->_glGetProgramiv = (PFNGLGETPROGRAMIVPROC)get_proc(libgl, "glGetProgramiv");
+ctx->_glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)get_proc(libgl, "glGetProgramInfoLog");
+ctx->_glGetShaderiv = (PFNGLGETSHADERIVPROC)get_proc(libgl, "glGetShaderiv");
+ctx->_glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)get_proc(libgl, "glGetShaderInfoLog");
+ctx->_glGetShaderSource = (PFNGLGETSHADERSOURCEPROC)get_proc(libgl, "glGetShaderSource");
+ctx->_glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)get_proc(libgl, "glGetUniformLocation");
+ctx->_glGetUniformfv = (PFNGLGETUNIFORMFVPROC)get_proc(libgl, "glGetUniformfv");
+ctx->_glGetUniformiv = (PFNGLGETUNIFORMIVPROC)get_proc(libgl, "glGetUniformiv");
+ctx->_glGetVertexAttribdv = (PFNGLGETVERTEXATTRIBDVPROC)get_proc(libgl, "glGetVertexAttribdv");
+ctx->_glGetVertexAttribfv = (PFNGLGETVERTEXATTRIBFVPROC)get_proc(libgl, "glGetVertexAttribfv");
+ctx->_glGetVertexAttribiv = (PFNGLGETVERTEXATTRIBIVPROC)get_proc(libgl, "glGetVertexAttribiv");
+ctx->_glGetVertexAttribPointerv = (PFNGLGETVERTEXATTRIBPOINTERVPROC)get_proc(libgl, "glGetVertexAttribPointerv");
+ctx->_glIsProgram = (PFNGLISPROGRAMPROC)get_proc(libgl, "glIsProgram");
+ctx->_glIsShader = (PFNGLISSHADERPROC)get_proc(libgl, "glIsShader");
+ctx->_glLinkProgram = (PFNGLLINKPROGRAMPROC)get_proc(libgl, "glLinkProgram");
+ctx->_glShaderSource = (PFNGLSHADERSOURCEPROC)get_proc(libgl, "glShaderSource");
+ctx->_glUseProgram = (PFNGLUSEPROGRAMPROC)get_proc(libgl, "glUseProgram");
+ctx->_glUniform1f = (PFNGLUNIFORM1FPROC)get_proc(libgl, "glUniform1f");
+ctx->_glUniform2f = (PFNGLUNIFORM2FPROC)get_proc(libgl, "glUniform2f");
+ctx->_glUniform3f = (PFNGLUNIFORM3FPROC)get_proc(libgl, "glUniform3f");
+ctx->_glUniform4f = (PFNGLUNIFORM4FPROC)get_proc(libgl, "glUniform4f");
+ctx->_glUniform1i = (PFNGLUNIFORM1IPROC)get_proc(libgl, "glUniform1i");
+ctx->_glUniform2i = (PFNGLUNIFORM2IPROC)get_proc(libgl, "glUniform2i");
+ctx->_glUniform3i = (PFNGLUNIFORM3IPROC)get_proc(libgl, "glUniform3i");
+ctx->_glUniform4i = (PFNGLUNIFORM4IPROC)get_proc(libgl, "glUniform4i");
+ctx->_glUniform1fv = (PFNGLUNIFORM1FVPROC)get_proc(libgl, "glUniform1fv");
+ctx->_glUniform2fv = (PFNGLUNIFORM2FVPROC)get_proc(libgl, "glUniform2fv");
+ctx->_glUniform3fv = (PFNGLUNIFORM3FVPROC)get_proc(libgl, "glUniform3fv");
+ctx->_glUniform4fv = (PFNGLUNIFORM4FVPROC)get_proc(libgl, "glUniform4fv");
+ctx->_glUniform1iv = (PFNGLUNIFORM1IVPROC)get_proc(libgl, "glUniform1iv");
+ctx->_glUniform2iv = (PFNGLUNIFORM2IVPROC)get_proc(libgl, "glUniform2iv");
+ctx->_glUniform3iv = (PFNGLUNIFORM3IVPROC)get_proc(libgl, "glUniform3iv");
+ctx->_glUniform4iv = (PFNGLUNIFORM4IVPROC)get_proc(libgl, "glUniform4iv");
+ctx->_glUniformMatrix2fv = (PFNGLUNIFORMMATRIX2FVPROC)get_proc(libgl, "glUniformMatrix2fv");
+ctx->_glUniformMatrix3fv = (PFNGLUNIFORMMATRIX3FVPROC)get_proc(libgl, "glUniformMatrix3fv");
+ctx->_glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)get_proc(libgl, "glUniformMatrix4fv");
+ctx->_glValidateProgram = (PFNGLVALIDATEPROGRAMPROC)get_proc(libgl, "glValidateProgram");
+ctx->_glVertexAttrib1d = (PFNGLVERTEXATTRIB1DPROC)get_proc(libgl, "glVertexAttrib1d");
+ctx->_glVertexAttrib1dv = (PFNGLVERTEXATTRIB1DVPROC)get_proc(libgl, "glVertexAttrib1dv");
+ctx->_glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)get_proc(libgl, "glVertexAttrib1f");
+ctx->_glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)get_proc(libgl, "glVertexAttrib1fv");
+ctx->_glVertexAttrib1s = (PFNGLVERTEXATTRIB1SPROC)get_proc(libgl, "glVertexAttrib1s");
+ctx->_glVertexAttrib1sv = (PFNGLVERTEXATTRIB1SVPROC)get_proc(libgl, "glVertexAttrib1sv");
+ctx->_glVertexAttrib2d = (PFNGLVERTEXATTRIB2DPROC)get_proc(libgl, "glVertexAttrib2d");
+ctx->_glVertexAttrib2dv = (PFNGLVERTEXATTRIB2DVPROC)get_proc(libgl, "glVertexAttrib2dv");
+ctx->_glVertexAttrib2f = (PFNGLVERTEXATTRIB2FPROC)get_proc(libgl, "glVertexAttrib2f");
+ctx->_glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)get_proc(libgl, "glVertexAttrib2fv");
+ctx->_glVertexAttrib2s = (PFNGLVERTEXATTRIB2SPROC)get_proc(libgl, "glVertexAttrib2s");
+ctx->_glVertexAttrib2sv = (PFNGLVERTEXATTRIB2SVPROC)get_proc(libgl, "glVertexAttrib2sv");
+ctx->_glVertexAttrib3d = (PFNGLVERTEXATTRIB3DPROC)get_proc(libgl, "glVertexAttrib3d");
+ctx->_glVertexAttrib3dv = (PFNGLVERTEXATTRIB3DVPROC)get_proc(libgl, "glVertexAttrib3dv");
+ctx->_glVertexAttrib3f = (PFNGLVERTEXATTRIB3FPROC)get_proc(libgl, "glVertexAttrib3f");
+ctx->_glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)get_proc(libgl, "glVertexAttrib3fv");
+ctx->_glVertexAttrib3s = (PFNGLVERTEXATTRIB3SPROC)get_proc(libgl, "glVertexAttrib3s");
+ctx->_glVertexAttrib3sv = (PFNGLVERTEXATTRIB3SVPROC)get_proc(libgl, "glVertexAttrib3sv");
+ctx->_glVertexAttrib4Nbv = (PFNGLVERTEXATTRIB4NBVPROC)get_proc(libgl, "glVertexAttrib4Nbv");
+ctx->_glVertexAttrib4Niv = (PFNGLVERTEXATTRIB4NIVPROC)get_proc(libgl, "glVertexAttrib4Niv");
+ctx->_glVertexAttrib4Nsv = (PFNGLVERTEXATTRIB4NSVPROC)get_proc(libgl, "glVertexAttrib4Nsv");
+ctx->_glVertexAttrib4Nub = (PFNGLVERTEXATTRIB4NUBPROC)get_proc(libgl, "glVertexAttrib4Nub");
+ctx->_glVertexAttrib4Nubv = (PFNGLVERTEXATTRIB4NUBVPROC)get_proc(libgl, "glVertexAttrib4Nubv");
+ctx->_glVertexAttrib4Nuiv = (PFNGLVERTEXATTRIB4NUIVPROC)get_proc(libgl, "glVertexAttrib4Nuiv");
+ctx->_glVertexAttrib4Nusv = (PFNGLVERTEXATTRIB4NUSVPROC)get_proc(libgl, "glVertexAttrib4Nusv");
+ctx->_glVertexAttrib4bv = (PFNGLVERTEXATTRIB4BVPROC)get_proc(libgl, "glVertexAttrib4bv");
+ctx->_glVertexAttrib4d = (PFNGLVERTEXATTRIB4DPROC)get_proc(libgl, "glVertexAttrib4d");
+ctx->_glVertexAttrib4dv = (PFNGLVERTEXATTRIB4DVPROC)get_proc(libgl, "glVertexAttrib4dv");
+ctx->_glVertexAttrib4f = (PFNGLVERTEXATTRIB4FPROC)get_proc(libgl, "glVertexAttrib4f");
+ctx->_glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)get_proc(libgl, "glVertexAttrib4fv");
+ctx->_glVertexAttrib4iv = (PFNGLVERTEXATTRIB4IVPROC)get_proc(libgl, "glVertexAttrib4iv");
+ctx->_glVertexAttrib4s = (PFNGLVERTEXATTRIB4SPROC)get_proc(libgl, "glVertexAttrib4s");
+ctx->_glVertexAttrib4sv = (PFNGLVERTEXATTRIB4SVPROC)get_proc(libgl, "glVertexAttrib4sv");
+ctx->_glVertexAttrib4ubv = (PFNGLVERTEXATTRIB4UBVPROC)get_proc(libgl, "glVertexAttrib4ubv");
+ctx->_glVertexAttrib4uiv = (PFNGLVERTEXATTRIB4UIVPROC)get_proc(libgl, "glVertexAttrib4uiv");
+ctx->_glVertexAttrib4usv = (PFNGLVERTEXATTRIB4USVPROC)get_proc(libgl, "glVertexAttrib4usv");
+ctx->_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)get_proc(libgl, "glVertexAttribPointer");
+ctx->_glUniformMatrix2x3fv = (PFNGLUNIFORMMATRIX2X3FVPROC)get_proc(libgl, "glUniformMatrix2x3fv");
+ctx->_glUniformMatrix3x2fv = (PFNGLUNIFORMMATRIX3X2FVPROC)get_proc(libgl, "glUniformMatrix3x2fv");
+ctx->_glUniformMatrix2x4fv = (PFNGLUNIFORMMATRIX2X4FVPROC)get_proc(libgl, "glUniformMatrix2x4fv");
+ctx->_glUniformMatrix4x2fv = (PFNGLUNIFORMMATRIX4X2FVPROC)get_proc(libgl, "glUniformMatrix4x2fv");
+ctx->_glUniformMatrix3x4fv = (PFNGLUNIFORMMATRIX3X4FVPROC)get_proc(libgl, "glUniformMatrix3x4fv");
+ctx->_glUniformMatrix4x3fv = (PFNGLUNIFORMMATRIX4X3FVPROC)get_proc(libgl, "glUniformMatrix4x3fv");
+ctx->_glColorMaski = (PFNGLCOLORMASKIPROC)get_proc(libgl, "glColorMaski");
+ctx->_glGetBooleani_v = (PFNGLGETBOOLEANI_VPROC)get_proc(libgl, "glGetBooleani_v");
+ctx->_glGetIntegeri_v = (PFNGLGETINTEGERI_VPROC)get_proc(libgl, "glGetIntegeri_v");
+ctx->_glEnablei = (PFNGLENABLEIPROC)get_proc(libgl, "glEnablei");
+ctx->_glDisablei = (PFNGLDISABLEIPROC)get_proc(libgl, "glDisablei");
+ctx->_glIsEnabledi = (PFNGLISENABLEDIPROC)get_proc(libgl, "glIsEnabledi");
+ctx->_glBeginTransformFeedback = (PFNGLBEGINTRANSFORMFEEDBACKPROC)get_proc(libgl, "glBeginTransformFeedback");
+ctx->_glEndTransformFeedback = (PFNGLENDTRANSFORMFEEDBACKPROC)get_proc(libgl, "glEndTransformFeedback");
+ctx->_glBindBufferRange = (PFNGLBINDBUFFERRANGEPROC)get_proc(libgl, "glBindBufferRange");
+ctx->_glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)get_proc(libgl, "glBindBufferBase");
+ctx->_glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)get_proc(libgl, "glTransformFeedbackVaryings");
+ctx->_glGetTransformFeedbackVarying = (PFNGLGETTRANSFORMFEEDBACKVARYINGPROC)get_proc(libgl, "glGetTransformFeedbackVarying");
+ctx->_glClampColor = (PFNGLCLAMPCOLORPROC)get_proc(libgl, "glClampColor");
+ctx->_glBeginConditionalRender = (PFNGLBEGINCONDITIONALRENDERPROC)get_proc(libgl, "glBeginConditionalRender");
+ctx->_glEndConditionalRender = (PFNGLENDCONDITIONALRENDERPROC)get_proc(libgl, "glEndConditionalRender");
+ctx->_glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)get_proc(libgl, "glVertexAttribIPointer");
+ctx->_glGetVertexAttribIiv = (PFNGLGETVERTEXATTRIBIIVPROC)get_proc(libgl, "glGetVertexAttribIiv");
+ctx->_glGetVertexAttribIuiv = (PFNGLGETVERTEXATTRIBIUIVPROC)get_proc(libgl, "glGetVertexAttribIuiv");
+ctx->_glVertexAttribI1i = (PFNGLVERTEXATTRIBI1IPROC)get_proc(libgl, "glVertexAttribI1i");
+ctx->_glVertexAttribI2i = (PFNGLVERTEXATTRIBI2IPROC)get_proc(libgl, "glVertexAttribI2i");
+ctx->_glVertexAttribI3i = (PFNGLVERTEXATTRIBI3IPROC)get_proc(libgl, "glVertexAttribI3i");
+ctx->_glVertexAttribI4i = (PFNGLVERTEXATTRIBI4IPROC)get_proc(libgl, "glVertexAttribI4i");
+ctx->_glVertexAttribI1ui = (PFNGLVERTEXATTRIBI1UIPROC)get_proc(libgl, "glVertexAttribI1ui");
+ctx->_glVertexAttribI2ui = (PFNGLVERTEXATTRIBI2UIPROC)get_proc(libgl, "glVertexAttribI2ui");
+ctx->_glVertexAttribI3ui = (PFNGLVERTEXATTRIBI3UIPROC)get_proc(libgl, "glVertexAttribI3ui");
+ctx->_glVertexAttribI4ui = (PFNGLVERTEXATTRIBI4UIPROC)get_proc(libgl, "glVertexAttribI4ui");
+ctx->_glVertexAttribI1iv = (PFNGLVERTEXATTRIBI1IVPROC)get_proc(libgl, "glVertexAttribI1iv");
+ctx->_glVertexAttribI2iv = (PFNGLVERTEXATTRIBI2IVPROC)get_proc(libgl, "glVertexAttribI2iv");
+ctx->_glVertexAttribI3iv = (PFNGLVERTEXATTRIBI3IVPROC)get_proc(libgl, "glVertexAttribI3iv");
+ctx->_glVertexAttribI4iv = (PFNGLVERTEXATTRIBI4IVPROC)get_proc(libgl, "glVertexAttribI4iv");
+ctx->_glVertexAttribI1uiv = (PFNGLVERTEXATTRIBI1UIVPROC)get_proc(libgl, "glVertexAttribI1uiv");
+ctx->_glVertexAttribI2uiv = (PFNGLVERTEXATTRIBI2UIVPROC)get_proc(libgl, "glVertexAttribI2uiv");
+ctx->_glVertexAttribI3uiv = (PFNGLVERTEXATTRIBI3UIVPROC)get_proc(libgl, "glVertexAttribI3uiv");
+ctx->_glVertexAttribI4uiv = (PFNGLVERTEXATTRIBI4UIVPROC)get_proc(libgl, "glVertexAttribI4uiv");
+ctx->_glVertexAttribI4bv = (PFNGLVERTEXATTRIBI4BVPROC)get_proc(libgl, "glVertexAttribI4bv");
+ctx->_glVertexAttribI4sv = (PFNGLVERTEXATTRIBI4SVPROC)get_proc(libgl, "glVertexAttribI4sv");
+ctx->_glVertexAttribI4ubv = (PFNGLVERTEXATTRIBI4UBVPROC)get_proc(libgl, "glVertexAttribI4ubv");
+ctx->_glVertexAttribI4usv = (PFNGLVERTEXATTRIBI4USVPROC)get_proc(libgl, "glVertexAttribI4usv");
+ctx->_glGetUniformuiv = (PFNGLGETUNIFORMUIVPROC)get_proc(libgl, "glGetUniformuiv");
+ctx->_glBindFragDataLocation = (PFNGLBINDFRAGDATALOCATIONPROC)get_proc(libgl, "glBindFragDataLocation");
+ctx->_glGetFragDataLocation = (PFNGLGETFRAGDATALOCATIONPROC)get_proc(libgl, "glGetFragDataLocation");
+ctx->_glUniform1ui = (PFNGLUNIFORM1UIPROC)get_proc(libgl, "glUniform1ui");
+ctx->_glUniform2ui = (PFNGLUNIFORM2UIPROC)get_proc(libgl, "glUniform2ui");
+ctx->_glUniform3ui = (PFNGLUNIFORM3UIPROC)get_proc(libgl, "glUniform3ui");
+ctx->_glUniform4ui = (PFNGLUNIFORM4UIPROC)get_proc(libgl, "glUniform4ui");
+ctx->_glUniform1uiv = (PFNGLUNIFORM1UIVPROC)get_proc(libgl, "glUniform1uiv");
+ctx->_glUniform2uiv = (PFNGLUNIFORM2UIVPROC)get_proc(libgl, "glUniform2uiv");
+ctx->_glUniform3uiv = (PFNGLUNIFORM3UIVPROC)get_proc(libgl, "glUniform3uiv");
+ctx->_glUniform4uiv = (PFNGLUNIFORM4UIVPROC)get_proc(libgl, "glUniform4uiv");
+ctx->_glTexParameterIiv = (PFNGLTEXPARAMETERIIVPROC)get_proc(libgl, "glTexParameterIiv");
+ctx->_glTexParameterIuiv = (PFNGLTEXPARAMETERIUIVPROC)get_proc(libgl, "glTexParameterIuiv");
+ctx->_glGetTexParameterIiv = (PFNGLGETTEXPARAMETERIIVPROC)get_proc(libgl, "glGetTexParameterIiv");
+ctx->_glGetTexParameterIuiv = (PFNGLGETTEXPARAMETERIUIVPROC)get_proc(libgl, "glGetTexParameterIuiv");
+ctx->_glClearBufferiv = (PFNGLCLEARBUFFERIVPROC)get_proc(libgl, "glClearBufferiv");
+ctx->_glClearBufferuiv = (PFNGLCLEARBUFFERUIVPROC)get_proc(libgl, "glClearBufferuiv");
+ctx->_glClearBufferfv = (PFNGLCLEARBUFFERFVPROC)get_proc(libgl, "glClearBufferfv");
+ctx->_glClearBufferfi = (PFNGLCLEARBUFFERFIPROC)get_proc(libgl, "glClearBufferfi");
+ctx->_glGetStringi = (PFNGLGETSTRINGIPROC)get_proc(libgl, "glGetStringi");
+ctx->_glIsRenderbuffer = (PFNGLISRENDERBUFFERPROC)get_proc(libgl, "glIsRenderbuffer");
+ctx->_glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)get_proc(libgl, "glBindRenderbuffer");
+ctx->_glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)get_proc(libgl, "glDeleteRenderbuffers");
+ctx->_glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)get_proc(libgl, "glGenRenderbuffers");
+ctx->_glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)get_proc(libgl, "glRenderbufferStorage");
+ctx->_glGetRenderbufferParameteriv = (PFNGLGETRENDERBUFFERPARAMETERIVPROC)get_proc(libgl, "glGetRenderbufferParameteriv");
+ctx->_glIsFramebuffer = (PFNGLISFRAMEBUFFERPROC)get_proc(libgl, "glIsFramebuffer");
+ctx->_glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)get_proc(libgl, "glBindFramebuffer");
+ctx->_glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)get_proc(libgl, "glDeleteFramebuffers");
+ctx->_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)get_proc(libgl, "glGenFramebuffers");
+ctx->_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)get_proc(libgl, "glCheckFramebufferStatus");
+ctx->_glFramebufferTexture1D = (PFNGLFRAMEBUFFERTEXTURE1DPROC)get_proc(libgl, "glFramebufferTexture1D");
+ctx->_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)get_proc(libgl, "glFramebufferTexture2D");
+ctx->_glFramebufferTexture3D = (PFNGLFRAMEBUFFERTEXTURE3DPROC)get_proc(libgl, "glFramebufferTexture3D");
+ctx->_glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)get_proc(libgl, "glFramebufferRenderbuffer");
+ctx->_glGetFramebufferAttachmentParameteriv = (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)get_proc(libgl, "glGetFramebufferAttachmentParameteriv");
+ctx->_glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)get_proc(libgl, "glGenerateMipmap");
+ctx->_glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)get_proc(libgl, "glBlitFramebuffer");
+ctx->_glRenderbufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)get_proc(libgl, "glRenderbufferStorageMultisample");
+ctx->_glFramebufferTextureLayer = (PFNGLFRAMEBUFFERTEXTURELAYERPROC)get_proc(libgl, "glFramebufferTextureLayer");
+ctx->_glMapBufferRange = (PFNGLMAPBUFFERRANGEPROC)get_proc(libgl, "glMapBufferRange");
+ctx->_glFlushMappedBufferRange = (PFNGLFLUSHMAPPEDBUFFERRANGEPROC)get_proc(libgl, "glFlushMappedBufferRange");
+ctx->_glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)get_proc(libgl, "glBindVertexArray");
+ctx->_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)get_proc(libgl, "glDeleteVertexArrays");
+ctx->_glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)get_proc(libgl, "glGenVertexArrays");
+ctx->_glIsVertexArray = (PFNGLISVERTEXARRAYPROC)get_proc(libgl, "glIsVertexArray");
+ctx->_glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)get_proc(libgl, "glDrawArraysInstanced");
+ctx->_glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)get_proc(libgl, "glDrawElementsInstanced");
+ctx->_glTexBuffer = (PFNGLTEXBUFFERPROC)get_proc(libgl, "glTexBuffer");
+ctx->_glPrimitiveRestartIndex = (PFNGLPRIMITIVERESTARTINDEXPROC)get_proc(libgl, "glPrimitiveRestartIndex");
+ctx->_glCopyBufferSubData = (PFNGLCOPYBUFFERSUBDATAPROC)get_proc(libgl, "glCopyBufferSubData");
+ctx->_glGetUniformIndices = (PFNGLGETUNIFORMINDICESPROC)get_proc(libgl, "glGetUniformIndices");
+ctx->_glGetActiveUniformsiv = (PFNGLGETACTIVEUNIFORMSIVPROC)get_proc(libgl, "glGetActiveUniformsiv");
+ctx->_glGetActiveUniformName = (PFNGLGETACTIVEUNIFORMNAMEPROC)get_proc(libgl, "glGetActiveUniformName");
+ctx->_glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)get_proc(libgl, "glGetUniformBlockIndex");
+ctx->_glGetActiveUniformBlockiv = (PFNGLGETACTIVEUNIFORMBLOCKIVPROC)get_proc(libgl, "glGetActiveUniformBlockiv");
+ctx->_glGetActiveUniformBlockName = (PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC)get_proc(libgl, "glGetActiveUniformBlockName");
+ctx->_glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)get_proc(libgl, "glUniformBlockBinding");
+ctx->_glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)get_proc(libgl, "glDrawElementsBaseVertex");
+ctx->_glDrawRangeElementsBaseVertex = (PFNGLDRAWRANGEELEMENTSBASEVERTEXPROC)get_proc(libgl, "glDrawRangeElementsBaseVertex");
+ctx->_glDrawElementsInstancedBaseVertex = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC)get_proc(libgl, "glDrawElementsInstancedBaseVertex");
+ctx->_glMultiDrawElementsBaseVertex = (PFNGLMULTIDRAWELEMENTSBASEVERTEXPROC)get_proc(libgl, "glMultiDrawElementsBaseVertex");
+ctx->_glProvokingVertex = (PFNGLPROVOKINGVERTEXPROC)get_proc(libgl, "glProvokingVertex");
+ctx->_glFenceSync = (PFNGLFENCESYNCPROC)get_proc(libgl, "glFenceSync");
+ctx->_glIsSync = (PFNGLISSYNCPROC)get_proc(libgl, "glIsSync");
+ctx->_glDeleteSync = (PFNGLDELETESYNCPROC)get_proc(libgl, "glDeleteSync");
+ctx->_glClientWaitSync = (PFNGLCLIENTWAITSYNCPROC)get_proc(libgl, "glClientWaitSync");
+ctx->_glWaitSync = (PFNGLWAITSYNCPROC)get_proc(libgl, "glWaitSync");
+ctx->_glGetInteger64v = (PFNGLGETINTEGER64VPROC)get_proc(libgl, "glGetInteger64v");
+ctx->_glGetSynciv = (PFNGLGETSYNCIVPROC)get_proc(libgl, "glGetSynciv");
+ctx->_glGetInteger64i_v = (PFNGLGETINTEGER64I_VPROC)get_proc(libgl, "glGetInteger64i_v");
+ctx->_glGetBufferParameteri64v = (PFNGLGETBUFFERPARAMETERI64VPROC)get_proc(libgl, "glGetBufferParameteri64v");
+ctx->_glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)get_proc(libgl, "glFramebufferTexture");
+ctx->_glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)get_proc(libgl, "glTexImage2DMultisample");
+ctx->_glTexImage3DMultisample = (PFNGLTEXIMAGE3DMULTISAMPLEPROC)get_proc(libgl, "glTexImage3DMultisample");
+ctx->_glGetMultisamplefv = (PFNGLGETMULTISAMPLEFVPROC)get_proc(libgl, "glGetMultisamplefv");
+ctx->_glSampleMaski = (PFNGLSAMPLEMASKIPROC)get_proc(libgl, "glSampleMaski");
+ctx->_glBindFragDataLocationIndexed = (PFNGLBINDFRAGDATALOCATIONINDEXEDPROC)get_proc(libgl, "glBindFragDataLocationIndexed");
+ctx->_glGetFragDataIndex = (PFNGLGETFRAGDATAINDEXPROC)get_proc(libgl, "glGetFragDataIndex");
+ctx->_glGenSamplers = (PFNGLGENSAMPLERSPROC)get_proc(libgl, "glGenSamplers");
+ctx->_glDeleteSamplers = (PFNGLDELETESAMPLERSPROC)get_proc(libgl, "glDeleteSamplers");
+ctx->_glIsSampler = (PFNGLISSAMPLERPROC)get_proc(libgl, "glIsSampler");
+ctx->_glBindSampler = (PFNGLBINDSAMPLERPROC)get_proc(libgl, "glBindSampler");
+ctx->_glSamplerParameteri = (PFNGLSAMPLERPARAMETERIPROC)get_proc(libgl, "glSamplerParameteri");
+ctx->_glSamplerParameteriv = (PFNGLSAMPLERPARAMETERIVPROC)get_proc(libgl, "glSamplerParameteriv");
+ctx->_glSamplerParameterf = (PFNGLSAMPLERPARAMETERFPROC)get_proc(libgl, "glSamplerParameterf");
+ctx->_glSamplerParameterfv = (PFNGLSAMPLERPARAMETERFVPROC)get_proc(libgl, "glSamplerParameterfv");
+ctx->_glSamplerParameterIiv = (PFNGLSAMPLERPARAMETERIIVPROC)get_proc(libgl, "glSamplerParameterIiv");
+ctx->_glSamplerParameterIuiv = (PFNGLSAMPLERPARAMETERIUIVPROC)get_proc(libgl, "glSamplerParameterIuiv");
+ctx->_glGetSamplerParameteriv = (PFNGLGETSAMPLERPARAMETERIVPROC)get_proc(libgl, "glGetSamplerParameteriv");
+ctx->_glGetSamplerParameterIiv = (PFNGLGETSAMPLERPARAMETERIIVPROC)get_proc(libgl, "glGetSamplerParameterIiv");
+ctx->_glGetSamplerParameterfv = (PFNGLGETSAMPLERPARAMETERFVPROC)get_proc(libgl, "glGetSamplerParameterfv");
+ctx->_glGetSamplerParameterIuiv = (PFNGLGETSAMPLERPARAMETERIUIVPROC)get_proc(libgl, "glGetSamplerParameterIuiv");
+ctx->_glQueryCounter = (PFNGLQUERYCOUNTERPROC)get_proc(libgl, "glQueryCounter");
+ctx->_glGetQueryObjecti64v = (PFNGLGETQUERYOBJECTI64VPROC)get_proc(libgl, "glGetQueryObjecti64v");
+ctx->_glGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC)get_proc(libgl, "glGetQueryObjectui64v");
+ctx->_glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)get_proc(libgl, "glVertexAttribDivisor");
+ctx->_glVertexAttribP1ui = (PFNGLVERTEXATTRIBP1UIPROC)get_proc(libgl, "glVertexAttribP1ui");
+ctx->_glVertexAttribP1uiv = (PFNGLVERTEXATTRIBP1UIVPROC)get_proc(libgl, "glVertexAttribP1uiv");
+ctx->_glVertexAttribP2ui = (PFNGLVERTEXATTRIBP2UIPROC)get_proc(libgl, "glVertexAttribP2ui");
+ctx->_glVertexAttribP2uiv = (PFNGLVERTEXATTRIBP2UIVPROC)get_proc(libgl, "glVertexAttribP2uiv");
+ctx->_glVertexAttribP3ui = (PFNGLVERTEXATTRIBP3UIPROC)get_proc(libgl, "glVertexAttribP3ui");
+ctx->_glVertexAttribP3uiv = (PFNGLVERTEXATTRIBP3UIVPROC)get_proc(libgl, "glVertexAttribP3uiv");
+ctx->_glVertexAttribP4ui = (PFNGLVERTEXATTRIBP4UIPROC)get_proc(libgl, "glVertexAttribP4ui");
+ctx->_glVertexAttribP4uiv = (PFNGLVERTEXATTRIBP4UIVPROC)get_proc(libgl, "glVertexAttribP4uiv");
+ctx->_glMinSampleShading = (PFNGLMINSAMPLESHADINGPROC)get_proc(libgl, "glMinSampleShading");
+ctx->_glBlendEquationi = (PFNGLBLENDEQUATIONIPROC)get_proc(libgl, "glBlendEquationi");
+ctx->_glBlendEquationSeparatei = (PFNGLBLENDEQUATIONSEPARATEIPROC)get_proc(libgl, "glBlendEquationSeparatei");
+ctx->_glBlendFunci = (PFNGLBLENDFUNCIPROC)get_proc(libgl, "glBlendFunci");
+ctx->_glBlendFuncSeparatei = (PFNGLBLENDFUNCSEPARATEIPROC)get_proc(libgl, "glBlendFuncSeparatei");
+ctx->_glDrawArraysIndirect = (PFNGLDRAWARRAYSINDIRECTPROC)get_proc(libgl, "glDrawArraysIndirect");
+ctx->_glDrawElementsIndirect = (PFNGLDRAWELEMENTSINDIRECTPROC)get_proc(libgl, "glDrawElementsIndirect");
+ctx->_glUniform1d = (PFNGLUNIFORM1DPROC)get_proc(libgl, "glUniform1d");
+ctx->_glUniform2d = (PFNGLUNIFORM2DPROC)get_proc(libgl, "glUniform2d");
+ctx->_glUniform3d = (PFNGLUNIFORM3DPROC)get_proc(libgl, "glUniform3d");
+ctx->_glUniform4d = (PFNGLUNIFORM4DPROC)get_proc(libgl, "glUniform4d");
+ctx->_glUniform1dv = (PFNGLUNIFORM1DVPROC)get_proc(libgl, "glUniform1dv");
+ctx->_glUniform2dv = (PFNGLUNIFORM2DVPROC)get_proc(libgl, "glUniform2dv");
+ctx->_glUniform3dv = (PFNGLUNIFORM3DVPROC)get_proc(libgl, "glUniform3dv");
+ctx->_glUniform4dv = (PFNGLUNIFORM4DVPROC)get_proc(libgl, "glUniform4dv");
+ctx->_glUniformMatrix2dv = (PFNGLUNIFORMMATRIX2DVPROC)get_proc(libgl, "glUniformMatrix2dv");
+ctx->_glUniformMatrix3dv = (PFNGLUNIFORMMATRIX3DVPROC)get_proc(libgl, "glUniformMatrix3dv");
+ctx->_glUniformMatrix4dv = (PFNGLUNIFORMMATRIX4DVPROC)get_proc(libgl, "glUniformMatrix4dv");
+ctx->_glUniformMatrix2x3dv = (PFNGLUNIFORMMATRIX2X3DVPROC)get_proc(libgl, "glUniformMatrix2x3dv");
+ctx->_glUniformMatrix2x4dv = (PFNGLUNIFORMMATRIX2X4DVPROC)get_proc(libgl, "glUniformMatrix2x4dv");
+ctx->_glUniformMatrix3x2dv = (PFNGLUNIFORMMATRIX3X2DVPROC)get_proc(libgl, "glUniformMatrix3x2dv");
+ctx->_glUniformMatrix3x4dv = (PFNGLUNIFORMMATRIX3X4DVPROC)get_proc(libgl, "glUniformMatrix3x4dv");
+ctx->_glUniformMatrix4x2dv = (PFNGLUNIFORMMATRIX4X2DVPROC)get_proc(libgl, "glUniformMatrix4x2dv");
+ctx->_glUniformMatrix4x3dv = (PFNGLUNIFORMMATRIX4X3DVPROC)get_proc(libgl, "glUniformMatrix4x3dv");
+ctx->_glGetUniformdv = (PFNGLGETUNIFORMDVPROC)get_proc(libgl, "glGetUniformdv");
+ctx->_glGetSubroutineUniformLocation = (PFNGLGETSUBROUTINEUNIFORMLOCATIONPROC)get_proc(libgl, "glGetSubroutineUniformLocation");
+ctx->_glGetSubroutineIndex = (PFNGLGETSUBROUTINEINDEXPROC)get_proc(libgl, "glGetSubroutineIndex");
+ctx->_glGetActiveSubroutineUniformiv = (PFNGLGETACTIVESUBROUTINEUNIFORMIVPROC)get_proc(libgl, "glGetActiveSubroutineUniformiv");
+ctx->_glGetActiveSubroutineUniformName = (PFNGLGETACTIVESUBROUTINEUNIFORMNAMEPROC)get_proc(libgl, "glGetActiveSubroutineUniformName");
+ctx->_glGetActiveSubroutineName = (PFNGLGETACTIVESUBROUTINENAMEPROC)get_proc(libgl, "glGetActiveSubroutineName");
+ctx->_glUniformSubroutinesuiv = (PFNGLUNIFORMSUBROUTINESUIVPROC)get_proc(libgl, "glUniformSubroutinesuiv");
+ctx->_glGetUniformSubroutineuiv = (PFNGLGETUNIFORMSUBROUTINEUIVPROC)get_proc(libgl, "glGetUniformSubroutineuiv");
+ctx->_glGetProgramStageiv = (PFNGLGETPROGRAMSTAGEIVPROC)get_proc(libgl, "glGetProgramStageiv");
+ctx->_glPatchParameteri = (PFNGLPATCHPARAMETERIPROC)get_proc(libgl, "glPatchParameteri");
+ctx->_glPatchParameterfv = (PFNGLPATCHPARAMETERFVPROC)get_proc(libgl, "glPatchParameterfv");
+ctx->_glBindTransformFeedback = (PFNGLBINDTRANSFORMFEEDBACKPROC)get_proc(libgl, "glBindTransformFeedback");
+ctx->_glDeleteTransformFeedbacks = (PFNGLDELETETRANSFORMFEEDBACKSPROC)get_proc(libgl, "glDeleteTransformFeedbacks");
+ctx->_glGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC)get_proc(libgl, "glGenTransformFeedbacks");
+ctx->_glIsTransformFeedback = (PFNGLISTRANSFORMFEEDBACKPROC)get_proc(libgl, "glIsTransformFeedback");
+ctx->_glPauseTransformFeedback = (PFNGLPAUSETRANSFORMFEEDBACKPROC)get_proc(libgl, "glPauseTransformFeedback");
+ctx->_glResumeTransformFeedback = (PFNGLRESUMETRANSFORMFEEDBACKPROC)get_proc(libgl, "glResumeTransformFeedback");
+ctx->_glDrawTransformFeedback = (PFNGLDRAWTRANSFORMFEEDBACKPROC)get_proc(libgl, "glDrawTransformFeedback");
+ctx->_glDrawTransformFeedbackStream = (PFNGLDRAWTRANSFORMFEEDBACKSTREAMPROC)get_proc(libgl, "glDrawTransformFeedbackStream");
+ctx->_glBeginQueryIndexed = (PFNGLBEGINQUERYINDEXEDPROC)get_proc(libgl, "glBeginQueryIndexed");
+ctx->_glEndQueryIndexed = (PFNGLENDQUERYINDEXEDPROC)get_proc(libgl, "glEndQueryIndexed");
+ctx->_glGetQueryIndexediv = (PFNGLGETQUERYINDEXEDIVPROC)get_proc(libgl, "glGetQueryIndexediv");
+ctx->_glReleaseShaderCompiler = (PFNGLRELEASESHADERCOMPILERPROC)get_proc(libgl, "glReleaseShaderCompiler");
+ctx->_glShaderBinary = (PFNGLSHADERBINARYPROC)get_proc(libgl, "glShaderBinary");
+ctx->_glGetShaderPrecisionFormat = (PFNGLGETSHADERPRECISIONFORMATPROC)get_proc(libgl, "glGetShaderPrecisionFormat");
+ctx->_glDepthRangef = (PFNGLDEPTHRANGEFPROC)get_proc(libgl, "glDepthRangef");
+ctx->_glClearDepthf = (PFNGLCLEARDEPTHFPROC)get_proc(libgl, "glClearDepthf");
+ctx->_glGetProgramBinary = (PFNGLGETPROGRAMBINARYPROC)get_proc(libgl, "glGetProgramBinary");
+ctx->_glProgramBinary = (PFNGLPROGRAMBINARYPROC)get_proc(libgl, "glProgramBinary");
+ctx->_glProgramParameteri = (PFNGLPROGRAMPARAMETERIPROC)get_proc(libgl, "glProgramParameteri");
+ctx->_glUseProgramStages = (PFNGLUSEPROGRAMSTAGESPROC)get_proc(libgl, "glUseProgramStages");
+ctx->_glActiveShaderProgram = (PFNGLACTIVESHADERPROGRAMPROC)get_proc(libgl, "glActiveShaderProgram");
+ctx->_glCreateShaderProgramv = (PFNGLCREATESHADERPROGRAMVPROC)get_proc(libgl, "glCreateShaderProgramv");
+ctx->_glBindProgramPipeline = (PFNGLBINDPROGRAMPIPELINEPROC)get_proc(libgl, "glBindProgramPipeline");
+ctx->_glDeleteProgramPipelines = (PFNGLDELETEPROGRAMPIPELINESPROC)get_proc(libgl, "glDeleteProgramPipelines");
+ctx->_glGenProgramPipelines = (PFNGLGENPROGRAMPIPELINESPROC)get_proc(libgl, "glGenProgramPipelines");
+ctx->_glIsProgramPipeline = (PFNGLISPROGRAMPIPELINEPROC)get_proc(libgl, "glIsProgramPipeline");
+ctx->_glGetProgramPipelineiv = (PFNGLGETPROGRAMPIPELINEIVPROC)get_proc(libgl, "glGetProgramPipelineiv");
+ctx->_glProgramUniform1i = (PFNGLPROGRAMUNIFORM1IPROC)get_proc(libgl, "glProgramUniform1i");
+ctx->_glProgramUniform1iv = (PFNGLPROGRAMUNIFORM1IVPROC)get_proc(libgl, "glProgramUniform1iv");
+ctx->_glProgramUniform1f = (PFNGLPROGRAMUNIFORM1FPROC)get_proc(libgl, "glProgramUniform1f");
+ctx->_glProgramUniform1fv = (PFNGLPROGRAMUNIFORM1FVPROC)get_proc(libgl, "glProgramUniform1fv");
+ctx->_glProgramUniform1d = (PFNGLPROGRAMUNIFORM1DPROC)get_proc(libgl, "glProgramUniform1d");
+ctx->_glProgramUniform1dv = (PFNGLPROGRAMUNIFORM1DVPROC)get_proc(libgl, "glProgramUniform1dv");
+ctx->_glProgramUniform1ui = (PFNGLPROGRAMUNIFORM1UIPROC)get_proc(libgl, "glProgramUniform1ui");
+ctx->_glProgramUniform1uiv = (PFNGLPROGRAMUNIFORM1UIVPROC)get_proc(libgl, "glProgramUniform1uiv");
+ctx->_glProgramUniform2i = (PFNGLPROGRAMUNIFORM2IPROC)get_proc(libgl, "glProgramUniform2i");
+ctx->_glProgramUniform2iv = (PFNGLPROGRAMUNIFORM2IVPROC)get_proc(libgl, "glProgramUniform2iv");
+ctx->_glProgramUniform2f = (PFNGLPROGRAMUNIFORM2FPROC)get_proc(libgl, "glProgramUniform2f");
+ctx->_glProgramUniform2fv = (PFNGLPROGRAMUNIFORM2FVPROC)get_proc(libgl, "glProgramUniform2fv");
+ctx->_glProgramUniform2d = (PFNGLPROGRAMUNIFORM2DPROC)get_proc(libgl, "glProgramUniform2d");
+ctx->_glProgramUniform2dv = (PFNGLPROGRAMUNIFORM2DVPROC)get_proc(libgl, "glProgramUniform2dv");
+ctx->_glProgramUniform2ui = (PFNGLPROGRAMUNIFORM2UIPROC)get_proc(libgl, "glProgramUniform2ui");
+ctx->_glProgramUniform2uiv = (PFNGLPROGRAMUNIFORM2UIVPROC)get_proc(libgl, "glProgramUniform2uiv");
+ctx->_glProgramUniform3i = (PFNGLPROGRAMUNIFORM3IPROC)get_proc(libgl, "glProgramUniform3i");
+ctx->_glProgramUniform3iv = (PFNGLPROGRAMUNIFORM3IVPROC)get_proc(libgl, "glProgramUniform3iv");
+ctx->_glProgramUniform3f = (PFNGLPROGRAMUNIFORM3FPROC)get_proc(libgl, "glProgramUniform3f");
+ctx->_glProgramUniform3fv = (PFNGLPROGRAMUNIFORM3FVPROC)get_proc(libgl, "glProgramUniform3fv");
+ctx->_glProgramUniform3d = (PFNGLPROGRAMUNIFORM3DPROC)get_proc(libgl, "glProgramUniform3d");
+ctx->_glProgramUniform3dv = (PFNGLPROGRAMUNIFORM3DVPROC)get_proc(libgl, "glProgramUniform3dv");
+ctx->_glProgramUniform3ui = (PFNGLPROGRAMUNIFORM3UIPROC)get_proc(libgl, "glProgramUniform3ui");
+ctx->_glProgramUniform3uiv = (PFNGLPROGRAMUNIFORM3UIVPROC)get_proc(libgl, "glProgramUniform3uiv");
+ctx->_glProgramUniform4i = (PFNGLPROGRAMUNIFORM4IPROC)get_proc(libgl, "glProgramUniform4i");
+ctx->_glProgramUniform4iv = (PFNGLPROGRAMUNIFORM4IVPROC)get_proc(libgl, "glProgramUniform4iv");
+ctx->_glProgramUniform4f = (PFNGLPROGRAMUNIFORM4FPROC)get_proc(libgl, "glProgramUniform4f");
+ctx->_glProgramUniform4fv = (PFNGLPROGRAMUNIFORM4FVPROC)get_proc(libgl, "glProgramUniform4fv");
+ctx->_glProgramUniform4d = (PFNGLPROGRAMUNIFORM4DPROC)get_proc(libgl, "glProgramUniform4d");
+ctx->_glProgramUniform4dv = (PFNGLPROGRAMUNIFORM4DVPROC)get_proc(libgl, "glProgramUniform4dv");
+ctx->_glProgramUniform4ui = (PFNGLPROGRAMUNIFORM4UIPROC)get_proc(libgl, "glProgramUniform4ui");
+ctx->_glProgramUniform4uiv = (PFNGLPROGRAMUNIFORM4UIVPROC)get_proc(libgl, "glProgramUniform4uiv");
+ctx->_glProgramUniformMatrix2fv = (PFNGLPROGRAMUNIFORMMATRIX2FVPROC)get_proc(libgl, "glProgramUniformMatrix2fv");
+ctx->_glProgramUniformMatrix3fv = (PFNGLPROGRAMUNIFORMMATRIX3FVPROC)get_proc(libgl, "glProgramUniformMatrix3fv");
+ctx->_glProgramUniformMatrix4fv = (PFNGLPROGRAMUNIFORMMATRIX4FVPROC)get_proc(libgl, "glProgramUniformMatrix4fv");
+ctx->_glProgramUniformMatrix2dv = (PFNGLPROGRAMUNIFORMMATRIX2DVPROC)get_proc(libgl, "glProgramUniformMatrix2dv");
+ctx->_glProgramUniformMatrix3dv = (PFNGLPROGRAMUNIFORMMATRIX3DVPROC)get_proc(libgl, "glProgramUniformMatrix3dv");
+ctx->_glProgramUniformMatrix4dv = (PFNGLPROGRAMUNIFORMMATRIX4DVPROC)get_proc(libgl, "glProgramUniformMatrix4dv");
+ctx->_glProgramUniformMatrix2x3fv = (PFNGLPROGRAMUNIFORMMATRIX2X3FVPROC)get_proc(libgl, "glProgramUniformMatrix2x3fv");
+ctx->_glProgramUniformMatrix3x2fv = (PFNGLPROGRAMUNIFORMMATRIX3X2FVPROC)get_proc(libgl, "glProgramUniformMatrix3x2fv");
+ctx->_glProgramUniformMatrix2x4fv = (PFNGLPROGRAMUNIFORMMATRIX2X4FVPROC)get_proc(libgl, "glProgramUniformMatrix2x4fv");
+ctx->_glProgramUniformMatrix4x2fv = (PFNGLPROGRAMUNIFORMMATRIX4X2FVPROC)get_proc(libgl, "glProgramUniformMatrix4x2fv");
+ctx->_glProgramUniformMatrix3x4fv = (PFNGLPROGRAMUNIFORMMATRIX3X4FVPROC)get_proc(libgl, "glProgramUniformMatrix3x4fv");
+ctx->_glProgramUniformMatrix4x3fv = (PFNGLPROGRAMUNIFORMMATRIX4X3FVPROC)get_proc(libgl, "glProgramUniformMatrix4x3fv");
+ctx->_glProgramUniformMatrix2x3dv = (PFNGLPROGRAMUNIFORMMATRIX2X3DVPROC)get_proc(libgl, "glProgramUniformMatrix2x3dv");
+ctx->_glProgramUniformMatrix3x2dv = (PFNGLPROGRAMUNIFORMMATRIX3X2DVPROC)get_proc(libgl, "glProgramUniformMatrix3x2dv");
+ctx->_glProgramUniformMatrix2x4dv = (PFNGLPROGRAMUNIFORMMATRIX2X4DVPROC)get_proc(libgl, "glProgramUniformMatrix2x4dv");
+ctx->_glProgramUniformMatrix4x2dv = (PFNGLPROGRAMUNIFORMMATRIX4X2DVPROC)get_proc(libgl, "glProgramUniformMatrix4x2dv");
+ctx->_glProgramUniformMatrix3x4dv = (PFNGLPROGRAMUNIFORMMATRIX3X4DVPROC)get_proc(libgl, "glProgramUniformMatrix3x4dv");
+ctx->_glProgramUniformMatrix4x3dv = (PFNGLPROGRAMUNIFORMMATRIX4X3DVPROC)get_proc(libgl, "glProgramUniformMatrix4x3dv");
+ctx->_glValidateProgramPipeline = (PFNGLVALIDATEPROGRAMPIPELINEPROC)get_proc(libgl, "glValidateProgramPipeline");
+ctx->_glGetProgramPipelineInfoLog = (PFNGLGETPROGRAMPIPELINEINFOLOGPROC)get_proc(libgl, "glGetProgramPipelineInfoLog");
+ctx->_glVertexAttribL1d = (PFNGLVERTEXATTRIBL1DPROC)get_proc(libgl, "glVertexAttribL1d");
+ctx->_glVertexAttribL2d = (PFNGLVERTEXATTRIBL2DPROC)get_proc(libgl, "glVertexAttribL2d");
+ctx->_glVertexAttribL3d = (PFNGLVERTEXATTRIBL3DPROC)get_proc(libgl, "glVertexAttribL3d");
+ctx->_glVertexAttribL4d = (PFNGLVERTEXATTRIBL4DPROC)get_proc(libgl, "glVertexAttribL4d");
+ctx->_glVertexAttribL1dv = (PFNGLVERTEXATTRIBL1DVPROC)get_proc(libgl, "glVertexAttribL1dv");
+ctx->_glVertexAttribL2dv = (PFNGLVERTEXATTRIBL2DVPROC)get_proc(libgl, "glVertexAttribL2dv");
+ctx->_glVertexAttribL3dv = (PFNGLVERTEXATTRIBL3DVPROC)get_proc(libgl, "glVertexAttribL3dv");
+ctx->_glVertexAttribL4dv = (PFNGLVERTEXATTRIBL4DVPROC)get_proc(libgl, "glVertexAttribL4dv");
+ctx->_glVertexAttribLPointer = (PFNGLVERTEXATTRIBLPOINTERPROC)get_proc(libgl, "glVertexAttribLPointer");
+ctx->_glGetVertexAttribLdv = (PFNGLGETVERTEXATTRIBLDVPROC)get_proc(libgl, "glGetVertexAttribLdv");
+ctx->_glViewportArrayv = (PFNGLVIEWPORTARRAYVPROC)get_proc(libgl, "glViewportArrayv");
+ctx->_glViewportIndexedf = (PFNGLVIEWPORTINDEXEDFPROC)get_proc(libgl, "glViewportIndexedf");
+ctx->_glViewportIndexedfv = (PFNGLVIEWPORTINDEXEDFVPROC)get_proc(libgl, "glViewportIndexedfv");
+ctx->_glScissorArrayv = (PFNGLSCISSORARRAYVPROC)get_proc(libgl, "glScissorArrayv");
+ctx->_glScissorIndexed = (PFNGLSCISSORINDEXEDPROC)get_proc(libgl, "glScissorIndexed");
+ctx->_glScissorIndexedv = (PFNGLSCISSORINDEXEDVPROC)get_proc(libgl, "glScissorIndexedv");
+ctx->_glDepthRangeArrayv = (PFNGLDEPTHRANGEARRAYVPROC)get_proc(libgl, "glDepthRangeArrayv");
+ctx->_glDepthRangeIndexed = (PFNGLDEPTHRANGEINDEXEDPROC)get_proc(libgl, "glDepthRangeIndexed");
+ctx->_glGetFloati_v = (PFNGLGETFLOATI_VPROC)get_proc(libgl, "glGetFloati_v");
+ctx->_glGetDoublei_v = (PFNGLGETDOUBLEI_VPROC)get_proc(libgl, "glGetDoublei_v");
+ctx->_glDrawArraysInstancedBaseInstance = (PFNGLDRAWARRAYSINSTANCEDBASEINSTANCEPROC)get_proc(libgl, "glDrawArraysInstancedBaseInstance");
+ctx->_glDrawElementsInstancedBaseInstance = (PFNGLDRAWELEMENTSINSTANCEDBASEINSTANCEPROC)get_proc(libgl, "glDrawElementsInstancedBaseInstance");
+ctx->_glDrawElementsInstancedBaseVertexBaseInstance = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC)get_proc(libgl, "glDrawElementsInstancedBaseVertexBaseInstance");
+ctx->_glGetInternalformativ = (PFNGLGETINTERNALFORMATIVPROC)get_proc(libgl, "glGetInternalformativ");
+ctx->_glGetActiveAtomicCounterBufferiv = (PFNGLGETACTIVEATOMICCOUNTERBUFFERIVPROC)get_proc(libgl, "glGetActiveAtomicCounterBufferiv");
+ctx->_glBindImageTexture = (PFNGLBINDIMAGETEXTUREPROC)get_proc(libgl, "glBindImageTexture");
+ctx->_glMemoryBarrier = (PFNGLMEMORYBARRIERPROC)get_proc(libgl, "glMemoryBarrier");
+ctx->_glTexStorage1D = (PFNGLTEXSTORAGE1DPROC)get_proc(libgl, "glTexStorage1D");
+ctx->_glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)get_proc(libgl, "glTexStorage2D");
+ctx->_glTexStorage3D = (PFNGLTEXSTORAGE3DPROC)get_proc(libgl, "glTexStorage3D");
+ctx->_glDrawTransformFeedbackInstanced = (PFNGLDRAWTRANSFORMFEEDBACKINSTANCEDPROC)get_proc(libgl, "glDrawTransformFeedbackInstanced");
+ctx->_glDrawTransformFeedbackStreamInstanced = (PFNGLDRAWTRANSFORMFEEDBACKSTREAMINSTANCEDPROC)get_proc(libgl, "glDrawTransformFeedbackStreamInstanced");
+ctx->_glClearBufferData = (PFNGLCLEARBUFFERDATAPROC)get_proc(libgl, "glClearBufferData");
+ctx->_glClearBufferSubData = (PFNGLCLEARBUFFERSUBDATAPROC)get_proc(libgl, "glClearBufferSubData");
+ctx->_glDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)get_proc(libgl, "glDispatchCompute");
+ctx->_glDispatchComputeIndirect = (PFNGLDISPATCHCOMPUTEINDIRECTPROC)get_proc(libgl, "glDispatchComputeIndirect");
+ctx->_glCopyImageSubData = (PFNGLCOPYIMAGESUBDATAPROC)get_proc(libgl, "glCopyImageSubData");
+ctx->_glFramebufferParameteri = (PFNGLFRAMEBUFFERPARAMETERIPROC)get_proc(libgl, "glFramebufferParameteri");
+ctx->_glGetFramebufferParameteriv = (PFNGLGETFRAMEBUFFERPARAMETERIVPROC)get_proc(libgl, "glGetFramebufferParameteriv");
+ctx->_glGetInternalformati64v = (PFNGLGETINTERNALFORMATI64VPROC)get_proc(libgl, "glGetInternalformati64v");
+ctx->_glInvalidateTexSubImage = (PFNGLINVALIDATETEXSUBIMAGEPROC)get_proc(libgl, "glInvalidateTexSubImage");
+ctx->_glInvalidateTexImage = (PFNGLINVALIDATETEXIMAGEPROC)get_proc(libgl, "glInvalidateTexImage");
+ctx->_glInvalidateBufferSubData = (PFNGLINVALIDATEBUFFERSUBDATAPROC)get_proc(libgl, "glInvalidateBufferSubData");
+ctx->_glInvalidateBufferData = (PFNGLINVALIDATEBUFFERDATAPROC)get_proc(libgl, "glInvalidateBufferData");
+ctx->_glInvalidateFramebuffer = (PFNGLINVALIDATEFRAMEBUFFERPROC)get_proc(libgl, "glInvalidateFramebuffer");
+ctx->_glInvalidateSubFramebuffer = (PFNGLINVALIDATESUBFRAMEBUFFERPROC)get_proc(libgl, "glInvalidateSubFramebuffer");
+ctx->_glMultiDrawArraysIndirect = (PFNGLMULTIDRAWARRAYSINDIRECTPROC)get_proc(libgl, "glMultiDrawArraysIndirect");
+ctx->_glMultiDrawElementsIndirect = (PFNGLMULTIDRAWELEMENTSINDIRECTPROC)get_proc(libgl, "glMultiDrawElementsIndirect");
+ctx->_glGetProgramInterfaceiv = (PFNGLGETPROGRAMINTERFACEIVPROC)get_proc(libgl, "glGetProgramInterfaceiv");
+ctx->_glGetProgramResourceIndex = (PFNGLGETPROGRAMRESOURCEINDEXPROC)get_proc(libgl, "glGetProgramResourceIndex");
+ctx->_glGetProgramResourceName = (PFNGLGETPROGRAMRESOURCENAMEPROC)get_proc(libgl, "glGetProgramResourceName");
+ctx->_glGetProgramResourceiv = (PFNGLGETPROGRAMRESOURCEIVPROC)get_proc(libgl, "glGetProgramResourceiv");
+ctx->_glGetProgramResourceLocation = (PFNGLGETPROGRAMRESOURCELOCATIONPROC)get_proc(libgl, "glGetProgramResourceLocation");
+ctx->_glGetProgramResourceLocationIndex = (PFNGLGETPROGRAMRESOURCELOCATIONINDEXPROC)get_proc(libgl, "glGetProgramResourceLocationIndex");
+ctx->_glShaderStorageBlockBinding = (PFNGLSHADERSTORAGEBLOCKBINDINGPROC)get_proc(libgl, "glShaderStorageBlockBinding");
+ctx->_glTexBufferRange = (PFNGLTEXBUFFERRANGEPROC)get_proc(libgl, "glTexBufferRange");
+ctx->_glTexStorage2DMultisample = (PFNGLTEXSTORAGE2DMULTISAMPLEPROC)get_proc(libgl, "glTexStorage2DMultisample");
+ctx->_glTexStorage3DMultisample = (PFNGLTEXSTORAGE3DMULTISAMPLEPROC)get_proc(libgl, "glTexStorage3DMultisample");
+ctx->_glTextureView = (PFNGLTEXTUREVIEWPROC)get_proc(libgl, "glTextureView");
+ctx->_glBindVertexBuffer = (PFNGLBINDVERTEXBUFFERPROC)get_proc(libgl, "glBindVertexBuffer");
+ctx->_glVertexAttribFormat = (PFNGLVERTEXATTRIBFORMATPROC)get_proc(libgl, "glVertexAttribFormat");
+ctx->_glVertexAttribIFormat = (PFNGLVERTEXATTRIBIFORMATPROC)get_proc(libgl, "glVertexAttribIFormat");
+ctx->_glVertexAttribLFormat = (PFNGLVERTEXATTRIBLFORMATPROC)get_proc(libgl, "glVertexAttribLFormat");
+ctx->_glVertexAttribBinding = (PFNGLVERTEXATTRIBBINDINGPROC)get_proc(libgl, "glVertexAttribBinding");
+ctx->_glVertexBindingDivisor = (PFNGLVERTEXBINDINGDIVISORPROC)get_proc(libgl, "glVertexBindingDivisor");
+ctx->_glDebugMessageControl = (PFNGLDEBUGMESSAGECONTROLPROC)get_proc(libgl, "glDebugMessageControl");
+ctx->_glDebugMessageInsert = (PFNGLDEBUGMESSAGEINSERTPROC)get_proc(libgl, "glDebugMessageInsert");
+ctx->_glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)get_proc(libgl, "glDebugMessageCallback");
+ctx->_glGetDebugMessageLog = (PFNGLGETDEBUGMESSAGELOGPROC)get_proc(libgl, "glGetDebugMessageLog");
+ctx->_glPushDebugGroup = (PFNGLPUSHDEBUGGROUPPROC)get_proc(libgl, "glPushDebugGroup");
+ctx->_glPopDebugGroup = (PFNGLPOPDEBUGGROUPPROC)get_proc(libgl, "glPopDebugGroup");
+ctx->_glObjectLabel = (PFNGLOBJECTLABELPROC)get_proc(libgl, "glObjectLabel");
+ctx->_glGetObjectLabel = (PFNGLGETOBJECTLABELPROC)get_proc(libgl, "glGetObjectLabel");
+ctx->_glObjectPtrLabel = (PFNGLOBJECTPTRLABELPROC)get_proc(libgl, "glObjectPtrLabel");
+ctx->_glGetObjectPtrLabel = (PFNGLGETOBJECTPTRLABELPROC)get_proc(libgl, "glGetObjectPtrLabel");
+ctx->_glBufferStorage = (PFNGLBUFFERSTORAGEPROC)get_proc(libgl, "glBufferStorage");
+ctx->_glClearTexImage = (PFNGLCLEARTEXIMAGEPROC)get_proc(libgl, "glClearTexImage");
+ctx->_glClearTexSubImage = (PFNGLCLEARTEXSUBIMAGEPROC)get_proc(libgl, "glClearTexSubImage");
+ctx->_glBindBuffersBase = (PFNGLBINDBUFFERSBASEPROC)get_proc(libgl, "glBindBuffersBase");
+ctx->_glBindBuffersRange = (PFNGLBINDBUFFERSRANGEPROC)get_proc(libgl, "glBindBuffersRange");
+ctx->_glBindTextures = (PFNGLBINDTEXTURESPROC)get_proc(libgl, "glBindTextures");
+ctx->_glBindSamplers = (PFNGLBINDSAMPLERSPROC)get_proc(libgl, "glBindSamplers");
+ctx->_glBindImageTextures = (PFNGLBINDIMAGETEXTURESPROC)get_proc(libgl, "glBindImageTextures");
+ctx->_glBindVertexBuffers = (PFNGLBINDVERTEXBUFFERSPROC)get_proc(libgl, "glBindVertexBuffers");
+ctx->_glGetTextureHandleARB = (PFNGLGETTEXTUREHANDLEARBPROC)get_proc(libgl, "glGetTextureHandleARB");
+ctx->_glGetTextureSamplerHandleARB = (PFNGLGETTEXTURESAMPLERHANDLEARBPROC)get_proc(libgl, "glGetTextureSamplerHandleARB");
+ctx->_glMakeTextureHandleResidentARB = (PFNGLMAKETEXTUREHANDLERESIDENTARBPROC)get_proc(libgl, "glMakeTextureHandleResidentARB");
+ctx->_glMakeTextureHandleNonResidentARB = (PFNGLMAKETEXTUREHANDLENONRESIDENTARBPROC)get_proc(libgl, "glMakeTextureHandleNonResidentARB");
+ctx->_glGetImageHandleARB = (PFNGLGETIMAGEHANDLEARBPROC)get_proc(libgl, "glGetImageHandleARB");
+ctx->_glMakeImageHandleResidentARB = (PFNGLMAKEIMAGEHANDLERESIDENTARBPROC)get_proc(libgl, "glMakeImageHandleResidentARB");
+ctx->_glMakeImageHandleNonResidentARB = (PFNGLMAKEIMAGEHANDLENONRESIDENTARBPROC)get_proc(libgl, "glMakeImageHandleNonResidentARB");
+ctx->_glUniformHandleui64ARB = (PFNGLUNIFORMHANDLEUI64ARBPROC)get_proc(libgl, "glUniformHandleui64ARB");
+ctx->_glUniformHandleui64vARB = (PFNGLUNIFORMHANDLEUI64VARBPROC)get_proc(libgl, "glUniformHandleui64vARB");
+ctx->_glProgramUniformHandleui64ARB = (PFNGLPROGRAMUNIFORMHANDLEUI64ARBPROC)get_proc(libgl, "glProgramUniformHandleui64ARB");
+ctx->_glProgramUniformHandleui64vARB = (PFNGLPROGRAMUNIFORMHANDLEUI64VARBPROC)get_proc(libgl, "glProgramUniformHandleui64vARB");
+ctx->_glIsTextureHandleResidentARB = (PFNGLISTEXTUREHANDLERESIDENTARBPROC)get_proc(libgl, "glIsTextureHandleResidentARB");
+ctx->_glIsImageHandleResidentARB = (PFNGLISIMAGEHANDLERESIDENTARBPROC)get_proc(libgl, "glIsImageHandleResidentARB");
+ctx->_glVertexAttribL1ui64ARB = (PFNGLVERTEXATTRIBL1UI64ARBPROC)get_proc(libgl, "glVertexAttribL1ui64ARB");
+ctx->_glVertexAttribL1ui64vARB = (PFNGLVERTEXATTRIBL1UI64VARBPROC)get_proc(libgl, "glVertexAttribL1ui64vARB");
+ctx->_glGetVertexAttribLui64vARB = (PFNGLGETVERTEXATTRIBLUI64VARBPROC)get_proc(libgl, "glGetVertexAttribLui64vARB");
+ctx->_glCreateSyncFromCLeventARB = (PFNGLCREATESYNCFROMCLEVENTARBPROC)get_proc(libgl, "glCreateSyncFromCLeventARB");
+ctx->_glDispatchComputeGroupSizeARB = (PFNGLDISPATCHCOMPUTEGROUPSIZEARBPROC)get_proc(libgl, "glDispatchComputeGroupSizeARB");
+ctx->_glDebugMessageControlARB = (PFNGLDEBUGMESSAGECONTROLARBPROC)get_proc(libgl, "glDebugMessageControlARB");
+ctx->_glDebugMessageInsertARB = (PFNGLDEBUGMESSAGEINSERTARBPROC)get_proc(libgl, "glDebugMessageInsertARB");
+ctx->_glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)get_proc(libgl, "glDebugMessageCallbackARB");
+ctx->_glGetDebugMessageLogARB = (PFNGLGETDEBUGMESSAGELOGARBPROC)get_proc(libgl, "glGetDebugMessageLogARB");
+ctx->_glBlendEquationiARB = (PFNGLBLENDEQUATIONIARBPROC)get_proc(libgl, "glBlendEquationiARB");
+ctx->_glBlendEquationSeparateiARB = (PFNGLBLENDEQUATIONSEPARATEIARBPROC)get_proc(libgl, "glBlendEquationSeparateiARB");
+ctx->_glBlendFunciARB = (PFNGLBLENDFUNCIARBPROC)get_proc(libgl, "glBlendFunciARB");
+ctx->_glBlendFuncSeparateiARB = (PFNGLBLENDFUNCSEPARATEIARBPROC)get_proc(libgl, "glBlendFuncSeparateiARB");
+ctx->_glMultiDrawArraysIndirectCountARB = (PFNGLMULTIDRAWARRAYSINDIRECTCOUNTARBPROC)get_proc(libgl, "glMultiDrawArraysIndirectCountARB");
+ctx->_glMultiDrawElementsIndirectCountARB = (PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTARBPROC)get_proc(libgl, "glMultiDrawElementsIndirectCountARB");
+ctx->_glGetGraphicsResetStatusARB = (PFNGLGETGRAPHICSRESETSTATUSARBPROC)get_proc(libgl, "glGetGraphicsResetStatusARB");
+ctx->_glGetnTexImageARB = (PFNGLGETNTEXIMAGEARBPROC)get_proc(libgl, "glGetnTexImageARB");
+ctx->_glReadnPixelsARB = (PFNGLREADNPIXELSARBPROC)get_proc(libgl, "glReadnPixelsARB");
+ctx->_glGetnCompressedTexImageARB = (PFNGLGETNCOMPRESSEDTEXIMAGEARBPROC)get_proc(libgl, "glGetnCompressedTexImageARB");
+ctx->_glGetnUniformfvARB = (PFNGLGETNUNIFORMFVARBPROC)get_proc(libgl, "glGetnUniformfvARB");
+ctx->_glGetnUniformivARB = (PFNGLGETNUNIFORMIVARBPROC)get_proc(libgl, "glGetnUniformivARB");
+ctx->_glGetnUniformuivARB = (PFNGLGETNUNIFORMUIVARBPROC)get_proc(libgl, "glGetnUniformuivARB");
+ctx->_glGetnUniformdvARB = (PFNGLGETNUNIFORMDVARBPROC)get_proc(libgl, "glGetnUniformdvARB");
+ctx->_glMinSampleShadingARB = (PFNGLMINSAMPLESHADINGARBPROC)get_proc(libgl, "glMinSampleShadingARB");
+ctx->_glNamedStringARB = (PFNGLNAMEDSTRINGARBPROC)get_proc(libgl, "glNamedStringARB");
+ctx->_glDeleteNamedStringARB = (PFNGLDELETENAMEDSTRINGARBPROC)get_proc(libgl, "glDeleteNamedStringARB");
+ctx->_glCompileShaderIncludeARB = (PFNGLCOMPILESHADERINCLUDEARBPROC)get_proc(libgl, "glCompileShaderIncludeARB");
+ctx->_glIsNamedStringARB = (PFNGLISNAMEDSTRINGARBPROC)get_proc(libgl, "glIsNamedStringARB");
+ctx->_glGetNamedStringARB = (PFNGLGETNAMEDSTRINGARBPROC)get_proc(libgl, "glGetNamedStringARB");
+ctx->_glGetNamedStringivARB = (PFNGLGETNAMEDSTRINGIVARBPROC)get_proc(libgl, "glGetNamedStringivARB");
+ctx->_glTexPageCommitmentARB = (PFNGLTEXPAGECOMMITMENTARBPROC)get_proc(libgl, "glTexPageCommitmentARB");
+}

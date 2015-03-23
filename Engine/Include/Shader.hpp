@@ -13,6 +13,7 @@ namespace ae3d
         void SetMatrix( const char* name, const float* matrix4x4 );
         void SetTexture( const char* name, const Texture2D* texture, int textureUnit );
         void SetInt( const char* name, int value );
+        void SetFloat( const char* name, float value );
 
     private:
         unsigned id = 0;

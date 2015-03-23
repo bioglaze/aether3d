@@ -1,11 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\Components\CameraComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\Components\GameObject.cpp" />
     <ClCompile Include="..\Core\Math.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -26,6 +24,24 @@
     </ClCompile>
     <ClCompile Include="..\ThirdParty\stb_image.c">
       <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Matrix.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\System.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\GameObject.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\ShaderGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\GL\glxw.c">
+      <Filter>ThirdParty\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\VertexBufferGL.cpp">
+      <Filter>Video</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +100,18 @@
     </ClInclude>
     <ClInclude Include="..\Include\Texture2D.hpp">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Matrix.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Shader.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\GL\glxw.h">
+      <Filter>ThirdParty\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\VertexBuffer.hpp">
+      <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

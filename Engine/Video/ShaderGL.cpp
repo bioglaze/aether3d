@@ -1,5 +1,10 @@
 #include "Shader.hpp"
+#if __APPLE__
 #include <OpenGL/GL.h>
+#endif
+#if _MSC_VER
+#include <GL/glxw.h>
+#endif
 #include "System.hpp"
 #include "Texture2D.hpp"
 
@@ -9,23 +14,23 @@ ae3d::BuiltinShaders builtinShaders;
 void ae3d::BuiltinShaders::Load()
 {
     const char* vertexSource =
-    "#version 410 core\n \
-    \
-    layout (location = 0) in vec4 aPosition;\
-    layout (location = 1) in vec2 aTexCoord;\
-    uniform mat4 _ProjectionMatrix;\
-    uniform vec4 textureMap_ST;\
-    \
-    out vec2 vTexCoord;\
-    \
-    void main()\
-    {\
-        gl_Position = _ProjectionMatrix * position;\
-        vTexCoord = aTexCoord * textureMap_ST.xy + textureMap_ST.zw;\
+        "#version 410 core\n \
+            \
+                layout (location = 0) in vec3 aPosition;\
+                    layout (location = 1) in vec2 aTexCoord;\
+                        uniform mat4 _ProjectionMatrix;\
+                            uniform vec4 textureMap_ST;\
+                                \
+                                    out vec2 vTexCoord;\
+                                        \
+                                            void main()\
+                                                {\
+                                                        gl_Position = _ProjectionMatrix * vec4(aPosition.xyz, 1.0);\
+                                                                vTexCoord = aTexCoord;\
     }";
     
     const char* fragmentSource =
-    "#version 410 core\
+    "#version 410 core\n\
     \
     in vec2 vTexCoord;\
     out vec4 fragColor;\
@@ -146,4 +151,9 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
 void ae3d::Shader::SetInt( const char* name, int value )
 {
     glUniform1i( glGetUniformLocation( id, name ), value );
+}
+
+void ae3d::Shader::SetFloat(const char* name, float value)
+{
+    glUniform1f(glGetUniformLocation(id, name), value);
 }
