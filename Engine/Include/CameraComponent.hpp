@@ -34,7 +34,7 @@ namespace ae3d
          \param near Near plane distance.
          \param far Far plane distance.
          */
-        void SetProjection( int left, int right, int bottom, int top, float near, float far );
+        void SetProjection(float left, float right, float bottom, float top, float near, float far);
 
         // \return clear color.
         Vec3 GetClearColor() const { return clearColor; }

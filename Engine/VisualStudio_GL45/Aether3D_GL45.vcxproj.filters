@@ -43,6 +43,9 @@
     <ClCompile Include="..\Video\VertexBufferGL.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\RendererGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -111,6 +114,9 @@
       <Filter>ThirdParty\GL</Filter>
     </ClInclude>
     <ClInclude Include="..\Video\VertexBuffer.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\Renderer.hpp">
       <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>

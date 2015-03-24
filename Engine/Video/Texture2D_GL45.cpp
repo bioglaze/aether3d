@@ -3,6 +3,7 @@
 #include "stb_image.c"
 #include "System.hpp"
 #include <GL/glxw.h>
+#include "GfxDevice.hpp"
 
 void ae3d::Texture2D::Load(const System::FileContentsData& fileContents)
 {
@@ -16,7 +17,7 @@ void ae3d::Texture2D::Load(const System::FileContentsData& fileContents)
         return;
     }
     
-    glGenTextures( 1, &id );
+    id = GfxDevice::CreateTextureId();
     glBindTexture( GL_TEXTURE_2D, id );
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );

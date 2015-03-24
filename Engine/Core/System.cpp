@@ -7,9 +7,15 @@
 #endif
 #include <cstdarg>
 #include <cassert>
+#include "GfxDevice.hpp"
 
 // Implemented in WindowOSX_GL.mm
 extern void nsLog(const char* msg);
+
+void ae3d::System::Deinit()
+{
+    ae3d::GfxDevice::ReleaseGPUObjects();
+}
 
 void ae3d::System::EnableWindowsMemleakDetection()
 {

@@ -14,7 +14,7 @@ ae3d::CameraComponent* ae3d::CameraComponent::Get(int index)
     return &cameraComponents[index];
 }
 
-void ae3d::CameraComponent::SetProjection( int left, int right, int bottom, int top, float near, float far )
+void ae3d::CameraComponent::SetProjection(float left, float right, float bottom, float top, float near, float far)
 {
     projectionMatrix.MakeProjection( left, right, bottom, top, near, far );
 }

@@ -8,7 +8,7 @@
 #include "Renderer.hpp"
 
 // TODO [2015-03-23]: Move somewhere else.
-ae3d::Renderer renderer;
+extern ae3d::Renderer renderer;
 
 ae3d::Scene::Scene()
 {

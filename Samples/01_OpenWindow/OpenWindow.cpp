@@ -13,7 +13,7 @@ int main()
 {
     System::EnableWindowsMemleakDetection();
     Window::Instance().Create( 640, 480, WindowCreateFlags::Empty );
-    
+
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     //camera.GetComponent<TransformComponent>().SetPosition(Vec3(20, 0, 0)); */
@@ -63,4 +63,6 @@ int main()
 
         Window::Instance().SwapBuffers();
     }
+
+    System::Deinit();
 }

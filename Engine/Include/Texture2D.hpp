@@ -11,9 +11,10 @@ namespace ae3d
     class Texture2D
     {
     public:
-        void Load( const System::FileContentsData& textureData );
+        static void Deinit();
+        void Load(const System::FileContentsData& textureData);
         unsigned GetID() const { return id; }
-        
+
     private:
         int width = 0;
         int height = 0;

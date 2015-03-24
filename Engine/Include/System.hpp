@@ -14,6 +14,9 @@ namespace ae3d
             std::string path;
         };
 
+        /** Releases all resources allocated by the engine. Call when exiting. */
+        void Deinit();
+
         /** Enables memory leak detection on DEBUG builds on Visual Studio. */
         void EnableWindowsMemleakDetection();
 

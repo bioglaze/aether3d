@@ -13,6 +13,11 @@ namespace ae3d
 
         void ClearScreen( unsigned clearFlags );
         void SetClearColor(float red, float green, float blue);
+        unsigned CreateIboId();
+        unsigned CreateTextureId();
+        unsigned CreateVaoId();
+        unsigned CreateVboId();
+        void ReleaseGPUObjects();
     }
 }
 #endif
