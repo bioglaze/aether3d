@@ -22,7 +22,7 @@ namespace ae3d
 
     private:
         unsigned id = 0;
-        std::map<std::string, unsigned> uniformLocations;
+        std::map<std::string, int> uniformLocations;
     };    
 }
 #endif

@@ -17,6 +17,8 @@ namespace WindowGlobal
     ae3d::WindowEvent eventStack[eventStackSize];
     int eventIndex = -1;
     NSOpenGLContext* glContext;
+    NSApplication *application;
+
 }
 
 bool ae3d::Window::IsOpen()
@@ -80,7 +82,6 @@ NSObject <NSWindowDelegate> @end
 }
 @end
 
-NSApplication *application;
 NSWindow *window;
 
 @interface OpenGLView: NSOpenGLView @end
@@ -111,18 +112,18 @@ NSWindow *window;
 void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 {
     // Init application begin
-    application = [NSApplication sharedApplication];
+    WindowGlobal::application = [NSApplication sharedApplication];
     // In Snow Leopard, programs without application bundles and
     // Info.plist files don't get a menubar and can't be brought
     // to the front unless the presentation option is changed.
-    [application setActivationPolicy: NSApplicationActivationPolicyRegular];
+    [WindowGlobal::application setActivationPolicy: NSApplicationActivationPolicyRegular];
     // Specify application delegate impl.
     ApplicationDelegate *delegate = [[ApplicationDelegate alloc] init];
-    [application setDelegate: delegate];
+    [WindowGlobal::application setDelegate: delegate];
     // Normally this function would block, so if we want
     // to make our own main loop we need to stop it just
     // after initialization (see ApplicationDelegate implementation).
-    [application run];
+    [WindowGlobal::application run];
     // Init application end
     
     // Create window begin
@@ -143,7 +144,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     [window setTitle: appName];
     NSMenuItem *appMenuItem = [NSMenuItem alloc];
     [menubar addItem: appMenuItem];
-    [application setMainMenu: menubar];
+    [WindowGlobal::application setMainMenu: menubar];
     NSMenu *appMenu = [NSMenu alloc];
     id quitTitle = [@"Quit " stringByAppendingString: appName];
     // Make menu respond to cmd+q
@@ -155,11 +156,11 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     [appMenuItem setSubmenu: appMenu];
     // When running from console we need to manually steal focus
     // from the terminal window for some reason.
-    [application activateIgnoringOtherApps:YES];
+    [WindowGlobal::application activateIgnoringOtherApps:YES];
     // Create window end
     
     // A cryptic way to ask window to open.
-    [window makeKeyAndOrderFront: application];
+    [window makeKeyAndOrderFront: WindowGlobal::application];
     WindowGlobal::isOpen = true;
 
     // Init OpenGL context.
@@ -209,14 +210,14 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     [WindowGlobal::glContext setView: view];
 }
 
-void cocoaProcessEvents(
-                        NSApplication *application,
-                        NSWindow *window
-                        ) {
+void cocoaProcessEvents()
+{
     NSAutoreleasePool *eventsAutoreleasePool = [[NSAutoreleasePool alloc] init];
-    while (true) {
+    
+    while (true)
+    {
         NSEvent* event =
-        [application nextEventMatchingMask: NSAnyEventMask
+        [WindowGlobal::application nextEventMatchingMask: NSAnyEventMask
                                  untilDate: [NSDate distantPast]
                                     inMode: NSDefaultRunLoopMode
                                    dequeue: YES];
@@ -244,7 +245,7 @@ void cocoaProcessEvents(
                 if ([event modifierFlags] & hotkeyMask)
                 {
                     // Handle events like cmd+q etc
-                    [application sendEvent:event];
+                    [WindowGlobal::application sendEvent:event];
                     break;
                 }
 
@@ -288,7 +289,7 @@ void cocoaProcessEvents(
             default:
             {
                 // Handle events like app focus/unfocus etc
-                [application sendEvent:event];
+                [WindowGlobal::application sendEvent:event];
             } break;
         }
     }
@@ -297,7 +298,7 @@ void cocoaProcessEvents(
 
 void ae3d::Window::PumpEvents()
 {
-    cocoaProcessEvents(application, window);
+    cocoaProcessEvents();
 }
 
 bool ae3d::Window::PollEvent( WindowEvent& outEvent )

@@ -11,17 +11,23 @@ using namespace ae3d;
 
 int main()
 {
+    const int width = 640;
+    const int height = 480;
+    
     System::EnableWindowsMemleakDetection();
-    Window::Instance().Create( 640, 480, WindowCreateFlags::Empty );
+    Window::Instance().Create( width, height, WindowCreateFlags::Empty );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     //camera.GetComponent<TransformComponent>().SetPosition(Vec3(20, 0, 0)); */
-    camera.GetComponent<CameraComponent>()->SetProjection( 0, 640, 0, 480, 0, 1 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, 0, (float)height, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 1, 0 ) );
 
     Texture2D spriteTex;
     spriteTex.Load(System::FileContents("glider.png"));
+
+    Texture2D spriteTex2;
+    spriteTex2.Load(System::FileContents("glider.png"));
 
     GameObject sprite;
     sprite.AddComponent<SpriteRendererComponent>();

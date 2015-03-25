@@ -9,12 +9,12 @@ enum class InfoLogType
     Shader
 };
 
-static std::map<std::string, unsigned> GetUniformLocations(GLuint program)
+static std::map<std::string, GLint> GetUniformLocations(GLuint program)
 {
     int numUni = -1;
     glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
 
-    std::map<std::string, unsigned> outUniforms;
+    std::map<std::string, GLint> outUniforms;
 
     for (int i = 0; i < numUni; ++i)
     {
@@ -27,9 +27,7 @@ static std::map<std::string, unsigned> GetUniformLocations(GLuint program)
 
         name[namelen] = 0;
 
-        GLuint location = glGetUniformLocation(program, name);
-
-        outUniforms[name] = location;
+        outUniforms[ name ] = glGetUniformLocation( program, name );
     }
 
     return outUniforms;

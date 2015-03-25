@@ -4,7 +4,7 @@ UNAME := $(shell uname)
 COMPILER := g++
 ENGINE_LIB := libaether3d_linux.a
 STD_LIB := -std=c++11
-INCLUDES := -IInclude -IVideo -IThirdParty
+INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++
@@ -21,6 +21,7 @@ all:
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/Texture2D_GL45.cpp -o $(OUTPUT_DIR)/Texture2D_GL45.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/FileWatcher.cpp -o $(OUTPUT_DIR)/FileWatcher.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Math.cpp -o $(OUTPUT_DIR)/Math.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o
