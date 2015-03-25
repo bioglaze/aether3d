@@ -1,0 +1,41 @@
+#include "FileWatcher.hpp"
+#include <ctime>
+#include <sys/stat.h>
+#include <locale.h>
+
+ae3d::FileWatcher fileWatcher;
+
+void ae3d::FileWatcher::AddFile( const std::string& path, std::function<void(const std::string&)> updateFunc )
+{
+    pathToEntry[ path ] = Entry();
+    pathToEntry[ path ].path = path;
+    pathToEntry[ path ].updateFunc = updateFunc;
+
+    struct stat inode;
+
+    if (stat( path.c_str(), &inode ) != -1)
+    {
+        tm* tm = localtime( &inode.st_mtime );
+        pathToEntry[ path ].hour   = tm->tm_hour;
+        pathToEntry[ path ].minute = tm->tm_min;
+        pathToEntry[ path ].second = tm->tm_sec;
+    }
+}
+
+void ae3d::FileWatcher::Poll()
+{
+    struct stat inode;
+
+    for (auto& entry : pathToEntry)
+    {
+        if (stat( entry.second.path.c_str(), &inode ) != -1)
+        {
+            tm* tm = localtime( &inode.st_mtime );
+            
+            if (tm->tm_hour != entry.second.hour || tm->tm_min != entry.second.minute || tm->tm_sec != entry.second.second)
+            {
+                entry.second.updateFunc( entry.second.path );
+            }
+        }
+    }
+}

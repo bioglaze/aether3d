@@ -4,11 +4,19 @@
 #include "System.hpp"
 #include <GL/glxw.h>
 #include "GfxDevice.hpp"
+#include "FileWatcher.hpp"
+
+extern ae3d::FileWatcher fileWatcher;
+
+void TexReload( const std::string& path )
+{
+    ae3d::System::Print("texture reload (unimplemented): %s", path.c_str());
+}
 
 void ae3d::Texture2D::Load(const System::FileContentsData& fileContents)
 {
     int components;
-    unsigned char* data = stbi_load(fileContents.path.c_str(), &width, &height, &components, 4);
+    unsigned char* data = stbi_load_from_memory(&fileContents.data[0], static_cast<int>(fileContents.data.size()), &width, &height, &components, 4);
 
     if (!data)
     {
@@ -25,5 +33,6 @@ void ae3d::Texture2D::Load(const System::FileContentsData& fileContents)
 
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
 
+    fileWatcher.AddFile( fileContents.path, TexReload );
     stbi_image_free(data);
 }

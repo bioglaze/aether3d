@@ -10,7 +10,7 @@ namespace ae3d
     {
         struct FileContentsData
         {
-            std::vector<char> data;
+            std::vector<unsigned char> data;
             std::string path;
         };
 
