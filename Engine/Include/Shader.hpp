@@ -1,6 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <map>
+#include <string>
+
 namespace ae3d
 {
     class Texture2D;
@@ -14,9 +17,12 @@ namespace ae3d
         void SetTexture( const char* name, const Texture2D* texture, int textureUnit );
         void SetInt( const char* name, int value );
         void SetFloat( const char* name, float value );
+        void SetVector3( const char* name, float* vec3 );
+        void SetVector4( const char* name, float* vec4 );
 
     private:
         unsigned id = 0;
+        std::map<std::string, unsigned> uniformLocations;
     };    
 }
 #endif

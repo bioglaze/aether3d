@@ -9,6 +9,32 @@ enum class InfoLogType
     Shader
 };
 
+static std::map<std::string, unsigned> GetUniformLocations(GLuint program)
+{
+    int numUni = -1;
+    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
+
+    std::map<std::string, unsigned> outUniforms;
+
+    for (int i = 0; i < numUni; ++i)
+    {
+        int namelen;
+        int num;
+        GLenum type;
+        char name[128];
+
+        glGetActiveUniform(program, static_cast<GLuint>(i), sizeof(name) - 1, &namelen, &num, &type, name);
+
+        name[namelen] = 0;
+
+        GLuint location = glGetUniformLocation(program, name);
+
+        outUniforms[name] = location;
+    }
+
+    return outUniforms;
+}
+
 static void PrintInfoLog( GLuint shader, InfoLogType logType )
 {
     GLint logLength = 0;
@@ -86,6 +112,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     }
 
     id = program;
+    uniformLocations = GetUniformLocations(id);
 }
 
 void ae3d::Shader::Use()
@@ -95,8 +122,7 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    // TODO [2014-03-22] Uniform location cache.
-    glUniformMatrix4fv( glGetUniformLocation( id, name ), 1, GL_FALSE, matrix4x4 );
+    glUniformMatrix4fv( uniformLocations[ name ], 1, GL_FALSE, matrix4x4 );
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
@@ -108,10 +134,20 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
-    glUniform1i( glGetUniformLocation( id, name ), value );
+    glUniform1i( uniformLocations[ name ], value );
 }
 
-void ae3d::Shader::SetFloat(const char* name, float value)
+void ae3d::Shader::SetFloat( const char* name, float value )
 {
-    glUniform1f(glGetUniformLocation(id, name), value);
+    glUniform1f( uniformLocations[ name ], value );
+}
+
+void ae3d::Shader::SetVector3( const char* name, float* vec3 )
+{
+    glUniform3fv( uniformLocations[ name ], 1, vec3 );
+}
+
+void ae3d::Shader::SetVector4( const char* name, float* vec4 )
+{
+    glUniform4fv( uniformLocations[ name ], 1, vec4 );
 }
