@@ -5,6 +5,10 @@
 #include <GL/glxw.h>
 #include <GL/wglext.h>
 
+// Testing hotloading
+#include "FileWatcher.hpp"
+extern ae3d::FileWatcher fileWatcher;
+
 // TODO: Separate all GL stuff from this source file so it can be used also with D3D.
 
 namespace WindowGlobal
@@ -238,5 +242,13 @@ namespace ae3d
     void Window::SwapBuffers() const
     {
         ::SwapBuffers(WindowGlobal::hdc);
+
+        static int frame = 0;
+        ++frame;
+
+        if ((frame % 60) == 0)
+        {
+            fileWatcher.Poll();
+        }
     }
 }

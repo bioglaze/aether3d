@@ -88,7 +88,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -103,7 +103,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -120,7 +120,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -138,7 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -153,12 +153,14 @@
     <ClCompile Include="..\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Components\GameObject.cpp" />
     <ClCompile Include="..\Components\SpriteRendererComponent.cpp" />
+    <ClCompile Include="..\Core\FileWatcher.cpp" />
     <ClCompile Include="..\Core\Math.cpp" />
     <ClCompile Include="..\Core\Matrix.cpp" />
     <ClCompile Include="..\Core\Scene.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\ThirdParty\GL\glxw.c" />
     <ClCompile Include="..\ThirdParty\stb_image.c" />
+    <ClCompile Include="..\Video\DDSLoader.cpp" />
     <ClCompile Include="..\Video\GfxDeviceGL45.cpp" />
     <ClCompile Include="..\Video\RendererGL.cpp" />
     <ClCompile Include="..\Video\ShaderGL.cpp" />
@@ -167,6 +169,7 @@
     <ClCompile Include="..\Video\WindowWin32.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Core\FileWatcher.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />
     <ClInclude Include="..\Include\GameObject.hpp" />
     <ClInclude Include="..\Include\Math.hpp" />
@@ -181,6 +184,7 @@
     <ClInclude Include="..\ThirdParty\GL\glcorearb.h" />
     <ClInclude Include="..\ThirdParty\GL\glxw.h" />
     <ClInclude Include="..\ThirdParty\GL\wglext.h" />
+    <ClInclude Include="..\Video\DDSLoader.hpp" />
     <ClInclude Include="..\Video\GfxDevice.hpp" />
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />

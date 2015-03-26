@@ -46,6 +46,12 @@
     <ClCompile Include="..\Video\RendererGL.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\FileWatcher.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\DDSLoader.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -117,6 +123,12 @@
       <Filter>Video</Filter>
     </ClInclude>
     <ClInclude Include="..\Video\Renderer.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\FileWatcher.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\DDSLoader.hpp">
       <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>

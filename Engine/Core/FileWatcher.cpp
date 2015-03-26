@@ -15,10 +15,16 @@ void ae3d::FileWatcher::AddFile( const std::string& path, std::function<void(con
 
     if (stat( path.c_str(), &inode ) != -1)
     {
-        tm* tm = localtime( &inode.st_mtime );
-        pathToEntry[ path ].hour   = tm->tm_hour;
-        pathToEntry[ path ].minute = tm->tm_min;
-        pathToEntry[ path ].second = tm->tm_sec;
+#if _MSC_VER
+        tm timeinfo;
+        localtime_s( &timeinfo, &inode.st_mtime );
+        tm* timeinfo2 = &timeinfo;
+#else
+        tm* timeinfo2 = localtime( &inode.st_mtime );
+#endif
+        pathToEntry[ path ].hour = timeinfo2->tm_hour;
+        pathToEntry[ path ].minute = timeinfo2->tm_min;
+        pathToEntry[ path ].second = timeinfo2->tm_sec;
     }
 }
 
@@ -30,11 +36,20 @@ void ae3d::FileWatcher::Poll()
     {
         if (stat( entry.second.path.c_str(), &inode ) != -1)
         {
-            tm* tm = localtime( &inode.st_mtime );
-            
-            if (tm->tm_hour != entry.second.hour || tm->tm_min != entry.second.minute || tm->tm_sec != entry.second.second)
+#if _MSC_VER
+            tm timeinfo;
+            localtime_s( &timeinfo, &inode.st_mtime );
+            tm* timeinfo2 = &timeinfo;
+#else
+            tm* timeinfo2 = localtime( &inode.st_mtime );
+#endif
+
+            if (timeinfo2->tm_hour != entry.second.hour || timeinfo2->tm_min != entry.second.minute || timeinfo2->tm_sec != entry.second.second)
             {
                 entry.second.updateFunc( entry.second.path );
+                entry.second.hour = timeinfo2->tm_hour;
+                entry.second.minute = timeinfo2->tm_min;
+                entry.second.second = timeinfo2->tm_sec;
             }
         }
     }

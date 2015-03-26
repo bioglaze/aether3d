@@ -26,8 +26,8 @@ int main()
     Texture2D spriteTex;
     spriteTex.Load(System::FileContents("glider.png"));
 
-    Texture2D spriteTex2;
-    spriteTex2.Load(System::FileContents("glider.png"));
+    //Texture2D spriteTex2;
+    //spriteTex2.Load(System::FileContents("glider.png"));
 
     GameObject sprite;
     sprite.AddComponent<SpriteRendererComponent>();
