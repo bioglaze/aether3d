@@ -23,7 +23,7 @@ namespace ae3d
         void SetTexture(Texture2D* texture);
 
     private:
-        static ae3d::SpriteRendererComponent spriteRendererComponents[100];
+        static SpriteRendererComponent spriteRendererComponents[100];
         Texture2D* texture;
     };
 }

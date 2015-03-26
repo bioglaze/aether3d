@@ -20,6 +20,8 @@ all:
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/Texture2D_GL45.cpp -o $(OUTPUT_DIR)/Texture2D_GL45.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Video/DDSLoader.cpp -o $(OUTPUT_DIR)/DDSLoader.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/FileWatcher.cpp -o $(OUTPUT_DIR)/FileWatcher.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) -c Core/Math.cpp -o $(OUTPUT_DIR)/Math.o

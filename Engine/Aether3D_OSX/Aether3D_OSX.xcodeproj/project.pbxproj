@@ -32,6 +32,9 @@
 		ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */; };
 		ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */; };
 		ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */; };
+		ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */; };
+		ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */; };
+		ABC1A6871AC4693F00C4F401 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */; };
 		ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */; };
 		ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */; };
 		ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */; };
@@ -68,6 +71,11 @@
 		ABBD9DBF1AC30EFD005AD2ED /* libaether3d_osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libaether3d_osx.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileWatcher.cpp; path = ../Core/FileWatcher.cpp; sourceTree = "<group>"; };
 		ABBD9DC21AC31EDB005AD2ED /* FileWatcher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FileWatcher.hpp; path = ../Core/FileWatcher.hpp; sourceTree = "<group>"; };
+		ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DDSLoader.cpp; path = ../Video/DDSLoader.cpp; sourceTree = "<group>"; };
+		ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DDSLoader.hpp; path = ../Video/DDSLoader.hpp; sourceTree = "<group>"; };
+		ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../Include/TransformComponent.hpp; sourceTree = "<group>"; };
+		ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformComponent.cpp; path = ../Components/TransformComponent.cpp; sourceTree = "<group>"; };
+		ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Quaternion.hpp; path = ../Include/Quaternion.hpp; sourceTree = "<group>"; };
 		ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
 		ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VertexBufferGL.cpp; path = ../Video/VertexBufferGL.cpp; sourceTree = "<group>"; };
 		ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glcorearb.h; path = ../ThirdParty/GL/glcorearb.h; sourceTree = "<group>"; };
@@ -104,6 +112,8 @@
 		AB3A77DC1AB4486A0081864C /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */,
+				ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */,
 				AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */,
 				AB889AE91ABB4C3B005BA86D /* GfxDeviceGL41.cpp */,
 				AB949D361ABC8E44007D561E /* ShaderGL.cpp */,
@@ -132,6 +142,7 @@
 		AB3FD4931AB432FD00D28653 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */,
 				AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */,
 				AB889AF31ABB4C5B005BA86D /* GameObject.hpp */,
 				AB889AF41ABB4C5B005BA86D /* Math.hpp */,
@@ -139,9 +150,10 @@
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
 				AB949D341ABC8DDF007D561E /* Shader.hpp */,
 				AB889AF61ABB4C5B005BA86D /* SpriteRendererComponent.hpp */,
-				AB889AF71ABB4C5B005BA86D /* Texture2D.hpp */,
-				AB889AF81ABB4C5B005BA86D /* Vec3.hpp */,
 				AB3FD4941AB4330C00D28653 /* System.hpp */,
+				AB889AF71ABB4C5B005BA86D /* Texture2D.hpp */,
+				ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */,
+				AB889AF81ABB4C5B005BA86D /* Vec3.hpp */,
 				AB3FD4951AB4330C00D28653 /* Window.hpp */,
 			);
 			name = Include;
@@ -162,6 +174,7 @@
 				AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */,
 				AB889B061ABB4FDE005BA86D /* GameObject.cpp */,
 				AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */,
+				ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -188,6 +201,7 @@
 				AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */,
 				ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */,
 				AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */,
+				ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */,
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
 				ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */,
 				AB3FD4961AB4330C00D28653 /* System.hpp in Headers */,
@@ -261,10 +275,12 @@
 				AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */,
 				ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */,
 				ABCE0CA91AC08BD700F9EC53 /* RendererGL.cpp in Sources */,
+				ABC1A6871AC4693F00C4F401 /* TransformComponent.cpp in Sources */,
 				AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */,
 				AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
 				AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */,
+				ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */,
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,
 				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
