@@ -1,7 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include "Math.hpp"
+#include <cmath>
 
 namespace ae3d
 {
@@ -270,7 +270,7 @@ namespace ae3d
         {
             const float len = Length();
 
-            if (ae3d::Math::Abs(len) < 0.0001f)
+            if (std::abs(len) < 0.0001f)
             {
                 return Vec3(1, 0, 0);
             }
@@ -280,7 +280,7 @@ namespace ae3d
         }
 
         /// \return length.
-        float Length() const { return ae3d::Math::Sqrt(x * x + y * y + z * z); }
+        float Length() const { return std::sqrt(x * x + y * y + z * z); }
 
         /// Resets this vector's values to 0.
         void Zero() { x = y = z = 0; }
@@ -367,7 +367,7 @@ namespace ae3d
         }
 
         /// \return length.
-        float Length() const { return Math::Sqrt(x * x + y * y + z * z); }
+        float Length() const { return std::sqrt(x * x + y * y + z * z); }
 
         /**
          Normalizes this vector.
@@ -376,7 +376,7 @@ namespace ae3d
         {
             const float len = Length();
 
-            if (Math::Abs(len) < 0.0001f)
+            if (std::abs(len) < 0.0001f)
             {
                 x = 1;
                 y = 0;

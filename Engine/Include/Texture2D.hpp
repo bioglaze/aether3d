@@ -20,7 +20,7 @@ namespace ae3d
         unsigned GetID() const { return id; }
 
     private:
-        // TODO: Load from data
+#pragma message("TODO: Load from data and obey SRP")
         void LoadDDS( const char* path );
         /**
           Loads texture from stb_image.c supported formats.

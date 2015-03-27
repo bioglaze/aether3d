@@ -3,7 +3,7 @@
 #include <GL/glxw.h>
 
 // Based on https://github.com/vbo/handmadehero_osx_platform_layer/blob/day_29/code/osx_handmade.m
-// TODO [2015-03-14]: ARC
+#pragma message("TODO [2015-03-14]: ARC")
 
 void nsLog(const char* msg)
 {

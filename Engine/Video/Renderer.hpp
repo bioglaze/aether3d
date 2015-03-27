@@ -17,7 +17,7 @@ namespace ae3d
     class Renderer
     {
     public:
-        // TODO: make private.
+#pragma message("TODO: make private.")
         BuiltinShaders builtinShaders;
         VertexBuffer quadBuffer;
         

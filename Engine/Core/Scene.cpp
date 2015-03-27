@@ -7,7 +7,7 @@
 #include "VertexBuffer.hpp"
 #include "Renderer.hpp"
 
-// TODO [2015-03-23]: Move somewhere else.
+#pragma message("TODO [2015-03-23]: Move somewhere else.")
 extern ae3d::Renderer renderer;
 
 ae3d::Scene::Scene()
@@ -17,7 +17,7 @@ ae3d::Scene::Scene()
         gameObjects[ i ] = nullptr;
     }
 
-    // TODO [2015-03-23] These clearly need to be moved out but there is no proper place yet.
+#pragma message("TODO [2015-03-23] These clearly need to be moved out but there is no proper place yet.")
     renderer.builtinShaders.Load();
     renderer.quadBuffer.GenerateQuad();
 }

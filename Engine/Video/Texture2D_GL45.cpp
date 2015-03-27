@@ -22,9 +22,9 @@ void TexReload( const std::string& path )
 }
 
 bool HasStbExtension( const std::string& path )
-{
+{    
     // Checks for uncompressed formats in texture's file name.
-    const std::string extensions[] =
+    static const std::string extensions[] =
     {
         ".png", ".PNG", ".jpg", ".JPG", ".tga", ".TGA",
         ".bmp", ".BMP", ".gif", ".GIF"
@@ -62,7 +62,7 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents )
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-    // TODO [2015-03-26] Combine similar parts in LoadDDS and LoadSTB when DDS loader enables it.
+#pragma message("TODO [2015-03-26] Combine similar parts in LoadDDS and LoadSTB when DDS loader enables it.")
 
     // First load.
     if (id == 0)
