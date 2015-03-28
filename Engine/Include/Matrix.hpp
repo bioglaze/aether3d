@@ -86,7 +86,7 @@ namespace ae3d
         Matrix44( const Matrix44& other );
         
         /** \param data Column-major initialization data. */
-        Matrix44( const float* data );
+        explicit Matrix44( const float* data );
         
         /**
          \param other Matrix from which this matrix is initialized.

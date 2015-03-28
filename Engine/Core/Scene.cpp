@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
+#include "TransformComponent.hpp"
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
@@ -24,7 +25,7 @@ ae3d::Scene::Scene()
 
 void ae3d::Scene::Add( GameObject* gameObject )
 {
-    gameObjects[0] = gameObject;
+    gameObjects[ nextFreeGameObject++ ] = gameObject;
 
     CameraComponent* camera = gameObject->GetComponent<CameraComponent>();
 
@@ -52,9 +53,12 @@ void ae3d::Scene::Render()
     {
         if (gameObject && gameObject->GetComponent<SpriteRendererComponent>())
         {
+            //auto pos = gameObject->GetComponent<TransformComponent>()->GetLocalPosition();
+            //ae3d::System::Print("pos: %f %f %f", pos.x, pos.y, pos.z);
             renderer.builtinShaders.spriteRendererShader.Use();
             renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionMatrix", camera->GetProjection().m );
             renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", gameObject->GetComponent<SpriteRendererComponent>()->GetTexture(), 0);
+            renderer.builtinShaders.spriteRendererShader.SetVector3( "_Position", &gameObject->GetComponent<TransformComponent>()->GetLocalPosition().x );
             renderer.quadBuffer.Draw();
         }
     }

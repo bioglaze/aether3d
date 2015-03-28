@@ -75,11 +75,11 @@ static GLuint CompileShader( const char* source, GLenum shaderType )
     glShaderSource( shader, 1, &source, nullptr );
     glCompileShader( shader );
     
-    GLint compiled;
+    GLint wasCompiled;
     
-    glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
+    glGetShaderiv( shader, GL_COMPILE_STATUS, &wasCompiled );
     
-    if (!compiled)
+    if (!wasCompiled)
     {
         ae3d::System::Print( "Shader compile error in source: \n%s", source );
         PrintInfoLog( shader, InfoLogType::Shader );
@@ -140,12 +140,12 @@ void ae3d::Shader::SetFloat( const char* name, float value )
     glUniform1f( uniformLocations[ name ], value );
 }
 
-void ae3d::Shader::SetVector3( const char* name, float* vec3 )
+void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
     glUniform3fv( uniformLocations[ name ], 1, vec3 );
 }
 
-void ae3d::Shader::SetVector4( const char* name, float* vec4 )
+void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
     glUniform4fv( uniformLocations[ name ], 1, vec4 );
 }

@@ -11,12 +11,13 @@ void ae3d::BuiltinShaders::Load()
     layout (location = 1) in vec2 aTexCoord;\
     uniform mat4 _ProjectionMatrix;\
     uniform vec4 textureMap_ST;\
+    uniform vec3 _Position;\
     \
     out vec2 vTexCoord;\
     \
     void main()\
     {\
-    gl_Position = _ProjectionMatrix * vec4(aPosition.xyz, 1.0);\
+    gl_Position = _ProjectionMatrix * vec4(aPosition.xyz + _Position, 1.0);\
     vTexCoord = aTexCoord;\
     }";
     

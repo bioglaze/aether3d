@@ -306,7 +306,7 @@ namespace ae3d
         Vec4(float ax, float ay, float az, float aw) : x(ax), y(ay), z(az), w(aw) {}
 
         /// \param v Vec3
-        Vec4(const Vec3& v) : x(v.x), y(v.y), z(v.z), w(1) {}
+        explicit Vec4(const Vec3& v) : x(v.x), y(v.y), z(v.z), w(1) {}
 
         /**
            Constructor.

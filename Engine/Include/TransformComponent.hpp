@@ -18,6 +18,12 @@ namespace ae3d
         // \return Component at index or null if index is invalid.
         static TransformComponent* Get( int index );
 
+        // \return Local position.
+        const Vec3& GetLocalPosition() const { return localPosition; }
+
+        // \param localPos Local position.
+        void SetLocalPosition( const Vec3& localPos );
+        
     private:
         static TransformComponent transformComponents[100];
         Vec3 localPosition;

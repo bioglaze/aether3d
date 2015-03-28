@@ -56,7 +56,7 @@ void ae3d::System::Print(const char* format, ...)
     OutputDebugStringA("\n");
 #endif
 #if __APPLE__
-    nsLog(msg);
+    //nsLog(msg);
 #endif
     std::fflush(stdout);
 }

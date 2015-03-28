@@ -121,7 +121,7 @@ void Matrix44::InverseTranspose( const float m[ 16 ], float* out )
     }
     
 #if DEBUG
-    ae3d::CheckNaN( out );
+    //ae3d::CheckNaN( out );
 #endif
 }
 

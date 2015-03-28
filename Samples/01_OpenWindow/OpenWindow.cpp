@@ -1,5 +1,6 @@
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
+#include "TransformComponent.hpp"
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "System.hpp"
@@ -19,7 +20,6 @@ int main()
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
-    //camera.GetComponent<TransformComponent>().SetPosition(Vec3(20, 0, 0)); */
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, 0, (float)height, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 1, 0 ) );
 
@@ -32,10 +32,19 @@ int main()
     GameObject sprite;
     sprite.AddComponent<SpriteRendererComponent>();
     sprite.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex );
+    sprite.AddComponent<TransformComponent>();
+    sprite.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 320, 0, 0 ) );
+
+    GameObject sprite2;
+    sprite2.AddComponent<SpriteRendererComponent>();
+    sprite2.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex );
+    sprite2.AddComponent<TransformComponent>();
+    sprite2.GetComponent<TransformComponent>()->SetLocalPosition(Vec3(0, 240, 0));
 
     Scene scene;
     scene.Add( &camera );
     scene.Add( &sprite );
+    scene.Add( &sprite2 );
 
     bool quit = false;
     

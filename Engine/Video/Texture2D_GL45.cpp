@@ -91,7 +91,7 @@ void ae3d::Texture2D::LoadSTB( const System::FileContentsData& fileContents )
     int components;
     unsigned char* data = stbi_load_from_memory( &fileContents.data[ 0 ], static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
 
-    if (!data)
+    if (data == nullptr)
     {
         const std::string reason( stbi_failure_reason() );
         System::Print( "%s failed to load. stb_image's reason: %s", fileContents.path.c_str(), reason.c_str() );
