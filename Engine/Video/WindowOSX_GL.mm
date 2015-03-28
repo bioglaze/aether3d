@@ -236,7 +236,7 @@ void cocoaProcessEvents()
                 
                 ++WindowGlobal::eventIndex;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
-                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
+                //WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
                 
                 int hotkeyMask = NSCommandKeyMask
                 | NSAlternateKeyMask
@@ -249,40 +249,53 @@ void cocoaProcessEvents()
                     break;
                 }
 
+                // TODO [2015-03-28]: key table
                 switch ([event keyCode])
                 {
+                    case 0: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::A;
+                    } break;
                     case 13: { // W
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::W;
                     } break;
-                    case 0: { // A
+                    case 1: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::S;
                     } break;
-                    case 1: { // S
+                    case 2: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::D;
                     } break;
-                    case 2: { // D
+                    case 35: { // P
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::P;
                     } break;
-                    case 12: { // Q
+                    case 12: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Q;
                     } break;
-                    case 14: { // E
+                    case 14: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::E;
                     } break;
-                    case 126: { // Up
+                    case 126: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Up;
                     } break;
-                    case 123: { // Left
+                    case 123: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Left;
                     } break;
-                    case 125: { // Down
+                    case 125: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Down;
                     } break;
-                    case 124: { // Right
+                    case 124: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Right;
                     } break;
-                    case 53: { // Esc
+                    case 53: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Escape;
                     } break;
-                    case 49: { // Space
+                    case 49: {
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Space;
                     } break;
                     case 122: { // F1
                     } break;
-                    case 35: { // P
-                    } break;
                     default:
                     {
-                        // Uncomment to learn your keys:
-                        //NSLog(@"Unhandled key: %d", [event keyCode]);
+                        NSLog(@"Unhandled key: %d", [event keyCode]);
                     } break;
                 }
             } break;

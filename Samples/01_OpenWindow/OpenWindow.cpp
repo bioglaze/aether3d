@@ -17,10 +17,11 @@ int main()
     
     System::EnableWindowsMemleakDetection();
     Window::Instance().Create( width, height, WindowCreateFlags::Empty );
-
+    System::LoadBuiltinAssets();
+    
     GameObject camera;
     camera.AddComponent<CameraComponent>();
-    camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, 0, (float)height, 0, 1 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 1, 0 ) );
 
     Texture2D spriteTex;
@@ -29,24 +30,23 @@ int main()
     //Texture2D spriteTex2;
     //spriteTex2.Load(System::FileContents("glider.png"));
 
-    GameObject sprite;
-    sprite.AddComponent<SpriteRendererComponent>();
-    sprite.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex );
-    sprite.AddComponent<TransformComponent>();
-    sprite.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 320, 0, 0 ) );
-
-    GameObject sprite2;
-    sprite2.AddComponent<SpriteRendererComponent>();
-    sprite2.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex );
-    sprite2.AddComponent<TransformComponent>();
-    sprite2.GetComponent<TransformComponent>()->SetLocalPosition(Vec3(0, 240, 0));
+    GameObject spriteRenderer;
+    spriteRenderer.AddComponent<SpriteRendererComponent>();
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 320, 0, 0 ) );
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 0, 240, 0 ) );
+    spriteRenderer.AddComponent<TransformComponent>();
+    spriteRenderer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
 
     Scene scene;
     scene.Add( &camera );
-    scene.Add( &sprite );
-    scene.Add( &sprite2 );
+    scene.Add( &spriteRenderer );
 
     bool quit = false;
+    
+    float x = 320;
+    float y = 0;
+    //float dx = 0;
+    //float dy = 0;
     
     while (Window::Instance().IsOpen() && !quit)
     {
@@ -60,16 +60,31 @@ int main()
                 quit = true;
             }
             
-            if (event.type == WindowEventType::KeyDown)
+            if (event.type == WindowEventType::KeyDown ||
+                event.type == WindowEventType::KeyUp)
             {
-                int keyCode = event.keyCode;
+                KeyCode keyCode = event.keyCode;
 
-                const int escape = 27;
-
-                if (keyCode == escape)
+                if (keyCode == KeyCode::Escape)
                 {
                     quit = true;
                 }
+                /*if (keyCode == KeyCode::Left)
+                {
+                    dx = event.type == WindowEventType::KeyDown ? -1 : 0;
+                }
+                if (keyCode == KeyCode::Right)
+                {
+                    dx = event.type == WindowEventType::KeyDown ? 1 : 0;
+                }
+                if (keyCode == KeyCode::Up)
+                {
+                    dy = event.type == WindowEventType::KeyDown ? 1 : 0;
+                }
+                if (keyCode == KeyCode::Down)
+                {
+                    dy = event.type == WindowEventType::KeyDown ? -1 : 0;
+                }*/
             }
         }
 

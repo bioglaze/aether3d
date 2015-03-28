@@ -45,7 +45,6 @@ namespace ae3d
 
         int GetNextComponentIndex();
 
-#pragma message("TODO [2015-03-16] constexpr when VS supports it (VS 2015 should)")
         static const int MaxComponents = 10;
         int nextFreeComponentIndex = 0;
         ComponentEntry components[ MaxComponents ];

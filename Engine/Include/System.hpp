@@ -20,6 +20,9 @@ namespace ae3d
         /** Enables memory leak detection on DEBUG builds on Visual Studio. */
         void EnableWindowsMemleakDetection();
 
+        /** Loads built-in assets and shaders. */
+        void LoadBuiltinAssets();
+        
         /**
           Reads file contents.
           

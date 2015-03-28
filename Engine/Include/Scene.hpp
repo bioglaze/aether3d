@@ -1,8 +1,6 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "GameObject.hpp"
-
 namespace ae3d
 {
     class GameObject;

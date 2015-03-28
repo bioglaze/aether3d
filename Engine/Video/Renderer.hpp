@@ -2,7 +2,6 @@
 #define RENDERER_H
 
 #include "Shader.hpp"
-#include "VertexBuffer.hpp"
 
 namespace ae3d
 {
@@ -17,9 +16,10 @@ namespace ae3d
     class Renderer
     {
     public:
+        //void AddSprite( const Matrix44* projectionMatrix, const Texture2D* texture );
+        
 #pragma message("TODO: make private.")
         BuiltinShaders builtinShaders;
-        VertexBuffer quadBuffer;
         
     private:
     };

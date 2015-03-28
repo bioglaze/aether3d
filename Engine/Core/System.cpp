@@ -8,9 +8,10 @@
 #include <cstdarg>
 #include <cassert>
 #include "GfxDevice.hpp"
+#include "Renderer.hpp"
 
-// Implemented in WindowOSX_GL.mm
 extern void nsLog(const char* msg);
+extern ae3d::Renderer renderer;
 
 void ae3d::System::Deinit()
 {
@@ -24,6 +25,11 @@ void ae3d::System::EnableWindowsMemleakDetection()
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+}
+
+void ae3d::System::LoadBuiltinAssets()
+{
+    renderer.builtinShaders.Load();
 }
 
 ae3d::System::FileContentsData ae3d::System::FileContents(const char* path)

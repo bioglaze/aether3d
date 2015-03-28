@@ -18,7 +18,12 @@ namespace ae3d
         void Load( const System::FileContentsData& textureData );
         // \return id.
         unsigned GetID() const { return id; }
+        // \return Width in pixels.
+        int GetWidth() const { return width; }
 
+        // \return Width in pixels.
+        int GetHeight() const { return height; }
+        
     private:
 #pragma message("TODO: Load from data and obey SRP")
         void LoadDDS( const char* path );

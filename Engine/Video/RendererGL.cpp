@@ -17,7 +17,7 @@ void ae3d::BuiltinShaders::Load()
     \
     void main()\
     {\
-    gl_Position = _ProjectionMatrix * vec4(aPosition.xyz + _Position, 1.0);\
+    gl_Position = _ProjectionMatrix * vec4(aPosition.xyz /*+ _Position*/, 1.0);\
     vTexCoord = aTexCoord;\
     }";
     

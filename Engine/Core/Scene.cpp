@@ -5,11 +5,7 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
-#include "VertexBuffer.hpp"
-#include "Renderer.hpp"
-
-#pragma message("TODO [2015-03-23]: Move somewhere else.")
-extern ae3d::Renderer renderer;
+#include "GameObject.hpp"
 
 ae3d::Scene::Scene()
 {
@@ -17,10 +13,6 @@ ae3d::Scene::Scene()
     {
         gameObjects[ i ] = nullptr;
     }
-
-#pragma message("TODO [2015-03-23] These clearly need to be moved out but there is no proper place yet.")
-    renderer.builtinShaders.Load();
-    renderer.quadBuffer.GenerateQuad();
 }
 
 void ae3d::Scene::Add( GameObject* gameObject )
@@ -51,15 +43,16 @@ void ae3d::Scene::Render()
     
     for (auto gameObject : gameObjects)
     {
-        if (gameObject && gameObject->GetComponent<SpriteRendererComponent>())
+        if (gameObject == nullptr)
         {
-            //auto pos = gameObject->GetComponent<TransformComponent>()->GetLocalPosition();
-            //ae3d::System::Print("pos: %f %f %f", pos.x, pos.y, pos.z);
-            renderer.builtinShaders.spriteRendererShader.Use();
-            renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionMatrix", camera->GetProjection().m );
-            renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", gameObject->GetComponent<SpriteRendererComponent>()->GetTexture(), 0);
-            renderer.builtinShaders.spriteRendererShader.SetVector3( "_Position", &gameObject->GetComponent<TransformComponent>()->GetLocalPosition().x );
-            renderer.quadBuffer.Draw();
+            continue;
+        }
+        
+        auto spriteRenderer = gameObject->GetComponent<SpriteRendererComponent>();
+        
+        if (gameObject && spriteRenderer)
+        {
+            spriteRenderer->Render( camera->GetProjection().m );
         }
     }
 }
