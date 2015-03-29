@@ -27,13 +27,13 @@ int main()
     Texture2D spriteTex;
     spriteTex.Load(System::FileContents("glider.png"));
 
-    //Texture2D spriteTex2;
-    //spriteTex2.Load(System::FileContents("glider.png"));
+    Texture2D spriteTex2;
+    spriteTex2.Load(System::FileContents("glider2.png"));
 
     GameObject spriteRenderer;
     spriteRenderer.AddComponent<SpriteRendererComponent>();
     spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 320, 0, 0 ) );
-    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 0, 240, 0 ) );
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex2, Vec3( 0, 240, 0 ) );
     spriteRenderer.AddComponent<TransformComponent>();
     spriteRenderer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
 

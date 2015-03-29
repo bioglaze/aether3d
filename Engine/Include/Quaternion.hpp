@@ -64,7 +64,12 @@ namespace ae3d
          */
         bool operator==( const Quaternion& q ) const
         {
-            return x == q.x && y == q.y && z == q.z && w == q.w;
+            const float acceptableDelta = 0.00001f;
+
+            return std::fabs(x - q.x) < acceptableDelta &&
+                   std::fabs(y - q.y) < acceptableDelta &&
+                   std::fabs(z - q.z) < acceptableDelta &&
+                   std::fabs(w - q.w) < acceptableDelta;
         }
         
         /**

@@ -55,6 +55,8 @@ void ae3d::Scene::Render()
             spriteRenderer->Render( camera->GetProjection().m );
         }
     }
+
+    GfxDevice::ErrorCheck( "Scene render end" );
 }
 
 void ae3d::Scene::Update()

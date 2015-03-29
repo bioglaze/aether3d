@@ -7,6 +7,7 @@
 
 // Testing hotloading
 #include "FileWatcher.hpp"
+#include "System.hpp"
 extern ae3d::FileWatcher fileWatcher;
 
 // TODO: Separate all GL stuff from this source file so it can be used also with D3D.
@@ -40,7 +41,36 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         {
             ++WindowGlobal::eventIndex;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = static_cast<int>( wParam );
+            ae3d::System::Print("Got key down: %d", wParam);
+            //WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = static_cast<int>( wParam );
+            if (wParam == 65) // A
+            {
+                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::A;
+            }
+            if (wParam == 38) // arrow up
+            {
+                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Up;
+            }
+            if (wParam == 40) // arrow down
+            {
+                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Down;
+            }
+            if (wParam == 37) // arrow left
+            {
+                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Left;
+            }
+            if (wParam == 39) // arrow right
+            {
+                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Right;
+            }
+            if (wParam == 66) // B
+            {
+                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::B;
+            }
+            if (wParam == 27) // escape
+            {
+                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Escape;
+            }
         }
         break;
         case WM_SYSCOMMAND:
@@ -70,7 +100,6 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             //bool rightButtonDown=wParam & MK_RBUTTON;
             break;
         case WM_CLOSE:
-            OutputDebugStringA("Window close message win32\n");
             ++WindowGlobal::eventIndex;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::Close;
             break;

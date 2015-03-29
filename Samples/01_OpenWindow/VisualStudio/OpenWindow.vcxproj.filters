@@ -24,9 +24,6 @@
     <ClInclude Include="..\..\..\Engine\Include\Vec3.hpp">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Engine\Include\Math.hpp">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Engine\Include\Scene.hpp">
       <Filter>Include</Filter>
     </ClInclude>
@@ -40,6 +37,12 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\Include\Shader.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\Quaternion.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\TransformComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

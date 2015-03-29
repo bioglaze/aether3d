@@ -17,11 +17,11 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     glGenVertexArrays(1, &id);
     glBindVertexArray(id);
     
-    GLuint vboId = GfxDevice::CreateVboId();
+    GLuint vboId = GfxDevice::CreateBufferId();
     glBindBuffer( GL_ARRAY_BUFFER, vboId );
     glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(VertexPT), vertices, GL_STATIC_DRAW );
     
-    GLuint iboId = GfxDevice::CreateIboId();
+    GLuint iboId = GfxDevice::CreateBufferId();
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iboId );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, GL_STATIC_DRAW );
     
@@ -37,8 +37,17 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     glVertexAttribPointer( uvChannel, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (GLvoid*)offsetof(struct VertexPT, u) ); // No warning.
 }
 
-void ae3d::VertexBuffer::Draw() const
+void ae3d::VertexBuffer::Bind() const
 {
     glBindVertexArray( id );
-    glDrawElements( GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, 0 );
+}
+
+void ae3d::VertexBuffer::Draw() const
+{
+    glDrawElements( GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, nullptr );
+}
+
+void ae3d::VertexBuffer::DrawRange( int start, int end ) const
+{
+    glDrawRangeElements(GL_TRIANGLES, start, end, (end - start) * 3, GL_UNSIGNED_SHORT, (const GLvoid*)(start * sizeof(Face)));
 }

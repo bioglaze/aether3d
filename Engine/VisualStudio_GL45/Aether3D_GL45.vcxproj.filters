@@ -4,9 +4,6 @@
     <ClCompile Include="..\Components\CameraComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\Core\Math.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\Core\Scene.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -52,6 +49,12 @@
     <ClCompile Include="..\Video\DDSLoader.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\String.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\TransformComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -87,9 +90,6 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\Vec3.hpp">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\Math.hpp">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\Scene.hpp">
@@ -130,6 +130,15 @@
     </ClInclude>
     <ClInclude Include="..\Video\DDSLoader.hpp">
       <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\String.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Quaternion.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TransformComponent.hpp">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

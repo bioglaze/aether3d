@@ -23,6 +23,8 @@ namespace ae3d
         // \return Component at index or null if index is invalid.
         static SpriteRendererComponent* Get(int index);
         
+        SpriteRendererComponent();
+
         // Removes all textures that were added using SetTexture.
         void Clear();
         

@@ -35,8 +35,10 @@ namespace ae3d
             float u, v;
         };
 
+        void Bind() const;
         void Generate( const Face* faces, int faceCount, const VertexPT* vertices, int vertexCount );
         void Draw() const;
+        void DrawRange( int start, int end ) const;
 
     private:
         unsigned id = 0;
