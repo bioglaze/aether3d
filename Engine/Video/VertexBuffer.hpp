@@ -21,10 +21,10 @@ namespace ae3d
             unsigned short a, b, c;
         };
 
-        struct VertexPT
+        struct VertexPTC
         {
-            VertexPT() {}
-            VertexPT(const Vec3& pos, float aU, float aV)
+            VertexPTC() {}
+            VertexPTC(const Vec3& pos, float aU, float aV)
             : position(pos)
             , u(aU)
             , v(aV)
@@ -33,10 +33,11 @@ namespace ae3d
             
             Vec3 position;
             float u, v;
+            Vec4 color;
         };
 
         void Bind() const;
-        void Generate( const Face* faces, int faceCount, const VertexPT* vertices, int vertexCount );
+        void Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount );
         void Draw() const;
         void DrawRange( int start, int end ) const;
 

@@ -31,7 +31,6 @@ void ae3d::Scene::Render()
 {
     if (mainCamera == nullptr)
     {
-        ae3d::System::Print("mainCamera is null.");
         return;
     }
     

@@ -1,4 +1,6 @@
 #include "GfxDevice.hpp"
+#include <algorithm>
+#include <string>
 #include <vector>
 #include <GL/glxw.h>
 #include "System.hpp"
@@ -100,5 +102,23 @@ void ae3d::GfxDevice::ErrorCheck(const char* info)
             ae3d::System::Assert(false, "OpenGL error!");
         }
 #endif
+}
 
+bool ae3d::GfxDevice::HasExtension( const char* glExtension )
+{
+    static std::vector< std::string > sExtensions;
+    
+    if (sExtensions.empty())
+    {
+        int count;
+        glGetIntegerv( GL_NUM_EXTENSIONS, &count );
+        sExtensions.resize( (std::size_t)count );
+        
+        for (int i = 0; i < count; ++i)
+        {
+            sExtensions[ i ] = std::string( (const char*)glGetStringi( GL_EXTENSIONS, i ) );
+        }
+    }
+    
+    return std::find( std::begin( sExtensions ), std::end( sExtensions ), glExtension ) != std::end( sExtensions );
 }

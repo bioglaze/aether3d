@@ -68,6 +68,12 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     if (id == 0)
     {
         id = GfxDevice::CreateTextureId();
+
+        if (GfxDevice::HasExtension( "KHR_debug" ))
+        {
+            glObjectLabel( GL_TEXTURE, id, (GLsizei)std::string( path ).size(), path );
+        }
+
         fileWatcher.AddFile( path, TexReload );
     }
     

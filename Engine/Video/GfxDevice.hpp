@@ -12,12 +12,15 @@ namespace ae3d
         };
 
         void ClearScreen( unsigned clearFlags );
-        void ErrorCheck( const char* info );
         void SetClearColor(float red, float green, float blue);
         unsigned CreateBufferId();
         unsigned CreateTextureId();
         unsigned CreateVaoId();
         void ReleaseGPUObjects();
+#if RENDERER_OPENGL
+        void ErrorCheck( const char* info );
+        bool HasExtension( const char* glExtension );
+#endif
     }
 }
 #endif

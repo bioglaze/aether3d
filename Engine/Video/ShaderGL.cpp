@@ -1,5 +1,6 @@
 #include "Shader.hpp"
 #include <GL/glxw.h>
+#include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
 
@@ -95,6 +96,12 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     GLuint fragmentShader = CompileShader( fragmentSource, GL_FRAGMENT_SHADER );
 
     GLuint program = glCreateProgram();
+
+    if (GfxDevice::HasExtension( "KHR_debug" ))
+    {
+        glObjectLabel( GL_PROGRAM, id, (GLsizei)std::string( "shader" ).size(), "shader" );
+    }
+
     glAttachShader( program, vertexShader );
     glAttachShader( program, fragmentShader );
 

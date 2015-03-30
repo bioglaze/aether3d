@@ -13,7 +13,6 @@
 		AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4951AB4330C00D28653 /* Window.hpp */; };
 		AB7233161AC5C16E000E7835 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7233151AC5C16E000E7835 /* String.cpp */; };
 		AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */; };
-		AB889AEC1ABB4C3B005BA86D /* GfxDeviceGL41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AE91ABB4C3B005BA86D /* GfxDeviceGL41.cpp */; };
 		AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */; };
 		AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEF1ABB4C49005BA86D /* Scene.cpp */; };
 		AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */; };
@@ -34,6 +33,7 @@
 		ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */; };
 		ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */; };
 		ABC1A6871AC4693F00C4F401 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */; };
+		ABCE07FE1AC9A5C300379611 /* GfxDeviceGL45.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */; };
 		ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */; };
 		ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */; };
 		ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */; };
@@ -50,7 +50,6 @@
 		AB7233141AC5C0DC000E7835 /* String.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = String.hpp; path = ../Core/String.hpp; sourceTree = "<group>"; };
 		AB7233151AC5C16E000E7835 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../Core/String.cpp; sourceTree = "<group>"; };
 		AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GfxDevice.hpp; path = ../Video/GfxDevice.hpp; sourceTree = "<group>"; };
-		AB889AE91ABB4C3B005BA86D /* GfxDeviceGL41.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GfxDeviceGL41.cpp; path = ../Video/GfxDeviceGL41.cpp; sourceTree = "<group>"; };
 		AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Texture2D_GL45.cpp; path = ../Video/Texture2D_GL45.cpp; sourceTree = "<group>"; };
 		AB889AEF1ABB4C49005BA86D /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ../Core/Scene.cpp; sourceTree = "<group>"; };
 		AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CameraComponent.hpp; path = ../Include/CameraComponent.hpp; sourceTree = "<group>"; };
@@ -75,6 +74,7 @@
 		ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../Include/TransformComponent.hpp; sourceTree = "<group>"; };
 		ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformComponent.cpp; path = ../Components/TransformComponent.cpp; sourceTree = "<group>"; };
 		ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Quaternion.hpp; path = ../Include/Quaternion.hpp; sourceTree = "<group>"; };
+		ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GfxDeviceGL45.cpp; path = ../Video/GfxDeviceGL45.cpp; sourceTree = "<group>"; };
 		ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
 		ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VertexBufferGL.cpp; path = ../Video/VertexBufferGL.cpp; sourceTree = "<group>"; };
 		ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glcorearb.h; path = ../ThirdParty/GL/glcorearb.h; sourceTree = "<group>"; };
@@ -114,8 +114,8 @@
 			children = (
 				ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */,
 				ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */,
+				ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */,
 				AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */,
-				AB889AE91ABB4C3B005BA86D /* GfxDeviceGL41.cpp */,
 				AB949D361ABC8E44007D561E /* ShaderGL.cpp */,
 				AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */,
 				ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */,
@@ -283,10 +283,10 @@
 				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB7233161AC5C16E000E7835 /* String.cpp in Sources */,
-				AB889AEC1ABB4C3B005BA86D /* GfxDeviceGL41.cpp in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
 				ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */,
 				AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */,
+				ABCE07FE1AC9A5C300379611 /* GfxDeviceGL45.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -377,6 +377,11 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)";
 				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					RENDERER_OPENGL,
+				);
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
 				HEADER_SEARCH_PATHS = (
@@ -397,6 +402,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)";
 				EXECUTABLE_PREFIX = "";
+				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_OPENGL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
 				HEADER_SEARCH_PATHS = (

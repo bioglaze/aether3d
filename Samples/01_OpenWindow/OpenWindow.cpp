@@ -32,8 +32,8 @@ int main()
 
     GameObject spriteRenderer;
     spriteRenderer.AddComponent<SpriteRendererComponent>();
-    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 320, 0, 0 ) );
-    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex2, Vec3( 0, 240, 0 ) );
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 320, 0, 0 ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 0, 240, 0 ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
     spriteRenderer.AddComponent<TransformComponent>();
     spriteRenderer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
 

@@ -7,6 +7,7 @@ namespace ae3d
 {
     class Texture2D;
     struct Vec3;
+    struct Vec4;
     
     /**
       Container for sprites.
@@ -34,10 +35,12 @@ namespace ae3d
          
           \param texture Texture.
           \param position Position relative to the component's transform.
+          \param dimensionPixels Dimension in pixels.
+          \param tintColor Tint color in range 0-1.
 
-          // TODO [2015-03-28]: Set pivot and scale, maybe also rotation.
+          // TODO [2015-03-28]: Set pivot, maybe also rotation.
          */
-        void SetTexture( Texture2D* texture, const Vec3& position );
+        void SetTexture( Texture2D* texture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor );
 
 #pragma message("Remove from public API")
         void Render( const float* projectionMatrix );

@@ -9,29 +9,33 @@ void ae3d::BuiltinShaders::Load()
     \
     layout (location = 0) in vec3 aPosition;\
     layout (location = 1) in vec2 aTexCoord;\
+    layout (location = 2) in vec4 aColor;\
     uniform mat4 _ProjectionMatrix;\
     uniform vec4 textureMap_ST;\
     uniform vec3 _Position;\
     \
     out vec2 vTexCoord;\
+    out vec4 vColor;\
     \
     void main()\
     {\
-    gl_Position = _ProjectionMatrix * vec4(aPosition.xyz /*+ _Position*/, 1.0);\
+    gl_Position = _ProjectionMatrix * vec4(aPosition.xyz, 1.0);\
     vTexCoord = aTexCoord;\
+    vColor = aColor;\
     }";
     
     const char* fragmentSource =
     "#version 410 core\n\
     \
     in vec2 vTexCoord;\
+    in vec4 vColor;\
     out vec4 fragColor;\
     \
     uniform sampler2D textureMap;\
     \
     void main()\
     {\
-    fragColor = texture( textureMap, vTexCoord );\
+    fragColor = texture( textureMap, vTexCoord ) * vColor;\
     }";
     
     spriteRendererShader.Load( vertexSource, fragmentSource );
