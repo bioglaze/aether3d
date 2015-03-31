@@ -1,13 +1,13 @@
 #include "Texture2D.hpp"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.c"
-#include "System.hpp"
 #include <algorithm>
 #include <map>
 #include <GL/glxw.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.c"
+#include "DDSLoader.hpp"
 #include "GfxDevice.hpp"
 #include "FileWatcher.hpp"
-#include "DDSLoader.hpp"
+#include "System.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 
@@ -38,6 +38,11 @@ bool HasStbExtension( const std::string& path )
 
 void ae3d::Texture2D::Load( const System::FileContentsData& fileContents )
 {
+    if (!fileContents.isLoaded)
+    {
+        return;
+    }
+    
     const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
 
     if (isCached && id == 0)

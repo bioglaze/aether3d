@@ -142,6 +142,7 @@ void Matrix44::Multiply( const Matrix44& a, const Matrix44& b, Matrix44& out )
 {
     float tmp[ 16 ];
 
+    // TODO: Verify loop order to avoid cache misses.
     for (int j = 0; j < 4; ++j)
     {
         for (int i = 0; i < 4; ++i)

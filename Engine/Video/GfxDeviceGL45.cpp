@@ -20,14 +20,14 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     glDeleteBuffers(static_cast<GLsizei>(GfxDeviceGlobal::bufferIds.size()), GfxDeviceGlobal::bufferIds.data());
     glDeleteTextures(static_cast<GLsizei>(GfxDeviceGlobal::textureIds.size()), GfxDeviceGlobal::textureIds.data());
 
-    for (std::size_t i = 0; i < GfxDeviceGlobal::shaderIds.size(); ++i)
+    for (auto i : GfxDeviceGlobal::shaderIds)
     {
-        glDeleteShader( GfxDeviceGlobal::shaderIds[ i ] );
+        glDeleteShader( i );
     }
 
-    for (std::size_t i = 0; i < GfxDeviceGlobal::programIds.size(); ++i)
+    for (auto i : GfxDeviceGlobal::programIds)
     {
-        glDeleteShader( GfxDeviceGlobal::programIds[ i ] );
+        glDeleteProgram( i );
     }
 }
 

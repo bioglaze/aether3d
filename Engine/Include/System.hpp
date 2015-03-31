@@ -12,6 +12,7 @@ namespace ae3d
         {
             std::vector<unsigned char> data;
             std::string path;
+            bool isLoaded = false;
         };
 
         /** Releases all resources allocated by the engine. Call when exiting. */

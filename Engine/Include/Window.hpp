@@ -29,6 +29,8 @@ namespace ae3d
     {
         WindowEventType type = WindowEventType::None;
         KeyCode keyCode = KeyCode::A;
+        int mouseX; // X coordinate in window
+        int mouseY; // Y coordinate in window
     };
     
     class Window

@@ -40,7 +40,13 @@ ae3d::System::FileContentsData ae3d::System::FileContents(const char* path)
 
     outData.data.assign(std::istreambuf_iterator< char >(ifs), std::istreambuf_iterator< char >());
     outData.path = std::string(path);
+    outData.isLoaded = ifs.is_open();
 
+    if (!outData.isLoaded)
+    {
+        Print( "Could not open %s", path );
+    }
+    
     return outData;
 }
 

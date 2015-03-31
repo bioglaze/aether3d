@@ -97,6 +97,8 @@ NSWindow *window;
     NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
     ++WindowGlobal::eventIndex;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
 }
 
 - (void) mouseUp: (NSEvent*) event
@@ -105,28 +107,14 @@ NSWindow *window;
     NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
     ++WindowGlobal::eventIndex;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
 }
 
 @end
 
-void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
+static void CreateWindow( int width, int height )
 {
-    // Init application begin
-    WindowGlobal::application = [NSApplication sharedApplication];
-    // In Snow Leopard, programs without application bundles and
-    // Info.plist files don't get a menubar and can't be brought
-    // to the front unless the presentation option is changed.
-    [WindowGlobal::application setActivationPolicy: NSApplicationActivationPolicyRegular];
-    // Specify application delegate impl.
-    ApplicationDelegate *delegate = [[ApplicationDelegate alloc] init];
-    [WindowGlobal::application setDelegate: delegate];
-    // Normally this function would block, so if we want
-    // to make our own main loop we need to stop it just
-    // after initialization (see ApplicationDelegate implementation).
-    [WindowGlobal::application run];
-    // Init application end
-    
-    // Create window begin
     int windowStyleMask;
     NSRect windowRect;
     windowRect = NSMakeRect(0, 0, width, height);
@@ -157,14 +145,14 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     // When running from console we need to manually steal focus
     // from the terminal window for some reason.
     [WindowGlobal::application activateIgnoringOtherApps:YES];
-    // Create window end
     
     // A cryptic way to ask window to open.
     [window makeKeyAndOrderFront: WindowGlobal::application];
     WindowGlobal::isOpen = true;
+}
 
-    // Init OpenGL context.
-    
+static void CreateGLContext()
+{
     NSOpenGLPixelFormatAttribute attributes[] =
     {
         NSOpenGLPFAClosestPolicy,
@@ -180,7 +168,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     };
     
     NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
-
+    
     WindowGlobal::glContext =
     [[NSOpenGLContext alloc] initWithFormat: pixelFormat
                                shareContext: 0];
@@ -189,12 +177,12 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
         NSLog(@"Could not create OpenGL context!");
         return;
     }
-
+    
     [WindowGlobal::glContext makeCurrentContext];
     
     GLint vsync = 1;
     [WindowGlobal::glContext setValues: &vsync
-                forParameter: NSOpenGLCPSwapInterval];
+     forParameter: NSOpenGLCPSwapInterval];
     OpenGLView *view = [[OpenGLView alloc] init];
     [window setContentView: view];
     [view setOpenGLContext: WindowGlobal::glContext];
@@ -204,10 +192,36 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     {
         NSLog(@"Failed to load OpenGL function pointers using GLXW!");
     }
-
+    
     NSLog(@"GL version:   %s", glGetString(GL_VERSION));
-
+    
     [WindowGlobal::glContext setView: view];
+}
+
+void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
+{
+    if (width < 0 || height < 0)
+    {
+        nsLog("Window::Create: Negative width or height! Setting 640x480.");
+        width = 640;
+        height = 480;
+    }
+    
+    WindowGlobal::application = [NSApplication sharedApplication];
+    // In Snow Leopard, programs without application bundles and
+    // Info.plist files don't get a menubar and can't be brought
+    // to the front unless the presentation option is changed.
+    [WindowGlobal::application setActivationPolicy: NSApplicationActivationPolicyRegular];
+    // Specify application delegate impl.
+    ApplicationDelegate *delegate = [[ApplicationDelegate alloc] init];
+    [WindowGlobal::application setDelegate: delegate];
+    // Normally this function would block, so if we want
+    // to make our own main loop we need to stop it just
+    // after initialization (see ApplicationDelegate implementation).
+    [WindowGlobal::application run];
+    
+    CreateWindow( width, height );
+    CreateGLContext();
 }
 
 void cocoaProcessEvents()

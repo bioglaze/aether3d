@@ -42,10 +42,10 @@ namespace ae3d
          */
         void SetTexture( Texture2D* texture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor );
 
-#pragma message("Remove from public API")
+    private:
+        friend class Scene;
         void Render( const float* projectionMatrix );
         
-    private:
         struct Impl;
         Impl& m() { return reinterpret_cast<Impl&>(_storage); }
         Impl const& m() const { return reinterpret_cast<Impl const&>(_storage); }
