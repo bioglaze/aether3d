@@ -14,6 +14,7 @@
 
 // Based on https://github.com/nxsy/xcb_handmade/blob/master/src/xcb_handmade.cpp
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
+// Event tutorial: http://xcb.freedesktop.org/tutorial/events/
 
 namespace WindowGlobal
 {
@@ -27,7 +28,7 @@ namespace WindowGlobal
     GLXDrawable drawable = 0;
 }
 
-int setup_and_run(Display* display, xcb_connection_t *connection, int default_screen, xcb_screen_t *screen)
+static int setup_and_run(Display* display, xcb_connection_t *connection, int default_screen, xcb_screen_t *screen)
 {
     int visualID = 0;
     
@@ -154,7 +155,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
     
     /* Initialize window and OpenGL context, run main loop and deinitialize */
-    int retval = setup_and_run( WindowGlobal::display, WindowGlobal::connection, default_screen, screen );
+    /*int retval =*/ setup_and_run( WindowGlobal::display, WindowGlobal::connection, default_screen, screen );
     
     /* run main loop */
     //int retval = main_loop(display, connection, window, drawable);
@@ -176,31 +177,63 @@ void ae3d::Window::PumpEvents()
     
     while ((event = xcb_poll_for_event(WindowGlobal::connection)))
     {
-        // NOTE(nbm): The high-order bit of response_type is whether the event
-        // is synthetic. I'm not sure I care, but let's grab it in case.
-        bool synthetic_event = (event->response_type & 0x80) != 0;
-        uint8_t response_type = event->response_type & ~0x80;
+        //const bool synthetic_event = (event->response_type & 0x80) != 0;
+        const uint8_t response_type = event->response_type & ~0x80;
+
         switch(response_type)
         {
+            case XCB_EVENT_MASK_BUTTON_PRESS:
+            {
+                xcb_button_press_event_t* be = (xcb_button_press_event_t*)event;
+
+                ++WindowGlobal::eventIndex;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = be->event_x;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = be->event_y;
+            }
+            break;
             case XCB_KEY_PRESS:
             case XCB_KEY_RELEASE:
             {
                 xcb_key_press_event_t *e = (xcb_key_press_event_t *)event;
-                bool is_down = (response_type == XCB_KEY_PRESS);
+                const bool isDown = (response_type == XCB_KEY_PRESS);
+                const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
+                ++WindowGlobal::eventIndex;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
                 xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
-                
+
+                if (keysym == XK_a)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::A;
+                }
+                if (keysym == XK_b)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::B;
+                }
                 if (keysym == XK_w)
                 {
-                    std::cout << "pressed w" << std::endl;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::W;
                 }
                 if (keysym == XK_Up)
                 {
-                    std::cout << "pressed up" << std::endl;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Up;
+                }
+                if (keysym == XK_Down)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Down;
+                }
+                if (keysym == XK_Left)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Left;
+                }
+                if (keysym == XK_Right)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Right;
                 }
             }
             case XCB_MOTION_NOTIFY:
             {
-                xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
+                //xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
                 //std::cout << "mouse x: " << e->event_x;
                 //std::cout << "mouse y: " << e->event_y;
                 break;
@@ -221,11 +254,16 @@ void ae3d::Window::PumpEvents()
             }
             case XCB_EXPOSE:
             {
-                glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
+                //glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
             }
-                break;
+            break;
         }
     }
+}
+
+void ae3d::Window::SwapBuffers() const
+{
+    glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
 }
 
 bool ae3d::Window::PollEvent( WindowEvent& outEvent )
