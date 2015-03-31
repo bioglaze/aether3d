@@ -23,10 +23,12 @@ all:
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Texture2D_GL45.cpp -o $(OUTPUT_DIR)/Texture2D_GL45.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/VertexBufferGL.cpp -o $(OUTPUT_DIR)/VertexBufferGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/DDSLoader.cpp -o $(OUTPUT_DIR)/DDSLoader.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileWatcher.cpp -o $(OUTPUT_DIR)/FileWatcher.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Matrix.cpp -o $(OUTPUT_DIR)/Matrix.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/String.cpp -o $(OUTPUT_DIR)/String.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o

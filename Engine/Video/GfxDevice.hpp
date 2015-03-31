@@ -16,6 +16,8 @@ namespace ae3d
         unsigned CreateBufferId();
         unsigned CreateTextureId();
         unsigned CreateVaoId();
+        unsigned CreateShaderId( unsigned shaderType );
+        unsigned CreateProgramId();
         void ReleaseGPUObjects();
 #if RENDERER_OPENGL
         void ErrorCheck( const char* info );

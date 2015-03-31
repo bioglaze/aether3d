@@ -72,7 +72,7 @@ static void PrintInfoLog( GLuint shader, InfoLogType logType )
 
 static GLuint CompileShader( const char* source, GLenum shaderType )
 {
-    const GLuint shader = glCreateShader( shaderType );
+    const GLuint shader = ae3d::GfxDevice::CreateShaderId( static_cast<unsigned>(shaderType) );
     glShaderSource( shader, 1, &source, nullptr );
     glCompileShader( shader );
     
@@ -95,7 +95,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     GLuint vertexShader = CompileShader( vertexSource, GL_VERTEX_SHADER );
     GLuint fragmentShader = CompileShader( fragmentSource, GL_FRAGMENT_SHADER );
 
-    GLuint program = glCreateProgram();
+    GLuint program = GfxDevice::CreateProgramId();
 
     if (GfxDevice::HasExtension( "KHR_debug" ))
     {

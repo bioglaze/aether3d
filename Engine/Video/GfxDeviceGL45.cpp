@@ -10,6 +10,8 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > vaoIds;
     std::vector< GLuint > bufferIds;
     std::vector< GLuint > textureIds;
+    std::vector< GLuint > shaderIds;
+    std::vector< GLuint > programIds;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
@@ -17,6 +19,16 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     glDeleteVertexArrays(static_cast<GLsizei>(GfxDeviceGlobal::vaoIds.size()), GfxDeviceGlobal::vaoIds.data());
     glDeleteBuffers(static_cast<GLsizei>(GfxDeviceGlobal::bufferIds.size()), GfxDeviceGlobal::bufferIds.data());
     glDeleteTextures(static_cast<GLsizei>(GfxDeviceGlobal::textureIds.size()), GfxDeviceGlobal::textureIds.data());
+
+    for (std::size_t i = 0; i < GfxDeviceGlobal::shaderIds.size(); ++i)
+    {
+        glDeleteShader( GfxDeviceGlobal::shaderIds[ i ] );
+    }
+
+    for (std::size_t i = 0; i < GfxDeviceGlobal::programIds.size(); ++i)
+    {
+        glDeleteShader( GfxDeviceGlobal::programIds[ i ] );
+    }
 }
 
 unsigned ae3d::GfxDevice::CreateTextureId()
@@ -40,6 +52,20 @@ unsigned ae3d::GfxDevice::CreateBufferId()
     GLuint outId;
     glGenBuffers(1, &outId);
     GfxDeviceGlobal::bufferIds.push_back(outId);
+    return outId;
+}
+
+unsigned ae3d::GfxDevice::CreateShaderId( unsigned shaderType )
+{
+    GLuint outId = glCreateShader( shaderType );
+    GfxDeviceGlobal::shaderIds.push_back(outId);
+    return outId;
+}
+
+unsigned ae3d::GfxDevice::CreateProgramId()
+{
+    GLuint outId = glCreateProgram();
+    GfxDeviceGlobal::programIds.push_back(outId);
     return outId;
 }
 
