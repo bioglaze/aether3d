@@ -1,9 +1,62 @@
 #include "GfxDevice.hpp"
 #include <algorithm>
-#include <string>
+//#include <string>
 #include <vector>
 #include <GL/glxw.h>
 #include "System.hpp"
+
+void PrintOpenGLDebugOutput( GLenum source, GLenum type, GLuint id, GLenum severity, const char *msg)
+{
+    const char *sourceFmt = "UNDEFINED(0x%04X)";
+
+    switch (source)
+    {
+    case GL_DEBUG_SOURCE_API_ARB:             sourceFmt = "API"; break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB:   sourceFmt = "WINDOW_SYSTEM"; break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER_ARB: sourceFmt = "SHADER_COMPILER"; break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY_ARB:     sourceFmt = "THIRD_PARTY"; break;
+    case GL_DEBUG_SOURCE_APPLICATION_ARB:     sourceFmt = "APPLICATION"; break;
+    case GL_DEBUG_SOURCE_OTHER_ARB:           sourceFmt = "OTHER"; break;
+    }
+
+    const char *typeFmt = "UNDEFINED(0x%04X)";
+
+    switch (type)
+    {
+    case GL_DEBUG_TYPE_ERROR_ARB:               typeFmt = "ERROR"; break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB: typeFmt = "DEPRECATED_BEHAVIOR"; break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB:  typeFmt = "UNDEFINED_BEHAVIOR"; break;
+    case GL_DEBUG_TYPE_PORTABILITY_ARB:         typeFmt = "PORTABILITY"; break;
+    case GL_DEBUG_TYPE_PERFORMANCE_ARB:         typeFmt = "PERFORMANCE"; break;
+    case GL_DEBUG_TYPE_OTHER_ARB:               typeFmt = "OTHER"; break;
+    }
+
+    const char *severityFmt = "UNDEFINED";
+
+    switch (severity)
+    {
+    case GL_DEBUG_SEVERITY_HIGH_ARB:   severityFmt = "HIGH";   break;
+    case GL_DEBUG_SEVERITY_MEDIUM_ARB: severityFmt = "MEDIUM"; break;
+    case GL_DEBUG_SEVERITY_LOW_ARB:    severityFmt = "LOW"; break;
+    }
+
+    ae3d::System::Print( "OpenGL: %s [source=%s type=%s severity=%s id=%u]",
+        msg, sourceFmt, typeFmt, severityFmt, id );
+}
+
+void APIENTRY DebugCallbackARB( GLenum source, GLenum type, GLuint id, GLenum severity,
+                                GLsizei length, const GLchar *message, const GLvoid *userParam )
+{
+    const int undefinedSeverity = 33387;
+    // Old engine (untested on current): NVIDIA driver spams buffer creation messages at 'undefined' severity, this silences them.
+    if (severity != undefinedSeverity)
+    {
+        (void)length;
+        (void)userParam;
+        PrintOpenGLDebugOutput( source, type, id, severity, message);
+        ae3d::System::Assert(false, "OpenGL error");
+    }
+}
 
 namespace GfxDeviceGlobal
 {
@@ -16,9 +69,18 @@ namespace GfxDeviceGlobal
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
-    glDeleteVertexArrays(static_cast<GLsizei>(GfxDeviceGlobal::vaoIds.size()), GfxDeviceGlobal::vaoIds.data());
-    glDeleteBuffers(static_cast<GLsizei>(GfxDeviceGlobal::bufferIds.size()), GfxDeviceGlobal::bufferIds.data());
-    glDeleteTextures(static_cast<GLsizei>(GfxDeviceGlobal::textureIds.size()), GfxDeviceGlobal::textureIds.data());
+    if (!GfxDeviceGlobal::vaoIds.empty())
+    {
+        glDeleteVertexArrays( static_cast<GLsizei>(GfxDeviceGlobal::vaoIds.size()), GfxDeviceGlobal::vaoIds.data() );
+    }
+    if (!GfxDeviceGlobal::bufferIds.empty())
+    {
+        glDeleteBuffers( static_cast<GLsizei>(GfxDeviceGlobal::bufferIds.size()), GfxDeviceGlobal::bufferIds.data() );
+    }
+    if (!GfxDeviceGlobal::textureIds.empty())
+    {
+        glDeleteTextures( static_cast<GLsizei>(GfxDeviceGlobal::textureIds.size()), GfxDeviceGlobal::textureIds.data() );
+    }
 
     for (auto i : GfxDeviceGlobal::shaderIds)
     {

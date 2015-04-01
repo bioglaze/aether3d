@@ -43,45 +43,48 @@ struct ae3d::SpriteRendererComponent::Impl
 
 void ae3d::SpriteRendererComponent::Impl::CreateVertexBuffer()
 {
-    std::vector< VertexBuffer::VertexPTC > vertices(sprites.size() * 4);
-    std::vector< VertexBuffer::Face > faces(sprites.size() * 2);
+    const int quadVertexCount = 4;
+    const int quadFaceCount = 2;
+    std::vector< VertexBuffer::VertexPTC > vertices( sprites.size() * quadVertexCount );
+    std::vector< VertexBuffer::Face > faces( sprites.size() * quadFaceCount );
 
     // TODO: evaluate perf and consider other containers.
     std::sort( sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) { return a.texture->GetID() <= b.texture->GetID(); } );
 
     for (unsigned short i = 0; i < static_cast<unsigned short>(sprites.size()); ++i)
     {
-        vertices[ i * 4 + 0 ].position = sprites[i].position;
-        vertices[ i * 4 + 1 ].position = sprites[i].position + Vec3( sprites[i].dimension.x, 0, 0 );
-        vertices[ i * 4 + 2 ].position = sprites[i].position + Vec3( sprites[i].dimension.x, sprites[i].dimension.y, 0 );
-        vertices[ i * 4 + 3 ].position = sprites[i].position + Vec3( 0, sprites[i].dimension.y, 0 );
+        const auto& dim = sprites[ i ].dimension;
+        vertices[ i * quadVertexCount + 0 ].position = sprites[ i ].position;
+        vertices[ i * quadVertexCount + 1 ].position = sprites[ i ].position + Vec3( dim.x, 0, 0 );
+        vertices[ i * quadVertexCount + 2 ].position = sprites[ i ].position + Vec3( dim.x, dim.y, 0 );
+        vertices[ i * quadVertexCount + 3 ].position = sprites[ i ].position + Vec3( 0, dim.y, 0 );
 
-        for (int v = 0; v < 4; ++v)
+        for (int v = 0; v < quadVertexCount; ++v)
         {
-            vertices[ i * 4 + v ].color = sprites[i].tint;
+            vertices[ i * quadVertexCount + v ].color = sprites[i].tint;
         }
 
-        vertices[ i * 4 + 0 ].u = 0;
-        vertices[ i * 4 + 0 ].v = 0;
+        vertices[ i * quadVertexCount + 0 ].u = 0;
+        vertices[ i * quadVertexCount + 0 ].v = 0;
 
-        vertices[ i * 4 + 1 ].u = 1;
-        vertices[ i * 4 + 1 ].v = 0;
+        vertices[ i * quadVertexCount + 1 ].u = 1;
+        vertices[ i * quadVertexCount + 1 ].v = 0;
 
-        vertices[ i * 4 + 2 ].u = 1;
-        vertices[ i * 4 + 2 ].v = 1;
+        vertices[ i * quadVertexCount + 2 ].u = 1;
+        vertices[ i * quadVertexCount + 2 ].v = 1;
 
-        vertices[ i * 4 + 3 ].u = 0;
-        vertices[ i * 4 + 3 ].v = 1;
+        vertices[ i * quadVertexCount + 3 ].u = 0;
+        vertices[ i * quadVertexCount + 3 ].v = 1;
 
-        auto& tri1 = faces[ i * 2 + 0 ];
-        tri1.a = i * 4 + 0;
-        tri1.b = i * 4 + 1;
-        tri1.c = i * 4 + 2;
+        auto& tri1 = faces[ i * quadFaceCount + 0 ];
+        tri1.a = i * quadVertexCount + 0;
+        tri1.b = i * quadVertexCount + 1;
+        tri1.c = i * quadVertexCount + 2;
 
-        auto& tri2 = faces[ i * 2 + 1 ];
-        tri2.a = i * 4 + 2;
-        tri2.b = i * 4 + 3;
-        tri2.c = i * 4 + 0;
+        auto& tri2 = faces[ i * quadFaceCount + 1 ];
+        tri2.a = i * quadVertexCount + 2;
+        tri2.b = i * quadVertexCount + 3;
+        tri2.c = i * quadVertexCount + 0;
     }
 
     vertexBuffer.Generate(faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()));
@@ -154,6 +157,11 @@ ae3d::SpriteRendererComponent::SpriteRendererComponent()
     //    "SpriteRendererComponent::StorageSize need be changed");
     //static_assert(StorageAlign == alignof(Impl),
     //    "SpriteRendererComponent::StorageAlign need be changed")
+}
+
+ae3d::SpriteRendererComponent::~SpriteRendererComponent()
+{
+    reinterpret_cast< Impl* >(&_storage)->~Impl();
 }
 
 void ae3d::SpriteRendererComponent::Clear()

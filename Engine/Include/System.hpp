@@ -4,6 +4,14 @@
 #include <string>
 #include <vector>
 
+#define Stringize( L ) #L
+#define MakeString( M, L ) M(L)
+#define $Line \
+MakeString( Stringize, __LINE__ )
+#define Todo \
+__FILE__ "(" $Line "): TODO: "
+// Usage: #pragma message(Todo "text")
+
 namespace ae3d
 {
     namespace System

@@ -18,7 +18,9 @@ namespace Texture2DGlobal
 
 void TexReload( const std::string& path )
 {
-    Texture2DGlobal::pathToCachedTexture[ path ].Load( ae3d::System::FileContents( path.c_str() ));
+    auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
+
+    tex.Load( ae3d::System::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter() );
 }
 
 bool HasStbExtension( const std::string& path )
@@ -36,8 +38,11 @@ bool HasStbExtension( const std::string& path )
     return extensionFound;
 }
 
-void ae3d::Texture2D::Load( const System::FileContentsData& fileContents )
+void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter )
 {
+    filter = aFilter;
+    wrap = aWrap;
+
     if (!fileContents.isLoaded)
     {
         return;
@@ -67,8 +72,7 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents )
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-#pragma message("TODO [2015-03-26] Combine similar parts in LoadDDS and LoadSTB when DDS loader enables it.")
-
+#pragma message(Todo "[2015-03-26] Combine similar parts in LoadDDS and LoadSTB when DDS loader enables it.") 
     // First load.
     if (id == 0)
     {
@@ -83,11 +87,10 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     }
     
     glBindTexture( GL_TEXTURE_2D, id );
-
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
 
     const bool success = DDSLoader::Load( path, 0, width, height, opaque );
 
@@ -118,11 +121,21 @@ void ae3d::Texture2D::LoadSTB( const System::FileContentsData& fileContents )
 
     glBindTexture( GL_TEXTURE_2D, id );
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+#if __APPLE__
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+#else
+    glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, width, height );
+    glTexSubImage2D( GL_TEXTURE_2D,
+        0,
+        0, 0,
+        width, height,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        data );
+#endif
     stbi_image_free( data );
 }
