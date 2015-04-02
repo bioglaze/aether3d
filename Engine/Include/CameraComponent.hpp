@@ -12,15 +12,6 @@ namespace ae3d
     class CameraComponent
     {
     public:
-        // \return Component's type code. Must be unique for each component type.
-        static int Type() { return 0; }
-
-        // \return Component handle that uniquely identifies the instance.
-        static int New();
-
-        // \return Component at index or null if index is invalid.
-        static CameraComponent* Get(int index);
-
         // \return Projection matrix.
         const Matrix44& GetProjection() const { return projectionMatrix; }
         
@@ -43,6 +34,17 @@ namespace ae3d
         void SetClearColor( const Vec3& color );
 
     private:
+        friend class GameObject;
+        
+        // \return Component's type code. Must be unique for each component type.
+        static int Type() { return 0; }
+        
+        // \return Component handle that uniquely identifies the instance.
+        static int New();
+        
+        // \return Component at index or null if index is invalid.
+        static CameraComponent* Get(int index);
+
         static ae3d::CameraComponent cameraComponents[100];
         Matrix44 projectionMatrix;
         Matrix44 viewMatrix;

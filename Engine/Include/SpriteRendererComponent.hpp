@@ -15,15 +15,6 @@ namespace ae3d
     class SpriteRendererComponent
     {
     public:
-        // \return Component's type code. Must be unique for each component type.
-        static int Type() { return 1; }
-
-        // \return Component handle that uniquely identifies the instance.
-        static int New();
-
-        // \return Component at index or null if index is invalid.
-        static SpriteRendererComponent* Get(int index);
-        
         // Constructor
         SpriteRendererComponent();
 
@@ -47,8 +38,19 @@ namespace ae3d
         void SetTexture( Texture2D* texture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor );
 
     private:
+        friend class GameObject;
         friend class Scene;
-        void Render( const float* projectionMatrix );
+        
+        // \return Component's type code. Must be unique for each component type.
+        static int Type() { return 1; }
+        
+        // \return Component handle that uniquely identifies the instance.
+        static int New();
+        
+        // \return Component at index or null if index is invalid.
+        static SpriteRendererComponent* Get(int index);
+
+        void Render( const float* projectionMatrix, const float* modelMatrix );
         
         struct Impl;
         Impl& m() { return reinterpret_cast<Impl&>(_storage); }

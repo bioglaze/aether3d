@@ -153,10 +153,6 @@ ae3d::SpriteRendererComponent* ae3d::SpriteRendererComponent::Get(int index)
 ae3d::SpriteRendererComponent::SpriteRendererComponent()
 {
     new(&_storage)Impl();
-    //static_assert(sizeof(Impl) <= StorageSize && StorageSize <= sizeof(Impl) * 1.1,
-    //    "SpriteRendererComponent::StorageSize need be changed");
-    //static_assert(StorageAlign == alignof(Impl),
-    //    "SpriteRendererComponent::StorageAlign need be changed")
 }
 
 ae3d::SpriteRendererComponent::~SpriteRendererComponent()
@@ -188,10 +184,11 @@ void ae3d::SpriteRendererComponent::Impl::BuildRenderQueue()
     renderQueueIsDirty = false;
 }
 
-void ae3d::SpriteRendererComponent::Render( const float* projectionMatrix )
+void ae3d::SpriteRendererComponent::Render( const float* projectionMatrix, const float* modelMatrix )
 {    
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionMatrix", projectionMatrix );
+    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ModelMatrix", modelMatrix );
  
     m().Render();
 }

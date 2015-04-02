@@ -16,4 +16,6 @@ ae3d::TransformComponent* ae3d::TransformComponent::Get(int index)
 void ae3d::TransformComponent::SetLocalPosition( const Vec3& localPos )
 {
     localPosition = localPos;
+    localMatrix = Matrix44::identity;
+    localMatrix.Translate( localPosition );
 }

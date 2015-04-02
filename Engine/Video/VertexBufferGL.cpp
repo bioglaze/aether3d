@@ -3,7 +3,6 @@
 #include <GL/glxw.h>
 #include "GfxDevice.hpp"
 #include "Vec3.hpp"
-//#include <cstddef> for offset of on VS2013
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
 {
@@ -32,13 +31,11 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     // TexCoord.
     const int uvChannel = 1;
     glEnableVertexAttribArray( uvChannel );
-    //glVertexAttribPointer(uvChannel, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), (const GLvoid*)(3 * 4)); PVS-Studio warning
     glVertexAttribPointer( uvChannel, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), (GLvoid*)offsetof(struct VertexPTC, u) ); // No warning.
 
     // Color.
     const int colorChannel = 2;
     glEnableVertexAttribArray( colorChannel );
-    //glVertexAttribPointer(colorChannel, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), (const GLvoid*)(3 * 4)); PVS-Studio warning
     glVertexAttribPointer( colorChannel, 4, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), (GLvoid*)offsetof(struct VertexPTC, color) );
 }
 
@@ -49,10 +46,12 @@ void ae3d::VertexBuffer::Bind() const
 
 void ae3d::VertexBuffer::Draw() const
 {
+    GfxDevice::IncDrawCalls();
     glDrawElements( GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, nullptr );
 }
 
 void ae3d::VertexBuffer::DrawRange( int start, int end ) const
 {
+    GfxDevice::IncDrawCalls();
     glDrawRangeElements(GL_TRIANGLES, start, end, (end - start) * 3, GL_UNSIGNED_SHORT, (const GLvoid*)(start * sizeof(Face)));
 }

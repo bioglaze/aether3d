@@ -13,11 +13,18 @@ namespace ae3d
 
         void ClearScreen( unsigned clearFlags );
         void SetClearColor(float red, float green, float blue);
+
         unsigned CreateBufferId();
         unsigned CreateTextureId();
         unsigned CreateVaoId();
         unsigned CreateShaderId( unsigned shaderType );
         unsigned CreateProgramId();
+        
+        // TODO: Disable statistic calls in Release builds.
+        void IncDrawCalls();
+        int GetDrawCalls();
+        void ResetFrameStatistics();
+
         void ReleaseGPUObjects();
 #if RENDERER_OPENGL
         void ErrorCheck( const char* info );

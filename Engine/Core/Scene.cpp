@@ -39,6 +39,7 @@ void ae3d::Scene::Render()
     Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+    GfxDevice::ResetFrameStatistics();
     
     for (auto gameObject : gameObjects)
     {
@@ -48,11 +49,20 @@ void ae3d::Scene::Render()
         }
         
         auto spriteRenderer = gameObject->GetComponent<SpriteRendererComponent>();
+        auto transform = gameObject->GetComponent<TransformComponent>();
         
         if (gameObject && spriteRenderer)
         {
-            spriteRenderer->Render( camera->GetProjection().m );
+            spriteRenderer->Render( camera->GetProjection().m, transform->GetLocalMatrix().m );
         }
+    }
+
+    // TODO: Remove when text rendering is implemented.
+    static int frame = 0;
+    ++frame;
+    if (frame % 60 == 0)
+    {
+        ae3d::System::Print("draw calls: %d", GfxDevice::GetDrawCalls());
     }
 
     GfxDevice::ErrorCheck( "Scene render end" );

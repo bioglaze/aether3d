@@ -11,15 +11,15 @@ void ae3d::BuiltinShaders::Load()
     layout (location = 1) in vec2 aTexCoord;\
     layout (location = 2) in vec4 aColor;\
     uniform mat4 _ProjectionMatrix;\
+    uniform mat4 _ModelMatrix;\
     uniform vec4 textureMap_ST;\
-    uniform vec3 _Position;\
     \
     out vec2 vTexCoord;\
     out vec4 vColor;\
     \
     void main()\
     {\
-    gl_Position = _ProjectionMatrix * vec4(aPosition.xyz, 1.0);\
+    gl_Position = _ProjectionMatrix * _ModelMatrix * vec4(aPosition.xyz, 1.0);\
     vTexCoord = aTexCoord;\
     vColor = aColor;\
     }";

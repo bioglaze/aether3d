@@ -65,6 +65,22 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > textureIds;
     std::vector< GLuint > shaderIds;
     std::vector< GLuint > programIds;
+    int drawCalls = 0;
+}
+
+void ae3d::GfxDevice::IncDrawCalls()
+{
+    ++GfxDeviceGlobal::drawCalls;
+}
+
+void ae3d::GfxDevice::ResetFrameStatistics()
+{
+    GfxDeviceGlobal::drawCalls = 0;
+}
+
+int ae3d::GfxDevice::GetDrawCalls()
+{
+    return GfxDeviceGlobal::drawCalls;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
