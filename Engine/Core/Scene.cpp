@@ -53,7 +53,9 @@ void ae3d::Scene::Render()
         
         if (gameObject && spriteRenderer)
         {
-            spriteRenderer->Render( camera->GetProjection().m, transform->GetLocalMatrix().m );
+            Matrix44 projectionModel;
+            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
+            spriteRenderer->Render( projectionModel.m );
         }
     }
 

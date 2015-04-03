@@ -50,7 +50,7 @@ namespace ae3d
         // \return Component at index or null if index is invalid.
         static SpriteRendererComponent* Get(int index);
 
-        void Render( const float* projectionMatrix, const float* modelMatrix );
+        void Render( const float* projectionModelMatrix );
         
         struct Impl;
         Impl& m() { return reinterpret_cast<Impl&>(_storage); }

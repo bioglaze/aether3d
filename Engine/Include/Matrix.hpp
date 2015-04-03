@@ -1,13 +1,19 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include "Macros.hpp"
+
 namespace ae3d
 {
     struct Vec3;
     struct Vec4;
 
     /// 4x4 Matrix.
+#if SIMD_SSE3
+    struct BEGIN_ALIGNED( Matrix44, 16 )
+#else
     struct Matrix44
+#endif
     {
         /// Identity matrix.
         static const Matrix44 identity;
@@ -160,6 +166,10 @@ namespace ae3d
         
         /// Member data, row-major.
         float m[16];
-    };
+    }
+#if SIMD_SSE3
+    END_ALIGNED( Matrix44, 16 )
+#endif
+    ;
 }
 #endif

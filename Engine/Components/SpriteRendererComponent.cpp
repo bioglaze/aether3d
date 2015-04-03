@@ -184,11 +184,10 @@ void ae3d::SpriteRendererComponent::Impl::BuildRenderQueue()
     renderQueueIsDirty = false;
 }
 
-void ae3d::SpriteRendererComponent::Render( const float* projectionMatrix, const float* modelMatrix )
-{    
+void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
+{
     renderer.builtinShaders.spriteRendererShader.Use();
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionMatrix", projectionMatrix );
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ModelMatrix", modelMatrix );
+    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
  
     m().Render();
 }
