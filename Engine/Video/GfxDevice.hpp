@@ -11,6 +11,13 @@ namespace ae3d
             Depth = 1 << 1
         };
 
+        enum class BlendMode
+        {
+            AlphaBlend,
+            Additive,
+            Off
+        };
+        
         void ClearScreen( unsigned clearFlags );
         void SetClearColor(float red, float green, float blue);
 
@@ -26,6 +33,7 @@ namespace ae3d
         void ResetFrameStatistics();
 
         void ReleaseGPUObjects();
+        void SetBlendMode( BlendMode blendMode );
 #if RENDERER_OPENGL
         void ErrorCheck( const char* info );
         bool HasExtension( const char* glExtension );

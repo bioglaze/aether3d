@@ -1,7 +1,6 @@
 #ifndef QUATERNION_H
 #define QUATERNION_H
 
-// TODO [2014-03-26] Replace with Math.hpp
 #include <cmath>
 #include "Vec3.hpp"
 #include "Matrix.hpp"

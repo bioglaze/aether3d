@@ -168,6 +168,28 @@ void ae3d::GfxDevice::SetClearColor(float red, float green, float blue)
     glClearColor( red, green, blue, 1 );
 }
 
+void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
+{
+    if (blendMode == BlendMode::Off)
+    {
+        glDisable( GL_BLEND );
+    }
+    else if (blendMode == BlendMode::AlphaBlend)
+    {
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glEnable( GL_BLEND );
+    }
+    else if (blendMode == BlendMode::Additive)
+    {
+        glBlendFunc( GL_ONE, GL_ONE );
+        glEnable( GL_BLEND );
+    }
+    else
+    {
+        ae3d::System::Assert( false, "Unhandled blend mode." );
+    }
+}
+
 const char* GetGLErrorString(GLenum code)
 {
     if (code == GL_OUT_OF_MEMORY)

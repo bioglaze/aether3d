@@ -44,6 +44,9 @@ namespace ae3d
         // \return Filtering mode
         TextureFilter GetFilter() const { return filter; }
 
+        // \return True, if the texture does not contain an alpha channel.
+        bool IsOpaque() const { return opaque; }
+
     private:
         void LoadDDS( const char* path );
         

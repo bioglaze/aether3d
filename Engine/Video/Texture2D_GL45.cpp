@@ -110,7 +110,9 @@ void ae3d::Texture2D::LoadSTB( const System::FileContentsData& fileContents )
         System::Print( "%s failed to load. stb_image's reason: %s", fileContents.path.c_str(), reason.c_str() );
         return;
     }
-    
+  
+    opaque = (components == 3 || components == 1);
+
     if (GfxDevice::HasExtension("GL_ARB_texture_storage"))
     {
         glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, width, height );
