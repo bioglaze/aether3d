@@ -194,6 +194,7 @@ static void CreateGLContext()
     }
     
     NSLog(@"GL version:   %s", glGetString(GL_VERSION));
+    glEnable( GL_DEPTH_TEST );
     
     [WindowGlobal::glContext setView: view];
 }

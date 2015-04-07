@@ -56,7 +56,7 @@ namespace ae3d
         Impl& m() { return reinterpret_cast<Impl&>(_storage); }
         Impl const& m() const { return reinterpret_cast<Impl const&>(_storage); }
         
-        static const std::size_t StorageSize = 384;
+        static const std::size_t StorageSize = 1384;
         static const std::size_t StorageAlign = 16;
         
         std::aligned_storage<StorageSize, StorageAlign>::type _storage;

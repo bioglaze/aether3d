@@ -15,6 +15,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     
     glBindVertexArray(id);
     
+    // TODO: Don't create if != 0
     GLuint vboId = GfxDevice::CreateBufferId();
     glBindBuffer( GL_ARRAY_BUFFER, vboId );
     glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(VertexPTC), vertices, GL_STATIC_DRAW );

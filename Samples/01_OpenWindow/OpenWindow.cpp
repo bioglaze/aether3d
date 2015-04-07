@@ -28,12 +28,13 @@ int main()
     spriteTex.Load( System::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest );
 
     Texture2D spriteTex2;
-    spriteTex2.Load( System::FileContents( "glider2.png" ), TextureWrap::Repeat, TextureFilter::Nearest );
+    spriteTex2.Load( System::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest );
 
     GameObject spriteRenderer;
     spriteRenderer.AddComponent<SpriteRendererComponent>();
-    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 320, 0, 0 ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 0, 240, 0 ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 340, 80, -0.5f ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
+    spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex2, Vec3( 280, 60, -0.4f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     spriteRenderer.AddComponent<TransformComponent>();
     spriteRenderer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
 
@@ -42,11 +43,6 @@ int main()
     scene.Add( &spriteRenderer );
 
     bool quit = false;
-    
-    //float x = 320;
-    //float y = 0;
-    //float dx = 0;
-    //float dy = 0;
     
     while (Window::Instance().IsOpen() && !quit)
     {
@@ -69,22 +65,6 @@ int main()
                 {
                     quit = true;
                 }
-                /*if (keyCode == KeyCode::Left)
-                {
-                    dx = event.type == WindowEventType::KeyDown ? -1 : 0;
-                }
-                if (keyCode == KeyCode::Right)
-                {
-                    dx = event.type == WindowEventType::KeyDown ? 1 : 0;
-                }
-                if (keyCode == KeyCode::Up)
-                {
-                    dy = event.type == WindowEventType::KeyDown ? 1 : 0;
-                }
-                if (keyCode == KeyCode::Down)
-                {
-                    dy = event.type == WindowEventType::KeyDown ? -1 : 0;
-                }*/
             }
         }
 
