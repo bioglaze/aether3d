@@ -1,6 +1,8 @@
 #ifndef TEXTURE_2D_H
 #define TEXTURE_2D_H
 
+#include "Vec3.hpp"
+
 namespace ae3d
 {
     namespace System
@@ -21,14 +23,23 @@ namespace ae3d
     };
 
     /**
-      2D texture.
+      2D immutable texture.
     */
     class Texture2D
     {
     public:
-        // \param textureData Texture data. File format must be png, tga, jpg, bmp or bmp.
+        // \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
+        // \param wrap Wrap mode.
+        // \param filter Filter mode.
         void Load( const System::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter );
         
+        // \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
+        // \param atlasMetaData Atlas metadata. Format is Ogre/CEGUI. Example atlas tool: Texture Packer.
+        // \param textureName Name of the texture in atlas.
+        // \param wrap Wrap mode.
+        // \param filter Filter mode.
+        void LoadFromAtlas( const System::FileContentsData& atlasTextureData, const System::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter );
+
         // \return id.
         unsigned GetID() const { return id; }
         
@@ -43,6 +54,8 @@ namespace ae3d
 
         // \return Filtering mode
         TextureFilter GetFilter() const { return filter; }
+
+        const Vec4& GetScaleOffset() const { return scaleOffset; }
 
         // \return True, if the texture does not contain an alpha channel.
         bool IsOpaque() const { return opaque; }
@@ -63,6 +76,7 @@ namespace ae3d
         TextureWrap wrap = TextureWrap::Repeat;
         TextureFilter filter = TextureFilter::Nearest;
         bool opaque = true;
+        Vec4 scaleOffset{ 1, 1, 0, 0 };
     };
 }
 #endif

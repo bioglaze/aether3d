@@ -293,6 +293,8 @@ namespace ae3d
             glDebugMessageCallback( DebugCallbackARB, nullptr );
             glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
         }
+
+        glEnable( GL_DEPTH_TEST);
     }
 
     void Window::SwapBuffers() const

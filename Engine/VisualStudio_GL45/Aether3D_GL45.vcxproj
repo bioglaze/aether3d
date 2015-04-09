@@ -92,6 +92,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <PreprocessorDefinitions>RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -108,6 +109,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <PreprocessorDefinitions>RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -125,6 +127,7 @@
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -144,6 +147,7 @@
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -160,6 +164,7 @@
     <ClCompile Include="..\Components\TransformComponent.cpp" />
     <ClCompile Include="..\Core\FileWatcher.cpp" />
     <ClCompile Include="..\Core\Matrix.cpp" />
+    <ClCompile Include="..\Core\MatrixSSE3.cpp" />
     <ClCompile Include="..\Core\Scene.cpp" />
     <ClCompile Include="..\Core\String.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
@@ -178,6 +183,7 @@
     <ClInclude Include="..\Core\String.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />
     <ClInclude Include="..\Include\GameObject.hpp" />
+    <ClInclude Include="..\Include\Macros.hpp" />
     <ClInclude Include="..\Include\Matrix.hpp" />
     <ClInclude Include="..\Include\Quaternion.hpp" />
     <ClInclude Include="..\Include\Scene.hpp" />

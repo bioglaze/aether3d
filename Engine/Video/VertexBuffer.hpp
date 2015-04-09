@@ -36,13 +36,26 @@ namespace ae3d
             Vec4 color;
         };
 
+        // Binds the buffer. Must be called before Draw or DrawRange.
         void Bind() const;
+
+        // Generates the buffer from supplied geometry.
+        // \param faces Faces.
+        // \param faceCount Face count.
+        // \param vertices Vertices.
+        // \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount );
         void Draw() const;
+        /// <summary>
+        /// Draws a range of triangles.
+        /// </summary>
+        /// <param name="start">Start</param>
         void DrawRange( int start, int end ) const;
 
     private:
-        unsigned id = 0;
+        unsigned vaoId = 0;
+        unsigned vboId = 0;
+        unsigned iboId = 0;
         int elementCount = 0;
     };
 }

@@ -2,9 +2,12 @@
 #include "Matrix.hpp"
 #include <cstring>
 #include <cmath>
-#include <iostream>
 #include <pmmintrin.h>
 #include "Vec3.hpp"
+
+#ifndef M_PI
+#    define M_PI 3.14159265358979f
+#endif
 
 namespace ae3d
 {

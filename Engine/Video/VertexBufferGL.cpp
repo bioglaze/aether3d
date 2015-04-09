@@ -8,23 +8,30 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 {
     elementCount = faceCount * 3;
     
-    if (id == 0)
+    if (vaoId == 0)
     {
-        id = GfxDevice::CreateVaoId();
+        vaoId = GfxDevice::CreateVaoId();
     }
     
-    glBindVertexArray(id);
+    glBindVertexArray( vaoId );
     
-    // TODO: Don't create if != 0
-    GLuint vboId = GfxDevice::CreateBufferId();
+    if (vboId == 0)
+    {
+        vboId = GfxDevice::CreateBufferId();
+    }
+
     glBindBuffer( GL_ARRAY_BUFFER, vboId );
     glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(VertexPTC), vertices, GL_STATIC_DRAW );
     
-    GLuint iboId = GfxDevice::CreateBufferId();
+    if (iboId == 0)
+    {
+        iboId = GfxDevice::CreateBufferId();
+    }
+
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iboId );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, GL_STATIC_DRAW );
     
-    // Vertex
+    // Position.
     const int posChannel = 0;
     glEnableVertexAttribArray( posChannel );
     glVertexAttribPointer( posChannel, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), nullptr );
@@ -42,7 +49,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
 void ae3d::VertexBuffer::Bind() const
 {
-    glBindVertexArray( id );
+    glBindVertexArray( vaoId );
 }
 
 void ae3d::VertexBuffer::Draw() const

@@ -19,7 +19,7 @@ void ae3d::BuiltinShaders::Load()
     void main()\
     {\
     gl_Position = _ProjectionModelMatrix * vec4(aPosition.xyz, 1.0);\
-    vTexCoord = aTexCoord;\
+    vTexCoord = aTexCoord * textureMap_ST.xy + textureMap_ST.zw;\
     vColor = aColor;\
     }";
     

@@ -33,6 +33,7 @@ namespace ae3d
         static TransformComponent transformComponents[100];
         Vec3 localPosition;
         Quaternion localRotation;
+        int padding = 0;
         Matrix44 localMatrix;
     };
 }

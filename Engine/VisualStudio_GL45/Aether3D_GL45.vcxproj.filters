@@ -55,6 +55,9 @@
     <ClCompile Include="..\Components\TransformComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\MatrixSSE3.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -138,6 +141,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\TransformComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Macros.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
