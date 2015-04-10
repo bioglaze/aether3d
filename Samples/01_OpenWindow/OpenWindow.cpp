@@ -69,6 +69,10 @@ int main()
                 {
                     quit = true;
                 }
+                if (keyCode == KeyCode::A)
+                {
+                    System::ReloadChangedAssets();
+                }
             }
         }
 

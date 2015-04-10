@@ -46,6 +46,9 @@ namespace ae3d
         %f: float
         */
         void Print(const char* format, ...);
+
+        // Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often.
+        void ReloadChangedAssets();
     }
 }
 #endif

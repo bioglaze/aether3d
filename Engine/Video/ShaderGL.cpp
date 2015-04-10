@@ -135,8 +135,9 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_2D, texture->GetID() );
     SetInt( name, textureUnit );
-    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
+    // TODO: Enable when unused parameters don't cause OpenGL errors.
+    //const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
+    //SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )

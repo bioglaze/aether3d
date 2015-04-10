@@ -8,10 +8,12 @@
 #include <cstdarg>
 #include <cassert>
 #include "GfxDevice.hpp"
+#include "FileWatcher.hpp"
 #include "Renderer.hpp"
 
 extern void nsLog(const char* msg);
 extern ae3d::Renderer renderer;
+extern ae3d::FileWatcher fileWatcher;
 
 void ae3d::System::Deinit()
 {
@@ -85,4 +87,9 @@ void ae3d::System::Assert(bool condition, const char* message)
         assert(false);
 #endif
     }
+}
+
+void ae3d::System::ReloadChangedAssets()
+{
+    fileWatcher.Poll();
 }

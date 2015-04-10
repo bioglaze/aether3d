@@ -52,17 +52,25 @@ static void CreateVertexBuffer( std::vector< Sprite >& sprites, ae3d::VertexBuff
             vertices[ i * quadVertexCount + v ].color = sprites[i].tint;
         }
         
-        vertices[ i * quadVertexCount + 0 ].u = 0;
-        vertices[ i * quadVertexCount + 0 ].v = 0;
+        const ae3d::Vec4& so = sprites[i].texture->GetScaleOffset();
+
+        const float u0 = 0.0f * so.x + so.z;
+        const float u1 = 1.0f * so.x + so.z;
+
+        const float v0 = 0.0f * so.y + so.w;
+        const float v1 = 1.0f * so.y + so.w;
+
+        vertices[ i * quadVertexCount + 0 ].u = u0;
+        vertices[ i * quadVertexCount + 0 ].v = v0;
         
-        vertices[ i * quadVertexCount + 1 ].u = 1;
-        vertices[ i * quadVertexCount + 1 ].v = 0;
+        vertices[ i * quadVertexCount + 1 ].u = u1;
+        vertices[ i * quadVertexCount + 1 ].v = v0;
         
-        vertices[ i * quadVertexCount + 2 ].u = 1;
-        vertices[ i * quadVertexCount + 2 ].v = 1;
+        vertices[ i * quadVertexCount + 2 ].u = u1;
+        vertices[ i * quadVertexCount + 2 ].v = v1;
         
-        vertices[ i * quadVertexCount + 3 ].u = 0;
-        vertices[ i * quadVertexCount + 3 ].v = 1;
+        vertices[ i * quadVertexCount + 3 ].u = u0;
+        vertices[ i * quadVertexCount + 3 ].v = v1;
         
         auto& tri1 = faces[ i * quadFaceCount + 0 ];
         tri1.a = i * quadVertexCount + 0;

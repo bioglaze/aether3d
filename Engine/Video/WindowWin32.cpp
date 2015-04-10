@@ -5,11 +5,6 @@
 #include <GL/glxw.h>
 #include <GL/wglext.h>
 
-// Testing hotloading
-#include "FileWatcher.hpp"
-#include "System.hpp"
-extern ae3d::FileWatcher fileWatcher;
-
 // TODO: Separate all GL stuff from this source file so it can be used also with D3D.
 
 void APIENTRY DebugCallbackARB(GLenum source, GLenum type, GLuint id, GLenum severity,
@@ -44,7 +39,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         {
             ++WindowGlobal::eventIndex;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
-            ae3d::System::Print("Got key down: %d", wParam);
+            //ae3d::System::Print("Got key down: %d", wParam);
             //WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = static_cast<int>( wParam );
             if (wParam == 65) // A
             {
@@ -300,13 +295,5 @@ namespace ae3d
     void Window::SwapBuffers() const
     {
         ::SwapBuffers( WindowGlobal::hdc );
-
-        static int frame = 0;
-        ++frame;
-
-        if ((frame % 60) == 0)
-        {
-            fileWatcher.Poll();
-        }
     }
 }
