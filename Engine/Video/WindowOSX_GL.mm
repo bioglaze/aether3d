@@ -113,12 +113,21 @@ NSWindow *window;
 
 @end
 
-static void CreateWindow( int width, int height )
+static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
 {
     int windowStyleMask;
     NSRect windowRect;
     windowRect = NSMakeRect(0, 0, width, height);
-    windowStyleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
+
+    if (flags & ae3d::WindowCreateFlags::Fullscreen)
+    {
+        windowStyleMask = NSBorderlessWindowMask;
+    }
+    else
+    {
+        windowStyleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
+    }
+    
     window =
     [[NSWindow alloc] initWithContentRect: windowRect
                                 styleMask: windowStyleMask
@@ -148,7 +157,17 @@ static void CreateWindow( int width, int height )
     
     // A cryptic way to ask window to open.
     [window makeKeyAndOrderFront: WindowGlobal::application];
+    [window center];
     WindowGlobal::isOpen = true;
+    
+    if (flags & ae3d::WindowCreateFlags::Fullscreen)
+    {
+        [window setLevel: NSMainMenuWindowLevel + 1];
+        [window setHidesOnDeactivate: YES];
+        NSRect screenRect = [[NSScreen mainScreen] frame];
+        [window setContentSize: screenRect.size];
+        [window setFrameOrigin: screenRect.origin];
+    }
 }
 
 static void CreateGLContext()
@@ -221,7 +240,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     // after initialization (see ApplicationDelegate implementation).
     [WindowGlobal::application run];
     
-    CreateWindow( width, height );
+    CreateWindow( width, height, flags );
     CreateGLContext();
 }
 

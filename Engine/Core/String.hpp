@@ -12,7 +12,7 @@ namespace ae3d
     public:
         String();
         explicit String( const char* text );
-        bool operator<( const String< Size >& other ) const { return false; }
+        bool operator<( const String< Size >& /*other*/ ) const { return false; }
         bool operator==( const char* other ) const;
         const char* CStr() const;
 

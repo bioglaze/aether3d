@@ -21,8 +21,15 @@ namespace ae3d
         void SetVector4( const char* name, const float* vec4 );
 
     private:
+        struct IntDefaultedToMinusOne
+        {
+            int i = -1;
+        };
+
+        std::map<std::string, IntDefaultedToMinusOne > GetUniformLocations();
+        
         unsigned id = 0;
-        std::map<std::string, int> uniformLocations;
+        std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
     };    
 }
 #endif

@@ -10,30 +10,6 @@ enum class InfoLogType
     Shader
 };
 
-static std::map<std::string, GLint> GetUniformLocations(GLuint program)
-{
-    int numUni = -1;
-    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
-
-    std::map<std::string, GLint> outUniforms;
-
-    for (int i = 0; i < numUni; ++i)
-    {
-        int namelen;
-        int num;
-        GLenum type;
-        char name[128];
-
-        glGetActiveUniform(program, static_cast<GLuint>(i), sizeof(name) - 1, &namelen, &num, &type, name);
-
-        name[namelen] = 0;
-
-        outUniforms[ name ] = glGetUniformLocation( program, name );
-    }
-
-    return outUniforms;
-}
-
 static void PrintInfoLog( GLuint shader, InfoLogType logType )
 {
     GLint logLength = 0;
@@ -90,6 +66,30 @@ static GLuint CompileShader( const char* source, GLenum shaderType )
     return shader;
 }
 
+std::map<std::string, ae3d::Shader::IntDefaultedToMinusOne> ae3d::Shader::GetUniformLocations()
+{
+    int numUni = -1;
+    glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &numUni);
+    
+    std::map<std::string, IntDefaultedToMinusOne> outUniforms;
+    
+    for (int i = 0; i < numUni; ++i)
+    {
+        int namelen;
+        int num;
+        GLenum type;
+        char name[128];
+        
+        glGetActiveUniform(id, static_cast<GLuint>(i), sizeof(name) - 1, &namelen, &num, &type, name);
+        
+        name[namelen] = 0;
+        
+        outUniforms[ name ].i = glGetUniformLocation( id, name );
+    }
+    
+    return outUniforms;
+}
+
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
     GLuint vertexShader = CompileShader( vertexSource, GL_VERTEX_SHADER );
@@ -117,7 +117,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     }
 
     id = program;
-    uniformLocations = GetUniformLocations(id);
+    uniformLocations = GetUniformLocations();
 }
 
 void ae3d::Shader::Use()
@@ -127,7 +127,7 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    glUniformMatrix4fv( uniformLocations[ name ], 1, GL_FALSE, matrix4x4 );
+    glProgramUniformMatrix4fv( id, uniformLocations[ name ].i, 1, GL_FALSE, matrix4x4 );
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
@@ -135,27 +135,27 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_2D, texture->GetID() );
     SetInt( name, textureUnit );
-    // TODO: Enable when unused parameters don't cause OpenGL errors.
-    //const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    //SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
+
+    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
+    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
-    glUniform1i( uniformLocations[ name ], value );
+    glProgramUniform1i( id, uniformLocations[ name ].i, value );
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )
 {
-    glUniform1f( uniformLocations[ name ], value );
+    glProgramUniform1f( id, uniformLocations[ name ].i, value );
 }
 
 void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
-    glUniform3fv( uniformLocations[ name ], 1, vec3 );
+    glProgramUniform3fv( id, uniformLocations[ name ].i, 1, vec3 );
 }
 
 void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
-    glUniform4fv( uniformLocations[ name ], 1, vec4 );
+    glProgramUniform4fv( id, uniformLocations[ name ].i, 1, vec4 );
 }

@@ -29,7 +29,7 @@ namespace ae3d
                 v1.z * v2.x - v1.x * v2.z,
                 v1.x * v2.y - v1.y * v2.x);
         }
-
+        
         /**
          Solves distance between two vectors.
 
@@ -277,6 +277,14 @@ namespace ae3d
 
             Vec3 out = *this * (1.0f / len);
             return out;
+        }
+
+        bool IsAlmost( const Vec3& v2 )
+        {
+            const float epsilon = 0.0001f;
+            return std::abs( x - v2.x ) < epsilon &&
+            std::abs( y - v2.y ) < epsilon &&
+            std::abs( z - v2.z ) < epsilon;
         }
 
         /// \return length.
