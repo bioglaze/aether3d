@@ -9,19 +9,17 @@ namespace ae3d
     struct Vec3;
     struct Vec4;
     
-    /**
-      Container for sprites.
-     */
+    /// Renders sprites.
     class SpriteRendererComponent
     {
     public:
-        // Constructor
+        /// Constructor
         SpriteRendererComponent();
 
-        // Destructor
+        /// Destructor
         ~SpriteRendererComponent();
 
-        // Removes all textures that were added using SetTexture.
+        /// Removes all textures that were added using SetTexture.
         void Clear();
         
         /**

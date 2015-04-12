@@ -8,10 +8,14 @@ namespace ae3d
 {
     namespace System
     {
+        /// File contents.
         struct FileContentsData
         {
+            /// File content bytes.
             std::vector<unsigned char> data;
+            /// File path.
             std::string path;
+            /// True if data has been loaded from path.
             bool isLoaded = false;
         };
 

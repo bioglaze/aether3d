@@ -7,15 +7,17 @@
 
 namespace ae3d
 {
+    /// Stores a position and an orientation.
     class TransformComponent
     {
     public:
-        // \return Local position.
+        /// \return Local position.
         const Vec3& GetLocalPosition() const { return localPosition; }
 
-        // \param localPos Local position.
+        /// \param localPos Local position.
         void SetLocalPosition( const Vec3& localPos );
         
+        /// \return Local transform matrix.
         const Matrix44& GetLocalMatrix() const { return localMatrix; }
         
     private:
