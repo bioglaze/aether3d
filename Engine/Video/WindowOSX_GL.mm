@@ -1,9 +1,9 @@
 #include "Window.hpp"
+#include <map>
 #import <Cocoa/Cocoa.h>
 #include <GL/glxw.h>
 
 // Based on https://github.com/vbo/handmadehero_osx_platform_layer/blob/day_29/code/osx_handmade.m
-#pragma message("TODO [2015-03-14]: ARC")
 
 void nsLog(const char* msg)
 {
@@ -19,6 +19,43 @@ namespace WindowGlobal
     NSOpenGLContext* glContext;
     NSApplication *application;
 
+    std::map< unsigned, ae3d::KeyCode > keyMap = {
+        { 0, ae3d::KeyCode::A },
+        { 11, ae3d::KeyCode::B },
+        { 8, ae3d::KeyCode::C },
+        { 2, ae3d::KeyCode::D },
+        { 14, ae3d::KeyCode::E },
+        { 3, ae3d::KeyCode::F },
+        { 5, ae3d::KeyCode::G },
+        { 4, ae3d::KeyCode::H },
+        { 34, ae3d::KeyCode::I },
+        { 38, ae3d::KeyCode::J },
+        { 40, ae3d::KeyCode::K },
+        { 37, ae3d::KeyCode::L },
+        { 46, ae3d::KeyCode::M },
+        { 45, ae3d::KeyCode::N },
+        { 31, ae3d::KeyCode::O },
+        { 35, ae3d::KeyCode::P },
+        { 12, ae3d::KeyCode::Q },
+        { 15, ae3d::KeyCode::R },
+        { 1, ae3d::KeyCode::S },
+        { 17, ae3d::KeyCode::T },
+        { 32, ae3d::KeyCode::U },
+        { 9, ae3d::KeyCode::V },
+        { 13, ae3d::KeyCode::W },
+        { 7, ae3d::KeyCode::X },
+        { 16, ae3d::KeyCode::Y },
+        { 6, ae3d::KeyCode::Z },
+
+        { 126, ae3d::KeyCode::Up },
+        { 125, ae3d::KeyCode::Down },
+        { 123, ae3d::KeyCode::Left },
+        { 124, ae3d::KeyCode::Right },
+
+        { 53, ae3d::KeyCode::Escape },
+        { 36, ae3d::KeyCode::Enter },
+        { 49, ae3d::KeyCode::Escape }
+    };
 }
 
 bool ae3d::Window::IsOpen()
@@ -32,6 +69,8 @@ bool ae3d::Window::IsOpen()
 @implementation ApplicationDelegate : NSObject
 - (void)applicationDidFinishLaunching: (NSNotification *)notification
 {
+    (void)notification;
+    
     // Stop the event loop after app initialization because we have our own loop.
     [NSApp stop: nil];
     // Post empty event to get the app visible.
@@ -53,6 +92,7 @@ bool ae3d::Window::IsOpen()
 - (NSApplicationTerminateReply)
 applicationShouldTerminate: (NSApplication *)sender
 {
+    (void)sender;
     return NSApplicationTerminateReply::NSTerminateNow;
 }
 
@@ -68,16 +108,19 @@ NSObject <NSWindowDelegate> @end
 @implementation WindowDelegate : NSObject
 - (BOOL)windowShouldClose: (id)sender
 {
+    (void)sender;
     //globalApplicationState.isRunning = false;
     return NO;
 }
 
 - (void)windowDidBecomeKey: (NSNotification *)notification
 {
+    (void)notification;
 }
 
 - (void)windowDidResignKey: (NSNotification *)notification
 {
+    (void)notification;
     //NSWindow *window = [notification object];
 }
 @end
@@ -88,13 +131,13 @@ NSWindow *window;
 @implementation OpenGLView : NSOpenGLView
 - (void)reshape
 {
-    glViewport(0, 0, 640, 480);
+    //glViewport(0, 0, 640, 480);
 }
 
 - (void) mouseDown: (NSEvent*) event
 {
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
+    //NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
     ++WindowGlobal::eventIndex;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
@@ -104,7 +147,7 @@ NSWindow *window;
 - (void) mouseUp: (NSEvent*) event
 {
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
+    //NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
     ++WindowGlobal::eventIndex;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
@@ -284,54 +327,9 @@ void cocoaProcessEvents()
                 }
 
                 // TODO [2015-03-28]: key table
-                switch ([event keyCode])
-                {
-                    case 0: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::A;
-                    } break;
-                    case 13: { // W
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::W;
-                    } break;
-                    case 1: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::S;
-                    } break;
-                    case 2: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::D;
-                    } break;
-                    case 35: { // P
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::P;
-                    } break;
-                    case 12: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Q;
-                    } break;
-                    case 14: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::E;
-                    } break;
-                    case 126: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Up;
-                    } break;
-                    case 123: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Left;
-                    } break;
-                    case 125: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Down;
-                    } break;
-                    case 124: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Right;
-                    } break;
-                    case 53: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Escape;
-                    } break;
-                    case 49: {
-                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Space;
-                    } break;
-                    case 122: { // F1
-                    } break;
-                    default:
-                    {
-                        NSLog(@"Unhandled key: %d", [event keyCode]);
-                    } break;
-                }
+                
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ [event keyCode] ];
+                NSLog(@"key: %d", [event keyCode]);
             } break;
             default:
             {

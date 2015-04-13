@@ -15,6 +15,22 @@ extern ae3d::FileWatcher fileWatcher;
 namespace Texture2DGlobal
 {
     std::map< std::string, ae3d::Texture2D > pathToCachedTexture;
+#if DEBUG
+    std::map< std::string, std::size_t > pathToCachedTextureSizeInBytes;
+    
+    void PrintMemoryUsage()
+    {
+        std::size_t total = 0;
+        
+        for (const auto& path : pathToCachedTextureSizeInBytes)
+        {
+            ae3d::System::Print("%s: %d B", path.first.c_str(), path.second);
+            total += path.second;
+        }
+        
+        ae3d::System::Print( "Total texture usage: %d KiB", total / 1024 );
+    }
+#endif
 }
 
 void TexReload( const std::string& path )
@@ -109,6 +125,10 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
     }
 
     Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
+#if DEBUG
+    Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = fileContents.data.size();
+    //Texture2DGlobal::PrintMemoryUsage();
+#endif
 }
 
 void ae3d::Texture2D::LoadFromAtlas( const System::FileContentsData& atlasTextureData, const System::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
@@ -118,58 +138,65 @@ void ae3d::Texture2D::LoadFromAtlas( const System::FileContentsData& atlasTextur
     const std::string metaStr = std::string( std::begin( atlasMetaData.data ), std::end( atlasMetaData.data ) );
     std::stringstream metaStream( metaStr );
 
-    if (atlasMetaData.path.find( ".xml" ) != std::string::npos || atlasMetaData.path.find( ".XML" ) != std::string::npos)
+    if (atlasMetaData.path.find( ".xml" ) == std::string::npos && atlasMetaData.path.find( ".XML" ) == std::string::npos)
     {
-        std::string line;
+        System::Print("Atlas meta data path %s could not be opened!", atlasMetaData.path.c_str());
+        return;
+    }
 
-        while (std::getline( metaStream, line ))
+    std::string line;
+
+    while (std::getline( metaStream, line ))
+    {
+        if (line.find( "<Image Name" ) == std::string::npos)
         {
-            if (line.find( "<Image Name" ) != std::string::npos)
+            continue;
+        }
+
+        std::vector< std::string > tokens;
+        Tokenize( line, tokens, "\"" );
+        bool found = false;
+        
+        for (std::size_t t = 0; t < tokens.size(); ++t)
+        {
+            if (tokens[ t ].find( "Name" ) != std::string::npos)
             {
-                std::vector< std::string > tokens;
-                Tokenize( line, tokens, "\"" );
-                bool found = false;
-
-                for (std::size_t t = 0; t < tokens.size(); ++t)
+                if (tokens[ t + 1 ] == textureName)
                 {
-                    if (tokens[ t ].find( "Name" ) != std::string::npos)
-                    {
-                        if (tokens[ t + 1 ] == textureName)
-                        {
-                            found = true;
-                        }
-                    }
-
-                    if (found)
-                    {
-                        if (tokens[ t ].find( "XPos" ) != std::string::npos)
-                        {
-                            scaleOffset.z = std::stoi( tokens[ t + 1 ] ) / static_cast<float>(width);
-                        }
-                        else if (tokens[ t ].find( "YPos" ) != std::string::npos)
-                        {
-                            scaleOffset.w = std::stoi( tokens[ t + 1 ] ) / static_cast<float>(height);
-                        }
-                        else if (tokens[ t ].find( "Width" ) != std::string::npos)
-                        {
-                            const int w = std::stoi( tokens[ t + 1 ] );
-                            scaleOffset.x = 1.0f / (static_cast<float>(width) / static_cast<float>(w));
-                            width = w;
-                        }
-                        else if (tokens[ t ].find( "Height" ) != std::string::npos)
-                        {
-                            const int h = std::stoi( tokens[ t + 1 ] );
-                            scaleOffset.y = 1.0f / (static_cast<float>(height) / static_cast<float>(h));
-                            height = h;
-                        }
-                    }
-                }
-
-                if (found)
-                {
-                    return;
+                    found = true;
                 }
             }
+            
+            if (!found)
+            {
+                continue;
+            }
+
+            if (tokens[ t ].find( "XPos" ) != std::string::npos)
+            {
+                scaleOffset.z = std::stoi( tokens[ t + 1 ] ) / static_cast<float>(width);
+            }
+            else if (tokens[ t ].find( "YPos" ) != std::string::npos)
+            {
+                scaleOffset.w = std::stoi( tokens[ t + 1 ] ) / static_cast<float>(height);
+            }
+            else if (tokens[ t ].find( "Width" ) != std::string::npos)
+            {
+                const int w = std::stoi( tokens[ t + 1 ] );
+                scaleOffset.x = 1.0f / (static_cast<float>(width) / static_cast<float>(w));
+                width = w;
+            }
+            else if (tokens[ t ].find( "Height" ) != std::string::npos)
+            {
+                const int h = std::stoi( tokens[ t + 1 ] );
+                scaleOffset.y = 1.0f / (static_cast<float>(height) / static_cast<float>(h));
+                height = h;
+            }
+        }
+    
+        if (found)
+        {
+            return;
         }
     }
 }
