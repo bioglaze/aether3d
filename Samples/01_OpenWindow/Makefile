@@ -1,7 +1,7 @@
 UNAME := $(shell uname)
 COMPILER := g++
 ENGINE_LIB := libaether3d_linux.a
-LINKER := -lxcb -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL
+LINKER := -ldl -lxcb -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++ --stdlib=libc++ -DAETHER3D_UNIX

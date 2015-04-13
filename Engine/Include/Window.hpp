@@ -3,6 +3,7 @@
 
 namespace ae3d
 {
+    /// Window events.
     enum class WindowEventType
     {
         None = 0,
@@ -13,29 +14,38 @@ namespace ae3d
         Mouse1Up
     };
 
+    /// Key codes.
     enum class KeyCode
     {
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
         Left, Right, Up, Down, Space, Escape, Enter
     };
     
+    /// Create flags.
     enum WindowCreateFlags : unsigned
     {
         Empty = 1 << 0,
         Fullscreen = 1 << 1
     };
 
+    /// Window event is a key press, close event, mouse click etc.
     struct WindowEvent
     {
+        /// Event type.
         WindowEventType type = WindowEventType::None;
+        /// Key code.
         KeyCode keyCode = KeyCode::A;
-        int mouseX; // X coordinate in window
-        int mouseY; // Y coordinate in window
+        /// X coordinate in window.
+        int mouseX; 
+        /// Y coordinate in window.
+        int mouseY; 
     };
-    
+
+    /// Window singleton.    
     class Window
     {
     public:
+        /// Returns the window instance.
         static Window& Instance()
         {
             static Window instance;
@@ -50,9 +60,18 @@ namespace ae3d
           \param flags Bitmask of creation flags.
         */
         void Create( int width, int height, WindowCreateFlags flags );
+
+        /// \return True if window is open.
         bool IsOpen();
+
+        /// Reads events from windowing system to be used in PollEvent depending on platform.
         void PumpEvents();
+
+        /// Reads and discards the most recent event.
+        /// \return True if there are more events.
         bool PollEvent( WindowEvent& outEvent );
+
+        /// Displays the contents of the screen.
         void SwapBuffers() const;
 
     private:

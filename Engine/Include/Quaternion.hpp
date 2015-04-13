@@ -5,9 +5,9 @@
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 
-/// Stores an orientation.
 namespace ae3d
 {
+    /// Stores an orientation.
     class Quaternion
     {
     public:
@@ -287,7 +287,14 @@ namespace ae3d
             }
         }
         
-        float x, y, z, w;
+        /// X component.
+        float x;
+        /// Y component.
+        float y;
+        /// Z component.
+        float z;
+        /// W component.
+        float w;
         
     private:
         void FindOrthonormals( const Vec3& normal, Vec3& orthonormal1, Vec3& orthonormal2 ) const

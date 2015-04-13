@@ -11,7 +11,12 @@ namespace ae3d
     */
     struct Vec3
     {
-        float x = 0, y = 0, z = 0;
+        /// X coordinate.
+        float x = 0;
+        /// Y coordinate.
+        float y = 0;
+        /// Z coordinate.
+        float z = 0;
         
         /** Copy constructor. */
         Vec3(const Vec3& other) = default;
@@ -279,6 +284,9 @@ namespace ae3d
             return out;
         }
 
+        /// Compares this vector with another vector.
+        /// \param v2 Another vector.
+        /// \return True if vectors are almost equal.
         bool IsAlmost( const Vec3& v2 )
         {
             const float epsilon = 0.0001f;
@@ -294,12 +302,17 @@ namespace ae3d
         void Zero() { x = y = z = 0; }
     };
 
-    /**
-     4-component vector.
-     */
+    /// 4-component vector.
     struct Vec4
     {
-        float x = 0, y = 0, z = 0, w = 0;
+        /// X coordinate.
+        float x = 0;
+        /// Y coordinate.
+        float y = 0;
+        /// Z coordinate.
+        float z = 0;
+        /// W coordinate.
+        float w = 0;
 
         Vec4() {}
         

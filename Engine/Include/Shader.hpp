@@ -8,16 +8,40 @@ namespace ae3d
 {
     class Texture2D;
 
+    /// Shader program containing a vertex and pixel shader.
     class Shader
     {
     public:
+        /// \param vertexSource Vertex shader source.
+        /// \param fragmentSource Fragment shader source.
         void Load( const char* vertexSource, const char* fragmentSource );
+
+        /// Activates the shader to be used in a draw call.
         void Use();
+
+        /// \param name Matrix uniform name.
+        /// \param matrix4x4 Contents of Matrix44.
         void SetMatrix( const char* name, const float* matrix4x4 );
+
+        /// \param name Texture uniform name.
+        /// \param texture Texture.
+        /// \param textureUnit Texture unit.
         void SetTexture( const char* name, const Texture2D* texture, int textureUnit );
+
+        /// \param name Integer uniform name.
+        /// \param value Value.
         void SetInt( const char* name, int value );
+
+        /// \param name Float uniform name.
+        /// \param value Value.
         void SetFloat( const char* name, float value );
+
+        /// \param name Vector uniform name.
+        /// \param vec3 Vec3 contents.
         void SetVector3( const char* name, const float* vec3 );
+
+        /// \param name Vector uniform name.
+        /// \param vec4 Vec4 contents.
         void SetVector4( const char* name, const float* vec4 );
 
     private:

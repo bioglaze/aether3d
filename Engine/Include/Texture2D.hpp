@@ -10,57 +10,59 @@ namespace ae3d
         struct FileContentsData;
     }
 
+    /// Texture wrap controls behavior when coordinates are outside range 0-1. Repeat should not be used for atlased textures.
     enum class TextureWrap
     {
         Repeat,
         Clamp
     };
 
+    /// Filter controls behavior when the texture is smaller or larger than its original size.
     enum class TextureFilter
     {
         Nearest,
         Linear
     };
 
-    /**
-      2D immutable texture.
-    */
+    /// 2D texture.
     class Texture2D
     {
     public:
-        // \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
-        // \param wrap Wrap mode.
-        // \param filter Filter mode.
+        /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
+        /// \param wrap Wrap mode.
+        /// \param filter Filter mode.
         void Load( const System::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter );
         
-        // \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
-        // \param atlasMetaData Atlas metadata. Format is Ogre/CEGUI. Example atlas tool: Texture Packer.
-        // \param textureName Name of the texture in atlas.
-        // \param wrap Wrap mode.
-        // \param filter Filter mode.
+        /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
+        /// \param atlasMetaData Atlas metadata. Format is Ogre/CEGUI. Example atlas tool: Texture Packer.
+        /// \param textureName Name of the texture in atlas.
+        /// \param wrap Wrap mode.
+        /// \param filter Filter mode.
         void LoadFromAtlas( const System::FileContentsData& atlasTextureData, const System::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter );
 
-        // \return id.
+        /// \return id.
         unsigned GetID() const { return id; }
         
-        // \return Width in pixels.
+        /// \return Width in pixels.
         int GetWidth() const { return width; }
 
-        // \return Width in pixels.
+        /// \return Width in pixels.
         int GetHeight() const { return height; }
         
-        // \return Wrapping mode
+        /// \return Wrapping mode
         TextureWrap GetWrap() const { return wrap; }
 
-        // \return Filtering mode
+        /// \return Filtering mode
         TextureFilter GetFilter() const { return filter; }
 
+        /// \return Scale and offset. x: scale x, y: scale y, z: offset x, w: offset y.
         const Vec4& GetScaleOffset() const { return scaleOffset; }
 
-        // \return True, if the texture does not contain an alpha channel.
+        /// \return True, if the texture does not contain an alpha channel.
         bool IsOpaque() const { return opaque; }
 
     private:
+        /// \param path Path.
         void LoadDDS( const char* path );
         
         /**
