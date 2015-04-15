@@ -7,16 +7,21 @@
 #include "Shader.hpp"
 #include "GameObject.hpp"
 
-ae3d::Scene::Scene()
-{
-    for (int i = 0; i < 10; ++i)
-    {
-        gameObjects[ i ] = nullptr;
-    }
-}
-
 void ae3d::Scene::Add( GameObject* gameObject )
 {
+    for (const auto& go : gameObjects)
+    {
+        if (go == gameObject)
+        {
+            return;
+        }
+    }
+
+    if (nextFreeGameObject == gameObjects.size())
+    {
+        gameObjects.resize( gameObjects.size() + 10 );
+    }
+
     gameObjects[ nextFreeGameObject++ ] = gameObject;
 
     CameraComponent* camera = gameObject->GetComponent<CameraComponent>();
@@ -68,8 +73,4 @@ void ae3d::Scene::Render()
     }
 
     GfxDevice::ErrorCheck( "Scene render end" );
-}
-
-void ae3d::Scene::Update()
-{
 }

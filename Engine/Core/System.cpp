@@ -64,10 +64,9 @@ void ae3d::System::Print(const char* format, ...)
     vsnprintf(msg, sizeof(msg), format, ap);
 #endif
     va_end(ap);
-    std::printf("%s\n", msg);
+    std::printf("%s", msg);
 #if _MSC_VER
     OutputDebugStringA(msg);
-    OutputDebugStringA("\n");
 #endif
 #if __APPLE__
     //nsLog(msg);

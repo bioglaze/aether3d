@@ -39,6 +39,8 @@ int main()
     spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex, Vec3( 340, 80, -0.5f ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
     spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTex2, Vec3( 280, 60, -0.4f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     spriteRenderer.GetComponent<SpriteRendererComponent>()->SetTexture( &spriteTexFromAtlas, Vec3( 260, 160, -0.4f ), Vec3( (float)spriteTexFromAtlas.GetWidth(), (float)spriteTexFromAtlas.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    spriteRenderer.AddComponent<SpriteRendererComponent>();
+
     spriteRenderer.AddComponent<TransformComponent>();
     spriteRenderer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
 
@@ -76,7 +78,6 @@ int main()
             }
         }
 
-        scene.Update();
         scene.Render();
 
         Window::Instance().SwapBuffers();

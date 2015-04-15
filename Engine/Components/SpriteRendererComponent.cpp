@@ -1,7 +1,6 @@
 #include "SpriteRendererComponent.hpp"
 #include <vector>
 #include <algorithm>
-//#include <cassert>
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
 #include "Texture2D.hpp"
@@ -11,7 +10,7 @@
 
 extern ae3d::Renderer renderer;
 
-ae3d::SpriteRendererComponent spriteRendererComponents[100];
+std::vector<ae3d::SpriteRendererComponent> spriteRendererComponents;
 int nextFreeSpriteComponent = 0;
 
 struct Drawable
@@ -179,12 +178,18 @@ void ae3d::SpriteRendererComponent::Impl::Render()
 
 int ae3d::SpriteRendererComponent::New()
 {
+    if (nextFreeSpriteComponent == spriteRendererComponents.size())
+    {
+        spriteRendererComponents.resize( spriteRendererComponents.size() + 10 );
+    }
+
     return nextFreeSpriteComponent++;
 }
 
-ae3d::SpriteRendererComponent* ae3d::SpriteRendererComponent::Get(int index)
+ae3d::SpriteRendererComponent* ae3d::SpriteRendererComponent::Get( int index )
 {
-    return &spriteRendererComponents[index];
+    System::Assert( index < spriteRendererComponents.size(), "Tried to get a too high index for spriteRendererComponents." );
+    return &spriteRendererComponents[ index ];
 }
 
 ae3d::SpriteRendererComponent::SpriteRendererComponent()

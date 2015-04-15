@@ -17,7 +17,7 @@ namespace ae3d
         /// \param localPos Local position.
         void SetLocalPosition( const Vec3& localPos );
         
-        /// \return Local transform matrix.
+        /* \return Local transform matrix. */
         const Matrix44& GetLocalMatrix() const { return localMatrix; }
         
     private:
@@ -32,7 +32,6 @@ namespace ae3d
         // \return Component at index or null if index is invalid.
         static TransformComponent* Get( int index );
 
-        static TransformComponent transformComponents[100];
         Vec3 localPosition;
         Quaternion localRotation;
         int padding = 0;

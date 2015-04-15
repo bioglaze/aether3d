@@ -1,11 +1,16 @@
 #include "CameraComponent.hpp"
+#include <vector>
 
-const int CameraComponentMax = 100;
-ae3d::CameraComponent ae3d::CameraComponent::cameraComponents[CameraComponentMax];
+std::vector< ae3d::CameraComponent > cameraComponents;
 int nextFreeCameraComponent = 0;
 
 int ae3d::CameraComponent::New()
 {
+    if (nextFreeCameraComponent == cameraComponents.size())
+    {
+        cameraComponents.resize( cameraComponents.size() + 10 );
+    }
+
     return nextFreeCameraComponent++;
 }
 

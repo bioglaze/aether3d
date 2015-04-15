@@ -126,7 +126,7 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
 
     Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
 #if DEBUG
-    Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = fileContents.data.size();
+    Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = width * height * 4;
     //Texture2DGlobal::PrintMemoryUsage();
 #endif
 }

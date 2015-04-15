@@ -1,10 +1,17 @@
 #include "TransformComponent.hpp"
+#include <vector>
+#include "System.hpp"
 
-ae3d::TransformComponent ae3d::TransformComponent::transformComponents[100];
+std::vector< ae3d::TransformComponent > transformComponents;
 int nextFreeTransformComponent = 0;
 
 int ae3d::TransformComponent::New()
 {
+    if (nextFreeTransformComponent == transformComponents.size())
+    {
+        transformComponents.resize( transformComponents.size() + 10 );
+    }
+
     return nextFreeTransformComponent++;
 }
 
