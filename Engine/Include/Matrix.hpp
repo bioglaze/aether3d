@@ -8,17 +8,13 @@ namespace ae3d
     struct Vec3;
     struct Vec4;
 
-    /// 4x4 Matrix.
-//#if SIMD_SSE3
+    /* 4x4 Matrix. */
     struct ALIGNAS( 16 ) Matrix44
-//#else
-    //struct Matrix44
-//#endif
     {
-        /// Identity matrix.
+        /* Identity matrix. */
         static const Matrix44 identity;
         
-        /// Converts depth coordinates from [-1,1] to [0,1]. This is needed to sample the shadow map texture.
+        /* Converts depth coordinates from [-1,1] to [0,1]. This is needed to sample the shadow map texture. */
         static const Matrix44 bias;
         
         /**
@@ -78,7 +74,7 @@ namespace ae3d
             MakeIdentity();
         }
         
-        /// Constructor that makes an XYZ rotation matrix.
+        /* Constructor that makes an XYZ rotation matrix. */
         Matrix44( float xDeg, float yDeg, float zDeg )
         {
             MakeRotationXYZ( xDeg, yDeg, zDeg );
@@ -111,10 +107,10 @@ namespace ae3d
          */
         void Scale( float x, float y, float z );
         
-        /// \param data 4x4 column-major matrix data.
+        /* \param data 4x4 column-major matrix data. */
         void InitFrom( const float* data );
         
-        /// Resets this matrix.
+        /* Resets this matrix. */
         void MakeIdentity();
         
         /**
@@ -158,13 +154,13 @@ namespace ae3d
          */
         void MakeRotationXYZ( float xDeg, float yDeg, float zDeg );
         
-        /// \param out Result of transpose.
+        /* \param out Result of transpose. */
         void Transpose( Matrix44& out ) const;
         
-        /// \param v Translation.
+        /* \param v Translation. */
         void Translate( const Vec3& v );
         
-        /// Member data, row-major.
+        /* Member data, row-major. */
         float m[16];
     };
 }

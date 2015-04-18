@@ -9,17 +9,17 @@ namespace ae3d
     struct Vec3;
     struct Vec4;
     
-    /// Renders sprites.
+    /* Renders sprites. */
     class SpriteRendererComponent
     {
     public:
-        /// Constructor
+        /* Constructor. */
         SpriteRendererComponent();
 
-        /// Destructor
+        /* Destructor. */
         ~SpriteRendererComponent();
 
-        /// Removes all textures that were added using SetTexture.
+        /* Removes all textures that were added using SetTexture. */
         void Clear();
         
         /**
@@ -39,15 +39,16 @@ namespace ae3d
         friend class GameObject;
         friend class Scene;
         
-        // \return Component's type code. Must be unique for each component type.
+        /* \return Component's type code. Must be unique for each component type. */
         static int Type() { return 1; }
         
-        // \return Component handle that uniquely identifies the instance.
+        /* \return Component handle that uniquely identifies the instance. */
         static int New();
         
-        // \return Component at index or null if index is invalid.
+        /* \return Component at index or null if index is invalid. */
         static SpriteRendererComponent* Get(int index);
 
+        /* \param projectionModelMatrix Projection and model matrix combined. */
         void Render( const float* projectionModelMatrix );
         
         struct Impl;

@@ -7,6 +7,7 @@
 #endif
 #include <cstdarg>
 #include <cassert>
+#include "AudioSystem.hpp"
 #include "GfxDevice.hpp"
 #include "FileWatcher.hpp"
 #include "Renderer.hpp"
@@ -17,7 +18,8 @@ extern ae3d::FileWatcher fileWatcher;
 
 void ae3d::System::Deinit()
 {
-    ae3d::GfxDevice::ReleaseGPUObjects();
+    GfxDevice::ReleaseGPUObjects();
+    AudioSystem::Deinit();
 }
 
 void ae3d::System::EnableWindowsMemleakDetection()
@@ -27,6 +29,11 @@ void ae3d::System::EnableWindowsMemleakDetection()
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+}
+
+void ae3d::System::InitAudio()
+{
+    AudioSystem::Init();
 }
 
 void ae3d::System::LoadBuiltinAssets()

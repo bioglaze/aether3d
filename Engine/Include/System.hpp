@@ -8,7 +8,7 @@ namespace ae3d
 {
     namespace System
     {
-        /// File contents.
+        /* File contents. */
         struct FileContentsData
         {
             /// File content bytes.
@@ -19,6 +19,9 @@ namespace ae3d
             bool isLoaded = false;
         };
 
+        /* Inits audio system. */
+        void InitAudio();
+        
         /** Releases all resources allocated by the engine. Call when exiting. */
         void Deinit();
 

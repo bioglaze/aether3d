@@ -7,11 +7,11 @@
 
 namespace ae3d
 {
-    /// Stores an orientation.
+    /* Stores an orientation. */
     class Quaternion
     {
     public:
-        /// Constructor.
+        /* Constructor. */
         Quaternion() : x( 0 ), y( 0 ), z( 0 ), w( 1 ) {}
         
         /**
@@ -183,7 +183,7 @@ namespace ae3d
             return q;
         }
         
-        /// \param mat Matrix.
+        /* \param mat Matrix. */
         void FromMatrix( const Matrix44& mat )
         {
             const float trace = 1.0f + mat.m[0] + mat.m[5] + mat.m[10];
@@ -270,7 +270,7 @@ namespace ae3d
             return out / (3.14159265358979f / 180.0f);
         }
         
-        /// Normalizes the quaternion if it's not near unit-length already.
+        /* Normalizes the quaternion if it's not near unit-length already. */
         void Normalize()
         {
             const float mag2 = w * w + x * x + y * y + z * z;
@@ -287,13 +287,13 @@ namespace ae3d
             }
         }
         
-        /// X component.
+        /* X component. */
         float x;
-        /// Y component.
+        /* Y component. */
         float y;
-        /// Z component.
+        /* Z component. */
         float z;
-        /// W component.
+        /* W component. */
         float w;
         
     private:

@@ -7,12 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB07F20D1AE15C9800669331 /* AudioClip.cpp */; };
+		AB07F2121AE1611300669331 /* AudioSystemOpenAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */; };
 		AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AB3A77DA1AB448500081864C /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB3A77D91AB448500081864C /* System.cpp */; };
 		AB3FD4961AB4330C00D28653 /* System.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4941AB4330C00D28653 /* System.hpp */; };
 		AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4951AB4330C00D28653 /* Window.hpp */; };
 		AB6CD09B1ACEDF9E00C4FA84 /* MatrixSSE3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */; };
 		AB7233161AC5C16E000E7835 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7233151AC5C16E000E7835 /* String.cpp */; };
+		AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */; };
+		AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */; };
 		AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */; };
 		AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */; };
 		AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEF1ABB4C49005BA86D /* Scene.cpp */; };
@@ -44,6 +48,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AB07F20D1AE15C9800669331 /* AudioClip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioClip.cpp; path = ../Core/AudioClip.cpp; sourceTree = "<group>"; };
+		AB07F20F1AE15CC400669331 /* AudioClip.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioClip.hpp; path = ../Include/AudioClip.hpp; sourceTree = "<group>"; };
+		AB07F2101AE1601500669331 /* AudioSystem.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSystem.hpp; path = ../Core/AudioSystem.hpp; sourceTree = "<group>"; };
+		AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSystemOpenAL.cpp; path = ../Core/AudioSystemOpenAL.cpp; sourceTree = "<group>"; };
 		AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WindowOSX_GL.mm; path = ../Video/WindowOSX_GL.mm; sourceTree = "<group>"; };
 		AB3A77D91AB448500081864C /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = System.cpp; path = ../Core/System.cpp; sourceTree = "<group>"; };
 		AB3FD4941AB4330C00D28653 /* System.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = System.hpp; path = ../Include/System.hpp; sourceTree = "<group>"; };
@@ -52,6 +60,9 @@
 		AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Macros.hpp; path = ../Include/Macros.hpp; sourceTree = "<group>"; };
 		AB7233141AC5C0DC000E7835 /* String.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = String.hpp; path = ../Core/String.hpp; sourceTree = "<group>"; };
 		AB7233151AC5C16E000E7835 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../Core/String.cpp; sourceTree = "<group>"; };
+		AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
+		AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
+		AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GfxDevice.hpp; path = ../Video/GfxDevice.hpp; sourceTree = "<group>"; };
 		AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Texture2D_GL45.cpp; path = ../Video/Texture2D_GL45.cpp; sourceTree = "<group>"; };
 		AB889AEF1ABB4C49005BA86D /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ../Core/Scene.cpp; sourceTree = "<group>"; };
@@ -101,6 +112,9 @@
 		AB3A77DB1AB448580081864C /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				AB07F20D1AE15C9800669331 /* AudioClip.cpp */,
+				AB07F2101AE1601500669331 /* AudioSystem.hpp */,
+				AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */,
 				ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */,
 				ABBD9DC21AC31EDB005AD2ED /* FileWatcher.hpp */,
 				AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */,
@@ -146,11 +160,13 @@
 		AB3FD4931AB432FD00D28653 /* Include */ = {
 			isa = PBXGroup;
 			children = (
-				ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */,
+				AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */,
+				AB07F20F1AE15CC400669331 /* AudioClip.hpp */,
 				AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */,
 				AB889AF31ABB4C5B005BA86D /* GameObject.hpp */,
 				AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */,
 				ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */,
+				ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */,
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
 				AB949D341ABC8DDF007D561E /* Shader.hpp */,
 				AB889AF61ABB4C5B005BA86D /* SpriteRendererComponent.hpp */,
@@ -167,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				ABCE0CA01AC06A3100F9EC53 /* GL */,
+				AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */,
 				AB889B011ABB4C70005BA86D /* stb_image.c */,
 			);
 			name = ThirdParty;
@@ -175,6 +192,7 @@
 		AB889B041ABB4FD0005BA86D /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */,
 				AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */,
 				AB889B061ABB4FDE005BA86D /* GameObject.cpp */,
 				AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */,
@@ -282,6 +300,9 @@
 				AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */,
 				AB6CD09B1ACEDF9E00C4FA84 /* MatrixSSE3.cpp in Sources */,
 				AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */,
+				AB07F2121AE1611300669331 /* AudioSystemOpenAL.cpp in Sources */,
+				AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */,
+				AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
 				AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */,
 				ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */,
@@ -290,6 +311,7 @@
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB7233161AC5C16E000E7835 /* String.cpp in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
+				AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */,
 				ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */,
 				AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */,
 				ABCE07FE1AC9A5C300379611 /* GfxDeviceGL45.cpp in Sources */,

@@ -69,7 +69,7 @@ void ae3d::Scene::Render()
     ++frame;
     if (frame % 60 == 0)
     {
-        ae3d::System::Print("draw calls: %d", GfxDevice::GetDrawCalls());
+        ae3d::System::Print("draw calls: %d\n", GfxDevice::GetDrawCalls());
     }
 
     GfxDevice::ErrorCheck( "Scene render end" );
