@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
+#include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "GfxDevice.hpp"
 #include "System.hpp"
@@ -40,6 +41,7 @@ void ae3d::Scene::Render()
     }
     
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
+    System::Assert( camera, "mainCamera doesn't contain camera component!" );
 
     Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
@@ -53,14 +55,26 @@ void ae3d::Scene::Render()
             continue;
         }
         
-        auto spriteRenderer = gameObject->GetComponent<SpriteRendererComponent>();
         auto transform = gameObject->GetComponent<TransformComponent>();
+
+        // TODO: Watch for this duplication of logic.
         
-        if (gameObject && spriteRenderer)
+        auto spriteRenderer = gameObject->GetComponent<SpriteRendererComponent>();
+        
+        if (spriteRenderer)
         {
             Matrix44 projectionModel;
             Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
             spriteRenderer->Render( projectionModel.m );
+        }
+        
+        auto textRenderer = gameObject->GetComponent<TextRendererComponent>();
+        
+        if (textRenderer)
+        {
+            Matrix44 projectionModel;
+            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
+            textRenderer->Render( projectionModel.m );
         }
     }
 
@@ -69,7 +83,7 @@ void ae3d::Scene::Render()
     ++frame;
     if (frame % 60 == 0)
     {
-        ae3d::System::Print("draw calls: %d\n", GfxDevice::GetDrawCalls());
+        System::Print("draw calls: %d\n", GfxDevice::GetDrawCalls());
     }
 
     GfxDevice::ErrorCheck( "Scene render end" );

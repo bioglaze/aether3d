@@ -25,4 +25,13 @@ void ae3d::TransformComponent::SetLocalPosition( const Vec3& localPos )
     localPosition = localPos;
     localMatrix = Matrix44::identity;
     localMatrix.Translate( localPosition );
+    localMatrix.Scale( localScale, localScale, localScale );
+}
+
+void ae3d::TransformComponent::SetLocalScale( float aLocalScale )
+{
+    localScale = aLocalScale;
+    localMatrix = Matrix44::identity;
+    localMatrix.Translate( localPosition );
+    localMatrix.Scale( localScale, localScale, localScale );
 }

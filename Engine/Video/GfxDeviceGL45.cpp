@@ -224,7 +224,7 @@ void ae3d::GfxDevice::ErrorCheck(const char* info)
 
         while ((errorCode = glGetError()) != GL_NO_ERROR)
         {
-            ae3d::System::Print("%s caused an OpenGL error: %s", info, GetGLErrorString( errorCode ) );
+            ae3d::System::Print("%s caused an OpenGL error: %s\n", info, GetGLErrorString( errorCode ) );
             ae3d::System::Assert(false, "OpenGL error!");
         }
 #endif

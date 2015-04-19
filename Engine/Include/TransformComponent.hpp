@@ -16,7 +16,10 @@ namespace ae3d
 
         /// \param localPos Local position.
         void SetLocalPosition( const Vec3& localPos );
-        
+
+        /// \param localScale Local scale.
+        void SetLocalScale( float localScale );
+
         /* \return Local transform matrix. */
         const Matrix44& GetLocalMatrix() const { return localMatrix; }
         
@@ -34,7 +37,7 @@ namespace ae3d
 
         Vec3 localPosition;
         Quaternion localRotation;
-        int padding = 0;
+        float localScale = 1;
         Matrix44 localMatrix;
     };
 }

@@ -45,6 +45,8 @@
 		ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0CA21AC06A4000F9EC53 /* glxw.c */; };
 		ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0CA31AC06A4000F9EC53 /* glxw.h */; };
 		ABCE0CA91AC08BD700F9EC53 /* RendererGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */; };
+		ABCF19C01AE28EA600822E80 /* TextRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */; };
+		ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19C21AE2D08800822E80 /* Font.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +98,10 @@
 		ABCE0CA31AC06A4000F9EC53 /* glxw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glxw.h; path = ../ThirdParty/GL/glxw.h; sourceTree = "<group>"; };
 		ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Renderer.hpp; path = ../Video/Renderer.hpp; sourceTree = "<group>"; };
 		ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererGL.cpp; path = ../Video/RendererGL.cpp; sourceTree = "<group>"; };
+		ABCF19BE1AE28DB200822E80 /* TextRendererComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TextRendererComponent.hpp; path = ../Include/TextRendererComponent.hpp; sourceTree = "<group>"; };
+		ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextRendererComponent.cpp; path = ../Components/TextRendererComponent.cpp; sourceTree = "<group>"; };
+		ABCF19C11AE2CF7200822E80 /* Font.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Font.hpp; path = ../Include/Font.hpp; sourceTree = "<group>"; };
+		ABCF19C21AE2D08800822E80 /* Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Font.cpp; path = ../Core/Font.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +123,7 @@
 				AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */,
 				ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */,
 				ABBD9DC21AC31EDB005AD2ED /* FileWatcher.hpp */,
+				ABCF19C21AE2D08800822E80 /* Font.cpp */,
 				AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */,
 				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
 				AB889AEF1ABB4C49005BA86D /* Scene.cpp */,
@@ -162,6 +169,7 @@
 			children = (
 				AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */,
 				AB07F20F1AE15CC400669331 /* AudioClip.hpp */,
+				ABCF19C11AE2CF7200822E80 /* Font.hpp */,
 				AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */,
 				AB889AF31ABB4C5B005BA86D /* GameObject.hpp */,
 				AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */,
@@ -172,6 +180,7 @@
 				AB889AF61ABB4C5B005BA86D /* SpriteRendererComponent.hpp */,
 				AB3FD4941AB4330C00D28653 /* System.hpp */,
 				AB889AF71ABB4C5B005BA86D /* Texture2D.hpp */,
+				ABCF19BE1AE28DB200822E80 /* TextRendererComponent.hpp */,
 				ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */,
 				AB889AF81ABB4C5B005BA86D /* Vec3.hpp */,
 				AB3FD4951AB4330C00D28653 /* Window.hpp */,
@@ -197,6 +206,7 @@
 				AB889B061ABB4FDE005BA86D /* GameObject.cpp */,
 				AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */,
 				ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */,
+				ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -301,6 +311,8 @@
 				AB6CD09B1ACEDF9E00C4FA84 /* MatrixSSE3.cpp in Sources */,
 				AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */,
 				AB07F2121AE1611300669331 /* AudioSystemOpenAL.cpp in Sources */,
+				ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */,
+				ABCF19C01AE28EA600822E80 /* TextRendererComponent.cpp in Sources */,
 				AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */,
 				AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,

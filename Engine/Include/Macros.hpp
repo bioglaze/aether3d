@@ -1,16 +1,6 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-// Alignment for SIMD.
-/*#if defined( _MSC_VER ) || defined( COMPILER_INTEL )
-#       define BEGIN_ALIGNED( n, a )                            __declspec( align( a ) ) n
-#       define END_ALIGNED( n, a )
-#elif defined( __GNUC__ ) || defined( __clang__ )
-#       define BEGIN_ALIGNED( n, a )                            n
-#       define END_ALIGNED( n, a )                              __attribute__( (aligned( a ) ) )
-#endif
-*/
-
 #if (defined( _MSC_VER ) && (_MSC_VER >= 1900)) || defined(__APPLE__) || defined(__GNUC__)
 #define ALIGNAS( n ) alignas( n )
 #else
