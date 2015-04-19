@@ -5,7 +5,7 @@
 std::vector< ae3d::TransformComponent > transformComponents;
 unsigned nextFreeTransformComponent = 0;
 
-int ae3d::TransformComponent::New()
+unsigned ae3d::TransformComponent::New()
 {
     if (nextFreeTransformComponent == transformComponents.size())
     {

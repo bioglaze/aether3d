@@ -1,7 +1,7 @@
 #ifndef TEXT_RENDERER_H
 #define TEXT_RENDERER_H
 
-#include <string>
+#include <type_traits>
 
 namespace ae3d
 {
@@ -27,16 +27,16 @@ namespace ae3d
         friend class GameObject;
         friend class Scene;
 
-        /* \return Component's type code. Must be unique for each component type. */
+        /** \return Component's type code. Must be unique for each component type. */
         static int Type() { return 4; }
         
-        /* \return Component handle that uniquely identifies the instance. */
-        static int New();
+        /** \return Component handle that uniquely identifies the instance. */
+        static unsigned New();
         
-        /* \return Component at index or null if index is invalid. */
+        /** \return Component at index or null if index is invalid. */
         static TextRendererComponent* Get( unsigned index );
 
-        /* \param projectionModelMatrix Projection and model matrix combined. */
+        /** \param projectionModelMatrix Projection and model matrix combined. */
         void Render( const float* projectionModelMatrix );
 
         struct Impl;
@@ -47,9 +47,6 @@ namespace ae3d
         static const std::size_t StorageAlign = 16;
         
         std::aligned_storage<StorageSize, StorageAlign>::type _storage;
-
-        //std::string text;
-        //Font* font = nullptr;
     };
 }
 

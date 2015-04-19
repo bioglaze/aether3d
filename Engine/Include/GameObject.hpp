@@ -8,12 +8,12 @@ namespace ae3d
     {
     public:
         /** Invalid component index. */
-        static const int InvalidComponentIndex = -1;
+        static const unsigned InvalidComponentIndex = 99999999;
 
         /** Adds a component into the game object. There can be multiple components of the same type. */
         template< class T > void AddComponent()
         {
-            const int index = GetNextComponentIndex();
+            const unsigned index = GetNextComponentIndex();
             
             if (index != InvalidComponentIndex)
             {
@@ -29,7 +29,7 @@ namespace ae3d
             {
                 if (T::Type() == component.type)
                 {
-                    return T::Get(component.handle);
+                    return T::Get( component.handle );
                 }
             }
 
@@ -40,7 +40,7 @@ namespace ae3d
         struct ComponentEntry
         {
             int type = 0;
-            int handle = 0;
+            unsigned handle = 0;
         };
 
         unsigned GetNextComponentIndex();

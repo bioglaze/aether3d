@@ -38,10 +38,10 @@ namespace ae3d
         static int Type() { return 0; }
         
         /** \return Component handle that uniquely identifies the instance. */
-        static int New();
+        static unsigned New();
         
         /** \return Component at index or null if index is invalid. */
-        static CameraComponent* Get(int index);
+        static CameraComponent* Get( unsigned index );
 
         Matrix44 projectionMatrix;
         Matrix44 viewMatrix;

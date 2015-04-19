@@ -15,12 +15,10 @@ namespace ae3d
         /** Loads a clip from .wav or Ogg Vorbis file data. */
         void Load( const System::FileContentsData& clipData );
 
-      private:
-        friend class AudioSourceComponent;
-
         /** \return Clip's handle. */
         unsigned GetId() const { return id; }
-        
+
+      private:
         unsigned id = 0;
     };
 }

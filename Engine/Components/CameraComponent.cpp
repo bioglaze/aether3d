@@ -4,7 +4,7 @@
 std::vector< ae3d::CameraComponent > cameraComponents;
 unsigned nextFreeCameraComponent = 0;
 
-int ae3d::CameraComponent::New()
+unsigned ae3d::CameraComponent::New()
 {
     if (nextFreeCameraComponent == cameraComponents.size())
     {
@@ -14,17 +14,17 @@ int ae3d::CameraComponent::New()
     return nextFreeCameraComponent++;
 }
 
-ae3d::CameraComponent* ae3d::CameraComponent::Get(int index)
+ae3d::CameraComponent* ae3d::CameraComponent::Get( unsigned index )
 {
     return &cameraComponents[index];
 }
 
-void ae3d::CameraComponent::SetProjection(float left, float right, float bottom, float top, float near, float far)
+void ae3d::CameraComponent::SetProjection( float left, float right, float bottom, float top, float near, float far )
 {
     projectionMatrix.MakeProjection( left, right, bottom, top, near, far );
 }
 
-void ae3d::CameraComponent::SetClearColor(const Vec3& color)
+void ae3d::CameraComponent::SetClearColor( const Vec3& color )
 {
     clearColor = color;
 }

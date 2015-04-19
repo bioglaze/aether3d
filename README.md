@@ -9,6 +9,7 @@ This is a work in progress, no releases have been made yet.
   - OpenGL 4.1 and 4.5 renderer.
   - Component-based game object system.
   - Sprite rendering, texture atlasing and batching.
+  - Bitmap font rendering using BMFont fonts.
   - Audio support for .wav and .ogg.
 
 # Planned Features

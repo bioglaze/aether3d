@@ -9,7 +9,7 @@ extern ae3d::Renderer renderer;
 std::vector< ae3d::TextRendererComponent > textComponents;
 unsigned nextFreeTextComponent = 0;
 
-int ae3d::TextRendererComponent::New()
+unsigned ae3d::TextRendererComponent::New()
 {
     if (nextFreeTextComponent == textComponents.size())
     {
@@ -47,7 +47,6 @@ void ae3d::TextRendererComponent::SetText( const char* aText )
 
     if (m().font)
     {
-        // TODO: Dirty flag.
         m().font->CreateVertexBuffer( aText, m().vertexBuffer );
     }
 }
@@ -56,10 +55,9 @@ void ae3d::TextRendererComponent::SetFont( Font* aFont )
 {
     m().font = aFont;
 
-    if (m().font)
+    if (aFont)
     {
-        // TODO: Dirty flag.
-        m().font->CreateVertexBuffer( m().text.c_str()  , m().vertexBuffer );
+        aFont->CreateVertexBuffer( m().text.c_str(), m().vertexBuffer );
     }
 }
 
@@ -67,7 +65,7 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
 {
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
-    renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", m().font->GetTexture(), 0);
+    renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", m().font->GetTexture(), 0 );
 
     m().vertexBuffer.Bind();
     m().vertexBuffer.Draw();

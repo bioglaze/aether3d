@@ -1,8 +1,6 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include <vector>
-
 namespace ae3d
 {
     namespace System

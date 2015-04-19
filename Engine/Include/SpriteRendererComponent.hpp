@@ -43,10 +43,10 @@ namespace ae3d
         static int Type() { return 1; }
         
         /* \return Component handle that uniquely identifies the instance. */
-        static int New();
+        static unsigned New();
         
         /* \return Component at index or null if index is invalid. */
-        static SpriteRendererComponent* Get(unsigned index);
+        static SpriteRendererComponent* Get( unsigned index );
 
         /* \param projectionModelMatrix Projection and model matrix combined. */
         void Render( const float* projectionModelMatrix );

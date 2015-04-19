@@ -55,7 +55,7 @@ int main()
     
     GameObject audioContainer;
     audioContainer.AddComponent<AudioSourceComponent>();
-    audioContainer.GetComponent<AudioSourceComponent>()->SetClip( &audioClip );
+    audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;

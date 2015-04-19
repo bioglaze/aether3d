@@ -8,9 +8,8 @@
 namespace ae3d
 {
     /** Stores an orientation. */
-    class Quaternion
+    struct Quaternion
     {
-    public:
         /** Constructor. */
         Quaternion() : x( 0 ), y( 0 ), z( 0 ), w( 1 ) {}
         

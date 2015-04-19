@@ -176,7 +176,7 @@ void ae3d::SpriteRendererComponent::Impl::Render()
     transparentRenderQueue.Render();
 }
 
-int ae3d::SpriteRendererComponent::New()
+unsigned ae3d::SpriteRendererComponent::New()
 {
     if (nextFreeSpriteComponent == spriteRendererComponents.size())
     {

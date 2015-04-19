@@ -30,7 +30,7 @@ namespace ae3d
         static int Type() { return 2; }
         
         // \return Component handle that uniquely identifies the instance.
-        static int New();
+        static unsigned New();
         
         // \return Component at index or null if index is invalid.
         static TransformComponent* Get( unsigned index );

@@ -42,17 +42,17 @@ namespace ae3d
           \param condition Condition that causes the assert to fire when true.
           \param message Assert message to be displayed when condition is true.
         */
-        void Assert(bool condition, const char* message);
+        void Assert( bool condition, const char* message );
 
         /**
         Formats a message and prints it into stdout.
-        Example: Log::PrintFormat( "My name is %s", name.c_str() ); // where name is a std::string.
+        Example: Print( "My name is %s\n", name.c_str() ); // where name is a std::string.
         Formatting examples:
         %d: integer
         %s: C-style null-terminated string
         %f: float
         */
-        void Print(const char* format, ...);
+        void Print( const char* format, ... );
 
         /** Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often. */
         void ReloadChangedAssets();

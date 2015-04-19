@@ -3,14 +3,12 @@
 
 namespace ae3d
 {
-    class AudioClip;
-    
     /** Contains an audio clip and methods to play it. */
     class AudioSourceComponent
     {
     public:
-        /** \param audioClip Audio clip */
-        void SetClip( AudioClip* audioClip );
+        /** \param audioClipId Audio clip id. */
+        void SetClipId( unsigned audioClipId );
 
         /** Plays the clip. */
         void Play();
@@ -22,12 +20,12 @@ namespace ae3d
         static int Type() { return 3; }
         
         /** \return Component handle that uniquely identifies the instance. */
-        static int New();
+        static unsigned New();
         
         /** \return Component at index or null if index is invalid. */
-        static AudioSourceComponent* Get(int index);
+        static AudioSourceComponent* Get( unsigned index );
         
-        AudioClip* clip = nullptr;
+        unsigned clipId = 0;
     };
 }
 
