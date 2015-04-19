@@ -20,7 +20,7 @@ namespace ae3d
     private:
         std::vector< GameObject* > gameObjects;
         GameObject* mainCamera = nullptr;
-        int nextFreeGameObject = 0;
+        unsigned nextFreeGameObject = 0;
     };
 }
 #endif

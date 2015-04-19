@@ -7,7 +7,7 @@
 extern ae3d::Renderer renderer;
 
 std::vector< ae3d::TextRendererComponent > textComponents;
-int nextFreeTextComponent = 0;
+unsigned nextFreeTextComponent = 0;
 
 int ae3d::TextRendererComponent::New()
 {
@@ -19,7 +19,7 @@ int ae3d::TextRendererComponent::New()
     return nextFreeTextComponent++;
 }
 
-ae3d::TextRendererComponent* ae3d::TextRendererComponent::Get(int index)
+ae3d::TextRendererComponent* ae3d::TextRendererComponent::Get( unsigned index )
 {
     return &textComponents[ index ];
 }

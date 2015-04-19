@@ -11,7 +11,7 @@
 extern ae3d::Renderer renderer;
 
 std::vector<ae3d::SpriteRendererComponent> spriteRendererComponents;
-int nextFreeSpriteComponent = 0;
+unsigned nextFreeSpriteComponent = 0;
 
 struct Drawable
 {
@@ -186,7 +186,7 @@ int ae3d::SpriteRendererComponent::New()
     return nextFreeSpriteComponent++;
 }
 
-ae3d::SpriteRendererComponent* ae3d::SpriteRendererComponent::Get( int index )
+ae3d::SpriteRendererComponent* ae3d::SpriteRendererComponent::Get( unsigned index )
 {
     System::Assert( index < spriteRendererComponents.size(), "Tried to get a too high index for spriteRendererComponents." );
     return &spriteRendererComponents[ index ];

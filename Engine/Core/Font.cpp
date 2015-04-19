@@ -55,7 +55,7 @@ void ae3d::Font::CreateVertexBuffer( const char* text, ae3d::VertexBuffer& outVe
 
     float accumX = 0;
     
-    for (std::size_t c = 0; c < textStr.size(); ++c)
+    for (unsigned short c = 0; c < static_cast<unsigned short>( textStr.size() ); ++c)
     {
         if (static_cast<int>(text[ c ]) < 0)
         {

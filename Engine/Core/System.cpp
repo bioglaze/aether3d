@@ -53,7 +53,7 @@ ae3d::System::FileContentsData ae3d::System::FileContents(const char* path)
 
     if (!outData.isLoaded)
     {
-        Print( "Could not open %s", path );
+        Print( "Could not open %s\n", path );
     }
     
     return outData;
@@ -85,7 +85,7 @@ void ae3d::System::Assert(bool condition, const char* message)
 {
     if (!condition)
     {
-        Print("Assertion failed: %s", message);
+        Print("Assertion failed: %s\n", message);
 
 #ifdef _MSC_VER
         __debugbreak();

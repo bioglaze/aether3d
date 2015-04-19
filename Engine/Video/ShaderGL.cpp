@@ -111,7 +111,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     
     if (!wasLinked)
     {
-        ae3d::System::Print("Link failed.");
+        ae3d::System::Print("Shader linking failed.\n");
         PrintInfoLog( program, InfoLogType::Program );
         return;
     }

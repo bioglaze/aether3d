@@ -24,11 +24,11 @@ namespace Texture2DGlobal
         
         for (const auto& path : pathToCachedTextureSizeInBytes)
         {
-            ae3d::System::Print("%s: %d B", path.first.c_str(), path.second);
+            ae3d::System::Print("%s: %d B\n", path.first.c_str(), path.second);
             total += path.second;
         }
         
-        ae3d::System::Print( "Total texture usage: %d KiB", total / 1024 );
+        ae3d::System::Print( "Total texture usage: %d KiB\n", total / 1024 );
     }
 #endif
 }

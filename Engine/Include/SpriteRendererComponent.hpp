@@ -46,7 +46,7 @@ namespace ae3d
         static int New();
         
         /* \return Component at index or null if index is invalid. */
-        static SpriteRendererComponent* Get(int index);
+        static SpriteRendererComponent* Get(unsigned index);
 
         /* \param projectionModelMatrix Projection and model matrix combined. */
         void Render( const float* projectionModelMatrix );

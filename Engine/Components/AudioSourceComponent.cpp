@@ -4,7 +4,7 @@
 #include <vector>
 
 std::vector< ae3d::AudioSourceComponent > audioSourceComponents;
-int nextFreeAudioSourceComponent = 0;
+unsigned nextFreeAudioSourceComponent = 0;
 
 int ae3d::AudioSourceComponent::New()
 {

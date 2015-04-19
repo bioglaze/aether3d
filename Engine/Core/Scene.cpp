@@ -41,7 +41,7 @@ void ae3d::Scene::Render()
     }
     
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
-    System::Assert( camera, "mainCamera doesn't contain camera component!" );
+    System::Assert( camera != nullptr, "mainCamera doesn't contain camera component!" );
 
     Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );

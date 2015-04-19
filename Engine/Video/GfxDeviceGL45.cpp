@@ -40,7 +40,7 @@ void PrintOpenGLDebugOutput( GLenum source, GLenum type, GLuint id, GLenum sever
     case GL_DEBUG_SEVERITY_LOW_ARB:    severityFmt = "LOW"; break;
     }
 
-    ae3d::System::Print( "OpenGL: %s [source=%s type=%s severity=%s id=%u]",
+    ae3d::System::Print( "OpenGL: %s [source=%s type=%s severity=%s id=%u\n",
         msg, sourceFmt, typeFmt, severityFmt, id );
 }
 

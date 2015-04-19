@@ -264,7 +264,7 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const System::FileContentsData& cl
 {
     if (!clipData.isLoaded)
     {
-        ae3d::System::Print( "AudioSystem: File data %s not loaded!", clipData.path.c_str() );
+        ae3d::System::Print( "AudioSystem: File data %s not loaded!\n", clipData.path.c_str() );
         return 0;
     }
 

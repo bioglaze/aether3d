@@ -3,7 +3,7 @@
 #include "System.hpp"
 
 std::vector< ae3d::TransformComponent > transformComponents;
-int nextFreeTransformComponent = 0;
+unsigned nextFreeTransformComponent = 0;
 
 int ae3d::TransformComponent::New()
 {
@@ -15,7 +15,7 @@ int ae3d::TransformComponent::New()
     return nextFreeTransformComponent++;
 }
 
-ae3d::TransformComponent* ae3d::TransformComponent::Get(int index)
+ae3d::TransformComponent* ae3d::TransformComponent::Get( unsigned index )
 {
     return &transformComponents[ index ];
 }

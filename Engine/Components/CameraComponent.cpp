@@ -2,7 +2,7 @@
 #include <vector>
 
 std::vector< ae3d::CameraComponent > cameraComponents;
-int nextFreeCameraComponent = 0;
+unsigned nextFreeCameraComponent = 0;
 
 int ae3d::CameraComponent::New()
 {

@@ -33,7 +33,7 @@ namespace ae3d
         static int New();
         
         // \return Component at index or null if index is invalid.
-        static TransformComponent* Get( int index );
+        static TransformComponent* Get( unsigned index );
 
         Vec3 localPosition;
         Quaternion localRotation;

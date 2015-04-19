@@ -43,10 +43,10 @@ namespace ae3d
             int handle = 0;
         };
 
-        int GetNextComponentIndex();
+        unsigned GetNextComponentIndex();
 
         static const int MaxComponents = 10;
-        int nextFreeComponentIndex = 0;
+        unsigned nextFreeComponentIndex = 0;
         ComponentEntry components[ MaxComponents ];
     };
 }

@@ -29,6 +29,6 @@ namespace ae3d
         
         AudioClip* clip = nullptr;
     };
-};
+}
 
 #endif

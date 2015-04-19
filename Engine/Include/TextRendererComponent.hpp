@@ -37,7 +37,7 @@ namespace ae3d
         static int New();
         
         /* \return Component at index or null if index is invalid. */
-        static TextRendererComponent* Get( int index );
+        static TextRendererComponent* Get( unsigned index );
 
         /* \param projectionModelMatrix Projection and model matrix combined. */
         void Render( const float* projectionModelMatrix );

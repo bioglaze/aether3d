@@ -58,6 +58,24 @@
     <ClCompile Include="..\Core\MatrixSSE3.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\ThirdParty\stb_vorbis.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\AudioClip.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\AudioSystemOpenAL.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Font.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\AudioSourceComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\TextRendererComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -145,6 +163,21 @@
     </ClInclude>
     <ClInclude Include="..\Include\Macros.hpp">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\AudioClip.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\AudioSourceComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Font.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\AudioSystem.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

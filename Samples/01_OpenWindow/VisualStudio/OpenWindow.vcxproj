@@ -87,8 +87,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Aether3D_GL45_d.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_GL45_d.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
@@ -109,8 +109,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Aether3D_GL45_d.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_GL45_d.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
@@ -135,8 +135,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
@@ -161,8 +161,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
@@ -177,7 +177,9 @@
     <ClCompile Include="..\OpenWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Engine\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Font.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Quaternion.hpp" />
@@ -185,6 +187,7 @@
     <ClInclude Include="..\..\..\Engine\Include\Shader.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\SpriteRendererComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\System.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\TextRendererComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Texture2D.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\TransformComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Vec3.hpp" />

@@ -26,3 +26,4 @@ Third party library licenses are:
   - stb_image.c is public domain
   - stb_vorbis.c is public domain
   - glxw is under zlib license
+  - OpenAL-soft is under LGPLv2 license
