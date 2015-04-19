@@ -20,7 +20,7 @@ namespace ae3d
         /// \param localScale Local scale.
         void SetLocalScale( float localScale );
 
-        /* \return Local transform matrix. */
+        /// \return Local transform matrix.
         const Matrix44& GetLocalMatrix() const { return localMatrix; }
         
     private:

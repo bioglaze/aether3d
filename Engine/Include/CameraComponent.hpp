@@ -6,11 +6,11 @@
 
 namespace ae3d
 {
-    /* Camera views the scene. */
+    /** Camera views the scene. */
     class CameraComponent
     {
     public:
-        /* \return Projection matrix. */
+        /** \return Projection matrix. */
         const Matrix44& GetProjection() const { return projectionMatrix; }
         
         /**
@@ -25,22 +25,22 @@ namespace ae3d
          */
         void SetProjection(float left, float right, float bottom, float top, float near, float far);
 
-        /* \return Clear color in range 0-1. */
+        /** \return Clear color in range 0-1. */
         Vec3 GetClearColor() const { return clearColor; }
 
-        /* \param color Color in range 0-1. */
+        /** \param color Color in range 0-1. */
         void SetClearColor( const Vec3& color );
 
     private:
         friend class GameObject;
         
-        /* \return Component's type code. Must be unique for each component type. */
+        /** \return Component's type code. Must be unique for each component type. */
         static int Type() { return 0; }
         
-        /* \return Component handle that uniquely identifies the instance. */
+        /** \return Component handle that uniquely identifies the instance. */
         static int New();
         
-        /* \return Component at index or null if index is invalid. */
+        /** \return Component at index or null if index is invalid. */
         static CameraComponent* Get(int index);
 
         Matrix44 projectionMatrix;

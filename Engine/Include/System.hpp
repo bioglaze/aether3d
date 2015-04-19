@@ -8,7 +8,7 @@ namespace ae3d
 {
     namespace System
     {
-        /* File contents. */
+        /** File contents. */
         struct FileContentsData
         {
             /// File content bytes.
@@ -19,7 +19,7 @@ namespace ae3d
             bool isLoaded = false;
         };
 
-        /* Inits audio system. */
+        /** Inits audio system. */
         void InitAudio();
         
         /** Releases all resources allocated by the engine. Call when exiting. */
@@ -44,7 +44,7 @@ namespace ae3d
         */
         void Assert(bool condition, const char* message);
 
-        /*
+        /**
         Formats a message and prints it into stdout.
         Example: Log::PrintFormat( "My name is %s", name.c_str() ); // where name is a std::string.
         Formatting examples:
@@ -54,7 +54,7 @@ namespace ae3d
         */
         void Print(const char* format, ...);
 
-        // Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often.
+        /** Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often. */
         void ReloadChangedAssets();
     }
 }

@@ -3,14 +3,14 @@
 
 namespace ae3d
 {
-    /* GameObject is composed of components that define its behavior. */
+    /** GameObject is composed of components that define its behavior. */
     class GameObject
     {
     public:
-        /* Invalid component index. */
+        /** Invalid component index. */
         static const int InvalidComponentIndex = -1;
 
-        /* Adds a component into the game object. There can be multiple components of the same type. */
+        /** Adds a component into the game object. There can be multiple components of the same type. */
         template< class T > void AddComponent()
         {
             const int index = GetNextComponentIndex();
@@ -22,7 +22,7 @@ namespace ae3d
             }
         }
 
-        /* \return The first component of type T or null if there is no such component. */
+        /** \return The first component of type T or null if there is no such component. */
         template< class T > T* GetComponent()
         {
             for (const auto& component : components)

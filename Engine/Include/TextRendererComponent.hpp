@@ -7,23 +7,20 @@ namespace ae3d
 {
     class Font;
 
-    /* Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/ */
+    /** Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/ */
     class TextRendererComponent
     {
       public:
-        /* Constructor. */
+        /** Constructor. */
         TextRendererComponent();
         
-        /* Destructor. */
+        /** Destructor. */
         ~TextRendererComponent();
 
-        /*
-           \param fontTex Font texture.
-           \param metaData BMFont metadata in binary or text.
-         */
+        /** \param font Font. */
         void SetFont( Font* font );
         
-        /* \param text Text. Characters not in font are rendered empty. */
+        /** \param text Text. Characters not in font are rendered empty. */
         void SetText( const char* text );
 
       private:

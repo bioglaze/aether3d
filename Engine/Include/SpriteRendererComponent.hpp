@@ -9,7 +9,7 @@ namespace ae3d
     struct Vec3;
     struct Vec4;
     
-    /* Renders sprites. */
+    /** Renders sprites. */
     class SpriteRendererComponent
     {
     public:
@@ -19,7 +19,7 @@ namespace ae3d
         /* Destructor. */
         ~SpriteRendererComponent();
 
-        /* Removes all textures that were added using SetTexture. */
+        /** Removes all textures that were added using SetTexture. */
         void Clear();
         
         /**
