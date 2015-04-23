@@ -27,7 +27,7 @@ void ae3d::Scene::Add( GameObject* gameObject )
 
     CameraComponent* camera = gameObject->GetComponent<CameraComponent>();
 
-    if (camera && !mainCamera)
+    if (camera && mainCamera == nullptr)
     {
         mainCamera = gameObject;
     }
@@ -76,14 +76,6 @@ void ae3d::Scene::Render()
             Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
             textRenderer->Render( projectionModel.m );
         }
-    }
-
-    // TODO: Remove when text rendering is implemented.
-    static int frame = 0;
-    ++frame;
-    if (frame % 60 == 0)
-    {
-        System::Print("draw calls: %d\n", GfxDevice::GetDrawCalls());
     }
 
     GfxDevice::ErrorCheck( "Scene render end" );

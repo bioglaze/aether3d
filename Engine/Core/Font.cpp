@@ -150,7 +150,6 @@ void ae3d::Font::LoadBMFontMetaText( const System::FileContentsData& metaData )
         
         if (token.find( "padding" ) != std::string::npos)
         {
-            // \todo Support padding over 9.
             const char a[ 2 ] = { token[  8 ], 0 };
             const char b[ 2 ] = { token[ 10 ], 0 };
             const char c[ 2 ] = { token[ 12 ], 0 };
@@ -163,7 +162,6 @@ void ae3d::Font::LoadBMFontMetaText( const System::FileContentsData& metaData )
         }
         else if (token.find( "spacing" ) != std::string::npos)
         {
-            // \todo Support spacing over 9.
             const char a[ 2 ] = { token[  8 ], 0 };
             const char b[ 2 ] = { token[ 10 ], 0 };
             
@@ -238,11 +236,19 @@ void ae3d::Font::LoadBMFontMetaBinary( const System::FileContentsData& metaData 
     std::stringstream ifs( std::string( metaData.data.begin(), metaData.data.end() ) );
     unsigned char header[ 4 ];
     ifs.read( (char*)&header, 4 );
-    const bool validHeader = header[ 0 ] == 66 && header[ 1 ] == 77 && header[ 2 ] == 70 && header[ 3 ] == 3;
+    const bool validHeaderHead = header[ 0 ] == 66 && header[ 1 ] == 77 && header[ 2 ] == 70;
     
-    if (!validHeader)
+    if (!validHeaderHead)
     {
         System::Print( "%s does not contain a valid BMFont header!\n", metaData.path.c_str() );
+        return;
+    }
+    
+    const bool validHeaderTail = header[ 3 ] == 3;
+    
+    if (!validHeaderTail)
+    {
+        System::Print( "%s contains a BMFont header but the version is invalid! Valid is version 3.\n", metaData.path.c_str() );
         return;
     }
     

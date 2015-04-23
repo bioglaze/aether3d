@@ -12,7 +12,7 @@ namespace ae3d
         Shader spriteRendererShader;
     };
 
-    // High-level rendering stuff.
+    /** High-level rendering stuff. */
     class Renderer
     {
     public:
@@ -20,7 +20,7 @@ namespace ae3d
         BuiltinShaders builtinShaders;
         
     private:
-    };
+    };    
 }
 
 #endif

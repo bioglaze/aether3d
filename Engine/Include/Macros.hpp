@@ -7,7 +7,7 @@
 #define ALIGNAS( n ) __declspec( align( n ) )
 #endif
 
-// TODO comments as compile warnings/links
+// Prints TODO comments as compile warnings/links
 #if _MSC_VER
 #define Stringize( L ) #L
 #define MakeString( M, L ) M(L)

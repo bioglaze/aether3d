@@ -26,6 +26,8 @@ namespace AudioGlobal
     std::vector< ClipInfo > clips;
 }
 
+namespace
+{
 /**
  * WAVE structure which is used by .wav files.
  * Follows the specification at the following URI:
@@ -55,7 +57,7 @@ struct WAVE
     std::vector< unsigned char > data; // Chunk data.
 };
 
-static const char * GetOpenALErrorString( int errID )
+const char * GetOpenALErrorString( int errID )
 {
     if (errID == AL_NO_ERROR) return "";
     if (errID == AL_INVALID_NAME) return "Invalid name";
@@ -67,7 +69,7 @@ static const char * GetOpenALErrorString( int errID )
     return " Don't know ";
 }
 
-static void CheckOpenALError( const char* info )
+void CheckOpenALError( const char* info )
 {
     const ALenum err = alGetError();
     
@@ -77,7 +79,7 @@ static void CheckOpenALError( const char* info )
     }
 }
 
-static void LoadOgg( const ae3d::System::FileContentsData& clipData )
+void LoadOgg( const ae3d::System::FileContentsData& clipData )
 {
     short* decoded = nullptr;
     int channels = 0;
@@ -110,7 +112,7 @@ static void LoadOgg( const ae3d::System::FileContentsData& clipData )
     AudioGlobal::clips.push_back( info );
 }
 
-static void LoadWav( const ae3d::System::FileContentsData& clipData )
+void LoadWav( const ae3d::System::FileContentsData& clipData )
 {
     std::istringstream ifs( std::string( clipData.data.begin(), clipData.data.end() ) );
 
@@ -221,6 +223,7 @@ static void LoadWav( const ae3d::System::FileContentsData& clipData )
     
     CheckOpenALError( "Loading .wav data." );
     AudioGlobal::clips.push_back( info );
+}
 }
 
 void ae3d::AudioSystem::Init()

@@ -40,7 +40,9 @@ void TexReload( const std::string& path )
     tex.Load( ae3d::System::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter() );
 }
 
-static bool HasStbExtension( const std::string& path )
+namespace
+{
+bool HasStbExtension( const std::string& path )
 {    
     // Checks for uncompressed formats in texture's file name.
     static const std::string extensions[] =
@@ -55,8 +57,7 @@ static bool HasStbExtension( const std::string& path )
     return extensionFound;
 }
 
-/// \todo Create StringUtil.hpp when more string methods are needed.
-static void Tokenize( const std::string& str,
+void Tokenize( const std::string& str,
     std::vector< std::string >& tokens,
     const std::string& delimiters = " " )
 {
@@ -74,6 +75,7 @@ static void Tokenize( const std::string& str,
         // Find next "non-delimiter"
         pos = str.find_first_of( delimiters, lastPos );
     }
+}
 }
 
 void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter )

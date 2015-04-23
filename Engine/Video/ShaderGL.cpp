@@ -10,7 +10,9 @@ enum class InfoLogType
     Shader
 };
 
-static void PrintInfoLog( GLuint shader, InfoLogType logType )
+namespace
+{
+void PrintInfoLog( GLuint shader, InfoLogType logType )
 {
     GLint logLength = 0;
     
@@ -46,7 +48,7 @@ static void PrintInfoLog( GLuint shader, InfoLogType logType )
     }
 }
 
-static GLuint CompileShader( const char* source, GLenum shaderType )
+GLuint CompileShader( const char* source, GLenum shaderType )
 {
     const GLuint shader = ae3d::GfxDevice::CreateShaderId( static_cast<unsigned>(shaderType) );
     glShaderSource( shader, 1, &source, nullptr );
@@ -64,6 +66,7 @@ static GLuint CompileShader( const char* source, GLenum shaderType )
     }
 
     return shader;
+}
 }
 
 std::map<std::string, ae3d::Shader::IntDefaultedToMinusOne> ae3d::Shader::GetUniformLocations()

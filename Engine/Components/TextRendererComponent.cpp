@@ -1,6 +1,7 @@
 #include "TextRendererComponent.hpp"
 #include <vector>
 #include "Font.hpp"
+#include "GfxDevice.hpp"
 #include "Renderer.hpp"
 #include "VertexBuffer.hpp"
 
@@ -67,6 +68,8 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", m().font->GetTexture(), 0 );
 
+    GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::AlphaBlend );
+    
     m().vertexBuffer.Bind();
     m().vertexBuffer.Draw();
 }

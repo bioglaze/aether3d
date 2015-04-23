@@ -7,6 +7,7 @@
 
 namespace ae3d
 {
+    /** Keeps track of files and calls updateFunc when they have changed on disk. This enables asset hotloading. */
     class FileWatcher
     {
     public:
@@ -25,7 +26,7 @@ namespace ae3d
         };
         
         std::map< std::string, Entry > pathToEntry;
-    };
+    };    
 }
 
 #endif

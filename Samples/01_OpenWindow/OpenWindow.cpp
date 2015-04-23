@@ -1,3 +1,4 @@
+#include <string>
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
@@ -66,16 +67,25 @@ int main()
     
     GameObject textContainer;
     textContainer.AddComponent<TextRendererComponent>();
-    textContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D Game Engine" );
+    textContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
     textContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     textContainer.AddComponent<TransformComponent>();
     textContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 20, 0 ) );
-    //textContainer.GetComponent<TransformComponent>()->SetLocalScale( 1 );
-    
+    //textContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
+
+    GameObject statsContainer;
+    statsContainer.AddComponent<TextRendererComponent>();
+    statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
+    statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
+    statsContainer.AddComponent<TransformComponent>();
+    statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 40, 0 ) );
+    //textContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
+
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
+    scene.Add( &statsContainer );
     
     bool quit = false;
     
@@ -106,6 +116,9 @@ int main()
                 }
             }
         }
+
+        const std::string fps = std::string("draw calls: ") + std::to_string( System::Statistics::GetDrawCallCount() );
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( fps.c_str() );
 
         scene.Render();
 

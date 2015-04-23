@@ -8,10 +8,12 @@
 #    define M_PI 3.14159265358979f
 #endif
 
-// Not using MathUtil::IsNaN() because want to keep Include/ source dependencies to the minimum.
-static bool IsNaN( float f )
+namespace
+{
+bool IsNaN( float f )
 {
     return f != f;
+}
 }
 
 namespace ae3d

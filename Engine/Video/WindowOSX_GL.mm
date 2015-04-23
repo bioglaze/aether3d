@@ -16,8 +16,8 @@ namespace WindowGlobal
     const int eventStackSize = 10;
     ae3d::WindowEvent eventStack[eventStackSize];
     int eventIndex = -1;
-    NSOpenGLContext* glContext;
-    NSApplication *application;
+    NSOpenGLContext* glContext = nullptr;
+    NSApplication *application = nullptr;
 
     std::map< unsigned, ae3d::KeyCode > keyMap = {
         { 0, ae3d::KeyCode::A },
@@ -234,7 +234,7 @@ static void CreateGLContext()
     WindowGlobal::glContext =
     [[NSOpenGLContext alloc] initWithFormat: pixelFormat
                                shareContext: 0];
-    if (!WindowGlobal::glContext)
+    if (WindowGlobal::glContext == nullptr)
     {
         NSLog(@"Could not create OpenGL context!");
         return;
@@ -298,7 +298,7 @@ void cocoaProcessEvents()
                                  untilDate: [NSDate distantPast]
                                     inMode: NSDefaultRunLoopMode
                                    dequeue: YES];
-        if (!event)
+        if (event == nullptr)
         {
             break;
         }
@@ -326,8 +326,6 @@ void cocoaProcessEvents()
                     break;
                 }
 
-                // TODO [2015-03-28]: key table
-                
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ [event keyCode] ];
                 NSLog(@"key: %d", [event keyCode]);
             } break;

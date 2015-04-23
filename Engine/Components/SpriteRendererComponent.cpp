@@ -28,7 +28,9 @@ struct Sprite
     ae3d::Vec4 tint;
 };
 
-static void CreateVertexBuffer( std::vector< Sprite >& sprites, ae3d::VertexBuffer& outVertexBuffer )
+namespace
+{
+void CreateVertexBuffer( std::vector< Sprite >& sprites, ae3d::VertexBuffer& outVertexBuffer )
 {
     const int quadVertexCount = 4;
     const int quadFaceCount = 2;
@@ -85,7 +87,7 @@ static void CreateVertexBuffer( std::vector< Sprite >& sprites, ae3d::VertexBuff
     outVertexBuffer.Generate(faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()));
 }
 
-static void CreateDrawables( const std::vector< Sprite >& sprites, std::vector< Drawable >& outDrawables )
+void CreateDrawables( const std::vector< Sprite >& sprites, std::vector< Drawable >& outDrawables )
 {
     outDrawables.clear();
     
@@ -117,6 +119,7 @@ static void CreateDrawables( const std::vector< Sprite >& sprites, std::vector< 
             back2.bufferEnd = oldEnd + 2;
         }
     }
+}
 }
 
 struct RenderQueue
@@ -210,7 +213,8 @@ void ae3d::SpriteRendererComponent::Clear()
 
 void ae3d::SpriteRendererComponent::SetTexture( Texture2D* aTexture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor )
 {
-    if (!aTexture)
+    // TODO: default texture.
+    if (aTexture == nullptr)
     {
         return;
     }
@@ -235,6 +239,12 @@ void ae3d::SpriteRendererComponent::SetTexture( Texture2D* aTexture, const Vec3&
 
 void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
 {
+    // TODO: default texture so this can be removed.
+    if (m().transparentRenderQueue.drawables.empty() && m().opaqueRenderQueue.drawables.empty())
+    {
+        return;
+    }
+    
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
     m().Render();

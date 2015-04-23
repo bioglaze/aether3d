@@ -56,6 +56,11 @@ namespace ae3d
 
         /** Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often. */
         void ReloadChangedAssets();
+        
+        namespace Statistics
+        {
+            int GetDrawCallCount();
+        }
     }
 }
 #endif

@@ -99,3 +99,8 @@ void ae3d::System::ReloadChangedAssets()
 {
     fileWatcher.Poll();
 }
+
+int ae3d::System::Statistics::GetDrawCallCount()
+{
+    return GfxDevice::GetDrawCalls();
+}
