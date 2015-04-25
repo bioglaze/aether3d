@@ -10,11 +10,15 @@ namespace ae3d
     
     class Texture2D;
     class VertexBuffer;
+    class Vec4;
 
     /** Contains glyphs loaded from AngelCode BMFont files. For Mac there is a compatible program called BMGlyph. */    
     class Font
     {
       public:
+        /** Constructor. */
+        Font();
+        
         /**
           \param fontTex Font texture. No outline support.
           \param metaData BMFont metadata. Must be text or binary.
@@ -37,9 +41,10 @@ namespace ae3d
 
         /**
          \param text Text.
+         \param color Color in range 0-1.
          \param outVertexBuffer Vertex buffer created from text.
          */
-        void CreateVertexBuffer( const char* text, VertexBuffer& outVertexBuffer ) const;
+        void CreateVertexBuffer( const char* text, const Vec4& color, VertexBuffer& outVertexBuffer ) const;
 
         /** \param metaData BMFont text metadata. */
         void LoadBMFontMetaText( const System::FileContentsData& metaData );

@@ -1,5 +1,6 @@
 #include "Texture2D.hpp"
 #include <algorithm>
+#include <vector>
 #include <sstream>
 #include <map>
 #include <GL/glxw.h>
@@ -14,6 +15,8 @@ extern ae3d::FileWatcher fileWatcher;
 
 namespace Texture2DGlobal
 {
+    ae3d::Texture2D defaultTexture;
+    
     std::map< std::string, ae3d::Texture2D > pathToCachedTexture;
 #if DEBUG
     std::map< std::string, std::size_t > pathToCachedTextureSizeInBytes;
@@ -76,6 +79,33 @@ void Tokenize( const std::string& str,
         pos = str.find_first_of( delimiters, lastPos );
     }
 }
+}
+
+const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
+{
+    if (Texture2DGlobal::defaultTexture.GetWidth() == 0)
+    {
+        Texture2DGlobal::defaultTexture.width = 32;
+        Texture2DGlobal::defaultTexture.height = 32;
+
+        Texture2DGlobal::defaultTexture.id = GfxDevice::CreateTextureId();
+        
+        if (GfxDevice::HasExtension( "KHR_debug" ))
+        {
+            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.id, (GLsizei)std::string("default texture 2d").size(), "default texture 2d" );
+        }
+    
+        glBindTexture( GL_TEXTURE_2D, Texture2DGlobal::defaultTexture.id );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+   
+        int data[ 32 * 32 * 4 ] = { 0xFFC0CB };
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, Texture2DGlobal::defaultTexture.width, Texture2DGlobal::defaultTexture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+    }
+    
+    return &Texture2DGlobal::defaultTexture;
 }
 
 void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter )

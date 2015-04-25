@@ -48,7 +48,7 @@ ae3d::System::FileContentsData ae3d::System::FileContents(const char* path)
     std::ifstream ifs(path, std::ios::binary);
 
     outData.data.assign(std::istreambuf_iterator< char >(ifs), std::istreambuf_iterator< char >());
-    outData.path = std::string(path);
+    outData.path = path == nullptr ? "" : std::string( path );
     outData.isLoaded = ifs.is_open();
 
     if (!outData.isLoaded)

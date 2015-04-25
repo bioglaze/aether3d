@@ -15,14 +15,14 @@ unsigned nextFreeSpriteComponent = 0;
 
 struct Drawable
 {
-    ae3d::Texture2D* texture = nullptr;
+    const ae3d::Texture2D* texture = nullptr;
     int bufferStart = 0;
     int bufferEnd = 0;
 };
 
 struct Sprite
 {
-    ae3d::Texture2D* texture = nullptr;
+    const ae3d::Texture2D* texture = nullptr;
     ae3d::Vec3 position;
     ae3d::Vec3 dimension;
     ae3d::Vec4 tint;
@@ -211,12 +211,11 @@ void ae3d::SpriteRendererComponent::Clear()
     m().transparentRenderQueue.Clear();
 }
 
-void ae3d::SpriteRendererComponent::SetTexture( Texture2D* aTexture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor )
+void ae3d::SpriteRendererComponent::SetTexture( const Texture2D* aTexture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor )
 {
-    // TODO: default texture.
     if (aTexture == nullptr)
     {
-        return;
+        aTexture = Texture2D::GetDefaultTexture();
     }
     
     Sprite sprite;
@@ -240,7 +239,7 @@ void ae3d::SpriteRendererComponent::SetTexture( Texture2D* aTexture, const Vec3&
 void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
 {
     // TODO: default texture so this can be removed.
-    if (m().transparentRenderQueue.drawables.empty() && m().opaqueRenderQueue.drawables.empty())
+    if (m().transparentRenderQueue.sprites.empty() && m().opaqueRenderQueue.sprites.empty())
     {
         return;
     }

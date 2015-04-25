@@ -1,7 +1,7 @@
 # Aether3D Game Engine
 This codebase will evolve into the next generation [Aether3D]( "Aether3D"). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
-This is a work in progress, no releases have been made yet.
+This is a work in progress.
 
 # Features
 
@@ -17,6 +17,21 @@ This is a work in progress, no releases have been made yet.
   - Vulkan and D3D12 renderers.
   - Cross-Platform scene editor.
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
+
+# Build
+
+  - After building build artifacts can be found in aether3d_build next to aether3d.
+
+## Windows
+
+  - Open the project in Engine/VisualStudio_GL45 and build it. For MinGW you can use Engine/Makefile.
+  - Create directory aether3d_build next to aether3d.
+  - Build and run Samples/01_OpenWindow.
+
+## OS X
+
+  - Open the project Engine/Aether3D_OSX in Xcode and build it.
+  - Run the Makefile in Samples/01_OpenWindow.
 
 # License
 

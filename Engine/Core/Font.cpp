@@ -3,6 +3,7 @@
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "VertexBuffer.hpp"
+#include "Vec3.hpp"
 
 namespace BlockType
 {
@@ -46,7 +47,12 @@ struct CommonBlock
     unsigned char  blue;
 };
 
-void ae3d::Font::CreateVertexBuffer( const char* text, ae3d::VertexBuffer& outVertexBuffer ) const
+ae3d::Font::Font()
+{
+    texture = Texture2D::GetDefaultTexture();
+}
+
+void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, VertexBuffer& outVertexBuffer ) const
 {
     const std::string textStr( text );
     
@@ -54,6 +60,7 @@ void ae3d::Font::CreateVertexBuffer( const char* text, ae3d::VertexBuffer& outVe
     std::vector< ae3d::VertexBuffer::Face > faces( textStr.size() * 2 );
 
     float accumX = 0;
+    float y = 0;
     
     for (unsigned short c = 0; c < static_cast<unsigned short>( textStr.size() ); ++c)
     {
@@ -63,17 +70,25 @@ void ae3d::Font::CreateVertexBuffer( const char* text, ae3d::VertexBuffer& outVe
         }
         
         const Character& ch = chars[ static_cast<int>(text[ c ]) ];
+
+        if (text[ c ] == '\n')
+        {
+            const Character& charA = chars[ static_cast<int>(text[ 'a' ]) ];
+            accumX = 0;
+            y += charA.height + charA.yOffset;
+        }
+        else
+        {
+            accumX += ch.xAdvance;
+        }
         
         const float scale = 1;
-        const float x = 0;
-        const float y = 0;
-        
+        float x = 0;
+        const float z = 0;
+
         float offx = x + ch.xOffset * scale + accumX * scale;
         float offy = y + ch.yOffset * scale;
         
-        accumX += ch.xAdvance;
-        
-        // TODO: Default texture if !texture
         auto tex = texture;
         
         float u0 = ch.x / tex->GetWidth();
@@ -81,9 +96,7 @@ void ae3d::Font::CreateVertexBuffer( const char* text, ae3d::VertexBuffer& outVe
         
         float v0 = (ch.y + ch.height) / tex->GetHeight();
         float v1 = (ch.y) / tex->GetHeight();
-        
-        const float z = 0;
-        
+
         // Upper triangle.
         faces[ c * 2 + 0 ].a = c * 6 + 0;
         faces[ c * 2 + 0 ].b = c * 6 + 1;
@@ -102,13 +115,13 @@ void ae3d::Font::CreateVertexBuffer( const char* text, ae3d::VertexBuffer& outVe
         vertices[ c * 6 + 4 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx + ch.width * scale, offy + ch.height * scale, z ), u1, v0 );
         vertices[ c * 6 + 5 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx, offy + ch.height * scale, z ), u0, v0 );
         
-        vertices[ c * 6 + 0 ].color = Vec4( 1, 1, 1, 1 );
-        vertices[ c * 6 + 1 ].color = Vec4( 1, 1, 1, 1 );
-        vertices[ c * 6 + 2 ].color = Vec4( 1, 1, 1, 1 );
+        vertices[ c * 6 + 0 ].color = color;
+        vertices[ c * 6 + 1 ].color = color;
+        vertices[ c * 6 + 2 ].color = color;
 
-        vertices[ c * 6 + 3 ].color = Vec4( 1, 1, 1, 1 );
-        vertices[ c * 6 + 4 ].color = Vec4( 1, 1, 1, 1 );
-        vertices[ c * 6 + 5 ].color = Vec4( 1, 1, 1, 1 );
+        vertices[ c * 6 + 3 ].color = color;
+        vertices[ c * 6 + 4 ].color = color;
+        vertices[ c * 6 + 5 ].color = color;
     }
     
     outVertexBuffer.Generate( faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()) );
@@ -116,7 +129,10 @@ void ae3d::Font::CreateVertexBuffer( const char* text, ae3d::VertexBuffer& outVe
 
 void ae3d::Font::LoadBMFont( const Texture2D* fontTex, const System::FileContentsData& metaData )
 {
-    texture = fontTex;
+    if (fontTex != nullptr)
+    {
+        texture = fontTex;
+    }
 
     std::stringstream metaStream( std::string( std::begin( metaData.data ), std::end( metaData.data ) ) );
     std::string token;

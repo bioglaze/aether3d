@@ -6,6 +6,7 @@
 namespace ae3d
 {
     class Font;
+    class Vec4;
 
     /** Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/ */
     class TextRendererComponent
@@ -16,6 +17,9 @@ namespace ae3d
         
         /** Destructor. */
         ~TextRendererComponent();
+
+        /** \param color Color in range 0-1. */
+        void SetColor( const Vec4& color );
 
         /** \param font Font. */
         void SetFont( Font* font );
