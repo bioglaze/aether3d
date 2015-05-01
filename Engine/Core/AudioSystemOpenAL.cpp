@@ -12,11 +12,15 @@
 #define STB_VORBIS_HEADER_ONLY
 #include "stb_vorbis.c"
 #include "System.hpp"
+#include "FileWatcher.hpp"
+
+extern ae3d::FileWatcher fileWatcher;
 
 struct ClipInfo
 {
     ALuint bufID;
     ALuint srcID;
+    std::string path;
 };
 
 namespace AudioGlobal
@@ -61,12 +65,12 @@ const char * GetOpenALErrorString( int errID )
 {
     if (errID == AL_NO_ERROR) return "";
     if (errID == AL_INVALID_NAME) return "Invalid name";
-    if (errID == AL_INVALID_ENUM) return " Invalid enum ";
-    if (errID == AL_INVALID_VALUE) return " Invalid value ";
-    if (errID == AL_INVALID_OPERATION) return " Invalid operation ";
-    if (errID == AL_OUT_OF_MEMORY) return " Out of memory! ";
+    if (errID == AL_INVALID_ENUM) return "Invalid enum";
+    if (errID == AL_INVALID_VALUE) return "Invalid value";
+    if (errID == AL_INVALID_OPERATION) return "Invalid operation";
+    if (errID == AL_OUT_OF_MEMORY) return "Out of memory!";
     
-    return " Don't know ";
+    return "Unhandled OpenAL error type.";
 }
 
 void CheckOpenALError( const char* info )
@@ -75,11 +79,11 @@ void CheckOpenALError( const char* info )
     
     if (err != AL_NO_ERROR)
     {
-        ae3d::System::Print( "OpenAL error (%s) for %s\n", GetOpenALErrorString( err ), info );
+        ae3d::System::Print( "OpenAL error (code %d: %s) for %s\n", err, GetOpenALErrorString( err ), info );
     }
 }
 
-void LoadOgg( const ae3d::System::FileContentsData& clipData )
+void LoadOgg( const ae3d::System::FileContentsData& clipData, const ClipInfo& info )
 {
     short* decoded = nullptr;
     int channels = 0;
@@ -91,14 +95,7 @@ void LoadOgg( const ae3d::System::FileContentsData& clipData )
         ae3d::System::Print( "AudioSystem: Could not open %s\n", clipData.path.c_str() );
         return;
     }
-    
-    ClipInfo info;
-    alGenBuffers( 1, &info.bufID );
-    alGenSources( 1, &info.srcID );
 
-    alListener3f( AL_POSITION, 0.0f, 0.0f, 0.0f );
-    alSource3f( info.srcID, AL_POSITION, 0.0f, 0.0f, 0.0f );
-    
     int error;
     stb_vorbis* vorbis = stb_vorbis_open_memory( clipData.data.data(), static_cast< int >( clipData.data.size() ), &error, nullptr );
     const stb_vorbis_info vinfo = stb_vorbis_get_info( vorbis );
@@ -106,13 +103,11 @@ void LoadOgg( const ae3d::System::FileContentsData& clipData )
     const ALenum format = vinfo.channels == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
     
     alBufferData( info.bufID, format, &decoded[0], len, vinfo.sample_rate );
-    alSourcei( info.srcID, AL_BUFFER, info.bufID );
     
     CheckOpenALError("Loading ogg");
-    AudioGlobal::clips.push_back( info );
 }
 
-void LoadWav( const ae3d::System::FileContentsData& clipData )
+void LoadWav( const ae3d::System::FileContentsData& clipData, const ClipInfo& info )
 {
     std::istringstream ifs( std::string( clipData.data.begin(), clipData.data.end() ) );
 
@@ -212,18 +207,31 @@ void LoadWav( const ae3d::System::FileContentsData& clipData )
     {
         ae3d::System::Print( "Audio: Unknown format in file %s\n", clipData.path.c_str() );
     }
-    
-    ClipInfo info;
-    alGenBuffers( 1, &info.bufID );
-    alGenSources( 1, &info.srcID );
-    
-    alBufferData( info.bufID, format, wav.data.data(), dataSize, wav.sampleRate );
-    alSourcei( info.srcID, AL_BUFFER, info.bufID );
-    alSourcef( info.srcID, AL_GAIN, 1.0f );
-    
+
+    alBufferData( info.bufID, format, wav.data.data(), dataSize, wav.sampleRate );    
     CheckOpenALError( "Loading .wav data." );
-    AudioGlobal::clips.push_back( info );
 }
+}
+
+void AudioReload( const std::string& path )
+{
+    for (auto& clip : AudioGlobal::clips)
+    {
+        if (path == clip.path)
+        {
+            const std::string extension = path.substr( path.length() - 3, path.length() );
+            
+            if (extension == "wav" || extension == "WAV")
+            {
+                LoadWav( ae3d::System::FileContents( path.c_str() ), clip );
+            }
+            else if (extension == "ogg" || extension == "OGG")
+            {
+                LoadOgg( ae3d::System::FileContents( path.c_str() ), clip );
+            }
+            ae3d::System::Print("after reload\n");
+        }
+    }
 }
 
 void ae3d::AudioSystem::Init()
@@ -265,29 +273,51 @@ void ae3d::AudioSystem::Deinit()
 
 unsigned ae3d::AudioSystem::GetClipIdForData( const System::FileContentsData& clipData )
 {
+    // Checks cache for an already loaded clip from the same path.
+    for (std::size_t i = 0; i < AudioGlobal::clips.size(); ++i)
+    {
+        if (AudioGlobal::clips[ i ].path == clipData.path)
+        {
+            return static_cast< unsigned >( i );
+        }
+    }
+    
     if (!clipData.isLoaded)
     {
-        ae3d::System::Print( "AudioSystem: File data %s not loaded!\n", clipData.path.c_str() );
+        System::Print( "AudioSystem: File data %s not loaded!\n", clipData.path.c_str() );
         return 0;
     }
 
-    unsigned clipId = static_cast< unsigned >( AudioGlobal::clips.size() );
-    
+    const unsigned clipId = static_cast< unsigned >( AudioGlobal::clips.size() );
+
+    ClipInfo info;
+    info.path = clipData.path;
+    alGenBuffers( 1, &info.bufID );
+    alGenSources( 1, &info.srcID );
+
+    AudioGlobal::clips.push_back( info );
+
     const std::string extension = clipData.path.substr( clipData.path.length() - 3, clipData.path.length() );
     
     if (extension == "wav" || extension == "WAV")
     {
-        LoadWav( clipData );
+        LoadWav( clipData, info );
     }
     else if (extension == "ogg" || extension == "OGG")
     {
-        LoadOgg( clipData );
+        LoadOgg( clipData, info );
     }
     else
     {
         System::Print( "Unsupported audio file extension in %d. Must be .wav or .ogg.\n", clipData.path.c_str() );
     }
-    
+    alListener3f( AL_POSITION, 0.0f, 0.0f, 0.0f );
+    alSource3f( info.srcID, AL_POSITION, 0.0f, 0.0f, 0.0f );
+    alSourcei( info.srcID, AL_BUFFER, info.bufID );
+    alSourcef( info.srcID, AL_GAIN, 1.0f );
+
+    fileWatcher.AddFile( clipData.path, AudioReload );
+
     return clipId;
 }
 

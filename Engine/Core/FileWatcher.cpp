@@ -15,16 +15,15 @@ void ae3d::FileWatcher::AddFile( const std::string& path, std::function<void(con
 
     if (stat( path.c_str(), &inode ) != -1)
     {
-#if _MSC_VER
         tm timeinfo;
+#if _MSC_VER
         localtime_s( &timeinfo, &inode.st_mtime );
-        tm* timeinfo2 = &timeinfo;
 #else
-        tm* timeinfo2 = localtime( &inode.st_mtime );
+        localtime_r( &inode.st_mtime, &timeinfo );
 #endif
-        pathToEntry[ path ].hour = timeinfo2->tm_hour;
-        pathToEntry[ path ].minute = timeinfo2->tm_min;
-        pathToEntry[ path ].second = timeinfo2->tm_sec;
+        pathToEntry[ path ].hour = timeinfo.tm_hour;
+        pathToEntry[ path ].minute = timeinfo.tm_min;
+        pathToEntry[ path ].second = timeinfo.tm_sec;
     }
 }
 

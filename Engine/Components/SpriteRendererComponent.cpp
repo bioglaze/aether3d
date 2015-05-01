@@ -38,7 +38,7 @@ void CreateVertexBuffer( std::vector< Sprite >& sprites, ae3d::VertexBuffer& out
     std::vector< ae3d::VertexBuffer::Face > faces( sprites.size() * quadFaceCount );
     
     // TODO: evaluate perf and consider other containers.
-    std::sort( sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) { return a.texture->GetID() <= b.texture->GetID(); } );
+    std::sort( sprites.begin(), sprites.end(), [](const Sprite& a, const Sprite& b) { return a.texture->GetID() < b.texture->GetID(); } );
     
     for (unsigned short i = 0; i < static_cast<unsigned short>(sprites.size()); ++i)
     {

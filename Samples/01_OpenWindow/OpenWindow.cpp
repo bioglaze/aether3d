@@ -52,12 +52,12 @@ int main()
 
     AudioClip audioClip;
     audioClip.Load( System::FileContents( "explosion.wav" ) );
-    //audioClip.Load( System::FileContents( "thingy.ogg" ) );
     
+    // TODO: Test playing when clip is not set.
     GameObject audioContainer;
     audioContainer.AddComponent<AudioSourceComponent>();
     audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
-    audioContainer.GetComponent<AudioSourceComponent>()->Play();
+    //audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
     fontTex.Load( System::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Nearest );
@@ -71,15 +71,13 @@ int main()
     textContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     textContainer.AddComponent<TransformComponent>();
     textContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 20, 0 ) );
-    //textContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
 
     GameObject statsContainer;
     statsContainer.AddComponent<TextRendererComponent>();
     statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
     statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     statsContainer.AddComponent<TransformComponent>();
-    statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 40, 0 ) );
-    //textContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
+    statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
 
     Scene scene;
     scene.Add( &camera );
@@ -114,11 +112,15 @@ int main()
                 {
                     System::ReloadChangedAssets();
                 }
+                if (keyCode == KeyCode::B && event.type == WindowEventType::KeyUp)
+                {
+                    audioContainer.GetComponent<AudioSourceComponent>()->Play();
+                }
             }
         }
 
-        const std::string fps = std::string("draw calls: ") + std::to_string( System::Statistics::GetDrawCallCount() );
-        statsContainer.GetComponent<TextRendererComponent>()->SetText( fps.c_str() );
+        const std::string drawCalls = std::string("draw calls: ") + std::to_string( System::Statistics::GetDrawCallCount() );
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( drawCalls.c_str() );
 
         scene.Render();
 
