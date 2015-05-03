@@ -73,7 +73,7 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
 
         if (text[ c ] == '\n')
         {
-            const Character& charA = chars[ static_cast<int>(text[ 'a' ]) ];
+            const Character& charA = chars[ static_cast<int>( 'a' )];
             accumX = 0;
             y += charA.height + charA.yOffset;
         }

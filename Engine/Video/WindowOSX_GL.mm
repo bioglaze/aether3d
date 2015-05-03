@@ -54,7 +54,7 @@ namespace WindowGlobal
 
         { 53, ae3d::KeyCode::Escape },
         { 36, ae3d::KeyCode::Enter },
-        { 49, ae3d::KeyCode::Escape }
+        { 49, ae3d::KeyCode::Space }
     };
 }
 
@@ -313,7 +313,6 @@ void cocoaProcessEvents()
                 
                 ++WindowGlobal::eventIndex;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
-                //WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = [event keyCode];
                 
                 int hotkeyMask = NSCommandKeyMask
                 | NSAlternateKeyMask
@@ -327,7 +326,7 @@ void cocoaProcessEvents()
                 }
 
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ [event keyCode] ];
-                NSLog(@"key: %d", [event keyCode]);
+                //NSLog(@"key: %d", [event keyCode]);
             } break;
             default:
             {
