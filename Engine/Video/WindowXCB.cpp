@@ -1,16 +1,16 @@
 #include "Window.hpp"
 #include <iostream>
-//#define class class_name
+#include <map>
 #include <xcb/xcb_icccm.h>
-//#undef class
 #include <xcb/xcb_keysyms.h>
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
+#include <GL/glxw.h>
 #include <GL/glx.h>
-#include <GL/gl.h>
-#include <cstring> // for strlen
+//#include <GL/gl.h>
+//#include <cstring> // for strlen
 
 // Based on https://github.com/nxsy/xcb_handmade/blob/master/src/xcb_handmade.cpp
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
@@ -26,37 +26,70 @@ namespace WindowGlobal
     xcb_connection_t *connection = nullptr;
     xcb_key_symbols_t *key_symbols;
     GLXDrawable drawable = 0;
+    std::map< xcb_keysym_t, ae3d::KeyCode > keyMap =
+    {
+        { XK_a, ae3d::KeyCode::A },
+        { XK_b, ae3d::KeyCode::B },
+        { XK_c, ae3d::KeyCode::C },
+        { XK_d, ae3d::KeyCode::D },
+        { XK_e, ae3d::KeyCode::E },
+        { XK_f, ae3d::KeyCode::F },
+        { XK_g, ae3d::KeyCode::G },
+        { XK_h, ae3d::KeyCode::H },
+        { XK_i, ae3d::KeyCode::I },
+        { XK_j, ae3d::KeyCode::J },
+        { XK_k, ae3d::KeyCode::K },
+        { XK_l, ae3d::KeyCode::L },
+        { XK_m, ae3d::KeyCode::M },
+        { XK_n, ae3d::KeyCode::N },
+        { XK_o, ae3d::KeyCode::O },
+        { XK_p, ae3d::KeyCode::P },
+        { XK_q, ae3d::KeyCode::Q },
+        { XK_r, ae3d::KeyCode::R },
+        { XK_s, ae3d::KeyCode::S },
+        { XK_t, ae3d::KeyCode::T },
+        { XK_u, ae3d::KeyCode::U },
+        { XK_v, ae3d::KeyCode::V },
+        { XK_w, ae3d::KeyCode::W },
+        { XK_x, ae3d::KeyCode::X },
+        { XK_y, ae3d::KeyCode::Y },
+        { XK_z, ae3d::KeyCode::Z },
+        { XK_Left, ae3d::KeyCode::Left },
+        { XK_Right, ae3d::KeyCode::Right },
+        { XK_Up, ae3d::KeyCode::Up },
+        { XK_Down, ae3d::KeyCode::Down },
+        { XK_Escape, ae3d::KeyCode::Escape }
+    };
 }
 
-static int setup_and_run(Display* display, xcb_connection_t *connection, int default_screen, xcb_screen_t *screen)
+static int setup_and_run( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height )
 {
     int visualID = 0;
-    
-    GLXFBConfig *fb_configs = 0;
+    GLXFBConfig* fb_configs = nullptr;
     int num_fb_configs = 0;
-    fb_configs = glXGetFBConfigs(display, default_screen, &num_fb_configs);
+    fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
     
     if(!fb_configs || num_fb_configs == 0)
     {
-        fprintf(stderr, "glXGetFBConfigs failed\n");
+        std::cerr << "glXGetFBConfigs failed." << std::endl;
         return -1;
     }
     
     /* Select first framebuffer config and query visualID */
-    GLXFBConfig fb_config = fb_configs[0];
-    glXGetFBConfigAttrib(display, fb_config, GLX_VISUAL_ID , &visualID);
+    GLXFBConfig fb_config = fb_configs[ 0 ];
+    glXGetFBConfigAttrib( display, fb_config, GLX_VISUAL_ID, &visualID );
     
-    GLXContext context = glXCreateNewContext(display, fb_config, GLX_RGBA_TYPE, 0, True);
+    GLXContext context = glXCreateNewContext( display, fb_config, GLX_RGBA_TYPE, 0, True );
     
     if(!context)
     {
-        fprintf(stderr, "glXCreateNewContext failed\n");
+        std::cerr << "glXCreateNewContext failed." << std::endl;
         return -1;
     }
     
     /* Create XID's for colormap and window */
-    xcb_colormap_t colormap = xcb_generate_id(connection);
-    xcb_window_t window = xcb_generate_id(connection);
+    xcb_colormap_t colormap = xcb_generate_id( connection );
+    xcb_window_t window = xcb_generate_id( connection );
     
     /* Create colormap */
     xcb_create_colormap(
@@ -78,7 +111,7 @@ static int setup_and_run(Display* display, xcb_connection_t *connection, int def
                       window,
                       screen->root,
                       0, 0,
-                      150, 150,
+                      width, height,
                       0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT,
                       visualID,
@@ -94,22 +127,27 @@ static int setup_and_run(Display* display, xcb_connection_t *connection, int def
 
     if(!window)
     {
-        xcb_destroy_window(connection, window);
-        glXDestroyContext(display, context);
+        xcb_destroy_window( connection, window );
+        glXDestroyContext( display, context );
         
-        fprintf(stderr, "glXDestroyContext failed\n");
+        std::cerr << "glXDestroyContext failed" << std::endl;
         return -1;
     }
     
     WindowGlobal::drawable = glxwindow;
     
-    if(!glXMakeContextCurrent(display, WindowGlobal::drawable, WindowGlobal::drawable, context))
+    if(!glXMakeContextCurrent( display, WindowGlobal::drawable, WindowGlobal::drawable, context ))
     {
-        xcb_destroy_window(connection, window);
-        glXDestroyContext(display, context);
+        xcb_destroy_window( connection, window );
+        glXDestroyContext( display, context );
         
         std::cerr << "glXMakeContextCurrent failed" << std::endl;
         return -1;
+    }
+
+    if (glxwInit() != 0)
+    {
+        std::cerr << "Could not init GLXW!" << std::endl;
     }
     
     return 0;
@@ -122,8 +160,9 @@ bool ae3d::Window::IsOpen()
 
 void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 {
-    WindowGlobal::display = XOpenDisplay(0);
-    if(!WindowGlobal::display)
+    WindowGlobal::display = XOpenDisplay( 0 );
+
+    if (!WindowGlobal::display)
     {
         std::cerr << "Can't open display" << std::endl;
         return;
@@ -133,32 +172,27 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     WindowGlobal::connection = XGetXCBConnection( WindowGlobal::display );
 
-    if(!WindowGlobal::connection)
+    if (!WindowGlobal::connection)
     {
-        XCloseDisplay(WindowGlobal::display);
+        XCloseDisplay( WindowGlobal::display );
         std::cerr << "Can't get xcb connection from display" << std::endl;
         return;
     }
     
     /* Acquire event queue ownership */
-    XSetEventQueueOwner(WindowGlobal::display, XCBOwnsEventQueue);
+    XSetEventQueueOwner( WindowGlobal::display, XCBOwnsEventQueue );
 
     /* Find XCB screen */
     xcb_screen_t *screen = 0;
     xcb_screen_iterator_t screen_iter =
     xcb_setup_roots_iterator(xcb_get_setup(WindowGlobal::connection));
-    for(int screen_num = default_screen;
-        screen_iter.rem && screen_num > 0;
-        --screen_num, xcb_screen_next(&screen_iter));
+    for (int screen_num = default_screen; screen_iter.rem && screen_num > 0; --screen_num, xcb_screen_next( &screen_iter ));
     screen = screen_iter.data;
     
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
     
     /* Initialize window and OpenGL context, run main loop and deinitialize */
-    /*int retval =*/ setup_and_run( WindowGlobal::display, WindowGlobal::connection, default_screen, screen );
-    
-    /* run main loop */
-    //int retval = main_loop(display, connection, window, drawable);
+    /*int retval =*/ setup_and_run( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height );
     
     /* Cleanup */
     //glXDestroyWindow(display, glxwindow);
@@ -175,7 +209,7 @@ void ae3d::Window::PumpEvents()
 {
     xcb_generic_event_t* event;
     
-    while ((event = xcb_poll_for_event(WindowGlobal::connection)))
+    while ((event = xcb_poll_for_event( WindowGlobal::connection )))
     {
         //const bool synthetic_event = (event->response_type & 0x80) != 0;
         const uint8_t response_type = event->response_type & ~0x80;
@@ -198,38 +232,11 @@ void ae3d::Window::PumpEvents()
                 xcb_key_press_event_t *e = (xcb_key_press_event_t *)event;
                 const bool isDown = (response_type == XCB_KEY_PRESS);
                 const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
+
                 ++WindowGlobal::eventIndex;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
-                xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
-
-                if (keysym == XK_a)
-                {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::A;
-                }
-                if (keysym == XK_b)
-                {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::B;
-                }
-                if (keysym == XK_w)
-                {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::W;
-                }
-                if (keysym == XK_Up)
-                {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Up;
-                }
-                if (keysym == XK_Down)
-                {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Down;
-                }
-                if (keysym == XK_Left)
-                {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Left;
-                }
-                if (keysym == XK_Right)
-                {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = ae3d::KeyCode::Right;
-                }
+                const xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ keysym ];
             }
             case XCB_MOTION_NOTIFY:
             {
@@ -254,7 +261,6 @@ void ae3d::Window::PumpEvents()
             }
             case XCB_EXPOSE:
             {
-                //glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
             }
             break;
         }
