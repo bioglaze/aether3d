@@ -8,7 +8,7 @@ namespace ae3d
 {
     class Texture2D;
 
-    /** Shader program containing a vertex and pixel shader. */
+    /// Shader program containing a vertex and pixel shader.
     class Shader
     {
     public:

@@ -8,7 +8,7 @@ namespace ae3d
     class Font;
     class Vec4;
 
-    /** Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/ */
+    /// Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/
     class TextRendererComponent
     {
       public:

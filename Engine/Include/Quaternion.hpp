@@ -7,7 +7,7 @@
 
 namespace ae3d
 {
-    /** Stores an orientation. */
+    /// Stores an orientation.
     struct Quaternion
     {
         /** Constructor. */

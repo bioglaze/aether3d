@@ -12,7 +12,7 @@ namespace ae3d
     class VertexBuffer;
     class Vec4;
 
-    /** Contains glyphs loaded from AngelCode BMFont files. For Mac there is a compatible program called BMGlyph. */    
+    /// Contains glyphs loaded from AngelCode BMFont files. For Mac there is a compatible program called BMGlyph.
     class Font
     {
       public:

@@ -3,7 +3,7 @@
 
 namespace ae3d
 {
-    /** Contains an audio clip and methods to play it. */
+    /// Contains an audio clip and methods to play it.
     class AudioSourceComponent
     {
     public:

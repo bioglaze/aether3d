@@ -6,7 +6,7 @@
 
 namespace ae3d
 {
-    /** Camera views the scene. */
+    /// Camera views the scene.
     class CameraComponent
     {
     public:

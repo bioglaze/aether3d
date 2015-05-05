@@ -7,7 +7,7 @@ namespace ae3d
 {
     class GameObject;
 
-    /** Contains game objects in a transform hierarchy. */
+    /// Contains game objects in a transform hierarchy.
     class Scene
     {
     public:

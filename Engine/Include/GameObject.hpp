@@ -3,7 +3,7 @@
 
 namespace ae3d
 {
-    /** GameObject is composed of components that define its behavior. */
+    /// GameObject is composed of components that define its behavior.
     class GameObject
     {
     public:

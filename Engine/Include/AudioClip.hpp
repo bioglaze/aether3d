@@ -8,7 +8,7 @@ namespace ae3d
         struct FileContentsData;
     }
 
-    /** Audio clip. */
+    /// Audio clip.
     class AudioClip
     {
       public:
