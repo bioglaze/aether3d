@@ -332,3 +332,8 @@ void ae3d::Font::LoadBMFontMetaBinary( const System::FileContentsData& metaData 
         }
     }
 }
+
+int ae3d::Font::TextWidth( const char* text ) const
+{
+    return (int)(std::string( text ).length() * chars[ (int)'a' ].width);
+}

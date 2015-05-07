@@ -27,7 +27,6 @@ namespace ae3d
         unsigned CreateShaderId( unsigned shaderType );
         unsigned CreateProgramId();
         
-        // TODO: Disable statistic calls in Release builds.
         void IncDrawCalls();
         int GetDrawCalls();
         void ResetFrameStatistics();

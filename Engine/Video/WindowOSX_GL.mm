@@ -137,9 +137,17 @@ NSWindow *window;
 - (void) mouseDown: (NSEvent*) event
 {
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    //NSLog(@"Left mouse down: %lf, %lf", point.x, point.y);
     ++WindowGlobal::eventIndex;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
+}
+
+- (void) rightMouseDown: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse2Down;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
 }
@@ -147,9 +155,45 @@ NSWindow *window;
 - (void) mouseUp: (NSEvent*) event
 {
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
-    //NSLog(@"Left mouse up: %lf, %lf", point.x, point.y);
     ++WindowGlobal::eventIndex;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
+}
+
+- (void) rightMouseUp: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse2Up;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
+}
+
+- (void) otherMouseDown: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMiddleDown;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
+}
+
+- (void) otherMouseUp: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMiddleUp;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
+}
+
+- (void) scrollWheel: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    float deltaY = [event deltaY];
+    ++WindowGlobal::eventIndex;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = deltaY < 0 ? ae3d::WindowEventType::MouseMiddleDown : ae3d::WindowEventType::MouseMiddleUp;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
 }

@@ -28,6 +28,9 @@ namespace ae3d
         /** \return Font texture. */
         const Texture2D* GetTexture() { return texture; }
         
+        /// \return Text width.
+        int TextWidth( const char* text ) const;
+        
       private:
         friend class TextRendererComponent;
 
