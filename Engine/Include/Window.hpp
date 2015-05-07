@@ -11,7 +11,13 @@ namespace ae3d
         KeyDown,
         KeyUp,
         Mouse1Down,
-        Mouse1Up
+        Mouse1Up,
+        Mouse2Down,
+        Mouse2Up,
+        MouseMiddleDown,
+        MouseMiddleUp,
+        MouseWheelScrollDown,
+        MouseWheelScrollUp
     };
 
     /// Key codes.

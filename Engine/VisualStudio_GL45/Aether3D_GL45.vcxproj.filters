@@ -76,6 +76,9 @@
     <ClCompile Include="..\Components\TextRendererComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\WindowWin32GL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

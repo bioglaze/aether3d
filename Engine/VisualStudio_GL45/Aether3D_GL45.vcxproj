@@ -188,6 +188,7 @@
     <ClCompile Include="..\Video\Texture2D_GL45.cpp" />
     <ClCompile Include="..\Video\VertexBufferGL.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
+    <ClCompile Include="..\Video\WindowWin32GL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp" />
