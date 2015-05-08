@@ -20,6 +20,9 @@ endif
 WARNINGS := -pedantic -Wall -Wextra
 
 all:
+ifeq ($(OS),Windows_NT)
+	IF exist ..\..\..\aether3d_build\Samples ( echo building ) ELSE ( mkdir ..\..\..\aether3d_build\Samples )
+endif
 ifneq ($(OS),Windows_NT)
 	mkdir -p ../../../aether3d_build/Samples
 endif

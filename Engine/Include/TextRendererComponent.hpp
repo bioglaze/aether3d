@@ -6,7 +6,7 @@
 namespace ae3d
 {
     class Font;
-    class Vec4;
+    struct Vec4;
 
     /// Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/
     class TextRendererComponent

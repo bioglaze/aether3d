@@ -20,9 +20,13 @@ DEFINES := -DRENDERER_OPENGL
 ifeq ($(OS),Windows_NT)
 ENGINE_LIB := libaether3d_win.a
 CCOMPILER := gcc
+OUTPUT_DIR := ..\..\aether3d_build
 endif
 
 all:
+ifeq ($(OS),Windows_NT)
+	IF exist $(OUTPUT_DIR) ( echo building ) ELSE ( mkdir $(OUTPUT_DIR) )
+endif
 ifeq ($(UNAME), Darwin)
 	mkdir -p $(OUTPUT_DIR)
 endif
@@ -30,8 +34,8 @@ ifeq ($(UNAME), Linux)
 	mkdir -p $(OUTPUT_DIR)
 endif
 	$(CCOMPILER) $(INCLUDES) $(WARNINGS) -c ThirdParty/GL/glxw.c -o $(OUTPUT_DIR)/glxw.o
-	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
+	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Texture2D_GL45.cpp -o $(OUTPUT_DIR)/Texture2D_GL45.o
@@ -60,6 +64,7 @@ ifeq ($(UNAME), Linux)
 endif
 ifeq ($(OS),Windows_NT)
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowWin32.cpp -o $(OUTPUT_DIR)/Window.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowWin32GL.cpp -o $(OUTPUT_DIR)/WindowGL.o
 endif
 	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
 

@@ -10,7 +10,7 @@ namespace ae3d
     
     class Texture2D;
     class VertexBuffer;
-    class Vec4;
+    struct Vec4;
 
     /// Contains glyphs loaded from AngelCode BMFont files. For Mac there is a compatible program called BMGlyph.
     class Font

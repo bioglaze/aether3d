@@ -938,7 +938,7 @@ static void crc32_init(void)
     }
 }
 
-static __forceinline uint32 crc32_update(uint32 crc, uint8 byte)
+static uint32 crc32_update(uint32 crc, uint8 byte)
 {
     return (crc << 8) ^ crc_table[byte ^ (crc >> 24)];
 }
@@ -1555,7 +1555,7 @@ static uint32 get_bits(vorb *f, int n)
 // expand the buffer to as many bits as possible without reading off end of packet
 // it might be nice to allow f->valid_bits and f->acc to be stored in registers,
 // e.g. cache them locally and decode locally
-static __forceinline void prep_huffman(vorb *f)
+static void prep_huffman(vorb *f)
 {
     if (f->valid_bits <= 24) {
         if (f->valid_bits == 0) f->acc = 0;
@@ -2039,7 +2039,7 @@ static float inverse_db_table[256] =
 int8 integer_divide_table[DIVTAB_NUMER][DIVTAB_DENOM]; // 2KB
 #endif
 
-static __forceinline void draw_line(float *output, int x0, int y0, int x1, int y1, int n)
+static void draw_line(float *output, int x0, int y0, int x1, int y1, int n)
 {
     int dy = y1 - y0;
     int adx = x1 - x0;
@@ -2596,7 +2596,7 @@ static void imdct_step3_inner_s_loop(int n, float *e, int i_off, int k_off, floa
     }
 }
 
-static __forceinline void iter_54(float *z)
+static void iter_54(float *z)
 {
     float k00,k11,k22,k33;
     float y0,y1,y2,y3;
