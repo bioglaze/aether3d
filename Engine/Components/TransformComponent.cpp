@@ -20,18 +20,61 @@ ae3d::TransformComponent* ae3d::TransformComponent::Get( unsigned index )
     return &transformComponents[ index ];
 }
 
+const ae3d::Matrix44& ae3d::TransformComponent::GetLocalMatrix()
+{
+    if (isDirty || (parent && parent->isDirty))
+    {
+        SolveLocalMatrix();
+        isDirty = false;
+    }
+    
+    return localMatrix;
+}
+
 void ae3d::TransformComponent::SetLocalPosition( const Vec3& localPos )
 {
     localPosition = localPos;
-    localMatrix = Matrix44::identity;
-    localMatrix.Translate( localPosition );
-    localMatrix.Scale( localScale, localScale, localScale );
+    isDirty = true;
+}
+
+void ae3d::TransformComponent::SetLocalRotation( const Quaternion& localRot )
+{
+    localRotation = localRot;
+    isDirty = true;
 }
 
 void ae3d::TransformComponent::SetLocalScale( float aLocalScale )
 {
     localScale = aLocalScale;
-    localMatrix = Matrix44::identity;
+    isDirty = true;
+}
+
+void ae3d::TransformComponent::SolveLocalMatrix()
+{
+    localRotation.GetMatrix( localMatrix );
     localMatrix.Translate( localPosition );
     localMatrix.Scale( localScale, localScale, localScale );
+    
+    if (parent != nullptr)
+    {
+        Matrix44::Multiply( localMatrix, parent->GetLocalMatrix(), localMatrix );
+    }
+}
+
+void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
+{
+    TransformComponent* testComponent = aParent;
+    
+    // Disallows cycles.
+    while (testComponent != nullptr)
+    {
+        if (testComponent == this)
+        {
+            return;
+        }
+        
+        testComponent = testComponent->parent;
+    }
+
+    parent = aParent;
 }

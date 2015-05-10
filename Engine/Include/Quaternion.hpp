@@ -135,11 +135,9 @@ namespace ae3d
             outAngleRad = std::acos( w ) * 2;
         }
         
-        /**
-         http://web.archive.org/web/20060914224155/http://web.archive.org/web/20041029003853/http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q60
-         \param euler Euler angles.
-         */
-        void FromEuler( const Vec3& euler )
+        /// \param euler Euler angles in degrees.
+        /// \return Quaternion created from euler.
+        static Quaternion FromEuler( const Vec3& euler )
         {
             const Vec3 xAxis( 1, 0, 0 );
             const Vec3 yAxis( 0, 1, 0 );
@@ -150,7 +148,7 @@ namespace ae3d
             qy.FromAxisAngle( yAxis, euler.y );
             qz.FromAxisAngle( zAxis, euler.z );
             qt = qx * qy;
-            *this = qt * qz;
+            return qt * qz;
         }
         
         /**

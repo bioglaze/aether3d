@@ -53,14 +53,13 @@ int main()
     AudioClip audioClip;
     audioClip.Load( System::FileContents( "explosion.wav" ) );
     
-    // TODO: Test playing when clip is not set.
     GameObject audioContainer;
     audioContainer.AddComponent<AudioSourceComponent>();
     audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
-    //audioContainer.GetComponent<AudioSourceComponent>()->Play();
+    audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load( System::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Nearest );
+    fontTex.Load( System::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear );
 
     Font font;
     font.LoadBMFont( &fontTex, System::FileContents( "font_txt.fnt" ) );
@@ -70,20 +69,27 @@ int main()
     textContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
     textContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     textContainer.AddComponent<TransformComponent>();
-    textContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 20, 0 ) );
-
+    textContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 160, 0 ) );
+    textContainer.GetComponent<TransformComponent>()->SetLocalRotation( Quaternion::FromEuler( Vec3( 0, 0, 45 ) ) );
+                                                                       
+    GameObject statsParent;
+    statsParent.AddComponent<TransformComponent>();
+    statsParent.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, -80, 0 ) );
+    
     GameObject statsContainer;
     statsContainer.AddComponent<TextRendererComponent>();
     statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
     statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     statsContainer.AddComponent<TransformComponent>();
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
+    statsContainer.GetComponent<TransformComponent>()->SetParent( statsParent.GetComponent<TransformComponent>() );
 
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     scene.Add( &statsContainer );
+    scene.Add( &statsParent );
     
     bool quit = false;
     

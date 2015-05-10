@@ -17,28 +17,38 @@ namespace ae3d
         /// \param localPos Local position.
         void SetLocalPosition( const Vec3& localPos );
 
+        /// \param localRotation Local rotation.
+        void SetLocalRotation( const Quaternion& localRotation );
+        
         /// \param localScale Local scale.
         void SetLocalScale( float localScale );
 
+        /// \param parent Parent transform or null if there is no parent.
+        void SetParent( TransformComponent* parent );
+        
         /// \return Local transform matrix.
-        const Matrix44& GetLocalMatrix() const { return localMatrix; }
+        const Matrix44& GetLocalMatrix();
         
     private:
         friend class GameObject;
 
-        // \return Component's type code. Must be unique for each component type.
+        /// \return Component's type code. Must be unique for each component type.
         static int Type() { return 2; }
         
-        // \return Component handle that uniquely identifies the instance.
+        /// \return Component handle that uniquely identifies the instance.
         static unsigned New();
         
-        // \return Component at index or null if index is invalid.
+        /// \return Component at index or null if index is invalid.
         static TransformComponent* Get( unsigned index );
 
+        void SolveLocalMatrix();
+        
         Vec3 localPosition;
         Quaternion localRotation;
         float localScale = 1;
         Matrix44 localMatrix;
+        TransformComponent* parent = nullptr;
+        bool isDirty = true;
     };
 }
 
