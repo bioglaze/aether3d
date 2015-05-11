@@ -6,8 +6,6 @@
 #include <GL/glxw.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
-#include "DDSLoader.hpp"
-#include "GfxDevice.hpp"
 #include "FileWatcher.hpp"
 #include "System.hpp"
 
@@ -88,21 +86,7 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         Texture2DGlobal::defaultTexture.width = 32;
         Texture2DGlobal::defaultTexture.height = 32;
 
-        Texture2DGlobal::defaultTexture.id = GfxDevice::CreateTextureId();
-        
-        if (GfxDevice::HasExtension( "KHR_debug" ))
-        {
-            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.id, (GLsizei)std::string("default texture 2d").size(), "default texture 2d" );
-        }
-    
-        glBindTexture( GL_TEXTURE_2D, Texture2DGlobal::defaultTexture.id );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-   
-        int data[ 32 * 32 * 4 ] = { 0xFFC0CB };
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, Texture2DGlobal::defaultTexture.width, Texture2DGlobal::defaultTexture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+        Texture2DGlobal::defaultTexture.id = 0;
     }
     
     return &Texture2DGlobal::defaultTexture;
@@ -130,36 +114,13 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
     // First load.
     if (id == 0)
     {
-        id = GfxDevice::CreateTextureId();
-        
-        if (GfxDevice::HasExtension( "KHR_debug" ))
-        {
-            glObjectLabel( GL_TEXTURE, id, (GLsizei)fileContents.path.size(), fileContents.path.c_str() );
-        }
-        
+        id = 1;
         fileWatcher.AddFile( fileContents.path, TexReload );
     }
 
-    glBindTexture( GL_TEXTURE_2D, id );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : (mipmaps == Mipmaps::Generate ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR ) );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
-
-    const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
-    
     if (HasStbExtension( fileContents.path ))
     {
         LoadSTB( fileContents );
-    }
-    else if (isDDS)
-    {
-        LoadDDS( fileContents.path.c_str() );
-    }
-
-    if (mipmaps == Mipmaps::Generate)
-    {
-        glGenerateMipmap( GL_TEXTURE_2D );
     }
 
     Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
@@ -241,12 +202,6 @@ void ae3d::Texture2D::LoadFromAtlas( const System::FileContentsData& atlasTextur
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-    const bool success = DDSLoader::Load( path, 0, width, height, opaque );
-
-    if (!success)
-    {
-        ae3d::System::Print( "DDS Loader could not load %s", path );
-    }
 }
 
 void ae3d::Texture2D::LoadSTB( const System::FileContentsData& fileContents )
@@ -262,22 +217,6 @@ void ae3d::Texture2D::LoadSTB( const System::FileContentsData& fileContents )
     }
   
     opaque = (components == 3 || components == 1);
-
-    if (GfxDevice::HasExtension("GL_ARB_texture_storage"))
-    {
-        glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, width, height );
-        glTexSubImage2D( GL_TEXTURE_2D,
-                        0,
-                        0, 0,
-                        width, height,
-                        GL_RGBA,
-                        GL_UNSIGNED_BYTE,
-                        data );
-    }
-    else
-    {
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
-    }
 
     stbi_image_free( data );
 }
