@@ -40,7 +40,7 @@ void TexReload( const std::string& path )
 {
     auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
 
-    tex.Load( ae3d::System::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter() );
+    tex.Load( ae3d::System::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps() );
 }
 
 namespace
@@ -108,10 +108,11 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
 {
     filter = aFilter;
     wrap = aWrap;
+    mipmaps = aMipmaps;
 
     if (!fileContents.isLoaded)
     {
@@ -156,6 +157,11 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
         LoadDDS( fileContents.path.c_str() );
     }
 
+    if (mipmaps == Mipmaps::Generate)
+    {
+        glGenerateMipmap( GL_TEXTURE_2D );
+    }
+
     Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
 #if DEBUG
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = width * height * 4;
@@ -165,7 +171,7 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
 
 void ae3d::Texture2D::LoadFromAtlas( const System::FileContentsData& atlasTextureData, const System::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
 {
-    Load( atlasTextureData, aWrap, aFilter );
+    Load( atlasTextureData, aWrap, aFilter, mipmaps );
 
     const std::string metaStr = std::string( std::begin( atlasMetaData.data ), std::end( atlasMetaData.data ) );
     std::stringstream metaStream( metaStr );

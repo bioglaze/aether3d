@@ -31,10 +31,10 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
 
     Texture2D spriteTex;
-    spriteTex.Load( System::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest );
+    spriteTex.Load( System::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
 
     Texture2D spriteTex2;
-    spriteTex2.Load( System::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest );
+    spriteTex2.Load( System::FileContents("test_dxt1.dds"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
 
     Texture2D spriteTexFromAtlas;
     spriteTexFromAtlas.LoadFromAtlas( System::FileContents( "atlas_cegui.png" ), System::FileContents( "atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest );
@@ -59,7 +59,7 @@ int main()
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load( System::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear );
+    fontTex.Load( System::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
     Font font;
     font.LoadBMFont( &fontTex, System::FileContents( "font_txt.fnt" ) );

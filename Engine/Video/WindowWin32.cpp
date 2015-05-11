@@ -2,6 +2,9 @@
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <Windows.h>
+#include <map>
+
+#include "System.hpp"
 
 namespace WindowGlobal
 {
@@ -11,6 +14,41 @@ namespace WindowGlobal
     int eventIndex = -1;
     HWND hwnd;
     HDC hdc;
+    std::map< unsigned, ae3d::KeyCode > keyMap = {
+        {65, ae3d::KeyCode::A},
+        {66, ae3d::KeyCode::B},
+        {67, ae3d::KeyCode::C},
+        {68, ae3d::KeyCode::D},
+        {69, ae3d::KeyCode::E},
+        {70, ae3d::KeyCode::F},
+        {71, ae3d::KeyCode::G},
+        {72, ae3d::KeyCode::H},
+        {73, ae3d::KeyCode::I},
+        {74, ae3d::KeyCode::J},
+        {75, ae3d::KeyCode::K},
+        {76, ae3d::KeyCode::L},
+        {77, ae3d::KeyCode::M},
+        {78, ae3d::KeyCode::N},
+        {79, ae3d::KeyCode::O},
+        {80, ae3d::KeyCode::P},
+        {81, ae3d::KeyCode::Q},
+        {82, ae3d::KeyCode::R},
+        {83, ae3d::KeyCode::S},
+        {84, ae3d::KeyCode::T},
+        {85, ae3d::KeyCode::U},
+        {86, ae3d::KeyCode::V},
+        {87, ae3d::KeyCode::W},
+        {88, ae3d::KeyCode::X},
+        {89, ae3d::KeyCode::Y},
+        {90, ae3d::KeyCode::Z},
+        {38, ae3d::KeyCode::Up},
+        {40, ae3d::KeyCode::Down},
+        {37, ae3d::KeyCode::Left},
+        {39, ae3d::KeyCode::Right},
+        {27, ae3d::KeyCode::Escape},
+        {32, ae3d::KeyCode::Space},
+        {13, ae3d::KeyCode::Enter}
+    };
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -32,36 +70,8 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         {
             ++WindowGlobal::eventIndex;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
-            //ae3d::System::Print("Got key down: %d", wParam);
-
-            if (wParam == 65) // A
-            {
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::A;
-            }
-            if (wParam == 38) // arrow up
-            {
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Up;
-            }
-            if (wParam == 40) // arrow down
-            {
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Down;
-            }
-            if (wParam == 37) // arrow left
-            {
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Left;
-            }
-            if (wParam == 39) // arrow right
-            {
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Right;
-            }
-            if (wParam == 66) // B
-            {
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::B;
-            }
-            if (wParam == 27) // escape
-            {
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = ae3d::KeyCode::Escape;
-            }
+            ae3d::System::Print("Got key down: %d", wParam);
+            WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = WindowGlobal::keyMap[ wParam ];
         }
         break;
         case WM_SYSCOMMAND:

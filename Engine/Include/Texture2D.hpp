@@ -24,6 +24,12 @@ namespace ae3d
         Linear
     };
 
+    enum class Mipmaps
+    {
+        Generate,
+        None
+    };
+
     /// 2D texture.
     class Texture2D
     {
@@ -34,7 +40,7 @@ namespace ae3d
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
-        void Load( const System::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter );
+        void Load( const System::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps );
         
         /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param atlasMetaData Atlas metadata. Format is Ogre/CEGUI. Example atlas tool: Texture Packer.
@@ -58,6 +64,9 @@ namespace ae3d
         /// \return Filtering mode
         TextureFilter GetFilter() const { return filter; }
 
+        /// \return Mipmap usage.
+        Mipmaps GetMipmaps() const { return mipmaps; }
+
         /// \return Scale and offset. x: scale x, y: scale y, z: offset x, w: offset y.
         const Vec4& GetScaleOffset() const { return scaleOffset; }
 
@@ -80,8 +89,9 @@ namespace ae3d
         unsigned id = 0;
         TextureWrap wrap = TextureWrap::Repeat;
         TextureFilter filter = TextureFilter::Nearest;
-        bool opaque = true;
+        Mipmaps mipmaps = Mipmaps::None;
         Vec4 scaleOffset{ 1, 1, 0, 0 };
+        bool opaque = true;
     };
 }
 #endif
