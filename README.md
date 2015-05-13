@@ -1,5 +1,5 @@
 # Aether3D Game Engine
-This codebase will evolve into the next generation [Aether3D]( "Aether3D"). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
+This codebase will evolve into the next generation [Aether3D]("Aether3D"). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
 This is a work in progress.
 
@@ -24,14 +24,13 @@ This is a work in progress.
 
 ## Windows
 
-  - Open the project in Engine/VisualStudio_GL45 and build it. For MinGW you can use Engine/Makefile.
-  - Create directory aether3d_build next to aether3d.
-  - Build and run Samples/01_OpenWindow.
+  - Open the project in Engine\VisualStudio_GL45 and build it. For MinGW you can use Engine/Makefile.
+  - Build and run Samples\01_OpenWindow.
 
-## OS X
+## OS X / GNU/Linux
 
-  - Open the project Engine/Aether3D_OSX in Xcode and build it.
-  - Run the Makefile in Samples/01_OpenWindow.
+  - Open the project Engine/Aether3D_OSX in Xcode and build it or run the Makefile.
+  - Open the project Samples/01_OpenWindow/OpenWindow.xcodeproj and run it or run the Makefile.
 
 # License
 

@@ -24,6 +24,7 @@ namespace ae3d
         Linear
     };
 
+    /// Mipmap usage.
     enum class Mipmaps
     {
         Generate,

@@ -15,14 +15,14 @@ unsigned nextFreeSpriteComponent = 0;
 
 struct Drawable
 {
-    const ae3d::Texture2D* texture = nullptr;
+    const ae3d::Texture2D* texture = ae3d::Texture2D::GetDefaultTexture();
     int bufferStart = 0;
     int bufferEnd = 0;
 };
 
 struct Sprite
 {
-    const ae3d::Texture2D* texture = nullptr;
+    const ae3d::Texture2D* texture = ae3d::Texture2D::GetDefaultTexture();
     ae3d::Vec3 position;
     ae3d::Vec3 dimension;
     ae3d::Vec4 tint;
@@ -238,7 +238,6 @@ void ae3d::SpriteRendererComponent::SetTexture( const Texture2D* aTexture, const
 
 void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
 {
-    // TODO: default texture so this can be removed.
     if (m().transparentRenderQueue.sprites.empty() && m().opaqueRenderQueue.sprites.empty())
     {
         return;

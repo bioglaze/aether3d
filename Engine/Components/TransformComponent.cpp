@@ -1,6 +1,5 @@
 #include "TransformComponent.hpp"
 #include <vector>
-#include "System.hpp"
 
 std::vector< ae3d::TransformComponent > transformComponents;
 unsigned nextFreeTransformComponent = 0;
@@ -22,7 +21,21 @@ ae3d::TransformComponent* ae3d::TransformComponent::Get( unsigned index )
 
 const ae3d::Matrix44& ae3d::TransformComponent::GetLocalMatrix()
 {
-    if (isDirty || (parent && parent->isDirty))
+    const TransformComponent* testComponent = parent;
+    bool dirtyGrandparent = false;
+
+    while (testComponent != nullptr)
+    {
+        if (testComponent->isDirty)
+        {
+            isDirty = true;
+            break;
+        }
+
+        testComponent = testComponent->parent;
+    }
+
+    if (isDirty)
     {
         SolveLocalMatrix();
         isDirty = false;
@@ -63,7 +76,7 @@ void ae3d::TransformComponent::SolveLocalMatrix()
 
 void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
 {
-    TransformComponent* testComponent = aParent;
+    const TransformComponent* testComponent = aParent;
     
     // Disallows cycles.
     while (testComponent != nullptr)

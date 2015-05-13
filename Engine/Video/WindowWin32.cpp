@@ -4,8 +4,6 @@
 #include <Windows.h>
 #include <map>
 
-#include "System.hpp"
-
 namespace WindowGlobal
 {
     bool isOpen = false;
@@ -70,7 +68,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         {
             ++WindowGlobal::eventIndex;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
-            ae3d::System::Print("Got key down: %d", wParam);
+            //ae3d::System::Print("Got key down: %d", wParam);
             WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = WindowGlobal::keyMap[ wParam ];
         }
         break;
