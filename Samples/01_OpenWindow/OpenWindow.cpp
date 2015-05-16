@@ -13,6 +13,8 @@
 
 using namespace ae3d;
 
+// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.1.zip
+
 int main()
 {
     const int width = 640;
@@ -28,7 +30,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
 
     Texture2D spriteTex;
-    spriteTex.Load( System::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
+    spriteTex.Load( System::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();

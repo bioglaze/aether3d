@@ -164,7 +164,7 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
 
     Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
 #if DEBUG
-    Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f);
+    Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
     //Texture2DGlobal::PrintMemoryUsage();
 #endif
 }

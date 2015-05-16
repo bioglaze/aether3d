@@ -15,6 +15,8 @@
 
 using namespace ae3d;
 
+// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.1.zip
+
 int main()
 {
     const int width = 640;

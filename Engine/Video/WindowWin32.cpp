@@ -69,7 +69,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             ++WindowGlobal::eventIndex;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
             //ae3d::System::Print("Got key down: %d", wParam);
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = WindowGlobal::keyMap[ wParam ];
+            WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
         }
         break;
         case WM_SYSCOMMAND:
