@@ -49,7 +49,7 @@ int main( int argCount, char* args[] )
         fileList.push_back( FileMetaBlock() );
         fileList.back().path = line;
         
-        if (line.length() > 128)
+        if (line.length() > MaxPathLength)
         {
             std::cout << "Too long path in " << line << ". Max length is " << MaxPathLength << std::endl;
             return 1;
@@ -63,17 +63,17 @@ int main( int argCount, char* args[] )
         ifs.seekg( 0, std::ios::end );
         file.dataSize = static_cast< unsigned >( ifs.tellg() );
     }
-
+    
     std::ofstream ofs( args[ 2 ], std::ios::out | std::ios::binary );
     const unsigned listLength = static_cast< unsigned >( fileList.size() );
-    ofs.write( (char*)listLength, 4 );
+    ofs.write( (char*)&listLength, 4 );
 
     for (const auto& file : fileList)
     {
         char path[ MaxPathLength ] = { 0 };
         std::strcpy( path, file.path.c_str() );
         ofs.write( (char*)path, MaxPathLength );
-        ofs.write( (char*)file.dataSize, 4 );
+        ofs.write( (char*)&file.dataSize, 4 );
         std::vector< unsigned char > data;
         std::ifstream ifs( file.path );
         data.assign( std::istreambuf_iterator< char >( ifs ), std::istreambuf_iterator< char >() );

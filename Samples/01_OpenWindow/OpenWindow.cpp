@@ -23,6 +23,7 @@ int main()
     System::EnableWindowsMemleakDetection();
     Window::Instance().Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
+    //System::LoadPakFile( "files.pak" );
     
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -42,7 +43,7 @@ int main()
 
     Font font;
     font.LoadBMFont( &fontTex, System::FileContents( "font_txt.fnt" ) );
-    
+
     GameObject textContainer;
     textContainer.AddComponent<TextRendererComponent>();
     textContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );

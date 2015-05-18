@@ -22,7 +22,6 @@ ae3d::TransformComponent* ae3d::TransformComponent::Get( unsigned index )
 const ae3d::Matrix44& ae3d::TransformComponent::GetLocalMatrix()
 {
     const TransformComponent* testComponent = parent;
-    bool dirtyGrandparent = false;
 
     while (testComponent != nullptr)
     {
