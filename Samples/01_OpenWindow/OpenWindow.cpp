@@ -7,6 +7,7 @@
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "System.hpp"
+#include "FileSystem.hpp"
 #include "Vec3.hpp"
 #include "Window.hpp"
 #include "Texture2D.hpp"
@@ -31,7 +32,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
 
     Texture2D spriteTex;
-    spriteTex.Load( System::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
+    spriteTex.Load(FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None);
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
@@ -39,10 +40,10 @@ int main()
     sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
 
     Texture2D fontTex;
-    fontTex.Load( System::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
+    fontTex.Load(FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None);
 
     Font font;
-    font.LoadBMFont( &fontTex, System::FileContents( "font_txt.fnt" ) );
+    font.LoadBMFont(&fontTex, FileSystem::FileContents("font_txt.fnt"));
 
     GameObject textContainer;
     textContainer.AddComponent<TextRendererComponent>();

@@ -3,7 +3,7 @@
 
 namespace ae3d
 {
-    namespace System
+    namespace FileSystem
     {
         struct FileContentsData;
     }
@@ -23,7 +23,7 @@ namespace ae3d
           \param fontTex Font texture. No outline support.
           \param metaData BMFont metadata. Must be text or binary.
          */
-        void LoadBMFont( const Texture2D* fontTex, const System::FileContentsData& metaData );
+        void LoadBMFont(const Texture2D* fontTex, const FileSystem::FileContentsData& metaData);
         
         /** \return Font texture. */
         const Texture2D* GetTexture() { return texture; }
@@ -50,10 +50,10 @@ namespace ae3d
         void CreateVertexBuffer( const char* text, const Vec4& color, VertexBuffer& outVertexBuffer ) const;
 
         /** \param metaData BMFont text metadata. */
-        void LoadBMFontMetaText( const System::FileContentsData& metaData );
+        void LoadBMFontMetaText(const FileSystem::FileContentsData& metaData);
         
         /** \param metaData BMFont binary metadata. */
-        void LoadBMFontMetaBinary( const System::FileContentsData& metaData );
+        void LoadBMFontMetaBinary(const FileSystem::FileContentsData& metaData);
         
         /** The spacing for each character (horizontal, vertical). */
         int spacing[ 2 ];

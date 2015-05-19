@@ -79,6 +79,9 @@
     <ClCompile Include="..\Video\WindowWin32GL.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\FileSystem.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -181,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="..\Core\AudioSystem.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FileSystem.hpp">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

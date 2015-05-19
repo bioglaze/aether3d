@@ -3,7 +3,7 @@
 
 namespace ae3d
 {
-    namespace System
+    namespace FileSystem
     {
         struct FileContentsData;
     }
@@ -13,7 +13,7 @@ namespace ae3d
     {
       public:
         /** Loads a clip from .wav or Ogg Vorbis file data. */
-        void Load( const System::FileContentsData& clipData );
+        void Load( const FileSystem::FileContentsData& clipData );
 
         /** \return Clip's handle. */
         unsigned GetId() const { return id; }

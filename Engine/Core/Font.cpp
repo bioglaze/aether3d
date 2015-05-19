@@ -1,6 +1,8 @@
 #include "Font.hpp"
 #include <sstream>
+#include <vector>
 #include "System.hpp"
+#include "FileSystem.hpp"
 #include "Texture2D.hpp"
 #include "VertexBuffer.hpp"
 #include "Vec3.hpp"
@@ -127,7 +129,7 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
     outVertexBuffer.Generate( faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()) );
 }
 
-void ae3d::Font::LoadBMFont( const Texture2D* fontTex, const System::FileContentsData& metaData )
+void ae3d::Font::LoadBMFont( const Texture2D* fontTex, const FileSystem::FileContentsData& metaData )
 {
     if (fontTex != nullptr)
     {
@@ -149,7 +151,7 @@ void ae3d::Font::LoadBMFont( const Texture2D* fontTex, const System::FileContent
     }
 }
 
-void ae3d::Font::LoadBMFontMetaText( const System::FileContentsData& metaData )
+void ae3d::Font::LoadBMFontMetaText( const FileSystem::FileContentsData& metaData )
 {
     std::stringstream metaStream( std::string( metaData.data.begin(), metaData.data.end() ) );
 
@@ -247,7 +249,7 @@ void ae3d::Font::LoadBMFontMetaText( const System::FileContentsData& metaData )
     }
 }
 
-void ae3d::Font::LoadBMFontMetaBinary( const System::FileContentsData& metaData )
+void ae3d::Font::LoadBMFontMetaBinary(const FileSystem::FileContentsData& metaData)
 {
     std::stringstream ifs( std::string( metaData.data.begin(), metaData.data.end() ) );
     unsigned char header[ 4 ];

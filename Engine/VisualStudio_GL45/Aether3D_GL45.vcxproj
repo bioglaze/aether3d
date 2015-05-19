@@ -93,6 +93,7 @@
     <ClCompile Include="..\Components\TransformComponent.cpp" />
     <ClCompile Include="..\Core\AudioClip.cpp" />
     <ClCompile Include="..\Core\AudioSystemOpenAL.cpp" />
+    <ClCompile Include="..\Core\FileSystem.cpp" />
     <ClCompile Include="..\Core\FileWatcher.cpp" />
     <ClCompile Include="..\Core\Font.cpp" />
     <ClCompile Include="..\Core\Matrix.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="..\Include\AudioClip.hpp" />
     <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\Include\FileSystem.hpp" />
     <ClInclude Include="..\Include\Font.hpp" />
     <ClInclude Include="..\Include\GameObject.hpp" />
     <ClInclude Include="..\Include\Macros.hpp" />

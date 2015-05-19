@@ -9,6 +9,7 @@
 #include "DDSLoader.hpp"
 #include "GfxDevice.hpp"
 #include "FileWatcher.hpp"
+#include "FileSystem.hpp"
 #include "System.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
@@ -40,7 +41,7 @@ void TexReload( const std::string& path )
 {
     auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
 
-    tex.Load( ae3d::System::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps() );
+    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps() );
 }
 
 namespace
@@ -108,7 +109,7 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
 {
     filter = aFilter;
     wrap = aWrap;
@@ -169,7 +170,7 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
 #endif
 }
 
-void ae3d::Texture2D::LoadFromAtlas( const System::FileContentsData& atlasTextureData, const System::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
 {
     Load( atlasTextureData, aWrap, aFilter, mipmaps );
 
@@ -249,7 +250,7 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     }
 }
 
-void ae3d::Texture2D::LoadSTB( const System::FileContentsData& fileContents )
+void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
 {
     int components;
     unsigned char* data = stbi_load_from_memory( &fileContents.data[ 0 ], static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );

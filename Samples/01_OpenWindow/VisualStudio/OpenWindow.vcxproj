@@ -98,6 +98,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Engine\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\FileSystem.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Font.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />

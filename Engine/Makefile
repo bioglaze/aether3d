@@ -49,6 +49,7 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Font.cpp -o $(OUTPUT_DIR)/Font.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioClip.cpp -o $(OUTPUT_DIR)/AudioClip.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioSystemOpenAL.cpp -o $(OUTPUT_DIR)/AudioSystemOpenAL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileSystem.cpp -o $(OUTPUT_DIR)/FileSystem.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Matrix.cpp -o $(OUTPUT_DIR)/Matrix.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/String.cpp -o $(OUTPUT_DIR)/String.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o

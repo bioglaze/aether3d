@@ -3,7 +3,7 @@
 
 namespace ae3d
 {
-    namespace System
+    namespace FileSystem
     {
         struct FileContentsData;
     }
@@ -22,7 +22,7 @@ namespace ae3d
           \param clipData .wav or Ogg Vorbis audio data.
           \return Clip handle that can be passed to Play.
          */
-        unsigned GetClipIdForData( const System::FileContentsData& clipData );
+        unsigned GetClipIdForData( const FileSystem::FileContentsData& clipData );
         
         /* \param clipId Clip handle from GetClipIdForData. */
         void Play( unsigned clipId );

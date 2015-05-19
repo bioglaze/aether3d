@@ -12,6 +12,7 @@
 #define STB_VORBIS_HEADER_ONLY
 #include "stb_vorbis.c"
 #include "System.hpp"
+#include "FileSystem.hpp"
 #include "FileWatcher.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
@@ -83,7 +84,7 @@ void CheckOpenALError( const char* info )
     }
 }
 
-void LoadOgg( const ae3d::System::FileContentsData& clipData, const ClipInfo& info )
+void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, const ClipInfo& info )
 {
     short* decoded = nullptr;
     int channels = 0;
@@ -107,7 +108,7 @@ void LoadOgg( const ae3d::System::FileContentsData& clipData, const ClipInfo& in
     CheckOpenALError("Loading ogg");
 }
 
-void LoadWav( const ae3d::System::FileContentsData& clipData, const ClipInfo& info )
+void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, const ClipInfo& info )
 {
     std::istringstream ifs( std::string( clipData.data.begin(), clipData.data.end() ) );
 
@@ -223,11 +224,11 @@ void AudioReload( const std::string& path )
             
             if (extension == "wav" || extension == "WAV")
             {
-                LoadWav( ae3d::System::FileContents( path.c_str() ), clip );
+                LoadWav( ae3d::FileSystem::FileContents( path.c_str() ), clip );
             }
             else if (extension == "ogg" || extension == "OGG")
             {
-                LoadOgg( ae3d::System::FileContents( path.c_str() ), clip );
+                LoadOgg(ae3d::FileSystem::FileContents(path.c_str()), clip);
             }
             ae3d::System::Print("after reload\n");
         }
@@ -271,7 +272,7 @@ void ae3d::AudioSystem::Deinit()
     }
 }
 
-unsigned ae3d::AudioSystem::GetClipIdForData( const System::FileContentsData& clipData )
+unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData& clipData )
 {
     // Checks cache for an already loaded clip from the same path.
     for (std::size_t i = 0; i < AudioGlobal::clips.size(); ++i)

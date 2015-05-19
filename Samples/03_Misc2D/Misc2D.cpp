@@ -9,6 +9,7 @@
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "System.hpp"
+#include "FileSystem.hpp"
 #include "Vec3.hpp"
 #include "Window.hpp"
 #include "Texture2D.hpp"
@@ -33,13 +34,13 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
 
     Texture2D spriteTex;
-    spriteTex.Load( System::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
+    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
 
     Texture2D spriteTex2;
-    spriteTex2.Load( System::FileContents("test_dxt1.dds"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
+    spriteTex2.Load( FileSystem::FileContents("test_dxt1.dds"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
 
     Texture2D spriteTexFromAtlas;
-    spriteTexFromAtlas.LoadFromAtlas( System::FileContents( "atlas_cegui.png" ), System::FileContents( "atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest );
+    spriteTexFromAtlas.LoadFromAtlas(FileSystem::FileContents("atlas_cegui.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest);
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
@@ -53,7 +54,7 @@ int main()
     spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
 
     AudioClip audioClip;
-    audioClip.Load( System::FileContents( "explosion.wav" ) );
+    audioClip.Load(FileSystem::FileContents("explosion.wav"));
     
     GameObject audioContainer;
     audioContainer.AddComponent<AudioSourceComponent>();
@@ -61,10 +62,10 @@ int main()
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load( System::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
+    fontTex.Load(FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None);
 
     Font font;
-    font.LoadBMFont( &fontTex, System::FileContents( "font_txt.fnt" ) );
+    font.LoadBMFont(&fontTex, FileSystem::FileContents("font_txt.fnt"));
     
     GameObject textContainer;
     textContainer.AddComponent<TextRendererComponent>();

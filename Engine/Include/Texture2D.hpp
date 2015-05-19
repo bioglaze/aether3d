@@ -5,7 +5,7 @@
 
 namespace ae3d
 {
-    namespace System
+    namespace FileSystem
     {
         struct FileContentsData;
     }
@@ -41,14 +41,14 @@ namespace ae3d
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
-        void Load( const System::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps );
+        void Load( const FileSystem::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps );
         
         /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param atlasMetaData Atlas metadata. Format is Ogre/CEGUI. Example atlas tool: Texture Packer.
         /// \param textureName Name of the texture in atlas.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
-        void LoadFromAtlas( const System::FileContentsData& atlasTextureData, const System::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter );
+        void LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter );
 
         /// \return id.
         unsigned GetID() const { return id; }
@@ -83,7 +83,7 @@ namespace ae3d
 
           \param textureData Texture data.
           */
-        void LoadSTB( const System::FileContentsData& textureData );
+        void LoadSTB( const FileSystem::FileContentsData& textureData );
 
         int width = 0;
         int height = 0;

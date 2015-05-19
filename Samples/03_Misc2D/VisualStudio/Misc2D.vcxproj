@@ -83,6 +83,26 @@
   <ItemGroup>
     <ClCompile Include="..\Misc2D.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Engine\Include\AudioClip.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\AudioSourceComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\FileSystem.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Font.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Macros.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Quaternion.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Scene.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Shader.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\SpriteRendererComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\System.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\TextRendererComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Texture2D.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\TransformComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Vec3.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Window.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

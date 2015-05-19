@@ -1,8 +1,8 @@
 #include "AudioClip.hpp"
 #include "AudioSystem.hpp"
-#include "System.hpp"
+#include "FileSystem.hpp"
 
-void ae3d::AudioClip::Load( const System::FileContentsData& clipData )
+void ae3d::AudioClip::Load( const FileSystem::FileContentsData& clipData )
 {
     id = AudioSystem::GetClipIdForData( clipData );
 }
