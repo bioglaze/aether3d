@@ -14,6 +14,7 @@
 extern void nsLog(const char* msg);
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
+void PlatformInitGamePad();
 
 void ae3d::System::Deinit()
 {
@@ -33,6 +34,11 @@ void ae3d::System::EnableWindowsMemleakDetection()
 void ae3d::System::InitAudio()
 {
     AudioSystem::Init();
+}
+
+void ae3d::System::InitGamePad()
+{
+    PlatformInitGamePad();
 }
 
 void ae3d::System::LoadBuiltinAssets()

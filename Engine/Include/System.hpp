@@ -18,6 +18,7 @@
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>.</li>
+   <li>Virtual file system aka .pak archive files for faster loading.</li>
    </ul>
 
    \section Requirements
@@ -58,16 +59,19 @@ namespace ae3d
 {
     namespace System
     {
-        /** Inits audio system. */
+        /// Inits audio system.
         void InitAudio();
-        
-        /** Releases all resources allocated by the engine. Call when exiting. */
+
+        /// Inits the gamepad.
+        void InitGamePad();
+
+        /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();
 
-        /** Enables memory leak detection on DEBUG builds on Visual Studio. */
+        /// Enables memory leak detection on DEBUG builds on Visual Studio.
         void EnableWindowsMemleakDetection();
 
-        /** Loads built-in assets and shaders. */
+        /// Loads built-in assets and shaders.
         void LoadBuiltinAssets();
 
         /**
@@ -86,7 +90,7 @@ namespace ae3d
         */
         void Print( const char* format, ... );
 
-        /** Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often. */
+        /// Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often.
         void ReloadChangedAssets();
         
         namespace Statistics

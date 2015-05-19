@@ -224,8 +224,12 @@ void ae3d::Font::LoadBMFontMetaText( const FileSystem::FileContentsData& metaDat
         charStream.seekg( line.find( "id=" ) + 3 );
         int id;
         charStream >> id;
-        System::Assert( id < 256, "Too high glyph id." );
-        
+
+        if (id > 255)
+        {
+            continue;
+        }
+
         charStream.seekg( line.find( "x=" ) + 2 );
         charStream >> chars[ id ].x;
         

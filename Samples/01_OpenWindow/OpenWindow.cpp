@@ -24,6 +24,8 @@ int main()
     System::EnableWindowsMemleakDetection();
     Window::Instance().Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
+    System::InitGamePad();
+
     //System::LoadPakFile( "files.pak" );
     
     GameObject camera;

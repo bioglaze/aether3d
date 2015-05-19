@@ -4,7 +4,6 @@
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "GfxDevice.hpp"
-#include "System.hpp"
 #include "Shader.hpp"
 #include "GameObject.hpp"
 
@@ -35,13 +34,12 @@ void ae3d::Scene::Add( GameObject* gameObject )
 
 void ae3d::Scene::Render()
 {
-    if (mainCamera == nullptr)
+    if (mainCamera == nullptr || (mainCamera != nullptr && mainCamera->GetComponent<CameraComponent>() == nullptr))
     {
         return;
     }
     
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
-    System::Assert( camera != nullptr, "mainCamera doesn't contain camera component!" );
 
     Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );

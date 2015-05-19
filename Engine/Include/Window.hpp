@@ -17,7 +17,21 @@ namespace ae3d
         MouseMiddleDown,
         MouseMiddleUp,
         MouseWheelScrollDown,
-        MouseWheelScrollUp
+        MouseWheelScrollUp,
+        GamePadButtonA,
+        GamePadButtonB,
+        GamePadButtonX,
+        GamePadButtonY,
+        GamePadButtonDPadUp,
+        GamePadButtonDPadDown,
+        GamePadButtonDPadLeft,
+        GamePadButtonDPadRight,
+        GamePadButtonStart,
+        GamePadButtonBack,
+        GamePadButtonLeftShoulder,
+        GamePadButtonRightShoulder,
+        GamePadLeftThumbState,
+        GamePadRightThumbState,
     };
 
     /// Key codes.
@@ -42,16 +56,18 @@ namespace ae3d
         /// Key code.
         KeyCode keyCode = KeyCode::A;
         /// X coordinate in window.
-        int mouseX; 
+        int mouseX = 0; 
         /// Y coordinate in window.
-        int mouseY; 
+        int mouseY = 0; 
+        float gamePadThumbX = 0;
+        float gamePadThumbY = 0;
     };
 
     /// Window singleton.    
     class Window
     {
     public:
-        /// Returns the window instance.
+        /// \return the window instance.
         static Window& Instance()
         {
             static Window instance;

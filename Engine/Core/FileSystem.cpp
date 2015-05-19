@@ -68,18 +68,20 @@ void ae3d::FileSystem::LoadPakFile(const char* path)
     }
 
     ifs.read((char*)&entryCount, 4);
-    Global::pakFiles.back().entries.resize(entryCount);
-    Global::pakFiles.back().path = path;
+    auto& pakFile = Global::pakFiles.back();
+    pakFile.entries.resize(entryCount);
+    pakFile.path = path;
 
     for (unsigned i = 0; i < entryCount; ++i)
     {
+        auto& entry = pakFile.entries[i];
         char entryPath[128];
         ifs.read(entryPath, 128);
-        Global::pakFiles.back().entries[i].path = entryPath;
+        entry.path = entryPath;
         unsigned entrySize = 0;
         ifs.read((char*)&entrySize, 4);
-        Global::pakFiles.back().entries[i].contents.resize(entrySize);
-        ifs.read((char*)Global::pakFiles.back().entries[i].contents.data(), entrySize);
+        entry.contents.resize(entrySize);
+        ifs.read((char*)entry.contents.data(), entrySize);
     }
 }
 
