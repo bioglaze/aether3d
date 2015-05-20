@@ -1,6 +1,7 @@
 #include "GfxDevice.hpp"
 #include <algorithm>
 #include <vector>
+#include <string>
 #include <GL/glxw.h>
 #include "System.hpp"
 

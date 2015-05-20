@@ -10,6 +10,11 @@ void nsLog(const char* msg)
     NSLog(@"%s", msg);
 }
 
+void PlatformInitGamePad()
+{
+
+}
+
 namespace WindowGlobal
 {
     bool isOpen = false;

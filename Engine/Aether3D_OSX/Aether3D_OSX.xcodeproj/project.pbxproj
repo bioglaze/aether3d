@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		442A12B01B0CBD8D00D21520 /* FileSystem.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 442A12AF1B0CBD8D00D21520 /* FileSystem.hpp */; };
 		AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB07F20D1AE15C9800669331 /* AudioClip.cpp */; };
 		AB07F2121AE1611300669331 /* AudioSystemOpenAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */; };
 		AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -50,6 +51,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		442A12AF1B0CBD8D00D21520 /* FileSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FileSystem.hpp; path = ../Include/FileSystem.hpp; sourceTree = "<group>"; };
 		AB07F20D1AE15C9800669331 /* AudioClip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioClip.cpp; path = ../Core/AudioClip.cpp; sourceTree = "<group>"; };
 		AB07F20F1AE15CC400669331 /* AudioClip.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioClip.hpp; path = ../Include/AudioClip.hpp; sourceTree = "<group>"; };
 		AB07F2101AE1601500669331 /* AudioSystem.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSystem.hpp; path = ../Core/AudioSystem.hpp; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 		AB3FD4931AB432FD00D28653 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				442A12AF1B0CBD8D00D21520 /* FileSystem.hpp */,
 				AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */,
 				AB07F20F1AE15CC400669331 /* AudioClip.hpp */,
 				ABCF19C11AE2CF7200822E80 /* Font.hpp */,
@@ -237,6 +240,7 @@
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
 				ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */,
 				AB3FD4961AB4330C00D28653 /* System.hpp in Headers */,
+				442A12B01B0CBD8D00D21520 /* FileSystem.hpp in Headers */,
 				AB889AFE1ABB4C5B005BA86D /* Texture2D.hpp in Headers */,
 				AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */,
 				ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */,
