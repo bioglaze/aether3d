@@ -39,6 +39,7 @@
 		ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */; };
 		ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */; };
 		ABC1A6871AC4693F00C4F401 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */; };
+		ABC8B6071B0D0C1A00E5C32B /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC8B6061B0D0C1A00E5C32B /* FileSystem.cpp */; };
 		ABCE07FE1AC9A5C300379611 /* GfxDeviceGL45.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */; };
 		ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */; };
 		ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */; };
@@ -92,6 +93,7 @@
 		ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../Include/TransformComponent.hpp; sourceTree = "<group>"; };
 		ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformComponent.cpp; path = ../Components/TransformComponent.cpp; sourceTree = "<group>"; };
 		ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Quaternion.hpp; path = ../Include/Quaternion.hpp; sourceTree = "<group>"; };
+		ABC8B6061B0D0C1A00E5C32B /* FileSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileSystem.cpp; path = ../Core/FileSystem.cpp; sourceTree = "<group>"; };
 		ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GfxDeviceGL45.cpp; path = ../Video/GfxDeviceGL45.cpp; sourceTree = "<group>"; };
 		ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
 		ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VertexBufferGL.cpp; path = ../Video/VertexBufferGL.cpp; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */,
 				ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */,
 				ABBD9DC21AC31EDB005AD2ED /* FileWatcher.hpp */,
+				ABC8B6061B0D0C1A00E5C32B /* FileSystem.cpp */,
 				ABCF19C21AE2D08800822E80 /* Font.cpp */,
 				AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */,
 				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
@@ -320,6 +323,7 @@
 				AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */,
 				AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
+				ABC8B6071B0D0C1A00E5C32B /* FileSystem.cpp in Sources */,
 				AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */,
 				ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */,
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,

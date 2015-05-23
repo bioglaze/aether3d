@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ABAEEDB11B103EF10008E252 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABAEEDB01B103EF10008E252 /* IOKit.framework */; };
 		ABC1E00C1AF394BD002C8AB3 /* OpenWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1E00B1AF394BD002C8AB3 /* OpenWindow.cpp */; };
 		ABC1E00E1AF39574002C8AB3 /* libaether3d_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC1E00D1AF39574002C8AB3 /* libaether3d_osx.a */; };
 		ABC1E0131AF395C0002C8AB3 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC1E0121AF395C0002C8AB3 /* OpenGL.framework */; };
@@ -28,6 +29,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		ABAEEDB01B103EF10008E252 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		ABC1E00B1AF394BD002C8AB3 /* OpenWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenWindow.cpp; sourceTree = SOURCE_ROOT; };
 		ABC1E00D1AF39574002C8AB3 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
 		ABC1E0121AF395C0002C8AB3 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -42,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABAEEDB11B103EF10008E252 /* IOKit.framework in Frameworks */,
 				ABC1E0191AF395DF002C8AB3 /* OpenAL.framework in Frameworks */,
 				ABC1E0171AF395D9002C8AB3 /* Cocoa.framework in Frameworks */,
 				ABC1E0151AF395C8002C8AB3 /* QuartzCore.framework in Frameworks */,
@@ -56,6 +59,7 @@
 		ABC1E0111AF395A9002C8AB3 /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				ABAEEDB01B103EF10008E252 /* IOKit.framework */,
 				ABC1E0181AF395DF002C8AB3 /* OpenAL.framework */,
 				ABC1E0161AF395D9002C8AB3 /* Cocoa.framework */,
 				ABC1E0141AF395C8002C8AB3 /* QuartzCore.framework */,

@@ -1,5 +1,9 @@
 #include "Window.hpp"
 
+void PlatformInitGamePad()
+{
+}
+
 namespace ae3d
 {
     void Window::Create( int width, int height, WindowCreateFlags flags )

@@ -46,7 +46,7 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents(const char* pa
 
     if (!outData.isLoaded)
     {
-        System::Print("Could not open %s\n", path);
+        System::Print( "FileSystem: Could not open %s.\n", path );
     }
 
     return outData;

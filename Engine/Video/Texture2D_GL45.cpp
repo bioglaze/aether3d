@@ -117,6 +117,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (!fileContents.isLoaded)
     {
+        *this = Texture2DGlobal::defaultTexture;
         return;
     }
     

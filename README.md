@@ -11,6 +11,8 @@ This is a work in progress.
   - Sprite rendering, texture atlasing and batching.
   - Bitmap font rendering using BMFont fonts.
   - Audio support for .wav and .ogg.
+  - Virtual file system for .pak files.
+  - XBox controller support.
 
 # Planned Features
 

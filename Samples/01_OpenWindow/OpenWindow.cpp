@@ -22,9 +22,9 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
+    System::InitGamePad();
     Window::Instance().Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
-    System::InitGamePad();
 
     //System::LoadPakFile( "files.pak" );
     
@@ -40,7 +40,8 @@ int main()
     spriteContainer.AddComponent<SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
     sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-
+    spriteContainer.AddComponent<TransformComponent>();
+    
     Texture2D fontTex;
     fontTex.Load(FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None);
 
@@ -85,6 +86,11 @@ int main()
                     System::ReloadChangedAssets();
                 }
             }
+
+            /*if (event.type == WindowEventType::GamePadLeftThumbState)
+            {
+                spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3(event.gamePadThumbX * 40, event.gamePadThumbY * 40, 0) );
+            }*/
         }
 
         scene.Render();
