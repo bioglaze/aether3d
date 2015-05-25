@@ -1,6 +1,9 @@
 #ifndef TEXTURE_2D_H
 #define TEXTURE_2D_H
 
+#if AETHER3D_IOS && !(__i386__)
+#import <Metal/Metal.h>
+#endif
 #include "Vec3.hpp"
 
 namespace ae3d
@@ -51,8 +54,11 @@ namespace ae3d
         void LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter );
 
         /// \return id.
-        unsigned GetID() const { return id; }
-        
+        unsigned GetID() const { return handle; }
+#if AETHER3D_IOS && !(__i386__)
+        id<MTLTexture> GetMetalTexture() const { if (metalTexture == nullptr) { return GetDefaultTexture()->metalTexture; /*System::Print("metalTexture is null\n");*/} return metalTexture; }
+#endif
+
         /// \return Width in pixels.
         int GetWidth() const { return width; }
 
@@ -84,10 +90,15 @@ namespace ae3d
           \param textureData Texture data.
           */
         void LoadSTB( const FileSystem::FileContentsData& textureData );
+#if AETHER3D_IOS && !(__i386__)
+        void LoadPVRv2( const char* path );
+        void LoadPVRv3( const char* path );
+        id<MTLTexture> metalTexture;
+#endif
 
         int width = 0;
         int height = 0;
-        unsigned id = 0;
+        unsigned handle = 0;
         TextureWrap wrap = TextureWrap::Repeat;
         TextureFilter filter = TextureFilter::Nearest;
         Mipmaps mipmaps = Mipmaps::None;

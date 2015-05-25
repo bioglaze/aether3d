@@ -1,6 +1,11 @@
 #ifndef GFX_DEVICE_H
 #define GFX_DEVICE_H
 
+#if defined(AETHER3D_IOS)
+#import <Metal/Metal.h>
+#import <QuartzCore/CAMetalLayer.h>
+#endif
+
 namespace ae3d
 {
     namespace GfxDevice
@@ -18,6 +23,15 @@ namespace ae3d
             Off
         };
         
+#if AETHER3D_IOS
+        void Init( CAMetalLayer* metalLayer );
+        void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
+        id <MTLDevice> GetMetalDevice();
+        id <MTLLibrary> GetDefaultMetalShaderLibrary();
+        void PresentDrawable();
+        void BeginFrame();
+#endif
+
         void ClearScreen( unsigned clearFlags );
         void SetClearColor(float red, float green, float blue);
 
@@ -33,8 +47,8 @@ namespace ae3d
 
         void ReleaseGPUObjects();
         void SetBlendMode( BlendMode blendMode );
-#if RENDERER_OPENGL
         void ErrorCheck( const char* info );
+#if RENDERER_OPENGL
         bool HasExtension( const char* glExtension );
 #endif
     }

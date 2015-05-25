@@ -3,6 +3,9 @@
 
 #include <map>
 #include <string>
+#if AETHER3D_IOS && !(__i386__)
+#import <Metal/Metal.h>
+#endif
 
 namespace ae3d
 {
@@ -15,6 +18,9 @@ namespace ae3d
         /// \param vertexSource Vertex shader source.
         /// \param fragmentSource Fragment shader source.
         void Load( const char* vertexSource, const char* fragmentSource );
+#if AETHER3D_IOS
+        void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
+#endif
 
         /// Activates the shader to be used in a draw call.
         void Use();
@@ -43,6 +49,11 @@ namespace ae3d
         /// \param name Vector uniform name.
         /// \param vec4 Vec4 contents.
         void SetVector4( const char* name, const float* vec4 );
+
+#if AETHER3D_IOS && !(__i386__)
+        id <MTLFunction> vertexProgram;
+        id <MTLFunction> fragmentProgram;
+#endif
 
     private:
         struct IntDefaultedToMinusOne
