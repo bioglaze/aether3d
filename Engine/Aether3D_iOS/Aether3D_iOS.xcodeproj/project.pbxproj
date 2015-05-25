@@ -64,8 +64,6 @@
 		44F9050D1AEE7D8D00938D28 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F905021AEE7D8D00938D28 /* Font.cpp */; };
 		44F9050E1AEE7D8D00938D28 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F905031AEE7D8D00938D28 /* Matrix.cpp */; };
 		44F9050F1AEE7D8D00938D28 /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F905041AEE7D8D00938D28 /* Scene.cpp */; };
-		44F905101AEE7D8D00938D28 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F905051AEE7D8D00938D28 /* String.cpp */; };
-		44F905111AEE7D8D00938D28 /* String.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 44F905061AEE7D8D00938D28 /* String.hpp */; };
 		44F905121AEE7D8D00938D28 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F905071AEE7D8D00938D28 /* System.cpp */; };
 		44F905181AEE7E3900938D28 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 44F905161AEE7E3900938D28 /* stb_image.c */; };
 		44F905191AEE7E3900938D28 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 44F905171AEE7E3900938D28 /* stb_vorbis.c */; };
@@ -128,8 +126,6 @@
 		44F905021AEE7D8D00938D28 /* Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Font.cpp; path = ../Core/Font.cpp; sourceTree = "<group>"; };
 		44F905031AEE7D8D00938D28 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../Core/Matrix.cpp; sourceTree = "<group>"; };
 		44F905041AEE7D8D00938D28 /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ../Core/Scene.cpp; sourceTree = "<group>"; };
-		44F905051AEE7D8D00938D28 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../Core/String.cpp; sourceTree = "<group>"; };
-		44F905061AEE7D8D00938D28 /* String.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = String.hpp; path = ../Core/String.hpp; sourceTree = "<group>"; };
 		44F905071AEE7D8D00938D28 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = System.cpp; path = ../Core/System.cpp; sourceTree = "<group>"; };
 		44F905161AEE7E3900938D28 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_image.c; path = ../ThirdParty/stb_image.c; sourceTree = "<group>"; };
 		44F905171AEE7E3900938D28 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
@@ -241,8 +237,6 @@
 				44F905021AEE7D8D00938D28 /* Font.cpp */,
 				44F905031AEE7D8D00938D28 /* Matrix.cpp */,
 				44F905041AEE7D8D00938D28 /* Scene.cpp */,
-				44F905051AEE7D8D00938D28 /* String.cpp */,
-				44F905061AEE7D8D00938D28 /* String.hpp */,
 				44F905071AEE7D8D00938D28 /* System.cpp */,
 				44732FF21B09FB5F0071E800 /* MatrixNEON.cpp */,
 			);
@@ -283,7 +277,6 @@
 				44F904E61AEE7CE300938D28 /* Window.hpp in Headers */,
 				44F904E51AEE7CE300938D28 /* Vec3.hpp in Headers */,
 				44F904DD1AEE7CE300938D28 /* Quaternion.hpp in Headers */,
-				44F905111AEE7D8D00938D28 /* String.hpp in Headers */,
 				44F904F91AEE7D6F00938D28 /* GfxDevice.hpp in Headers */,
 				44F905091AEE7D8D00938D28 /* AudioSystem.hpp in Headers */,
 				44F904FB1AEE7D6F00938D28 /* VertexBuffer.hpp in Headers */,
@@ -392,7 +385,6 @@
 				44E891501B131E1300341B8C /* Texture2DMetal.mm in Sources */,
 				44F9050F1AEE7D8D00938D28 /* Scene.cpp in Sources */,
 				44F904F21AEE7D2E00938D28 /* TextRendererComponent.cpp in Sources */,
-				44F905101AEE7D8D00938D28 /* String.cpp in Sources */,
 				44F904EF1AEE7D2E00938D28 /* CameraComponent.cpp in Sources */,
 				44F9050E1AEE7D8D00938D28 /* Matrix.cpp in Sources */,
 				44F905181AEE7E3900938D28 /* stb_image.c in Sources */,

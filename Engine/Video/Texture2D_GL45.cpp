@@ -89,14 +89,14 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         Texture2DGlobal::defaultTexture.width = 32;
         Texture2DGlobal::defaultTexture.height = 32;
 
-        Texture2DGlobal::defaultTexture.id = GfxDevice::CreateTextureId();
+        Texture2DGlobal::defaultTexture.handle = GfxDevice::CreateTextureId();
         
         if (GfxDevice::HasExtension( "KHR_debug" ))
         {
-            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.id, (GLsizei)std::string("default texture 2d").size(), "default texture 2d" );
+            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.handle, (GLsizei)std::string("default texture 2d").size(), "default texture 2d" );
         }
     
-        glBindTexture( GL_TEXTURE_2D, Texture2DGlobal::defaultTexture.id );
+        glBindTexture( GL_TEXTURE_2D, Texture2DGlobal::defaultTexture.handle );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
@@ -123,26 +123,26 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     
     const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
 
-    if (isCached && id == 0)
+    if (isCached && handle == 0)
     {
         *this = Texture2DGlobal::pathToCachedTexture[ fileContents.path ];
         return;
     }
     
     // First load.
-    if (id == 0)
+    if (handle == 0)
     {
-        id = GfxDevice::CreateTextureId();
+        handle = GfxDevice::CreateTextureId();
         
         if (GfxDevice::HasExtension( "KHR_debug" ))
         {
-            glObjectLabel( GL_TEXTURE, id, (GLsizei)fileContents.path.size(), fileContents.path.c_str() );
+            glObjectLabel( GL_TEXTURE, handle, (GLsizei)fileContents.path.size(), fileContents.path.c_str() );
         }
         
         fileWatcher.AddFile( fileContents.path, TexReload );
     }
 
-    glBindTexture( GL_TEXTURE_2D, id );
+    glBindTexture( GL_TEXTURE_2D, handle );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : (mipmaps == Mipmaps::Generate ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR ) );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );

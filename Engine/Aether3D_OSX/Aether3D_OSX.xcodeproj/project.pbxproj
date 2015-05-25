@@ -15,7 +15,6 @@
 		AB3FD4961AB4330C00D28653 /* System.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4941AB4330C00D28653 /* System.hpp */; };
 		AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4951AB4330C00D28653 /* Window.hpp */; };
 		AB6CD09B1ACEDF9E00C4FA84 /* MatrixSSE3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */; };
-		AB7233161AC5C16E000E7835 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7233151AC5C16E000E7835 /* String.cpp */; };
 		AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */; };
 		AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */; };
 		AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */; };
@@ -63,8 +62,6 @@
 		AB3FD4951AB4330C00D28653 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../Include/Window.hpp; sourceTree = "<group>"; };
 		AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MatrixSSE3.cpp; path = ../Core/MatrixSSE3.cpp; sourceTree = "<group>"; };
 		AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Macros.hpp; path = ../Include/Macros.hpp; sourceTree = "<group>"; };
-		AB7233141AC5C0DC000E7835 /* String.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = String.hpp; path = ../Core/String.hpp; sourceTree = "<group>"; };
-		AB7233151AC5C16E000E7835 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../Core/String.cpp; sourceTree = "<group>"; };
 		AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
 		AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
 		AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
@@ -133,8 +130,6 @@
 				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
 				AB889AEF1ABB4C49005BA86D /* Scene.cpp */,
 				AB3A77D91AB448500081864C /* System.cpp */,
-				AB7233141AC5C0DC000E7835 /* String.hpp */,
-				AB7233151AC5C16E000E7835 /* String.cpp */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -329,7 +324,6 @@
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,
 				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
-				AB7233161AC5C16E000E7835 /* String.cpp in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
 				AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */,
 				ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */,
