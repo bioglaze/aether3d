@@ -162,7 +162,7 @@ void ae3d::Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4*
     *out = tmp;
     
 #if DEBUG
-    ae3d::CheckNaN( mat );
+    //ae3d::CheckNaN( mat );
 #endif
 }
 

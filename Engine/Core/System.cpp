@@ -16,6 +16,23 @@ extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
 void PlatformInitGamePad();
 
+#if AETHER3D_IOS
+void ae3d::System::InitMetal( CAMetalLayer* metalLayer )
+{
+    GfxDevice::Init( metalLayer );
+}
+
+void ae3d::System::EndFrame()
+{
+    GfxDevice::PresentDrawable();
+}
+
+void ae3d::System::BeginFrame()
+{
+    GfxDevice::BeginFrame();
+}
+#endif
+
 void ae3d::System::Deinit()
 {
     GfxDevice::ReleaseGPUObjects();

@@ -1,6 +1,11 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#if AETHER3D_IOS
+#import <UIKit/UIKit.h>
+#import <QuartzCore/CAMetalLayer.h>
+#endif
+
 /**
    \mainpage Aether3D Game Engine v0.2 Documentation
 
@@ -73,6 +78,11 @@ namespace ae3d
 
         /// Loads built-in assets and shaders.
         void LoadBuiltinAssets();
+#if AETHER3D_IOS
+        void InitMetal( CAMetalLayer* metalLayer );
+        void EndFrame();
+        void BeginFrame();
+#endif
 
         /**
           \param condition Condition that causes the assert to fire when true.

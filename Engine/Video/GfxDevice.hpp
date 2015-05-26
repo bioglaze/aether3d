@@ -1,7 +1,7 @@
 #ifndef GFX_DEVICE_H
 #define GFX_DEVICE_H
 
-#if defined(AETHER3D_IOS)
+#if AETHER3D_IOS
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
 #endif

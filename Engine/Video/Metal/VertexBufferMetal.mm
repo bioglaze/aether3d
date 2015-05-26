@@ -14,14 +14,11 @@ void ae3d::VertexBuffer::Draw() const
 
 void ae3d::VertexBuffer::DrawRange( int start, int end ) const
 {
-#if !(__i386__)
     GfxDevice::DrawVertexBuffer( vertexBuffer, indexBuffer, (end - start) * 3, start * 2 * 3 );
-#endif
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
 {
-#if !(__i386__)
     if (faceCount > 0)
     {
         vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
@@ -36,5 +33,4 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
         elementCount = faceCount * 3;
     }
-#endif
 }

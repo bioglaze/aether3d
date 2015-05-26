@@ -8,6 +8,8 @@
 #include "System.hpp"
 #include "GfxDevice.hpp"
 
+#define MYMAX(x, y) ((x) > (y) ? (x) : (y))
+
 namespace PVRType
 {
     enum Enum
@@ -276,8 +278,8 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
             
             dataOffset += dataSize;
             
-            width = MAX(width >> 1, 1);
-            height = MAX(height >> 1, 1);
+            width = MYMAX(width >> 1, 1);
+            height = MYMAX(height >> 1, 1);
         }
         
         // Stores mipmaps.
@@ -333,7 +335,7 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
     uint32_t mipCount = CFSwapInt32LittleToHost(header->mipmapCount);
     const bool isLinear = (CFSwapInt32LittleToHost(header->colorSpace) == 0);
     
-    NSMutableArray *levelDatas = [NSMutableArray arrayWithCapacity:MAX(1, mipCount)];
+    NSMutableArray *levelDatas = [NSMutableArray arrayWithCapacity:MYMAX(1, mipCount)];
     
     if (header->pixelFormat == rgb4bpp || header->pixelFormat == rgba4bpp)
     {
@@ -368,8 +370,8 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
         
         dataOffset += mipSize;
         
-        levelWidth = MAX(levelWidth / 2, 1);
-        levelHeight = MAX(levelHeight / 2, 1);
+        levelWidth = MYMAX(levelWidth / 2, 1);
+        levelHeight = MYMAX(levelHeight / 2, 1);
     }
     
     MTLPixelFormat pixelFormat = MTLPixelFormatPVRTC_RGBA_2BPP;

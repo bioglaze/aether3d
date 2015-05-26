@@ -3,6 +3,22 @@
 #include <fstream>
 #include <vector>
 
+#if AETHER3D_IOS
+const char* GetFullPath( const char* fileName )
+{
+    NSBundle *b = [NSBundle mainBundle];
+    NSString *dir = [b resourcePath];
+    NSString* fName = [NSString stringWithUTF8String: fileName];
+    dir = [dir stringByAppendingString:fName];
+    return [dir fileSystemRepresentation];
+}
+#else
+const char* GetFullPath( const char* fileName )
+{
+    return fileName;
+}
+#endif
+
 struct PakFile
 {
     struct FileEntry
@@ -23,7 +39,7 @@ namespace Global
 ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents(const char* path)
 {
     ae3d::FileSystem::FileContentsData outData;
-    outData.path = path == nullptr ? "" : std::string(path);
+    outData.path = path == nullptr ? "" : std::string(GetFullPath(path));
 
     for (const auto& pakFile : Global::pakFiles)
     {
@@ -39,7 +55,7 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents(const char* pa
     }
 
 
-    std::ifstream ifs(path, std::ios::binary);
+    std::ifstream ifs(GetFullPath(path), std::ios::binary);
 
     outData.data.assign(std::istreambuf_iterator< char >(ifs), std::istreambuf_iterator< char >());
     outData.isLoaded = ifs.is_open();

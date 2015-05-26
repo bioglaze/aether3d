@@ -12,6 +12,7 @@
 #include "Aether3D_iOS.framework/Headers/AudioSourceComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/AudioClip.hpp"
 #include "Aether3D_iOS.framework/Headers/Font.hpp"
+#include "Aether3D_iOS.framework/Headers/FileSystem.hpp"
 
 @implementation GameViewController
 {
@@ -63,9 +64,9 @@
     camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1);
     scene.Add( &camera );
 
-    spriteTex.Load( ae3d::System::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest );
-    spriteTexPVRv2.Load( ae3d::System::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest );
-    spriteTexPVRv3.Load( ae3d::System::FileContents( "/Assets/hotair.2bpp.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest );
+    spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
+    spriteTexPVRv2.Load( ae3d::FileSystem::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
+    spriteTexPVRv3.Load( ae3d::FileSystem::FileContents( "/Assets/hotair.2bpp.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
 
     sprite.AddComponent<ae3d::SpriteRendererComponent>();
     sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv3, ae3d::Vec3( 60, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
@@ -73,14 +74,14 @@
     //sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv2, ae3d::Vec3( 240, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     scene.Add( &sprite );
 
-    audioClip.Load( ae3d::System::FileContents( "/Assets/explosion.wav" ) );
+    audioClip.Load( ae3d::FileSystem::FileContents( "/Assets/explosion.wav" ) );
     audioSource.AddComponent<ae3d::AudioSourceComponent>();
     audioSource.GetComponent<ae3d::AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     audioSource.GetComponent<ae3d::AudioSourceComponent>()->Play();
     
-    fontTex.Load( ae3d::System::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest );
+    fontTex.Load( ae3d::FileSystem::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
 
-    font.LoadBMFont( &fontTex, ae3d::System::FileContents("/Assets/font.fnt"));
+    font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents("/Assets/font.fnt"));
     text.AddComponent<ae3d::TextRendererComponent>();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText("Aether3D Game Engine");
     text.GetComponent<ae3d::TextRendererComponent>()->SetFont( &font );

@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
+#if AETHER3D_IOS
 #import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
+#endif
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
 
@@ -22,6 +24,11 @@ id<CAMetalDrawable> drawable;
 dispatch_semaphore_t inflight_semaphore;
 bool pipelineCreated = false;
 id<MTLTexture> texture0;
+
+void PlatformInitGamePad()
+{
+
+}
 
 struct Uniforms
 {
@@ -230,4 +237,9 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
 {
+}
+
+void ae3d::GfxDevice::ErrorCheck(char const*)
+{
+    
 }
