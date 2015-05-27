@@ -62,10 +62,10 @@ namespace ae3d
         int padding[ 4 ];
         
         /** This is the distance in pixels between each line of text. */
-        int lineHeight;
+        int lineHeight = 32;
         
         /** The number of pixels from the absolute top of the line to the base of the characters. */
-        int base;
+        int base = 32;
         
         Character chars[ 256 ];
         const Texture2D* texture = nullptr;

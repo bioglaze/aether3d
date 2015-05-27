@@ -12,20 +12,26 @@ namespace ae3d
     class TextRendererComponent
     {
       public:
-        /** Constructor. */
+        /// Shader type for rendering text.
+        enum class ShaderType { Sprite, SDF };
+        
+        /// Constructor.
         TextRendererComponent();
         
-        /** Destructor. */
+        /// Destructor.
         ~TextRendererComponent();
 
-        /** \param color Color in range 0-1. */
+        /// \param color Color in range 0-1.
         void SetColor( const Vec4& color );
 
-        /** \param font Font. */
+        /// \param font Font.
         void SetFont( Font* font );
         
-        /** \param text Text. Characters not in font are rendered empty. */
+        /// \param text Text. Characters not in font are rendered empty.
         void SetText( const char* text );
+
+        /// \param shaderType Shader type.
+        void SetShader( ShaderType shaderType );
 
       private:
         friend class GameObject;

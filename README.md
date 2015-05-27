@@ -5,8 +5,8 @@ This is a work in progress.
 
 # Features
 
-  - Windows, OS X and Linux support.
-  - OpenGL 4.1 and 4.5 renderer.
+  - Windows, OS X, iOS and Linux support.
+  - OpenGL 4.1, 4.5 and Metal renderers.
   - Component-based game object system.
   - Sprite rendering, texture atlasing and batching.
   - Bitmap font rendering using BMFont fonts.

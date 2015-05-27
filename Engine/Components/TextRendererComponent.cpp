@@ -3,6 +3,7 @@
 #include "Font.hpp"
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
+#include "Shader.hpp"
 #include "VertexBuffer.hpp"
 #include "Vec3.hpp"
 #include "System.hpp"
@@ -33,6 +34,7 @@ struct ae3d::TextRendererComponent::Impl
     Font* font = nullptr;
     Vec4 color = { 1, 1, 1, 1 };
     bool isDirty = true;
+    Shader* shader = &renderer.builtinShaders.spriteRendererShader;
 };
 
 ae3d::TextRendererComponent::TextRendererComponent()
@@ -76,12 +78,18 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
         m().isDirty = false;
     }
 
-    renderer.builtinShaders.spriteRendererShader.Use();
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
-    renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", m().font->GetTexture(), 0 );
-
     GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::AlphaBlend );
-    
+
+    m().shader->Use();
+    m().shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+    m().shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
+
+ 
     m().vertexBuffer.Bind();
     m().vertexBuffer.Draw();
+}
+
+void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )
+{
+    m().shader = aShaderType == ShaderType::Sprite ? &renderer.builtinShaders.spriteRendererShader : &renderer.builtinShaders.sdfShader;
 }

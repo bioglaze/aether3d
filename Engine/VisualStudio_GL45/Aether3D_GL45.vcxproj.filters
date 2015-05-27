@@ -49,9 +49,6 @@
     <ClCompile Include="..\Video\DDSLoader.cpp">
       <Filter>Video</Filter>
     </ClCompile>
-    <ClCompile Include="..\Core\String.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\Components\TransformComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
@@ -157,9 +154,6 @@
     </ClInclude>
     <ClInclude Include="..\Video\DDSLoader.hpp">
       <Filter>Video</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Core\String.hpp">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\Quaternion.hpp">
       <Filter>Include</Filter>

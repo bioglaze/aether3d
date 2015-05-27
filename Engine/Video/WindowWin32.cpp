@@ -3,13 +3,11 @@
 #define VC_EXTRALEAN
 #include <Windows.h>
 #include <xinput.h>
-#include <map>
-
 #include "System.hpp"
 
 typedef DWORD WINAPI x_input_get_state( DWORD dwUserIndex, XINPUT_STATE* pState );
 
-DWORD WINAPI XInputGetStateStub( DWORD dwUserIndex, XINPUT_STATE* pState )
+DWORD WINAPI XInputGetStateStub( DWORD /*dwUserIndex*/, XINPUT_STATE* /*pState*/ )
 {
     return ERROR_DEVICE_NOT_CONNECTED;
 }
@@ -18,7 +16,7 @@ static x_input_get_state* XInputGetState_ = XInputGetStateStub;
 
 typedef DWORD WINAPI x_input_set_state( DWORD dwUserIndex, XINPUT_VIBRATION* pVibration );
 
-DWORD WINAPI XInputSetStateStub( DWORD dwUserIndex, XINPUT_VIBRATION* pVibration )
+DWORD WINAPI XInputSetStateStub( DWORD /*dwUserIndex*/, XINPUT_VIBRATION* /*pVibration*/ )
 {
     return ERROR_DEVICE_NOT_CONNECTED;
 }
@@ -29,45 +27,49 @@ namespace WindowGlobal
 {
     bool isOpen = false;
     const int eventStackSize = 10;
-    ae3d::WindowEvent eventStack[eventStackSize];
+    ae3d::WindowEvent eventStack[ eventStackSize ];
     int eventIndex = -1;
     HWND hwnd;
     HDC hdc;
-    std::map< unsigned, ae3d::KeyCode > keyMap = {
-        {65, ae3d::KeyCode::A},
-        {66, ae3d::KeyCode::B},
-        {67, ae3d::KeyCode::C},
-        {68, ae3d::KeyCode::D},
-        {69, ae3d::KeyCode::E},
-        {70, ae3d::KeyCode::F},
-        {71, ae3d::KeyCode::G},
-        {72, ae3d::KeyCode::H},
-        {73, ae3d::KeyCode::I},
-        {74, ae3d::KeyCode::J},
-        {75, ae3d::KeyCode::K},
-        {76, ae3d::KeyCode::L},
-        {77, ae3d::KeyCode::M},
-        {78, ae3d::KeyCode::N},
-        {79, ae3d::KeyCode::O},
-        {80, ae3d::KeyCode::P},
-        {81, ae3d::KeyCode::Q},
-        {82, ae3d::KeyCode::R},
-        {83, ae3d::KeyCode::S},
-        {84, ae3d::KeyCode::T},
-        {85, ae3d::KeyCode::U},
-        {86, ae3d::KeyCode::V},
-        {87, ae3d::KeyCode::W},
-        {88, ae3d::KeyCode::X},
-        {89, ae3d::KeyCode::Y},
-        {90, ae3d::KeyCode::Z},
-        {38, ae3d::KeyCode::Up},
-        {40, ae3d::KeyCode::Down},
-        {37, ae3d::KeyCode::Left},
-        {39, ae3d::KeyCode::Right},
-        {27, ae3d::KeyCode::Escape},
-        {32, ae3d::KeyCode::Space},
-        {13, ae3d::KeyCode::Enter}
-    };
+    ae3d::KeyCode keyMap[ 256 ] = { ae3d::KeyCode::A };
+}
+
+static void InitKeyMap()
+{
+    WindowGlobal::keyMap[ 13 ] = ae3d::KeyCode::Enter;
+    WindowGlobal::keyMap[ 37 ] = ae3d::KeyCode::Left;
+    WindowGlobal::keyMap[ 38 ] = ae3d::KeyCode::Up;
+    WindowGlobal::keyMap[ 39 ] = ae3d::KeyCode::Right;
+    WindowGlobal::keyMap[ 40 ] = ae3d::KeyCode::Down;
+    WindowGlobal::keyMap[ 27 ] = ae3d::KeyCode::Escape;
+    WindowGlobal::keyMap[ 32 ] = ae3d::KeyCode::Space;
+
+    WindowGlobal::keyMap[ 65 ] = ae3d::KeyCode::A;
+    WindowGlobal::keyMap[ 66 ] = ae3d::KeyCode::B;
+    WindowGlobal::keyMap[ 67 ] = ae3d::KeyCode::C;
+    WindowGlobal::keyMap[ 68 ] = ae3d::KeyCode::D;
+    WindowGlobal::keyMap[ 69 ] = ae3d::KeyCode::E;
+    WindowGlobal::keyMap[ 70 ] = ae3d::KeyCode::F;
+    WindowGlobal::keyMap[ 71 ] = ae3d::KeyCode::G;
+    WindowGlobal::keyMap[ 72 ] = ae3d::KeyCode::H;
+    WindowGlobal::keyMap[ 73 ] = ae3d::KeyCode::I;
+    WindowGlobal::keyMap[ 74 ] = ae3d::KeyCode::J;
+    WindowGlobal::keyMap[ 75 ] = ae3d::KeyCode::K;
+    WindowGlobal::keyMap[ 76 ] = ae3d::KeyCode::L;
+    WindowGlobal::keyMap[ 77 ] = ae3d::KeyCode::M;
+    WindowGlobal::keyMap[ 78 ] = ae3d::KeyCode::N;
+    WindowGlobal::keyMap[ 79 ] = ae3d::KeyCode::O;
+    WindowGlobal::keyMap[ 80 ] = ae3d::KeyCode::P;
+    WindowGlobal::keyMap[ 81 ] = ae3d::KeyCode::Q;
+    WindowGlobal::keyMap[ 82 ] = ae3d::KeyCode::R;
+    WindowGlobal::keyMap[ 83 ] = ae3d::KeyCode::S;
+    WindowGlobal::keyMap[ 84 ] = ae3d::KeyCode::T;
+    WindowGlobal::keyMap[ 85 ] = ae3d::KeyCode::U;
+    WindowGlobal::keyMap[ 86 ] = ae3d::KeyCode::V;
+    WindowGlobal::keyMap[ 87 ] = ae3d::KeyCode::W;
+    WindowGlobal::keyMap[ 88 ] = ae3d::KeyCode::X;
+    WindowGlobal::keyMap[ 89 ] = ae3d::KeyCode::Y;
+    WindowGlobal::keyMap[ 90 ] = ae3d::KeyCode::Z;
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -89,7 +91,6 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         {
             ++WindowGlobal::eventIndex;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
-            //ae3d::System::Print("Got key down: %d", wParam);
             WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
         }
         break;
@@ -178,16 +179,17 @@ void PlatformInitGamePad()
 
 namespace ae3d
 {
-    float ProcessGamePadStickValue( SHORT Value, SHORT DeadZoneThreshold )
+    float ProcessGamePadStickValue( SHORT value, SHORT DeadZoneThreshold )
     {
         float Result = 0;
-        if (Value < -DeadZoneThreshold)
+        
+        if (value < -DeadZoneThreshold)
         {
-            Result = (float)((Value + DeadZoneThreshold) / (32768.0f - DeadZoneThreshold));
+            Result = (float)((value + DeadZoneThreshold) / (32768.0f - DeadZoneThreshold));
         }
-        else if (Value > DeadZoneThreshold)
+        else if (value > DeadZoneThreshold)
         {
-            Result = (float)((Value - DeadZoneThreshold) / (32767.0f - DeadZoneThreshold));
+            Result = (float)((value - DeadZoneThreshold) / (32767.0f - DeadZoneThreshold));
         }
 
         return Result;
@@ -266,7 +268,6 @@ namespace ae3d
             {
                 ++WindowGlobal::eventIndex;
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonRightShoulder;
-                ae3d::System::Print( "right shoulder\n" );
 
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_START) != 0)
@@ -284,6 +285,7 @@ namespace ae3d
 
     void Window::Create(int width, int height, WindowCreateFlags flags)
     {
+        InitKeyMap();
         const int finalWidth = width == 0 ? GetSystemMetrics(SM_CXSCREEN) : width;
         const int finalHeight = height == 0 ? GetSystemMetrics(SM_CYSCREEN) : height;
 

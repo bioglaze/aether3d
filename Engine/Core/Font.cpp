@@ -52,6 +52,12 @@ struct CommonBlock
 ae3d::Font::Font()
 {
     texture = Texture2D::GetDefaultTexture();
+    padding[ 0 ] = 200;
+    padding[ 1 ] = 200;
+    padding[ 2 ] = 200;
+    padding[ 3 ] = 200;
+    spacing[ 0 ] = 200;
+    spacing[ 1 ] = 200;
 }
 
 void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, VertexBuffer& outVertexBuffer ) const
@@ -192,6 +198,7 @@ void ae3d::Font::LoadBMFontMetaText( const FileSystem::FileContentsData& metaDat
     
     // Second line (common)
     std::stringstream commonStream( line );
+
     while (!commonStream.eof())
     {
         commonStream >> token;

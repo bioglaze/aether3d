@@ -66,15 +66,23 @@ int main()
 
     Font font;
     font.LoadBMFont(&fontTex, FileSystem::FileContents("font_txt.fnt"));
-    
+
+    //Texture2D fontTexSDF;
+    //fontTexSDF.Load( FileSystem::FileContents( "font_sdf.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
+
+    //Font sdfFont;
+    //sdfFont.LoadBMFont( &fontTexSDF, FileSystem::FileContents( "font_sdf.txt" ) );
+
     GameObject textContainer;
     textContainer.AddComponent<TextRendererComponent>();
     textContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
     textContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
+    textContainer.GetComponent<TextRendererComponent>()->SetShader( TextRendererComponent::ShaderType::Sprite );
     textContainer.AddComponent<TransformComponent>();
     textContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 160, 0 ) );
-    textContainer.GetComponent<TransformComponent>()->SetLocalRotation( Quaternion::FromEuler( Vec3( 0, 0, 45 ) ) );
-                                                                       
+    //textContainer.GetComponent<TransformComponent>()->SetLocalScale( 2 );
+    //textContainer.GetComponent<TransformComponent>()->SetLocalRotation( Quaternion::FromEuler( Vec3( 0, 0, 45 ) ) );
+
     GameObject statsParent;
     statsParent.AddComponent<TransformComponent>();
     statsParent.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, -80, 0 ) );

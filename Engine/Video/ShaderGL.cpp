@@ -60,7 +60,7 @@ GLuint CompileShader( const char* source, GLenum shaderType )
     
     if (!wasCompiled)
     {
-        ae3d::System::Print( "Shader compile error in source: \n%s", source );
+        ae3d::System::Print( "Shader compile error.\n" );
         PrintInfoLog( shader, InfoLogType::Shader );
         return 0;
     }

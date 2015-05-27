@@ -10,6 +10,7 @@ namespace ae3d
         void Load();
         
         Shader spriteRendererShader;
+        Shader sdfShader;
     };
 
     /** High-level rendering stuff. */
