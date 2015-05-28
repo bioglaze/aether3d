@@ -92,13 +92,13 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
         
         const float scale = 1;
         float x = 0;
-        const float z = 0;
+        const float z = -0.6f;
 
         float offx = x + ch.xOffset * scale + accumX * scale;
         float offy = y + ch.yOffset * scale;
         
         auto tex = texture;
-        
+
         float u0 = ch.x / tex->GetWidth();
         float u1 = (ch.x + ch.width) / tex->GetWidth();
         
@@ -110,18 +110,18 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
         faces[ c * 2 + 0 ].b = c * 6 + 1;
         faces[ c * 2 + 0 ].c = c * 6 + 2;
         
-        vertices[ c * 6 + 0 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx, offy, z ), u0, v1 );
-        vertices[ c * 6 + 1 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx + ch.width * scale, offy, z ), u1, v1 );
-        vertices[ c * 6 + 2 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx, offy + ch.height * scale, z ), u0, v0 );
+        vertices[ c * 6 + 0 ] = VertexBuffer::VertexPTC( ae3d::Vec3( offx, offy, z ), u0, v1 );
+        vertices[ c * 6 + 1 ] = VertexBuffer::VertexPTC( ae3d::Vec3( offx + ch.width * scale, offy, z ), u1, v1 );
+        vertices[ c * 6 + 2 ] = VertexBuffer::VertexPTC( ae3d::Vec3( offx, offy + ch.height * scale, z ), u0, v0 );
         
         // Lower triangle.
         faces[ c * 2 + 1 ].a = c * 6 + 3;
         faces[ c * 2 + 1 ].b = c * 6 + 4;
         faces[ c * 2 + 1 ].c = c * 6 + 5;
         
-        vertices[ c * 6 + 3 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx + ch.width * scale, offy, z ), u1, v1 );
-        vertices[ c * 6 + 4 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx + ch.width * scale, offy + ch.height * scale, z ), u1, v0 );
-        vertices[ c * 6 + 5 ] = ae3d::VertexBuffer::VertexPTC( ae3d::Vec3( offx, offy + ch.height * scale, z ), u0, v0 );
+        vertices[ c * 6 + 3 ] = VertexBuffer::VertexPTC( ae3d::Vec3( offx + ch.width * scale, offy, z ), u1, v1 );
+        vertices[ c * 6 + 4 ] = VertexBuffer::VertexPTC( ae3d::Vec3( offx + ch.width * scale, offy + ch.height * scale, z ), u1, v0 );
+        vertices[ c * 6 + 5 ] = VertexBuffer::VertexPTC( ae3d::Vec3( offx, offy + ch.height * scale, z ), u0, v0 );
         
         vertices[ c * 6 + 0 ].color = color;
         vertices[ c * 6 + 1 ].color = color;

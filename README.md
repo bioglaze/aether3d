@@ -34,6 +34,10 @@ This is a work in progress.
   - Open the project Engine/Aether3D_OSX in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow/OpenWindow.xcodeproj and run it or run the Makefile.
 
+## iOS
+  - Build Aether3D_iOS in Engine. It creates a framework.
+  - Open Samples/02_iOS_Hello and add the framework into the project.
+
 # License
 
 The engine is licensed under zlib license.

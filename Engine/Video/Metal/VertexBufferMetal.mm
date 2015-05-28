@@ -3,13 +3,11 @@
 
 void ae3d::VertexBuffer::Bind() const
 {
-
 }
 
 void ae3d::VertexBuffer::Draw() const
 {
-    //GfxDevice::DrawVertexBuffer( vertexBuffer, indexBuffer, elementCount, 0 );
-    DrawRange(0, elementCount/3);
+    GfxDevice::DrawVertexBuffer( vertexBuffer, indexBuffer, elementCount, 0 );
 }
 
 void ae3d::VertexBuffer::DrawRange( int start, int end ) const

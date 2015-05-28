@@ -84,7 +84,6 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
     m().shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
     m().shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
 
- 
     m().vertexBuffer.Bind();
     m().vertexBuffer.Draw();
 }

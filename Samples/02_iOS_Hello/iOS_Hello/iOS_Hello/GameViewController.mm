@@ -81,14 +81,15 @@
     
     fontTex.Load( ae3d::FileSystem::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
 
-    font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents("/Assets/font.fnt"));
+    font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents("/Assets/font_txt.fnt"));
     text.AddComponent<ae3d::TextRendererComponent>();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText("Aether3D Game Engine");
     text.GetComponent<ae3d::TextRendererComponent>()->SetFont( &font );
-    text.AddComponent<ae3d::TransformComponent>();
-    text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 40, 0 ) );
+    text.GetComponent<ae3d::TextRendererComponent>()->SetColor( ae3d::Vec4( 1, 0, 0, 1 ) );
+    //text.AddComponent<ae3d::TransformComponent>();
+    //text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 40, 0 ) );
     
-    //scene.Add( &text );
+    scene.Add( &text );
 }
 
 -(void) touchesBegan: (NSSet *) touches withEvent: (UIEvent *) event

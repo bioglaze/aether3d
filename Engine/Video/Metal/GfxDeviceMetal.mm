@@ -27,13 +27,17 @@ id<MTLTexture> texture0;
 
 void PlatformInitGamePad()
 {
-
 }
 
 struct Uniforms
 {
     float mvp[ 16 ];
 };
+
+namespace GfxDeviceGlobal
+{
+    int drawCalls = 0;
+}
 
 namespace
 {
@@ -88,7 +92,6 @@ void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
     int max_inflight_buffers = 1;
     inflight_semaphore = dispatch_semaphore_create( max_inflight_buffers );
     
-    // Find a usable device
     device = MTLCreateSystemDefaultDevice();
 
     metalLayer = aMetalLayer;
@@ -98,8 +101,6 @@ void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
     metalLayer.framebufferOnly = YES;
 
     commandQueue = [device newCommandQueue];
-    
-    // Load all the shader files with a metal file extension in the project
     defaultLibrary = [device newDefaultLibrary];
     
     MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
@@ -170,6 +171,8 @@ void ae3d::GfxDevice::BeginFrame()
     renderEncoder.label = @"MyRenderEncoder";
 
     dispatch_semaphore_wait(inflight_semaphore, DISPATCH_TIME_FOREVER);
+    
+    //[commandQueue insertDebugCaptureBoundary];
 }
 
 void ae3d::GfxDevice::PresentDrawable()
@@ -220,15 +223,17 @@ unsigned ae3d::GfxDevice::CreateProgramId()
 
 void ae3d::GfxDevice::IncDrawCalls()
 {
+    ++GfxDeviceGlobal::drawCalls;
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
 {
-    return 0;
+    return GfxDeviceGlobal::drawCalls;
 }
 
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
+    GfxDeviceGlobal::drawCalls = 0;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

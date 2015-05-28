@@ -106,7 +106,6 @@
 		4449E8941B14B4B5009A869C /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
 		4449E89D1B14B570009A869C /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		4449E89F1B14B576009A869C /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
-		4449E8A31B14B678009A869C /* Aether3D_iOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aether3D_iOS.framework; path = ../../../../../Desktop/Aether3D_iOS.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,7 +124,6 @@
 		4449E81A1B14B3E7009A869C = {
 			isa = PBXGroup;
 			children = (
-				4449E8A31B14B678009A869C /* Aether3D_iOS.framework */,
 				4449E89F1B14B576009A869C /* OpenAL.framework */,
 				4449E89D1B14B570009A869C /* Metal.framework */,
 				4449E8261B14B3E8009A869C /* Aether3D_iOS */,
@@ -543,6 +541,7 @@
 				4449E83C1B14B3E8009A869C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
