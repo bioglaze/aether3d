@@ -1,7 +1,7 @@
 #ifndef TEXTURE_2D_H
 #define TEXTURE_2D_H
 
-#if AETHER3D_IOS && !(__i386__)
+#if AETHER3D_IOS
 #import <Metal/Metal.h>
 #endif
 #include "Vec3.hpp"
@@ -38,12 +38,13 @@ namespace ae3d
     class Texture2D
     {
     public:
-        /** Gets a default texture that is always available after System::LoadBuiltinAssets(). */
+        /// Gets a default texture that is always available after System::LoadBuiltinAssets().
         static const Texture2D* GetDefaultTexture();
         
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
+        /// \param mipmaps Mipmaps
         void Load( const FileSystem::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps );
         
         /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.

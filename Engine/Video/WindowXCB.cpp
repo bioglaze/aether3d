@@ -14,6 +14,11 @@
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
 // Event tutorial: http://xcb.freedesktop.org/tutorial/events/
 
+void PlatformInitGamePad()
+{
+
+}
+
 namespace WindowGlobal
 {
     bool isOpen = false;

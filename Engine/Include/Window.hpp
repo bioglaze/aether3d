@@ -58,8 +58,10 @@ namespace ae3d
         /// X coordinate in window.
         int mouseX = 0; 
         /// Y coordinate in window.
-        int mouseY = 0; 
+        int mouseY = 0;
+        /// Gamepad's thumb x in range [-1, 1]. Event type indicates left or right thumb.
         float gamePadThumbX = 0;
+        /// Gamepad's thumb y in range [-1, 1]. Event type indicates left or right thumb.
         float gamePadThumbY = 0;
     };
 
