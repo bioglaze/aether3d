@@ -6,11 +6,13 @@
 
 namespace ae3d
 {
+    class RenderTexture2D;
+
     /// Camera views the scene.
     class CameraComponent
     {
     public:
-        /** \return Projection matrix. */
+        /// \return Projection matrix.
         const Matrix44& GetProjection() const { return projectionMatrix; }
         
         /**
@@ -23,14 +25,20 @@ namespace ae3d
          \param near Near plane distance.
          \param far Far plane distance.
          */
-        void SetProjection(float left, float right, float bottom, float top, float near, float far);
+        void SetProjection( float left, float right, float bottom, float top, float near, float far );
 
-        /** \return Clear color in range 0-1. */
+        /// \return Clear color in range 0-1.
         Vec3 GetClearColor() const { return clearColor; }
 
-        /** \param color Color in range 0-1. */
+        /// \return Target texture or null if there is no target texture.
+        RenderTexture2D* GetTargetTexture() { return targetTexture; }
+        
+        /// \param color Color in range 0-1.
         void SetClearColor( const Vec3& color );
 
+        /// \param renderTexture2D 2D render texture.
+        void SetTargetTexture( RenderTexture2D* renderTexture2D );
+        
     private:
         friend class GameObject;
         
@@ -46,6 +54,7 @@ namespace ae3d
         Matrix44 projectionMatrix;
         Matrix44 viewMatrix;
         Vec3 clearColor;
+        RenderTexture2D* targetTexture = nullptr;
     };
 }
 #endif

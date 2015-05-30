@@ -8,6 +8,8 @@
 
 namespace ae3d
 {
+    class RenderTexture2D;
+
     namespace GfxDevice
     {
         enum ClearFlags : unsigned
@@ -33,14 +35,17 @@ namespace ae3d
 #endif
 
         void ClearScreen( unsigned clearFlags );
-        void SetClearColor(float red, float green, float blue);
+        void SetClearColor( float red, float green, float blue );
+        void SetRenderTarget( RenderTexture2D* target );
 
         unsigned CreateBufferId();
         unsigned CreateTextureId();
         unsigned CreateVaoId();
         unsigned CreateShaderId( unsigned shaderType );
         unsigned CreateProgramId();
-        
+        unsigned CreateRboId();
+        unsigned CreateFboId();
+
         void IncDrawCalls();
         int GetDrawCalls();
         void ResetFrameStatistics();
@@ -49,6 +54,8 @@ namespace ae3d
         void SetBlendMode( BlendMode blendMode );
         void ErrorCheck( const char* info );
 #if RENDERER_OPENGL
+        void SetBackBufferDimensionAndFBO( int width, int height );
+        void ErrorCheckFBO();
         bool HasExtension( const char* glExtension );
 #endif
     }

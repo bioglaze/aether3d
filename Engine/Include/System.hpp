@@ -18,12 +18,13 @@
    \section Features
 
    <ul>
-   <li>Windows, OS X and GNU/Linux.</li>
-   <li>OpenGL 4.1 and 4.5 renderers.</li>
+   <li>Windows, OS X, iOS and GNU/Linux.</li>
+   <li>OpenGL 4.1, 4.5 and Metal renderers.</li>
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
-   <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>.</li>
+   <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
    <li>Virtual file system aka .pak archive files for faster loading.</li>
+   <li>SIMD optimized math routines on desktop and iOS.</li>
    </ul>
 
    \section Requirements

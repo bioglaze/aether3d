@@ -6,6 +6,7 @@
 namespace ae3d
 {
     class GameObject;
+    class CameraComponent;
 
     /// Contains game objects in a transform hierarchy.
     class Scene
@@ -18,6 +19,8 @@ namespace ae3d
         void Render();
 
     private:
+        void RenderWithCamera( CameraComponent* camera );
+
         std::vector< GameObject* > gameObjects;
         GameObject* mainCamera = nullptr;
         unsigned nextFreeGameObject = 0;

@@ -4,6 +4,7 @@
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
 #include "Texture2D.hpp"
+#include "TextureBase.hpp"
 #include "Vec3.hpp"
 #include "VertexBuffer.hpp"
 #include "System.hpp"
@@ -15,14 +16,14 @@ unsigned nextFreeSpriteComponent = 0;
 
 struct Drawable
 {
-    const ae3d::Texture2D* texture = ae3d::Texture2D::GetDefaultTexture();
+    const ae3d::TextureBase* texture = ae3d::Texture2D::GetDefaultTexture();
     int bufferStart = 0;
     int bufferEnd = 0;
 };
 
 struct Sprite
 {
-    const ae3d::Texture2D* texture = ae3d::Texture2D::GetDefaultTexture();
+    const ae3d::TextureBase* texture = ae3d::Texture2D::GetDefaultTexture();
     ae3d::Vec3 position;
     ae3d::Vec3 dimension;
     ae3d::Vec4 tint;
@@ -158,7 +159,7 @@ void RenderQueue::Render()
     
     for (auto& drawable : drawables)
     {
-        renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", drawable.texture, 0);
+        renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", (const ae3d::Texture2D*)drawable.texture, 0);
         vertexBuffer.DrawRange( drawable.bufferStart, drawable.bufferEnd );
     }
 }
@@ -211,7 +212,7 @@ void ae3d::SpriteRendererComponent::Clear()
     m().transparentRenderQueue.Clear();
 }
 
-void ae3d::SpriteRendererComponent::SetTexture( const Texture2D* aTexture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor )
+void ae3d::SpriteRendererComponent::SetTexture( const TextureBase* aTexture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor )
 {
     if (aTexture == nullptr)
     {

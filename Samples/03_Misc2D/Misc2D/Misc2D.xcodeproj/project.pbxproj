@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AB7E96A31B19AE1F004A3289 /* Misc2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7E96A21B19AE1F004A3289 /* Misc2D.cpp */; };
 		AB7E96A61B19AEB6004A3289 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96A51B19AEB6004A3289 /* OpenAL.framework */; };
 		AB7E96A81B19AEBD004A3289 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96A71B19AEBD004A3289 /* OpenGL.framework */; };
 		AB7E96AA1B19AECB004A3289 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96A91B19AECB004A3289 /* IOKit.framework */; };
 		AB7E96AC1B19AED1004A3289 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96AB1B19AED1004A3289 /* Cocoa.framework */; };
 		AB7E96AE1B19AEE1004A3289 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96AD1B19AEE1004A3289 /* QuartzCore.framework */; };
 		AB7E96B01B19AF28004A3289 /* libaether3d_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96AF1B19AF28004A3289 /* libaether3d_osx.a */; };
+		AB9AB6EC1B19DF0E00C9F006 /* Misc2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB9AB6EB1B19DF0E00C9F006 /* Misc2D.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,14 +29,34 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AB78D91D1B19E405009928E1 /* TextureBase.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../../../Engine/Include/TextureBase.hpp; sourceTree = "<group>"; };
 		AB7E96981B19AE09004A3289 /* Misc2D */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Misc2D; sourceTree = BUILT_PRODUCTS_DIR; };
-		AB7E96A21B19AE1F004A3289 /* Misc2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Misc2D.cpp; path = ../../Misc2D.cpp; sourceTree = "<group>"; };
 		AB7E96A51B19AEB6004A3289 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		AB7E96A71B19AEBD004A3289 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		AB7E96A91B19AECB004A3289 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		AB7E96AB1B19AED1004A3289 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		AB7E96AD1B19AEE1004A3289 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AB7E96AF1B19AF28004A3289 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
+		AB9AB6EB1B19DF0E00C9F006 /* Misc2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Misc2D.cpp; path = ../Misc2D.cpp; sourceTree = "<group>"; };
+		AB9AB6EE1B19E07300C9F006 /* AudioClip.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioClip.hpp; path = ../../../Engine/Include/AudioClip.hpp; sourceTree = "<group>"; };
+		AB9AB6EF1B19E07300C9F006 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../../../Engine/Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
+		AB9AB6F01B19E07300C9F006 /* CameraComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CameraComponent.hpp; path = ../../../Engine/Include/CameraComponent.hpp; sourceTree = "<group>"; };
+		AB9AB6F11B19E07300C9F006 /* FileSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FileSystem.hpp; path = ../../../Engine/Include/FileSystem.hpp; sourceTree = "<group>"; };
+		AB9AB6F21B19E07300C9F006 /* Font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Font.hpp; path = ../../../Engine/Include/Font.hpp; sourceTree = "<group>"; };
+		AB9AB6F31B19E07300C9F006 /* GameObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GameObject.hpp; path = ../../../Engine/Include/GameObject.hpp; sourceTree = "<group>"; };
+		AB9AB6F41B19E07300C9F006 /* Macros.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Macros.hpp; path = ../../../Engine/Include/Macros.hpp; sourceTree = "<group>"; };
+		AB9AB6F51B19E07300C9F006 /* Matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Matrix.hpp; path = ../../../Engine/Include/Matrix.hpp; sourceTree = "<group>"; };
+		AB9AB6F61B19E07300C9F006 /* Quaternion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Quaternion.hpp; path = ../../../Engine/Include/Quaternion.hpp; sourceTree = "<group>"; };
+		AB9AB6F71B19E07300C9F006 /* Scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Scene.hpp; path = ../../../Engine/Include/Scene.hpp; sourceTree = "<group>"; };
+		AB9AB6F81B19E07300C9F006 /* Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = ../../../Engine/Include/Shader.hpp; sourceTree = "<group>"; };
+		AB9AB6F91B19E07300C9F006 /* SpriteRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpriteRendererComponent.hpp; path = ../../../Engine/Include/SpriteRendererComponent.hpp; sourceTree = "<group>"; };
+		AB9AB6FA1B19E07300C9F006 /* System.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = System.hpp; path = ../../../Engine/Include/System.hpp; sourceTree = "<group>"; };
+		AB9AB6FB1B19E07300C9F006 /* TextRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextRendererComponent.hpp; path = ../../../Engine/Include/TextRendererComponent.hpp; sourceTree = "<group>"; };
+		AB9AB6FC1B19E07300C9F006 /* Texture2D.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Texture2D.hpp; path = ../../../Engine/Include/Texture2D.hpp; sourceTree = "<group>"; };
+		AB9AB6FD1B19E07300C9F006 /* TransformComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../../../Engine/Include/TransformComponent.hpp; sourceTree = "<group>"; };
+		AB9AB6FE1B19E07300C9F006 /* Vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Vec3.hpp; path = ../../../Engine/Include/Vec3.hpp; sourceTree = "<group>"; };
+		AB9AB6FF1B19E07300C9F006 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../../../Engine/Include/Window.hpp; sourceTree = "<group>"; };
+		AB9AB7001B19E12600C9F006 /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../../Engine/Include/RenderTexture.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,8 +79,9 @@
 		AB7E968F1B19AE09004A3289 = {
 			isa = PBXGroup;
 			children = (
+				AB9AB6ED1B19E04D00C9F006 /* Include */,
+				AB9AB6EB1B19DF0E00C9F006 /* Misc2D.cpp */,
 				AB7E96A41B19AEA9004A3289 /* Libs */,
-				AB7E969A1B19AE09004A3289 /* Misc2D */,
 				AB7E96991B19AE09004A3289 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,14 +92,6 @@
 				AB7E96981B19AE09004A3289 /* Misc2D */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		AB7E969A1B19AE09004A3289 /* Misc2D */ = {
-			isa = PBXGroup;
-			children = (
-				AB7E96A21B19AE1F004A3289 /* Misc2D.cpp */,
-			);
-			path = Misc2D;
 			sourceTree = "<group>";
 		};
 		AB7E96A41B19AEA9004A3289 /* Libs */ = {
@@ -92,6 +105,33 @@
 				AB7E96A51B19AEB6004A3289 /* OpenAL.framework */,
 			);
 			name = Libs;
+			sourceTree = "<group>";
+		};
+		AB9AB6ED1B19E04D00C9F006 /* Include */ = {
+			isa = PBXGroup;
+			children = (
+				AB9AB6EE1B19E07300C9F006 /* AudioClip.hpp */,
+				AB9AB6EF1B19E07300C9F006 /* AudioSourceComponent.hpp */,
+				AB9AB6F01B19E07300C9F006 /* CameraComponent.hpp */,
+				AB9AB6F11B19E07300C9F006 /* FileSystem.hpp */,
+				AB9AB6F21B19E07300C9F006 /* Font.hpp */,
+				AB9AB6F31B19E07300C9F006 /* GameObject.hpp */,
+				AB9AB6F41B19E07300C9F006 /* Macros.hpp */,
+				AB9AB6F51B19E07300C9F006 /* Matrix.hpp */,
+				AB9AB6F61B19E07300C9F006 /* Quaternion.hpp */,
+				AB9AB7001B19E12600C9F006 /* RenderTexture.hpp */,
+				AB9AB6F71B19E07300C9F006 /* Scene.hpp */,
+				AB9AB6F81B19E07300C9F006 /* Shader.hpp */,
+				AB9AB6F91B19E07300C9F006 /* SpriteRendererComponent.hpp */,
+				AB9AB6FA1B19E07300C9F006 /* System.hpp */,
+				AB9AB6FB1B19E07300C9F006 /* TextRendererComponent.hpp */,
+				AB9AB6FC1B19E07300C9F006 /* Texture2D.hpp */,
+				AB9AB6FD1B19E07300C9F006 /* TransformComponent.hpp */,
+				AB9AB6FE1B19E07300C9F006 /* Vec3.hpp */,
+				AB9AB6FF1B19E07300C9F006 /* Window.hpp */,
+				AB78D91D1B19E405009928E1 /* TextureBase.hpp */,
+			);
+			name = Include;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -150,7 +190,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AB7E96A31B19AE1F004A3289 /* Misc2D.cpp in Sources */,
+				AB9AB6EC1B19DF0E00C9F006 /* Misc2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +334,7 @@
 				AB7E96A11B19AE09004A3289 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

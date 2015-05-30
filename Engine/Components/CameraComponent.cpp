@@ -29,3 +29,7 @@ void ae3d::CameraComponent::SetClearColor( const Vec3& color )
     clearColor = color;
 }
 
+void ae3d::CameraComponent::SetTargetTexture( ae3d::RenderTexture2D* renderTexture2D )
+{
+    targetTexture = renderTexture2D;
+}

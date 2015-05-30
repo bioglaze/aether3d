@@ -4,6 +4,7 @@
 #include <string>
 #include <GL/glxw.h>
 #include "System.hpp"
+#include "RenderTexture.hpp"
 
 void PrintOpenGLDebugOutput( GLenum source, GLenum type, GLuint id, GLenum severity, const char *msg)
 {
@@ -65,7 +66,12 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > textureIds;
     std::vector< GLuint > shaderIds;
     std::vector< GLuint > programIds;
+    std::vector< GLuint > rboIds;
+    std::vector< GLuint > fboIds;
     int drawCalls = 0;
+    int backBufferWidth = 640;
+    int backBufferHeight = 400;
+    GLuint systemFBO = 0;
 }
 
 void ae3d::GfxDevice::IncDrawCalls()
@@ -97,6 +103,14 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     {
         glDeleteTextures( static_cast<GLsizei>(GfxDeviceGlobal::textureIds.size()), GfxDeviceGlobal::textureIds.data() );
     }
+    if (!GfxDeviceGlobal::rboIds.empty())
+    {
+        glDeleteRenderbuffers( static_cast<GLsizei>(GfxDeviceGlobal::rboIds.size()), GfxDeviceGlobal::rboIds.data() );
+    }
+    if (!GfxDeviceGlobal::fboIds.empty())
+    {
+        glDeleteFramebuffers( static_cast<GLsizei>(GfxDeviceGlobal::fboIds.size()), GfxDeviceGlobal::fboIds.data() );
+    }
 
     for (auto i : GfxDeviceGlobal::shaderIds)
     {
@@ -121,7 +135,7 @@ unsigned ae3d::GfxDevice::CreateVaoId()
 {
     GLuint outId;
     glGenVertexArrays(1, &outId);
-    GfxDeviceGlobal::vaoIds.push_back(outId);
+    GfxDeviceGlobal::vaoIds.push_back( outId );
     return outId;
 }
 
@@ -129,21 +143,37 @@ unsigned ae3d::GfxDevice::CreateBufferId()
 {
     GLuint outId;
     glGenBuffers(1, &outId);
-    GfxDeviceGlobal::bufferIds.push_back(outId);
+    GfxDeviceGlobal::bufferIds.push_back( outId );
     return outId;
 }
 
 unsigned ae3d::GfxDevice::CreateShaderId( unsigned shaderType )
 {
     GLuint outId = glCreateShader( shaderType );
-    GfxDeviceGlobal::shaderIds.push_back(outId);
+    GfxDeviceGlobal::shaderIds.push_back( outId );
     return outId;
 }
 
 unsigned ae3d::GfxDevice::CreateProgramId()
 {
     GLuint outId = glCreateProgram();
-    GfxDeviceGlobal::programIds.push_back(outId);
+    GfxDeviceGlobal::programIds.push_back( outId );
+    return outId;
+}
+
+unsigned ae3d::GfxDevice::CreateRboId()
+{
+    GLuint outId;
+    glGenRenderbuffers( 1, &outId );
+    GfxDeviceGlobal::rboIds.push_back( outId );
+    return outId;
+}
+
+unsigned ae3d::GfxDevice::CreateFboId()
+{
+    GLuint outId;
+    glGenFramebuffers( 1, &outId );
+    GfxDeviceGlobal::fboIds.push_back( outId );
     return outId;
 }
 
@@ -212,7 +242,22 @@ const char* GetGLErrorString(GLenum code)
     {
         return "GL_INVALID_FRAMEBUFFER_OPERATION";
     }
-
+    if (code == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
+    {
+        return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+    }
+    if (code == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
+    {
+        return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+    }
+    if (code == GL_FRAMEBUFFER_UNSUPPORTED)
+    {
+        return "GL_FRAMEBUFFER_UNSUPPORTED";
+    }
+    if (code == GL_FRAMEBUFFER_UNDEFINED)
+    {
+        return "GL_FRAMEBUFFER_UNDEFINED";
+    }
     return "other GL error";
 }
 
@@ -224,9 +269,24 @@ void ae3d::GfxDevice::ErrorCheck(const char* info)
 
         while ((errorCode = glGetError()) != GL_NO_ERROR)
         {
-            ae3d::System::Print("%s caused an OpenGL error: %s\n", info, GetGLErrorString( errorCode ) );
-            ae3d::System::Assert(false, "OpenGL error!");
+            System::Print("%s caused an OpenGL error: %s\n", info, GetGLErrorString( errorCode ) );
+            System::Assert(false, "OpenGL error!");
         }
+#endif
+}
+
+void ae3d::GfxDevice::ErrorCheckFBO()
+{
+#if defined _DEBUG || defined DEBUG
+    const GLenum errorCode = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+    
+    if (errorCode == GL_FRAMEBUFFER_COMPLETE)
+    {
+        return;
+    }
+    
+    System::Print( "FBO error: %s\n", GetGLErrorString(errorCode) );
+    System::Assert( false, "OpenGL FBO error." );
 #endif
 }
 
@@ -247,4 +307,27 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
     }
     
     return std::find( std::begin( sExtensions ), std::end( sExtensions ), glExtension ) != std::end( sExtensions );
+}
+
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture2D* target )
+{
+    glBindFramebuffer( GL_FRAMEBUFFER, target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO );
+
+    if (target != nullptr)
+    {
+        glViewport( 0, 0, target->GetWidth(), target->GetHeight() );
+    }
+    else
+    {
+        glViewport( 0, 0, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
+    }
+}
+
+void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )
+{
+    GfxDeviceGlobal::backBufferWidth = width;
+    GfxDeviceGlobal::backBufferHeight = height;
+    int fboId = 0;
+    glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fboId );
+    GfxDeviceGlobal::systemFBO = static_cast< unsigned >(fboId);
 }

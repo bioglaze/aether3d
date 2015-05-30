@@ -13,6 +13,7 @@
 #include "Vec3.hpp"
 #include "Window.hpp"
 #include "Texture2D.hpp"
+#include "RenderTexture.hpp"
 
 using namespace ae3d;
 
@@ -95,12 +96,27 @@ int main()
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
     statsContainer.GetComponent<TransformComponent>()->SetParent( statsParent.GetComponent<TransformComponent>() );
 
+    RenderTexture2D rtTex;
+    rtTex.Create( 512, 512, TextureWrap::Clamp, TextureFilter::Linear );
+    
+    GameObject renderTextureContainer;
+    renderTextureContainer.AddComponent<SpriteRendererComponent>();
+    spriteContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+
+    GameObject rtCamera;
+    rtCamera.AddComponent<CameraComponent>();
+    rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
+    rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
+    
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
     
     bool quit = false;
     

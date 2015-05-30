@@ -3,7 +3,7 @@
 
 #include <map>
 #include <string>
-#if AETHER3D_IOS && !(__i386__)
+#if AETHER3D_IOS
 #import <Metal/Metal.h>
 #endif
 
@@ -50,7 +50,7 @@ namespace ae3d
         /// \param vec4 Vec4 contents.
         void SetVector4( const char* name, const float* vec4 );
 
-#if AETHER3D_IOS && !(__i386__)
+#if AETHER3D_IOS
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
 #endif

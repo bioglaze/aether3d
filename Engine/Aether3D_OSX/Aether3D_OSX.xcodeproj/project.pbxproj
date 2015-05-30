@@ -15,6 +15,9 @@
 		AB3FD4961AB4330C00D28653 /* System.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4941AB4330C00D28653 /* System.hpp */; };
 		AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4951AB4330C00D28653 /* Window.hpp */; };
 		AB6CD09B1ACEDF9E00C4FA84 /* MatrixSSE3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */; };
+		AB78D91C1B19E2E8009928E1 /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB78D91B1B19E2E8009928E1 /* RenderTexture.hpp */; };
+		AB78D91F1B19E5A1009928E1 /* TextureBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB78D91E1B19E5A1009928E1 /* TextureBase.hpp */; };
+		AB78D9211B19E685009928E1 /* RenderTextureGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */; };
 		AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */; };
 		AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */; };
 		AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */; };
@@ -62,6 +65,9 @@
 		AB3FD4951AB4330C00D28653 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../Include/Window.hpp; sourceTree = "<group>"; };
 		AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MatrixSSE3.cpp; path = ../Core/MatrixSSE3.cpp; sourceTree = "<group>"; };
 		AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Macros.hpp; path = ../Include/Macros.hpp; sourceTree = "<group>"; };
+		AB78D91B1B19E2E8009928E1 /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../Include/RenderTexture.hpp; sourceTree = "<group>"; };
+		AB78D91E1B19E5A1009928E1 /* TextureBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../Include/TextureBase.hpp; sourceTree = "<group>"; };
+		AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTextureGL.cpp; path = ../Video/RenderTextureGL.cpp; sourceTree = "<group>"; };
 		AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
 		AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
 		AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
@@ -148,6 +154,7 @@
 				ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */,
 				ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */,
 				AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */,
+				AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */,
 			);
 			name = Video;
 			sourceTree = "<group>";
@@ -176,11 +183,13 @@
 				AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */,
 				ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */,
 				ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */,
+				AB78D91B1B19E2E8009928E1 /* RenderTexture.hpp */,
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
 				AB949D341ABC8DDF007D561E /* Shader.hpp */,
 				AB889AF61ABB4C5B005BA86D /* SpriteRendererComponent.hpp */,
 				AB3FD4941AB4330C00D28653 /* System.hpp */,
 				AB889AF71ABB4C5B005BA86D /* Texture2D.hpp */,
+				AB78D91E1B19E5A1009928E1 /* TextureBase.hpp */,
 				ABCF19BE1AE28DB200822E80 /* TextRendererComponent.hpp */,
 				ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */,
 				AB889AF81ABB4C5B005BA86D /* Vec3.hpp */,
@@ -237,10 +246,12 @@
 				ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */,
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
 				ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */,
+				AB78D91C1B19E2E8009928E1 /* RenderTexture.hpp in Headers */,
 				AB3FD4961AB4330C00D28653 /* System.hpp in Headers */,
 				442A12B01B0CBD8D00D21520 /* FileSystem.hpp in Headers */,
 				AB889AFE1ABB4C5B005BA86D /* Texture2D.hpp in Headers */,
 				AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */,
+				AB78D91F1B19E5A1009928E1 /* TextureBase.hpp in Headers */,
 				ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */,
 				AB889AFA1ABB4C5B005BA86D /* GameObject.hpp in Headers */,
 				AB889AFC1ABB4C5B005BA86D /* Scene.hpp in Headers */,
@@ -319,6 +330,7 @@
 				AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
 				ABC8B6071B0D0C1A00E5C32B /* FileSystem.cpp in Sources */,
+				AB78D9211B19E685009928E1 /* RenderTextureGL.cpp in Sources */,
 				AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */,
 				ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */,
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,

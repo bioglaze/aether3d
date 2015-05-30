@@ -1,4 +1,5 @@
 #include "Scene.hpp"
+#include <list>
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
@@ -6,6 +7,7 @@
 #include "GfxDevice.hpp"
 #include "Shader.hpp"
 #include "GameObject.hpp"
+#include "System.hpp"
 
 void ae3d::Scene::Add( GameObject* gameObject )
 {
@@ -39,8 +41,39 @@ void ae3d::Scene::Render()
         return;
     }
     
+    std::list< CameraComponent* > rtCameras;
+    
+    for (auto gameObject : gameObjects)
+    {
+        if (gameObject == nullptr)
+        {
+            continue;
+        }
+
+        auto cameraComponent = gameObject->GetComponent<CameraComponent>();
+        
+        if (cameraComponent && cameraComponent->GetTargetTexture())
+        {
+            rtCameras.push_back( cameraComponent );
+        }
+    }
+    
+    for (auto rtCamera : rtCameras)
+    {
+        RenderWithCamera( rtCamera );
+    }
+    
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
 
+    RenderWithCamera( camera );
+}
+
+void ae3d::Scene::RenderWithCamera( CameraComponent* camera )
+{
+    System::Assert( camera != nullptr, "camera is null!" );
+    
+    GfxDevice::SetRenderTarget( camera->GetTargetTexture() );
+    
     Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
@@ -54,7 +87,7 @@ void ae3d::Scene::Render()
         }
         
         auto transform = gameObject->GetComponent<TransformComponent>();
-
+        
         // TODO: Watch for this duplication of logic.
         
         auto spriteRenderer = gameObject->GetComponent<SpriteRendererComponent>();
@@ -75,6 +108,6 @@ void ae3d::Scene::Render()
             textRenderer->Render( projectionModel.m );
         }
     }
-
+    
     GfxDevice::ErrorCheck( "Scene render end" );
 }

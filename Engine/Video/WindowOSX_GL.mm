@@ -1,10 +1,10 @@
 #include "Window.hpp"
-#include <map>
 #import <Cocoa/Cocoa.h>
 #include <GL/glxw.h>
 #include <IOKit/hid/IOHidLib.h>
 #include <Kernel/IOKit/hidsystem/IOHIDUsageTables.h>
 #include "System.hpp"
+#include "GfxDevice.hpp"
 
 // Based on https://github.com/vbo/handmadehero_osx_platform_layer/blob/day_29/code/osx_handmade.m
 // XBox One controller driver: https://github.com/FranticRain/Xone-OSX
@@ -30,6 +30,7 @@ namespace WindowGlobal
     NSOpenGLContext* glContext = nullptr;
     NSApplication *application = nullptr;
     game_input gInput;
+    ae3d::KeyCode keyMap[ 256 ];
 
     void IncEventIndex()
     {
@@ -41,44 +42,45 @@ namespace WindowGlobal
             ae3d::System::Print( "Too many window/input events!\n" );
         }
     }
-    
-    std::map< unsigned, ae3d::KeyCode > keyMap = {
-        { 0, ae3d::KeyCode::A },
-        { 11, ae3d::KeyCode::B },
-        { 8, ae3d::KeyCode::C },
-        { 2, ae3d::KeyCode::D },
-        { 14, ae3d::KeyCode::E },
-        { 3, ae3d::KeyCode::F },
-        { 5, ae3d::KeyCode::G },
-        { 4, ae3d::KeyCode::H },
-        { 34, ae3d::KeyCode::I },
-        { 38, ae3d::KeyCode::J },
-        { 40, ae3d::KeyCode::K },
-        { 37, ae3d::KeyCode::L },
-        { 46, ae3d::KeyCode::M },
-        { 45, ae3d::KeyCode::N },
-        { 31, ae3d::KeyCode::O },
-        { 35, ae3d::KeyCode::P },
-        { 12, ae3d::KeyCode::Q },
-        { 15, ae3d::KeyCode::R },
-        { 1, ae3d::KeyCode::S },
-        { 17, ae3d::KeyCode::T },
-        { 32, ae3d::KeyCode::U },
-        { 9, ae3d::KeyCode::V },
-        { 13, ae3d::KeyCode::W },
-        { 7, ae3d::KeyCode::X },
-        { 16, ae3d::KeyCode::Y },
-        { 6, ae3d::KeyCode::Z },
-        
-        { 126, ae3d::KeyCode::Up },
-        { 125, ae3d::KeyCode::Down },
-        { 123, ae3d::KeyCode::Left },
-        { 124, ae3d::KeyCode::Right },
-        
-        { 53, ae3d::KeyCode::Escape },
-        { 36, ae3d::KeyCode::Enter },
-        { 49, ae3d::KeyCode::Space }
-    };
+
+    void InitKeyMap()
+    {
+        keyMap[ 0 ] = ae3d::KeyCode::A;
+        keyMap[ 11 ] = ae3d::KeyCode::B;
+        keyMap[ 8 ] = ae3d::KeyCode::C;
+        keyMap[ 2 ] = ae3d::KeyCode::D;
+        keyMap[ 14 ] = ae3d::KeyCode::E;
+        keyMap[ 3 ] = ae3d::KeyCode::F;
+        keyMap[ 5 ] = ae3d::KeyCode::G;
+        keyMap[ 4 ] = ae3d::KeyCode::H;
+        keyMap[ 34 ] = ae3d::KeyCode::I;
+        keyMap[ 38 ] = ae3d::KeyCode::J;
+        keyMap[ 40 ] = ae3d::KeyCode::K;
+        keyMap[ 37 ] = ae3d::KeyCode::L;
+        keyMap[ 46 ] = ae3d::KeyCode::M;
+        keyMap[ 45 ] = ae3d::KeyCode::N;
+        keyMap[ 31 ] = ae3d::KeyCode::O;
+        keyMap[ 35 ] = ae3d::KeyCode::P;
+        keyMap[ 12 ] = ae3d::KeyCode::Q;
+        keyMap[ 15 ] = ae3d::KeyCode::R;
+        keyMap[ 1 ] = ae3d::KeyCode::S;
+        keyMap[ 17 ] = ae3d::KeyCode::T;
+        keyMap[ 32 ] = ae3d::KeyCode::U;
+        keyMap[ 9 ] = ae3d::KeyCode::V;
+        keyMap[ 13 ] = ae3d::KeyCode::W;
+        keyMap[ 7 ] = ae3d::KeyCode::X;
+        keyMap[ 16 ] = ae3d::KeyCode::Y;
+        keyMap[ 6 ] = ae3d::KeyCode::Z;
+
+        keyMap[ 126 ] = ae3d::KeyCode::Up;
+        keyMap[ 125 ] = ae3d::KeyCode::Down;
+        keyMap[ 123 ] = ae3d::KeyCode::Left;
+        keyMap[ 124 ] = ae3d::KeyCode::Right;
+
+        keyMap[ 53 ] = ae3d::KeyCode::Escape;
+        keyMap[ 36 ] = ae3d::KeyCode::Enter;
+        keyMap[ 49 ] = ae3d::KeyCode::Space;
+    }
 }
 
 static void iokitControllerValueChangeCallbackImpl( void*/*context*/, IOReturn /*result*/, void*/*sender*/, IOHIDValueRef valueRef )
@@ -192,33 +194,33 @@ static void iokitControllerValueChangeCallbackImpl( void*/*context*/, IOReturn /
             case kHIDUsage_GD_X:
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadLeftThumbState;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = valueNormalized;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = WindowGlobal::gInput.Controllers[0].lastY;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadLeftThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = valueNormalized;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = WindowGlobal::gInput.Controllers[0].lastY;
                 WindowGlobal::gInput.Controllers[0].lastX = valueNormalized;
             } break;
             case kHIDUsage_GD_Y:
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadLeftThumbState;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = WindowGlobal::gInput.Controllers[0].lastX;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = valueNormalized;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadLeftThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = WindowGlobal::gInput.Controllers[0].lastX;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = valueNormalized;
                 WindowGlobal::gInput.Controllers[0].lastY = valueNormalized;
             } break;
             case kHIDUsage_GD_Rx:
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadRightThumbState;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = valueNormalized;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = WindowGlobal::gInput.Controllers[0].lastY;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadRightThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = valueNormalized;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = WindowGlobal::gInput.Controllers[0].lastY;
                 WindowGlobal::gInput.Controllers[0].lastX = valueNormalized;
             } break;
             case kHIDUsage_GD_Ry:
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadRightThumbState;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = WindowGlobal::gInput.Controllers[0].lastX;
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = valueNormalized;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadRightThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = WindowGlobal::gInput.Controllers[0].lastX;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = valueNormalized;
                 WindowGlobal::gInput.Controllers[0].lastY = valueNormalized;
             } break;
         }
@@ -241,12 +243,12 @@ static void iokitControllerUnplugCallbackImpl(void* context, IOReturn /*result*/
 
 static void iokitControllerPluginCallbackImpl( void* context, IOReturn /*result*/, void* /*sender*/, IOHIDDeviceRef device )
 {
-    // Find first free controller slot.
+    // Finds the first free controller slot.
     game_input *input = (game_input *)context;
     GamePad* controller = nullptr;
     GamePad* controllers = input->Controllers;
 
-    for (std::size_t i = 0; i < 5; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         if (!controllers[ i ].isConnected)
         {
@@ -390,7 +392,6 @@ NSWindow *window;
 @implementation OpenGLView : NSOpenGLView
 - (void)reshape
 {
-    //glViewport(0, 0, 640, 480);
 }
 
 - (void) mouseDown: (NSEvent*) event
@@ -461,10 +462,12 @@ NSWindow *window;
 
 static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
 {
+    WindowGlobal::InitKeyMap();
+    
     int windowStyleMask;
     NSRect windowRect;
-    windowRect = NSMakeRect(0, 0, width, height);
-
+    windowRect = NSMakeRect( 0, 0, width, height );
+    
     if (flags & ae3d::WindowCreateFlags::Fullscreen)
     {
         windowStyleMask = NSBorderlessWindowMask;
@@ -510,7 +513,7 @@ static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
     {
         [window setLevel: NSMainMenuWindowLevel + 1];
         [window setHidesOnDeactivate: YES];
-        NSRect screenRect = [[NSScreen mainScreen] frame];
+        const NSRect screenRect = [[NSScreen mainScreen] frame];
         [window setContentSize: screenRect.size];
         [window setFrameOrigin: screenRect.origin];
     }
@@ -528,6 +531,7 @@ static void CreateGLContext()
         NSOpenGLPFAColorSize, 32,
         NSOpenGLPFADepthSize, 24,
         NSOpenGLPFAAlphaSize, 8,
+        // Actually this creates 4.1 context. NSOpenGLProfileVersion4_1Core didn't work for me.
         NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
         0
     };
@@ -558,9 +562,9 @@ static void CreateGLContext()
         NSLog(@"Failed to load OpenGL function pointers using GLXW!");
     }
     
-    NSLog(@"GL version:   %s", glGetString(GL_VERSION));
+    //NSLog(@"GL version:   %s", glGetString(GL_VERSION));
     glEnable( GL_DEPTH_TEST );
-    
+
     [WindowGlobal::glContext setView: view];
 }
 
@@ -573,12 +577,22 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
         height = 480;
     }
     
+    const NSRect screenRect = [[NSScreen mainScreen] frame];
+
+    if (width == 0)
+    {
+        width = screenRect.size.width;
+    }
+    if (height == 0)
+    {
+        height = screenRect.size.height;
+    }
+    
     WindowGlobal::application = [NSApplication sharedApplication];
     // In Snow Leopard, programs without application bundles and
     // Info.plist files don't get a menubar and can't be brought
     // to the front unless the presentation option is changed.
     [WindowGlobal::application setActivationPolicy: NSApplicationActivationPolicyRegular];
-    // Specify application delegate impl.
     ApplicationDelegate *delegate = [[ApplicationDelegate alloc] init];
     [WindowGlobal::application setDelegate: delegate];
     // Normally this function would block, so if we want
@@ -588,6 +602,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     CreateWindow( width, height, flags );
     CreateGLContext();
+    ae3d::GfxDevice::SetBackBufferDimensionAndFBO( width, height );
 }
 
 void cocoaProcessEvents()
