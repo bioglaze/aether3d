@@ -7,17 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ABAEEDB11B103EF10008E252 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABAEEDB01B103EF10008E252 /* IOKit.framework */; };
-		ABC1E00C1AF394BD002C8AB3 /* OpenWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1E00B1AF394BD002C8AB3 /* OpenWindow.cpp */; };
-		ABC1E00E1AF39574002C8AB3 /* libaether3d_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC1E00D1AF39574002C8AB3 /* libaether3d_osx.a */; };
-		ABC1E0131AF395C0002C8AB3 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC1E0121AF395C0002C8AB3 /* OpenGL.framework */; };
-		ABC1E0151AF395C8002C8AB3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC1E0141AF395C8002C8AB3 /* QuartzCore.framework */; };
-		ABC1E0171AF395D9002C8AB3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC1E0161AF395D9002C8AB3 /* Cocoa.framework */; };
-		ABC1E0191AF395DF002C8AB3 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABC1E0181AF395DF002C8AB3 /* OpenAL.framework */; };
+		AB7E96A31B19AE1F004A3289 /* Misc2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7E96A21B19AE1F004A3289 /* Misc2D.cpp */; };
+		AB7E96A61B19AEB6004A3289 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96A51B19AEB6004A3289 /* OpenAL.framework */; };
+		AB7E96A81B19AEBD004A3289 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96A71B19AEBD004A3289 /* OpenGL.framework */; };
+		AB7E96AA1B19AECB004A3289 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96A91B19AECB004A3289 /* IOKit.framework */; };
+		AB7E96AC1B19AED1004A3289 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96AB1B19AED1004A3289 /* Cocoa.framework */; };
+		AB7E96AE1B19AEE1004A3289 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96AD1B19AEE1004A3289 /* QuartzCore.framework */; };
+		AB7E96B01B19AF28004A3289 /* libaether3d_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB7E96AF1B19AF28004A3289 /* libaether3d_osx.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		ABC8EDE71AF3948300186942 /* CopyFiles */ = {
+		AB7E96961B19AE09004A3289 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -29,135 +29,135 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		ABAEEDB01B103EF10008E252 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		ABC1E00B1AF394BD002C8AB3 /* OpenWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenWindow.cpp; sourceTree = SOURCE_ROOT; };
-		ABC1E00D1AF39574002C8AB3 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
-		ABC1E0121AF395C0002C8AB3 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		ABC1E0141AF395C8002C8AB3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		ABC1E0161AF395D9002C8AB3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		ABC1E0181AF395DF002C8AB3 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
-		ABC8EDE91AF3948300186942 /* OpenWindow */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenWindow; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB7E96981B19AE09004A3289 /* Misc2D */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Misc2D; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB7E96A21B19AE1F004A3289 /* Misc2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Misc2D.cpp; path = ../../Misc2D.cpp; sourceTree = "<group>"; };
+		AB7E96A51B19AEB6004A3289 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		AB7E96A71B19AEBD004A3289 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		AB7E96A91B19AECB004A3289 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		AB7E96AB1B19AED1004A3289 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		AB7E96AD1B19AEE1004A3289 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		AB7E96AF1B19AF28004A3289 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		ABC8EDE61AF3948300186942 /* Frameworks */ = {
+		AB7E96951B19AE09004A3289 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ABAEEDB11B103EF10008E252 /* IOKit.framework in Frameworks */,
-				ABC1E0191AF395DF002C8AB3 /* OpenAL.framework in Frameworks */,
-				ABC1E0171AF395D9002C8AB3 /* Cocoa.framework in Frameworks */,
-				ABC1E0151AF395C8002C8AB3 /* QuartzCore.framework in Frameworks */,
-				ABC1E0131AF395C0002C8AB3 /* OpenGL.framework in Frameworks */,
-				ABC1E00E1AF39574002C8AB3 /* libaether3d_osx.a in Frameworks */,
+				AB7E96B01B19AF28004A3289 /* libaether3d_osx.a in Frameworks */,
+				AB7E96AE1B19AEE1004A3289 /* QuartzCore.framework in Frameworks */,
+				AB7E96AC1B19AED1004A3289 /* Cocoa.framework in Frameworks */,
+				AB7E96AA1B19AECB004A3289 /* IOKit.framework in Frameworks */,
+				AB7E96A81B19AEBD004A3289 /* OpenGL.framework in Frameworks */,
+				AB7E96A61B19AEB6004A3289 /* OpenAL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		ABC1E0111AF395A9002C8AB3 /* Libs */ = {
+		AB7E968F1B19AE09004A3289 = {
 			isa = PBXGroup;
 			children = (
-				ABAEEDB01B103EF10008E252 /* IOKit.framework */,
-				ABC1E0181AF395DF002C8AB3 /* OpenAL.framework */,
-				ABC1E0161AF395D9002C8AB3 /* Cocoa.framework */,
-				ABC1E0141AF395C8002C8AB3 /* QuartzCore.framework */,
-				ABC1E0121AF395C0002C8AB3 /* OpenGL.framework */,
-				ABC1E00D1AF39574002C8AB3 /* libaether3d_osx.a */,
-			);
-			name = Libs;
-			sourceTree = "<group>";
-		};
-		ABC8EDE01AF3948300186942 = {
-			isa = PBXGroup;
-			children = (
-				ABC1E0111AF395A9002C8AB3 /* Libs */,
-				ABC8EDEB1AF3948300186942 /* OpenWindow */,
-				ABC8EDEA1AF3948300186942 /* Products */,
+				AB7E96A41B19AEA9004A3289 /* Libs */,
+				AB7E969A1B19AE09004A3289 /* Misc2D */,
+				AB7E96991B19AE09004A3289 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		ABC8EDEA1AF3948300186942 /* Products */ = {
+		AB7E96991B19AE09004A3289 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				ABC8EDE91AF3948300186942 /* OpenWindow */,
+				AB7E96981B19AE09004A3289 /* Misc2D */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		ABC8EDEB1AF3948300186942 /* OpenWindow */ = {
+		AB7E969A1B19AE09004A3289 /* Misc2D */ = {
 			isa = PBXGroup;
 			children = (
-				ABC1E00B1AF394BD002C8AB3 /* OpenWindow.cpp */,
+				AB7E96A21B19AE1F004A3289 /* Misc2D.cpp */,
 			);
-			path = OpenWindow;
+			path = Misc2D;
+			sourceTree = "<group>";
+		};
+		AB7E96A41B19AEA9004A3289 /* Libs */ = {
+			isa = PBXGroup;
+			children = (
+				AB7E96AF1B19AF28004A3289 /* libaether3d_osx.a */,
+				AB7E96AD1B19AEE1004A3289 /* QuartzCore.framework */,
+				AB7E96AB1B19AED1004A3289 /* Cocoa.framework */,
+				AB7E96A91B19AECB004A3289 /* IOKit.framework */,
+				AB7E96A71B19AEBD004A3289 /* OpenGL.framework */,
+				AB7E96A51B19AEB6004A3289 /* OpenAL.framework */,
+			);
+			name = Libs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		ABC8EDE81AF3948300186942 /* OpenWindow */ = {
+		AB7E96971B19AE09004A3289 /* Misc2D */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ABC8EDF01AF3948300186942 /* Build configuration list for PBXNativeTarget "OpenWindow" */;
+			buildConfigurationList = AB7E969F1B19AE09004A3289 /* Build configuration list for PBXNativeTarget "Misc2D" */;
 			buildPhases = (
-				ABC8EDE51AF3948300186942 /* Sources */,
-				ABC8EDE61AF3948300186942 /* Frameworks */,
-				ABC8EDE71AF3948300186942 /* CopyFiles */,
+				AB7E96941B19AE09004A3289 /* Sources */,
+				AB7E96951B19AE09004A3289 /* Frameworks */,
+				AB7E96961B19AE09004A3289 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = OpenWindow;
-			productName = OpenWindow;
-			productReference = ABC8EDE91AF3948300186942 /* OpenWindow */;
+			name = Misc2D;
+			productName = Misc2D;
+			productReference = AB7E96981B19AE09004A3289 /* Misc2D */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		ABC8EDE11AF3948300186942 /* Project object */ = {
+		AB7E96901B19AE09004A3289 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0620;
 				ORGANIZATIONNAME = "Timo Wiren";
 				TargetAttributes = {
-					ABC8EDE81AF3948300186942 = {
+					AB7E96971B19AE09004A3289 = {
 						CreatedOnToolsVersion = 6.2;
 					};
 				};
 			};
-			buildConfigurationList = ABC8EDE41AF3948300186942 /* Build configuration list for PBXProject "OpenWindow" */;
+			buildConfigurationList = AB7E96931B19AE09004A3289 /* Build configuration list for PBXProject "Misc2D" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = ABC8EDE01AF3948300186942;
-			productRefGroup = ABC8EDEA1AF3948300186942 /* Products */;
+			mainGroup = AB7E968F1B19AE09004A3289;
+			productRefGroup = AB7E96991B19AE09004A3289 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				ABC8EDE81AF3948300186942 /* OpenWindow */,
+				AB7E96971B19AE09004A3289 /* Misc2D */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		ABC8EDE51AF3948300186942 /* Sources */ = {
+		AB7E96941B19AE09004A3289 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ABC1E00C1AF394BD002C8AB3 /* OpenWindow.cpp in Sources */,
+				AB7E96A31B19AE1F004A3289 /* Misc2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		ABC8EDEE1AF3948300186942 /* Debug */ = {
+		AB7E969D1B19AE09004A3289 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -186,6 +186,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -197,7 +198,7 @@
 			};
 			name = Debug;
 		};
-		ABC8EDEF1AF3948300186942 /* Release */ = {
+		AB7E969E1B19AE09004A3289 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -221,6 +222,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
@@ -231,9 +233,10 @@
 			};
 			name = Release;
 		};
-		ABC8EDF11AF3948300186942 /* Debug */ = {
+		AB7E96A01B19AE09004A3289 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
@@ -241,19 +244,20 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../../Engine/Include,
+					../../../Engine/Include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					../../../aether3d_build,
+					../../../../aether3d_build,
 					/Users/glaze/Documents/src/aether3d_build,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		ABC8EDF21AF3948300186942 /* Release */ = {
+		AB7E96A11B19AE09004A3289 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
@@ -261,10 +265,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../../Engine/Include,
+					../../../Engine/Include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					../../../aether3d_build,
+					../../../../aether3d_build,
 					/Users/glaze/Documents/src/aether3d_build,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -274,25 +278,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		ABC8EDE41AF3948300186942 /* Build configuration list for PBXProject "OpenWindow" */ = {
+		AB7E96931B19AE09004A3289 /* Build configuration list for PBXProject "Misc2D" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				ABC8EDEE1AF3948300186942 /* Debug */,
-				ABC8EDEF1AF3948300186942 /* Release */,
+				AB7E969D1B19AE09004A3289 /* Debug */,
+				AB7E969E1B19AE09004A3289 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ABC8EDF01AF3948300186942 /* Build configuration list for PBXNativeTarget "OpenWindow" */ = {
+		AB7E969F1B19AE09004A3289 /* Build configuration list for PBXNativeTarget "Misc2D" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				ABC8EDF11AF3948300186942 /* Debug */,
-				ABC8EDF21AF3948300186942 /* Release */,
+				AB7E96A01B19AE09004A3289 /* Debug */,
+				AB7E96A11B19AE09004A3289 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = ABC8EDE11AF3948300186942 /* Project object */;
+	rootObject = AB7E96901B19AE09004A3289 /* Project object */;
 }

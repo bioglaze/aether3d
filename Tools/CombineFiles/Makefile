@@ -6,5 +6,5 @@ COMPILER := clang++
 endif
 
 all:
-	clang++ -std=c++11 CombineFiles.cpp -o CombineFiles
+	$(COMPILER) -std=c++11 CombineFiles.cpp -o CombineFiles
 
