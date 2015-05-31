@@ -82,7 +82,7 @@ int main()
     textContainer.AddComponent<TransformComponent>();
     textContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 160, 0 ) );
     //textContainer.GetComponent<TransformComponent>()->SetLocalScale( 2 );
-    //textContainer.GetComponent<TransformComponent>()->SetLocalRotation( Quaternion::FromEuler( Vec3( 0, 0, 45 ) ) );
+    textContainer.GetComponent<TransformComponent>()->SetLocalRotation( Quaternion::FromEuler( Vec3( 0, 0, 45 ) ) );
 
     GameObject statsParent;
     statsParent.AddComponent<TransformComponent>();

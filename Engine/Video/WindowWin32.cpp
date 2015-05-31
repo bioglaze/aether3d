@@ -3,6 +3,7 @@
 #define VC_EXTRALEAN
 #include <Windows.h>
 #include <xinput.h>
+#include "GfxDevice.hpp"
 #include "System.hpp"
 
 typedef DWORD WINAPI x_input_get_state( DWORD dwUserIndex, XINPUT_STATE* pState );
@@ -179,20 +180,20 @@ void PlatformInitGamePad()
 
 namespace ae3d
 {
-    float ProcessGamePadStickValue( SHORT value, SHORT DeadZoneThreshold )
+    float ProcessGamePadStickValue( SHORT value, SHORT deadZoneThreshold )
     {
-        float Result = 0;
+        float result = 0;
         
-        if (value < -DeadZoneThreshold)
+        if (value < -deadZoneThreshold)
         {
-            Result = (float)((value + DeadZoneThreshold) / (32768.0f - DeadZoneThreshold));
+            result = (float)((value + deadZoneThreshold) / (32768.0f - deadZoneThreshold));
         }
-        else if (value > DeadZoneThreshold)
+        else if (value > deadZoneThreshold)
         {
-            Result = (float)((value - DeadZoneThreshold) / (32767.0f - DeadZoneThreshold));
+            result = (float)((value - deadZoneThreshold) / (32767.0f - deadZoneThreshold));
         }
 
-        return Result;
+        return result;
     }
 
     void PumpGamePadEvents()
@@ -293,9 +294,9 @@ namespace ae3d
         const bool fullscreen = (flags & WindowCreateFlags::Fullscreen) != 0;
 
         WNDCLASSEX wc;
-        ZeroMemory(&wc, sizeof(WNDCLASSEX));
+        ZeroMemory( &wc, sizeof( WNDCLASSEX ) );
 
-        wc.cbSize = sizeof(WNDCLASSEX);
+        wc.cbSize = sizeof( WNDCLASSEX );
         wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
         wc.lpfnWndProc = WindowProc;
         wc.hInstance = hInstance;
@@ -325,9 +326,10 @@ namespace ae3d
             hInstance,    // application handle
             nullptr);    // used with multiple windows    
         
-        ShowWindow(WindowGlobal::hwnd, SW_SHOW);
+        ShowWindow( WindowGlobal::hwnd, SW_SHOW );
         CreateRenderer();
         WindowGlobal::isOpen = true;
+        GfxDevice::SetBackBufferDimensionAndFBO( finalWidth, finalHeight );
     }
 
     bool Window::PollEvent(WindowEvent& outEvent)
@@ -337,7 +339,7 @@ namespace ae3d
             return false;
         }
 
-        outEvent = WindowGlobal::eventStack[WindowGlobal::eventIndex];
+        outEvent = WindowGlobal::eventStack[ WindowGlobal::eventIndex ];
         --WindowGlobal::eventIndex;
         return true;
     }
@@ -346,10 +348,10 @@ namespace ae3d
     {
         MSG msg;
 
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        if (PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            TranslateMessage( &msg );
+            DispatchMessage( &msg );
         }
 
         PumpGamePadEvents();
