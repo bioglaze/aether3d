@@ -22,7 +22,6 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    System::InitGamePad();
     Window::Instance().Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
 
@@ -86,11 +85,6 @@ int main()
                     System::ReloadChangedAssets();
                 }
             }
-
-            /*if (event.type == WindowEventType::GamePadLeftThumbState)
-            {
-                spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3(event.gamePadThumbX * 40, event.gamePadThumbY * 40, 0) );
-            }*/
         }
 
         scene.Render();

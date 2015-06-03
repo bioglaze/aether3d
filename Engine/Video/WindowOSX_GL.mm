@@ -1,6 +1,5 @@
 #include "Window.hpp"
 #import <Cocoa/Cocoa.h>
-#include <GL/glxw.h>
 #include <IOKit/hid/IOHidLib.h>
 #include <Kernel/IOKit/hidsystem/IOHIDUsageTables.h>
 #include "System.hpp"
@@ -557,14 +556,7 @@ static void CreateGLContext()
     [view setOpenGLContext: WindowGlobal::glContext];
     [view setPixelFormat: pixelFormat];
     
-    if (glxwInit() != 0)
-    {
-        NSLog(@"Failed to load OpenGL function pointers using GLXW!");
-    }
-    
     //NSLog(@"GL version:   %s", glGetString(GL_VERSION));
-    glEnable( GL_DEPTH_TEST );
-
     [WindowGlobal::glContext setView: view];
 }
 
@@ -602,7 +594,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     CreateWindow( width, height, flags );
     CreateGLContext();
-    ae3d::GfxDevice::SetBackBufferDimensionAndFBO( width, height );
+    GfxDevice::Init( width, height );
 }
 
 void cocoaProcessEvents()

@@ -79,6 +79,10 @@ namespace ae3d
 
         /// Loads built-in assets and shaders.
         void LoadBuiltinAssets();
+        
+        /// Loads OpenGL function pointers and sets backbuffer dimension. Doesn't create a context.
+        void InitGfxDeviceForEditor( int width, int height );
+        
 #if AETHER3D_IOS
         void InitMetal( CAMetalLayer* metalLayer );
         void EndFrame();

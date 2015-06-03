@@ -16,6 +16,11 @@ extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
 void PlatformInitGamePad();
 
+void ae3d::System::InitGfxDeviceForEditor( int width, int height )
+{
+    GfxDevice::Init( width, height );
+}
+
 #if AETHER3D_IOS
 void ae3d::System::InitMetal( CAMetalLayer* metalLayer )
 {

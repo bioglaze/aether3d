@@ -192,6 +192,11 @@ unsigned ae3d::SpriteRendererComponent::New()
 
 ae3d::SpriteRendererComponent* ae3d::SpriteRendererComponent::Get( unsigned index )
 {
+    if (index >= spriteRendererComponents.size())
+    {
+        System::Print( "SpriteRendererComponent: invalid index: %u\n", index );
+    }
+    
     System::Assert( index < spriteRendererComponents.size(), "Tried to get a too high index for spriteRendererComponents." );
     return &spriteRendererComponents[ index ];
 }

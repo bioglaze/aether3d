@@ -8,6 +8,7 @@
 #include "stb_image.c"
 #include "FileWatcher.hpp"
 #include "System.hpp"
+#include "FileSystem.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 
@@ -38,7 +39,7 @@ void TexReload( const std::string& path )
 {
     auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
 
-    tex.Load( ae3d::System::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps() );
+    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps() );
 }
 
 namespace
@@ -86,13 +87,13 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         Texture2DGlobal::defaultTexture.width = 32;
         Texture2DGlobal::defaultTexture.height = 32;
 
-        Texture2DGlobal::defaultTexture.id = 0;
+        Texture2DGlobal::defaultTexture.handle = 0;
     }
     
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
 {
     filter = aFilter;
     wrap = aWrap;
@@ -105,16 +106,16 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
     
     const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
 
-    if (isCached && id == 0)
+    if (isCached && handle == 0)
     {
         *this = Texture2DGlobal::pathToCachedTexture[ fileContents.path ];
         return;
     }
     
     // First load.
-    if (id == 0)
+    if (handle == 0)
     {
-        id = 1;
+        handle = 1;
         fileWatcher.AddFile( fileContents.path, TexReload );
     }
 
@@ -130,7 +131,7 @@ void ae3d::Texture2D::Load( const System::FileContentsData& fileContents, Textur
 #endif
 }
 
-void ae3d::Texture2D::LoadFromAtlas( const System::FileContentsData& atlasTextureData, const System::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
 {
     Load( atlasTextureData, aWrap, aFilter, mipmaps );
 
@@ -204,7 +205,7 @@ void ae3d::Texture2D::LoadDDS( const char* path )
 {
 }
 
-void ae3d::Texture2D::LoadSTB( const System::FileContentsData& fileContents )
+void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
 {
     int components;
     unsigned char* data = stbi_load_from_memory( &fileContents.data[ 0 ], static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );

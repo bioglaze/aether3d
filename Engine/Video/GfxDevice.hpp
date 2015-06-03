@@ -25,6 +25,7 @@ namespace ae3d
             Off
         };
         
+        void Init( int width, int height );
 #if AETHER3D_IOS
         void Init( CAMetalLayer* metalLayer );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
