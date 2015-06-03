@@ -79,6 +79,9 @@
     <ClCompile Include="..\Core\FileSystem.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\RenderTextureGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -180,6 +183,12 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\FileSystem.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderTexture.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextureBase.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

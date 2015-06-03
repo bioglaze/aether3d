@@ -72,6 +72,7 @@ namespace GfxDeviceGlobal
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     GLuint systemFBO = 0;
+    GLuint cachedFBO = 0;
 }
 
 void ae3d::GfxDevice::Init( int width, int height )
@@ -325,7 +326,18 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture2D* target )
 {
-    glBindFramebuffer( GL_FRAMEBUFFER, target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO );
+    if (target != nullptr && target->GetFBO() == GfxDeviceGlobal::cachedFBO)
+    {
+        return;
+    }
+    if (target == nullptr && GfxDeviceGlobal::cachedFBO == GfxDeviceGlobal::systemFBO)
+    {
+        return;
+    }
+
+    GLuint fbo = target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
+    glBindFramebuffer( GL_FRAMEBUFFER, fbo );
+    GfxDeviceGlobal::cachedFBO = fbo;
 
     if (target != nullptr)
     {
