@@ -1,8 +1,10 @@
 #include "SceneWidget.hpp"
 #include <QKeyEvent>
+#include <QSurfaceFormat>
+#include <QApplication>
+#include <QDir>
 #include "System.hpp"
 #include "FileSystem.hpp"
-#include <qdir.h>
 #include "TransformComponent.hpp"
 
 using namespace ae3d;
@@ -19,15 +21,24 @@ std::string AbsoluteFilePath( const std::string& relativePath )
     return dir.absoluteFilePath( relativePath.c_str() ).toUtf8().constData();
 }
 
-SceneWidget::SceneWidget(const QGLFormat & format, QWidget *parent) : QGLWidget(format, parent)
+SceneWidget::SceneWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
+    QSurfaceFormat fmt;
+#if __APPLE__
+    fmt.setVersion(4, 1);
+#else
+    fmt.setVersion(4, 3);
+#endif
+    fmt.setDepthBufferSize(24);
+    fmt.setProfile(QSurfaceFormat::CoreProfile);
+    setFormat(fmt);
 }
 
 void SceneWidget::Init()
 {
     System::InitGfxDeviceForEditor( width(), height() );
     System::LoadBuiltinAssets();
-System::Print("dimension: %dx%d\n", width(), height());
+
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width(), (float)height(), 0, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1.0f, 0.5f, 0.5f ) );
@@ -41,8 +52,8 @@ System::Print("dimension: %dx%d\n", width(), height());
 
     scene.Add( &camera );
     scene.Add( &spriteContainer );
-    System::Print("inited widget\n");
 }
+
 void SceneWidget::initializeGL()
 {
     Init();
@@ -55,8 +66,6 @@ void SceneWidget::updateGL()
 
 void SceneWidget::paintGL()
 {
-    glClearColor( 1, 0, 0, 1 );
-    glClear( GL_COLOR_BUFFER_BIT );
     scene.Render();
 }
 
@@ -96,12 +105,18 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
     setFocus();
 }
 
-bool SceneWidget::eventFilter(QObject */*obj*/, QEvent *event)
+bool SceneWidget::eventFilter(QObject * /*obj*/, QEvent *event)
 {
     if (event->type() == QEvent::MouseMove)
     {
         //ae3d::System::Print("mouse move\n");
     }
+    else if (event->type() == QEvent::Quit)
+    {
+        QApplication::quit();
+    }
+
+    return false;
 }
 
 void SceneWidget::wheelEvent(QWheelEvent *event)

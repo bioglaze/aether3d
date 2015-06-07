@@ -1,21 +1,19 @@
 #ifndef SCENEWIDGET_HPP
 #define SCENEWIDGET_HPP
 
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "Texture2D.hpp"
 #include "Scene.hpp"
 
-
-class SceneWidget : public QGLWidget
+class SceneWidget : public QOpenGLWidget
 {
     Q_OBJECT
 
 public:
-    explicit SceneWidget(const QGLFormat & format, QWidget *parent=0);
-    explicit SceneWidget(QWidget *parent = 0) {}
+    explicit SceneWidget(QWidget *parent=0);
     void Init();
 
 protected:
@@ -37,4 +35,4 @@ private:
     ae3d::GameObject spriteContainer;
 };
 
-#endif // SCENEWIDGET_HPP
+#endif

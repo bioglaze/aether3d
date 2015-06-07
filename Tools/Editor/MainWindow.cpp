@@ -1,23 +1,32 @@
 #include <QSplitter>
-#include <QtOpenGL/QGLWidget>
+#include <QTreeWidget>
 #include "MainWindow.hpp"
 #include "SceneWidget.hpp"
+#include "WindowMenu.hpp"
 #include <iostream>
 
 MainWindow::MainWindow()
 {
-    QGLFormat gFormat;
-    gFormat.setVersion( 4, 1 );
-    gFormat.setSwapInterval( 1 );
-    gFormat.setProfile( QGLFormat::CoreProfile );
+    sceneTree = new QTreeWidget();
+    sceneTree->setColumnCount( 1 );
+    connect( sceneTree, &QTreeWidget::itemClicked, [&](QTreeWidgetItem* item, int /* column */) { std::cout << "jee" << std::endl;/*SelectTreeItem( item );*/ });
 
-    sceneWidget = new SceneWidget(gFormat);
+    sceneWidget = new SceneWidget();
     setWindowTitle( tr( "Editor" ) );
 
+    windowMenu.Init( this );
+    setMenuBar( windowMenu.menuBar );
+
     QSplitter* splitter = new QSplitter();
+    splitter->addWidget( sceneTree );
     splitter->addWidget( sceneWidget );
     setCentralWidget( splitter );
-    std::cout << "mutsis" << std::endl;
+
+    UpdateHierarchy();
 }
 
-
+void MainWindow::UpdateHierarchy()
+{
+    sceneTree->clear();
+    sceneTree->setHeaderLabel( "Hierarchy" );
+}

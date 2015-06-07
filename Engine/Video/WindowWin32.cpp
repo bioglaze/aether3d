@@ -329,7 +329,7 @@ namespace ae3d
         ShowWindow( WindowGlobal::hwnd, SW_SHOW );
         CreateRenderer();
         WindowGlobal::isOpen = true;
-        GfxDevice::SetBackBufferDimensionAndFBO( finalWidth, finalHeight );
+        GfxDevice::Init( finalWidth, finalHeight );
     }
 
     bool Window::PollEvent(WindowEvent& outEvent)

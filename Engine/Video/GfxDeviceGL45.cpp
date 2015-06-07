@@ -82,11 +82,8 @@ void ae3d::GfxDevice::Init( int width, int height )
         //NSLog(@"Failed to load OpenGL function pointers using GLXW!");
     }
     
-    GfxDeviceGlobal::backBufferWidth = width;
-    GfxDeviceGlobal::backBufferHeight = height;
-    //NSLog(@"GL version:   %s", glGetString(GL_VERSION));
+    SetBackBufferDimensionAndFBO( width, height );
     glEnable( GL_DEPTH_TEST );
-
 }
 
 void ae3d::GfxDevice::IncDrawCalls()

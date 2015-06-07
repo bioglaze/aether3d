@@ -1,4 +1,4 @@
-QT       += core gui opengl
+QT       += core gui opengl widgets
 
 TARGET = Editor
 CONFIG   += console
@@ -12,22 +12,28 @@ QMAKE_INFO_PLIST = Info.plist
 INCLUDEPATH += $$PWD/../../../aether3d/Engine/Include
 DEPENDPATH += $$PWD/../../../aether3d_build
 
-macx
-{
+win32 {
+    PWD_WIN = $${PWD}
+    DESTDIR_WIN = $${OUT_PWD}
+    PWD_WIN ~= s,/,\\,g
+    DESTDIR_WIN ~= s,/,\\,g
+# Use the following line if you compiled with Visual Studio
+    LIBS += -L$$PWD/../../../aether3d_build/ -lAether3D_GL45_d
+
+    LIBS += -L$$PWD/../../Engine/ThirdParty/lib/ -llibOpenAL32
+
+#win32-msvc:LIBS += -L$$PWD/../../../aether3d_build/ -lAether3D_GL45_d
+#win32-g++:LIBS += -L$$PWD/../../../aether3d_build/ -laether3d_win
+
+    copyfiles.commands = $$quote(cmd /c xcopy /S /I /y $${PWD_WIN}\copy_to_output $${DESTDIR_WIN})
+    #PRE_TARGETDEPS += $$PWD/../../../aether3d_build/libaether3d_win.a
+}
+macx {
     QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
     LIBS += -L$$PWD/../../../aether3d_build/ -laether3d_osx
     LIBS += -framework CoreFoundation -framework OpenAL -framework QuartzCore -framework IOKit -framework Cocoa
     copyfiles.commands = cp -r $$PWD/copy_to_output/* $$OUT_PWD
     PRE_TARGETDEPS += $$PWD/../../../aether3d_build/libaether3d_osx.a
-}
-win32 {
-    DEFINES += AETHER3D_WINDOWS
-    PWD_WIN = $${PWD}
-    DESTDIR_WIN = $${OUT_PWD}
-    PWD_WIN ~= s,/,\\,g
-    DESTDIR_WIN ~= s,/,\\,g
-    copyfiles.commands = $$quote(cmd /c xcopy /S /I /y $${PWD_WIN}\copy_to_output $${DESTDIR_WIN})
-    PRE_TARGETDEPS += $$PWD/../../../aether3d_build/libaether3d_win.a
 }
 linux {
     QMAKE_CXXFLAGS += -std=c++11
@@ -42,8 +48,10 @@ POST_TARGETDEPS += copyfiles
 SOURCES += \
     main.cpp \
     MainWindow.cpp \
-    SceneWidget.cpp
+    SceneWidget.cpp \
+    WindowMenu.cpp
 
 HEADERS += \
     MainWindow.hpp \
-    SceneWidget.hpp
+    SceneWidget.hpp \
+    WindowMenu.hpp
