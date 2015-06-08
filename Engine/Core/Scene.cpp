@@ -34,6 +34,18 @@ void ae3d::Scene::Add( GameObject* gameObject )
     }
 }
 
+void ae3d::Scene::Remove( GameObject* gameObject )
+{
+    for (std::size_t i = 0; i < gameObjects.size(); ++i)
+    {
+        if (gameObject == gameObjects[ i ])
+        {
+            gameObjects.erase( std::begin( gameObjects ) + i );
+            return;
+        }
+    }
+}
+
 void ae3d::Scene::Render()
 {
     if (mainCamera == nullptr || (mainCamera != nullptr && mainCamera->GetComponent<CameraComponent>() == nullptr))

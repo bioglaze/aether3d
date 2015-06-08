@@ -12,10 +12,13 @@ namespace ae3d
     class Scene
     {
     public:
-        /** Adds a game object into the scene if it does not exist there already. */
+        /// Adds a game object into the scene if it does not exist there already.
         void Add( GameObject* gameObject );
-
-        /** Renders the scene. */
+        
+        /// \param gameObject Game object to remove. Does nothing if it is null or doesn't exist in the scene.
+        void Remove( GameObject* gameObject );
+        
+        /// Renders the scene.
         void Render();
 
     private:

@@ -25,13 +25,14 @@ SceneWidget::SceneWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
     QSurfaceFormat fmt;
 #if __APPLE__
-    fmt.setVersion(4, 1);
+    fmt.setVersion(3, 2);
 #else
     fmt.setVersion(4, 3);
 #endif
-    fmt.setDepthBufferSize(24);
+    //fmt.setDepthBufferSize(24);
     fmt.setProfile(QSurfaceFormat::CoreProfile);
     setFormat(fmt);
+    QSurfaceFormat::setDefaultFormat(fmt);
 }
 
 void SceneWidget::Init()
@@ -124,3 +125,9 @@ void SceneWidget::wheelEvent(QWheelEvent *event)
 
 }
 
+int SceneWidget::CreateGameObject()
+{
+    gameObjects.push_back( ae3d::GameObject() );
+    gameObjects.back().SetName( "Game Object" );
+    return gameObjects.size() - 1;
+}

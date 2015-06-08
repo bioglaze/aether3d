@@ -9,7 +9,7 @@ This is a work in progress.
   - OpenGL 4.1, 4.5 and Metal renderers.
   - Component-based game object system.
   - Sprite rendering, texture atlasing and batching.
-  - Bitmap font rendering using BMFont fonts.
+  - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Audio support for .wav and .ogg.
   - Virtual file system for .pak files.
   - XBox controller support.
@@ -48,3 +48,7 @@ Third party library licenses are:
   - stb_vorbis.c is public domain
   - glxw is under zlib license
   - OpenAL-soft is under LGPLv2 license
+
+# Roadmap/internal TODO
+
+https://docs.google.com/document/d/1jKuEkIUHiFtF4Ys2-duCNKfV0SrxGgCSN_A2GhWeLDw/edit?usp=sharing

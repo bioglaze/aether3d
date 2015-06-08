@@ -49,9 +49,16 @@ SOURCES += \
     main.cpp \
     MainWindow.cpp \
     SceneWidget.cpp \
-    WindowMenu.cpp
+    WindowMenu.cpp \
+    CreateCameraCommand.cpp \
+    CommandManager.cpp \
+    CreateGoCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
     SceneWidget.hpp \
-    WindowMenu.hpp
+    WindowMenu.hpp \
+    Command.hpp \
+    CreateCameraCommand.hpp \
+    CommandManager.hpp \
+    CreateGoCommand.hpp

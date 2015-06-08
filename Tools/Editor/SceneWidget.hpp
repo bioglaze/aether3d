@@ -1,6 +1,7 @@
 #ifndef SCENEWIDGET_HPP
 #define SCENEWIDGET_HPP
 
+#include <vector>
 #include <QOpenGLWidget>
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
@@ -13,19 +14,30 @@ class SceneWidget : public QOpenGLWidget
     Q_OBJECT
 
 public:
-    explicit SceneWidget(QWidget *parent=0);
+    explicit SceneWidget( QWidget* parent = 0 );
+
     void Init();
+
+    /// \return Index of created game object.
+    /// Should only be called by CreateGoCommand!
+    int CreateGameObject();
+
+    int GetGameObjectCount() const { return gameObjects.size(); }
+
+    ae3d::Scene* GetScene() { return &scene; }
+
+    ae3d::GameObject* GetGameObject( int index ) { return &gameObjects[ index ]; }
 
 protected:
     void initializeGL();
     void paintGL();
     void resizeGL( int width, int height );
+    void updateGL();
     void keyPressEvent( QKeyEvent* event );
     void keyReleaseEvent( QKeyEvent* event );
     void wheelEvent(QWheelEvent *event);
     void mousePressEvent( QMouseEvent* event );
     void mouseReleaseEvent( QMouseEvent* event );
-    void updateGL();
     bool eventFilter(QObject *obj, QEvent *event);
 
 private:
@@ -33,6 +45,7 @@ private:
     ae3d::Texture2D spriteTex;
     ae3d::Scene scene;
     ae3d::GameObject spriteContainer;
+    std::vector< ae3d::GameObject > gameObjects;
 };
 
 #endif
