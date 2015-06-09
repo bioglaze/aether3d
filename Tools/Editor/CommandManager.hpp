@@ -4,17 +4,16 @@
 #include <stack>
 #include <memory>
 
-class ICommand;
+class CommandBase;
 
 class CommandManager
 {
 public:
-    CommandManager();
-    void Execute( std::shared_ptr< ICommand > command );
+    void Execute( std::shared_ptr< CommandBase > command );
     void Undo();
 
 private:
-    std::stack< std::shared_ptr< ICommand > > undoStack;
+    std::stack< std::shared_ptr< CommandBase > > undoStack;
 };
 
 #endif

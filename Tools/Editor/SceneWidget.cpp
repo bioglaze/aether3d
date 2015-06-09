@@ -3,6 +3,8 @@
 #include <QSurfaceFormat>
 #include <QApplication>
 #include <QDir>
+#include <QGLFormat>
+#include <QMessageBox>
 #include "System.hpp"
 #include "FileSystem.hpp"
 #include "TransformComponent.hpp"
@@ -21,8 +23,15 @@ std::string AbsoluteFilePath( const std::string& relativePath )
     return dir.absoluteFilePath( relativePath.c_str() ).toUtf8().constData();
 }
 
-SceneWidget::SceneWidget(QWidget *parent) : QOpenGLWidget(parent)
+SceneWidget::SceneWidget( QWidget* parent ) : QOpenGLWidget( parent )
 {
+    if (!QGLFormat::hasOpenGL())
+    {
+        QMessageBox::critical(this,
+                        "No OpenGL Support",
+                        "Missing OpenGL support! Maybe you need to update your display driver.");
+    }
+
     QSurfaceFormat fmt;
 #if __APPLE__
     fmt.setVersion(3, 2);
@@ -30,9 +39,9 @@ SceneWidget::SceneWidget(QWidget *parent) : QOpenGLWidget(parent)
     fmt.setVersion(4, 3);
 #endif
     //fmt.setDepthBufferSize(24);
-    fmt.setProfile(QSurfaceFormat::CoreProfile);
-    setFormat(fmt);
-    QSurfaceFormat::setDefaultFormat(fmt);
+    fmt.setProfile( QSurfaceFormat::CoreProfile );
+    setFormat( fmt );
+    QSurfaceFormat::setDefaultFormat( fmt );
 }
 
 void SceneWidget::Init()
@@ -78,15 +87,12 @@ void SceneWidget::resizeGL( int width, int height )
 
 void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
 {
-    ae3d::System::Print("key press\n");
     if (aEvent->key() == Qt::Key_Escape)
     {
         //mainWindow->SetSelectedNode( nullptr );
     }
     else if (aEvent->key() == Qt::Key_A)
     {
-        //cameraMoveDir.x = -1;
-        //ae3d::System::Print("Pressed A\n");
     }
  }
 
@@ -97,12 +103,10 @@ void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
 
 void SceneWidget::mousePressEvent( QMouseEvent* event )
 {
-    //ae3d::System::Print("Mouse press\n");
 }
 
 void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
 {
-    //ae3d::System::Print("Mouse press\n");
     setFocus();
 }
 
@@ -110,7 +114,6 @@ bool SceneWidget::eventFilter(QObject * /*obj*/, QEvent *event)
 {
     if (event->type() == QEvent::MouseMove)
     {
-        //ae3d::System::Print("mouse move\n");
     }
     else if (event->type() == QEvent::Quit)
     {
@@ -122,12 +125,18 @@ bool SceneWidget::eventFilter(QObject * /*obj*/, QEvent *event)
 
 void SceneWidget::wheelEvent(QWheelEvent *event)
 {
-
 }
 
 int SceneWidget::CreateGameObject()
 {
     gameObjects.push_back( ae3d::GameObject() );
     gameObjects.back().SetName( "Game Object" );
+    gameObjectsInScene.push_back( 1 );
     return gameObjects.size() - 1;
+}
+
+void SceneWidget::RemoveGameObject( int index )
+{
+    scene.Remove( &gameObjects[ index ] );
+    gameObjectsInScene[ index ] = 0;
 }

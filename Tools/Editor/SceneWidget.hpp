@@ -22,7 +22,12 @@ public:
     /// Should only be called by CreateGoCommand!
     int CreateGameObject();
 
+    /// \param index Index.
+    void RemoveGameObject( int index );
+
     int GetGameObjectCount() const { return gameObjects.size(); }
+
+    bool IsGameObjectInScene( int index ) const { return gameObjectsInScene[ index ] != 0; }
 
     ae3d::Scene* GetScene() { return &scene; }
 
@@ -46,6 +51,7 @@ private:
     ae3d::Scene scene;
     ae3d::GameObject spriteContainer;
     std::vector< ae3d::GameObject > gameObjects;
+    std::vector< int > gameObjectsInScene; // Using int to avoid bool vector specialization madness.
 };
 
 #endif

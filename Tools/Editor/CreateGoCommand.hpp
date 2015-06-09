@@ -10,12 +10,12 @@ namespace ae3d
 
 class SceneWidget;
 
-class CreateGoCommand : public ICommand
+class CreateGoCommand : public CommandBase
 {
 public:
-    CreateGoCommand( SceneWidget* aSceneWidget );
-    void Execute();
-    void Undo();
+    CreateGoCommand( SceneWidget* sceneWidget );
+    void Execute() override;
+    void Undo() override;
 
 private:
     SceneWidget* sceneWidget = nullptr;

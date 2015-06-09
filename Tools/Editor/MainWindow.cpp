@@ -1,12 +1,14 @@
 #include <QSplitter>
 #include <QTreeWidget>
+#include <QKeyEvent>
+#include <QFileDialog>
+#include <iostream>
+#include <memory>
 #include "MainWindow.hpp"
 #include "SceneWidget.hpp"
 #include "WindowMenu.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
-#include <iostream>
-#include <memory>
 
 MainWindow::MainWindow()
 {
@@ -15,7 +17,7 @@ MainWindow::MainWindow()
     connect( sceneTree, &QTreeWidget::itemClicked, [&](QTreeWidgetItem* item, int /* column */) { std::cout << "jee" << std::endl;/*SelectTreeItem( item );*/ });
 
     sceneWidget = new SceneWidget();
-    setWindowTitle( tr( "Editor" ) );
+    setWindowTitle( "Editor" );
 
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
@@ -28,22 +30,28 @@ MainWindow::MainWindow()
     UpdateHierarchy();
 }
 
-void MainWindow::CommandCreateCamera()
+void MainWindow::keyReleaseEvent( QKeyEvent* event )
 {
-    std::cout << "MainWindow CreateCamera" << std::endl;
-    commandManager.Execute( std::make_shared< CreateCameraCommand >() );
+}
+
+void MainWindow::CommandCreateCameraComponent()
+{
+    commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
 }
 
 void MainWindow::CommandCreateGameObject()
 {
-    std::cout << "MainWindow CommandCreateGameObject" << std::endl;
     commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
     UpdateHierarchy();
 }
 
 void MainWindow::LoadScene()
 {
-    std::cout << "MainWindow loadscene" << std::endl;
+    const QString fileName = QFileDialog::getOpenFileName( this, "Open Scene", "", "Scenes (*.scene)" );
+
+    if (fileName != "")
+    {
+    }
 }
 
 void MainWindow::UpdateHierarchy()
@@ -52,31 +60,21 @@ void MainWindow::UpdateHierarchy()
     sceneTree->setHeaderLabel( "Hierarchy" );
 
     QList< QTreeWidgetItem* > nodes;
-    int count = sceneWidget->GetGameObjectCount();
+    const int count = sceneWidget->GetGameObjectCount();
+    int g = 0;
 
-    for (std::size_t i = 0; i < count; ++i)
+    for (int i = 0; i < count; ++i)
     {
-        nodes.append(new QTreeWidgetItem((QTreeWidget*)0, QStringList(QString(sceneWidget->GetGameObject(i)->GetName().c_str()))));
-        //m->treeWidgetToNode[ nodes.back() ] = node;
-
+        if (sceneWidget->IsGameObjectInScene( i ))
+        {
+            nodes.append(new QTreeWidgetItem( (QTreeWidget*)0, QStringList( QString( sceneWidget->GetGameObject( g )->GetName().c_str() ) ) ) );
+            ++g;
+        }
         /*if (node == editorState->selectedNode)
         {
             sceneTree->setCurrentItem( nodes.back() );
         }*/
     }
-    /*for (auto& node : sceneWidget->GetScene()->Children())
-    {
-        if (!sceneWidget->IsEditorWidget( node ))
-        {
-            nodes.append(new QTreeWidgetItem((QTreeWidget*)0, QStringList(QString(node->GetName().c_str()))));
-            m->treeWidgetToNode[ nodes.back() ] = node;
-
-            if (node == editorState->selectedNode)
-            {
-                sceneTree->setCurrentItem( nodes.back() );
-            }
-        }
-    }*/
 
     sceneTree->insertTopLevelItems( 0, nodes );
 }

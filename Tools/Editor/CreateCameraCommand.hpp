@@ -3,11 +3,17 @@
 
 #include "Command.hpp"
 
-class CreateCameraCommand : public ICommand
+class SceneWidget;
+
+class CreateCameraCommand : public CommandBase
 {
 public:
+    CreateCameraCommand( SceneWidget* sceneWidget );
     void Execute() override;
     void Undo() override;
+
+private:
+    SceneWidget* sceneWidget = nullptr;
 };
 
 #endif

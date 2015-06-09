@@ -1,12 +1,7 @@
 #include "CommandManager.hpp"
 #include "Command.hpp"
 
-CommandManager::CommandManager()
-{
-
-}
-
-void CommandManager::Execute( std::shared_ptr< ICommand > command )
+void CommandManager::Execute( std::shared_ptr< CommandBase > command )
 {
     command->Execute();
     undoStack.push( command );
@@ -14,5 +9,9 @@ void CommandManager::Execute( std::shared_ptr< ICommand > command )
 
 void CommandManager::Undo()
 {
-
+    if (undoStack.size() > 0)
+    {
+        undoStack.top()->Undo();
+        undoStack.pop();
+    }
 }

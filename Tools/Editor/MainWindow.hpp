@@ -7,6 +7,7 @@
 
 class SceneWidget;
 class QTreeWidget;
+class QKeyEvent;
 
 class MainWindow : public QMainWindow
 {
@@ -14,15 +15,17 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-    SceneWidget* GetSceneWidget() { return sceneWidget; }
+    SceneWidget* GetSceneWidget() const { return sceneWidget; }
 
 public slots:
     void LoadScene();
-    void CommandCreateCamera();
+    void CommandCreateCameraComponent();
     void CommandCreateGameObject();
+    void Undo() { commandManager.Undo(); UpdateHierarchy(); }
 
 private:
     void UpdateHierarchy();
+    void keyReleaseEvent( QKeyEvent* event );
 
     QTreeWidget* sceneTree = nullptr;
     SceneWidget* sceneWidget = nullptr;

@@ -1,7 +1,8 @@
 #ifndef COMMAND
 #define COMMAND
 
-class ICommand
+/// Everything that modifies the scene is a command. This allows undo.
+class CommandBase
 {
 public:
     virtual void Execute() = 0;
