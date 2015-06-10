@@ -5,6 +5,7 @@
 #endif
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
+#include "RenderTexture.hpp"
 
 extern ae3d::Renderer renderer;
 
@@ -24,7 +25,9 @@ id<CAMetalDrawable> drawable;
 dispatch_semaphore_t inflight_semaphore;
 bool pipelineCreated = false;
 id<MTLTexture> texture0;
+id<MTLTexture> currentRenderTarget;
 
+// TODO: Move somewhere else.
 void PlatformInitGamePad()
 {
 }
@@ -37,6 +40,14 @@ struct Uniforms
 namespace GfxDeviceGlobal
 {
     int drawCalls = 0;
+    int backBufferWidth = 0;
+    int backBufferHeight = 0;
+}
+
+void ae3d::GfxDevice::Init( int width, int height )
+{
+    GfxDeviceGlobal::backBufferWidth = width;
+    GfxDeviceGlobal::backBufferHeight = height;
 }
 
 namespace
@@ -161,9 +172,16 @@ void ae3d::GfxDevice::BeginFrame()
         pipelineCreated = true;
     }
 
-    drawable = GetCurrentDrawable();
-    setupRenderPassDescriptor( drawable.texture );
-
+    if (!currentRenderTarget)
+    {
+        drawable = GetCurrentDrawable();
+        setupRenderPassDescriptor( drawable.texture );
+    }
+    else
+    {
+        setupRenderPassDescriptor( currentRenderTarget );
+    }
+    
     commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
@@ -242,6 +260,21 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
 {
+}
+
+void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture2D* renderTexture2d )
+{
+    if ((!currentRenderTarget && !renderTexture2d) ||
+        (renderTexture2d != nullptr && renderTexture2d->GetMetalTexture() == currentRenderTarget))
+    {
+        return;
+    }
+    
+    PresentDrawable();
+    
+    //setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture );
+    currentRenderTarget = renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : nullptr;//GetCurrentDrawable().texture;
+    BeginFrame();
 }
 
 void ae3d::GfxDevice::ErrorCheck(char const*)

@@ -1,9 +1,6 @@
 #ifndef TEXTURE_2D_H
 #define TEXTURE_2D_H
 
-#if AETHER3D_IOS
-#import <Metal/Metal.h>
-#endif
 #include "Vec3.hpp"
 #include "TextureBase.hpp"
 

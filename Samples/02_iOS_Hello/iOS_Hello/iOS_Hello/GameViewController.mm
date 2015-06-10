@@ -13,6 +13,7 @@
 #include "Aether3D_iOS.framework/Headers/AudioClip.hpp"
 #include "Aether3D_iOS.framework/Headers/Font.hpp"
 #include "Aether3D_iOS.framework/Headers/FileSystem.hpp"
+#include "Aether3D_iOS.framework/Headers/RenderTexture.hpp"
 
 @implementation GameViewController
 {
@@ -32,6 +33,9 @@
     ae3d::Scene scene;
     ae3d::AudioClip audioClip;
     ae3d::Font font;
+    ae3d::GameObject rtCamera;
+    ae3d::RenderTexture2D rtTex;
+    ae3d::GameObject renderTextureContainer;
 }
 
 - (void)dealloc
@@ -90,6 +94,18 @@
     //text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 40, 0 ) );
     
     scene.Add( &text );
+    
+    rtTex.Create( 512, 512, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    
+    renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
+    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 150, 250, -0.6f ), ae3d::Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    
+    rtCamera.AddComponent<ae3d::CameraComponent>();
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
 }
 
 -(void) touchesBegan: (NSSet *) touches withEvent: (UIEvent *) event

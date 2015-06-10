@@ -292,6 +292,7 @@
 		4469AA241AEFCDFE007BBBF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -307,12 +308,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "~/Desktop";
+				VALID_ARCHS = arm64;
 			};
 			name = Debug;
 		};
 		4469AA251AEFCDFE007BBBF1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -323,8 +326,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_IOS;
 				INFOPLIST_FILE = iOS_Hello/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "~/Desktop";
+				VALID_ARCHS = arm64;
 			};
 			name = Release;
 		};

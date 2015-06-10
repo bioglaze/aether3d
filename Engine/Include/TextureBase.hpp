@@ -1,6 +1,9 @@
 #ifndef TEXTURE_BASE_H
 #define TEXTURE_BASE_H
 
+#if AETHER3D_IOS
+#import <Metal/Metal.h>
+#endif
 #include "Vec3.hpp"
 
 namespace ae3d
@@ -32,7 +35,7 @@ namespace ae3d
         /// \return id.
         unsigned GetID() const { return handle; }
 #if AETHER3D_IOS
-        id<MTLTexture> GetMetalTexture() const { if (metalTexture == nullptr) { return GetDefaultTexture()->metalTexture; /*System::Print("metalTexture is null\n");*/} return metalTexture; }
+        id<MTLTexture> GetMetalTexture() const { return metalTexture; }
 #endif
         
         /// \return Width in pixels.

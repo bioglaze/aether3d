@@ -53,8 +53,9 @@
 		4449E89C1B14B4B5009A869C /* VertexBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8941B14B4B5009A869C /* VertexBuffer.hpp */; };
 		4449E89E1B14B570009A869C /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449E89D1B14B570009A869C /* Metal.framework */; };
 		4449E8A01B14B576009A869C /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449E89F1B14B576009A869C /* OpenAL.framework */; };
-		ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E51B1A277B0017797C /* RenderTexture.hpp */; };
-		ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E61B1A277B0017797C /* TextureBase.hpp */; };
+		4498A00C1B1C397E00C2271C /* RenderTextureMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */; };
+		ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E51B1A277B0017797C /* RenderTexture.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E61B1A277B0017797C /* TextureBase.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -108,6 +109,7 @@
 		4449E8941B14B4B5009A869C /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
 		4449E89D1B14B570009A869C /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		4449E89F1B14B576009A869C /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RenderTextureMetal.mm; path = ../../Video/Metal/RenderTextureMetal.mm; sourceTree = "<group>"; };
 		ABF341E51B1A277B0017797C /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../Include/RenderTexture.hpp; sourceTree = "<group>"; };
 		ABF341E61B1A277B0017797C /* TextureBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../../Include/TextureBase.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -258,6 +260,7 @@
 				4449E8911B14B4B5009A869C /* Texture2DMetal.mm */,
 				4449E8921B14B4B5009A869C /* VertexBufferMetal.mm */,
 				4449E8931B14B4B5009A869C /* Renderer.hpp */,
+				4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */,
 				4449E8941B14B4B5009A869C /* VertexBuffer.hpp */,
 			);
 			name = Video;
@@ -271,7 +274,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4449E8531B14B423009A869C /* AudioSourceComponent.hpp in Headers */,
-				ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */,
 				4449E8551B14B423009A869C /* FileSystem.hpp in Headers */,
 				4449E85D1B14B423009A869C /* SpriteRendererComponent.hpp in Headers */,
 				4449E85C1B14B423009A869C /* Shader.hpp in Headers */,
@@ -281,12 +283,13 @@
 				4449E85B1B14B423009A869C /* Scene.hpp in Headers */,
 				4449E8571B14B423009A869C /* GameObject.hpp in Headers */,
 				4449E8521B14B423009A869C /* AudioClip.hpp in Headers */,
-				ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */,
 				4449E8591B14B423009A869C /* Matrix.hpp in Headers */,
 				4449E8611B14B423009A869C /* TransformComponent.hpp in Headers */,
 				4449E85A1B14B423009A869C /* Quaternion.hpp in Headers */,
 				4449E85F1B14B423009A869C /* TextRendererComponent.hpp in Headers */,
 				4449E8561B14B423009A869C /* Font.hpp in Headers */,
+				ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */,
+				ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */,
 				4449E8621B14B423009A869C /* Vec3.hpp in Headers */,
 				4449E8581B14B423009A869C /* Macros.hpp in Headers */,
 				4449E86F1B14B44E009A869C /* AudioSystem.hpp in Headers */,
@@ -382,6 +385,7 @@
 				4449E88A1B14B48E009A869C /* stb_image.c in Sources */,
 				4449E86E1B14B44E009A869C /* AudioClip.cpp in Sources */,
 				4449E8831B14B46C009A869C /* TextRendererComponent.cpp in Sources */,
+				4498A00C1B1C397E00C2271C /* RenderTextureMetal.mm in Sources */,
 				4449E8981B14B4B5009A869C /* ShaderMetal.mm in Sources */,
 				4449E8741B14B44E009A869C /* Font.cpp in Sources */,
 				4449E8961B14B4B5009A869C /* GfxDeviceMetal.mm in Sources */,
