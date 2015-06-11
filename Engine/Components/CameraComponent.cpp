@@ -1,5 +1,6 @@
 #include "CameraComponent.hpp"
 #include <vector>
+#include <sstream>
 
 std::vector< ae3d::CameraComponent > cameraComponents;
 unsigned nextFreeCameraComponent = 0;
@@ -19,12 +20,14 @@ ae3d::CameraComponent* ae3d::CameraComponent::Get( unsigned index )
     return &cameraComponents[index];
 }
 
-void ae3d::CameraComponent::SetProjection( float left, float right, float bottom, float top, float near, float far )
+void ae3d::CameraComponent::SetProjection( float left, float right, float bottom, float top, float aNear, float aFar )
 {
     orthoParams.left = left;
     orthoParams.right = right;
     orthoParams.top = top;
     orthoParams.down = bottom;
+    near = aNear;
+    far = aFar;
 
     projectionMatrix.MakeProjection( left, right, bottom, top, near, far );
 }
@@ -41,11 +44,9 @@ void ae3d::CameraComponent::SetTargetTexture( ae3d::RenderTexture2D* renderTextu
 
 std::string ae3d::CameraComponent::GetSerialized() const
 {
-    std::string outSerialized = "camera\n";
-    const std::string space = " ";
-    outSerialized += std::string( "ortho " ) + std::to_string( orthoParams.left ) + space +
-       std::to_string( orthoParams.right ) + std::to_string( orthoParams.top ) + space + std::to_string( orthoParams.down ) + 
-       std::to_string( near ) + space + std::to_string( far );
-
-    return outSerialized + "\n\n";
+    std::stringstream outStream;
+    outStream << "camera\n" << "ortho " << orthoParams.left << " " << orthoParams.right << " " << orthoParams.top << " " << orthoParams.down <<
+    " " << near << " " << far << "\n\n";
+    
+    return outStream.str();
 }

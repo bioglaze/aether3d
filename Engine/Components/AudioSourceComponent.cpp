@@ -1,6 +1,7 @@
 #include "AudioSourceComponent.hpp"
 #include "AudioSystem.hpp"
 #include <vector>
+#include <sstream>
 
 std::vector< ae3d::AudioSourceComponent > audioSourceComponents;
 unsigned nextFreeAudioSourceComponent = 0;
@@ -29,3 +30,11 @@ void ae3d::AudioSourceComponent::Play()
 {
     AudioSystem::Play( clipId );
 }
+
+std::string ae3d::AudioSourceComponent::GetSerialized() const
+{
+    std::stringstream outStream;
+    outStream << "audiosource\n" << clipId << "\n\n";
+    return outStream.str();
+}
+

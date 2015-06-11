@@ -117,7 +117,8 @@ int main()
     scene.Add( &statsParent );
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
-    
+    System::Print( "%s\n", scene.GetSerialized().c_str() );
+
     bool quit = false;
     
     while (Window::Instance().IsOpen() && !quit)

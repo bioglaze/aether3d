@@ -129,14 +129,16 @@ void SceneWidget::wheelEvent(QWheelEvent *event)
 
 int SceneWidget::CreateGameObject()
 {
-    gameObjects.push_back( ae3d::GameObject() );
-    gameObjects.back().SetName( "Game Object" );
+    gameObjects.push_back( new ae3d::GameObject() );
+    gameObjects.back()->SetName( "Game Object" );
     gameObjectsInScene.push_back( 1 );
+    scene.Add( gameObjects.back() );
+    selectedGameObject = gameObjects.size() - 1;
     return gameObjects.size() - 1;
 }
 
 void SceneWidget::RemoveGameObject( int index )
 {
-    scene.Remove( &gameObjects[ index ] );
+    scene.Remove( gameObjects[ index ] );
     gameObjectsInScene[ index ] = 0;
 }

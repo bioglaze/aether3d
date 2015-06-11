@@ -56,7 +56,7 @@ int main()
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
-    //System::Print( "%s\n", scene.GetSerialized().c_str() );
+    System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;
     

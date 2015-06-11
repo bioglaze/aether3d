@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 #include <list>
+#include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
@@ -135,7 +136,7 @@ std::string ae3d::Scene::GetSerialized() const
             continue;
         }
 
-        //outSerialized += gameObject->GetSerialized();
+        outSerialized += gameObject->GetSerialized();
         
         // TODO: Try to DRY.
         if (gameObject->GetComponent<TransformComponent>())
@@ -149,6 +150,10 @@ std::string ae3d::Scene::GetSerialized() const
         if (gameObject->GetComponent<TextRendererComponent>())
         {
             outSerialized += gameObject->GetComponent<TextRendererComponent>()->GetSerialized();
+        }
+        if (gameObject->GetComponent<AudioSourceComponent>())
+        {
+            outSerialized += gameObject->GetComponent<AudioSourceComponent>()->GetSerialized();
         }
     }
     return outSerialized;

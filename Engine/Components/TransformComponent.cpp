@@ -1,5 +1,6 @@
 #include "TransformComponent.hpp"
 #include <vector>
+#include <sstream>
 
 std::vector< ae3d::TransformComponent > transformComponents;
 unsigned nextFreeTransformComponent = 0;
@@ -93,16 +94,9 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
 
 std::string ae3d::TransformComponent::GetSerialized() const
 {
-    std::string outSerialized = "transform\n";
-
-    outSerialized += std::to_string( localPosition.x ) + " ";
-    outSerialized += std::to_string( localPosition.y ) + " ";
-    outSerialized += std::to_string( localPosition.z ) + "\n";
-
-    outSerialized += std::to_string( localRotation.x ) + " ";
-    outSerialized += std::to_string( localRotation.y ) + " ";
-    outSerialized += std::to_string( localRotation.z ) + " ";
-    outSerialized += std::to_string( localRotation.w ) + "\n\n";
-
-    return outSerialized;
+    std::stringstream outStream;
+    outStream << "transform\n" << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\n";
+    outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\n\n";
+    
+    return outStream.str();
 }

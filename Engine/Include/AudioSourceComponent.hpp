@@ -1,6 +1,8 @@
 #ifndef AUDIO_SOURCE_COMPONENT
 #define AUDIO_SOURCE_COMPONENT
 
+#include <string>
+
 namespace ae3d
 {
     /// Contains an audio clip and methods to play it.
@@ -12,6 +14,9 @@ namespace ae3d
 
         /** Plays the clip. */
         void Play();
+
+        /// \return Textual representation of component.
+        std::string GetSerialized() const;
 
     private:
         friend class GameObject;

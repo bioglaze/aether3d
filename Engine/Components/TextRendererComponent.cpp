@@ -1,12 +1,13 @@
 #include "TextRendererComponent.hpp"
 #include <vector>
+#include <sstream>
 #include "Font.hpp"
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
 #include "Vec3.hpp"
-#include "System.hpp"
+
 extern ae3d::Renderer renderer;
 
 std::vector< ae3d::TextRendererComponent > textComponents;
@@ -95,13 +96,9 @@ void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )
 
 std::string ae3d::TextRendererComponent::GetSerialized() const
 {
-    std::string outSerialized = "textrenderer\n";
-    const std::string space = " ";
-    outSerialized += std::string("color ") + std::to_string( m().color.x ) + 
-        space + std::to_string( m().color.y ) + 
-        space + std::to_string( m().color.z ) +
-        space + std::to_string( m().color.w ) + "\n";
-    outSerialized += "text " + m().text + "\n\n";
-
-    return outSerialized;
+    std::stringstream outStream;
+    outStream << "textrenderer\n";
+    outStream << "color " << m().color.x << " " << m().color.y << " " << m().color.z << " " << m().color.w << "\n";
+    outStream << "text " << m().text << "\n\n";
+    return outStream.str();
 }

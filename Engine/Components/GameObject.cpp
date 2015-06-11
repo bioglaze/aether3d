@@ -8,7 +8,7 @@ unsigned ae3d::GameObject::GetNextComponentIndex()
 std::string ae3d::GameObject::GetSerialized() const
 {
     std::string outSerialized = "gameobject ";
-    outSerialized += name;
+    outSerialized += name + "\n";
 
     return outSerialized;
 }

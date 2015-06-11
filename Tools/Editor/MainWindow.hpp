@@ -8,6 +8,7 @@
 class SceneWidget;
 class QTreeWidget;
 class QKeyEvent;
+class QTreeWidgetItem;
 
 class MainWindow : public QMainWindow
 {
@@ -19,6 +20,7 @@ public:
 
 public slots:
     void LoadScene();
+    void SaveScene();
     void CommandCreateCameraComponent();
     void CommandCreateGameObject();
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
@@ -26,6 +28,7 @@ public slots:
 private:
     void UpdateHierarchy();
     void keyReleaseEvent( QKeyEvent* event );
+    void SelectTreeItem( QTreeWidgetItem* item );
 
     QTreeWidget* sceneTree = nullptr;
     SceneWidget* sceneWidget = nullptr;

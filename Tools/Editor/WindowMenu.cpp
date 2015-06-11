@@ -7,7 +7,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     menuBar = new QMenuBar( mainWindow );
 
     fileMenu = menuBar->addMenu( "&File" );
-    fileMenu->addAction( "Load Scene", mainWindow, SLOT(LoadScene()), QKeySequence("Ctrl+O"));
+    fileMenu->addAction( "Save Scene", mainWindow, SLOT(SaveScene()), QKeySequence("Ctrl+S"));
     //fileMenu->addSeparator();
 
     editMenu = menuBar->addMenu( "&Edit" );
