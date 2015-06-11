@@ -92,3 +92,16 @@ void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )
 {
     m().shader = aShaderType == ShaderType::Sprite ? &renderer.builtinShaders.spriteRendererShader : &renderer.builtinShaders.sdfShader;
 }
+
+std::string ae3d::TextRendererComponent::GetSerialized() const
+{
+    std::string outSerialized = "textrenderer\n";
+    const std::string space = " ";
+    outSerialized += std::string("color ") + std::to_string( m().color.x ) + 
+        space + std::to_string( m().color.y ) + 
+        space + std::to_string( m().color.z ) +
+        space + std::to_string( m().color.w ) + "\n";
+    outSerialized += "text " + m().text + "\n\n";
+
+    return outSerialized;
+}

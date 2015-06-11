@@ -123,3 +123,33 @@ void ae3d::Scene::RenderWithCamera( CameraComponent* camera )
     
     GfxDevice::ErrorCheck( "Scene render end" );
 }
+
+std::string ae3d::Scene::GetSerialized() const
+{
+    std::string outSerialized;
+
+    for (auto gameObject : gameObjects)
+    {
+        if (gameObject == nullptr)
+        {
+            continue;
+        }
+
+        //outSerialized += gameObject->GetSerialized();
+        
+        // TODO: Try to DRY.
+        if (gameObject->GetComponent<TransformComponent>())
+        {
+            outSerialized += gameObject->GetComponent<TransformComponent>()->GetSerialized();
+        }
+        if (gameObject->GetComponent<CameraComponent>())
+        {
+            outSerialized += gameObject->GetComponent<CameraComponent>()->GetSerialized();
+        }
+        if (gameObject->GetComponent<TextRendererComponent>())
+        {
+            outSerialized += gameObject->GetComponent<TextRendererComponent>()->GetSerialized();
+        }
+    }
+    return outSerialized;
+}

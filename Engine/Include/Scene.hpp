@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include <vector>
+#include <string>
 
 namespace ae3d
 {
@@ -20,6 +21,9 @@ namespace ae3d
         
         /// Renders the scene.
         void Render();
+
+        /// \return Scene's contents in a textual format that can be saved into file etc.
+        std::string GetSerialized() const;
 
     private:
         void RenderWithCamera( CameraComponent* camera );

@@ -90,3 +90,19 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
 
     parent = aParent;
 }
+
+std::string ae3d::TransformComponent::GetSerialized() const
+{
+    std::string outSerialized = "transform\n";
+
+    outSerialized += std::to_string( localPosition.x ) + " ";
+    outSerialized += std::to_string( localPosition.y ) + " ";
+    outSerialized += std::to_string( localPosition.z ) + "\n";
+
+    outSerialized += std::to_string( localRotation.x ) + " ";
+    outSerialized += std::to_string( localRotation.y ) + " ";
+    outSerialized += std::to_string( localRotation.z ) + " ";
+    outSerialized += std::to_string( localRotation.w ) + "\n\n";
+
+    return outSerialized;
+}

@@ -1,7 +1,6 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
-// TODO: Resurrect own fixed-length string class from archives.
 #include <string>
 
 namespace ae3d
@@ -45,10 +44,13 @@ namespace ae3d
         /// \return Game Object's name.
         const std::string& GetName() const { return name; }
         
+        /// \return Game Object's contents excluding components
+        std::string GetSerialized() const;
+
     private:
         struct ComponentEntry
         {
-            int type = 0;
+            int type = -1;
             unsigned handle = 0;
         };
 

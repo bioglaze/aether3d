@@ -1,6 +1,7 @@
 #ifndef CAMERA_COMPONENT_H
 #define CAMERA_COMPONENT_H
 
+#include <string>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 
@@ -39,6 +40,9 @@ namespace ae3d
         /// \param renderTexture2D 2D render texture.
         void SetTargetTexture( RenderTexture2D* renderTexture2D );
         
+        /// \return Textual representation of component.
+        std::string GetSerialized() const;
+
     private:
         friend class GameObject;
         
@@ -55,6 +59,17 @@ namespace ae3d
         Matrix44 viewMatrix;
         Vec3 clearColor;
         RenderTexture2D* targetTexture = nullptr;
+
+        struct OrthoParams
+        {
+            float left = 0;
+            float right = 100;
+            float top = 0;
+            float down = 100;
+        } orthoParams;
+
+        float near = 0;
+        float far = 1;
     };
 }
 #endif

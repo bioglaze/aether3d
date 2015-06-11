@@ -1,6 +1,7 @@
 #ifndef TRANSFORM_COMPONENT_H
 #define TRANSFORM_COMPONENT_H
 
+#include <string>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
@@ -29,6 +30,9 @@ namespace ae3d
         /// \return Local transform matrix.
         const Matrix44& GetLocalMatrix();
         
+        /// \return Textual representation of component.
+        std::string GetSerialized() const;
+
     private:
         friend class GameObject;
 
