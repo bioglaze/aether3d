@@ -35,17 +35,31 @@ MainWindow::MainWindow()
 
 void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
 {
-    //SetSelectedNode( m->treeWidgetToNode[ item ] );
-    int g = 0;
+    int sceneObjectCounter = 0;
 
     for (int i = 0; i < sceneWidget->GetGameObjectCount(); ++i)
     {
         if (sceneWidget->IsGameObjectInScene( i ))
         {
-            //if (sceneTree->ite)
-            ++g;
+            ++sceneObjectCounter;
         }
     }
+
+    int selectedIndex = 0;
+
+    // Figures out which game object was selected.
+    for (int i = 0; i < sceneObjectCounter; ++i)
+    {
+        if (sceneTree->topLevelItem( i ) == item)
+        {
+            selectedIndex = i;
+            std::cout << "selected list item: " << i << std::endl;
+        }
+    }
+
+    // TODO: Remove sceneWidget->selectedGameObject variable.
+    sceneWidget->selectedGameObject = sceneWidget->GetGameObject( selectedIndex );
+    emit GameObjectSelected( sceneWidget->GetGameObject( selectedIndex ) );
 }
 
 void MainWindow::keyReleaseEvent( QKeyEvent* event )

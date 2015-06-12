@@ -7,6 +7,11 @@ class QMenu;
 class QMenuBar;
 class QWidget;
 
+namespace ae3d
+{
+    class GameObject;
+}
+
 class WindowMenu : QObject
 {
     Q_OBJECT
@@ -14,6 +19,9 @@ class WindowMenu : QObject
 public:
     void Init( QWidget* mainWindow );
     QMenuBar* menuBar = nullptr;
+
+private slots:
+    void GameObjectSelected( ae3d::GameObject* gameObject );
 
 private:
     QMenu* fileMenu = nullptr;

@@ -1,6 +1,7 @@
 #ifndef SCENEWIDGET_HPP
 #define SCENEWIDGET_HPP
 
+#include <memory>
 #include <vector>
 #include <QOpenGLWidget>
 #include "GameObject.hpp"
@@ -31,7 +32,7 @@ public:
 
     ae3d::Scene* GetScene() { return &scene; }
 
-    ae3d::GameObject* GetGameObject( int index ) { return gameObjects[ index ]; }
+    ae3d::GameObject* GetGameObject( int index ) { return gameObjects[ index ].get(); }
 
     // TODO: Maybe create an editor state class and put this there.
     int selectedGameObject = -1;
@@ -53,7 +54,7 @@ private:
     ae3d::Texture2D spriteTex;
     ae3d::Scene scene;
     ae3d::GameObject spriteContainer;
-    std::vector< ae3d::GameObject* > gameObjects;
+    std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
     std::vector< int > gameObjectsInScene; // Using int to avoid bool vector specialization madness.
 };
 

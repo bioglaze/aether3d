@@ -10,6 +10,11 @@ class QTreeWidget;
 class QKeyEvent;
 class QTreeWidgetItem;
 
+namespace ae3d
+{
+    class GameObject;
+}
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -24,6 +29,9 @@ public slots:
     void CommandCreateCameraComponent();
     void CommandCreateGameObject();
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
+
+signals:
+    void GameObjectSelected( ae3d::GameObject* gameObject );
 
 private:
     void UpdateHierarchy();

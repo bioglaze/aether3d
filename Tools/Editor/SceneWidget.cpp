@@ -62,6 +62,9 @@ void SceneWidget::Init()
 
     scene.Add( &camera );
     scene.Add( &spriteContainer );
+
+    //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
+    //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
 }
 
 void SceneWidget::initializeGL()
@@ -96,21 +99,21 @@ void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
     }
  }
 
-void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
+void SceneWidget::keyReleaseEvent( QKeyEvent* /*aEvent*/ )
 {
 
 }
 
-void SceneWidget::mousePressEvent( QMouseEvent* event )
+void SceneWidget::mousePressEvent( QMouseEvent* /*event*/ )
 {
 }
 
-void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
+void SceneWidget::mouseReleaseEvent( QMouseEvent* /*event*/ )
 {
     setFocus();
 }
 
-bool SceneWidget::eventFilter(QObject * /*obj*/, QEvent *event)
+bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
 {
     if (event->type() == QEvent::MouseMove)
     {
@@ -123,22 +126,23 @@ bool SceneWidget::eventFilter(QObject * /*obj*/, QEvent *event)
     return false;
 }
 
-void SceneWidget::wheelEvent(QWheelEvent *event)
+void SceneWidget::wheelEvent( QWheelEvent */*event*/)
 {
 }
 
 int SceneWidget::CreateGameObject()
 {
-    gameObjects.push_back( new ae3d::GameObject() );
+    gameObjects.push_back( std::make_shared<ae3d::GameObject>() );
     gameObjects.back()->SetName( "Game Object" );
+    gameObjects.back()->AddComponent< ae3d::TransformComponent >();
     gameObjectsInScene.push_back( 1 );
-    scene.Add( gameObjects.back() );
+    scene.Add( gameObjects.back().get() );
     selectedGameObject = gameObjects.size() - 1;
     return gameObjects.size() - 1;
 }
 
 void SceneWidget::RemoveGameObject( int index )
 {
-    scene.Remove( gameObjects[ index ] );
+    scene.Remove( gameObjects[ index ].get() );
     gameObjectsInScene[ index ] = 0;
 }
