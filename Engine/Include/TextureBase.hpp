@@ -29,6 +29,7 @@ namespace ae3d
         None
     };
 
+    /// Base class for textures.
     class TextureBase
     {
   public:
@@ -60,13 +61,21 @@ namespace ae3d
         bool IsOpaque() const { return opaque; }
 
   protected:
+        /// Width in pixels.
         int width = 0;
+        /// Height in pixels.
         int height = 0;
+        /// Graphics API handle.
         unsigned handle = 0;
+        /// Wrapping controls how coordinates outside 0-1 are interpreted.
         TextureWrap wrap = TextureWrap::Repeat;
+        /// Filtering mode.
         TextureFilter filter = TextureFilter::Nearest;
+        /// Mipmaps.
         Mipmaps mipmaps = Mipmaps::None;
+        /// Scale (tiling) and offset.
         Vec4 scaleOffset{ 1, 1, 0, 0 };
+        /// Is the texture opaque.
         bool opaque = true;
 #if AETHER3D_IOS
         id<MTLTexture> metalTexture;  

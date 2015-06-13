@@ -137,7 +137,8 @@ int SceneWidget::CreateGameObject()
     gameObjects.back()->AddComponent< ae3d::TransformComponent >();
     gameObjectsInScene.push_back( 1 );
     scene.Add( gameObjects.back().get() );
-    selectedGameObject = gameObjects.size() - 1;
+    selectedGameObjects.clear();
+    selectedGameObjects.push_back( gameObjects.size() - 1 );
     return gameObjects.size() - 1;
 }
 

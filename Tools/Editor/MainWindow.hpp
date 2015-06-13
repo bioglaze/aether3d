@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW
 #define MAINWINDOW
 
+#include <list>
 #include <QMainWindow>
 #include "WindowMenu.hpp"
 #include "CommandManager.hpp"
@@ -31,11 +32,11 @@ public slots:
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
 
 signals:
-    void GameObjectSelected( ae3d::GameObject* gameObject );
+    void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
 
 private:
     void UpdateHierarchy();
-    void keyReleaseEvent( QKeyEvent* event );
+    void keyPressEvent( QKeyEvent* event );
     void SelectTreeItem( QTreeWidgetItem* item );
 
     QTreeWidget* sceneTree = nullptr;

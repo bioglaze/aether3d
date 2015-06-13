@@ -287,7 +287,7 @@ namespace ae3d
         /// Compares this vector with another vector.
         /// \param v2 Another vector.
         /// \return True if vectors are almost equal.
-        bool IsAlmost( const Vec3& v2 )
+        bool IsAlmost( const Vec3& v2 ) const
         {
             const float epsilon = 0.0001f;
             return std::abs( x - v2.x ) < epsilon &&

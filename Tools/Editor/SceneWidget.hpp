@@ -2,6 +2,7 @@
 #define SCENEWIDGET_HPP
 
 #include <memory>
+#include <list>
 #include <vector>
 #include <QOpenGLWidget>
 #include "GameObject.hpp"
@@ -24,6 +25,7 @@ public:
     int CreateGameObject();
 
     /// \param index Index.
+    /// TODO: Implement as a command.
     void RemoveGameObject( int index );
 
     int GetGameObjectCount() const { return gameObjects.size(); }
@@ -35,7 +37,7 @@ public:
     ae3d::GameObject* GetGameObject( int index ) { return gameObjects[ index ].get(); }
 
     // TODO: Maybe create an editor state class and put this there.
-    int selectedGameObject = -1;
+    std::list< int > selectedGameObjects;
 
 protected:
     void initializeGL();

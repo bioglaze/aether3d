@@ -1,3 +1,4 @@
+#include <list>
 #include "CreateCameraCommand.hpp"
 #include "CameraComponent.hpp"
 #include "SceneWidget.hpp"
@@ -10,10 +11,10 @@ CreateCameraCommand::CreateCameraCommand( SceneWidget* aSceneWidget )
 
 void CreateCameraCommand::Execute()
 {
-    ae3d::System::Assert( sceneWidget != nullptr, "null pointer" );
-    ae3d::System::Assert( sceneWidget->selectedGameObject != -1, "no gameobject selected." );
+    ae3d::System::Assert( sceneWidget != nullptr, "Create camera needs scene." );
+    ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "no gameobjects selected." );
 
-    sceneWidget->GetGameObject( sceneWidget->selectedGameObject )->AddComponent< ae3d::CameraComponent >();
+    sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->AddComponent< ae3d::CameraComponent >();
 }
 
 void CreateCameraCommand::Undo()

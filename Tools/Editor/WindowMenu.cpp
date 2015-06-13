@@ -1,11 +1,11 @@
 #include <QMenu>
 #include <QMenuBar>
 #include "WindowMenu.hpp"
-#include <iostream>
 
 void WindowMenu::Init( QWidget* mainWindow )
 {
-    connect(mainWindow, SIGNAL(GameObjectSelected(ae3d::GameObject*)), this, SLOT(GameObjectSelected(ae3d::GameObject*)));
+    connect(mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
+            this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
     menuBar = new QMenuBar( mainWindow );
 
     fileMenu = menuBar->addMenu( "&File" );
@@ -22,7 +22,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     componentMenu->addAction( "Add Camera", mainWindow, SLOT(CommandCreateCameraComponent()));
 }
 
-void WindowMenu::GameObjectSelected( ae3d::GameObject* gameObject )
+void WindowMenu::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
 {
-    componentMenu->setEnabled( gameObject != nullptr );
+    componentMenu->setEnabled( !gameObjects.empty() );
 }

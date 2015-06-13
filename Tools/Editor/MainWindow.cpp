@@ -17,7 +17,9 @@ MainWindow::MainWindow()
 {
     sceneTree = new QTreeWidget();
     sceneTree->setColumnCount( 1 );
+    // TODO: Change itemClicked to something that can handle multi-selection properly.
     connect( sceneTree, &QTreeWidget::itemClicked, [&](QTreeWidgetItem* item, int /* column */) { SelectTreeItem( item ); });
+    sceneTree->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
     sceneWidget = new SceneWidget();
     setWindowTitle( "Editor" );
@@ -53,17 +55,40 @@ void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
         if (sceneTree->topLevelItem( i ) == item)
         {
             selectedIndex = i;
-            std::cout << "selected list item: " << i << std::endl;
         }
     }
-
+    std::cout << "printing selection: " << std::endl;
+for (auto index : sceneWidget->selectedGameObjects)
+{
+std::cout << "selection: " << index << std::endl;
+}
     // TODO: Remove sceneWidget->selectedGameObject variable.
-    sceneWidget->selectedGameObject = sceneWidget->GetGameObject( selectedIndex );
-    emit GameObjectSelected( sceneWidget->GetGameObject( selectedIndex ) );
+    sceneWidget->selectedGameObjects.clear();
+    sceneWidget->selectedGameObjects.push_back( selectedIndex/*sceneWidget->GetGameObject( selectedIndex )*/ );
+    std::list< ae3d::GameObject* > selectedObjects;
+    selectedObjects.push_back( sceneWidget->GetGameObject( selectedIndex ) );
+    emit GameObjectSelected( selectedObjects );
 }
 
-void MainWindow::keyReleaseEvent( QKeyEvent* event )
+void MainWindow::keyPressEvent( QKeyEvent* event )
 {
+    const int macDelete = 16777219;
+
+    if (event->key() == Qt::Key_Escape)
+    {
+        std::list< ae3d::GameObject* > emptyList;
+        emit GameObjectSelected( emptyList );
+    }
+    else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
+    {
+        for (auto goIndex : sceneWidget->selectedGameObjects)
+        {
+            sceneWidget->RemoveGameObject( goIndex );
+            std::cout << "removed " << goIndex << std::endl;
+        }
+
+        UpdateHierarchy();
+    }
 }
 
 void MainWindow::CommandCreateCameraComponent()
@@ -126,12 +151,15 @@ void MainWindow::UpdateHierarchy()
 
     sceneTree->insertTopLevelItems( 0, nodes );
 
-    // Highlights selected game object.
+    // Highlights selected game objects.
     for (int i = 0; i < g; ++i)
     {
-        if (i == sceneWidget->selectedGameObject)
+        for (auto goIndex : sceneWidget->selectedGameObjects)
         {
-            sceneTree->setCurrentItem( nodes.at(i) );
+            if (i == goIndex)
+            {
+                sceneTree->setCurrentItem( nodes.at(i) );
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 #ifndef WINDOWMENU_H
 #define WINDOWMENU_H
 
+#include <list>
 #include <QObject>
 
 class QMenu;
@@ -21,7 +22,7 @@ public:
     QMenuBar* menuBar = nullptr;
 
 private slots:
-    void GameObjectSelected( ae3d::GameObject* gameObject );
+    void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
 
 private:
     QMenu* fileMenu = nullptr;
