@@ -146,4 +146,5 @@ void SceneWidget::RemoveGameObject( int index )
 {
     scene.Remove( gameObjects[ index ].get() );
     gameObjectsInScene[ index ] = 0;
+    gameObjectsInScene.erase(gameObjectsInScene.begin() + index);
 }

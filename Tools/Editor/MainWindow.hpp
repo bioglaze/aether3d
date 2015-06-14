@@ -38,6 +38,7 @@ private:
     void UpdateHierarchy();
     void keyPressEvent( QKeyEvent* event );
     void SelectTreeItem( QTreeWidgetItem* item );
+    void HierarchyItemRenamed( QTreeWidgetItem* item );
 
     QTreeWidget* sceneTree = nullptr;
     SceneWidget* sceneWidget = nullptr;

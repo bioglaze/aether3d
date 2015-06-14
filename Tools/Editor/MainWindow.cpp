@@ -19,6 +19,7 @@ MainWindow::MainWindow()
     sceneTree->setColumnCount( 1 );
     // TODO: Change itemClicked to something that can handle multi-selection properly.
     connect( sceneTree, &QTreeWidget::itemClicked, [&](QTreeWidgetItem* item, int /* column */) { SelectTreeItem( item ); });
+    connect( sceneTree, &QTreeWidget::itemChanged, [&](QTreeWidgetItem* item, int /* column */) { HierarchyItemRenamed( item ); });
     sceneTree->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
     sceneWidget = new SceneWidget();
@@ -32,6 +33,33 @@ MainWindow::MainWindow()
     splitter->addWidget( sceneWidget );
     setCentralWidget( splitter );
 
+    UpdateHierarchy();
+}
+
+void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
+{
+    int sceneObjectCounter = 0;
+
+    for (int i = 0; i < sceneWidget->GetGameObjectCount(); ++i)
+    {
+        if (sceneWidget->IsGameObjectInScene( i ))
+        {
+            ++sceneObjectCounter;
+        }
+    }
+
+    int renamedIndex = 0;
+
+    // Figures out which game object was renamed.
+    for (int i = 0; i < sceneObjectCounter; ++i)
+    {
+        if (sceneTree->topLevelItem( i ) == item)
+        {
+            renamedIndex = i;
+        }
+    }
+
+    sceneWidget->GetGameObject( renamedIndex )->SetName( item->text( 0 ).toUtf8().constData() );
     UpdateHierarchy();
 }
 
@@ -57,14 +85,16 @@ void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
             selectedIndex = i;
         }
     }
+
     std::cout << "printing selection: " << std::endl;
-for (auto index : sceneWidget->selectedGameObjects)
-{
-std::cout << "selection: " << index << std::endl;
-}
+    for (auto index : sceneWidget->selectedGameObjects)
+    {
+        std::cout << "selection: " << index << std::endl;
+    }
+
     // TODO: Remove sceneWidget->selectedGameObject variable.
     sceneWidget->selectedGameObjects.clear();
-    sceneWidget->selectedGameObjects.push_back( selectedIndex/*sceneWidget->GetGameObject( selectedIndex )*/ );
+    sceneWidget->selectedGameObjects.push_back( selectedIndex );
     std::list< ae3d::GameObject* > selectedObjects;
     selectedObjects.push_back( sceneWidget->GetGameObject( selectedIndex ) );
     emit GameObjectSelected( selectedObjects );
@@ -139,12 +169,13 @@ void MainWindow::UpdateHierarchy()
     const int count = sceneWidget->GetGameObjectCount();
     int g = 0;
 
+    std::cout << "cleared scene tree" << std::endl;
     for (int i = 0; i < count; ++i)
     {
         if (sceneWidget->IsGameObjectInScene( i ))
         {
             nodes.append(new QTreeWidgetItem( (QTreeWidget*)0, QStringList( QString( sceneWidget->GetGameObject( g )->GetName().c_str() ) ) ) );
-
+            nodes.back()->setFlags(nodes.back()->flags() | Qt::ItemIsEditable);
             ++g;
         }
     }
