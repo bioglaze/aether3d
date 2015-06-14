@@ -38,20 +38,10 @@ MainWindow::MainWindow()
 
 void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
 {
-    int sceneObjectCounter = 0;
-
-    for (int i = 0; i < sceneWidget->GetGameObjectCount(); ++i)
-    {
-        if (sceneWidget->IsGameObjectInScene( i ))
-        {
-            ++sceneObjectCounter;
-        }
-    }
-
     int renamedIndex = 0;
 
     // Figures out which game object was renamed.
-    for (int i = 0; i < sceneObjectCounter; ++i)
+    for (int i = 0; i < sceneWidget->GetGameObjectCount(); ++i)
     {
         if (sceneTree->topLevelItem( i ) == item)
         {
@@ -65,24 +55,18 @@ void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
 
 void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
 {
-    int sceneObjectCounter = 0;
+    std::list< ae3d::GameObject* > selectedObjects;
+    sceneWidget->selectedGameObjects.clear();
 
-    for (int i = 0; i < sceneWidget->GetGameObjectCount(); ++i)
+    for (int g = 0; g < sceneWidget->GetGameObjectCount(); ++g)
     {
-        if (sceneWidget->IsGameObjectInScene( i ))
+        for (auto i : sceneTree->selectedItems())
         {
-            ++sceneObjectCounter;
-        }
-    }
-
-    int selectedIndex = 0;
-
-    // Figures out which game object was selected.
-    for (int i = 0; i < sceneObjectCounter; ++i)
-    {
-        if (sceneTree->topLevelItem( i ) == item)
-        {
-            selectedIndex = i;
+            if (sceneTree->topLevelItem( g ) == i)
+            {
+                selectedObjects.push_back( sceneWidget->GetGameObject( g ) );
+                sceneWidget->selectedGameObjects.push_back( g );
+            }
         }
     }
 
@@ -92,11 +76,7 @@ void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
         std::cout << "selection: " << index << std::endl;
     }
 
-    // TODO: Remove sceneWidget->selectedGameObject variable.
-    sceneWidget->selectedGameObjects.clear();
-    sceneWidget->selectedGameObjects.push_back( selectedIndex );
-    std::list< ae3d::GameObject* > selectedObjects;
-    selectedObjects.push_back( sceneWidget->GetGameObject( selectedIndex ) );
+
     emit GameObjectSelected( selectedObjects );
 }
 
@@ -111,10 +91,11 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     }
     else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
     {
+        std::cout << "removing selected objects" << std::endl;
         for (auto goIndex : sceneWidget->selectedGameObjects)
         {
+            std::cout << "removed " << sceneWidget->GetGameObject(goIndex)->GetName() << std::endl;
             sceneWidget->RemoveGameObject( goIndex );
-            std::cout << "removed " << goIndex << std::endl;
         }
 
         UpdateHierarchy();
@@ -167,23 +148,19 @@ void MainWindow::UpdateHierarchy()
 
     QList< QTreeWidgetItem* > nodes;
     const int count = sceneWidget->GetGameObjectCount();
-    int g = 0;
 
     std::cout << "cleared scene tree" << std::endl;
     for (int i = 0; i < count; ++i)
     {
-        if (sceneWidget->IsGameObjectInScene( i ))
-        {
-            nodes.append(new QTreeWidgetItem( (QTreeWidget*)0, QStringList( QString( sceneWidget->GetGameObject( g )->GetName().c_str() ) ) ) );
-            nodes.back()->setFlags(nodes.back()->flags() | Qt::ItemIsEditable);
-            ++g;
-        }
+        nodes.append(new QTreeWidgetItem( (QTreeWidget*)0, QStringList( QString( sceneWidget->GetGameObject( i )->GetName().c_str() ) ) ) );
+        nodes.back()->setFlags( nodes.back()->flags() | Qt::ItemIsEditable );
+        std::cout << "added to list: " <<  sceneWidget->GetGameObject( i )->GetName()<< std::endl;
     }
 
     sceneTree->insertTopLevelItems( 0, nodes );
 
     // Highlights selected game objects.
-    for (int i = 0; i < g; ++i)
+    for (int i = 0; i < count; ++i)
     {
         for (auto goIndex : sceneWidget->selectedGameObjects)
         {

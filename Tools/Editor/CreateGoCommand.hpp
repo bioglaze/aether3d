@@ -6,6 +6,7 @@
 namespace ae3d
 {
     class Scene;
+    class GameObject;
 }
 
 class SceneWidget;
@@ -19,7 +20,7 @@ public:
 
 private:
     SceneWidget* sceneWidget = nullptr;
-    int createdGoIndex = 0;
+    ae3d::GameObject* createdGo = nullptr;
 };
 
 #endif

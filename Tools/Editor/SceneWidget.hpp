@@ -22,7 +22,7 @@ public:
 
     /// \return Index of created game object.
     /// Should only be called by CreateGoCommand!
-    int CreateGameObject();
+    ae3d::GameObject* CreateGameObject();
 
     /// \param index Index.
     /// TODO: Implement as a command.
@@ -30,7 +30,7 @@ public:
 
     int GetGameObjectCount() const { return gameObjects.size(); }
 
-    bool IsGameObjectInScene( int index ) const { return gameObjectsInScene[ index ] != 0; }
+    //bool IsGameObjectInScene( int index ) const { return gameObjectsInScene[ index ] != 0; }
 
     ae3d::Scene* GetScene() { return &scene; }
 
@@ -57,7 +57,7 @@ private:
     ae3d::Scene scene;
     ae3d::GameObject spriteContainer;
     std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
-    std::vector< int > gameObjectsInScene; // Using int to avoid bool vector specialization madness.
+    //std::vector< int > gameObjectsInScene; // Using int to avoid bool vector specialization madness.
 };
 
 #endif

@@ -51,13 +51,13 @@ void SceneWidget::Init()
 
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width(), (float)height(), 0, 0, 1 );
-    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1.0f, 0.5f, 0.5f ) );
+    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0  ) );
 
     spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
 
     spriteContainer.AddComponent<SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
-    sprite->SetTexture( &spriteTex, Vec3( 20, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
+    sprite->SetTexture( &spriteTex, Vec3( 20, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     spriteContainer.AddComponent<TransformComponent>();
 
     scene.Add( &camera );
@@ -130,21 +130,19 @@ void SceneWidget::wheelEvent( QWheelEvent */*event*/)
 {
 }
 
-int SceneWidget::CreateGameObject()
+ae3d::GameObject* SceneWidget::CreateGameObject()
 {
     gameObjects.push_back( std::make_shared<ae3d::GameObject>() );
     gameObjects.back()->SetName( "Game Object" );
     gameObjects.back()->AddComponent< ae3d::TransformComponent >();
-    gameObjectsInScene.push_back( 1 );
     scene.Add( gameObjects.back().get() );
     selectedGameObjects.clear();
     selectedGameObjects.push_back( gameObjects.size() - 1 );
-    return gameObjects.size() - 1;
+    return gameObjects.back().get();
 }
 
 void SceneWidget::RemoveGameObject( int index )
 {
     scene.Remove( gameObjects[ index ].get() );
-    gameObjectsInScene[ index ] = 0;
-    gameObjectsInScene.erase(gameObjectsInScene.begin() + index);
+    gameObjects.erase( gameObjects.begin() + index );
 }
