@@ -12,9 +12,12 @@ extern ae3d::Renderer renderer;
 id <MTLDevice> device;
 id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
-id <MTLRenderPipelineState> pipelineState;
 id <MTLDepthStencilState> depthState;
 id <CAMetalDrawable> currentDrawable;
+id <MTLRenderPipelineState> pipelineOpaqueSprite;
+bool pipelineOpaqueSpriteCreated = false;
+id <MTLRenderPipelineState> pipelineBlendedSprite;
+bool pipelineBlendedSpriteCreated = false;
 CAMetalLayer* metalLayer;
 MTLRenderPassDescriptor *renderPassDescriptor = nullptr;
 id <MTLTexture> depthTex;
@@ -23,7 +26,6 @@ id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
 id<CAMetalDrawable> drawable;
 dispatch_semaphore_t inflight_semaphore;
-bool pipelineCreated = false;
 id<MTLTexture> texture0;
 id<MTLTexture> currentRenderTarget;
 
@@ -34,7 +36,7 @@ void PlatformInitGamePad()
 
 struct Uniforms
 {
-    float mvp[ 16 ];
+    float modelViewProjection[ 16 ];
 };
 
 namespace GfxDeviceGlobal
@@ -139,8 +141,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 void ae3d::GfxDevice::DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset )
 {
-    // Configure and issue our draw call
-    [renderEncoder setRenderPipelineState:pipelineState];
+    [renderEncoder setRenderPipelineState:pipelineBlendedSprite];
     [renderEncoder setVertexBuffer:vertexBuffer offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:uniformBuffer offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
@@ -153,23 +154,52 @@ void ae3d::GfxDevice::DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer
 
 void ae3d::GfxDevice::BeginFrame()
 {
-    // Create a reusable pipeline state
-    if (!pipelineCreated)
+    if (!pipelineOpaqueSpriteCreated)
     {
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineStateDescriptor.label = @"MyPipeline";
+        pipelineStateDescriptor.label = @"Opaque sprite pipeline";
         [pipelineStateDescriptor setSampleCount: 1];
         [pipelineStateDescriptor setVertexFunction:renderer.builtinShaders.spriteRendererShader.vertexProgram];
         [pipelineStateDescriptor setFragmentFunction:renderer.builtinShaders.spriteRendererShader.fragmentProgram];
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
         pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
         NSError* error = NULL;
-        pipelineState = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
-        if (!pipelineState)
+        pipelineOpaqueSprite = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
+        
+        if (!pipelineOpaqueSprite)
         {
-            NSLog(@"Failed to created pipeline state, error %@", error);
+            NSLog(@"Failed to created opaque sprite pipeline state, error %@", error);
         }
-        pipelineCreated = true;
+
+        pipelineOpaqueSpriteCreated = true;
+    }
+
+    if (!pipelineBlendedSpriteCreated)
+    {
+        MTLRenderPipelineDescriptor *pipelineDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
+        pipelineDescriptor.label = @"Blended sprite pipeline";
+        [pipelineDescriptor setSampleCount: 1];
+        [pipelineDescriptor setVertexFunction:renderer.builtinShaders.spriteRendererShader.vertexProgram];
+        [pipelineDescriptor setFragmentFunction:renderer.builtinShaders.spriteRendererShader.fragmentProgram];
+        pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+        pipelineDescriptor.colorAttachments[0].blendingEnabled = TRUE;
+        pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+        pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+        pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+        pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
+        pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+        pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+
+        pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+        NSError* error = NULL;
+        pipelineBlendedSprite = [device newRenderPipelineStateWithDescriptor:pipelineDescriptor error:&error];
+        
+        if (!pipelineBlendedSprite)
+        {
+            NSLog(@"Failed to created blended sprite pipeline state, error %@", error);
+        }
+        
+        pipelineBlendedSpriteCreated = true;
     }
 
     if (!currentRenderTarget)

@@ -104,8 +104,8 @@
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
+    //scene.Add( &renderTextureContainer );
+    //scene.Add( &rtCamera );
 }
 
 -(void) touchesBegan: (NSSet *) touches withEvent: (UIEvent *) event
