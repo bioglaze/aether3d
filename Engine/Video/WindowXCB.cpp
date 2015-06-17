@@ -9,26 +9,83 @@
 #include <X11/Xlib-xcb.h>
 #include <GL/glxw.h>
 #include <GL/glx.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <linux/joystick.h>
+#include <dirent.h>
+#include <cstring>
+#include "GfxDevice.hpp"
 
 // Based on https://github.com/nxsy/xcb_handmade/blob/master/src/xcb_handmade.cpp
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
 // Event tutorial: http://xcb.freedesktop.org/tutorial/events/
 
-void PlatformInitGamePad()
+struct GamePad
 {
+    bool isActive = false;
+    int fd;
+    int buttonA;
+    int buttonB;
+    int buttonX;
+    int buttonY;
+    int buttonBack;
+    int buttonStart;
+    int buttonLeftShoulder;
+    int buttonRightShoulder;
+    int dpadXaxis;
+    int dpadYaxis;
+    int leftThumbX;
+    int leftThumbY;
+    int rightThumbX;
+    int rightThumbY;
+    short deadZone;
+};
 
+namespace
+{
+    // TODO: DRY. Duplicated in WindowWin32.cpp
+    float ProcessGamePadStickValue( short value, short deadZoneThreshold )
+    {
+        float result = 0;
+        
+        if (value < -deadZoneThreshold)
+        {
+            result = (float)((value + deadZoneThreshold) / (32768.0f - deadZoneThreshold));
+        }
+        else if (value > deadZoneThreshold)
+        {
+            result = (float)((value - deadZoneThreshold) / (32767.0f - deadZoneThreshold));
+        }
+
+        return result;
+    }
 }
 
 namespace WindowGlobal
 {
     bool isOpen = false;
-    const int eventStackSize = 10;
+    const int eventStackSize = 15;
     ae3d::WindowEvent eventStack[eventStackSize];
     int eventIndex = -1;
+    void IncEventIndex()
+    {
+        if (eventIndex < eventStackSize - 1)
+        {
+            ++eventIndex;
+        }
+    }
+    
     Display* display;
     xcb_connection_t *connection = nullptr;
+    xcb_window_t window;
     xcb_key_symbols_t *key_symbols;
+    xcb_atom_t wm_protocols;
+    xcb_atom_t wm_delete_window;
     GLXDrawable drawable = 0;
+    GamePad gamePad;
+    float lastLeftThumbX = 0;
+    float lastLeftThumbY = 0;
     std::map< xcb_keysym_t, ae3d::KeyCode > keyMap =
     {
         { XK_a, ae3d::KeyCode::A },
@@ -67,7 +124,83 @@ namespace WindowGlobal
     };
 }
 
-static int setup_and_run( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height )
+void PlatformInitGamePad()
+{
+    DIR* dir = opendir( "/dev/input" );
+    dirent entry;
+    dirent* result;
+
+    while (!readdir_r( dir, &entry, &result ) && result)
+    {
+        if ((entry.d_name[0] == 'j') && (entry.d_name[1] == 's'))
+        {
+            char full_device_path[ 260 ];
+            snprintf( full_device_path, sizeof( full_device_path ), "%s/%s", "/dev/input", entry.d_name );
+            int fd = open( full_device_path, O_RDONLY );
+
+            if (fd < 0)
+            {
+                // Permissions could cause this code path.
+                std::cerr << "Unable to open joystick file" << std::endl;
+                continue;
+            }
+
+            char name[ 128 ];
+            ioctl( fd, JSIOCGNAME( 128 ), name);
+            /*if (!strstr(name, "Microsoft X-Box 360 pad"))
+            {
+                //close(fd);
+                std::cerr << "Not an xbox controller: " << std::string( name ) << std::endl;;
+                continue;
+                }*/
+
+            int version;
+            ioctl( fd, JSIOCGVERSION, &version );
+            uint8_t axes;
+            ioctl( fd, JSIOCGAXES, &axes );
+            uint8_t buttons;
+            ioctl( fd, JSIOCGBUTTONS, &buttons );
+            std::cout << "d_name: " << std::string( entry.d_name ) << ", name " << std::string( name ) << ", version " << version << ", axes " << axes << ", buttons " << buttons << std::endl; 
+            WindowGlobal::gamePad.fd = fd;
+            WindowGlobal::gamePad.isActive = true;
+            // XBox One Controller values. Should also work for 360 Controller.
+            WindowGlobal::gamePad.buttonA = 0;
+            WindowGlobal::gamePad.buttonB = 1;
+            WindowGlobal::gamePad.buttonX = 2;
+            WindowGlobal::gamePad.buttonY = 3;
+            WindowGlobal::gamePad.buttonStart = 7;
+            WindowGlobal::gamePad.buttonBack = 6;
+            WindowGlobal::gamePad.buttonLeftShoulder = 4;
+            WindowGlobal::gamePad.buttonRightShoulder = 5;
+            WindowGlobal::gamePad.dpadXaxis = 6;
+            WindowGlobal::gamePad.dpadYaxis = 7;
+            WindowGlobal::gamePad.leftThumbX = 0;
+            WindowGlobal::gamePad.leftThumbY = 1;
+            WindowGlobal::gamePad.rightThumbX = 3;
+            WindowGlobal::gamePad.rightThumbY = 4;
+            WindowGlobal::gamePad.deadZone = 7849;
+            
+            fcntl( fd, F_SETFL, O_NONBLOCK );
+        }
+    }
+
+    closedir( dir );
+}
+
+void LoadAtoms()
+{
+    xcb_intern_atom_cookie_t wm_delete_window_cookie = xcb_intern_atom( WindowGlobal::connection, 0, 16, "WM_DELETE_WINDOW" );
+    xcb_intern_atom_cookie_t wm_protocols_cookie = xcb_intern_atom(WindowGlobal::connection, 0, strlen("WM_PROTOCOLS"), "WM_PROTOCOLS" );
+
+    xcb_flush( WindowGlobal::connection );
+    xcb_intern_atom_reply_t* wm_delete_window_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_delete_window_cookie, 0 );
+    xcb_intern_atom_reply_t* wm_protocols_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_protocols_cookie, 0 );
+
+    WindowGlobal::wm_protocols = wm_protocols_cookie_reply->atom;
+    WindowGlobal::wm_delete_window = wm_delete_window_cookie_reply->atom;
+}
+
+static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height )
 {
     GLXFBConfig* fb_configs = nullptr;
     int num_fb_configs = 0;
@@ -94,7 +227,7 @@ static int setup_and_run( Display* display, xcb_connection_t* connection, int de
     
     /* Create XID's for colormap and window */
     xcb_colormap_t colormap = xcb_generate_id( connection );
-    xcb_window_t window = xcb_generate_id( connection );
+    WindowGlobal::window = xcb_generate_id( connection );
     
     xcb_create_colormap(
                         connection,
@@ -112,7 +245,7 @@ static int setup_and_run( Display* display, xcb_connection_t* connection, int de
     xcb_create_window(
                       connection,
                       XCB_COPY_FROM_PARENT,
-                      window,
+                      WindowGlobal::window,
                       screen->root,
                       0, 0,
                       width, height,
@@ -123,13 +256,13 @@ static int setup_and_run( Display* display, xcb_connection_t* connection, int de
                       valuelist
                       );
     
-    xcb_map_window( connection, window );
+    xcb_map_window( connection, WindowGlobal::window );
     
-    GLXWindow glxwindow = glXCreateWindow( display, fb_config, window, 0 );
+    GLXWindow glxwindow = glXCreateWindow( display, fb_config, WindowGlobal::window, 0 );
 
-    if (!window)
+    if (!glxwindow)
     {
-        xcb_destroy_window( connection, window );
+        xcb_destroy_window( connection, WindowGlobal::window );
         glXDestroyContext( display, context );
         
         std::cerr << "glXDestroyContext failed" << std::endl;
@@ -140,18 +273,13 @@ static int setup_and_run( Display* display, xcb_connection_t* connection, int de
     
     if (!glXMakeContextCurrent( display, WindowGlobal::drawable, WindowGlobal::drawable, context ))
     {
-        xcb_destroy_window( connection, window );
+        xcb_destroy_window( connection, WindowGlobal::window );
         glXDestroyContext( display, context );
         
         std::cerr << "glXMakeContextCurrent failed" << std::endl;
         return -1;
     }
 
-    if (glxwInit() != 0)
-    {
-        std::cerr << "Could not init GLXW!" << std::endl;
-    }
-    
     return 0;
 }
 
@@ -171,8 +299,9 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     }
     
     int default_screen = DefaultScreen( WindowGlobal::display );
-    
+
     WindowGlobal::connection = XGetXCBConnection( WindowGlobal::display );
+    LoadAtoms();
 
     if (!WindowGlobal::connection)
     {
@@ -183,7 +312,6 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     XSetEventQueueOwner( WindowGlobal::display, XCBOwnsEventQueue );
 
-    /* Find XCB screen */
     xcb_screen_t *screen = 0;
     xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator( xcb_get_setup( WindowGlobal::connection ) );
     for (int screen_num = default_screen; screen_iter.rem && screen_num > 0; --screen_num, xcb_screen_next( &screen_iter ));
@@ -191,8 +319,19 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
     
-    /*int retval =*/ setup_and_run( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height );
+    CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height );
+    GfxDevice::Init( width, height );
+
     
+    const char *title = "Aether3D Game Engine";
+    xcb_change_property(WindowGlobal::connection,
+                        XCB_PROP_MODE_REPLACE,
+                        WindowGlobal::window,
+                        XCB_ATOM_WM_NAME,
+                        XCB_ATOM_STRING,
+                        8,
+                        strlen (title),
+                        title );
     /* Cleanup */
     //glXDestroyWindow(display, glxwindow);
     //xcb_destroy_window(connection, window);
@@ -225,7 +364,8 @@ void ae3d::Window::PumpEvents()
                 const auto b2Type = response_type == XCB_EVENT_MASK_BUTTON_PRESS ? ae3d::WindowEventType::Mouse2Down : ae3d::WindowEventType::Mouse2Up;
                 const auto b3Type = response_type == XCB_EVENT_MASK_BUTTON_PRESS ? ae3d::WindowEventType::MouseMiddleDown : ae3d::WindowEventType::MouseMiddleUp;
 
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
+                
                 if (newb1)
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b1Type;
@@ -255,7 +395,7 @@ void ae3d::Window::PumpEvents()
                 const bool isDown = (response_type == XCB_KEY_PRESS);
                 const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
 
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
                 const xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ keysym ];
@@ -269,22 +409,137 @@ void ae3d::Window::PumpEvents()
             }
             case XCB_CLIENT_MESSAGE:
             {
-                /*xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
-                 if (client_message_event->type == context.wm_protocols)
-                 {
-                 if (client_message_event->data.data32[0] == context.wm_delete_window)
-                 {
-                 std::cout << "Quitting" << std::endl;
-                 exit(1);
-                 break;
+                xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
+                if (client_message_event->type == WindowGlobal::wm_protocols)
+                {
+                    if (client_message_event->data.data32[0] == WindowGlobal::wm_delete_window)
+                    {
+                        std::cout << "Quitting" << std::endl;
+                        exit(1);
+                        break;
+                    }
                  }
-                 }*/
                 break;
             }
             case XCB_EXPOSE:
             {
             }
             break;
+        }
+    }
+
+    if (!WindowGlobal::gamePad.isActive)
+    {
+        return;
+    }
+    js_event j;
+    while (read(WindowGlobal::gamePad.fd, &j, sizeof(js_event)) == sizeof(js_event))
+        //read(WindowGlobal::gamePad.fd, &j, sizeof(js_event));
+    {
+        // Don't care if init or afterwards
+        j.type &= ~JS_EVENT_INIT;
+            
+        if (j.type == JS_EVENT_BUTTON)
+        {
+            if (j.number == WindowGlobal::gamePad.buttonA)
+            {
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonA;
+                }
+            }
+            else if (j.number == WindowGlobal::gamePad.buttonB)
+            {
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonB;
+                }
+            }
+            else if (j.number == WindowGlobal::gamePad.buttonX)
+            {
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonX;
+                }
+            }
+            else if (j.number == WindowGlobal::gamePad.buttonY)
+            {
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonY;
+                }
+            }
+            else if (j.number == WindowGlobal::gamePad.buttonStart)
+            {
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonStart;
+                }
+            }
+            else if (j.number == WindowGlobal::gamePad.buttonBack)
+            {
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonBack;
+                }
+            }
+            else
+            {
+                std::cout << "pressed button " << (int)j.number << std::endl;
+            }
+        }
+        else if (j.type == JS_EVENT_AXIS)
+        {
+            if (j.number == WindowGlobal::gamePad.leftThumbX)
+            {
+                float x = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
+                WindowGlobal::IncEventIndex();
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadLeftThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = x;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = WindowGlobal::lastLeftThumbY;
+                WindowGlobal::lastLeftThumbX = x;
+            }
+            else if (j.number == WindowGlobal::gamePad.leftThumbY)
+            {
+                float y = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
+                WindowGlobal::IncEventIndex();
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadLeftThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = WindowGlobal::lastLeftThumbX;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = y;
+                WindowGlobal::lastLeftThumbY = y;
+            }
+            else if (j.number == WindowGlobal::gamePad.dpadXaxis)
+            {
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonDPadRight;
+                }
+                if (j.value < 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonDPadLeft;
+                }
+            }
+            else if (j.number == WindowGlobal::gamePad.dpadYaxis)
+            {
+                if (j.value < 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonDPadUp;
+                }
+                if (j.value > 0)
+                {
+                    WindowGlobal::IncEventIndex();
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadButtonDPadDown;
+                }
+            }
         }
     }
 }

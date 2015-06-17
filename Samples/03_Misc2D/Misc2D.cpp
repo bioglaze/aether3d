@@ -120,12 +120,16 @@ int main()
     System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;
+
+    System::InitGamePad();
     
     while (Window::Instance().IsOpen() && !quit)
     {
         Window::Instance().PumpEvents();
         WindowEvent event;
 
+        std::string text( "draw calls:" );
+        
         while (Window::Instance().PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
@@ -151,9 +155,13 @@ int main()
                     audioContainer.GetComponent<AudioSourceComponent>()->Play();
                 }
             }
+            if (event.type == WindowEventType::GamePadButtonA)
+            {
+                text = "mutsis";
+            }
         }
 
-        const std::string drawCalls = std::string("draw calls: ") + std::to_string( System::Statistics::GetDrawCallCount() );
+        const std::string drawCalls = text + std::to_string( System::Statistics::GetDrawCallCount() );
         statsContainer.GetComponent<TextRendererComponent>()->SetText( drawCalls.c_str() );
 
         scene.Render();

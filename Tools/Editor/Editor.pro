@@ -37,8 +37,8 @@ macx {
 }
 linux {
     QMAKE_CXXFLAGS += -std=c++11
-    LIBS += -ldl -fPIC
-    DEFINES += AETHER3D_UNIX
+    LIBS += -ldl -fPIC -lxcb -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
+    LIBS += -L$$PWD/../../../aether3d_build -laether3d_linux
     copyfiles.commands = cp -r $$PWD/copy_to_output/* $$OUT_PWD
 }
 
