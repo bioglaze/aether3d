@@ -28,7 +28,7 @@ public:
     /// TODO: Implement as a command.
     void RemoveGameObject( int index );
 
-    int GetGameObjectCount() const { return gameObjects.size(); }
+    int GetGameObjectCount() const { return (int)gameObjects.size(); }
 
     //bool IsGameObjectInScene( int index ) const { return gameObjectsInScene[ index ] != 0; }
 

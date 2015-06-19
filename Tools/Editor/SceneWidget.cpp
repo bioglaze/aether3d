@@ -126,7 +126,7 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
     return false;
 }
 
-void SceneWidget::wheelEvent( QWheelEvent */*event*/)
+void SceneWidget::wheelEvent( QWheelEvent * /*event*/)
 {
 }
 
@@ -137,7 +137,7 @@ ae3d::GameObject* SceneWidget::CreateGameObject()
     gameObjects.back()->AddComponent< ae3d::TransformComponent >();
     scene.Add( gameObjects.back().get() );
     selectedGameObjects.clear();
-    selectedGameObjects.push_back( gameObjects.size() - 1 );
+    selectedGameObjects.push_back( (int)gameObjects.size() - 1 );
     return gameObjects.back().get();
 }
 

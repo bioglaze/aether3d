@@ -68,8 +68,8 @@ namespace ae3d
             float down = 100;
         } orthoParams;
 
-        float near = 0;
-        float far = 1;
+        float nearp = 0;
+        float farp = 1;
     };
 }
 #endif

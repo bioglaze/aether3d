@@ -26,10 +26,10 @@ void ae3d::CameraComponent::SetProjection( float left, float right, float bottom
     orthoParams.right = right;
     orthoParams.top = top;
     orthoParams.down = bottom;
-    near = aNear;
-    far = aFar;
+    nearp= aNear;
+    farp = aFar;
 
-    projectionMatrix.MakeProjection( left, right, bottom, top, near, far );
+    projectionMatrix.MakeProjection( left, right, bottom, top, nearp, farp );
 }
 
 void ae3d::CameraComponent::SetClearColor( const Vec3& color )
@@ -46,7 +46,7 @@ std::string ae3d::CameraComponent::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "camera\n" << "ortho " << orthoParams.left << " " << orthoParams.right << " " << orthoParams.top << " " << orthoParams.down <<
-    " " << near << " " << far << "\n\n";
+    " " << nearp << " " << farp << "\n\n";
     
     return outStream.str();
 }

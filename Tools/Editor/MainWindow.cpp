@@ -144,7 +144,7 @@ void MainWindow::SaveScene()
     ofs << sceneWidget->GetScene()->GetSerialized();
     const bool saveSuccess = ofs.is_open();
 
-    if (!saveSuccess)
+    if (!saveSuccess && fileName.toUtf8() != "")
     {
         QMessageBox::critical(this, "Unable to Save!", "Scene could not be saved.");
     }

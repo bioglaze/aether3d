@@ -54,8 +54,6 @@ int main()
     spriteContainer.AddComponent<TransformComponent>();
     spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
 
-    FileSystem::LoadPakFile( "font_explosion" );
-    
     AudioClip audioClip;
     audioClip.Load(FileSystem::FileContents("explosion.wav"));
     
