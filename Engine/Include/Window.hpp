@@ -65,17 +65,9 @@ namespace ae3d
         float gamePadThumbY = 0;
     };
 
-    /// Window singleton.    
-    class Window
+    /// Window
+    namespace Window
     {
-    public:
-        /// \return the window instance.
-        static Window& Instance()
-        {
-            static Window instance;
-            return instance;
-        }
-
         /**
           Creates a window and rendering context.
 
@@ -96,11 +88,7 @@ namespace ae3d
         bool PollEvent( WindowEvent& outEvent );
 
         /// Displays the contents of the screen.
-        void SwapBuffers() const;
-
-    private:
-        Window() {}
-        void CreateRenderer();
-    };
+        void SwapBuffers();
+    }
 }
 #endif

@@ -22,7 +22,7 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    Window::Instance().Create( width, height, WindowCreateFlags::Empty );
+    Window::Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
 
     //FileSystem::LoadPakFile( "files.pak" );
@@ -60,12 +60,12 @@ int main()
 
     bool quit = false;
     
-    while (Window::Instance().IsOpen() && !quit)
+    while (Window::IsOpen() && !quit)
     {
-        Window::Instance().PumpEvents();
+        Window::PumpEvents();
         WindowEvent event;
 
-        while (Window::Instance().PollEvent( event ))
+        while (Window::PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
             {
@@ -90,7 +90,7 @@ int main()
 
         scene.Render();
 
-        Window::Instance().SwapBuffers();
+        Window::SwapBuffers();
     }
 
     System::Deinit();

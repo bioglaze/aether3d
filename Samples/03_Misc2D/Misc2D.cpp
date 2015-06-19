@@ -14,6 +14,7 @@
 #include "Window.hpp"
 #include "Texture2D.hpp"
 #include "RenderTexture.hpp"
+#include "TextureCube.hpp"
 
 using namespace ae3d;
 
@@ -25,10 +26,11 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    Window::Instance().Create( width, height, WindowCreateFlags::Empty );
+    Window::Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
     System::InitAudio();
-    
+    System::InitGamePad();
+
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
@@ -63,7 +65,7 @@ int main()
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load(FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None);
+    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
     Font font;
     font.LoadBMFont(&fontTex, FileSystem::FileContents("font_txt.fnt"));
@@ -119,18 +121,22 @@ int main()
     scene.Add( &rtCamera );
     System::Print( "%s\n", scene.GetSerialized().c_str() );
 
-    bool quit = false;
+    TextureCube skybox;
+    skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
+                 FileSystem::FileContents( "skybox/top.jpg" ), FileSystem::FileContents( "skybox/bottom.jpg" ),
+                 FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
+                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
-    System::InitGamePad();
+    bool quit = false;
     
-    while (Window::Instance().IsOpen() && !quit)
+    while (Window::IsOpen() && !quit)
     {
-        Window::Instance().PumpEvents();
+        Window::PumpEvents();
         WindowEvent event;
 
         std::string text( "draw calls:" );
         
-        while (Window::Instance().PollEvent( event ))
+        while (Window::PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
             {
@@ -166,7 +172,7 @@ int main()
 
         scene.Render();
 
-        Window::Instance().SwapBuffers();
+        Window::SwapBuffers();
     }
 
     System::Deinit();

@@ -24,7 +24,7 @@ namespace ae3d
         return true;
     }
 
-    void Window::SwapBuffers() const
+    void Window::SwapBuffers()
     {
     }
 }

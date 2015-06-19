@@ -665,7 +665,7 @@ bool ae3d::Window::PollEvent( WindowEvent& outEvent )
     return true;
 }
 
-void ae3d::Window::SwapBuffers() const
+void ae3d::Window::SwapBuffers()
 {
     [WindowGlobal::glContext flushBuffer];
 }
