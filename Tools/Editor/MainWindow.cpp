@@ -76,7 +76,6 @@ void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
         std::cout << "selection: " << index << std::endl;
     }
 
-
     emit GameObjectSelected( selectedObjects );
 }
 
@@ -92,11 +91,21 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
     {
         std::cout << "removing selected objects" << std::endl;
-        for (auto goIndex : sceneWidget->selectedGameObjects)
+        for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
+        {
+            if (sceneTree->topLevelItem(i)->isSelected())
+            {
+                sceneWidget->RemoveGameObject( i );
+                sceneWidget->selectedGameObjects.clear();
+            }
+        }
+
+        /*for (auto goIndex : sceneWidget->selectedGameObjects)
         {
             std::cout << "removed " << sceneWidget->GetGameObject(goIndex)->GetName() << std::endl;
             sceneWidget->RemoveGameObject( goIndex );
-        }
+            sceneWidget->selectedGameObjects.clear();
+        }*/
 
         UpdateHierarchy();
     }

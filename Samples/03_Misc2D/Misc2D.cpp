@@ -17,7 +17,7 @@
 
 using namespace ae3d;
 
-// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.1.zip
+// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.2.zip
 
 int main()
 {
@@ -54,6 +54,8 @@ int main()
     spriteContainer.AddComponent<TransformComponent>();
     spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
 
+    FileSystem::LoadPakFile( "font_explosion" );
+    
     AudioClip audioClip;
     audioClip.Load(FileSystem::FileContents("explosion.wav"));
     
@@ -157,7 +159,7 @@ int main()
             }
             if (event.type == WindowEventType::GamePadButtonA)
             {
-                text = "mutsis";
+                text = "button a down";
             }
         }
 

@@ -54,7 +54,8 @@ void CreateDistanceMap( unsigned char* imageData, int width, int height )
 
     // Distance to nearest boundary point map.
     distanceMap.resize( width * height );
-    for (int i = 0; i < distanceMap.size(); ++i)
+
+    for (std::size_t i = 0; i < distanceMap.size(); ++i)
     {
         distanceMap[i] = 0;
     }

@@ -18,6 +18,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <cstring>
 
 struct FileMetaBlock
 {

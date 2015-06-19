@@ -31,12 +31,13 @@
 
    Only 64-bit project files/libraries are provided.
    <br />
-   There are two OpenGL renderers, 4.1 for OS X and 4.5 for Windows and GNU/Linux. At the moment you cannot
-   build 4.1 renderer on Windows or GNU/Linux without manually modifying project/makefiles (You will be in the next release).
+   There are two OpenGL renderers, 4.1 for OS X and 4.5 for Windows and GNU/Linux.
 
    \section Compilation
 
-   \subsection Windows/Visual Studio
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.2.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+
+   \subsection win1 Windows/Visual Studio
    
    You'll need Visual Studio 2013 or newer. Build Engine/VisualStudio_GL45. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
@@ -48,7 +49,7 @@
 
    \subsection osx OS X/Xcode
 
-   Build engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making
+   Build Engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making
    sure the running folder is set to aether3d_build/Samples.
 
    \subsection osx_cmd OS X and GNU/Linux Command Line

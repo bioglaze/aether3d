@@ -14,7 +14,7 @@
 
 using namespace ae3d;
 
-// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.1.zip
+// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.2.zip
 
 int main()
 {
@@ -25,7 +25,7 @@ int main()
     Window::Instance().Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
 
-    //System::LoadPakFile( "files.pak" );
+    //FileSystem::LoadPakFile( "files.pak" );
     
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -56,7 +56,7 @@ int main()
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
-    System::Print( "%s\n", scene.GetSerialized().c_str() );
+    //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;
     
