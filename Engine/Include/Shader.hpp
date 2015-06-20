@@ -10,6 +10,7 @@
 namespace ae3d
 {
     class Texture2D;
+    class TextureCube;
 
     /// Shader program containing a vertex and pixel shader.
     class Shader
@@ -33,6 +34,11 @@ namespace ae3d
         /// \param texture Texture.
         /// \param textureUnit Texture unit.
         void SetTexture( const char* name, const Texture2D* texture, int textureUnit );
+
+        /// \param name Texture uniform name.
+        /// \param texture Texture.
+        /// \param textureUnit Texture unit.
+        void SetTexture( const char* name, const TextureCube* texture, int textureUnit );
 
         /// \param name Integer uniform name.
         /// \param value Value.

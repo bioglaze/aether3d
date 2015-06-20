@@ -26,10 +26,17 @@ void ae3d::CameraComponent::SetProjection( float left, float right, float bottom
     orthoParams.right = right;
     orthoParams.top = top;
     orthoParams.down = bottom;
-    nearp= aNear;
+    nearp = aNear;
     farp = aFar;
 
     projectionMatrix.MakeProjection( left, right, bottom, top, nearp, farp );
+}
+
+void ae3d::CameraComponent::SetProjection( float fovDegrees, float aspect, float aNear, float aFar )
+{
+    nearp = aNear;
+    farp = aFar;
+    projectionMatrix.MakeProjection( fovDegrees, aspect, aNear, aFar );
 }
 
 void ae3d::CameraComponent::SetClearColor( const Vec3& color )

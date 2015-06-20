@@ -75,4 +75,33 @@ void ae3d::BuiltinShaders::Load()
     }";
     
     sdfShader.Load( sdfVertexSource, sdfFragmentSource );
+
+    const char* skyboxVertexSource =
+"#version 410 core\n \
+\
+layout (location = 0) in vec3 aPosition;\
+uniform mat4 _ModelViewProjection;\
+\
+out vec3 vTexCoord;\
+\
+void main()\
+{\
+gl_Position = _ModelViewProjection * vec4(aPosition.xyz, 1.0);\
+vTexCoord = aPosition;\
+}";
+
+const char* skyboxFragmentSource =
+"#version 410 core\n\
+\
+in vec3 vTexCoord;\
+out vec4 fragColor;\
+\
+uniform samplerCube skyMap;\
+\
+void main()\
+{\
+fragColor = texture( skyMap, vTexCoord );\
+}";
+
+    skyboxShader.Load( skyboxVertexSource, skyboxFragmentSource );
 }

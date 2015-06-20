@@ -10,6 +10,7 @@
 		442A12B01B0CBD8D00D21520 /* FileSystem.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 442A12AF1B0CBD8D00D21520 /* FileSystem.hpp */; };
 		AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB07F20D1AE15C9800669331 /* AudioClip.cpp */; };
 		AB07F2121AE1611300669331 /* AudioSystemOpenAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */; };
+		AB2E39361B3543D8001D493E /* RendererCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB2E39351B3543D8001D493E /* RendererCommon.cpp */; };
 		AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AB3A77DA1AB448500081864C /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB3A77D91AB448500081864C /* System.cpp */; };
 		AB3FD4961AB4330C00D28653 /* System.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4941AB4330C00D28653 /* System.hpp */; };
@@ -61,6 +62,7 @@
 		AB07F20F1AE15CC400669331 /* AudioClip.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioClip.hpp; path = ../Include/AudioClip.hpp; sourceTree = "<group>"; };
 		AB07F2101AE1601500669331 /* AudioSystem.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSystem.hpp; path = ../Core/AudioSystem.hpp; sourceTree = "<group>"; };
 		AB07F2111AE1611300669331 /* AudioSystemOpenAL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSystemOpenAL.cpp; path = ../Core/AudioSystemOpenAL.cpp; sourceTree = "<group>"; };
+		AB2E39351B3543D8001D493E /* RendererCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererCommon.cpp; path = ../Video/RendererCommon.cpp; sourceTree = "<group>"; };
 		AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WindowOSX_GL.mm; path = ../Video/WindowOSX_GL.mm; sourceTree = "<group>"; };
 		AB3A77D91AB448500081864C /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = System.cpp; path = ../Core/System.cpp; sourceTree = "<group>"; };
 		AB3FD4941AB4330C00D28653 /* System.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = System.hpp; path = ../Include/System.hpp; sourceTree = "<group>"; };
@@ -154,13 +156,14 @@
 				AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */,
 				ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */,
 				ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */,
+				AB2E39351B3543D8001D493E /* RendererCommon.cpp */,
+				AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */,
 				AB949D361ABC8E44007D561E /* ShaderGL.cpp */,
 				AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */,
 				AB77FD571B344CB0001858CC /* TextureCubeGL.cpp */,
 				ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */,
 				ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */,
 				AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */,
-				AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */,
 				AB77FD591B344FCD001858CC /* TextureCommon.cpp */,
 			);
 			name = Video;
@@ -335,6 +338,7 @@
 				ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */,
 				ABCF19C01AE28EA600822E80 /* TextRendererComponent.cpp in Sources */,
 				AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */,
+				AB2E39361B3543D8001D493E /* RendererCommon.cpp in Sources */,
 				AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
 				ABC8B6071B0D0C1A00E5C32B /* FileSystem.cpp in Sources */,

@@ -6,9 +6,11 @@
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "GfxDevice.hpp"
-#include "Shader.hpp"
+#include "Renderer.hpp"
 #include "GameObject.hpp"
 #include "System.hpp"
+
+extern ae3d::Renderer renderer;
 
 void ae3d::Scene::Add( GameObject* gameObject )
 {
@@ -77,20 +79,26 @@ void ae3d::Scene::Render()
     }
     
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
-
-    RenderWithCamera( camera );
+    
+    if (camera != nullptr)
+    {
+        RenderWithCamera( camera );
+    }
 }
 
 void ae3d::Scene::RenderWithCamera( CameraComponent* camera )
 {
-    System::Assert( camera != nullptr, "camera is null!" );
-    
     GfxDevice::SetRenderTarget( camera->GetTargetTexture() );
     
-    Vec3 color = camera->GetClearColor();
+    const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::ResetFrameStatistics();
+    
+    if (skybox != nullptr)
+    {
+        renderer.RenderSkybox( skybox, *camera );
+    }
     
     for (auto gameObject : gameObjects)
     {
@@ -123,6 +131,11 @@ void ae3d::Scene::RenderWithCamera( CameraComponent* camera )
     }
     
     GfxDevice::ErrorCheck( "Scene render end" );
+}
+
+void ae3d::Scene::SetSkybox( const TextureCube* skyTexture )
+{
+    skybox = skyTexture;
 }
 
 std::string ae3d::Scene::GetSerialized() const

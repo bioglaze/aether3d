@@ -31,6 +31,11 @@ int main()
     System::InitAudio();
     System::InitGamePad();
 
+    GameObject perspCamera;
+    perspCamera.AddComponent<CameraComponent>();
+    perspCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
+    perspCamera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
+
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
@@ -112,20 +117,22 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     
     Scene scene;
+    //scene.Add( &perspCamera );
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
-    System::Print( "%s\n", scene.GetSerialized().c_str() );
+    //scene.Add( &renderTextureContainer );
+    //scene.Add( &rtCamera );
+    //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     TextureCube skybox;
     skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                  FileSystem::FileContents( "skybox/top.jpg" ), FileSystem::FileContents( "skybox/bottom.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
+    //scene.SetSkybox( &skybox );
 
     bool quit = false;
     

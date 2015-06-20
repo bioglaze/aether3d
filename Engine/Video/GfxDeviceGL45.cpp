@@ -79,7 +79,8 @@ void ae3d::GfxDevice::Init( int width, int height )
 {
     if (glxwInit() != 0)
     {
-        //NSLog(@"Failed to load OpenGL function pointers using GLXW!");
+        System::Print( "Unable to initialize GLXW!" );
+        return;
     }
     
     SetBackBufferDimensionAndFBO( width, height );
@@ -353,4 +354,20 @@ void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )
     int fboId = 0;
     glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fboId );
     GfxDeviceGlobal::systemFBO = static_cast< unsigned >(fboId);
+}
+
+void ae3d::GfxDevice::SetDepthFunc( DepthFunc depthFunc )
+{
+    if (depthFunc == DepthFunc::LessOrEqualWriteOn)
+    {
+        glDepthMask( GL_TRUE );
+        glEnable( GL_DEPTH_TEST );
+        glDepthFunc( GL_LEQUAL );
+    }
+    else if (depthFunc == DepthFunc::LessOrEqualWriteOff)
+    {
+        glDepthMask( GL_FALSE );
+        glEnable( GL_DEPTH_TEST );
+        glDepthFunc( GL_LEQUAL );
+    }
 }

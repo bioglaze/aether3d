@@ -15,6 +15,9 @@ namespace ae3d
     public:
         /// \return Projection matrix.
         const Matrix44& GetProjection() const { return projectionMatrix; }
+
+        /// \return View matrix.
+        const Matrix44& GetView() const { return viewMatrix; }
         
         /**
           Sets an orthographic projection matrix.
@@ -27,6 +30,16 @@ namespace ae3d
          \param far Far plane distance.
          */
         void SetProjection( float left, float right, float bottom, float top, float near, float far );
+
+        /**
+         Sets a perspective projection matrix.
+         
+         \param fovDegrees Field of view in degrees.
+         \param aspect Aspect ratio.
+         \param near Near plane distance.
+         \param far Far plane distance.
+         */
+        void SetProjection( float fovDegrees, float aspect, float near, float far );
 
         /// \return Clear color in range 0-1.
         Vec3 GetClearColor() const { return clearColor; }

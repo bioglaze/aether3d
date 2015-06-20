@@ -3,49 +3,50 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
-
-enum class InfoLogType
-{
-    Program,
-    Shader
-};
+#include "TextureCube.hpp"
 
 namespace
 {
-void PrintInfoLog( GLuint shader, InfoLogType logType )
-{
-    GLint logLength = 0;
-    
-    if (logType == InfoLogType::Program)
+    enum class InfoLogType
     {
-        glGetProgramiv( shader, GL_INFO_LOG_LENGTH, &logLength );
-    }
-    else
-    {
-        glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logLength );
-    }
+        Program,
+        Shader
+    };
 
-    if (logLength > 0)
+    void PrintInfoLog( GLuint shader, InfoLogType logType )
     {
-        GLchar* log = new GLchar[ (std::size_t)logLength + 1 ];
-        GLsizei charsWritten = 0;
+        GLint logLength = 0;
         
         if (logType == InfoLogType::Program)
         {
-            glGetProgramInfoLog( shader, logLength, &charsWritten, log );
+            glGetProgramiv( shader, GL_INFO_LOG_LENGTH, &logLength );
         }
         else
         {
-            glGetShaderInfoLog( shader, logLength, &charsWritten, log );
+            glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logLength );
         }
         
-        if (charsWritten > 0)
+        if (logLength > 0)
         {
-            ae3d::System::Print( log );
+            GLchar* log = new GLchar[ (std::size_t)logLength + 1 ];
+            GLsizei charsWritten = 0;
+            
+            if (logType == InfoLogType::Program)
+            {
+                glGetProgramInfoLog( shader, logLength, &charsWritten, log );
+            }
+            else
+            {
+                glGetShaderInfoLog( shader, logLength, &charsWritten, log );
+            }
+            
+            if (charsWritten > 0)
+            {
+                ae3d::System::Print( log );
+            }
+            
+            delete[] log;
         }
-        
-        delete[] log;
-    }
 }
 
 GLuint CompileShader( const char* source, GLenum shaderType )
@@ -139,6 +140,16 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
     glBindTexture( GL_TEXTURE_2D, texture->GetID() );
     SetInt( name, textureUnit );
 
+    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
+    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
+}
+
+void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )
+{
+    glActiveTexture( GL_TEXTURE0 + textureUnit );
+    glBindTexture( GL_TEXTURE_CUBE_MAP, texture->GetID() );
+    SetInt( name, textureUnit );
+    
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }

@@ -8,6 +8,7 @@ namespace ae3d
 {
     class GameObject;
     class CameraComponent;
+    class TextureCube;
 
     /// Contains game objects in a transform hierarchy.
     class Scene
@@ -22,6 +23,9 @@ namespace ae3d
         /// Renders the scene.
         void Render();
 
+        /// \param skyTexture Skybox texture.
+        void SetSkybox( const TextureCube* skyTexture );
+        
         /// \return Scene's contents in a textual format that can be saved into file etc.
         std::string GetSerialized() const;
 
@@ -29,8 +33,9 @@ namespace ae3d
         void RenderWithCamera( CameraComponent* camera );
 
         std::vector< GameObject* > gameObjects;
-        GameObject* mainCamera = nullptr;
         unsigned nextFreeGameObject = 0;
+        const TextureCube* skybox = nullptr;
+        GameObject* mainCamera = nullptr;
     };
 }
 #endif

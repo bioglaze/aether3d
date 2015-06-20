@@ -10,6 +10,7 @@ namespace ae3d
 {
     class RenderTexture2D;
 
+    /// Low-level graphics state abstraction.
     namespace GfxDevice
     {
         enum ClearFlags : unsigned
@@ -23,6 +24,12 @@ namespace ae3d
             AlphaBlend,
             Additive,
             Off
+        };
+        
+        enum class DepthFunc
+        {
+            LessOrEqualWriteOff,
+            LessOrEqualWriteOn
         };
         
         void Init( int width, int height );
@@ -53,6 +60,7 @@ namespace ae3d
 
         void ReleaseGPUObjects();
         void SetBlendMode( BlendMode blendMode );
+        void SetDepthFunc( DepthFunc depthFunc );
         void ErrorCheck( const char* info );
 #if RENDERER_OPENGL
         void SetBackBufferDimensionAndFBO( int width, int height );

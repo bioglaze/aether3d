@@ -40,7 +40,8 @@ void ae3d::RenderTexture2D::Create( int aWidth, int aHeight, TextureWrap aWrap, 
     
     // Creates the Frame Buffer Object.
     fboId = GfxDevice::CreateFboId();
-    glBindFramebuffer( GL_FRAMEBUFFER, fboId );
+    //glBindFramebuffer( GL_FRAMEBUFFER, fboId );
+    GfxDevice::SetRenderTarget( this );
     
     GfxDevice::ErrorCheck( "CreateRenderTexture2D middle" );
     
