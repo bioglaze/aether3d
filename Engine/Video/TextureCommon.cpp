@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-#include <functional>
+#include <algorithm>
 
 bool HasStbExtension( const std::string& path )
 {

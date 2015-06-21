@@ -136,6 +136,11 @@ void ae3d::Scene::RenderWithCamera( CameraComponent* camera )
 void ae3d::Scene::SetSkybox( const TextureCube* skyTexture )
 {
     skybox = skyTexture;
+
+    if (skybox != nullptr && !renderer.IsSkyboxGenerated())
+    {
+        renderer.GenerateSkybox();
+    }
 }
 
 std::string ae3d::Scene::GetSerialized() const

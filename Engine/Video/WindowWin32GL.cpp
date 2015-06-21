@@ -13,7 +13,7 @@ namespace WindowGlobal
 
 namespace ae3d
 {
-    void Window::CreateRenderer()
+    void CreateRenderer()
     {
         // Choose pixel format
         PIXELFORMATDESCRIPTOR pfd;

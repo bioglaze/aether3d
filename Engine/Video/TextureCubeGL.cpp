@@ -51,7 +51,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             if (data == nullptr)
             {
                 const std::string reason( stbi_failure_reason() );
-                System::Print( "%s failed to load. stb_image's reason: %s", paths[ face ].c_str(), reason.c_str() );
+                System::Print( "%s failed to load. stb_image's reason: %s\n", paths[ face ].c_str(), reason.c_str() );
                 return;
             }
             
@@ -67,5 +67,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             //LoadDDS( fileContents.path.c_str() );
         }
     }
+
+    GfxDevice::ErrorCheck( "Cube map creation" );
 }
 

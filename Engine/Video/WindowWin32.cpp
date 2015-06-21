@@ -24,6 +24,11 @@ DWORD WINAPI XInputSetStateStub( DWORD /*dwUserIndex*/, XINPUT_VIBRATION* /*pVib
 
 static x_input_set_state* XInputSetState_ = XInputSetStateStub;
 
+namespace ae3d
+{
+    void CreateRenderer();
+}
+
 namespace WindowGlobal
 {
     bool isOpen = false;
@@ -362,7 +367,7 @@ namespace ae3d
         return WindowGlobal::isOpen;
     }
 
-    void Window::SwapBuffers() const
+    void Window::SwapBuffers()
     {
         ::SwapBuffers( WindowGlobal::hdc );
     }

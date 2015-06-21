@@ -132,7 +132,7 @@ int main()
                  FileSystem::FileContents( "skybox/top.jpg" ), FileSystem::FileContents( "skybox/bottom.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
-    //scene.SetSkybox( &skybox );
+    scene.SetSkybox( &skybox );
 
     bool quit = false;
     

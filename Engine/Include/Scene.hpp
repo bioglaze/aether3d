@@ -23,7 +23,7 @@ namespace ae3d
         /// Renders the scene.
         void Render();
 
-        /// \param skyTexture Skybox texture.
+        /// \param skyTexture Skybox texture. If this is the first time a valid skybox texture is provided, skybox geometry will also be generated.
         void SetSkybox( const TextureCube* skyTexture );
         
         /// \return Scene's contents in a textual format that can be saved into file etc.

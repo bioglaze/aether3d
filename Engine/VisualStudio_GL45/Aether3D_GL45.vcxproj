@@ -110,10 +110,13 @@
     </ClCompile>
     <ClCompile Include="..\Video\DDSLoader.cpp" />
     <ClCompile Include="..\Video\GfxDeviceGL45.cpp" />
+    <ClCompile Include="..\Video\RendererCommon.cpp" />
     <ClCompile Include="..\Video\RendererGL.cpp" />
     <ClCompile Include="..\Video\RenderTextureGL.cpp" />
     <ClCompile Include="..\Video\ShaderGL.cpp" />
     <ClCompile Include="..\Video\Texture2D_GL45.cpp" />
+    <ClCompile Include="..\Video\TextureCommon.cpp" />
+    <ClCompile Include="..\Video\TextureCubeGL.cpp" />
     <ClCompile Include="..\Video\VertexBufferGL.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
     <ClCompile Include="..\Video\WindowWin32GL.cpp" />
@@ -138,6 +141,7 @@
     <ClInclude Include="..\Include\TextRendererComponent.hpp" />
     <ClInclude Include="..\Include\Texture2D.hpp" />
     <ClInclude Include="..\Include\TextureBase.hpp" />
+    <ClInclude Include="..\Include\TextureCube.hpp" />
     <ClInclude Include="..\Include\TransformComponent.hpp" />
     <ClInclude Include="..\Include\Vec3.hpp" />
     <ClInclude Include="..\Include\Window.hpp" />

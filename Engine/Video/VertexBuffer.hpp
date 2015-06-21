@@ -24,6 +24,7 @@ namespace ae3d
             unsigned short a, b, c;
         };
 
+        /// Vertex with position, texture coordinate and color.
         struct VertexPTC
         {
             VertexPTC() {}
@@ -39,20 +40,24 @@ namespace ae3d
             Vec4 color;
         };
 
-        // Binds the buffer. Must be called before Draw or DrawRange.
+        /// Binds the buffer. Must be called before Draw or DrawRange.
         void Bind() const;
 
-        // Generates the buffer from supplied geometry.
-        // \param faces Faces.
-        // \param faceCount Face count.
-        // \param vertices Vertices.
-        // \param vertexCount Vertex count.
+        bool IsGenerated() const { return elementCount != 0; }
+
+        /// Generates the buffer from supplied geometry.
+        /// \param faces Faces.
+        /// \param faceCount Face count.
+        /// \param vertices Vertices.
+        /// \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount );
+        
+        /// Draws the whole buffer.
         void Draw() const;
-        /// <summary>
+        
         /// Draws a range of triangles.
-        /// </summary>
-        /// <param name="start">Start</param>
+        /// \param start Start index.
+        /// \param end End index.
         void DrawRange( int start, int end ) const;
 
     private:

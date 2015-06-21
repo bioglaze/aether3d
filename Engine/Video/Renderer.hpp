@@ -7,7 +7,7 @@
 namespace ae3d
 {
     class TextureCube;
-    class Vec3;
+    struct sVec3;
     class CameraComponent;
     
     struct BuiltinShaders
@@ -23,6 +23,11 @@ namespace ae3d
     class Renderer
     {
     public:
+        /// \return True if skybox has been generated.
+        bool IsSkyboxGenerated() const { return skyboxBuffer.IsGenerated(); }
+        
+        void GenerateSkybox();
+
         void RenderSkybox( const TextureCube* skyTexture, const CameraComponent& camera );
 
         BuiltinShaders builtinShaders;
