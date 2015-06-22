@@ -18,7 +18,7 @@ namespace ae3d
 
         /// \return View matrix.
         const Matrix44& GetView() const { return viewMatrix; }
-        
+
         /**
           Sets an orthographic projection matrix.
          
@@ -58,21 +58,25 @@ namespace ae3d
 
     private:
         friend class GameObject;
-        
-        /** \return Component's type code. Must be unique for each component type. */
+        friend class Scene;
+
+        /// \return Component's type code. Must be unique for each component type.
         static int Type() { return 0; }
         
-        /** \return Component handle that uniquely identifies the instance. */
+        /// \return Component handle that uniquely identifies the instance.
         static unsigned New();
         
-        /** \return Component at index or null if index is invalid. */
+        /// \return Component at index or null if index is invalid.
         static CameraComponent* Get( unsigned index );
+
+        /// \param view View matrix.
+        void SetView( const Matrix44& view ) { viewMatrix = view; }
 
         Matrix44 projectionMatrix;
         Matrix44 viewMatrix;
         Vec3 clearColor;
         RenderTexture2D* targetTexture = nullptr;
-
+        
         struct OrthoParams
         {
             float left = 0;

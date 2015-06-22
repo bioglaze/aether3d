@@ -18,6 +18,7 @@ namespace ae3d
         MouseMiddleUp,
         MouseWheelScrollDown,
         MouseWheelScrollUp,
+        MouseMove,
         GamePadButtonA,
         GamePadButtonB,
         GamePadButtonX,

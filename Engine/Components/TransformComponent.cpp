@@ -20,6 +20,67 @@ ae3d::TransformComponent* ae3d::TransformComponent::Get( unsigned index )
     return &transformComponents[ index ];
 }
 
+void ae3d::TransformComponent::LookAt( const Vec3& aLocalPosition, const Vec3& center, const Vec3& up )
+{
+    Matrix44 lookAt;
+    lookAt.MakeLookAt( aLocalPosition, center, up );
+    localRotation.FromMatrix( lookAt );
+    localPosition = aLocalPosition;
+    isDirty = true;
+}
+
+void ae3d::TransformComponent::MoveForward( float amount )
+{
+    if (amount > 0.00001f || amount < -0.00001f)
+    {
+        localPosition += localRotation * Vec3( 0, 0, amount );
+        isDirty = true;
+    }
+}
+
+void ae3d::TransformComponent::MoveRight( float amount )
+{
+    if (amount > 0.00001f || amount < -0.00001f)
+    {
+        localPosition += localRotation * Vec3( amount, 0, 0 );
+        isDirty = true;
+    }
+}
+
+void ae3d::TransformComponent::MoveUp( float amount )
+{
+    localPosition.y += amount;
+    isDirty = true;
+}
+
+void ae3d::TransformComponent::OffsetRotate( const Vec3& axis, float angleDeg )
+{
+    Quaternion rot;
+    rot.FromAxisAngle( axis, angleDeg );
+
+    Quaternion newRotation;
+
+    if (axis.y < 0.00001f && axis.y > -0.00001f )
+    {
+        newRotation = localRotation * rot;
+    }
+    else
+    {
+        newRotation = rot * localRotation;
+    }
+
+    newRotation.Normalize();
+
+    if ((axis.x == 1.0f || axis.x == -1.0f) && axis.y == 0.0f && axis.z == 0.0f &&
+        newRotation.FindTwist( Vec3( 1.0f, 0.0f, 0.0f ) ) > 0.9999f)
+    {
+        return;
+    }
+
+    localRotation = newRotation;
+    isDirty = true;
+}
+
 const ae3d::Matrix44& ae3d::TransformComponent::GetLocalMatrix()
 {
     const TransformComponent* testComponent = parent;

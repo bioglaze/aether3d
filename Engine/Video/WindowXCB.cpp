@@ -238,7 +238,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                         );
     
     const uint32_t eventmask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE |
-                               XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
+                               XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION;
     const uint32_t valuelist[] = { eventmask, colormap, 0 };
     const uint32_t valuemask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
     
@@ -319,9 +319,12 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
     
-    CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height );
+    if (CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height ) == -1)
+    {
+        return;
+    }
+    
     GfxDevice::Init( width, height );
-
     
     const char *title = "Aether3D Game Engine";
     xcb_change_property(WindowGlobal::connection,
@@ -332,11 +335,6 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
                         8,
                         strlen (title),
                         title );
-    /* Cleanup */
-    //glXDestroyWindow(display, glxwindow);
-    //xcb_destroy_window(connection, window);
-    //glXDestroyContext(display, context);    
-    //XCloseDisplay(display);
     WindowGlobal::isOpen = true;
 }
 
@@ -402,9 +400,11 @@ void ae3d::Window::PumpEvents()
             }
             case XCB_MOTION_NOTIFY:
             {
-                //xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
-                //std::cout << "mouse x: " << e->event_x;
-                //std::cout << "mouse y: " << e->event_y;
+                xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
+                WindowGlobal::IncEventIndex();
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = e->event_x;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = e->event_y;
                 break;
             }
             case XCB_CLIENT_MESSAGE:
@@ -544,7 +544,7 @@ void ae3d::Window::PumpEvents()
     }
 }
 
-void ae3d::Window::SwapBuffers() const
+void ae3d::Window::SwapBuffers()
 {
     glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
 }

@@ -56,7 +56,7 @@ void ae3d::Scene::Render()
         return;
     }
     
-    std::list< CameraComponent* > rtCameras;
+    std::list< GameObject* > rtCameras;
     
     for (auto gameObject : gameObjects)
     {
@@ -69,7 +69,7 @@ void ae3d::Scene::Render()
         
         if (cameraComponent && cameraComponent->GetTargetTexture())
         {
-            rtCameras.push_back( cameraComponent );
+            rtCameras.push_back( gameObject );
         }
     }
     
@@ -82,21 +82,28 @@ void ae3d::Scene::Render()
     
     if (camera != nullptr)
     {
-        RenderWithCamera( camera );
+        RenderWithCamera( mainCamera );
     }
 }
 
-void ae3d::Scene::RenderWithCamera( CameraComponent* camera )
+void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
 {
+    CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
     GfxDevice::SetRenderTarget( camera->GetTargetTexture() );
     
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::ResetFrameStatistics();
-    
+
     if (skybox != nullptr)
     {
+        Matrix44 view;
+        auto cameraTrans = cameraGo->GetComponent< TransformComponent >();
+        cameraTrans->GetLocalRotation().GetMatrix( view );
+        camera->SetView( view );    
+        //Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
+        //frustum.Update( localPosition, viewDir );
         renderer.RenderSkybox( skybox, *camera );
     }
     

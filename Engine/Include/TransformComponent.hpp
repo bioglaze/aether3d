@@ -15,6 +15,27 @@ namespace ae3d
         /// \return Local position.
         const Vec3& GetLocalPosition() const { return localPosition; }
 
+        /// \return Local rotation.
+        const Quaternion& GetLocalRotation() const { return localRotation; }
+
+        /// \param localPosition Local position.
+        /// \param center Point we're looking at.
+        /// \param up Up vector.
+        void LookAt( const Vec3& localPosition, const Vec3& center, const Vec3& up );
+
+        /// \param amount Amount.
+        void MoveRight( float amount );
+
+        /// \param amount Amount.
+        void MoveForward( float amount );
+
+        /// \param amount Amount.
+        void MoveUp( float amount );
+
+        /// \param axis Axis to rotate about.
+        /// \angleDegrees Angle in degrees to be added to current rotation.
+        void OffsetRotate( const Vec3& axis, float angleDegrees );
+        
         /// \param localPos Local position.
         void SetLocalPosition( const Vec3& localPos );
 
@@ -46,6 +67,8 @@ namespace ae3d
         static TransformComponent* Get( unsigned index );
 
         void SolveLocalMatrix();
+
+        void UpdateViewMatrix();
         
         Vec3 localPosition;
         Quaternion localRotation;

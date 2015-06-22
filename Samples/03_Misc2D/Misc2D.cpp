@@ -22,11 +22,13 @@ using namespace ae3d;
 
 int main()
 {
-    const int width = 640;
-    const int height = 480;
+    //const int width = 640;
+    //const int height = 480;
+    const int width = 1366;
+    const int height = 768;
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, WindowCreateFlags::Empty );
+    Window::Create( width, height, WindowCreateFlags::Fullscreen );
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
@@ -35,6 +37,8 @@ int main()
     perspCamera.AddComponent<CameraComponent>();
     perspCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     perspCamera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
+    perspCamera.AddComponent<TransformComponent>();
+    perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 00, 0, 0 ) );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -117,8 +121,8 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     
     Scene scene;
-    //scene.Add( &perspCamera );
-    scene.Add( &camera );
+    scene.Add( &perspCamera );
+    //scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     scene.Add( &statsContainer );
@@ -129,7 +133,7 @@ int main()
 
     TextureCube skybox;
     skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
-                 FileSystem::FileContents( "skybox/top.jpg" ), FileSystem::FileContents( "skybox/bottom.jpg" ),
+                 FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
     scene.SetSkybox( &skybox );
@@ -167,10 +171,41 @@ int main()
                 {
                     audioContainer.GetComponent<AudioSourceComponent>()->Play();
                 }
+                if (keyCode == KeyCode::W)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->MoveUp( 0.2f );
+                }
+                if (keyCode == KeyCode::S)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->MoveUp( -0.2f );
+                }
+                if (keyCode == KeyCode::Left)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), 1 );
+                }
+                if (keyCode == KeyCode::Right)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -1 );
+                }
+                if (keyCode == KeyCode::Up)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
+                }
+                if (keyCode == KeyCode::Down)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), 1 );
+                }
             }
             if (event.type == WindowEventType::GamePadButtonA)
             {
                 text = "button a down";
+            }
+            if (event.type == WindowEventType::MouseMove)
+            {
+                // TODO: Needs relative position
+                ae3d::System::Print("mouse move: %d, %d\n", event.mouseX, event.mouseY);
+                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( event.mouseX - width/2 ) / 20 );
+                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( event.mouseY - height/2 ) / 20 );
             }
         }
 

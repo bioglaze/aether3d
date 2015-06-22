@@ -30,7 +30,7 @@ namespace ae3d
         std::string GetSerialized() const;
 
     private:
-        void RenderWithCamera( CameraComponent* camera );
+        void RenderWithCamera( GameObject* cameraGo );
 
         std::vector< GameObject* > gameObjects;
         unsigned nextFreeGameObject = 0;
