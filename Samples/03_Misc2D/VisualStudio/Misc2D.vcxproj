@@ -101,6 +101,7 @@
     <ClInclude Include="..\..\..\Engine\Include\TextRendererComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Texture2D.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\TextureBase.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\TextureCube.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\TransformComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Vec3.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Window.hpp" />

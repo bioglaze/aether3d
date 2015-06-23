@@ -31,10 +31,21 @@ namespace ae3d
 
 namespace WindowGlobal
 {
-    bool isOpen = false;
+    int windowWidth = 640;
+    int windowHeight = 480;
     const int eventStackSize = 10;
     ae3d::WindowEvent eventStack[ eventStackSize ];
     int eventIndex = -1;
+
+    void IncEventIndex()
+    {
+        if (eventIndex < eventStackSize - 1)
+        {
+            ++eventIndex;
+        }
+    }
+
+    bool isOpen = false;
     HWND hwnd;
     HDC hdc;
     ae3d::KeyCode keyMap[ 256 ] = { ae3d::KeyCode::A };
@@ -95,7 +106,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
         {
-            ++WindowGlobal::eventIndex;
+            WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
         }
@@ -111,7 +122,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_LBUTTONDOWN:
         case WM_LBUTTONUP:
         {
-            ++WindowGlobal::eventIndex;
+            WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = message == WM_LBUTTONDOWN ? ae3d::WindowEventType::Mouse1Down : ae3d::WindowEventType::Mouse1Up;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
             WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseY = HIWORD(lParam);
@@ -120,7 +131,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_RBUTTONDOWN:
         case WM_RBUTTONUP:
         {
-            ++WindowGlobal::eventIndex;
+            WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = message == WM_RBUTTONDOWN ? ae3d::WindowEventType::Mouse2Down : ae3d::WindowEventType::Mouse2Up;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
             WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseY = HIWORD(lParam);
@@ -128,18 +139,18 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             break;
         case WM_MBUTTONDOWN:
         case WM_MBUTTONUP:
-            ++WindowGlobal::eventIndex;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = message == WM_MBUTTONDOWN ? ae3d::WindowEventType::MouseMiddleDown : ae3d::WindowEventType::MouseMiddleUp;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseY = HIWORD(lParam);
+            WindowGlobal::IncEventIndex();
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = message == WM_MBUTTONDOWN ? ae3d::WindowEventType::MouseMiddleDown : ae3d::WindowEventType::MouseMiddleUp;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = HIWORD(lParam);
             break;
         case WM_MOUSEWHEEL:
         {
             int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-            ++WindowGlobal::eventIndex;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = delta < 0 ? ae3d::WindowEventType::MouseWheelScrollDown : ae3d::WindowEventType::MouseWheelScrollUp;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseY = HIWORD(lParam);
+            WindowGlobal::IncEventIndex();
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = delta < 0 ? ae3d::WindowEventType::MouseWheelScrollDown : ae3d::WindowEventType::MouseWheelScrollUp;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = HIWORD(lParam);
         }
             break;
         case WM_MOUSEMOVE:
@@ -148,10 +159,14 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             
             // Check if right button down:
             //bool rightButtonDown=wParam & MK_RBUTTON;
+            WindowGlobal::IncEventIndex();
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD( lParam );
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = HIWORD( lParam );
             break;
         case WM_CLOSE:
-            ++WindowGlobal::eventIndex;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::Close;
+            WindowGlobal::IncEventIndex();
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Close;
             break;
     }
 
@@ -212,7 +227,7 @@ namespace ae3d
             float avgX = ProcessGamePadStickValue( Pad->sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE );
             float avgY = ProcessGamePadStickValue( Pad->sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE );
             
-            ++WindowGlobal::eventIndex;
+            WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadLeftThumbState;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = avgX;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = avgY;
@@ -220,70 +235,70 @@ namespace ae3d
             avgX = ProcessGamePadStickValue( Pad->sThumbRX, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE );
             avgY = ProcessGamePadStickValue( Pad->sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE );
 
-            ++WindowGlobal::eventIndex;
+            WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadRightThumbState;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = avgX;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = avgY;
 
             if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadUp;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadDown;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_LEFT) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadLeft;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadRight;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_A) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonA;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_B) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonB;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_X) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonX;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_Y) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonY;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonLeftShoulder;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)!= 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonRightShoulder;
 
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_START) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonStart;
             }
             if ((Pad->wButtons & XINPUT_GAMEPAD_BACK) != 0)
             {
-                ++WindowGlobal::eventIndex;
+                WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonBack;
             }
         }
@@ -292,8 +307,8 @@ namespace ae3d
     void Window::Create(int width, int height, WindowCreateFlags flags)
     {
         InitKeyMap();
-        const int finalWidth = width == 0 ? GetSystemMetrics(SM_CXSCREEN) : width;
-        const int finalHeight = height == 0 ? GetSystemMetrics(SM_CYSCREEN) : height;
+        WindowGlobal::windowWidth = width == 0 ? GetSystemMetrics(SM_CXSCREEN) : width;
+        WindowGlobal::windowHeight = height == 0 ? GetSystemMetrics( SM_CYSCREEN ) : height;
 
         const HINSTANCE hInstance = GetModuleHandle(nullptr);
         const bool fullscreen = (flags & WindowCreateFlags::Fullscreen) != 0;
@@ -318,23 +333,29 @@ namespace ae3d
 
         RegisterClassEx(&wc);
 
-        WindowGlobal::hwnd = CreateWindowExA(fullscreen ? WS_EX_TOOLWINDOW | WS_EX_TOPMOST : 0,
+        WindowGlobal::hwnd = CreateWindowExA( fullscreen ? WS_EX_TOOLWINDOW | WS_EX_TOPMOST : 0,
             "WindowClass1",    // name of the window class
             "Window",   // title of the window
             fullscreen ? WS_POPUP : (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU),    // window style
             CW_USEDEFAULT,    // x-position of the window
             CW_USEDEFAULT,    // y-position of the window
-            finalWidth,    // width of the window
-            finalHeight,    // height of the window
+            WindowGlobal::windowWidth,    // width of the window
+            WindowGlobal::windowHeight,    // height of the window
             nullptr,    // we have no parent window
             nullptr,    // we aren't using menus
             hInstance,    // application handle
-            nullptr);    // used with multiple windows    
+            nullptr );    // used with multiple windows    
         
         ShowWindow( WindowGlobal::hwnd, SW_SHOW );
         CreateRenderer();
         WindowGlobal::isOpen = true;
-        GfxDevice::Init( finalWidth, finalHeight );
+        GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
+    }
+
+    void Window::GetSize( int& outWidth, int& outHeight )
+    {
+        outWidth = WindowGlobal::windowWidth;
+        outHeight = WindowGlobal::windowHeight;
     }
 
     bool Window::PollEvent(WindowEvent& outEvent)

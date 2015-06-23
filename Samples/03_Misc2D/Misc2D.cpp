@@ -24,11 +24,13 @@ int main()
 {
     //const int width = 640;
     //const int height = 480;
-    const int width = 1366;
-    const int height = 768;
+    int width = 0;
+    int height = 0;
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Fullscreen );
+    Window::GetSize( width, height );
+    //Window::SetMouseRelative( true );
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
@@ -140,6 +142,9 @@ int main()
 
     bool quit = false;
     
+    int lastMouseX = 0;
+    int lastMouseY = 0;
+
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -202,10 +207,13 @@ int main()
             }
             if (event.type == WindowEventType::MouseMove)
             {
-                // TODO: Needs relative position
-                ae3d::System::Print("mouse move: %d, %d\n", event.mouseX, event.mouseY);
-                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( event.mouseX - width/2 ) / 20 );
-                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( event.mouseY - height/2 ) / 20 );
+                const int mouseDeltaX = event.mouseX - lastMouseX;
+                const int mouseDeltaY = event.mouseY - lastMouseY;
+                lastMouseX = event.mouseX;
+                lastMouseY = event.mouseY;
+
+                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
+                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( mouseDeltaY ) / 20 );
             }
         }
 

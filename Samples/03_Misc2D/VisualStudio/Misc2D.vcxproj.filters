@@ -75,5 +75,8 @@
     <ClInclude Include="..\..\..\Engine\Include\TextureBase.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\TextureCube.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
