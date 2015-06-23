@@ -194,11 +194,11 @@ int main()
                 }
                 if (keyCode == KeyCode::Up)
                 {
-                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
+                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), 1 );
                 }
                 if (keyCode == KeyCode::Down)
                 {
-                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), 1 );
+                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
                 }
             }
             if (event.type == WindowEventType::GamePadButtonA)
@@ -213,7 +213,7 @@ int main()
                 lastMouseY = event.mouseY;
 
                 perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
-                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( mouseDeltaY ) / 20 );
+                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }
         }
 

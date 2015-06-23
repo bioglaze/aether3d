@@ -22,9 +22,12 @@ struct game_input
 
 namespace WindowGlobal
 {
+    int windowWidth = 640;
+    int windowHeight = 480;
+
     bool isOpen = false;
-    const int eventStackSize = 10;
-    ae3d::WindowEvent eventStack[eventStackSize];
+    const int eventStackSize = 15;
+    ae3d::WindowEvent eventStack[ eventStackSize ];
     int eventIndex = -1;
     NSOpenGLContext* glContext = nullptr;
     NSApplication *application = nullptr;
@@ -369,7 +372,6 @@ NSObject <NSWindowDelegate> @end
 - (BOOL)windowShouldClose: (id)sender
 {
     (void)sender;
-    //globalApplicationState.isRunning = false;
     return NO;
 }
 
@@ -420,6 +422,15 @@ NSWindow *window;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
 }
 
+- (void) mouseMoved: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    WindowGlobal::IncEventIndex();
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
+}
+
 - (void) rightMouseUp: (NSEvent*) event
 {
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
@@ -457,6 +468,10 @@ NSWindow *window;
     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = point.y;
 }
 
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
+}
 @end
 
 static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
@@ -464,8 +479,7 @@ static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
     WindowGlobal::InitKeyMap();
     
     int windowStyleMask;
-    NSRect windowRect;
-    windowRect = NSMakeRect( 0, 0, width, height );
+    NSRect windowRect = NSMakeRect( 0, 0, width, height );
     
     if (flags & ae3d::WindowCreateFlags::Fullscreen)
     {
@@ -503,19 +517,25 @@ static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
     // from the terminal window for some reason.
     [WindowGlobal::application activateIgnoringOtherApps:YES];
     
-    // A cryptic way to ask window to open.
     [window makeKeyAndOrderFront: WindowGlobal::application];
     [window center];
-    WindowGlobal::isOpen = true;
     
+    [window setAcceptsMouseMovedEvents:YES];
+    [window makeFirstResponder:WindowGlobal::application];
+    
+    const NSRect screenRect = [[NSScreen mainScreen] frame];
+
     if (flags & ae3d::WindowCreateFlags::Fullscreen)
     {
         [window setLevel: NSMainMenuWindowLevel + 1];
         [window setHidesOnDeactivate: YES];
-        const NSRect screenRect = [[NSScreen mainScreen] frame];
         [window setContentSize: screenRect.size];
         [window setFrameOrigin: screenRect.origin];
     }
+
+    WindowGlobal::windowWidth = width == 0 ? screenRect.size.width : width;
+    WindowGlobal::windowHeight = height == 0 ? screenRect.size.height : height;
+    WindowGlobal::isOpen = true;
 }
 
 static void CreateGLContext()
@@ -530,7 +550,7 @@ static void CreateGLContext()
         NSOpenGLPFAColorSize, 32,
         NSOpenGLPFADepthSize, 24,
         NSOpenGLPFAAlphaSize, 8,
-        // Actually this creates 4.1 context. NSOpenGLProfileVersion4_1Core didn't work for me.
+        // Actually this creates 4.1 context. NSOpenGLProfileVersion4_1Core didn't work for me on a 2013 MacBook Pro (NVIDIA GT 750M, OS X Mavericks)
         NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
         0
     };
@@ -581,15 +601,9 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     }
     
     WindowGlobal::application = [NSApplication sharedApplication];
-    // In Snow Leopard, programs without application bundles and
-    // Info.plist files don't get a menubar and can't be brought
-    // to the front unless the presentation option is changed.
     [WindowGlobal::application setActivationPolicy: NSApplicationActivationPolicyRegular];
     ApplicationDelegate *delegate = [[ApplicationDelegate alloc] init];
     [WindowGlobal::application setDelegate: delegate];
-    // Normally this function would block, so if we want
-    // to make our own main loop we need to stop it just
-    // after initialization (see ApplicationDelegate implementation).
     [WindowGlobal::application run];
     
     CreateWindow( width, height, flags );
@@ -646,6 +660,12 @@ void cocoaProcessEvents()
         }
     }
     [eventsAutoreleasePool drain];
+}
+
+void ae3d::Window::GetSize( int& outWidth, int& outHeight )
+{
+    outWidth = WindowGlobal::windowWidth;
+    outHeight = WindowGlobal::windowHeight;
 }
 
 void ae3d::Window::PumpEvents()
