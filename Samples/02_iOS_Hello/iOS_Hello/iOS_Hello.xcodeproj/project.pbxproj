@@ -18,6 +18,7 @@
 		4469AA111AEFCDFE007BBBF1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4469AA101AEFCDFE007BBBF1 /* Images.xcassets */; };
 		4469AA141AEFCDFE007BBBF1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4469AA121AEFCDFE007BBBF1 /* LaunchScreen.xib */; };
 		44C7371E1B171CB100864C28 /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = 44C7371D1B171CB100864C28 /* SDF.metal */; };
+		44E5FC941B399CC8009AC088 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC931B399CC8009AC088 /* Skybox.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,6 +50,7 @@
 		4469AA101AEFCDFE007BBBF1 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4469AA131AEFCDFE007BBBF1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		44C7371D1B171CB100864C28 /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../../Engine/Assets/SDF.metal; sourceTree = "<group>"; };
+		44E5FC931B399CC8009AC088 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
 		44EFE87E1B09D7810072F435 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -88,6 +90,7 @@
 			children = (
 				44C7371D1B171CB100864C28 /* SDF.metal */,
 				4449E8A11B14B644009A869C /* SpriteShader.metal */,
+				44E5FC931B399CC8009AC088 /* Skybox.metal */,
 				4469AA051AEFCDFE007BBBF1 /* AppDelegate.h */,
 				4469AA061AEFCDFE007BBBF1 /* AppDelegate.m */,
 				4469AA081AEFCDFE007BBBF1 /* GameViewController.h */,
@@ -186,6 +189,7 @@
 				4469AA0A1AEFCDFE007BBBF1 /* GameViewController.mm in Sources */,
 				4469AA041AEFCDFE007BBBF1 /* main.m in Sources */,
 				44C7371E1B171CB100864C28 /* SDF.metal in Sources */,
+				44E5FC941B399CC8009AC088 /* Skybox.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

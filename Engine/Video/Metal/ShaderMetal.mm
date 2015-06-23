@@ -2,6 +2,7 @@
 #include "Shader.hpp"
 #include "GfxDevice.hpp"
 #include "Texture2D.hpp"
+#include "TextureCube.hpp"
 #include "System.hpp"
 
 uint8_t constantDataBufferIndex = 0;
@@ -48,6 +49,18 @@ void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int t
     if (texture != nullptr)
     {
         texture0 = const_cast<Texture2D*>(texture)->GetMetalTexture();
+    }
+    else
+    {
+        System::Print("Shader tried to set null texture\n");
+    }
+}
+
+void ae3d::Shader::SetTexture( const char* name, const TextureCube* texture, int textureUnit )
+{
+    if (texture != nullptr)
+    {
+        texture0 = const_cast<TextureCube*>(texture)->GetMetalTexture();
     }
     else
     {
