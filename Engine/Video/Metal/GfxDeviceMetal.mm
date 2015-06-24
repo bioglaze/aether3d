@@ -14,10 +14,16 @@ id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
 id <MTLDepthStencilState> depthState;
 id <CAMetalDrawable> currentDrawable;
+
 id <MTLRenderPipelineState> pipelineOpaqueSprite;
 bool pipelineOpaqueSpriteCreated = false;
+
 id <MTLRenderPipelineState> pipelineBlendedSprite;
 bool pipelineBlendedSpriteCreated = false;
+
+id <MTLRenderPipelineState> pipelineSkybox;
+bool pipelineSkyboxCreated = false;
+
 CAMetalLayer* metalLayer;
 MTLRenderPassDescriptor *renderPassDescriptor = nullptr;
 id <MTLTexture> depthTex;
@@ -141,7 +147,8 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 void ae3d::GfxDevice::DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset )
 {
-    [renderEncoder setRenderPipelineState:pipelineBlendedSprite];
+    //[renderEncoder setRenderPipelineState:pipelineBlendedSprite];
+    [renderEncoder setRenderPipelineState:pipelineSkybox];
     [renderEncoder setVertexBuffer:vertexBuffer offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:uniformBuffer offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
@@ -172,6 +179,26 @@ void ae3d::GfxDevice::BeginFrame()
         }
 
         pipelineOpaqueSpriteCreated = true;
+    }
+
+    if (!pipelineSkyboxCreated)
+    {
+        MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
+        pipelineStateDescriptor.label = @"Skybox pipeline";
+        [pipelineStateDescriptor setSampleCount: 1];
+        [pipelineStateDescriptor setVertexFunction:renderer.builtinShaders.skyboxShader.vertexProgram];
+        [pipelineStateDescriptor setFragmentFunction:renderer.builtinShaders.skyboxShader.fragmentProgram];
+        pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+        pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+        NSError* error = NULL;
+        pipelineSkybox = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
+        
+        if (!pipelineSkybox)
+        {
+            NSLog(@"Failed to created skybox pipeline state, error %@", error);
+        }
+        
+        pipelineSkyboxCreated = true;
     }
 
     if (!pipelineBlendedSpriteCreated)
@@ -294,7 +321,6 @@ void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
 
 void ae3d::GfxDevice::SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
 {
-
 }
 
 void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture2D* renderTexture2d )

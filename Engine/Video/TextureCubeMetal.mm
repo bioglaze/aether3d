@@ -16,6 +16,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                               const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
                               TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
 {
+    if (!negX.isLoaded || !posX.isLoaded || !negY.isLoaded || !posY.isLoaded || !negZ.isLoaded || !posZ.isLoaded)
+    {
+        ae3d::System::Print( "Cube map contains a texture that's not loaded.\n" );
+        return;
+    }
+    
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
@@ -23,14 +29,14 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
 
-    MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatPVRTC_RGBA_4BPP
-                                                                                          size:width
-                                                                                      mipmapped:NO];
-    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-    
     int firstImageComponents;
     unsigned char* firstImageData = stbi_load_from_memory( datas[ 0 ]->data(), static_cast<int>(datas[ 0 ]->size()), &width, &height, &firstImageComponents, 4 );
     stbi_image_free( firstImageData );
+
+    MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
+                                                                                          size:width
+                                                                                      mipmapped:NO];
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
 
     const NSUInteger bytesPerPixel = 4;
     const NSUInteger bytesPerRow = bytesPerPixel * width;
@@ -62,6 +68,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                      bytesPerImage:bytesPerImage];
 
             stbi_image_free( data );
+        }
+        else
+        {
+            System::Print("Cube map texture has unsupported extension %s. Only .bmp, .jpg, .tga, .gif etc. are supported.\n", paths[ face ].c_str() );
         }
     }
 }

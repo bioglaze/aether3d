@@ -14,6 +14,7 @@
 #include "Aether3D_iOS.framework/Headers/Font.hpp"
 #include "Aether3D_iOS.framework/Headers/FileSystem.hpp"
 #include "Aether3D_iOS.framework/Headers/RenderTexture.hpp"
+#include "Aether3D_iOS.framework/Headers/TextureCube.hpp"
 
 @implementation GameViewController
 {
@@ -30,10 +31,12 @@
     ae3d::Texture2D spriteTexPVRv2;
     ae3d::Texture2D spriteTexPVRv3;
     ae3d::Texture2D fontTex;
+    ae3d::TextureCube skyboxTex;
     ae3d::Scene scene;
     ae3d::AudioClip audioClip;
     ae3d::Font font;
     ae3d::GameObject rtCamera;
+    ae3d::GameObject perspCamera;
     ae3d::RenderTexture2D rtTex;
     ae3d::GameObject renderTextureContainer;
 }
@@ -66,7 +69,7 @@
     
     camera.AddComponent<ae3d::CameraComponent>();
     camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1);
-    scene.Add( &camera );
+    //scene.Add( &camera );
 
     spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
     spriteTexPVRv2.Load( ae3d::FileSystem::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
@@ -76,7 +79,7 @@
     sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv3, ae3d::Vec3( 60, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTex, ae3d::Vec3( 180, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     //sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv2, ae3d::Vec3( 240, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    scene.Add( &sprite );
+    //scene.Add( &sprite );
 
     audioClip.Load( ae3d::FileSystem::FileContents( "/Assets/explosion.wav" ) );
     audioSource.AddComponent<ae3d::AudioSourceComponent>();
@@ -93,7 +96,7 @@
     //text.AddComponent<ae3d::TransformComponent>();
     //text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 40, 0 ) );
     
-    scene.Add( &text );
+    //scene.Add( &text );
     
     rtTex.Create( 512, 512, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
@@ -106,6 +109,17 @@
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
+    
+    perspCamera.AddComponent<ae3d::CameraComponent>();
+    perspCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    perspCamera.AddComponent<ae3d::TransformComponent>();
+    scene.Add( &perspCamera );
+    
+    skyboxTex.Load( ae3d::FileSystem::FileContents( "/Assets/skybox/left.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/right.jpg" ),
+                 ae3d::FileSystem::FileContents( "/Assets/skybox/bottom.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/top.jpg" ),
+                 ae3d::FileSystem::FileContents( "/Assets/skybox/front.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/back.jpg" ),
+                 ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None );
+    scene.SetSkybox( &skyboxTex );
 }
 
 -(void) touchesBegan: (NSSet *) touches withEvent: (UIEvent *) event

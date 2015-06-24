@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdint.h>
 #define STB_IMAGE_IMPLEMENTATION
+#define STBI_NEON
 #include "stb_image.c"
 #include "FileSystem.hpp"
 #include "System.hpp"
