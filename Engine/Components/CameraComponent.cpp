@@ -53,7 +53,8 @@ std::string ae3d::CameraComponent::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "camera\n" << "ortho " << orthoParams.left << " " << orthoParams.right << " " << orthoParams.top << " " << orthoParams.down <<
-    " " << nearp << " " << farp << "\n\n";
+    " " << nearp << " " << farp << "\n";
+    outStream << "clearcolor" << clearColor.x << " " << clearColor.y << " " << clearColor.z << "\n\n";
     
     return outStream.str();
 }

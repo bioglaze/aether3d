@@ -81,9 +81,10 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
 
     GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::AlphaBlend );
 
-    m().shader->Use();
-    m().shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
-    m().shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
+    auto shader = m().shader;
+    shader->Use();
+    shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+    shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
 
     m().vertexBuffer.Bind();
     m().vertexBuffer.Draw();
@@ -98,7 +99,8 @@ std::string ae3d::TextRendererComponent::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "textrenderer\n";
-    outStream << "color " << m().color.x << " " << m().color.y << " " << m().color.z << " " << m().color.w << "\n";
+    const auto& color = m().color;
+    outStream << "color " << color.x << " " << color.y << " " << color.z << " " << color.w << "\n";
     outStream << "text " << m().text << "\n\n";
     return outStream.str();
 }

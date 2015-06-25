@@ -58,6 +58,14 @@ int main()
     scene.Add( &textContainer );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
+    /*std::vector< GameObject > gameObjectsFromSceneFile;
+    scene.Deserialize( FileSystem::FileContents( "scene.scene" ), gameObjectsFromSceneFile );
+
+    for (auto& go : gameObjectsFromSceneFile)
+    {
+        scene.Add( &go );
+    }*/
+    
     bool quit = false;
     
     while (Window::IsOpen() && !quit)

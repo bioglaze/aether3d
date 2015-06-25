@@ -1,7 +1,10 @@
 #include "Scene.hpp"
 #include <list>
+#include <string>
+#include <sstream>
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
+#include "FileSystem.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
@@ -183,3 +186,68 @@ std::string ae3d::Scene::GetSerialized() const
     }
     return outSerialized;
 }
+
+ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects )
+{
+    outGameObjects.clear();
+
+    std::stringstream stream( std::string( std::begin( serialized.data ), std::end( serialized.data ) ) );
+    std::string line;
+    
+    while (!stream.eof())
+    {
+        std::getline( stream, line );
+        std::stringstream lineStream( line );
+        std::string token;
+        lineStream >> token;
+        
+        if (token == "gameobject")
+        {
+            outGameObjects.push_back( GameObject() );
+            std::string name;
+            lineStream >> name;
+        }
+
+        if (token == "camera")
+        {
+            outGameObjects.back().AddComponent< CameraComponent >();
+        }
+
+        if (token == "ortho")
+        {
+            float x, y, width, height, nearp, farp;
+            lineStream >> x >> y >> width >> height >> nearp >> farp;
+            outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( x, y, width, height, nearp, farp );
+        }
+        
+        if (token == "clearcolor")
+        {
+            float red, green, blue;
+            lineStream >> red >> green >> blue;
+            outGameObjects.back().GetComponent< CameraComponent >()->SetClearColor( { red, green, blue } );
+        }
+
+        if (token == "transform")
+        {
+            outGameObjects.back().AddComponent< TransformComponent >();
+        }
+
+        if (token == "position")
+        {
+            float x, y, z;
+            lineStream >> x >> y >> z;
+            outGameObjects.back().GetComponent< TransformComponent >()->SetLocalPosition( { x, y, z } );
+        }
+
+        if (token == "rotation")
+        {
+            float x, y, z, s;
+            lineStream >> x >> y >> z >> s;
+            outGameObjects.back().GetComponent< TransformComponent >()->SetLocalRotation( { { x, y, z }, s } );
+        }
+
+    }
+    
+    return DeserializeResult::Success;
+}
+

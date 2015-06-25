@@ -1,6 +1,15 @@
 #include "TransformComponent.hpp"
 #include <vector>
 #include <sstream>
+#include <cmath>
+
+namespace
+{
+    bool IsAlmost( float f1, float f2 )
+    {
+        return std::abs( f1 - f2 ) < 0.0001f;
+    }
+}
 
 std::vector< ae3d::TransformComponent > transformComponents;
 unsigned nextFreeTransformComponent = 0;
@@ -31,7 +40,7 @@ void ae3d::TransformComponent::LookAt( const Vec3& aLocalPosition, const Vec3& c
 
 void ae3d::TransformComponent::MoveForward( float amount )
 {
-    if (amount > 0.00001f || amount < -0.00001f)
+    if (!IsAlmost( amount, 0 ))
     {
         localPosition += localRotation * Vec3( 0, 0, amount );
         isDirty = true;
@@ -40,7 +49,7 @@ void ae3d::TransformComponent::MoveForward( float amount )
 
 void ae3d::TransformComponent::MoveRight( float amount )
 {
-    if (amount > 0.00001f || amount < -0.00001f)
+    if (!IsAlmost( amount, 0 ))
     {
         localPosition += localRotation * Vec3( amount, 0, 0 );
         isDirty = true;
@@ -60,7 +69,7 @@ void ae3d::TransformComponent::OffsetRotate( const Vec3& axis, float angleDeg )
 
     Quaternion newRotation;
 
-    if (axis.y < 0.00001f && axis.y > -0.00001f )
+    if (IsAlmost( axis.y, 0 ))
     {
         newRotation = localRotation * rot;
     }
@@ -71,7 +80,7 @@ void ae3d::TransformComponent::OffsetRotate( const Vec3& axis, float angleDeg )
 
     newRotation.Normalize();
 
-    if ((axis.x == 1.0f || axis.x == -1.0f) && axis.y == 0.0f && axis.z == 0.0f &&
+    if ((IsAlmost( axis.x, 1 ) || IsAlmost( axis.x, -1 )) && IsAlmost( axis.y, 0 ) && IsAlmost( axis.z, 0 ) &&
         newRotation.FindTwist( Vec3( 1.0f, 0.0f, 0.0f ) ) > 0.9999f)
     {
         return;
@@ -156,7 +165,7 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
 std::string ae3d::TransformComponent::GetSerialized() const
 {
     std::stringstream outStream;
-    outStream << "transform\n" << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\n";
+    outStream << "transform\nposition" << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\nrotation";
     outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\n\n";
     
     return outStream.str();

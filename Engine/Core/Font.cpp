@@ -52,12 +52,12 @@ struct CommonBlock
 ae3d::Font::Font()
 {
     texture = Texture2D::GetDefaultTexture();
-    padding[ 0 ] = 200;
-    padding[ 1 ] = 200;
-    padding[ 2 ] = 200;
-    padding[ 3 ] = 200;
-    spacing[ 0 ] = 200;
-    spacing[ 1 ] = 200;
+    padding[ 0 ] = 1;
+    padding[ 1 ] = 2;
+    padding[ 2 ] = 3;
+    padding[ 3 ] = 4;
+    spacing[ 0 ] = 10;
+    spacing[ 1 ] = 20;
 }
 
 void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, VertexBuffer& outVertexBuffer ) const

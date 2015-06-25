@@ -10,10 +10,17 @@ namespace ae3d
     class CameraComponent;
     class TextureCube;
 
+    namespace FileSystem
+    {
+        struct FileContentsData;
+    }
+    
     /// Contains game objects in a transform hierarchy.
     class Scene
     {
     public:
+        enum class DeserializeResult { Success, ParseError };
+        
         /// Adds a game object into the scene if it does not exist there already.
         void Add( GameObject* gameObject );
         
@@ -29,6 +36,11 @@ namespace ae3d
         /// \return Scene's contents in a textual format that can be saved into file etc.
         std::string GetSerialized() const;
 
+        /// \param serialized Serialized scene contents.
+        /// \param outGameObjects Returns game objects that were created from serialized scene contents.
+        /// \return Result. Parsing stops on first error and successfully loaded game objects are returned.
+        DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects );
+        
     private:
         void RenderWithCamera( GameObject* cameraGo );
 
