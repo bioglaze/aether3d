@@ -105,7 +105,7 @@
    (pf.dwAlphaBitMask == 0xff000000U))
 
 #define PF_IS_BGR8(pf) \
-  ((pf.dwFlags & DDPF_ALPHAPIXELS) && \
+  ((pf.dwFlags & DDPF_RGB) && \
   !(pf.dwFlags & DDPF_ALPHAPIXELS) && \
    (pf.dwRGBBitCount == 24) && \
    (pf.dwRBitMask == 0xff0000) && \

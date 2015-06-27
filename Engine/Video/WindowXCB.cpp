@@ -3,6 +3,7 @@
 #include <map>
 #include <xcb/xcb_icccm.h>
 #include <xcb/xcb_keysyms.h>
+#include <xcb/xcb_ewmh.h>
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
 #include <X11/Xlib.h>
@@ -68,6 +69,7 @@ namespace WindowGlobal
     const int eventStackSize = 15;
     ae3d::WindowEvent eventStack[eventStackSize];
     int eventIndex = -1;
+    
     void IncEventIndex()
     {
         if (eventIndex < eventStackSize - 1)
@@ -82,6 +84,13 @@ namespace WindowGlobal
     xcb_key_symbols_t *key_symbols;
     xcb_atom_t wm_protocols;
     xcb_atom_t wm_delete_window;
+
+    // Testing fullscreen.
+    xcb_ewmh_connection_t EWMH;
+    xcb_intern_atom_cookie_t* EWMHCookie = nullptr;
+    
+    int windowWidth = 640;
+    int windowHeight = 480;
     GLXDrawable drawable = 0;
     GamePad gamePad;
     float lastLeftThumbX = 0;
@@ -141,7 +150,7 @@ void PlatformInitGamePad()
             if (fd < 0)
             {
                 // Permissions could cause this code path.
-                std::cerr << "Unable to open joystick file" << std::endl;
+                //std::cerr << "Unable to open joystick file" << std::endl;
                 continue;
             }
 
@@ -160,7 +169,7 @@ void PlatformInitGamePad()
             ioctl( fd, JSIOCGAXES, &axes );
             uint8_t buttons;
             ioctl( fd, JSIOCGBUTTONS, &buttons );
-            std::cout << "d_name: " << std::string( entry.d_name ) << ", name " << std::string( name ) << ", version " << version << ", axes " << axes << ", buttons " << buttons << std::endl; 
+            //std::cout << "d_name: " << std::string( entry.d_name ) << ", name " << std::string( name ) << ", version " << version << ", axes " << axes << ", buttons " << buttons << std::endl; 
             WindowGlobal::gamePad.fd = fd;
             WindowGlobal::gamePad.isActive = true;
             // XBox One Controller values. Should also work for 360 Controller.
@@ -193,14 +202,14 @@ void LoadAtoms()
     xcb_intern_atom_cookie_t wm_protocols_cookie = xcb_intern_atom(WindowGlobal::connection, 0, strlen("WM_PROTOCOLS"), "WM_PROTOCOLS" );
 
     xcb_flush( WindowGlobal::connection );
-    xcb_intern_atom_reply_t* wm_delete_window_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_delete_window_cookie, 0 );
-    xcb_intern_atom_reply_t* wm_protocols_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_protocols_cookie, 0 );
+    xcb_intern_atom_reply_t* wm_delete_window_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_delete_window_cookie, nullptr );
+    xcb_intern_atom_reply_t* wm_protocols_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_protocols_cookie, nullptr );
 
     WindowGlobal::wm_protocols = wm_protocols_cookie_reply->atom;
     WindowGlobal::wm_delete_window = wm_delete_window_cookie_reply->atom;
 }
 
-static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height )
+static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
     GLXFBConfig* fb_configs = nullptr;
     int num_fb_configs = 0;
@@ -217,7 +226,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     GLXFBConfig fb_config = fb_configs[ 0 ];
     glXGetFBConfigAttrib( display, fb_config, GLX_VISUAL_ID, &visualID );
     
-    GLXContext context = glXCreateNewContext( display, fb_config, GLX_RGBA_TYPE, 0, True );
+    GLXContext context = glXCreateNewContext( display, fb_config, GLX_RGBA_TYPE, nullptr, True );
     
     if (!context)
     {
@@ -228,6 +237,10 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     /* Create XID's for colormap and window */
     xcb_colormap_t colormap = xcb_generate_id( connection );
     WindowGlobal::window = xcb_generate_id( connection );
+
+    WindowGlobal::windowWidth = width == 0 ? screen->width_in_pixels : width;
+    WindowGlobal::windowHeight = height == 0 ? screen->height_in_pixels : height;
+    std::cout << "width " << WindowGlobal::windowWidth << ", height " << WindowGlobal::windowHeight << std::endl;
     
     xcb_create_colormap(
                         connection,
@@ -248,7 +261,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                       WindowGlobal::window,
                       screen->root,
                       0, 0,
-                      width, height,
+                      WindowGlobal::windowWidth, WindowGlobal::windowHeight,
                       0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT,
                       visualID,
@@ -257,8 +270,34 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                       );
     
     xcb_map_window( connection, WindowGlobal::window );
+
+    if ((flags & ae3d::WindowCreateFlags::Fullscreen) != 0)
+    {
+        WindowGlobal::EWMHCookie = xcb_ewmh_init_atoms( WindowGlobal::connection, &WindowGlobal::EWMH );
+
+        if (!xcb_ewmh_init_atoms_replies( &WindowGlobal::EWMH, WindowGlobal::EWMHCookie, nullptr ))
+        {
+            std::cout << "Fullscreen not supported." << std::endl;
+        }
+        xcb_ewmh_request_change_wm_state( &WindowGlobal::EWMH, XDefaultScreen( display ), WindowGlobal::window,
+                                          XCB_EWMH_WM_STATE_ADD, WindowGlobal::EWMH._NET_WM_STATE_FULLSCREEN, 0,
+                                          XCB_EWMH_CLIENT_SOURCE_TYPE_NORMAL
+                                          );
+        xcb_ewmh_request_change_active_window( &WindowGlobal::EWMH, XDefaultScreen( display ), WindowGlobal::window,
+                                               XCB_EWMH_CLIENT_SOURCE_TYPE_NORMAL, XCB_CURRENT_TIME, XCB_WINDOW_NONE
+                                               );
     
-    GLXWindow glxwindow = glXCreateWindow( display, fb_config, WindowGlobal::window, 0 );
+        xcb_generic_error_t* error;
+        xcb_get_window_attributes_reply_t* reply = xcb_get_window_attributes_reply( WindowGlobal::connection, xcb_get_window_attributes( WindowGlobal::connection, WindowGlobal::window ), &error );
+        if (!reply)
+        {
+            std::cerr << "Full screen reply failed" << std::endl;
+        }
+    }
+    //xcb_change_property( WindowGlobal::connection, XCB_PROP_MODE_REPLACE, WindowGlobal::window, WindowGlobal::EWMH._NET_WM_STATE, XCB_ATOM, 32, 1, &(WindowGlobal::EWMH._NET_WM_STATE_FULLSCREEN)); 
+    // End test
+    
+    GLXWindow glxwindow = glXCreateWindow( display, fb_config, WindowGlobal::window, nullptr );
 
     if (!glxwindow)
     {
@@ -290,7 +329,7 @@ bool ae3d::Window::IsOpen()
 
 void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 {
-    WindowGlobal::display = XOpenDisplay( 0 );
+    WindowGlobal::display = XOpenDisplay( nullptr );
 
     if (!WindowGlobal::display)
     {
@@ -312,19 +351,19 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     XSetEventQueueOwner( WindowGlobal::display, XCBOwnsEventQueue );
 
-    xcb_screen_t *screen = 0;
+    xcb_screen_t* screen = nullptr;
     xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator( xcb_get_setup( WindowGlobal::connection ) );
     for (int screen_num = default_screen; screen_iter.rem && screen_num > 0; --screen_num, xcb_screen_next( &screen_iter ));
     screen = screen_iter.data;
     
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
     
-    if (CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height ) == -1)
+    if (CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height, flags ) == -1)
     {
         return;
     }
     
-    GfxDevice::Init( width, height );
+    GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
     
     const char *title = "Aether3D Game Engine";
     xcb_change_property(WindowGlobal::connection,
@@ -336,6 +375,12 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
                         strlen (title),
                         title );
     WindowGlobal::isOpen = true;
+}
+
+void ae3d::Window::GetSize( int& outWidth, int& outHeight )
+{
+    outWidth = WindowGlobal::windowWidth;
+    outHeight = WindowGlobal::windowHeight;
 }
 
 void ae3d::Window::PumpEvents()
@@ -352,7 +397,7 @@ void ae3d::Window::PumpEvents()
             case XCB_EVENT_MASK_BUTTON_PRESS:
             case XCB_EVENT_MASK_BUTTON_RELEASE:
             {
-                const xcb_query_pointer_reply_t* pointer = xcb_query_pointer_reply(WindowGlobal::connection, xcb_query_pointer(WindowGlobal::connection, XDefaultRootWindow(WindowGlobal::display)), NULL);
+                const xcb_query_pointer_reply_t* pointer = xcb_query_pointer_reply( WindowGlobal::connection, xcb_query_pointer(WindowGlobal::connection, XDefaultRootWindow(WindowGlobal::display)), nullptr );
                 const bool newb1 = (pointer->mask & XCB_BUTTON_MASK_1) != 0;
                 const bool newb2 = (pointer->mask & XCB_BUTTON_MASK_2) != 0;
                 const bool newb3 = (pointer->mask & XCB_BUTTON_MASK_3) != 0;
@@ -414,7 +459,6 @@ void ae3d::Window::PumpEvents()
                 {
                     if (client_message_event->data.data32[0] == WindowGlobal::wm_delete_window)
                     {
-                        std::cout << "Quitting" << std::endl;
                         exit(1);
                         break;
                     }
@@ -432,8 +476,10 @@ void ae3d::Window::PumpEvents()
     {
         return;
     }
+
     js_event j;
-    while (read(WindowGlobal::gamePad.fd, &j, sizeof(js_event)) == sizeof(js_event))
+
+    while (read( WindowGlobal::gamePad.fd, &j, sizeof(js_event) ) == sizeof(js_event))
         //read(WindowGlobal::gamePad.fd, &j, sizeof(js_event));
     {
         // Don't care if init or afterwards
@@ -491,7 +537,7 @@ void ae3d::Window::PumpEvents()
             }
             else
             {
-                std::cout << "pressed button " << (int)j.number << std::endl;
+                //std::cout << "pressed button " << (int)j.number << std::endl;
             }
         }
         else if (j.type == JS_EVENT_AXIS)
