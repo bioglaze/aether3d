@@ -187,7 +187,7 @@ std::string ae3d::Scene::GetSerialized() const
     return outSerialized;
 }
 
-ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects )
+ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects ) const
 {
     outGameObjects.clear();
 
@@ -206,6 +206,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outGameObjects.push_back( GameObject() );
             std::string name;
             lineStream >> name;
+            outGameObjects.back().SetName( name.c_str() );
         }
 
         if (token == "camera")
@@ -245,7 +246,6 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> x >> y >> z >> s;
             outGameObjects.back().GetComponent< TransformComponent >()->SetLocalRotation( { { x, y, z }, s } );
         }
-
     }
     
     return DeserializeResult::Success;

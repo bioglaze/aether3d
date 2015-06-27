@@ -212,7 +212,7 @@ DDSInfo loadInfoBGR565 = { false, true, false, 1, 2, GL_RGB5, GL_RGB, GL_UNSIGNE
 
 DDSInfo loadInfoIndex8 = { false, false, true, 1, 1, GL_RGB8, GL_BGRA, GL_UNSIGNED_BYTE };
 
-bool DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque )
+DDSLoader::LoadResult DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque )
 {
     assert( cubeMapFace >= 0 && cubeMapFace < 7 );
 
@@ -226,7 +226,7 @@ bool DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& out
     {
         outWidth = 512;
         outHeight = 512;
-        return false;
+        return LoadResult::FileNotFound;
     }
 
     ifs.read((char*) &hdr, sizeof( hdr ) );
@@ -240,7 +240,7 @@ bool DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& out
         outWidth    = 32;
         outHeight   = 32;
         outOpaque = true;
-        return false;
+        return LoadResult::UnknownPixelFormat;
     }
 
     const uint32_t xSize = hdr.sHeader.dwWidth;
@@ -298,7 +298,7 @@ bool DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& out
         outWidth    = 32;
         outHeight   = 32;
         outOpaque = true;
-        return false;
+        return LoadResult::UnknownPixelFormat;
     }
 
     x = xSize;
@@ -325,7 +325,7 @@ bool DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& out
             outWidth    = 32;
             outHeight   = 32;
             outOpaque = true;
-            return false;
+            return LoadResult::FileNotFound;
         }
 
         for (int ix = 0; ix < mipMapCount; ++ix)
@@ -389,5 +389,5 @@ bool DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& out
     }
 
     glTexParameteri( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1 );
-    return true;
+    return LoadResult::Success;
 }

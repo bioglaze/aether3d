@@ -9,11 +9,11 @@ namespace ae3d
     class AudioSourceComponent
     {
     public:
-        /** \param audioClipId Audio clip id. */
+        /// \param audioClipId Audio clip id.
         void SetClipId( unsigned audioClipId );
 
-        /** Plays the clip. */
-        void Play();
+        /// Plays the clip.
+        void Play() const;
 
         /// \return Textual representation of component.
         std::string GetSerialized() const;
@@ -21,13 +21,13 @@ namespace ae3d
     private:
         friend class GameObject;
         
-        /** \return Component's type code. Must be unique for each component type. */
+        /// \return Component's type code. Must be unique for each component type.
         static int Type() { return 3; }
         
-        /** \return Component handle that uniquely identifies the instance. */
+        /// \return Component handle that uniquely identifies the instance.
         static unsigned New();
         
-        /** \return Component at index or null if index is invalid. */
+        /// \return Component at index or null if index is invalid.
         static AudioSourceComponent* Get( unsigned index );
         
         unsigned clipId = 0;

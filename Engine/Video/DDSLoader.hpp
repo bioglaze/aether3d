@@ -1,11 +1,11 @@
 #ifndef DDSLOADER_H
 #define DDSLOADER_H
 
-/**
-   Holds info about DDS (Direct Draw Surface) image and contains a method to load a .dds file.
- */
+/// Loads a .dds (DirectDraw Surface)
 namespace DDSLoader
 {
+    enum class LoadResult { Success, UnknownPixelFormat, FileNotFound };
+    
     /**
      Loads a .dds file and stores it to currently bound texture.
      Texture must be bound before calling this method.
@@ -15,8 +15,8 @@ namespace DDSLoader
      \param outWidth Stores the width of the texture in pixels.
      \param outHeight Stores the height of the texture in pixels.
      \param outOpaque Stores info about alpha channel.
-     \return True, if loading was successful, false otherwise.
+     \return Load result.
      */
-    bool Load( const char* path, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque );
+    LoadResult Load( const char* path, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque );
 }
 #endif

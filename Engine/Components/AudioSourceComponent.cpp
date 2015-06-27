@@ -26,7 +26,7 @@ void ae3d::AudioSourceComponent::SetClipId( unsigned audioClipId )
     clipId = audioClipId;
 }
 
-void ae3d::AudioSourceComponent::Play()
+void ae3d::AudioSourceComponent::Play() const
 {
     AudioSystem::Play( clipId );
 }

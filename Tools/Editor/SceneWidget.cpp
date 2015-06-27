@@ -34,9 +34,9 @@ SceneWidget::SceneWidget( QWidget* parent ) : QOpenGLWidget( parent )
 
     QSurfaceFormat fmt;
 #if __APPLE__
-    fmt.setVersion(3, 2);
+    fmt.setVersion( 4, 1 );
 #else
-    fmt.setVersion(4, 3);
+    fmt.setVersion( 4, 3 );
 #endif
     //fmt.setDepthBufferSize(24);
     fmt.setProfile( QSurfaceFormat::CoreProfile );
@@ -145,4 +145,27 @@ void SceneWidget::RemoveGameObject( int index )
 {
     scene.Remove( gameObjects[ index ].get() );
     gameObjects.erase( gameObjects.begin() + index );
+}
+
+void SceneWidget::LoadSceneFromFile( const char* path )
+{
+    std::vector< ae3d::GameObject > gos;
+    Scene::DeserializeResult result = scene.Deserialize( ae3d::FileSystem::FileContents( path ), gos );
+
+    if (result == Scene::DeserializeResult::ParseError)
+    {
+        QMessageBox::critical( this,
+                        "Scene Parse Error", "There was an error parsing the scene. More info in console." );
+    }
+
+    gameObjects.clear();
+
+    for (auto& go : gos)
+    {
+        gameObjects.push_back( std::make_shared< ae3d::GameObject >() );
+        *gameObjects.back() = go;
+        scene.Add( gameObjects.back().get() );
+    }
+
+    emit GameObjectsAddedOrDeleted();
 }

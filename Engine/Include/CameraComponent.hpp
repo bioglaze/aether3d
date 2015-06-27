@@ -87,6 +87,9 @@ namespace ae3d
 
         float nearp = 0;
         float farp = 1;
+        float fovDegrees = 45;
+        float aspect = 1;
+        bool isOrthographic = true; // If false, assume perspective
     };
 }
 #endif

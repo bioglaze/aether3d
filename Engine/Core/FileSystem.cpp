@@ -68,50 +68,50 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents(const char* pa
     return outData;
 }
 
-void ae3d::FileSystem::LoadPakFile(const char* path)
+void ae3d::FileSystem::LoadPakFile( const char* path )
 {
     if (path == nullptr)
     {
-        System::Print("LoadPakFile: path is null\n");
+        System::Print( "LoadPakFile: path is null\n" );
     }
 
-    Global::pakFiles.push_back(PakFile());
+    Global::pakFiles.emplace_back( PakFile() );
     unsigned entryCount = 0;
-    std::ifstream ifs(path);
+    std::ifstream ifs( path );
     if (!ifs.is_open())
     {
-        System::Print("LoadPakFile: Could not open %s\n", path);
+        System::Print( "LoadPakFile: Could not open %s\n", path );
     }
 
-    ifs.read((char*)&entryCount, 4);
+    ifs.read( (char*)&entryCount, 4 );
     auto& pakFile = Global::pakFiles.back();
-    pakFile.entries.resize(entryCount);
+    pakFile.entries.resize( entryCount );
     pakFile.path = path;
 
     for (unsigned i = 0; i < entryCount; ++i)
     {
         auto& entry = pakFile.entries[i];
-        char entryPath[128];
-        ifs.read(entryPath, 128);
+        char entryPath[ 128 ];
+        ifs.read( entryPath, 128 );
         entry.path = entryPath;
         unsigned entrySize = 0;
-        ifs.read((char*)&entrySize, 4);
-        entry.contents.resize(entrySize);
-        ifs.read((char*)entry.contents.data(), entrySize);
+        ifs.read( (char*)&entrySize, 4 );
+        entry.contents.resize( entrySize );
+        ifs.read( (char*)entry.contents.data(), entrySize );
     }
 }
 
-void ae3d::FileSystem::UnloadPakFile(const char* path)
+void ae3d::FileSystem::UnloadPakFile( const char* path )
 {
     int i = 0;
 
     for (const PakFile& pakFile : Global::pakFiles)
     {
-        if (pakFile.path == std::string(path))
+        if (pakFile.path == std::string( path ))
         {
-            Global::pakFiles.erase(std::begin(Global::pakFiles) + i);
-            ++i;
+            Global::pakFiles.erase( std::begin( Global::pakFiles ) + i );
             return;
         }
+        ++i;
     }
 }

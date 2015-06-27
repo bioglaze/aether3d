@@ -9,10 +9,10 @@ namespace
     {
         return std::abs( f1 - f2 ) < 0.0001f;
     }
-}
 
-std::vector< ae3d::TransformComponent > transformComponents;
-unsigned nextFreeTransformComponent = 0;
+    std::vector< ae3d::TransformComponent > transformComponents;
+    unsigned nextFreeTransformComponent = 0;
+}
 
 unsigned ae3d::TransformComponent::New()
 {

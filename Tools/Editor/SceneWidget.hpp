@@ -28,16 +28,24 @@ public:
     /// TODO: Implement as a command.
     void RemoveGameObject( int index );
 
+    /// \return Game object count.
     int GetGameObjectCount() const { return (int)gameObjects.size(); }
+
+    /// \param path Path to .scene file.
+    void LoadSceneFromFile( const char* path );
 
     //bool IsGameObjectInScene( int index ) const { return gameObjectsInScene[ index ] != 0; }
 
+    /// \return scene.
     ae3d::Scene* GetScene() { return &scene; }
 
     ae3d::GameObject* GetGameObject( int index ) { return gameObjects[ index ].get(); }
 
     // TODO: Maybe create an editor state class and put this there.
     std::list< int > selectedGameObjects;
+
+signals:
+    void GameObjectsAddedOrDeleted();
 
 protected:
     void initializeGL();

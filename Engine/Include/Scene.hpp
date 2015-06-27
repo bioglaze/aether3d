@@ -39,7 +39,7 @@ namespace ae3d
         /// \param serialized Serialized scene contents.
         /// \param outGameObjects Returns game objects that were created from serialized scene contents.
         /// \return Result. Parsing stops on first error and successfully loaded game objects are returned.
-        DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects );
+        DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects ) const;
         
     private:
         void RenderWithCamera( GameObject* cameraGo );

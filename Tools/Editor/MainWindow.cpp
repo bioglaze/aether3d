@@ -24,6 +24,7 @@ MainWindow::MainWindow()
 
     sceneWidget = new SceneWidget();
     setWindowTitle( "Editor" );
+    connect( sceneWidget, SIGNAL(GameObjectsAddedOrDeleted()), this, SLOT(HandleGameObjectsAddedOrDeleted()) );
 
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
@@ -33,6 +34,11 @@ MainWindow::MainWindow()
     splitter->addWidget( sceneWidget );
     setCentralWidget( splitter );
 
+    UpdateHierarchy();
+}
+
+void MainWindow::HandleGameObjectsAddedOrDeleted()
+{
     UpdateHierarchy();
 }
 
@@ -91,12 +97,15 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
     {
         std::cout << "removing selected objects" << std::endl;
+
         for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
         {
-            if (sceneTree->topLevelItem(i)->isSelected())
+            if (sceneTree->topLevelItem( i )->isSelected())
             {
                 sceneWidget->RemoveGameObject( i );
                 sceneWidget->selectedGameObjects.clear();
+                std::list< ae3d::GameObject* > emptyList;
+                emit GameObjectSelected( emptyList );
             }
         }
 
@@ -128,6 +137,9 @@ void MainWindow::LoadScene()
 
     if (fileName != "")
     {
+        // TODO: Clear scene.
+        // TODO: Ask for confirmation if the scene hasa unsaved modifications.
+        sceneWidget->LoadSceneFromFile( fileName.toUtf8().constData() );
     }
 }
 
@@ -146,7 +158,7 @@ void MainWindow::SaveScene()
 
     if (!saveSuccess && fileName.toUtf8() != "")
     {
-        QMessageBox::critical(this, "Unable to Save!", "Scene could not be saved.");
+        QMessageBox::critical( this, "Unable to Save!", "Scene could not be saved." );
     }
 }
 

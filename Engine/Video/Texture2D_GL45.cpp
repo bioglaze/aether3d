@@ -209,9 +209,9 @@ void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTe
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-    const bool success = DDSLoader::Load( path, 0, width, height, opaque );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( path, 0, width, height, opaque );
 
-    if (!success)
+    if (loadResult != DDSLoader::LoadResult::Success)
     {
         ae3d::System::Print( "DDS Loader could not load %s", path );
     }

@@ -30,6 +30,7 @@ public slots:
     void CommandCreateCameraComponent();
     void CommandCreateGameObject();
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
+    void HandleGameObjectsAddedOrDeleted();
 
 signals:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );

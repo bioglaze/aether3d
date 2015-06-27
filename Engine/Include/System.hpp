@@ -41,7 +41,8 @@
    
    You'll need Visual Studio 2013 or newer. Build Engine/VisualStudio_GL45. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
-
+   You'll need OpenAL32.dll from OpenAL Soft either in your system directory or in the directory used to run samples/editor.
+ 
    \subsection win Windows/MinGW
 
    Run mingw32-make in Engine/.
