@@ -22,15 +22,11 @@ using namespace ae3d;
 
 int main()
 {
-    //const int width = 640;
-    //const int height = 480;
-    int width = 0;
-    int height = 0;
+    const int width = 640;
+    const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, WindowCreateFlags::Fullscreen );
-    Window::GetSize( width, height );
-    //Window::SetMouseRelative( true );
+    Window::Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
@@ -48,13 +44,13 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
 
     Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
+    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
     Texture2D spriteTex2;
-    spriteTex2.Load( FileSystem::FileContents("test_dxt1.dds"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
+    spriteTex2.Load( FileSystem::FileContents("test_dxt1.dds"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
     Texture2D spriteTexFromAtlas;
-    spriteTexFromAtlas.LoadFromAtlas(FileSystem::FileContents("atlas_cegui.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest);
+    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents("atlas_cegui.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
@@ -76,7 +72,7 @@ int main()
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
+    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
 
     Font font;
     font.LoadBMFont(&fontTex, FileSystem::FileContents("font_txt.fnt"));

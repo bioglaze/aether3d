@@ -33,7 +33,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
 
     Texture2D spriteTex;
-    spriteTex.Load(FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None);
+    spriteTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
@@ -42,10 +42,10 @@ int main()
     spriteContainer.AddComponent<TransformComponent>();
     
     Texture2D fontTex;
-    fontTex.Load(FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None);
+    fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
 
     Font font;
-    font.LoadBMFont(&fontTex, FileSystem::FileContents("font_txt.fnt"));
+    font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
 
     GameObject textContainer;
     textContainer.AddComponent<TextRendererComponent>();

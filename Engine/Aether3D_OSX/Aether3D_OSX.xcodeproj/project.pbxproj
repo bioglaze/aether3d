@@ -461,6 +461,23 @@
 				INSTALL_PATH = "";
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
+				WARNING_CFLAGS = (
+					"-Weverything",
+					"-Wno-old-style-cast",
+					"-Wno-padded",
+					"-Wno-c++98-compat",
+					"-Wno-c++98-compat-pedantic",
+					"-Wno-exit-time-destructors",
+					"-Wno-float-equal",
+					"-Wno-unused-macros",
+					"-Wno-sign-conversion",
+					"-Wno-missing-variable-declarations",
+					"-Wno-undef",
+					"-Wno-missing-prototypes",
+					"-Wno-documentation",
+					"-Wno-implicit-fallthrough",
+					"-Wno-global-constructors",
+				);
 			};
 			name = Debug;
 		};
@@ -483,6 +500,23 @@
 				INSTALL_PATH = "";
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
+				WARNING_CFLAGS = (
+					"-Weverything",
+					"-Wno-old-style-cast",
+					"-Wno-padded",
+					"-Wno-c++98-compat",
+					"-Wno-c++98-compat-pedantic",
+					"-Wno-exit-time-destructors",
+					"-Wno-float-equal",
+					"-Wno-unused-macros",
+					"-Wno-sign-conversion",
+					"-Wno-missing-variable-declarations",
+					"-Wno-undef",
+					"-Wno-missing-prototypes",
+					"-Wno-documentation",
+					"-Wno-implicit-fallthrough",
+					"-Wno-global-constructors",
+				);
 			};
 			name = Release;
 		};

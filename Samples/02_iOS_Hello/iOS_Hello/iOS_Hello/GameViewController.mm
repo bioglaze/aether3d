@@ -71,9 +71,9 @@
     camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1);
     //scene.Add( &camera );
 
-    spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
-    spriteTexPVRv2.Load( ae3d::FileSystem::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
-    spriteTexPVRv3.Load( ae3d::FileSystem::FileContents( "/Assets/hotair.2bpp.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
+    spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
+    spriteTexPVRv2.Load( ae3d::FileSystem::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
+    spriteTexPVRv3.Load( ae3d::FileSystem::FileContents( "/Assets/hotair.2bpp.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
 
     sprite.AddComponent<ae3d::SpriteRendererComponent>();
     sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv3, ae3d::Vec3( 60, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
@@ -86,7 +86,7 @@
     audioSource.GetComponent<ae3d::AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     audioSource.GetComponent<ae3d::AudioSourceComponent>()->Play();
     
-    fontTex.Load( ae3d::FileSystem::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None );
+    fontTex.Load( ae3d::FileSystem::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
 
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents("/Assets/font_txt.fnt"));
     text.AddComponent<ae3d::TextRendererComponent>();
@@ -111,14 +111,14 @@
     //scene.Add( &rtCamera );
     
     perspCamera.AddComponent<ae3d::CameraComponent>();
-    perspCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    perspCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
     perspCamera.AddComponent<ae3d::TransformComponent>();
     scene.Add( &perspCamera );
     
-    skyboxTex.Load( ae3d::FileSystem::FileContents( "/Assets/skybox/left.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/right.jpg" ),
-                 ae3d::FileSystem::FileContents( "/Assets/skybox/bottom.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/top.jpg" ),
-                 ae3d::FileSystem::FileContents( "/Assets/skybox/front.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/back.jpg" ),
-                 ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None );
+    skyboxTex.Load( ae3d::FileSystem::FileContents( "/Assets/skybox/left.jpg" ),   ae3d::FileSystem::FileContents( "/Assets/skybox/right.jpg" ),
+                    ae3d::FileSystem::FileContents( "/Assets/skybox/bottom.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/top.jpg" ),
+                    ae3d::FileSystem::FileContents( "/Assets/skybox/front.jpg" ),  ae3d::FileSystem::FileContents( "/Assets/skybox/back.jpg" ),
+                    ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, 1 );
     scene.SetSkybox( &skyboxTex );
 }
 

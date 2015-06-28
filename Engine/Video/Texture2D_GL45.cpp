@@ -45,7 +45,7 @@ void TexReload( const std::string& path )
 {
     auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
 
-    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps() );
+    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetAnisotropy() );
 }
 
 const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
@@ -75,12 +75,13 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, float aAnisotropy )
 {
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
-
+    anisotropy = aAnisotropy;
+    
     if (!fileContents.isLoaded)
     {
         *this = Texture2DGlobal::defaultTexture;
@@ -114,6 +115,11 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
 
+    if (GfxDevice::HasExtension( "GL_EXT_texture_filter_anisotropic" ) && anisotropy > 1)
+    {
+        glTexParameterf( GL_TEXTURE_2D, 0x84FE/*GL_TEXTURE_MAX_ANISOTROPY_EXT*/, anisotropy );
+    }
+
     const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
     
     if (HasStbExtension( fileContents.path ))
@@ -137,9 +143,9 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 #endif
 }
 
-void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, float anisotropy )
 {
-    Load( atlasTextureData, aWrap, aFilter, mipmaps );
+    Load( atlasTextureData, aWrap, aFilter, mipmaps, anisotropy );
 
     const std::string metaStr = std::string( std::begin( atlasMetaData.data ), std::end( atlasMetaData.data ) );
     std::stringstream metaStream( metaStr );

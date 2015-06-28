@@ -38,6 +38,8 @@ namespace ae3d
 #if AETHER3D_IOS
         id<MTLTexture> GetMetalTexture() const { return metalTexture; }
 #endif
+        /// \return Anisotropy.
+        float GetAnisotropy() const { return anisotropy; }
         
         /// \return Width in pixels.
         int GetWidth() const { return width; }
@@ -77,6 +79,8 @@ namespace ae3d
         Vec4 scaleOffset{ 1, 1, 0, 0 };
         /// Is the texture opaque.
         bool opaque = true;
+        /// Anisotropy.
+        float anisotropy = 1;
 #if AETHER3D_IOS
         id<MTLTexture> metalTexture;  
 #endif

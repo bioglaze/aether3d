@@ -91,7 +91,7 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, float aAnisotropy )
 {
     if (!fileContents.isLoaded)
     {
@@ -102,6 +102,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     wrap = aWrap;
     handle = GfxDevice::CreateTextureId();
     mipmaps = aMipmaps;
+    anisotropy = aAnisotropy;
     
     /*const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
     
@@ -142,9 +143,9 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 }
 
 // TODO: DRY (repeated in Texture2D_GL45)
-void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, float aAnisotropy )
 {
-    Load( atlasTextureData, aWrap, aFilter, mipmaps );
+    Load( atlasTextureData, aWrap, aFilter, mipmaps, aAnisotropy );
     
     const std::string metaStr = std::string( std::begin( atlasMetaData.data ), std::end( atlasMetaData.data ) );
     std::stringstream metaStream( metaStr );
@@ -339,7 +340,7 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
                                                                                           mipmapped:NO];
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
         
-        MTLRegion region = MTLRegionMake2D(0, 0, width, height);
+        MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         
         NSData* data = [imageData objectAtIndex:0];
         [metalTexture replaceRegion:region mipmapLevel:0 withBytes:[data bytes] bytesPerRow:0];
@@ -363,14 +364,14 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
     height = CFSwapInt32LittleToHost( header->height );
     opaque = header->pixelFormat == rgb2bpp || header->pixelFormat == rgb4bpp;
 
-    uint32_t dataLength = (uint32_t)[fileData length] - (sizeof(PVRv3Header) + CFSwapInt32LittleToHost( header->metadataLength ) );
+    uint32_t dataLength = (uint32_t)[fileData length] - (sizeof( PVRv3Header ) + CFSwapInt32LittleToHost( header->metadataLength ) );
 
     // The following line has - 4 because on 64-bit code the header size is 56 bytes due to alignment, but in the file it's only 52 bytes.
-    uint8_t* bytes = ((uint8_t *)[fileData bytes]) + sizeof(PVRv3Header) + CFSwapInt32LittleToHost( header->metadataLength ) - 4;
+    uint8_t* bytes = ((uint8_t *)[fileData bytes]) + sizeof( PVRv3Header ) + CFSwapInt32LittleToHost( header->metadataLength ) - 4;
     
     uint32_t blockWidth = 0, blockHeight = 0, bitsPerPixel = 0;
-    uint32_t mipCount = CFSwapInt32LittleToHost(header->mipmapCount);
-    const bool isLinear = (CFSwapInt32LittleToHost(header->colorSpace) == 0);
+    uint32_t mipCount = CFSwapInt32LittleToHost( header->mipmapCount );
+    const bool isLinear = (CFSwapInt32LittleToHost( header->colorSpace ) == 0);
     
     NSMutableArray *levelDatas = [NSMutableArray arrayWithCapacity:MYMAX(1, mipCount)];
     
@@ -407,8 +408,8 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
         
         dataOffset += mipSize;
         
-        levelWidth = MYMAX(levelWidth / 2, 1);
-        levelHeight = MYMAX(levelHeight / 2, 1);
+        levelWidth = MYMAX( levelWidth / 2, 1 );
+        levelHeight = MYMAX( levelHeight / 2, 1 );
     }
     
     MTLPixelFormat pixelFormat = MTLPixelFormatPVRTC_RGBA_2BPP;
