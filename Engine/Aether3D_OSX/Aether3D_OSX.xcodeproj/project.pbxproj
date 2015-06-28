@@ -36,6 +36,10 @@
 		AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */; };
 		AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B061ABB4FDE005BA86D /* GameObject.cpp */; };
 		AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */; };
+		AB922E4C1B4039A7000F3488 /* Mesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E4B1B4039A7000F3488 /* Mesh.hpp */; };
+		AB922E4E1B4039DB000F3488 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E4D1B4039DB000F3488 /* Mesh.cpp */; };
+		AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */; };
+		AB922E531B404D1E000F3488 /* MeshRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E521B404D1E000F3488 /* MeshRendererComponent.hpp */; };
 		AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB949D341ABC8DDF007D561E /* Shader.hpp */; };
 		AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB949D361ABC8E44007D561E /* ShaderGL.cpp */; };
 		ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */; };
@@ -91,6 +95,11 @@
 		AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CameraComponent.cpp; path = ../Components/CameraComponent.cpp; sourceTree = "<group>"; };
 		AB889B061ABB4FDE005BA86D /* GameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameObject.cpp; path = ../Components/GameObject.cpp; sourceTree = "<group>"; };
 		AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpriteRendererComponent.cpp; path = ../Components/SpriteRendererComponent.cpp; sourceTree = "<group>"; };
+		AB922E4B1B4039A7000F3488 /* Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../Include/Mesh.hpp; sourceTree = "<group>"; };
+		AB922E4D1B4039DB000F3488 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mesh.cpp; path = ../Core/Mesh.cpp; sourceTree = "<group>"; };
+		AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeshRendererComponent.cpp; path = ../Components/MeshRendererComponent.cpp; sourceTree = "<group>"; };
+		AB922E521B404D1E000F3488 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
+		AB922E5C1B405F5E000F3488 /* SubMesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SubMesh.hpp; path = ../Core/SubMesh.hpp; sourceTree = "<group>"; };
 		AB949D341ABC8DDF007D561E /* Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = ../Include/Shader.hpp; sourceTree = "<group>"; };
 		AB949D361ABC8E44007D561E /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/ShaderGL.cpp; sourceTree = "<group>"; };
 		ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../Core/Matrix.cpp; sourceTree = "<group>"; };
@@ -141,8 +150,10 @@
 				ABCF19C21AE2D08800822E80 /* Font.cpp */,
 				AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */,
 				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
+				AB922E4D1B4039DB000F3488 /* Mesh.cpp */,
 				AB889AEF1ABB4C49005BA86D /* Scene.cpp */,
 				AB3A77D91AB448500081864C /* System.cpp */,
+				AB922E5C1B405F5E000F3488 /* SubMesh.hpp */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -192,6 +203,8 @@
 				AB889AF31ABB4C5B005BA86D /* GameObject.hpp */,
 				AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */,
 				ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */,
+				AB922E4B1B4039A7000F3488 /* Mesh.hpp */,
+				AB922E521B404D1E000F3488 /* MeshRendererComponent.hpp */,
 				ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */,
 				AB78D91B1B19E2E8009928E1 /* RenderTexture.hpp */,
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
@@ -225,6 +238,7 @@
 				AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */,
 				AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */,
 				AB889B061ABB4FDE005BA86D /* GameObject.cpp */,
+				AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */,
 				AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */,
 				ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */,
 				ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */,
@@ -251,6 +265,7 @@
 			files = (
 				AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */,
 				ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */,
+				AB922E531B404D1E000F3488 /* MeshRendererComponent.hpp in Headers */,
 				AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */,
 				ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */,
 				AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */,
@@ -263,6 +278,7 @@
 				AB889AFE1ABB4C5B005BA86D /* Texture2D.hpp in Headers */,
 				AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */,
 				AB78D91F1B19E5A1009928E1 /* TextureBase.hpp in Headers */,
+				AB922E4C1B4039A7000F3488 /* Mesh.hpp in Headers */,
 				ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */,
 				AB889AFA1ABB4C5B005BA86D /* GameObject.hpp in Headers */,
 				AB889AFC1ABB4C5B005BA86D /* Scene.hpp in Headers */,
@@ -348,8 +364,10 @@
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,
 				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB77FD5A1B344FCD001858CC /* TextureCommon.cpp in Sources */,
+				AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
+				AB922E4E1B4039DB000F3488 /* Mesh.cpp in Sources */,
 				AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */,
 				AB77FD581B344CB0001858CC /* TextureCubeGL.cpp in Sources */,
 				ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */,

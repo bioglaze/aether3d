@@ -37,6 +37,9 @@
 		AB7E96AB1B19AED1004A3289 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		AB7E96AD1B19AEE1004A3289 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AB7E96AF1B19AF28004A3289 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
+		AB922E491B403523000F3488 /* TextureCube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../../Engine/Include/TextureCube.hpp; sourceTree = "<group>"; };
+		AB922E4A1B4036C9000F3488 /* Mesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../../../Engine/Include/Mesh.hpp; sourceTree = "<group>"; };
+		AB922E4F1B404B71000F3488 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../../../Engine/Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
 		AB9AB6EB1B19DF0E00C9F006 /* Misc2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Misc2D.cpp; path = ../Misc2D.cpp; sourceTree = "<group>"; };
 		AB9AB6EE1B19E07300C9F006 /* AudioClip.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioClip.hpp; path = ../../../Engine/Include/AudioClip.hpp; sourceTree = "<group>"; };
 		AB9AB6EF1B19E07300C9F006 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../../../Engine/Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
@@ -118,6 +121,8 @@
 				AB9AB6F31B19E07300C9F006 /* GameObject.hpp */,
 				AB9AB6F41B19E07300C9F006 /* Macros.hpp */,
 				AB9AB6F51B19E07300C9F006 /* Matrix.hpp */,
+				AB922E4A1B4036C9000F3488 /* Mesh.hpp */,
+				AB922E4F1B404B71000F3488 /* MeshRendererComponent.hpp */,
 				AB9AB6F61B19E07300C9F006 /* Quaternion.hpp */,
 				AB9AB7001B19E12600C9F006 /* RenderTexture.hpp */,
 				AB9AB6F71B19E07300C9F006 /* Scene.hpp */,
@@ -125,11 +130,12 @@
 				AB9AB6F91B19E07300C9F006 /* SpriteRendererComponent.hpp */,
 				AB9AB6FA1B19E07300C9F006 /* System.hpp */,
 				AB9AB6FB1B19E07300C9F006 /* TextRendererComponent.hpp */,
+				AB78D91D1B19E405009928E1 /* TextureBase.hpp */,
+				AB922E491B403523000F3488 /* TextureCube.hpp */,
 				AB9AB6FC1B19E07300C9F006 /* Texture2D.hpp */,
 				AB9AB6FD1B19E07300C9F006 /* TransformComponent.hpp */,
 				AB9AB6FE1B19E07300C9F006 /* Vec3.hpp */,
 				AB9AB6FF1B19E07300C9F006 /* Window.hpp */,
-				AB78D91D1B19E405009928E1 /* TextureBase.hpp */,
 			);
 			name = Include;
 			sourceTree = "<group>";

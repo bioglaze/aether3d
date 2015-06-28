@@ -5,6 +5,7 @@
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
+#include "MeshRendererComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
@@ -117,11 +118,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
             continue;
         }
         
-        auto transform = gameObject->GetComponent<TransformComponent>();
+        auto transform = gameObject->GetComponent< TransformComponent >();
         
         // TODO: Watch for this duplication of logic.
         
-        auto spriteRenderer = gameObject->GetComponent<SpriteRendererComponent>();
+        auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
         
         if (spriteRenderer)
         {
@@ -130,13 +131,23 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
             spriteRenderer->Render( projectionModel.m );
         }
         
-        auto textRenderer = gameObject->GetComponent<TextRendererComponent>();
+        auto textRenderer = gameObject->GetComponent< TextRendererComponent >();
         
         if (textRenderer)
         {
             Matrix44 projectionModel;
             Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
             textRenderer->Render( projectionModel.m );
+        }
+        
+        auto meshRenderer = gameObject->GetComponent< MeshRendererComponent >();
+
+        if (meshRenderer)
+        {
+            Matrix44 mvp;
+            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, cameraGo->GetComponent< TransformComponent >()->GetLocalMatrix(), mvp );
+            Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
+            meshRenderer->Render( mvp.m );
         }
     }
     

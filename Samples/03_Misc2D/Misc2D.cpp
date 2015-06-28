@@ -3,18 +3,20 @@
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
 #include "CameraComponent.hpp"
+#include "MeshRendererComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
+#include "FileSystem.hpp"
 #include "GameObject.hpp"
+#include "Mesh.hpp"
 #include "Scene.hpp"
 #include "System.hpp"
-#include "FileSystem.hpp"
+#include "RenderTexture.hpp"
+#include "Texture2D.hpp"
+#include "TextureCube.hpp"
 #include "Vec3.hpp"
 #include "Window.hpp"
-#include "Texture2D.hpp"
-#include "RenderTexture.hpp"
-#include "TextureCube.hpp"
 
 using namespace ae3d;
 
@@ -36,7 +38,7 @@ int main()
     perspCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     perspCamera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
     perspCamera.AddComponent<TransformComponent>();
-    perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 00, 0, 0 ) );
+    perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -136,6 +138,15 @@ int main()
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
     scene.SetSkybox( &skybox );
 
+    GameObject cube;
+    Mesh cubeMesh;
+    cubeMesh.Load( FileSystem::FileContents( "not_yet.mesh" ) );
+    cube.AddComponent< MeshRendererComponent >();
+    cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    cube.AddComponent<TransformComponent>();
+    cube.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, -100 ) );
+    scene.Add( &cube );
+    
     bool quit = false;
     
     int lastMouseX = 0;

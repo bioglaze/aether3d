@@ -52,8 +52,10 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/AudioSourceComponent.cpp -o $(OUTPUT_DIR)/AudioSourceComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/MeshRendererComponent.cpp -o $(OUTPUT_DIR)/MeshRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TextRendererComponent.cpp -o $(OUTPUT_DIR)/TextRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileWatcher.cpp -o $(OUTPUT_DIR)/FileWatcher.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Mesh.cpp -o $(OUTPUT_DIR)/Mesh.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Font.cpp -o $(OUTPUT_DIR)/Font.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioClip.cpp -o $(OUTPUT_DIR)/AudioClip.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioSystemOpenAL.cpp -o $(OUTPUT_DIR)/AudioSystemOpenAL.o
