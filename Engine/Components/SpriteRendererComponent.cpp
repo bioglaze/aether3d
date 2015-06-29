@@ -211,6 +211,19 @@ ae3d::SpriteRendererComponent::~SpriteRendererComponent()
     reinterpret_cast< Impl* >(&_storage)->~Impl();
 }
 
+ae3d::SpriteRendererComponent::SpriteRendererComponent( const SpriteRendererComponent& other )
+{
+    new(&_storage)Impl();
+    reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
+}
+
+ae3d::SpriteRendererComponent& ae3d::SpriteRendererComponent::operator=( const SpriteRendererComponent& other )
+{
+    new(&_storage)Impl();
+    reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
+    return *this;
+}
+
 void ae3d::SpriteRendererComponent::Clear()
 {
     m().opaqueRenderQueue.Clear();

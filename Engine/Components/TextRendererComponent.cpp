@@ -8,6 +8,8 @@
 #include "VertexBuffer.hpp"
 #include "Vec3.hpp"
 
+#include <iostream>
+
 extern ae3d::Renderer renderer;
 
 std::vector< ae3d::TextRendererComponent > textComponents;
@@ -41,6 +43,19 @@ struct ae3d::TextRendererComponent::Impl
 ae3d::TextRendererComponent::TextRendererComponent()
 {
     new(&_storage)Impl();
+}
+
+ae3d::TextRendererComponent::TextRendererComponent( const TextRendererComponent& other )
+{
+    new(&_storage)Impl();
+    reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
+}
+
+ae3d::TextRendererComponent& ae3d::TextRendererComponent::operator=( const TextRendererComponent& other )
+{
+    new(&_storage)Impl();
+    reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
+    return *this;
 }
 
 ae3d::TextRendererComponent::~TextRendererComponent()

@@ -19,6 +19,19 @@ ae3d::Mesh::~Mesh()
     reinterpret_cast< Impl* >(&_storage)->~Impl();
 }
 
+ae3d::Mesh::Mesh( const Mesh& other )
+{
+    new(&_storage)Impl();
+    reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
+}
+
+ae3d::Mesh& ae3d::Mesh::operator=( const Mesh& other )
+{
+    new(&_storage)Impl();
+    reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
+    return *this;
+}
+
 std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
 {
     return m().subMeshes;

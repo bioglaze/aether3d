@@ -19,9 +19,15 @@ namespace ae3d
       public:
         /// Constructor.
         Mesh();
+
+        /// \param other Other.
+        Mesh( const Mesh& other );
         
         /// Destructor.
         ~Mesh();
+
+        /// \param other Other.
+        Mesh& operator=( const Mesh& other );
         
         /// \param meshData Data from .ae3d mesh file.
         void Load( const FileSystem::FileContentsData& meshData );

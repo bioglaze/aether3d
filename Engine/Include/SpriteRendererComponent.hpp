@@ -13,13 +13,19 @@ namespace ae3d
     class SpriteRendererComponent
     {
     public:
-        /* Constructor. */
+        /// Constructor.
         SpriteRendererComponent();
 
-        /* Destructor. */
+        /// \param other Other.
+        SpriteRendererComponent( const SpriteRendererComponent& other );
+        
+        /// Destructor.
         ~SpriteRendererComponent();
 
-        /** Removes all textures that were added using SetTexture. */
+        /// \param other Other.
+        SpriteRendererComponent& operator=( const SpriteRendererComponent& other );
+
+        /// Removes all textures that were added using SetTexture.
         void Clear();
         
         /**

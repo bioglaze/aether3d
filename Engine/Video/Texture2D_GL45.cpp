@@ -143,9 +143,9 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 #endif
 }
 
-void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, float anisotropy )
+void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, float aAnisotropy )
 {
-    Load( atlasTextureData, aWrap, aFilter, mipmaps, anisotropy );
+    Load( atlasTextureData, aWrap, aFilter, mipmaps, aAnisotropy );
 
     const std::string metaStr = std::string( std::begin( atlasMetaData.data ), std::end( atlasMetaData.data ) );
     std::stringstream metaStream( metaStr );

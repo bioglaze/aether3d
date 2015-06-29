@@ -56,7 +56,7 @@
    \subsection osx_cmd OS X and GNU/Linux Command Line
 
    Run the Makefile in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
-   On GNU/Linux you need at least the following packages: libopenal-dev libxcb1-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+   On GNU/Linux you need at least the following packages: libopenal-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
    \subsection Bugs
 
    <ul>

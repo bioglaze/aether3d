@@ -1,7 +1,7 @@
 UNAME := $(shell uname)
-COMPILER := g++
+COMPILER := g++ -g
 ENGINE_LIB := libaether3d_linux.a
-LIBS := -ldl -lxcb -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
+LIBS := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++

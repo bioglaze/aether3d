@@ -18,9 +18,15 @@ namespace ae3d
         
         /// Constructor.
         TextRendererComponent();
+
+        /// \param other Other.
+        TextRendererComponent( const TextRendererComponent& other );
         
         /// Destructor.
         ~TextRendererComponent();
+
+        /// \param other Other.
+        TextRendererComponent& operator=( const TextRendererComponent& other );
 
         /// \param color Color in range 0-1.
         void SetColor( const Vec4& color );
