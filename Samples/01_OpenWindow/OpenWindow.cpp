@@ -25,8 +25,6 @@ int main()
     Window::Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
 
-    //FileSystem::LoadPakFile( "files.pak" );
-    
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
@@ -56,15 +54,6 @@ int main()
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
-    //System::Print( "%s\n", scene.GetSerialized().c_str() );
-
-    /*std::vector< GameObject > gameObjectsFromSceneFile;
-    scene.Deserialize( FileSystem::FileContents( "scene.scene" ), gameObjectsFromSceneFile );
-
-    for (auto& go : gameObjectsFromSceneFile)
-    {
-        scene.Add( &go );
-    }*/
     
     bool quit = false;
     

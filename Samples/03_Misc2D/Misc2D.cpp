@@ -3,18 +3,15 @@
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
 #include "CameraComponent.hpp"
-#include "MeshRendererComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
-#include "Mesh.hpp"
 #include "Scene.hpp"
 #include "System.hpp"
 #include "RenderTexture.hpp"
 #include "Texture2D.hpp"
-#include "TextureCube.hpp"
 #include "Vec3.hpp"
 #include "Window.hpp"
 
@@ -32,14 +29,6 @@ int main()
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
-
-    GameObject perspCamera;
-    perspCamera.AddComponent<CameraComponent>();
-    perspCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
-    perspCamera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
-    perspCamera.AddComponent<TransformComponent>();
-    //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
-    perspCamera.GetComponent<TransformComponent>()->LookAt( {0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -122,37 +111,17 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     
     Scene scene;
-    scene.Add( &perspCamera );
-    //scene.Add( &camera );
+    scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    //scene.Add( &renderTextureContainer );
-    //scene.Add( &rtCamera );
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
-    TextureCube skybox;
-    skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
-                 FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
-                 FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
-    scene.SetSkybox( &skybox );
-
-    GameObject cube;
-    Mesh cubeMesh;
-    cubeMesh.Load( FileSystem::FileContents( "not_yet.mesh" ) );
-    cube.AddComponent< MeshRendererComponent >();
-    cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube.AddComponent< TransformComponent >();
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( Vec3( 0, 0, -100 ) );
-    scene.Add( &cube );
-    
     bool quit = false;
     
-    int lastMouseX = 0;
-    int lastMouseY = 0;
-
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -172,8 +141,6 @@ int main()
             {
                 KeyCode keyCode = event.keyCode;
                 
-                const float velocity = 1.5f;
-                
                 if (keyCode == KeyCode::Escape)
                 {
                     quit = true;
@@ -186,60 +153,10 @@ int main()
                 {
                     audioContainer.GetComponent<AudioSourceComponent>()->Play();
                 }
-                else if (keyCode == KeyCode::W)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->MoveForward( -velocity );
-                }
-                else if (keyCode == KeyCode::S)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->MoveForward( velocity );
-                }
-                else if (keyCode == KeyCode::E)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->MoveUp( velocity );
-                }
-                else if (keyCode == KeyCode::Q)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->MoveUp( -velocity );
-                }
-                else if (keyCode == KeyCode::A)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->MoveRight( -velocity );
-                }
-                else if (keyCode == KeyCode::D)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->MoveRight( velocity );
-                }
-                else if (keyCode == KeyCode::Left)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), 1 );
-                }
-                else if (keyCode == KeyCode::Right)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -1 );
-                }
-                else if (keyCode == KeyCode::Up)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), 1 );
-                }
-                else if (keyCode == KeyCode::Down)
-                {
-                    perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
-                }
             }
             if (event.type == WindowEventType::GamePadButtonA)
             {
                 text = "button a down";
-            }
-            if (event.type == WindowEventType::MouseMove)
-            {
-                const int mouseDeltaX = event.mouseX - lastMouseX;
-                const int mouseDeltaY = event.mouseY - lastMouseY;
-                lastMouseX = event.mouseX;
-                lastMouseY = event.mouseY;
-
-                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
-                perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }
         }
 
