@@ -120,8 +120,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
         
         auto transform = gameObject->GetComponent< TransformComponent >();
         
-        // TODO: Watch for this duplication of logic.
-        
         auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
         
         if (spriteRenderer)
@@ -144,8 +142,14 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
 
         if (meshRenderer)
         {
+            Matrix44 view;
+            cameraGo->GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
+            Matrix44 translation;
+            translation.Translate( -cameraGo->GetComponent< TransformComponent >()->GetLocalPosition() );
+            Matrix44::Multiply( translation, view, view );
+            
             Matrix44 mvp;
-            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, cameraGo->GetComponent< TransformComponent >()->GetLocalMatrix(), mvp );
+            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, view, mvp );
             Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
             meshRenderer->Render( mvp.m );
         }

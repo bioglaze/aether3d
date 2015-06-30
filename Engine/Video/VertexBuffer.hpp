@@ -37,7 +37,7 @@ namespace ae3d
             
             Vec3 position;
             float u, v;
-            Vec4 color;
+            Vec4 color = { 1, 1, 1, 1 };
         };
 
         /// Binds the buffer. Must be called before Draw or DrawRange.

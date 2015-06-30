@@ -1,6 +1,7 @@
 #include "MeshRendererComponent.hpp"
 #include <vector>
 #include "Mesh.hpp"
+#include "GfxDevice.hpp"
 #include "VertexBuffer.hpp"
 #include "SubMesh.hpp"
 #include "Renderer.hpp"
@@ -34,6 +35,8 @@ void ae3d::MeshRendererComponent::Render( const float* projectionViewMatrix )
     for (auto& subMesh : subMeshes)
     {
         const ae3d::Texture2D* texture = ae3d::Texture2D::GetDefaultTexture();
+
+        GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::Off );
 
         renderer.builtinShaders.spriteRendererShader.Use();
         renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionViewMatrix );

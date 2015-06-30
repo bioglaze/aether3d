@@ -36,9 +36,10 @@ int main()
     GameObject perspCamera;
     perspCamera.AddComponent<CameraComponent>();
     perspCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
-    perspCamera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
+    perspCamera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     perspCamera.AddComponent<TransformComponent>();
-    perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
+    //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
+    perspCamera.GetComponent<TransformComponent>()->LookAt( {0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -143,8 +144,8 @@ int main()
     cubeMesh.Load( FileSystem::FileContents( "not_yet.mesh" ) );
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube.AddComponent<TransformComponent>();
-    cube.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, -100 ) );
+    cube.AddComponent< TransformComponent >();
+    cube.GetComponent< TransformComponent >()->SetLocalPosition( Vec3( 0, 0, -100 ) );
     scene.Add( &cube );
     
     bool quit = false;
@@ -170,40 +171,58 @@ int main()
                 event.type == WindowEventType::KeyUp)
             {
                 KeyCode keyCode = event.keyCode;
-
+                
+                const float velocity = 1.5f;
+                
                 if (keyCode == KeyCode::Escape)
                 {
                     quit = true;
                 }
-                if (keyCode == KeyCode::A)
+                else if (keyCode == KeyCode::R)
                 {
                     System::ReloadChangedAssets();
                 }
-                if (keyCode == KeyCode::B && event.type == WindowEventType::KeyUp)
+                else if (keyCode == KeyCode::B && event.type == WindowEventType::KeyUp)
                 {
                     audioContainer.GetComponent<AudioSourceComponent>()->Play();
                 }
-                if (keyCode == KeyCode::W)
+                else if (keyCode == KeyCode::W)
                 {
-                    perspCamera.GetComponent<TransformComponent>()->MoveUp( 0.2f );
+                    perspCamera.GetComponent<TransformComponent>()->MoveForward( -velocity );
                 }
-                if (keyCode == KeyCode::S)
+                else if (keyCode == KeyCode::S)
                 {
-                    perspCamera.GetComponent<TransformComponent>()->MoveUp( -0.2f );
+                    perspCamera.GetComponent<TransformComponent>()->MoveForward( velocity );
                 }
-                if (keyCode == KeyCode::Left)
+                else if (keyCode == KeyCode::E)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->MoveUp( velocity );
+                }
+                else if (keyCode == KeyCode::Q)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->MoveUp( -velocity );
+                }
+                else if (keyCode == KeyCode::A)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->MoveRight( -velocity );
+                }
+                else if (keyCode == KeyCode::D)
+                {
+                    perspCamera.GetComponent<TransformComponent>()->MoveRight( velocity );
+                }
+                else if (keyCode == KeyCode::Left)
                 {
                     perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), 1 );
                 }
-                if (keyCode == KeyCode::Right)
+                else if (keyCode == KeyCode::Right)
                 {
                     perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -1 );
                 }
-                if (keyCode == KeyCode::Up)
+                else if (keyCode == KeyCode::Up)
                 {
                     perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), 1 );
                 }
-                if (keyCode == KeyCode::Down)
+                else if (keyCode == KeyCode::Down)
                 {
                     perspCamera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
                 }
