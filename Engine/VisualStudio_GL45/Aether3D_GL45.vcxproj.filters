@@ -91,6 +91,12 @@
     <ClCompile Include="..\Video\TextureCubeGL.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\MeshRendererComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Mesh.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -201,6 +207,12 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\TextureCube.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Mesh.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MeshRendererComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

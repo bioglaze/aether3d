@@ -102,6 +102,8 @@
     <ClInclude Include="..\..\..\Engine\Include\Font.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\Mesh.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\MeshRendererComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\RenderTexture.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Scene.hpp" />

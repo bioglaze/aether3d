@@ -88,6 +88,7 @@
     <ClCompile Include="..\Components\AudioSourceComponent.cpp" />
     <ClCompile Include="..\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Components\GameObject.cpp" />
+    <ClCompile Include="..\Components\MeshRendererComponent.cpp" />
     <ClCompile Include="..\Components\SpriteRendererComponent.cpp" />
     <ClCompile Include="..\Components\TextRendererComponent.cpp" />
     <ClCompile Include="..\Components\TransformComponent.cpp" />
@@ -98,6 +99,7 @@
     <ClCompile Include="..\Core\Font.cpp" />
     <ClCompile Include="..\Core\Matrix.cpp" />
     <ClCompile Include="..\Core\MatrixSSE3.cpp" />
+    <ClCompile Include="..\Core\Mesh.cpp" />
     <ClCompile Include="..\Core\Scene.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\ThirdParty\GL\glxw.c" />
@@ -132,6 +134,8 @@
     <ClInclude Include="..\Include\GameObject.hpp" />
     <ClInclude Include="..\Include\Macros.hpp" />
     <ClInclude Include="..\Include\Matrix.hpp" />
+    <ClInclude Include="..\Include\Mesh.hpp" />
+    <ClInclude Include="..\Include\MeshRendererComponent.hpp" />
     <ClInclude Include="..\Include\Quaternion.hpp" />
     <ClInclude Include="..\Include\RenderTexture.hpp" />
     <ClInclude Include="..\Include\Scene.hpp" />

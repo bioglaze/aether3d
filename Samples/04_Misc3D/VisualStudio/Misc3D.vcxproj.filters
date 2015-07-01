@@ -2,15 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <UniqueIdentifier>{58e9e7eb-87bf-4ad1-8804-1ddd8a0bc74d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Include">
-      <UniqueIdentifier>{4e1301b7-7393-4c30-9a46-31104d96b5d0}</UniqueIdentifier>
+      <UniqueIdentifier>{83812432-71f7-4f40-867b-3898539f17ab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Misc2D.cpp">
+    <ClCompile Include="..\Misc3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -39,7 +38,16 @@
     <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\Mesh.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\MeshRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Engine\Include\Quaternion.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\RenderTexture.hpp">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\Include\Scene.hpp">
@@ -60,6 +68,12 @@
     <ClInclude Include="..\..\..\Engine\Include\Texture2D.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\TextureBase.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\TextureCube.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Engine\Include\TransformComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
@@ -67,21 +81,6 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\Include\Window.hpp">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Engine\Include\RenderTexture.hpp">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Engine\Include\TextureBase.hpp">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Engine\Include\TextureCube.hpp">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Engine\Include\Mesh.hpp">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Engine\Include\MeshRendererComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
