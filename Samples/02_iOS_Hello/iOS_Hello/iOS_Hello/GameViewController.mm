@@ -5,6 +5,7 @@
 #include "Aether3D_iOS.framework/Headers/CameraComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/SpriteRendererComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/TextRendererComponent.hpp"
+#include "Aether3D_iOS.framework/Headers/MeshRendererComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/TransformComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/System.hpp"
 #include "Aether3D_iOS.framework/Headers/Scene.hpp"
@@ -12,6 +13,7 @@
 #include "Aether3D_iOS.framework/Headers/AudioSourceComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/AudioClip.hpp"
 #include "Aether3D_iOS.framework/Headers/Font.hpp"
+#include "Aether3D_iOS.framework/Headers/Mesh.hpp"
 #include "Aether3D_iOS.framework/Headers/FileSystem.hpp"
 #include "Aether3D_iOS.framework/Headers/RenderTexture.hpp"
 #include "Aether3D_iOS.framework/Headers/TextureCube.hpp"
@@ -37,8 +39,10 @@
     ae3d::Font font;
     ae3d::GameObject rtCamera;
     ae3d::GameObject perspCamera;
+    ae3d::GameObject cube;
     ae3d::RenderTexture2D rtTex;
     ae3d::GameObject renderTextureContainer;
+    ae3d::Mesh cubeMesh;
 }
 
 - (void)dealloc
@@ -118,8 +122,15 @@
     skyboxTex.Load( ae3d::FileSystem::FileContents( "/Assets/skybox/left.jpg" ),   ae3d::FileSystem::FileContents( "/Assets/skybox/right.jpg" ),
                     ae3d::FileSystem::FileContents( "/Assets/skybox/bottom.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/top.jpg" ),
                     ae3d::FileSystem::FileContents( "/Assets/skybox/front.jpg" ),  ae3d::FileSystem::FileContents( "/Assets/skybox/back.jpg" ),
-                    ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, 1 );
+                    ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None );
     scene.SetSkybox( &skyboxTex );
+    
+    cubeMesh.Load( ae3d::FileSystem::FileContents( "not_yet.mesh" ) );
+    cube.AddComponent<ae3d::MeshRendererComponent>();
+    cube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    cube.AddComponent<ae3d::TransformComponent>();
+    cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -100 ) );
+    scene.Add( &cube );
 }
 
 -(void) touchesBegan: (NSSet *) touches withEvent: (UIEvent *) event
@@ -131,9 +142,16 @@
     UITouch *touch = [touches anyObject];
     CGPoint location = [touch locationInView: self.view];
     
-    sprite.GetComponent<ae3d::SpriteRendererComponent>()->Clear();
+    /*sprite.GetComponent<ae3d::SpriteRendererComponent>()->Clear();
     sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTex, ae3d::Vec3( location.x, location.y, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv2, ae3d::Vec3( 180, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv2, ae3d::Vec3( 180, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );*/
+    static int lastX = location.x;
+    int x = location.x - lastX;
+    perspCamera.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 0, 1, 0 ), -x / 60.0f );
+
+    static int lastY = location.y;
+    int y = location.y - lastY;
+    perspCamera.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 1, 0, 0 ), -y / 60.0f );
 }
 
 - (void)didReceiveMemoryWarning {

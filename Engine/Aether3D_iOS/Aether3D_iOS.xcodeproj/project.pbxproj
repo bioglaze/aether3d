@@ -54,6 +54,7 @@
 		4449E89E1B14B570009A869C /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449E89D1B14B570009A869C /* Metal.framework */; };
 		4449E8A01B14B576009A869C /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449E89F1B14B576009A869C /* OpenAL.framework */; };
 		4498A00C1B1C397E00C2271C /* RenderTextureMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */; };
+		449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */; };
 		44E5FC961B399E32009AC088 /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC951B399E32009AC088 /* TextureCubeMetal.mm */; };
 		44E5FC991B399E6C009AC088 /* RendererCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC971B399E6C009AC088 /* RendererCommon.cpp */; };
 		44E5FC9A1B399E6C009AC088 /* TextureCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC981B399E6C009AC088 /* TextureCommon.cpp */; };
@@ -117,6 +118,7 @@
 		4449E89F1B14B576009A869C /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../Include/TextureCube.hpp; sourceTree = "<group>"; };
 		4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RenderTextureMetal.mm; path = ../../Video/Metal/RenderTextureMetal.mm; sourceTree = "<group>"; };
+		449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SubMesh.hpp; path = ../../Core/SubMesh.hpp; sourceTree = "<group>"; };
 		44E5FC951B399E32009AC088 /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../../Video/TextureCubeMetal.mm; sourceTree = "<group>"; };
 		44E5FC971B399E6C009AC088 /* RendererCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererCommon.cpp; path = ../../Video/RendererCommon.cpp; sourceTree = "<group>"; };
 		44E5FC981B399E6C009AC088 /* TextureCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCommon.cpp; path = ../../Video/TextureCommon.cpp; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 				4449E86B1B14B44E009A869C /* MatrixNEON.cpp */,
 				AB922E581B405020000F3488 /* Mesh.cpp */,
 				4449E86C1B14B44E009A869C /* Scene.cpp */,
+				449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */,
 				4449E86D1B14B44E009A869C /* System.cpp */,
 			);
 			name = Core;
@@ -287,6 +290,7 @@
 				4449E8601B14B423009A869C /* Texture2D.hpp in Headers */,
 				4449E8541B14B423009A869C /* CameraComponent.hpp in Headers */,
 				4449E85E1B14B423009A869C /* System.hpp in Headers */,
+				449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */,
 				4449E85B1B14B423009A869C /* Scene.hpp in Headers */,
 				4449E8571B14B423009A869C /* GameObject.hpp in Headers */,
 				4449E8521B14B423009A869C /* AudioClip.hpp in Headers */,
