@@ -11,12 +11,14 @@ namespace ae3d
         struct FileContentsData;
     }
 
-    class SubMesh;
+    struct SubMesh;
 
     /// Contains a mesh. Can contain submeshes.
     class Mesh
     {
       public:
+        enum class LoadResult { Success, Corrupted, OutOfMemory };
+
         /// Constructor.
         Mesh();
 
@@ -30,7 +32,8 @@ namespace ae3d
         Mesh& operator=( const Mesh& other );
         
         /// \param meshData Data from .ae3d mesh file.
-        void Load( const FileSystem::FileContentsData& meshData );
+        /// \return Load result.
+        LoadResult Load( const FileSystem::FileContentsData& meshData );
         
       private:
         friend class MeshRendererComponent;

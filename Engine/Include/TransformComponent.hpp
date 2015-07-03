@@ -33,7 +33,7 @@ namespace ae3d
         void MoveUp( float amount );
 
         /// \param axis Axis to rotate about.
-        /// \angleDegrees Angle in degrees to be added to current rotation.
+        /// \param angleDegrees Angle in degrees to be added to current rotation.
         void OffsetRotate( const Vec3& axis, float angleDegrees );
         
         /// \param localPos Local position.

@@ -240,7 +240,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
 
     WindowGlobal::windowWidth = width == 0 ? screen->width_in_pixels : width;
     WindowGlobal::windowHeight = height == 0 ? screen->height_in_pixels : height;
-    std::cout << "width " << WindowGlobal::windowWidth << ", height " << WindowGlobal::windowHeight << std::endl;
     
     xcb_create_colormap(
                         connection,

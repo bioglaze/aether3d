@@ -18,8 +18,8 @@ namespace ae3d
         /// Z coordinate.
         float z = 0;
         
-        /** Copy constructor. */
-        Vec3(const Vec3& other) = default;
+        /// Copy constructor.
+        Vec3( const Vec3& other ) = default;
 
         /**
            \brief Cross product.
@@ -28,11 +28,42 @@ namespace ae3d
            \param v2 Another vector.
            \return Cross product of this vector and v.
            */
-        static Vec3 Cross(const Vec3& v1, const Vec3& v2)
+        static Vec3 Cross( const Vec3& v1, const Vec3& v2 )
         {
-            return Vec3(v1.y * v2.z - v1.z * v2.y,
-                v1.z * v2.x - v1.x * v2.z,
-                v1.x * v2.y - v1.y * v2.x);
+            return Vec3( v1.y * v2.z - v1.z * v2.y,
+                         v1.z * v2.x - v1.x * v2.z,
+                         v1.x * v2.y - v1.y * v2.x );
+        }
+
+        /**
+           Gets minimum components and creates a new vector from them.
+           Example: \code v1( 1, 0, 2 ), v2( 2, 1, 1 ) -> result( 1, 0, 1 ) \endcode.
+
+           \param v1 Vector.
+           \param v2 Other vector.
+           \return Vector that has v1's and v2's minimum components.
+           \see Max2()
+        */
+        static Vec3 Min2( const Vec3& v1, const Vec3& v2 )
+        {
+            return Vec3( v1.x < v2.x ? v1.x : v2.x,
+                         v1.y < v2.y ? v1.y : v2.y,
+                         v1.z < v2.z ? v1.z : v2.z );
+        }
+
+        /**
+           Gets maximum components and creates a new vector from them.
+           Example: v1( 1, 0, 2 ), v2( 2, 1, 1 ) -> result( 2, 1, 2 ).
+
+           \param v1 Vector.
+           \param v2 Other vector.
+           \return Vector that has v1's and v2's maximum components.
+        */
+        static Vec3 Max2( const Vec3& v1, const Vec3& v2 )
+        {
+            return Vec3( v1.x > v2.x ? v1.x : v2.x,
+                         v1.y > v2.y ? v1.y : v2.y,
+                         v1.z > v2.z ? v1.z : v2.z );
         }
         
         /**

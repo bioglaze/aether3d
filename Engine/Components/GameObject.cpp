@@ -2,7 +2,7 @@
 
 unsigned ae3d::GameObject::GetNextComponentIndex()
 {
-    return nextFreeComponentIndex++;
+    return nextFreeComponentIndex >= MaxComponents ? InvalidComponentIndex : nextFreeComponentIndex++;
 }
 
 std::string ae3d::GameObject::GetSerialized() const

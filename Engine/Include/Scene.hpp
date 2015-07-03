@@ -19,6 +19,7 @@ namespace ae3d
     class Scene
     {
     public:
+        /// Result of GetSerialized.
         enum class DeserializeResult { Success, ParseError };
         
         /// Adds a game object into the scene if it does not exist there already.

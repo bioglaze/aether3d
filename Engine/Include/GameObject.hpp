@@ -19,8 +19,8 @@ namespace ae3d
             
             if (index != InvalidComponentIndex)
             {
-                components[index].handle = T::New();
-                components[index].type = T::Type();
+                components[ index ].handle = T::New();
+                components[ index ].type = T::Type();
             }
         }
 

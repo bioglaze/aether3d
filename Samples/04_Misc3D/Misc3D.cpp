@@ -29,7 +29,7 @@ int main()
     Window::Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
     System::InitAudio();
-    System::InitGamePad();
+    //System::InitGamePad();
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -41,7 +41,7 @@ int main()
 
     GameObject cube;
     Mesh cubeMesh;
-    cubeMesh.Load( FileSystem::FileContents( "not_yet.mesh" ) );
+    cubeMesh.Load( FileSystem::FileContents( "shuttle.ae3d" ) );
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
@@ -152,4 +152,6 @@ int main()
         scene.Render();
         Window::SwapBuffers();
     }
+
+    System::Deinit();
 }
