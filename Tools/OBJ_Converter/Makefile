@@ -8,7 +8,11 @@ WARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wctor-dtor-privacy -Wdisabled-
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++
-WARNINGS := -Wall
+WARNINGS := -g -Weverything -Wno-old-style-cast -Wno-padded -Wno-c++98-compat -Wno-c++98-compat-pedantic \
+-Wno-exit-time-destructors -Wno-float-equal -Wno-unused-macros -Wno-sign-conversion \
+-Wno-missing-variable-declarations -Wno-undef -Wno-missing-prototypes -Wno-documentation \
+-Wno-implicit-fallthrough -Wno-global-constructors
+
 endif
 
 all:

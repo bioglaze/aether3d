@@ -305,14 +305,7 @@ namespace ae3d
         Vec3 Normalized() const
         {
             const float len = Length();
-
-            if (std::abs(len) < 0.0001f)
-            {
-                return Vec3(1, 0, 0);
-            }
-
-            Vec3 out = *this * (1.0f / len);
-            return out;
+            return *this * (1.0f / len);
         }
 
         /// Compares this vector with another vector.

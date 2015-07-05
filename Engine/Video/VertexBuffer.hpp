@@ -51,7 +51,17 @@ namespace ae3d
             Vec4 tangent;
             Vec4 color;
         };
-        
+
+        /// Vertex with position, texcoord and normal.
+        struct VertexPTN
+        {
+            Vec3 position;
+            float u, v;
+            Vec3 normal;
+            Vec4 tangent;
+            Vec4 color;
+        };
+
         /// Binds the buffer. Must be called before Draw or DrawRange.
         void Bind() const;
 
@@ -70,6 +80,13 @@ namespace ae3d
         /// \param faceCount Face count.
         /// \param vertices Vertices.
         /// \param vertexCount Vertex count.
+        void Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount );
+
+        /// Generates the buffer from supplied geometry.
+        /// \param faces Faces.
+        /// \param faceCount Face count.
+        /// \param vertices Vertices.
+        /// \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount );
         
         /// Draws the whole buffer.
@@ -81,11 +98,17 @@ namespace ae3d
         void DrawRange( int start, int end ) const;
 
     private:
-        enum class VertexFormat { PTC, PTNTC };
+        enum class VertexFormat { PTC, PTN, PTNTC };
+        static const int posChannel = 0;
+        static const int uvChannel = 1;
+        static const int colorChannel = 2;
+        static const int normalChannel = 3;
+        static const int tangentChannel = 4;
         
         unsigned vaoId = 0;
         unsigned vboId = 0;
         unsigned iboId = 0;
+        
         int elementCount = 0;
         VertexFormat vertexFormat = VertexFormat::PTC;
 #if AETHER3D_IOS

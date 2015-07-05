@@ -182,7 +182,7 @@ void LoadObj( const std::string& path )
                 gMeshes.back().vertex.push_back( vertex[va-1] );
                 vertGlobalLocal[ va - 1 ] = (int)gMeshes.back().vertex.size() - 1;
             }
-            face.vInd[0] = va-1;
+            face.vInd[0] = static_cast< unsigned short >( va - 1 );
             // Reads '/' if any.
             stm >> slash;
 
@@ -192,7 +192,7 @@ void LoadObj( const std::string& path )
                 stm.unget();
 
                 stm >> vb;
-                face.vInd[1] = vb-1;
+                face.vInd[1] = static_cast< unsigned short >( vb - 1 );
 
                 // Didn't find the index in index conversion map, so add it.
                 if (vertGlobalLocal.find(vb-1) == vertGlobalLocal.end())
@@ -202,7 +202,7 @@ void LoadObj( const std::string& path )
                 }
                 
                 stm >> vc;
-                face.vInd[2] = vc-1;
+                face.vInd[2] = static_cast< unsigned short >( vc - 1 );
 
                 if (vertGlobalLocal.find(vc-1) == vertGlobalLocal.end())
                 {
@@ -232,7 +232,8 @@ void LoadObj( const std::string& path )
                     gMeshes.back().tcoord.push_back( tcoord[ta-1] );
                     tcoordGlobalLocal[ ta - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                 }
-                face.uvInd[0] = ta-1;
+                
+                face.uvInd[0] = static_cast< unsigned short >( ta - 1 );
             }
             else
             {
@@ -261,7 +262,8 @@ void LoadObj( const std::string& path )
                         gMeshes.back().vnormal.push_back( vnormal[na-1] );
                         normGlobalLocal[ na - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                     }
-                    face.vnInd[0] = na-1;
+                    
+                    face.vnInd[0] = static_cast< unsigned short >( na - 1 );
                 }
                 else
                 {
@@ -281,7 +283,9 @@ void LoadObj( const std::string& path )
                 gMeshes.back().vertex.push_back( vertex[vb-1] );
                 vertGlobalLocal[ vb - 1 ] = (int)gMeshes.back().vertex.size() - 1;
             }
-            face.vInd[1] = vb - 1;
+
+            face.vInd[1] = static_cast< unsigned short >( vb - 1 );
+
             // Texture coordinate index of this vertex.
             if (hasTextureCoords)
             {
@@ -299,7 +303,8 @@ void LoadObj( const std::string& path )
                     gMeshes.back().tcoord.push_back( tcoord[tb-1] );
                     tcoordGlobalLocal[ tb - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                 }
-                face.uvInd[1] = tb-1;
+
+                face.uvInd[1] = static_cast< unsigned short >( tb - 1 );
             }
             // Eats '/' if face has normals but not texture coords.
             if (!hasTextureCoords && hasVNormals)
@@ -323,7 +328,8 @@ void LoadObj( const std::string& path )
                     gMeshes.back().vnormal.push_back( vnormal[nb-1] );
                     normGlobalLocal[ nb - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                 }
-                face.vnInd[1] = nb-1;
+
+                face.vnInd[1] = static_cast< unsigned short >( nb - 1 );
             }
 
             // Reads the third vertex.
@@ -339,7 +345,8 @@ void LoadObj( const std::string& path )
                 gMeshes.back().vertex.push_back( vertex[vc-1] );
                 vertGlobalLocal[ vc - 1 ] = (int)gMeshes.back().vertex.size() - 1;
             }
-            face.vInd[2] = vc-1;
+
+            face.vInd[2] = static_cast< unsigned short >( vc - 1 );
             
             // Texture coordinate index of this vertex.
             if (hasTextureCoords)
@@ -358,7 +365,8 @@ void LoadObj( const std::string& path )
                     gMeshes.back().tcoord.push_back( tcoord[tc-1] );
                     tcoordGlobalLocal[ tc - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                 }
-                face.uvInd[2] = tc-1;
+
+                face.uvInd[2] = static_cast< unsigned short >( tc - 1 );
             }
             // Eats '/' if face has normals but not texture coords.
             if (!hasTextureCoords && hasVNormals)
@@ -382,7 +390,8 @@ void LoadObj( const std::string& path )
                     gMeshes.back().vnormal.push_back( vnormal[nc-1] );
                     normGlobalLocal[ nc - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                 }
-                face.vnInd[2] = nc-1;
+
+                face.vnInd[2] = static_cast< unsigned short >( nc - 1 );
             }
             gMeshes.back().face.push_back(face);
 
@@ -403,7 +412,7 @@ void LoadObj( const std::string& path )
                     vertGlobalLocal[ vd - 1 ] = (int)gMeshes.back().vertex.size() - 1;
                 }
                 Face face2;
-                face2.vInd[1] = vd-1;
+                face2.vInd[1] = static_cast< unsigned short >( vd - 1 );
 
                 face2.vInd[0] = face.vInd[2];
                 face2.uvInd[0] = face.uvInd[2];
@@ -430,7 +439,9 @@ void LoadObj( const std::string& path )
                         gMeshes.back().tcoord.push_back( tcoord[td-1] );
                         tcoordGlobalLocal[ td - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                     }
-                    face2.uvInd[1] = td-1;
+
+                    face2.uvInd[1] = static_cast< unsigned short >( td - 1 );
+
                 }
                 // Eats '/' if the mesh has normals but not texture coords.
                 if (!hasTextureCoords && hasVNormals)
@@ -454,7 +465,8 @@ void LoadObj( const std::string& path )
                         gMeshes.back().vnormal.push_back( vnormal[nd-1] );
                         normGlobalLocal[ nd - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                     }
-                    face2.vnInd[1] = nd-1;
+
+                    face2.vnInd[1] = static_cast< unsigned short >( nd - 1 );
                 }
                 gMeshes.back().face.push_back( face2 );
             }
@@ -466,20 +478,28 @@ void LoadObj( const std::string& path )
 
 int main( int paramCount, char** params )
 {
-    if (paramCount != 2)
+    if (paramCount != 3)
     {
-        std::cerr << "Usage: ./convert_obj file.obj" << std::endl;
+        std::cerr << "Usage: ./convert_obj <vertexformat> file.obj" << std::endl;
+        std::cerr << "  where <vertexformat> is 0 for PTNTC and 1 for PTN." << std::endl;
         return 1;
     }
 
     std::cerr << "Converting... ";
 
-    LoadObj( params[ 1 ] );
+    LoadObj( params[ 2 ] );
 
     // Creates a new file name by replacing 'obj' with 'ae3d'.
-    std::string outFile = std::string( params [ 1 ] );
+    std::string outFile = std::string( params [ 2 ] );
     outFile = outFile.substr( 0, outFile.length() - 3 );
     outFile.append( "ae3d" );
-
-    WriteAe3d( outFile );
+    
+    VertexFormat vertexFormat { VertexFormat::PTNTC };
+    
+    if (std::string( params[ 1 ] ) == "1")
+    {
+        vertexFormat = VertexFormat::PTN;
+    }
+    
+    WriteAe3d( outFile, vertexFormat );
 }

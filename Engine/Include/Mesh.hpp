@@ -17,7 +17,7 @@ namespace ae3d
     class Mesh
     {
       public:
-        enum class LoadResult { Success, Corrupted, OutOfMemory };
+        enum class LoadResult { Success, Corrupted, OutOfMemory, FileNotFound };
 
         /// Constructor.
         Mesh();

@@ -57,7 +57,9 @@ struct VertexInd
     unsigned short a, b, c;
 };
 
-struct Vertex
+enum class VertexFormat { PTNTC, PTN };
+
+struct VertexPTNTC
 {
     ae3d::Vec3 position;
     TexCoord texCoord;
@@ -66,13 +68,15 @@ struct Vertex
     ae3d::Vec4 color;
 };
 
+struct VertexPTN
+{
+    ae3d::Vec3 position;
+    TexCoord texCoord;
+    ae3d::Vec3 normal;
+};
+
 struct Mesh
 {
-    Mesh()
-    : name( "unnamed" )
-    {
-    }
-
     void BuildVertexInfluences();
     void Interleave();
     void SolveAABB();
@@ -80,11 +84,13 @@ struct Mesh
     void SolveFaceTangents();
     void SolveVertexNormals();
     void SolveVertexTangents();
+    void CopyInterleavedVerticesToPTN();
+
     bool AlmostEquals( const ae3d::Vec3& v1, const ae3d::Vec3& v2 ) const;
     bool AlmostEquals( const ae3d::Vec4& v1, const ae3d::Vec4& v2 ) const;
     bool AlmostEquals( const TexCoord& t1, const TexCoord& t2 ) const;
 
-    std::string name;
+    std::string name = { "unnamed" };
     std::vector< ae3d::Vec3 > vertex;
     std::vector< ae3d::Vec4 > tangents;
     std::vector< ae3d::Vec3 > vnormal;
@@ -95,7 +101,8 @@ struct Mesh
 
     // Separate element arrays combined to one.
     // These are written to the .ae3d file.
-    std::vector< Vertex >    interleavedVertices;
+    std::vector< VertexPTNTC > interleavedVertices;
+    std::vector< VertexPTN > interleavedVerticesPTN;
     std::vector< VertexInd > indices;
 
     // Used to calculate tangent-space handedness.
@@ -107,6 +114,18 @@ struct Mesh
 };
 
 std::vector< Mesh > gMeshes;
+
+void Mesh::CopyInterleavedVerticesToPTN()
+{
+    interleavedVerticesPTN.resize( interleavedVertices.size() );
+    
+    for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
+    {
+        interleavedVerticesPTN[ i ].position = interleavedVertices[ i ].position;
+        interleavedVerticesPTN[ i ].texCoord = interleavedVertices[ i ].texCoord;
+        interleavedVerticesPTN[ i ].normal = interleavedVertices[ i ].normal;
+    }
+}
 
 void Mesh::SolveAABB()
 {
@@ -220,6 +239,8 @@ void Mesh::SolveFaceTangents()
 
 void Mesh::SolveVertexNormals()
 {
+    vnormal.resize( vertex.size() );
+    
     // For every vertex, check how many faces touches
     // it and calculate the average of those face normals.
     for (std::size_t vertInd = 0; vertInd < vertex.size(); ++vertInd)
@@ -232,16 +253,13 @@ void Mesh::SolveVertexNormals()
             face[ faceInd ].vnInd[ 1 ] = face[ faceInd ].vInd[ 1 ];
             face[ faceInd ].vnInd[ 2 ] = face[ faceInd ].vInd[ 2 ];
 
-            unsigned short& faceA = face[ faceInd ].vInd[ 0 ];
-            unsigned short& faceB = face[ faceInd ].vInd[ 1 ];
-            unsigned short& faceC = face[ faceInd ].vInd[ 2 ];
+            const unsigned short& faceA = face[ faceInd ].vInd[ 0 ];
+            const unsigned short& faceB = face[ faceInd ].vInd[ 1 ];
+            const unsigned short& faceC = face[ faceInd ].vInd[ 2 ];
 
             const ae3d::Vec3 va = vertex[ faceA ];
-            ae3d::Vec3 vb = vertex[ faceB ];
-            ae3d::Vec3 vc = vertex[ faceC ];
-
-            vb -= va;
-            vc -= va;
+            ae3d::Vec3 vb = vertex[ faceB ] - va;
+            const ae3d::Vec3 vc = vertex[ faceC ] - va;
 
             vb = ae3d::Vec3::Cross( vb, vc ).Normalized();
 
@@ -253,8 +271,7 @@ void Mesh::SolveVertexNormals()
             }
         }
         
-        normal = normal.Normalized();
-        vnormal.push_back( normal );
+        vnormal[ vertInd ] = normal.Normalized();
     }
 }
 
@@ -340,7 +357,7 @@ void Mesh::Interleave()
 
         if (!found)
         {
-            Vertex newVertex;
+            VertexPTNTC newVertex;
             newVertex.position = tvertex;
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
@@ -376,7 +393,7 @@ void Mesh::Interleave()
 
         if (!found)
         {
-            Vertex newVertex;
+            VertexPTNTC newVertex;
             newVertex.position = tvertex;
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
@@ -411,7 +428,7 @@ void Mesh::Interleave()
 
         if (!found)
         {
-            Vertex newVertex;
+            VertexPTNTC newVertex;
             newVertex.position = tvertex;
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
@@ -473,9 +490,9 @@ bool Mesh::AlmostEquals( const TexCoord& t1, const TexCoord& t2 ) const
 
 /// Writes a .ae3d model to a file.
 /// \param aOutFile File name to save the model into.
-void WriteAe3d( const std::string& aOutFile )
+void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
 {
-    static_assert( sizeof( Vertex     ) == 64, "" );
+    static_assert( sizeof( VertexPTNTC) == 64, "" );
     static_assert( sizeof( ae3d::Vec3 ) == 12, "" );
     static_assert( sizeof( VertexInd  ) ==  6, "" );
 
@@ -545,8 +562,28 @@ void WriteAe3d( const std::string& aOutFile )
         ofs.write( reinterpret_cast< char* >((char*)&nVertices), 2 );
 
         // Writes vertex data.
-        ofs.write( (char*)&gMeshes[m].interleavedVertices[ 0 ], gMeshes[m].interleavedVertices.size() * sizeof( Vertex ) );
+        if (vertexFormat == VertexFormat::PTNTC)
+        {
+            const unsigned char format = 0;
+            ofs.write( (char*)&format, 1 );
 
+            ofs.write( (char*)&gMeshes[m].interleavedVertices[ 0 ], gMeshes[m].interleavedVertices.size() * sizeof( VertexPTNTC ) );
+        }
+        else if (vertexFormat == VertexFormat::PTN)
+        {
+            gMeshes[ m ].CopyInterleavedVerticesToPTN();
+
+            const unsigned char format = 1;
+            ofs.write( (char*)&format, 1 );
+        
+            ofs.write( (char*)&gMeshes[m].interleavedVerticesPTN[ 0 ], gMeshes[m].interleavedVerticesPTN.size() * sizeof( VertexPTN ) );
+        }
+        else
+        {
+            std::cerr << "WriteAe3d: Unhandled Vertex format!" << std::endl;
+            exit( 1 );
+        }
+        
         // Writes # of indices.
         const unsigned short nIndices = (unsigned short)gMeshes[m].indices.size();
         ofs.write( reinterpret_cast< char* >((char*)&nIndices), 2 );

@@ -46,38 +46,43 @@ std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
 
 ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& meshData )
 {
-    // TODO: Load from file data.
-    /*const float s = 25;
-    
-    const std::vector< VertexBuffer::VertexPTC > vertices =
+    if (!meshData.isLoaded)
     {
-        { Vec3( -s, -s, s ), 0, 0 },
-        { Vec3( s, -s, s ), 0, 0 },
-        { Vec3( s, -s, -s ), 0, 0 },
-        { Vec3( -s, -s, -s ), 0, 0 },
-        { Vec3( -s, s, s ), 0, 0 },
-        { Vec3( s, s, s ), 0, 0 },
-        { Vec3( s, s, -s ), 0, 0 },
-        { Vec3( -s, s, -s ), 0, 0 }
-    };
+        const float s = 5;
+        
+        const std::vector< VertexBuffer::VertexPTC > vertices =
+        {
+            { Vec3( -s, -s, s ), 0, 0 },
+            { Vec3( s, -s, s ), 0, 0 },
+            { Vec3( s, -s, -s ), 0, 0 },
+            { Vec3( -s, -s, -s ), 0, 0 },
+            { Vec3( -s, s, s ), 0, 0 },
+            { Vec3( s, s, s ), 0, 0 },
+            { Vec3( s, s, -s ), 0, 0 },
+            { Vec3( -s, s, -s ), 0, 0 }
+        };
+        
+        const std::vector< VertexBuffer::Face > indices =
+        {
+            { 0, 4, 1 },
+            { 4, 5, 1 },
+            { 1, 5, 2 },
+            { 2, 5, 6 },
+            { 2, 6, 3 },
+            { 3, 6, 7 },
+            { 3, 7, 0 },
+            { 0, 7, 4 },
+            { 4, 7, 5 },
+            { 5, 7, 6 },
+            { 3, 0, 2 },
+            { 2, 0, 1 }
+        };
+        
+        m().subMeshes.resize( 1 );
+        m().subMeshes[ 0 ].vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
+        return LoadResult::FileNotFound;
+    }
     
-    const std::vector< VertexBuffer::Face > indices =
-    {
-        { 0, 4, 1 },
-        { 4, 5, 1 },
-        { 1, 5, 2 },
-        { 2, 5, 6 },
-        { 2, 6, 3 },
-        { 3, 6, 7 },
-        { 3, 7, 0 },
-        { 0, 7, 4 },
-        { 4, 7, 5 },
-        { 5, 7, 6 },
-        { 3, 0, 2 },
-        { 2, 0, 1 }
-        };*/
-    //m().subMeshes.resize( 1 );
-
     uint8_t magic[ 2 ];
 
     std::istringstream is( std::string( std::begin( meshData.data ), std::end( meshData.data ) ) );
@@ -114,16 +119,38 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         uint16_t vertexCount;
         is.read( (char*)&vertexCount, sizeof( vertexCount ) );
 
-        std::vector< VertexBuffer::VertexPTNTC > vertices;
+        std::vector< VertexBuffer::VertexPTNTC > verticesPTNTC;
+        std::vector< VertexBuffer::VertexPTN > verticesPTN;
+
+        uint8_t vertexFormat;
+        is.read( (char*)&vertexFormat, sizeof( vertexFormat ) );
         
-        try { vertices.resize( vertexCount ); }
-        catch (std::bad_alloc&)
-        { 
-            return LoadResult::OutOfMemory;
+        if (vertexFormat != 0 && vertexFormat != 1)
+        {
+            System::Print( "Mesh %s submesh %s has invalid vertex format %d. Only 0 and 1 are valid!\n", meshData.path.c_str(), subMesh.name.c_str(), vertexFormat );
+            return LoadResult::Corrupted;
         }
-
-        is.read( (char*)&vertices[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTNTC ) );
-
+        else if (vertexFormat == 0) // PTNTC
+        {
+            try { verticesPTNTC.resize( vertexCount ); }
+            catch (std::bad_alloc&)
+            {
+                return LoadResult::OutOfMemory;
+            }
+        
+            is.read( (char*)&verticesPTNTC[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTNTC ) );
+        }
+        else if (vertexFormat == 1) // PTN
+        {
+            try { verticesPTN.resize( vertexCount ); }
+            catch (std::bad_alloc&)
+            {
+                return LoadResult::OutOfMemory;
+            }
+            
+            is.read( (char*)&verticesPTN[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTN ) );
+        }
+        
         uint16_t faceCount;
         is.read( (char*)&faceCount, sizeof( faceCount ) );
 
@@ -137,7 +164,14 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
 
         is.read( (char*)&indices[ 0 ], faceCount * sizeof( VertexBuffer::Face ) );
 
-        subMesh.vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
+        if (vertexFormat == 0)
+        {
+            subMesh.vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), verticesPTNTC.data(), static_cast< int >( verticesPTNTC.size() ) );
+        }
+        else if (vertexFormat == 1)
+        {
+            subMesh.vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), verticesPTN.data(), static_cast< int >( verticesPTN.size() ) );
+        }
     }
 
     return LoadResult::Success;

@@ -37,7 +37,25 @@ int main()
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     camera.AddComponent<TransformComponent>();
     //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
-    camera.GetComponent<TransformComponent>()->LookAt( {0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+
+    GameObject camera2d;
+    camera2d.AddComponent<CameraComponent>();
+    camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
+    camera2d.GetComponent<CameraComponent>()->SetClearColor( { 0.5f, 0.5f, 0.5f } );
+
+    Texture2D fontTex;
+    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
+    
+    Font font;
+    font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
+
+    GameObject statsContainer;
+    statsContainer.AddComponent<TextRendererComponent>();
+    statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
+    statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
+    statsContainer.AddComponent<TransformComponent>();
+    statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( { 20, 0, 0 } );
 
     GameObject cube;
     Mesh cubeMesh;
@@ -45,7 +63,7 @@ int main()
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( Vec3( 0, 0, -100 ) );
+    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -100 } );
 
     Scene scene;
     
@@ -57,7 +75,9 @@ int main()
 
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
+    scene.Add( &camera2d );
     scene.Add( &cube );
+    scene.Add( &statsContainer );
 
     bool quit = false;
     
@@ -148,7 +168,10 @@ int main()
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }
         }
-        
+
+        const std::string drawCalls = text + std::to_string( System::Statistics::GetDrawCallCount() );
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( drawCalls.c_str() );
+
         scene.Render();
         Window::SwapBuffers();
     }
