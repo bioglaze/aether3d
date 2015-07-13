@@ -57,13 +57,23 @@ int main()
     statsContainer.AddComponent<TransformComponent>();
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( { 20, 0, 0 } );
 
-    GameObject cube;
     Mesh cubeMesh;
     cubeMesh.Load( FileSystem::FileContents( "shuttle.ae3d" ) );
+
+    GameObject cube;
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -100 } );
+
+    Mesh cubeMesh2;
+    cubeMesh2.Load( FileSystem::FileContents( "shuttle.ae3d" ) );
+
+    GameObject cube2;
+    cube2.AddComponent< MeshRendererComponent >();
+    cube2.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
+    cube2.AddComponent< TransformComponent >();
+    cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -100 } );
 
     Scene scene;
     
@@ -77,6 +87,7 @@ int main()
     scene.Add( &camera );
     scene.Add( &camera2d );
     scene.Add( &cube );
+    scene.Add( &cube2 );
     scene.Add( &statsContainer );
 
     bool quit = false;

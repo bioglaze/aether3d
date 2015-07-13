@@ -2,12 +2,21 @@
 #include <vector>
 #include <sstream>
 #include <cstdint>
+#include <string>
 #include "FileSystem.hpp"
+#include "FileWatcher.hpp"
 #include "VertexBuffer.hpp"
 #include "SubMesh.hpp"
 #include "System.hpp"
 
 using namespace ae3d;
+
+extern ae3d::FileWatcher fileWatcher;
+
+void MeshReload( const std::string& path )
+{
+    System::Print("mesh reload unimplemented\n");
+}
 
 struct ae3d::Mesh::Impl
 {
@@ -15,6 +24,16 @@ struct ae3d::Mesh::Impl
     Vec3 aabbMax;
     std::vector< SubMesh > subMeshes;
 };
+
+struct MeshCacheEntry
+{
+    std::string path;
+    Vec3 aabbMin;
+    Vec3 aabbMax;
+    std::vector< SubMesh > subMeshes;    
+};
+
+std::vector< MeshCacheEntry > gMeshCache;
 
 ae3d::Mesh::Mesh()
 {
@@ -46,6 +65,18 @@ std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
 
 ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& meshData )
 {
+    for (const auto& entry : gMeshCache)
+    {
+        if (entry.path == meshData.path)
+        {
+            System::Print("Loading from cache: %s\n", entry.path.c_str());
+            m().aabbMin = entry.aabbMin;
+            m().aabbMax = entry.aabbMax;
+            m().subMeshes = entry.subMeshes;
+            return LoadResult::Success;
+        }
+    }
+    
     if (!meshData.isLoaded)
     {
         const float s = 5;
@@ -174,5 +205,14 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         }
     }
 
+    MeshCacheEntry cacheEntry;
+    cacheEntry.path = meshData.path;
+    cacheEntry.aabbMin = m().aabbMin;
+    cacheEntry.aabbMax = m().aabbMax;
+    cacheEntry.subMeshes = m().subMeshes;
+    gMeshCache.push_back( cacheEntry );
+
+    fileWatcher.AddFile( meshData.path, MeshReload );
+    
     return LoadResult::Success;
 }
