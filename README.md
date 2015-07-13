@@ -1,8 +1,6 @@
 # Aether3D Game Engine
 This codebase will evolve into the next generation [Aether3D]("Aether3D"). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
-This is a work in progress.
-
 # Features
 
   - Windows, OS X, iOS and Linux support.
@@ -11,6 +9,7 @@ This is a work in progress.
   - Sprite rendering, texture atlasing and batching.
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Audio support for .wav and .ogg.
+  - Custom model format with .obj and Blender exporter.
   - Virtual file system for .pak files.
   - XBox controller support.
 

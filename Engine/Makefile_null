@@ -58,4 +58,10 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowNull.cpp -o $(OUTPUT_DIR)/Window.o
 	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
+ifeq ($(UNAME), Linux)
+        rm $(OUTPUT_DIR)/*.o
+endif
+ifeq ($(UNAME), Darwin)
+        rm $(OUTPUT_DIR)/*.o
+endif
 
