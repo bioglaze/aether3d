@@ -78,4 +78,11 @@ ifeq ($(OS),Windows_NT)
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowWin32GL.cpp -o $(OUTPUT_DIR)/WindowGL.o
 endif
 	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
+ifeq ($(UNAME), Linux)
+	rm $(OUTPUT_DIR)/*.o
+endif
+ifeq ($(UNAME), Darwin)
+	rm $(OUTPUT_DIR)/*.o
+endif
+
 

@@ -173,6 +173,14 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             subMesh.vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), verticesPTN.data(), static_cast< int >( verticesPTN.size() ) );
         }
     }
+    
+    uint8_t terminator;
+    is.read( (char*)&terminator, sizeof( terminator ) );
+
+    if (terminator != 100)
+    {
+        return LoadResult::Corrupted;
+    }
 
     return LoadResult::Success;
 }
