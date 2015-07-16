@@ -8,7 +8,7 @@ namespace ae3d
 {
     class Material;
     class Mesh;
-    class Matrix44;
+    struct Matrix44;
     
     /// Contains a mesh.
     class MeshRendererComponent

@@ -1,13 +1,31 @@
 #include "Shader.hpp"
 #include <GL/glxw.h>
+#include <vector>
 #include "FileSystem.hpp"
+#include "FileWatcher.hpp"
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 
+extern ae3d::FileWatcher fileWatcher;
+
 namespace
 {
+    struct ShaderCacheEntry
+    {
+        ShaderCacheEntry( const std::string& vp, const std::string& fp, ae3d::Shader* aShader )
+        : vertexPath( vp )
+        , fragmentPath( fp )
+        , shader( aShader ) {}
+        
+        std::string vertexPath;
+        std::string fragmentPath;
+        ae3d::Shader* shader = nullptr;
+    };
+    
+    std::vector< ShaderCacheEntry > cacheEntries;
+
     enum class InfoLogType
     {
         Program,
@@ -48,51 +66,68 @@ namespace
             
             delete[] log;
         }
-}
-
-GLuint CompileShader( const char* source, GLenum shaderType )
-{
-    const GLuint shader = ae3d::GfxDevice::CreateShaderId( static_cast<unsigned>(shaderType) );
-    glShaderSource( shader, 1, &source, nullptr );
-    glCompileShader( shader );
-    
-    GLint wasCompiled;
-    
-    glGetShaderiv( shader, GL_COMPILE_STATUS, &wasCompiled );
-    
-    if (!wasCompiled)
-    {
-        ae3d::System::Print( "Shader compile error.\n" );
-        PrintInfoLog( shader, InfoLogType::Shader );
-        return 0;
     }
 
-    return shader;
-}
-}
-
-std::map<std::string, ae3d::Shader::IntDefaultedToMinusOne> ae3d::Shader::GetUniformLocations()
-{
-    int numUni = -1;
-    glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &numUni);
-    
-    std::map<std::string, IntDefaultedToMinusOne> outUniforms;
-    
-    for (int i = 0; i < numUni; ++i)
+    GLuint CompileShader( const char* source, GLenum shaderType )
     {
-        int namelen;
-        int num;
-        GLenum type;
-        char name[128];
+        const GLuint shader = ae3d::GfxDevice::CreateShaderId( static_cast<unsigned>(shaderType) );
+        glShaderSource( shader, 1, &source, nullptr );
+        glCompileShader( shader );
         
-        glGetActiveUniform(id, static_cast<GLuint>(i), sizeof(name) - 1, &namelen, &num, &type, name);
+        GLint wasCompiled;
         
-        name[namelen] = 0;
+        glGetShaderiv( shader, GL_COMPILE_STATUS, &wasCompiled );
         
-        outUniforms[ name ].i = glGetUniformLocation( id, name );
+        if (!wasCompiled)
+        {
+            ae3d::System::Print( "Shader compile error.\n" );
+            PrintInfoLog( shader, InfoLogType::Shader );
+            return 0;
+        }
+        
+        return shader;
     }
     
-    return outUniforms;
+    std::map< std::string, ae3d::Shader::IntDefaultedToMinusOne > GetUniformLocations( GLuint program )
+    {
+        int numUni = -1;
+        glGetProgramiv( program, GL_ACTIVE_UNIFORMS, &numUni );
+        
+        std::map< std::string, ae3d::Shader::IntDefaultedToMinusOne > outUniforms;
+        
+        for (int i = 0; i < numUni; ++i)
+        {
+            int namelen;
+            int num;
+            GLenum type;
+            char name[128];
+            
+            glGetActiveUniform( program, static_cast<GLuint>(i), sizeof(name) - 1, &namelen, &num, &type, name );
+            
+            name[ namelen ] = 0;
+            
+            outUniforms[ name ].i = glGetUniformLocation( program, name );
+        }
+        
+        return outUniforms;
+    }
+}
+
+void ShaderReload( const std::string& path )
+{
+    for (const auto& entry : cacheEntries)
+    {
+        if (entry.vertexPath == path || entry.fragmentPath == path)
+        {
+            const auto vertexData = ae3d::FileSystem::FileContents( entry.vertexPath.c_str() );
+            const std::string vertexStr = std::string( std::begin( vertexData.data ), std::end( vertexData.data ) );
+
+            const auto fragmentData = ae3d::FileSystem::FileContents( entry.fragmentPath.c_str() );
+            const std::string fragmentStr = std::string( std::begin( fragmentData.data ), std::end( fragmentData.data ) );
+
+            entry.shader->Load( vertexStr.c_str(), fragmentStr.c_str() );
+        }
+    }
 }
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -122,7 +157,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     }
 
     id = program;
-    uniformLocations = GetUniformLocations();
+    uniformLocations = GetUniformLocations( program );
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData,
@@ -132,6 +167,23 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexData, const F
     const std::string fragmentStr = std::string( std::begin( fragmentData.data ), std::end( fragmentData.data ) );
 
     Load( vertexStr.c_str(), fragmentStr.c_str() );
+
+    bool isInCache = false;
+    
+    for (const auto& entry : cacheEntries)
+    {
+        if (entry.shader == this)
+        {
+            isInCache = true;
+        }
+    }
+    
+    if (!isInCache && !vertexData.path.empty() && !fragmentData.path.empty())
+    {
+        fileWatcher.AddFile( vertexData.path.c_str(), ShaderReload );
+        fileWatcher.AddFile( fragmentData.path.c_str(), ShaderReload );
+        cacheEntries.push_back( { vertexData.path, fragmentData.path, this } );
+    }
 }
 
 void ae3d::Shader::Use()

@@ -59,6 +59,8 @@
 		44E5FC991B399E6C009AC088 /* RendererCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC971B399E6C009AC088 /* RendererCommon.cpp */; };
 		44E5FC9A1B399E6C009AC088 /* TextureCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC981B399E6C009AC088 /* TextureCommon.cpp */; };
 		44E5FC9C1B399EE5009AC088 /* TextureCube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 44E5FC9B1B399EE5009AC088 /* TextureCube.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB190E321B57DE73005ECE49 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB190E311B57DE73005ECE49 /* Material.cpp */; };
+		AB190E341B57DE85005ECE49 /* Material.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB190E331B57DE85005ECE49 /* Material.hpp */; };
 		AB922E561B404FFB000F3488 /* Mesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E541B404FFB000F3488 /* Mesh.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB922E571B404FFB000F3488 /* MeshRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB922E591B405020000F3488 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E581B405020000F3488 /* Mesh.cpp */; };
@@ -123,6 +125,8 @@
 		44E5FC971B399E6C009AC088 /* RendererCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererCommon.cpp; path = ../../Video/RendererCommon.cpp; sourceTree = "<group>"; };
 		44E5FC981B399E6C009AC088 /* TextureCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCommon.cpp; path = ../../Video/TextureCommon.cpp; sourceTree = "<group>"; };
 		44E5FC9B1B399EE5009AC088 /* TextureCube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../Include/TextureCube.hpp; sourceTree = "<group>"; };
+		AB190E311B57DE73005ECE49 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Material.cpp; path = ../../Video/Material.cpp; sourceTree = "<group>"; };
+		AB190E331B57DE85005ECE49 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../Include/Material.hpp; sourceTree = "<group>"; };
 		AB922E541B404FFB000F3488 /* Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../../Include/Mesh.hpp; sourceTree = "<group>"; };
 		AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../../Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
 		AB922E581B405020000F3488 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mesh.cpp; path = ../../Core/Mesh.cpp; sourceTree = "<group>"; };
@@ -186,6 +190,7 @@
 		4449E8401B14B3FF009A869C /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				AB190E331B57DE85005ECE49 /* Material.hpp */,
 				4449E8411B14B423009A869C /* AudioClip.hpp */,
 				4449E8421B14B423009A869C /* AudioSourceComponent.hpp */,
 				4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */,
@@ -261,6 +266,7 @@
 			children = (
 				4449E88D1B14B4B5009A869C /* GfxDevice.hpp */,
 				4449E88E1B14B4B5009A869C /* GfxDeviceMetal.mm */,
+				AB190E311B57DE73005ECE49 /* Material.cpp */,
 				4449E8931B14B4B5009A869C /* Renderer.hpp */,
 				4449E88F1B14B4B5009A869C /* RendererMetal.mm */,
 				44E5FC971B399E6C009AC088 /* RendererCommon.cpp */,
@@ -291,6 +297,7 @@
 				4449E8541B14B423009A869C /* CameraComponent.hpp in Headers */,
 				4449E85E1B14B423009A869C /* System.hpp in Headers */,
 				449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */,
+				AB190E341B57DE85005ECE49 /* Material.hpp in Headers */,
 				4449E85B1B14B423009A869C /* Scene.hpp in Headers */,
 				4449E8571B14B423009A869C /* GameObject.hpp in Headers */,
 				4449E8521B14B423009A869C /* AudioClip.hpp in Headers */,
@@ -389,6 +396,7 @@
 				AB922E591B405020000F3488 /* Mesh.cpp in Sources */,
 				4449E8751B14B44E009A869C /* MatrixNEON.cpp in Sources */,
 				4449E8811B14B46C009A869C /* GameObject.cpp in Sources */,
+				AB190E321B57DE73005ECE49 /* Material.cpp in Sources */,
 				4449E8761B14B44E009A869C /* Scene.cpp in Sources */,
 				4449E8701B14B44E009A869C /* AudioSystemOpenAL.cpp in Sources */,
 				4449E8971B14B4B5009A869C /* RendererMetal.mm in Sources */,

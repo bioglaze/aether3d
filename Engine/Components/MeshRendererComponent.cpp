@@ -7,8 +7,6 @@
 #include "VertexBuffer.hpp"
 #include "SubMesh.hpp"
 
-#include "Texture2D.hpp"
-
 std::vector< ae3d::MeshRendererComponent > meshRendererComponents;
 unsigned nextFreeMeshRendererComponent = 0;
 
@@ -34,13 +32,11 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection )
     
     for (auto& subMesh : subMeshes)
     {
-        if (materials[ subMeshIndex ] == nullptr)
+        if (materials[ subMeshIndex ] == nullptr || !materials[ subMeshIndex ]->IsValidShader())
         {
             continue;
         }
         
-        // const ae3d::Texture2D* texture = ae3d::Texture2D::GetDefaultTexture();
-
         GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::Off );
 
         materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );

@@ -187,7 +187,6 @@ int main()
                 const int mouseDeltaY = event.mouseY - lastMouseY;
                 lastMouseX = event.mouseX;
                 lastMouseY = event.mouseY;
-                
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }

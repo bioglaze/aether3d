@@ -21,6 +21,9 @@ namespace ae3d
     class Shader
     {
     public:
+        /// \return True if the shader has been succesfully compiled and linked.
+        bool IsValid() const { return id != 0; }
+        
         /// \param vertexSource Vertex shader source.
         /// \param fragmentSource Fragment shader source.
         void Load( const char* vertexSource, const char* fragmentSource );
@@ -72,15 +75,12 @@ namespace ae3d
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
 #endif
-
-    private:
         struct IntDefaultedToMinusOne
         {
             int i = -1;
         };
 
-        std::map<std::string, IntDefaultedToMinusOne > GetUniformLocations();
-        
+    private:
         unsigned id = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
     };    

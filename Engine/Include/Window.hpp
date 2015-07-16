@@ -56,9 +56,9 @@ namespace ae3d
         WindowEventType type = WindowEventType::None;
         /// Key code.
         KeyCode keyCode = KeyCode::A;
-        /// X coordinate in window.
+        /// X coordinate in window. Origin: left.
         int mouseX = 0; 
-        /// Y coordinate in window.
+        /// Y coordinate in window. Origin: bottom.
         int mouseY = 0;
         /// Gamepad's thumb x in range [-1, 1]. Event type indicates left or right thumb.
         float gamePadThumbX = 0;
