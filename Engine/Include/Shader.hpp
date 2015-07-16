@@ -9,6 +9,11 @@
 
 namespace ae3d
 {
+    namespace FileSystem
+    {
+        struct FileContentsData;
+    }
+    
     class Texture2D;
     class TextureCube;
 
@@ -19,6 +24,13 @@ namespace ae3d
         /// \param vertexSource Vertex shader source.
         /// \param fragmentSource Fragment shader source.
         void Load( const char* vertexSource, const char* fragmentSource );
+
+        /// \param vertexData GLSL Vertex shader file contents.
+        /// \param fragmentData GLSL Fragment shader file contents.
+        /// \param metalVertexShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
+        /// \param metalFragmentShaderName Fragment shader name for Metal renderer. Must be referenced by the application's Xcode project.
+        void Load( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData, const char* metalVertexShaderName, const char* metalFragmentShaderName );
+        
 #if AETHER3D_IOS
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
 #endif

@@ -2,18 +2,25 @@
 #define MESH_RENDERER_COMPONENT
 
 #include <string>
+#include <vector>
 
 namespace ae3d
 {
+    class Material;
     class Mesh;
+    class Matrix44;
     
     /// Contains a mesh.
     class MeshRendererComponent
     {
     public:
+        /// \param material Material.
+        /// \param subMeshIndex Sub mesh index.
+        void SetMaterial( Material* material, int subMeshIndex );
+
         /// \param aMesh Mesh.
-        void SetMesh( Mesh* aMesh ) { mesh = aMesh; }
-        
+        void SetMesh( Mesh* aMesh );
+
         /// \return Textual representation of component.
         std::string GetSerialized() const;
         
@@ -30,10 +37,11 @@ namespace ae3d
         /// \return Component at index or null if index is invalid.
         static MeshRendererComponent* Get( unsigned index );
         
-        /* \param projectionModelMatrix Projection and model matrix combined. */
-        void Render( const float* projectionModelMatrix );
+        /// \param modelViewProjectionMatrix Model-view-projection matrix.
+        void Render( const Matrix44& modelViewProjectionMatrix );
 
         Mesh* mesh = nullptr;
+        std::vector< Material* > materials;
     };
 }
 

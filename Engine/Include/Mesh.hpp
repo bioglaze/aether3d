@@ -12,7 +12,7 @@ namespace ae3d
     }
 
     struct SubMesh;
-
+    
     /// Contains a mesh. Can contain submeshes.
     class Mesh
     {
@@ -30,7 +30,7 @@ namespace ae3d
 
         /// \param other Other.
         Mesh& operator=( const Mesh& other );
-        
+
         /// \param meshData Data from .ae3d mesh file.
         /// \return Load result.
         LoadResult Load( const FileSystem::FileContentsData& meshData );

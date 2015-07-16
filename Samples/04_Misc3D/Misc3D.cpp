@@ -9,8 +9,10 @@
 #include "TransformComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
+#include "Material.hpp"
 #include "Mesh.hpp"
 #include "Scene.hpp"
+#include "Shader.hpp"
 #include "System.hpp"
 #include "RenderTexture.hpp"
 #include "Texture2D.hpp"
@@ -75,6 +77,17 @@ int main()
     cube2.AddComponent< TransformComponent >();
     cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -100 } );
 
+    Shader shader;
+    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag" );
+
+    Material material;
+    material.SetShader( &shader );
+    material.SetTexture( "textureMap", &fontTex );
+    material.SetVector( "tint", { 1, 0, 0, 1} );
+
+    cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    
     Scene scene;
     
     TextureCube skybox;

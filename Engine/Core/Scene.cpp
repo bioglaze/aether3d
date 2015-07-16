@@ -151,7 +151,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
             Matrix44 mvp;
             Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, view, mvp );
             Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
-            meshRenderer->Render( mvp.m );
+            meshRenderer->Render( mvp );
         }
     }
     

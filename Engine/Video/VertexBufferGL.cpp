@@ -4,6 +4,11 @@
 #include "GfxDevice.hpp"
 #include "Vec3.hpp"
 
+namespace Global
+{
+    GLuint activeVao = -1;
+}
+
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTC;
@@ -137,7 +142,11 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
 void ae3d::VertexBuffer::Bind() const
 {
-    glBindVertexArray( vaoId );
+    if (Global::activeVao != vaoId)
+    {
+        glBindVertexArray( vaoId );
+        Global::activeVao = vaoId;
+    }
 }
 
 void ae3d::VertexBuffer::Draw() const

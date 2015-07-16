@@ -1,5 +1,6 @@
 #include "Shader.hpp"
 #include <GL/glxw.h>
+#include "FileSystem.hpp"
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
@@ -122,6 +123,15 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     id = program;
     uniformLocations = GetUniformLocations();
+}
+
+void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData,
+                         const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/ )
+{
+    const std::string vertexStr = std::string( std::begin( vertexData.data ), std::end( vertexData.data ) );
+    const std::string fragmentStr = std::string( std::begin( fragmentData.data ), std::end( fragmentData.data ) );
+
+    Load( vertexStr.c_str(), fragmentStr.c_str() );
 }
 
 void ae3d::Shader::Use()
