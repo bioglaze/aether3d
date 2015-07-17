@@ -18,7 +18,6 @@
 #include <cstring>
 #include "GfxDevice.hpp"
 
-// Based on https://github.com/nxsy/xcb_handmade/blob/master/src/xcb_handmade.cpp
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
 // Event tutorial: http://xcb.freedesktop.org/tutorial/events/
 
@@ -234,20 +233,13 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         return -1;
     }
     
-    /* Create XID's for colormap and window */
     xcb_colormap_t colormap = xcb_generate_id( connection );
     WindowGlobal::window = xcb_generate_id( connection );
 
     WindowGlobal::windowWidth = width == 0 ? screen->width_in_pixels : width;
     WindowGlobal::windowHeight = height == 0 ? screen->height_in_pixels : height;
     
-    xcb_create_colormap(
-                        connection,
-                        XCB_COLORMAP_ALLOC_NONE,
-                        colormap,
-                        screen->root,
-                        visualID
-                        );
+    xcb_create_colormap( connection, XCB_COLORMAP_ALLOC_NONE, colormap, screen->root, visualID );
     
     const uint32_t eventmask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE |
                                XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION;
@@ -293,8 +285,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
             std::cerr << "Full screen reply failed" << std::endl;
         }
     }
-    //xcb_change_property( WindowGlobal::connection, XCB_PROP_MODE_REPLACE, WindowGlobal::window, WindowGlobal::EWMH._NET_WM_STATE, XCB_ATOM, 32, 1, &(WindowGlobal::EWMH._NET_WM_STATE_FULLSCREEN)); 
-    // End test
     
     GLXWindow glxwindow = glXCreateWindow( display, fb_config, WindowGlobal::window, nullptr );
 
@@ -336,7 +326,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
         return;
     }
     
-    int default_screen = DefaultScreen( WindowGlobal::display );
+    const int default_screen = DefaultScreen( WindowGlobal::display );
 
     WindowGlobal::connection = XGetXCBConnection( WindowGlobal::display );
     LoadAtoms();
@@ -350,10 +340,9 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     XSetEventQueueOwner( WindowGlobal::display, XCBOwnsEventQueue );
 
-    xcb_screen_t* screen = nullptr;
     xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator( xcb_get_setup( WindowGlobal::connection ) );
     for (int screen_num = default_screen; screen_iter.rem && screen_num > 0; --screen_num, xcb_screen_next( &screen_iter ));
-    screen = screen_iter.data;
+    xcb_screen_t* screen = screen_iter.data;
     
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
     
@@ -363,8 +352,12 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     }
     
     GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
-    
-    const char *title = "Aether3D Game Engine";
+    SetTitle( "Aether3D Game Engine" );
+    WindowGlobal::isOpen = true;
+}
+
+void ae3d::Window::SetTitle( const char* title )
+{
     xcb_change_property(WindowGlobal::connection,
                         XCB_PROP_MODE_REPLACE,
                         WindowGlobal::window,
@@ -373,7 +366,6 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
                         8,
                         strlen (title),
                         title );
-    WindowGlobal::isOpen = true;
 }
 
 void ae3d::Window::GetSize( int& outWidth, int& outHeight )
@@ -427,7 +419,7 @@ void ae3d::Window::PumpEvents()
                 }
                 
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = be->event_x;
-                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = be->event_y;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - be->event_y;
             }
             break;
             case XCB_KEY_PRESS:
@@ -448,7 +440,7 @@ void ae3d::Window::PumpEvents()
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = e->event_x;
-                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = e->event_y;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - e->event_y;
                 break;
             }
             case XCB_CLIENT_MESSAGE:

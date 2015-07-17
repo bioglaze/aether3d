@@ -55,12 +55,15 @@ void ae3d::Scene::Remove( GameObject* gameObject )
 
 void ae3d::Scene::Render()
 {
+    GfxDevice::ResetFrameStatistics();
+
     if (mainCamera == nullptr || (mainCamera != nullptr && mainCamera->GetComponent<CameraComponent>() == nullptr))
     {
         return;
     }
     
     std::list< GameObject* > rtCameras;
+    std::list< GameObject* > cameras;
     
     for (auto gameObject : gameObjects)
     {
@@ -75,16 +78,28 @@ void ae3d::Scene::Render()
         {
             rtCameras.push_back( gameObject );
         }
+        if (cameraComponent && cameraComponent->GetTargetTexture() == nullptr)
+        {
+            cameras.push_back( gameObject );
+        }
     }
     
     for (auto rtCamera : rtCameras)
     {
         RenderWithCamera( rtCamera );
     }
+
+    for (auto camera : cameras)
+    {
+        if (camera != mainCamera && camera->GetComponent<TransformComponent>())
+        {
+            RenderWithCamera( camera );
+        }
+    }
     
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
     
-    if (camera != nullptr)
+    if (camera != nullptr && mainCamera->GetComponent<TransformComponent>())
     {
         RenderWithCamera( mainCamera );
     }
@@ -97,9 +112,12 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
     
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
-    GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
-    GfxDevice::ResetFrameStatistics();
 
+    if (camera->GetClearFlag() == CameraComponent::ClearFlag::DepthAndColor)
+    {
+        GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+    }
+    
     if (skybox != nullptr)
     {
         Matrix44 view;

@@ -36,7 +36,6 @@ namespace ae3d
 
         /// \param name Texture uniform name.
         /// \param texture Texture.
-        /// \param textureUnit Texture unit.
         void SetTexture( const char* name, TextureCube* texture );
         
         /// \param name Integer uniform name.

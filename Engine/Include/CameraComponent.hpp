@@ -13,6 +13,9 @@ namespace ae3d
     class CameraComponent
     {
     public:
+        /// Clear flag.
+        enum class ClearFlag { DepthAndColor, DontClear };
+        
         /// \return Projection matrix.
         const Matrix44& GetProjection() const { return projectionMatrix; }
 
@@ -52,6 +55,12 @@ namespace ae3d
 
         /// \param renderTexture2D 2D render texture.
         void SetTargetTexture( RenderTexture2D* renderTexture2D );
+
+        /// \param clearFlag Clear flag. Defaults to DepthAndColor.
+        void SetClearFlag( ClearFlag clearFlag );
+
+        /// \return Clear flag.
+        ClearFlag GetClearFlag() const { return clearFlag; }
         
         /// \return Textual representation of component.
         std::string GetSerialized() const;
@@ -90,6 +99,7 @@ namespace ae3d
         float fovDegrees = 45;
         float aspect = 1;
         bool isOrthographic = true; // If false, assume perspective
+        ClearFlag clearFlag = ClearFlag::DepthAndColor;
     };
 }
 #endif

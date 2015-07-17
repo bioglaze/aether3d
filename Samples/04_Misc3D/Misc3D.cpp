@@ -29,6 +29,7 @@ int main()
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
+    Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();
     System::InitAudio();
     //System::InitGamePad();
@@ -44,8 +45,9 @@ int main()
     GameObject camera2d;
     camera2d.AddComponent<CameraComponent>();
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera2d.GetComponent<CameraComponent>()->SetClearColor( { 0.5f, 0.5f, 0.5f } );
-
+    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DontClear );
+    camera2d.AddComponent<TransformComponent>();
+    
     Texture2D fontTex;
     fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
     
@@ -97,8 +99,8 @@ int main()
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
     scene.SetSkybox( &skybox );
-    scene.Add( &camera );
     scene.Add( &camera2d );
+    scene.Add( &camera );
     scene.Add( &cube );
     scene.Add( &cube2 );
     scene.Add( &statsContainer );

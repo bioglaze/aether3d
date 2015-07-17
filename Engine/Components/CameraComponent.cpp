@@ -52,6 +52,11 @@ void ae3d::CameraComponent::SetTargetTexture( ae3d::RenderTexture2D* renderTextu
     targetTexture = renderTexture2D;
 }
 
+void ae3d::CameraComponent::SetClearFlag( ClearFlag aClearFlag )
+{
+    clearFlag = aClearFlag;
+}
+
 std::string ae3d::CameraComponent::GetSerialized() const
 {
     std::stringstream outStream;

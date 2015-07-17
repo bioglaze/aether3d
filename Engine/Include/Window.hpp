@@ -92,6 +92,9 @@ namespace ae3d
         /// \return True if there are more events.
         bool PollEvent( WindowEvent& outEvent );
 
+        /// \param title Title.
+        void SetTitle( const char* title );
+        
         /// Displays the contents of the screen.
         void SwapBuffers();
     }

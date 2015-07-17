@@ -28,9 +28,8 @@ ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
 void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection )
 {
     std::vector< SubMesh >& subMeshes = mesh->GetSubMeshes();
-    int subMeshIndex = 0;
     
-    for (auto& subMesh : subMeshes)
+    for (std::size_t subMeshIndex = 0; subMeshIndex < subMeshes.size(); ++subMeshIndex)
     {
         if (materials[ subMeshIndex ] == nullptr || !materials[ subMeshIndex ]->IsValidShader())
         {
@@ -42,8 +41,8 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection )
         materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
         materials[ subMeshIndex ]->Apply();
         
-        subMesh.vertexBuffer.Bind();
-        subMesh.vertexBuffer.Draw();
+        subMeshes[ subMeshIndex ].vertexBuffer.Bind();
+        subMeshes[ subMeshIndex ].vertexBuffer.Draw();
 
         ++subMeshIndex;
     }

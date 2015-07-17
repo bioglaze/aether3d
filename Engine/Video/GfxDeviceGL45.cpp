@@ -85,7 +85,6 @@ void ae3d::GfxDevice::Init( int width, int height )
     
     SetBackBufferDimensionAndFBO( width, height );
     glEnable( GL_DEPTH_TEST );
-    glEnable( GL_CULL_FACE );
 }
 
 void ae3d::GfxDevice::IncDrawCalls()

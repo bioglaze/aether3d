@@ -77,6 +77,7 @@ namespace ae3d
 #endif
         struct IntDefaultedToMinusOne
         {
+            /// -1 means unused/missing uniform.
             int i = -1;
         };
 
