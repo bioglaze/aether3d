@@ -23,6 +23,9 @@ namespace ae3d
         /// Applies the uniforms into the shader. Called internally.
         void Apply();
 
+        /// \param enable Enable backface culling. Defaults to true.
+        void SetBackFaceCulling( bool enable ) { cullBackFaces = enable; }
+        
         /// \param name Name. This is a uniform in the shader.
         /// \param matrix 4x4 matrix.
         void SetMatrix( const char* name, const Matrix44& matrix );
@@ -64,6 +67,7 @@ namespace ae3d
         std::unordered_map< std::string, TextureCube* > texCubes;
         std::unordered_map< std::string, Matrix44 > mat4s;
         Shader* shader = nullptr;
+        bool cullBackFaces = true;
     };
 }
 

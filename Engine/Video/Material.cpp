@@ -1,4 +1,5 @@
 #include "Material.hpp"
+#include "GfxDevice.hpp"
 #include "Texture2D.hpp"
 #include "Shader.hpp"
 
@@ -54,6 +55,8 @@ void ae3d::Material::Apply()
     {
         shader->SetMatrix( mat4.first.c_str(), mat4.second.m );
     }
+
+    GfxDevice::SetBackFaceCulling( cullBackFaces );
 }
 
 void ae3d::Material::SetMatrix( const char* name, const Matrix44& matrix )

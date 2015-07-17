@@ -58,8 +58,6 @@ namespace ae3d
             Vec3 position;
             float u, v;
             Vec3 normal;
-            Vec4 tangent;
-            Vec4 color;
         };
 
         /// Binds the buffer. Must be called before Draw or DrawRange.

@@ -29,7 +29,8 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
-
+    camera.AddComponent<TransformComponent>();
+    
     Texture2D spriteTex;
     spriteTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 

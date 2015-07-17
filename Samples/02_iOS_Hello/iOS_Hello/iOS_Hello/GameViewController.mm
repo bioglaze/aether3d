@@ -73,6 +73,7 @@
     
     camera.AddComponent<ae3d::CameraComponent>();
     camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1);
+    camera.AddComponent<ae3d::TransformComponent>();
     //scene.Add( &camera );
 
     spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );

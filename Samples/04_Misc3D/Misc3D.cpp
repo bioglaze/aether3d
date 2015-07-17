@@ -62,7 +62,7 @@ int main()
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( { 20, 0, 0 } );
 
     Mesh cubeMesh;
-    cubeMesh.Load( FileSystem::FileContents( "shuttle.ae3d" ) );
+    cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
     GameObject cube;
     cube.AddComponent< MeshRendererComponent >();
@@ -82,11 +82,15 @@ int main()
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag" );
 
+    Texture2D asphaltTex;
+    asphaltTex.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
+
     Material material;
     material.SetShader( &shader );
-    material.SetTexture( "textureMap", &fontTex );
+    material.SetTexture( "textureMap", &asphaltTex );
     material.SetVector( "tint", { 1, 0, 0, 1} );
-
+    material.SetBackFaceCulling( true );
+    
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     

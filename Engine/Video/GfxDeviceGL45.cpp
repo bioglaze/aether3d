@@ -206,7 +206,19 @@ void ae3d::GfxDevice::ClearScreen(unsigned clearFlags)
     glClear( mask );
 }
 
-void ae3d::GfxDevice::SetClearColor(float red, float green, float blue)
+void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
+{
+    if (enable)
+    {
+        glEnable( GL_CULL_FACE );
+    }
+    else
+    {
+        glDisable( GL_CULL_FACE );
+    }
+}
+
+void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 {
     glClearColor( red, green, blue, 1 );
 }

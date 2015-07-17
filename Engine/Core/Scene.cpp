@@ -1,7 +1,7 @@
 #include "Scene.hpp"
-#include <list>
 #include <string>
 #include <sstream>
+#include <vector>
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
@@ -62,8 +62,10 @@ void ae3d::Scene::Render()
         return;
     }
     
-    std::list< GameObject* > rtCameras;
-    std::list< GameObject* > cameras;
+    std::vector< GameObject* > rtCameras;
+    rtCameras.reserve( gameObjects.size() / 4 );
+    std::vector< GameObject* > cameras;
+    cameras.reserve( gameObjects.size() / 4 );
     
     for (auto gameObject : gameObjects)
     {
@@ -139,6 +141,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
         auto transform = gameObject->GetComponent< TransformComponent >();
         
         auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
+
+        GfxDevice::SetBackFaceCulling( false );
         
         if (spriteRenderer)
         {

@@ -77,14 +77,13 @@ namespace WindowGlobal
         }
     }
     
-    Display* display;
-    xcb_connection_t *connection = nullptr;
+    Display* display = nullptr;
+    xcb_connection_t* connection = nullptr;
     xcb_window_t window;
-    xcb_key_symbols_t *key_symbols;
+    xcb_key_symbols_t* key_symbols = nullptr;
     xcb_atom_t wm_protocols;
     xcb_atom_t wm_delete_window;
 
-    // Testing fullscreen.
     xcb_ewmh_connection_t EWMH;
     xcb_intern_atom_cookie_t* EWMHCookie = nullptr;
     
@@ -210,9 +209,8 @@ void LoadAtoms()
 
 static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
-    GLXFBConfig* fb_configs = nullptr;
     int num_fb_configs = 0;
-    fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
+    GLXFBConfig* fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
     
     if (!fb_configs || num_fb_configs == 0)
     {
@@ -270,6 +268,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         {
             std::cout << "Fullscreen not supported." << std::endl;
         }
+
         xcb_ewmh_request_change_wm_state( &WindowGlobal::EWMH, XDefaultScreen( display ), WindowGlobal::window,
                                           XCB_EWMH_WM_STATE_ADD, WindowGlobal::EWMH._NET_WM_STATE_FULLSCREEN, 0,
                                           XCB_EWMH_CLIENT_SOURCE_TYPE_NORMAL
@@ -280,6 +279,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     
         xcb_generic_error_t* error;
         xcb_get_window_attributes_reply_t* reply = xcb_get_window_attributes_reply( WindowGlobal::connection, xcb_get_window_attributes( WindowGlobal::connection, WindowGlobal::window ), &error );
+
         if (!reply)
         {
             std::cerr << "Full screen reply failed" << std::endl;
@@ -425,7 +425,7 @@ void ae3d::Window::PumpEvents()
             case XCB_KEY_PRESS:
             case XCB_KEY_RELEASE:
             {
-                xcb_key_press_event_t *e = (xcb_key_press_event_t *)event;
+                const xcb_key_press_event_t* e = (xcb_key_press_event_t *)event;
                 const bool isDown = (response_type == XCB_KEY_PRESS);
                 const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
 
@@ -436,7 +436,7 @@ void ae3d::Window::PumpEvents()
             }
             case XCB_MOTION_NOTIFY:
             {
-                xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
+                const xcb_motion_notify_event_t* e = (xcb_motion_notify_event_t*)event;
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = e->event_x;
@@ -445,7 +445,8 @@ void ae3d::Window::PumpEvents()
             }
             case XCB_CLIENT_MESSAGE:
             {
-                xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
+                const xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
+
                 if (client_message_event->type == WindowGlobal::wm_protocols)
                 {
                     if (client_message_event->data.data32[0] == WindowGlobal::wm_delete_window)

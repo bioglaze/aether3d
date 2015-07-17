@@ -88,7 +88,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     
     // Normal.
     glEnableVertexAttribArray( normalChannel );
-    glVertexAttribPointer( normalChannel, 3, GL_FLOAT, GL_FALSE, sizeof( VertexPTN ), (GLvoid*)offsetof( struct VertexPTN, color ) );
+    glVertexAttribPointer( normalChannel, 3, GL_FLOAT, GL_FALSE, sizeof( VertexPTN ), (GLvoid*)offsetof( struct VertexPTN, normal ) );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
