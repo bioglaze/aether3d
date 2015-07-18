@@ -198,8 +198,9 @@ int main()
             }
         }
 
-        const std::string drawCalls = text + std::to_string( System::Statistics::GetDrawCallCount() );
-        statsContainer.GetComponent<TextRendererComponent>()->SetText( drawCalls.c_str() );
+        std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
+        stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         scene.Render();
         Window::SwapBuffers();

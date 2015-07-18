@@ -57,6 +57,10 @@ namespace ae3d
 
         void IncDrawCalls();
         int GetDrawCalls();
+        void IncVertexBufferBinds();
+        int GetVertexBufferBinds();
+        void IncTextureBinds();
+        int GetTextureBinds();
         void ResetFrameStatistics();
 
         void ReleaseGPUObjects();

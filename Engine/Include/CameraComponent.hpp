@@ -9,7 +9,7 @@ namespace ae3d
 {
     class RenderTexture2D;
 
-    /// Camera views the scene.
+    /// Camera views the scene. Game Object containing a camera component must also contain a transform component to render anything.
     class CameraComponent
     {
     public:

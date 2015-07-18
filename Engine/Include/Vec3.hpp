@@ -18,9 +18,6 @@ namespace ae3d
         /// Z coordinate.
         float z = 0;
         
-        /// Copy constructor.
-        Vec3( const Vec3& other ) = default;
-
         /**
            \brief Cross product.
 
@@ -74,7 +71,7 @@ namespace ae3d
          \return Distance.
          \see DistanceSquared()
          */
-        static float Distance(const Vec3& v1, const Vec3& v2)
+        static float Distance( const Vec3& v1, const Vec3& v2 )
         {
             return (v2 - v1).Length();
         }
@@ -87,7 +84,7 @@ namespace ae3d
          \return Squared distance.
          \see Distance()
          */
-        static float DistanceSquared(const Vec3& v1, const Vec3& v2)
+        static float DistanceSquared( const Vec3& v1, const Vec3& v2 )
         {
             const Vec3 sub = v2 - v1;
             return sub.x * sub.x + sub.y * sub.y + sub.z * sub.z;
@@ -112,10 +109,16 @@ namespace ae3d
          \param normal Normal.
          \return Reflected vector.
          */
-        static Vec3 Reflect(const Vec3& vec, const Vec3& normal) { return vec - normal * Dot(normal, vec) * 2; }
+        static Vec3 Reflect( const Vec3& vec, const Vec3& normal ) { return vec - normal * Dot( normal, vec ) * 2; }
 
         // Default constructor
         Vec3() {}
+
+        /// Copy constructor.
+        Vec3( const Vec3& other ) = default;
+
+        /// Move constructor.
+        Vec3( Vec3&& other ) = default;
 
         /**
          Constructor.
@@ -124,7 +127,7 @@ namespace ae3d
          \param ay Y-coordinate.
          \param az Z-coordinate.
          */
-        Vec3(float ax, float ay, float az) : x(ax), y(ay), z(az) {}
+        Vec3( float ax, float ay, float az ) : x(ax), y(ay), z(az) {}
 
         /**
            Divides by a scalar operator.
@@ -132,7 +135,7 @@ namespace ae3d
            \param f Scalar value.
            \return a vector that has its values divided by f.
            */
-        Vec3 operator/(float f) const
+        Vec3 operator/( float f ) const
         {
             const float inv = 1.0f / f;
             return Vec3(x * inv, y * inv, z * inv);
@@ -144,9 +147,9 @@ namespace ae3d
            \param v Vector value.
            \return a vector that has its values divided by v.
            */
-        Vec3 operator/(const Vec3& v) const
+        Vec3 operator/( const Vec3& v ) const
         {
-            return Vec3(x / v.x, y / v.y, z / v.z);
+            return Vec3( x / v.x, y / v.y, z / v.z );
         }
 
         /**
@@ -156,7 +159,7 @@ namespace ae3d
            */
         Vec3 operator-() const
         {
-            return Vec3(-x, -y, -z);
+            return Vec3( -x, -y, -z );
         }
 
         /**
@@ -165,9 +168,9 @@ namespace ae3d
            \param v a vector that is to be subtracted from this vector.
            \return result of the subtraction.
            */
-        Vec3 operator-(const Vec3& v) const
+        Vec3 operator-( const Vec3& v ) const
         {
-            return Vec3(x - v.x, y - v.y, z - v.z);
+            return Vec3( x - v.x, y - v.y, z - v.z );
         }
 
         /**
@@ -176,9 +179,9 @@ namespace ae3d
            \param v a vector that is to be added to this vector.
            \return A vector that is the sum of this vector and v.
            */
-        Vec3 operator+(const Vec3& v) const
+        Vec3 operator+( const Vec3& v ) const
         {
-            return Vec3(x + v.x, y + v.y, z + v.z);
+            return Vec3( x + v.x, y + v.y, z + v.z );
         }
 
         /**
@@ -187,9 +190,9 @@ namespace ae3d
            \param f a value that is to be added to this vector.
            \return A vector that is the sum of this vector and c.
            */
-        Vec3 operator+(float f) const
+        Vec3 operator+( float f ) const
         {
-            return Vec3(x + f, y + f, z + f);
+            return Vec3( x + f, y + f, z + f );
         }
 
         /**
@@ -198,7 +201,7 @@ namespace ae3d
            \param v Vector that is to be subtracted from this vector.
            \return Reference to this vector.
            */
-        Vec3& operator-=(const Vec3& v)
+        Vec3& operator-=( const Vec3& v )
         {
             x -= v.x;
             y -= v.y;
@@ -213,7 +216,7 @@ namespace ae3d
          \param v Vector that is to be added to this vector.
          \return Reference to this vector.
          */
-        Vec3& operator+=(const Vec3& v)
+        Vec3& operator+=( const Vec3& v )
         {
             x += v.x;
             y += v.y;
@@ -228,7 +231,7 @@ namespace ae3d
            \param f A value that is to be multiplied with this vector.
            \return Reference to this vector.
            */
-        Vec3& operator*=(float f)
+        Vec3& operator*=( float f )
         {
             x *= f;
             y *= f;
@@ -238,12 +241,12 @@ namespace ae3d
         }
 
         /**
-        Operator divide and assign.
-
-        \param f A value that is to be divided with this vector.
-        \return Reference to this vector.
+           Operator divide and assign.
+           
+           \param f A value that is to be divided with this vector.
+           \return Reference to this vector.
         */
-        Vec3& operator/=(float f)
+        Vec3& operator/=( float f )
         {
             const float inv = 1.0f / f;
 
@@ -260,7 +263,7 @@ namespace ae3d
            \param v A value that is to be multiplied with this vector.
            \return Reference to this vector.
            */
-        Vec3& operator*=(const Vec3& v)
+        Vec3& operator*=( const Vec3& v )
         {
             x *= v.x;
             y *= v.y;
@@ -275,7 +278,7 @@ namespace ae3d
            \param v a vector that is assigned to this vector.
            \return Reference to this vector.
            */
-        Vec3& operator=(const Vec3& v) { x = v.x; y = v.y; z = v.z; return *this; }
+        Vec3& operator=( const Vec3& v ) { x = v.x; y = v.y; z = v.z; return *this; }
 
         /**
            Multiplication operator.
@@ -285,7 +288,7 @@ namespace ae3d
            */
         Vec3 operator*(const Vec3& v) const
         {
-            return Vec3(x * v.x, y * v.y, z * v.z);
+            return Vec3( x * v.x, y * v.y, z * v.z );
         }
 
         /**
@@ -294,9 +297,9 @@ namespace ae3d
            \param f A value that is multiplied with this vector.
            \return This vector multiplied by f.
            */
-        Vec3 operator*(float f) const
+        Vec3 operator*( float f ) const
         {
-            return Vec3(x * f, y * f, z * f);
+            return Vec3( x * f, y * f, z * f );
         }
 
         /**
@@ -320,7 +323,7 @@ namespace ae3d
         }
 
         /// \return length.
-        float Length() const { return std::sqrt(x * x + y * y + z * z); }
+        float Length() const { return std::sqrt( x * x + y * y + z * z ); }
 
         /// Resets this vector's values to 0.
         void Zero() { x = y = z = 0; }

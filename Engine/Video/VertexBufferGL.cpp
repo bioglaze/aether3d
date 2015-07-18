@@ -146,6 +146,7 @@ void ae3d::VertexBuffer::Bind() const
     {
         glBindVertexArray( vaoId );
         Global::activeVao = vaoId;
+        GfxDevice::IncVertexBufferBinds();
     }
 }
 

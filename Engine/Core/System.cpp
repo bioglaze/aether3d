@@ -113,3 +113,13 @@ int ae3d::System::Statistics::GetDrawCallCount()
 {
     return GfxDevice::GetDrawCalls();
 }
+
+int ae3d::System::Statistics::GetVertexBufferBindCount()
+{
+    return GfxDevice::GetVertexBufferBinds();
+}
+
+int ae3d::System::Statistics::GetTextureBindCount()
+{
+    return GfxDevice::GetTextureBinds();
+}

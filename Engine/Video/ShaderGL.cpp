@@ -200,6 +200,7 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_2D, texture->GetID() );
+    GfxDevice::IncTextureBinds();
     SetInt( name, textureUnit );
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
@@ -210,6 +211,7 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* textur
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_CUBE_MAP, texture->GetID() );
+    GfxDevice::IncTextureBinds();
     SetInt( name, textureUnit );
     
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );

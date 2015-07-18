@@ -131,6 +131,11 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     is.read( (char*)&m().aabbMin, sizeof( m().aabbMin ) );
     is.read( (char*)&m().aabbMax, sizeof( m().aabbMax ) );
 
+    if (m().aabbMin.x > m().aabbMax.x || m().aabbMin.y > m().aabbMax.y || m().aabbMin.z > m().aabbMax.z)
+    {
+        return LoadResult::Corrupted;
+    }
+    
     uint16_t meshCount;
     is.read( (char*)&meshCount, sizeof( meshCount ) );
 

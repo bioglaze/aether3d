@@ -57,6 +57,7 @@
 
    Run the Makefile in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    On GNU/Linux you need at least the following packages: libopenal-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+
    \subsection Bugs
 
    <ul>
@@ -113,6 +114,8 @@ namespace ae3d
         namespace Statistics
         {
             int GetDrawCallCount();
+            int GetVertexBufferBindCount();
+            int GetTextureBindCount();
         }
     }
 }
