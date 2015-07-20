@@ -6,7 +6,7 @@
 
 namespace Global
 {
-    GLuint activeVao = -1;
+    GLuint activeVao = 0;
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )

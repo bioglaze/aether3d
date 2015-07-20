@@ -125,7 +125,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = message == WM_LBUTTONDOWN ? ae3d::WindowEventType::Mouse1Down : ae3d::WindowEventType::Mouse1Up;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseY = HIWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
         }
             break;
         case WM_RBUTTONDOWN:
@@ -134,7 +134,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[WindowGlobal::eventIndex].type = message == WM_RBUTTONDOWN ? ae3d::WindowEventType::Mouse2Down : ae3d::WindowEventType::Mouse2Up;
             WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseY = HIWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
         }
             break;
         case WM_MBUTTONDOWN:
@@ -142,7 +142,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = message == WM_MBUTTONDOWN ? ae3d::WindowEventType::MouseMiddleDown : ae3d::WindowEventType::MouseMiddleUp;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = HIWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
             break;
         case WM_MOUSEWHEEL:
         {
@@ -150,7 +150,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = delta < 0 ? ae3d::WindowEventType::MouseWheelScrollDown : ae3d::WindowEventType::MouseWheelScrollUp;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = HIWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
         }
             break;
         case WM_MOUSEMOVE:
@@ -162,7 +162,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD( lParam );
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = HIWORD( lParam );
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
             break;
         case WM_CLOSE:
             WindowGlobal::IncEventIndex();
@@ -350,6 +350,11 @@ namespace ae3d
         CreateRenderer();
         WindowGlobal::isOpen = true;
         GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
+    }
+
+    void Window::SetTitle( const char* title )
+    {
+        SetWindowTextA( WindowGlobal::hwnd, title );
     }
 
     void Window::GetSize( int& outWidth, int& outHeight )

@@ -117,9 +117,6 @@ namespace ae3d
         /// Copy constructor.
         Vec3( const Vec3& other ) = default;
 
-        /// Move constructor.
-        Vec3( Vec3&& other ) = default;
-
         /**
          Constructor.
 

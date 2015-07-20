@@ -112,6 +112,7 @@
     </ClCompile>
     <ClCompile Include="..\Video\DDSLoader.cpp" />
     <ClCompile Include="..\Video\GfxDeviceGL45.cpp" />
+    <ClCompile Include="..\Video\Material.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />
     <ClCompile Include="..\Video\RendererGL.cpp" />
     <ClCompile Include="..\Video\RenderTextureGL.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="..\Include\Font.hpp" />
     <ClInclude Include="..\Include\GameObject.hpp" />
     <ClInclude Include="..\Include\Macros.hpp" />
+    <ClInclude Include="..\Include\Material.hpp" />
     <ClInclude Include="..\Include\Matrix.hpp" />
     <ClInclude Include="..\Include\Mesh.hpp" />
     <ClInclude Include="..\Include\MeshRendererComponent.hpp" />

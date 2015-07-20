@@ -97,6 +97,9 @@
     <ClCompile Include="..\Core\Mesh.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\Material.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -213,6 +216,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MeshRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Material.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
