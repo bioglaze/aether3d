@@ -12,6 +12,7 @@ namespace ae3d
     }
 
     struct SubMesh;
+    struct Vec3;
     
     /// Contains a mesh. Can contain submeshes.
     class Mesh
@@ -35,6 +36,12 @@ namespace ae3d
         /// \param meshData Data from .ae3d mesh file.
         /// \return Load result.
         LoadResult Load( const FileSystem::FileContentsData& meshData );
+        
+        /// \return Axis-aligned bounding box minimum in local coordinates.
+        const Vec3& GetAABBMin() const;
+        
+        /// \return Axis-aligned bounding box maximum in local coordinates.
+        const Vec3& GetAABBMax() const;
         
       private:
         friend class MeshRendererComponent;

@@ -8,6 +8,7 @@ namespace ae3d
 {
     class Material;
     class Mesh;
+    class Frustum;
     struct Matrix44;
     
     /// Contains a mesh.
@@ -38,7 +39,9 @@ namespace ae3d
         static MeshRendererComponent* Get( unsigned index );
         
         /// \param modelViewProjectionMatrix Model-view-projection matrix.
-        void Render( const Matrix44& modelViewProjectionMatrix );
+        /// \param cameraFrustum Camera frustum.
+        /// \param localToWorld Transforms mesh AABB from mesh-local space into world-space.
+        void Render( const Matrix44& modelViewProjectionMatrix, const Frustum& cameraFrustum, const Matrix44& localToWorld );
 
         Mesh* mesh = nullptr;
         std::vector< Material* > materials;

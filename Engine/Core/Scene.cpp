@@ -5,13 +5,14 @@
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
+#include "Frustum.hpp"
+#include "GameObject.hpp"
+#include "GfxDevice.hpp"
 #include "MeshRendererComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
-#include "GfxDevice.hpp"
 #include "Renderer.hpp"
-#include "GameObject.hpp"
 #include "System.hpp"
 
 extern ae3d::Renderer renderer;
@@ -126,11 +127,29 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
         auto cameraTrans = cameraGo->GetComponent< TransformComponent >();
         cameraTrans->GetLocalRotation().GetMatrix( view );
         camera->SetView( view );    
-        //Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
-        //frustum.Update( localPosition, viewDir );
         renderer.RenderSkybox( skybox, *camera );
     }
+
+    Matrix44 view;
+    cameraGo->GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
+    Matrix44 translation;
+    translation.Translate( -cameraGo->GetComponent< TransformComponent >()->GetLocalPosition() );
+    Matrix44::Multiply( translation, view, view );
+
+    Frustum frustum;
     
+    if (!camera->isOrthographic)
+    {
+        frustum.SetProjection( camera->GetFovDegrees(), camera->GetAspect(), camera->GetNear(), camera->GetFar() );
+    }
+    else
+    {
+        frustum.SetProjection( camera->GetLeft(), camera->GetRight(), camera->GetBottom(), camera->GetTop(), camera->GetNear(), camera->GetFar() );
+    }
+    
+    const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
+    frustum.Update( cameraGo->GetComponent< TransformComponent >()->GetLocalPosition(), viewDir );
+
     for (auto gameObject : gameObjects)
     {
         if (gameObject == nullptr)
@@ -139,7 +158,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
         }
         
         auto transform = gameObject->GetComponent< TransformComponent >();
-        
         auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
 
         GfxDevice::SetBackFaceCulling( false );
@@ -164,16 +182,13 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
 
         if (meshRenderer)
         {
-            Matrix44 view;
-            cameraGo->GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
-            Matrix44 translation;
-            translation.Translate( -cameraGo->GetComponent< TransformComponent >()->GetLocalPosition() );
-            Matrix44::Multiply( translation, view, view );
+            auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
             
             Matrix44 mvp;
-            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, view, mvp );
+            Matrix44::Multiply( meshLocalToWorld, view, mvp );
             Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
-            meshRenderer->Render( mvp );
+            
+            meshRenderer->Render( mvp, frustum, meshLocalToWorld );
         }
     }
     

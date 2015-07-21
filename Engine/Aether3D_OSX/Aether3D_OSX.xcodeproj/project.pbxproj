@@ -25,6 +25,7 @@
 		AB78D9211B19E685009928E1 /* RenderTextureGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */; };
 		AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */; };
 		AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */; };
+		AB870F9D1B5EBB0C0004BEE5 /* Frustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB870F9C1B5EBB0C0004BEE5 /* Frustum.cpp */; };
 		AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */; };
 		AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */; };
 		AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEF1ABB4C49005BA86D /* Scene.cpp */; };
@@ -86,6 +87,8 @@
 		AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
 		AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
 		AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
+		AB870F9B1B5EBAA90004BEE5 /* Frustum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Frustum.hpp; path = ../Core/Frustum.hpp; sourceTree = "<group>"; };
+		AB870F9C1B5EBB0C0004BEE5 /* Frustum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Frustum.cpp; path = ../Core/Frustum.cpp; sourceTree = "<group>"; };
 		AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GfxDevice.hpp; path = ../Video/GfxDevice.hpp; sourceTree = "<group>"; };
 		AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Texture2D_GL45.cpp; path = ../Video/Texture2D_GL45.cpp; sourceTree = "<group>"; };
 		AB889AEF1ABB4C49005BA86D /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ../Core/Scene.cpp; sourceTree = "<group>"; };
@@ -152,6 +155,8 @@
 				ABBD9DC21AC31EDB005AD2ED /* FileWatcher.hpp */,
 				ABC8B6061B0D0C1A00E5C32B /* FileSystem.cpp */,
 				ABCF19C21AE2D08800822E80 /* Font.cpp */,
+				AB870F9C1B5EBB0C0004BEE5 /* Frustum.cpp */,
+				AB870F9B1B5EBAA90004BEE5 /* Frustum.hpp */,
 				AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */,
 				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
 				AB922E4D1B4039DB000F3488 /* Mesh.cpp */,
@@ -375,6 +380,7 @@
 				AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
+				AB870F9D1B5EBB0C0004BEE5 /* Frustum.cpp in Sources */,
 				AB922E4E1B4039DB000F3488 /* Mesh.cpp in Sources */,
 				AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */,
 				AB77FD581B344CB0001858CC /* TextureCubeGL.cpp in Sources */,

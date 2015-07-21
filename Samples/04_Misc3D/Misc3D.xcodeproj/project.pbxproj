@@ -288,7 +288,7 @@
 					../../../Engine/Include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					../../../../aether3d_build,
+					../../../aether3d_build,
 					/Users/glaze/Documents/src/aether3d_build,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -304,7 +304,7 @@
 					../../../Engine/Include,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					../../../../aether3d_build,
+					../../../aether3d_build,
 					/Users/glaze/Documents/src/aether3d_build,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";

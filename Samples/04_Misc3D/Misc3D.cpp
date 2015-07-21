@@ -28,7 +28,7 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, WindowCreateFlags::Empty/*MSAA16*/ );
+    Window::Create( width, height, WindowCreateFlags::MSAA16 );
     Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();
     System::InitAudio();

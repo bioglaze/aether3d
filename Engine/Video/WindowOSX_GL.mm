@@ -558,7 +558,7 @@ static void CreateGLContext( ae3d::WindowCreateFlags flags )
     NSOpenGLPixelFormatAttribute attributes[] =
     {
         NSOpenGLPFAClosestPolicy,
-        NSOpenGLPFASampleBuffers, sampleBuffers,
+        NSOpenGLPFASampleBuffers, sampleBuffers > 0 ? 1U : 0U,
         NSOpenGLPFASamples, sampleBuffers,
         NSOpenGLPFAAccelerated,
         NSOpenGLPFADoubleBuffer,

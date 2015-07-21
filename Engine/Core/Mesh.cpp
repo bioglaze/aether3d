@@ -58,6 +58,16 @@ ae3d::Mesh& ae3d::Mesh::operator=( const Mesh& other )
     return *this;
 }
 
+const Vec3& ae3d::Mesh::GetAABBMin() const
+{
+    return m().aabbMin;
+}
+
+const Vec3& ae3d::Mesh::GetAABBMax() const
+{
+    return m().aabbMax;
+}
+
 std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
 {
     return m().subMeshes;

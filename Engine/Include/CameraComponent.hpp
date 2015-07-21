@@ -62,8 +62,32 @@ namespace ae3d
         /// \return Clear flag.
         ClearFlag GetClearFlag() const { return clearFlag; }
         
+        /// \return Near plane.
+        float GetNear() const { return nearp; }
+
+        /// \return Far plane.
+        float GetFar() const { return farp; }
+
+        /// \return Aspect ratio.
+        float GetAspect() const { return aspect; }
+
+        /// \return FOV in degrees.
+        float GetFovDegrees() const { return fovDegrees; }
+
         /// \return Textual representation of component.
         std::string GetSerialized() const;
+
+        /// \return Left clipping plane.
+        float GetLeft() const { return orthoParams.left; }
+
+        /// \return Right clipping plane.
+        float GetRight() const { return orthoParams.right; }
+
+        /// \return Bottom clipping plane.
+        float GetBottom() const { return orthoParams.down; }
+
+        /// \return Top clipping plane.
+        float GetTop() const { return orthoParams.top; }
 
     private:
         friend class GameObject;
