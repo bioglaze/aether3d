@@ -538,12 +538,28 @@ static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
     WindowGlobal::isOpen = true;
 }
 
-static void CreateGLContext()
+static void CreateGLContext( ae3d::WindowCreateFlags flags )
 {
+    unsigned sampleBuffers = 0;
+    
+    if (flags & ae3d::WindowCreateFlags::MSAA4)
+    {
+        sampleBuffers = 4;
+    }
+    if (flags & ae3d::WindowCreateFlags::MSAA8)
+    {
+        sampleBuffers = 8;
+    }
+    if (flags & ae3d::WindowCreateFlags::MSAA16)
+    {
+        sampleBuffers = 16;
+    }
+
     NSOpenGLPixelFormatAttribute attributes[] =
     {
         NSOpenGLPFAClosestPolicy,
-        NSOpenGLPFASampleBuffers, 0,
+        NSOpenGLPFASampleBuffers, sampleBuffers,
+        NSOpenGLPFASamples, sampleBuffers,
         NSOpenGLPFAAccelerated,
         NSOpenGLPFADoubleBuffer,
         NSOpenGLPFAClosestPolicy,
@@ -607,8 +623,15 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     [WindowGlobal::application run];
     
     CreateWindow( width, height, flags );
-    CreateGLContext();
+    CreateGLContext( flags );
     GfxDevice::Init( width, height );
+    
+    if ((flags & ae3d::WindowCreateFlags::MSAA4) ||
+        (flags & ae3d::WindowCreateFlags::MSAA8) ||
+        (flags & ae3d::WindowCreateFlags::MSAA16))
+    {
+        ae3d::GfxDevice::SetMultiSampling( true );
+    }
 }
 
 void cocoaProcessEvents()
@@ -683,6 +706,12 @@ bool ae3d::Window::PollEvent( WindowEvent& outEvent )
     outEvent = WindowGlobal::eventStack[ WindowGlobal::eventIndex ];
     --WindowGlobal::eventIndex;
     return true;
+}
+
+void ae3d::Window::SetTitle( const char* title )
+{
+    NSString* tit = [NSString stringWithCString:title encoding:NSUTF8StringEncoding];
+    [window setTitle: tit];
 }
 
 void ae3d::Window::SwapBuffers()

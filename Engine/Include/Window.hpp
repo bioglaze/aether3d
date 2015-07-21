@@ -46,7 +46,10 @@ namespace ae3d
     enum WindowCreateFlags : unsigned
     {
         Empty = 1 << 0,
-        Fullscreen = 1 << 1
+        Fullscreen = 1 << 1,
+        MSAA4 = 1 << 2,
+        MSAA8 = 1 << 3,
+        MSAA16 = 1 << 4
     };
 
     /// Window event is a key press, close event, mouse click etc.

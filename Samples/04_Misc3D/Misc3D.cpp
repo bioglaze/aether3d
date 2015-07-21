@@ -28,7 +28,7 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, WindowCreateFlags::Empty );
+    Window::Create( width, height, WindowCreateFlags::Empty/*MSAA16*/ );
     Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();
     System::InitAudio();
@@ -182,10 +182,6 @@ int main()
                 {
                     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
                 }
-            }
-            if (event.type == WindowEventType::GamePadButtonA)
-            {
-                text = "button a down";
             }
             if (event.type == WindowEventType::MouseMove)
             {

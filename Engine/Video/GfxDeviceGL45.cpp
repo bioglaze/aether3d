@@ -89,6 +89,18 @@ void ae3d::GfxDevice::Init( int width, int height )
     glEnable( GL_DEPTH_TEST );
 }
 
+void ae3d::GfxDevice::SetMultiSampling( bool enable )
+{
+    if (enable)
+    {
+        glEnable( GL_MULTISAMPLE );
+    }
+    else
+    {
+        glDisable( GL_MULTISAMPLE );
+    }
+}
+
 void ae3d::GfxDevice::IncDrawCalls()
 {
     ++GfxDeviceGlobal::drawCalls;
