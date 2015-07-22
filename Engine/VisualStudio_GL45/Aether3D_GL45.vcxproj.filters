@@ -100,6 +100,9 @@
     <ClCompile Include="..\Video\Material.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\Frustum.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -220,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\Material.hpp">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Frustum.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

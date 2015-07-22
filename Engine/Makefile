@@ -41,6 +41,8 @@ endif
 	$(CCOMPILER) $(INCLUDES) $(WARNINGS) -c ThirdParty/GL/glxw.c -o $(OUTPUT_DIR)/glxw.o
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
 	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/GfxDeviceGL45.cpp -o $(OUTPUT_DIR)/GfxDeviceGL45.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RenderTextureGL.cpp -o $(OUTPUT_DIR)/RenderTextureGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
@@ -55,6 +57,8 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/AudioSourceComponent.cpp -o $(OUTPUT_DIR)/AudioSourceComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/MeshRendererComponent.cpp -o $(OUTPUT_DIR)/MeshRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TextRendererComponent.cpp -o $(OUTPUT_DIR)/TextRendererComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/GameObject.cpp -o $(OUTPUT_DIR)/GameObject.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileWatcher.cpp -o $(OUTPUT_DIR)/FileWatcher.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Mesh.cpp -o $(OUTPUT_DIR)/Mesh.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Font.cpp -o $(OUTPUT_DIR)/Font.o
@@ -63,11 +67,8 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileSystem.cpp -o $(OUTPUT_DIR)/FileSystem.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Matrix.cpp -o $(OUTPUT_DIR)/Matrix.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Frustum.cpp -o $(OUTPUT_DIR)/Frustum.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/GameObject.cpp -o $(OUTPUT_DIR)/GameObject.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/GfxDeviceGL45.cpp -o $(OUTPUT_DIR)/GfxDeviceGL45.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RenderTextureGL.cpp -o $(OUTPUT_DIR)/RenderTextureGL.o
 ifeq ($(UNAME), Darwin)
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowOSX_GL.mm -o $(OUTPUT_DIR)/Window.o
 endif

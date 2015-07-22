@@ -97,6 +97,7 @@
     <ClCompile Include="..\Core\FileSystem.cpp" />
     <ClCompile Include="..\Core\FileWatcher.cpp" />
     <ClCompile Include="..\Core\Font.cpp" />
+    <ClCompile Include="..\Core\Frustum.cpp" />
     <ClCompile Include="..\Core\Matrix.cpp" />
     <ClCompile Include="..\Core\MatrixSSE3.cpp" />
     <ClCompile Include="..\Core\Mesh.cpp" />
@@ -127,6 +128,7 @@
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp" />
     <ClInclude Include="..\Core\FileWatcher.hpp" />
+    <ClInclude Include="..\Core\Frustum.hpp" />
     <ClInclude Include="..\Include\AudioClip.hpp" />
     <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />

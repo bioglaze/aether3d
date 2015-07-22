@@ -26,7 +26,7 @@ static x_input_set_state* XInputSetState_ = XInputSetStateStub;
 
 namespace ae3d
 {
-    void CreateRenderer();
+    void CreateRenderer( int samples );
 }
 
 namespace WindowGlobal
@@ -345,11 +345,34 @@ namespace ae3d
             nullptr,    // we aren't using menus
             hInstance,    // application handle
             nullptr );    // used with multiple windows    
-        
+
+        WindowGlobal::hdc = GetDC( WindowGlobal::hwnd );
+
         ShowWindow( WindowGlobal::hwnd, SW_SHOW );
-        CreateRenderer();
+        
+        int samples = 0;
+
+        if (flags & WindowCreateFlags::MSAA4)
+        {
+            samples = 4;
+        }
+        else if (flags & WindowCreateFlags::MSAA8)
+        {
+            samples = 8;
+        }
+        else if (flags & WindowCreateFlags::MSAA16)
+        {
+            samples = 16;
+        }
+
+        CreateRenderer( samples );
         WindowGlobal::isOpen = true;
         GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
+        
+        if (samples > 0)
+        {
+            GfxDevice::SetMultiSampling( true );
+        }
     }
 
     void Window::SetTitle( const char* title )
