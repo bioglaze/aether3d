@@ -7,13 +7,12 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.2 Documentation
+   \mainpage Aether3D Game Engine v0.3 Documentation
 
    \section Introduction
 
    Aether3D is an open source game engine focusing on simplicity, robustness, portability and forward-thinking.
    <br>
-   Current version only has 2D support, but 3D will soon follow.
 
    \section Features
 
@@ -24,7 +23,11 @@
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
    <li>Virtual file system aka .pak archive files for faster loading.</li>
+   <li>Custom mesh format, converters included for .obj and Blender.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
+   <li>Scene serialization.</li>
+   <li>Scene editor built using Qt.</li>
+   <li>XBox controller support.</li>
    </ul>
 
    \section Requirements
@@ -35,7 +38,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.2.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.3.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    

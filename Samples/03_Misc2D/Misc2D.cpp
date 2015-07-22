@@ -110,6 +110,7 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
+    rtCamera.AddComponent<TransformComponent>();
     
     Scene scene;
     scene.Add( &camera );

@@ -75,6 +75,7 @@ namespace ae3d
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
 #endif
+        /// Wraps an int that is defaulted to -1. Needed for uniform handling.
         struct IntDefaultedToMinusOne
         {
             /// -1 means unused/missing uniform.

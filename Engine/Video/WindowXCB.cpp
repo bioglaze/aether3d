@@ -217,10 +217,57 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         std::cerr << "glXGetFBConfigs failed." << std::endl;
         return -1;
     }
+
+    int samples = 0;
+
+    if (flags & ae3d::WindowCreateFlags::MSAA4)
+    {
+        samples = 4;
+    }
+    else if (flags & ae3d::WindowCreateFlags::MSAA8)
+    {
+        samples = 8;
+    }
+    else if (flags & ae3d::WindowCreateFlags::MSAA16)
+    {
+        samples = 16;
+    }
+    
+    const int Visual_attribs[] =
+    {
+        GLX_X_RENDERABLE, True,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        GLX_RENDER_TYPE, GLX_RGBA_BIT,
+        GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
+        GLX_RED_SIZE, 8,
+        GLX_GREEN_SIZE, 8,
+        GLX_BLUE_SIZE, 8,
+        GLX_ALPHA_SIZE, 8,
+        GLX_DEPTH_SIZE, 24,
+        GLX_STENCIL_SIZE, 8,
+        GLX_DOUBLEBUFFER, True,
+        GLX_SAMPLE_BUFFERS, samples > 0 ? 1 : 0,
+        GLX_SAMPLES, samples,
+        None
+    };
+
+    int attribs[ 100 ];
+    memcpy( attribs, Visual_attribs, sizeof( Visual_attribs ) );
+
+    int fbcount;
+    GLXFBConfig fb_config = nullptr;
+    GLXFBConfig* fbConfigs = glXChooseFBConfig( display, DefaultScreen( display ), attribs, &fbcount );
+
+    if (!fbConfigs || fbcount == 0)
+    {
+        std::cerr << "glXChooseFBConfig didn't find any suitable configs." << std::endl;
+        return -1;
+    }
+
+    fb_config = fbConfigs[ 0 ];
     
     /* Select first framebuffer config and query visualID */
     int visualID = 0;
-    GLXFBConfig fb_config = fb_configs[ 0 ];
     glXGetFBConfigAttrib( display, fb_config, GLX_VISUAL_ID, &visualID );
     
     GLXContext context = glXCreateNewContext( display, fb_config, GLX_RGBA_TYPE, nullptr, True );

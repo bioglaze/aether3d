@@ -89,6 +89,7 @@ void ae3d::Scene::Render()
     
     for (auto rtCamera : rtCameras)
     {
+        if (rtCamera->GetComponent<TransformComponent>())
         RenderWithCamera( rtCamera );
     }
 
