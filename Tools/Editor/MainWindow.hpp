@@ -31,6 +31,7 @@ public slots:
     void CommandCreateGameObject();
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
     void HandleGameObjectsAddedOrDeleted();
+    void ShowAbout();
 
 signals:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );

@@ -83,12 +83,12 @@ int main()
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag" );
 
     Texture2D asphaltTex;
-    asphaltTex.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
+    asphaltTex.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
 
     Material material;
     material.SetShader( &shader );
     material.SetTexture( "textureMap", &asphaltTex );
-    material.SetVector( "tint", { 1, 0, 0, 1} );
+    material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
     
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );

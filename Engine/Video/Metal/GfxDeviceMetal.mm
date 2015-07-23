@@ -323,6 +323,14 @@ void ae3d::GfxDevice::SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
 {
 }
 
+void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
+{
+}
+
+void ae3d::GfxDevice::SetMultiSampling( bool enable )
+{
+}
+
 void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture2D* renderTexture2d )
 {
     if ((!currentRenderTarget && !renderTexture2d) ||

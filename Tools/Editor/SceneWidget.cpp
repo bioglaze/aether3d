@@ -8,6 +8,7 @@
 #include "System.hpp"
 #include "FileSystem.hpp"
 #include "TransformComponent.hpp"
+#include "MeshRendererComponent.hpp"
 
 using namespace ae3d;
 
@@ -50,18 +51,39 @@ void SceneWidget::Init()
     System::LoadBuiltinAssets();
 
     camera.AddComponent<CameraComponent>();
-    camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width(), (float)height(), 0, 0, 1 );
-    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0  ) );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() ) / height(), 1, 400 );
+    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
+    camera.AddComponent<TransformComponent>();
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
-    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None );
+    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
     spriteContainer.AddComponent<SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
     sprite->SetTexture( &spriteTex, Vec3( 20, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     spriteContainer.AddComponent<TransformComponent>();
 
+    cubeMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "textured_cube.ae3d" ).c_str() ) );
+    cubeContainer.AddComponent< MeshRendererComponent >();
+    cubeContainer.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    cubeContainer.AddComponent< TransformComponent >();
+    cubeContainer.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -50 } );
+
+    cubeShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ), FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag" );
+
+    cubeMaterial.SetShader( &cubeShader );
+    cubeMaterial.SetTexture( "textureMap", &spriteTex );
+    cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
+    cubeMaterial.SetBackFaceCulling( true );
+
+    cubeContainer.GetComponent< MeshRendererComponent >()->SetMaterial( &cubeMaterial, 0 );
+
     scene.Add( &camera );
     scene.Add( &spriteContainer );
+    scene.Add( &cubeContainer );
+
+    connect( &myTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
+    myTimer.start();
 
     //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
     //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
@@ -85,7 +107,7 @@ void SceneWidget::paintGL()
 void SceneWidget::resizeGL( int width, int height )
 {
     System::InitGfxDeviceForEditor( width, height );
-    camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width ) / height, 1, 400 );
 }
 
 void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
@@ -94,29 +116,163 @@ void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
     {
         //mainWindow->SetSelectedNode( nullptr );
     }
-    else if (aEvent->key() == Qt::Key_A)
+    else if (aEvent->key() == Qt::Key_A && mouseMode == MouseMode::Grab)
     {
+        cameraMoveDir.x = -1;
+    }
+    else if (aEvent->key() == Qt::Key_D && mouseMode == MouseMode::Grab)
+    {
+        cameraMoveDir.x = 1;
+    }
+    else if (aEvent->key() == Qt::Key_Q && mouseMode == MouseMode::Grab)
+    {
+        cameraMoveDir.y = -1;
+    }
+    else if (aEvent->key() == Qt::Key_E && mouseMode == MouseMode::Grab)
+    {
+        cameraMoveDir.y = 1;
+    }
+    else if (aEvent->key() == Qt::Key_W && mouseMode == MouseMode::Grab)
+    {
+        cameraMoveDir.z = -1;
+    }
+    else if (aEvent->key() == Qt::Key_S && mouseMode == MouseMode::Grab)
+    {
+        cameraMoveDir.z = 1;
     }
  }
 
-void SceneWidget::keyReleaseEvent( QKeyEvent* /*aEvent*/ )
+void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
 {
-
+    if (aEvent->key() == Qt::Key_A)
+    {
+        cameraMoveDir.x = 0;
+    }
+    else if (aEvent->key() == Qt::Key_D)
+    {
+        cameraMoveDir.x = 0;
+    }
+    else if (aEvent->key() == Qt::Key_Q)
+    {
+        cameraMoveDir.y = 0;
+    }
+    else if (aEvent->key() == Qt::Key_E)
+    {
+        cameraMoveDir.y = 0;
+    }
+    else if (aEvent->key() == Qt::Key_W)
+    {
+        cameraMoveDir.z = 0;
+    }
+    else if (aEvent->key() == Qt::Key_S)
+    {
+        cameraMoveDir.z = 0;
+    }
+    /*else if (aEvent->key() == Qt::Key_F)
+    {
+        if (editorState->selectedNode)
+        {
+            CenterSelected();
+        }
+    }*/
 }
 
-void SceneWidget::mousePressEvent( QMouseEvent* /*event*/ )
+void SceneWidget::mousePressEvent( QMouseEvent* event )
 {
+    setFocus();
+
+    if (event->button() == Qt::RightButton && mouseMode != MouseMode::Grab)
+    {
+        mouseMode = MouseMode::Grab;
+        setCursor( Qt::BlankCursor );
+        lastMousePosition[ 0 ] = event->x();
+        lastMousePosition[ 1 ] = event->y();
+    }
+    else if (event->button() == Qt::MiddleButton)
+    {
+        mouseMode = MouseMode::Pan;
+        lastMousePosition[ 0 ] = event->x();
+        lastMousePosition[ 1 ] = event->y();
+        cursor().setShape( Qt::ClosedHandCursor );
+    }
 }
 
 void SceneWidget::mouseReleaseEvent( QMouseEvent* /*event*/ )
 {
-    setFocus();
+    if (mouseMode == MouseMode::Grab)
+    {
+        mouseMode = MouseMode::Normal;
+        unsetCursor();
+    }
+    else if (mouseMode == MouseMode::Pan)
+    {
+        cameraMoveDir.x = 0;
+        cameraMoveDir.y = 0;
+        mouseMode = MouseMode::Normal;
+        cursor().setShape( Qt::ArrowCursor );
+    }
 }
 
 bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
 {
     if (event->type() == QEvent::MouseMove)
     {
+        const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+
+        float deltaX = (lastMousePosition[ 0 ] - mouseEvent->x()) * 0.1f;
+        float deltaY = (lastMousePosition[ 1 ] - mouseEvent->y()) * 0.1f;
+
+        if (mouseMode == MouseMode::Grab)
+        {
+            QPoint globalPos = mapToGlobal(QPoint(mouseEvent->x(), mouseEvent->y()));
+
+            int x = mouseEvent->x();
+            int y = mouseEvent->y();
+
+            if (globalPos.x() < 5)
+            {
+                x = desktop.geometry().width() - 10;
+                cursor().setPos( desktop.geometry().width() - 10, globalPos.y() );
+            }
+            else if (globalPos.x() > desktop.geometry().width() - 5)
+            {
+                x = 10;
+                cursor().setPos( 10, globalPos.y() );
+            }
+
+            if (globalPos.y() < 5)
+            {
+                cursor().setPos( globalPos.x(), desktop.geometry().height() - 10 );
+            }
+            else if (globalPos.y() > desktop.geometry().height() - 10 )
+            {
+                cursor().setPos( globalPos.x(), 10 );
+            }
+
+            deltaX = deltaX > 5 ? 5 : deltaX;
+            deltaX = deltaX < -5 ? -5 : deltaX;
+
+            deltaY = deltaY > 5 ? 5 : deltaY;
+            deltaY = deltaY < -5 ? -5 : deltaY;
+
+            camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 0.0f, 1.0f, 0.0f ), deltaX );
+            camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 1.0f, 0.0f, 0.0f ), deltaY );
+
+            lastMousePosition[ 0 ] = x;
+            lastMousePosition[ 1 ] = y;
+            return true;
+        }
+        else if (mouseMode == MouseMode::Pan)
+        {
+            cameraMoveDir.x = deltaX * 0.1f;
+            cameraMoveDir.y = -deltaY * 0.1f;
+            camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x );
+            camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y );
+            cameraMoveDir.x = cameraMoveDir.y = 0;
+            lastMousePosition[ 0 ] = mouseEvent->x();
+            lastMousePosition[ 1 ] = mouseEvent->y();
+            return true;
+        }
     }
     else if (event->type() == QEvent::Quit)
     {
@@ -126,8 +282,20 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
     return false;
 }
 
-void SceneWidget::wheelEvent( QWheelEvent * /*event*/)
+void SceneWidget::wheelEvent( QWheelEvent* event )
 {
+    const float dir = event->angleDelta().y() < 0 ? -1 : 1;
+    const float speed = dir;
+    camera.GetComponent< ae3d::TransformComponent >()->MoveForward( speed );
+}
+
+void SceneWidget::UpdateCamera()
+{
+    const float speed = 0.2f;
+    camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x * speed );
+    camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y * speed );
+    camera.GetComponent< ae3d::TransformComponent >()->MoveForward( cameraMoveDir.z * speed );
+    updateGL();
 }
 
 ae3d::GameObject* SceneWidget::CreateGameObject()

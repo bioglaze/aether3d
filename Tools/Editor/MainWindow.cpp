@@ -37,6 +37,11 @@ MainWindow::MainWindow()
     UpdateHierarchy();
 }
 
+void MainWindow::ShowAbout()
+{
+    QMessageBox::about(this, "Controls", "Aether3D Editor by Timo Wiren 2015\n\nControls\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
+}
+
 void MainWindow::HandleGameObjectsAddedOrDeleted()
 {
     UpdateHierarchy();

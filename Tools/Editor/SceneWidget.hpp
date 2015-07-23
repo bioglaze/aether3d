@@ -5,15 +5,24 @@
 #include <list>
 #include <vector>
 #include <QOpenGLWidget>
+#include <QDesktopWidget>
+#include <QTimer>
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "Texture2D.hpp"
 #include "Scene.hpp"
+#include "Mesh.hpp"
+#include "Material.hpp"
+#include "Shader.hpp"
+#include "Vec3.hpp"
 
 class SceneWidget : public QOpenGLWidget
 {
     Q_OBJECT
+
+public slots:
+    void UpdateCamera();
 
 public:
     explicit SceneWidget( QWidget* parent = 0 );
@@ -33,8 +42,6 @@ public:
 
     /// \param path Path to .scene file.
     void LoadSceneFromFile( const char* path );
-
-    //bool IsGameObjectInScene( int index ) const { return gameObjectsInScene[ index ] != 0; }
 
     /// \return scene.
     ae3d::Scene* GetScene() { return &scene; }
@@ -60,12 +67,22 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
 private:
+    enum class MouseMode { Grab, Pan, Normal };
+
     ae3d::GameObject camera;
     ae3d::Texture2D spriteTex;
     ae3d::Scene scene;
     ae3d::GameObject spriteContainer;
+    ae3d::GameObject cubeContainer;
+    ae3d::Material cubeMaterial;
+    ae3d::Mesh cubeMesh;
+    ae3d::Shader cubeShader;
+    ae3d::Vec3 cameraMoveDir;
+    MouseMode mouseMode = MouseMode::Normal;
+    int lastMousePosition[ 2 ];
+    QTimer myTimer;
+    QDesktopWidget desktop;
     std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
-    //std::vector< int > gameObjectsInScene; // Using int to avoid bool vector specialization madness.
 };
 
 #endif
