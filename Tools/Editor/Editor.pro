@@ -38,7 +38,7 @@ macx {
 linux {
     QMAKE_CXXFLAGS += -std=c++11
     LIBS += -L$$PWD/../../../aether3d_build -laether3d_linux
-    LIBS += -ldl -fPIC -lxcb -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
+    LIBS += -ldl -fPIC -lxcb -lxcb-keysyms -lxcb-icccm -lxcb-ewmh -lX11-xcb -lX11 -lGL -lopenal
     copyfiles.commands = cp -r $$PWD/copy_to_output/* $$OUT_PWD
 }
 
@@ -52,7 +52,8 @@ SOURCES += \
     WindowMenu.cpp \
     CreateCameraCommand.cpp \
     CommandManager.cpp \
-    CreateGoCommand.cpp
+    CreateGoCommand.cpp \
+    TransformInspector.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -61,4 +62,5 @@ HEADERS += \
     Command.hpp \
     CreateCameraCommand.hpp \
     CommandManager.hpp \
-    CreateGoCommand.hpp
+    CreateGoCommand.hpp \
+    TransformInspector.hpp

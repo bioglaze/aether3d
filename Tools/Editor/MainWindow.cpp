@@ -2,6 +2,7 @@
 #include <memory>
 #include <fstream>
 #include <string>
+#include <QBoxLayout>
 #include <QSplitter>
 #include <QTreeWidget>
 #include <QKeyEvent>
@@ -12,6 +13,7 @@
 #include "WindowMenu.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
+#include "TransformInspector.hpp"
 
 MainWindow::MainWindow()
 {
@@ -19,22 +21,47 @@ MainWindow::MainWindow()
     sceneTree->setColumnCount( 1 );
     // TODO: Change itemClicked to something that can handle multi-selection properly.
     connect( sceneTree, &QTreeWidget::itemClicked, [&](QTreeWidgetItem* item, int /* column */) { SelectTreeItem( item ); });
+    connect( sceneTree, &QTreeWidget::itemEntered, [&](QTreeWidgetItem* item, int /* column */) { SelectTreeItem( item ); });
     connect( sceneTree, &QTreeWidget::itemChanged, [&](QTreeWidgetItem* item, int /* column */) { HierarchyItemRenamed( item ); });
     sceneTree->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
     sceneWidget = new SceneWidget();
+    sceneWidget->SetMainWindow( this );
     setWindowTitle( "Editor" );
     connect( sceneWidget, SIGNAL(GameObjectsAddedOrDeleted()), this, SLOT(HandleGameObjectsAddedOrDeleted()) );
 
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
 
+    transformInspector.Init( this );
+    QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
+    inspectorLayout->addWidget( transformInspector.GetWidget() );
+    inspectorContainer = new QWidget();
+    inspectorContainer->setLayout( inspectorLayout );
+    inspectorContainer->setMinimumWidth( 380 );
+
     QSplitter* splitter = new QSplitter();
     splitter->addWidget( sceneTree );
     splitter->addWidget( sceneWidget );
+    splitter->addWidget( inspectorContainer );
     setCentralWidget( splitter );
 
     UpdateHierarchy();
+    UpdateInspector();
+}
+
+void MainWindow::UpdateInspector()
+{
+    if (sceneWidget->selectedGameObjects.empty())
+    {
+        std::cout << "Hiding inspector." << std::endl;
+        transformInspector.GetWidget()->hide();
+    }
+    else
+    {
+        std::cout << "Showing inspector." << std::endl;
+        transformInspector.GetWidget()->show();
+    }
 }
 
 void MainWindow::ShowAbout()
@@ -87,6 +114,7 @@ void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
         std::cout << "selection: " << index << std::endl;
     }
 
+    UpdateInspector();
     emit GameObjectSelected( selectedObjects );
 }
 
@@ -98,6 +126,9 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     {
         std::list< ae3d::GameObject* > emptyList;
         emit GameObjectSelected( emptyList );
+        sceneWidget->selectedGameObjects.clear();
+        sceneTree->clearSelection();
+        UpdateInspector();
     }
     else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
     {
@@ -111,6 +142,8 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
                 sceneWidget->selectedGameObjects.clear();
                 std::list< ae3d::GameObject* > emptyList;
                 emit GameObjectSelected( emptyList );
+                sceneTree->clearSelection();
+                UpdateInspector();
             }
         }
 

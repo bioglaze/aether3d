@@ -5,11 +5,13 @@
 #include <QMainWindow>
 #include "WindowMenu.hpp"
 #include "CommandManager.hpp"
+#include "TransformInspector.hpp"
 
 class SceneWidget;
 class QTreeWidget;
 class QKeyEvent;
 class QTreeWidgetItem;
+class QWidget;
 
 namespace ae3d
 {
@@ -41,9 +43,12 @@ private:
     void keyPressEvent( QKeyEvent* event );
     void SelectTreeItem( QTreeWidgetItem* item );
     void HierarchyItemRenamed( QTreeWidgetItem* item );
+    void UpdateInspector();
 
+    QWidget* inspectorContainer = nullptr;
     QTreeWidget* sceneTree = nullptr;
     SceneWidget* sceneWidget = nullptr;
+    TransformInspector transformInspector;
     WindowMenu windowMenu;
     CommandManager commandManager;
 };

@@ -48,6 +48,8 @@ public:
 
     ae3d::GameObject* GetGameObject( int index ) { return gameObjects[ index ].get(); }
 
+    void SetMainWindow( QWidget* aMainWindow ) { mainWindow = aMainWindow; }
+
     // TODO: Maybe create an editor state class and put this there.
     std::list< int > selectedGameObjects;
 
@@ -66,13 +68,15 @@ protected:
     void mouseReleaseEvent( QMouseEvent* event );
     bool eventFilter(QObject *obj, QEvent *event);
 
+private slots:
+    void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
+
 private:
     enum class MouseMode { Grab, Pan, Normal };
 
     ae3d::GameObject camera;
     ae3d::Texture2D spriteTex;
     ae3d::Scene scene;
-    ae3d::GameObject spriteContainer;
     ae3d::GameObject cubeContainer;
     ae3d::Material cubeMaterial;
     ae3d::Mesh cubeMesh;
@@ -82,6 +86,7 @@ private:
     int lastMousePosition[ 2 ];
     QTimer myTimer;
     QDesktopWidget desktop;
+    QWidget* mainWindow = nullptr;
     std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
 };
 

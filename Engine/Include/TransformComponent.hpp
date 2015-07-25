@@ -18,6 +18,9 @@ namespace ae3d
         /// \return Local rotation.
         const Quaternion& GetLocalRotation() const { return localRotation; }
 
+        /// \return Local scale.
+        float GetLocalScale() const { return localScale; }
+        
         /// \param localPosition Local position.
         /// \param center Point we're looking at.
         /// \param up Up vector.

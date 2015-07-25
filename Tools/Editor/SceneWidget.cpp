@@ -37,7 +37,7 @@ SceneWidget::SceneWidget( QWidget* parent ) : QOpenGLWidget( parent )
 #if __APPLE__
     fmt.setVersion( 4, 1 );
 #else
-    fmt.setVersion( 4, 3 );
+    fmt.setVersion( 4, 4 );
 #endif
     //fmt.setDepthBufferSize(24);
     fmt.setProfile( QSurfaceFormat::CoreProfile );
@@ -47,6 +47,8 @@ SceneWidget::SceneWidget( QWidget* parent ) : QOpenGLWidget( parent )
 
 void SceneWidget::Init()
 {
+    System::Assert( mainWindow != nullptr, "mainWindow not set.");
+
     System::InitGfxDeviceForEditor( width(), height() );
     System::LoadBuiltinAssets();
 
@@ -57,11 +59,6 @@ void SceneWidget::Init()
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
-
-    spriteContainer.AddComponent<SpriteRendererComponent>();
-    auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
-    sprite->SetTexture( &spriteTex, Vec3( 20, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
-    spriteContainer.AddComponent<TransformComponent>();
 
     cubeMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "textured_cube.ae3d" ).c_str() ) );
     cubeContainer.AddComponent< MeshRendererComponent >();
@@ -79,12 +76,12 @@ void SceneWidget::Init()
     cubeContainer.GetComponent< MeshRendererComponent >()->SetMaterial( &cubeMaterial, 0 );
 
     scene.Add( &camera );
-    scene.Add( &spriteContainer );
     scene.Add( &cubeContainer );
 
     connect( &myTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
     myTimer.start();
-
+    connect(mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
+            this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
     //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
     //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
 }
@@ -296,6 +293,11 @@ void SceneWidget::UpdateCamera()
     camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y * speed );
     camera.GetComponent< ae3d::TransformComponent >()->MoveForward( cameraMoveDir.z * speed );
     updateGL();
+}
+
+void SceneWidget::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
+{
+    // TODO: Highlight etc.
 }
 
 ae3d::GameObject* SceneWidget::CreateGameObject()
