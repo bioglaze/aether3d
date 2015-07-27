@@ -165,7 +165,7 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
 std::string ae3d::TransformComponent::GetSerialized() const
 {
     std::stringstream outStream;
-    outStream << "transform\nposition" << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\nrotation";
+    outStream << "transform\nposition " << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\nrotation ";
     outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\n\n";
     
     return outStream.str();

@@ -9,6 +9,9 @@
 #include "FileSystem.hpp"
 #include "TransformComponent.hpp"
 #include "MeshRendererComponent.hpp"
+#include "Mesh.hpp"
+
+#include <iostream>
 
 using namespace ae3d;
 
@@ -22,6 +25,31 @@ std::string AbsoluteFilePath( const std::string& relativePath )
     dir.cdUp();
 #endif
     return dir.absoluteFilePath( relativePath.c_str() ).toUtf8().constData();
+}
+
+void SceneWidget::TransformGizmo::Init( Shader* shader )
+{
+    translateTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
+
+    translateMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "cursor_translate.ae3d" ).c_str() ) );
+
+    translateMaterial.SetShader( shader );
+    translateMaterial.SetTexture( "textureMap", &translateTex );
+    translateMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
+    translateMaterial.SetBackFaceCulling( true );
+
+    go.AddComponent< MeshRendererComponent >();
+    go.GetComponent< MeshRendererComponent >()->SetMesh( &translateMesh );
+    go.AddComponent< TransformComponent >();
+    go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &translateMaterial, 0 );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &translateMaterial, 1 );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &translateMaterial, 2 );
+}
+
+void SceneWidget::TransformGizmo::SetPosition( const ae3d::Vec3& position )
+{
+    go.GetComponent< TransformComponent >()->SetLocalPosition( position );
 }
 
 SceneWidget::SceneWidget( QWidget* parent ) : QOpenGLWidget( parent )
@@ -58,7 +86,7 @@ void SceneWidget::Init()
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
-    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
+    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
 
     cubeMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "textured_cube.ae3d" ).c_str() ) );
     cubeContainer.AddComponent< MeshRendererComponent >();
@@ -66,24 +94,39 @@ void SceneWidget::Init()
     cubeContainer.AddComponent< TransformComponent >();
     cubeContainer.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -50 } );
 
-    cubeShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ), FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag" );
+    unlitShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ), FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag" );
 
-    cubeMaterial.SetShader( &cubeShader );
+    cubeMaterial.SetShader( &unlitShader );
     cubeMaterial.SetTexture( "textureMap", &spriteTex );
     cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     cubeMaterial.SetBackFaceCulling( true );
 
     cubeContainer.GetComponent< MeshRendererComponent >()->SetMaterial( &cubeMaterial, 0 );
 
+    transformGizmo.Init( &unlitShader );
+
+    AddEditorObjects();
     scene.Add( &camera );
     scene.Add( &cubeContainer );
+    //scene.Add( &transformGizmo.go );
 
     connect( &myTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
     myTimer.start();
     connect(mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
             this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
+
     //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
     //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
+}
+
+void SceneWidget::RemoveEditorObjects()
+{
+    scene.Remove( &camera );
+}
+
+void SceneWidget::AddEditorObjects()
+{
+    scene.Add( &camera );
 }
 
 void SceneWidget::initializeGL()
@@ -297,7 +340,30 @@ void SceneWidget::UpdateCamera()
 
 void SceneWidget::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
 {
-    // TODO: Highlight etc.
+    std::cout << "scene got selected event. go count: " << gameObjects.size() << std::endl;
+
+    if (gameObjects.empty())
+    {
+        scene.Remove( &transformGizmo.go );
+        return;
+    }
+
+    Vec3 avgPosition;
+
+    for (auto go : gameObjects)
+    {
+        auto transform = go->GetComponent< ae3d::TransformComponent >();
+
+        if (transform)
+        {
+            avgPosition += transform->GetLocalPosition();
+        }
+    }
+
+    avgPosition /= gameObjects.size();
+
+    transformGizmo.SetPosition( avgPosition );
+    scene.Add( &transformGizmo.go );
 }
 
 ae3d::GameObject* SceneWidget::CreateGameObject()

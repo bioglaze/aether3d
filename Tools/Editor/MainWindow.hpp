@@ -41,7 +41,7 @@ signals:
 private:
     void UpdateHierarchy();
     void keyPressEvent( QKeyEvent* event );
-    void SelectTreeItem( QTreeWidgetItem* item );
+    void HierarchySelectionChanged();
     void HierarchyItemRenamed( QTreeWidgetItem* item );
     void UpdateInspector();
 

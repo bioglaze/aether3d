@@ -19,9 +19,7 @@ MainWindow::MainWindow()
 {
     sceneTree = new QTreeWidget();
     sceneTree->setColumnCount( 1 );
-    // TODO: Change itemClicked to something that can handle multi-selection properly.
-    connect( sceneTree, &QTreeWidget::itemClicked, [&](QTreeWidgetItem* item, int /* column */) { SelectTreeItem( item ); });
-    connect( sceneTree, &QTreeWidget::itemEntered, [&](QTreeWidgetItem* item, int /* column */) { SelectTreeItem( item ); });
+    connect( sceneTree, &QTreeWidget::itemSelectionChanged, [&]() { HierarchySelectionChanged(); });
     connect( sceneTree, &QTreeWidget::itemChanged, [&](QTreeWidgetItem* item, int /* column */) { HierarchyItemRenamed( item ); });
     sceneTree->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
@@ -91,10 +89,18 @@ void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
     UpdateHierarchy();
 }
 
-void MainWindow::SelectTreeItem( QTreeWidgetItem* item )
+void MainWindow::HierarchySelectionChanged()
 {
     std::list< ae3d::GameObject* > selectedObjects;
     sceneWidget->selectedGameObjects.clear();
+
+    if (sceneTree->selectedItems().empty())
+    {
+        std::cout << "Empty selection" << std::endl;
+        UpdateInspector();
+        emit GameObjectSelected( selectedObjects );
+        return;
+    }
 
     for (int g = 0; g < sceneWidget->GetGameObjectCount(); ++g)
     {
@@ -176,7 +182,7 @@ void MainWindow::LoadScene()
     if (fileName != "")
     {
         // TODO: Clear scene.
-        // TODO: Ask for confirmation if the scene hasa unsaved modifications.
+        // TODO: Ask for confirmation if the scene has unsaved modifications.
         sceneWidget->LoadSceneFromFile( fileName.toUtf8().constData() );
     }
 }
@@ -191,7 +197,9 @@ void MainWindow::SaveScene()
 
     QString fileName = QFileDialog::getSaveFileName( this, "Save Scene", QDir::homePath() + appendDir, "Scenes (*.scene)" );
     std::ofstream ofs( fileName.toUtf8().constData() );
+    sceneWidget->RemoveEditorObjects();
     ofs << sceneWidget->GetScene()->GetSerialized();
+    sceneWidget->AddEditorObjects();
     const bool saveSuccess = ofs.is_open();
 
     if (!saveSuccess && fileName.toUtf8() != "")
@@ -219,7 +227,7 @@ void MainWindow::UpdateHierarchy()
     sceneTree->insertTopLevelItems( 0, nodes );
 
     // Highlights selected game objects.
-    for (int i = 0; i < count; ++i)
+    /*for (int i = 0; i < count; ++i)
     {
         for (auto goIndex : sceneWidget->selectedGameObjects)
         {
@@ -228,5 +236,5 @@ void MainWindow::UpdateHierarchy()
                 sceneTree->setCurrentItem( nodes.at(i) );
             }
         }
-    }
+    }*/
 }

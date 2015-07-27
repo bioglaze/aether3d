@@ -43,6 +43,10 @@ public:
     /// \param path Path to .scene file.
     void LoadSceneFromFile( const char* path );
 
+    void RemoveEditorObjects();
+
+    void AddEditorObjects();
+
     /// \return scene.
     ae3d::Scene* GetScene() { return &scene; }
 
@@ -74,14 +78,27 @@ private slots:
 private:
     enum class MouseMode { Grab, Pan, Normal };
 
+    struct TransformGizmo
+    {
+        void Init( ae3d::Shader* shader );
+        void SetPosition( const ae3d::Vec3& position );
+
+        ae3d::GameObject go;
+        ae3d::Mesh translateMesh;
+        ae3d::Material translateMaterial;
+        ae3d::Texture2D translateTex;
+    };
+
+    TransformGizmo transformGizmo;
     ae3d::GameObject camera;
     ae3d::Texture2D spriteTex;
     ae3d::Scene scene;
     ae3d::GameObject cubeContainer;
     ae3d::Material cubeMaterial;
     ae3d::Mesh cubeMesh;
-    ae3d::Shader cubeShader;
+    ae3d::Shader unlitShader;
     ae3d::Vec3 cameraMoveDir;
+
     MouseMode mouseMode = MouseMode::Normal;
     int lastMousePosition[ 2 ];
     QTimer myTimer;

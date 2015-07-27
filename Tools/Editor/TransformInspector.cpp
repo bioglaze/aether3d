@@ -2,6 +2,7 @@
 #include <QTableWidget>
 #include "GameObject.hpp"
 #include "TransformComponent.hpp"
+#include "System.hpp"
 
 using namespace ae3d;
 
@@ -19,6 +20,8 @@ void TransformInspector::Init( QWidget* mainWindow )
 
 void TransformInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
 {
+    selectedGameObjects = gameObjects;
+
     if (gameObjects.empty())
     {
         return;
@@ -56,16 +59,28 @@ void TransformInspector::GameObjectSelected( std::list< ae3d::GameObject* > game
     table->setItem( 1, 2, new QTableWidgetItem( buf ) );
 
     // Scale.
-    sprintf( buf, "%.2f", 1.0f/*go->GetComponent< ae3d::TransformComponent >()->GetLocalScale()*/ );
+    sprintf( buf, "%.2f", go->GetComponent< ae3d::TransformComponent >()->GetLocalScale() );
     table->setItem( 2, 0, new QTableWidgetItem( buf ) );
 }
 
 void TransformInspector::FieldsChanged( QTableWidgetItem* item )
 {
-    printf("Field changed\n");
-    Vec3 position;// = editorState->selectedNode->GetPosition();
-    Quaternion rotation;// = editorState->selectedNode->GetRotation();
-    Vec3 rotationEuler;// = rotation.GetEuler();
+    if (selectedGameObjects.empty())
+    {
+        ae3d::System::Assert( false, "transform inspector was visible even though game objects are not selected." );
+        return;
+    }
+
+    ae3d::TransformComponent* transform = selectedGameObjects.front()->GetComponent< ae3d::TransformComponent >();
+
+    if (!transform)
+    {
+        return;
+    }
+
+    Vec3 position = transform->GetLocalPosition();
+    Quaternion rotation = transform->GetLocalRotation();
+    Vec3 rotationEuler = rotation.GetEuler();
 
     const std::string newValue = item->text().toUtf8().constData();
 
@@ -146,18 +161,18 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         try
         {
             const float scale = std::stof( newValue );
-            //editorState->selectedNode->SetScale( scale );
+            transform->SetLocalScale( scale );
         }
         catch (std::invalid_argument& a)
         {
-            //item->setText( std::to_string(editorState->selectedNode->GetScale()).c_str());
+            item->setText( std::to_string( transform->GetLocalScale() ).c_str());
         }
     }
 
-    rotation.FromEuler( rotationEuler );
+    rotation = rotation.FromEuler( rotationEuler );
 
     //std::cout << "Setting rotation from Euler: " << rotationEuler.x << ", " << rotationEuler.y << ", " << rotationEuler.z << std::endl;
 
-    //editorState->selectedNode->SetPosition( position );
-    //editorState->selectedNode->SetRotation( rotation );
+    transform->SetLocalPosition( position );
+    transform->SetLocalRotation( rotation );
 }

@@ -1,6 +1,9 @@
 #include <QApplication>
 #include "MainWindow.hpp"
 
+// TODO: delete all selected game objects.
+// FIXME: deleting gameobjects cause memory corruption that does not crash instantly.
+
 int main( int argc, char *argv[] )
 {
     QApplication a( argc, argv );
