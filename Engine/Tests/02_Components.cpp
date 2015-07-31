@@ -1,5 +1,6 @@
 #include <iostream>
 #include "CameraComponent.hpp"
+#include "FileSystem.hpp"
 #include "GameObject.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
@@ -44,6 +45,21 @@ void TestTransform()
     gGo.AddComponent< TransformComponent >();
     gGo.GetComponent< TransformComponent >()->SetLocalPosition( pos );
     System::Assert( gGo.GetComponent< TransformComponent >()->GetLocalPosition().IsAlmost( pos ), "transform position failed" );
+    
+    TransformComponent copy = *gGo.GetComponent< TransformComponent >();
+    System::Assert( copy.GetLocalPosition().x == gGo.GetComponent< TransformComponent >()->GetLocalPosition().x &&
+                    copy.GetLocalPosition().y == gGo.GetComponent< TransformComponent >()->GetLocalPosition().y &&
+                    copy.GetLocalPosition().z == gGo.GetComponent< TransformComponent >()->GetLocalPosition().z,
+                    "Transform copy failed (position)!" );
+
+    System::Assert( copy.GetLocalRotation().x == gGo.GetComponent< TransformComponent >()->GetLocalRotation().x &&
+                    copy.GetLocalRotation().y == gGo.GetComponent< TransformComponent >()->GetLocalRotation().y &&
+                    copy.GetLocalRotation().z == gGo.GetComponent< TransformComponent >()->GetLocalRotation().z &&
+                    copy.GetLocalRotation().w == gGo.GetComponent< TransformComponent >()->GetLocalRotation().w,
+                    "Transform copy failed (rotation)!" );
+    
+    System::Assert( copy.GetLocalScale() == gGo.GetComponent< TransformComponent >()->GetLocalScale(),
+                   "transform copy failed (scale)!" );
 }
 
 void TestText()
@@ -53,19 +69,36 @@ void TestText()
     gGo.GetComponent< TextRendererComponent >()->SetText( "a" );
     gGo.GetComponent< TextRendererComponent >()->SetText( "" );
     gGo.GetComponent< TextRendererComponent >()->SetText( nullptr );
+    
+    TextRendererComponent copy = *gGo.GetComponent< TextRendererComponent >();
 }
 
 void TestSprite()
 {
     gGo.AddComponent< SpriteRendererComponent >();
     gGo.GetComponent< SpriteRendererComponent >()->SetTexture( nullptr, { 0, 0, 0 }, { 10, 10, 1 }, { 1, 0, 0, 1 } );
+    
+    SpriteRendererComponent copy = *gGo.GetComponent< SpriteRendererComponent >();
 }
 
 void TestMesh()
 {
     Mesh mesh;
+    
+    Mesh::LoadResult loadResult = mesh.Load( FileSystem::FileContents( "notfound" ) );
+    System::Assert( loadResult == Mesh::LoadResult::FileNotFound, "Mesh load result FileNotFound failed!" );
+
+    loadResult = mesh.Load( FileSystem::FileContents( "Makefile.math" ) );
+    System::Assert( loadResult == Mesh::LoadResult::Corrupted, "Mesh load result Corrupted failed!" );
+    
     gGo.AddComponent< MeshRendererComponent >();
     gGo.GetComponent< MeshRendererComponent >()->SetMesh( nullptr );
+    
+    Mesh copy = mesh;
+    System::Assert( copy.GetAABBMin().x == mesh.GetAABBMin().x &&
+                    copy.GetAABBMin().y == mesh.GetAABBMin().y &&
+                    copy.GetAABBMin().z == mesh.GetAABBMin().z,
+                    "Mesh copy failed!" );
 }
 
 int main()

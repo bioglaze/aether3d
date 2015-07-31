@@ -134,7 +134,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
 
     if (magic[ 0 ] != 'a' || magic[ 1 ] != '9')
     {
-        System::Print( "%s is corrupted or old format: Wrong magic number!", meshData.path.c_str() );
+        System::Print( "%s is corrupted or old format: Wrong magic number!\n", meshData.path.c_str() );
         return LoadResult::Corrupted;
     }
 

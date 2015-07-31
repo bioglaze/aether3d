@@ -9,18 +9,18 @@ using namespace ae3d;
 void TransformInspector::Init( QWidget* mainWindow )
 {
     table = new QTableWidget( 3, 3 );
-    table->setHorizontalHeaderLabels(QString("X;Y;Z").split(";"));
-    table->setVerticalHeaderLabels(QString("Position;Rotation;Scale").split(";"));
+    table->setHorizontalHeaderLabels( QString("X;Y;Z").split(";") );
+    table->setVerticalHeaderLabels( QString("Position;Rotation;Scale").split(";") );
     table->setSpan( 2, 0, 1, 3 );
 
-    connect(mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
-            this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
-    connect( table, &QTableWidget::itemChanged, [&](QTableWidgetItem * item) { FieldsChanged( item ); });
+    connect( mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
+             this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );
+    connect( table, &QTableWidget::itemChanged, [&](QTableWidgetItem* item) { FieldsChanged( item ); });
 }
 
 void TransformInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
 {
-    selectedGameObjects = gameObjects;
+    disconnect( table, &QTableWidget::itemChanged, table, nullptr );
 
     if (gameObjects.empty())
     {
@@ -61,26 +61,16 @@ void TransformInspector::GameObjectSelected( std::list< ae3d::GameObject* > game
     // Scale.
     sprintf( buf, "%.2f", go->GetComponent< ae3d::TransformComponent >()->GetLocalScale() );
     table->setItem( 2, 0, new QTableWidgetItem( buf ) );
+
+    connect( table, &QTableWidget::itemChanged, [&](QTableWidgetItem* item) { FieldsChanged( item ); });
 }
 
 void TransformInspector::FieldsChanged( QTableWidgetItem* item )
 {
-    if (selectedGameObjects.empty())
-    {
-        ae3d::System::Assert( false, "transform inspector was visible even though game objects are not selected." );
-        return;
-    }
-
-    ae3d::TransformComponent* transform = selectedGameObjects.front()->GetComponent< ae3d::TransformComponent >();
-
-    if (!transform)
-    {
-        return;
-    }
-
-    Vec3 position = transform->GetLocalPosition();
-    Quaternion rotation = transform->GetLocalRotation();
-    Vec3 rotationEuler = rotation.GetEuler();
+    Vec3 position;
+    Quaternion rotation;
+    Vec3 rotationEuler;
+    float scale = 1;
 
     const std::string newValue = item->text().toUtf8().constData();
 
@@ -160,19 +150,15 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
     {
         try
         {
-            const float scale = std::stof( newValue );
-            transform->SetLocalScale( scale );
+            scale = std::stof( newValue );
         }
         catch (std::invalid_argument& a)
         {
-            item->setText( std::to_string( transform->GetLocalScale() ).c_str());
+            item->setText( "1" );
         }
     }
 
     rotation = rotation.FromEuler( rotationEuler );
 
-    //std::cout << "Setting rotation from Euler: " << rotationEuler.x << ", " << rotationEuler.y << ", " << rotationEuler.z << std::endl;
-
-    transform->SetLocalPosition( position );
-    transform->SetLocalRotation( rotation );
+    emit TransformModified( position, rotation, scale );
 }

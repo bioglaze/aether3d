@@ -25,6 +25,8 @@ public slots:
     void UpdateCamera();
 
 public:
+    enum class GizmoAxis { None, X, Y, Z };
+
     explicit SceneWidget( QWidget* parent = 0 );
 
     void Init();
@@ -100,6 +102,7 @@ private:
     ae3d::Vec3 cameraMoveDir;
 
     MouseMode mouseMode = MouseMode::Normal;
+    GizmoAxis dragAxis = GizmoAxis::None;
     int lastMousePosition[ 2 ];
     QTimer myTimer;
     QDesktopWidget desktop;

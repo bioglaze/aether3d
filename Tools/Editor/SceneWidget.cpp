@@ -1,4 +1,6 @@
 #include "SceneWidget.hpp"
+#include <vector>
+#include <cmath>
 #include <QKeyEvent>
 #include <QSurfaceFormat>
 #include <QApplication>
@@ -8,8 +10,10 @@
 #include "System.hpp"
 #include "FileSystem.hpp"
 #include "TransformComponent.hpp"
+#include "Matrix.hpp"
 #include "MeshRendererComponent.hpp"
 #include "Mesh.hpp"
+#include "Vec3.hpp"
 
 #include <iostream>
 
@@ -25,6 +29,132 @@ std::string AbsoluteFilePath( const std::string& relativePath )
     dir.cdUp();
 #endif
     return dir.absoluteFilePath( relativePath.c_str() ).toUtf8().constData();
+}
+
+void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screenHeight, GameObject& camera, Vec3& outRayOrigin, Vec3& outRayTarget )
+{
+    const float aspect = screenHeight / screenWidth;
+    const float halfWidth = screenWidth * 0.5f;
+    const float halfHeight = screenHeight * 0.5f;
+    const float fov = camera.GetComponent< CameraComponent >()->GetFovDegrees() * (3.1415926535f / 180.0f);
+
+    // Normalizes screen coordinates and scales them to the FOV.
+    const float dx = std::tan( fov * 0.5f ) * (screenX / halfWidth - 1.0f) / aspect;
+    const float dy = std::tan( fov * 0.5f ) * (screenY / halfHeight - 1.0f);
+
+    Matrix44 view;
+    camera.GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
+    Matrix44 translation;
+    translation.Translate( -camera.GetComponent< TransformComponent >()->GetLocalPosition() );
+    Matrix44::Multiply( translation, view, view );
+
+    Matrix44 invView;
+    Matrix44::Invert( view, invView );
+
+    const float farp = camera.GetComponent< CameraComponent >()->GetFar();
+
+    outRayOrigin = camera.GetComponent< TransformComponent >()->GetLocalPosition();
+    outRayTarget = -Vec3( -dx * farp, dy * farp, farp );
+
+    Matrix44::TransformPoint( outRayTarget, invView, &outRayTarget );
+}
+
+template< typename T >
+T Min2( T t1, T t2 )
+{
+    return t1 < t2 ? t1 : t2;
+}
+
+template< typename T >
+T Max2( T t1, T t2 )
+{
+    return t1 > t2 ? t1 : t2;
+}
+
+float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min, const Vec3& max )
+{
+    const Vec3 dir = (target - origin).Normalized();
+
+    Vec3 dirfrac;
+    dirfrac.x = 1.0f / dir.x;
+    dirfrac.y = 1.0f / dir.y;
+    dirfrac.z = 1.0f / dir.z;
+
+    const float t1 = (min.x - origin.x) * dirfrac.x;
+    const float t2 = (max.x - origin.x) * dirfrac.x;
+    const float t3 = (min.y - origin.y) * dirfrac.y;
+    const float t4 = (max.y - origin.y) * dirfrac.y;
+    const float t5 = (min.z - origin.z) * dirfrac.z;
+    const float t6 = (max.z - origin.z) * dirfrac.z;
+
+    const float tmin = Max2< float >( Max2< float >( Min2< float >(t1, t2), Min2< float >(t3, t4)), Min2< float >(t5, t6) );
+    const float tmax = Min2< float >( Min2< float >( Max2< float >(t1, t2), Max2< float >(t3, t4)), Max2< float >(t5, t6) );
+
+    // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+    if (tmax < 0)
+    {
+        return -1.0f;
+    }
+
+    // if tmin > tmax, ray doesn't intersect AABB
+    if (tmin > tmax)
+    {
+        return -1.0f;
+    }
+
+    return tmin;
+}
+
+struct CollisionInfo
+{
+    GameObject* go;
+    std::vector< int > subMeshIndices;
+};
+
+SceneWidget::GizmoAxis CollidesWithGizmo( GameObject& camera, GameObject& gizmo, int screenX, int screenY, int width, int height, float maxDistance )
+{
+    Vec3 rayOrigin, rayTarget;
+    ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
+
+    auto meshRenderer = gizmo.GetComponent< MeshRendererComponent >();
+    auto meshLocalToWorld = gizmo.GetComponent< TransformComponent >() ? gizmo.GetComponent< TransformComponent >()->GetLocalMatrix() : Matrix44::identity;
+    Vec3 oMin, oMax;
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMin(), meshLocalToWorld, &oMin );
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMax(), meshLocalToWorld, &oMax );
+
+    const float meshDistance = IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
+    //std::cout << "gizmo distance: " << meshDistance << std::endl;
+    return (-1 < meshDistance && meshDistance < maxDistance) ? SceneWidget::GizmoAxis::Y : SceneWidget::GizmoAxis::None;
+}
+
+std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector< std::shared_ptr< ae3d::GameObject > >& gameObjects,
+                                           int screenX, int screenY, int width, int height, float maxDistance )
+{
+    Vec3 rayOrigin, rayTarget;
+    ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
+    std::vector< CollisionInfo > outInfo;
+
+    // Collects meshes that collide with the ray.
+    for (auto& go : gameObjects)
+    {
+        //std::cout << "Looping game objects" << std::endl;
+        auto meshRenderer = go->GetComponent< MeshRendererComponent >();
+
+        if (!meshRenderer || !meshRenderer->GetMesh())
+        {
+            continue;
+        }
+
+        auto meshLocalToWorld = go->GetComponent< TransformComponent >() ? go->GetComponent< TransformComponent >()->GetLocalMatrix() : Matrix44::identity;
+        Vec3 oMin, oMax;
+        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMin(), meshLocalToWorld, &oMin );
+        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMax(), meshLocalToWorld, &oMax );
+
+        const float meshDistance = IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
+        //std::cout << "mesh distance: " << meshDistance << std::endl;
+    }
+
+    return outInfo;
 }
 
 void SceneWidget::TransformGizmo::Init( Shader* shader )
@@ -154,7 +284,8 @@ void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
 {
     if (aEvent->key() == Qt::Key_Escape)
     {
-        //mainWindow->SetSelectedNode( nullptr );
+        selectedGameObjects.clear();
+        // TODO: Inform mainWindow
     }
     else if (aEvent->key() == Qt::Key_A && mouseMode == MouseMode::Grab)
     {
@@ -208,13 +339,13 @@ void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
     {
         cameraMoveDir.z = 0;
     }
-    /*else if (aEvent->key() == Qt::Key_F)
+    else if (aEvent->key() == Qt::Key_F)
     {
-        if (editorState->selectedNode)
+        /*if (editorState->selectedNode)
         {
             CenterSelected();
-        }
-    }*/
+        }*/
+    }
 }
 
 void SceneWidget::mousePressEvent( QMouseEvent* event )
@@ -235,10 +366,16 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
         lastMousePosition[ 1 ] = event->y();
         cursor().setShape( Qt::ClosedHandCursor );
     }
+    else if (event->button() == Qt::LeftButton)
+    {
+        dragAxis = CollidesWithGizmo( camera, transformGizmo.go, event->x(), event->y(), width(), height(), 200 );
+    }
 }
 
-void SceneWidget::mouseReleaseEvent( QMouseEvent* /*event*/ )
+void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
 {
+    dragAxis = GizmoAxis::None;
+
     if (mouseMode == MouseMode::Grab)
     {
         mouseMode = MouseMode::Normal;
@@ -250,6 +387,12 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* /*event*/ )
         cameraMoveDir.y = 0;
         mouseMode = MouseMode::Normal;
         cursor().setShape( Qt::ArrowCursor );
+    }
+
+    if (event->button() == Qt::LeftButton)
+    {
+        const QPoint point = mapFromGlobal( QCursor::pos() );
+        auto colliders = GetColliders( camera, gameObjects, point.x(), point.y(), width(), height(), 200 );
     }
 }
 
@@ -312,6 +455,36 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
             lastMousePosition[ 0 ] = mouseEvent->x();
             lastMousePosition[ 1 ] = mouseEvent->y();
             return true;
+        }
+        else if (dragAxis == GizmoAxis::Y)
+        {
+            for (auto goIndex : selectedGameObjects)
+            {
+                GameObject* go = gameObjects[ goIndex ].get();
+                const Vec3 oldPosition = go->GetComponent< TransformComponent >()->GetLocalPosition();
+                float yOffset = deltaY;
+
+                if (yOffset > 1)
+                {
+                    yOffset = 1;
+                }
+                if (yOffset < -1)
+                {
+                    yOffset = -1;
+                }
+
+                const Vec3 newPosition = oldPosition + Vec3( 0, yOffset, 0 );
+                go->GetComponent< TransformComponent >()->SetLocalPosition( newPosition );
+                transformGizmo.SetPosition( newPosition );
+                lastMousePosition[ 0 ] = mouseEvent->x();
+                lastMousePosition[ 1 ] = mouseEvent->y();
+            }
+        }
+        else if (!selectedGameObjects.empty())
+        {
+            GizmoAxis axis = CollidesWithGizmo( camera, transformGizmo.go, mouseEvent->x(), mouseEvent->y(), width(), height(), 200 );
+            Vec4 color = (axis == GizmoAxis::Y) ? Vec4( 1, 0, 0, 1 ) : Vec4( 1, 1, 1, 1 );
+            transformGizmo.translateMaterial.SetVector( "tint", color );
         }
     }
     else if (event->type() == QEvent::Quit)

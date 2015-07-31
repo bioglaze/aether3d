@@ -53,7 +53,8 @@ SOURCES += \
     CreateCameraCommand.cpp \
     CommandManager.cpp \
     CreateGoCommand.cpp \
-    TransformInspector.cpp
+    TransformInspector.cpp \
+    ModifyTransformCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -63,4 +64,5 @@ HEADERS += \
     CreateCameraCommand.hpp \
     CommandManager.hpp \
     CreateGoCommand.hpp \
-    TransformInspector.hpp
+    TransformInspector.hpp \
+    ModifyTransformCommand.hpp

@@ -15,6 +15,9 @@ namespace ae3d
     class MeshRendererComponent
     {
     public:
+        /// \return Mesh.
+        Mesh* GetMesh() const { return mesh; }
+        
         /// \param material Material.
         /// \param subMeshIndex Sub mesh index.
         void SetMaterial( Material* material, int subMeshIndex );

@@ -16,6 +16,9 @@ class QWidget;
 namespace ae3d
 {
     class GameObject;
+    class TransformComponent;
+    struct Vec3;
+    struct Quaternion;
 }
 
 class MainWindow : public QMainWindow
@@ -31,6 +34,8 @@ public slots:
     void SaveScene();
     void CommandCreateCameraComponent();
     void CommandCreateGameObject();
+    void CommandCreateMeshRendererComponent();
+    void CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
     void HandleGameObjectsAddedOrDeleted();
     void ShowAbout();

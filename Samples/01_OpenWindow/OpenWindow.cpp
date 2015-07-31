@@ -36,9 +36,9 @@ int main()
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
+    spriteContainer.AddComponent<TransformComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
     sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-    spriteContainer.AddComponent<TransformComponent>();
     
     Texture2D fontTex;
     fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );

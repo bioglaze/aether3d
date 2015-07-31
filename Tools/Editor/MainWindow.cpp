@@ -13,7 +13,9 @@
 #include "WindowMenu.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
+#include "ModifyTransformCommand.hpp"
 #include "TransformInspector.hpp"
+#include "Quaternion.hpp"
 
 MainWindow::MainWindow()
 {
@@ -27,6 +29,9 @@ MainWindow::MainWindow()
     sceneWidget->SetMainWindow( this );
     setWindowTitle( "Editor" );
     connect( sceneWidget, SIGNAL(GameObjectsAddedOrDeleted()), this, SLOT(HandleGameObjectsAddedOrDeleted()) );
+
+    connect( &transformInspector, SIGNAL(TransformModified( const ae3d::Vec3&, const ae3d::Quaternion&, float )),
+             this, SLOT(CommandModifyTransform( const ae3d::Vec3&, const ae3d::Quaternion&, float )) );
 
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
@@ -52,19 +57,17 @@ void MainWindow::UpdateInspector()
 {
     if (sceneWidget->selectedGameObjects.empty())
     {
-        std::cout << "Hiding inspector." << std::endl;
         transformInspector.GetWidget()->hide();
     }
     else
     {
-        std::cout << "Showing inspector." << std::endl;
         transformInspector.GetWidget()->show();
     }
 }
 
 void MainWindow::ShowAbout()
 {
-    QMessageBox::about(this, "Controls", "Aether3D Editor by Timo Wiren 2015\n\nControls\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
+    QMessageBox::about( this, "Controls", "Aether3D Editor by Timo Wiren 2015\n\nControls:\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
 }
 
 void MainWindow::HandleGameObjectsAddedOrDeleted()
@@ -96,7 +99,6 @@ void MainWindow::HierarchySelectionChanged()
 
     if (sceneTree->selectedItems().empty())
     {
-        std::cout << "Empty selection" << std::endl;
         UpdateInspector();
         emit GameObjectSelected( selectedObjects );
         return;
@@ -114,7 +116,6 @@ void MainWindow::HierarchySelectionChanged()
         }
     }
 
-    std::cout << "printing selection: " << std::endl;
     for (auto index : sceneWidget->selectedGameObjects)
     {
         std::cout << "selection: " << index << std::endl;
@@ -138,8 +139,6 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     }
     else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
     {
-        std::cout << "removing selected objects" << std::endl;
-
         for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
         {
             if (sceneTree->topLevelItem( i )->isSelected())
@@ -167,6 +166,21 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
 void MainWindow::CommandCreateCameraComponent()
 {
     commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
+}
+
+void MainWindow::CommandCreateMeshRendererComponent()
+{
+//commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->AddComponent< ae3d::CameraComponent >();
+    }
+}
+
+void MainWindow::CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
+{
+    std::cout << "CommandModifyTransform" << std::endl;
+    commandManager.Execute( std::make_shared< ModifyTransformCommand >( sceneWidget, newPosition, newRotation, newScale ) );
 }
 
 void MainWindow::CommandCreateGameObject()
