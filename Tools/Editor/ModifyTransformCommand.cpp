@@ -13,6 +13,8 @@ ModifyTransformCommand::ModifyTransformCommand( SceneWidget* aSceneWidget, const
 
 void ModifyTransformCommand::Execute()
 {
+    selectedGameObjects = sceneWidget->selectedGameObjects;
+
     for (auto index : sceneWidget->selectedGameObjects)
     {
         auto transform = sceneWidget->GetGameObject( index )->GetComponent< ae3d::TransformComponent >();
@@ -32,7 +34,7 @@ void ModifyTransformCommand::Execute()
 
 void ModifyTransformCommand::Undo()
 {
-    for (auto index : sceneWidget->selectedGameObjects)
+    for (auto index : selectedGameObjects)
     {
         auto transform = sceneWidget->GetGameObject( index )->GetComponent< ae3d::TransformComponent >();
 

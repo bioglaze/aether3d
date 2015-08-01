@@ -68,6 +68,16 @@ const Vec3& ae3d::Mesh::GetAABBMax() const
     return m().aabbMax;
 }
 
+const Vec3& ae3d::Mesh::GetSubMeshAABBMin( unsigned subMeshIndex ) const
+{
+    return m().subMeshes[ subMeshIndex < m().subMeshes.size() ? subMeshIndex : 0 ].aabbMin;
+}
+
+const Vec3& ae3d::Mesh::GetSubMeshAABBMax( unsigned subMeshIndex ) const
+{
+    return m().subMeshes[ subMeshIndex < m().subMeshes.size() ? subMeshIndex : 0 ].aabbMax;
+}
+
 std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
 {
     return m().subMeshes;

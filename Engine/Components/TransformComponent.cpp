@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include <cmath>
+#include "Matrix.hpp"
 
 namespace
 {
@@ -170,3 +171,15 @@ std::string ae3d::TransformComponent::GetSerialized() const
     
     return outStream.str();
 }
+
+ae3d::Vec3 ae3d::TransformComponent::GetViewDirection() const
+{
+    ae3d::Matrix44 view;
+    GetLocalRotation().GetMatrix( view );
+    Matrix44 translation;
+    translation.Translate( -GetLocalPosition() );
+    Matrix44::Multiply( translation, view, view );
+
+    return Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
+}
+

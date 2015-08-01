@@ -52,7 +52,7 @@ public:
     /// \return scene.
     ae3d::Scene* GetScene() { return &scene; }
 
-    ae3d::GameObject* GetGameObject( int index ) { return gameObjects[ index ].get(); }
+    ae3d::GameObject* GetGameObject( int index ) { return gameObjects.at( index ).get(); }
 
     void SetMainWindow( QWidget* aMainWindow ) { mainWindow = aMainWindow; }
 
@@ -87,7 +87,9 @@ private:
 
         ae3d::GameObject go;
         ae3d::Mesh translateMesh;
-        ae3d::Material translateMaterial;
+        ae3d::Material xAxisMaterial;
+        ae3d::Material yAxisMaterial;
+        ae3d::Material zAxisMaterial;
         ae3d::Texture2D translateTex;
     };
 
@@ -95,7 +97,6 @@ private:
     ae3d::GameObject camera;
     ae3d::Texture2D spriteTex;
     ae3d::Scene scene;
-    ae3d::GameObject cubeContainer;
     ae3d::Material cubeMaterial;
     ae3d::Mesh cubeMesh;
     ae3d::Shader unlitShader;

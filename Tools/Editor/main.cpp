@@ -1,20 +1,24 @@
 #include <QApplication>
 #include "MainWindow.hpp"
 
+// FIXME: deleting gameobjects causes memory corruption that does not crash instantly.
 // TODO: delete all selected game objects.
-// FIXME: deleting gameobjects cause memory corruption that does not crash instantly.
+// TODO: game object delete command
+// TODO: game object rename command
+// TODO: Ray-Triangle intersection for selection.
+// TODO: Prevent empty name for game object
 
 int main( int argc, char *argv[] )
 {
-    QApplication a( argc, argv );
-    a.setKeyboardInputInterval( 10 );
+    QApplication app( argc, argv );
+    app.setKeyboardInputInterval( 10 );
 
     MainWindow mainWindow;
     // Prevents a warning on Windows.
-    mainWindow.setGeometry(200,200,200,200);
+    mainWindow.setGeometry( 200, 200, 200, 200 );
     mainWindow.showMaximized();
-    a.installEventFilter( (QObject*)mainWindow.GetSceneWidget() );
+    app.installEventFilter( (QObject*)mainWindow.GetSceneWidget() );
 
-    return a.exec();
+    return app.exec();
 }
 

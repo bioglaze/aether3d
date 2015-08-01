@@ -141,8 +141,6 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
         
         subMeshes[ subMeshIndex ].vertexBuffer.Bind();
         subMeshes[ subMeshIndex ].vertexBuffer.Draw();
-
-        ++subMeshIndex;
     }
 }
 

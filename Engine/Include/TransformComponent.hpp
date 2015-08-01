@@ -57,6 +57,9 @@ namespace ae3d
         /// \return Textual representation of component.
         std::string GetSerialized() const;
 
+        /// \return View direction (normalized)
+        Vec3 GetViewDirection() const;
+        
     private:
         friend class GameObject;
 

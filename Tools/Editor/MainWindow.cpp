@@ -170,16 +170,11 @@ void MainWindow::CommandCreateCameraComponent()
 
 void MainWindow::CommandCreateMeshRendererComponent()
 {
-//commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
-    if (!sceneWidget->selectedGameObjects.empty())
-    {
-        sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->AddComponent< ae3d::CameraComponent >();
-    }
+    //commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
 }
 
 void MainWindow::CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
 {
-    std::cout << "CommandModifyTransform" << std::endl;
     commandManager.Execute( std::make_shared< ModifyTransformCommand >( sceneWidget, newPosition, newRotation, newScale ) );
 }
 
@@ -239,16 +234,4 @@ void MainWindow::UpdateHierarchy()
     }
 
     sceneTree->insertTopLevelItems( 0, nodes );
-
-    // Highlights selected game objects.
-    /*for (int i = 0; i < count; ++i)
-    {
-        for (auto goIndex : sceneWidget->selectedGameObjects)
-        {
-            if (i == goIndex)
-            {
-                sceneTree->setCurrentItem( nodes.at(i) );
-            }
-        }
-    }*/
 }

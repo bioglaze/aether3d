@@ -42,7 +42,15 @@ namespace ae3d
         
         /// \return Axis-aligned bounding box maximum in local coordinates.
         const Vec3& GetAABBMax() const;
+
+        /// \param subMeshIndex Submesh index. If invalid, the first submesh AABB min is returned.
+        /// \return Axis-aligned bounding box minimum for a submesh in local coordinates.
+        const Vec3& GetSubMeshAABBMin( unsigned subMeshIndex ) const;
         
+        /// \param subMeshIndex Submesh index. If invalid, the first submesh AABB max is returned.
+        /// \return Axis-aligned bounding box maximum in local coordinates.
+        const Vec3& GetSubMeshAABBMax( unsigned subMeshIndex ) const;
+
       private:
         friend class MeshRendererComponent;
         

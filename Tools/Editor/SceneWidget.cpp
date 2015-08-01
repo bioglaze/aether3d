@@ -118,13 +118,50 @@ SceneWidget::GizmoAxis CollidesWithGizmo( GameObject& camera, GameObject& gizmo,
 
     auto meshRenderer = gizmo.GetComponent< MeshRendererComponent >();
     auto meshLocalToWorld = gizmo.GetComponent< TransformComponent >() ? gizmo.GetComponent< TransformComponent >()->GetLocalMatrix() : Matrix44::identity;
+
     Vec3 oMin, oMax;
     Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMin(), meshLocalToWorld, &oMin );
     Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMax(), meshLocalToWorld, &oMax );
 
     const float meshDistance = IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
+
+    if (meshDistance < 0 || meshDistance > maxDistance)
+    {
+        return SceneWidget::GizmoAxis::None;
+    }
+
+    Vec3 upMin, upMax;
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( 2 ), meshLocalToWorld, &upMin );
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( 2 ), meshLocalToWorld, &upMax );
+    const float upDistance = IntersectRayAABB( rayOrigin, rayTarget, upMin, upMax );
+
+    if (-1 < upDistance && upDistance < maxDistance)
+    {
+        return SceneWidget::GizmoAxis::Y;
+    }
+
+    Vec3 rightMin, rightMax;
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( 1 ), meshLocalToWorld, &rightMin );
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( 1 ), meshLocalToWorld, &rightMax );
+    const float rightDistance = IntersectRayAABB( rayOrigin, rayTarget, rightMin, rightMax );
+
+    if (-1 < rightDistance && rightDistance < maxDistance)
+    {
+        return SceneWidget::GizmoAxis::X;
+    }
+
+    Vec3 forwardMin, forwardMax;
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( 0 ), meshLocalToWorld, &forwardMin );
+    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( 0 ), meshLocalToWorld, &forwardMax );
+    const float forwardDistance = IntersectRayAABB( rayOrigin, rayTarget, forwardMin, forwardMax );
+
+    if (-1 < forwardDistance && forwardDistance < maxDistance)
+    {
+        return SceneWidget::GizmoAxis::Z;
+    }
+
     //std::cout << "gizmo distance: " << meshDistance << std::endl;
-    return (-1 < meshDistance && meshDistance < maxDistance) ? SceneWidget::GizmoAxis::Y : SceneWidget::GizmoAxis::None;
+    return SceneWidget::GizmoAxis::None;
 }
 
 std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector< std::shared_ptr< ae3d::GameObject > >& gameObjects,
@@ -160,21 +197,30 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
 void SceneWidget::TransformGizmo::Init( Shader* shader )
 {
     translateTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
-
     translateMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "cursor_translate.ae3d" ).c_str() ) );
 
-    translateMaterial.SetShader( shader );
-    translateMaterial.SetTexture( "textureMap", &translateTex );
-    translateMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
-    translateMaterial.SetBackFaceCulling( true );
+    xAxisMaterial.SetShader( shader );
+    xAxisMaterial.SetTexture( "textureMap", &translateTex );
+    xAxisMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
+    xAxisMaterial.SetBackFaceCulling( true );
+
+    yAxisMaterial.SetShader( shader );
+    yAxisMaterial.SetTexture( "textureMap", &translateTex );
+    yAxisMaterial.SetVector( "tint", { 0, 1, 0, 1 } );
+    yAxisMaterial.SetBackFaceCulling( true );
+
+    zAxisMaterial.SetShader( shader );
+    zAxisMaterial.SetTexture( "textureMap", &translateTex );
+    zAxisMaterial.SetVector( "tint", { 0, 0, 1, 1 } );
+    zAxisMaterial.SetBackFaceCulling( true );
 
     go.AddComponent< MeshRendererComponent >();
     go.GetComponent< MeshRendererComponent >()->SetMesh( &translateMesh );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &xAxisMaterial, 1 );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &yAxisMaterial, 2 );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &zAxisMaterial, 0 );
     go.AddComponent< TransformComponent >();
     go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
-    go.GetComponent< MeshRendererComponent >()->SetMaterial( &translateMaterial, 0 );
-    go.GetComponent< MeshRendererComponent >()->SetMaterial( &translateMaterial, 1 );
-    go.GetComponent< MeshRendererComponent >()->SetMaterial( &translateMaterial, 2 );
 }
 
 void SceneWidget::TransformGizmo::SetPosition( const ae3d::Vec3& position )
@@ -219,10 +265,13 @@ void SceneWidget::Init()
     spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
 
     cubeMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "textured_cube.ae3d" ).c_str() ) );
-    cubeContainer.AddComponent< MeshRendererComponent >();
-    cubeContainer.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cubeContainer.AddComponent< TransformComponent >();
-    cubeContainer.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -50 } );
+
+    gameObjects.push_back( std::make_shared< GameObject >() );
+    gameObjects[ 0 ]->AddComponent< MeshRendererComponent >();
+    gameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    gameObjects[ 0 ]->AddComponent< TransformComponent >();
+    gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -50 } );
+    gameObjects[ 0 ]->SetName( "Game Object" );
 
     unlitShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ), FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag" );
 
@@ -231,13 +280,13 @@ void SceneWidget::Init()
     cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     cubeMaterial.SetBackFaceCulling( true );
 
-    cubeContainer.GetComponent< MeshRendererComponent >()->SetMaterial( &cubeMaterial, 0 );
+    gameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->SetMaterial( &cubeMaterial, 0 );
 
     transformGizmo.Init( &unlitShader );
 
     AddEditorObjects();
     scene.Add( &camera );
-    scene.Add( &cubeContainer );
+    scene.Add( gameObjects[ 0 ].get() );
     //scene.Add( &transformGizmo.go );
 
     connect( &myTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
@@ -282,34 +331,37 @@ void SceneWidget::resizeGL( int width, int height )
 
 void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
 {
+    const bool shift = aEvent->modifiers() & Qt::ShiftModifier;
+    const float speed = shift ? 2 : 1;
+
     if (aEvent->key() == Qt::Key_Escape)
     {
         selectedGameObjects.clear();
-        // TODO: Inform mainWindow
+        emit GameObjectsAddedOrDeleted();
     }
     else if (aEvent->key() == Qt::Key_A && mouseMode == MouseMode::Grab)
     {
-        cameraMoveDir.x = -1;
+        cameraMoveDir.x = -speed;
     }
     else if (aEvent->key() == Qt::Key_D && mouseMode == MouseMode::Grab)
     {
-        cameraMoveDir.x = 1;
+        cameraMoveDir.x = speed;
     }
     else if (aEvent->key() == Qt::Key_Q && mouseMode == MouseMode::Grab)
     {
-        cameraMoveDir.y = -1;
+        cameraMoveDir.y = -speed;
     }
     else if (aEvent->key() == Qt::Key_E && mouseMode == MouseMode::Grab)
     {
-        cameraMoveDir.y = 1;
+        cameraMoveDir.y = speed;
     }
     else if (aEvent->key() == Qt::Key_W && mouseMode == MouseMode::Grab)
     {
-        cameraMoveDir.z = -1;
+        cameraMoveDir.z = -speed;
     }
     else if (aEvent->key() == Qt::Key_S && mouseMode == MouseMode::Grab)
     {
-        cameraMoveDir.z = 1;
+        cameraMoveDir.z = speed;
     }
  }
 
@@ -456,12 +508,29 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
             lastMousePosition[ 1 ] = mouseEvent->y();
             return true;
         }
-        else if (dragAxis == GizmoAxis::Y)
+        else if (dragAxis == GizmoAxis::X || dragAxis == GizmoAxis::Y || dragAxis == GizmoAxis::Z)
         {
+            const Vec3 direction = camera.GetComponent<TransformComponent>()->GetViewDirection();
+
             for (auto goIndex : selectedGameObjects)
             {
+                const Vec3 axisMask { dragAxis == GizmoAxis::X ? 1.0f : 0.0f, dragAxis == GizmoAxis::Y ? 1.0f : 0.0f, dragAxis == GizmoAxis::Z ? 1.0f : 0.0f };
                 GameObject* go = gameObjects[ goIndex ].get();
                 const Vec3 oldPosition = go->GetComponent< TransformComponent >()->GetLocalPosition();
+
+                float xOffset = -deltaX;
+
+                if (xOffset > 1)
+                {
+                    xOffset = 1;
+                }
+                if (xOffset < -1)
+                {
+                    xOffset = -1;
+                }
+
+                float zOffset = -xOffset;
+
                 float yOffset = deltaY;
 
                 if (yOffset > 1)
@@ -473,7 +542,7 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
                     yOffset = -1;
                 }
 
-                const Vec3 newPosition = oldPosition + Vec3( 0, yOffset, 0 );
+                const Vec3 newPosition = oldPosition + Vec3( xOffset * direction.z, yOffset, zOffset * direction.x ) * axisMask;
                 go->GetComponent< TransformComponent >()->SetLocalPosition( newPosition );
                 transformGizmo.SetPosition( newPosition );
                 lastMousePosition[ 0 ] = mouseEvent->x();
@@ -483,8 +552,10 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
         else if (!selectedGameObjects.empty())
         {
             GizmoAxis axis = CollidesWithGizmo( camera, transformGizmo.go, mouseEvent->x(), mouseEvent->y(), width(), height(), 200 );
-            Vec4 color = (axis == GizmoAxis::Y) ? Vec4( 1, 0, 0, 1 ) : Vec4( 1, 1, 1, 1 );
-            transformGizmo.translateMaterial.SetVector( "tint", color );
+
+            transformGizmo.xAxisMaterial.SetVector( "tint", axis == GizmoAxis::X ? Vec4( 1, 1, 1, 1 ) : Vec4( 1, 0, 0, 1 ) );
+            transformGizmo.yAxisMaterial.SetVector( "tint", axis == GizmoAxis::Y ? Vec4( 1, 1, 1, 1 ) : Vec4( 0, 1, 0, 1 ) );
+            transformGizmo.zAxisMaterial.SetVector( "tint", axis == GizmoAxis::Z ? Vec4( 1, 1, 1, 1 ) : Vec4( 0, 0, 1, 1 ) );
         }
     }
     else if (event->type() == QEvent::Quit)
