@@ -40,6 +40,9 @@ public slots:
     void HandleGameObjectsAddedOrDeleted();
     void ShowAbout();
 
+private slots:
+    void OnGameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
+
 signals:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
 

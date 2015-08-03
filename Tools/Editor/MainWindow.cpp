@@ -33,6 +33,9 @@ MainWindow::MainWindow()
     connect( &transformInspector, SIGNAL(TransformModified( const ae3d::Vec3&, const ae3d::Quaternion&, float )),
              this, SLOT(CommandModifyTransform( const ae3d::Vec3&, const ae3d::Quaternion&, float )) );
 
+    connect(this, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
+            this, SLOT(OnGameObjectSelected(std::list< ae3d::GameObject* >)));
+
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
 
@@ -50,6 +53,12 @@ MainWindow::MainWindow()
     setCentralWidget( splitter );
 
     UpdateHierarchy();
+    UpdateInspector();
+}
+
+void MainWindow::OnGameObjectSelected( std::list< ae3d::GameObject* > /*gameObjects*/ )
+{
+    //UpdateHierarchy();
     UpdateInspector();
 }
 
@@ -161,6 +170,10 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
 
         UpdateHierarchy();
     }
+    if (event->key() == Qt::Key_F)
+    {
+        sceneWidget->CenterSelected();
+    }
 }
 
 void MainWindow::CommandCreateCameraComponent()
@@ -170,7 +183,7 @@ void MainWindow::CommandCreateCameraComponent()
 
 void MainWindow::CommandCreateMeshRendererComponent()
 {
-    //commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
+    //commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
 }
 
 void MainWindow::CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
@@ -188,7 +201,7 @@ void MainWindow::LoadScene()
 {
     const QString fileName = QFileDialog::getOpenFileName( this, "Open Scene", "", "Scenes (*.scene)" );
 
-    if (fileName != "")
+    if (!fileName.isEmpty())
     {
         // TODO: Clear scene.
         // TODO: Ask for confirmation if the scene has unsaved modifications.
@@ -211,7 +224,7 @@ void MainWindow::SaveScene()
     sceneWidget->AddEditorObjects();
     const bool saveSuccess = ofs.is_open();
 
-    if (!saveSuccess && fileName.toUtf8() != "")
+    if (!saveSuccess && !fileName.isEmpty())
     {
         QMessageBox::critical( this, "Unable to Save!", "Scene could not be saved." );
     }
@@ -225,12 +238,11 @@ void MainWindow::UpdateHierarchy()
     QList< QTreeWidgetItem* > nodes;
     const int count = sceneWidget->GetGameObjectCount();
 
-    std::cout << "cleared scene tree" << std::endl;
     for (int i = 0; i < count; ++i)
     {
         nodes.append(new QTreeWidgetItem( (QTreeWidget*)0, QStringList( QString( sceneWidget->GetGameObject( i )->GetName().c_str() ) ) ) );
         nodes.back()->setFlags( nodes.back()->flags() | Qt::ItemIsEditable );
-        std::cout << "added to list: " <<  sceneWidget->GetGameObject( i )->GetName()<< std::endl;
+        //std::cout << "added to list: " <<  sceneWidget->GetGameObject( i )->GetName()<< std::endl;
     }
 
     sceneTree->insertTopLevelItems( 0, nodes );

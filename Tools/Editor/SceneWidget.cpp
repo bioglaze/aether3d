@@ -14,6 +14,7 @@
 #include "MeshRendererComponent.hpp"
 #include "Mesh.hpp"
 #include "Vec3.hpp"
+#include "MainWindow.hpp"
 
 #include <iostream>
 
@@ -130,37 +131,21 @@ SceneWidget::GizmoAxis CollidesWithGizmo( GameObject& camera, GameObject& gizmo,
         return SceneWidget::GizmoAxis::None;
     }
 
-    Vec3 upMin, upMax;
-    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( 2 ), meshLocalToWorld, &upMin );
-    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( 2 ), meshLocalToWorld, &upMax );
-    const float upDistance = IntersectRayAABB( rayOrigin, rayTarget, upMin, upMax );
+    const SceneWidget::GizmoAxis axisOrder[] { SceneWidget::GizmoAxis::Z, SceneWidget::GizmoAxis::X, SceneWidget::GizmoAxis::Y };
 
-    if (-1 < upDistance && upDistance < maxDistance)
+    for (int axis = 0; axis < 3; ++axis)
     {
-        return SceneWidget::GizmoAxis::Y;
+        Vec3 aabbMin, aabbMax;
+        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( axis ), meshLocalToWorld, &aabbMin );
+        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( axis ), meshLocalToWorld, &aabbMax );
+        const float aabbDistance = IntersectRayAABB( rayOrigin, rayTarget, aabbMin, aabbMax );
+
+        if (-1 < aabbDistance && aabbDistance < maxDistance)
+        {
+            return axisOrder[ axis ];
+        }
     }
 
-    Vec3 rightMin, rightMax;
-    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( 1 ), meshLocalToWorld, &rightMin );
-    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( 1 ), meshLocalToWorld, &rightMax );
-    const float rightDistance = IntersectRayAABB( rayOrigin, rayTarget, rightMin, rightMax );
-
-    if (-1 < rightDistance && rightDistance < maxDistance)
-    {
-        return SceneWidget::GizmoAxis::X;
-    }
-
-    Vec3 forwardMin, forwardMax;
-    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( 0 ), meshLocalToWorld, &forwardMin );
-    Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( 0 ), meshLocalToWorld, &forwardMax );
-    const float forwardDistance = IntersectRayAABB( rayOrigin, rayTarget, forwardMin, forwardMax );
-
-    if (-1 < forwardDistance && forwardDistance < maxDistance)
-    {
-        return SceneWidget::GizmoAxis::Z;
-    }
-
-    //std::cout << "gizmo distance: " << meshDistance << std::endl;
     return SceneWidget::GizmoAxis::None;
 }
 
@@ -174,7 +159,6 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
     // Collects meshes that collide with the ray.
     for (auto& go : gameObjects)
     {
-        //std::cout << "Looping game objects" << std::endl;
         auto meshRenderer = go->GetComponent< MeshRendererComponent >();
 
         if (!meshRenderer || !meshRenderer->GetMesh())
@@ -189,6 +173,13 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
 
         const float meshDistance = IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
         //std::cout << "mesh distance: " << meshDistance << std::endl;
+        if (0 < meshDistance && meshDistance < maxDistance)
+        {
+            CollisionInfo collisionInfo;
+            collisionInfo.go = go.get();
+            // TODO: submeshindices
+            outInfo.emplace_back( collisionInfo );
+        }
     }
 
     return outInfo;
@@ -270,7 +261,7 @@ void SceneWidget::Init()
     gameObjects[ 0 ]->AddComponent< MeshRendererComponent >();
     gameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     gameObjects[ 0 ]->AddComponent< TransformComponent >();
-    gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -50 } );
+    gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
     gameObjects[ 0 ]->SetName( "Game Object" );
 
     unlitShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ), FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag" );
@@ -287,7 +278,6 @@ void SceneWidget::Init()
     AddEditorObjects();
     scene.Add( &camera );
     scene.Add( gameObjects[ 0 ].get() );
-    //scene.Add( &transformGizmo.go );
 
     connect( &myTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
     myTimer.start();
@@ -296,6 +286,7 @@ void SceneWidget::Init()
 
     //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
     //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
+    emit GameObjectsAddedOrDeleted();
 }
 
 void SceneWidget::RemoveEditorObjects()
@@ -339,65 +330,80 @@ void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
         selectedGameObjects.clear();
         emit GameObjectsAddedOrDeleted();
     }
-    else if (aEvent->key() == Qt::Key_A && mouseMode == MouseMode::Grab)
+    else if (mouseMode == MouseMode::Grab)
     {
-        cameraMoveDir.x = -speed;
-    }
-    else if (aEvent->key() == Qt::Key_D && mouseMode == MouseMode::Grab)
-    {
-        cameraMoveDir.x = speed;
-    }
-    else if (aEvent->key() == Qt::Key_Q && mouseMode == MouseMode::Grab)
-    {
-        cameraMoveDir.y = -speed;
-    }
-    else if (aEvent->key() == Qt::Key_E && mouseMode == MouseMode::Grab)
-    {
-        cameraMoveDir.y = speed;
-    }
-    else if (aEvent->key() == Qt::Key_W && mouseMode == MouseMode::Grab)
-    {
-        cameraMoveDir.z = -speed;
-    }
-    else if (aEvent->key() == Qt::Key_S && mouseMode == MouseMode::Grab)
-    {
-        cameraMoveDir.z = speed;
+        if (aEvent->key() == Qt::Key_A)
+        {
+            cameraMoveDir.x = -speed;
+        }
+        else if (aEvent->key() == Qt::Key_D)
+        {
+            cameraMoveDir.x = speed;
+        }
+        else if (aEvent->key() == Qt::Key_Q)
+        {
+            cameraMoveDir.y = -speed;
+        }
+        else if (aEvent->key() == Qt::Key_E)
+        {
+            cameraMoveDir.y = speed;
+        }
+        else if (aEvent->key() == Qt::Key_W)
+        {
+            cameraMoveDir.z = -speed;
+        }
+        else if (aEvent->key() == Qt::Key_S)
+        {
+            cameraMoveDir.z = speed;
+        }
     }
  }
 
 void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
 {
-    if (aEvent->key() == Qt::Key_A)
+    const int macDelete = 16777219;
+
+    if (aEvent->key() == Qt::Key_A || aEvent->key() == Qt::Key_D)
     {
         cameraMoveDir.x = 0;
     }
-    else if (aEvent->key() == Qt::Key_D)
-    {
-        cameraMoveDir.x = 0;
-    }
-    else if (aEvent->key() == Qt::Key_Q)
+    else if (aEvent->key() == Qt::Key_Q || aEvent->key() == Qt::Key_E)
     {
         cameraMoveDir.y = 0;
     }
-    else if (aEvent->key() == Qt::Key_E)
-    {
-        cameraMoveDir.y = 0;
-    }
-    else if (aEvent->key() == Qt::Key_W)
+    else if (aEvent->key() == Qt::Key_W || aEvent->key() == Qt::Key_S)
     {
         cameraMoveDir.z = 0;
     }
-    else if (aEvent->key() == Qt::Key_S)
+    else if (aEvent->key() == Qt::Key_Delete || aEvent->key() == macDelete)
     {
-        cameraMoveDir.z = 0;
+        for (auto i : selectedGameObjects)
+        {
+            scene.Remove( gameObjects[ i ].get() );
+        }
+        // TODO: Remove gameObjects entries that were removed from scene.
+        selectedGameObjects.clear();
+        emit GameObjectsAddedOrDeleted();
+        std::list< ae3d::GameObject* > emptySelection;
+        emit ((MainWindow*)mainWindow)->GameObjectSelected( emptySelection );
     }
     else if (aEvent->key() == Qt::Key_F)
     {
-        /*if (editorState->selectedNode)
+        if (!selectedGameObjects.empty())
         {
             CenterSelected();
-        }*/
+        }
     }
+}
+
+void SceneWidget::CenterSelected()
+{
+    if (selectedGameObjects.empty())
+    {
+        return;
+    }
+
+    camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() - Vec3( 0, 0, 5 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
 }
 
 void SceneWidget::mousePressEvent( QMouseEvent* event )
@@ -426,7 +432,19 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
 
 void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
 {
-    dragAxis = GizmoAxis::None;
+    if (dragAxis != GizmoAxis::None)
+    {
+        dragAxis = GizmoAxis::None;
+        std::list< ae3d::GameObject* > selectedObjects;
+
+        for (auto& go : selectedGameObjects)
+        {
+            selectedObjects.push_back( gameObjects[ go ].get() );
+        }
+
+        emit ((MainWindow*)mainWindow)->GameObjectSelected( selectedObjects );
+        return;
+    }
 
     if (mouseMode == MouseMode::Grab)
     {
@@ -445,6 +463,23 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
     {
         const QPoint point = mapFromGlobal( QCursor::pos() );
         auto colliders = GetColliders( camera, gameObjects, point.x(), point.y(), width(), height(), 200 );
+        selectedGameObjects.clear();
+        std::list< ae3d::GameObject* > selectedObjects;
+
+        if (!colliders.empty())
+        {
+            selectedObjects.push_back( colliders.front().go );
+
+            for (std::size_t i = 0; i < gameObjects.size(); ++i)
+            {
+                if (gameObjects[ i ].get() == selectedObjects.back())
+                {
+                    selectedGameObjects.push_back( i );
+                }
+            }
+        }
+
+        emit ((MainWindow*)mainWindow)->GameObjectSelected( selectedObjects );
     }
 }
 
@@ -584,14 +619,18 @@ void SceneWidget::UpdateCamera()
 
 void SceneWidget::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
 {
-    std::cout << "scene got selected event. go count: " << gameObjects.size() << std::endl;
-
     if (gameObjects.empty())
     {
         scene.Remove( &transformGizmo.go );
         return;
     }
 
+    transformGizmo.SetPosition( SelectionAveragePosition() );
+    scene.Add( &transformGizmo.go );
+}
+
+ae3d::Vec3 SceneWidget::SelectionAveragePosition()
+{
     Vec3 avgPosition;
 
     for (auto go : gameObjects)
@@ -606,10 +645,8 @@ void SceneWidget::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects
 
     avgPosition /= gameObjects.size();
 
-    transformGizmo.SetPosition( avgPosition );
-    scene.Add( &transformGizmo.go );
+    return avgPosition;
 }
-
 ae3d::GameObject* SceneWidget::CreateGameObject()
 {
     gameObjects.push_back( std::make_shared<ae3d::GameObject>() );

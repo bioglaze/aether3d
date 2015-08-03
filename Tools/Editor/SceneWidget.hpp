@@ -29,6 +29,8 @@ public:
 
     explicit SceneWidget( QWidget* parent = 0 );
 
+    void CenterSelected();
+
     void Init();
 
     /// \return Index of created game object.
@@ -56,7 +58,6 @@ public:
 
     void SetMainWindow( QWidget* aMainWindow ) { mainWindow = aMainWindow; }
 
-    // TODO: Maybe create an editor state class and put this there.
     std::list< int > selectedGameObjects;
 
 signals:
@@ -92,6 +93,8 @@ private:
         ae3d::Material zAxisMaterial;
         ae3d::Texture2D translateTex;
     };
+
+    ae3d::Vec3 SelectionAveragePosition();
 
     TransformGizmo transformGizmo;
     ae3d::GameObject camera;
