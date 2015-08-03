@@ -130,9 +130,10 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         };
         
         m().subMeshes.resize( 1 );
-        m().subMeshes[ 0 ].vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
-        m().subMeshes[ 0 ].aabbMin = { -s, -s, -s };
-        m().subMeshes[ 0 ].aabbMax = {  s,  s,  s };
+        auto& firstSubMesh = m().subMeshes[ 0 ];
+        firstSubMesh.vertexBuffer.Generate( indices.data(), static_cast< int >(indices.size()), vertices.data(), static_cast< int >(vertices.size()) );
+        firstSubMesh.aabbMin = {-s, -s, -s};
+        firstSubMesh.aabbMax = {s, s, s};
         return LoadResult::FileNotFound;
     }
     
@@ -151,7 +152,10 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     is.read( (char*)&m().aabbMin, sizeof( m().aabbMin ) );
     is.read( (char*)&m().aabbMax, sizeof( m().aabbMax ) );
 
-    if (m().aabbMin.x > m().aabbMax.x || m().aabbMin.y > m().aabbMax.y || m().aabbMin.z > m().aabbMax.z)
+    const auto& aabbMin = m().aabbMin;
+    const auto& aabbMax = m().aabbMax;
+
+    if (aabbMin.x > aabbMax.x || aabbMin.y > aabbMax.y || aabbMin.z > aabbMax.z)
     {
         return LoadResult::Corrupted;
     }

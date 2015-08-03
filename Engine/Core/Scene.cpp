@@ -132,9 +132,10 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
     }
 
     Matrix44 view;
-    cameraGo->GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
+    auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
+    cameraTransform->GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -cameraGo->GetComponent< TransformComponent >()->GetLocalPosition() );
+    translation.Translate( -cameraTransform->GetLocalPosition() );
     Matrix44::Multiply( translation, view, view );
 
     Frustum frustum;
@@ -149,7 +150,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
     }
     
     const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
-    frustum.Update( cameraGo->GetComponent< TransformComponent >()->GetLocalPosition(), viewDir );
+    frustum.Update( cameraTransform->GetLocalPosition(), viewDir );
 
     for (auto gameObject : gameObjects)
     {

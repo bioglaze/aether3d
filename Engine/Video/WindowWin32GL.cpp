@@ -160,7 +160,7 @@ namespace ae3d
         UINT numFormats = 0;
         BOOL status = wglChoosePixelFormatARB( Dummy::hdc, attributes, 0, 1, &returnedPixelFormat, &numFormats );
 
-        if (status == TRUE && numFormats > 0)
+        if (status != FALSE && numFormats > 0)
         {
             outPixelFormat = returnedPixelFormat;
         }
