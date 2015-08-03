@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		441392051B6F441500B98C1E /* Frustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 441392031B6F441500B98C1E /* Frustum.cpp */; };
+		441392061B6F441500B98C1E /* Frustum.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 441392041B6F441500B98C1E /* Frustum.hpp */; };
 		4449E8521B14B423009A869C /* AudioClip.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8411B14B423009A869C /* AudioClip.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		4449E8531B14B423009A869C /* AudioSourceComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8421B14B423009A869C /* AudioSourceComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		4449E8541B14B423009A869C /* CameraComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8431B14B423009A869C /* CameraComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -70,6 +72,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		441392031B6F441500B98C1E /* Frustum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Frustum.cpp; path = ../../Core/Frustum.cpp; sourceTree = "<group>"; };
+		441392041B6F441500B98C1E /* Frustum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Frustum.hpp; path = ../../Core/Frustum.hpp; sourceTree = "<group>"; };
 		4449E8241B14B3E8009A869C /* Aether3D_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Aether3D_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4449E8281B14B3E8009A869C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4449E8411B14B423009A869C /* AudioClip.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioClip.hpp; path = ../../Include/AudioClip.hpp; sourceTree = "<group>"; };
@@ -228,6 +232,8 @@
 				4449E8681B14B44E009A869C /* FileWatcher.cpp */,
 				4449E8691B14B44E009A869C /* FileWatcher.hpp */,
 				4449E86A1B14B44E009A869C /* Font.cpp */,
+				441392031B6F441500B98C1E /* Frustum.cpp */,
+				441392041B6F441500B98C1E /* Frustum.hpp */,
 				4449E86B1B14B44E009A869C /* MatrixNEON.cpp */,
 				AB922E581B405020000F3488 /* Mesh.cpp */,
 				4449E86C1B14B44E009A869C /* Scene.cpp */,
@@ -293,6 +299,7 @@
 				AB922E571B404FFB000F3488 /* MeshRendererComponent.hpp in Headers */,
 				4449E85D1B14B423009A869C /* SpriteRendererComponent.hpp in Headers */,
 				4449E85C1B14B423009A869C /* Shader.hpp in Headers */,
+				441392061B6F441500B98C1E /* Frustum.hpp in Headers */,
 				4449E8601B14B423009A869C /* Texture2D.hpp in Headers */,
 				4449E8541B14B423009A869C /* CameraComponent.hpp in Headers */,
 				4449E85E1B14B423009A869C /* System.hpp in Headers */,
@@ -394,6 +401,7 @@
 				44E5FC961B399E32009AC088 /* TextureCubeMetal.mm in Sources */,
 				44E5FC991B399E6C009AC088 /* RendererCommon.cpp in Sources */,
 				AB922E591B405020000F3488 /* Mesh.cpp in Sources */,
+				441392051B6F441500B98C1E /* Frustum.cpp in Sources */,
 				4449E8751B14B44E009A869C /* MatrixNEON.cpp in Sources */,
 				4449E8811B14B46C009A869C /* GameObject.cpp in Sources */,
 				AB190E321B57DE73005ECE49 /* Material.cpp in Sources */,

@@ -48,6 +48,8 @@ struct Uniforms
 namespace GfxDeviceGlobal
 {
     int drawCalls = 0;
+    int textureBinds = 0;
+    int vertexBufferBinds = 0;
     int backBufferWidth = 0;
     int backBufferHeight = 0;
 }
@@ -138,6 +140,16 @@ id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
 id <MTLLibrary> ae3d::GfxDevice::GetDefaultMetalShaderLibrary()
 {
     return defaultLibrary;
+}
+
+int ae3d::GfxDevice::GetTextureBinds()
+{
+    return GfxDeviceGlobal::textureBinds;
+}
+
+int ae3d::GfxDevice::GetVertexBufferBinds()
+{
+    return GfxDeviceGlobal::vertexBufferBinds;
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
