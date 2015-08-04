@@ -9,7 +9,7 @@ void CommandManager::Execute( std::shared_ptr< CommandBase > command )
 
 void CommandManager::Undo()
 {
-    if (undoStack.size() > 0)
+    if (!undoStack.empty())
     {
         undoStack.top()->Undo();
         undoStack.pop();

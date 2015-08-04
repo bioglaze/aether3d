@@ -80,7 +80,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         {
             position.x = std::stof( newValue );
         }
-        catch (std::invalid_argument& a)
+        catch (std::invalid_argument&)
         {
             position.x = 0;
             item->setText( "0" );
@@ -92,7 +92,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         {
             position.y = std::stof( newValue );
         }
-        catch (std::invalid_argument& a)
+        catch (std::invalid_argument&)
         {
             position.y = 0;
             item->setText( "0" );
@@ -104,7 +104,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         {
             position.z = std::stof( newValue );
         }
-        catch (std::invalid_argument& a)
+        catch (std::invalid_argument&)
         {
             position.z = 0;
             item->setText( "0" );
@@ -116,7 +116,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         {
             rotationEuler.x = std::stof( newValue );
         }
-        catch (std::invalid_argument& a)
+        catch (std::invalid_argument&)
         {
             rotationEuler.x = 0;
             item->setText( "0" );
@@ -128,7 +128,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         {
             rotationEuler.y = std::stof( newValue );
         }
-        catch (std::invalid_argument& a)
+        catch (std::invalid_argument&)
         {
             rotationEuler.y = 0;
             item->setText( "0" );
@@ -140,7 +140,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         {
             rotationEuler.z = std::stof( newValue );
         }
-        catch (std::invalid_argument& a)
+        catch (std::invalid_argument&)
         {
             rotationEuler.z = 0;
             item->setText( "0" );
@@ -152,7 +152,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
         {
             scale = std::stof( newValue );
         }
-        catch (std::invalid_argument& a)
+        catch (std::invalid_argument&)
         {
             item->setText( "1" );
         }

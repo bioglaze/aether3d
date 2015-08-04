@@ -8,7 +8,7 @@ class SceneWidget;
 class CreateCameraCommand : public CommandBase
 {
 public:
-    CreateCameraCommand( SceneWidget* sceneWidget );
+    explicit CreateCameraCommand( SceneWidget* sceneWidget );
     void Execute() override;
     void Undo() override;
 

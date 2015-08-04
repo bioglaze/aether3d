@@ -4,11 +4,11 @@
 
 ModifyTransformCommand::ModifyTransformCommand( SceneWidget* aSceneWidget, const ae3d::Vec3& newPosition,
                                                 const ae3d::Quaternion& newRotation, float newScale )
+    : sceneWidget( aSceneWidget )
+    , position( newPosition )
+    , rotation( newRotation )
+    , scale( newScale )
 {
-    sceneWidget = aSceneWidget;
-    position = newPosition;
-    rotation = newRotation;
-    scale = newScale;
 }
 
 void ModifyTransformCommand::Execute()

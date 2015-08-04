@@ -385,7 +385,7 @@ void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
         selectedGameObjects.clear();
         emit GameObjectsAddedOrDeleted();
         std::list< ae3d::GameObject* > emptySelection;
-        emit ((MainWindow*)mainWindow)->GameObjectSelected( emptySelection );
+        emit static_cast< MainWindow* >(mainWindow)->GameObjectSelected( emptySelection );
     }
     else if (aEvent->key() == Qt::Key_F)
     {
@@ -414,14 +414,15 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
     {
         mouseMode = MouseMode::Grab;
         setCursor( Qt::BlankCursor );
-        lastMousePosition[ 0 ] = event->x();
-        lastMousePosition[ 1 ] = event->y();
+        lastMousePosition[ 0 ] = QCursor::pos().x();//event->pos().x();
+        lastMousePosition[ 1 ] = QCursor::pos().y();//event->pos().y();
+        //std::cout << "button down pos: " << lastMousePosition[ 0 ] << ", " << lastMousePosition[ 1 ] << std::endl;
     }
     else if (event->button() == Qt::MiddleButton)
     {
         mouseMode = MouseMode::Pan;
-        lastMousePosition[ 0 ] = event->x();
-        lastMousePosition[ 1 ] = event->y();
+        lastMousePosition[ 0 ] = QCursor::pos().x();//event->pos().x();
+        lastMousePosition[ 1 ] = QCursor::pos().y();//event->pos().y();
         cursor().setShape( Qt::ClosedHandCursor );
     }
     else if (event->button() == Qt::LeftButton)
@@ -442,7 +443,7 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
             selectedObjects.push_back( gameObjects[ go ].get() );
         }
 
-        emit ((MainWindow*)mainWindow)->GameObjectSelected( selectedObjects );
+        emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedObjects );
         return;
     }
 
@@ -474,30 +475,32 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
             {
                 if (gameObjects[ i ].get() == selectedObjects.back())
                 {
-                    selectedGameObjects.push_back( i );
+                    selectedGameObjects.push_back( int( i ) );
                 }
             }
         }
 
-        emit ((MainWindow*)mainWindow)->GameObjectSelected( selectedObjects );
+        emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedObjects );
     }
 }
 
-bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
+bool SceneWidget::eventFilter( QObject* obj, QEvent* event )
 {
-    if (event->type() == QEvent::MouseMove)
+    if (event->type() == QEvent::MouseMove && !obj->objectName().isEmpty())
     {
         const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
 
-        float deltaX = (lastMousePosition[ 0 ] - mouseEvent->x()) * 0.1f;
-        float deltaY = (lastMousePosition[ 1 ] - mouseEvent->y()) * 0.1f;
+        float deltaX = (lastMousePosition[ 0 ] - QCursor::pos().x()/*mouseEvent->pos().x()*/) * 0.1f;
+        float deltaY = (lastMousePosition[ 1 ] - QCursor::pos().y()/*mouseEvent->pos().y()*/) * 0.1f;
+//std::cout << "move pos: " << mouseEvent->pos().x() << ", " << mouseEvent->pos().y() << std::endl;
+//std::cout << "cursor pos: " << QCursor::pos().x() << ", " << QCursor::pos().y() << std::endl;
 
         if (mouseMode == MouseMode::Grab)
         {
             QPoint globalPos = mapToGlobal(QPoint(mouseEvent->x(), mouseEvent->y()));
 
-            int x = mouseEvent->x();
-            int y = mouseEvent->y();
+            int x = QCursor::pos().x();//mouseEvent->x();
+            int y = QCursor::pos().y();//mouseEvent->y();
 
             if (globalPos.x() < 5)
             {
@@ -524,7 +527,7 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
 
             deltaY = deltaY > 5 ? 5 : deltaY;
             deltaY = deltaY < -5 ? -5 : deltaY;
-
+std::cout << "deltaX: " << deltaX << ", deltaY: " << deltaY << std::endl;
             camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 0.0f, 1.0f, 0.0f ), deltaX );
             camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 1.0f, 0.0f, 0.0f ), deltaY );
 
@@ -539,8 +542,8 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
             camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x );
             camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y );
             cameraMoveDir.x = cameraMoveDir.y = 0;
-            lastMousePosition[ 0 ] = mouseEvent->x();
-            lastMousePosition[ 1 ] = mouseEvent->y();
+            lastMousePosition[ 0 ] = QCursor::pos().x();//mouseEvent->x();
+            lastMousePosition[ 1 ] = QCursor::pos().y();//mouseEvent->y();
             return true;
         }
         else if (dragAxis == GizmoAxis::X || dragAxis == GizmoAxis::Y || dragAxis == GizmoAxis::Z)
@@ -580,8 +583,8 @@ bool SceneWidget::eventFilter( QObject * /*obj*/, QEvent *event )
                 const Vec3 newPosition = oldPosition + Vec3( xOffset * direction.z, yOffset, zOffset * direction.x ) * axisMask;
                 go->GetComponent< TransformComponent >()->SetLocalPosition( newPosition );
                 transformGizmo.SetPosition( newPosition );
-                lastMousePosition[ 0 ] = mouseEvent->x();
-                lastMousePosition[ 1 ] = mouseEvent->y();
+                lastMousePosition[ 0 ] = QCursor::pos().x();// mouseEvent->x();
+                lastMousePosition[ 1 ] = QCursor::pos().y();//mouseEvent->y();
             }
         }
         else if (!selectedGameObjects.empty())

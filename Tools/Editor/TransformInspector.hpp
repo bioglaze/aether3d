@@ -33,6 +33,5 @@ private:
     void FieldsChanged( QTableWidgetItem* item );
 
     QTableWidget* table = nullptr;
-    //std::list< ae3d::GameObject* > selectedGameObjects;
 };
 #endif

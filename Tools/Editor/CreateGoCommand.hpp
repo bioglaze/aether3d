@@ -14,7 +14,7 @@ class SceneWidget;
 class CreateGoCommand : public CommandBase
 {
 public:
-    CreateGoCommand( SceneWidget* sceneWidget );
+    explicit CreateGoCommand( SceneWidget* sceneWidget );
     void Execute() override;
     void Undo() override;
 

@@ -169,7 +169,7 @@ void CreateDistanceMap( unsigned char* imageData, int width, int height )
         }
     }
     
-    free(boundaryPointMap);
+    delete[] boundaryPointMap;
 }
 
 void WriteScaledMapIntoTGAFile( const char* path, int width, int height )

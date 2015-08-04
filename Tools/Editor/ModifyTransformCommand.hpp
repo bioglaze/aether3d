@@ -22,7 +22,7 @@ private:
     float scale;
     ae3d::Vec3 oldPosition;
     ae3d::Quaternion oldRotation;
-    float oldScale;
+    float oldScale = 1;
     std::list< int > selectedGameObjects;
 };
 
