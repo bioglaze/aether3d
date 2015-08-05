@@ -29,7 +29,7 @@ win32 {
     #PRE_TARGETDEPS += $$PWD/../../../aether3d_build/libaether3d_win.a
 }
 macx {
-    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+    QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++ -Wall -Wextra
     LIBS += -L$$PWD/../../../aether3d_build/ -laether3d_osx
     LIBS += -framework CoreFoundation -framework OpenAL -framework QuartzCore -framework IOKit -framework Cocoa
     copyfiles.commands = cp -r $$PWD/copy_to_output/* $$OUT_PWD

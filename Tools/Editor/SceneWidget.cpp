@@ -484,23 +484,21 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
     }
 }
 
-bool SceneWidget::eventFilter( QObject* obj, QEvent* event )
+bool SceneWidget::eventFilter( QObject* /*obj*/, QEvent* event )
 {
-    if (event->type() == QEvent::MouseMove && !obj->objectName().isEmpty())
+    if (event->type() == QEvent::MouseMove)
     {
         const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
 
-        float deltaX = (lastMousePosition[ 0 ] - QCursor::pos().x()/*mouseEvent->pos().x()*/) * 0.1f;
-        float deltaY = (lastMousePosition[ 1 ] - QCursor::pos().y()/*mouseEvent->pos().y()*/) * 0.1f;
-//std::cout << "move pos: " << mouseEvent->pos().x() << ", " << mouseEvent->pos().y() << std::endl;
-//std::cout << "cursor pos: " << QCursor::pos().x() << ", " << QCursor::pos().y() << std::endl;
+        float deltaX = (lastMousePosition[ 0 ] - QCursor::pos().x()) * 0.1f;
+        float deltaY = (lastMousePosition[ 1 ] - QCursor::pos().y()) * 0.1f;
 
         if (mouseMode == MouseMode::Grab)
         {
             QPoint globalPos = mapToGlobal(QPoint(mouseEvent->x(), mouseEvent->y()));
 
-            int x = QCursor::pos().x();//mouseEvent->x();
-            int y = QCursor::pos().y();//mouseEvent->y();
+            int x = QCursor::pos().x();
+            int y = QCursor::pos().y();
 
             if (globalPos.x() < 5)
             {
@@ -527,7 +525,7 @@ bool SceneWidget::eventFilter( QObject* obj, QEvent* event )
 
             deltaY = deltaY > 5 ? 5 : deltaY;
             deltaY = deltaY < -5 ? -5 : deltaY;
-std::cout << "deltaX: " << deltaX << ", deltaY: " << deltaY << std::endl;
+
             camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 0.0f, 1.0f, 0.0f ), deltaX );
             camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 1.0f, 0.0f, 0.0f ), deltaY );
 
@@ -542,8 +540,8 @@ std::cout << "deltaX: " << deltaX << ", deltaY: " << deltaY << std::endl;
             camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x );
             camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y );
             cameraMoveDir.x = cameraMoveDir.y = 0;
-            lastMousePosition[ 0 ] = QCursor::pos().x();//mouseEvent->x();
-            lastMousePosition[ 1 ] = QCursor::pos().y();//mouseEvent->y();
+            lastMousePosition[ 0 ] = QCursor::pos().x();
+            lastMousePosition[ 1 ] = QCursor::pos().y();
             return true;
         }
         else if (dragAxis == GizmoAxis::X || dragAxis == GizmoAxis::Y || dragAxis == GizmoAxis::Z)
@@ -583,13 +581,13 @@ std::cout << "deltaX: " << deltaX << ", deltaY: " << deltaY << std::endl;
                 const Vec3 newPosition = oldPosition + Vec3( xOffset * direction.z, yOffset, zOffset * direction.x ) * axisMask;
                 go->GetComponent< TransformComponent >()->SetLocalPosition( newPosition );
                 transformGizmo.SetPosition( newPosition );
-                lastMousePosition[ 0 ] = QCursor::pos().x();// mouseEvent->x();
-                lastMousePosition[ 1 ] = QCursor::pos().y();//mouseEvent->y();
+                lastMousePosition[ 0 ] = QCursor::pos().x();
+                lastMousePosition[ 1 ] = QCursor::pos().y();
             }
         }
         else if (!selectedGameObjects.empty())
         {
-            GizmoAxis axis = CollidesWithGizmo( camera, transformGizmo.go, mouseEvent->x(), mouseEvent->y(), width(), height(), 200 );
+            const GizmoAxis axis = CollidesWithGizmo( camera, transformGizmo.go, mouseEvent->x(), mouseEvent->y(), width(), height(), 200 );
 
             transformGizmo.xAxisMaterial.SetVector( "tint", axis == GizmoAxis::X ? Vec4( 1, 1, 1, 1 ) : Vec4( 1, 0, 0, 1 ) );
             transformGizmo.yAxisMaterial.SetVector( "tint", axis == GizmoAxis::Y ? Vec4( 1, 1, 1, 1 ) : Vec4( 0, 1, 0, 1 ) );
@@ -636,8 +634,9 @@ ae3d::Vec3 SceneWidget::SelectionAveragePosition()
 {
     Vec3 avgPosition;
 
-    for (auto go : gameObjects)
+    for (auto goIndex : selectedGameObjects)
     {
+        auto go = gameObjects[ goIndex ];
         auto transform = go->GetComponent< ae3d::TransformComponent >();
 
         if (transform)
@@ -646,7 +645,7 @@ ae3d::Vec3 SceneWidget::SelectionAveragePosition()
         }
     }
 
-    avgPosition /= gameObjects.size();
+    avgPosition /= selectedGameObjects.size();
 
     return avgPosition;
 }

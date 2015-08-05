@@ -58,8 +58,27 @@ MainWindow::MainWindow()
 
 void MainWindow::OnGameObjectSelected( std::list< ae3d::GameObject* > /*gameObjects*/ )
 {
-    //UpdateHierarchy();
+    UpdateHierarchySelection();
     UpdateInspector();
+}
+
+void MainWindow::UpdateHierarchySelection()
+{
+    disconnect( sceneTree, &QTreeWidget::itemSelectionChanged, sceneTree, nullptr);
+    disconnect( sceneTree, &QTreeWidget::itemChanged, sceneTree, nullptr);
+
+    sceneTree->clearSelection();
+
+    for (auto selectedIndex : sceneWidget->selectedGameObjects)
+    {
+        if (sceneTree->topLevelItem( selectedIndex ) != nullptr)
+        {
+            sceneTree->topLevelItem( selectedIndex )->setSelected( true );
+        }
+    }
+
+    connect( sceneTree, &QTreeWidget::itemSelectionChanged, [&]() { HierarchySelectionChanged(); });
+    connect( sceneTree, &QTreeWidget::itemChanged, [&](QTreeWidgetItem* item, int /* column */) { HierarchyItemRenamed( item ); });
 }
 
 void MainWindow::UpdateInspector()
@@ -125,10 +144,10 @@ void MainWindow::HierarchySelectionChanged()
         }
     }
 
-    for (auto index : sceneWidget->selectedGameObjects)
+    /*for (auto index : sceneWidget->selectedGameObjects)
     {
         std::cout << "selection: " << index << std::endl;
-    }
+    }*/
 
     UpdateInspector();
     emit GameObjectSelected( selectedObjects );
