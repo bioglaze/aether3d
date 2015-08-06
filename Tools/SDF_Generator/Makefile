@@ -9,5 +9,5 @@ endif
 
 all:
 	$(CCOMPILER) -c ../../Engine/ThirdParty/stb_image.c -o stb_image.o
-	$(COMPILER) -pedantic -Wall -ansi -std=c++11 -g -I../../Engine/ThirdParty SDF_Generator.cpp stb_image.o -o SDF_Generator
+	$(COMPILER) -pedantic -Wall -Wextra -ansi -std=c++11 -g -I../../Engine/ThirdParty SDF_Generator.cpp stb_image.o -o SDF_Generator
 

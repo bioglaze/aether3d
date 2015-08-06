@@ -150,6 +150,12 @@ void LoadObj( const std::string& path )
 
             if (gMeshes.back().name != "unnamed")
             {
+                // Some exporters use 'g' without specifying geometry for it, so remove them.
+                if (gMeshes.back().face.empty())
+                {
+                    gMeshes.erase( std::begin( gMeshes ) + gMeshes.size() - 1 );
+                }
+                
                 gMeshes.push_back( Mesh() );
                 hasTextureCoords = false;
             }
