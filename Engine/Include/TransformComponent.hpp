@@ -50,7 +50,13 @@ namespace ae3d
 
         /// \param parent Parent transform or null if there is no parent.
         void SetParent( TransformComponent* parent );
-        
+
+        /// \param view View matrix.
+        const Matrix44& GetVrView() const { return hmdView; }
+
+        /// \param view View matrix for VR viewing.
+        void SetVrView( const Matrix44& view );
+
         /// \return Local transform matrix.
         const Matrix44& GetLocalMatrix();
         
@@ -81,6 +87,7 @@ namespace ae3d
         float localScale = 1;
         Matrix44 localMatrix;
         TransformComponent* parent = nullptr;
+        Matrix44 hmdView; // For VR
         bool isDirty = true;
     };
 }

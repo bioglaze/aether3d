@@ -42,6 +42,12 @@ void ae3d::CameraComponent::SetProjection( float aFovDegrees, float aAspect, flo
     projectionMatrix.MakeProjection( fovDegrees, aspect, aNear, aFar );
 }
 
+void ae3d::CameraComponent::SetProjection( const Matrix44& proj )
+{
+    isOrthographic = false;
+    projectionMatrix = proj;
+}
+
 void ae3d::CameraComponent::SetClearColor( const Vec3& color )
 {
     clearColor = color;

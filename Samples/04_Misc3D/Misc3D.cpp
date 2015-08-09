@@ -19,6 +19,7 @@
 #include "TextureCube.hpp"
 #include "Vec3.hpp"
 #include "Window.hpp"
+#include "VR.hpp"
 
 using namespace ae3d;
 
@@ -28,7 +29,9 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
+    VR::Init();
     Window::Create( width, height, WindowCreateFlags::Empty );
+    VR::StartTracking( width, height );
     Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();
     System::InitAudio();
@@ -37,6 +40,7 @@ int main()
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
+    //camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DontClear );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     camera.AddComponent<TransformComponent>();
     //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
@@ -68,7 +72,7 @@ int main()
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -100 } );
+    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -100 } );
 
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "shuttle.ae3d" ) );
@@ -83,7 +87,7 @@ int main()
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag" );
 
     Texture2D asphaltTex;
-    asphaltTex.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
+    asphaltTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
 
     Material material;
     material.SetShader( &shader );
@@ -102,18 +106,33 @@ int main()
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
-    scene.SetSkybox( &skybox );
-    scene.Add( &camera2d );
+    //scene.SetSkybox( &skybox );
+    //scene.Add( &camera2d );
     scene.Add( &camera );
     scene.Add( &cube );
     scene.Add( &cube2 );
     scene.Add( &statsContainer );
+
+    GameObject cubes[ 5 ];
+
+    for (int i = 0; i < 5; ++i)
+    {
+        cubes[ i ].AddComponent< MeshRendererComponent >();
+        cubes[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+        cubes[ i ].AddComponent< TransformComponent >();
+        cubes[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { i * 2.5f - 4, 0, -100 } );
+        cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+
+        scene.Add( &cubes[ i ] );
+    }
 
     bool quit = false;
     
     int lastMouseX = 0;
     int lastMouseY = 0;
     
+    float yaw = 0;
+
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -169,10 +188,12 @@ int main()
                 else if (keyCode == KeyCode::Left)
                 {
                     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), 1 );
+                    yaw += 4;
                 }
                 else if (keyCode == KeyCode::Right)
                 {
                     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -1 );
+                    yaw -= 4;
                 }
                 else if (keyCode == KeyCode::Up)
                 {
@@ -198,7 +219,21 @@ int main()
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
+#if OCULUS_RIFT
+        VR::CalcEyePose();
+
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            VR::SetEye( eye );
+            VR::CalcCameraForEye( camera, yaw, eye );
+            scene.Render();
+            VR::UnsetEye( eye );
+        }
+
+        VR::SubmitFrame();
+#else
         scene.Render();
+#endif
         Window::SwapBuffers();
     }
 

@@ -44,6 +44,9 @@ namespace ae3d
          */
         void SetProjection( float fovDegrees, float aspect, float near, float far );
 
+        /// \param proj Projection matrix.
+        void SetProjection( const Matrix44& proj );
+
         /// \return Clear color in range 0-1.
         Vec3 GetClearColor() const { return clearColor; }
 

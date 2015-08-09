@@ -103,6 +103,9 @@
     <ClCompile Include="..\Core\Frustum.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\OculusRiftSupport.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -226,6 +229,9 @@
     </ClInclude>
     <ClInclude Include="..\Core\Frustum.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VR.hpp">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

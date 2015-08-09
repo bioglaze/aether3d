@@ -58,7 +58,7 @@ void ae3d::Scene::Render()
 {
     GfxDevice::ResetFrameStatistics();
 
-    if (mainCamera == nullptr || (mainCamera != nullptr && mainCamera->GetComponent<CameraComponent>() == nullptr))
+    if (mainCamera == nullptr || mainCamera->GetComponent<CameraComponent>() == nullptr)
     {
         return;
     }
@@ -133,11 +133,17 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
 
     Matrix44 view;
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
+    
+    // TODO: Maybe add a VR flag into camera to select between HMD and normal pose.
+#if OCULUS_RIFT
+    view = cameraGo->GetComponent< TransformComponent >()->GetVrView();
+#else
     cameraTransform->GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
     translation.Translate( -cameraTransform->GetLocalPosition() );
     Matrix44::Multiply( translation, view, view );
-
+#endif
+    
     Frustum frustum;
     
     if (!camera->isOrthographic)
