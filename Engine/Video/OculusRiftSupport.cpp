@@ -300,7 +300,7 @@ void ae3d::VR::Init()
 {
 }
 
-void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
+void ae3d::VR::StartTracking( int /*windowWidth*/, int /*windowHeight*/ )
 {
 }
 

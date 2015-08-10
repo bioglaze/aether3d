@@ -61,6 +61,8 @@
 		ABCE0CA91AC08BD700F9EC53 /* RendererGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */; };
 		ABCF19C01AE28EA600822E80 /* TextRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */; };
 		ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19C21AE2D08800822E80 /* Font.cpp */; };
+		ABD910F41B78F930005EBB74 /* VR.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABD910F31B78F930005EBB74 /* VR.hpp */; };
+		ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -132,6 +134,8 @@
 		ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextRendererComponent.cpp; path = ../Components/TextRendererComponent.cpp; sourceTree = "<group>"; };
 		ABCF19C11AE2CF7200822E80 /* Font.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Font.hpp; path = ../Include/Font.hpp; sourceTree = "<group>"; };
 		ABCF19C21AE2D08800822E80 /* Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Font.cpp; path = ../Core/Font.cpp; sourceTree = "<group>"; };
+		ABD910F31B78F930005EBB74 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../Include/VR.hpp; sourceTree = "<group>"; };
+		ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +179,7 @@
 				ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */,
 				AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */,
 				AB190E2D1B57DB0B005ECE49 /* Material.cpp */,
+				ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */,
 				ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */,
 				ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */,
 				AB2E39351B3543D8001D493E /* RendererCommon.cpp */,
@@ -228,6 +233,7 @@
 				ABCF19BE1AE28DB200822E80 /* TextRendererComponent.hpp */,
 				ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */,
 				AB889AF81ABB4C5B005BA86D /* Vec3.hpp */,
+				ABD910F31B78F930005EBB74 /* VR.hpp */,
 				AB3FD4951AB4330C00D28653 /* Window.hpp */,
 			);
 			name = Include;
@@ -282,6 +288,7 @@
 				AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */,
 				AB190E301B57DB27005ECE49 /* Material.hpp in Headers */,
 				ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */,
+				ABD910F41B78F930005EBB74 /* VR.hpp in Headers */,
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
 				ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */,
 				AB78D91C1B19E2E8009928E1 /* RenderTexture.hpp in Headers */,
@@ -387,6 +394,7 @@
 				ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */,
 				AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */,
 				ABCE07FE1AC9A5C300379611 /* GfxDeviceGL45.cpp in Sources */,
+				ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

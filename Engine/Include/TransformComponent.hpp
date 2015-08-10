@@ -51,9 +51,12 @@ namespace ae3d
         /// \param parent Parent transform or null if there is no parent.
         void SetParent( TransformComponent* parent );
 
-        /// \param view View matrix.
+        /// \return View matrix for VR that was set by SetVrView.
+#if OCULUS_RIFT
         const Matrix44& GetVrView() const { return hmdView; }
-
+#else
+        const Matrix44& GetVrView() const { return Matrix44::identity; }
+#endif
         /// \param view View matrix for VR viewing.
         void SetVrView( const Matrix44& view );
 
@@ -87,7 +90,9 @@ namespace ae3d
         float localScale = 1;
         Matrix44 localMatrix;
         TransformComponent* parent = nullptr;
+#if OCULUS_RIFT
         Matrix44 hmdView; // For VR
+#endif
         bool isDirty = true;
     };
 }

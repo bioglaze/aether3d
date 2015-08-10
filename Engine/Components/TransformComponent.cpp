@@ -147,7 +147,11 @@ void ae3d::TransformComponent::SolveLocalMatrix()
 
 void ae3d::TransformComponent::SetVrView( const Matrix44& view )
 {
+    (void)view;
+    
+#if OCULUS_RIFT
     hmdView = view;
+#endif
 }
 
 void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
