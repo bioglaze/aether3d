@@ -33,6 +33,9 @@ MainWindow::MainWindow()
     connect( &transformInspector, SIGNAL(TransformModified( const ae3d::Vec3&, const ae3d::Quaternion&, float )),
              this, SLOT(CommandModifyTransform( const ae3d::Vec3&, const ae3d::Quaternion&, float )) );
 
+    connect( sceneWidget, SIGNAL(TransformModified( const ae3d::Vec3&, const ae3d::Quaternion&, float )),
+             this, SLOT(CommandModifyTransform( const ae3d::Vec3&, const ae3d::Quaternion&, float )) );
+
     connect(this, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
             this, SLOT(OnGameObjectSelected(std::list< ae3d::GameObject* >)));
 

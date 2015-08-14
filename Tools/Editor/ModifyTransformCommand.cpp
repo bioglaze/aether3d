@@ -14,6 +14,11 @@ ModifyTransformCommand::ModifyTransformCommand( SceneWidget* aSceneWidget, const
 void ModifyTransformCommand::Execute()
 {
     selectedGameObjects = sceneWidget->selectedGameObjects;
+    oldPositions.resize( selectedGameObjects.size() );
+    oldRotations.resize( selectedGameObjects.size() );
+    oldScales.resize( selectedGameObjects.size() );
+
+    int i = 0;
 
     for (auto index : sceneWidget->selectedGameObjects)
     {
@@ -21,28 +26,34 @@ void ModifyTransformCommand::Execute()
 
         if (transform)
         {
-            oldPosition = transform->GetLocalPosition();
-            oldRotation = transform->GetLocalRotation();
-            oldScale = transform->GetLocalScale();
+            oldPositions[ i ] = transform->GetLocalPosition();
+            oldRotations[ i ] = transform->GetLocalRotation();
+            oldScales[ i ] = transform->GetLocalScale();
 
             transform->SetLocalPosition( position );
             transform->SetLocalRotation( rotation );
             transform->SetLocalScale( scale );
         }
+
+        ++i;
     }
 }
 
 void ModifyTransformCommand::Undo()
 {
+    int i = 0;
+
     for (auto index : selectedGameObjects)
     {
         auto transform = sceneWidget->GetGameObject( index )->GetComponent< ae3d::TransformComponent >();
 
         if (transform)
         {
-            transform->SetLocalPosition( oldPosition );
-            transform->SetLocalRotation( oldRotation );
-            transform->SetLocalScale( oldScale );
+            transform->SetLocalPosition( oldPositions[ i ] );
+            transform->SetLocalRotation( oldRotations[ i ] );
+            transform->SetLocalScale( oldScales[ i ] );
         }
+
+        ++i;
     }
 }

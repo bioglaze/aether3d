@@ -17,9 +17,17 @@
 #include "Shader.hpp"
 #include "Vec3.hpp"
 
+namespace ae3d
+{
+    struct Quaternion;
+}
+
 class SceneWidget : public QOpenGLWidget
 {
     Q_OBJECT
+
+signals:
+    void TransformModified( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
 
 public slots:
     void UpdateCamera();

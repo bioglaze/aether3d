@@ -2,6 +2,7 @@
 #define MODIFYTRANSFORMCOMMAND_HPP
 
 #include <list>
+#include <vector>
 #include "Command.hpp"
 #include "Vec3.hpp"
 #include "Quaternion.hpp"
@@ -20,9 +21,9 @@ private:
     ae3d::Vec3 position;
     ae3d::Quaternion rotation;
     float scale;
-    ae3d::Vec3 oldPosition;
-    ae3d::Quaternion oldRotation;
-    float oldScale = 1;
+    std::vector< ae3d::Vec3 > oldPositions;
+    std::vector< ae3d::Quaternion > oldRotations;
+    std::vector< float > oldScales;
     std::list< int > selectedGameObjects;
 };
 

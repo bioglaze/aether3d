@@ -29,7 +29,7 @@ std::string AbsoluteFilePath( const std::string& relativePath )
     dir.cdUp();
     dir.cdUp();
 #endif
-    return dir.absoluteFilePath( relativePath.c_str() ).toUtf8().constData();
+    return dir.absoluteFilePath( relativePath.c_str() ).toStdString();
 }
 
 void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screenHeight, GameObject& camera, Vec3& outRayOrigin, Vec3& outRayTarget )
@@ -421,13 +421,34 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
     else if (event->button() == Qt::MiddleButton)
     {
         mouseMode = MouseMode::Pan;
-        lastMousePosition[ 0 ] = QCursor::pos().x();//event->pos().x();
-        lastMousePosition[ 1 ] = QCursor::pos().y();//event->pos().y();
+        lastMousePosition[ 0 ] = QCursor::pos().x();
+        lastMousePosition[ 1 ] = QCursor::pos().y();
         cursor().setShape( Qt::ClosedHandCursor );
     }
     else if (event->button() == Qt::LeftButton)
     {
         dragAxis = CollidesWithGizmo( camera, transformGizmo.go, event->x(), event->y(), width(), height(), 200 );
+
+        if (dragAxis != GizmoAxis::None)
+        {
+            std::list< ae3d::GameObject* > selectedObjects;
+
+            for (auto& go : selectedGameObjects)
+            {
+                selectedObjects.push_back( gameObjects[ go ].get() );
+            }
+
+            auto transform = selectedObjects.front()->GetComponent< TransformComponent >();
+
+            if (transform)
+            {
+                auto pos = transform->GetLocalPosition();
+                auto rot = transform->GetLocalRotation();
+                auto sca = transform->GetLocalScale();
+                emit TransformModified( pos, rot, sca );
+                std::cout << "Drag start: Emitting command" << std::endl;
+            }
+        }
     }
 }
 
