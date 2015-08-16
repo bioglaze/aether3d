@@ -283,31 +283,6 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     clearColor[ 2 ] = blue;
 }
 
-unsigned ae3d::GfxDevice::CreateBufferId()
-{
-    return 0;
-}
-
-unsigned ae3d::GfxDevice::CreateTextureId()
-{
-    return textureHandle++;
-}
-
-unsigned ae3d::GfxDevice::CreateVaoId()
-{
-    return 0;
-}
-
-unsigned ae3d::GfxDevice::CreateShaderId( unsigned shaderType )
-{
-    return 0;
-}
-
-unsigned ae3d::GfxDevice::CreateProgramId()
-{
-    return 0;
-}
-
 void ae3d::GfxDevice::IncDrawCalls()
 {
     ++GfxDeviceGlobal::drawCalls;

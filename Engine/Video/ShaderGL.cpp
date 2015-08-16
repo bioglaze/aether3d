@@ -160,11 +160,12 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     uniformLocations = GetUniformLocations( program );
 }
 
-void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData,
-                         const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/ )
+void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexGLSL, const FileSystem::FileContentsData& fragmentGLSL,
+                         const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/,
+                         const FileSystem::FileContentsData& /*vertexHLSL*/, const FileSystem::FileContentsData& /*fragmentHLSL*/ )
 {
-    const std::string vertexStr = std::string( std::begin( vertexData.data ), std::end( vertexData.data ) );
-    const std::string fragmentStr = std::string( std::begin( fragmentData.data ), std::end( fragmentData.data ) );
+    const std::string vertexStr = std::string( std::begin( vertexGLSL.data ), std::end( vertexGLSL.data ) );
+    const std::string fragmentStr = std::string( std::begin( fragmentGLSL.data ), std::end( fragmentGLSL.data ) );
 
     Load( vertexStr.c_str(), fragmentStr.c_str() );
 
@@ -178,11 +179,11 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexData, const F
         }
     }
     
-    if (!isInCache && !vertexData.path.empty() && !fragmentData.path.empty())
+    if (!isInCache && !vertexGLSL.path.empty() && !fragmentGLSL.path.empty())
     {
-        fileWatcher.AddFile( vertexData.path.c_str(), ShaderReload );
-        fileWatcher.AddFile( fragmentData.path.c_str(), ShaderReload );
-        cacheEntries.push_back( { vertexData.path, fragmentData.path, this } );
+        fileWatcher.AddFile( vertexGLSL.path.c_str(), ShaderReload );
+        fileWatcher.AddFile( fragmentGLSL.path.c_str(), ShaderReload );
+        cacheEntries.push_back( { vertexGLSL.path, fragmentGLSL.path, this } );
     }
 }
 

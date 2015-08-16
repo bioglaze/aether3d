@@ -5,18 +5,15 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Oculus Release|x64">
-      <Configuration>Oculus Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{019FBC31-2509-43FE-9E2F-6AC4626F9808}</ProjectGuid>
-    <RootNamespace>Aether3D_GL45</RootNamespace>
+    <ProjectGuid>{8175F3CB-546B-4D77-B5BC-7A0F2D32FFCB}</ProjectGuid>
+    <RootNamespace>Aether3D_D3D12</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -32,36 +29,23 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'" Label="PropertySheets">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
-    <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
-    <TargetExt>.lib</TargetExt>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">
     <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
@@ -72,14 +56,11 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>DEBUG;_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;AETHER3D_D3D12</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <PreprocessorDefinitions>DEBUG;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies />
-      <NoEntryPoint>true</NoEntryPoint>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -91,38 +72,12 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;AETHER3D_D3D12</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies />
-      <NoEntryPoint>true</NoEntryPoint>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core;..\ThirdParty\LibOVRKernel\Src</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>OCULUS_RIFT;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <NoEntryPoint>true</NoEntryPoint>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -140,39 +95,31 @@
     <ClCompile Include="..\Core\Font.cpp" />
     <ClCompile Include="..\Core\Frustum.cpp" />
     <ClCompile Include="..\Core\Matrix.cpp" />
+    <ClCompile Include="..\Core\MatrixNEON.cpp" />
     <ClCompile Include="..\Core\MatrixSSE3.cpp" />
     <ClCompile Include="..\Core\Mesh.cpp" />
     <ClCompile Include="..\Core\Scene.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
-    <ClCompile Include="..\ThirdParty\GL\glxw.c" />
     <ClCompile Include="..\ThirdParty\stb_image.c" />
-    <ClCompile Include="..\ThirdParty\stb_vorbis.c">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Oculus Release|Win32'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="..\Video\DDSLoader.cpp" />
-    <ClCompile Include="..\Video\GfxDeviceGL45.cpp" />
+    <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
+    <ClCompile Include="..\Video\D3D12\GfxDeviceD3D12.cpp" />
+    <ClCompile Include="..\Video\D3D12\RendererD3D12.cpp" />
+    <ClCompile Include="..\Video\D3D12\RenderTextureD3D12.cpp" />
+    <ClCompile Include="..\Video\D3D12\ShaderD3D12.cpp" />
+    <ClCompile Include="..\Video\D3D12\Texture2D_D3D12.cpp" />
+    <ClCompile Include="..\Video\D3D12\TextureCubeD3D12.cpp" />
+    <ClCompile Include="..\Video\D3D12\VertexBufferD3D12.cpp" />
     <ClCompile Include="..\Video\Material.cpp" />
     <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />
-    <ClCompile Include="..\Video\RendererGL.cpp" />
-    <ClCompile Include="..\Video\RenderTextureGL.cpp" />
-    <ClCompile Include="..\Video\ShaderGL.cpp" />
-    <ClCompile Include="..\Video\Texture2D_GL45.cpp" />
     <ClCompile Include="..\Video\TextureCommon.cpp" />
-    <ClCompile Include="..\Video\TextureCubeGL.cpp" />
-    <ClCompile Include="..\Video\VertexBufferGL.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
-    <ClCompile Include="..\Video\WindowWin32GL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp" />
     <ClInclude Include="..\Core\FileWatcher.hpp" />
     <ClInclude Include="..\Core\Frustum.hpp" />
+    <ClInclude Include="..\Core\SubMesh.hpp" />
     <ClInclude Include="..\Include\AudioClip.hpp" />
     <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />
@@ -198,10 +145,6 @@
     <ClInclude Include="..\Include\Vec3.hpp" />
     <ClInclude Include="..\Include\VR.hpp" />
     <ClInclude Include="..\Include\Window.hpp" />
-    <ClInclude Include="..\ThirdParty\GL\glcorearb.h" />
-    <ClInclude Include="..\ThirdParty\GL\glxw.h" />
-    <ClInclude Include="..\ThirdParty\GL\wglext.h" />
-    <ClInclude Include="..\Video\DDSLoader.hpp" />
     <ClInclude Include="..\Video\GfxDevice.hpp" />
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />

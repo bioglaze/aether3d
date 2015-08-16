@@ -28,11 +28,15 @@ namespace ae3d
         /// \param fragmentSource Fragment shader source.
         void Load( const char* vertexSource, const char* fragmentSource );
 
-        /// \param vertexData GLSL Vertex shader file contents.
-        /// \param fragmentData GLSL Fragment shader file contents.
+        /// \param vertexDataGLSL GLSL Vertex shader file contents.
+        /// \param fragmentDataGLSL GLSL Fragment shader file contents.
         /// \param metalVertexShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param metalFragmentShaderName Fragment shader name for Metal renderer. Must be referenced by the application's Xcode project.
-        void Load( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData, const char* metalVertexShaderName, const char* metalFragmentShaderName );
+        /// \param vertexDataHLSL HLSL Vertex shader file contents.
+        /// \param fragmentDataHLSL HLSL Fragment shader file contents.
+        void Load( const FileSystem::FileContentsData& vertexDataGLSL, const FileSystem::FileContentsData& fragmentDataGLSL,
+                   const char* metalVertexShaderName, const char* metalFragmentShaderName,
+                   const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL );
         
 #if AETHER3D_IOS
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );

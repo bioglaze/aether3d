@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{8cc6543b-af7b-4f80-983b-1ddbe1b6b59a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Video">
+      <UniqueIdentifier>{da2b4e46-daa2-4c06-82f1-f7d5ebe6e158}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ThirdParty\stb_image.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\stb_vorbis.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\AudioClip.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\AudioSystemOpenAL.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\FileSystem.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\FileWatcher.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Font.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Frustum.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Matrix.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MatrixNEON.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\MatrixSSE3.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Mesh.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\Scene.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\System.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\Material.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\RendererCommon.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\TextureCommon.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\WindowWin32.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\D3D12\GfxDeviceD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\D3D12\RendererD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\D3D12\RenderTextureD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\D3D12\Texture2D_D3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\D3D12\TextureCubeD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\AudioSourceComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\CameraComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\GameObject.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\MeshRendererComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\SpriteRendererComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\TextRendererComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Components\TransformComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\D3D12\VertexBufferD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\D3D12\ShaderD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OculusRiftSupport.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Core\AudioSystem.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\FileWatcher.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Frustum.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\SubMesh.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\GfxDevice.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\Renderer.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\VertexBuffer.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\AudioClip.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\AudioSourceComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\CameraComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\FileSystem.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Font.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\GameObject.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Macros.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Material.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Matrix.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Mesh.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MeshRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Quaternion.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\RenderTexture.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Scene.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Shader.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpriteRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\System.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Texture2D.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextureBase.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TextureCube.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\TransformComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Vec3.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Window.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\VR.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

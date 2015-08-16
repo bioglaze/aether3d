@@ -41,20 +41,11 @@ namespace ae3d
         void PresentDrawable();
         void BeginFrame();
 #endif
-
         void ClearScreen( unsigned clearFlags );
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture2D* target );
         void SetBackFaceCulling( bool enable );
         void SetMultiSampling( bool enable );
-
-        unsigned CreateBufferId();
-        unsigned CreateTextureId();
-        unsigned CreateVaoId();
-        unsigned CreateShaderId( unsigned shaderType );
-        unsigned CreateProgramId();
-        unsigned CreateRboId();
-        unsigned CreateFboId();
 
         void IncDrawCalls();
         int GetDrawCalls();
@@ -68,10 +59,23 @@ namespace ae3d
         void SetBlendMode( BlendMode blendMode );
         void SetDepthFunc( DepthFunc depthFunc );
         void ErrorCheck( const char* info );
+        void Present();
+
 #if RENDERER_OPENGL
+        unsigned CreateBufferId();
+        unsigned CreateTextureId();
+        unsigned CreateVaoId();
+        unsigned CreateShaderId( unsigned shaderType );
+        unsigned CreateProgramId();
+        unsigned CreateRboId();
+        unsigned CreateFboId();
+
         void SetBackBufferDimensionAndFBO( int width, int height );
         void ErrorCheckFBO();
         bool HasExtension( const char* glExtension );
+#endif
+#if AETHER3D_D3D12
+        void WaitForCommandQueueFence();
 #endif
     }
 }

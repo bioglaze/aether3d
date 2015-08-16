@@ -6,6 +6,8 @@
 #endif
 #include "Vec3.hpp"
 
+struct ID3D12Resource;
+
 namespace ae3d
 {
     /// Contains geometry used for rendering.
@@ -102,16 +104,21 @@ namespace ae3d
         static const int colorChannel = 2;
         static const int normalChannel = 3;
         static const int tangentChannel = 4;
-        
+
+        int elementCount = 0;
+        VertexFormat vertexFormat = VertexFormat::PTC;
+
         unsigned vaoId = 0;
         unsigned vboId = 0;
         unsigned iboId = 0;
         
-        int elementCount = 0;
-        VertexFormat vertexFormat = VertexFormat::PTC;
 #if AETHER3D_IOS
         id<MTLBuffer> vertexBuffer;
         id<MTLBuffer> indexBuffer;
+#endif
+#if AETHER3D_D3D12
+        ID3D12Resource* vb = nullptr;
+        ID3D12Resource* vbUpload = nullptr;
 #endif
     };
 }

@@ -1,3 +1,5 @@
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.3.zip
+
 #include <string>
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
@@ -48,8 +50,9 @@ int main()
 
     GameObject camera2d;
     camera2d.AddComponent<CameraComponent>();
+    camera2d.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DontClear );
+    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera2d.AddComponent<TransformComponent>();
     
     Texture2D fontTex;
@@ -84,7 +87,7 @@ int main()
     cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -100 } );
 
     Shader shader;
-    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag" );
+    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents(""), FileSystem::FileContents( "" ) );
 
     Texture2D asphaltTex;
     asphaltTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
@@ -106,7 +109,7 @@ int main()
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
-    //scene.SetSkybox( &skybox );
+    scene.SetSkybox( &skybox );
     //scene.Add( &camera2d );
     scene.Add( &camera );
     scene.Add( &cube );

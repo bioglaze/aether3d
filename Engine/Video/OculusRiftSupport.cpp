@@ -16,7 +16,7 @@ struct DepthBuffer
 {
     GLuint texId;
 
-    DepthBuffer( OVR::Sizei size )
+    explicit DepthBuffer( OVR::Sizei size )
     {
         glGenTextures( 1, &texId );
         glBindTexture( GL_TEXTURE_2D, texId );

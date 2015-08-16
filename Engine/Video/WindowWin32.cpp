@@ -418,6 +418,11 @@ namespace ae3d
 
     void Window::SwapBuffers()
     {
+#if RENDERER_OPENGL
         ::SwapBuffers( WindowGlobal::hdc );
+#endif
+#if AETHER3D_D3D12
+        GfxDevice::Present();
+#endif
     }
 }
