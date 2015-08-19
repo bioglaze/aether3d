@@ -12,16 +12,20 @@ void ae3d::BuiltinShaders::Load()
     float4 pos : SV_POSITION;\
     float4 color : COLOR;\
     };\
+cbuffer Scene\
+    {\
+        float4x4 mvp;\
+    };\
     VSOutput VSMain( float3 pos : POSITION, float4 color : COLOR )\
     {\
         VSOutput vsOut;\
-        vsOut.pos = float4( pos, 1.0 );\
+        vsOut.pos = mul( mvp, float4( pos, 1.0 ) );\
         vsOut.color = color;\
         return vsOut;\
     }\
     float4 PSMain( VSOutput vsOut ) : SV_Target\
     {\
-        return vsOut.color;\
+        return float4(0.0, 0.0, 0.0, 1.0);\
     }"
         );
 

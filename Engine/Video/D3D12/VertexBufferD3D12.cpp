@@ -4,13 +4,18 @@
 #include <d3dx12.h>
 #include "GfxDevice.hpp"
 #include "Vec3.hpp"
+#include "System.hpp"
 
 #define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
 
-namespace Global
+namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* commandList;
+}
+
+namespace Global
+{
     std::vector< ID3D12Resource* > vbs;
     std::vector< ID3D12Resource* > vbUploads;
 }
@@ -28,15 +33,79 @@ void DestroyVertexBuffers()
     }
 }
 
+unsigned ae3d::VertexBuffer::GetVBSize() const
+{
+    // TODO: Vertex count
+    return elementCount * GetStride();
+}
+
+unsigned ae3d::VertexBuffer::GetIBSize() const
+{
+    return elementCount * 2;
+}
+
+unsigned ae3d::VertexBuffer::GetStride() const
+{
+    if (vertexFormat == VertexFormat::PTC)
+    {
+        return sizeof( VertexPTC );
+    }
+    else if (vertexFormat == VertexFormat::PTN)
+    {
+        return sizeof( VertexPTN );
+    }
+    else if (vertexFormat == VertexFormat::PTNTC)
+    {
+        return sizeof( VertexPTN );
+    }
+    else
+    {
+        System::Assert( false, "unhandled vertex format!" );
+        return sizeof( VertexPTC );
+    }
+}
+
+void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize )
+{
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD ),
+        D3D12_HEAP_FLAG_NONE,
+        &CD3DX12_RESOURCE_DESC::Buffer( ibOffset + ibSize ),
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS( &vb ) );
+    if (FAILED( hr ))
+    {
+        OutputDebugStringA( "Unable to create vertex buffer!\n" );
+    }
+
+    vb->SetName( L"VertexBuffer" );
+    char* vbUploadPtr = nullptr;
+    hr = vb->Map( 0, nullptr, reinterpret_cast<void**>(&vbUploadPtr) );
+    if (FAILED( hr ))
+    {
+        OutputDebugStringA( "Unable to map vertex buffer!\n" );
+    }
+
+    memcpy_s( vbUploadPtr, ibOffset, vertices, ibOffset );
+    memcpy_s( vbUploadPtr + ibOffset, ibSize, faces, ibSize );
+    vb->Unmap( 0, nullptr );
+}
+
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTC;
     elementCount = faceCount * 3;
 
-    HRESULT hr = Global::device->CreateCommittedResource(
+    const UINT64 ibSize = elementCount * 2;
+    ibOffset = sizeof( VertexPTC ) * vertexCount;
+
+    UploadVB( (void*)faces, (void*)vertices, ibSize );
+#if 0
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ),
         D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer( sizeof( VertexPTC ) * vertexCount ),
+        &CD3DX12_RESOURCE_DESC::Buffer( sizeof( VertexPTC ) * vertexCount + ibSize ),
         D3D12_RESOURCE_STATE_COPY_DEST,
         nullptr,
         IID_PPV_ARGS( &vb ) );
@@ -48,7 +117,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vb->SetName( L"Vertex Buffer Resource" );
     Global::vbs.push_back( vb );
 
-    hr = Global::device->CreateCommittedResource(
+    hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer( sizeof( VertexPTC ) * vertexCount ),
@@ -70,10 +139,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexData.RowPitch = sizeof( VertexPTC ) * vertexCount;
         vertexData.SlicePitch = vertexData.RowPitch;
 
-        UpdateSubresources( Global::commandList, vb, vbUpload, 0, 0, 1, &vertexData );
-        Global::commandList->ResourceBarrier( 1, &CD3DX12_RESOURCE_BARRIER::Transition( vb, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER ) );
+        UpdateSubresources( GfxDeviceGlobal::commandList, vb, vbUpload, 0, 0, 1, &vertexData );
+        GfxDeviceGlobal::commandList->ResourceBarrier( 1, &CD3DX12_RESOURCE_BARRIER::Transition( vb, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER ) );
     }
-
+#endif
     GfxDevice::WaitForCommandQueueFence();
 }
 
@@ -81,8 +150,14 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 {
     vertexFormat = VertexFormat::PTN;
     elementCount = faceCount * 3;
- 
-    HRESULT hr = Global::device->CreateCommittedResource(
+
+    const UINT64 ibSize = elementCount * 2;
+    ibOffset = sizeof( VertexPTN ) * vertexCount;
+
+    UploadVB( (void*)faces, (void*)vertices, ibSize );
+
+#if 0
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer( sizeof( VertexPTN ) * vertexCount ),
@@ -97,7 +172,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vb->SetName( L"Vertex Buffer Resource" );
     Global::vbs.push_back( vb );
 
-    hr = Global::device->CreateCommittedResource(
+    hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer( sizeof( VertexPTN ) * vertexCount ),
@@ -119,10 +194,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexData.RowPitch = sizeof( VertexPTN ) * vertexCount;
         vertexData.SlicePitch = vertexData.RowPitch;
 
-        UpdateSubresources( Global::commandList, vb, vbUpload, 0, 0, 1, &vertexData );
-        Global::commandList->ResourceBarrier( 1, &CD3DX12_RESOURCE_BARRIER::Transition( vb, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER ) );
+        UpdateSubresources( GfxDeviceGlobal::commandList, vb, vbUpload, 0, 0, 1, &vertexData );
+        GfxDeviceGlobal::commandList->ResourceBarrier( 1, &CD3DX12_RESOURCE_BARRIER::Transition( vb, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER ) );
     }
-
+#endif
     GfxDevice::WaitForCommandQueueFence();
 }
 
@@ -131,7 +206,13 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
 
-    HRESULT hr = Global::device->CreateCommittedResource(
+    const UINT64 ibSize = elementCount * 2;
+    ibOffset = sizeof( VertexPTNTC ) * vertexCount;
+
+    UploadVB( (void*)faces, (void*)vertices, ibSize );
+
+#if 0
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer( sizeof( VertexPTNTC ) * vertexCount ),
@@ -146,7 +227,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vb->SetName( L"Vertex Buffer Resource" );
     Global::vbs.push_back( vb );
 
-    hr = Global::device->CreateCommittedResource(
+    hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer( sizeof( VertexPTNTC ) * vertexCount ),
@@ -168,10 +249,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexData.RowPitch = sizeof( VertexPTNTC ) * vertexCount;
         vertexData.SlicePitch = vertexData.RowPitch;
 
-        UpdateSubresources( Global::commandList, vb, vbUpload, 0, 0, 1, &vertexData );
-        Global::commandList->ResourceBarrier( 1, &CD3DX12_RESOURCE_BARRIER::Transition( vb, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER ) );
+        UpdateSubresources( GfxDeviceGlobal::commandList, vb, vbUpload, 0, 0, 1, &vertexData );
+        GfxDeviceGlobal::commandList->ResourceBarrier( 1, &CD3DX12_RESOURCE_BARRIER::Transition( vb, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER ) );
     }
-
+#endif
     GfxDevice::WaitForCommandQueueFence();
 }
 

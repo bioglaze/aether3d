@@ -6,6 +6,9 @@
 #if AETHER3D_IOS
 #import <Metal/Metal.h>
 #endif
+#if AETHER3D_D3D12
+#include <d3d12.h>
+#endif
 
 namespace ae3d
 {
@@ -74,6 +77,16 @@ namespace ae3d
         /// \param name Vector uniform name.
         /// \param vec4 Vec4 contents.
         void SetVector4( const char* name, const float* vec4 );
+
+#if AETHER3D_D3D12
+        void CreateConstantBuffer();
+        ID3D12DescriptorHeap* GetDescriptorHeap() const { return mDescHeapCbvSrvUav; }
+        ID3D12DescriptorHeap* mDescHeapCbvSrvUav = nullptr;
+        ID3D12Resource* constantBuffer = nullptr;
+        void* constantBufferUpload = nullptr;
+        ID3DBlob* blobShaderVertex = nullptr;
+        ID3DBlob* blobShaderPixel = nullptr;
+#endif
 
 #if AETHER3D_IOS
         id <MTLFunction> vertexProgram;

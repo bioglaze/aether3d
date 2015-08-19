@@ -4,10 +4,14 @@
 #include <Windows.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <d3dx12.h>
 #include <vector>
+#include <unordered_map>
 #include <string>
 #include "System.hpp"
 #include "RenderTexture.hpp"
+#include "Shader.hpp"
+#include "VertexBuffer.hpp"
 
 #define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
 
@@ -18,7 +22,7 @@ namespace WindowGlobal
     extern HWND hwnd;
 }
 
-namespace Global
+namespace GfxDeviceGlobal
 {
     const unsigned BufferCount = 2;
     int drawCalls = 0;
@@ -32,14 +36,13 @@ namespace Global
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12CommandQueue* commandQueue = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
-    ID3D12PipelineState* pso = nullptr;
     ID3D12GraphicsCommandList* commandList = nullptr;
-    // Create a GPU fence that will fire an event once the command list has been executed by the command queue.
     ID3D12Fence* fence = nullptr;
     unsigned frameIndex = 0;
-    ID3D12DescriptorHeap* rtvDescriptorHeap2;
+    ID3D12DescriptorHeap* rtvDescriptorHeap;
     HANDLE fenceEvent;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
+    std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
 }
 
 void setResourceBarrier( ID3D12GraphicsCommandList* commandList, ID3D12Resource* res,
@@ -61,34 +64,122 @@ namespace ae3d
 
 void CreateDescriptorHeap()
 {
-    for (int i = 0; i < Global::BufferCount; ++i)
+    for (int i = 0; i < GfxDeviceGlobal::BufferCount; ++i)
     {
-        const HRESULT hr = Global::swapChain->GetBuffer( i, IID_PPV_ARGS( &Global::renderTargets[ i ] ) );
+        const HRESULT hr = GfxDeviceGlobal::swapChain->GetBuffer( i, IID_PPV_ARGS( &GfxDeviceGlobal::renderTargets[ i ] ) );
         if (FAILED( hr ))
         {
             OutputDebugStringA( "Failed to create RTV!\n" );
         }
 
-        Global::renderTargets[ i ]->SetName( L"SwapChain_Buffer" );
+        GfxDeviceGlobal::renderTargets[ i ]->SetName( L"SwapChain_Buffer" );
     }
 
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     desc.NumDescriptors = 10;
     desc.NodeMask = 0;
-    const HRESULT hr = Global::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &Global::rtvDescriptorHeap2 ) );
+    const HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::rtvDescriptorHeap ) );
     if (FAILED( hr ))
     {
         OutputDebugStringA( "Failed to create descriptor heap!\n" );
     }
 
-    auto rtvStep = Global::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
-    for (auto i = 0u; i < Global::BufferCount; ++i)
+    auto rtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
+    for (auto i = 0u; i < GfxDeviceGlobal::BufferCount; ++i)
     {
-        auto d = Global::rtvDescriptorHeap2->GetCPUDescriptorHandleForHeapStart();
+        auto d = GfxDeviceGlobal::rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
         d.ptr += i * rtvStep;
-        Global::device->CreateRenderTargetView( Global::renderTargets[ i ], nullptr, d );
+        GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], nullptr, d );
     }
+}
+
+void CreateRootSignature()
+{
+    CD3DX12_DESCRIPTOR_RANGE descRange1[ 1 ];
+    descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
+
+    CD3DX12_ROOT_PARAMETER rootParam[ 1 ];
+    rootParam[ 0 ].InitAsDescriptorTable( ARRAYSIZE( descRange1 ), descRange1 );
+
+    ID3DBlob* pOutBlob = nullptr;
+    ID3DBlob* pErrorBlob = nullptr;
+    D3D12_ROOT_SIGNATURE_DESC descRootSignature;
+    descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    descRootSignature.NumParameters = 1;
+    descRootSignature.NumStaticSamplers = 0;
+    descRootSignature.pParameters = rootParam;
+    descRootSignature.pStaticSamplers = nullptr;
+    D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
+    HRESULT hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
+    if (FAILED( hr ))
+    {
+        OutputDebugStringA( "Unable to create root signature!\n" );
+    }
+}
+
+std::string GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+{
+    std::string hashString;
+    hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
+    hashString += std::to_string( (ptrdiff_t)&shader.blobShaderVertex );
+    hashString += std::to_string( (ptrdiff_t)&shader.blobShaderPixel );
+    hashString += std::to_string( (unsigned)blendMode );
+    hashString += std::to_string( ((unsigned)depthFunc) + 4 );
+    return hashString;
+}
+
+void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+{
+    D3D12_RASTERIZER_DESC descRaster;
+    ZeroMemory( &descRaster, sizeof( descRaster ) );
+    descRaster.CullMode = D3D12_CULL_MODE_NONE;
+    descRaster.DepthBias = 0;
+    descRaster.DepthBiasClamp = 0;
+    descRaster.DepthClipEnable = true;
+    descRaster.FillMode = D3D12_FILL_MODE_SOLID;
+    descRaster.FrontCounterClockwise = false;
+    descRaster.MultisampleEnable = false;
+    descRaster.SlopeScaledDepthBias = 0;
+
+    D3D12_BLEND_DESC descBlend;
+    ZeroMemory( &descBlend, sizeof( descBlend ) );
+
+    D3D12_INPUT_ELEMENT_DESC layout[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+    };
+    
+    const UINT numElements = sizeof( layout ) / sizeof( layout[ 0 ] );
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC descPso;
+    ZeroMemory( &descPso, sizeof( descPso ) );
+    descPso.InputLayout = { layout, numElements };
+    descPso.pRootSignature = GfxDeviceGlobal::rootSignature;
+    descPso.VS = { reinterpret_cast<BYTE*>(shader.blobShaderVertex->GetBufferPointer()), shader.blobShaderVertex->GetBufferSize() };
+    descPso.PS = { reinterpret_cast<BYTE*>(shader.blobShaderPixel->GetBufferPointer()), shader.blobShaderPixel->GetBufferSize() };
+    descPso.RasterizerState = descRaster;
+    descPso.BlendState = descBlend;
+    descPso.DepthStencilState.DepthEnable = FALSE;
+    descPso.DepthStencilState.StencilEnable = FALSE;
+    descPso.SampleMask = UINT_MAX;
+    descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    descPso.NumRenderTargets = 1;
+    descPso.RTVFormats[ 0 ] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descPso.SampleDesc.Count = 1;
+
+    const std::string hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
+    ID3D12PipelineState* pso;
+    HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
+
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to create PSO!\n" );
+        return;
+    }
+
+    GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
 void ae3d::CreateRenderer( int /*samples*/ )
@@ -105,7 +196,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
         OutputDebugStringA( "Failed to create debug layer!\n" );
     }
 #endif
-    HRESULT hr = D3D12CreateDevice( nullptr, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)&Global::device );
+    HRESULT hr = D3D12CreateDevice( nullptr, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)&GfxDeviceGlobal::device );
     if (hr != S_OK)
     {
         OutputDebugStringA( "Failed to create D3D12 device!\n" );
@@ -113,7 +204,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
         return;
     }
 
-    hr = Global::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&Global::commandListAllocator );
+    hr = GfxDeviceGlobal::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&GfxDeviceGlobal::commandListAllocator );
     if (FAILED( hr ))
     {
         OutputDebugStringA( "Failed to create command allocator!\n" );
@@ -121,7 +212,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
         return;
     }
 
-    hr = Global::device->CreateCommandList( 1, D3D12_COMMAND_LIST_TYPE_DIRECT, Global::commandListAllocator, nullptr, __uuidof(ID3D12CommandList), (void**)&Global::commandList );
+    hr = GfxDeviceGlobal::device->CreateCommandList( 1, D3D12_COMMAND_LIST_TYPE_DIRECT, GfxDeviceGlobal::commandListAllocator, nullptr, __uuidof(ID3D12CommandList), (void**)&GfxDeviceGlobal::commandList );
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Failed to create command list.\n" );
@@ -130,18 +221,16 @@ void ae3d::CreateRenderer( int /*samples*/ )
 
     D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
     commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-    hr = Global::device->CreateCommandQueue( &commandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)&Global::commandQueue );
+    hr = GfxDeviceGlobal::device->CreateCommandQueue( &commandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)&GfxDeviceGlobal::commandQueue );
     if (FAILED( hr ))
     {
         OutputDebugStringA( "Failed to create command queue!\n" );
     }
 
-    // Create the swap chain descriptor
     DXGI_SWAP_CHAIN_DESC swapChainDesc{ {},{ 1, 0 }, DXGI_USAGE_RENDER_TARGET_OUTPUT, 2, WindowGlobal::hwnd, TRUE, DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH };
     ZeroMemory( &swapChainDesc.BufferDesc, sizeof( swapChainDesc.BufferDesc ) );
     swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    // Create a DXGI factory to create the swapchain from the command queue
     IDXGIFactory2 *dxgiFactory = nullptr;
     unsigned factoryFlags = 0;
 #if DEBUG
@@ -152,24 +241,57 @@ void ae3d::CreateRenderer( int /*samples*/ )
     {
         OutputDebugStringA( "Failed to create DXGI factory!\n" );
     }
-    // Create the swap chain using the command queue, NOT using the device.
-    hr = dxgiFactory->CreateSwapChain( Global::commandQueue, &swapChainDesc, (IDXGISwapChain**)&Global::swapChain );
+
+    hr = dxgiFactory->CreateSwapChain( GfxDeviceGlobal::commandQueue, &swapChainDesc, (IDXGISwapChain**)&GfxDeviceGlobal::swapChain );
     if (FAILED( hr ))
     {
         OutputDebugStringA( "Failed to create DXGI factory!\n" );
     }
     dxgiFactory->Release();
 
-    hr = Global::device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&Global::fence );
+    hr = GfxDeviceGlobal::device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&GfxDeviceGlobal::fence );
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Failed to create fence!\n" );
         return;
     }
 
-    Global::fenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
+    GfxDeviceGlobal::fenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
 
     CreateDescriptorHeap();
+    CreateRootSignature();
+}
+
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+{
+    const std::string psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
+    
+    if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
+    {
+        CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
+    }
+    
+    GfxDeviceGlobal::commandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
+    GfxDeviceGlobal::commandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
+
+    ID3D12DescriptorHeap* descHeaps[] = { shader.GetDescriptorHeap() };
+    GfxDeviceGlobal::commandList->SetDescriptorHeaps( 1, descHeaps );
+    GfxDeviceGlobal::commandList->SetGraphicsRootDescriptorTable( 0, shader.GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart() );
+
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+    vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
+    vertexBufferView.StrideInBytes = vertexBuffer.GetStride();
+    vertexBufferView.SizeInBytes = vertexBuffer.GetVBSize();
+
+    D3D12_INDEX_BUFFER_VIEW indexBufferView;
+    indexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress() + vertexBuffer.GetIBOffset();
+    indexBufferView.SizeInBytes = vertexBuffer.GetIBSize();
+    indexBufferView.Format = DXGI_FORMAT_R16_UINT;
+
+    GfxDeviceGlobal::commandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    GfxDeviceGlobal::commandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
+    GfxDeviceGlobal::commandList->IASetIndexBuffer( &indexBufferView );
+    GfxDeviceGlobal::commandList->DrawIndexedInstanced( vertexBuffer.GetIndexCount(), 1, 0, 0, 0 );
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
@@ -182,59 +304,63 @@ void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
 
 void ae3d::GfxDevice::IncDrawCalls()
 {
-    ++Global::drawCalls;
+    ++GfxDeviceGlobal::drawCalls;
 }
 
 void ae3d::GfxDevice::IncTextureBinds()
 {
-    ++Global::textureBinds;
+    ++GfxDeviceGlobal::textureBinds;
 }
 
 void ae3d::GfxDevice::IncVertexBufferBinds()
 {
-    ++Global::vaoBinds;
+    ++GfxDeviceGlobal::vaoBinds;
 }
 
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
-    Global::drawCalls = 0;
-    Global::vaoBinds = 0;
-    Global::textureBinds = 0;
+    GfxDeviceGlobal::drawCalls = 0;
+    GfxDeviceGlobal::vaoBinds = 0;
+    GfxDeviceGlobal::textureBinds = 0;
 
     // TODO: Create BeginFrame() etc.
-    ++Global::frameIndex;
+    ++GfxDeviceGlobal::frameIndex;
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
 {
-    return Global::drawCalls;
+    return GfxDeviceGlobal::drawCalls;
 }
 
 int ae3d::GfxDevice::GetTextureBinds()
 {
-    return Global::textureBinds;
+    return GfxDeviceGlobal::textureBinds;
 }
 
 int ae3d::GfxDevice::GetVertexBufferBinds()
 {
-    return Global::vaoBinds;
+    return GfxDeviceGlobal::vaoBinds;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
-    CloseHandle( Global::fenceEvent );
-    //Global::rtvDescriptorHeap.Destroy();
-    AE3D_SAFE_RELEASE( Global::rtvDescriptorHeap2 );
-    AE3D_SAFE_RELEASE( Global::commandList );
-    AE3D_SAFE_RELEASE( Global::commandListAllocator );
-    AE3D_SAFE_RELEASE( Global::commandQueue );
-    AE3D_SAFE_RELEASE( Global::fence );
-    AE3D_SAFE_RELEASE( Global::pso );
-    AE3D_SAFE_RELEASE( Global::rootSignature );
-    AE3D_SAFE_RELEASE( Global::device );
-    AE3D_SAFE_RELEASE( Global::renderTargets[ 0 ] );
-    AE3D_SAFE_RELEASE( Global::renderTargets[ 1 ] );
-    AE3D_SAFE_RELEASE( Global::swapChain );
+    CloseHandle( GfxDeviceGlobal::fenceEvent );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rtvDescriptorHeap );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandList );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
+    
+    for (auto& pso : GfxDeviceGlobal::psoCache)
+    {
+        AE3D_SAFE_RELEASE( pso.second );
+    }
+
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 0 ] );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 1 ] );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
     DestroyVertexBuffers();
 }
 
@@ -246,52 +372,51 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     }
 
     // Barrier Present -> RenderTarget
-    ID3D12Resource* d3dBuffer = Global::renderTargets[ (Global::frameIndex - 1) % Global::BufferCount ];
-    setResourceBarrier( Global::commandList, d3dBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET );
+    ID3D12Resource* d3dBuffer = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
+    setResourceBarrier( GfxDeviceGlobal::commandList, d3dBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET );
 
     // Viewport
     D3D12_VIEWPORT viewport = {};
-    viewport.Width = (float)Global::backBufferWidth;
-    viewport.Height = (float)Global::backBufferHeight;
-    Global::commandList->RSSetViewports( 1, &viewport );
+    D3D12_VIEWPORT mViewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
+    GfxDeviceGlobal::commandList->RSSetViewports( 1, &viewport );
 
-    D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = Global::rtvDescriptorHeap2->GetCPUDescriptorHandleForHeapStart();
-    auto descHandleRtvStep = Global::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
-    descHandleRtv.ptr += ((Global::frameIndex - 1) % Global::BufferCount) * descHandleRtvStep;
-    Global::commandList->ClearRenderTargetView( descHandleRtv, Global::clearColor, 0, nullptr );
+    D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = GfxDeviceGlobal::rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
+    descHandleRtv.ptr += ((GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount) * descHandleRtvStep;
+    GfxDeviceGlobal::commandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
 }
 
 void ae3d::GfxDevice::Present()
 {
     // Barrier RenderTarget -> Present
-    ID3D12Resource* d3dBuffer = Global::renderTargets[ (Global::frameIndex - 1) % Global::BufferCount ];
-    setResourceBarrier( Global::commandList, d3dBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT );
+    ID3D12Resource* d3dBuffer = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
+    setResourceBarrier( GfxDeviceGlobal::commandList, d3dBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT );
 
-    HRESULT hr = Global::commandList->Close();
+    HRESULT hr = GfxDeviceGlobal::commandList->Close();
     if (hr != S_OK)
     {
         OutputDebugStringA( "Failed to close command list!\n" );
     }
 
-    ID3D12CommandList* const cmdList = Global::commandList;
-    Global::commandQueue->ExecuteCommandLists( 1, &cmdList );
+    ID3D12CommandList* const cmdList = GfxDeviceGlobal::commandList;
+    GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, &cmdList );
 
-    hr = Global::swapChain->Present( 1, 0 );
+    hr = GfxDeviceGlobal::swapChain->Present( 1, 0 );
     if (FAILED( hr ))
     {
         OutputDebugStringA( "Present() failed\n" );
     }
 
-    Global::fence->SetEventOnCompletion( Global::frameIndex, Global::fenceEvent );
-    Global::commandQueue->Signal( Global::fence, Global::frameIndex );
-    DWORD wait = WaitForSingleObject( Global::fenceEvent, 10000 );
+    GfxDeviceGlobal::fence->SetEventOnCompletion( GfxDeviceGlobal::frameIndex, GfxDeviceGlobal::fenceEvent );
+    GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, GfxDeviceGlobal::frameIndex );
+    DWORD wait = WaitForSingleObject( GfxDeviceGlobal::fenceEvent, 10000 );
     if (wait != WAIT_OBJECT_0)
     {
         OutputDebugStringA( "Present() failed in WaitForSingleObject\n" );
     }
 
-    Global::commandListAllocator->Reset();
-    Global::commandList->Reset( Global::commandListAllocator, nullptr );
+    GfxDeviceGlobal::commandListAllocator->Reset();
+    GfxDeviceGlobal::commandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
 }
 
 void ae3d::GfxDevice::SetBackFaceCulling( bool /*enable*/ )
@@ -300,9 +425,9 @@ void ae3d::GfxDevice::SetBackFaceCulling( bool /*enable*/ )
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 {
-    Global::clearColor[ 0 ] = red;
-    Global::clearColor[ 1 ] = green;
-    Global::clearColor[ 2 ] = blue;
+    GfxDeviceGlobal::clearColor[ 0 ] = red;
+    GfxDeviceGlobal::clearColor[ 1 ] = green;
+    GfxDeviceGlobal::clearColor[ 2 ] = blue;
 }
 
 void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
@@ -348,25 +473,25 @@ void ae3d::GfxDevice::SetDepthFunc( DepthFunc depthFunc )
 void ae3d::GfxDevice::WaitForCommandQueueFence()
 {
     // Reset the fence signal
-    HRESULT hr = Global::fence->Signal( 0 );
+    HRESULT hr = GfxDeviceGlobal::fence->Signal( 0 );
     if (FAILED( hr ))
     {
         return;
     }
     // Set the event to be fired once the signal value is 1
-    hr = Global::fence->SetEventOnCompletion( 1, Global::fenceEvent );
+    hr = GfxDeviceGlobal::fence->SetEventOnCompletion( 1, GfxDeviceGlobal::fenceEvent );
     if (FAILED( hr ))
     {
         return;
     }
 
     // After the command list has executed, tell the GPU to signal the fence
-    hr = Global::commandQueue->Signal( Global::fence, 1 );
+    hr = GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, 1 );
     if (FAILED( hr ))
     {
         return;
     }
 
     // Wait for the event to be fired by the fence
-    WaitForSingleObject( Global::fenceEvent, INFINITE );
+    WaitForSingleObject( GfxDeviceGlobal::fenceEvent, INFINITE );
 };

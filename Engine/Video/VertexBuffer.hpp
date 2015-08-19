@@ -7,6 +7,7 @@
 #include "Vec3.hpp"
 
 struct ID3D12Resource;
+struct ID3D12DescriptorHeap;
 
 namespace ae3d
 {
@@ -61,6 +62,26 @@ namespace ae3d
             float u, v;
             Vec3 normal;
         };
+
+        /// Return Stride in bytes.
+        unsigned GetStride() const;
+
+        /// \return Vertex buffer size in bytes.
+        unsigned GetVBSize() const;
+
+        /// \return Index buffer size in bytes.
+        unsigned GetIBSize() const;
+
+#if AETHER3D_D3D12
+        /// \return Vertex buffer resource.
+        ID3D12Resource* GetVBResource() { return vb; }
+
+        /// \return Index count.
+        long GetIndexCount() const { return elementCount; }
+
+        /// \return Index buffer offset from the beginning of the vb.
+        long GetIBOffset() const { return ibOffset; }
+#endif
 
         /// Binds the buffer. Must be called before Draw or DrawRange.
         void Bind() const;
@@ -117,8 +138,10 @@ namespace ae3d
         id<MTLBuffer> indexBuffer;
 #endif
 #if AETHER3D_D3D12
+        void UploadVB( void* faces, void* vertices, unsigned ibSize );
+        // Index buffer is stored in the vertex buffer after vertex data.
         ID3D12Resource* vb = nullptr;
-        ID3D12Resource* vbUpload = nullptr;
+        long ibOffset = 0;
 #endif
     };
 }

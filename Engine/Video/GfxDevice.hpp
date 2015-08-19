@@ -9,6 +9,8 @@
 namespace ae3d
 {
     class RenderTexture2D;
+    class VertexBuffer;
+    class Shader;
 
     /// Low-level graphics state abstraction.
     namespace GfxDevice
@@ -42,10 +44,15 @@ namespace ae3d
         void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );
+        void Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMode blendMode, DepthFunc depthFunc );
+        void ErrorCheck( const char* info );
+
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture2D* target );
         void SetBackFaceCulling( bool enable );
         void SetMultiSampling( bool enable );
+        void SetBlendMode( BlendMode blendMode );
+        void SetDepthFunc( DepthFunc depthFunc );
 
         void IncDrawCalls();
         int GetDrawCalls();
@@ -55,11 +62,8 @@ namespace ae3d
         int GetTextureBinds();
         void ResetFrameStatistics();
 
-        void ReleaseGPUObjects();
-        void SetBlendMode( BlendMode blendMode );
-        void SetDepthFunc( DepthFunc depthFunc );
-        void ErrorCheck( const char* info );
         void Present();
+        void ReleaseGPUObjects();
 
 #if RENDERER_OPENGL
         unsigned CreateBufferId();

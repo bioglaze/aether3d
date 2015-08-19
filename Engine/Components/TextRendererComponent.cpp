@@ -8,8 +8,6 @@
 #include "VertexBuffer.hpp"
 #include "Vec3.hpp"
 
-#include <iostream>
-
 extern ae3d::Renderer renderer;
 
 std::vector< ae3d::TextRendererComponent > textComponents;
@@ -93,7 +91,10 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
         m().font->CreateVertexBuffer( m().text.c_str(), m().color, m().vertexBuffer );
         m().isDirty = false;
     }
-
+#if AETHER3D_D3D12
+    m().shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+    GfxDevice::Draw( m().vertexBuffer, *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
+#else
     GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::AlphaBlend );
 
     auto shader = m().shader;
@@ -103,6 +104,7 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
 
     m().vertexBuffer.Bind();
     m().vertexBuffer.Draw();
+#endif
 }
 
 void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )

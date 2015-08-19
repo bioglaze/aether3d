@@ -2,6 +2,7 @@
 #include <vector>
 #include <d3d12.h>
 #include <d3dcompiler.h>
+#include <d3dx12.h>
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
 #include "GfxDevice.hpp"
@@ -12,6 +13,11 @@
 #define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
 
 extern ae3d::FileWatcher fileWatcher;
+
+namespace GfxDeviceGlobal
+{
+    extern ID3D12Device* device;
+}
 
 namespace
 {
@@ -47,19 +53,58 @@ void ShaderReload( const std::string& path )
     }
 }
 
+void ae3d::Shader::CreateConstantBuffer()
+{
+    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    desc.NumDescriptors = 100;
+    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    desc.NodeMask = 0;
+    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &mDescHeapCbvSrvUav ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Print( "Unable to create shader DescriptorHeap!" );
+        return;
+    }
+
+    hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD ),
+        D3D12_HEAP_FLAG_NONE,
+        &CD3DX12_RESOURCE_DESC::Buffer( D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT ),
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS( &constantBuffer ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Print( "Unable to create shader constant buffer!" );
+        return;
+    }
+
+    constantBuffer->SetName( L"ConstantBuffer" );
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+    cbvDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();
+    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
+    GfxDeviceGlobal::device->CreateConstantBufferView(
+        &cbvDesc,
+        mDescHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart() );
+    hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &constantBufferUpload ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Print( "Unable to map shader constant buffer!" );
+    }
+}
+
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
     const std::size_t vertexSourceLength = std::string( vertexSource ).size();
-    ID3DBlob* blobShaderVert = nullptr;
     ID3DBlob* blobError = nullptr;
-    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", 0, 0, &blobShaderVert, &blobError );
+    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", 0, 0, &blobShaderVertex, &blobError );
     if (FAILED( hr ))
     {
         ae3d::System::Print( "Unable to compile vertex shader: %s!\n", blobError->GetBufferPointer() );
         return;
     }
 
-    ID3DBlob* blobShaderPixel = nullptr;
     const std::size_t pixelSourceLength = std::string( fragmentSource ).size();
 
     hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", 0, 0, &blobShaderPixel, &blobError );
@@ -69,15 +114,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
         return;
     }
 
-    D3D12_INPUT_ELEMENT_DESC layout[] =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-    };
-    UINT numElements = sizeof( layout ) / sizeof( layout[ 0 ] );
-
-    AE3D_SAFE_RELEASE( blobShaderVert );
-    AE3D_SAFE_RELEASE( blobShaderPixel );
+    CreateConstantBuffer();
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/, const FileSystem::FileContentsData& /*fragmentDataGLSL*/,
@@ -111,8 +148,10 @@ void ae3d::Shader::Use()
 {
 }
 
-void ae3d::Shader::SetMatrix( const char* /*name*/, const float* /*matrix4x4*/ )
+void ae3d::Shader::SetMatrix( const char* /*name*/, const float* matrix4x4 )
 {
+    System::Assert( constantBufferUpload, "CreateConstantBuffer probably not called!" );
+    memcpy_s( constantBufferUpload, 64, matrix4x4, 64 );
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
