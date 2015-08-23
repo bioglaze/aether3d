@@ -87,5 +87,8 @@
     <ClInclude Include="..\..\..\Engine\Include\Material.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\VR.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -66,9 +66,6 @@ namespace ae3d
         /// Return Stride in bytes.
         unsigned GetStride() const;
 
-        /// \return Vertex buffer size in bytes.
-        unsigned GetVBSize() const;
-
         /// \return Index buffer size in bytes.
         unsigned GetIBSize() const;
 

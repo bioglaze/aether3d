@@ -127,7 +127,7 @@ struct RenderQueue
 {
     void Clear();
     void Build();
-    void Render();
+    void Render( ae3d::GfxDevice::BlendMode blendMode);
     
     bool isDirty = true;
     std::vector< Sprite > sprites;
@@ -148,7 +148,7 @@ void RenderQueue::Build()
     isDirty = false;
 }
 
-void RenderQueue::Render()
+void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
 {
     if (isDirty)
     {
@@ -159,8 +159,13 @@ void RenderQueue::Render()
     
     for (auto& drawable : drawables)
     {
-        renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", (const ae3d::Texture2D*)drawable.texture, 0);
+        renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (const ae3d::Texture2D*)drawable.texture, 0 );
+#if AETHER3D_D3D12
+        // TODO: DrawRange
+        ae3d::GfxDevice::Draw( vertexBuffer, renderer.builtinShaders.spriteRendererShader, blendMode, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
+#else
         vertexBuffer.DrawRange( drawable.bufferStart, drawable.bufferEnd );
+#endif
     }
 }
 
@@ -174,10 +179,8 @@ struct ae3d::SpriteRendererComponent::Impl
 
 void ae3d::SpriteRendererComponent::Impl::Render()
 {
-    GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::Off );
-    opaqueRenderQueue.Render();
-    GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::AlphaBlend );
-    transparentRenderQueue.Render();
+    opaqueRenderQueue.Render( ae3d::GfxDevice::BlendMode::Off );
+    transparentRenderQueue.Render( ae3d::GfxDevice::BlendMode::AlphaBlend );
 }
 
 unsigned ae3d::SpriteRendererComponent::New()

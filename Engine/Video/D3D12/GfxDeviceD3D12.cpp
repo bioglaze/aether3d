@@ -16,6 +16,7 @@
 #define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
 
 void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
+void DestroyShaders(); // Defined in ShaderD3D12.cpp
 
 namespace WindowGlobal
 {
@@ -33,13 +34,15 @@ namespace GfxDeviceGlobal
     ID3D12Device* device = nullptr;
     IDXGISwapChain3* swapChain = nullptr;
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
+    ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12CommandQueue* commandQueue = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
     ID3D12GraphicsCommandList* commandList = nullptr;
     ID3D12Fence* fence = nullptr;
     unsigned frameIndex = 0;
-    ID3D12DescriptorHeap* rtvDescriptorHeap;
+    ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+    ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
     HANDLE fenceEvent;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
@@ -73,6 +76,8 @@ void CreateDescriptorHeap()
         }
 
         GfxDeviceGlobal::renderTargets[ i ]->SetName( L"SwapChain_Buffer" );
+        GfxDeviceGlobal::backBufferWidth = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Width );
+        GfxDeviceGlobal::backBufferHeight = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Height );
     }
 
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -138,17 +143,29 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descRaster.DepthBiasClamp = 0;
     descRaster.DepthClipEnable = true;
     descRaster.FillMode = D3D12_FILL_MODE_SOLID;
-    descRaster.FrontCounterClockwise = false;
-    descRaster.MultisampleEnable = false;
+    descRaster.FrontCounterClockwise = FALSE;
+    descRaster.MultisampleEnable = FALSE;
     descRaster.SlopeScaledDepthBias = 0;
 
-    D3D12_BLEND_DESC descBlend;
-    ZeroMemory( &descBlend, sizeof( descBlend ) );
+    D3D12_BLEND_DESC descBlend = {};
+    descBlend.AlphaToCoverageEnable = FALSE;
+    descBlend.IndependentBlendEnable = FALSE;
+
+    const D3D12_RENDER_TARGET_BLEND_DESC rtBlend =
+    {
+        FALSE,FALSE,
+        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+        D3D12_LOGIC_OP_NOOP,
+        D3D12_COLOR_WRITE_ENABLE_ALL,
+    };
+    descBlend.RenderTarget[ 0 ] = rtBlend;
 
     D3D12_INPUT_ELEMENT_DESC layout[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
     
     const UINT numElements = sizeof( layout ) / sizeof( layout[ 0 ] );
@@ -156,6 +173,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     D3D12_GRAPHICS_PIPELINE_STATE_DESC descPso;
     ZeroMemory( &descPso, sizeof( descPso ) );
     descPso.InputLayout = { layout, numElements };
+    descPso.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
     descPso.pRootSignature = GfxDeviceGlobal::rootSignature;
     descPso.VS = { reinterpret_cast<BYTE*>(shader.blobShaderVertex->GetBufferPointer()), shader.blobShaderVertex->GetBufferSize() };
     descPso.PS = { reinterpret_cast<BYTE*>(shader.blobShaderPixel->GetBufferPointer()), shader.blobShaderPixel->GetBufferSize() };
@@ -163,10 +181,13 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descPso.BlendState = descBlend;
     descPso.DepthStencilState.DepthEnable = FALSE;
     descPso.DepthStencilState.StencilEnable = FALSE;
+    descPso.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
     descPso.SampleMask = UINT_MAX;
     descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     descPso.NumRenderTargets = 1;
     descPso.RTVFormats[ 0 ] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     descPso.SampleDesc.Count = 1;
 
     const std::string hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
@@ -180,6 +201,50 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     }
 
     GfxDeviceGlobal::psoCache[ hash ] = pso;
+}
+
+void CreateDepthStencilView()
+{
+    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    desc.NumDescriptors = 10;
+    desc.NodeMask = 0;
+    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::dsvDescriptorHeap ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to create depth-stencil descriptor!\n" );
+        return;
+    }
+
+    auto resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+        DXGI_FORMAT_R32_TYPELESS, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+        D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
+
+    D3D12_CLEAR_VALUE dsvClearValue;
+    dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+    dsvClearValue.DepthStencil.Depth = 1.0f;
+    dsvClearValue.DepthStencil.Stencil = 0;
+    hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ), // No need to read/write by CPU
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        &dsvClearValue,
+        IID_PPV_ARGS( &GfxDeviceGlobal::depthTexture ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to create depth-stencil texture!\n" );
+        return;
+    }
+    GfxDeviceGlobal::depthTexture->SetName( L"DepthTexture" );
+
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+    dsvDesc.Texture2D.MipSlice = 0;
+    dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+    GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &dsvDesc, GfxDeviceGlobal::dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart() );
+
 }
 
 void ae3d::CreateRenderer( int /*samples*/ )
@@ -260,6 +325,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
 
     CreateDescriptorHeap();
     CreateRootSignature();
+    CreateDepthStencilView();
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
@@ -271,17 +337,16 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMod
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
     }
     
-    GfxDeviceGlobal::commandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
     GfxDeviceGlobal::commandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
-
     ID3D12DescriptorHeap* descHeaps[] = { shader.GetDescriptorHeap() };
     GfxDeviceGlobal::commandList->SetDescriptorHeaps( 1, descHeaps );
     GfxDeviceGlobal::commandList->SetGraphicsRootDescriptorTable( 0, shader.GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::commandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
 
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
     vertexBufferView.StrideInBytes = vertexBuffer.GetStride();
-    vertexBufferView.SizeInBytes = vertexBuffer.GetVBSize();
+    vertexBufferView.SizeInBytes = vertexBuffer.GetIBOffset();
 
     D3D12_INDEX_BUFFER_VIEW indexBufferView;
     indexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress() + vertexBuffer.GetIBOffset();
@@ -346,11 +411,13 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 {
     CloseHandle( GfxDeviceGlobal::fenceEvent );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rtvDescriptorHeap );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::dsvDescriptorHeap );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
-    
+
     for (auto& pso : GfxDeviceGlobal::psoCache)
     {
         AE3D_SAFE_RELEASE( pso.second );
@@ -362,6 +429,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 1 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
     DestroyVertexBuffers();
+    DestroyShaders();
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
@@ -370,20 +438,28 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     {
         return;
     }
-
+    
     // Barrier Present -> RenderTarget
     ID3D12Resource* d3dBuffer = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
     setResourceBarrier( GfxDeviceGlobal::commandList, d3dBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET );
 
     // Viewport
-    D3D12_VIEWPORT viewport = {};
     D3D12_VIEWPORT mViewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
-    GfxDeviceGlobal::commandList->RSSetViewports( 1, &viewport );
+    GfxDeviceGlobal::commandList->RSSetViewports( 1, &mViewPort );
+
+    D3D12_RECT scissor = {};
+    scissor.right = (LONG)GfxDeviceGlobal::backBufferWidth;
+    scissor.bottom = (LONG)GfxDeviceGlobal::backBufferHeight;
+    GfxDeviceGlobal::commandList->RSSetScissorRects( 1, &scissor );
 
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = GfxDeviceGlobal::rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
     descHandleRtv.ptr += ((GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount) * descHandleRtvStep;
     GfxDeviceGlobal::commandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
+
+    D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = GfxDeviceGlobal::dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    GfxDeviceGlobal::commandList->ClearDepthStencilView( descHandleDsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr );
+    GfxDeviceGlobal::commandList->OMSetRenderTargets( 1, &descHandleRtv, TRUE, &descHandleDsv );
 }
 
 void ae3d::GfxDevice::Present()

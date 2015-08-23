@@ -16,7 +16,7 @@ cbuffer Scene\
     {\
         float4x4 mvp;\
     };\
-    VSOutput VSMain( float3 pos : POSITION, float4 color : COLOR )\
+    VSOutput VSMain( float3 pos : POSITION, float2 uv : TEXCOORD, float4 color : COLOR )\
     {\
         VSOutput vsOut;\
         vsOut.pos = mul( mvp, float4( pos, 1.0 ) );\
@@ -25,10 +25,11 @@ cbuffer Scene\
     }\
     float4 PSMain( VSOutput vsOut ) : SV_Target\
     {\
-        return float4(0.0, 0.0, 0.0, 1.0);\
+        return float4(0.0, 1.0, 0.0, 1.0);\
     }"
         );
 
     spriteRendererShader.Load( source.c_str(), source.c_str() );
-
+    sdfShader.Load( source.c_str(), source.c_str() );
+    skyboxShader.Load( source.c_str(), source.c_str() );
 }

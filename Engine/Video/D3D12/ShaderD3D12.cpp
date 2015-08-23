@@ -19,6 +19,29 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
 }
 
+namespace Global
+{
+    std::vector< ID3DBlob* > shaders;
+    std::vector< ID3D12DescriptorHeap* > descHeaps;
+    std::vector< ID3D12Resource* > constantBuffers;
+}
+
+void DestroyShaders()
+{
+    for (std::size_t i = 0; i < Global::shaders.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( Global::shaders[ i ] );
+    }
+
+    ae3d::System::Assert( Global::descHeaps.size() == Global::constantBuffers.size(), "sizes must equal" );
+
+    for (std::size_t i = 0; i < Global::descHeaps.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( Global::descHeaps[ i ] );
+        AE3D_SAFE_RELEASE( Global::constantBuffers[ i ] );
+    }
+}
+
 namespace
 {
     struct ShaderCacheEntry
@@ -67,6 +90,8 @@ void ae3d::Shader::CreateConstantBuffer()
         return;
     }
 
+    Global::descHeaps.push_back( mDescHeapCbvSrvUav );
+
     hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD ),
         D3D12_HEAP_FLAG_NONE,
@@ -79,6 +104,8 @@ void ae3d::Shader::CreateConstantBuffer()
         ae3d::System::Print( "Unable to create shader constant buffer!" );
         return;
     }
+
+    Global::constantBuffers.push_back( constantBuffer );
 
     constantBuffer->SetName( L"ConstantBuffer" );
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
@@ -113,6 +140,9 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
         ae3d::System::Print( "Unable to compile pixel shader: %s!\n", blobError->GetBufferPointer() );
         return;
     }
+
+    Global::shaders.push_back( blobShaderVertex );
+    Global::shaders.push_back( blobShaderPixel );
 
     CreateConstantBuffer();
 }
