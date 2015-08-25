@@ -116,7 +116,7 @@ int main()
     //scene.Add( &cube2 );
     scene.Add( &statsContainer );
 
-    GameObject cubes[ 5 ];
+    /*GameObject cubes[ 5 ];
 
     for (int i = 0; i < 5; ++i)
     {
@@ -127,7 +127,7 @@ int main()
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
         scene.Add( &cubes[ i ] );
-    }
+    }*/
 
     bool quit = false;
     

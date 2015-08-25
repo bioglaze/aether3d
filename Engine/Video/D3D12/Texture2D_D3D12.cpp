@@ -3,6 +3,8 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <d3d12.h>
+#include <d3dx12.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
 #include "GfxDevice.hpp"
@@ -10,11 +12,32 @@
 #include "FileSystem.hpp"
 #include "System.hpp"
 
+#define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
+
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 void Tokenize( const std::string& str,
               std::vector< std::string >& tokens,
               const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
+
+namespace GfxDeviceGlobal
+{
+    extern ID3D12Device* device;
+    extern ID3D12DescriptorHeap* descHeapCbvSrvUav;
+}
+
+namespace Global
+{
+    std::vector< ID3D12Resource* > textures;
+}
+
+void DestroyTextures()
+{
+    for (std::size_t i = 0; i < Global::textures.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( Global::textures[ i ] );
+    }
+}
 
 namespace Texture2DGlobal
 {
@@ -90,8 +113,29 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
     else if (isDDS)
     {
+        ae3d::System::Assert( false, ".dds loading not implemented in d3d12!\n" );
         LoadDDS( fileContents.path.c_str() );
     }
+    else
+    {
+        ae3d::System::Print("Unknown texture file extension: %s\n", fileContents.path.c_str() );
+    }
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;// DXGI_FORMAT_B8G8R8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1; // No MIP
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.PlaneSlice = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    auto cbvSrcUavDescHandle = GfxDeviceGlobal::descHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart();
+    auto cbvSrvUavDescStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    cbvSrcUavDescHandle.ptr += cbvSrvUavDescStep;
+
+    // kaatuu ennen ekaa presentia
+    GfxDeviceGlobal::device->CreateShaderResourceView( resource, &srvDesc, cbvSrcUavDescHandle );
 
     if (mipmaps == Mipmaps::Generate)
     {
@@ -176,13 +220,13 @@ void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTe
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
 {
     int components;
     unsigned char* data = stbi_load_from_memory( &fileContents.data[ 0 ], static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
+    System::Assert( width > 0 && height > 0, "Invalid texture dimension" );
 
     if (data == nullptr)
     {
@@ -193,7 +237,36 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
   
     opaque = (components == 3 || components == 1);
 
-    // TODO: Load
+    D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+        DXGI_FORMAT_R8G8B8A8_UNORM, width, height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_NONE,
+        D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD ),
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS( &resource ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to create texture resource!\n" );
+        return;
+    }
+
+    Global::textures.push_back( resource );
+
+    resource->SetName( L"Texture2D" );
+    D3D12_BOX box = {};
+    box.right = width;
+    box.bottom = height;
+    box.back = 1;
+    hr = resource->WriteToSubresource( 0, &box, data, 4 * width, 4 * width * height );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable write texture resource!" );
+        return;
+    }
 
     stbi_image_free( data );
 }

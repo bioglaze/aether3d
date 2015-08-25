@@ -164,6 +164,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
         // TODO: DrawRange
         ae3d::GfxDevice::Draw( vertexBuffer, renderer.builtinShaders.spriteRendererShader, blendMode, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
 #else
+        ae3d::GfxDevice::SetBlendMode( blendMode );
         vertexBuffer.DrawRange( drawable.bufferStart, drawable.bufferEnd );
 #endif
     }

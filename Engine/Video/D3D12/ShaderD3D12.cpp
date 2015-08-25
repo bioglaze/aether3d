@@ -17,12 +17,13 @@ extern ae3d::FileWatcher fileWatcher;
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
+    extern ID3D12DescriptorHeap* descHeapCbvSrvUav;
 }
 
 namespace Global
 {
     std::vector< ID3DBlob* > shaders;
-    std::vector< ID3D12DescriptorHeap* > descHeaps;
+    //std::vector< ID3D12DescriptorHeap* > descHeaps;
     std::vector< ID3D12Resource* > constantBuffers;
 }
 
@@ -33,13 +34,13 @@ void DestroyShaders()
         AE3D_SAFE_RELEASE( Global::shaders[ i ] );
     }
 
-    ae3d::System::Assert( Global::descHeaps.size() == Global::constantBuffers.size(), "sizes must equal" );
+    /*ae3d::System::Assert( Global::descHeaps.size() == Global::constantBuffers.size(), "sizes must equal" );
 
     for (std::size_t i = 0; i < Global::descHeaps.size(); ++i)
     {
         AE3D_SAFE_RELEASE( Global::descHeaps[ i ] );
         AE3D_SAFE_RELEASE( Global::constantBuffers[ i ] );
-    }
+    }*/
 }
 
 namespace
@@ -78,7 +79,7 @@ void ShaderReload( const std::string& path )
 
 void ae3d::Shader::CreateConstantBuffer()
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+    /*D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     desc.NumDescriptors = 100;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
@@ -90,9 +91,9 @@ void ae3d::Shader::CreateConstantBuffer()
         return;
     }
 
-    Global::descHeaps.push_back( mDescHeapCbvSrvUav );
+    Global::descHeaps.push_back( mDescHeapCbvSrvUav );*/
 
-    hr = GfxDeviceGlobal::device->CreateCommittedResource(
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD ),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer( D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT ),
@@ -113,7 +114,7 @@ void ae3d::Shader::CreateConstantBuffer()
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView(
         &cbvDesc,
-        mDescHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart() );
+        GfxDeviceGlobal::descHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart() );
     hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &constantBufferUpload ) );
     if (FAILED( hr ))
     {
@@ -180,7 +181,7 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::SetMatrix( const char* /*name*/, const float* matrix4x4 )
 {
-    System::Assert( constantBufferUpload, "CreateConstantBuffer probably not called!" );
+    System::Assert( constantBufferUpload != nullptr, "CreateConstantBuffer probably not called!" );
     memcpy_s( constantBufferUpload, 64, matrix4x4, 64 );
 }
 

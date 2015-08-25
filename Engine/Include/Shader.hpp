@@ -80,8 +80,10 @@ namespace ae3d
 
 #if AETHER3D_D3D12
         void CreateConstantBuffer();
-        ID3D12DescriptorHeap* GetDescriptorHeap() const { return mDescHeapCbvSrvUav; }
-        ID3D12DescriptorHeap* mDescHeapCbvSrvUav = nullptr;
+        // TODO: Move into gfxdevice at least for now
+        //ID3D12DescriptorHeap* GetDescriptorHeap() const { return mDescHeapCbvSrvUav; }
+        //ID3D12DescriptorHeap* mDescHeapCbvSrvUav = nullptr;
+
         ID3D12Resource* constantBuffer = nullptr;
         void* constantBufferUpload = nullptr;
         ID3DBlob* blobShaderVertex = nullptr;

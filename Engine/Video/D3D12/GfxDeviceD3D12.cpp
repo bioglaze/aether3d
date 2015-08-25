@@ -17,6 +17,7 @@
 
 void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
+void DestroyTextures(); // Defined in Texture2D_D3D12.cpp
 
 namespace WindowGlobal
 {
@@ -43,9 +44,13 @@ namespace GfxDeviceGlobal
     unsigned frameIndex = 0;
     ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
     ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
+    ID3D12DescriptorHeap* samplerDescriptorHeap = nullptr;
     HANDLE fenceEvent;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
+
+    // FIXME: This is related to texturing and shader constant buffers, so try to move somewhere else.
+    ID3D12DescriptorHeap* descHeapCbvSrvUav = nullptr;
 }
 
 void setResourceBarrier( ID3D12GraphicsCommandList* commandList, ID3D12Resource* res,
@@ -84,7 +89,7 @@ void CreateDescriptorHeap()
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     desc.NumDescriptors = 10;
     desc.NodeMask = 0;
-    const HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::rtvDescriptorHeap ) );
+    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::rtvDescriptorHeap ) );
     if (FAILED( hr ))
     {
         OutputDebugStringA( "Failed to create descriptor heap!\n" );
@@ -97,21 +102,64 @@ void CreateDescriptorHeap()
         d.ptr += i * rtvStep;
         GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], nullptr, d );
     }
+
+    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    desc.NumDescriptors = 100;
+    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    desc.NodeMask = 0;
+    hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::descHeapCbvSrvUav ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Print( "Unable to create shader DescriptorHeap!" );
+        return;
+    }
+}
+
+void CreateSampler()
+{
+    D3D12_DESCRIPTOR_HEAP_DESC desc;
+    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
+    desc.NumDescriptors = 100;
+    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    desc.NodeMask = 0;
+    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::samplerDescriptorHeap ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Print( "Unable to create sampler DescriptorHeap!" );
+        return;
+    }
+
+    D3D12_SAMPLER_DESC samplerDesc;
+    samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    samplerDesc.MinLOD = -FLT_MAX;
+    samplerDesc.MaxLOD = FLT_MAX;
+    samplerDesc.MipLODBias = 0;
+    samplerDesc.MaxAnisotropy = 0;
+    samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+    GfxDeviceGlobal::device->CreateSampler( &samplerDesc, GfxDeviceGlobal::samplerDescriptorHeap->GetCPUDescriptorHandleForHeapStart() );
 }
 
 void CreateRootSignature()
 {
-    CD3DX12_DESCRIPTOR_RANGE descRange1[ 1 ];
+    CD3DX12_DESCRIPTOR_RANGE descRange1[ 2 ];
     descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
+    descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
 
-    CD3DX12_ROOT_PARAMETER rootParam[ 1 ];
-    rootParam[ 0 ].InitAsDescriptorTable( ARRAYSIZE( descRange1 ), descRange1 );
+    CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
+    descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0 );
+
+    CD3DX12_ROOT_PARAMETER rootParam[ 2 ];
+    rootParam[ 0 ].InitAsDescriptorTable( 2, descRange1 );
+    rootParam[ 1 ].InitAsDescriptorTable( 1, descRange2, D3D12_SHADER_VISIBILITY_PIXEL );
 
     ID3DBlob* pOutBlob = nullptr;
     ID3DBlob* pErrorBlob = nullptr;
     D3D12_ROOT_SIGNATURE_DESC descRootSignature;
     descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-    descRootSignature.NumParameters = 1;
+    descRootSignature.NumParameters = 2;
     descRootSignature.NumStaticSamplers = 0;
     descRootSignature.pParameters = rootParam;
     descRootSignature.pStaticSamplers = nullptr;
@@ -153,7 +201,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
 
     const D3D12_RENDER_TARGET_BLEND_DESC rtBlend =
     {
-        FALSE,FALSE,
+        FALSE, FALSE,
         D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
         D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
         D3D12_LOGIC_OP_NOOP,
@@ -244,7 +292,6 @@ void CreateDepthStencilView()
     dsvDesc.Texture2D.MipSlice = 0;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
     GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &dsvDesc, GfxDeviceGlobal::dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart() );
-
 }
 
 void ae3d::CreateRenderer( int /*samples*/ )
@@ -326,6 +373,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
     CreateDescriptorHeap();
     CreateRootSignature();
     CreateDepthStencilView();
+    CreateSampler();
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
@@ -338,9 +386,10 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMod
     }
     
     GfxDeviceGlobal::commandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
-    ID3D12DescriptorHeap* descHeaps[] = { shader.GetDescriptorHeap() };
-    GfxDeviceGlobal::commandList->SetDescriptorHeaps( 1, descHeaps );
-    GfxDeviceGlobal::commandList->SetGraphicsRootDescriptorTable( 0, shader.GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart() );
+    ID3D12DescriptorHeap* descHeaps[] = { GfxDeviceGlobal::descHeapCbvSrvUav, GfxDeviceGlobal::samplerDescriptorHeap };
+    GfxDeviceGlobal::commandList->SetDescriptorHeaps( 2, descHeaps );
+    GfxDeviceGlobal::commandList->SetGraphicsRootDescriptorTable( 0, GfxDeviceGlobal::descHeapCbvSrvUav->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::commandList->SetGraphicsRootDescriptorTable( 1, GfxDeviceGlobal::samplerDescriptorHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::commandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
 
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
@@ -409,6 +458,9 @@ int ae3d::GfxDevice::GetVertexBufferBinds()
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
+    DestroyVertexBuffers();
+    DestroyShaders();
+    DestroyTextures();
     CloseHandle( GfxDeviceGlobal::fenceEvent );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rtvDescriptorHeap );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::dsvDescriptorHeap );
@@ -417,6 +469,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::descHeapCbvSrvUav );
 
     for (auto& pso : GfxDeviceGlobal::psoCache)
     {
@@ -428,8 +481,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 0 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 1 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
-    DestroyVertexBuffers();
-    DestroyShaders();
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
@@ -480,7 +531,18 @@ void ae3d::GfxDevice::Present()
     hr = GfxDeviceGlobal::swapChain->Present( 1, 0 );
     if (FAILED( hr ))
     {
-        OutputDebugStringA( "Present() failed\n" );
+        if (hr == DXGI_ERROR_DEVICE_REMOVED)
+        {
+            ae3d::System::Assert( false, "Present failed. Reason: device removed." );
+        }
+        else if (hr == DXGI_ERROR_DEVICE_RESET)
+        {
+            ae3d::System::Assert( false, "Present failed. Reason: device reset." );
+        }
+        else
+        {
+            ae3d::System::Assert( false, "Present failed. Reason: unknown." );
+        }
     }
 
     GfxDeviceGlobal::fence->SetEventOnCompletion( GfxDeviceGlobal::frameIndex, GfxDeviceGlobal::fenceEvent );
@@ -545,29 +607,3 @@ void ae3d::GfxDevice::SetDepthFunc( DepthFunc depthFunc )
     {
     }
 }
-
-void ae3d::GfxDevice::WaitForCommandQueueFence()
-{
-    // Reset the fence signal
-    HRESULT hr = GfxDeviceGlobal::fence->Signal( 0 );
-    if (FAILED( hr ))
-    {
-        return;
-    }
-    // Set the event to be fired once the signal value is 1
-    hr = GfxDeviceGlobal::fence->SetEventOnCompletion( 1, GfxDeviceGlobal::fenceEvent );
-    if (FAILED( hr ))
-    {
-        return;
-    }
-
-    // After the command list has executed, tell the GPU to signal the fence
-    hr = GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, 1 );
-    if (FAILED( hr ))
-    {
-        return;
-    }
-
-    // Wait for the event to be fired by the fence
-    WaitForSingleObject( GfxDeviceGlobal::fenceEvent, INFINITE );
-};

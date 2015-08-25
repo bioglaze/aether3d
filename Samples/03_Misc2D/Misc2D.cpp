@@ -34,24 +34,25 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
+    camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.AddComponent<TransformComponent>();
 
-    Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
+    //Texture2D spriteTex;
+    //spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
-    Texture2D spriteTex2;
-    spriteTex2.Load( FileSystem::FileContents("test_dxt1.dds"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
+    //Texture2D spriteTex2;
+    //spriteTex2.Load( FileSystem::FileContents("test_dxt1.dds"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
-    Texture2D spriteTexFromAtlas;
-    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents("atlas_cegui.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
+    //Texture2D spriteTexFromAtlas;
+    //spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents("atlas_cegui.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
-    sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-    sprite->SetTexture( &spriteTex, Vec3( 340, 80, -0.5f ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
-    sprite->SetTexture( &spriteTex2, Vec3( 280, 60, -0.4f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
-    sprite->SetTexture( &spriteTexFromAtlas, Vec3( 260, 160, -0.4f ), Vec3( (float)spriteTexFromAtlas.GetWidth(), (float)spriteTexFromAtlas.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    //sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
+    //sprite->SetTexture( &spriteTex, Vec3( 340, 80, -0.5f ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
+    //sprite->SetTexture( &spriteTex2, Vec3( 280, 60, -0.4f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    //sprite->SetTexture( &spriteTexFromAtlas, Vec3( 260, 160, -0.4f ), Vec3( (float)spriteTexFromAtlas.GetWidth(), (float)spriteTexFromAtlas.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
 
     spriteContainer.AddComponent<TransformComponent>();
     spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
@@ -68,7 +69,7 @@ int main()
     fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
 
     Font font;
-    font.LoadBMFont(&fontTex, FileSystem::FileContents("font_txt.fnt"));
+    font.LoadBMFont( &fontTex, FileSystem::FileContents("font_txt.fnt"));
 
     //Texture2D fontTexSDF;
     //fontTexSDF.Load( FileSystem::FileContents( "font_sdf.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
@@ -103,7 +104,7 @@ int main()
     
     GameObject renderTextureContainer;
     renderTextureContainer.AddComponent<SpriteRendererComponent>();
-    spriteContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    //spriteContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
 
     GameObject rtCamera;
     rtCamera.AddComponent<CameraComponent>();
@@ -114,12 +115,12 @@ int main()
     
     Scene scene;
     scene.Add( &camera );
-    scene.Add( &spriteContainer );
+    //scene.Add( &spriteContainer );
     scene.Add( &textContainer );
-    scene.Add( &statsContainer );
-    scene.Add( &statsParent );
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
+    //scene.Add( &statsContainer );
+    //scene.Add( &statsParent );
+    //scene.Add( &renderTextureContainer );
+    //scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;

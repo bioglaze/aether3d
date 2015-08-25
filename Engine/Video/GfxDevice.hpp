@@ -78,9 +78,6 @@ namespace ae3d
         void ErrorCheckFBO();
         bool HasExtension( const char* glExtension );
 #endif
-#if AETHER3D_D3D12
-        void WaitForCommandQueueFence();
-#endif
     }
 }
 #endif

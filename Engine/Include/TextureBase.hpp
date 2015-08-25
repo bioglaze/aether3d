@@ -6,6 +6,8 @@
 #endif
 #include "Vec3.hpp"
 
+struct ID3D12Resource;
+
 namespace ae3d
 {
     /// Texture wrap controls behavior when coordinates are outside range 0-1. Repeat should not be used for atlased textures.
@@ -83,6 +85,9 @@ namespace ae3d
         float anisotropy = 1;
 #if AETHER3D_IOS
         id<MTLTexture> metalTexture;  
+#endif
+#if AETHER3D_D3D12
+        ID3D12Resource* resource = nullptr;
 #endif
     };
 }

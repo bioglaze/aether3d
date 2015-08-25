@@ -64,7 +64,8 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
         IID_PPV_ARGS( &vb ) );
     if (FAILED( hr ))
     {
-        OutputDebugStringA( "Unable to create vertex buffer!\n" );
+        ae3d::System::Assert( false, "Unable to create vertex buffer!\n" );
+        return;
     }
 
     vb->SetName( L"VertexBuffer" );
@@ -74,7 +75,8 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
     hr = vb->Map( 0, nullptr, reinterpret_cast<void**>(&vbUploadPtr) );
     if (FAILED( hr ))
     {
-        OutputDebugStringA( "Unable to map vertex buffer!\n" );
+        ae3d::System::Assert( false, "Unable to map vertex buffer!\n" );
+        return;
     }
 
     memcpy_s( vbUploadPtr, ibOffset, vertices, ibOffset );
@@ -87,11 +89,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexFormat = VertexFormat::PTC;
     elementCount = faceCount * 3;
 
-    const UINT64 ibSize = elementCount * 2;
+    const int ibSize = elementCount * 2;
     ibOffset = sizeof( VertexPTC ) * vertexCount;
 
     UploadVB( (void*)faces, (void*)vertices, ibSize );
-    GfxDevice::WaitForCommandQueueFence();
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
@@ -99,11 +100,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexFormat = VertexFormat::PTN;
     elementCount = faceCount * 3;
 
-    const UINT64 ibSize = elementCount * 2;
+    const int ibSize = elementCount * 2;
     ibOffset = sizeof( VertexPTN ) * vertexCount;
 
     UploadVB( (void*)faces, (void*)vertices, ibSize );
-    GfxDevice::WaitForCommandQueueFence();
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
@@ -111,11 +111,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
 
-    const UINT64 ibSize = elementCount * 2;
+    const int ibSize = elementCount * 2;
     ibOffset = sizeof( VertexPTNTC ) * vertexCount;
 
     UploadVB( (void*)faces, (void*)vertices, ibSize );
-    GfxDevice::WaitForCommandQueueFence();
 }
 
 void ae3d::VertexBuffer::Bind() const
@@ -127,7 +126,7 @@ void ae3d::VertexBuffer::Draw() const
     GfxDevice::IncDrawCalls();
 }
 
-void ae3d::VertexBuffer::DrawRange( int start, int end ) const
+void ae3d::VertexBuffer::DrawRange( int /*start*/, int /*end*/ ) const
 {
     GfxDevice::IncDrawCalls();
 }
