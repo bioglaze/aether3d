@@ -186,10 +186,10 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
 {
     D3D12_RASTERIZER_DESC descRaster;
     ZeroMemory( &descRaster, sizeof( descRaster ) );
-    descRaster.CullMode = D3D12_CULL_MODE_NONE;
+    descRaster.CullMode = D3D12_CULL_MODE_BACK;
     descRaster.DepthBias = 0;
     descRaster.DepthBiasClamp = 0;
-    descRaster.DepthClipEnable = true;
+    descRaster.DepthClipEnable = TRUE;
     descRaster.FillMode = D3D12_FILL_MODE_SOLID;
     descRaster.FrontCounterClockwise = FALSE;
     descRaster.MultisampleEnable = FALSE;
@@ -199,7 +199,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descBlend.AlphaToCoverageEnable = FALSE;
     descBlend.IndependentBlendEnable = FALSE;
 
-    const D3D12_RENDER_TARGET_BLEND_DESC rtBlend =
+    const D3D12_RENDER_TARGET_BLEND_DESC blendOff =
     {
         FALSE, FALSE,
         D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
@@ -207,7 +207,45 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
         D3D12_LOGIC_OP_NOOP,
         D3D12_COLOR_WRITE_ENABLE_ALL,
     };
-    descBlend.RenderTarget[ 0 ] = rtBlend;
+
+    D3D12_RENDER_TARGET_BLEND_DESC blendAlpha;
+    ZeroMemory( &blendAlpha, sizeof( D3D12_RENDER_TARGET_BLEND_DESC ) );
+    blendAlpha.BlendEnable = TRUE;
+    blendAlpha.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+    blendAlpha.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+    blendAlpha.SrcBlendAlpha = D3D12_BLEND_ONE;
+    blendAlpha.DestBlendAlpha = D3D12_BLEND_ZERO;
+    blendAlpha.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+    blendAlpha.BlendOp = D3D12_BLEND_OP_ADD;
+    blendAlpha.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+    D3D12_RENDER_TARGET_BLEND_DESC blendAdd;
+    ZeroMemory( &blendAdd, sizeof( D3D12_RENDER_TARGET_BLEND_DESC ) );
+    blendAdd.BlendEnable = TRUE;
+    blendAdd.SrcBlend = D3D12_BLEND_ONE;
+    blendAdd.DestBlend = D3D12_BLEND_ONE;
+    blendAdd.SrcBlendAlpha = D3D12_BLEND_ONE;
+    blendAdd.DestBlendAlpha = D3D12_BLEND_ONE;
+    blendAdd.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+    blendAdd.BlendOp = D3D12_BLEND_OP_ADD;
+    blendAdd.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+    if (blendMode == ae3d::GfxDevice::BlendMode::Off)
+    {
+        descBlend.RenderTarget[ 0 ] = blendOff;
+    }
+    else if (blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend)
+    {
+        descBlend.RenderTarget[ 0 ] = blendAlpha;
+    }
+    else if (blendMode == ae3d::GfxDevice::BlendMode::Additive)
+    {
+        descBlend.RenderTarget[ 0 ] = blendAdd;
+    }
+    else
+    {
+        ae3d::System::Assert( false, "unhandled blend mode" );
+    }
 
     D3D12_INPUT_ELEMENT_DESC layout[] =
     {
@@ -227,10 +265,23 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descPso.PS = { reinterpret_cast<BYTE*>(shader.blobShaderPixel->GetBufferPointer()), shader.blobShaderPixel->GetBufferSize() };
     descPso.RasterizerState = descRaster;
     descPso.BlendState = descBlend;
-    descPso.DepthStencilState.DepthEnable = FALSE;
+    descPso.DepthStencilState.DepthEnable = TRUE;
     descPso.DepthStencilState.StencilEnable = FALSE;
     descPso.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-    descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    
+    if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff)
+    {
+        descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    }
+    else if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
+    {
+        descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+    }
+    else
+    {
+        ae3d::System::Assert( false, "unhandled depth mode" );
+    }
+
     descPso.SampleMask = UINT_MAX;
     descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     descPso.NumRenderTargets = 1;
