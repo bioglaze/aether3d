@@ -8,12 +8,14 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "CameraComponent.hpp"
 #include "MainWindow.hpp"
 #include "SceneWidget.hpp"
 #include "WindowMenu.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
 #include "ModifyTransformCommand.hpp"
+#include "ModifyCameraCommand.hpp"
 #include "TransformInspector.hpp"
 #include "Quaternion.hpp"
 
@@ -39,12 +41,19 @@ MainWindow::MainWindow()
     connect(this, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
             this, SLOT(OnGameObjectSelected(std::list< ae3d::GameObject* >)));
 
+    connect( &cameraInspector, SIGNAL(CameraModified(ae3d::CameraComponent::ClearFlag, const ae3d::Vec4&, const ae3d::Vec4&)),
+             this, SLOT(CommandModifyCamera(ae3d::CameraComponent::ClearFlag, const ae3d::Vec4&, const ae3d::Vec4&)) );
+
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
 
     transformInspector.Init( this );
+    cameraInspector.Init( this );
+
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->addWidget( transformInspector.GetWidget() );
+    inspectorLayout->addWidget( cameraInspector.GetWidget() );
+
     inspectorContainer = new QWidget();
     inspectorContainer->setLayout( inspectorLayout );
     inspectorContainer->setMinimumWidth( 380 );
@@ -89,10 +98,21 @@ void MainWindow::UpdateInspector()
     if (sceneWidget->selectedGameObjects.empty())
     {
         transformInspector.GetWidget()->hide();
+        cameraInspector.GetWidget()->hide();
     }
     else
     {
         transformInspector.GetWidget()->show();
+
+        auto cameraComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::CameraComponent >();
+        if (cameraComponent)
+        {
+            cameraInspector.GetWidget()->show();
+        }
+        else
+        {
+            cameraInspector.GetWidget()->hide();
+        }
     }
 }
 
@@ -201,11 +221,13 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
 void MainWindow::CommandCreateCameraComponent()
 {
     commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
+    UpdateInspector();
 }
 
 void MainWindow::CommandCreateMeshRendererComponent()
 {
     //commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
+    UpdateInspector();
 }
 
 void MainWindow::CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
@@ -217,6 +239,12 @@ void MainWindow::CommandCreateGameObject()
 {
     commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
     UpdateHierarchy();
+}
+
+void MainWindow::CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams )
+{
+    auto camera = sceneWidget->GetGameObject( 0 )->GetComponent< ae3d::CameraComponent >();
+    commandManager.Execute( std::make_shared< ModifyCameraCommand >( camera, clearFlag, orthoParams, perspParams  ) );
 }
 
 void MainWindow::LoadScene()

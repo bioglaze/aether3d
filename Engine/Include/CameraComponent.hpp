@@ -62,6 +62,9 @@ namespace ae3d
         /// \param clearFlag Clear flag. Defaults to DepthAndColor.
         void SetClearFlag( ClearFlag clearFlag );
 
+        /// \return True if the projection is orthographic, false if it's perspective.
+        bool IsOrthographic() const { return isOrthographic; }
+        
         /// \return Clear flag.
         ClearFlag GetClearFlag() const { return clearFlag; }
         

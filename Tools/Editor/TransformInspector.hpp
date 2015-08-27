@@ -1,7 +1,6 @@
 #ifndef TRANSFORMINSPECTOR_HPP
 #define TRANSFORMINSPECTOR_HPP
 
-//#include <list>
 #include <QObject>
 
 namespace ae3d

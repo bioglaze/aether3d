@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include "WindowMenu.hpp"
 #include "CommandManager.hpp"
+#include "CameraInspector.hpp"
 #include "TransformInspector.hpp"
 
 class SceneWidget;
@@ -36,6 +37,7 @@ public slots:
     void CommandCreateGameObject();
     void CommandCreateMeshRendererComponent();
     void CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
+    void CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams );
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
     void HandleGameObjectsAddedOrDeleted();
     void ShowAbout();
@@ -58,6 +60,7 @@ private:
     QTreeWidget* sceneTree = nullptr;
     SceneWidget* sceneWidget = nullptr;
     TransformInspector transformInspector;
+    CameraInspector cameraInspector;
     WindowMenu windowMenu;
     CommandManager commandManager;
 };

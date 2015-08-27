@@ -4,19 +4,21 @@ This codebase will evolve into the next generation [Aether3D]("Aether3D"). More 
 # Features
 
   - Windows, OS X, iOS and Linux support.
-  - OpenGL 4.1, 4.5 and Metal renderers.
+  - OpenGL 4.1, 4.5, D3D12 (WIP) and Metal renderers.
   - Component-based game object system.
+  - Oculus Rift support.
   - Sprite rendering, texture atlasing and batching.
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Audio support for .wav and .ogg.
   - Custom model format with .obj and Blender exporter.
   - Virtual file system for .pak files.
   - XBox controller support.
+  - Cross-Platform scene editor.
 
 # Planned Features
 
-  - Vulkan and D3D12 renderers.
-  - Cross-Platform scene editor.
+  - Vulkan renderer.
+  - Clustered Forward lighting.
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
 
 # Build

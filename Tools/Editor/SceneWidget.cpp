@@ -264,7 +264,9 @@ void SceneWidget::Init()
     gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
     gameObjects[ 0 ]->SetName( "Game Object" );
 
-    unlitShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ), FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag" );
+    unlitShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ),
+                      FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag",
+                      FileSystem::FileContents(""), FileSystem::FileContents(""));
 
     cubeMaterial.SetShader( &unlitShader );
     cubeMaterial.SetTexture( "textureMap", &spriteTex );

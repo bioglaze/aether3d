@@ -12,6 +12,7 @@ void TransformInspector::Init( QWidget* mainWindow )
     table->setHorizontalHeaderLabels( QString("X;Y;Z").split(";") );
     table->setVerticalHeaderLabels( QString("Position;Rotation;Scale").split(";") );
     table->setSpan( 2, 0, 1, 3 );
+    table->setContentsMargins( 1, 1, 1, 1 );
 
     connect( mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
              this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );
@@ -72,7 +73,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
     Vec3 rotationEuler;
     float scale = 1;
 
-    const std::string newValue = item->text().toUtf8().constData();
+    const std::string newValue = item->text().toStdString();
 
     if (item->row() == 0 && item->column() == 0)
     {
