@@ -91,20 +91,12 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
         m().font->CreateVertexBuffer( m().text.c_str(), m().color, m().vertexBuffer );
         m().isDirty = false;
     }
-#if AETHER3D_D3D12
-    m().shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
-    GfxDevice::Draw( m().vertexBuffer, *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
-#else
-    GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::AlphaBlend );
 
     auto shader = m().shader;
     shader->Use();
     shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
     shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
-
-    m().vertexBuffer.Bind();
-    m().vertexBuffer.Draw();
-#endif
+    GfxDevice::Draw( m().vertexBuffer, 0, m().vertexBuffer.GetFaceCount(), *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
 }
 
 void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )

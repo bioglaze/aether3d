@@ -86,14 +86,14 @@ int main()
     cube2.AddComponent< TransformComponent >();
     cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -100 } );
 
-    //Shader shader;
-    //shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents(""), FileSystem::FileContents( "" ) );
+    Shader shader;
+    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents(""), FileSystem::FileContents( "" ) );
 
     Texture2D asphaltTex;
     asphaltTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
 
     Material material;
-    //material.SetShader( &shader );
+    material.SetShader( &shader );
     material.SetTexture( "textureMap", &asphaltTex );
     material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
@@ -109,14 +109,14 @@ int main()
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
-    //scene.SetSkybox( &skybox );
-    scene.Add( &camera2d );
-    //scene.Add( &camera );
-    //scene.Add( &cube );
-    //scene.Add( &cube2 );
+    scene.SetSkybox( &skybox );
+    //scene.Add( &camera2d );
+    scene.Add( &camera );
+    scene.Add( &cube );
+    scene.Add( &cube2 );
     scene.Add( &statsContainer );
 
-    /*GameObject cubes[ 5 ];
+    GameObject cubes[ 5 ];
 
     for (int i = 0; i < 5; ++i)
     {
@@ -127,7 +127,7 @@ int main()
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
         scene.Add( &cubes[ i ] );
-    }*/
+    }
 
     bool quit = false;
     

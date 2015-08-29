@@ -44,13 +44,15 @@ namespace ae3d
         void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );
-        void Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMode blendMode, DepthFunc depthFunc );
+        void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc );
         void ErrorCheck( const char* info );
 
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture2D* target );
-        void SetBackFaceCulling( bool enable );
         void SetMultiSampling( bool enable );
+        
+        // TODO: Remove these to prepare for modern API style draw submission (these are provided in Draw())
+        void SetBackFaceCulling( bool enable );
         void SetBlendMode( BlendMode blendMode );
         void SetDepthFunc( DepthFunc depthFunc );
 

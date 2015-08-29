@@ -427,7 +427,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
     CreateSampler();
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
 {
     const std::string psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
     
@@ -456,7 +456,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, Shader& shader, BlendMod
     GfxDeviceGlobal::commandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     GfxDeviceGlobal::commandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
     GfxDeviceGlobal::commandList->IASetIndexBuffer( &indexBufferView );
-    GfxDeviceGlobal::commandList->DrawIndexedInstanced( vertexBuffer.GetIndexCount(), 1, 0, 0, 0 );
+    GfxDeviceGlobal::commandList->DrawIndexedInstanced( endFace - startFace, 1, startFace, 0, 0 );
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )

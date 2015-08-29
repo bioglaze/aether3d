@@ -5,6 +5,8 @@
 #include <GL/glxw.h>
 #include "System.hpp"
 #include "RenderTexture.hpp"
+#include "Shader.hpp"
+#include "VertexBuffer.hpp"
 
 void PrintOpenGLDebugOutput( GLenum source, GLenum type, GLuint id, GLenum severity, const char *msg)
 {
@@ -77,6 +79,46 @@ namespace GfxDeviceGlobal
     GLuint cachedFBO = 0;
 }
 
+
+void ae3d::GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
+{
+    if (blendMode == ae3d::GfxDevice::BlendMode::Off)
+    {
+        glDisable( GL_BLEND );
+    }
+    else if (blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend)
+    {
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glEnable( GL_BLEND );
+    }
+    else if (blendMode == ae3d::GfxDevice::BlendMode::Additive)
+    {
+        glBlendFunc( GL_ONE, GL_ONE );
+        glEnable( GL_BLEND );
+    }
+    else
+    {
+        ae3d::System::Assert( false, "Unhandled blend mode." );
+    }
+}
+
+void ae3d::GfxDevice::SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
+{
+    if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
+    {
+        glDepthMask( GL_TRUE );
+        glEnable( GL_DEPTH_TEST );
+        glDepthFunc( GL_LEQUAL );
+    }
+    else if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff)
+    {
+        glDepthMask( GL_FALSE );
+        glEnable( GL_DEPTH_TEST );
+        glDepthFunc( GL_LEQUAL );
+    }
+}
+
+
 void ae3d::GfxDevice::Init( int width, int height )
 {
     if (glxwInit() != 0)
@@ -87,6 +129,18 @@ void ae3d::GfxDevice::Init( int width, int height )
     
     SetBackBufferDimensionAndFBO( width, height );
     glEnable( GL_DEPTH_TEST );
+}
+
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+{
+    ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount(), "Invalid range" );
+    ae3d::System::Assert( endIndex > -1 && endIndex > startIndex && endIndex <= vertexBuffer.GetFaceCount(), "Invalid range" );
+
+    SetBlendMode( blendMode );
+    SetDepthFunc( depthFunc );
+    shader.Use();
+    vertexBuffer.Bind();
+    vertexBuffer.DrawRange( startIndex, endIndex );
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool enable )
@@ -259,28 +313,6 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     glClearColor( red, green, blue, 1 );
 }
 
-void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
-{
-    if (blendMode == BlendMode::Off)
-    {
-        glDisable( GL_BLEND );
-    }
-    else if (blendMode == BlendMode::AlphaBlend)
-    {
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-        glEnable( GL_BLEND );
-    }
-    else if (blendMode == BlendMode::Additive)
-    {
-        glBlendFunc( GL_ONE, GL_ONE );
-        glEnable( GL_BLEND );
-    }
-    else
-    {
-        ae3d::System::Assert( false, "Unhandled blend mode." );
-    }
-}
-
 const char* GetGLErrorString(GLenum code)
 {
     if (code == GL_OUT_OF_MEMORY)
@@ -402,20 +434,4 @@ void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )
     int fboId = 0;
     glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fboId );
     GfxDeviceGlobal::systemFBO = static_cast< unsigned >(fboId);
-}
-
-void ae3d::GfxDevice::SetDepthFunc( DepthFunc depthFunc )
-{
-    if (depthFunc == DepthFunc::LessOrEqualWriteOn)
-    {
-        glDepthMask( GL_TRUE );
-        glEnable( GL_DEPTH_TEST );
-        glDepthFunc( GL_LEQUAL );
-    }
-    else if (depthFunc == DepthFunc::LessOrEqualWriteOff)
-    {
-        glDepthMask( GL_FALSE );
-        glEnable( GL_DEPTH_TEST );
-        glDepthFunc( GL_LEQUAL );
-    }
 }

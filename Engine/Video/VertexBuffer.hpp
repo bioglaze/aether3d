@@ -83,6 +83,9 @@ namespace ae3d
         /// Binds the buffer. Must be called before Draw or DrawRange.
         void Bind() const;
 
+        /// \return Face count.
+        int GetFaceCount() const { return elementCount; }
+
         /// \return True if the buffer contains geometry ready for rendering.
         bool IsGenerated() const { return elementCount != 0; }
 

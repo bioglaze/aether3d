@@ -134,13 +134,11 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
             continue;
         }
         
-        GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode::Off );
-
         materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
         materials[ subMeshIndex ]->Apply();
         
-        subMeshes[ subMeshIndex ].vertexBuffer.Bind();
-        subMeshes[ subMeshIndex ].vertexBuffer.Draw();
+        GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount(),
+                         *materials[ subMeshIndex ]->GetShader(), ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn );
     }
 }
 

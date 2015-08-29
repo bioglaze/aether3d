@@ -99,8 +99,8 @@ int main()
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
     statsContainer.GetComponent<TransformComponent>()->SetParent( statsParent.GetComponent<TransformComponent>() );
 
-    RenderTexture2D rtTex;
-    rtTex.Create( 512, 512, TextureWrap::Clamp, TextureFilter::Linear );
+    //RenderTexture2D rtTex;
+    //rtTex.Create( 512, 512, TextureWrap::Clamp, TextureFilter::Linear );
     
     GameObject renderTextureContainer;
     renderTextureContainer.AddComponent<SpriteRendererComponent>();
@@ -108,9 +108,9 @@ int main()
 
     GameObject rtCamera;
     rtCamera.AddComponent<CameraComponent>();
-    rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    //rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
-    rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
+    //rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
     
     Scene scene;
