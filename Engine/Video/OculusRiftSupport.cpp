@@ -54,7 +54,7 @@ struct TextureBuffer
             // This texture isn't necessarily going to be a rendertarget, but it usually is.
             OVR_ASSERT( hmd ); // No HMD? A little odd.
 
-            ovrHmd_CreateSwapTextureSetGL( hmd, GL_RGBA, size.w, size.h, &TextureSet );
+            ovr_CreateSwapTextureSetGL( hmd, GL_RGBA, size.w, size.h, &TextureSet );
 
             for (int i = 0; i < TextureSet->TextureCount; ++i)
             {
@@ -139,7 +139,8 @@ namespace Global
     ovrEyeRenderDesc EyeRenderDesc[ 2 ];
     TextureBuffer* eyeRenderTexture[ 2 ] = {};
     DepthBuffer* eyeDepthBuffer[ 2 ] = {};
-    ovrHmd HMD;
+    ovrHmd hmd;
+    ovrHmdDesc HMD;
     ovrGLTexture* mirrorTexture = nullptr;
     GLuint mirrorFBO = 0;
     ovrPosef EyeRenderPose[ 2 ];
@@ -156,12 +157,8 @@ void ae3d::VR::Init()
         return;
     }
 
-    ovrResult result = ovrHmd_Create( 0, &Global::HMD );
-
-    if (!OVR_SUCCESS( result ))
-    {
-        result = ovrHmd_CreateDebug( ovrHmd_DK2, &Global::HMD );
-    }
+    ovrGraphicsLuid luid;
+    ovrResult result = ovr_Create( &Global::hmd, &luid );
 
     if (!OVR_SUCCESS( result ))
     {
@@ -170,7 +167,9 @@ void ae3d::VR::Init()
         return;
     }
 
-    if (Global::HMD->ProductName[ 0 ] == '\0')
+    Global::HMD = ovr_GetHmdDesc( Global::hmd );
+
+    if (Global::HMD.ProductName[ 0 ] == '\0')
     {
         MessageBoxA( nullptr, "Rift detected, display not enabled.", "", MB_OK );
     }
@@ -188,23 +187,23 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
         idealTextureSize.h = windowHeight;
         const bool isRenderTarget = true;
 
-        Global::eyeRenderTexture[ i ] = new TextureBuffer( Global::HMD, isRenderTarget, true, idealTextureSize, 1, nullptr );
+        Global::eyeRenderTexture[ i ] = new TextureBuffer( Global::hmd, isRenderTarget, true, idealTextureSize, 1, nullptr );
         Global::eyeDepthBuffer[ i ] = new DepthBuffer( Global::eyeRenderTexture[ i ]->GetSize() );
     }
 
-    ovrHmd_CreateMirrorTextureGL( Global::HMD, GL_RGBA, windowWidth, windowHeight, (ovrTexture**)&Global::mirrorTexture );
+    ovr_CreateMirrorTextureGL( Global::hmd, GL_RGBA, windowWidth, windowHeight, (ovrTexture**)&Global::mirrorTexture );
     glGenFramebuffers( 1, &Global::mirrorFBO );
     glBindFramebuffer( GL_READ_FRAMEBUFFER, Global::mirrorFBO );
     glFramebufferTexture2D( GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Global::mirrorTexture->OGL.TexId, 0 );
     glFramebufferRenderbuffer( GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 );
     glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
 
-    Global::EyeRenderDesc[ 0 ] = ovrHmd_GetRenderDesc( Global::HMD, ovrEye_Left, Global::HMD->DefaultEyeFov[ 0 ] );
-    Global::EyeRenderDesc[ 1 ] = ovrHmd_GetRenderDesc( Global::HMD, ovrEye_Right, Global::HMD->DefaultEyeFov[ 1 ] );
+    Global::EyeRenderDesc[ 0 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Left, Global::HMD.DefaultEyeFov[ 0 ] );
+    Global::EyeRenderDesc[ 1 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Right, Global::HMD.DefaultEyeFov[ 1 ] );
 
-    ovrHmd_SetEnabledCaps( Global::HMD, ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction );
+    ovr_SetEnabledCaps( Global::hmd, 0/*ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction*/ );
 
-    ovrHmd_ConfigureTracking( Global::HMD, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0 );
+    ovr_ConfigureTracking( Global::hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0 );
 
     wglSwapIntervalEXT( 0 );
 }
@@ -214,8 +213,8 @@ void ae3d::VR::CalcEyePose()
     Global::ViewOffset[ 0 ] = Global::EyeRenderDesc[ 0 ].HmdToEyeViewOffset;
     Global::ViewOffset[ 1 ] = Global::EyeRenderDesc[ 1 ].HmdToEyeViewOffset;
 
-    ovrFrameTiming ftiming = ovrHmd_GetFrameTiming( Global::HMD, 0 );
-    ovrTrackingState hmdState = ovrHmd_GetTrackingState( Global::HMD, ftiming.DisplayMidpointSeconds );
+    ovrFrameTiming ftiming = ovr_GetFrameTiming( Global::hmd, 0 );
+    ovrTrackingState hmdState = ovr_GetTrackingState( Global::hmd, ftiming.DisplayMidpointSeconds );
     ovr_CalcEyePoses( hmdState.HeadPose.ThePose, Global::ViewOffset, Global::EyeRenderPose );
 }
 
@@ -245,12 +244,12 @@ void ae3d::VR::SubmitFrame()
     {
         ld.ColorTexture[ eye ] = Global::eyeRenderTexture[ eye ]->TextureSet;
         ld.Viewport[ eye ] = OVR::Recti( Global::eyeRenderTexture[ eye ]->GetSize() );
-        ld.Fov[ eye ] = Global::HMD->DefaultEyeFov[ eye ];
+        ld.Fov[ eye ] = Global::HMD.DefaultEyeFov[ eye ];
         ld.RenderPose[ eye ] = Global::EyeRenderPose[ eye ];
     }
 
     ovrLayerHeader* layers = &ld.Header;
-    /*ovrResult result = */ovrHmd_SubmitFrame( Global::HMD, 0, &viewScaleDesc, &layers, 1 );
+    /*ovrResult result = */ovr_SubmitFrame( Global::hmd, 0, &viewScaleDesc, &layers, 1 );
     //isVisible = OVR_SUCCESS( result );
 
     // Blit mirror texture to back buffer
@@ -279,7 +278,7 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float yawDegrees, int eye )
     OVR::Vector3f shiftedEyePos = cameraPosOVR + rollPitchYaw.Transform( Global::EyeRenderPose[ eye ].Position );
 
     OVR::Matrix4f view = OVR::Matrix4f::LookAtRH( shiftedEyePos, shiftedEyePos + finalForward, finalUp );
-    OVR::Matrix4f proj = ovrMatrix4f_Projection( Global::HMD->DefaultEyeFov[ eye ], 0.2f, 1000.0f, ovrProjection_RightHanded );
+    OVR::Matrix4f proj = ovrMatrix4f_Projection( Global::HMD.DefaultEyeFov[ eye ], 0.2f, 1000.0f, ovrProjection_RightHanded );
 
     Matrix44 viewMat;
     view.Transpose();
