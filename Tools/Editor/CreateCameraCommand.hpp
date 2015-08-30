@@ -5,6 +5,11 @@
 
 class SceneWidget;
 
+namespace ae3d
+{
+    class GameObject;
+}
+
 class CreateCameraCommand : public CommandBase
 {
 public:
@@ -14,6 +19,7 @@ public:
 
 private:
     SceneWidget* sceneWidget = nullptr;
+    ae3d::GameObject* gameObject = nullptr;
 };
 
 #endif

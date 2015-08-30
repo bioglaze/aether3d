@@ -13,6 +13,9 @@ namespace ae3d
     class CameraComponent
     {
     public:
+        /// Projection type
+        enum class ProjectionType { Orthographic, Perspective };
+        
         /// Clear flag.
         enum class ClearFlag { DepthAndColor, DontClear };
         
@@ -22,6 +25,12 @@ namespace ae3d
         /// \return View matrix.
         const Matrix44& GetView() const { return viewMatrix; }
 
+        /// \return Projection type.
+        ProjectionType GetProjectionType() const { return projectionType; }
+
+        /// \param aProjectionType Projection type. Defaults to orthographic.
+        void SetProjectionType( ProjectionType aProjectionType ) { projectionType = aProjectionType; }
+        
         /**
           Sets an orthographic projection matrix.
          
@@ -61,9 +70,6 @@ namespace ae3d
 
         /// \param clearFlag Clear flag. Defaults to DepthAndColor.
         void SetClearFlag( ClearFlag clearFlag );
-
-        /// \return True if the projection is orthographic, false if it's perspective.
-        bool IsOrthographic() const { return isOrthographic; }
         
         /// \return Clear flag.
         ClearFlag GetClearFlag() const { return clearFlag; }
@@ -128,7 +134,7 @@ namespace ae3d
         float farp = 1;
         float fovDegrees = 45;
         float aspect = 1;
-        bool isOrthographic = true; // If false, assume perspective
+        ProjectionType projectionType = ProjectionType::Orthographic;
         ClearFlag clearFlag = ClearFlag::DepthAndColor;
     };
 }

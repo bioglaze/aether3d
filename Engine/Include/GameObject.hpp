@@ -24,6 +24,20 @@ namespace ae3d
             }
         }
 
+        /// Remove a component from the game object.
+        template< class T > void RemoveComponent()
+        {
+            for (unsigned i = 0; i < nextFreeComponentIndex; ++i)
+            {
+                if (components[ i ].type == T::Type())
+                {
+                    components[ i ].handle = 0;
+                    components[ i ].type = -1;
+                    return;
+                }
+            }
+        }
+
         /// \return The first component of type T or null if there is no such component.
         template< class T > T* GetComponent()
         {

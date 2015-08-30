@@ -248,6 +248,7 @@ void SceneWidget::Init()
     System::LoadBuiltinAssets();
 
     camera.AddComponent<CameraComponent>();
+    camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() ) / height(), 1, 400 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.AddComponent<TransformComponent>();
@@ -438,6 +439,11 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
             for (auto& go : selectedGameObjects)
             {
                 selectedObjects.push_back( gameObjects[ go ].get() );
+            }
+
+            if (selectedObjects.empty())
+            {
+                return;
             }
 
             auto transform = selectedObjects.front()->GetComponent< TransformComponent >();

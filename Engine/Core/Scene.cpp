@@ -146,7 +146,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
     
     Frustum frustum;
     
-    if (!camera->isOrthographic)
+    if (camera->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
     {
         frustum.SetProjection( camera->GetFovDegrees(), camera->GetAspect(), camera->GetNear(), camera->GetFar() );
     }

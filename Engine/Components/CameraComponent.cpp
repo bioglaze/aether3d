@@ -28,7 +28,6 @@ void ae3d::CameraComponent::SetProjection( float left, float right, float bottom
     orthoParams.down = bottom;
     nearp = aNear;
     farp = aFar;
-    isOrthographic = true;
     projectionMatrix.MakeProjection( left, right, bottom, top, nearp, farp );
 }
 
@@ -38,13 +37,11 @@ void ae3d::CameraComponent::SetProjection( float aFovDegrees, float aAspect, flo
     farp = aFar;
     fovDegrees = aFovDegrees;
     aspect = aAspect;
-    isOrthographic = false;
     projectionMatrix.MakeProjection( fovDegrees, aspect, aNear, aFar );
 }
 
 void ae3d::CameraComponent::SetProjection( const Matrix44& proj )
 {
-    isOrthographic = false;
     projectionMatrix = proj;
 }
 
@@ -68,17 +65,23 @@ std::string ae3d::CameraComponent::GetSerialized() const
     std::stringstream outStream;
     outStream << "camera\n";
 
-    if (isOrthographic)
-    {
-        outStream << "ortho " << orthoParams.left << " " << orthoParams.right << " " << orthoParams.top << " " << orthoParams.down <<
+    outStream << "ortho " << orthoParams.left << " " << orthoParams.right << " " << orthoParams.top << " " << orthoParams.down <<
     " " << nearp << " " << farp << "\n";
+
+    outStream << "projection ";
+    
+    if (projectionType == ProjectionType::Perspective)
+    {
+        outStream << "perspective\n";
     }
     else
     {
-        outStream << "persp " << fovDegrees << " " << aspect << " " << nearp << " " << farp << "\n";
+        outStream << "orthographic\n";
     }
     
-    outStream << "clearcolor" << clearColor.x << " " << clearColor.y << " " << clearColor.z << "\n\n";
+    outStream << "persp " << fovDegrees << " " << aspect << " " << nearp << " " << farp << "\n";
     
+    outStream << "clearcolor " << clearColor.x << " " << clearColor.y << " " << clearColor.z << "\n\n";
+
     return outStream.str();
 }

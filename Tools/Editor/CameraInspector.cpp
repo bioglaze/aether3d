@@ -1,11 +1,13 @@
 #include "CameraInspector.hpp"
 #include <iostream>
 #include <QBoxLayout>
+#include <QColorDialog>
 #include <QTableWidget>
 #include <QLabel>
 #include <QComboBox>
 #include <QString>
 #include <QHeaderView>
+#include <QPushButton>
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
 #include "Quaternion.hpp"
@@ -44,11 +46,16 @@ void CameraInspector::Init( QWidget* mainWindow )
     projectionBox->addItem("Orthographic");
     projectionBox->addItem("Perspective");
 
+    //clearColorDialog = new QColorDialog();
+    clearColorButton = new QPushButton("clear color");
+
     QBoxLayout* clearLayout = new QBoxLayout( QBoxLayout::LeftToRight );
     //clearLayout->setMargin(1);
     clearLayout->setContentsMargins( 1, 1, 1, 1 );
     clearLayout->addWidget( clearTitle );
     clearLayout->addWidget( clearFlagsBox );
+    clearLayout->addWidget( clearColorButton );
+    //clearLayout->addWidget( clearColorDialog );
     QWidget* clearWidget = new QWidget();
     clearWidget->setLayout( clearLayout );
 
@@ -77,6 +84,12 @@ void CameraInspector::Init( QWidget* mainWindow )
     connect( persp, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
     connect( clearFlagsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearFlagsChanged(int) ));
     connect( projectionBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ProjectionChanged() ));
+    connect( clearColorButton, SIGNAL(clicked()), this, SLOT(OpenColorSelection() ));
+}
+
+void CameraInspector::OpenColorSelection()
+{
+    new QColorDialog();
 }
 
 void CameraInspector::ProjectionChanged()
@@ -91,18 +104,19 @@ void CameraInspector::ClearFlagsChanged( int )
 
 void CameraInspector::ApplySelectedCameraIntoFields( const ae3d::CameraComponent& camera )
 {
-    float width = 0, height = 0;
-
     disconnect( ortho, &QTableWidget::itemChanged, ortho, nullptr );
     disconnect( persp, &QTableWidget::itemChanged, persp, nullptr );
+
+    projectionBox->setCurrentIndex( camera.GetProjectionType() == ae3d::CameraComponent::ProjectionType::Orthographic ? 0 : 1 );
+    clearFlagsBox->setCurrentIndex( camera.GetClearFlag() == ae3d::CameraComponent::ClearFlag::DepthAndColor ? 0 : 1 );
 
     persp->item( 0, 0 )->setText( QString::fromStdString( std::to_string( camera.GetFovDegrees() ) ) );
     persp->item( 0, 1 )->setText( QString::fromStdString( std::to_string( camera.GetAspect() ) ) );
     persp->item( 0, 2 )->setText( QString::fromStdString( std::to_string( camera.GetNear() ) ) );
     persp->item( 0, 3 )->setText( QString::fromStdString( std::to_string( camera.GetFar() ) ) );
 
-    ortho->item( 0, 0 )->setText( QString::fromStdString( std::to_string( width ) ) );
-    ortho->item( 0, 1 )->setText( QString::fromStdString( std::to_string( height ) ) );
+    ortho->item( 0, 0 )->setText( QString::fromStdString( std::to_string( camera.GetRight() ) ) );
+    ortho->item( 0, 1 )->setText( QString::fromStdString( std::to_string( camera.GetTop() ) ) );
     ortho->item( 0, 2 )->setText( QString::fromStdString( std::to_string( camera.GetNear() ) ) );
     ortho->item( 0, 3 )->setText( QString::fromStdString( std::to_string( camera.GetFar() ) ) );
 
@@ -122,7 +136,6 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         fov = 0;
     }
-    ae3d::System::Print("fov: %f\n", fov);
 
     try
     {
@@ -132,7 +145,6 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         aspect = 1;
     }
-    ae3d::System::Print("aspect: %f\n", aspect);
 
     try
     {
@@ -142,7 +154,6 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         perspNear = 1;
     }
-    ae3d::System::Print("perspNear: %f\n", perspNear);
 
     try
     {
@@ -152,7 +163,6 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         perspFar = 1;
     }
-    ae3d::System::Print("perspFar: %f\n", perspFar);
 
     try
     {
@@ -162,7 +172,6 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         width = 1;
     }
-    ae3d::System::Print("width: %f\n", width);
 
     try
     {
@@ -172,17 +181,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         height = 1;
     }
-    ae3d::System::Print("height: %f\n", height);
 
-    try
-    {
-        aspect = std::stof( persp->item( 0, 1 )->text().toUtf8().constData() );
-    }
-    catch (std::invalid_argument&)
-    {
-        aspect = 1;
-    }
-    ae3d::System::Print("aspect: %f\n", aspect);
 
     try
     {
@@ -192,7 +191,6 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         orthoNear = 1;
     }
-    ae3d::System::Print("orthoNear: %f\n", orthoNear);
 
     try
     {
@@ -202,12 +200,13 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     {
         orthoFar = 1;
     }
-    ae3d::System::Print("orthoFar: %f\n", orthoFar);
 
     const ae3d::Vec4 orthoParams { width, height, orthoNear, orthoFar };
     const ae3d::Vec4 perspParams { fov, aspect, perspNear, perspFar };
 
-    emit CameraModified( CameraComponent::ClearFlag::DepthAndColor, orthoParams, perspParams );
+    ae3d::CameraComponent::ProjectionType projectionType = ae3d::CameraComponent::ProjectionType::Perspective;
+
+    emit CameraModified( CameraComponent::ClearFlag::DepthAndColor, projectionType, orthoParams, perspParams );
 }
 
 void CameraInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
