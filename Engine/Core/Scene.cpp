@@ -1,4 +1,5 @@
 #include "Scene.hpp"
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -158,8 +159,14 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
     const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
     frustum.Update( cameraTransform->GetLocalPosition(), viewDir );
 
+    std::vector< unsigned > gameObjectsWithMeshRenderer;
+    gameObjectsWithMeshRenderer.reserve( gameObjects.size() );
+    unsigned i = -1;
+    
     for (auto gameObject : gameObjects)
     {
+        ++i;
+        
         if (gameObject == nullptr)
         {
             continue;
@@ -190,14 +197,24 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
 
         if (meshRenderer)
         {
-            auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
-            
-            Matrix44 mvp;
-            Matrix44::Multiply( meshLocalToWorld, view, mvp );
-            Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
-            
-            meshRenderer->Render( mvp, frustum, meshLocalToWorld );
+            gameObjectsWithMeshRenderer.push_back( i );
         }
+    }
+
+    auto meshSorterByMesh = [&](unsigned j, unsigned k) { return gameObjects[ j ]->GetComponent< MeshRendererComponent >()->GetMesh() ==
+                                                                 gameObjects[ k ]->GetComponent< MeshRendererComponent >()->GetMesh(); };
+    std::sort( std::begin( gameObjectsWithMeshRenderer ), std::end( gameObjectsWithMeshRenderer ), meshSorterByMesh );
+    
+    for (auto j : gameObjectsWithMeshRenderer)
+    {
+        auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
+        auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
+            
+        Matrix44 mvp;
+        Matrix44::Multiply( meshLocalToWorld, view, mvp );
+        Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
+            
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mvp, frustum, meshLocalToWorld );
     }
     
     GfxDevice::ErrorCheck( "Scene render end" );

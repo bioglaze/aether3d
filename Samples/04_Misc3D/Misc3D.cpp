@@ -37,7 +37,7 @@ int main()
     Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();
     System::InitAudio();
-    //System::InitGamePad();
+    System::InitGamePad();
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -137,7 +137,11 @@ int main()
     int lastMouseY = 0;
     
     float yaw = 0;
-
+    float gamePadLeftThumbX = 0;
+    float gamePadLeftThumbY = 0;
+    float gamePadRightThumbX = 0;
+    float gamePadRightThumbY = 0;
+    
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -218,7 +222,22 @@ int main()
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }
+            if (event.type == WindowEventType::GamePadLeftThumbState)
+            {
+                gamePadLeftThumbX = event.gamePadThumbX;
+                gamePadLeftThumbY = event.gamePadThumbY;
+            }
+            if (event.type == WindowEventType::GamePadRightThumbState)
+            {
+                gamePadRightThumbX = event.gamePadThumbX;
+                gamePadRightThumbY = event.gamePadThumbY;
+            }
         }
+
+        camera.GetComponent<TransformComponent>()->MoveForward( gamePadLeftThumbY );
+        camera.GetComponent<TransformComponent>()->MoveRight( gamePadLeftThumbX );
+        camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( gamePadRightThumbX ) / 1 );
+        camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( gamePadRightThumbY ) / 1 );
 
         std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
