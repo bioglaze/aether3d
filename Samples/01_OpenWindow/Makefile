@@ -1,5 +1,5 @@
 UNAME := $(shell uname)
-COMPILER := g++
+COMPILER ?= g++
 ENGINE_LIB := libaether3d_linux.a
 LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
 LIB_PATH := -L.

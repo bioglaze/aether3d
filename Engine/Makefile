@@ -1,19 +1,27 @@
 OUTPUT_DIR := ../../aether3d_build
 
 UNAME := $(shell uname)
-COMPILER := g++
-CCOMPILER := gcc
+COMPILER ?= g++
+CCOMPILER ?= gcc
 ENGINE_LIB := libaether3d_linux.a
 STD_LIB := -std=c++11
 INCLUDES := -IInclude -IVideo -ICore -IThirdParty
-WARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
+GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
  -Wunsafe-loop-optimizations -Wvector-operation-performance -Wzero-as-null-pointer-constant
+CLANGWARNINGS := -Wall -ansi -pedantic
+
+ifeq ($(COMPILER), clang)
+WARNINGS := $(CLANGWARNGING)
+endif
+ifeq ($(OMPILER), g++)
+WARNINGS := $(GCCWARNINGS)
+endif
 
 ifeq ($(UNAME), Darwin)
-COMPILER := clang++
-CCOMPILER := clang
+COMPILER ?= clang++
+CCOMPILER ?= clang
 STD_LIB := -std=c++11 -stdlib=libc++
 WARNINGS := -Wall -ansi -pedantic
 ENGINE_LIB := libaether3d_osx.a
