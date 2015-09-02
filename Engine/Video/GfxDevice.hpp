@@ -8,7 +8,7 @@
 
 namespace ae3d
 {
-    class RenderTexture2D;
+    class RenderTexture;
     class VertexBuffer;
     class Shader;
 
@@ -48,7 +48,7 @@ namespace ae3d
         void ErrorCheck( const char* info );
 
         void SetClearColor( float red, float green, float blue );
-        void SetRenderTarget( RenderTexture2D* target );
+        void SetRenderTarget( RenderTexture* target, unsigned cubeMapFace );
         void SetMultiSampling( bool enable );
         
         // TODO: Remove these to prepare for modern API style draw submission (these are provided in Draw())

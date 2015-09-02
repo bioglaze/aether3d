@@ -134,7 +134,7 @@ void ae3d::GfxDevice::Init( int width, int height )
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
 {
     ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount(), "Invalid range" );
-    ae3d::System::Assert( endIndex > -1 && endIndex > startIndex && endIndex <= vertexBuffer.GetFaceCount(), "Invalid range" );
+    ae3d::System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount(), "Invalid range" );
 
     SetBlendMode( blendMode );
     SetDepthFunc( depthFunc );
@@ -402,7 +402,7 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
     return std::find( std::begin( sExtensions ), std::end( sExtensions ), glExtension ) != std::end( sExtensions );
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture2D* target )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
     if (target != nullptr && target->GetFBO() == GfxDeviceGlobal::cachedFBO)
     {
@@ -417,6 +417,13 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture2D* target )
     glBindFramebuffer( GL_FRAMEBUFFER, fbo );
     GfxDeviceGlobal::cachedFBO = fbo;
 
+    if (target && target->IsCube())
+    {
+        const unsigned glCubeMapFace = GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace;
+        System::Assert( glCubeMapFace >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && glCubeMapFace <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "Invalid cube map face." );
+        glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glCubeMapFace, target->GetID(), 0 );
+    }
+    
     if (target != nullptr)
     {
         glViewport( 0, 0, target->GetWidth(), target->GetHeight() );

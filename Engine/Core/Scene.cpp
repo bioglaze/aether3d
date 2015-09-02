@@ -113,7 +113,7 @@ void ae3d::Scene::Render()
 void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
 {
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
-    GfxDevice::SetRenderTarget( camera->GetTargetTexture() );
+    GfxDevice::SetRenderTarget( camera->GetTargetTexture(), 0 );
     
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );

@@ -4,6 +4,8 @@
 #import <Metal/Metal.h>
 #endif
 #include "GfxDevice.hpp"
+#include "VertexBuffer.hpp"
+#include "Shader.hpp"
 #include "Renderer.hpp"
 #include "RenderTexture.hpp"
 
@@ -62,7 +64,6 @@ void ae3d::GfxDevice::Init( int width, int height )
 
 namespace
 {
-    int textureHandle = 0;
     float clearColor[] = { 0, 0, 0, 1 };
 
 id<CAMetalDrawable> GetCurrentDrawable()
@@ -155,6 +156,11 @@ int ae3d::GfxDevice::GetVertexBufferBinds()
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
     // Handled by setupRenderPassDescriptor().
+}
+
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+{
+    NSLog(@"GfxDevice::Draw not implemented!\n");
 }
 
 void ae3d::GfxDevice::DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset )

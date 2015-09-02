@@ -7,8 +7,8 @@
 
 namespace ae3d
 {
-    class RenderTexture2D;
-
+    class RenderTexture;
+    
     /// Camera views the scene. Game Object containing a camera component must also contain a transform component to render anything.
     class CameraComponent
     {
@@ -60,13 +60,13 @@ namespace ae3d
         Vec3 GetClearColor() const { return clearColor; }
 
         /// \return Target texture or null if there is no target texture.
-        RenderTexture2D* GetTargetTexture() { return targetTexture; }
-        
+        RenderTexture* GetTargetTexture() { return targetTexture; }
+
         /// \param color Color in range 0-1.
         void SetClearColor( const Vec3& color );
 
-        /// \param renderTexture2D 2D render texture.
-        void SetTargetTexture( RenderTexture2D* renderTexture2D );
+        /// \param renderTexture 2D or Cube render texture.
+        void SetTargetTexture( RenderTexture* renderTexture );
 
         /// \param clearFlag Clear flag. Defaults to DepthAndColor.
         void SetClearFlag( ClearFlag clearFlag );
@@ -120,7 +120,7 @@ namespace ae3d
         Matrix44 projectionMatrix;
         Matrix44 viewMatrix;
         Vec3 clearColor;
-        RenderTexture2D* targetTexture = nullptr;
+        RenderTexture* targetTexture = nullptr;
         
         struct OrthoParams
         {

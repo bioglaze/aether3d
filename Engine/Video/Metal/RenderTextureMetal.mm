@@ -2,7 +2,7 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
-void ae3d::RenderTexture2D::Create( int aWidth, int aHeight, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -15,7 +15,6 @@ void ae3d::RenderTexture2D::Create( int aWidth, int aHeight, TextureWrap aWrap, 
     wrap = aWrap;
     filter = aFilter;
     
-    handle = GfxDevice::CreateTextureId();
     MTLTextureDescriptor* textureDescriptor =
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
                                                        width:width
@@ -27,4 +26,9 @@ void ae3d::RenderTexture2D::Create( int aWidth, int aHeight, TextureWrap aWrap, 
     {
         System::Print("Failed to create a render texture!\n");
     }
+}
+
+void ae3d::RenderTexture::CreateCube( int aDimension, TextureWrap aWrap, TextureFilter aFilter )
+{
+    System::Print( "Cube map RT not implemented!\n" );
 }

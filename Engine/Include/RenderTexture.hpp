@@ -6,15 +6,23 @@
 
 namespace ae3d
 {
-    /// 2D render texture.
-    class RenderTexture2D : public TextureBase
+    /// Render texture.
+    class RenderTexture : public TextureBase
     {
   public:
         /// \param width Width.
         /// \param height Height.
         /// \param wrap Wrapping mode.
         /// \param filter Filtering mode.
-        void Create( int width, int height, TextureWrap wrap, TextureFilter filter );
+        void Create2D( int width, int height, TextureWrap wrap, TextureFilter filter );
+
+        /// \param dimension Dimension.
+        /// \param wrap Wrapping mode.
+        /// \param filter Filtering mode.
+        void CreateCube( int dimension, TextureWrap wrap, TextureFilter filter );
+
+        /// \return True, if the texture is a cube map.
+        bool IsCube() const { return isCube; }
         
         /// \return FBO.
         unsigned GetFBO() const { return fboId; }
@@ -22,6 +30,7 @@ namespace ae3d
   private:
         unsigned rboId = 0;
         unsigned fboId = 0;
+        bool isCube = false;
     };
 }
 #endif

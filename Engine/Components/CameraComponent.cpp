@@ -50,9 +50,9 @@ void ae3d::CameraComponent::SetClearColor( const Vec3& color )
     clearColor = color;
 }
 
-void ae3d::CameraComponent::SetTargetTexture( ae3d::RenderTexture2D* renderTexture2D )
+void ae3d::CameraComponent::SetTargetTexture( ae3d::RenderTexture* renderTexture )
 {
-    targetTexture = renderTexture2D;
+    targetTexture = renderTexture;
 }
 
 void ae3d::CameraComponent::SetClearFlag( ClearFlag aClearFlag )

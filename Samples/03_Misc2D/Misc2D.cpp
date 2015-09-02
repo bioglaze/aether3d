@@ -109,8 +109,8 @@ int main()
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
     statsContainer.GetComponent<TransformComponent>()->SetParent( statsParent.GetComponent<TransformComponent>() );
 
-    RenderTexture2D rtTex;
-    rtTex.Create( 512, 512, TextureWrap::Clamp, TextureFilter::Linear );
+    RenderTexture rtTex;
+    rtTex.Create2D( 512, 512, TextureWrap::Clamp, TextureFilter::Linear );
     
     GameObject renderTextureContainer;
     renderTextureContainer.AddComponent<SpriteRendererComponent>();

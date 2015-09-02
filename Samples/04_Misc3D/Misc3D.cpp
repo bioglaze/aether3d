@@ -49,6 +49,19 @@ int main()
     //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
+    /*RenderTexture cubeRT;
+    cubeRT.CreateCube( 512, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    
+    GameObject cameraCubeRT;
+    cameraCubeRT.AddComponent<CameraComponent>();
+    cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
+    cameraCubeRT.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+    cameraCubeRT.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    cameraCubeRT.GetComponent<CameraComponent>()->SetTargetTexture( &cubeRT );
+    cameraCubeRT.AddComponent<TransformComponent>();
+    //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
+    cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );*/
+
     GameObject camera2d;
     camera2d.AddComponent<CameraComponent>();
     camera2d.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
