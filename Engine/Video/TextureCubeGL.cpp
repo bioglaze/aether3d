@@ -1,19 +1,71 @@
 #include <GL/glxw.h>
-#include "stb_image.c"
-#include <string>
 #include <vector>
+#include "stb_image.c"
 #include "TextureCube.hpp"
 #include "GfxDevice.hpp"
 #include "FileSystem.hpp"
+#include "FileWatcher.hpp"
 #include "System.hpp"
 
+extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
+
+namespace TextureCubeGlobal
+{
+    std::vector< ae3d::TextureCube > cachedTextures;
+}
+
+void CubeReload( const std::string& path )
+{
+    for (auto& texture : TextureCubeGlobal::cachedTextures)
+    {
+        if (texture.PosX() == path || texture.PosY() == path || texture.PosZ() == path ||
+            texture.NegX() == path || texture.NegY() == path || texture.NegZ() == path)
+        {
+            ae3d::System::Print("Reloading cube map\n");
+            texture.Load( ae3d::FileSystem::FileContents( texture.NegX().c_str() ),
+                          ae3d::FileSystem::FileContents( texture.PosX().c_str() ),
+                          ae3d::FileSystem::FileContents( texture.NegY().c_str() ),
+                          ae3d::FileSystem::FileContents( texture.PosY().c_str() ),
+                          ae3d::FileSystem::FileContents( texture.NegZ().c_str() ),
+                          ae3d::FileSystem::FileContents( texture.PosZ().c_str() ),
+                          texture.GetWrap(), texture.GetFilter(), texture.GetMipmaps() );
+        }
+    }
+}
 
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
           const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
           const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
           TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
 {
+    const bool isCached = [&]()
+    {
+        for (auto& texture : TextureCubeGlobal::cachedTextures)
+        {
+            if (texture.PosX() == posX.path && texture.PosY() == posY.path && texture.PosZ() == posZ.path &&
+                texture.NegX() == negX.path && texture.NegY() == negY.path && texture.NegZ() == negZ.path)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }();
+    
+    if (isCached && handle == 0)
+    {
+        for (auto& texture : TextureCubeGlobal::cachedTextures)
+        {
+            if (texture.PosX() == posX.path && texture.PosY() == posY.path && texture.PosZ() == posZ.path &&
+                texture.NegX() == negX.path && texture.NegY() == negY.path && texture.NegZ() == negZ.path)
+            {
+                *this = texture;
+                return;
+            }
+        }
+    }
+
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
@@ -26,6 +78,20 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         {
             glObjectLabel( GL_TEXTURE, handle, (GLsizei)negX.path.size(), negX.path.c_str() );
         }
+        
+        fileWatcher.AddFile( negX.path, CubeReload );
+        fileWatcher.AddFile( posX.path, CubeReload );
+        fileWatcher.AddFile( negY.path, CubeReload );
+        fileWatcher.AddFile( posY.path, CubeReload );
+        fileWatcher.AddFile( negZ.path, CubeReload );
+        fileWatcher.AddFile( posZ.path, CubeReload );
+        
+        posXpath = posX.path;
+        posYpath = posY.path;
+        posZpath = posZ.path;
+        negXpath = negX.path;
+        negYpath = negY.path;
+        negZpath = negZ.path;
     }
     
     glActiveTexture( GL_TEXTURE0 );
@@ -68,6 +134,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
     }
 
+    if (!isCached)
+    {
+        TextureCubeGlobal::cachedTextures.push_back( *this );
+    }
+    
     GfxDevice::ErrorCheck( "Cube map creation" );
 }
 
