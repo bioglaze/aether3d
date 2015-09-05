@@ -102,7 +102,7 @@ void ae3d::GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
     }
 }
 
-void ae3d::GfxDevice::SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
+void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
 {
     if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
     {

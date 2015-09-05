@@ -12,8 +12,10 @@
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
+#include "CommandListManager.hpp"
 
 #define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
+#define AE3D_CHECK_D3D(x, msg) if (x != S_OK) { ae3d::System::Assert( false, msg ); }
 
 void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
@@ -37,18 +39,15 @@ namespace GfxDeviceGlobal
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
     ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
-    ID3D12CommandQueue* commandQueue = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
     ID3D12GraphicsCommandList* commandList = nullptr;
-    ID3D12Fence* fence = nullptr;
     unsigned frameIndex = 0;
     ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
     ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
     ID3D12DescriptorHeap* samplerDescriptorHeap = nullptr;
-    HANDLE fenceEvent;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
-
+    CommandListManager commandListManager;
     // FIXME: This is related to texturing and shader constant buffers, so try to move somewhere else.
     ID3D12DescriptorHeap* descHeapCbvSrvUav = nullptr;
 }
@@ -75,10 +74,7 @@ void CreateDescriptorHeap()
     for (int i = 0; i < GfxDeviceGlobal::BufferCount; ++i)
     {
         const HRESULT hr = GfxDeviceGlobal::swapChain->GetBuffer( i, IID_PPV_ARGS( &GfxDeviceGlobal::renderTargets[ i ] ) );
-        if (FAILED( hr ))
-        {
-            OutputDebugStringA( "Failed to create RTV!\n" );
-        }
+        AE3D_CHECK_D3D( hr, "Failed to create RTV" );
 
         GfxDeviceGlobal::renderTargets[ i ]->SetName( L"SwapChain_Buffer" );
         GfxDeviceGlobal::backBufferWidth = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Width );
@@ -90,10 +86,7 @@ void CreateDescriptorHeap()
     desc.NumDescriptors = 10;
     desc.NodeMask = 0;
     HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::rtvDescriptorHeap ) );
-    if (FAILED( hr ))
-    {
-        OutputDebugStringA( "Failed to create descriptor heap!\n" );
-    }
+    AE3D_CHECK_D3D( hr, "Failed to create RTV descriptor heap" );
 
     auto rtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
     for (auto i = 0u; i < GfxDeviceGlobal::BufferCount; ++i)
@@ -108,11 +101,7 @@ void CreateDescriptorHeap()
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     desc.NodeMask = 0;
     hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::descHeapCbvSrvUav ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Print( "Unable to create shader DescriptorHeap!" );
-        return;
-    }
+    AE3D_CHECK_D3D( hr, "Failed to create shader descriptor heap" );
 }
 
 void CreateSampler()
@@ -123,11 +112,7 @@ void CreateSampler()
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     desc.NodeMask = 0;
     HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::samplerDescriptorHeap ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Print( "Unable to create sampler DescriptorHeap!" );
-        return;
-    }
+    AE3D_CHECK_D3D( hr, "Failed to create sampler descriptor heap" );
 
     D3D12_SAMPLER_DESC samplerDesc;
     samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -163,12 +148,12 @@ void CreateRootSignature()
     descRootSignature.NumStaticSamplers = 0;
     descRootSignature.pParameters = rootParam;
     descRootSignature.pStaticSamplers = nullptr;
-    D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
-    HRESULT hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
-    if (FAILED( hr ))
-    {
-        OutputDebugStringA( "Unable to create root signature!\n" );
-    }
+
+    HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
+    AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
+
+    hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
+    AE3D_CHECK_D3D( hr, "Failed to create root signature" );
 }
 
 std::string GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
@@ -298,12 +283,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     const std::string hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
     ID3D12PipelineState* pso;
     HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
-
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Unable to create PSO!\n" );
-        return;
-    }
+    AE3D_CHECK_D3D( hr, "Failed to create PSO" );
 
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
@@ -315,32 +295,27 @@ void CreateDepthStencilView()
     desc.NumDescriptors = 10;
     desc.NodeMask = 0;
     HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::dsvDescriptorHeap ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Unable to create depth-stencil descriptor!\n" );
-        return;
-    }
+    AE3D_CHECK_D3D( hr, "Failed to create depth-stencil descriptor heap" );
 
     auto resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
         DXGI_FORMAT_R32_TYPELESS, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
         D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
+
+    auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT );
 
     D3D12_CLEAR_VALUE dsvClearValue;
     dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
     dsvClearValue.DepthStencil.Depth = 1.0f;
     dsvClearValue.DepthStencil.Stencil = 0;
     hr = GfxDeviceGlobal::device->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT ), // No need to read/write by CPU
+        &prop, // No need to read/write by CPU
         D3D12_HEAP_FLAG_NONE,
         &resourceDesc,
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &dsvClearValue,
         IID_PPV_ARGS( &GfxDeviceGlobal::depthTexture ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Unable to create depth-stencil texture!\n" );
-        return;
-    }
+    AE3D_CHECK_D3D( hr, "Failed to create depth texture" );
+
     GfxDeviceGlobal::depthTexture->SetName( L"DepthTexture" );
 
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
@@ -353,7 +328,7 @@ void CreateDepthStencilView()
 
 void ae3d::CreateRenderer( int /*samples*/ )
 {
-#ifndef NDEBUG
+#ifdef DEBUG
     ID3D12Debug* debugController;
     const HRESULT dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &debugController ) );
     if (dhr == S_OK)
@@ -365,36 +340,15 @@ void ae3d::CreateRenderer( int /*samples*/ )
         OutputDebugStringA( "Failed to create debug layer!\n" );
     }
 #endif
-    HRESULT hr = D3D12CreateDevice( nullptr, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)&GfxDeviceGlobal::device );
-    if (hr != S_OK)
-    {
-        OutputDebugStringA( "Failed to create D3D12 device!\n" );
-        ae3d::System::Assert( false, "Failed to create D3D12 device!" );
-        return;
-    }
+    HRESULT hr = D3D12CreateDevice( nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
+    AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
+#ifdef DEBUG
+    // Prevents GPU from over/underclocking to get consistent timing information.
+    GfxDeviceGlobal::device->SetStablePowerState( TRUE );
+#endif
 
-    hr = GfxDeviceGlobal::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&GfxDeviceGlobal::commandListAllocator );
-    if (FAILED( hr ))
-    {
-        OutputDebugStringA( "Failed to create command allocator!\n" );
-        ae3d::System::Assert( false, "Failed to create command allocator!" );
-        return;
-    }
-
-    hr = GfxDeviceGlobal::device->CreateCommandList( 1, D3D12_COMMAND_LIST_TYPE_DIRECT, GfxDeviceGlobal::commandListAllocator, nullptr, __uuidof(ID3D12CommandList), (void**)&GfxDeviceGlobal::commandList );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Failed to create command list.\n" );
-        return;
-    }
-
-    D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
-    commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-    hr = GfxDeviceGlobal::device->CreateCommandQueue( &commandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)&GfxDeviceGlobal::commandQueue );
-    if (FAILED( hr ))
-    {
-        OutputDebugStringA( "Failed to create command queue!\n" );
-    }
+    GfxDeviceGlobal::commandListManager.Create( GfxDeviceGlobal::device );
+    GfxDeviceGlobal::commandListManager.CreateNewCommandList( &GfxDeviceGlobal::commandList, &GfxDeviceGlobal::commandListAllocator );
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc{ {},{ 1, 0 }, DXGI_USAGE_RENDER_TARGET_OUTPUT, 2, WindowGlobal::hwnd, TRUE, DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH };
     ZeroMemory( &swapChainDesc.BufferDesc, sizeof( swapChainDesc.BufferDesc ) );
@@ -405,27 +359,12 @@ void ae3d::CreateRenderer( int /*samples*/ )
 #if DEBUG
     factoryFlags = DXGI_CREATE_FACTORY_DEBUG;
 #endif
-    hr = CreateDXGIFactory2( factoryFlags, __uuidof(IDXGIFactory2), (void**)&dxgiFactory );
-    if (FAILED( hr ))
-    {
-        OutputDebugStringA( "Failed to create DXGI factory!\n" );
-    }
+    hr = CreateDXGIFactory2( factoryFlags, IID_PPV_ARGS( &dxgiFactory ) );
+    AE3D_CHECK_D3D( hr, "Failed to create DXGI factory" );
 
-    hr = dxgiFactory->CreateSwapChain( GfxDeviceGlobal::commandQueue, &swapChainDesc, (IDXGISwapChain**)&GfxDeviceGlobal::swapChain );
-    if (FAILED( hr ))
-    {
-        OutputDebugStringA( "Failed to create DXGI factory!\n" );
-    }
+    hr = dxgiFactory->CreateSwapChain( GfxDeviceGlobal::commandListManager.GetCommandQueue(), &swapChainDesc, (IDXGISwapChain**)&GfxDeviceGlobal::swapChain );
+    AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
     dxgiFactory->Release();
-
-    hr = GfxDeviceGlobal::device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&GfxDeviceGlobal::fence );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Failed to create fence!\n" );
-        return;
-    }
-
-    GfxDeviceGlobal::fenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
 
     CreateDescriptorHeap();
     CreateRootSignature();
@@ -518,14 +457,14 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     DestroyVertexBuffers();
     DestroyShaders();
     DestroyTextures();
-    CloseHandle( GfxDeviceGlobal::fenceEvent );
+    GfxDeviceGlobal::commandListManager.Destroy();
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rtvDescriptorHeap );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::dsvDescriptorHeap );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
+    auto commandQueue = GfxDeviceGlobal::commandListManager.GetCommandQueue();
+    AE3D_SAFE_RELEASE( commandQueue );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::descHeapCbvSrvUav );
 
     for (auto& pso : GfxDeviceGlobal::psoCache)
@@ -577,13 +516,9 @@ void ae3d::GfxDevice::Present()
     setResourceBarrier( GfxDeviceGlobal::commandList, d3dBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT );
 
     HRESULT hr = GfxDeviceGlobal::commandList->Close();
-    if (hr != S_OK)
-    {
-        OutputDebugStringA( "Failed to close command list!\n" );
-    }
+    AE3D_CHECK_D3D( hr, "Failed to close command list" );
 
-    ID3D12CommandList* const cmdList = GfxDeviceGlobal::commandList;
-    GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, &cmdList );
+    std::uint64_t fenceValue = GfxDeviceGlobal::commandListManager.ExecuteCommandList( (ID3D12CommandList*)GfxDeviceGlobal::commandList );
 
     hr = GfxDeviceGlobal::swapChain->Present( 1, 0 );
     if (FAILED( hr ))
@@ -602,13 +537,7 @@ void ae3d::GfxDevice::Present()
         }
     }
 
-    GfxDeviceGlobal::fence->SetEventOnCompletion( GfxDeviceGlobal::frameIndex, GfxDeviceGlobal::fenceEvent );
-    GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, GfxDeviceGlobal::frameIndex );
-    DWORD wait = WaitForSingleObject( GfxDeviceGlobal::fenceEvent, 10000 );
-    if (wait != WAIT_OBJECT_0)
-    {
-        OutputDebugStringA( "Present() failed in WaitForSingleObject\n" );
-    }
+    GfxDeviceGlobal::commandListManager.WaitForFence( fenceValue );
 
     GfxDeviceGlobal::commandListAllocator->Reset();
     GfxDeviceGlobal::commandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
@@ -625,23 +554,6 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     GfxDeviceGlobal::clearColor[ 2 ] = blue;
 }
 
-void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
-{
-    if (blendMode == BlendMode::Off)
-    {
-    }
-    else if (blendMode == BlendMode::AlphaBlend)
-    {
-    }
-    else if (blendMode == BlendMode::Additive)
-    {
-    }
-    else
-    {
-        ae3d::System::Assert( false, "Unhandled blend mode." );
-    }
-}
-
 void ae3d::GfxDevice::ErrorCheck(const char* info)
 {
         (void)info;
@@ -652,15 +564,5 @@ void ae3d::GfxDevice::ErrorCheck(const char* info)
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned cubeMapFace )
 {
-
-}
-
-void ae3d::GfxDevice::SetDepthFunc( DepthFunc depthFunc )
-{
-    if (depthFunc == DepthFunc::LessOrEqualWriteOn)
-    {
-    }
-    else if (depthFunc == DepthFunc::LessOrEqualWriteOff)
-    {
-    }
+    cubeMapFace;
 }

@@ -93,8 +93,10 @@ void ae3d::Shader::CreateConstantBuffer()
 
     Global::descHeaps.push_back( mDescHeapCbvSrvUav );*/
 
+    auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD );
+
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD ),
+        &prop,
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer( D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT ),
         D3D12_RESOURCE_STATE_GENERIC_READ,

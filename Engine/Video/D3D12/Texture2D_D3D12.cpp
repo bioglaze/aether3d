@@ -15,9 +15,6 @@
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
-void Tokenize( const std::string& str,
-              std::vector< std::string >& tokens,
-              const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
 
 namespace GfxDeviceGlobal
 {
@@ -119,7 +116,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
         ae3d::System::Print("Unknown texture file extension: %s\n", fileContents.path.c_str() );
     }
-
+    
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
@@ -165,12 +162,14 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
   
     opaque = (components == 3 || components == 1);
 
-    D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-        DXGI_FORMAT_R8G8B8A8_UNORM, width, height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_NONE,
+   D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+       DXGI_FORMAT_R8G8B8A8_UNORM, width, height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_NONE,
         D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
 
+    auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD );
+
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD ),
+        &prop,
         D3D12_HEAP_FLAG_NONE,
         &resourceDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ,

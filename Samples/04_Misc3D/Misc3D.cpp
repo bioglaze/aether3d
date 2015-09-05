@@ -233,10 +233,6 @@ int main()
                 {
                     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
                 }
-                else if (keyCode == KeyCode::R)
-                {
-                    System::ReloadChangedAssets();
-                }
             }
             if (event.type == WindowEventType::MouseMove)
             {

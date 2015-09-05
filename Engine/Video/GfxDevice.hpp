@@ -55,7 +55,6 @@ namespace ae3d
         // TODO: Remove these to prepare for modern API style draw submission (these are provided in Draw())
         void SetBackFaceCulling( bool enable );
         void SetBlendMode( BlendMode blendMode );
-        void SetDepthFunc( DepthFunc depthFunc );
 
         void IncDrawCalls();
         int GetDrawCalls();

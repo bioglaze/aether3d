@@ -102,6 +102,7 @@
     <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\ThirdParty\stb_image.c" />
     <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
+    <ClCompile Include="..\Video\D3D12\CommandListManager.cpp" />
     <ClCompile Include="..\Video\D3D12\GfxDeviceD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\RendererD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\RenderTextureD3D12.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="..\Include\Vec3.hpp" />
     <ClInclude Include="..\Include\VR.hpp" />
     <ClInclude Include="..\Include\Window.hpp" />
+    <ClInclude Include="..\Video\D3D12\CommandListManager.hpp" />
     <ClInclude Include="..\Video\GfxDevice.hpp" />
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />
