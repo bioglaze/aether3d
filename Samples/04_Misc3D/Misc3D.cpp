@@ -49,7 +49,7 @@ int main()
     //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
-    /*RenderTexture cubeRT;
+    RenderTexture cubeRT;
     cubeRT.CreateCube( 512, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
     GameObject cameraCubeRT;
@@ -59,8 +59,8 @@ int main()
     cameraCubeRT.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     cameraCubeRT.GetComponent<CameraComponent>()->SetTargetTexture( &cubeRT );
     cameraCubeRT.AddComponent<TransformComponent>();
-    //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
-    cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );*/
+    //cameraCubeRT.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
+    cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     GameObject camera2d;
     camera2d.AddComponent<CameraComponent>();
@@ -114,6 +114,13 @@ int main()
     material.SetBackFaceCulling( true );
     
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+
+    Material materialCubeRT;
+    materialCubeRT.SetShader( &shader );
+    materialCubeRT.SetRenderTexture( "textureMap", &cubeRT );
+    materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
+    materialCubeRT.SetBackFaceCulling( true );
+
     cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     
     Scene scene;
@@ -127,6 +134,7 @@ int main()
     scene.SetSkybox( &skybox );
     //scene.Add( &camera2d );
     scene.Add( &camera );
+    scene.Add( &cameraCubeRT );
     scene.Add( &cube );
     scene.Add( &cube2 );
     scene.Add( &statsContainer );

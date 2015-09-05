@@ -146,6 +146,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     Global::shaders.push_back( blobShaderPixel );
 
     CreateConstantBuffer();
+    id = 1;
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/, const FileSystem::FileContentsData& /*fragmentDataGLSL*/,
@@ -167,7 +168,7 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/,
         }
     }
     
-    if (!isInCache && !vertexDataHLSL.path.empty() && !fragmentDataHLSL.path.empty())
+    if (!isInCache && !vertexDataHLSL.path.empty() && !fragmentDataHLSL.path.empty() && IsValid())
     {
         fileWatcher.AddFile( vertexDataHLSL.path.c_str(), ShaderReload );
         fileWatcher.AddFile( fragmentDataHLSL.path.c_str(), ShaderReload );

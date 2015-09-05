@@ -265,17 +265,23 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descPso.PS = { reinterpret_cast<BYTE*>(shader.blobShaderPixel->GetBufferPointer()), shader.blobShaderPixel->GetBufferSize() };
     descPso.RasterizerState = descRaster;
     descPso.BlendState = descBlend;
-    descPso.DepthStencilState.DepthEnable = TRUE;
     descPso.DepthStencilState.StencilEnable = FALSE;
     descPso.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
     
     if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff)
     {
         descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        descPso.DepthStencilState.DepthEnable = TRUE;
     }
     else if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
     {
         descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        descPso.DepthStencilState.DepthEnable = TRUE;
+    }
+    else if (depthFunc == ae3d::GfxDevice::DepthFunc::NoneWriteOff)
+    {
+        descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        descPso.DepthStencilState.DepthEnable = FALSE;
     }
     else
     {
@@ -644,7 +650,7 @@ void ae3d::GfxDevice::ErrorCheck(const char* info)
 #endif
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture2D* /*target*/ )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned cubeMapFace )
 {
 
 }

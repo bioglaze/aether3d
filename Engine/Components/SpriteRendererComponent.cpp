@@ -143,8 +143,12 @@ void RenderQueue::Clear()
 
 void RenderQueue::Build()
 {
-    CreateVertexBuffer( sprites, vertexBuffer );
-    CreateDrawables( sprites, drawables );
+    if (!sprites.empty())
+    {
+        CreateVertexBuffer( sprites, vertexBuffer );
+        CreateDrawables( sprites, drawables );
+    }
+
     isDirty = false;
 }
 
@@ -158,7 +162,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
     for (auto& drawable : drawables)
     {
         renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (const ae3d::Texture2D*)drawable.texture, 0 );
-        ae3d::GfxDevice::Draw( vertexBuffer, drawable.bufferStart, drawable.bufferEnd, renderer.builtinShaders.spriteRendererShader, blendMode, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
+        ae3d::GfxDevice::Draw( vertexBuffer, drawable.bufferStart, drawable.bufferEnd, renderer.builtinShaders.spriteRendererShader, blendMode, ae3d::GfxDevice::DepthFunc::NoneWriteOff );
     }
 }
 

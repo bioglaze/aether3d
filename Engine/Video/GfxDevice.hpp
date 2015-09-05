@@ -31,7 +31,8 @@ namespace ae3d
         enum class DepthFunc
         {
             LessOrEqualWriteOff,
-            LessOrEqualWriteOn
+            LessOrEqualWriteOn,
+            NoneWriteOff
         };
         
         void Init( int width, int height );

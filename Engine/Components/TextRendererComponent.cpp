@@ -88,7 +88,11 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
 
     if (m().isDirty)
     {
-        m().font->CreateVertexBuffer( m().text.c_str(), m().color, m().vertexBuffer );
+        if (!m().text.empty())
+        {
+            m().font->CreateVertexBuffer( m().text.c_str(), m().color, m().vertexBuffer );
+        }
+
         m().isDirty = false;
     }
 
@@ -96,7 +100,11 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
     shader->Use();
     shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
     shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
-    GfxDevice::Draw( m().vertexBuffer, 0, m().vertexBuffer.GetFaceCount(), *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
+
+    if (m().vertexBuffer.IsGenerated())
+    {
+        GfxDevice::Draw( m().vertexBuffer, 0, m().vertexBuffer.GetFaceCount(), *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
+    }
 }
 
 void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )

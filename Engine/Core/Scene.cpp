@@ -91,7 +91,9 @@ void ae3d::Scene::Render()
     for (auto rtCamera : rtCameras)
     {
         if (rtCamera->GetComponent<TransformComponent>())
-        RenderWithCamera( rtCamera );
+        {
+            RenderWithCamera( rtCamera );
+        }
     }
 
     for (auto camera : cameras)
@@ -161,7 +163,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
 
     std::vector< unsigned > gameObjectsWithMeshRenderer;
     gameObjectsWithMeshRenderer.reserve( gameObjects.size() );
-    unsigned i = -1;
+    int i = -1;
     
     for (auto gameObject : gameObjects)
     {
@@ -266,6 +268,8 @@ std::string ae3d::Scene::GetSerialized() const
 
 ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects ) const
 {
+    // TODO: It would be better to store the token strings into somewhere accessible to GetSerialized() to prevent typos etc.
+
     outGameObjects.clear();
 
     std::stringstream stream( std::string( std::begin( serialized.data ), std::end( serialized.data ) ) );
@@ -297,7 +301,29 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> x >> y >> width >> height >> nearp >> farp;
             outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( x, y, width, height, nearp, farp );
         }
-        
+
+        if (token == "persp")
+        {
+            float fov, aspect, nearp, farp;
+            lineStream >> fov >> aspect >> nearp >> farp;
+            outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( fov, aspect, nearp, farp );
+        }
+
+        if (token == "projection")
+        {
+            std::string type;
+            lineStream >> type;
+            
+            if (type == "orthographic")
+            {
+                outGameObjects.back().GetComponent< CameraComponent >()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
+            }
+            else if (type == "perspective")
+            {
+                outGameObjects.back().GetComponent< CameraComponent >()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+            }
+        }
+
         if (token == "clearcolor")
         {
             float red, green, blue;

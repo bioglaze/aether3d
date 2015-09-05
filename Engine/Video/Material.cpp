@@ -1,7 +1,9 @@
 #include "Material.hpp"
 #include "GfxDevice.hpp"
 #include "Texture2D.hpp"
+#include "RenderTexture.hpp"
 #include "Shader.hpp"
+#include "System.hpp"
 
 bool ae3d::Material::IsValidShader() const
 {
@@ -51,6 +53,13 @@ void ae3d::Material::Apply()
         ++texUnit;
     }
 
+    for (const auto& texRT : texRTs)
+    {
+        System::Print("shader: texRT not implemented\n");
+        //shader->SetTexture( texRT.first.c_str(), texRT.second, texUnit );
+        ++texUnit;
+    }
+
     for (const auto& mat4 : mat4s)
     {
         shader->SetMatrix( mat4.first.c_str(), mat4.second.m );
@@ -77,6 +86,11 @@ void ae3d::Material::SetTexture( const char* name, Texture2D* texture )
 void ae3d::Material::SetTexture( const char* name, TextureCube* texture )
 {
     texCubes[ name ] = texture;
+}
+
+void ae3d::Material::SetRenderTexture( const char* name, RenderTexture* renderTexture )
+{
+    texRTs[ name ] = renderTexture;
 }
 
 void ae3d::Material::SetInt( const char* name, int value )

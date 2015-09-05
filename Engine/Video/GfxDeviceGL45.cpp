@@ -116,6 +116,11 @@ void ae3d::GfxDevice::SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
         glEnable( GL_DEPTH_TEST );
         glDepthFunc( GL_LEQUAL );
     }
+    else if (depthFunc == ae3d::GfxDevice::DepthFunc::NoneWriteOff)
+    {
+        glDepthMask( GL_FALSE );
+        glDisable( GL_DEPTH_TEST );
+    }
 }
 
 
@@ -413,7 +418,7 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
         return;
     }
 
-    GLuint fbo = target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
+    const GLuint fbo = target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
     glBindFramebuffer( GL_FRAMEBUFFER, fbo );
     GfxDeviceGlobal::cachedFBO = fbo;
 

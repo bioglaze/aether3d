@@ -11,6 +11,7 @@ namespace ae3d
     class Shader;
     class Texture2D;
     class TextureCube;
+    class RenderTexture;
     struct Matrix44;
     
     /// Material is used to render a mesh.
@@ -43,6 +44,10 @@ namespace ae3d
         /// \param name Texture uniform name.
         /// \param texture Texture.
         void SetTexture( const char* name, TextureCube* texture );
+
+        /// \param name Texture uniform name.
+        /// \param renderTexture Render texture.
+        void SetRenderTexture( const char* name, RenderTexture* renderTexture );
         
         /// \param name Integer uniform name.
         /// \param value Value.
@@ -68,6 +73,7 @@ namespace ae3d
         std::unordered_map< std::string, Vec4 > vec4s;
         std::unordered_map< std::string, Texture2D* > tex2ds;
         std::unordered_map< std::string, TextureCube* > texCubes;
+        std::unordered_map< std::string, RenderTexture* > texRTs;
         std::unordered_map< std::string, Matrix44 > mat4s;
         Shader* shader = nullptr;
         bool cullBackFaces = true;

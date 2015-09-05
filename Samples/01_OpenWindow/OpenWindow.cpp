@@ -11,6 +11,7 @@
 #include "Vec3.hpp"
 #include "Window.hpp"
 #include "Texture2D.hpp"
+#include "Shader.hpp"
 
 using namespace ae3d;
 

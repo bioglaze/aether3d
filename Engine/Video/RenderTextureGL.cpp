@@ -68,7 +68,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, TextureWrap aWrap, Texture
     isCube = true;
 
     handle = GfxDevice::CreateTextureId();
-    glBindTexture( GL_TEXTURE_2D, handle );
+    glBindTexture( GL_TEXTURE_CUBE_MAP, handle );
     
     if (GfxDevice::HasExtension( "KHR_debug" ))
     {

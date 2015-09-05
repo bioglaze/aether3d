@@ -1,7 +1,6 @@
 #include "Texture2D.hpp"
 #include <algorithm>
 #include <vector>
-#include <sstream>
 #include <map>
 #include <d3d12.h>
 #include <d3dx12.h>
@@ -122,10 +121,10 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;// DXGI_FORMAT_B8G8R8A8_UNORM;
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1; // No MIP
+    srvDesc.Texture2D.MipLevels = 1; 
     srvDesc.Texture2D.MostDetailedMip = 0;
     srvDesc.Texture2D.PlaneSlice = 0;
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
@@ -134,7 +133,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     auto cbvSrvUavDescStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     cbvSrcUavDescHandle.ptr += cbvSrvUavDescStep;
 
-    // kaatuu ennen ekaa presentia
     GfxDeviceGlobal::device->CreateShaderResourceView( resource, &srvDesc, cbvSrcUavDescHandle );
 
     if (mipmaps == Mipmaps::Generate)
@@ -146,76 +144,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
     //Texture2DGlobal::PrintMemoryUsage();
 #endif
-}
-
-void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, float aAnisotropy )
-{
-    Load( atlasTextureData, aWrap, aFilter, mipmaps, aAnisotropy );
-
-    const std::string metaStr = std::string( std::begin( atlasMetaData.data ), std::end( atlasMetaData.data ) );
-    std::stringstream metaStream( metaStr );
-
-    if (atlasMetaData.path.find( ".xml" ) == std::string::npos && atlasMetaData.path.find( ".XML" ) == std::string::npos)
-    {
-        System::Print("Atlas meta data path %s could not be opened!", atlasMetaData.path.c_str());
-        return;
-    }
-
-    std::string line;
-
-    while (std::getline( metaStream, line ))
-    {
-        if (line.find( "<Image Name" ) == std::string::npos)
-        {
-            continue;
-        }
-
-        std::vector< std::string > tokens;
-        Tokenize( line, tokens, "\"" );
-        bool found = false;
-        
-        for (std::size_t t = 0; t < tokens.size(); ++t)
-        {
-            if (tokens[ t ].find( "Name" ) != std::string::npos)
-            {
-                if (tokens[ t + 1 ] == textureName)
-                {
-                    found = true;
-                }
-            }
-            
-            if (!found)
-            {
-                continue;
-            }
-
-            if (tokens[ t ].find( "XPos" ) != std::string::npos)
-            {
-                scaleOffset.z = std::stoi( tokens[ t + 1 ] ) / static_cast<float>(width);
-            }
-            else if (tokens[ t ].find( "YPos" ) != std::string::npos)
-            {
-                scaleOffset.w = std::stoi( tokens[ t + 1 ] ) / static_cast<float>(height);
-            }
-            else if (tokens[ t ].find( "Width" ) != std::string::npos)
-            {
-                const int w = std::stoi( tokens[ t + 1 ] );
-                scaleOffset.x = 1.0f / (static_cast<float>(width) / static_cast<float>(w));
-                width = w;
-            }
-            else if (tokens[ t ].find( "Height" ) != std::string::npos)
-            {
-                const int h = std::stoi( tokens[ t + 1 ] );
-                scaleOffset.y = 1.0f / (static_cast<float>(height) / static_cast<float>(h));
-                height = h;
-            }
-        }
-    
-        if (found)
-        {
-            return;
-        }
-    }
 }
 
 void ae3d::Texture2D::LoadDDS( const char* path )
