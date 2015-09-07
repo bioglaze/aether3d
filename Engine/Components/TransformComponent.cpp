@@ -176,7 +176,8 @@ std::string ae3d::TransformComponent::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "transform\nposition " << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\nrotation ";
-    outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\n\n";
+    outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\nscale " <<
+        localScale << "\n\n";
     
     return outStream.str();
 }

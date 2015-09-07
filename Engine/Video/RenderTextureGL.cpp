@@ -3,6 +3,11 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
+namespace GfxDeviceGlobal
+{
+    extern GLuint systemFBO;
+}
+
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
@@ -72,7 +77,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, TextureWrap aWrap, Texture
     
     if (GfxDevice::HasExtension( "KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, 17, "render_texture_cube" );
+        glObjectLabel( GL_TEXTURE, handle, 19, "render_texture_cube" );
     }
     
     glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : (mipmaps == Mipmaps::Generate ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR ) );
@@ -88,8 +93,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, TextureWrap aWrap, Texture
     glBindRenderbuffer( GL_RENDERBUFFER, 0 );
     
     fboId = GfxDevice::CreateFboId();
-    GfxDevice::SetRenderTarget( this, 0 );
-    
+    glBindFramebuffer( GL_FRAMEBUFFER, fboId );
+
     const GLenum externalFormat = GL_RGBA;
     const GLenum internalFormat = GL_RGBA8;
     const GLenum dataType = GL_UNSIGNED_BYTE;
@@ -100,9 +105,11 @@ void ae3d::RenderTexture::CreateCube( int aDimension, TextureWrap aWrap, Texture
                      aDimension, aDimension, 0, externalFormat,
                      dataType, nullptr );
     }
-    
+
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId );
     glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
+    
+    glBindFramebuffer( GL_FRAMEBUFFER, GfxDeviceGlobal::systemFBO );
 
     GfxDevice::ErrorCheckFBO();
     GfxDevice::ErrorCheck( "CreateRenderTextureCube end" );

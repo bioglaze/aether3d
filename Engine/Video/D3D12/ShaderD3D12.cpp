@@ -9,6 +9,7 @@
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
+#include "RenderTexture.hpp"
 
 #define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
 
@@ -201,6 +202,15 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* textur
     GfxDevice::IncTextureBinds();
     SetInt( name, textureUnit );
     
+    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
+    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
+}
+
+void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* texture, int textureUnit )
+{
+    GfxDevice::IncTextureBinds();
+    SetInt( name, textureUnit );
+
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }

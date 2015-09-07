@@ -10,6 +10,7 @@
 #include "GameObject.hpp"
 #include "GfxDevice.hpp"
 #include "MeshRendererComponent.hpp"
+#include "RenderTexture.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
@@ -78,7 +79,7 @@ void ae3d::Scene::Render()
 
         auto cameraComponent = gameObject->GetComponent<CameraComponent>();
         
-        if (cameraComponent && cameraComponent->GetTargetTexture())
+        if (cameraComponent && cameraComponent->GetTargetTexture() != nullptr)
         {
             rtCameras.push_back( gameObject );
         }
@@ -90,9 +91,41 @@ void ae3d::Scene::Render()
     
     for (auto rtCamera : rtCameras)
     {
-        if (rtCamera->GetComponent<TransformComponent>())
+        auto transform = rtCamera->GetComponent< TransformComponent >();
+
+        if (transform && !rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
         {
-            RenderWithCamera( rtCamera );
+            RenderWithCamera( rtCamera, 0 );
+        }
+        else if (transform && rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
+        {
+            for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
+            {
+                const float scale = 2000;
+
+                static const Vec3 directions[ 6 ] =
+                {
+                    Vec3( 1, 0, 0 ) * scale, // posX
+                    Vec3( -1, 0, 0 ) * scale, // negX
+                    Vec3( 0, 1, 0 ) * scale, // posY
+                    Vec3( 0, -1, 0 ) * scale, // negY
+                    Vec3( 0, 0, -1 ) * scale, // posZ
+                    Vec3( 0, 0, 1 ) * scale  // negZ
+                };
+
+                static const Vec3 ups[ 6 ] =
+                {
+                    Vec3( 0, -1, 0 ),
+                    Vec3( 0, -1, 0 ),
+                    Vec3( 0, 1, 0 ),
+                    Vec3( 0, 1, 0 ),
+                    Vec3( 0, -1, 0 ),
+                    Vec3( 0, -1, 0 )
+                };
+
+                transform->LookAt( transform->GetLocalPosition(), transform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
+                RenderWithCamera( rtCamera, 0 );
+            }
         }
     }
 
@@ -100,22 +133,25 @@ void ae3d::Scene::Render()
     {
         if (camera != mainCamera && camera->GetComponent<TransformComponent>())
         {
-            RenderWithCamera( camera );
+            RenderWithCamera( camera, 0 );
         }
     }
     
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
+    ae3d::System::Assert( mainCamera->GetComponent<CameraComponent>()->GetTargetTexture() == nullptr, "main camera must not have a texture target" );
     
     if (camera != nullptr && mainCamera->GetComponent<TransformComponent>())
     {
-        RenderWithCamera( mainCamera );
+        RenderWithCamera( mainCamera, 0 );
     }
 }
 
-void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
+void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 {
+    ae3d::System::Assert( 0 <= cubeMapFace && cubeMapFace < 6, "invalid cube map face" );
+
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
-    GfxDevice::SetRenderTarget( camera->GetTargetTexture(), 0 );
+    GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
     
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
@@ -125,16 +161,16 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo )
         GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     }
     
+    Matrix44 view;
+
     if (skybox != nullptr)
     {
-        Matrix44 view;
         auto cameraTrans = cameraGo->GetComponent< TransformComponent >();
         cameraTrans->GetLocalRotation().GetMatrix( view );
         camera->SetView( view );    
         renderer.RenderSkybox( skybox, *camera );
     }
 
-    Matrix44 view;
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
     
     // TODO: Maybe add a VR flag into camera to select between HMD and normal pose.

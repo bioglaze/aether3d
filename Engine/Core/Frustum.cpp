@@ -5,9 +5,7 @@ using namespace ae3d;
 void Frustum::UpdateCornersAndCenters( const Vec3& cameraPosition, const Vec3& zAxis )
 {
     const Vec3 up( 0, 1, 0 );
-    
-    Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
-    
+    const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
     const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
     
     // Computes the centers of near and far planes.

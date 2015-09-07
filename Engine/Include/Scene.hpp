@@ -43,7 +43,7 @@ namespace ae3d
         DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects ) const;
         
     private:
-        void RenderWithCamera( GameObject* cameraGo );
+        void RenderWithCamera( GameObject* cameraGo, int cubeMapFace );
 
         std::vector< GameObject* > gameObjects;
         unsigned nextFreeGameObject = 0;

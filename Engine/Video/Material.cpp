@@ -55,8 +55,7 @@ void ae3d::Material::Apply()
 
     for (const auto& texRT : texRTs)
     {
-        System::Print("shader: texRT not implemented\n");
-        //shader->SetTexture( texRT.first.c_str(), texRT.second, texUnit );
+        shader->SetRenderTexture( texRT.first.c_str(), texRT.second, texUnit );
         ++texUnit;
     }
 

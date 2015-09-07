@@ -39,14 +39,17 @@ int main()
     System::InitAudio();
     System::InitGamePad();
 
+    //GameObject dummy;
+    //dummy.AddComponent<TransformComponent>();
+    //dummy.AddComponent<CameraComponent>();
+
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
-    //camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DontClear );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.AddComponent<TransformComponent>();
-    //perspCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     RenderTexture cubeRT;
@@ -54,12 +57,12 @@ int main()
     
     GameObject cameraCubeRT;
     cameraCubeRT.AddComponent<CameraComponent>();
-    cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
+    cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 1, 0 ) );
     cameraCubeRT.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    cameraCubeRT.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    cameraCubeRT.GetComponent<CameraComponent>()->SetProjection( 45, 1, 1, 400 );
     cameraCubeRT.GetComponent<CameraComponent>()->SetTargetTexture( &cubeRT );
+    cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
-    //cameraCubeRT.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, 0 ) );
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     GameObject camera2d;
@@ -99,7 +102,7 @@ int main()
     cube2.AddComponent< MeshRendererComponent >();
     cube2.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
     cube2.AddComponent< TransformComponent >();
-    cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -100 } );
+    cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -50 } );
 
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents(""), FileSystem::FileContents( "" ) );
@@ -121,7 +124,7 @@ int main()
     materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
     materialCubeRT.SetBackFaceCulling( true );
 
-    cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
     
     Scene scene;
     

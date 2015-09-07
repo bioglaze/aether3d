@@ -123,7 +123,6 @@ void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
     }
 }
 
-
 void ae3d::GfxDevice::Init( int width, int height )
 {
     if (glxwInit() != 0)
@@ -435,8 +434,12 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     }
     else
     {
+        ae3d::System::Assert( GfxDeviceGlobal::backBufferWidth > 0, "invalid backbuffer dimension" );
         glViewport( 0, 0, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
     }
+
+    ErrorCheckFBO();
+    ErrorCheck( "SetRenderTarget end" );
 }
 
 void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )

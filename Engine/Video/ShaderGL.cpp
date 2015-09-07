@@ -7,6 +7,7 @@
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
+#include "RenderTexture.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 
@@ -215,6 +216,17 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* textur
     GfxDevice::IncTextureBinds();
     SetInt( name, textureUnit );
     
+    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
+    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
+}
+
+void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* texture, int textureUnit )
+{
+    glActiveTexture( GL_TEXTURE0 + textureUnit );
+    glBindTexture( texture->IsCube() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, texture->GetID() );
+    GfxDevice::IncTextureBinds();
+    SetInt( name, textureUnit );
+
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
