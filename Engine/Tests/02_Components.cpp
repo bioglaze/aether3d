@@ -15,7 +15,7 @@
 using namespace ae3d;
 
 GameObject gGo;
-RenderTexture2D gRenderTexture;
+RenderTexture gRenderTexture;
 
 void TestManyInstances()
 {
@@ -37,6 +37,27 @@ void TestCamera()
     gGo.AddComponent< CameraComponent >();
     gGo.GetComponent< CameraComponent >()->SetTargetTexture( &gRenderTexture );
     System::Assert( gGo.GetComponent< CameraComponent >()->GetTargetTexture() == &gRenderTexture, "camera render texture failed" );
+
+    GameObject go2;
+    go2.AddComponent< CameraComponent >();
+    System::Assert( gGo.GetComponent< CameraComponent >() != go2.GetComponent< CameraComponent >(), "AddComponent produced identical references!" );
+}
+
+void TestAddition()
+{
+    GameObject go1;
+    go1.AddComponent< CameraComponent >();
+    go1.AddComponent< TransformComponent >();
+    go1.AddComponent< MeshRendererComponent >();
+
+    GameObject go2;
+    go2.AddComponent< CameraComponent >();
+    go2.AddComponent< TransformComponent >();
+    go2.AddComponent< MeshRendererComponent >();
+
+    System::Assert( go1.GetComponent< CameraComponent >() != go2.GetComponent< CameraComponent >(), "AddComponent produced identical references!" );
+    System::Assert( go1.GetComponent< TransformComponent >() != go2.GetComponent< TransformComponent >(), "AddComponent produced identical references!" );
+    System::Assert( go1.GetComponent< MeshRendererComponent >() != go2.GetComponent< MeshRendererComponent >(), "AddComponent produced identical references!" );
 }
 
 void TestTransform()
@@ -112,6 +133,7 @@ int main()
     TestSprite();
     TestManyInstances();
     TestMesh();
+    TestAddition();
 }
 
     

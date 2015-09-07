@@ -1,6 +1,8 @@
 #include "Shader.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
+#include "TextureCube.hpp"
+#include "RenderTexture.hpp"
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
@@ -15,6 +17,14 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
+{
+}
+
+void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )
+{
+}
+
+void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* texture, int textureUnit )
 {
 }
 

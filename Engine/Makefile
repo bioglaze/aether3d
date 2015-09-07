@@ -15,7 +15,7 @@ CLANGWARNINGS := -Wall -ansi -pedantic
 ifeq ($(COMPILER), clang)
 WARNINGS := $(CLANGWARNGING)
 endif
-ifeq ($(OMPILER), g++)
+ifeq ($(COMPILER), g++)
 WARNINGS := $(GCCWARNINGS)
 endif
 
@@ -42,9 +42,11 @@ ifeq ($(OS),Windows_NT)
 endif
 ifeq ($(UNAME), Darwin)
 	mkdir -p $(OUTPUT_DIR)
+	rm -f $(OUTPUT_DIR)/libaether3d_osx.a
 endif
 ifeq ($(UNAME), Linux)
 	mkdir -p $(OUTPUT_DIR)
+	rm -f $(OUTPUT_DIR)/libaether3d_linux.a
 endif
 	$(CCOMPILER) $(INCLUDES) $(WARNINGS) -c ThirdParty/GL/glxw.c -o $(OUTPUT_DIR)/glxw.o
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
