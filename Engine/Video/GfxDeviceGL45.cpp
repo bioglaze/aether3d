@@ -297,7 +297,11 @@ void ae3d::GfxDevice::ClearScreen(unsigned clearFlags)
         mask |= GL_DEPTH_BUFFER_BIT;
     }
 
-    glClear( mask );
+    if (mask != 0)
+    {
+        glDepthMask( GL_TRUE );
+        glClear( mask );
+    }
 }
 
 void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
@@ -408,7 +412,7 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
-    if (target != nullptr && target->GetFBO() == GfxDeviceGlobal::cachedFBO)
+    if (target != nullptr && target->GetFBO() == GfxDeviceGlobal::cachedFBO && cubeMapFace == 0)
     {
         return;
     }

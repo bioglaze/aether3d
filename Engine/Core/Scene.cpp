@@ -124,7 +124,7 @@ void ae3d::Scene::Render()
                 };
 
                 transform->LookAt( transform->GetLocalPosition(), transform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
-                RenderWithCamera( rtCamera, 0 );
+                RenderWithCamera( rtCamera, cubeMapFace );
             }
         }
     }

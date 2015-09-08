@@ -39,10 +39,6 @@ int main()
     System::InitAudio();
     System::InitGamePad();
 
-    //GameObject dummy;
-    //dummy.AddComponent<TransformComponent>();
-    //dummy.AddComponent<CameraComponent>();
-
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
@@ -53,7 +49,7 @@ int main()
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     RenderTexture cubeRT;
-    cubeRT.CreateCube( 512, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    cubeRT.CreateCube( 512, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
     
     GameObject cameraCubeRT;
     cameraCubeRT.AddComponent<CameraComponent>();
@@ -96,7 +92,7 @@ int main()
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -100 } );
 
     Mesh cubeMesh2;
-    cubeMesh2.Load( FileSystem::FileContents( "shuttle.ae3d" ) );
+    cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
     GameObject cube2;
     cube2.AddComponent< MeshRendererComponent >();
@@ -118,8 +114,11 @@ int main()
     
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
+    Shader shaderCubeMap;
+    shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+
     Material materialCubeRT;
-    materialCubeRT.SetShader( &shader );
+    materialCubeRT.SetShader( &shaderCubeMap );
     materialCubeRT.SetRenderTexture( "textureMap", &cubeRT );
     materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
     materialCubeRT.SetBackFaceCulling( true );
