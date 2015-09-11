@@ -20,8 +20,8 @@ WARNINGS := $(GCCWARNINGS)
 endif
 
 ifeq ($(UNAME), Darwin)
-COMPILER ?= clang++
-CCOMPILER ?= clang
+COMPILER := clang++
+CCOMPILER := clang
 STD_LIB := -std=c++11 -stdlib=libc++
 WARNINGS := -Wall -ansi -pedantic
 ENGINE_LIB := libaether3d_osx.a

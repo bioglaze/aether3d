@@ -105,24 +105,24 @@ void ae3d::Scene::Render()
 
                 static const Vec3 directions[ 6 ] =
                 {
-                    Vec3( 1, 0, 0 ) * scale, // posX
-                    Vec3( -1, 0, 0 ) * scale, // negX
-                    Vec3( 0, 1, 0 ) * scale, // posY
-                    Vec3( 0, -1, 0 ) * scale, // negY
-                    Vec3( 0, 0, -1 ) * scale, // posZ
-                    Vec3( 0, 0, 1 ) * scale  // negZ
+                    Vec3(  1,  0,  0 ) * scale, // posX
+                    Vec3( -1,  0,  0 ) * scale, // negX
+                    Vec3(  0,  1,  0 ) * scale, // posY
+                    Vec3(  0, -1,  0 ) * scale, // negY
+                    Vec3(  0,  0,  1 ) * scale, // posZ
+                    Vec3(  0,  0, -1 ) * scale  // negZ
                 };
-
+                
                 static const Vec3 ups[ 6 ] =
                 {
-                    Vec3( 0, -1, 0 ),
-                    Vec3( 0, -1, 0 ),
-                    Vec3( 0, 1, 0 ),
-                    Vec3( 0, 1, 0 ),
-                    Vec3( 0, -1, 0 ),
-                    Vec3( 0, -1, 0 )
+                    Vec3( 0, -1,  0 ),
+                    Vec3( 0, -1,  0 ),
+                    Vec3( 0,  0,  1 ),
+                    Vec3( 0,  0, -1 ),
+                    Vec3( 0, -1,  0 ),
+                    Vec3( 0, -1,  0 )
                 };
-
+                
                 transform->LookAt( transform->GetLocalPosition(), transform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
                 RenderWithCamera( rtCamera, cubeMapFace );
             }
