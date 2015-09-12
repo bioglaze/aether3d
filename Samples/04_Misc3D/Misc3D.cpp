@@ -139,7 +139,7 @@ int main()
     scene.SetSkybox( &skybox );
     //scene.Add( &camera2d );
     scene.Add( &camera );
-    //scene.Add( &cameraCubeRT );
+    scene.Add( &cameraCubeRT );
     scene.Add( &cube );
     scene.Add( &cube2 );
     scene.Add( &statsContainer );

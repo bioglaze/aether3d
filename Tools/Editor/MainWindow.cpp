@@ -41,8 +41,8 @@ MainWindow::MainWindow()
     connect(this, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
             this, SLOT(OnGameObjectSelected(std::list< ae3d::GameObject* >)));
 
-    connect( &cameraInspector, SIGNAL(CameraModified(ae3d::CameraComponent::ClearFlag, ae3d::CameraComponent::ProjectionType, const ae3d::Vec4&, const ae3d::Vec4&)),
-             this, SLOT(CommandModifyCamera(ae3d::CameraComponent::ClearFlag, ae3d::CameraComponent::ProjectionType, const ae3d::Vec4&, const ae3d::Vec4&)) );
+    connect( &cameraInspector, SIGNAL(CameraModified(ae3d::CameraComponent::ClearFlag, ae3d::CameraComponent::ProjectionType, const ae3d::Vec4&, const ae3d::Vec4&, const ae3d::Vec3&)),
+             this, SLOT(CommandModifyCamera(ae3d::CameraComponent::ClearFlag, ae3d::CameraComponent::ProjectionType, const ae3d::Vec4&, const ae3d::Vec4&, const ae3d::Vec3&)) );
 
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
@@ -241,10 +241,11 @@ void MainWindow::CommandCreateGameObject()
     UpdateHierarchy();
 }
 
-void MainWindow::CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType, const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams )
+void MainWindow::CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
+                                      const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor )
 {
     auto camera = sceneWidget->GetGameObject( 0 )->GetComponent< ae3d::CameraComponent >();
-    commandManager.Execute( std::make_shared< ModifyCameraCommand >( camera, clearFlag, projectionType, orthoParams, perspParams  ) );
+    commandManager.Execute( std::make_shared< ModifyCameraCommand >( camera, clearFlag, projectionType, orthoParams, perspParams, clearColor ) );
 }
 
 void MainWindow::LoadScene()

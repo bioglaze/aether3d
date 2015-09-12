@@ -50,5 +50,5 @@ void ae3d::Renderer::RenderSkybox( const TextureCube* skyTexture, const CameraCo
     builtinShaders.skyboxShader.SetMatrix( "_ModelViewProjection", modelViewProjection.m );
     builtinShaders.skyboxShader.SetTexture( "skyMap", skyTexture, 0 );
 
-    GfxDevice::Draw( skyboxBuffer, 0, skyboxBuffer.GetFaceCount(), builtinShaders.skyboxShader, GfxDevice::BlendMode::Off, GfxDevice::DepthFunc::LessOrEqualWriteOff );
+    GfxDevice::Draw( skyboxBuffer, 0, skyboxBuffer.GetFaceCount() / 3, builtinShaders.skyboxShader, GfxDevice::BlendMode::Off, GfxDevice::DepthFunc::LessOrEqualWriteOff );
 }

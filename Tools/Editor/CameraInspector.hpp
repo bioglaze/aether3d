@@ -13,7 +13,6 @@ namespace ae3d
     struct Quaternion;
 }
 
-//class QColorDialog;
 class QTableWidget;
 class QTableWidgetItem;
 class QWidget;
@@ -31,13 +30,12 @@ class CameraInspector : public QObject
 
 signals:
     void CameraModified( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
-                         const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams );
+                         const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor );
 
 private slots:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
     void ClearFlagsChanged( int item );
     void ProjectionChanged();
-    void OpenColorSelection();
 
 private:
     void ApplyFieldsIntoSelectedCamera();
@@ -46,9 +44,8 @@ private:
     QWidget* root = nullptr;
     QTableWidget* ortho = nullptr;
     QTableWidget* persp = nullptr;
+    QTableWidget* clearColorTable = nullptr;
     QComboBox* clearFlagsBox = nullptr;
     QComboBox* projectionBox = nullptr;
-    QPushButton* clearColorButton = nullptr;
-    //QColorDialog* clearColorDialog = nullptr;
 };
 #endif

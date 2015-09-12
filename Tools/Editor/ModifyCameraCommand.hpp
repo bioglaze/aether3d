@@ -11,7 +11,8 @@ public:
     ModifyCameraCommand( ae3d::CameraComponent* camera,
                          ae3d::CameraComponent::ClearFlag clearFlag,
                          ae3d::CameraComponent::ProjectionType projectionType,
-                         const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams );
+                         const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams,
+                         const ae3d::Vec3& clearColor );
     void Execute() override;
     void Undo() override;
 

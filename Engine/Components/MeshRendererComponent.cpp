@@ -137,7 +137,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
         materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
         materials[ subMeshIndex ]->Apply();
         
-        GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount(),
+        GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount()/3,
             *materials[ subMeshIndex ]->GetShader(), ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn );
     }
 }

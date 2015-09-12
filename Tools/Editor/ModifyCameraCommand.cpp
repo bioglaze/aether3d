@@ -5,14 +5,14 @@
 ModifyCameraCommand::ModifyCameraCommand( ae3d::CameraComponent* aCamera,
                                           ae3d::CameraComponent::ClearFlag aClearFlag,
                                           ae3d::CameraComponent::ProjectionType aProjectionType,
-                                          const ae3d::Vec4& aOrthoParams, const ae3d::Vec4& aPerspParams )
+                                          const ae3d::Vec4& aOrthoParams, const ae3d::Vec4& aPerspParams,
+                                          const ae3d::Vec3& aClearColor )
     : camera( aCamera )
     , orthoParams( aOrthoParams )
     , perspParams( aPerspParams )
     , clearFlag( aClearFlag )
     , projectionType( aProjectionType )
-    // TODO: clear color
-    , clearColor( ae3d::Vec3( 0, 0, 0 ) )
+    , clearColor( aClearColor )
 {
     ae3d::System::Assert( camera, "Camera command needs camera!" );
 

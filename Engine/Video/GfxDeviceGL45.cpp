@@ -137,8 +137,8 @@ void ae3d::GfxDevice::Init( int width, int height )
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
 {
-    ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount(), "Invalid range" );
-    ae3d::System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount(), "Invalid range" );
+    ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
+    ae3d::System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
 
     SetBlendMode( blendMode );
     SetDepthFunc( depthFunc );

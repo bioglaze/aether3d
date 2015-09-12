@@ -1,5 +1,7 @@
 #include "CameraInspector.hpp"
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <QBoxLayout>
 #include <QColorDialog>
 #include <QTableWidget>
@@ -14,6 +16,13 @@
 #include "System.hpp"
 
 using namespace ae3d;
+
+QString FloatToQString( float f )
+{
+    std::ostringstream out;
+    out << std::setprecision( 6 ) << f;
+    return QString::fromStdString( out.str() );
+}
 
 void CameraInspector::Init( QWidget* mainWindow )
 {
@@ -34,8 +43,16 @@ void CameraInspector::Init( QWidget* mainWindow )
     persp->setHorizontalHeaderLabels( QString("Fov;Aspect;Near;Far").split(";") );
     persp->setVerticalHeaderLabels( QString("Perspective").split(";") );
 
+    clearColorTable = new QTableWidget( 1, 3 );
+    clearColorTable->setItem( 0, 0, new QTableWidgetItem() );
+    clearColorTable->setItem( 0, 1, new QTableWidgetItem() );
+    clearColorTable->setItem( 0, 2, new QTableWidgetItem() );
+    clearColorTable->setHorizontalHeaderLabels( QString("Red;Green;Blue").split(";") );
+    //clearColorTable->setVerticalHeaderLabels( QString("Clear Color").split(";") );
+
     QLabel* componentName = new QLabel("Camera");
     QLabel* clearTitle = new QLabel("Clear");
+    QLabel* clearColorTitle = new QLabel("Clear Color");
     QLabel* projectionTitle = new QLabel("Projection");
 
     clearFlagsBox = new QComboBox();
@@ -46,18 +63,19 @@ void CameraInspector::Init( QWidget* mainWindow )
     projectionBox->addItem("Orthographic");
     projectionBox->addItem("Perspective");
 
-    //clearColorDialog = new QColorDialog();
-    clearColorButton = new QPushButton("clear color");
-
     QBoxLayout* clearLayout = new QBoxLayout( QBoxLayout::LeftToRight );
-    //clearLayout->setMargin(1);
     clearLayout->setContentsMargins( 1, 1, 1, 1 );
     clearLayout->addWidget( clearTitle );
     clearLayout->addWidget( clearFlagsBox );
-    clearLayout->addWidget( clearColorButton );
-    //clearLayout->addWidget( clearColorDialog );
     QWidget* clearWidget = new QWidget();
     clearWidget->setLayout( clearLayout );
+
+    QBoxLayout* clearColorLayout = new QBoxLayout( QBoxLayout::LeftToRight );
+    clearColorLayout->setContentsMargins( 1, 1, 1, 1 );
+    clearColorLayout->addWidget( clearColorTitle );
+    clearColorLayout->addWidget( clearColorTable );
+    QWidget* clearColorWidget = new QWidget();
+    clearColorWidget->setLayout( clearColorLayout );
 
     QBoxLayout* projectionLayout = new QBoxLayout( QBoxLayout::LeftToRight );
     projectionLayout->setContentsMargins( 1, 1, 1, 1 );
@@ -71,6 +89,7 @@ void CameraInspector::Init( QWidget* mainWindow )
     inspectorLayout->setContentsMargins( 1, 1, 1, 1 );
     inspectorLayout->addWidget( componentName );
     inspectorLayout->addWidget( clearWidget );
+    inspectorLayout->addWidget( clearColorWidget );
     inspectorLayout->addWidget( projectionWidget );
     inspectorLayout->addWidget( ortho );
     inspectorLayout->addWidget( persp );
@@ -84,12 +103,7 @@ void CameraInspector::Init( QWidget* mainWindow )
     connect( persp, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
     connect( clearFlagsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearFlagsChanged(int) ));
     connect( projectionBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ProjectionChanged() ));
-    connect( clearColorButton, SIGNAL(clicked()), this, SLOT(OpenColorSelection() ));
-}
-
-void CameraInspector::OpenColorSelection()
-{
-    new QColorDialog();
+    connect( clearColorTable, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
 }
 
 void CameraInspector::ProjectionChanged()
@@ -110,15 +124,19 @@ void CameraInspector::ApplySelectedCameraIntoFields( const ae3d::CameraComponent
     projectionBox->setCurrentIndex( camera.GetProjectionType() == ae3d::CameraComponent::ProjectionType::Orthographic ? 0 : 1 );
     clearFlagsBox->setCurrentIndex( camera.GetClearFlag() == ae3d::CameraComponent::ClearFlag::DepthAndColor ? 0 : 1 );
 
-    persp->item( 0, 0 )->setText( QString::fromStdString( std::to_string( camera.GetFovDegrees() ) ) );
-    persp->item( 0, 1 )->setText( QString::fromStdString( std::to_string( camera.GetAspect() ) ) );
-    persp->item( 0, 2 )->setText( QString::fromStdString( std::to_string( camera.GetNear() ) ) );
-    persp->item( 0, 3 )->setText( QString::fromStdString( std::to_string( camera.GetFar() ) ) );
+    persp->item( 0, 0 )->setText( FloatToQString( camera.GetFovDegrees() ) );
+    persp->item( 0, 1 )->setText( FloatToQString( camera.GetAspect() ) );
+    persp->item( 0, 2 )->setText( FloatToQString( camera.GetNear() ) );
+    persp->item( 0, 3 )->setText( FloatToQString( camera.GetFar() ) );
 
-    ortho->item( 0, 0 )->setText( QString::fromStdString( std::to_string( camera.GetRight() ) ) );
-    ortho->item( 0, 1 )->setText( QString::fromStdString( std::to_string( camera.GetTop() ) ) );
-    ortho->item( 0, 2 )->setText( QString::fromStdString( std::to_string( camera.GetNear() ) ) );
-    ortho->item( 0, 3 )->setText( QString::fromStdString( std::to_string( camera.GetFar() ) ) );
+    ortho->item( 0, 0 )->setText( FloatToQString( camera.GetRight() ) );
+    ortho->item( 0, 1 )->setText( FloatToQString( camera.GetTop() ) );
+    ortho->item( 0, 2 )->setText( FloatToQString( camera.GetNear() ) );
+    ortho->item( 0, 3 )->setText( FloatToQString( camera.GetFar() ) );
+
+    clearColorTable->item( 0, 0 )->setText( FloatToQString( camera.GetClearColor().x ) );
+    clearColorTable->item( 0, 1 )->setText( FloatToQString( camera.GetClearColor().y ) );
+    clearColorTable->item( 0, 2 )->setText( FloatToQString( camera.GetClearColor().z ) );
 
     connect( ortho, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
     connect( persp, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
@@ -204,9 +222,39 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     const ae3d::Vec4 orthoParams { width, height, orthoNear, orthoFar };
     const ae3d::Vec4 perspParams { fov, aspect, perspNear, perspFar };
 
+    // TODO: init these from fields
+    ae3d::Vec3 clearColor;
+
+    try
+    {
+        clearColor.x = std::stof( clearColorTable->item( 0, 0 )->text().toUtf8().constData() );
+    }
+    catch (std::invalid_argument&)
+    {
+        clearColor.x = 0;
+    }
+
+    try
+    {
+        clearColor.y = std::stof( clearColorTable->item( 0, 1 )->text().toUtf8().constData() );
+    }
+    catch (std::invalid_argument&)
+    {
+        clearColor.y = 0;
+    }
+
+    try
+    {
+        clearColor.z = std::stof( clearColorTable->item( 0, 2 )->text().toUtf8().constData() );
+    }
+    catch (std::invalid_argument&)
+    {
+        clearColor.z = 0;
+    }
+
     ae3d::CameraComponent::ProjectionType projectionType = ae3d::CameraComponent::ProjectionType::Perspective;
 
-    emit CameraModified( CameraComponent::ClearFlag::DepthAndColor, projectionType, orthoParams, perspParams );
+    emit CameraModified( CameraComponent::ClearFlag::DepthAndColor, projectionType, orthoParams, perspParams, clearColor );
 }
 
 void CameraInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
