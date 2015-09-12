@@ -167,7 +167,17 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         auto cameraTrans = cameraGo->GetComponent< TransformComponent >();
         cameraTrans->GetLocalRotation().GetMatrix( view );
-        camera->SetView( view );    
+#if OCULUS_RIFT
+        Matrix44 vrView = cameraTrans->GetVrView();
+        // Cancels translation.
+        vrView.m[ 14 ] = 0;
+        vrView.m[ 13 ] = 0;
+        vrView.m[ 12 ] = 0;
+
+        camera->SetView( vrView );
+#else
+        camera->SetView( view );
+#endif
         renderer.RenderSkybox( skybox, *camera );
     }
 

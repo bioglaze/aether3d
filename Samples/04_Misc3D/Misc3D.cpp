@@ -27,11 +27,14 @@ using namespace ae3d;
 
 int main()
 {
-    const int width = 640;
-    const int height = 480;
+    int width = 640;
+    int height = 480;
     
     System::EnableWindowsMemleakDetection();
     VR::Init();
+#if OCULUS_RIFT
+    VR::GetIdealWindowSize( width, height );
+#endif
     Window::Create( width, height, WindowCreateFlags::Empty );
     VR::StartTracking( width, height );
     Window::SetTitle( "Misc3D" );
@@ -136,7 +139,7 @@ int main()
     scene.SetSkybox( &skybox );
     //scene.Add( &camera2d );
     scene.Add( &camera );
-    scene.Add( &cameraCubeRT );
+    //scene.Add( &cameraCubeRT );
     scene.Add( &cube );
     scene.Add( &cube2 );
     scene.Add( &statsContainer );

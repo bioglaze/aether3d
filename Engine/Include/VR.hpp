@@ -10,6 +10,10 @@ namespace ae3d
         /// Inits the device. Must be called as early as possible.
         void Init();
 
+        /// \param outWidth Returns optimal width for window.
+        /// \param outHeight Returns optimal height for window.
+        void GetIdealWindowSize( int& outWidth, int& outHeight );
+
         /// Creates mirror textures and starts tracking the head pose.
         /// \param windowWidth Window width in pixels.
         /// \param windowHeight Window height in pixels.

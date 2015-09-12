@@ -175,14 +175,21 @@ void ae3d::VR::Init()
     }
 }
 
+void ae3d::VR::GetIdealWindowSize( int& outWidth, int& outHeight )
+{
+   const ovrSizei idealTextureSize = ovr_GetFovTextureSize( Global::hmd, (ovrEyeType)0, Global::HMD.DefaultEyeFov[ 0 ], 1 );
+   outWidth = idealTextureSize.w;
+   outHeight = idealTextureSize.h;
+}
+
 void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
 {
     OVR::GLEContext::SetCurrentContext( &Global::GLEContext );
     Global::GLEContext.Init();
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; ++i)
     {
-        ovrSizei idealTextureSize;// = ovrHmd_GetFovTextureSize( WindowGlobal::HMD, (ovrEyeType)i, WindowGlobal::HMD->DefaultEyeFov[ i ], 1 );
+        ovrSizei idealTextureSize;
         idealTextureSize.w = windowWidth;
         idealTextureSize.h = windowHeight;
         const bool isRenderTarget = true;
@@ -201,7 +208,7 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
     Global::EyeRenderDesc[ 0 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Left, Global::HMD.DefaultEyeFov[ 0 ] );
     Global::EyeRenderDesc[ 1 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Right, Global::HMD.DefaultEyeFov[ 1 ] );
 
-    ovr_SetEnabledCaps( Global::hmd, 0/*ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction*/ );
+    ovr_SetEnabledCaps( Global::hmd, 0 );
 
     ovr_ConfigureTracking( Global::hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0 );
 
@@ -297,6 +304,12 @@ using namespace ae3d;
 
 void ae3d::VR::Init()
 {
+}
+
+void ae3d::VR::GetIdealWindowSize( int& outWidth, int& outHeight )
+{
+    outWidth = 640;
+    outHeight = 480;
 }
 
 void ae3d::VR::StartTracking( int /*windowWidth*/, int /*windowHeight*/ )
