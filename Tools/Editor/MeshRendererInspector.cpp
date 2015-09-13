@@ -6,7 +6,10 @@
 #include <QFileDialog>
 #include <QMainWindow>
 #include "GameObject.hpp"
+#include "FileSystem.hpp"
+#include "System.hpp"
 #include "MeshRendererComponent.hpp"
+#include "Mesh.hpp"
 
 void MeshRendererInspector::Init( QWidget* aMainWindow )
 {
@@ -15,7 +18,7 @@ void MeshRendererInspector::Init( QWidget* aMainWindow )
     // TODO: change type into something more intelligible.
     meshTable = new QTableWidget( 1, 1 );
     meshTable->setItem( 0, 0, new QTableWidgetItem() );
-    //meshTable->setHorizontalHeaderLabels( QString("Mesh").split(";") );
+    meshTable->setHorizontalHeaderLabels( QString("s").split(";") );
     meshTable->setVerticalHeaderLabels( QString("Mesh").split(";") );
 
     QLabel* componentName = new QLabel("Mesh Renderer");
@@ -28,17 +31,28 @@ void MeshRendererInspector::Init( QWidget* aMainWindow )
     root = new QWidget();
     root->setLayout( inspectorLayout );
 
-    connect(meshTable, SIGNAL(cellClicked(int,int)), this, SLOT(MeshCellClicked(int,int)));
+    connect( meshTable, SIGNAL(cellClicked(int,int)), this, SLOT(MeshCellClicked(int,int)) );
+    connect( mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
+             this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );
 }
 
 void MeshRendererInspector::MeshCellClicked( int, int )
 {
+    // TOOD: Asset library, this is only an ugly placeholder.
+
     //QMainWindow* qMainWindow = static_cast< QMainWindow* >( mainWindow );
     const std::string path = QFileDialog::getOpenFileName( root/*qMainWindow->centralWidget()*/, "Open Mesh", "", "Meshes (*.ae3d)" ).toStdString();
 
-    if (!path.empty())
+    if (!path.empty() && gameObject)
     {
+        ae3d::Mesh* mesh = new ae3d::Mesh();
+        ae3d::Mesh::LoadResult result = mesh->Load( ae3d::FileSystem::FileContents( path.c_str() ) );
 
+        if (result == ae3d::Mesh::LoadResult::Success)
+        {
+            auto meshRendererComponent = gameObject->GetComponent< ae3d::MeshRendererComponent >();
+            meshRendererComponent->SetMesh( mesh );
+        }
     }
 }
 
@@ -51,12 +65,5 @@ void MeshRendererInspector::GameObjectSelected( std::list< ae3d::GameObject* > g
     else
     {
         gameObject = gameObjects.front();
-    }
-
-    auto meshRendererComponent = gameObject->GetComponent< ae3d::MeshRendererComponent >();
-
-    if (meshRendererComponent)
-    {
-
     }
 }
