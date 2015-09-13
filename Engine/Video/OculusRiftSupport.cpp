@@ -9,8 +9,14 @@
 #include "LibOVR/Include/Extras/OVR_Math.h"
 #include "TransformComponent.hpp"
 #include "CameraComponent.hpp"
+#include "GfxDevice.hpp"
 
 using namespace ae3d;
+
+namespace GfxDeviceGlobal
+{
+    extern GLuint systemFBO;
+}
 
 struct DepthBuffer
 {
@@ -115,6 +121,8 @@ struct TextureBuffer
 
     void SetAndClearRenderSurface( DepthBuffer * dbuffer )
     {
+        GfxDeviceGlobal::systemFBO = fboId;
+
         ovrGLTexture* tex = (ovrGLTexture*)&TextureSet->Textures[ TextureSet->CurrentIndex ];
 
         glBindFramebuffer( GL_FRAMEBUFFER, fboId );
@@ -245,7 +253,7 @@ void ae3d::VR::SubmitFrame()
 
     ovrLayerEyeFov ld;
     ld.Header.Type = ovrLayerType_EyeFov;
-    ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
+    ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft | ovrLayerFlag_HighQuality;
 
     for (int eye = 0; eye < 2; ++eye)
     {
