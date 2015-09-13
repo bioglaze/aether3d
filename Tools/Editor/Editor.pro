@@ -56,7 +56,8 @@ SOURCES += \
     TransformInspector.cpp \
     ModifyTransformCommand.cpp \
     CameraInspector.cpp \
-    ModifyCameraCommand.cpp
+    ModifyCameraCommand.cpp \
+    MeshRendererInspector.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -69,4 +70,5 @@ HEADERS += \
     TransformInspector.hpp \
     ModifyTransformCommand.hpp \
     CameraInspector.hpp \
-    ModifyCameraCommand.hpp
+    ModifyCameraCommand.hpp \
+    MeshRendererInspector.hpp

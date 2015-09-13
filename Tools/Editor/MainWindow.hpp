@@ -6,6 +6,7 @@
 #include "WindowMenu.hpp"
 #include "CommandManager.hpp"
 #include "CameraInspector.hpp"
+#include "MeshRendererInspector.hpp"
 #include "TransformInspector.hpp"
 
 class SceneWidget;
@@ -62,6 +63,7 @@ private:
     SceneWidget* sceneWidget = nullptr;
     TransformInspector transformInspector;
     CameraInspector cameraInspector;
+    MeshRendererInspector meshRendererInspector;
     WindowMenu windowMenu;
     CommandManager commandManager;
 };

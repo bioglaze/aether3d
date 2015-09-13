@@ -84,7 +84,6 @@ void CameraInspector::Init( QWidget* mainWindow )
     QWidget* projectionWidget = new QWidget();
     projectionWidget->setLayout( projectionLayout );
 
-    root = new QWidget();
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->setContentsMargins( 1, 1, 1, 1 );
     inspectorLayout->addWidget( componentName );

@@ -14,6 +14,7 @@
 #include "WindowMenu.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
+#include "MeshRendererComponent.hpp"
 #include "ModifyTransformCommand.hpp"
 #include "ModifyCameraCommand.hpp"
 #include "TransformInspector.hpp"
@@ -49,10 +50,12 @@ MainWindow::MainWindow()
 
     transformInspector.Init( this );
     cameraInspector.Init( this );
+    meshRendererInspector.Init( this );
 
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->addWidget( transformInspector.GetWidget() );
     inspectorLayout->addWidget( cameraInspector.GetWidget() );
+    inspectorLayout->addWidget( meshRendererInspector.GetWidget() );
 
     inspectorContainer = new QWidget();
     inspectorContainer->setLayout( inspectorLayout );
@@ -99,6 +102,7 @@ void MainWindow::UpdateInspector()
     {
         transformInspector.GetWidget()->hide();
         cameraInspector.GetWidget()->hide();
+        meshRendererInspector.GetWidget()->hide();
     }
     else
     {
@@ -112,6 +116,16 @@ void MainWindow::UpdateInspector()
         else
         {
             cameraInspector.GetWidget()->hide();
+        }
+
+        auto meshRendererComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::MeshRendererComponent >();
+        if (meshRendererComponent)
+        {
+            meshRendererInspector.GetWidget()->show();
+        }
+        else
+        {
+            meshRendererInspector.GetWidget()->hide();
         }
     }
 }
