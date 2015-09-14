@@ -128,6 +128,7 @@
   <ItemGroup>
     <ClCompile Include="..\Components\AudioSourceComponent.cpp" />
     <ClCompile Include="..\Components\CameraComponent.cpp" />
+    <ClCompile Include="..\Components\DirectionalLightComponent.cpp" />
     <ClCompile Include="..\Components\GameObject.cpp" />
     <ClCompile Include="..\Components\MeshRendererComponent.cpp" />
     <ClCompile Include="..\Components\SpriteRendererComponent.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="..\Include\AudioClip.hpp" />
     <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\Include\DirectionalLightComponent.hpp" />
     <ClInclude Include="..\Include\FileSystem.hpp" />
     <ClInclude Include="..\Include\Font.hpp" />
     <ClInclude Include="..\Include\GameObject.hpp" />

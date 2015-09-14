@@ -47,9 +47,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, TextureWrap aWrap, 
     // Creates the Frame Buffer Object.
     fboId = GfxDevice::CreateFboId();
     glBindFramebuffer( GL_FRAMEBUFFER, fboId );
-    GfxDevice::SetRenderTarget( this, 0 );
-    
-    GfxDevice::ErrorCheck( "CreateRenderTexture2D middle" );
+    //GfxDevice::SetRenderTarget( this, 0 );
     
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, handle, 0 );
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId );

@@ -123,6 +123,9 @@
     <ClCompile Include="..\Video\D3D12\CommandListManager.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\DirectionalLightComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -223,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="..\Video\D3D12\CommandListManager.hpp">
       <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\DirectionalLightComponent.hpp">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,10 +1,9 @@
-// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.3.zip
-
 #include <string>
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
 #include "CameraComponent.hpp"
+#include "DirectionalLightComponent.hpp"
 #include "MeshRendererComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
@@ -24,6 +23,8 @@
 #include "VR.hpp"
 
 using namespace ae3d;
+
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.3.zip
 
 int main()
 {
@@ -128,6 +129,12 @@ int main()
 
     cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
     
+    GameObject dirLight;
+    dirLight.AddComponent<DirectionalLightComponent>();
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.AddComponent<TransformComponent>();
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+
     Scene scene;
     
     TextureCube skybox;
@@ -143,6 +150,7 @@ int main()
     scene.Add( &cube );
     scene.Add( &cube2 );
     scene.Add( &statsContainer );
+    scene.Add( &dirLight );
 
     GameObject cubes[ 5 ];
 

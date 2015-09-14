@@ -89,5 +89,8 @@
     <ClInclude Include="..\..\..\Engine\Include\VR.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\DirectionalLightComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
