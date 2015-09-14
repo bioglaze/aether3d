@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <vector>
+#include <string>
 
 namespace ae3d
 {
@@ -33,6 +34,9 @@ namespace ae3d
         /// \param other Other.
         Mesh& operator=( const Mesh& other );
 
+        /// \return Path where this mesh was loaded from.
+        const std::string& GetPath() const;
+        
         /// \param meshData Data from .ae3d mesh file.
         /// \return Load result.
         LoadResult Load( const FileSystem::FileContentsData& meshData );

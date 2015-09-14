@@ -1,6 +1,7 @@
 #include "Mesh.hpp"
 #include <vector>
 #include <sstream>
+#include <list>
 #include <cstdint>
 #include <string>
 #include "FileSystem.hpp"
@@ -13,16 +14,12 @@ using namespace ae3d;
 
 extern ae3d::FileWatcher fileWatcher;
 
-void MeshReload( const std::string& path )
-{
-    System::Print("mesh reload unimplemented\n");
-}
-
 struct ae3d::Mesh::Impl
 {
     Vec3 aabbMin;
     Vec3 aabbMax;
     std::vector< SubMesh > subMeshes;
+    std::string path;
 };
 
 struct MeshCacheEntry
@@ -34,6 +31,49 @@ struct MeshCacheEntry
 };
 
 std::vector< MeshCacheEntry > gMeshCache;
+std::list< Mesh* > gMeshInstances;
+
+void AddUniqueInstance( Mesh* mesh )
+{
+    bool found = false;
+    
+    for (auto instance : gMeshInstances)
+    {
+        if (instance == mesh)
+        {
+            found = true;
+        }
+    }
+    
+    if (!found)
+    {
+        gMeshInstances.push_back( mesh );
+    }
+}
+
+void MeshReload( const std::string& path )
+{
+    ae3d::System::Print("MeshReload begin\n");
+    
+    // Invalidates cache
+    for (std::size_t i = 0; i < gMeshCache.size(); ++i)
+    {
+        if (gMeshCache[ i ].path == path)
+        {
+            gMeshCache.erase( std::begin( gMeshCache ) + i );
+            break;
+        }
+    }
+    
+    for (auto instance : gMeshInstances)
+    {
+        if (instance->GetPath() == path)
+        {
+            ae3d::System::Print("Hot-reloading mesh\n");
+            instance->Load( FileSystem::FileContents( path.c_str() ) );
+        }
+    }
+}
 
 ae3d::Mesh::Mesh()
 {
@@ -56,6 +96,11 @@ ae3d::Mesh& ae3d::Mesh::operator=( const Mesh& other )
     new(&_storage)Impl();
     reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
     return *this;
+}
+
+const std::string& ae3d::Mesh::GetPath() const
+{
+    return m().path;
 }
 
 const Vec3& ae3d::Mesh::GetAABBMin() const
@@ -93,6 +138,10 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             m().aabbMin = entry.aabbMin;
             m().aabbMax = entry.aabbMax;
             m().subMeshes = entry.subMeshes;
+            m().path = entry.path;
+
+            AddUniqueInstance( this );
+            
             return LoadResult::Success;
         }
     }
@@ -187,12 +236,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         uint8_t vertexFormat;
         is.read( (char*)&vertexFormat, sizeof( vertexFormat ) );
         
-        if (vertexFormat != 0 && vertexFormat != 1)
-        {
-            System::Print( "Mesh %s submesh %s has invalid vertex format %d. Only 0 and 1 are valid!\n", meshData.path.c_str(), subMesh.name.c_str(), vertexFormat );
-            return LoadResult::Corrupted;
-        }
-        else if (vertexFormat == 0) // PTNTC
+        if (vertexFormat == 0) // PTNTC
         {
             try { verticesPTNTC.resize( vertexCount ); }
             catch (std::bad_alloc&)
@@ -212,7 +256,12 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             
             is.read( (char*)&verticesPTN[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTN ) );
         }
-        
+        else
+        {
+            System::Print( "Mesh %s submesh %s has invalid vertex format %d. Only 0 and 1 are valid!\n", meshData.path.c_str(), subMesh.name.c_str(), vertexFormat );
+            return LoadResult::Corrupted;
+        }
+
         uint16_t faceCount;
         is.read( (char*)&faceCount, sizeof( faceCount ) );
 
@@ -251,7 +300,11 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     cacheEntry.subMeshes = m().subMeshes;
     gMeshCache.push_back( cacheEntry );
 
+    AddUniqueInstance( this );
+
     fileWatcher.AddFile( meshData.path, MeshReload );
+    
+    m().path = meshData.path;
     
     return LoadResult::Success;
 }
