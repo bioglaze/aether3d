@@ -9,12 +9,16 @@ namespace ae3d
     class DirectionalLightComponent
     {
     public:
+        /// \return True, if the light casts a shadow.
+        bool CastsShadow() const { return castsShadow; }
+        
         /// \param enable If true, the light will cast a shadow.
         /// \param shadowMapSize Shadow map size in pixels.
         void SetCastShadow( bool enable, int shadowMapSize );
 
     private:
         friend class GameObject;
+        friend class Scene;
 
         /// \return Component's type code. Must be unique for each component type.
         static int Type() { return 6; }

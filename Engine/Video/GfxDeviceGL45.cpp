@@ -454,3 +454,10 @@ void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )
     glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fboId );
     GfxDeviceGlobal::systemFBO = static_cast< unsigned >(fboId);
 }
+
+void ae3d::GfxDevice::DebugBlitFBO( unsigned handle, int width, int height )
+{
+    glBindFramebuffer( GL_READ_FRAMEBUFFER, handle );
+    glBlitFramebuffer( 0, 0, 512, 512, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR );
+}
+

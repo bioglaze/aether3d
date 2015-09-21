@@ -80,13 +80,13 @@ void ae3d::BuiltinShaders::Load()
 "#version 410 core\n \
 \
 layout (location = 0) in vec3 aPosition;\
-uniform mat4 _ModelViewProjection;\
+uniform mat4 _ModelViewProjectionMatrix;\
 \
 out vec3 vTexCoord;\
 \
 void main()\
 {\
-gl_Position = _ModelViewProjection * vec4(aPosition.xyz, 1.0);\
+gl_Position = _ModelViewProjectionMatrix * vec4(aPosition.xyz, 1.0);\
 vTexCoord = aPosition;\
 }";
 
@@ -104,4 +104,37 @@ fragColor = texture( skyMap, vTexCoord );\
 }";
 
     skyboxShader.Load( skyboxVertexSource, skyboxFragmentSource );
+    
+    const char* momentsVertexSource =
+    "#version 410 core\n \
+    \
+    layout (location = 0) in vec3 aPosition;\
+    \
+    uniform mat4 _ModelViewProjectionMatrix;\
+    \
+    void main()\
+    {\
+        gl_Position = _ModelViewProjectionMatrix * vec4( aPosition, 1.0 );\
+    }";
+    
+    const char* momentsFragmentSource =
+    "#version 410 core\n \
+    \
+    out vec4 fragColor;\
+    \
+    void main()\
+    {\
+        float linearDepth = gl_FragCoord.z;\
+    \
+        float dx = dFdx( linearDepth );\
+        float dy = dFdy( linearDepth );\
+    \
+        float moment1 = linearDepth;\
+        float moment2 = linearDepth * linearDepth + 0.25 * (dx * dx + dy * dy);\
+    \
+        fragColor = vec4( moment1, moment2, 0.0, 1.0 );\
+    }\
+    ";
+
+    momentsShader.Load( momentsVertexSource, momentsFragmentSource );
 }

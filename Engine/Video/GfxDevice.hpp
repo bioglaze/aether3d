@@ -79,6 +79,7 @@ namespace ae3d
         void SetBackBufferDimensionAndFBO( int width, int height );
         void ErrorCheckFBO();
         bool HasExtension( const char* glExtension );
+        void DebugBlitFBO( unsigned handle, int width, int height );
 #endif
     }
 }

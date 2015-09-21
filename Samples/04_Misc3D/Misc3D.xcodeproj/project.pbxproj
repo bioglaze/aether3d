@@ -61,6 +61,7 @@
 		AB7112E51B43098400C4EE78 /* TransformComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../../Engine/Include/TransformComponent.hpp; sourceTree = "<group>"; };
 		AB7112E61B43098400C4EE78 /* Vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Vec3.hpp; path = ../../Engine/Include/Vec3.hpp; sourceTree = "<group>"; };
 		AB7112E71B43098400C4EE78 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../../Engine/Include/Window.hpp; sourceTree = "<group>"; };
+		ABB79F9B1BA9B7F9002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Engine/Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
 		ABD910F71B78F97A005EBB74 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../../Engine/Include/VR.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -118,6 +119,7 @@
 				AB7112D11B43098400C4EE78 /* AudioClip.hpp */,
 				AB7112D21B43098400C4EE78 /* AudioSourceComponent.hpp */,
 				AB7112D31B43098400C4EE78 /* CameraComponent.hpp */,
+				ABB79F9B1BA9B7F9002A1B5F /* DirectionalLightComponent.hpp */,
 				AB7112D41B43098400C4EE78 /* FileSystem.hpp */,
 				AB7112D51B43098400C4EE78 /* Font.hpp */,
 				AB7112D61B43098400C4EE78 /* GameObject.hpp */,

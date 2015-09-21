@@ -5,6 +5,8 @@
 #include "Shader.hpp"
 #include "System.hpp"
 
+std::unordered_map< std::string, ae3d::RenderTexture* > ae3d::Material::sTexRTs;
+
 bool ae3d::Material::IsValidShader() const
 {
     return shader && shader->IsValid();
@@ -64,6 +66,12 @@ void ae3d::Material::Apply()
         shader->SetMatrix( mat4.first.c_str(), mat4.second.m );
     }
 
+    for (const auto& globalTexRT : sTexRTs)
+    {
+        shader->SetRenderTexture( globalTexRT.first.c_str(), globalTexRT.second, texUnit );
+        ++texUnit;
+    }
+    
     GfxDevice::SetBackFaceCulling( cullBackFaces );
 }
 
@@ -90,6 +98,11 @@ void ae3d::Material::SetTexture( const char* name, TextureCube* texture )
 void ae3d::Material::SetRenderTexture( const char* name, RenderTexture* renderTexture )
 {
     texRTs[ name ] = renderTexture;
+}
+
+void ae3d::Material::SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture )
+{
+    sTexRTs[ name ] = renderTexture;
 }
 
 void ae3d::Material::SetInt( const char* name, int value )

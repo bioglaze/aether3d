@@ -47,7 +47,7 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 150 );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
@@ -70,7 +70,7 @@ int main()
     camera2d.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera2d.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Orthographic );
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DontClear );
     camera2d.AddComponent<TransformComponent>();
     
     Texture2D fontTex;
@@ -133,7 +133,7 @@ int main()
     dirLight.AddComponent<DirectionalLightComponent>();
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 } );
 
     Scene scene;
     
@@ -146,9 +146,9 @@ int main()
     scene.SetSkybox( &skybox );
     //scene.Add( &camera2d );
     scene.Add( &camera );
-    scene.Add( &cameraCubeRT );
+    //scene.Add( &cameraCubeRT );
     scene.Add( &cube );
-    scene.Add( &cube2 );
+    //scene.Add( &cube2 );
     scene.Add( &statsContainer );
     scene.Add( &dirLight );
 

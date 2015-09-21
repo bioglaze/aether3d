@@ -6,10 +6,18 @@
 #include "GfxDevice.hpp"
 #include "Material.hpp"
 #include "VertexBuffer.hpp"
+#include "Shader.hpp"
 #include "SubMesh.hpp"
 #include "Vec3.hpp"
 
 using namespace ae3d;
+
+// TODO: Try to design these away.
+namespace SceneGlobal
+{
+    extern Matrix44 shadowCameraViewMatrix;
+    extern Matrix44 shadowCameraProjectionMatrix;
+}
 
 namespace MathUtil
 {
@@ -89,7 +97,7 @@ ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
     return &meshRendererComponents[index];
 }
 
-void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, const Frustum& cameraFrustum, const Matrix44& localToWorld )
+void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, const Frustum& cameraFrustum, const Matrix44& localToWorld, Shader* overrideShader )
 {
     std::vector< Vec3 > aabbWorld;
     MathUtil::GetCorners( mesh->GetAABBMin(), mesh->GetAABBMax(), aabbWorld );
@@ -134,11 +142,28 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
             continue;
         }
         
-        materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
-        materials[ subMeshIndex ]->Apply();
+        Shader* shader = overrideShader ? overrideShader : materials[ subMeshIndex ]->GetShader();
         
-        GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount()/3,
-            *materials[ subMeshIndex ]->GetShader(), ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn );
+        if (overrideShader)
+        {
+            shader->Use();
+            shader->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection.m );
+        }
+        else
+        {
+            Matrix44 shadowTexProjMatrix = localToWorld;
+            
+            Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraViewMatrix, shadowTexProjMatrix );
+            Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraProjectionMatrix, shadowTexProjMatrix );
+            Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
+            
+            materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
+            materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
+            materials[ subMeshIndex ]->Apply();
+        }
+        
+        GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount() / 3,
+            *shader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn );
     }
 }
 

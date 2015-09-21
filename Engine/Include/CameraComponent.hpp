@@ -101,6 +101,10 @@ namespace ae3d
         /// \return Top clipping plane.
         float GetTop() const { return orthoParams.top; }
 
+        /// TODO: Convert to private
+        /// \param view View matrix.
+        void SetView( const Matrix44& view ) { viewMatrix = view; }
+
     private:
         friend class GameObject;
         friend class Scene;
@@ -113,9 +117,6 @@ namespace ae3d
         
         /// \return Component at index or null if index is invalid.
         static CameraComponent* Get( unsigned index );
-
-        /// \param view View matrix.
-        void SetView( const Matrix44& view ) { viewMatrix = view; }
 
         Matrix44 projectionMatrix;
         Matrix44 viewMatrix;

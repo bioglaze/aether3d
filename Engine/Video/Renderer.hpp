@@ -17,6 +17,7 @@ namespace ae3d
         Shader spriteRendererShader;
         Shader sdfShader;
         Shader skyboxShader;
+        Shader momentsShader;
     };
 
     /// High-level rendering stuff.

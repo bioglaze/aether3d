@@ -18,6 +18,11 @@ namespace ae3d
     class Material
     {
   public:
+        /// Sets a texture into every material, overriding textures set by SetTexture.
+        /// \param name Texture uniform name.
+        /// \param renderTexture Render texture.
+        static void SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture );
+
         /// \return shader.
         Shader* GetShader() const { return shader; }
 
@@ -67,6 +72,8 @@ namespace ae3d
 
   private:
         // TODO: String hash instead of string and get rid of STL *map.
+        static std::unordered_map< std::string, RenderTexture* > sTexRTs;
+
         std::unordered_map< std::string, float > floats;
         std::unordered_map< std::string, int > ints;
         std::unordered_map< std::string, Vec3 > vec3s;

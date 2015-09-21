@@ -47,6 +47,8 @@
 		AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB949D361ABC8E44007D561E /* ShaderGL.cpp */; };
 		ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */; };
 		ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */; };
+		ABB79F9D1BA9B818002A1B5F /* DirectionalLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB79F9C1BA9B818002A1B5F /* DirectionalLightComponent.cpp */; };
+		ABB79F9F1BA9B828002A1B5F /* DirectionalLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABB79F9E1BA9B828002A1B5F /* DirectionalLightComponent.hpp */; };
 		ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */; };
 		ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */; };
 		ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */; };
@@ -113,6 +115,8 @@
 		AB949D361ABC8E44007D561E /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/ShaderGL.cpp; sourceTree = "<group>"; };
 		ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../Core/Matrix.cpp; sourceTree = "<group>"; };
 		ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Matrix.hpp; path = ../Include/Matrix.hpp; sourceTree = "<group>"; };
+		ABB79F9C1BA9B818002A1B5F /* DirectionalLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DirectionalLightComponent.cpp; path = ../Components/DirectionalLightComponent.cpp; sourceTree = "<group>"; };
+		ABB79F9E1BA9B828002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
 		ABBD9DBF1AC30EFD005AD2ED /* libaether3d_osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libaether3d_osx.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileWatcher.cpp; path = ../Core/FileWatcher.cpp; sourceTree = "<group>"; };
 		ABBD9DC21AC31EDB005AD2ED /* FileWatcher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FileWatcher.hpp; path = ../Core/FileWatcher.hpp; sourceTree = "<group>"; };
@@ -213,6 +217,7 @@
 				AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */,
 				AB07F20F1AE15CC400669331 /* AudioClip.hpp */,
 				AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */,
+				ABB79F9E1BA9B828002A1B5F /* DirectionalLightComponent.hpp */,
 				442A12AF1B0CBD8D00D21520 /* FileSystem.hpp */,
 				ABCF19C11AE2CF7200822E80 /* Font.hpp */,
 				AB889AF31ABB4C5B005BA86D /* GameObject.hpp */,
@@ -254,6 +259,7 @@
 			children = (
 				AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */,
 				AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */,
+				ABB79F9C1BA9B818002A1B5F /* DirectionalLightComponent.cpp */,
 				AB889B061ABB4FDE005BA86D /* GameObject.cpp */,
 				AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */,
 				AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */,
@@ -290,6 +296,7 @@
 				ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */,
 				ABD910F41B78F930005EBB74 /* VR.hpp in Headers */,
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
+				ABB79F9F1BA9B828002A1B5F /* DirectionalLightComponent.hpp in Headers */,
 				ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */,
 				AB78D91C1B19E2E8009928E1 /* RenderTexture.hpp in Headers */,
 				AB3FD4961AB4330C00D28653 /* System.hpp in Headers */,
@@ -385,6 +392,7 @@
 				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB77FD5A1B344FCD001858CC /* TextureCommon.cpp in Sources */,
 				AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */,
+				ABB79F9D1BA9B818002A1B5F /* DirectionalLightComponent.cpp in Sources */,
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
 				AB870F9D1B5EBB0C0004BEE5 /* Frustum.cpp in Sources */,

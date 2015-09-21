@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "Vec3.hpp"
 
 namespace ae3d
 {
@@ -44,11 +45,15 @@ namespace ae3d
         
     private:
         void RenderWithCamera( GameObject* cameraGo, int cubeMapFace );
+        void RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace );
+        void GenerateAABB();
 
         std::vector< GameObject* > gameObjects;
         unsigned nextFreeGameObject = 0;
         const TextureCube* skybox = nullptr;
         GameObject* mainCamera = nullptr;
+        Vec3 aabbMin;
+        Vec3 aabbMax;
     };
 }
 #endif
