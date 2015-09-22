@@ -1,6 +1,7 @@
 #ifndef DIRECTIONAL_LIGHT_HPP
 #define DIRECTIONAL_LIGHT_HPP
 
+#include <string>
 #include "RenderTexture.hpp"
 
 namespace ae3d
@@ -16,6 +17,9 @@ namespace ae3d
         /// \param shadowMapSize Shadow map size in pixels.
         void SetCastShadow( bool enable, int shadowMapSize );
 
+        /// \return Serialized data.
+        std::string GetSerialized() const;
+        
     private:
         friend class GameObject;
         friend class Scene;

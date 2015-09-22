@@ -1,5 +1,6 @@
 #include "DirectionalLightComponent.hpp"
 #include <vector>
+#include <sstream>
 
 std::vector< ae3d::DirectionalLightComponent > directionalLightComponents;
 unsigned nextFreeDirectionalLightComponent = 0;
@@ -27,4 +28,12 @@ void ae3d::DirectionalLightComponent::SetCastShadow( bool enable, int shadowMapS
     {
         shadowMap.Create2D( shadowMapSize, shadowMapSize, TextureWrap::Clamp, TextureFilter::Nearest );
     }
+}
+
+std::string ae3d::DirectionalLightComponent::GetSerialized() const
+{
+    std::stringstream outStream;
+    outStream << "dirlight\n";
+    outStream << (castsShadow ? 1 : 0);
+    return outStream.str();
 }

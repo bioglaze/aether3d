@@ -310,7 +310,7 @@ void ae3d::Scene::Render()
         RenderWithCamera( mainCamera, 0 );
     }
     
-    GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
+    //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
 }
 
 void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
@@ -580,6 +580,18 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outGameObjects.back().SetName( name.c_str() );
         }
 
+        if (token == "dirlight")
+        {
+            outGameObjects.back().AddComponent< DirectionalLightComponent >();
+        }
+
+        if (token == "shadow")
+        {
+            int enabled;
+            lineStream >> enabled;
+            outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+        }
+
         if (token == "camera")
         {
             outGameObjects.back().AddComponent< CameraComponent >();
@@ -701,7 +713,4 @@ void ae3d::Scene::GenerateAABB()
             aabbMax.z = oAABBmax.z;
         }
     }
-    
-    System::Print("scene min: %f, %f, %f\n", aabbMin.x, aabbMin.y, aabbMin.z );
-    System::Print("scene max: %f, %f, %f\n", aabbMax.x, aabbMax.y, aabbMax.z );
 }
