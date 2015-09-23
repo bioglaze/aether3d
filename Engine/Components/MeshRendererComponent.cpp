@@ -157,6 +157,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
             Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraProjectionMatrix, shadowTexProjMatrix );
             Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
             
+            //shadowTexProjMatrix.Transpose(shadowTexProjMatrix);
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
             materials[ subMeshIndex ]->Apply();

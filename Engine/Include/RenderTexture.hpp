@@ -10,16 +10,24 @@ namespace ae3d
     class RenderTexture : public TextureBase
     {
   public:
+      enum class DataType
+      {
+          UByte,
+          Float
+      };
+
         /// \param width Width.
         /// \param height Height.
+        /// \param dataType Data type.
         /// \param wrap Wrapping mode.
         /// \param filter Filtering mode.
-        void Create2D( int width, int height, TextureWrap wrap, TextureFilter filter );
+        void Create2D( int width, int height, DataType dataType, TextureWrap wrap, TextureFilter filter );
 
         /// \param dimension Dimension.
+        /// \param dataType Data type.
         /// \param wrap Wrapping mode.
         /// \param filter Filtering mode.
-        void CreateCube( int dimension, TextureWrap wrap, TextureFilter filter );
+        void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter );
 
         /// \return True, if the texture is a cube map.
         bool IsCube() const { return isCube; }

@@ -46,10 +46,11 @@ namespace SceneGlobal
 void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const Frustum& eyeFrustum, const Vec3& sceneAABBmin, const Vec3& sceneAABBmax,
                                              ae3d::CameraComponent& outCamera, ae3d::TransformComponent& outCameraTransform )
 {
-    System::Assert( outCamera.GetTargetTexture(), "Shadow camera needs target texture" );
+    System::Assert( outCamera.GetTargetTexture() != nullptr, "Shadow camera needs target texture" );
+    System::Assert( lightDirection.Length() > 0.9f && lightDirection.Length() < 1.1f, "Light dir must be normalized" );
 
     const Vec3 viewFrustumCentroid = eyeFrustum.Centroid();
-    
+
     // Start at the centroid, and move back in the opposite direction of the light
     // by an amount equal to the camera's farClip. This is the temporary working position for the light.
     const Vec3 shadowCameraPosition = viewFrustumCentroid - lightDirection * eyeFrustum.FarClipPlane();
@@ -110,20 +111,7 @@ void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const F
     
     // Use world volume for near plane.
     viewMaxLS.z = sceneAABBmaxLS.z > viewMaxLS.z ? sceneAABBmaxLS.z : viewMaxLS.z;
-    
-    // Shimmering reduction. Doesn't seem to work.
-    // Source: https://msdn.microsoft.com/en-us/library/windows/desktop/ee416324(v=vs.85).aspx
-    // Possible solution: http://www.gamedev.net/topic/497259-stable-cascaded-shadow-maps/
-    /*const float texelSize = 1.0f / (float)outCamera.GetTargetTexture()->GetWidth();
-    
-    viewMinLS /= texelSize;
-    viewMinLS = Vec3( MathUtil::Floor(viewMinLS.x), MathUtil::Floor(viewMinLS.y), MathUtil::Floor(viewMinLS.z) );
-    viewMinLS *= texelSize;
-    
-    viewMaxLS /= texelSize;
-    viewMaxLS = Vec3( MathUtil::Floor(viewMaxLS.x), MathUtil::Floor(viewMaxLS.y), MathUtil::Floor(viewMaxLS.z) );
-    viewMaxLS *= texelSize;*/
-    
+   
     outCamera.SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
     outCamera.SetProjection( viewMinLS.x, viewMaxLS.x, viewMinLS.y, viewMaxLS.y, -viewMaxLS.z, -viewMinLS.z );
 }

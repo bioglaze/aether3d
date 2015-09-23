@@ -53,7 +53,7 @@ int main()
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     RenderTexture cubeRT;
-    cubeRT.CreateCube( 512, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
+    cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
     
     GameObject cameraCubeRT;
     cameraCubeRT.AddComponent<CameraComponent>();
@@ -133,7 +133,7 @@ int main()
     dirLight.AddComponent<DirectionalLightComponent>();
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { -1, -1, 0 }, { 0, 1, 0 } );
 
     Scene scene;
     
@@ -165,6 +165,9 @@ int main()
         scene.Add( &cubes[ i ] );
     }
 
+    cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );
+    cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
+    
     bool quit = false;
     
     int lastMouseX = 0;

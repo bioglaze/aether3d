@@ -8,7 +8,7 @@ namespace GfxDeviceGlobal
     extern GLuint systemFBO;
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -34,7 +34,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, TextureWrap aWrap, 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, dataType == DataType::Float ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr );
 
     glBindTexture( GL_TEXTURE_2D, 0 );
     
@@ -57,7 +57,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, TextureWrap aWrap, 
     GfxDevice::ErrorCheck( "CreateRenderTexture2D end" );
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aDimension <= 0)
     {
@@ -96,13 +96,13 @@ void ae3d::RenderTexture::CreateCube( int aDimension, TextureWrap aWrap, Texture
 
     const GLenum externalFormat = GL_RGBA;
     const GLenum internalFormat = GL_RGBA8;
-    const GLenum dataType = GL_UNSIGNED_BYTE;
+    const GLenum dataTypeGL = dataType == DataType::Float ? GL_FLOAT : GL_UNSIGNED_BYTE;
     
     for (int i = 0; i < 6; ++i)
     {
         glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
                      aDimension, aDimension, 0, externalFormat,
-                     dataType, nullptr );
+                     dataTypeGL, nullptr );
     }
 
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId );
