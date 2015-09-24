@@ -57,7 +57,9 @@ SOURCES += \
     ModifyTransformCommand.cpp \
     CameraInspector.cpp \
     ModifyCameraCommand.cpp \
-    MeshRendererInspector.cpp
+    MeshRendererInspector.cpp \
+    DirectionalLightInspector.cpp \
+    CreateLightCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -71,4 +73,6 @@ HEADERS += \
     ModifyTransformCommand.hpp \
     CameraInspector.hpp \
     ModifyCameraCommand.hpp \
-    MeshRendererInspector.hpp
+    MeshRendererInspector.hpp \
+    DirectionalLightInspector.hpp \
+    CreateLightCommand.hpp

@@ -9,11 +9,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "CameraComponent.hpp"
+#include "DirectionalLightComponent.hpp"
 #include "MainWindow.hpp"
 #include "SceneWidget.hpp"
 #include "WindowMenu.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
+#include "CreateLightCommand.hpp"
 #include "MeshRendererComponent.hpp"
 #include "ModifyTransformCommand.hpp"
 #include "ModifyCameraCommand.hpp"
@@ -51,11 +53,13 @@ MainWindow::MainWindow()
     transformInspector.Init( this );
     cameraInspector.Init( this );
     meshRendererInspector.Init( this );
+    dirLightInspector.Init( this );
 
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->addWidget( transformInspector.GetWidget() );
     inspectorLayout->addWidget( cameraInspector.GetWidget() );
     inspectorLayout->addWidget( meshRendererInspector.GetWidget() );
+    inspectorLayout->addWidget( dirLightInspector.GetWidget() );
 
     inspectorContainer = new QWidget();
     inspectorContainer->setLayout( inspectorLayout );
@@ -103,6 +107,7 @@ void MainWindow::UpdateInspector()
         transformInspector.GetWidget()->hide();
         cameraInspector.GetWidget()->hide();
         meshRendererInspector.GetWidget()->hide();
+        dirLightInspector.GetWidget()->hide();
     }
     else
     {
@@ -126,6 +131,16 @@ void MainWindow::UpdateInspector()
         else
         {
             meshRendererInspector.GetWidget()->hide();
+        }
+
+        auto dirLightComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::DirectionalLightComponent >();
+        if (dirLightComponent)
+        {
+            dirLightInspector.GetWidget()->show();
+        }
+        else
+        {
+            dirLightInspector.GetWidget()->hide();
         }
     }
 }
@@ -241,6 +256,12 @@ void MainWindow::CommandCreateCameraComponent()
 void MainWindow::CommandCreateMeshRendererComponent()
 {
     //commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
+    UpdateInspector();
+}
+
+void MainWindow::CommandCreateDirectionalLightComponent()
+{
+    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget ) );
     UpdateInspector();
 }
 

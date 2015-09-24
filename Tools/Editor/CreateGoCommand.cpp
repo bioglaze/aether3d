@@ -1,5 +1,4 @@
 #include "CreateGoCommand.hpp"
-#include <iostream>
 #include "System.hpp"
 #include "Scene.hpp"
 #include "SceneWidget.hpp"

@@ -24,6 +24,7 @@ void ae3d::DirectionalLightComponent::SetCastShadow( bool enable, int shadowMapS
 {
     castsShadow = enable;
 
+    // TODO: create only if not already created with current size.
     if (castsShadow && shadowMapSize > 0)
     {
         shadowMap.Create2D( shadowMapSize, shadowMapSize, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear );

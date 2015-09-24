@@ -133,7 +133,7 @@ int main()
     dirLight.AddComponent<DirectionalLightComponent>();
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { -1, -1, 0 }, { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { -1, 1, 0 }, { 0, 1, 0 } );
 
     Scene scene;
     
@@ -159,7 +159,7 @@ int main()
         cubes[ i ].AddComponent< MeshRendererComponent >();
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
         cubes[ i ].AddComponent< TransformComponent >();
-        cubes[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { i * 2.5f - 4, 0, -100 } );
+        cubes[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { i * 4.5f - 4, 0, -100 } );
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
         scene.Add( &cubes[ i ] );
