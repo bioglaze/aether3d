@@ -7,7 +7,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.3 Documentation
+   \mainpage Aether3D Game Engine v0.4 Documentation
 
    \section Introduction
 
@@ -24,6 +24,7 @@
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
    <li>Virtual file system aka .pak archive files for faster loading.</li>
    <li>Custom mesh format, converters included for .obj and Blender.</li>
+   <li>Shadow mapping from a directional light (no lighting yet)</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Scene serialization.</li>
    <li>Scene editor built using Qt.</li>
@@ -38,7 +39,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.3.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    

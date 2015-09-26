@@ -33,6 +33,11 @@ namespace MathUtil
     {
         return std::floor( f );
     }
+    
+    bool IsNaN( float f )
+    {
+        return f != f;
+    }
 }
 
 namespace SceneGlobal
@@ -46,14 +51,19 @@ namespace SceneGlobal
 void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const Frustum& eyeFrustum, const Vec3& sceneAABBmin, const Vec3& sceneAABBmax,
                                              ae3d::CameraComponent& outCamera, ae3d::TransformComponent& outCameraTransform )
 {
+    System::Assert( !MathUtil::IsNaN( lightDirection.x ) && !MathUtil::IsNaN( lightDirection.y ) && !MathUtil::IsNaN( lightDirection.z ), "Invalid light direction" );
+    System::Assert( !MathUtil::IsNaN( sceneAABBmin.x ) && !MathUtil::IsNaN( sceneAABBmin.y ) && !MathUtil::IsNaN( sceneAABBmin.z ), "Invalid scene AABB min" );
+    System::Assert( !MathUtil::IsNaN( sceneAABBmax.x ) && !MathUtil::IsNaN( sceneAABBmax.y ) && !MathUtil::IsNaN( sceneAABBmax.z ), "Invalid scene AABB max" );
+    System::Assert( !MathUtil::IsNaN( eyeFrustum.Centroid().x ) && !MathUtil::IsNaN( eyeFrustum.Centroid().y ) && !MathUtil::IsNaN( eyeFrustum.Centroid().z ), "Invalid eye frustum" );
     System::Assert( outCamera.GetTargetTexture() != nullptr, "Shadow camera needs target texture" );
     System::Assert( lightDirection.Length() > 0.9f && lightDirection.Length() < 1.1f, "Light dir must be normalized" );
-
+    
     const Vec3 viewFrustumCentroid = eyeFrustum.Centroid();
 
     // Start at the centroid, and move back in the opposite direction of the light
     // by an amount equal to the camera's farClip. This is the temporary working position for the light.
-    const Vec3 shadowCameraPosition = viewFrustumCentroid - lightDirection * eyeFrustum.FarClipPlane();
+    // TODO: Verify math. + was - in my last engine but had to be changed to get the right direction [TimoW, 2015-09-26]
+    const Vec3 shadowCameraPosition = viewFrustumCentroid + lightDirection * eyeFrustum.FarClipPlane();
     
     outCameraTransform.LookAt( shadowCameraPosition, viewFrustumCentroid, Vec3( 0, 1, 0 ) );
     

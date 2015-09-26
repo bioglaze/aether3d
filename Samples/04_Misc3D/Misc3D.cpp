@@ -24,7 +24,7 @@
 
 using namespace ae3d;
 
-// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.3.zip
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip
 
 int main()
 {
@@ -133,7 +133,7 @@ int main()
     dirLight.AddComponent<DirectionalLightComponent>();
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { -1, 1, 0 }, { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, -1, 0 }, { 0, 1, 0 } );
 
     Scene scene;
     
@@ -167,6 +167,9 @@ int main()
 
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
+
+    cubes[ 3 ].GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
+    cubes[ 3 ].GetComponent< TransformComponent >()->SetParent( cubes[ 2 ].GetComponent< TransformComponent >() );
     
     bool quit = false;
     
@@ -179,10 +182,18 @@ int main()
     float gamePadRightThumbX = 0;
     float gamePadRightThumbY = 0;
     
+    float angle = 0;
+    
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
         WindowEvent event;
+        
+        ++angle;
+        Quaternion rotation;
+        const Vec3 axis( 0, 1, 0 );
+        rotation.FromAxisAngle( axis, angle );
+        cubes[ 2 ].GetComponent< TransformComponent >()->SetLocalRotation( rotation );
         
         std::string text( "draw calls:" );
         

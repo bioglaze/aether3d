@@ -106,7 +106,9 @@ const ae3d::Matrix44& ae3d::TransformComponent::GetLocalMatrix()
         testComponent = testComponent->parent;
     }
 
-    if (isDirty)
+    // FIXME: Dirty checking doesn't work right on a transform hierarchy because parent can be
+    //        updated and undirtied before a child checks to see if it's dirty. [TimoW, 2015-09-26]
+    //if (isDirty)
     {
         SolveLocalMatrix();
         isDirty = false;
@@ -170,6 +172,7 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
     }
 
     parent = aParent;
+    isDirty = true;
 }
 
 std::string ae3d::TransformComponent::GetSerialized() const
@@ -187,7 +190,7 @@ ae3d::Vec3 ae3d::TransformComponent::GetViewDirection() const
     ae3d::Matrix44 view;
     GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -GetLocalPosition() );
+    translation.Translate( -localPosition );
     Matrix44::Multiply( translation, view, view );
 
     return Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
