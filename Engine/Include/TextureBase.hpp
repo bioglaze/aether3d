@@ -4,9 +4,21 @@
 #if AETHER3D_IOS
 #import <Metal/Metal.h>
 #endif
+#if AETHER3D_D3D12
+#include <d3d12.h>
+#endif
 #include "Vec3.hpp"
 
-struct ID3D12Resource;
+#if AETHER3D_D3D12
+// TODO: Move inside engine
+struct GpuResource
+{
+    ID3D12Resource* resource = nullptr;
+    D3D12_RESOURCE_STATES usageState;
+    D3D12_RESOURCE_STATES transitioningState;
+    D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress = 0;
+};
+#endif
 
 namespace ae3d
 {
@@ -87,7 +99,8 @@ namespace ae3d
         id<MTLTexture> metalTexture;  
 #endif
 #if AETHER3D_D3D12
-        ID3D12Resource* resource = nullptr;
+        GpuResource gpuResource;
+        D3D12_CPU_DESCRIPTOR_HANDLE srv;
 #endif
     };
 }

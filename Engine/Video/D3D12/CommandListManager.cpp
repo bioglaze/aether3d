@@ -37,6 +37,23 @@ void CommandListManager::CreateNewCommandList( ID3D12GraphicsCommandList** outLi
     AE3D_CHECK_D3D( hr, "Failed to create command list" );
 }
 
+ID3D12CommandAllocator* CommandListManager::RequestAllocator()
+{
+    // TODO: allocator pool
+    ID3D12CommandAllocator** outAllocator = nullptr;
+    HRESULT hr = device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( outAllocator ) );
+    AE3D_CHECK_D3D( hr, "Failed to create command allocator" );
+    return *outAllocator;
+}
+
+void CommandListManager::DiscardAllocator( uint64_t fenceValue, ID3D12CommandAllocator* allocator )
+{
+    // TODO: allocator pool
+    // FIXME: Is it safe to release immediately or should we wait?
+    //WaitForFence( fenceValue );
+    //AE3D_SAFE_RELEASE( allocator );
+}
+
 std::uint64_t CommandListManager::ExecuteCommandList( ID3D12CommandList* list )
 {
     commandQueue->ExecuteCommandLists( 1, &list );
@@ -45,7 +62,9 @@ std::uint64_t CommandListManager::ExecuteCommandList( ID3D12CommandList* list )
 
 std::uint64_t CommandListManager::IncrementFence()
 {
-    commandQueue->Signal( fence, nextFenceValue );
+    HRESULT hr = commandQueue->Signal( fence, nextFenceValue );
+    AE3D_CHECK_D3D( hr, "Failed to increment fence" );
+
     return nextFenceValue++;
 }
 
@@ -66,7 +85,9 @@ void CommandListManager::WaitForFence( std::uint64_t fenceValue )
         return;
     }
 
-    fence->SetEventOnCompletion( fenceValue, fenceEvent );
+    HRESULT hr = fence->SetEventOnCompletion( fenceValue, fenceEvent );
+    AE3D_CHECK_D3D( hr, "Failed to set fence completion event" );
+
     const DWORD wait = WaitForSingleObject( fenceEvent, INFINITE );
 
     if (wait != WAIT_OBJECT_0)

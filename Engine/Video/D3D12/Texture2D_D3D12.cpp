@@ -10,8 +10,11 @@
 #include "FileWatcher.hpp"
 #include "FileSystem.hpp"
 #include "System.hpp"
+#include "CommandListManager.hpp"
+#include "CommandContext.hpp"
 
 #define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
+#define AE3D_CHECK_D3D(x, msg) if (x != S_OK) { ae3d::System::Assert( false, msg ); }
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
@@ -20,6 +23,8 @@ namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
     extern ID3D12DescriptorHeap* descHeapCbvSrvUav;
+    extern CommandListManager commandListManager;
+    extern ID3D12CommandAllocator* commandListAllocator;
 }
 
 namespace Global
@@ -56,6 +61,46 @@ namespace Texture2DGlobal
         ae3d::System::Print( "Total texture usage: %d KiB\n", total / 1024 );
     }
 #endif
+}
+
+void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, unsigned dataSize )
+{
+    CommandContext& InitContext = CommandContext::Begin();
+
+    D3D12_HEAP_PROPERTIES heapProps;
+    heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+    heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    heapProps.CreationNodeMask = 1;
+    heapProps.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC bufferDesc;
+    bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    bufferDesc.Alignment = 0;
+    bufferDesc.Width = dataSize;
+    bufferDesc.Height = 1;
+    bufferDesc.DepthOrArraySize = 1;
+    bufferDesc.MipLevels = 1;
+    bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+    bufferDesc.SampleDesc.Count = 1;
+    bufferDesc.SampleDesc.Quality = 0;
+    bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    ID3D12Resource* uploadBuffer = nullptr;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &bufferDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS( &uploadBuffer ) );
+    AE3D_CHECK_D3D( hr, "Failed to create texture upload resource" );
+    uploadBuffer->SetName( L"Texture2D Upload Buffer" );
+
+    // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
+    InitContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
+    UpdateSubresources( InitContext.graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
+    InitContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+
+    InitContext.CloseAndExecute( true );
+    uploadBuffer->Release();
 }
 
 void TexReload( const std::string& path )
@@ -126,11 +171,11 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     srvDesc.Texture2D.PlaneSlice = 0;
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-    auto cbvSrcUavDescHandle = GfxDeviceGlobal::descHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart();
+    srv = GfxDeviceGlobal::descHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart();
     auto cbvSrvUavDescStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-    cbvSrcUavDescHandle.ptr += cbvSrvUavDescStep;
+    srv.ptr += cbvSrvUavDescStep;
 
-    GfxDeviceGlobal::device->CreateShaderResourceView( resource, &srvDesc, cbvSrcUavDescHandle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 
     if (mipmaps == Mipmaps::Generate)
     {
@@ -162,38 +207,41 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
   
     opaque = (components == 3 || components == 1);
 
-   D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-       DXGI_FORMAT_R8G8B8A8_UNORM, width, height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_NONE,
-        D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
+    gpuResource.usageState = D3D12_RESOURCE_STATE_COMMON;
 
-    auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD );
+    D3D12_RESOURCE_DESC texDesc = {};
+    texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    texDesc.Width = width;
+    texDesc.Height = (UINT)height;
+    texDesc.DepthOrArraySize = 1;
+    texDesc.MipLevels = 1;
+    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.SampleDesc.Quality = 0;
+    texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS( &resource ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Unable to create texture resource!\n" );
-        return;
-    }
+    D3D12_HEAP_PROPERTIES heapProps;
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT; // was upload
+    heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    heapProps.CreationNodeMask = 1;
+    heapProps.VisibleNodeMask = 1;
 
-    Global::textures.push_back( resource );
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+                 D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
+    AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+    
+    gpuResource.resource->SetName( L"Texture2D" );
+    Global::textures.push_back( gpuResource.resource );
 
-    resource->SetName( L"Texture2D" );
-    D3D12_BOX box = {};
-    box.right = width;
-    box.bottom = height;
-    box.back = 1;
-    hr = resource->WriteToSubresource( 0, &box, data, 4 * width, 4 * width * height );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Unable write texture resource!" );
-        return;
-    }
+    const int bytesPerPixel = 4;
+    D3D12_SUBRESOURCE_DATA texResource;
+    texResource.pData = data;
+    texResource.RowPitch = width * bytesPerPixel;
+    texResource.SlicePitch = texResource.RowPitch * height;
+
+    InitializeTexture( gpuResource, &texResource, width * height * 4 );
 
     stbi_image_free( data );
 }
