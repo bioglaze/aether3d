@@ -65,7 +65,7 @@ namespace Texture2DGlobal
 
 void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, unsigned dataSize )
 {
-    CommandContext& InitContext = CommandContext::Begin();
+    CommandContext& initContext = CommandContext::Begin();
 
     D3D12_HEAP_PROPERTIES heapProps;
     heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -95,12 +95,12 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
     uploadBuffer->SetName( L"Texture2D Upload Buffer" );
 
     // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
-    InitContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
-    UpdateSubresources( InitContext.graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
-    InitContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+    initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
+    UpdateSubresources( initContext.graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
+    initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
 
-    InitContext.CloseAndExecute( true );
-    uploadBuffer->Release();
+    initContext.CloseAndExecute( true );
+    //uploadBuffer->Release();
 }
 
 void TexReload( const std::string& path )

@@ -55,9 +55,6 @@ void CommandContext::TransitionResource( GpuResource& gpuResource, D3D12_RESOURC
     {
         D3D12_RESOURCE_BARRIER BarrierDesc = {};
 
-        //ASSERT( m_NumBarriersToFlush < 16, "Exceeded arbitrary limit on buffered barriers" );
-        //D3D12_RESOURCE_BARRIER& BarrierDesc = m_ResourceBarrierBuffer[ m_NumBarriersToFlush++ ];
-
         BarrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         BarrierDesc.Transition.pResource = gpuResource.resource;
         BarrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -100,16 +97,16 @@ std::uint64_t CommandContext::Finish( bool waitForCompletion )
     auto hr = graphicsCommandList->Close();
     AE3D_CHECK_D3D( hr, "command context command list close" );
 
-    std::uint64_t FenceValue = owningManager->ExecuteCommandList( graphicsCommandList );
-    owningManager->DiscardAllocator( FenceValue, currentAllocator );
+    std::uint64_t fenceValue = owningManager->ExecuteCommandList( graphicsCommandList );
+    owningManager->DiscardAllocator( fenceValue, currentAllocator );
     currentAllocator = nullptr;
 
     if (waitForCompletion)
     {
-        owningManager->WaitForFence( FenceValue );
+        owningManager->WaitForFence( fenceValue );
     }
 
-    return FenceValue;
+    return fenceValue;
 }
 
 std::uint64_t CommandContext::CloseAndExecute( bool waitForCompletion )

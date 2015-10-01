@@ -14,8 +14,9 @@ public:
     void Reset();
     void Initialize( class CommandListManager& commandListManager );
     std::uint64_t CloseAndExecute( bool waitForCompletion );
-    struct ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
     void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
+    
+    struct ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
 
 private:
     static void FreeContext( CommandContext* context );

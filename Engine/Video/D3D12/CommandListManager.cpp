@@ -40,10 +40,10 @@ void CommandListManager::CreateNewCommandList( ID3D12GraphicsCommandList** outLi
 ID3D12CommandAllocator* CommandListManager::RequestAllocator()
 {
     // TODO: allocator pool
-    ID3D12CommandAllocator** outAllocator = nullptr;
-    HRESULT hr = device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( outAllocator ) );
+    ID3D12CommandAllocator* outAllocator = nullptr;
+    HRESULT hr = device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( &outAllocator ) );
     AE3D_CHECK_D3D( hr, "Failed to create command allocator" );
-    return *outAllocator;
+    return outAllocator;
 }
 
 void CommandListManager::DiscardAllocator( uint64_t fenceValue, ID3D12CommandAllocator* allocator )
