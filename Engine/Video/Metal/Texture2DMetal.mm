@@ -67,7 +67,6 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     {
         defaultTexture.width = 128;
         defaultTexture.height = 128;
-        defaultTexture.handle = GfxDevice::CreateTextureId();
         defaultTexture.opaque = false;
         
         MTLTextureDescriptor* textureDescriptor =
@@ -97,7 +96,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     filter = aFilter;
     wrap = aWrap;
-    handle = GfxDevice::CreateTextureId();
     mipmaps = aMipmaps;
     anisotropy = aAnisotropy;
     

@@ -144,6 +144,7 @@
 				TargetAttributes = {
 					4469A9FD1AEFCDFE007BBBF1 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = UKGWYKDBK4;
 					};
 				};
 			};
@@ -299,6 +300,7 @@
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_ASSIGN_ENUM = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"~/Desktop",
@@ -322,6 +324,7 @@
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_ASSIGN_ENUM = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"~/Desktop",

@@ -40,7 +40,7 @@
     ae3d::GameObject rtCamera;
     ae3d::GameObject perspCamera;
     ae3d::GameObject cube;
-    ae3d::RenderTexture2D rtTex;
+    ae3d::RenderTexture rtTex;
     ae3d::GameObject renderTextureContainer;
     ae3d::Mesh cubeMesh;
 }
@@ -103,7 +103,7 @@
     
     //scene.Add( &text );
     
-    rtTex.Create( 512, 512, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 150, 250, -0.6f ), ae3d::Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );

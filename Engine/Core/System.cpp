@@ -11,7 +11,6 @@
 #include "FileWatcher.hpp"
 #include "Renderer.hpp"
 
-extern void nsLog(const char* msg);
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
 void PlatformInitGamePad();
@@ -83,9 +82,6 @@ void ae3d::System::Print(const char* format, ...)
     std::printf("%s", msg);
 #if _MSC_VER
     OutputDebugStringA(msg);
-#endif
-#if __APPLE__
-    //nsLog(msg);
 #endif
     std::fflush(stdout);
 }

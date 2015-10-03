@@ -311,11 +311,6 @@ static void iokitInit()
     IOHIDManagerScheduleWithRunLoop(hidManager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 }
 
-void nsLog(const char* msg)
-{
-    NSLog(@"%s", msg);
-}
-
 void PlatformInitGamePad()
 {
     iokitInit();
@@ -592,7 +587,6 @@ static void CreateGLContext( ae3d::WindowCreateFlags flags )
     [view setOpenGLContext: WindowGlobal::glContext];
     [view setPixelFormat: pixelFormat];
     
-    //NSLog(@"GL version:   %s", glGetString(GL_VERSION));
     [WindowGlobal::glContext setView: view];
 }
 
@@ -600,7 +594,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 {
     if (width < 0 || height < 0)
     {
-        nsLog("Window::Create: Negative width or height! Setting 640x480.");
+        NSLog( @"Window::Create: Negative width or height! Setting 640x480." );
         width = 640;
         height = 480;
     }

@@ -56,6 +56,11 @@ void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int t
     }
 }
 
+void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* renderTexture, int textureUnit )
+{
+
+}
+
 void ae3d::Shader::SetTexture( const char* name, const TextureCube* texture, int textureUnit )
 {
     if (texture != nullptr)
