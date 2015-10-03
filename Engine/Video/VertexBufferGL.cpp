@@ -149,15 +149,3 @@ void ae3d::VertexBuffer::Bind() const
         GfxDevice::IncVertexBufferBinds();
     }
 }
-
-void ae3d::VertexBuffer::Draw() const
-{
-    GfxDevice::IncDrawCalls();
-    glDrawElements( GL_TRIANGLES, elementCount, GL_UNSIGNED_SHORT, nullptr );
-}
-
-void ae3d::VertexBuffer::DrawRange( int start, int end ) const
-{
-    GfxDevice::IncDrawCalls();
-    glDrawRangeElements( GL_TRIANGLES, start, end, (end - start) * 3, GL_UNSIGNED_SHORT, (const GLvoid*)(start * sizeof( Face )) );
-}

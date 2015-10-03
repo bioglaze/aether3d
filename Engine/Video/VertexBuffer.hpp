@@ -109,14 +109,11 @@ namespace ae3d
         /// \param vertices Vertices.
         /// \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount );
-        
-        /// Draws the whole buffer.
-        void Draw() const;
-        
-        /// Draws a range of triangles.
-        /// \param start Start index.
-        /// \param end End index.
-        void DrawRange( int start, int end ) const;
+
+#if AETHER3D_IOS
+        id<MTLBuffer> GetVertexBuffer() const { return vertexBuffer; }
+        id<MTLBuffer> GetIndexBuffer() const { return indexBuffer; }
+#endif
 
     private:
         enum class VertexFormat { PTC, PTN, PTNTC };

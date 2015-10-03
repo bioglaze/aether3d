@@ -5,16 +5,6 @@ void ae3d::VertexBuffer::Bind() const
 {
 }
 
-void ae3d::VertexBuffer::Draw() const
-{
-    GfxDevice::DrawVertexBuffer( vertexBuffer, indexBuffer, elementCount, 0 );
-}
-
-void ae3d::VertexBuffer::DrawRange( int start, int end ) const
-{
-    GfxDevice::DrawVertexBuffer( vertexBuffer, indexBuffer, (end - start) * 3, start * 2 * 3 );
-}
-
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
 {
     if (faceCount > 0)

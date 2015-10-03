@@ -126,7 +126,7 @@
                     ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None );
     scene.SetSkybox( &skyboxTex );
     
-    cubeMesh.Load( ae3d::FileSystem::FileContents( "not_yet.mesh" ) );
+    cubeMesh.Load( ae3d::FileSystem::FileContents( "/Assets/textured_cube.ae3d" ) );
     cube.AddComponent<ae3d::MeshRendererComponent>();
     cube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     cube.AddComponent<ae3d::TransformComponent>();

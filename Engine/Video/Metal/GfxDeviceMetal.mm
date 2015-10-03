@@ -3,6 +3,7 @@
 #import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
 #endif
+#include <unordered_map>
 #include "GfxDevice.hpp"
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
@@ -16,15 +17,6 @@ id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
 id <MTLDepthStencilState> depthState;
 id <CAMetalDrawable> currentDrawable;
-
-id <MTLRenderPipelineState> pipelineOpaqueSprite;
-bool pipelineOpaqueSpriteCreated = false;
-
-id <MTLRenderPipelineState> pipelineBlendedSprite;
-bool pipelineBlendedSpriteCreated = false;
-
-id <MTLRenderPipelineState> pipelineSkybox;
-bool pipelineSkyboxCreated = false;
 
 CAMetalLayer* metalLayer;
 MTLRenderPassDescriptor *renderPassDescriptor = nullptr;
@@ -54,6 +46,7 @@ namespace GfxDeviceGlobal
     int vertexBufferBinds = 0;
     int backBufferWidth = 0;
     int backBufferHeight = 0;
+    std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
 }
 
 void ae3d::GfxDevice::Init( int width, int height )
@@ -158,95 +151,69 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     // Handled by setupRenderPassDescriptor().
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
 {
-    NSLog(@"GfxDevice::Draw not implemented!\n");
+    std::string hashString;
+    hashString += std::to_string( (ptrdiff_t)&shader.vertexProgram );
+    hashString += std::to_string( (ptrdiff_t)&shader.fragmentProgram );
+    hashString += std::to_string( (unsigned)blendMode );
+    hashString += std::to_string( ((unsigned)depthFunc) + 4 );
+    return hashString;
 }
 
-void ae3d::GfxDevice::DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset )
+id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
 {
-    //[renderEncoder setRenderPipelineState:pipelineBlendedSprite];
-    [renderEncoder setRenderPipelineState:pipelineSkybox];
-    [renderEncoder setVertexBuffer:vertexBuffer offset:0 atIndex:0];
-    [renderEncoder setVertexBuffer:uniformBuffer offset:0 atIndex:1];
-    [renderEncoder setFragmentTexture:texture0 atIndex:0];
-    [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
-                                    indexCount:elementCount
-                                     indexType:MTLIndexTypeUInt16
-                                   indexBuffer:indexBuffer
-                             indexBufferOffset:indexOffset];
-}
+    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc );
 
-void ae3d::GfxDevice::BeginFrame()
-{
-    if (!pipelineOpaqueSpriteCreated)
+    if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
         pipelineStateDescriptor.label = @"Opaque sprite pipeline";
         [pipelineStateDescriptor setSampleCount: 1];
-        [pipelineStateDescriptor setVertexFunction:renderer.builtinShaders.spriteRendererShader.vertexProgram];
-        [pipelineStateDescriptor setFragmentFunction:renderer.builtinShaders.spriteRendererShader.fragmentProgram];
+        [pipelineStateDescriptor setVertexFunction:shader.vertexProgram];
+        [pipelineStateDescriptor setFragmentFunction:shader.fragmentProgram];
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+        pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;
+        pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+        pipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+        pipelineStateDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
+        pipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
+        pipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+        pipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
         pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+
         NSError* error = NULL;
-        pipelineOpaqueSprite = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
+        id <MTLRenderPipelineState> pso = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
         
-        if (!pipelineOpaqueSprite)
+        if (!pso)
         {
             NSLog(@"Failed to created opaque sprite pipeline state, error %@", error);
         }
 
-        pipelineOpaqueSpriteCreated = true;
+        GfxDeviceGlobal::psoCache[ psoHash ] = pso;
     }
+    
 
-    if (!pipelineSkyboxCreated)
-    {
-        MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineStateDescriptor.label = @"Skybox pipeline";
-        [pipelineStateDescriptor setSampleCount: 1];
-        [pipelineStateDescriptor setVertexFunction:renderer.builtinShaders.skyboxShader.vertexProgram];
-        [pipelineStateDescriptor setFragmentFunction:renderer.builtinShaders.skyboxShader.fragmentProgram];
-        pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-        pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
-        NSError* error = NULL;
-        pipelineSkybox = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
-        
-        if (!pipelineSkybox)
-        {
-            NSLog(@"Failed to created skybox pipeline state, error %@", error);
-        }
-        
-        pipelineSkyboxCreated = true;
-    }
+    return GfxDeviceGlobal::psoCache[ psoHash ];
+}
 
-    if (!pipelineBlendedSpriteCreated)
-    {
-        MTLRenderPipelineDescriptor *pipelineDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineDescriptor.label = @"Blended sprite pipeline";
-        [pipelineDescriptor setSampleCount: 1];
-        [pipelineDescriptor setVertexFunction:renderer.builtinShaders.spriteRendererShader.vertexProgram];
-        [pipelineDescriptor setFragmentFunction:renderer.builtinShaders.spriteRendererShader.fragmentProgram];
-        pipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-        pipelineDescriptor.colorAttachments[0].blendingEnabled = TRUE;
-        pipelineDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
-        pipelineDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-        pipelineDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
-        pipelineDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
-        pipelineDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
-        pipelineDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+{
+    ++GfxDeviceGlobal::drawCalls;
 
-        pipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
-        NSError* error = NULL;
-        pipelineBlendedSprite = [device newRenderPipelineStateWithDescriptor:pipelineDescriptor error:&error];
-        
-        if (!pipelineBlendedSprite)
-        {
-            NSLog(@"Failed to created blended sprite pipeline state, error %@", error);
-        }
-        
-        pipelineBlendedSpriteCreated = true;
-    }
+    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
+    [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
+    [renderEncoder setVertexBuffer:uniformBuffer offset:0 atIndex:1];
+    [renderEncoder setFragmentTexture:texture0 atIndex:0];
+    [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+                              indexCount:(endIndex - startIndex) * 3
+                               indexType:MTLIndexTypeUInt16
+                             indexBuffer:vertexBuffer.GetIndexBuffer()
+                       indexBufferOffset:startIndex * 2 * 3];
+}
 
+void ae3d::GfxDevice::BeginFrame()
+{
     if (!currentRenderTarget)
     {
         drawable = GetCurrentDrawable();
