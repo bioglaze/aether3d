@@ -19,6 +19,7 @@
 		4469AA141AEFCDFE007BBBF1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4469AA121AEFCDFE007BBBF1 /* LaunchScreen.xib */; };
 		44C7371E1B171CB100864C28 /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = 44C7371D1B171CB100864C28 /* SDF.metal */; };
 		44E5FC941B399CC8009AC088 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC931B399CC8009AC088 /* Skybox.metal */; };
+		AB521D131BC051FF004CDF06 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB521D121BC051FF004CDF06 /* Unlit.metal */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -52,6 +53,7 @@
 		44C7371D1B171CB100864C28 /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../../Engine/Assets/SDF.metal; sourceTree = "<group>"; };
 		44E5FC931B399CC8009AC088 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
 		44EFE87E1B09D7810072F435 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		AB521D121BC051FF004CDF06 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +90,7 @@
 		4469AA001AEFCDFE007BBBF1 /* iOS_Hello */ = {
 			isa = PBXGroup;
 			children = (
+				AB521D121BC051FF004CDF06 /* Unlit.metal */,
 				44C7371D1B171CB100864C28 /* SDF.metal */,
 				4449E8A11B14B644009A869C /* SpriteShader.metal */,
 				44E5FC931B399CC8009AC088 /* Skybox.metal */,
@@ -187,6 +190,7 @@
 			files = (
 				4469AA071AEFCDFE007BBBF1 /* AppDelegate.m in Sources */,
 				4449E8A21B14B644009A869C /* SpriteShader.metal in Sources */,
+				AB521D131BC051FF004CDF06 /* Unlit.metal in Sources */,
 				4469AA0A1AEFCDFE007BBBF1 /* GameViewController.mm in Sources */,
 				4469AA041AEFCDFE007BBBF1 /* main.m in Sources */,
 				44C7371E1B171CB100864C28 /* SDF.metal in Sources */,

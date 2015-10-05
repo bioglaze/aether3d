@@ -25,7 +25,7 @@ id <MTLBuffer> uniformBuffer;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
 id<CAMetalDrawable> drawable;
-dispatch_semaphore_t inflight_semaphore;
+dispatch_semaphore_t inflightSemaphore;
 id<MTLTexture> texture0;
 id<MTLTexture> currentRenderTarget;
 
@@ -33,11 +33,6 @@ id<MTLTexture> currentRenderTarget;
 void PlatformInitGamePad()
 {
 }
-
-struct Uniforms
-{
-    float modelViewProjection[ 16 ];
-};
 
 namespace GfxDeviceGlobal
 {
@@ -47,6 +42,7 @@ namespace GfxDeviceGlobal
     int backBufferWidth = 0;
     int backBufferHeight = 0;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
+    //std::unordered_map< std::string, MTLRenderPipelineReflection* > psoReflection;
 }
 
 void ae3d::GfxDevice::Init( int width, int height )
@@ -104,8 +100,8 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
 
 void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
 {
-    int max_inflight_buffers = 1;
-    inflight_semaphore = dispatch_semaphore_create( max_inflight_buffers );
+    int maxInflightBuffers = 1;
+    inflightSemaphore = dispatch_semaphore_create( maxInflightBuffers );
     
     device = MTLCreateSystemDefaultDevice();
 
@@ -123,7 +119,8 @@ void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
     depthStateDesc.depthWriteEnabled = YES;
     depthState = [device newDepthStencilStateWithDescriptor:depthStateDesc];
     
-    uniformBuffer = [device newBufferWithLength:sizeof(Uniforms) options:MTLResourceOptionCPUCacheModeDefault];
+    uniformBuffer = [device newBufferWithLength:256 options:MTLResourceOptionCPUCacheModeDefault];
+    
 }
 
 id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
@@ -168,7 +165,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineStateDescriptor.label = @"Opaque sprite pipeline";
+        pipelineStateDescriptor.label = @"pipeline";
         [pipelineStateDescriptor setSampleCount: 1];
         [pipelineStateDescriptor setVertexFunction:shader.vertexProgram];
         [pipelineStateDescriptor setFragmentFunction:shader.fragmentProgram];
@@ -183,16 +180,21 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
 
         NSError* error = NULL;
-        id <MTLRenderPipelineState> pso = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor error:&error];
+        MTLRenderPipelineReflection* reflectionObj;
+        MTLPipelineOption option = MTLPipelineOptionBufferTypeInfo | MTLPipelineOptionArgumentInfo;
+        id <MTLRenderPipelineState> pso = [device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor options:option reflection:&reflectionObj error:&error];
         
         if (!pso)
         {
-            NSLog(@"Failed to created opaque sprite pipeline state, error %@", error);
+            NSLog(@"Failed to create pipeline state, error %@", error);
         }
 
         GfxDeviceGlobal::psoCache[ psoHash ] = pso;
+        //GfxDeviceGlobal::psoReflection[ psoHash ] = reflectionObj;
+        
+        // FIXME: If two PSOs use the same set of shaders, are their uniform locations equal? This code assumes so. [TimoW, 2015-10-05]
+        shader.LoadUniforms( reflectionObj );        
     }
-    
 
     return GfxDeviceGlobal::psoCache[ psoHash ];
 }
@@ -202,6 +204,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     ++GfxDeviceGlobal::drawCalls;
 
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
+    [renderEncoder setCullMode:MTLCullModeFront];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:uniformBuffer offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
@@ -230,9 +233,7 @@ void ae3d::GfxDevice::BeginFrame()
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
     renderEncoder.label = @"MyRenderEncoder";
 
-    dispatch_semaphore_wait(inflight_semaphore, DISPATCH_TIME_FOREVER);
-    
-    //[commandQueue insertDebugCaptureBoundary];
+    dispatch_semaphore_wait(inflightSemaphore, DISPATCH_TIME_FOREVER);
 }
 
 void ae3d::GfxDevice::PresentDrawable()
@@ -240,7 +241,7 @@ void ae3d::GfxDevice::PresentDrawable()
     [renderEncoder endEncoding];
 
     // Call the view's completion handler which is required by the view since it will signal its semaphore and set up the next buffer
-    __block dispatch_semaphore_t block_sema = inflight_semaphore;
+    __block dispatch_semaphore_t block_sema = inflightSemaphore;
     [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
         dispatch_semaphore_signal(block_sema);
     }];

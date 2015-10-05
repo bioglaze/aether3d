@@ -7,8 +7,10 @@
 #include "Aether3D_iOS.framework/Headers/TextRendererComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/MeshRendererComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/TransformComponent.hpp"
+#include "Aether3D_iOS.framework/Headers/Material.hpp"
 #include "Aether3D_iOS.framework/Headers/System.hpp"
 #include "Aether3D_iOS.framework/Headers/Scene.hpp"
+#include "Aether3D_iOS.framework/Headers/Shader.hpp"
 #include "Aether3D_iOS.framework/Headers/Texture2D.hpp"
 #include "Aether3D_iOS.framework/Headers/AudioSourceComponent.hpp"
 #include "Aether3D_iOS.framework/Headers/AudioClip.hpp"
@@ -43,6 +45,8 @@
     ae3d::RenderTexture rtTex;
     ae3d::GameObject renderTextureContainer;
     ae3d::Mesh cubeMesh;
+    ae3d::Material cubeMaterial;
+    ae3d::Shader shader;
 }
 
 - (void)dealloc
@@ -117,6 +121,8 @@
     
     perspCamera.AddComponent<ae3d::CameraComponent>();
     perspCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
+    perspCamera.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
+    perspCamera.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     perspCamera.AddComponent<ae3d::TransformComponent>();
     scene.Add( &perspCamera );
     
@@ -126,11 +132,21 @@
                     ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None );
     scene.SetSkybox( &skyboxTex );
     
+    shader.Load( ae3d::FileSystem::FileContents( "unlit.vsh" ), ae3d::FileSystem::FileContents( "unlit.fsh" ),
+                "unlit_vertex", "unlit_fragment",
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ) );
+
+    cubeMaterial.SetShader( &shader );
+    cubeMaterial.SetTexture( "textureMap", &spriteTex );
+    cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
+    cubeMaterial.SetBackFaceCulling( true );
+
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/Assets/textured_cube.ae3d" ) );
     cube.AddComponent<ae3d::MeshRendererComponent>();
     cube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    cube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     cube.AddComponent<ae3d::TransformComponent>();
-    cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -100 ) );
+    cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
     scene.Add( &cube );
 }
 

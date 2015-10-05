@@ -17,10 +17,6 @@ namespace ae3d
         struct FileContentsData;
     }
     
-    class Texture2D;
-    class TextureCube;
-    class RenderTexture;
-
     /// Shader program containing a vertex and pixel shader.
     class Shader
     {
@@ -56,17 +52,17 @@ namespace ae3d
         /// \param name Texture uniform name.
         /// \param texture Texture.
         /// \param textureUnit Texture unit.
-        void SetTexture( const char* name, const Texture2D* texture, int textureUnit );
+        void SetTexture( const char* name, const class Texture2D* texture, int textureUnit );
 
         /// \param name Texture uniform name.
         /// \param texture Texture.
         /// \param textureUnit Texture unit.
-        void SetTexture( const char* name, const TextureCube* texture, int textureUnit );
+        void SetTexture( const char* name, const class TextureCube* texture, int textureUnit );
 
         /// \param name Texture uniform name.
         /// \param renderTexture RenderTexture.
         /// \param textureUnit Texture unit.
-        void SetRenderTexture( const char* name, const RenderTexture* renderTexture, int textureUnit );
+        void SetRenderTexture( const char* name, const class RenderTexture* renderTexture, int textureUnit );
 
         /// \param name Integer uniform name.
         /// \param value Value.
@@ -97,6 +93,20 @@ namespace ae3d
 #endif
 
 #if AETHER3D_IOS
+        enum class UniformType { Float, Float2, Float3, Float4, Matrix4x4 };
+        
+        struct Uniform
+        {
+            UniformType type = UniformType::Float;
+            unsigned long offsetFromBufferStart = 0;
+            float floatValue[ 4 ];
+            float matrix4x4[ 16 ];
+        };
+        
+        std::map< std::string, Uniform > uniforms;
+        
+        void LoadUniforms( MTLRenderPipelineReflection* reflection );
+
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
 #endif
@@ -110,6 +120,6 @@ namespace ae3d
     private:
         unsigned id = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
-    };    
+    };
 }
 #endif
