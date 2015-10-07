@@ -22,4 +22,7 @@ __FILE__ "(" $Line "): TODO: "
 #define A_TODO(msg) PRAGMA_MESSAGE(message msg)
 #endif
 
+#define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
+#define AE3D_CHECK_D3D(x, msg) if (x != S_OK) { ae3d::System::Assert( false, msg ); }
+
 #endif

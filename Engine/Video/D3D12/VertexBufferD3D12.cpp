@@ -123,13 +123,3 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 void ae3d::VertexBuffer::Bind() const
 {
 }
-
-void ae3d::VertexBuffer::Draw() const
-{
-    GfxDevice::IncDrawCalls();
-}
-
-void ae3d::VertexBuffer::DrawRange( int /*start*/, int /*end*/ ) const
-{
-    GfxDevice::IncDrawCalls();
-}

@@ -5,26 +5,24 @@
 #include <d3dx12.h>
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
+#include "DescriptorHeapManager.hpp"
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "RenderTexture.hpp"
-
-#define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
+#include "Macros.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
-    extern ID3D12DescriptorHeap* descHeapCbvSrvUav;
 }
 
 namespace Global
 {
     std::vector< ID3DBlob* > shaders;
-    //std::vector< ID3D12DescriptorHeap* > descHeaps;
     std::vector< ID3D12Resource* > constantBuffers;
 }
 
@@ -34,14 +32,6 @@ void DestroyShaders()
     {
         AE3D_SAFE_RELEASE( Global::shaders[ i ] );
     }
-
-    /*ae3d::System::Assert( Global::descHeaps.size() == Global::constantBuffers.size(), "sizes must equal" );
-
-    for (std::size_t i = 0; i < Global::descHeaps.size(); ++i)
-    {
-        AE3D_SAFE_RELEASE( Global::descHeaps[ i ] );
-        AE3D_SAFE_RELEASE( Global::constantBuffers[ i ] );
-    }*/
 }
 
 namespace
@@ -80,26 +70,13 @@ void ShaderReload( const std::string& path )
 
 void ae3d::Shader::CreateConstantBuffer()
 {
-    /*D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = 100;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    desc.NodeMask = 0;
-    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &mDescHeapCbvSrvUav ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Print( "Unable to create shader DescriptorHeap!" );
-        return;
-    }
-
-    Global::descHeaps.push_back( mDescHeapCbvSrvUav );*/
-
     auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD );
+    auto buf = CD3DX12_RESOURCE_DESC::Buffer( D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT );
 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer( D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT ),
+        &buf,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS( &constantBuffer ) );
@@ -109,6 +86,8 @@ void ae3d::Shader::CreateConstantBuffer()
         return;
     }
 
+    auto initializeHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
     Global::constantBuffers.push_back( constantBuffer );
 
     constantBuffer->SetName( L"ConstantBuffer" );
@@ -117,7 +96,7 @@ void ae3d::Shader::CreateConstantBuffer()
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView(
         &cbvDesc,
-        GfxDeviceGlobal::descHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart() );
+        DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart() );
     hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &constantBufferUpload ) );
     if (FAILED( hr ))
     {
@@ -189,7 +168,7 @@ void ae3d::Shader::SetMatrix( const char* /*name*/, const float* matrix4x4 )
     memcpy_s( constantBufferUpload, 64, matrix4x4, 64 );
 }
 
-void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int /*textureUnit*/ )
 {
     GfxDevice::IncTextureBinds();
 
@@ -215,18 +194,18 @@ void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
-void ae3d::Shader::SetInt( const char* name, int value )
+void ae3d::Shader::SetInt( const char* /*name*/, int /*value*/ )
 {
 }
 
-void ae3d::Shader::SetFloat( const char* name, float value )
+void ae3d::Shader::SetFloat( const char* /*name*/, float /*value*/ )
 {
 }
 
-void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
+void ae3d::Shader::SetVector3( const char* /*name*/, const float* /*vec3*/ )
 {
 }
 
-void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
+void ae3d::Shader::SetVector4( const char* /*name*/, const float* /*vec4*/ )
 {
 }

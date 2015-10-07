@@ -9,12 +9,11 @@
 #include "GfxDevice.hpp"
 #include "FileWatcher.hpp"
 #include "FileSystem.hpp"
+#include "Macros.hpp"
 #include "System.hpp"
 #include "CommandListManager.hpp"
 #include "CommandContext.hpp"
-
-#define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
-#define AE3D_CHECK_D3D(x, msg) if (x != S_OK) { ae3d::System::Assert( false, msg ); }
+#include "DescriptorHeapManager.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
@@ -22,7 +21,6 @@ bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
-    extern ID3D12DescriptorHeap* descHeapCbvSrvUav;
     extern CommandListManager commandListManager;
     extern ID3D12CommandAllocator* commandListAllocator;
 }
@@ -100,6 +98,7 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
     initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
 
     initContext.CloseAndExecute( true );
+    // FIXME: This causes an error stating that the resource is in use when released, even though fence is waited.
     //uploadBuffer->Release();
 }
 
@@ -171,9 +170,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     srvDesc.Texture2D.PlaneSlice = 0;
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-    srv = GfxDeviceGlobal::descHeapCbvSrvUav->GetCPUDescriptorHandleForHeapStart();
-    auto cbvSrvUavDescStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-    srv.ptr += cbvSrvUavDescStep;
+    srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 

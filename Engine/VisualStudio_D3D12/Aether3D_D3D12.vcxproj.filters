@@ -129,6 +129,9 @@
     <ClCompile Include="..\Video\D3D12\CommandContext.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\D3D12\DescriptorHeapManager.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -237,6 +240,9 @@
       <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="..\Video\D3D12\CommandContext.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\D3D12\DescriptorHeapManager.hpp">
       <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>

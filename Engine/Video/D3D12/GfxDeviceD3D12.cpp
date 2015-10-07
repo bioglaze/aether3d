@@ -14,10 +14,9 @@
 #include "VertexBuffer.hpp"
 #include "CommandListManager.hpp"
 #include "CommandContext.hpp"
+#include "DescriptorHeapManager.hpp"
+#include "Macros.hpp"
 #include "TextureBase.hpp"
-
-#define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
-#define AE3D_CHECK_D3D(x, msg) if (x != S_OK) { ae3d::System::Assert( false, msg ); }
 
 void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
@@ -46,12 +45,9 @@ namespace GfxDeviceGlobal
     unsigned frameIndex = 0;
     ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
     ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
-    ID3D12DescriptorHeap* samplerDescriptorHeap = nullptr;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
     CommandListManager commandListManager;
-    // FIXME: This is related to texturing and shader constant buffers, so try to move somewhere else.
-    ID3D12DescriptorHeap* descHeapCbvSrvUav = nullptr;
 }
 
 namespace ae3d
@@ -85,24 +81,11 @@ void CreateDescriptorHeap()
         d.ptr += i * rtvStep;
         GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], nullptr, d );
     }
-
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = 100;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    desc.NodeMask = 0;
-    hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::descHeapCbvSrvUav ) );
-    AE3D_CHECK_D3D( hr, "Failed to create shader descriptor heap" );
 }
 
 void CreateSampler()
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc;
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-    desc.NumDescriptors = 100;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    desc.NodeMask = 0;
-    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::samplerDescriptorHeap ) );
-    AE3D_CHECK_D3D( hr, "Failed to create sampler descriptor heap" );
+    D3D12_CPU_DESCRIPTOR_HANDLE initSamplerHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
 
     D3D12_SAMPLER_DESC samplerDesc;
     samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -114,7 +97,7 @@ void CreateSampler()
     samplerDesc.MipLODBias = 0;
     samplerDesc.MaxAnisotropy = 0;
     samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-    GfxDeviceGlobal::device->CreateSampler( &samplerDesc, GfxDeviceGlobal::samplerDescriptorHeap->GetCPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::device->CreateSampler( &samplerDesc, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
 void CreateRootSignature()
@@ -373,10 +356,10 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     }
     
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
-    ID3D12DescriptorHeap* descHeaps[] = { GfxDeviceGlobal::descHeapCbvSrvUav, GfxDeviceGlobal::samplerDescriptorHeap };
+    ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetDescriptorHeaps( 2, descHeaps );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 0, GfxDeviceGlobal::descHeapCbvSrvUav->GetGPUDescriptorHandleForHeapStart() );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 1, GfxDeviceGlobal::samplerDescriptorHeap->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavHeap()->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
 
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
@@ -456,7 +439,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     auto commandQueue = GfxDeviceGlobal::commandListManager.GetCommandQueue();
     AE3D_SAFE_RELEASE( commandQueue );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::descHeapCbvSrvUav );
+    DescriptorHeapManager::Deinit();
 
     for (auto& pso : GfxDeviceGlobal::psoCache)
     {
@@ -478,7 +461,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     }
     
     // Barrier Present -> RenderTarget
-    ID3D12Resource* d3dBuffer = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
     GpuResource rtvResource;
     rtvResource.resource = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
     rtvResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -506,7 +488,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 void ae3d::GfxDevice::Present()
 {
     // Barrier RenderTarget -> Present
-    ID3D12Resource* d3dBuffer = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
     GpuResource presentResource;
     presentResource.resource = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
     presentResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
