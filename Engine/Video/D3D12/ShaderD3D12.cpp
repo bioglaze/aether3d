@@ -86,8 +86,6 @@ void ae3d::Shader::CreateConstantBuffer()
         return;
     }
 
-    auto initializeHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-
     Global::constantBuffers.push_back( constantBuffer );
 
     constantBuffer->SetName( L"ConstantBuffer" );

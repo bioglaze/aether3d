@@ -3,13 +3,16 @@
 #include "System.hpp"
 
 ID3D12DescriptorHeap* DescriptorHeapManager::cbvSrvUavHeap = nullptr;
-D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::currentCbvSrvUavHandle;
+D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::currentCbvSrvUavHandle = {};
 
 ID3D12DescriptorHeap* DescriptorHeapManager::samplerHeap = nullptr;
-D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::currentSamplerHandle;
+D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::currentSamplerHandle = {};
 
 ID3D12DescriptorHeap* DescriptorHeapManager::rtvHeap = nullptr;
-D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::currentRtvHandle;
+D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::currentRtvHandle = {};
+
+ID3D12DescriptorHeap* DescriptorHeapManager::dsvHeap = nullptr;
+D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::currentDsvHandle = {};
 
 namespace GfxDeviceGlobal
 {
@@ -21,21 +24,23 @@ void DescriptorHeapManager::Deinit()
     AE3D_SAFE_RELEASE( cbvSrvUavHeap );
     AE3D_SAFE_RELEASE( samplerHeap );
     AE3D_SAFE_RELEASE( rtvHeap );
+    AE3D_SAFE_RELEASE( dsvHeap );
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE type )
 {
     D3D12_CPU_DESCRIPTOR_HANDLE outHandle = {};
 
+    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+    desc.Type = type;
+    desc.NumDescriptors = 100;
+    desc.Flags = (type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV || type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV) ? (D3D12_DESCRIPTOR_HEAP_FLAGS)0 : D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    desc.NodeMask = 1;
+
     if (type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
     {
         if (!cbvSrvUavHeap)
         {
-            D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-            desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-            desc.NumDescriptors = 100;
-            desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-            desc.NodeMask = 1;
             HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &cbvSrvUavHeap ) );
             AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
             currentCbvSrvUavHandle = cbvSrvUavHeap->GetCPUDescriptorHandleForHeapStart();
@@ -48,11 +53,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DES
     {
         if (!samplerHeap)
         {
-            D3D12_DESCRIPTOR_HEAP_DESC desc;
-            desc.Type = type;
-            desc.NumDescriptors = 100;
-            desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-            desc.NodeMask = 0;
             HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &samplerHeap ) );
             AE3D_CHECK_D3D( hr, "Failed to create sampler descriptor heap" );
             currentSamplerHandle = samplerHeap->GetCPUDescriptorHandleForHeapStart();
@@ -65,10 +65,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DES
     {
         if (!rtvHeap)
         {
-            D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-            desc.Type = type;
-            desc.NumDescriptors = 10;
-            desc.NodeMask = 1;
             HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &rtvHeap ) );
             AE3D_CHECK_D3D( hr, "Failed to create RTV descriptor heap" );
             currentRtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
@@ -76,6 +72,18 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DES
 
         outHandle = currentRtvHandle;
         currentRtvHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( type );
+    }
+    else if (type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
+    {
+        if (!dsvHeap)
+        {
+            HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &dsvHeap ) );
+            AE3D_CHECK_D3D( hr, "Failed to create DSV descriptor heap" );
+            currentDsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+        }
+
+        outHandle = currentDsvHandle;
+        currentDsvHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( type );
     }
     else
     {

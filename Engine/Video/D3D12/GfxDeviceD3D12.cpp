@@ -43,8 +43,6 @@ namespace GfxDeviceGlobal
     ID3D12RootSignature* rootSignature = nullptr;
     CommandContext graphicsContext;
     unsigned frameIndex = 0;
-    ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
-    ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
     CommandListManager commandListManager;
@@ -67,37 +65,29 @@ void CreateDescriptorHeap()
         GfxDeviceGlobal::backBufferHeight = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Height );
     }
 
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    desc.NumDescriptors = 10;
-    desc.NodeMask = 0;
-    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::rtvDescriptorHeap ) );
-    AE3D_CHECK_D3D( hr, "Failed to create RTV descriptor heap" );
-
     auto rtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
+
     for (auto i = 0u; i < GfxDeviceGlobal::BufferCount; ++i)
     {
-        auto d = GfxDeviceGlobal::rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-        d.ptr += i * rtvStep;
-        GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], nullptr, d );
+        D3D12_CPU_DESCRIPTOR_HANDLE handle = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
+        handle.ptr += i * rtvStep;
+        GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], nullptr, handle );
     }
 }
 
 void CreateSampler()
 {
-    D3D12_CPU_DESCRIPTOR_HANDLE initSamplerHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
-
-    D3D12_SAMPLER_DESC samplerDesc;
-    samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-    samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    samplerDesc.MinLOD = -FLT_MAX;
-    samplerDesc.MaxLOD = FLT_MAX;
-    samplerDesc.MipLODBias = 0;
-    samplerDesc.MaxAnisotropy = 0;
-    samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-    GfxDeviceGlobal::device->CreateSampler( &samplerDesc, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
+    D3D12_SAMPLER_DESC descSampler;
+    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.MinLOD = -FLT_MAX;
+    descSampler.MaxLOD = FLT_MAX;
+    descSampler.MipLODBias = 0;
+    descSampler.MaxAnisotropy = 0;
+    descSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+    GfxDeviceGlobal::device->CreateSampler( &descSampler, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
 void CreateRootSignature()
@@ -263,14 +253,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
 
 void CreateDepthStencilView()
 {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    desc.NumDescriptors = 10;
-    desc.NodeMask = 0;
-    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::dsvDescriptorHeap ) );
-    AE3D_CHECK_D3D( hr, "Failed to create depth-stencil descriptor heap" );
-
-    auto resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+    auto descResource = CD3DX12_RESOURCE_DESC::Tex2D(
         DXGI_FORMAT_R32_TYPELESS, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
         D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
 
@@ -280,10 +263,10 @@ void CreateDepthStencilView()
     dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
     dsvClearValue.DepthStencil.Depth = 1.0f;
     dsvClearValue.DepthStencil.Stencil = 0;
-    hr = GfxDeviceGlobal::device->CreateCommittedResource(
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &prop, // No need to read/write by CPU
         D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
+        &descResource,
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &dsvClearValue,
         IID_PPV_ARGS( &GfxDeviceGlobal::depthTexture ) );
@@ -291,12 +274,12 @@ void CreateDepthStencilView()
 
     GfxDeviceGlobal::depthTexture->SetName( L"DepthTexture" );
 
-    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-    dsvDesc.Texture2D.MipSlice = 0;
-    dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-    GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &dsvDesc, GfxDeviceGlobal::dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart() );
+    D3D12_DEPTH_STENCIL_VIEW_DESC descDsv = {};
+    descDsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+    descDsv.Format = DXGI_FORMAT_D32_FLOAT;
+    descDsv.Texture2D.MipSlice = 0;
+    descDsv.Flags = D3D12_DSV_FLAG_NONE;
+    GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &descDsv, DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
 void ae3d::CreateRenderer( int /*samples*/ )
@@ -338,6 +321,11 @@ void ae3d::CreateRenderer( int /*samples*/ )
     hr = dxgiFactory->CreateSwapChain( GfxDeviceGlobal::commandListManager.GetCommandQueue(), &swapChainDesc, (IDXGISwapChain**)&GfxDeviceGlobal::swapChain );
     AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
     dxgiFactory->Release();
+
+    D3D12_CPU_DESCRIPTOR_HANDLE initRtvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
+    D3D12_CPU_DESCRIPTOR_HANDLE initSamplerHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+    D3D12_CPU_DESCRIPTOR_HANDLE initDsvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
+    D3D12_CPU_DESCRIPTOR_HANDLE initCbvSrvUavHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     CreateDescriptorHeap();
     CreateRootSignature();
@@ -432,8 +420,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     DestroyShaders();
     DestroyTextures();
     GfxDeviceGlobal::commandListManager.Destroy();
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rtvDescriptorHeap );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::dsvDescriptorHeap );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsContext.graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
@@ -475,12 +461,12 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     scissor.bottom = (LONG)GfxDeviceGlobal::backBufferHeight;
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->RSSetScissorRects( 1, &scissor );
 
-    D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = GfxDeviceGlobal::rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
     auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
     descHandleRtv.ptr += ((GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount) * descHandleRtvStep;
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
 
-    D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = GfxDeviceGlobal::dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->ClearDepthStencilView( descHandleDsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr );
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->OMSetRenderTargets( 1, &descHandleRtv, TRUE, &descHandleDsv );
 }
