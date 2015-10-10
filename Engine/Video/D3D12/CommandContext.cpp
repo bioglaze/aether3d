@@ -2,8 +2,7 @@
 #include <d3d12.h>
 #include "CommandListManager.hpp"
 #include "System.hpp"
-
-#define AE3D_CHECK_D3D(x, msg) if (x != S_OK) { ae3d::System::Assert( false, msg ); }
+#include "Macros.hpp"
 
 namespace GfxDeviceGlobal
 {

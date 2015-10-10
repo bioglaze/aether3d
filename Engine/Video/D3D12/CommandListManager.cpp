@@ -1,9 +1,8 @@
 #include "CommandListManager.hpp"
 #include <d3d12.h>
 #include "System.hpp"
+#include "Macros.hpp"
 
-#define AE3D_CHECK_D3D(x, msg) if (x != S_OK) { ae3d::System::Assert( false, msg ); }
-#define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
 #define MY_MAX( a, b ) (((a) > (b)) ? a : b)
 
 void CommandListManager::Create( ID3D12Device* aDevice )
@@ -24,8 +23,8 @@ void CommandListManager::Create( ID3D12Device* aDevice )
 
 void CommandListManager::Destroy()
 {
-    CloseHandle( fenceEvent );
     AE3D_SAFE_RELEASE( fence );
+    AE3D_SAFE_RELEASE( commandQueue );
 }
 
 void CommandListManager::CreateNewCommandList( ID3D12GraphicsCommandList** outList, ID3D12CommandAllocator** outAllocator )
@@ -46,12 +45,10 @@ ID3D12CommandAllocator* CommandListManager::RequestAllocator()
     return outAllocator;
 }
 
-void CommandListManager::DiscardAllocator( uint64_t fenceValue, ID3D12CommandAllocator* allocator )
+void CommandListManager::DiscardAllocator( uint64_t /*fenceValue*/, ID3D12CommandAllocator* allocator )
 {
     // TODO: allocator pool
-    // FIXME: Is it safe to release immediately or should we wait?
-    //WaitForFence( fenceValue );
-    //AE3D_SAFE_RELEASE( allocator );
+    AE3D_SAFE_RELEASE( allocator );
 }
 
 std::uint64_t CommandListManager::ExecuteCommandList( ID3D12CommandList* list )

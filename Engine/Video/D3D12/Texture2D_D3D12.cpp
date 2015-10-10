@@ -90,16 +90,20 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &bufferDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS( &uploadBuffer ) );
     AE3D_CHECK_D3D( hr, "Failed to create texture upload resource" );
-    uploadBuffer->SetName( L"Texture2D Upload Buffer" );
 
-    // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
-    initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
-    UpdateSubresources( initContext.graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
-    initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+    if (hr == S_OK)
+    {
+        uploadBuffer->SetName( L"Texture2D Upload Buffer" );
 
-    initContext.CloseAndExecute( true );
-    // FIXME: This causes an error stating that the resource is in use when released, even though fence is waited.
-    //uploadBuffer->Release();
+        // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
+        initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
+        UpdateSubresources( initContext.graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
+        initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+
+        initContext.CloseAndExecute( true );
+        // FIXME: This causes an error stating that the resource is in use when released, even though fence is waited.
+        //uploadBuffer->Release();
+    }
 }
 
 void TexReload( const std::string& path )
@@ -169,7 +173,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     srvDesc.Texture2D.MostDetailedMip = 0;
     srvDesc.Texture2D.PlaneSlice = 0;
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-
+    
     srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
@@ -192,7 +196,7 @@ void ae3d::Texture2D::LoadDDS( const char* path )
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
 {
     int components;
-    unsigned char* data = stbi_load_from_memory( &fileContents.data[ 0 ], static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
+    unsigned char* data = stbi_load_from_memory( fileContents.data.data(), static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
     System::Assert( width > 0 && height > 0, "Invalid texture dimension" );
 
     if (data == nullptr)
@@ -201,35 +205,34 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         System::Print( "%s failed to load. stb_image's reason: %s\n", fileContents.path.c_str(), reason.c_str() );
         return;
     }
-  
+
     opaque = (components == 3 || components == 1);
 
-    gpuResource.usageState = D3D12_RESOURCE_STATE_COMMON;
+    D3D12_RESOURCE_DESC descTex = {};
+    descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    descTex.Width = width;
+    descTex.Height = (UINT)height;
+    descTex.DepthOrArraySize = 1;
+    descTex.MipLevels = 1;
+    descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descTex.SampleDesc.Count = 1;
+    descTex.SampleDesc.Quality = 0;
+    descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    D3D12_RESOURCE_DESC texDesc = {};
-    texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    texDesc.Width = width;
-    texDesc.Height = (UINT)height;
-    texDesc.DepthOrArraySize = 1;
-    texDesc.MipLevels = 1;
-    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.SampleDesc.Quality = 0;
-    texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-    D3D12_HEAP_PROPERTIES heapProps;
-    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT; // was upload
+    D3D12_HEAP_PROPERTIES heapProps = {};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
     heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
     heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
     heapProps.CreationNodeMask = 1;
     heapProps.VisibleNodeMask = 1;
-
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+    
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
                  D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
-    
+
     gpuResource.resource->SetName( L"Texture2D" );
+    gpuResource.usageState = D3D12_RESOURCE_STATE_COMMON;
     Global::textures.push_back( gpuResource.resource );
 
     const int bytesPerPixel = 4;
@@ -237,7 +240,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     texResource.pData = data;
     texResource.RowPitch = width * bytesPerPixel;
     texResource.SlicePitch = texResource.RowPitch * height;
-
     InitializeTexture( gpuResource, &texResource, width * height * 4 );
 
     stbi_image_free( data );

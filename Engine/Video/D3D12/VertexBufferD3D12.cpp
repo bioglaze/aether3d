@@ -5,8 +5,7 @@
 #include "GfxDevice.hpp"
 #include "Vec3.hpp"
 #include "System.hpp"
-
-#define AE3D_SAFE_RELEASE(x) if (x) { x->Release(); x = nullptr; }
+#include "Macros.hpp"
 
 namespace GfxDeviceGlobal
 {

@@ -53,7 +53,7 @@ namespace ae3d
     void CreateRenderer( int samples );
 }
 
-void CreateDescriptorHeap()
+void CreateBackBuffer()
 {
     for (int i = 0; i < GfxDeviceGlobal::BufferCount; ++i)
     {
@@ -327,7 +327,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
     D3D12_CPU_DESCRIPTOR_HANDLE initDsvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
     D3D12_CPU_DESCRIPTOR_HANDLE initCbvSrvUavHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    CreateDescriptorHeap();
+    CreateBackBuffer();
     CreateRootSignature();
     CreateDepthStencilView();
     CreateSampler();
@@ -423,9 +423,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsContext.graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
-    auto commandQueue = GfxDeviceGlobal::commandListManager.GetCommandQueue();
-    AE3D_SAFE_RELEASE( commandQueue );
     DescriptorHeapManager::Deinit();
+    GfxDeviceGlobal::commandListManager.Destroy();
 
     for (auto& pso : GfxDeviceGlobal::psoCache)
     {
