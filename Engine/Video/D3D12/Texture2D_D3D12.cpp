@@ -25,21 +25,10 @@ namespace GfxDeviceGlobal
     extern ID3D12CommandAllocator* commandListAllocator;
 }
 
-namespace Global
-{
-    std::vector< ID3D12Resource* > textures;
-}
-
-void DestroyTextures()
-{
-    for (std::size_t i = 0; i < Global::textures.size(); ++i)
-    {
-        AE3D_SAFE_RELEASE( Global::textures[ i ] );
-    }
-}
-
 namespace Texture2DGlobal
 {
+    std::vector< ID3D12Resource* > textures;
+    std::vector< ID3D12Resource* > uploadBuffers;
     ae3d::Texture2D defaultTexture;
     
     std::map< std::string, ae3d::Texture2D > pathToCachedTexture;
@@ -59,6 +48,15 @@ namespace Texture2DGlobal
         ae3d::System::Print( "Total texture usage: %d KiB\n", total / 1024 );
     }
 #endif
+}
+
+void DestroyTextures()
+{
+    for (std::size_t i = 0; i < Texture2DGlobal::textures.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( Texture2DGlobal::textures[ i ] );
+        AE3D_SAFE_RELEASE( Texture2DGlobal::uploadBuffers[ i ] );
+    }
 }
 
 void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, unsigned dataSize )
@@ -94,6 +92,7 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
     if (hr == S_OK)
     {
         uploadBuffer->SetName( L"Texture2D Upload Buffer" );
+        Texture2DGlobal::uploadBuffers.push_back( uploadBuffer );
 
         // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
         initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
@@ -233,7 +232,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     gpuResource.resource->SetName( L"Texture2D" );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COMMON;
-    Global::textures.push_back( gpuResource.resource );
+    Texture2DGlobal::textures.push_back( gpuResource.resource );
 
     const int bytesPerPixel = 4;
     D3D12_SUBRESOURCE_DATA texResource;

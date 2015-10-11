@@ -8,6 +8,7 @@
 #endif
 #if AETHER3D_D3D12
 #include <d3d12.h>
+#include <d3dcompiler.h>
 #endif
 
 namespace ae3d
@@ -81,10 +82,6 @@ namespace ae3d
         void SetVector4( const char* name, const float* vec4 );
 
 #if AETHER3D_D3D12
-        void CreateConstantBuffer();
-
-        ID3D12Resource* constantBuffer = nullptr;
-        void* constantBufferUpload = nullptr;
         ID3DBlob* blobShaderVertex = nullptr;
         ID3DBlob* blobShaderPixel = nullptr;
 #endif
@@ -115,6 +112,14 @@ namespace ae3d
         };
 
     private:
+#if AETHER3D_D3D12
+        void CreateConstantBuffer();
+        void ReflectVariables();
+
+        ID3D12Resource* constantBuffer = nullptr;
+        void* constantBufferUpload = nullptr;
+        ID3D12ShaderReflection* reflector = nullptr;
+#endif
         unsigned id = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
     };

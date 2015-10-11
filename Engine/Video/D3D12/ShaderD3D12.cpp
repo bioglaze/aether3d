@@ -1,5 +1,6 @@
 #include "Shader.hpp"
 #include <vector>
+#include <string>
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include <d3dx12.h>
@@ -127,6 +128,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     CreateConstantBuffer();
     id = 1;
+    ReflectVariables();
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/, const FileSystem::FileContentsData& /*fragmentDataGLSL*/,
@@ -156,14 +158,44 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/,
     }
 }
 
+void ae3d::Shader::ReflectVariables()
+{
+    HRESULT hr = D3DReflect( blobShaderVertex->GetBufferPointer(), blobShaderVertex->GetBufferSize(), IID_PPV_ARGS( &reflector ) );
+    AE3D_CHECK_D3D( hr, "Shader reflection failed" );
+
+    D3D12_SHADER_DESC descShader;
+    reflector->GetDesc( &descShader );
+    AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
+
+    // FIXME: This doesn't differentiate between constant buffers, but currently I only have one [TimoW, 2015-10-11]
+    for (UINT i = 0; i < descShader.ConstantBuffers; ++i)
+    {
+        auto buffer = reflector->GetConstantBufferByIndex( i );
+
+        D3D12_SHADER_BUFFER_DESC desc;
+        hr = buffer->GetDesc( &desc );
+        AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
+
+        auto var = buffer->GetVariableByIndex( 0 );
+        D3D12_SHADER_VARIABLE_DESC descVar;
+        hr = var->GetDesc( &descVar );
+
+        uniformLocations[ descVar.Name ].i = descVar.StartOffset;
+    }
+}
+
 void ae3d::Shader::Use()
 {
 }
 
-void ae3d::Shader::SetMatrix( const char* /*name*/, const float* matrix4x4 )
+void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
     System::Assert( constantBufferUpload != nullptr, "CreateConstantBuffer probably not called!" );
-    memcpy_s( constantBufferUpload, 64, matrix4x4, 64 );
+    
+    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    {
+        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 64, matrix4x4, 64 );
+    }
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int /*textureUnit*/ )
@@ -188,18 +220,34 @@ void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
-void ae3d::Shader::SetInt( const char* /*name*/, int /*value*/ )
+void ae3d::Shader::SetInt( const char* name, int value )
 {
+    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    {
+        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 4, &value, 4 );
+    }
 }
 
-void ae3d::Shader::SetFloat( const char* /*name*/, float /*value*/ )
+void ae3d::Shader::SetFloat( const char* name, float value )
 {
+    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    {
+        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 4, &value, 4 );
+    }
 }
 
-void ae3d::Shader::SetVector3( const char* /*name*/, const float* /*vec3*/ )
+void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
+    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    {
+        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 3 * 4, vec3, 3 * 4 );
+    }
 }
 
-void ae3d::Shader::SetVector4( const char* /*name*/, const float* /*vec4*/ )
+void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
+    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    {
+        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 4 * 4, vec4, 4 * 4 );
+    }
 }

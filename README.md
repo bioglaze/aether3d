@@ -24,6 +24,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
+  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 

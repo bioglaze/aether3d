@@ -15,12 +15,12 @@ void ae3d::BuiltinShaders::Load()
     };\
 cbuffer Scene\
     {\
-        float4x4 mvp;\
+        float4x4 _ProjectionModelMatrix;\
     };\
     VSOutput VSMain( float3 pos : POSITION, float2 uv : TEXCOORD, float4 color : COLOR )\
     {\
         VSOutput vsOut;\
-        vsOut.pos = mul( mvp, float4( pos, 1.0 ) );\
+        vsOut.pos = mul( _ProjectionModelMatrix, float4( pos, 1.0 ) );\
         vsOut.uv = uv;\
         vsOut.color = color;\
         return vsOut;\
@@ -45,12 +45,12 @@ cbuffer Scene\
     };\
 cbuffer Scene\
     {\
-        float4x4 mvp;\
+        float4x4 _ProjectionModelMatrix;\
     };\
     VSOutput VSMain( float3 pos : POSITION, float2 uv : TEXCOORD, float4 color : COLOR )\
     {\
         VSOutput vsOut;\
-        vsOut.pos = mul( mvp, float4( pos, 1.0 ) );\
+        vsOut.pos = mul( _ProjectionModelMatrix, float4( pos, 1.0 ) );\
         vsOut.color = color;\
         return vsOut;\
     }\
@@ -71,12 +71,12 @@ cbuffer Scene\
     };\
 cbuffer Scene\
     {\
-        float4x4 mvp;\
+        float4x4 _ModelViewProjectionMatrix;\
     };\
     VSOutput VSMain( float3 pos : POSITION, float2 uv : TEXCOORD, float4 color : COLOR )\
     {\
         VSOutput vsOut;\
-        vsOut.pos = mul( mvp, float4( pos, 1.0 ) );\
+        vsOut.pos = mul( _ModelViewProjectionMatrix, float4( pos, 1.0 ) );\
         vsOut.color = color;\
         return vsOut;\
     }\
