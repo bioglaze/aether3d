@@ -97,6 +97,11 @@ ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
     return &meshRendererComponents[index];
 }
 
+std::string ae3d::MeshRendererComponent::GetSerialized() const
+{
+    return "meshrenderer\n";
+}
+
 void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, const Frustum& cameraFrustum, const Matrix44& localToWorld, Shader* overrideShader )
 {
     std::vector< Vec3 > aabbWorld;

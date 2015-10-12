@@ -2,13 +2,10 @@
 #define SPRITE_RENDERER_COMPONENT_H
 
 #include <type_traits>
+#include <string>
 
 namespace ae3d
 {
-    class TextureBase;
-    struct Vec3;
-    struct Vec4;
-    
     /// Renders sprites.
     class SpriteRendererComponent
     {
@@ -25,6 +22,9 @@ namespace ae3d
         /// \param other Other.
         SpriteRendererComponent& operator=( const SpriteRendererComponent& other );
 
+        /// \return Textual representation of component.
+        std::string GetSerialized() const;
+
         /// Removes all textures that were added using SetTexture.
         void Clear();
         
@@ -39,7 +39,7 @@ namespace ae3d
 
           // TODO [2015-03-28]: Set pivot, maybe also rotation.
          */
-        void SetTexture( const TextureBase* texture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor );
+        void SetTexture( const class TextureBase* texture, const struct Vec3& position, const Vec3& dimensionPixels, const struct Vec4& tintColor );
 
     private:
         friend class GameObject;

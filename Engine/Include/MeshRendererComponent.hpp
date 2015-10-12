@@ -6,22 +6,16 @@
 
 namespace ae3d
 {
-    class Material;
-    class Mesh;
-    class Frustum;
-    class Shader;
-    struct Matrix44;
-    
     /// Contains a mesh.
     class MeshRendererComponent
     {
     public:
         /// \return Mesh.
-        Mesh* GetMesh() const { return mesh; }
+        class Mesh* GetMesh() const { return mesh; }
         
         /// \param material Material.
         /// \param subMeshIndex Sub mesh index.
-        void SetMaterial( Material* material, int subMeshIndex );
+        void SetMaterial( class Material* material, int subMeshIndex );
 
         /// \param aMesh Mesh.
         void SetMesh( Mesh* aMesh );
@@ -45,7 +39,7 @@ namespace ae3d
         /// \param modelViewProjectionMatrix Model-view-projection matrix.
         /// \param cameraFrustum Camera frustum.
         /// \param localToWorld Transforms mesh AABB from mesh-local space into world-space.
-        void Render( const Matrix44& modelViewProjectionMatrix, const Frustum& cameraFrustum, const Matrix44& localToWorld, Shader* overrideShader );
+        void Render( const struct Matrix44& modelViewProjectionMatrix, const class Frustum& cameraFrustum, const Matrix44& localToWorld, class Shader* overrideShader );
 
         Mesh* mesh = nullptr;
         std::vector< Material* > materials;

@@ -224,6 +224,11 @@ ae3d::SpriteRendererComponent& ae3d::SpriteRendererComponent::operator=( const S
     return *this;
 }
 
+std::string ae3d::SpriteRendererComponent::GetSerialized() const
+{
+    return "spriterenderer\n";
+}
+
 void ae3d::SpriteRendererComponent::Clear()
 {
     m().opaqueRenderQueue.Clear();

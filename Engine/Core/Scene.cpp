@@ -248,7 +248,7 @@ void ae3d::Scene::Render()
     CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
     ae3d::System::Assert( mainCamera->GetComponent<CameraComponent>()->GetTargetTexture() == nullptr, "main camera must not have a texture target" );
 
-    unsigned debugShadowFBO = 0;
+    //unsigned debugShadowFBO = 0;
     
     if (camera != nullptr && mainCamera->GetComponent<TransformComponent>())
     {
@@ -301,7 +301,7 @@ void ae3d::Scene::Render()
                 
                 Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                 
-                debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
+                //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
             }
         }
         
@@ -534,6 +534,10 @@ std::string ae3d::Scene::GetSerialized() const
         outSerialized += gameObject->GetSerialized();
         
         // TODO: Try to DRY.
+        if (gameObject->GetComponent<MeshRendererComponent>())
+        {
+            outSerialized += gameObject->GetComponent<MeshRendererComponent>()->GetSerialized();
+        }
         if (gameObject->GetComponent<TransformComponent>())
         {
             outSerialized += gameObject->GetComponent<TransformComponent>()->GetSerialized();
@@ -541,6 +545,10 @@ std::string ae3d::Scene::GetSerialized() const
         if (gameObject->GetComponent<CameraComponent>())
         {
             outSerialized += gameObject->GetComponent<CameraComponent>()->GetSerialized();
+        }
+        if (gameObject->GetComponent<SpriteRendererComponent>())
+        {
+            outSerialized += gameObject->GetComponent<SpriteRendererComponent>()->GetSerialized();
         }
         if (gameObject->GetComponent<TextRendererComponent>())
         {

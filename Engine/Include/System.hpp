@@ -104,11 +104,12 @@ namespace ae3d
 
         /**
         Formats a message and prints it into stdout.
-        Example: Print( "My name is %s\n", name.c_str() ); // where name is a std::string.
+        Example: Print( "My name is %s", name.c_str() ); // where name is a std::string.
         Formatting examples:
         %d: integer
         %s: C-style null-terminated string
         %f: float
+        %x: hexadecimal
         */
         void Print( const char* format, ... );
 

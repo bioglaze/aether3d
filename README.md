@@ -9,6 +9,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Oculus Rift support.
   - Sprite rendering, texture atlasing and batching.
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
+  - Variance shadow mapping.
   - Audio support for .wav and .ogg.
   - Custom model format with .obj and Blender exporter.
   - Virtual file system for .pak files.

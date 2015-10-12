@@ -156,7 +156,7 @@ void ae3d::Texture2D::LoadDDS( const char* path )
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
 {
     int components;
-    unsigned char* data = stbi_load_from_memory( &fileContents.data[ 0 ], static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
+    unsigned char* data = stbi_load_from_memory( fileContents.data.data(), static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
 
     if (data == nullptr)
     {

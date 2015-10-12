@@ -7,10 +7,6 @@
 
 namespace ae3d
 {
-    class GameObject;
-    class CameraComponent;
-    class TextureCube;
-
     namespace FileSystem
     {
         struct FileContentsData;
@@ -24,7 +20,7 @@ namespace ae3d
         enum class DeserializeResult { Success, ParseError };
         
         /// Adds a game object into the scene if it does not exist there already.
-        void Add( GameObject* gameObject );
+        void Add( class GameObject* gameObject );
         
         /// \param gameObject Game object to remove. Does nothing if it is null or doesn't exist in the scene.
         void Remove( GameObject* gameObject );
@@ -33,7 +29,7 @@ namespace ae3d
         void Render();
 
         /// \param skyTexture Skybox texture. If this is the first time a valid skybox texture is provided, skybox geometry will also be generated.
-        void SetSkybox( const TextureCube* skyTexture );
+        void SetSkybox( const class TextureCube* skyTexture );
         
         /// \return Scene's contents in a textual format that can be saved into file etc.
         std::string GetSerialized() const;

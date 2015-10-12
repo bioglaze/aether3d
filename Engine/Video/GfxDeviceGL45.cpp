@@ -144,7 +144,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     SetDepthFunc( depthFunc );
     shader.Use();
     vertexBuffer.Bind();
-    //vertexBuffer.DrawRange( startIndex, endIndex );
     GfxDevice::IncDrawCalls();
     glDrawRangeElements( GL_TRIANGLES, startIndex, endIndex, (endIndex - startIndex) * 3, GL_UNSIGNED_SHORT, (const GLvoid*)(startIndex * sizeof( VertexBuffer::Face )) );
 }
@@ -325,43 +324,19 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 
 const char* GetGLErrorString(GLenum code)
 {
-    if (code == GL_OUT_OF_MEMORY)
+    switch (code)
     {
-        return "GL_OUT_OF_MEMORY";
+        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+        case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+        case GL_FRAMEBUFFER_UNSUPPORTED: return "GL_FRAMEBUFFER_UNSUPPORTED";
+        case GL_FRAMEBUFFER_UNDEFINED: return "GL_FRAMEBUFFER_UNDEFINED";
+        default: return "other GL error";
     }
-    if (code == GL_INVALID_ENUM)
-    {
-        return "GL_INVALID_ENUM";
-    }
-    if (code == GL_INVALID_VALUE)
-    {
-        return "GL_INVALID_VALUE";
-    }
-    if (code == GL_INVALID_OPERATION)
-    {
-        return "GL_INVALID_OPERATION";
-    }
-    if (code == GL_INVALID_FRAMEBUFFER_OPERATION)
-    {
-        return "GL_INVALID_FRAMEBUFFER_OPERATION";
-    }
-    if (code == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
-    {
-        return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-    }
-    if (code == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
-    {
-        return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-    }
-    if (code == GL_FRAMEBUFFER_UNSUPPORTED)
-    {
-        return "GL_FRAMEBUFFER_UNSUPPORTED";
-    }
-    if (code == GL_FRAMEBUFFER_UNDEFINED)
-    {
-        return "GL_FRAMEBUFFER_UNDEFINED";
-    }
-    return "other GL error";
 }
 
 void ae3d::GfxDevice::ErrorCheck(const char* info)

@@ -6,9 +6,6 @@
 
 namespace ae3d
 {
-    class Font;
-    struct Vec4;
-
     /// Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/
     class TextRendererComponent
     {
@@ -29,10 +26,10 @@ namespace ae3d
         TextRendererComponent& operator=( const TextRendererComponent& other );
 
         /// \param color Color in range 0-1.
-        void SetColor( const Vec4& color );
+        void SetColor( const struct Vec4& color );
 
         /// \param font Font.
-        void SetFont( Font* font );
+        void SetFont( class Font* font );
         
         /// \param text Text. Characters not in font are rendered empty.
         void SetText( const char* text );
