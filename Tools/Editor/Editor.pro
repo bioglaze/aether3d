@@ -29,6 +29,8 @@ win32 {
     #PRE_TARGETDEPS += $$PWD/../../../aether3d_build/libaether3d_win.a
 }
 macx {
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+    #QMAKE_MAC_SDK = macosx10.11
     QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++ -Wall -Wextra
     LIBS += -L$$PWD/../../../aether3d_build/ -laether3d_osx
     LIBS += -framework CoreFoundation -framework OpenAL -framework QuartzCore -framework IOKit -framework Cocoa

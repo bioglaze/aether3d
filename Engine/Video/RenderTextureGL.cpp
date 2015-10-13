@@ -47,11 +47,13 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     // Creates the Frame Buffer Object.
     fboId = GfxDevice::CreateFboId();
     glBindFramebuffer( GL_FRAMEBUFFER, fboId );
-    //GfxDevice::SetRenderTarget( this, 0 );
     
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, handle, 0 );
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId );
     //RendererImpl::Instance().ClearScreen();
+    
+    // FIXME: Set this only in editor if this causes problems. This cannot be systemFBO because it hangs the editor.
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
     
     GfxDevice::ErrorCheckFBO();
     GfxDevice::ErrorCheck( "CreateRenderTexture2D end" );

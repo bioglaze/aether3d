@@ -22,7 +22,6 @@ void DirectionalLightInspector::Init( QWidget* mainWindow )
     connect( shadowCheck, SIGNAL(stateChanged(int)), this, SLOT(ShadowStateChanged(int)) );
     connect( mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
              this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );
-
 }
 
 void DirectionalLightInspector::ShadowStateChanged( int enabled )
