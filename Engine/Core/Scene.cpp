@@ -51,14 +51,15 @@ namespace SceneGlobal
 void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const Frustum& eyeFrustum, const Vec3& sceneAABBmin, const Vec3& sceneAABBmax,
                                              ae3d::CameraComponent& outCamera, ae3d::TransformComponent& outCameraTransform )
 {
+    const Vec3 viewFrustumCentroid = eyeFrustum.Centroid();
+
     System::Assert( !MathUtil::IsNaN( lightDirection.x ) && !MathUtil::IsNaN( lightDirection.y ) && !MathUtil::IsNaN( lightDirection.z ), "Invalid light direction" );
     System::Assert( !MathUtil::IsNaN( sceneAABBmin.x ) && !MathUtil::IsNaN( sceneAABBmin.y ) && !MathUtil::IsNaN( sceneAABBmin.z ), "Invalid scene AABB min" );
     System::Assert( !MathUtil::IsNaN( sceneAABBmax.x ) && !MathUtil::IsNaN( sceneAABBmax.y ) && !MathUtil::IsNaN( sceneAABBmax.z ), "Invalid scene AABB max" );
-    System::Assert( !MathUtil::IsNaN( eyeFrustum.Centroid().x ) && !MathUtil::IsNaN( eyeFrustum.Centroid().y ) && !MathUtil::IsNaN( eyeFrustum.Centroid().z ), "Invalid eye frustum" );
+    System::Assert( !MathUtil::IsNaN( viewFrustumCentroid.x ) && !MathUtil::IsNaN( viewFrustumCentroid.y ) && !MathUtil::IsNaN( viewFrustumCentroid.z ), "Invalid eye frustum" );
     System::Assert( outCamera.GetTargetTexture() != nullptr, "Shadow camera needs target texture" );
     System::Assert( lightDirection.Length() > 0.9f && lightDirection.Length() < 1.1f, "Light dir must be normalized" );
     
-    const Vec3 viewFrustumCentroid = eyeFrustum.Centroid();
 
     // Start at the centroid, and move back in the opposite direction of the light
     // by an amount equal to the camera's farClip. This is the temporary working position for the light.
@@ -263,8 +264,9 @@ void ae3d::Scene::Render()
             }
             
             auto lightTransform = go->GetComponent<TransformComponent>();
-            
-            if (lightTransform && go->GetComponent<DirectionalLightComponent>() && go->GetComponent<DirectionalLightComponent>()->CastsShadow())
+            auto dirLight = go->GetComponent<DirectionalLightComponent>();
+
+            if (lightTransform && dirLight && dirLight->CastsShadow())
             {
                 Frustum eyeFrustum;
                 

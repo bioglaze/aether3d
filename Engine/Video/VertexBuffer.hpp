@@ -123,6 +123,12 @@ namespace ae3d
         static const int normalChannel = 3;
         static const int tangentChannel = 4;
 
+#if AETHER3D_D3D12
+        void UploadVB( void* faces, void* vertices, unsigned ibSize );
+        // Index buffer is stored in the vertex buffer after vertex data.
+        ID3D12Resource* vb = nullptr;
+        long ibOffset = 0;
+#endif
         int elementCount = 0;
         VertexFormat vertexFormat = VertexFormat::PTC;
 
@@ -133,12 +139,6 @@ namespace ae3d
 #if AETHER3D_IOS
         id<MTLBuffer> vertexBuffer;
         id<MTLBuffer> indexBuffer;
-#endif
-#if AETHER3D_D3D12
-        void UploadVB( void* faces, void* vertices, unsigned ibSize );
-        // Index buffer is stored in the vertex buffer after vertex data.
-        ID3D12Resource* vb = nullptr;
-        long ibOffset = 0;
 #endif
     };
 }
