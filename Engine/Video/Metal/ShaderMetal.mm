@@ -5,7 +5,6 @@
 #include "TextureCube.hpp"
 #include "System.hpp"
 
-extern id <MTLBuffer> uniformBuffer;
 extern id<MTLTexture> texture0;
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -40,6 +39,7 @@ void ae3d::Shader::LoadFromLibrary( const char* vertexShaderName, const char* fr
     }
     
     id = 1;
+    uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceOptionCPUCacheModeDefault];
 }
 
 void ae3d::Shader::Use()

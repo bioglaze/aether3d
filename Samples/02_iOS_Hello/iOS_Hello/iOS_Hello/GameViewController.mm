@@ -132,7 +132,7 @@
                     ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None );
     scene.SetSkybox( &skyboxTex );
     
-    shader.Load( ae3d::FileSystem::FileContents( "unlit.vsh" ), ae3d::FileSystem::FileContents( "unlit.fsh" ),
+    shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                 "unlit_vertex", "unlit_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ) );
 
@@ -159,16 +159,24 @@
     UITouch *touch = [touches anyObject];
     CGPoint location = [touch locationInView: self.view];
     
-    /*sprite.GetComponent<ae3d::SpriteRendererComponent>()->Clear();
-    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTex, ae3d::Vec3( location.x, location.y, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv2, ae3d::Vec3( 180, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );*/
     static int lastX = location.x;
-    int x = location.x - lastX;
-    perspCamera.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 0, 1, 0 ), -x / 60.0f );
-
     static int lastY = location.y;
+
+    int x = location.x - lastX;
     int y = location.y - lastY;
-    perspCamera.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 1, 0, 0 ), -y / 60.0f );
+    
+    unsigned long fingersOnScreen = [[event allTouches]count];
+
+    if (fingersOnScreen > 1)
+    {
+        perspCamera.GetComponent<ae3d::TransformComponent>()->MoveForward( y / 90.0f );
+        perspCamera.GetComponent<ae3d::TransformComponent>()->MoveRight( -x / 90.0f );
+    }
+    else
+    {
+        perspCamera.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 0, 1, 0 ), -x / 60.0f );
+        perspCamera.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 1, 0, 0 ), -y / 60.0f );
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -203,6 +211,14 @@
             _layerSizeDidUpdate = NO;
         }
         
+        static int angle = 0;
+        ++angle;
+        
+        ae3d::Quaternion rotation;
+        const ae3d::Vec3 axis( 0, 1, 0 );
+        rotation.FromAxisAngle( axis, angle );
+        cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
+
         ae3d::System::BeginFrame();
         scene.Render();
         ae3d::System::EndFrame();

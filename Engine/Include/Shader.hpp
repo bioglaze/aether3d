@@ -100,9 +100,11 @@ namespace ae3d
         std::map< std::string, Uniform > uniforms;
         
         void LoadUniforms( MTLRenderPipelineReflection* reflection );
+        id <MTLBuffer> GetUniformBuffer() { return uniformBuffer; }
 
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
+        id <MTLBuffer> uniformBuffer;
 #endif
         /// Wraps an int that is defaulted to -1. Needed for uniform handling.
         struct IntDefaultedToMinusOne

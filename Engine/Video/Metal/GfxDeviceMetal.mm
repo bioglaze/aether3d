@@ -21,7 +21,6 @@ id <CAMetalDrawable> currentDrawable;
 CAMetalLayer* metalLayer;
 MTLRenderPassDescriptor *renderPassDescriptor = nullptr;
 id <MTLTexture> depthTex;
-id <MTLBuffer> uniformBuffer;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
 id<CAMetalDrawable> drawable;
@@ -42,7 +41,6 @@ namespace GfxDeviceGlobal
     int backBufferWidth = 0;
     int backBufferHeight = 0;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
-    //std::unordered_map< std::string, MTLRenderPipelineReflection* > psoReflection;
 }
 
 void ae3d::GfxDevice::Init( int width, int height )
@@ -118,9 +116,6 @@ void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
     depthStateDesc.depthCompareFunction = MTLCompareFunctionLess;
     depthStateDesc.depthWriteEnabled = YES;
     depthState = [device newDepthStencilStateWithDescriptor:depthStateDesc];
-    
-    uniformBuffer = [device newBufferWithLength:256 options:MTLResourceOptionCPUCacheModeDefault];
-    
 }
 
 id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
@@ -206,7 +201,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
     [renderEncoder setCullMode:MTLCullModeFront];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
-    [renderEncoder setVertexBuffer:uniformBuffer offset:0 atIndex:1];
+    [renderEncoder setVertexBuffer:shader.GetUniformBuffer() offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
     [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                               indexCount:(endIndex - startIndex) * 3

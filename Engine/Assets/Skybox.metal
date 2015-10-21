@@ -5,7 +5,7 @@ using namespace metal;
 
 typedef struct
 {
-    matrix_float4x4 modelview_projection_matrix;
+    matrix_float4x4 _ModelViewProjectionMatrix;
 } uniforms_t;
 
 typedef struct
@@ -33,7 +33,7 @@ vertex ColorInOut skybox_vertex(device vertex_t* vertex_array [[ buffer(0) ]],
     ColorInOut out;
     
     float4 in_position = float4(float3(vertex_array[vid].position), 1.0);
-    out.position = uniforms.modelview_projection_matrix * in_position;
+    out.position = uniforms._ModelViewProjectionMatrix * in_position;
     
     out.color = half4( vertex_array[vid].color );
     out.texCoords = float3(vertex_array[vid].position);
