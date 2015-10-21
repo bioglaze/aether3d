@@ -25,6 +25,8 @@ void DestroyTextures(); // Defined in Texture2D_D3D12.cpp
 namespace WindowGlobal
 {
     extern HWND hwnd;
+    extern int windowWidth;
+    extern int windowHeight;
 }
 
 namespace GfxDeviceGlobal
@@ -290,6 +292,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
     if (dhr == S_OK)
     {
         debugController->EnableDebugLayer();
+        debugController->Release();
     }
     else
     {
@@ -306,10 +309,6 @@ void ae3d::CreateRenderer( int /*samples*/ )
     GfxDeviceGlobal::commandListManager.Create( GfxDeviceGlobal::device );
     GfxDeviceGlobal::graphicsContext.Initialize( GfxDeviceGlobal::commandListManager );
 
-    DXGI_SWAP_CHAIN_DESC swapChainDesc{ {},{ 1, 0 }, DXGI_USAGE_RENDER_TARGET_OUTPUT, 2, WindowGlobal::hwnd, TRUE, DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH };
-    ZeroMemory( &swapChainDesc.BufferDesc, sizeof( swapChainDesc.BufferDesc ) );
-    swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
     IDXGIFactory2 *dxgiFactory = nullptr;
     unsigned factoryFlags = 0;
 #if DEBUG
@@ -318,7 +317,18 @@ void ae3d::CreateRenderer( int /*samples*/ )
     hr = CreateDXGIFactory2( factoryFlags, IID_PPV_ARGS( &dxgiFactory ) );
     AE3D_CHECK_D3D( hr, "Failed to create DXGI factory" );
 
-    hr = dxgiFactory->CreateSwapChain( GfxDeviceGlobal::commandListManager.GetCommandQueue(), &swapChainDesc, (IDXGISwapChain**)&GfxDeviceGlobal::swapChain );
+    DXGI_SWAP_CHAIN_DESC1 swapChainDesc1 = {};
+    swapChainDesc1.BufferCount = 2;
+    swapChainDesc1.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapChainDesc1.Flags = 0;
+    swapChainDesc1.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapChainDesc1.Width = WindowGlobal::windowWidth;
+    swapChainDesc1.Height = WindowGlobal::windowHeight;
+    swapChainDesc1.SampleDesc.Count = 1;
+    swapChainDesc1.SampleDesc.Quality = 0;
+    swapChainDesc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+
+    hr = dxgiFactory->CreateSwapChainForHwnd( GfxDeviceGlobal::commandListManager.GetCommandQueue(), WindowGlobal::hwnd, &swapChainDesc1, nullptr, nullptr, (IDXGISwapChain1**)&GfxDeviceGlobal::swapChain );
     AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
     dxgiFactory->Release();
 
