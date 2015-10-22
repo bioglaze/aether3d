@@ -10,11 +10,12 @@ namespace ae3d
     class RenderTexture : public TextureBase
     {
   public:
-      enum class DataType
-      {
-          UByte,
-          Float
-      };
+        /// Data type.
+        enum class DataType
+        {
+            UByte,
+            Float
+        };
 
         /// \param width Width.
         /// \param height Height.

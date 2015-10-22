@@ -218,8 +218,6 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
 
     ovr_SetEnabledCaps( Global::hmd, 0 );
 
-    ovr_ConfigureTracking( Global::hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0 );
-
     wglSwapIntervalEXT( 0 );
 }
 
@@ -228,8 +226,8 @@ void ae3d::VR::CalcEyePose()
     Global::ViewOffset[ 0 ] = Global::EyeRenderDesc[ 0 ].HmdToEyeViewOffset;
     Global::ViewOffset[ 1 ] = Global::EyeRenderDesc[ 1 ].HmdToEyeViewOffset;
 
-    ovrFrameTiming ftiming = ovr_GetFrameTiming( Global::hmd, 0 );
-    ovrTrackingState hmdState = ovr_GetTrackingState( Global::hmd, ftiming.DisplayMidpointSeconds );
+    double ftiming = ovr_GetPredictedDisplayTime( Global::hmd, 0 );
+    ovrTrackingState hmdState = ovr_GetTrackingState( Global::hmd, ftiming, ovrTrue );
     ovr_CalcEyePoses( hmdState.HeadPose.ThePose, Global::ViewOffset, Global::EyeRenderPose );
 }
 

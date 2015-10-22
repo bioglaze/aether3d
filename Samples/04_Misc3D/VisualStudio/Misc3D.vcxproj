@@ -178,7 +178,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LibOVRKernel.lib;OleAut32.lib;Advapi32.lib;libOpenAL32.dll.a;Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib;..\LibOVR\Lib\Windows\x64\Release\VS2013\LibOVR.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\LibOVRKernel\Lib\Windows\x64\Release\VS2015\LibOVRKernel.lib;OleAut32.lib;Advapi32.lib;libOpenAL32.dll.a;Aether3D_GL45.lib;OpenGL32.lib;User32.lib;Gdi32.lib;..\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>
