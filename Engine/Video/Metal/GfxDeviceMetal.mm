@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 #import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
 #endif

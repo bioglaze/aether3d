@@ -1,7 +1,7 @@
 #ifndef GFX_DEVICE_H
 #define GFX_DEVICE_H
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
 #endif
@@ -36,7 +36,7 @@ namespace ae3d
         };
         
         void Init( int width, int height );
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         void Init( CAMetalLayer* metalLayer );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
         id <MTLDevice> GetMetalDevice();

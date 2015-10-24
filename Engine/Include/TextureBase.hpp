@@ -1,7 +1,7 @@
 #ifndef TEXTURE_BASE_H
 #define TEXTURE_BASE_H
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 #import <Metal/Metal.h>
 #endif
 #if AETHER3D_D3D12
@@ -49,7 +49,7 @@ namespace ae3d
   public:
         /// \return id.
         unsigned GetID() const { return handle; }
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         id<MTLTexture> GetMetalTexture() const { return metalTexture; }
 #endif
         /// \return Anisotropy.
@@ -95,7 +95,7 @@ namespace ae3d
         bool opaque = true;
         /// Anisotropy.
         float anisotropy = 1;
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         id<MTLTexture> metalTexture;  
 #endif
 #if AETHER3D_D3D12

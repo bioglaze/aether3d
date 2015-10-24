@@ -1,7 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 #import <UIKit/UIKit.h>
 #import <QuartzCore/CAMetalLayer.h>
 #endif
@@ -18,13 +18,14 @@
 
    <ul>
    <li>Windows, OS X, iOS and GNU/Linux.</li>
-   <li>OpenGL 4.1, 4.5 and Metal renderers.</li>
+   <li>OpenGL 4.1, 4.5, Metal and D3D12 (WIP) renderers.</li>
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
    <li>Virtual file system aka .pak archive files for faster loading.</li>
    <li>Custom mesh format, converters included for .obj and Blender.</li>
    <li>Shadow mapping from a directional light (no lighting yet)</li>
+   <li>Oculus Rift support.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Scene serialization.</li>
    <li>Scene editor built using Qt.</li>
@@ -52,6 +53,12 @@
    Run mingw32-make in Engine/.
    Then run mingw32-make in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
 
+   \subsection win_oculus Windows/Oculus Rift
+
+   Copy LibOVR and LibOVRKernel folders from Oculus SDK into Engine\ThirdParty and compile their release versions using VS2015.
+   Open Engine/VisualStudio_GL45 and build target Release.
+   Open Samples/04_Misc3D and build target Oculus Release.
+ 
    \subsection osx OS X/Xcode
 
    Build Engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making
@@ -90,7 +97,7 @@ namespace ae3d
         /// Loads OpenGL function pointers and sets backbuffer dimension. Doesn't create a context.
         void InitGfxDeviceForEditor( int width, int height );
         
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         void InitMetal( CAMetalLayer* metalLayer );
         void EndFrame();
         void BeginFrame();

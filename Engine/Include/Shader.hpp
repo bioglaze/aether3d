@@ -3,7 +3,7 @@
 
 #include <map>
 #include <string>
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 #import <Metal/Metal.h>
 #endif
 #if AETHER3D_D3D12
@@ -39,7 +39,7 @@ namespace ae3d
                    const char* metalVertexShaderName, const char* metalFragmentShaderName,
                    const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL );
         
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
 #endif
 
@@ -86,7 +86,7 @@ namespace ae3d
         ID3DBlob* blobShaderPixel = nullptr;
 #endif
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         enum class UniformType { Float, Float2, Float3, Float4, Matrix4x4 };
         
         struct Uniform

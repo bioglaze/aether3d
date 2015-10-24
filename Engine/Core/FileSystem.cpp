@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 const char* GetFullPath( const char* fileName )
 {
     NSBundle *b = [NSBundle mainBundle];

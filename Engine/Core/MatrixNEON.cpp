@@ -1,4 +1,4 @@
-#if AETHER3D_IOS && !(__i386__)
+#if AETHER3D_METAL && !(__i386__)
 #include "Matrix.hpp"
 #include <cstring>
 #include <cmath>

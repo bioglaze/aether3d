@@ -20,7 +20,7 @@ void ae3d::System::InitGfxDeviceForEditor( int width, int height )
     GfxDevice::Init( width, height );
 }
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 void ae3d::System::InitMetal( CAMetalLayer* metalLayer )
 {
     GfxDevice::Init( metalLayer );

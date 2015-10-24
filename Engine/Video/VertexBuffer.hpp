@@ -1,7 +1,7 @@
 #ifndef VERTEX_BUFFER_H
 #define VERTEX_BUFFER_H
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
 #import <Metal/Metal.h>
 #endif
 #include "Vec3.hpp"
@@ -110,7 +110,7 @@ namespace ae3d
         /// \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount );
 
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         id<MTLBuffer> GetVertexBuffer() const { return vertexBuffer; }
         id<MTLBuffer> GetIndexBuffer() const { return indexBuffer; }
 #endif
@@ -136,7 +136,7 @@ namespace ae3d
         unsigned vboId = 0;
         unsigned iboId = 0;
         
-#if AETHER3D_IOS
+#if AETHER3D_METAL
         id<MTLBuffer> vertexBuffer;
         id<MTLBuffer> indexBuffer;
 #endif

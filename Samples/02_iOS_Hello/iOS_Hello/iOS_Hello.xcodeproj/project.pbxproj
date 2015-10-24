@@ -310,7 +310,7 @@
 					"~/Desktop",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					AETHER3D_IOS,
+					AETHER3D_METAL,
 					"DEBUG=1",
 				);
 				INFOPLIST_FILE = iOS_Hello/Info.plist;
@@ -332,7 +332,7 @@
 					"$(inherited)",
 					"~/Desktop",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_IOS;
+				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_METAL;
 				INFOPLIST_FILE = iOS_Hello/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = YES;
