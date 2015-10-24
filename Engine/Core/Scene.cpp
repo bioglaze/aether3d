@@ -40,6 +40,11 @@ namespace MathUtil
     }
 }
 
+namespace Global
+{
+    extern Vec3 vrEyePosition;
+}
+
 namespace SceneGlobal
 {
     GameObject shadowCamera;
@@ -350,9 +355,15 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
     
+    float fovDegrees = camera->GetFovDegrees();
+    Vec3 position = cameraTransform->GetLocalPosition();
+
     // TODO: Maybe add a VR flag into camera to select between HMD and normal pose.
 #if OCULUS_RIFT
     view = cameraGo->GetComponent< TransformComponent >()->GetVrView();
+    position = Global::vrEyePosition;
+    float GetVRFov();
+    fovDegrees = GetVRFov();
 #else
     cameraTransform->GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
@@ -364,7 +375,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     
     if (camera->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
     {
-        frustum.SetProjection( camera->GetFovDegrees(), camera->GetAspect(), camera->GetNear(), camera->GetFar() );
+        frustum.SetProjection( fovDegrees, camera->GetAspect(), camera->GetNear(), camera->GetFar() );
     }
     else
     {
@@ -372,7 +383,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     }
     
     const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
-    frustum.Update( cameraTransform->GetLocalPosition(), viewDir );
+    frustum.Update( position, viewDir );
 
     std::vector< unsigned > gameObjectsWithMeshRenderer;
     gameObjectsWithMeshRenderer.reserve( gameObjects.size() );

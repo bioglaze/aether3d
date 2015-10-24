@@ -50,7 +50,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 150 );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.AddComponent<TransformComponent>();
-    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     RenderTexture cubeRT;
     cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
@@ -214,6 +214,10 @@ int main()
                 {
                     quit = true;
                 }
+                else if (keyCode == KeyCode::Space)
+                {
+                    VR::RecenterTracking();
+                }
                 else if (keyCode == KeyCode::R)
                 {
                     System::ReloadChangedAssets();
@@ -279,6 +283,14 @@ int main()
             {
                 gamePadRightThumbX = event.gamePadThumbX;
                 gamePadRightThumbY = event.gamePadThumbY;
+            }
+            if (event.type == WindowEventType::GamePadButtonY)
+            {
+                camera.GetComponent<TransformComponent>()->MoveUp( 0.1f );
+            }
+            if (event.type == WindowEventType::GamePadButtonA)
+            {
+                camera.GetComponent<TransformComponent>()->MoveUp( -0.1f );
             }
         }
 

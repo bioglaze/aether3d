@@ -1,5 +1,6 @@
 #include "VR.hpp"
 #include "GameObject.hpp"
+#include "System.hpp"
 
 #if OCULUS_RIFT
 
@@ -57,8 +58,7 @@ struct TextureBuffer
 
         if (displayableOnHmd)
         {
-            // This texture isn't necessarily going to be a rendertarget, but it usually is.
-            OVR_ASSERT( hmd ); // No HMD? A little odd.
+            OVR_ASSERT( hmd );
 
             ovr_CreateSwapTextureSetGL( hmd, GL_RGBA, size.w, size.h, &TextureSet );
 
@@ -153,6 +153,15 @@ namespace Global
     GLuint mirrorFBO = 0;
     ovrPosef EyeRenderPose[ 2 ];
     ovrVector3f ViewOffset[ 2 ];
+    Vec3 vrEyePosition; // Used in Scene.cpp for frustum culling
+}
+
+float GetVRFov()
+{
+    float fov = std::atan( Global::HMD.DefaultEyeFov[ 0 ].UpTan ) * 2;
+    float fovDegrees = fov * 180.0f / 3.14159265f;
+    //ae3d::System::Print("fov: %f, degrees: %f\n", fov, fovDegrees );
+    return fovDegrees;
 }
 
 void ae3d::VR::Init()
@@ -274,6 +283,11 @@ void ae3d::VR::SubmitFrame()
     glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
 }
 
+void ae3d::VR::RecenterTracking()
+{
+    ovr_RecenterPose( Global::hmd );
+}
+
 void ae3d::VR::CalcCameraForEye( GameObject& camera, float yawDegrees, int eye )
 {
     if (!camera.GetComponent< TransformComponent >() || !camera.GetComponent< CameraComponent >())
@@ -289,9 +303,13 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float yawDegrees, int eye )
     OVR::Vector3f finalUp = finalRollPitchYaw.Transform( OVR::Vector3f( 0, 1, 0 ) );
     OVR::Vector3f finalForward = finalRollPitchYaw.Transform( OVR::Vector3f( 0, 0, -1 ) );
     OVR::Vector3f shiftedEyePos = cameraPosOVR + rollPitchYaw.Transform( Global::EyeRenderPose[ eye ].Position );
+    Global::vrEyePosition = { shiftedEyePos.x, shiftedEyePos.y, shiftedEyePos.z };
+
+    const float nearPlane = camera.GetComponent< CameraComponent >()->GetNear();
+    const float farPlane = camera.GetComponent< CameraComponent >()->GetFar();
 
     OVR::Matrix4f view = OVR::Matrix4f::LookAtRH( shiftedEyePos, shiftedEyePos + finalForward, finalUp );
-    OVR::Matrix4f proj = ovrMatrix4f_Projection( Global::HMD.DefaultEyeFov[ eye ], 0.2f, 1000.0f, ovrProjection_RightHanded );
+    OVR::Matrix4f proj = ovrMatrix4f_Projection( Global::HMD.DefaultEyeFov[ eye ], nearPlane, farPlane, ovrProjection_RightHanded );
 
     Matrix44 viewMat;
     view.Transpose();
@@ -319,6 +337,10 @@ void ae3d::VR::GetIdealWindowSize( int& outWidth, int& outHeight )
 }
 
 void ae3d::VR::StartTracking( int /*windowWidth*/, int /*windowHeight*/ )
+{
+}
+
+void ae3d::VR::RecenterTracking()
 {
 }
 

@@ -38,6 +38,9 @@ namespace ae3d
         /// \param yawDegrees Yaw in degrees.
         /// \param eye 0 for left eye, 1 for right.
         void CalcCameraForEye( GameObject& camera, float yawDegrees, int eye );
+
+        /// Re-centers the sensor position and orientation.
+        void RecenterTracking();
     }
 }
 
