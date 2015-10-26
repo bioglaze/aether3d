@@ -1,4 +1,5 @@
 #include "Texture2D.hpp"
+#include "RenderTexture.hpp"
 #include <algorithm>
 #include <vector>
 #include <sstream>
@@ -78,6 +79,14 @@ void Tokenize( const std::string& str,
         pos = str.find_first_of( delimiters, lastPos );
     }
 }
+}
+
+void ae3d::RenderTexture::Create2D( int, int, RenderTexture::DataType, TextureWrap, TextureFilter )
+{
+}
+
+void ae3d::RenderTexture::CreateCube( int, RenderTexture::DataType, TextureWrap, TextureFilter )
+{
 }
 
 const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
