@@ -2,6 +2,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <cstdint>
 #if defined __APPLE__
 #    include <OpenAL/al.h>
 #    include <OpenAL/alc.h>
@@ -19,9 +20,10 @@ extern ae3d::FileWatcher fileWatcher;
 
 struct ClipInfo
 {
-    ALuint bufID;
-    ALuint srcID;
+    ALuint bufID = 0;
+    ALuint srcID = 0;
     std::string path;
+    float lengthInSeconds = 0;
 };
 
 namespace AudioGlobal
@@ -35,30 +37,26 @@ namespace
 {
 /**
  * WAVE structure which is used by .wav files.
- * Follows the specification at the following URI:
- * <http://ccrma.stanford.edu/courses/422/projects/WaveFormat/>
- *
- * Assumes that unsigned int is 4 bytes and unsigned short is 2 bytes.
  */
 struct WAVE
 {
-    unsigned char chunkID[ 4 ];
-    unsigned chunkSize;
-    unsigned char format[4];
+    std::uint8_t chunkID[ 4 ];
+    std::uint32_t chunkSize;
+    std::uint8_t format[4];
     
     // Format sub chunk
-    unsigned char subchunk1ID[ 4 ];
-    unsigned subchunk1Size;
-    unsigned short audioFormat;
-    unsigned short numChannels;
-    unsigned sampleRate;
-    unsigned byteRate;
-    unsigned short blockAlign;
-    unsigned short bitsPerSample;
+    std::uint8_t subchunk1ID[ 4 ];
+    std::uint32_t subchunk1Size;
+    std::uint16_t audioFormat;
+    std::uint16_t numChannels;
+    std::uint32_t sampleRate;
+    std::uint32_t bytesPerSecond;
+    std::uint16_t blockAlign;
+    std::uint16_t bitsPerSample;
     
     // Data sub chunk
-    unsigned char subchunk2ID[ 4 ]; // Data sub chunk ID.
-    unsigned subchunk2Size; // Data sub chunk size.
+    std::uint8_t subchunk2ID[ 4 ]; // Data sub chunk ID.
+    std::uint32_t subchunk2Size; // Data sub chunk size.
     std::vector< unsigned char > data; // Chunk data.
 };
 
@@ -84,7 +82,7 @@ void CheckOpenALError( const char* info )
     }
 }
 
-void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, const ClipInfo& info )
+void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info )
 {
     short* decoded = nullptr;
     int channels = 0;
@@ -104,11 +102,13 @@ void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, const ClipInfo
     const ALenum format = vinfo.channels == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
     
     alBufferData( info.bufID, format, &decoded[0], len, vinfo.sample_rate );
-    
+
+    info.lengthInSeconds = stb_vorbis_stream_length_in_seconds( vorbis );
+
     CheckOpenALError("Loading ogg");
 }
 
-void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, const ClipInfo& info )
+void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info )
 {
     std::istringstream ifs( std::string( clipData.data.begin(), clipData.data.end() ) );
 
@@ -156,7 +156,7 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, const ClipInfo
     
     ifs.read( (char*)&wav.numChannels,   2 );
     ifs.read( (char*)&wav.sampleRate,    4 );
-    ifs.read( (char*)&wav.byteRate,      4 );
+    ifs.read( (char*)&wav.bytesPerSecond,4 );
     ifs.read( (char*)&wav.blockAlign,    2 );
     ifs.read( (char*)&wav.bitsPerSample, 2 );
     
@@ -209,7 +209,10 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, const ClipInfo
         ae3d::System::Print( "Audio: Unknown format in file %s\n", clipData.path.c_str() );
     }
 
-    alBufferData( info.bufID, format, wav.data.data(), dataSize, wav.sampleRate );    
+    alBufferData( info.bufID, format, wav.data.data(), dataSize, wav.sampleRate );
+    
+    info.lengthInSeconds = dataSize / static_cast< float >(wav.bytesPerSecond);
+    
     CheckOpenALError( "Loading .wav data." );
 }
 }
@@ -228,7 +231,7 @@ void AudioReload( const std::string& path )
             }
             else if (extension == "ogg" || extension == "OGG")
             {
-                LoadOgg(ae3d::FileSystem::FileContents(path.c_str()), clip);
+                LoadOgg( ae3d::FileSystem::FileContents( path.c_str() ), clip );
             }
             ae3d::System::Print("after reload\n");
         }
@@ -312,6 +315,7 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     {
         System::Print( "Unsupported audio file extension in %d. Must be .wav or .ogg.\n", clipData.path.c_str() );
     }
+    
     alListener3f( AL_POSITION, 0.0f, 0.0f, 0.0f );
     alSource3f( info.srcID, AL_POSITION, 0.0f, 0.0f, 0.0f );
     alSourcei( info.srcID, AL_BUFFER, info.bufID );
@@ -320,6 +324,11 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     fileWatcher.AddFile( clipData.path, AudioReload );
 
     return clipId;
+}
+
+float ae3d::AudioSystem::GetClipLengthForId( unsigned handle )
+{
+    return AudioGlobal::clips[ handle ].lengthInSeconds;
 }
 
 void ae3d::AudioSystem::Play( unsigned clipId )

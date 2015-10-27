@@ -14,7 +14,7 @@ namespace ae3d
         bool CastsShadow() const { return castsShadow; }
         
         /// \param enable If true, the light will cast a shadow.
-        /// \param shadowMapSize Shadow map size in pixels.
+        /// \param shadowMapSize Shadow map size in pixels. If it's invalid, it falls back to 512.
         void SetCastShadow( bool enable, int shadowMapSize );
 
         /// \return Serialized data.

@@ -8,25 +8,21 @@ namespace ae3d
         struct FileContentsData;
     }
     
-    class Texture2D;
-    class VertexBuffer;
-    struct Vec4;
-
     /// Contains glyphs loaded from AngelCode BMFont files. For Mac there is a compatible program called BMGlyph.
     class Font
     {
       public:
-        /** Constructor. */
+        /// Constructor.
         Font();
         
         /**
           \param fontTex Font texture. No outline support.
           \param metaData BMFont metadata. Must be text or binary.
          */
-        void LoadBMFont(const Texture2D* fontTex, const FileSystem::FileContentsData& metaData);
+        void LoadBMFont( const class Texture2D* fontTex, const FileSystem::FileContentsData& metaData );
         
         /** \return Font texture. */
-        const Texture2D* GetTexture() { return texture; }
+        const Texture2D* GetTexture() const { return texture; }
         
         /// \return Text width.
         int TextWidth( const char* text ) const;
@@ -47,7 +43,7 @@ namespace ae3d
          \param color Color in range 0-1.
          \param outVertexBuffer Vertex buffer created from text.
          */
-        void CreateVertexBuffer( const char* text, const Vec4& color, VertexBuffer& outVertexBuffer ) const;
+        void CreateVertexBuffer( const char* text, const struct Vec4& color, class VertexBuffer& outVertexBuffer ) const;
 
         /** \param metaData BMFont text metadata. */
         void LoadBMFontMetaText(const FileSystem::FileContentsData& metaData);

@@ -10,10 +10,10 @@ namespace ae3d
 
     namespace AudioSystem
     {
-        /* Creates the audio device. Must be called before other methods in this namespace. */
+        /// Creates the audio device. Must be called before other methods in this namespace.
         void Init();
         
-        /* Releases all allocated handles and shuts down the audio system. */
+        /// Releases all allocated handles and shuts down the audio system.
         void Deinit();
         
         /*
@@ -24,7 +24,10 @@ namespace ae3d
          */
         unsigned GetClipIdForData( const FileSystem::FileContentsData& clipData );
         
-        /* \param clipId Clip handle from GetClipIdForData. */
+        /// \return Length in seconds.
+        float GetClipLengthForId( unsigned handle );
+        
+        /// \param clipId Clip handle from GetClipIdForData.
         void Play( unsigned clipId );
     }
 }

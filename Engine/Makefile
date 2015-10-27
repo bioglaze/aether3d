@@ -10,7 +10,7 @@ GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-priv
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
  -Wunsafe-loop-optimizations -Wvector-operation-performance -Wzero-as-null-pointer-constant
-CLANGWARNINGS := -Wall -ansi -pedantic
+CLANGWARNINGS := -Wall -Wextra -ansi -pedantic
 
 ifeq ($(COMPILER), clang)
 WARNINGS := $(CLANGWARNGING)

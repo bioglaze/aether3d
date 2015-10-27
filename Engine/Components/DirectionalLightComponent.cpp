@@ -23,11 +23,12 @@ ae3d::DirectionalLightComponent* ae3d::DirectionalLightComponent::Get( unsigned 
 void ae3d::DirectionalLightComponent::SetCastShadow( bool enable, int shadowMapSize )
 {
     castsShadow = enable;
-
+    const int mapSize = (shadowMapSize > 0 && shadowMapSize < 16385) ? shadowMapSize : 512;
+    
     // TODO: create only if not already created with current size.
-    if (castsShadow && shadowMapSize > 0)
+    if (castsShadow)
     {
-        shadowMap.Create2D( shadowMapSize, shadowMapSize, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear );
+        shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear );
     }
 }
 

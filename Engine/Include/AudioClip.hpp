@@ -12,14 +12,18 @@ namespace ae3d
     class AudioClip
     {
       public:
-        /** Loads a clip from .wav or Ogg Vorbis file data. */
+        /// \param clipData Clip data from .wav or .ogg file.
         void Load( const FileSystem::FileContentsData& clipData );
 
-        /** \return Clip's handle. */
-        unsigned GetId() const { return id; }
+        /// \return Clip's handle.
+        unsigned GetId() const { return handle; }
 
+        /// \return Clip's length in seconds.
+        float LengthInSeconds() const { return length; }
+        
       private:
-        unsigned id = 0;
+        unsigned handle = 0;
+        float length = 0;
     };
 }
 

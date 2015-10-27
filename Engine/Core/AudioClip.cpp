@@ -4,5 +4,6 @@
 
 void ae3d::AudioClip::Load( const FileSystem::FileContentsData& clipData )
 {
-    id = AudioSystem::GetClipIdForData( clipData );
+    handle = AudioSystem::GetClipIdForData( clipData );
+    length = AudioSystem::GetClipLengthForId( handle );
 }

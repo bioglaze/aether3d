@@ -95,6 +95,9 @@ int main()
     cube.AddComponent< TransformComponent >();
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -100 } );
 
+    GameObject copiedCube = cube;
+    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -100 } );
+
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
@@ -148,6 +151,7 @@ int main()
     scene.Add( &camera );
     //scene.Add( &cameraCubeRT );
     scene.Add( &cube );
+    scene.Add( &copiedCube );
     //scene.Add( &cube2 );
     scene.Add( &statsContainer );
     scene.Add( &dirLight );
@@ -186,6 +190,22 @@ int main()
     
     while (Window::IsOpen() && !quit)
     {
+#if OCULUS_RIFT
+        VR::CalcEyePose();
+        
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            VR::SetEye( eye );
+            VR::CalcCameraForEye( camera, yaw, eye );
+            scene.Render();
+            VR::UnsetEye( eye );
+        }
+        
+        VR::SubmitFrame();
+#else
+        scene.Render();
+#endif
+
         Window::PumpEvents();
         WindowEvent event;
         
@@ -303,21 +323,6 @@ int main()
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
         //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
-#if OCULUS_RIFT
-        VR::CalcEyePose();
-
-        for (int eye = 0; eye < 2; ++eye)
-        {
-            VR::SetEye( eye );
-            VR::CalcCameraForEye( camera, yaw, eye );
-            scene.Render();
-            VR::UnsetEye( eye );
-        }
-
-        VR::SubmitFrame();
-#else
-        scene.Render();
-#endif
         Window::SwapBuffers();
     }
 
