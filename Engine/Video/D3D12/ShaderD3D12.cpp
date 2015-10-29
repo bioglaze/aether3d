@@ -33,6 +33,11 @@ void DestroyShaders()
     {
         AE3D_SAFE_RELEASE( Global::shaders[ i ] );
     }
+
+    for (std::size_t i = 0; i < Global::constantBuffers.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( Global::constantBuffers[ i ] );
+    }
 }
 
 namespace

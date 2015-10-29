@@ -10,6 +10,7 @@
 class CommandContext
 {
 public:
+    static void Destroy();
     static CommandContext& Begin();
     void Reset();
     void Initialize( class CommandListManager& commandListManager );

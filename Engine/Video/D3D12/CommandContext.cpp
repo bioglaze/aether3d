@@ -32,6 +32,23 @@ CommandContext* CommandContext::AllocateContext()
     return ret;
 }
 
+void CommandContext::Destroy()
+{
+    for (auto& ctx : sContextPool)
+    {
+        AE3D_SAFE_RELEASE( ctx->graphicsCommandList );
+        AE3D_SAFE_RELEASE( ctx->currentAllocator );
+    }
+    
+    while (!sFreePool.empty())
+    {
+        auto fctx = sFreePool.front();
+        AE3D_SAFE_RELEASE( fctx->graphicsCommandList );
+        AE3D_SAFE_RELEASE( fctx->currentAllocator );
+        sFreePool.pop();
+    }
+}
+
 void CommandContext::Reset()
 {
     ae3d::System::Assert( graphicsCommandList != nullptr && currentAllocator == nullptr, "CommandContext was not initialized" );
@@ -42,8 +59,12 @@ void CommandContext::Reset()
 void CommandContext::Initialize( CommandListManager& commandListManager )
 {
     owningManager = &commandListManager;
-    owningManager->CreateNewCommandList( &graphicsCommandList, &currentAllocator );
-    graphicsCommandList->SetName( L"Command context graphics command list" );
+    
+    if (!graphicsCommandList)
+    {
+        owningManager->CreateNewCommandList( &graphicsCommandList, &currentAllocator );
+        graphicsCommandList->SetName( L"Command context graphics command list" );
+    }
 }
 
 void CommandContext::TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState )

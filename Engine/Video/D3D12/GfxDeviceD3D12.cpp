@@ -119,6 +119,7 @@ void CreateRootSignature()
 
     hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
     AE3D_CHECK_D3D( hr, "Failed to create root signature" );
+    GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
 }
 
 std::string GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
@@ -249,6 +250,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     ID3D12PipelineState* pso;
     HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
+    pso->SetName( L"PSO" );
 
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
@@ -429,23 +431,32 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     DestroyVertexBuffers();
     DestroyShaders();
     DestroyTextures();
-    GfxDeviceGlobal::commandListManager.Destroy();
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsContext.graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     DescriptorHeapManager::Deinit();
-    GfxDeviceGlobal::commandListManager.Destroy();
 
     for (auto& pso : GfxDeviceGlobal::psoCache)
     {
         AE3D_SAFE_RELEASE( pso.second );
     }
 
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 0 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 1 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
+
+    CommandContext::Destroy();
+    GfxDeviceGlobal::commandListManager.Destroy();
+
+/*#if _DEBUG
+    ID3D12DebugDevice* d3dDebug = nullptr;
+    GfxDeviceGlobal::device->QueryInterface(__uuidof(ID3D12DebugDevice), reinterpret_cast<void**>(&d3dDebug));
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
+    d3dDebug->ReportLiveDeviceObjects( D3D12_RLDO_DETAIL );
+    AE3D_SAFE_RELEASE( d3dDebug );
+#else*/
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
+//#endif
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )

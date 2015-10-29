@@ -10,7 +10,7 @@ namespace ae3d
     /// Stores an orientation.
     struct Quaternion
     {
-        /** Constructor. */
+        /// Constructor.
         Quaternion() : x( 0 ), y( 0 ), z( 0 ), w( 1 ) {}
         
         /**
@@ -18,7 +18,16 @@ namespace ae3d
          \param aW w.
          */
         Quaternion( const Vec3& vec, float aW ) : x( vec.x ), y( vec.y ), z( vec.z ), w( aW ) {}
+  
+        /// Move constructor
+        Quaternion( Quaternion&& v ) noexcept = default;
+
+        /// Move assignment
+        Quaternion& operator=( Quaternion&& ) noexcept = default;
         
+        /// Copy
+        Quaternion& operator=( const Quaternion& ) = default;
+
         /**
          \brief Multiplying a quaternion q with a vector v applies the q-rotation to vec.
          

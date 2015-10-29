@@ -187,7 +187,7 @@ int main()
     float gamePadRightThumbY = 0;
     
     float angle = 0;
-    
+   
     while (Window::IsOpen() && !quit)
     {
 #if OCULUS_RIFT

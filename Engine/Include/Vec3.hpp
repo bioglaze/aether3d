@@ -97,7 +97,7 @@ namespace ae3d
          \param v2 Other vector.
          \return Dot product of vectors v1 and v2.
          */
-        static float Dot(const Vec3& v1, const Vec3& v2)
+        static float Dot( const Vec3& v1, const Vec3& v2 )
         {
             return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
         }
@@ -114,8 +114,11 @@ namespace ae3d
         // Default constructor
         Vec3() {}
 
+        /// Move constructor
+        Vec3( Vec3&& v ) noexcept = default;
+
         /// Copy constructor.
-        Vec3( const Vec3& other ) = default;
+        Vec3( const Vec3& other ) noexcept = default;
 
         /**
          Constructor.
@@ -124,7 +127,10 @@ namespace ae3d
          \param ay Y-coordinate.
          \param az Z-coordinate.
          */
-        Vec3( float ax, float ay, float az ) : x(ax), y(ay), z(az) {}
+        Vec3( float ax, float ay, float az ) noexcept : x(ax), y(ay), z(az) {}
+
+        /// Move assignment
+        Vec3& operator=( Vec3&& ) noexcept = default;
 
         /**
            Divides by a scalar operator.
@@ -363,7 +369,13 @@ namespace ae3d
          \param az Z-coordinate.
          \param aw W-coordinate.
          */
-        Vec4(float ax, float ay, float az, float aw) : x(ax), y(ay), z(az), w(aw) {}
+        Vec4( float ax, float ay, float az, float aw ) : x( ax ), y( ay ), z( az ), w( aw ) {}
+
+        /// Move constructor
+        Vec4( Vec4&& v ) noexcept = default;
+
+        /// Copy constructor.
+        Vec4( const Vec4& other ) noexcept = default;
 
         /// \param v Vec3
         explicit Vec4(const Vec3& v) : x(v.x), y(v.y), z(v.z), w(1) {}
@@ -374,7 +386,15 @@ namespace ae3d
            \param v Vec3
            \param aW .w component
            */
-        Vec4(const Vec3& v, float aW) : x(v.x), y(v.y), z(v.z), w(aW) {}
+        Vec4( const Vec3& v, float aW ) : x( v.x ), y( v.y ), z( v.z ), w(aW) {}
+
+        /**
+        Assignment operator.
+
+        \param v a vector that is assigned to this vector.
+        \return Reference to this vector.
+        */
+        Vec4& operator=( const Vec4& v ) { x = v.x; y = v.y; z = v.z; w = v.w; return *this; }
 
         /**
          Multiplication operator.
@@ -382,7 +402,7 @@ namespace ae3d
          \param f A value that is multiplied with this vector.
          \return This vector multiplied by f.
          */
-        Vec4 operator*(float f) const
+        Vec4 operator*( float f ) const
         {
             return Vec4(x * f, y * f, z * f, w * f);
         }
@@ -392,7 +412,7 @@ namespace ae3d
 
          \param v Vector that is to be added to this vector.
          */
-        Vec4& operator+=(const Vec4& v)
+        Vec4& operator+=( const Vec4& v )
         {
             x += v.x;
             y += v.y;
@@ -406,7 +426,7 @@ namespace ae3d
 
          \param v Vector that is to be subtracted from this vector.
          */
-        Vec4& operator-=(const Vec4& v)
+        Vec4& operator-=( const Vec4& v )
         {
             x -= v.x;
             y -= v.y;
@@ -421,13 +441,13 @@ namespace ae3d
          \param v another vector.
          \return Dot product of this vector and v.
          */
-        float Dot(const Vec4& v) const
+        float Dot( const Vec4& v ) const
         {
             return x * v.x + y * v.y + z * v.z + w * v.w;
         }
 
         /// \return length.
-        float Length() const { return std::sqrt(x * x + y * y + z * z); }
+        float Length() const { return std::sqrt( x * x + y * y + z * z ); }
 
         /**
          Normalizes this vector.
@@ -436,7 +456,7 @@ namespace ae3d
         {
             const float len = Length();
 
-            if (std::abs(len) < 0.0001f)
+            if (std::abs( len ) < 0.0001f)
             {
                 x = 1;
                 y = 0;

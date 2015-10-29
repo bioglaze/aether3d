@@ -12,9 +12,11 @@ void CommandListManager::Create( ID3D12Device* aDevice )
     commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     HRESULT hr = device->CreateCommandQueue( &commandQueueDesc, IID_PPV_ARGS( &commandQueue ) );
     AE3D_CHECK_D3D( hr, "Failed to create command queue" );
+    commandQueue->SetName( L"Managed Command Queue" );
 
     hr = device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS( &fence ) );
     AE3D_CHECK_D3D( hr, "Failed to create fence" );
+    fence->SetName( L"Fence" );
     fence->Signal( 0 );
 
     fenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
@@ -31,9 +33,11 @@ void CommandListManager::CreateNewCommandList( ID3D12GraphicsCommandList** outLi
 {
     HRESULT hr = device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( outAllocator ) );
     AE3D_CHECK_D3D( hr, "Failed to create command allocator" );
+    (*outAllocator)->SetName( L"Newed Command Queue" );
 
     hr = device->CreateCommandList( 1, D3D12_COMMAND_LIST_TYPE_DIRECT, *outAllocator, nullptr, IID_PPV_ARGS( outList ) );
     AE3D_CHECK_D3D( hr, "Failed to create command list" );
+    (*outList)->SetName( L"Newed Command List" );
 }
 
 ID3D12CommandAllocator* CommandListManager::RequestAllocator()
@@ -42,6 +46,7 @@ ID3D12CommandAllocator* CommandListManager::RequestAllocator()
     ID3D12CommandAllocator* outAllocator = nullptr;
     HRESULT hr = device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( &outAllocator ) );
     AE3D_CHECK_D3D( hr, "Failed to create command allocator" );
+    outAllocator->SetName( L"Command Allocator" );
     return outAllocator;
 }
 
