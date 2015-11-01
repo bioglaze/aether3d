@@ -93,10 +93,7 @@ int main()
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -100 } );
-
-    GameObject copiedCube = cube;
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -100 } );
+    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
 
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
@@ -120,6 +117,9 @@ int main()
     material.SetBackFaceCulling( true );
     
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+
+    GameObject copiedCube = cube;
+    copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
 
     Shader shaderCubeMap;
     shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );

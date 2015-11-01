@@ -83,6 +83,24 @@ void TestTransform()
                    "transform copy failed (scale)!" );
 }
 
+void TestGameObjectCopying()
+{
+    const Vec3 pos{ 1, 2, 3 };
+
+    GameObject go;
+    go.AddComponent< TransformComponent >();
+    go.GetComponent< TransformComponent >()->SetLocalPosition( pos );
+
+    GameObject copy = go;
+    copy.GetComponent< TransformComponent >()->SetLocalPosition( pos );    
+
+    System::Assert( copy.GetComponent< TransformComponent >()->GetLocalPosition().x == go.GetComponent< TransformComponent >()->GetLocalPosition().x &&
+                    copy.GetComponent< TransformComponent >()->GetLocalPosition().y == go.GetComponent< TransformComponent >()->GetLocalPosition().y &&
+                    copy.GetComponent< TransformComponent >()->GetLocalPosition().z == go.GetComponent< TransformComponent >()->GetLocalPosition().z,
+                    "GameObject copy failed (position)!" );
+
+}
+
 void TestText()
 {
     gGo.AddComponent< TextRendererComponent >();
@@ -134,6 +152,7 @@ int main()
     TestManyInstances();
     TestMesh();
     TestAddition();
+    TestGameObjectCopying();
 }
 
     

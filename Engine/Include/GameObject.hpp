@@ -39,7 +39,7 @@ namespace ae3d
         }
 
         /// \return The first component of type T or null if there is no such component.
-        template< class T > T* GetComponent()
+        template< class T > T* GetComponent() const
         {
             for (const auto& component : components)
             {
@@ -51,6 +51,15 @@ namespace ae3d
 
             return nullptr;
         }
+
+        /// Constructor.
+        GameObject() = default;
+
+        /// Copy constructor.
+        GameObject( const GameObject& other );
+
+        /// \param go Other game object.
+        GameObject& operator=( const GameObject& go );
 
         /// \param aName Game Object's name.
         void SetName( const char* aName ) { name = aName; }

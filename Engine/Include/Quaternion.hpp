@@ -18,7 +18,10 @@ namespace ae3d
          \param aW w.
          */
         Quaternion( const Vec3& vec, float aW ) : x( vec.x ), y( vec.y ), z( vec.z ), w( aW ) {}
-  
+
+        /// Copy constructor
+        Quaternion( const Quaternion& v ) = default;
+        
         /// Move constructor
         Quaternion( Quaternion&& v ) noexcept = default;
 

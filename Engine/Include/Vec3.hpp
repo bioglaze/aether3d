@@ -388,6 +388,18 @@ namespace ae3d
            */
         Vec4( const Vec3& v, float aW ) : x( v.x ), y( v.y ), z( v.z ), w(aW) {}
 
+        /// Compares this vector with another vector.
+        /// \param v2 Another vector.
+        /// \return True if vectors are almost equal.
+        bool IsAlmost( const Vec4& v2 ) const
+        {
+            const float epsilon = 0.0001f;
+            return std::abs( x - v2.x ) < epsilon &&
+                   std::abs( y - v2.y ) < epsilon &&
+                   std::abs( z - v2.z ) < epsilon &&
+                   std::abs( w - v2.w ) < epsilon;
+        }
+
         /**
         Assignment operator.
 

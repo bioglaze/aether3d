@@ -496,6 +496,12 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
     static_assert( sizeof( ae3d::Vec3 ) == 12, "" );
     static_assert( sizeof( VertexInd  ) ==  6, "" );
 
+    if (gMeshes.empty())
+    {
+        std::cerr << "Model doesn't contain any meshes, aborting!" << std::endl;
+        return;
+    }
+    
     std::ofstream ofs( aOutFile.c_str(), std::ios::binary );
 
     if (!ofs.is_open())

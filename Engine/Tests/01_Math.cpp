@@ -5,6 +5,35 @@
 
 using namespace ae3d;
 
+bool IsAlmost( float f1, float f2 )
+{
+    const float tolerance = 0.0001f;
+    return std::abs( f1 - f2 ) < tolerance;
+}
+
+void TestVec4()
+{
+    if (!Vec4( 1, 2, 3, 4 ).IsAlmost( Vec4( 1, 2, 3, 4 ) ))
+    {
+        std::cerr << "Vec4 IsAlmost or constructor failed!" << std::endl;
+    }
+
+    Vec4 vec1;
+
+    if (!vec1.IsAlmost( Vec4( 0, 0, 0, 0 ) ))
+    {
+        std::cerr << "Vec4 constructor failed!" << std::endl;
+    }
+
+    Vec4 vec2( { 1, 2, 3 } );
+
+    if (!vec2.IsAlmost( Vec4( 1, 2, 3, 1 ) ))
+    {
+        std::cerr << "Vec4 constructor failed!" << std::endl;
+    }
+
+}
+
 void TestVec3()
 {
     Vec3 vec1;
@@ -225,8 +254,11 @@ static bool TestQuatNormalize()
 {
     Quaternion q( Vec3( 2.5f, -1.3f, -5.2f ), 1.8f );
     q.Normalize();
-     // \todo test.
-     return true;
+
+    return IsAlmost( q.x,  0.404385f ) &&
+           IsAlmost( q.y, -0.21028f ) &&
+           IsAlmost( q.z, -0.84112f ) &&
+           IsAlmost( q.w,  0.291157f );
 }
 
 static bool TestQuatGetConjugate()
@@ -240,10 +272,10 @@ static bool TestQuatGetConjugate()
     const Quaternion result = q.Conjugate();
     const float acceptableDelta = 0.00001f;
 
-    if (std::fabs( -result.x - tx ) > acceptableDelta ||
-        std::fabs( -result.y - ty ) > acceptableDelta ||
-        std::fabs( -result.z - tz ) > acceptableDelta ||
-        std::fabs(  result.w - tw ) > acceptableDelta)
+    if (!IsAlmost( -result.x, tx ) ||
+        !IsAlmost( -result.y, ty ) ||
+        !IsAlmost( -result.z, tz ) ||
+        !IsAlmost(  result.w, tw))
     {
         return false;
     }
@@ -279,7 +311,8 @@ void TestQuaternion()
 
 int main()
 {
-    TestVec3();    
+    TestVec3();
+    TestVec4();
     TestMatrixTranspose();
     TestMatrixMultiply();
     TestMatrixInverse();
