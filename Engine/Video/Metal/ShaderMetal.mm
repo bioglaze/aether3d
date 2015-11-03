@@ -3,9 +3,11 @@
 #include "GfxDevice.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
+#include "RenderTexture.hpp"
 #include "System.hpp"
 
 extern id<MTLTexture> texture0;
+extern id<MTLTexture> texture1;
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
@@ -25,7 +27,7 @@ void ae3d::Shader::LoadFromLibrary( const char* vertexShaderName, const char* fr
 
     if (vertexProgram == nullptr)
     {
-        NSLog(@"Shader: Could not load %s!\n", vertexShaderName);
+        NSLog( @"Shader: Could not load %s!\n", vertexShaderName );
         return;
     }
     
@@ -34,16 +36,17 @@ void ae3d::Shader::LoadFromLibrary( const char* vertexShaderName, const char* fr
     
     if (fragmentProgram == nullptr)
     {
-        NSLog(@"Shader: Could not load %s!\n", fragmentShaderName);
+        NSLog( @"Shader: Could not load %s!\n", fragmentShaderName );
         return;
     }
     
-    id = 1;
-    uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceOptionCPUCacheModeDefault];
+    handle = 1;
 }
 
 void ae3d::Shader::Use()
 {
+    System::Assert( IsValid(), "Shader not loaded" );
+    GfxDevice::GetNewUniformBuffer();
 }
 
 void ae3d::Shader::LoadUniforms( MTLRenderPipelineReflection* reflection )
@@ -93,7 +96,6 @@ void ae3d::Shader::LoadUniforms( MTLRenderPipelineReflection* reflection )
             }
         }
     }
-
 }
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
@@ -103,6 +105,7 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
         return;
     }
     
+    id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
     uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniforms[ name ].offsetFromBufferStart;
     memcpy( bufferPointer, matrix4x4, 16 * 4 );
 }
@@ -111,28 +114,56 @@ void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int t
 {
     if (texture != nullptr)
     {
-        texture0 = const_cast<Texture2D*>(texture)->GetMetalTexture();
+        if (textureUnit == 0)
+        {
+            texture0 = const_cast< Texture2D* >( texture )->GetMetalTexture();
+        }
+        else if (textureUnit == 1)
+        {
+            texture1 = const_cast< Texture2D* >( texture )->GetMetalTexture();
+        }
     }
     else
     {
-        System::Print("Shader tried to set null texture\n");
+        System::Print( "Shader tried to set null texture\n" );
     }
 }
 
 void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* renderTexture, int textureUnit )
 {
-
+    if (renderTexture != nullptr)
+    {
+        if (textureUnit == 0)
+        {
+            texture0 = renderTexture->GetMetalTexture();
+        }
+        else if (textureUnit == 1)
+        {
+            texture1 = renderTexture->GetMetalTexture();
+        }
+    }
+    else
+    {
+        System::Print( "Shader tried to set null texture\n" );
+    }
 }
 
 void ae3d::Shader::SetTexture( const char* name, const TextureCube* texture, int textureUnit )
 {
     if (texture != nullptr)
     {
-        texture0 = const_cast<TextureCube*>(texture)->GetMetalTexture();
+        if (textureUnit == 0)
+        {
+            texture0 = const_cast<TextureCube*>( texture )->GetMetalTexture();
+        }
+        else if (textureUnit == 1)
+        {
+            texture1 = const_cast<TextureCube*>( texture )->GetMetalTexture();
+        }
     }
     else
     {
-        System::Print("Shader tried to set null texture\n");
+        System::Print( "Shader tried to set null texture\n" );
     }
 }
 
@@ -147,6 +178,7 @@ void ae3d::Shader::SetFloat( const char* name, float value )
         return;
     }
     
+    id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
     uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniforms[ name ].offsetFromBufferStart;
     memcpy( bufferPointer, &value, 4 );
 }
@@ -158,6 +190,7 @@ void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
         return;
     }
     
+    id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
     uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniforms[ name ].offsetFromBufferStart;
     memcpy( bufferPointer, vec3, 3 * 4 );
 }
@@ -169,6 +202,7 @@ void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
         return;
     }
     
+    id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
     uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniforms[ name ].offsetFromBufferStart;
     memcpy( bufferPointer, vec4, 4 * 4 );
 }

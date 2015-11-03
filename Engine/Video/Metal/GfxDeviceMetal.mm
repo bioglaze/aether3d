@@ -4,6 +4,7 @@
 #import <Metal/Metal.h>
 #endif
 #include <unordered_map>
+#include <list>
 #include "GfxDevice.hpp"
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
@@ -26,6 +27,7 @@ id<MTLCommandBuffer> commandBuffer;
 id<CAMetalDrawable> drawable;
 dispatch_semaphore_t inflightSemaphore;
 id<MTLTexture> texture0;
+id<MTLTexture> texture1;
 id<MTLTexture> currentRenderTarget;
 
 // TODO: Move somewhere else.
@@ -41,6 +43,31 @@ namespace GfxDeviceGlobal
     int backBufferWidth = 0;
     int backBufferHeight = 0;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
+    
+    std::list< id<MTLBuffer> > uniformBuffers;
+}
+
+id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
+{
+    id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceCPUCacheModeDefaultCache];
+
+    GfxDeviceGlobal::uniformBuffers.push_back( uniformBuffer );
+    return uniformBuffer;
+}
+
+id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
+{
+    if (GfxDeviceGlobal::uniformBuffers.empty())
+    {
+        return GetNewUniformBuffer();
+    }
+    
+    return GfxDeviceGlobal::uniformBuffers.back();
+}
+
+void ae3d::GfxDevice::ResetUniformBuffers()
+{
+    GfxDeviceGlobal::uniformBuffers.clear();
 }
 
 void ae3d::GfxDevice::Init( int width, int height )
@@ -185,7 +212,6 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         }
 
         GfxDeviceGlobal::psoCache[ psoHash ] = pso;
-        //GfxDeviceGlobal::psoReflection[ psoHash ] = reflectionObj;
         
         // FIXME: If two PSOs use the same set of shaders, are their uniform locations equal? This code assumes so. [TimoW, 2015-10-05]
         shader.LoadUniforms( reflectionObj );        
@@ -201,8 +227,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
     [renderEncoder setCullMode:MTLCullModeFront];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
-    [renderEncoder setVertexBuffer:shader.GetUniformBuffer() offset:0 atIndex:1];
+    [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
+    [renderEncoder setFragmentTexture:texture1 atIndex:1];
     [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                               indexCount:(endIndex - startIndex) * 3
                                indexType:MTLIndexTypeUInt16
@@ -212,6 +239,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
 void ae3d::GfxDevice::BeginFrame()
 {
+    ResetUniformBuffers();
+    
     if (!currentRenderTarget)
     {
         drawable = GetCurrentDrawable();
@@ -228,7 +257,7 @@ void ae3d::GfxDevice::BeginFrame()
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
     renderEncoder.label = @"MyRenderEncoder";
 
-    dispatch_semaphore_wait(inflightSemaphore, DISPATCH_TIME_FOREVER);
+    dispatch_semaphore_wait( inflightSemaphore, DISPATCH_TIME_FOREVER );
 }
 
 void ae3d::GfxDevice::PresentDrawable()
@@ -298,7 +327,6 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, uns
     BeginFrame();
 }
 
-void ae3d::GfxDevice::ErrorCheck(char const*)
+void ae3d::GfxDevice::ErrorCheck( const char* )
 {
-    
 }

@@ -19,7 +19,8 @@
 		4469AA141AEFCDFE007BBBF1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4469AA121AEFCDFE007BBBF1 /* LaunchScreen.xib */; };
 		44C7371E1B171CB100864C28 /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = 44C7371D1B171CB100864C28 /* SDF.metal */; };
 		44E5FC941B399CC8009AC088 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC931B399CC8009AC088 /* Skybox.metal */; };
-		AB521D131BC051FF004CDF06 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB521D121BC051FF004CDF06 /* Unlit.metal */; settings = {ASSET_TAGS = (); }; };
+		AB46B9501BE7EDF200077391 /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB46B94F1BE7EDF200077391 /* Moments.metal */; };
+		AB521D131BC051FF004CDF06 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB521D121BC051FF004CDF06 /* Unlit.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +54,7 @@
 		44C7371D1B171CB100864C28 /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../../Engine/Assets/SDF.metal; sourceTree = "<group>"; };
 		44E5FC931B399CC8009AC088 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
 		44EFE87E1B09D7810072F435 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		AB46B94F1BE7EDF200077391 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
 		AB521D121BC051FF004CDF06 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,10 +92,11 @@
 		4469AA001AEFCDFE007BBBF1 /* iOS_Hello */ = {
 			isa = PBXGroup;
 			children = (
-				AB521D121BC051FF004CDF06 /* Unlit.metal */,
+				AB46B94F1BE7EDF200077391 /* Moments.metal */,
 				44C7371D1B171CB100864C28 /* SDF.metal */,
 				4449E8A11B14B644009A869C /* SpriteShader.metal */,
 				44E5FC931B399CC8009AC088 /* Skybox.metal */,
+				AB521D121BC051FF004CDF06 /* Unlit.metal */,
 				4469AA051AEFCDFE007BBBF1 /* AppDelegate.h */,
 				4469AA061AEFCDFE007BBBF1 /* AppDelegate.m */,
 				4469AA081AEFCDFE007BBBF1 /* GameViewController.h */,
@@ -189,6 +192,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4469AA071AEFCDFE007BBBF1 /* AppDelegate.m in Sources */,
+				AB46B9501BE7EDF200077391 /* Moments.metal in Sources */,
 				4449E8A21B14B644009A869C /* SpriteShader.metal in Sources */,
 				AB521D131BC051FF004CDF06 /* Unlit.metal in Sources */,
 				4469AA0A1AEFCDFE007BBBF1 /* GameViewController.mm in Sources */,

@@ -19,6 +19,7 @@
 #include "Aether3D_iOS.framework/Headers/FileSystem.hpp"
 #include "Aether3D_iOS.framework/Headers/RenderTexture.hpp"
 #include "Aether3D_iOS.framework/Headers/TextureCube.hpp"
+#include "Aether3D_iOS.framework/Headers/DirectionalLightComponent.hpp"
 
 @implementation GameViewController
 {
@@ -47,6 +48,8 @@
     ae3d::Mesh cubeMesh;
     ae3d::Material cubeMaterial;
     ae3d::Shader shader;
+    ae3d::GameObject dirLight;
+    ae3d::GameObject bigCube;
 }
 
 - (void)dealloc
@@ -148,6 +151,17 @@
     cube.AddComponent<ae3d::TransformComponent>();
     cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
     scene.Add( &cube );
+
+    bigCube = cube;
+    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( cube.GetComponent< ae3d::TransformComponent >()->GetLocalPosition() - ae3d::Vec3( 0, 10, 0 ) );
+    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 6 );
+    scene.Add( &bigCube );
+
+    dirLight.AddComponent<ae3d::DirectionalLightComponent>();
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
+    dirLight.AddComponent<ae3d::TransformComponent>();
+    dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    scene.Add( &dirLight );
 }
 
 -(void) touchesBegan: (NSSet *) touches withEvent: (UIEvent *) event

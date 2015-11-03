@@ -140,7 +140,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     if (GfxDevice::HasExtension( "KHR_debug" ))
     {
-        glObjectLabel( GL_PROGRAM, id, (GLsizei)std::string( "shader" ).size(), "shader" );
+        glObjectLabel( GL_PROGRAM, handle, (GLsizei)std::string( "shader" ).size(), "shader" );
     }
 
     glAttachShader( program, vertexShader );
@@ -157,7 +157,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
         return;
     }
 
-    id = program;
+    handle = program;
     uniformLocations = GetUniformLocations( program );
 }
 
@@ -190,12 +190,12 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexGLSL, const F
 
 void ae3d::Shader::Use()
 {
-    glUseProgram( id );
+    glUseProgram( handle );
 }
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    glProgramUniformMatrix4fv( id, uniformLocations[ name ].i, 1, GL_FALSE, matrix4x4 );
+    glProgramUniformMatrix4fv( handle, uniformLocations[ name ].i, 1, GL_FALSE, matrix4x4 );
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
@@ -233,20 +233,20 @@ void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
-    glProgramUniform1i( id, uniformLocations[ name ].i, value );
+    glProgramUniform1i( handle, uniformLocations[ name ].i, value );
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )
 {
-    glProgramUniform1f( id, uniformLocations[ name ].i, value );
+    glProgramUniform1f( handle, uniformLocations[ name ].i, value );
 }
 
 void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
-    glProgramUniform3fv( id, uniformLocations[ name ].i, 1, vec3 );
+    glProgramUniform3fv( handle, uniformLocations[ name ].i, 1, vec3 );
 }
 
 void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
-    glProgramUniform4fv( id, uniformLocations[ name ].i, 1, vec4 );
+    glProgramUniform4fv( handle, uniformLocations[ name ].i, 1, vec4 );
 }

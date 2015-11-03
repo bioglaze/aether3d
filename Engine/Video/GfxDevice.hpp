@@ -41,6 +41,9 @@ namespace ae3d
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
         id <MTLDevice> GetMetalDevice();
         id <MTLLibrary> GetDefaultMetalShaderLibrary();
+        id <MTLBuffer> GetNewUniformBuffer();
+        id <MTLBuffer> GetCurrentUniformBuffer();
+        void ResetUniformBuffers();
         void PresentDrawable();
         void BeginFrame();
 #endif

@@ -23,7 +23,7 @@ namespace ae3d
     {
     public:
         /// \return True if the shader has been succesfully compiled and linked.
-        bool IsValid() const { return id != 0; }
+        bool IsValid() const { return handle != 0; }
         
         /// \param vertexSource Vertex shader source.
         /// \param fragmentSource Fragment shader source.
@@ -100,11 +100,9 @@ namespace ae3d
         std::map< std::string, Uniform > uniforms;
         
         void LoadUniforms( MTLRenderPipelineReflection* reflection );
-        id <MTLBuffer> GetUniformBuffer() { return uniformBuffer; }
 
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
-        id <MTLBuffer> uniformBuffer;
 #endif
         /// Wraps an int that is defaulted to -1. Needed for uniform handling.
         struct IntDefaultedToMinusOne
@@ -122,7 +120,7 @@ namespace ae3d
         void* constantBufferUpload = nullptr;
         ID3D12ShaderReflection* reflector = nullptr;
 #endif
-        unsigned id = 0;
+        unsigned handle = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
     };
 }
