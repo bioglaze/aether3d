@@ -203,6 +203,10 @@ void ae3d::Scene::Render()
         }
     }
     
+    auto cameraSortFunction = [](GameObject* g1, GameObject* g2) { return g1->GetComponent< CameraComponent >()->GetRenderOrder() <
+        g2->GetComponent< CameraComponent >()->GetRenderOrder(); };
+    std::sort( std::begin( cameras ), std::end( cameras ), cameraSortFunction );
+    
     for (auto rtCamera : rtCameras)
     {
         auto transform = rtCamera->GetComponent< TransformComponent >();
@@ -393,7 +397,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         ++i;
         
-        if (gameObject == nullptr)
+        if (gameObject == nullptr || (gameObject->GetLayer() & camera->GetLayerMask()) == 0)
         {
             continue;
         }

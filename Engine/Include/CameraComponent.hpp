@@ -71,6 +71,18 @@ namespace ae3d
         /// \param clearFlag Clear flag. Defaults to DepthAndColor.
         void SetClearFlag( ClearFlag clearFlag );
         
+        /// \param layerMask Layer mask contains OR'd layers that this camera renders into.
+        void SetLayerMask( unsigned aLayerMask ) { layerMask = aLayerMask; }
+        
+        /// \return Render order.
+        unsigned GetRenderOrder() const { return renderOrder; }
+
+        /// \param order Order.
+        void SetRenderOrder( unsigned order ) { renderOrder = order; }
+        
+        /// \return Layer mask.
+        unsigned GetLayerMask() const { return layerMask; }
+        
         /// \return Clear flag.
         ClearFlag GetClearFlag() const { return clearFlag; }
         
@@ -135,6 +147,8 @@ namespace ae3d
         float farp = 1;
         float fovDegrees = 45;
         float aspect = 1;
+        unsigned layerMask = 1;
+        unsigned renderOrder = 0;
         ProjectionType projectionType = ProjectionType::Orthographic;
         ClearFlag clearFlag = ClearFlag::DepthAndColor;
     };

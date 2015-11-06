@@ -80,7 +80,8 @@ std::string ae3d::CameraComponent::GetSerialized() const
     }
     
     outStream << "persp " << fovDegrees << " " << aspect << " " << nearp << " " << farp << "\n";
-    
+    outStream << "layermask " << layerMask << "\n";
+    outStream << "order " << renderOrder << "\n";
     outStream << "clearcolor " << clearColor.x << " " << clearColor.y << " " << clearColor.z << "\n\n";
 
     return outStream.str();

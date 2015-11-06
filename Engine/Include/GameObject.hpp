@@ -67,6 +67,12 @@ namespace ae3d
         /// \return Game Object's name.
         const std::string& GetName() const { return name; }
         
+        /// \param aLayer Layer for controlling camera visibility etc. Must be power of two (2, 4, 8 etc.)
+        void SetLayer( unsigned aLayer ) { layer = aLayer; }
+
+        /// \return Layer.
+        unsigned GetLayer() const { return layer; }
+
         /// \return Game Object's contents excluding components
         std::string GetSerialized() const;
 
@@ -83,6 +89,7 @@ namespace ae3d
         unsigned nextFreeComponentIndex = 0;
         ComponentEntry components[ MaxComponents ];
         std::string name;
+        unsigned layer = 1;
     };
 }
 #endif

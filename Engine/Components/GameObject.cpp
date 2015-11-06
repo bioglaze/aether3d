@@ -1,4 +1,5 @@
 #include "GameObject.hpp"
+#include <sstream>
 #include "TransformComponent.hpp"
 #include "MeshRendererComponent.hpp"
 #include "CameraComponent.hpp"
@@ -70,8 +71,10 @@ GameObject& ae3d::GameObject::operator=( const GameObject& go )
 
 std::string ae3d::GameObject::GetSerialized() const
 {
-    std::string outSerialized = "gameobject ";
-    outSerialized += name + "\n";
+    std::stringstream outStream;
+    outStream << "gameobject\n";
+    outStream << "name " << name << "\n";
+    outStream << "layer " << layer << "\n";
 
-    return outSerialized;
+    return outStream.str();
 }

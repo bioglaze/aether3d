@@ -49,6 +49,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 150 );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+    camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
@@ -70,7 +71,9 @@ int main()
     camera2d.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera2d.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Orthographic );
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DontClear );
+    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+    camera2d.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
+    camera2d.GetComponent<CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<TransformComponent>();
     
     Texture2D fontTex;
@@ -85,7 +88,8 @@ int main()
     statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     statsContainer.AddComponent<TransformComponent>();
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( { 20, 0, 0 } );
-
+    statsContainer.SetLayer( 2 );
+    
     Mesh cubeMesh;
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
@@ -147,8 +151,8 @@ int main()
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
     scene.SetSkybox( &skybox );
-    //scene.Add( &camera2d );
     scene.Add( &camera );
+    scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
     scene.Add( &cube );
     scene.Add( &copiedCube );
@@ -171,7 +175,7 @@ int main()
 
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-
+    
     cubes[ 3 ].GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
     cubes[ 3 ].GetComponent< TransformComponent >()->SetParent( cubes[ 2 ].GetComponent< TransformComponent >() );
     
@@ -321,7 +325,7 @@ int main()
 
         std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
-        //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         Window::SwapBuffers();
     }
