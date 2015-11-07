@@ -270,7 +270,6 @@ static bool TestQuatGetConjugate()
 
     const Quaternion q( Vec3( tx, ty, tz ), tw );
     const Quaternion result = q.Conjugate();
-    const float acceptableDelta = 0.00001f;
 
     if (!IsAlmost( -result.x, tx ) ||
         !IsAlmost( -result.y, ty ) ||

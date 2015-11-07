@@ -41,7 +41,7 @@ namespace ae3d
             }
             
             Vec3 position;
-            float u, v;
+            float u = 0, v = 0;
             Vec4 color = { 1, 1, 1, 1 };
         };
 

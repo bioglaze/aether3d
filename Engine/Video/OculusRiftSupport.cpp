@@ -14,11 +14,6 @@
 
 using namespace ae3d;
 
-namespace GfxDeviceGlobal
-{
-    extern GLuint systemFBO;
-}
-
 struct DepthBuffer
 {
     GLuint texId;
@@ -121,7 +116,7 @@ struct TextureBuffer
 
     void SetAndClearRenderSurface( DepthBuffer * dbuffer )
     {
-        GfxDeviceGlobal::systemFBO = fboId;
+        GfxDevice::SetSystemFBO( fboId );
 
         ovrGLTexture* tex = (ovrGLTexture*)&TextureSet->Textures[ TextureSet->CurrentIndex ];
 

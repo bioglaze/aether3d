@@ -3,11 +3,6 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
-namespace GfxDeviceGlobal
-{
-    extern GLuint systemFBO;
-}
-
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
@@ -110,7 +105,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId );
     glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
     
-    glBindFramebuffer( GL_FRAMEBUFFER, GfxDeviceGlobal::systemFBO );
+    glBindFramebuffer( GL_FRAMEBUFFER, GfxDevice::GetSystemFBO() );
 
     GfxDevice::ErrorCheckFBO();
     GfxDevice::ErrorCheck( "CreateRenderTextureCube end" );

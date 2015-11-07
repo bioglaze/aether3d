@@ -24,6 +24,7 @@
 
 using namespace ae3d;
 extern ae3d::Renderer renderer;
+float GetVRFov();
 
 namespace MathUtil
 {
@@ -356,19 +357,19 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 #endif
         renderer.RenderSkybox( skybox, *camera );
     }
-
-    auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
     
-    float fovDegrees = camera->GetFovDegrees();
-    Vec3 position = cameraTransform->GetLocalPosition();
+    float fovDegrees;
+    Vec3 position;
 
     // TODO: Maybe add a VR flag into camera to select between HMD and normal pose.
 #if OCULUS_RIFT
     view = cameraGo->GetComponent< TransformComponent >()->GetVrView();
     position = Global::vrEyePosition;
-    float GetVRFov();
     fovDegrees = GetVRFov();
 #else
+    auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
+    position = cameraTransform->GetLocalPosition();
+    fovDegrees = camera->GetFovDegrees();
     cameraTransform->GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
     translation.Translate( -cameraTransform->GetLocalPosition() );

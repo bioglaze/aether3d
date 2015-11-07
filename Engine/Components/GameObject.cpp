@@ -23,6 +23,12 @@ ae3d::GameObject::GameObject( const GameObject& other )
 GameObject& ae3d::GameObject::operator=( const GameObject& go )
 {
     name = go.name;
+    
+    for (unsigned i = 0; i < MaxComponents; ++i)
+    {
+        components[ i ].type = -1;
+        components[ i ].handle = InvalidComponentIndex;
+    }
 
     if (go.GetComponent< TransformComponent >())
     {

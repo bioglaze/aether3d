@@ -438,3 +438,12 @@ void ae3d::GfxDevice::DebugBlitFBO( unsigned handle, int width, int height )
     glBlitFramebuffer( 0, 0, 512, 512, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR );
 }
 
+unsigned ae3d::GfxDevice::GetSystemFBO()
+{
+    return GfxDeviceGlobal::systemFBO;
+}
+
+void ae3d::GfxDevice::SetSystemFBO( unsigned fbo )
+{
+    GfxDeviceGlobal::systemFBO = fbo;
+}

@@ -15,6 +15,9 @@ namespace ae3d
 class Frustum
 {
 public:
+    // Workaround to silence a CppCheck warning that the class doesn't have a constructor.
+    Frustum() = default;
+
     const Vec3& NearTopLeft() const;
     const Vec3& NearTopRight() const;
     const Vec3& NearBottomLeft() const;

@@ -132,7 +132,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     Global::shaders.push_back( blobShaderPixel );
 
     CreateConstantBuffer();
-    id = 1;
+    handle = 1;
     ReflectVariables();
 }
 
