@@ -3,7 +3,6 @@
 #include <string>
 #include <d3d12.h>
 #include <d3dcompiler.h>
-#include <d3dx12.h>
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
 #include "DescriptorHeapManager.hpp"
@@ -76,8 +75,25 @@ void ShaderReload( const std::string& path )
 
 void ae3d::Shader::CreateConstantBuffer()
 {
-    auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD );
-    auto buf = CD3DX12_RESOURCE_DESC::Buffer( D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT );
+    D3D12_HEAP_PROPERTIES prop = {};
+    prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+    prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    prop.CreationNodeMask = 1;
+    prop.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC buf = {};
+    buf.Alignment = 0;
+    buf.DepthOrArraySize = 1;
+    buf.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    buf.Flags = D3D12_RESOURCE_FLAG_NONE;
+    buf.Format = DXGI_FORMAT_UNKNOWN;
+    buf.Height = 1;
+    buf.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    buf.MipLevels = 1;
+    buf.SampleDesc.Count = 1;
+    buf.SampleDesc.Quality = 0;
+    buf.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &prop,

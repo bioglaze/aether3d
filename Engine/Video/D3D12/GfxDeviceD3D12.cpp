@@ -43,6 +43,7 @@ namespace GfxDeviceGlobal
     ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
+    ID3D12InfoQueue* infoQueue = nullptr;
     CommandContext graphicsContext;
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
@@ -306,6 +307,10 @@ void ae3d::CreateRenderer( int /*samples*/ )
 #ifdef DEBUG
     // Prevents GPU from over/underclocking to get consistent timing information.
     GfxDeviceGlobal::device->SetStablePowerState( TRUE );
+
+    hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
+    AE3D_CHECK_D3D( hr, "Infoqueue failed" );
+    GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
 #endif
 
     GfxDeviceGlobal::commandListManager.Create( GfxDeviceGlobal::device );
@@ -440,6 +445,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         AE3D_SAFE_RELEASE( pso.second );
     }
 
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::infoQueue );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 0 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 1 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );

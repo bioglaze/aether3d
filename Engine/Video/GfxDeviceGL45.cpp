@@ -79,8 +79,7 @@ namespace GfxDeviceGlobal
     GLuint cachedFBO = 0;
 }
 
-
-void ae3d::GfxDevice::SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
+void SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
 {
     if (blendMode == ae3d::GfxDevice::BlendMode::Off)
     {

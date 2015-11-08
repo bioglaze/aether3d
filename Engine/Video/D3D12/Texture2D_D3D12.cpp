@@ -100,8 +100,6 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
         initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
 
         initContext.CloseAndExecute( true );
-        // FIXME: This causes an error stating that the resource is in use when released, even though fence is waited.
-        //uploadBuffer->Release();
     }
 }
 

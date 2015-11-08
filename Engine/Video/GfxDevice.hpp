@@ -55,9 +55,8 @@ namespace ae3d
         void SetRenderTarget( RenderTexture* target, unsigned cubeMapFace );
         void SetMultiSampling( bool enable );
         
-        // TODO: Remove these to prepare for modern API style draw submission (these are provided in Draw())
+        // TODO: Remove this to prepare for modern API style draw submission (these are provided in Draw())
         void SetBackFaceCulling( bool enable );
-        void SetBlendMode( BlendMode blendMode );
 
         void IncDrawCalls();
         int GetDrawCalls();

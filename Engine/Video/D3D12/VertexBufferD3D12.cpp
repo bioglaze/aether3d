@@ -1,7 +1,6 @@
 #include "VertexBuffer.hpp"
 #include <vector>
 #include <d3d12.h>
-#include <d3dx12.h>
 #include "GfxDevice.hpp"
 #include "Vec3.hpp"
 #include "System.hpp"
@@ -54,8 +53,25 @@ unsigned ae3d::VertexBuffer::GetStride() const
 
 void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize )
 {
-    auto uploadProp = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_UPLOAD );
-    auto bufferProp = CD3DX12_RESOURCE_DESC::Buffer( ibOffset + ibSize );
+    D3D12_HEAP_PROPERTIES uploadProp = {};
+    uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+    uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    uploadProp.CreationNodeMask = 1;
+    uploadProp.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC bufferProp = {};
+    bufferProp.Alignment = 0;
+    bufferProp.DepthOrArraySize = 1;
+    bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
+    bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+    bufferProp.Height = 1;
+    bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    bufferProp.MipLevels = 1;
+    bufferProp.SampleDesc.Count = 1;
+    bufferProp.SampleDesc.Quality = 0;
+    bufferProp.Width = ibOffset + ibSize;
 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &uploadProp,
