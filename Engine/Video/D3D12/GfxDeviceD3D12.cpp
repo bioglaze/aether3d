@@ -17,6 +17,7 @@
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
 #include "TextureBase.hpp"
+#include "Texture2D.hpp"
 
 void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
@@ -49,6 +50,8 @@ namespace GfxDeviceGlobal
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
     CommandListManager commandListManager;
+    ae3d::Texture2D* texture0 = nullptr;
+    std::vector< ID3D12DescriptorHeap* > frameHeaps;
 }
 
 namespace ae3d
@@ -360,10 +363,43 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
     }
     
+    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    desc.NumDescriptors = 100;
+    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    desc.NodeMask = 1;
+
+    ID3D12DescriptorHeap* tempHeap = nullptr;
+    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &tempHeap ) );
+    AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
+    GfxDeviceGlobal::frameHeaps.push_back( tempHeap );
+
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
+
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+    cbvDesc.BufferLocation = shader.GetConstantBuffer()->GetGPUVirtualAddress();
+    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
+    GfxDeviceGlobal::device->CreateConstantBufferView(
+        &cbvDesc,
+        handle );
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.PlaneSlice = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+    
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, &srvDesc, handle );
+
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
-    ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
+    ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetDescriptorHeaps( 2, descHeaps );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavHeap()->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
 
@@ -526,6 +562,11 @@ void ae3d::GfxDevice::Present()
     }
 
     GfxDeviceGlobal::graphicsContext.Reset();
+
+    for (std::size_t i = 0; i < GfxDeviceGlobal::frameHeaps.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( GfxDeviceGlobal::frameHeaps[ i ] );
+    }
 }
 
 void ae3d::GfxDevice::SetBackFaceCulling( bool /*enable*/ )

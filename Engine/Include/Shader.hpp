@@ -82,6 +82,7 @@ namespace ae3d
         void SetVector4( const char* name, const float* vec4 );
 
 #if AETHER3D_D3D12
+        ID3D12Resource* GetConstantBuffer() { return constantBuffer; }
         ID3DBlob* blobShaderVertex = nullptr;
         ID3DBlob* blobShaderPixel = nullptr;
 #endif

@@ -52,6 +52,10 @@ namespace ae3d
 #if AETHER3D_METAL
         id<MTLTexture> GetMetalTexture() const { return metalTexture; }
 #endif
+#if AETHER3D_D3D12
+        GpuResource* GetGpuResource() { return &gpuResource; }
+        D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const { return srv; }
+#endif
         /// \return Anisotropy.
         float GetAnisotropy() const { return anisotropy; }
         
