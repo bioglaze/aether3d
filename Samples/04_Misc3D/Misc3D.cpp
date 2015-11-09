@@ -71,7 +71,7 @@ int main()
     camera2d.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera2d.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Orthographic );
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::Depth );
     camera2d.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<TransformComponent>();

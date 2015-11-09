@@ -149,13 +149,6 @@ void ae3d::Scene::Add( GameObject* gameObject )
     }
 
     gameObjects[ nextFreeGameObject++ ] = gameObject;
-
-    CameraComponent* camera = gameObject->GetComponent<CameraComponent>();
-
-    if (camera && mainCamera == nullptr)
-    {
-        mainCamera = gameObject;
-    }
 }
 
 void ae3d::Scene::Remove( GameObject* gameObject )
@@ -174,11 +167,6 @@ void ae3d::Scene::Render()
 {
     GenerateAABB();
     GfxDevice::ResetFrameStatistics();
-
-    if (mainCamera == nullptr || mainCamera->GetComponent<CameraComponent>() == nullptr)
-    {
-        return;
-    }
     
     std::vector< GameObject* > rtCameras;
     rtCameras.reserve( gameObjects.size() / 4 );
@@ -194,11 +182,11 @@ void ae3d::Scene::Render()
 
         auto cameraComponent = gameObject->GetComponent<CameraComponent>();
         
-        if (cameraComponent && cameraComponent->GetTargetTexture() != nullptr)
+        if (cameraComponent && cameraComponent->GetTargetTexture() != nullptr && gameObject->GetComponent<TransformComponent>())
         {
             rtCameras.push_back( gameObject );
         }
-        if (cameraComponent && cameraComponent->GetTargetTexture() == nullptr)
+        if (cameraComponent && cameraComponent->GetTargetTexture() == nullptr && gameObject->GetComponent<TransformComponent>())
         {
             cameras.push_back( gameObject );
         }
@@ -250,74 +238,68 @@ void ae3d::Scene::Render()
 
     for (auto camera : cameras)
     {
-        if (camera != mainCamera && camera->GetComponent<TransformComponent>())
-        {
-            RenderWithCamera( camera, 0 );
-        }
-    }
-    
-    CameraComponent* camera = mainCamera->GetComponent<CameraComponent>();
-    ae3d::System::Assert( mainCamera->GetComponent<CameraComponent>()->GetTargetTexture() == nullptr, "main camera must not have a texture target" );
-
-    //unsigned debugShadowFBO = 0;
-    
-    if (camera != nullptr && mainCamera->GetComponent<TransformComponent>())
-    {
-        TransformComponent* mainCameraTransform = mainCamera->GetComponent<TransformComponent>();
-
-        // Shadow pass
-        for (auto go : gameObjects)
-        {
-            if (!go)
-            {
-                continue;
-            }
+        //unsigned debugShadowFBO = 0;
             
-            auto lightTransform = go->GetComponent<TransformComponent>();
-            auto dirLight = go->GetComponent<DirectionalLightComponent>();
-
-            if (lightTransform && dirLight && dirLight->CastsShadow())
+        if (camera != nullptr && camera->GetComponent<TransformComponent>())
+        {
+            TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
+            
+            // Shadow pass
+            for (auto go : gameObjects)
             {
-                Frustum eyeFrustum;
-                
-                if (camera->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
+                if (!go)
                 {
-                    eyeFrustum.SetProjection( camera->GetFovDegrees(), camera->GetAspect(), camera->GetNear(), camera->GetFar() );
-                }
-                else
-                {
-                    eyeFrustum.SetProjection( camera->GetLeft(), camera->GetRight(), camera->GetBottom(), camera->GetTop(), camera->GetNear(), camera->GetFar() );
+                    continue;
                 }
                 
-                Matrix44 eyeView;
-                mainCameraTransform->GetLocalRotation().GetMatrix( eyeView );
-                Matrix44 translation;
-                translation.Translate( -mainCameraTransform->GetLocalPosition() );
-                Matrix44::Multiply( translation, eyeView, eyeView );
-
-                const Vec3 eyeViewDir = Vec3( eyeView.m[2], eyeView.m[6], eyeView.m[10] ).Normalized();
-                eyeFrustum.Update( mainCameraTransform->GetLocalPosition(), eyeViewDir );
-
-                if (!SceneGlobal::isShadowCameraCreated)
+                auto lightTransform = go->GetComponent<TransformComponent>();
+                auto dirLight = go->GetComponent<DirectionalLightComponent>();
+                
+                if (lightTransform && dirLight && dirLight->CastsShadow())
                 {
-                    SceneGlobal::shadowCamera.AddComponent< CameraComponent >();
-                    SceneGlobal::shadowCamera.AddComponent< TransformComponent >();
-                    SceneGlobal::isShadowCameraCreated = true;
+                    Frustum eyeFrustum;
+                    
+                    auto cameraComponent = camera->GetComponent< CameraComponent >();
+                    
+                    if (cameraComponent->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
+                    {
+                        eyeFrustum.SetProjection( cameraComponent->GetFovDegrees(), cameraComponent->GetAspect(), cameraComponent->GetNear(), cameraComponent->GetFar() );
+                    }
+                    else
+                    {
+                        eyeFrustum.SetProjection( cameraComponent->GetLeft(), cameraComponent->GetRight(), cameraComponent->GetBottom(), cameraComponent->GetTop(), cameraComponent->GetNear(), cameraComponent->GetFar() );
+                    }
+                    
+                    Matrix44 eyeView;
+                    cameraTransform->GetLocalRotation().GetMatrix( eyeView );
+                    Matrix44 translation;
+                    translation.Translate( -cameraTransform->GetLocalPosition() );
+                    Matrix44::Multiply( translation, eyeView, eyeView );
+                    
+                    const Vec3 eyeViewDir = Vec3( eyeView.m[2], eyeView.m[6], eyeView.m[10] ).Normalized();
+                    eyeFrustum.Update( cameraTransform->GetLocalPosition(), eyeViewDir );
+                    
+                    if (!SceneGlobal::isShadowCameraCreated)
+                    {
+                        SceneGlobal::shadowCamera.AddComponent< CameraComponent >();
+                        SceneGlobal::shadowCamera.AddComponent< TransformComponent >();
+                        SceneGlobal::isShadowCameraCreated = true;
+                    }
+                    
+                    SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                    
+                    SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                    
+                    RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
+                    
+                    Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                    
+                    //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
                 }
-                
-                SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                
-                SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
-                
-                RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
-                
-                Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                
-                //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
             }
         }
         
-        RenderWithCamera( mainCamera, 0 );
+        RenderWithCamera( camera, 0 );
     }
     
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
@@ -336,6 +318,10 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     if (camera->GetClearFlag() == CameraComponent::ClearFlag::DepthAndColor)
     {
         GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+    }
+    else if (camera->GetClearFlag() == CameraComponent::ClearFlag::Depth)
+    {
+        GfxDevice::ClearScreen( GfxDevice::ClearFlags::Depth );
     }
     
     Matrix44 view;

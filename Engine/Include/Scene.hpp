@@ -47,7 +47,6 @@ namespace ae3d
         std::vector< GameObject* > gameObjects;
         unsigned nextFreeGameObject = 0;
         const TextureCube* skybox = nullptr;
-        GameObject* mainCamera = nullptr;
         Vec3 aabbMin;
         Vec3 aabbMax;
     };

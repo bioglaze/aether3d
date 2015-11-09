@@ -17,7 +17,7 @@ namespace ae3d
         enum class ProjectionType { Orthographic, Perspective };
         
         /// Clear flag.
-        enum class ClearFlag { DepthAndColor, DontClear };
+        enum class ClearFlag { DepthAndColor, Depth, DontClear };
         
         /// \return Projection matrix.
         const Matrix44& GetProjection() const { return projectionMatrix; }
@@ -71,7 +71,7 @@ namespace ae3d
         /// \param clearFlag Clear flag. Defaults to DepthAndColor.
         void SetClearFlag( ClearFlag clearFlag );
         
-        /// \param layerMask Layer mask contains OR'd layers that this camera renders into.
+        /// \param aLayerMask Layer mask contains OR'd layers that this camera renders into.
         void SetLayerMask( unsigned aLayerMask ) { layerMask = aLayerMask; }
         
         /// \return Render order.
