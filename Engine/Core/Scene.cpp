@@ -167,7 +167,8 @@ void ae3d::Scene::Render()
 {
     GenerateAABB();
     GfxDevice::ResetFrameStatistics();
-    
+    TransformComponent::UpdateLocalMatrices();
+
     std::vector< GameObject* > rtCameras;
     rtCameras.reserve( gameObjects.size() / 4 );
     std::vector< GameObject* > cameras;

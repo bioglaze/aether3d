@@ -128,6 +128,7 @@ namespace ae3d
             int GetDrawCallCount();
             int GetVertexBufferBindCount();
             int GetTextureBindCount();
+            int GetRenderTargetBindCount();
         }
     }
 }

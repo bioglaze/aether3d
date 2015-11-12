@@ -119,3 +119,8 @@ int ae3d::System::Statistics::GetTextureBindCount()
 {
     return GfxDevice::GetTextureBinds();
 }
+
+int ae3d::System::Statistics::GetRenderTargetBindCount()
+{
+    return GfxDevice::GetRenderTargetBinds();
+}

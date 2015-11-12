@@ -57,7 +57,7 @@ void APIENTRY DebugCallbackARB( GLenum source, GLenum type, GLuint id, GLenum se
         (void)length;
         (void)userParam;
         PrintOpenGLDebugOutput( source, type, id, severity, message);
-        ae3d::System::Assert(false, "OpenGL error");
+        ae3d::System::Assert( false, "OpenGL error" );
     }
 }
 
@@ -70,9 +70,12 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > programIds;
     std::vector< GLuint > rboIds;
     std::vector< GLuint > fboIds;
+    
     int drawCalls = 0;
     int vaoBinds = 0;
     int textureBinds = 0;
+    int renderTargetBinds = 0;
+    
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     GLuint systemFBO = 0;
@@ -169,6 +172,11 @@ void ae3d::GfxDevice::IncTextureBinds()
     ++GfxDeviceGlobal::textureBinds;
 }
 
+void ae3d::GfxDevice::IncRenderTargetBinds()
+{
+    ++GfxDeviceGlobal::renderTargetBinds;
+}
+
 void ae3d::GfxDevice::IncVertexBufferBinds()
 {
     ++GfxDeviceGlobal::vaoBinds;
@@ -179,6 +187,7 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     GfxDeviceGlobal::drawCalls = 0;
     GfxDeviceGlobal::vaoBinds = 0;
     GfxDeviceGlobal::textureBinds = 0;
+    GfxDeviceGlobal::renderTargetBinds = 0;
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
@@ -189,6 +198,11 @@ int ae3d::GfxDevice::GetDrawCalls()
 int ae3d::GfxDevice::GetTextureBinds()
 {
     return GfxDeviceGlobal::textureBinds;
+}
+
+int ae3d::GfxDevice::GetRenderTargetBinds()
+{
+    return GfxDeviceGlobal::renderTargetBinds;
 }
 
 int ae3d::GfxDevice::GetVertexBufferBinds()
@@ -398,6 +412,7 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     }
 
     const GLuint fbo = target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
+    IncRenderTargetBinds();
     glBindFramebuffer( GL_FRAMEBUFFER, fbo );
     GfxDeviceGlobal::cachedFBO = fbo;
 

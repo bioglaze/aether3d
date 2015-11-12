@@ -64,6 +64,8 @@ namespace ae3d
         int GetVertexBufferBinds();
         void IncTextureBinds();
         int GetTextureBinds();
+        void IncRenderTargetBinds();
+        int GetRenderTargetBinds();
         void ResetFrameStatistics();
 
         void Present();

@@ -68,9 +68,10 @@ namespace ae3d
 
         /// \return View direction (normalized)
         Vec3 GetViewDirection() const;
-        
+
     private:
         friend class GameObject;
+        friend class Scene;
 
         /// \return Component's type code. Must be unique for each component type.
         static int Type() { return 2; }
@@ -80,6 +81,9 @@ namespace ae3d
         
         /// \return Component at index or null if index is invalid.
         static TransformComponent* Get( unsigned index );
+
+        /// Updates matrices.
+        static void UpdateLocalMatrices();
 
         void SolveLocalMatrix();
 
@@ -93,7 +97,6 @@ namespace ae3d
 #if OCULUS_RIFT
         Matrix44 hmdView; // For VR
 #endif
-        bool isDirty = true;
     };
 }
 

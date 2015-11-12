@@ -191,7 +191,8 @@ int main()
     float gamePadRightThumbY = 0;
     
     float angle = 0;
-   
+    Vec3 moveDir;
+
     while (Window::IsOpen() && !quit)
     {
 #if OCULUS_RIFT
@@ -218,21 +219,18 @@ int main()
         const Vec3 axis( 0, 1, 0 );
         rotation.FromAxisAngle( axis, angle );
         cubes[ 2 ].GetComponent< TransformComponent >()->SetLocalRotation( rotation );
-        
-        std::string text( "draw calls:" );
-        
+
         while (Window::PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
             {
                 quit = true;
             }
-            else if (event.type == WindowEventType::KeyDown ||
-                event.type == WindowEventType::KeyUp)
+            else if (event.type == WindowEventType::KeyDown)
             {
                 KeyCode keyCode = event.keyCode;
                 
-                const float velocity = 1.5f;
+                const float velocity = 0.3f;
                 
                 if (keyCode == KeyCode::Escape)
                 {
@@ -248,27 +246,27 @@ int main()
                 }
                 else if (keyCode == KeyCode::W)
                 {
-                    camera.GetComponent<TransformComponent>()->MoveForward( -velocity );
+                    moveDir.z = -velocity;
                 }
                 else if (keyCode == KeyCode::S)
                 {
-                    camera.GetComponent<TransformComponent>()->MoveForward( velocity );
+                    moveDir.z = velocity;
                 }
                 else if (keyCode == KeyCode::E)
                 {
-                    camera.GetComponent<TransformComponent>()->MoveUp( velocity );
+                    moveDir.y = velocity;
                 }
                 else if (keyCode == KeyCode::Q)
                 {
-                    camera.GetComponent<TransformComponent>()->MoveUp( -velocity );
+                    moveDir.y = -velocity;
                 }
                 else if (keyCode == KeyCode::A)
                 {
-                    camera.GetComponent<TransformComponent>()->MoveRight( -velocity );
+                    moveDir.x = -velocity;
                 }
                 else if (keyCode == KeyCode::D)
                 {
-                    camera.GetComponent<TransformComponent>()->MoveRight( velocity );
+                    moveDir.x = velocity;
                 }
                 else if (keyCode == KeyCode::Left)
                 {
@@ -289,6 +287,36 @@ int main()
                     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -1 );
                 }
             }
+            else if (event.type == WindowEventType::KeyUp)
+            {
+                KeyCode keyCode = event.keyCode;
+
+                if (keyCode == KeyCode::W)
+                {
+                    moveDir.z = 0;
+                }
+                else if (keyCode == KeyCode::S)
+                {
+                    moveDir.z = 0;
+                }
+                else if (keyCode == KeyCode::E)
+                {
+                    moveDir.y = 0;
+                }
+                else if (keyCode == KeyCode::Q)
+                {
+                    moveDir.y = 0;
+                }
+                else if (keyCode == KeyCode::A)
+                {
+                    moveDir.x = 0;
+                }
+                else if (keyCode == KeyCode::D)
+                {
+                    moveDir.x = 0;
+                }
+            }
+            
             if (event.type == WindowEventType::MouseMove)
             {
                 const int mouseDeltaX = event.mouseX - lastMouseX;
@@ -318,13 +346,18 @@ int main()
             }
         }
 
+        camera.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
+        camera.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
+        camera.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+
         camera.GetComponent<TransformComponent>()->MoveForward( gamePadLeftThumbY );
         camera.GetComponent<TransformComponent>()->MoveRight( gamePadLeftThumbX );
         camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( gamePadRightThumbX ) / 1 );
         camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( gamePadRightThumbY ) / 1 );
 
-        std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
+        std::string stats = std::string( "draw calls:" ) + std::to_string( System::Statistics::GetDrawCallCount() );
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
+        stats += std::string( "\nRT binds:" ) + std::to_string( System::Statistics::GetRenderTargetBindCount() );
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         Window::SwapBuffers();

@@ -36,7 +36,6 @@ void ae3d::TransformComponent::LookAt( const Vec3& aLocalPosition, const Vec3& c
     lookAt.MakeLookAt( aLocalPosition, center, up );
     localRotation.FromMatrix( lookAt );
     localPosition = aLocalPosition;
-    isDirty = true;
 }
 
 void ae3d::TransformComponent::MoveForward( float amount )
@@ -44,7 +43,6 @@ void ae3d::TransformComponent::MoveForward( float amount )
     if (!IsAlmost( amount, 0 ))
     {
         localPosition += localRotation * Vec3( 0, 0, amount );
-        isDirty = true;
     }
 }
 
@@ -53,14 +51,12 @@ void ae3d::TransformComponent::MoveRight( float amount )
     if (!IsAlmost( amount, 0 ))
     {
         localPosition += localRotation * Vec3( amount, 0, 0 );
-        isDirty = true;
     }
 }
 
 void ae3d::TransformComponent::MoveUp( float amount )
 {
     localPosition.y += amount;
-    isDirty = true;
 }
 
 void ae3d::TransformComponent::OffsetRotate( const Vec3& axis, float angleDeg )
@@ -88,51 +84,34 @@ void ae3d::TransformComponent::OffsetRotate( const Vec3& axis, float angleDeg )
     }
 
     localRotation = newRotation;
-    isDirty = true;
+}
+
+void ae3d::TransformComponent::UpdateLocalMatrices()
+{
+    for (unsigned c = 0; c < nextFreeTransformComponent; ++c)
+    {
+        transformComponents[ c ].SolveLocalMatrix();
+    }
 }
 
 const ae3d::Matrix44& ae3d::TransformComponent::GetLocalMatrix()
 {
-    const TransformComponent* testComponent = parent;
-
-    while (testComponent != nullptr)
-    {
-        if (testComponent->isDirty)
-        {
-            isDirty = true;
-            break;
-        }
-
-        testComponent = testComponent->parent;
-    }
-
-    // FIXME: Dirty checking doesn't work right on a transform hierarchy because parent can be
-    //        updated and undirtied before a child checks to see if it's dirty. [TimoW, 2015-09-26]
-    //if (isDirty)
-    {
-        SolveLocalMatrix();
-        isDirty = false;
-    }
-    
     return localMatrix;
 }
 
 void ae3d::TransformComponent::SetLocalPosition( const Vec3& localPos )
 {
     localPosition = localPos;
-    isDirty = true;
 }
 
 void ae3d::TransformComponent::SetLocalRotation( const Quaternion& localRot )
 {
     localRotation = localRot;
-    isDirty = true;
 }
 
 void ae3d::TransformComponent::SetLocalScale( float aLocalScale )
 {
     localScale = aLocalScale;
-    isDirty = true;
 }
 
 void ae3d::TransformComponent::SolveLocalMatrix()
@@ -172,7 +151,6 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
     }
 
     parent = aParent;
-    isDirty = true;
 }
 
 std::string ae3d::TransformComponent::GetSerialized() const
@@ -193,6 +171,6 @@ ae3d::Vec3 ae3d::TransformComponent::GetViewDirection() const
     translation.Translate( -localPosition );
     Matrix44::Multiply( translation, view, view );
 
-    return Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
+    return Vec3( view.m[ 2 ], view.m[ 6 ], view.m[ 10 ] ).Normalized();
 }
 
