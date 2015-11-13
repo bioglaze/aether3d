@@ -28,6 +28,7 @@ using namespace ae3d;
 
 int main()
 {
+    // FIXME: Breaks if 0
     int width = 640;
     int height = 480;
     
@@ -47,7 +48,7 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 150 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 300 );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
     camera.AddComponent<TransformComponent>();
@@ -138,7 +139,7 @@ int main()
     
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, -1, 0 }, { 0, 1, 0 } );
 
@@ -150,6 +151,28 @@ int main()
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
+    // Sponza begins
+    
+    Mesh sponzaMesh;
+    sponzaMesh.Load( FileSystem::FileContents( "sponza.ae3d" ) );
+    
+    GameObject sponza;
+    sponza.AddComponent< MeshRendererComponent >();
+    sponza.GetComponent< MeshRendererComponent >()->SetMesh( &sponzaMesh );
+    sponza.AddComponent< TransformComponent >();
+    sponza.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+    sponza.GetComponent< TransformComponent >()->SetLocalScale( 0.1f );
+    unsigned subMeshCount = sponza.GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount();
+    
+    for (unsigned i = 0; i < subMeshCount; ++i)
+    {
+        sponza.GetComponent< MeshRendererComponent >()->SetMaterial( &material, i );
+    }
+    
+    scene.Add( &sponza );
+    
+    // Sponza ends
+    
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );

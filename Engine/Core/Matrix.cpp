@@ -240,41 +240,18 @@ void Matrix44::MakeIdentity()
 
 void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 {
-    Vec3 forward = (center - eye).Normalized();
-
-    Vec3 right = Vec3::Cross( forward, up ).Normalized();
-
-    const Vec3 newUp = Vec3::Cross( right, forward );
-
-    m[ 0 ] = right.x;
-    m[ 4 ] = right.y;
-    m[ 8 ] = right.z;
-    m[ 12 ] = 0;
-
-    m[ 1 ] = newUp.x;
-    m[ 5 ] = newUp.y;
-    m[ 9 ] = newUp.z;
-    m[13 ] = 0;
-
-    m[ 2 ] = -forward.x;
-    m[ 6 ] = -forward.y;
-    m[10 ] = -forward.z;
-    m[14 ] = 0;
-
-    m[ 3 ] = m[ 7 ] = m[ 11 ] = 0;
-    m[15 ] = 1;
-
-    Matrix44 translate;
-    translate.MakeIdentity();
-    translate.m[ 12 ] = -eye.x;
-    translate.m[ 13 ] = -eye.y;
-    translate.m[ 14 ] = -eye.z;
-
-    Multiply( translate, *this, *this );
+    // GameDev.net user Alundra's implementation.
+    const Vec3 zAxis = (center - eye).Normalized();
+    const Vec3 xAxis = Vec3::Cross( zAxis, up ).Normalized();
+    const Vec3 yAxis = Vec3::Cross( xAxis, zAxis );
+    // Mirrored:
+    //const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
+    //const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
     
-#if DEBUG
-    ae3d::CheckNaN( *this );
-#endif
+    m[  0 ] = xAxis.x; m[  1 ] = xAxis.y; m[  2 ] = xAxis.z; m[  3 ] = -Vec3::Dot( xAxis, eye );
+    m[  4 ] = yAxis.x; m[  5 ] = yAxis.y; m[  6 ] = yAxis.z; m[  7 ] = -Vec3::Dot( yAxis, eye );
+    m[  8 ] = zAxis.x; m[  9 ] = zAxis.y; m[ 10 ] = zAxis.z; m[ 11 ] = -Vec3::Dot( zAxis, eye );
+    m[ 12 ] =       0; m[ 13 ] =       0; m[ 14 ] =       0; m[ 15 ] = 1;
 }
 
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )

@@ -55,6 +55,9 @@ namespace ae3d
         /// \return Axis-aligned bounding box maximum in local coordinates.
         const Vec3& GetSubMeshAABBMax( unsigned subMeshIndex ) const;
 
+        /// \return Submesh count.
+        unsigned GetSubMeshCount() const;
+        
       private:
         friend class MeshRendererComponent;
         

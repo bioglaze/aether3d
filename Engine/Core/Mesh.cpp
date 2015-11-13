@@ -128,6 +128,11 @@ std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
     return m().subMeshes;
 }
 
+unsigned ae3d::Mesh::GetSubMeshCount() const
+{
+    return (unsigned)m().subMeshes.size();
+}
+
 ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& meshData )
 {
     for (const auto& entry : gMeshCache)
