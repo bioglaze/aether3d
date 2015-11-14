@@ -1,6 +1,7 @@
 #include "FileSystem.hpp"
 #include "System.hpp"
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 #if AETHER3D_METAL
@@ -36,10 +37,10 @@ namespace Global
     std::vector< PakFile > pakFiles;
 }
 
-ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents(const char* path)
+ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* path )
 {
     ae3d::FileSystem::FileContentsData outData;
-    outData.path = path == nullptr ? "" : std::string(GetFullPath(path));
+    outData.path = path == nullptr ? "" : std::string( GetFullPath( path ) );
 
     for (const auto& pakFile : Global::pakFiles)
     {
@@ -54,16 +55,19 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents(const char* pa
         }
     }
 
-
-    std::ifstream ifs(GetFullPath(path), std::ios::binary);
-
-    outData.data.assign(std::istreambuf_iterator< char >(ifs), std::istreambuf_iterator< char >());
-    outData.isLoaded = ifs.is_open();
+    std::ifstream in( GetFullPath( path ), std::ifstream::ate | std::ifstream::binary );
+    outData.isLoaded = in.is_open();
 
     if (!outData.isLoaded)
     {
         System::Print( "FileSystem: Could not open %s.\n", path );
+        return outData;
     }
+
+    const std::size_t size = (std::size_t)in.tellg();
+    outData.data.resize( size );
+    in.seekg( std::ifstream::beg );
+    in.read( (char*)outData.data.data(), outData.data.size() );
 
     return outData;
 }

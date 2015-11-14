@@ -99,8 +99,12 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_SIZE:
         case WM_SETCURSOR:
         case WM_DESTROY:
+            break;
         case WM_SYSKEYUP:
         case WM_KEYUP:
+            WindowGlobal::IncEventIndex();
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyUp;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
             break;
 
         case WM_KEYDOWN:

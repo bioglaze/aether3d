@@ -151,7 +151,7 @@ int main()
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
-    // Sponza begins
+    // Sponza begins.
     
     Mesh sponzaMesh;
     sponzaMesh.Load( FileSystem::FileContents( "sponza.ae3d" ) );

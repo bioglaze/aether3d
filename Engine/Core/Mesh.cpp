@@ -33,6 +33,23 @@ struct MeshCacheEntry
 std::vector< MeshCacheEntry > gMeshCache;
 std::list< Mesh* > gMeshInstances;
 
+struct membuf : std::streambuf
+{
+    membuf( char const* base, size_t size )
+    {
+        char* p( const_cast<char*>(base) );
+        this->setg( p, p, p + size );
+    }
+};
+
+struct imemstream : virtual membuf, std::istream
+{
+    imemstream( char const* base, size_t size )
+        : membuf( base, size )
+        , std::istream( static_cast<std::streambuf*>(this) ) {
+    }
+};
+
 void AddUniqueInstance( Mesh* mesh )
 {
     bool found = false;
@@ -193,8 +210,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     
     uint8_t magic[ 2 ];
 
-    std::istringstream is( std::string( std::begin( meshData.data ), std::end( meshData.data ) ) );
-
+    imemstream is( (char*)meshData.data.data(), meshData.data.size() );
     is.read( (char*)magic, sizeof( magic ) );
 
     if (magic[ 0 ] != 'a' || magic[ 1 ] != '9')
