@@ -55,7 +55,7 @@
 
    \subsection win_oculus Windows/Oculus Rift
 
-   Copy LibOVR and LibOVRKernel folders from Oculus SDK into Engine\ThirdParty and compile their release versions using VS2015.
+   Copy LibOVR and LibOVRKernel folders from Oculus SDK into Engine \ ThirdParty and compile their release versions using VS2015.
    Open Engine/VisualStudio_GL45 and build target Release.
    Open Samples/04_Misc3D and build target Oculus Release.
  

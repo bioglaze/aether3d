@@ -209,11 +209,12 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
         ae3d::System::Print( "Audio: Unknown format in file %s\n", clipData.path.c_str() );
     }
 
+    alSourcei( info.srcID, AL_BUFFER, 0 );
     alBufferData( info.bufID, format, wav.data.data(), dataSize, wav.sampleRate );
+    alSourcei( info.srcID, AL_BUFFER, info.bufID );
+    CheckOpenALError( "Loading .wav data." );
     
     info.lengthInSeconds = dataSize / static_cast< float >(wav.bytesPerSecond);
-    
-    CheckOpenALError( "Loading .wav data." );
 }
 }
 
@@ -233,7 +234,6 @@ void AudioReload( const std::string& path )
             {
                 LoadOgg( ae3d::FileSystem::FileContents( path.c_str() ), clip );
             }
-            ae3d::System::Print("after reload\n");
         }
     }
 }
