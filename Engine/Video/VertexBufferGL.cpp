@@ -28,26 +28,26 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
     glBindBuffer( GL_ARRAY_BUFFER, vboId );
     glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(VertexPTC), vertices, GL_STATIC_DRAW );
-    
+
     if (iboId == 0)
     {
         iboId = GfxDevice::CreateBufferId();
     }
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iboId );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iboId );    
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, GL_STATIC_DRAW );
-    
+
     // Position.
     glEnableVertexAttribArray( posChannel );
-    glVertexAttribPointer( posChannel, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), nullptr );
-    
+    glVertexAttribPointer( posChannel, 3, GL_FLOAT, GL_FALSE, sizeof( VertexPTC ), nullptr );
+
     // TexCoord.
     glEnableVertexAttribArray( uvChannel );
-    glVertexAttribPointer( uvChannel, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), (GLvoid*)offsetof( struct VertexPTC, u ) );
+    glVertexAttribPointer( uvChannel, 2, GL_FLOAT, GL_FALSE, sizeof( VertexPTC ), (GLvoid*)offsetof( struct VertexPTC, u ) );
 
     // Color.
     glEnableVertexAttribArray( colorChannel );
-    glVertexAttribPointer( colorChannel, 4, GL_FLOAT, GL_FALSE, sizeof(VertexPTC), (GLvoid*)offsetof( struct VertexPTC, color ) );
+    glVertexAttribPointer( colorChannel, 4, GL_FLOAT, GL_FALSE, sizeof( VertexPTC ), (GLvoid*)offsetof( struct VertexPTC, color ) );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
@@ -68,24 +68,42 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     }
     
     glBindBuffer( GL_ARRAY_BUFFER, vboId );
-    glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof(VertexPTN), vertices, GL_STATIC_DRAW );
-    
+
+    if (GfxDevice::HasExtension( "GL_ARB_buffer_storage" ))
+    {
+        const GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+        glBufferStorage( GL_ARRAY_BUFFER, vertexCount * sizeof( VertexPTN ), vertices, flags );
+    }
+    else
+    {
+        glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( VertexPTN ), vertices, GL_STATIC_DRAW );
+    }
+
     if (iboId == 0)
     {
         iboId = GfxDevice::CreateBufferId();
     }
     
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iboId );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, GL_STATIC_DRAW );
-    
+
+    if (GfxDevice::HasExtension( "GL_ARB_buffer_storage" ))
+    {
+        const GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+        glBufferStorage( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, flags );
+    }
+    else
+    {
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, GL_STATIC_DRAW );
+    }
+
     // Position.
     glEnableVertexAttribArray( posChannel );
     glVertexAttribPointer( posChannel, 3, GL_FLOAT, GL_FALSE, sizeof( VertexPTN ), nullptr );
-    
+
     // TexCoord.
     glEnableVertexAttribArray( uvChannel );
     glVertexAttribPointer( uvChannel, 2, GL_FLOAT, GL_FALSE, sizeof( VertexPTN ), (GLvoid*)offsetof( struct VertexPTN, u ) );
-    
+
     // Normal.
     glEnableVertexAttribArray( normalChannel );
     glVertexAttribPointer( normalChannel, 3, GL_FLOAT, GL_FALSE, sizeof( VertexPTN ), (GLvoid*)offsetof( struct VertexPTN, normal ) );
@@ -109,20 +127,38 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     }
 
     glBindBuffer( GL_ARRAY_BUFFER, vboId );
-    glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( VertexPTNTC ), vertices, GL_STATIC_DRAW );
     
+    if (GfxDevice::HasExtension( "GL_ARB_buffer_storage" ))
+    {
+        const GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+        glBufferStorage( GL_ARRAY_BUFFER, vertexCount * sizeof( VertexPTNTC ), vertices, flags );
+    }
+    else
+    {
+        glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( VertexPTNTC ), vertices, GL_STATIC_DRAW );
+    }
+
     if (iboId == 0)
     {
         iboId = GfxDevice::CreateBufferId();
     }
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iboId );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, GL_STATIC_DRAW );
-    
+
+    if (GfxDevice::HasExtension( "GL_ARB_buffer_storage" ))
+    {
+        const GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+        glBufferStorage( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, flags );
+    }
+    else
+    {
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, faceCount * sizeof( Face ), faces, GL_STATIC_DRAW );
+    }
+
     // Position.
     glEnableVertexAttribArray( posChannel );
     glVertexAttribPointer( posChannel, 3, GL_FLOAT, GL_FALSE, sizeof( VertexPTNTC ), nullptr );
-    
+
     // TexCoord.
     glEnableVertexAttribArray( uvChannel );
     glVertexAttribPointer( uvChannel, 2, GL_FLOAT, GL_FALSE, sizeof( VertexPTNTC ), (GLvoid*)offsetof( struct VertexPTNTC, u ) );
@@ -137,7 +173,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
     // Color.
     glEnableVertexAttribArray( colorChannel );
-    glVertexAttribPointer( colorChannel, 4, GL_FLOAT, GL_FALSE, sizeof( VertexPTNTC ), (GLvoid*)offsetof(struct VertexPTNTC, color) );
+    glVertexAttribPointer( colorChannel, 4, GL_FLOAT, GL_FALSE, sizeof( VertexPTNTC ), (GLvoid*)offsetof( struct VertexPTNTC, color ) );
 }
 
 void ae3d::VertexBuffer::Bind() const

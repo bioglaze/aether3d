@@ -70,8 +70,6 @@ void AddUniqueInstance( Mesh* mesh )
 
 void MeshReload( const std::string& path )
 {
-    ae3d::System::Print("MeshReload begin\n");
-    
     // Invalidates cache
     for (std::size_t i = 0; i < gMeshCache.size(); ++i)
     {
@@ -86,7 +84,6 @@ void MeshReload( const std::string& path )
     {
         if (instance->GetPath() == path)
         {
-            ae3d::System::Print("Hot-reloading mesh\n");
             instance->Load( FileSystem::FileContents( path.c_str() ) );
         }
     }
@@ -156,7 +153,6 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     {
         if (entry.path == meshData.path)
         {
-            System::Print("Loading from cache: %s\n", entry.path.c_str());
             m().aabbMin = entry.aabbMin;
             m().aabbMax = entry.aabbMax;
             m().subMeshes = entry.subMeshes;
