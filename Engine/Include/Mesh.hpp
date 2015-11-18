@@ -58,6 +58,10 @@ namespace ae3d
         /// \return Submesh count.
         unsigned GetSubMeshCount() const;
         
+        /// \param index Submesh index.
+        /// \return Submesh name. If index is invalid, returns first submesh's name.
+        const std::string& GetSubMeshName( unsigned index ) const;
+        
       private:
         friend class MeshRendererComponent;
         

@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include <vector>
+#include <map>
 #include <string>
 #include "Vec3.hpp"
 
@@ -36,8 +37,10 @@ namespace ae3d
 
         /// \param serialized Serialized scene contents.
         /// \param outGameObjects Returns game objects that were created from serialized scene contents.
+        /// \param outTexture2Ds Returns texture 2Ds that were created from serialized scene contents.
         /// \return Result. Parsing stops on first error and successfully loaded game objects are returned.
-        DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects ) const;
+        DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects,
+                                       std::map< std::string, class Texture2D >& outTexture2Ds ) const;
         
     private:
         void RenderWithCamera( GameObject* cameraGo, int cubeMapFace );

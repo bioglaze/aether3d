@@ -1,0 +1,10 @@
+UNAME := $(shell uname)
+COMPILER := g++
+
+ifeq ($(UNAME), Darwin)
+COMPILER := clang++ --stdlib=libc++
+endif
+
+all:
+	$(COMPILER) -g -std=c++11 -Wall -Wextra read_mtl.cpp -o ../../../aether3d_build/read_mtl
+

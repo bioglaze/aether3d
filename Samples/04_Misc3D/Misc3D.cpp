@@ -171,6 +171,32 @@ int main()
     
     scene.Add( &sponza );
     
+    std::vector< GameObject > sponzaGameObjects;
+    std::map< std::string, Material > sponzaMaterialNameToMaterial;
+    std::map< std::string, Texture2D > sponzaTexturelNameToTexture;
+    std::map< std::string, std::string > sponzaMeshNameToMaterialName;
+    
+    auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTexturelNameToTexture );
+    
+    if (res != Scene::DeserializeResult::Success)
+    {
+        System::Print( "Could not parse Sponza\n" );
+    }
+    
+    /*for (auto& material : sponzaMeshNameToMaterialName)
+    {
+        unsigned subMeshIndex = 0;
+        const unsigned subMeshCount = sponzaGameObjects[ 0 ].GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount();
+        
+        for (unsigned i = 0; i < subMeshCount; ++i)
+        {
+            if (sponzaGameObjects[ 0 ].GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshName( i ) == material.first)
+            {
+                sponzaGameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMaterial( &sponzaMaterialNameToMaterial[ material.second ], subMeshIndex );
+            }
+        }
+    }*/
+    
     // Sponza ends
     
     scene.SetSkybox( &skybox );

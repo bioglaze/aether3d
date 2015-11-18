@@ -19,6 +19,7 @@
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
+#include "Texture2D.hpp"
 #include "Renderer.hpp"
 #include "System.hpp"
 
@@ -567,7 +568,8 @@ std::string ae3d::Scene::GetSerialized() const
     return outSerialized;
 }
 
-ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects ) const
+ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects,
+                                                        std::map< std::string, class Texture2D >& outTexture2Ds ) const
 {
     // TODO: It would be better to store the token strings into somewhere accessible to GetSerialized() to prevent typos etc.
 
@@ -661,6 +663,17 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             float x, y, z, s;
             lineStream >> x >> y >> z >> s;
             outGameObjects.back().GetComponent< TransformComponent >()->SetLocalRotation( { { x, y, z }, s } );
+        }
+
+        if (token == "texture2d")
+        {
+            std::string name;
+            std::string path;
+            
+            lineStream >> name >> path;
+            
+            outTexture2Ds[ name ] = Texture2D();
+            outTexture2Ds[ name ].Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
         }
     }
     

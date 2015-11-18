@@ -30,6 +30,9 @@ struct MeshCacheEntry
     std::vector< SubMesh > subMeshes;    
 };
 
+namespace
+{
+
 std::vector< MeshCacheEntry > gMeshCache;
 std::list< Mesh* > gMeshInstances;
 
@@ -49,6 +52,7 @@ struct imemstream : virtual membuf, std::istream
         , std::istream( static_cast<std::streambuf*>(this) ) {
     }
 };
+}
 
 void AddUniqueInstance( Mesh* mesh )
 {
@@ -135,6 +139,11 @@ const Vec3& ae3d::Mesh::GetSubMeshAABBMin( unsigned subMeshIndex ) const
 const Vec3& ae3d::Mesh::GetSubMeshAABBMax( unsigned subMeshIndex ) const
 {
     return m().subMeshes[ subMeshIndex < m().subMeshes.size() ? subMeshIndex : 0 ].aabbMax;
+}
+
+const std::string& ae3d::Mesh::GetSubMeshName( unsigned index ) const
+{
+    return m().subMeshes[ index < m().subMeshes.size() ? index : 0 ].name;
 }
 
 std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
