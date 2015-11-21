@@ -28,16 +28,24 @@ using namespace ae3d;
 
 int main()
 {
-    // FIXME: Breaks if 0
+    bool fullScreen = true;
+
     int width = 640;
     int height = 480;
+    
+    if (fullScreen)
+    {
+        width = 0;
+        height = 0;
+    }
     
     System::EnableWindowsMemleakDetection();
     VR::Init();
 #if OCULUS_RIFT
     VR::GetIdealWindowSize( width, height );
 #endif
-    Window::Create( width, height, WindowCreateFlags::Empty );
+    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
+    Window::GetSize( width, height );
     VR::StartTracking( width, height );
     Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();

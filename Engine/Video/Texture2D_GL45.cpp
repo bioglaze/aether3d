@@ -109,9 +109,23 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         fileWatcher.AddFile( fileContents.path, TexReload );
     }
 
+    GLenum magFilter = GL_NEAREST;
+    GLenum minFilter = GL_NEAREST;
+    
+    if (filter == TextureFilter::Linear)
+    {
+        minFilter = GL_LINEAR;
+        magFilter = GL_LINEAR;
+        
+        if (aMipmaps == Mipmaps::Generate)
+        {
+            minFilter = GL_LINEAR_MIPMAP_LINEAR;
+        }
+    }
+    
     glBindTexture( GL_TEXTURE_2D, handle );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : (mipmaps == Mipmaps::Generate ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR ) );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
 
@@ -141,6 +155,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
     //Texture2DGlobal::PrintMemoryUsage();
 #endif
+    GfxDevice::ErrorCheck( "Load Texture2D" );
 }
 
 void ae3d::Texture2D::LoadDDS( const char* path )
