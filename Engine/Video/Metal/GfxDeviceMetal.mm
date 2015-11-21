@@ -40,6 +40,7 @@ namespace GfxDeviceGlobal
     int drawCalls = 0;
     int textureBinds = 0;
     int vertexBufferBinds = 0;
+    int renderTargetBinds = 0;
     int backBufferWidth = 0;
     int backBufferHeight = 0;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
@@ -163,6 +164,11 @@ int ae3d::GfxDevice::GetTextureBinds()
 int ae3d::GfxDevice::GetVertexBufferBinds()
 {
     return GfxDeviceGlobal::vertexBufferBinds;
+}
+
+int ae3d::GfxDevice::GetRenderTargetBinds()
+{
+    return GfxDeviceGlobal::renderTargetBinds;
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
@@ -294,13 +300,12 @@ int ae3d::GfxDevice::GetDrawCalls()
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
     GfxDeviceGlobal::drawCalls = 0;
+    GfxDeviceGlobal::renderTargetBinds = 0;
+    GfxDeviceGlobal::textureBinds = 0;
+    GfxDeviceGlobal::vertexBufferBinds = 0;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
-{
-}
-
-void ae3d::GfxDevice::SetBlendMode( BlendMode blendMode )
 {
 }
 

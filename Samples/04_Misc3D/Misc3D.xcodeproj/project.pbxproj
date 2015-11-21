@@ -30,6 +30,7 @@
 
 /* Begin PBXFileReference section */
 		AB190E351B57DEC4005ECE49 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../Engine/Include/Material.hpp; sourceTree = "<group>"; };
+		AB670F241C00A8B60041E6B0 /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Engine/Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
 		AB7112B71B4307D100C4EE78 /* Misc3D */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Misc3D; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB7112C21B4308F900C4EE78 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
 		AB7112C41B43090300C4EE78 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
@@ -116,6 +117,7 @@
 		AB7112D01B43095C00C4EE78 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				AB670F241C00A8B60041E6B0 /* SpotLightComponent.hpp */,
 				AB7112D11B43098400C4EE78 /* AudioClip.hpp */,
 				AB7112D21B43098400C4EE78 /* AudioSourceComponent.hpp */,
 				AB7112D31B43098400C4EE78 /* CameraComponent.hpp */,

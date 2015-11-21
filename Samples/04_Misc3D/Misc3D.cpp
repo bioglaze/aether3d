@@ -6,6 +6,7 @@
 #include "DirectionalLightComponent.hpp"
 #include "MeshRendererComponent.hpp"
 #include "SpriteRendererComponent.hpp"
+#include "SpotLightComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "FileSystem.hpp"
@@ -28,7 +29,7 @@ using namespace ae3d;
 
 int main()
 {
-    bool fullScreen = true;
+    bool fullScreen = false;
 
     int width = 640;
     int height = 480;
@@ -151,6 +152,13 @@ int main()
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, -1, 0 }, { 0, 1, 0 } );
 
+    GameObject spotLight;
+    spotLight.AddComponent<SpotLightComponent>();
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
+    spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
+    spotLight.AddComponent<TransformComponent>();
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+
     Scene scene;
     
     TextureCube skybox;
@@ -162,10 +170,10 @@ int main()
     // Sponza begins.
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
-    std::map< std::string, Texture2D* > sponzaTexturelNameToTexture;
+    std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
     
-    auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTexturelNameToTexture,
+    auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
     if (res != Scene::DeserializeResult::Success)
@@ -193,7 +201,8 @@ int main()
     scene.Add( &copiedCube );
     //scene.Add( &cube2 );
     scene.Add( &statsContainer );
-    scene.Add( &dirLight );
+    //scene.Add( &dirLight );
+    scene.Add( &spotLight );
 
     GameObject cubes[ 5 ];
 
@@ -397,6 +406,21 @@ int main()
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         Window::SwapBuffers();
+    }
+
+    for (auto& mat : sponzaMaterialNameToMaterial)
+    {
+        delete mat.second;
+    }
+    
+    for (auto& mesh : sponzaMeshes)
+    {
+        delete mesh;
+    }
+    
+    for (auto& t : sponzaTextureNameToTexture)
+    {
+        delete t.second;
     }
 
     System::Deinit();

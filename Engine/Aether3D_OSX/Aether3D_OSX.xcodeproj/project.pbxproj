@@ -45,6 +45,7 @@
 		AB922E531B404D1E000F3488 /* MeshRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E521B404D1E000F3488 /* MeshRendererComponent.hpp */; };
 		AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB949D341ABC8DDF007D561E /* Shader.hpp */; };
 		AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB949D361ABC8E44007D561E /* ShaderGL.cpp */; };
+		AB94ED061C006703005D6076 /* SpotLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB94ED051C006703005D6076 /* SpotLightComponent.cpp */; };
 		ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */; };
 		ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */; };
 		ABB79F9D1BA9B818002A1B5F /* DirectionalLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB79F9C1BA9B818002A1B5F /* DirectionalLightComponent.cpp */; };
@@ -113,6 +114,8 @@
 		AB922E5C1B405F5E000F3488 /* SubMesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SubMesh.hpp; path = ../Core/SubMesh.hpp; sourceTree = "<group>"; };
 		AB949D341ABC8DDF007D561E /* Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = ../Include/Shader.hpp; sourceTree = "<group>"; };
 		AB949D361ABC8E44007D561E /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/ShaderGL.cpp; sourceTree = "<group>"; };
+		AB94ED041C006621005D6076 /* SpotLightComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
+		AB94ED051C006703005D6076 /* SpotLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpotLightComponent.cpp; path = ../Components/SpotLightComponent.cpp; sourceTree = "<group>"; };
 		ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../Core/Matrix.cpp; sourceTree = "<group>"; };
 		ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Matrix.hpp; path = ../Include/Matrix.hpp; sourceTree = "<group>"; };
 		ABB79F9C1BA9B818002A1B5F /* DirectionalLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DirectionalLightComponent.cpp; path = ../Components/DirectionalLightComponent.cpp; sourceTree = "<group>"; };
@@ -231,6 +234,7 @@
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
 				AB949D341ABC8DDF007D561E /* Shader.hpp */,
 				AB889AF61ABB4C5B005BA86D /* SpriteRendererComponent.hpp */,
+				AB94ED041C006621005D6076 /* SpotLightComponent.hpp */,
 				AB3FD4941AB4330C00D28653 /* System.hpp */,
 				AB889AF71ABB4C5B005BA86D /* Texture2D.hpp */,
 				AB77FD561B344B26001858CC /* TextureCube.hpp */,
@@ -265,6 +269,7 @@
 				AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */,
 				ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */,
 				ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */,
+				AB94ED051C006703005D6076 /* SpotLightComponent.cpp */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -396,6 +401,7 @@
 				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
 				AB870F9D1B5EBB0C0004BEE5 /* Frustum.cpp in Sources */,
+				AB94ED061C006703005D6076 /* SpotLightComponent.cpp in Sources */,
 				AB922E4E1B4039DB000F3488 /* Mesh.cpp in Sources */,
 				AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */,
 				AB77FD581B344CB0001858CC /* TextureCubeGL.cpp in Sources */,

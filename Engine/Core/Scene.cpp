@@ -17,6 +17,7 @@
 #include "MeshRendererComponent.hpp"
 #include "RenderTexture.hpp"
 #include "SpriteRendererComponent.hpp"
+#include "SpotLightComponent.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "Texture2D.hpp"
@@ -53,6 +54,14 @@ namespace SceneGlobal
     bool isShadowCameraCreated = false;
     Matrix44 shadowCameraViewMatrix;
     Matrix44 shadowCameraProjectionMatrix;
+}
+
+void SetupCameraForSpotShadowCasting( const Vec3& lightPosition, const Vec3& lightDirection, ae3d::CameraComponent& outCamera,
+                                     ae3d::TransformComponent& outCameraTransform )
+{
+    outCameraTransform.LookAt( lightPosition, lightPosition + lightDirection * 200, Vec3( 0, 1, 0 ) );
+    outCamera.SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    outCamera.SetProjection( 45, 1, 1, 200 );
 }
 
 void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const Frustum& eyeFrustum, const Vec3& sceneAABBmin, const Vec3& sceneAABBmax,
@@ -238,10 +247,10 @@ void ae3d::Scene::Render()
         }
     }
 
+    //unsigned debugShadowFBO = 0;
+
     for (auto camera : cameras)
     {
-        //unsigned debugShadowFBO = 0;
-            
         if (camera != nullptr && camera->GetComponent<TransformComponent>())
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
@@ -256,8 +265,9 @@ void ae3d::Scene::Render()
                 
                 auto lightTransform = go->GetComponent<TransformComponent>();
                 auto dirLight = go->GetComponent<DirectionalLightComponent>();
-                
-                if (lightTransform && dirLight && dirLight->CastsShadow())
+                auto spotLight = go->GetComponent<SpotLightComponent>();
+
+                if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow())))
                 {
                     Frustum eyeFrustum;
                     
@@ -288,15 +298,30 @@ void ae3d::Scene::Render()
                         SceneGlobal::isShadowCameraCreated = true;
                     }
                     
-                    SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                    
-                    SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                    if (dirLight)
+                    {
+                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                        SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                    }
+                    if (spotLight)
+                    {
+                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
+                        SetupCameraForSpotShadowCasting( lightTransform->GetLocalPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+
+                    }
                     
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     
-                    Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                    
-                    //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
+                    if (dirLight)
+                    {
+                        Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                        //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
+                    }
+                    if (spotLight)
+                    {
+                        Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
+                        //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
+                    }
                 }
             }
         }
@@ -563,6 +588,14 @@ std::string ae3d::Scene::GetSerialized() const
         if (gameObject->GetComponent<AudioSourceComponent>())
         {
             outSerialized += gameObject->GetComponent<AudioSourceComponent>()->GetSerialized();
+        }
+        if (gameObject->GetComponent<DirectionalLightComponent>())
+        {
+            outSerialized += gameObject->GetComponent<DirectionalLightComponent>()->GetSerialized();
+        }
+        if (gameObject->GetComponent<SpotLightComponent>())
+        {
+            outSerialized += gameObject->GetComponent<SpotLightComponent>()->GetSerialized();
         }
     }
     return outSerialized;
