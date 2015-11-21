@@ -35,12 +35,17 @@ namespace ae3d
         /// \return Scene's contents in a textual format that can be saved into file etc.
         std::string GetSerialized() const;
 
+        /// Deserializes a scene additively from file contents. Must be called after renderer is initialized.
         /// \param serialized Serialized scene contents.
         /// \param outGameObjects Returns game objects that were created from serialized scene contents.
-        /// \param outTexture2Ds Returns texture 2Ds that were created from serialized scene contents.
+        /// \param outTexture2Ds Returns texture 2Ds that were created from serialized scene contents. Caller is responsible for freeing the memory.
+        /// \param outMaterials Returns materials that were created Caller is responsible for freeing the memory.
+        /// \param outMeshes Returns meshes that were created Caller is responsible for freeing the memory.
         /// \return Result. Parsing stops on first error and successfully loaded game objects are returned.
         DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects,
-                                       std::map< std::string, class Texture2D >& outTexture2Ds ) const;
+                                       std::map< std::string, class Texture2D* >& outTexture2Ds,
+                                       std::map< std::string, class Material* >& outMaterials,
+                                       std::vector< class Mesh* >& outMeshes ) const;
         
     private:
         void RenderWithCamera( GameObject* cameraGo, int cubeMapFace );

@@ -16,6 +16,11 @@ const char* GetFullPath( const char* fileName )
 #else
 const char* GetFullPath( const char* fileName )
 {
+    //static std::string fName;
+    //fName = fileName;
+    //fName.replace( std::begin( fName ), std::end( fName ), '\\', '/' );
+    //return fName.c_str();
+    
     return fileName;
 }
 #endif

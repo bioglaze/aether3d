@@ -152,51 +152,29 @@ int main()
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None );
 
     // Sponza begins.
-    
-    Mesh sponzaMesh;
-    sponzaMesh.Load( FileSystem::FileContents( "sponza.ae3d" ) );
-    
-    GameObject sponza;
-    sponza.AddComponent< MeshRendererComponent >();
-    sponza.GetComponent< MeshRendererComponent >()->SetMesh( &sponzaMesh );
-    sponza.AddComponent< TransformComponent >();
-    sponza.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
-    sponza.GetComponent< TransformComponent >()->SetLocalScale( 0.1f );
-    unsigned subMeshCount = sponza.GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount();
-    
-    for (unsigned i = 0; i < subMeshCount; ++i)
-    {
-        sponza.GetComponent< MeshRendererComponent >()->SetMaterial( &material, i );
-    }
-    
-    scene.Add( &sponza );
-    
     std::vector< GameObject > sponzaGameObjects;
-    std::map< std::string, Material > sponzaMaterialNameToMaterial;
-    std::map< std::string, Texture2D > sponzaTexturelNameToTexture;
-    std::map< std::string, std::string > sponzaMeshNameToMaterialName;
+    std::map< std::string, Material* > sponzaMaterialNameToMaterial;
+    std::map< std::string, Texture2D* > sponzaTexturelNameToTexture;
+    std::vector< Mesh* > sponzaMeshes;
     
-    auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTexturelNameToTexture );
+    auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTexturelNameToTexture,
+                                 sponzaMaterialNameToMaterial, sponzaMeshes );
     
     if (res != Scene::DeserializeResult::Success)
     {
         System::Print( "Could not parse Sponza\n" );
     }
-    
-    /*for (auto& material : sponzaMeshNameToMaterialName)
+
+    for (auto& mat : sponzaMaterialNameToMaterial)
     {
-        unsigned subMeshIndex = 0;
-        const unsigned subMeshCount = sponzaGameObjects[ 0 ].GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount();
-        
-        for (unsigned i = 0; i < subMeshCount; ++i)
-        {
-            if (sponzaGameObjects[ 0 ].GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshName( i ) == material.first)
-            {
-                sponzaGameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMaterial( &sponzaMaterialNameToMaterial[ material.second ], subMeshIndex );
-            }
-        }
-    }*/
+        mat.second->SetShader( &shader );
+        mat.second->SetVector( "tint", { 1, 1, 1, 1 } );
+    }
     
+    for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
+    {
+        scene.Add( &sponzaGameObjects[ i ] );
+    }
     // Sponza ends
     
     scene.SetSkybox( &skybox );
@@ -407,6 +385,7 @@ int main()
         std::string stats = std::string( "draw calls:" ) + std::to_string( System::Statistics::GetDrawCallCount() );
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
         stats += std::string( "\nRT binds:" ) + std::to_string( System::Statistics::GetRenderTargetBindCount() );
+        stats += std::string( "\nTexture binds:" ) + std::to_string( System::Statistics::GetTextureBindCount() );
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         Window::SwapBuffers();

@@ -569,7 +569,9 @@ std::string ae3d::Scene::GetSerialized() const
 }
 
 ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects,
-                                                        std::map< std::string, class Texture2D >& outTexture2Ds ) const
+                                                        std::map< std::string, Texture2D* >& outTexture2Ds,
+                                                        std::map< std::string, Material* >& outMaterials,
+                                                        std::vector< Mesh* >& outMeshes ) const
 {
     // TODO: It would be better to store the token strings into somewhere accessible to GetSerialized() to prevent typos etc.
 
@@ -577,6 +579,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
     std::stringstream stream( std::string( std::begin( serialized.data ), std::end( serialized.data ) ) );
     std::string line;
+    
+    std::string currentMaterialName;
     
     while (!stream.eof())
     {
@@ -595,11 +599,23 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
         if (token == "dirlight")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found dirlight but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             outGameObjects.back().AddComponent< DirectionalLightComponent >();
         }
 
         if (token == "shadow")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found shadow but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             int enabled;
             lineStream >> enabled;
             outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
@@ -607,11 +623,23 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
         if (token == "camera")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found camera but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             outGameObjects.back().AddComponent< CameraComponent >();
         }
 
         if (token == "ortho")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found ortho but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             float x, y, width, height, nearp, farp;
             lineStream >> x >> y >> width >> height >> nearp >> farp;
             outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( x, y, width, height, nearp, farp );
@@ -619,6 +647,12 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
         if (token == "persp")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found persp but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             float fov, aspect, nearp, farp;
             lineStream >> fov >> aspect >> nearp >> farp;
             outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( fov, aspect, nearp, farp );
@@ -626,6 +660,12 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
         if (token == "projection")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found projection but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             std::string type;
             lineStream >> type;
             
@@ -641,6 +681,12 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
         if (token == "clearcolor")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found clearcolor but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             float red, green, blue;
             lineStream >> red >> green >> blue;
             outGameObjects.back().GetComponent< CameraComponent >()->SetClearColor( { red, green, blue } );
@@ -648,11 +694,47 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
         if (token == "transform")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found transform but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             outGameObjects.back().AddComponent< TransformComponent >();
+        }
+
+        if (token == "meshrenderer")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found meshrenderer but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            std::string meshFile;
+            lineStream >> meshFile;
+            
+            outGameObjects.back().AddComponent< MeshRendererComponent >();
+            
+            outMeshes.push_back( new Mesh() );
+            outMeshes.back()->Load( FileSystem::FileContents( meshFile.c_str() ) );
+            outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMesh( outMeshes.back() );
         }
 
         if (token == "position")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found position but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            if (!outGameObjects.back().GetComponent< TransformComponent >())
+            {
+                System::Print( "Failed to parse %s: found position but the game object doesn't have a transform component.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             float x, y, z;
             lineStream >> x >> y >> z;
             outGameObjects.back().GetComponent< TransformComponent >()->SetLocalPosition( { x, y, z } );
@@ -660,9 +742,40 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
         if (token == "rotation")
         {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found rotation but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            if (!outGameObjects.back().GetComponent< TransformComponent >())
+            {
+                System::Print( "Failed to parse %s: found rotation but the game object doesn't have a transform component.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
             float x, y, z, s;
             lineStream >> x >> y >> z >> s;
             outGameObjects.back().GetComponent< TransformComponent >()->SetLocalRotation( { { x, y, z }, s } );
+        }
+
+        if (token == "scale")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found scale but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+            
+            if (!outGameObjects.back().GetComponent< TransformComponent >())
+            {
+                System::Print( "Failed to parse %s: found scale but the game object doesn't have a transform component.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            float scale;
+            lineStream >> scale;
+            outGameObjects.back().GetComponent< TransformComponent >()->SetLocalScale( scale );
         }
 
         if (token == "texture2d")
@@ -672,11 +785,64 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             lineStream >> name >> path;
             
-            outTexture2Ds[ name ] = Texture2D();
-            outTexture2Ds[ name ].Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
+            outTexture2Ds[ name ] = new Texture2D();
+            outTexture2Ds[ name ]->Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
+        }
+
+        if (token == "material")
+        {
+            std::string materialName;
+            lineStream >> materialName;
+            currentMaterialName = materialName;
+            
+            outMaterials[ materialName ] = new Material();
+        }
+
+        if (token == "mesh_material")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found mesh_material but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+            
+            if (!outGameObjects.back().GetComponent< MeshRendererComponent >())
+            {
+                System::Print( "Failed to parse %s: found mesh_material but the last defined game object doesn't have a mesh renderer component.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+            
+            if (!outGameObjects.back().GetComponent< MeshRendererComponent >()->GetMesh())
+            {
+                System::Print( "Failed to parse %s: found mesh_material but the last defined game object's mesh renderer doesn't have a mesh.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+            
+            std::string meshName;
+            std::string materialName;
+            lineStream >> meshName >> materialName;
+            
+            const unsigned subMeshCount = outGameObjects.back().GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount();
+            
+            for (unsigned i = 0; i < subMeshCount; ++i)
+            {
+                if (outGameObjects.back().GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshName( i ) == meshName)
+                {
+                    outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMaterial( outMaterials[ materialName ], i );
+                }
+            }
+        }
+
+        if (token == "param_texture")
+        {
+            std::string uniformName;
+            std::string textureName;
+            
+            lineStream >> uniformName >> textureName;
+            outMaterials[ currentMaterialName ]->SetTexture( uniformName.c_str(), outTexture2Ds[ textureName ]);
         }
     }
-    
+
     return DeserializeResult::Success;
 }
 
@@ -701,8 +867,8 @@ void ae3d::Scene::GenerateAABB()
             continue;
         }
         
-        Vec3 oAABBmin = meshRenderer->GetMesh()->GetAABBMin();
-        Vec3 oAABBmax = meshRenderer->GetMesh()->GetAABBMax();
+        Vec3 oAABBmin = meshRenderer->GetMesh() ? meshRenderer->GetMesh()->GetAABBMin() : Vec3( -1, -1, -1 );
+        Vec3 oAABBmax = meshRenderer->GetMesh() ? meshRenderer->GetMesh()->GetAABBMax() : Vec3(  1,  1,  1 );
         
         Matrix44::TransformPoint( oAABBmin, meshTransform->GetLocalMatrix(), &oAABBmin );
         Matrix44::TransformPoint( oAABBmax, meshTransform->GetLocalMatrix(), &oAABBmax );

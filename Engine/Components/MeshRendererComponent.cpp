@@ -104,6 +104,11 @@ std::string ae3d::MeshRendererComponent::GetSerialized() const
 
 void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, const Frustum& cameraFrustum, const Matrix44& localToWorld, Shader* overrideShader )
 {
+    if (!mesh)
+    {
+        return;
+    }
+    
     std::vector< Vec3 > aabbWorld;
     MathUtil::GetCorners( mesh->GetAABBMin(), mesh->GetAABBMax(), aabbWorld );
     
@@ -162,7 +167,6 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
             Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraProjectionMatrix, shadowTexProjMatrix );
             Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
             
-            //shadowTexProjMatrix.Transpose(shadowTexProjMatrix);
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
             materials[ subMeshIndex ]->Apply();
