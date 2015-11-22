@@ -72,5 +72,8 @@
     <ClInclude Include="..\..\..\Engine\Include\DirectionalLightComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\SpotLightComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

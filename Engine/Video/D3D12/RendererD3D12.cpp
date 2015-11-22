@@ -98,5 +98,5 @@ cbuffer Scene\
     }"
         );
 
-    //skyboxShader.Load( skyboxSource.c_str(), skyboxSource.c_str() );
+    skyboxShader.Load( skyboxSource.c_str(), skyboxSource.c_str() );
 }

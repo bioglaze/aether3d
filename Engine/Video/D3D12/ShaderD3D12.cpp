@@ -201,8 +201,9 @@ void ae3d::Shader::ReflectVariables()
         auto var = buffer->GetVariableByIndex( 0 );
         D3D12_SHADER_VARIABLE_DESC descVar;
         hr = var->GetDesc( &descVar );
+        AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
-        uniformLocations[ descVar.Name ].i = descVar.StartOffset;
+        uniformLocations[ std::string( descVar.Name) ].i = descVar.StartOffset;
     }
 }
 

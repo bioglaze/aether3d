@@ -356,6 +356,11 @@ void ae3d::CreateRenderer( int /*samples*/ )
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
 {
+    if (!GfxDeviceGlobal::texture0)
+    {
+        GfxDeviceGlobal::texture0 = const_cast< Texture2D*>( Texture2D::GetDefaultTexture() );
+    }
+
     const std::string psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
     
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
@@ -425,6 +430,11 @@ void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
 
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
 {
+}
+
+int ae3d::GfxDevice::GetRenderTargetBinds()
+{
+    return 0;
 }
 
 void ae3d::GfxDevice::IncDrawCalls()

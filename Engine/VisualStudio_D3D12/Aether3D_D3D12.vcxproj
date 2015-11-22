@@ -86,6 +86,7 @@
     <ClCompile Include="..\Components\DirectionalLightComponent.cpp" />
     <ClCompile Include="..\Components\GameObject.cpp" />
     <ClCompile Include="..\Components\MeshRendererComponent.cpp" />
+    <ClCompile Include="..\Components\SpotLightComponent.cpp" />
     <ClCompile Include="..\Components\SpriteRendererComponent.cpp" />
     <ClCompile Include="..\Components\TextRendererComponent.cpp" />
     <ClCompile Include="..\Components\TransformComponent.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="..\Include\RenderTexture.hpp" />
     <ClInclude Include="..\Include\Scene.hpp" />
     <ClInclude Include="..\Include\Shader.hpp" />
+    <ClInclude Include="..\Include\SpotLightComponent.hpp" />
     <ClInclude Include="..\Include\SpriteRendererComponent.hpp" />
     <ClInclude Include="..\Include\System.hpp" />
     <ClInclude Include="..\Include\TextRendererComponent.hpp" />

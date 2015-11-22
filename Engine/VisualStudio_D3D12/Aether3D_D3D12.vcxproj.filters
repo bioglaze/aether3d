@@ -132,6 +132,9 @@
     <ClCompile Include="..\Video\D3D12\DescriptorHeapManager.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\SpotLightComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -244,6 +247,9 @@
     </ClInclude>
     <ClInclude Include="..\Video\D3D12\DescriptorHeapManager.hpp">
       <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpotLightComponent.hpp">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

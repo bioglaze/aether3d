@@ -194,6 +194,7 @@
     <ClInclude Include="..\..\..\Engine\Include\RenderTexture.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Scene.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Shader.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\SpotLightComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\SpriteRendererComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\System.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\TextRendererComponent.hpp" />

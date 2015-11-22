@@ -109,6 +109,9 @@
     <ClCompile Include="..\Components\DirectionalLightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\SpotLightComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -237,6 +240,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\DirectionalLightComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\SpotLightComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
