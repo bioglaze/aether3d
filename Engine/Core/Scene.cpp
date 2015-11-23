@@ -350,7 +350,15 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         GfxDevice::ClearScreen( GfxDevice::ClearFlags::Depth );
     }
-    
+    else if (camera->GetClearFlag() == CameraComponent::ClearFlag::DontClear)
+    {
+        // Nothing to be done here.
+    }
+    else
+    {
+        System::Assert( false, "Unhandled clear flag." );
+    }
+
     Matrix44 view;
 
     if (skybox != nullptr)
@@ -710,6 +718,11 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             {
                 outGameObjects.back().GetComponent< CameraComponent >()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
             }
+            else
+            {
+                System::Print( "Camera has unknown projection type %s\n", type.c_str() );
+                return DeserializeResult::ParseError;
+            }
         }
 
         if (token == "clearcolor")
@@ -839,13 +852,15 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 return DeserializeResult::ParseError;
             }
             
-            if (!outGameObjects.back().GetComponent< MeshRendererComponent >())
+            auto mr = outGameObjects.back().GetComponent< MeshRendererComponent >();
+
+            if (!mr)
             {
                 System::Print( "Failed to parse %s: found mesh_material but the last defined game object doesn't have a mesh renderer component.\n", serialized.path.c_str() );
                 return DeserializeResult::ParseError;
             }
             
-            if (!outGameObjects.back().GetComponent< MeshRendererComponent >()->GetMesh())
+            if (!mr->GetMesh())
             {
                 System::Print( "Failed to parse %s: found mesh_material but the last defined game object's mesh renderer doesn't have a mesh.\n", serialized.path.c_str() );
                 return DeserializeResult::ParseError;
@@ -855,13 +870,13 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             std::string materialName;
             lineStream >> meshName >> materialName;
             
-            const unsigned subMeshCount = outGameObjects.back().GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount();
+            const unsigned subMeshCount = mr->GetMesh()->GetSubMeshCount();
             
             for (unsigned i = 0; i < subMeshCount; ++i)
             {
-                if (outGameObjects.back().GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshName( i ) == meshName)
+                if (mr->GetMesh()->GetSubMeshName( i ) == meshName)
                 {
-                    outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMaterial( outMaterials[ materialName ], i );
+                    mr->SetMaterial( outMaterials[ materialName ], i );
                 }
             }
         }

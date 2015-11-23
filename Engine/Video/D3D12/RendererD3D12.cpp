@@ -71,8 +71,7 @@ cbuffer Scene\
         return float4( vsOut.color.rgb, opacity );\
     }"
         );
-    // FIXME: Loading causes spriteRendererShader stuff to disappear even if sdf shader not used.
-    //sdfShader.Load( sdfSource.c_str(), sdfSource.c_str() );
+    sdfShader.Load( sdfSource.c_str(), sdfSource.c_str() );
 
     // TODO: Implement
     const std::string skyboxSource(

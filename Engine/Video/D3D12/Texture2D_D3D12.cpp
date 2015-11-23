@@ -154,7 +154,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
     else if (isDDS)
     {
-        ae3d::System::Assert( false, ".dds loading not implemented in d3d12!\n" );
+        *this = Texture2DGlobal::defaultTexture;
         LoadDDS( fileContents.path.c_str() );
     }
     else
@@ -188,6 +188,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
+    ae3d::System::Print( ".dds loading not implemented in d3d12!\n" );
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )

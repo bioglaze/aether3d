@@ -234,6 +234,10 @@ void AudioReload( const std::string& path )
             {
                 LoadOgg( ae3d::FileSystem::FileContents( path.c_str() ), clip );
             }
+            else
+            {
+                ae3d::System::Print( "Unhandled file format %s\n", extension.c_str() );
+            }
         }
     }
 }

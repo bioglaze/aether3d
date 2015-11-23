@@ -119,7 +119,7 @@ int main()
     cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -50 } );
 
     Shader shader;
-    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents(""), FileSystem::FileContents( "" ) );
+    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents("unlit.hlsl"), FileSystem::FileContents( "unlit.hlsl" ) );
 
     Texture2D asphaltTex;
     asphaltTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
@@ -136,7 +136,7 @@ int main()
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
 
     Shader shaderCubeMap;
-    shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents( "unlit_cube.hlsl" ), FileSystem::FileContents( "unlit_cube.hlsl" ) );
 
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );

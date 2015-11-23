@@ -47,6 +47,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         {
             //LoadDDS( fileContents.path.c_str() );
         }
+        else
+        {
+            System::Print( "Cube map face has unsupported texture extension in file: %s\n", paths[ face ].c_str() );
+        }
     }
 
     GfxDevice::ErrorCheck( "Cube map creation" );
