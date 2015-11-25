@@ -53,7 +53,8 @@ void CommandContext::Reset()
 {
     ae3d::System::Assert( graphicsCommandList != nullptr && currentAllocator == nullptr, "CommandContext was not initialized" );
     currentAllocator = owningManager->RequestAllocator();
-    graphicsCommandList->Reset( currentAllocator, nullptr );
+    HRESULT hr = graphicsCommandList->Reset( currentAllocator, nullptr );
+    AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
 }
 
 void CommandContext::Initialize( CommandListManager& commandListManager )

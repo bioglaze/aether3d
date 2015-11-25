@@ -7,7 +7,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.4 Documentation
+   \mainpage Aether3D Game Engine v0.5 Documentation
 
    \section Introduction
 
@@ -44,7 +44,7 @@
 
    \subsection win1 Windows/Visual Studio
    
-   You'll need Visual Studio 2013 or newer. Build Engine/VisualStudio_GL45. This creates the library in aether3d_build.
+   You'll need Visual Studio 2015 or newer. Build Engine/VisualStudio_GL45. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    You'll need OpenAL32.dll from OpenAL Soft either in your system directory or in the directory used to run samples/editor.
  
@@ -72,7 +72,7 @@
    \subsection Bugs
 
    <ul>
-   <li>Audio clip hotloading does not work.</li>
+   <li>D3D12 renderer is in a very early state.</li>
    </ul>
 */
 namespace ae3d

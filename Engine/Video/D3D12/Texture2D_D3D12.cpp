@@ -172,6 +172,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
     
     srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    handle = static_cast< unsigned >( srv.ptr );
 
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 

@@ -24,7 +24,7 @@ namespace ae3d
         static void SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture );
 
         /// \return shader.
-        Shader* GetShader() const { return shader; }
+        Shader* GetShader() { return shader; }
 
         /// \return True if the shader exists and has been compiled and linked successfully.
         bool IsValidShader() const;

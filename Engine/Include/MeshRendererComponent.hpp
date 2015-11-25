@@ -11,7 +11,7 @@ namespace ae3d
     {
     public:
         /// \return Mesh.
-        class Mesh* GetMesh() const { return mesh; }
+        class Mesh* GetMesh() { return mesh; }
         
         /// \param material Material.
         /// \param subMeshIndex Sub mesh index.

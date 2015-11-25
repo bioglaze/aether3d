@@ -33,12 +33,11 @@ void ae3d::BuiltinShaders::Load()
 
         "float4 PSMain( VSOutput vsOut ) : SV_Target"
         "{"
-        "    return tex.SampleLevel( sLinear, vsOut.uv, 0 );"
+        "    return tex.SampleLevel( sLinear, vsOut.uv, 0 ) * vsOut.color;"
         "}";
 
     spriteRendererShader.Load( spriteSource, spriteSource );
 
-    // TODO: Implement
     const std::string sdfSource(
         "struct VSOutput\
 {\

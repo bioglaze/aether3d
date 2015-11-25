@@ -566,6 +566,10 @@ void ae3d::GfxDevice::Present()
         {
             ae3d::System::Assert( false, "Present failed. Reason: device reset." );
         }
+        else if (hr == DXGI_ERROR_DEVICE_HUNG)
+        {
+            ae3d::System::Assert( false, "Present failed. Reason: device hung." );
+        }
         else
         {
             ae3d::System::Assert( false, "Present failed. Reason: unknown." );

@@ -19,11 +19,12 @@ using namespace ae3d;
 
 int main()
 {
-    const int width = 640;
-    const int height = 480;
+    int width = 640;
+    int height = 480;
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
+    Window::GetSize( width, height );
     System::LoadBuiltinAssets();
 
     GameObject camera;
@@ -33,7 +34,7 @@ int main()
     camera.AddComponent<TransformComponent>();
     
     Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
+    spriteTex.Load( FileSystem::FileContents( "glider2.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
