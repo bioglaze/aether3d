@@ -10,7 +10,7 @@ namespace ae3d
     {
     }
 
-    bool Window::PollEvent(WindowEvent& outEvent)
+    bool Window::PollEvent( WindowEvent& outEvent )
     {
         return true;
     }
@@ -25,6 +25,14 @@ namespace ae3d
     }
 
     void Window::SwapBuffers()
+    {
+    }
+    
+    void Window::GetSize( int& outWidth, int& outHeight )
+    {
+    }
+    
+    void Window::SetTitle( const char* title )
     {
     }
 }

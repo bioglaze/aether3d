@@ -32,6 +32,11 @@ int ae3d::GfxDevice::GetTextureBinds()
     return 0;
 }
 
+int ae3d::GfxDevice::GetRenderTargetBinds()
+{
+    return 0;
+}
+
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
 }

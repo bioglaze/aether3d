@@ -8,6 +8,12 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
 }
 
+void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexDataGLSL, const FileSystem::FileContentsData& fragmentDataGLSL,
+          const char* metalVertexShaderName, const char* metalFragmentShaderName,
+          const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL )
+{
+}
+
 void ae3d::Shader::Use()
 {
 }

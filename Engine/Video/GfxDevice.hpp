@@ -45,6 +45,7 @@ namespace ae3d
         id <MTLBuffer> GetCurrentUniformBuffer();
         void ResetUniformBuffers();
         void PresentDrawable();
+        void FlipBuffers();
         void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );

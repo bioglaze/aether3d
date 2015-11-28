@@ -25,7 +25,6 @@ id <MTLTexture> depthTex;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
 id<CAMetalDrawable> drawable;
-dispatch_semaphore_t inflightSemaphore;
 id<MTLTexture> texture0;
 id<MTLTexture> texture1;
 id<MTLTexture> currentRenderTarget;
@@ -43,6 +42,7 @@ namespace GfxDeviceGlobal
     int renderTargetBinds = 0;
     int backBufferWidth = 0;
     int backBufferHeight = 0;
+    bool cullBackFaces = true;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     
     std::list< id<MTLBuffer> > uniformBuffers;
@@ -103,22 +103,19 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
     }
     
     renderPassDescriptor.colorAttachments[0].texture = texture;
-    renderPassDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
     renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+    renderPassDescriptor.colorAttachments[0].loadAction = MTLLoadActionLoad;//Clear;
     renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
     
     if (!depthTex || (depthTex && (depthTex.width != texture.width || depthTex.height != texture.height)))
     {
-        //  If we need a depth texture and don't have one, or if the depth texture we have is the wrong size
-        //  Then allocate one of the proper size
-        
         MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat: MTLPixelFormatDepth32Float width: texture.width height: texture.height mipmapped: NO];
         depthTex = [device newTextureWithDescriptor: desc];
         depthTex.label = @"Depth";
         
         renderPassDescriptor.depthAttachment.texture = depthTex;
-        renderPassDescriptor.depthAttachment.loadAction = MTLLoadActionClear;
         renderPassDescriptor.depthAttachment.clearDepth = 1.0f;
+        renderPassDescriptor.depthAttachment.loadAction = MTLLoadActionClear;
         renderPassDescriptor.depthAttachment.storeAction = MTLStoreActionDontCare;
     }
 }
@@ -126,9 +123,6 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
 
 void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
 {
-    int maxInflightBuffers = 1;
-    inflightSemaphore = dispatch_semaphore_create( maxInflightBuffers );
-    
     device = MTLCreateSystemDefaultDevice();
 
     metalLayer = aMetalLayer;
@@ -231,7 +225,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     ++GfxDeviceGlobal::drawCalls;
 
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
-    [renderEncoder setCullMode:MTLCullModeFront];
+    [renderEncoder setCullMode:GfxDeviceGlobal::cullBackFaces ? MTLCullModeFront : MTLCullModeNone];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
@@ -262,22 +256,19 @@ void ae3d::GfxDevice::BeginFrame()
 
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
     renderEncoder.label = @"MyRenderEncoder";
+}
 
-    dispatch_semaphore_wait( inflightSemaphore, DISPATCH_TIME_FOREVER );
+void ae3d::GfxDevice::FlipBuffers()
+{
+    currentDrawable = nullptr;
 }
 
 void ae3d::GfxDevice::PresentDrawable()
 {
     [renderEncoder endEncoding];
-
-    // Call the view's completion handler which is required by the view since it will signal its semaphore and set up the next buffer
-    __block dispatch_semaphore_t block_sema = inflightSemaphore;
-    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
-        dispatch_semaphore_signal(block_sema);
-    }];
+    
     [commandBuffer presentDrawable:drawable];
     [commandBuffer commit];
-    currentDrawable = nullptr;
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
@@ -311,6 +302,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
 {
+    GfxDeviceGlobal::cullBackFaces = enable;
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool enable )
@@ -319,17 +311,18 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
 
 void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, unsigned cubeMapFace )
 {
-    if ((!currentRenderTarget && !renderTexture2d) ||
+    /*if ((!currentRenderTarget && !renderTexture2d) ||
         (renderTexture2d != nullptr && renderTexture2d->GetMetalTexture() == currentRenderTarget))
     {
         return;
     }
     
-    PresentDrawable();
+    PresentDrawable();*/
     
     //setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture );
-    currentRenderTarget = renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : nullptr;//GetCurrentDrawable().texture;
-    BeginFrame();
+
+    //currentRenderTarget = renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : nullptr;
+    //BeginFrame();
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* )

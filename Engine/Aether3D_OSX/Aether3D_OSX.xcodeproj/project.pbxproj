@@ -515,7 +515,6 @@
 					Include,
 					../ThirdParty,
 				);
-				INSTALL_PATH = "";
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
 				WARNING_CFLAGS = (
@@ -556,7 +555,6 @@
 					Include,
 					../ThirdParty,
 				);
-				INSTALL_PATH = "";
 				PRODUCT_MODULE_NAME = aether3d_osx;
 				PRODUCT_NAME = libaether3d_osx;
 				WARNING_CFLAGS = (

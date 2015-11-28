@@ -63,7 +63,7 @@
 		AB190E321B57DE73005ECE49 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB190E311B57DE73005ECE49 /* Material.cpp */; };
 		AB190E341B57DE85005ECE49 /* Material.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB190E331B57DE85005ECE49 /* Material.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB3E80111C00B5E80077D8BD /* SpotLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */; };
-		AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */; };
+		AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB521D111BC045BC004CDF06 /* TextureCube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB922E561B404FFB000F3488 /* Mesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E541B404FFB000F3488 /* Mesh.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB922E571B404FFB000F3488 /* MeshRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -327,13 +327,13 @@
 				4449E85F1B14B423009A869C /* TextRendererComponent.hpp in Headers */,
 				4449E8561B14B423009A869C /* Font.hpp in Headers */,
 				AB190E341B57DE85005ECE49 /* Material.hpp in Headers */,
+				AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */,
 				ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */,
 				4449E8621B14B423009A869C /* Vec3.hpp in Headers */,
 				4449E8581B14B423009A869C /* Macros.hpp in Headers */,
 				4449E86F1B14B44E009A869C /* AudioSystem.hpp in Headers */,
 				4449E89C1B14B4B5009A869C /* VertexBuffer.hpp in Headers */,
 				4449E8731B14B44E009A869C /* FileWatcher.hpp in Headers */,
-				AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */,
 				4449E89B1B14B4B5009A869C /* Renderer.hpp in Headers */,
 				4449E8951B14B4B5009A869C /* GfxDevice.hpp in Headers */,
 			);

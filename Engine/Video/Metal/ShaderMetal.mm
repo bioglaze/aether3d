@@ -122,6 +122,10 @@ void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int t
         {
             texture1 = const_cast< Texture2D* >( texture )->GetMetalTexture();
         }
+        else
+        {
+            System::Print( "Shader tried to set a texture into unit that is not handled\n" );
+        }
     }
     else
     {
@@ -141,6 +145,11 @@ void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture
         {
             texture1 = renderTexture->GetMetalTexture();
         }
+        else
+        {
+            System::Print( "Shader tried to set a texture into unit that is not handled\n" );
+        }
+
     }
     else
     {
@@ -159,6 +168,10 @@ void ae3d::Shader::SetTexture( const char* name, const TextureCube* texture, int
         else if (textureUnit == 1)
         {
             texture1 = const_cast<TextureCube*>( texture )->GetMetalTexture();
+        }
+        else
+        {
+            System::Print( "Shader tried to set a texture into unit that is not handled\n" );
         }
     }
     else

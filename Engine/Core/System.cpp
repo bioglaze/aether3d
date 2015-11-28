@@ -28,7 +28,7 @@ void ae3d::System::InitMetal( CAMetalLayer* metalLayer )
 
 void ae3d::System::EndFrame()
 {
-    GfxDevice::PresentDrawable();
+    GfxDevice::FlipBuffers();
 }
 
 void ae3d::System::BeginFrame()

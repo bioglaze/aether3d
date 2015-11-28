@@ -337,11 +337,12 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     ae3d::System::Assert( 0 <= cubeMapFace && cubeMapFace < 6, "invalid cube map face" );
 
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
-    GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
-    
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
-
+    GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
+#if AETHER3D_METAL
+    GfxDevice::BeginFrame();
+#endif
     if (camera->GetClearFlag() == CameraComponent::ClearFlag::DepthAndColor)
     {
         GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
@@ -468,7 +469,9 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mvp, frustum, meshLocalToWorld, nullptr );
     }
-    
+#if AETHER3D_METAL
+    GfxDevice::PresentDrawable();
+#endif
     GfxDevice::ErrorCheck( "Scene render end" );
 }
 

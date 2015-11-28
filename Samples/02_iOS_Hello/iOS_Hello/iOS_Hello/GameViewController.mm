@@ -20,6 +20,7 @@
 #include "Aether3D_iOS.framework/Headers/RenderTexture.hpp"
 #include "Aether3D_iOS.framework/Headers/TextureCube.hpp"
 #include "Aether3D_iOS.framework/Headers/DirectionalLightComponent.hpp"
+#include "Aether3D_iOS.framework/Headers/SpotLightComponent.hpp"
 
 @implementation GameViewController
 {
@@ -28,7 +29,7 @@
     
     CADisplayLink *_timer;
     
-    ae3d::GameObject camera;
+    ae3d::GameObject camera2d;
     ae3d::GameObject sprite;
     ae3d::GameObject text;
     ae3d::GameObject audioSource;
@@ -47,6 +48,7 @@
     ae3d::GameObject renderTextureContainer;
     ae3d::Mesh cubeMesh;
     ae3d::Material cubeMaterial;
+    ae3d::Material whiteMaterial;
     ae3d::Shader shader;
     ae3d::GameObject dirLight;
     ae3d::GameObject bigCube;
@@ -78,20 +80,26 @@
     ae3d::System::LoadBuiltinAssets();
     ae3d::System::InitAudio();
     
-    camera.AddComponent<ae3d::CameraComponent>();
-    camera.GetComponent<ae3d::CameraComponent>()->SetProjection(0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1);
-    camera.AddComponent<ae3d::TransformComponent>();
-    //scene.Add( &camera );
+    camera2d.AddComponent<ae3d::CameraComponent>();
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::Depth );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.0f, 0.0f ) );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
+    camera2d.AddComponent<ae3d::TransformComponent>();
+    scene.Add( &camera2d );
 
     spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
     spriteTexPVRv2.Load( ae3d::FileSystem::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
     spriteTexPVRv3.Load( ae3d::FileSystem::FileContents( "/Assets/hotair.2bpp.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
 
     sprite.AddComponent<ae3d::SpriteRendererComponent>();
-    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv3, ae3d::Vec3( 60, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTex, ae3d::Vec3( 180, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &spriteTexPVRv3, ae3d::Vec3( 60, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &spriteTex, ae3d::Vec3( 180, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    sprite.SetLayer( 2 );
     //sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture(&spriteTexPVRv2, ae3d::Vec3( 240, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    //scene.Add( &sprite );
+    scene.Add( &sprite );
 
     audioClip.Load( ae3d::FileSystem::FileContents( "/Assets/explosion.wav" ) );
     audioSource.AddComponent<ae3d::AudioSourceComponent>();
@@ -100,15 +108,16 @@
     
     fontTex.Load( ae3d::FileSystem::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
 
-    font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents("/Assets/font_txt.fnt"));
+    font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/Assets/font_txt.fnt" ) );
     text.AddComponent<ae3d::TextRendererComponent>();
-    text.GetComponent<ae3d::TextRendererComponent>()->SetText("Aether3D Game Engine");
+    text.GetComponent<ae3d::TextRendererComponent>()->SetText( "Aether3D Game Engine" );
     text.GetComponent<ae3d::TextRendererComponent>()->SetFont( &font );
     text.GetComponent<ae3d::TextRendererComponent>()->SetColor( ae3d::Vec4( 1, 0, 0, 1 ) );
-    //text.AddComponent<ae3d::TransformComponent>();
-    //text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 40, 0 ) );
+    text.AddComponent<ae3d::TransformComponent>();
+    text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 40, 0 ) );
+    text.SetLayer( 2 );
     
-    //scene.Add( &text );
+    scene.Add( &text );
     
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
@@ -117,7 +126,7 @@
     
     rtCamera.AddComponent<ae3d::CameraComponent>();
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
-    rtCamera.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.0f, 0.5f, 0.5f ) );
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
@@ -126,6 +135,7 @@
     perspCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
     perspCamera.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
     perspCamera.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    perspCamera.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
     perspCamera.AddComponent<ae3d::TransformComponent>();
     scene.Add( &perspCamera );
     
@@ -142,7 +152,10 @@
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &spriteTex );
     cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
-    cubeMaterial.SetBackFaceCulling( true );
+
+    whiteMaterial.SetShader( &shader );
+    whiteMaterial.SetTexture( "textureMap", &spriteTex );
+    whiteMaterial.SetVector( "tintColor", { 1, 1, 1, 1 } );
 
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/Assets/textured_cube.ae3d" ) );
     cube.AddComponent<ae3d::MeshRendererComponent>();
@@ -155,6 +168,7 @@
     bigCube = cube;
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( cube.GetComponent< ae3d::TransformComponent >()->GetLocalPosition() - ae3d::Vec3( 0, 10, 0 ) );
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 6 );
+    bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &whiteMaterial, 0 );
     scene.Add( &bigCube );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
@@ -233,7 +247,7 @@
         rotation.FromAxisAngle( axis, angle );
         cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
 
-        ae3d::System::BeginFrame();
+        //ae3d::System::BeginFrame();
         scene.Render();
         ae3d::System::EndFrame();
     }
