@@ -50,7 +50,7 @@ void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTe
 
     if (atlasMetaData.path.find( ".xml" ) == std::string::npos && atlasMetaData.path.find( ".XML" ) == std::string::npos)
     {
-        System::Print( "Atlas meta data path %s could not be opened!", atlasMetaData.path.c_str() );
+        System::Print( "Atlas meta data path %s extension is not .xml!", atlasMetaData.path.c_str() );
         return;
     }
 
