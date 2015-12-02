@@ -12,8 +12,8 @@
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
-#include "CommandListManager.hpp"
-#include "CommandContext.hpp"
+//#include "CommandListManager.hpp"
+//#include "CommandContext.hpp"
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
 #include "TextureBase.hpp"
@@ -45,19 +45,75 @@ namespace GfxDeviceGlobal
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
-    CommandContext graphicsContext;
+    //CommandContext graphicsContext;
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
-    CommandListManager commandListManager;
+    //CommandListManager commandListManager;
     ae3d::Texture2D* texture0 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
+
+    ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
+    ID3D12CommandQueue* commandQueue = nullptr;
+    ID3D12Fence* fence = nullptr;
+    UINT64 fenceValue = 1;
+    HANDLE fenceEvent;
 }
 
 namespace ae3d
 {
     void CreateRenderer( int samples );
 }
+
+void WaitForPreviousFrame()
+{
+    // Signal and increment the fence value.
+    const UINT64 fenceValue = GfxDeviceGlobal::fenceValue;
+    HRESULT hr = GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, fenceValue );
+    AE3D_CHECK_D3D( hr, "command queue signal" );
+    ++GfxDeviceGlobal::fenceValue;
+
+    // Wait until the previous frame is finished.
+    if (GfxDeviceGlobal::fence->GetCompletedValue() < fenceValue)
+    {
+        hr = GfxDeviceGlobal::fence->SetEventOnCompletion( fenceValue, GfxDeviceGlobal::fenceEvent );
+        WaitForSingleObject( GfxDeviceGlobal::fenceEvent, INFINITE );
+    }
+}
+
+void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState )
+{
+    D3D12_RESOURCE_STATES oldState = gpuResource.usageState;
+
+    if (oldState == newState)
+    {
+        return;
+    }
+
+    D3D12_RESOURCE_BARRIER BarrierDesc = {};
+
+    BarrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    BarrierDesc.Transition.pResource = gpuResource.resource;
+    BarrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    BarrierDesc.Transition.StateBefore = oldState;
+    BarrierDesc.Transition.StateAfter = newState;
+
+    // Check to see if we already started the transition
+    if (newState == gpuResource.transitioningState)
+    {
+        BarrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_END_ONLY;
+        gpuResource.transitioningState = (D3D12_RESOURCE_STATES)-1;
+    }
+    else
+    {
+        BarrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    }
+
+    gpuResource.usageState = newState;
+
+    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
+}
+
 
 void CreateBackBuffer()
 {
@@ -316,8 +372,30 @@ void ae3d::CreateRenderer( int /*samples*/ )
     GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
 #endif
 
-    GfxDeviceGlobal::commandListManager.Create( GfxDeviceGlobal::device );
-    GfxDeviceGlobal::graphicsContext.Initialize( GfxDeviceGlobal::commandListManager );
+    hr = GfxDeviceGlobal::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( &GfxDeviceGlobal::commandListAllocator ) );
+    AE3D_CHECK_D3D( hr, "Failed to create command allocator" );
+    GfxDeviceGlobal::commandListAllocator->SetName( L"Command Allocator" );
+
+    hr = GfxDeviceGlobal::device->CreateCommandList( 1, D3D12_COMMAND_LIST_TYPE_DIRECT, GfxDeviceGlobal::commandListAllocator, nullptr, IID_PPV_ARGS( &GfxDeviceGlobal::graphicsCommandList ) );
+    AE3D_CHECK_D3D( hr, "Failed to create command list" );
+    GfxDeviceGlobal::graphicsCommandList->SetName( L"Graphics Command List" );
+
+    hr = GfxDeviceGlobal::graphicsCommandList->Close();
+    AE3D_CHECK_D3D( hr, "command list close" );
+
+    D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
+    commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    hr = GfxDeviceGlobal::device->CreateCommandQueue( &commandQueueDesc, IID_PPV_ARGS( &GfxDeviceGlobal::commandQueue ) );
+    AE3D_CHECK_D3D( hr, "Failed to create command queue" );
+    GfxDeviceGlobal::commandQueue->SetName( L"Command Queue" );
+
+    hr = GfxDeviceGlobal::device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS( &GfxDeviceGlobal::fence ) );
+    AE3D_CHECK_D3D( hr, "Failed to create fence" );
+    GfxDeviceGlobal::fence->SetName( L"Fence" );
+    GfxDeviceGlobal::fence->Signal( 0 );
+
+    GfxDeviceGlobal::fenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
+    ae3d::System::Assert( GfxDeviceGlobal::fenceEvent != INVALID_HANDLE_VALUE, "Invalid fence event value!" );
 
     IDXGIFactory2 *dxgiFactory = nullptr;
     unsigned factoryFlags = 0;
@@ -338,7 +416,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
     swapChainDesc1.SampleDesc.Quality = 0;
     swapChainDesc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
-    hr = dxgiFactory->CreateSwapChainForHwnd( GfxDeviceGlobal::commandListManager.GetCommandQueue(), WindowGlobal::hwnd, &swapChainDesc1, nullptr, nullptr, (IDXGISwapChain1**)&GfxDeviceGlobal::swapChain );
+    hr = dxgiFactory->CreateSwapChainForHwnd( GfxDeviceGlobal::commandQueue, WindowGlobal::hwnd, &swapChainDesc1, nullptr, nullptr, (IDXGISwapChain1**)&GfxDeviceGlobal::swapChain );
     AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
     dxgiFactory->Release();
 
@@ -351,7 +429,6 @@ void ae3d::CreateRenderer( int /*samples*/ )
     CreateRootSignature();
     CreateDepthStencilView();
     CreateSampler();
-    GfxDeviceGlobal::graphicsContext.Initialize( GfxDeviceGlobal::commandListManager );
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
@@ -401,12 +478,12 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, &srvDesc, handle );
 
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetDescriptorHeaps( 2, descHeaps );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
+    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, descHeaps );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
 
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
@@ -418,10 +495,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     indexBufferView.SizeInBytes = vertexBuffer.GetIBSize();
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->IASetIndexBuffer( &indexBufferView );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace, 1, startFace, 0, 0 );
+    GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
+    GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( &indexBufferView );
+    GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace, 1, startFace, 0, 0 );
+
     GfxDevice::IncDrawCalls();
 }
 
@@ -459,8 +537,8 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     GfxDeviceGlobal::vaoBinds = 0;
     GfxDeviceGlobal::textureBinds = 0;
 
-    // TODO: Create BeginFrame() etc.
-    ++GfxDeviceGlobal::frameIndex;
+    HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
+    AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
@@ -498,8 +576,9 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
 
-    CommandContext::Destroy();
-    GfxDeviceGlobal::commandListManager.Destroy();
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
 
 /*#if _DEBUG
     ID3D12DebugDevice* d3dDebug = nullptr;
@@ -521,40 +600,44 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     
     // Barrier Present -> RenderTarget
     GpuResource rtvResource;
-    rtvResource.resource = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
+    //rtvResource.resource = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
+    rtvResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
     rtvResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    GfxDeviceGlobal::graphicsContext.TransitionResource( rtvResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
+    TransitionResource( rtvResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     
     // Viewport
     D3D12_VIEWPORT mViewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->RSSetViewports( 1, &mViewPort );
+    GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &mViewPort );
 
     D3D12_RECT scissor = {};
     scissor.right = (LONG)GfxDeviceGlobal::backBufferWidth;
     scissor.bottom = (LONG)GfxDeviceGlobal::backBufferHeight;
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->RSSetScissorRects( 1, &scissor );
+    GfxDeviceGlobal::graphicsCommandList->RSSetScissorRects( 1, &scissor );
 
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
     auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
-    descHandleRtv.ptr += ((GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount) * descHandleRtvStep;
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
+    descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
+    GfxDeviceGlobal::graphicsCommandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
 
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->ClearDepthStencilView( descHandleDsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr );
-    GfxDeviceGlobal::graphicsContext.graphicsCommandList->OMSetRenderTargets( 1, &descHandleRtv, TRUE, &descHandleDsv );
+    GfxDeviceGlobal::graphicsCommandList->ClearDepthStencilView( descHandleDsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr );
+    GfxDeviceGlobal::graphicsCommandList->OMSetRenderTargets( 1, &descHandleRtv, TRUE, &descHandleDsv );
 }
 
 void ae3d::GfxDevice::Present()
 {
-    // Barrier RenderTarget -> Present
     GpuResource presentResource;
-    presentResource.resource = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
+    presentResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
     presentResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    GfxDeviceGlobal::graphicsContext.TransitionResource( presentResource, D3D12_RESOURCE_STATE_PRESENT );
+    TransitionResource( presentResource, D3D12_RESOURCE_STATE_PRESENT );
 
-    GfxDeviceGlobal::graphicsContext.CloseAndExecute( true );
+    HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Close();
+    AE3D_CHECK_D3D( hr, "command list close" );
 
-    auto hr = GfxDeviceGlobal::swapChain->Present( 1, 0 );
+    ID3D12CommandList* ppCommandLists[] = { GfxDeviceGlobal::graphicsCommandList };
+    GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, ppCommandLists );
+
+    hr = GfxDeviceGlobal::swapChain->Present( 1, 0 );
 
     if (FAILED( hr ))
     {
@@ -576,7 +659,7 @@ void ae3d::GfxDevice::Present()
         }
     }
 
-    GfxDeviceGlobal::graphicsContext.Reset();
+    WaitForPreviousFrame();
 
     for (std::size_t i = 0; i < GfxDeviceGlobal::frameHeaps.size(); ++i)
     {

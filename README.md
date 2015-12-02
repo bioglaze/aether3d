@@ -29,7 +29,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 ## Windows
 
-  - Open the project in Engine\VisualStudio_GL45 and build it. For MinGW you can use Engine/Makefile.
+  - Open the project in Engine\VisualStudio_GL45 in VS2015 and build it. For MinGW you can use Engine/Makefile.
   - Build and run Samples\01_OpenWindow.
 
 ## OS X / GNU/Linux

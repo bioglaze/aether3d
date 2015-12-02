@@ -120,14 +120,8 @@
     <ClCompile Include="..\Video\OculusRiftSupport.cpp">
       <Filter>Video</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\D3D12\CommandListManager.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\Components\DirectionalLightComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Video\D3D12\CommandContext.cpp">
-      <Filter>Video</Filter>
     </ClCompile>
     <ClCompile Include="..\Video\D3D12\DescriptorHeapManager.cpp">
       <Filter>Video</Filter>
@@ -233,17 +227,11 @@
     <ClInclude Include="..\Include\VR.hpp">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Video\D3D12\CommandListManager.hpp">
-      <Filter>Video</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\DirectionalLightComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\ThirdParty\d3dx12.h">
       <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Video\D3D12\CommandContext.hpp">
-      <Filter>Video</Filter>
     </ClInclude>
     <ClInclude Include="..\Video\D3D12\DescriptorHeapManager.hpp">
       <Filter>Video</Filter>

@@ -45,14 +45,15 @@ int main()
     spriteTex2.Load( FileSystem::FileContents("glider2.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
 
     Texture2D spriteTexFromAtlas;
-    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents("atlas_cegui.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
+    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
+    //spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents("glider2.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
     sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
     sprite->SetTexture( &spriteTex, Vec3( 340, 80, -0.5f ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
-    sprite->SetTexture( &spriteTex2, Vec3( 280, 60, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    //sprite->SetTexture( &spriteTex2, Vec3( 280, 60, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     //sprite->SetTexture( &spriteTexFromAtlas, Vec3( 260, 160, -0.4f ), Vec3( (float)spriteTexFromAtlas.GetWidth(), (float)spriteTexFromAtlas.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
 
     spriteContainer.AddComponent<TransformComponent>();
@@ -129,10 +130,10 @@ int main()
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
-    //scene.Add( &textContainer );
+    scene.Add( &textContainer );
     //scene.Add( &textContainerSDF );
-    //scene.Add( &statsContainer );
-    //scene.Add( &statsParent );
+    scene.Add( &statsContainer );
+    scene.Add( &statsParent );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );

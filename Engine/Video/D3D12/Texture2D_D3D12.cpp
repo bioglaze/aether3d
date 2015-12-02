@@ -11,18 +11,18 @@
 #include "FileSystem.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
-#include "CommandListManager.hpp"
-#include "CommandContext.hpp"
 #include "DescriptorHeapManager.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
+void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
-    extern CommandListManager commandListManager;
     extern ID3D12CommandAllocator* commandListAllocator;
+    extern ID3D12GraphicsCommandList* graphicsCommandList;
+    extern ID3D12CommandQueue* commandQueue;
 }
 
 namespace Texture2DGlobal
@@ -61,8 +61,6 @@ void DestroyTextures()
 
 void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, unsigned dataSize )
 {
-    CommandContext& initContext = CommandContext::Begin();
-
     D3D12_HEAP_PROPERTIES heapProps;
     heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
     heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -94,12 +92,19 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
         uploadBuffer->SetName( L"Texture2D Upload Buffer" );
         Texture2DGlobal::uploadBuffers.push_back( uploadBuffer );
 
-        // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
-        initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
-        UpdateSubresources( initContext.graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
-        initContext.TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+        hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
+        AE3D_CHECK_D3D( hr, "command list reset in texture2d" );
 
-        initContext.CloseAndExecute( true );
+        // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
+        UpdateSubresources( GfxDeviceGlobal::graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+
+        hr = GfxDeviceGlobal::graphicsCommandList->Close();
+        AE3D_CHECK_D3D( hr, "command list close in texture2d" );
+
+        ID3D12CommandList* ppCommandLists[] = { GfxDeviceGlobal::graphicsCommandList };
+        GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, ppCommandLists );
     }
 }
 
