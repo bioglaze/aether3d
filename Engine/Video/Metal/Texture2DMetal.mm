@@ -87,7 +87,7 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, float aAnisotropy )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
 {
     if (!fileContents.isLoaded)
     {
@@ -97,6 +97,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
+    colorSpace = aColorSpace;
     anisotropy = aAnisotropy;
     
     /*const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
@@ -152,7 +153,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     opaque = (components == 3 || components == 1);
 
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];

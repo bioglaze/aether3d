@@ -43,6 +43,12 @@ namespace ae3d
         None
     };
 
+    enum class ColorSpace
+    {
+        RGB,
+        SRGB
+    };
+    
     /// Base class for textures.
     class TextureBase
     {
@@ -56,6 +62,9 @@ namespace ae3d
         GpuResource* GetGpuResource() { return &gpuResource; }
         D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const { return srv; }
 #endif
+        /// \return Color space.
+        ColorSpace GetColorSpace() const { return colorSpace; }
+        
         /// \return Anisotropy.
         float GetAnisotropy() const { return anisotropy; }
         
@@ -97,6 +106,8 @@ namespace ae3d
         Vec4 scaleOffset{ 1, 1, 0, 0 };
         /// Is the texture opaque.
         bool opaque = true;
+        /// Color space.
+        ColorSpace colorSpace = ColorSpace::RGB;
         /// Anisotropy.
         float anisotropy = 1;
 #if AETHER3D_METAL

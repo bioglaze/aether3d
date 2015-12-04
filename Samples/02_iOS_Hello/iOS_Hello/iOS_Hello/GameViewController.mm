@@ -90,9 +90,9 @@
     camera2d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera2d );
 
-    spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
-    spriteTexPVRv2.Load( ae3d::FileSystem::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
-    spriteTexPVRv3.Load( ae3d::FileSystem::FileContents( "/Assets/hotair.2bpp.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
+    spriteTex.Load( ae3d::FileSystem::FileContents( "/Assets/glider120.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    spriteTexPVRv2.Load( ae3d::FileSystem::FileContents( "/Assets/checker.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    spriteTexPVRv3.Load( ae3d::FileSystem::FileContents( "/Assets/hotair.2bpp.pvr" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
 
     sprite.AddComponent<ae3d::SpriteRendererComponent>();
     sprite.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &spriteTexPVRv3, ae3d::Vec3( 60, 60, -0.6f ), ae3d::Vec3( 100, 100, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
@@ -106,7 +106,7 @@
     audioSource.GetComponent<ae3d::AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     audioSource.GetComponent<ae3d::AudioSourceComponent>()->Play();
     
-    fontTex.Load( ae3d::FileSystem::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, 1 );
+    fontTex.Load( ae3d::FileSystem::FileContents( "/Assets/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
 
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/Assets/font_txt.fnt" ) );
     text.AddComponent<ae3d::TextRendererComponent>();
@@ -142,7 +142,7 @@
     skyboxTex.Load( ae3d::FileSystem::FileContents( "/Assets/skybox/left.jpg" ),   ae3d::FileSystem::FileContents( "/Assets/skybox/right.jpg" ),
                     ae3d::FileSystem::FileContents( "/Assets/skybox/bottom.jpg" ), ae3d::FileSystem::FileContents( "/Assets/skybox/top.jpg" ),
                     ae3d::FileSystem::FileContents( "/Assets/skybox/front.jpg" ),  ae3d::FileSystem::FileContents( "/Assets/skybox/back.jpg" ),
-                    ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None );
+                   ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB );
     scene.SetSkybox( &skyboxTex );
     
     shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),

@@ -30,7 +30,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, dataType == DataType::Float ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr );
-
+    GfxDevice::ErrorCheck( "Load Texture2D" );
+    
     glBindTexture( GL_TEXTURE_2D, 0 );
     
     // Creates a renderbuffer object to store depth info.
@@ -100,6 +101,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
         glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
                      aDimension, aDimension, 0, externalFormat,
                      dataTypeGL, nullptr );
+        GfxDevice::ErrorCheck( "Load Texture Cube" );
     }
 
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId );

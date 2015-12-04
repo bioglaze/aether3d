@@ -25,11 +25,13 @@ namespace ae3d
           \param wrap Wrapping mode.
           \param filter Filtering mode.
           \param mipmaps Should mipmaps be generated and used.
+          \param colorSpace Color space.
          */
         void Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                    const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
                    const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
-                   TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps );
+                   TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps, ColorSpace colorSpace );
+        
         /// \return Positive X texture path.
         const std::string& PosX() const { return posXpath; }
 

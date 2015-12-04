@@ -41,9 +41,9 @@ void Tokenize( const std::string& str,
     }
 }
 
-void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, float aAnisotropy )
+void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, ColorSpace colorSpace, float aAnisotropy )
 {
-    Load( atlasTextureData, aWrap, aFilter, mipmaps, aAnisotropy );
+    Load( atlasTextureData, aWrap, aFilter, mipmaps, colorSpace, aAnisotropy );
 
     const std::string metaStr = std::string( std::begin( atlasMetaData.data ), std::end( atlasMetaData.data ) );
     std::stringstream metaStream( metaStr );

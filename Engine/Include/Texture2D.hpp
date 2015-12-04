@@ -22,16 +22,18 @@ namespace ae3d
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
         /// \param mipmaps Mipmaps
+        /// \param colorSpace Color space.
         /// \param anisotropy Anisotropy. Value range is 1-16 depending on support.
-        void Load( const FileSystem::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps, float anisotropy );
+        void Load( const FileSystem::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps, ColorSpace colorSpace, float anisotropy );
         
         /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param atlasMetaData Atlas metadata. Format is Ogre/CEGUI. Example atlas tool: Texture Packer.
         /// \param textureName Name of the texture in atlas.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
+        /// \param colorSpace Color space.
         /// \param anisotropy Anisotropy. Value range is 1-16 depending on support.
-        void LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter, float anisotropy );
+        void LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter, ColorSpace colorSpace, float anisotropy );
 
     private:
         /// \param path Path.

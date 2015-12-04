@@ -14,7 +14,7 @@ void Tokenize( const std::string& str,
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                               const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
                               const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
-                              TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
+                              TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace )
 {
     if (!negX.isLoaded || !posX.isLoaded || !negY.isLoaded || !posY.isLoaded || !negZ.isLoaded || !posZ.isLoaded)
     {
@@ -25,7 +25,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
-
+    colorSpace = aColorSpace;
+    
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
 
@@ -33,7 +34,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     unsigned char* firstImageData = stbi_load_from_memory( datas[ 0 ]->data(), static_cast<int>(datas[ 0 ]->size()), &width, &height, &firstImageComponents, 4 );
     stbi_image_free( firstImageData );
 
-    MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
+    MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                                                           size:width
                                                                                       mipmapped:NO];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];

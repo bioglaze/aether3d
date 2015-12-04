@@ -45,7 +45,7 @@ void TexReload( const std::string& path )
 {
     auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
 
-    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetAnisotropy() );
+    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
 }
 
 const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
@@ -69,19 +69,21 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
    
         int data[ 32 * 32 * 4 ] = { 0xFFC0CB };
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, Texture2DGlobal::defaultTexture.width, Texture2DGlobal::defaultTexture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, Texture2DGlobal::defaultTexture.width, Texture2DGlobal::defaultTexture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+        GfxDevice::ErrorCheck( "Load Texture2D" );
     }
     
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, float aAnisotropy )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
 {
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
     anisotropy = aAnisotropy;
-    
+    colorSpace = aColorSpace;
+
     if (!fileContents.isLoaded)
     {
         *this = Texture2DGlobal::defaultTexture;
@@ -184,7 +186,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     if (GfxDevice::HasExtension("GL_ARB_texture_storage"))
     {
-        glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, width, height );
+        glTexStorage2D( GL_TEXTURE_2D, 1, colorSpace == ColorSpace::RGB ? GL_RGBA8 : GL_SRGB8_ALPHA8, width, height );
         glTexSubImage2D( GL_TEXTURE_2D,
                         0,
                         0, 0,
@@ -195,8 +197,9 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     }
     else
     {
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+        glTexImage2D( GL_TEXTURE_2D, 0, colorSpace == ColorSpace::RGB ? GL_RGBA8 : GL_SRGB8_ALPHA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
     }
 
+    GfxDevice::ErrorCheck( "Load Texture2D" );
     stbi_image_free( data );
 }

@@ -38,14 +38,14 @@ int main()
     camera.AddComponent<TransformComponent>();
 
     Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents("glider2.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
+    spriteTex.Load( FileSystem::FileContents("glider2.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
     Texture2D spriteTex2;
     //spriteTex2.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
-    spriteTex2.Load( FileSystem::FileContents("glider2.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
+    spriteTex2.Load( FileSystem::FileContents("glider2.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
     Texture2D spriteTexFromAtlas;
-    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
+    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, 1 );
     //spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents("glider2.png"), FileSystem::FileContents("atlas_cegui.xml"), "granite", TextureWrap::Repeat, TextureFilter::Nearest, 1 );
 
     GameObject spriteContainer;
@@ -68,14 +68,14 @@ int main()
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
+    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
 
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents("font_txt.fnt"));
 
     Texture2D fontTexSDF;
     //fontTexSDF.Load( FileSystem::FileContents( "font_sdf.tga" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
-    fontTexSDF.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
+    fontTexSDF.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
 
     Font sdfFont;
     sdfFont.LoadBMFont( &fontTexSDF, FileSystem::FileContents( "font_txt.fnt" ) );

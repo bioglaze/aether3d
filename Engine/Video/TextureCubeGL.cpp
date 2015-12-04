@@ -29,7 +29,7 @@ void CubeReload( const std::string& path )
                           ae3d::FileSystem::FileContents( texture.PosY().c_str() ),
                           ae3d::FileSystem::FileContents( texture.NegZ().c_str() ),
                           ae3d::FileSystem::FileContents( texture.PosZ().c_str() ),
-                          texture.GetWrap(), texture.GetFilter(), texture.GetMipmaps() );
+                          texture.GetWrap(), texture.GetFilter(), texture.GetMipmaps(), texture.GetColorSpace() );
         }
     }
 }
@@ -37,7 +37,7 @@ void CubeReload( const std::string& path )
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
           const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
           const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
-          TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
+          TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace )
 {
     const bool isCached = [&]()
     {
@@ -69,7 +69,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
-
+    colorSpace = aColorSpace;
+    
     if (handle == 0)
     {
         handle = GfxDevice::CreateTextureId();
@@ -123,8 +124,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             
             opaque = (components == 3 || components == 1);
             
-            glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
-            
+            glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, colorSpace == ColorSpace::RGB ? GL_RGBA8 : GL_SRGB8_ALPHA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+
             GfxDevice::ErrorCheck( "Cube map creation" );
             stbi_image_free( data );
         }
