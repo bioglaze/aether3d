@@ -89,7 +89,6 @@ int main()
         }
 
         scene.Render();
-
         Window::SwapBuffers();
     }
 

@@ -12,8 +12,6 @@
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
-//#include "CommandListManager.hpp"
-//#include "CommandContext.hpp"
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
 #include "TextureBase.hpp"
@@ -45,11 +43,9 @@ namespace GfxDeviceGlobal
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
-    //CommandContext graphicsContext;
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
-    //CommandListManager commandListManager;
     ae3d::Texture2D* texture0 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
 
@@ -67,16 +63,15 @@ namespace ae3d
 
 void WaitForPreviousFrame()
 {
-    // Signal and increment the fence value.
     const UINT64 fenceValue = GfxDeviceGlobal::fenceValue;
     HRESULT hr = GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, fenceValue );
     AE3D_CHECK_D3D( hr, "command queue signal" );
     ++GfxDeviceGlobal::fenceValue;
 
-    // Wait until the previous frame is finished.
     if (GfxDeviceGlobal::fence->GetCompletedValue() < fenceValue)
     {
         hr = GfxDeviceGlobal::fence->SetEventOnCompletion( fenceValue, GfxDeviceGlobal::fenceEvent );
+        AE3D_CHECK_D3D( hr, "fence event" );
         WaitForSingleObject( GfxDeviceGlobal::fenceEvent, INFINITE );
     }
 }
@@ -113,7 +108,6 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
 
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
 }
-
 
 void CreateBackBuffer()
 {
@@ -361,7 +355,19 @@ void ae3d::CreateRenderer( int /*samples*/ )
         OutputDebugStringA( "Failed to create debug layer!\n" );
     }
 #endif
-    HRESULT hr = D3D12CreateDevice( nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
+    IDXGIAdapter* adapter = nullptr;
+    IDXGIFactory4* factory = nullptr;
+    HRESULT hr = CreateDXGIFactory1( IID_PPV_ARGS( &factory ) );
+    AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP factory" );
+    bool useWarp = false;
+
+    if (useWarp)
+    {
+        hr = factory->EnumWarpAdapter( IID_PPV_ARGS( &adapter ) );
+        AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP adapter" );
+    }
+
+    hr = D3D12CreateDevice( adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
 #ifdef DEBUG
     // Prevents GPU from over/underclocking to get consistent timing information.
@@ -397,14 +403,6 @@ void ae3d::CreateRenderer( int /*samples*/ )
     GfxDeviceGlobal::fenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
     ae3d::System::Assert( GfxDeviceGlobal::fenceEvent != INVALID_HANDLE_VALUE, "Invalid fence event value!" );
 
-    IDXGIFactory2 *dxgiFactory = nullptr;
-    unsigned factoryFlags = 0;
-#if DEBUG
-    factoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-#endif
-    hr = CreateDXGIFactory2( factoryFlags, IID_PPV_ARGS( &dxgiFactory ) );
-    AE3D_CHECK_D3D( hr, "Failed to create DXGI factory" );
-
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc1 = {};
     swapChainDesc1.BufferCount = 2;
     swapChainDesc1.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -416,9 +414,9 @@ void ae3d::CreateRenderer( int /*samples*/ )
     swapChainDesc1.SampleDesc.Quality = 0;
     swapChainDesc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
-    hr = dxgiFactory->CreateSwapChainForHwnd( GfxDeviceGlobal::commandQueue, WindowGlobal::hwnd, &swapChainDesc1, nullptr, nullptr, (IDXGISwapChain1**)&GfxDeviceGlobal::swapChain );
+    hr = factory->CreateSwapChainForHwnd( GfxDeviceGlobal::commandQueue, WindowGlobal::hwnd, &swapChainDesc1, nullptr, nullptr, (IDXGISwapChain1**)&GfxDeviceGlobal::swapChain );
     AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
-    dxgiFactory->Release();
+    factory->Release();
 
     D3D12_CPU_DESCRIPTOR_HANDLE initRtvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
     D3D12_CPU_DESCRIPTOR_HANDLE initSamplerHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
@@ -461,9 +459,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = shader.GetConstantBuffer()->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
-    GfxDeviceGlobal::device->CreateConstantBufferView(
-        &cbvDesc,
-        handle );
+    GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -537,6 +533,8 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     GfxDeviceGlobal::vaoBinds = 0;
     GfxDeviceGlobal::textureBinds = 0;
 
+    // TODO: Figure out a better place for this.
+
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
     AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
 }
@@ -600,9 +598,8 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     
     // Barrier Present -> RenderTarget
     GpuResource rtvResource;
-    //rtvResource.resource = GfxDeviceGlobal::renderTargets[ (GfxDeviceGlobal::frameIndex - 1) % GfxDeviceGlobal::BufferCount ];
     rtvResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
-    rtvResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    rtvResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET; // FIXME: Probably should to be present. Better yet, don't set explicitly.
     TransitionResource( rtvResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     
     // Viewport
@@ -660,6 +657,9 @@ void ae3d::GfxDevice::Present()
     }
 
     WaitForPreviousFrame();
+
+    hr = GfxDeviceGlobal::commandListAllocator->Reset();
+    AE3D_CHECK_D3D( hr, "commandListAllocator Reset" );
 
     for (std::size_t i = 0; i < GfxDeviceGlobal::frameHeaps.size(); ++i)
     {

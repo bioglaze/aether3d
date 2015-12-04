@@ -48,9 +48,6 @@
     <ClCompile Include="..\Core\Matrix.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\Core\MatrixNEON.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\Core\MatrixSSE3.cpp">
       <Filter>Core</Filter>
     </ClCompile>

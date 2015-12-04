@@ -332,7 +332,7 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
 
 float ae3d::AudioSystem::GetClipLengthForId( unsigned handle )
 {
-    return AudioGlobal::clips[ handle ].lengthInSeconds;
+    return handle < AudioGlobal::clips.size() ? AudioGlobal::clips[ handle ].lengthInSeconds : 1;
 }
 
 void ae3d::AudioSystem::Play( unsigned clipId )

@@ -215,7 +215,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     
     uint8_t magic[ 2 ];
 
-    imemstream is( (char*)meshData.data.data(), meshData.data.size() );
+    imemstream is( (const char*)meshData.data.data(), meshData.data.size() );
     is.read( (char*)magic, sizeof( magic ) );
 
     if (magic[ 0 ] != 'a' || magic[ 1 ] != '9')
