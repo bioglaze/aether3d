@@ -4,7 +4,9 @@
 #include <sstream>
 #include <stdint.h>
 #define STB_IMAGE_IMPLEMENTATION
+#if TARGET_OS_IPHONE
 #define STBI_NEON
+#endif
 #include "stb_image.c"
 #include "FileSystem.hpp"
 #include "System.hpp"
@@ -168,6 +170,10 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
 void ae3d::Texture2D::LoadPVRv2( const char* path )
 {
+#if !TARGET_OS_IPHONE
+    System::Assert( false, "PVR2 loading only supported on iOS");
+    return;
+#else
     NSString* pvrtcNSString = [NSString stringWithUTF8String: path];
     NSData* fileData = [NSData dataWithContentsOfFile:pvrtcNSString];
     PVRv2Header* header = (PVRv2Header*) [fileData bytes];
@@ -259,7 +265,8 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
          outHeight = MAX( outHeight >> 1, 1 );
          }*/
         
-        MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatPVRTC_RGBA_4BPP
+        auto pixelFormat = MTLPixelFormatPVRTC_RGBA_4BPP;
+        MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                                                               width:width
                                                                                              height:height
                                                                                           mipmapped:NO];
@@ -272,10 +279,15 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
         
         [imageData removeAllObjects];
     }
+#endif
 }
 
 void ae3d::Texture2D::LoadPVRv3( const char* path )
 {
+#if !TARGET_OS_IPHONE
+    System::Assert( false, "PVR3 loading only supported on iOS");
+    return;
+#else
     NSString* pvrtcNSString = [NSString stringWithUTF8String: path];
     NSData* fileData = [NSData dataWithContentsOfFile:pvrtcNSString];
     PVRv3Header* header = (PVRv3Header*) [fileData bytes];
@@ -360,7 +372,7 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
         System::Print( "Unknown pixel format in %s\n", path );
         return;
     }
-    
+
     MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                                                           width:width
                                                                                          height:height
@@ -373,4 +385,5 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:[data bytes] bytesPerRow:0];
     
     [levelDatas removeAllObjects];
+#endif
 }

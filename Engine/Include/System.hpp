@@ -2,7 +2,9 @@
 #define SYSTEM_H
 
 #if AETHER3D_METAL
+#if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
+#endif
 #import <QuartzCore/CAMetalLayer.h>
 #endif
 
