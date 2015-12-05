@@ -1,10 +1,14 @@
 #include <iostream>
+#include "AudioClip.hpp"
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
+#include "Font.hpp"
 #include "GameObject.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
 #include "RenderTexture.hpp"
+#include "Texture2D.hpp"
+#include "TextureCube.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "System.hpp"
 #include "TransformComponent.hpp"
@@ -140,6 +144,27 @@ void TestMesh()
                     "Mesh copy failed!" );
 }
 
+void TestMissingFiles()
+{
+    AudioClip audioClip;
+    audioClip.Load( FileSystem::FileContents( "notfound.wav" ) );
+
+    Mesh mesh;
+    mesh.Load( FileSystem::FileContents( "notfound.ae3d" ) );
+
+    Texture2D tex2d;
+    tex2d.Load( FileSystem::FileContents("notfound.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+
+    TextureCube texCube;
+    texCube.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
+                FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
+                FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
+                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+    
+    Font font;
+    font.LoadBMFont( &tex2d, FileSystem::FileContents("not_found.fnt") );
+}
+
 int main()
 {
     Window::Create( 512, 512, WindowCreateFlags::Empty );
@@ -153,6 +178,7 @@ int main()
     TestMesh();
     TestAddition();
     TestGameObjectCopying();
+    TestMissingFiles();
 }
 
     

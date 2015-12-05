@@ -2,6 +2,7 @@
 #if AETHER3D_METAL
 #import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
+#import <MetalKit/MetalKit.h>
 #endif
 #include <unordered_map>
 #include <list>
@@ -19,8 +20,8 @@ id <MTLLibrary> defaultLibrary;
 id <MTLDepthStencilState> depthState;
 id <CAMetalDrawable> currentDrawable;
 
-CAMetalLayer* metalLayer;
-MTLRenderPassDescriptor *renderPassDescriptor = nullptr;
+CAMetalLayer* metalLayer = nullptr;
+MTLRenderPassDescriptor* renderPassDescriptor = nullptr;
 id <MTLTexture> depthTex;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
@@ -28,6 +29,7 @@ id<CAMetalDrawable> drawable;
 id<MTLTexture> texture0;
 id<MTLTexture> texture1;
 id<MTLTexture> currentRenderTarget;
+MTKView* appView = nullptr;
 
 // TODO: Move somewhere else.
 void PlatformInitGamePad()
@@ -77,12 +79,19 @@ void ae3d::GfxDevice::Init( int width, int height )
     GfxDeviceGlobal::backBufferHeight = height;
 }
 
+void ae3d::GfxDevice::SetCurrentDrawableMetalOSX( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass )
+{
+    currentDrawable = drawable;
+    renderPassDescriptor = renderPass;
+}
+
 namespace
 {
     float clearColor[] = { 0, 0, 0, 1 };
 
 id<CAMetalDrawable> GetCurrentDrawable()
 {
+#if TARGET_OS_IPHONE
     while (currentDrawable == nil)
     {
         currentDrawable = [metalLayer nextDrawable];
@@ -91,7 +100,7 @@ id<CAMetalDrawable> GetCurrentDrawable()
             NSLog(@"CurrentDrawable is nil");
         }
     }
-    
+#endif
     return currentDrawable;
 }
 
@@ -106,10 +115,11 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
     renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
     renderPassDescriptor.colorAttachments[0].loadAction = MTLLoadActionLoad;//Clear;
     renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
-    
+#if TARGET_OS_IPHONE
     if (!depthTex || (depthTex && (depthTex.width != texture.width || depthTex.height != texture.height)))
     {
         MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat: MTLPixelFormatDepth32Float width: texture.width height: texture.height mipmapped: NO];
+        
         depthTex = [device newTextureWithDescriptor: desc];
         depthTex.label = @"Depth";
         
@@ -118,11 +128,14 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
         renderPassDescriptor.depthAttachment.loadAction = MTLLoadActionClear;
         renderPassDescriptor.depthAttachment.storeAction = MTLStoreActionDontCare;
     }
+#endif
 }
 }
 
 void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
 {
+    assert( aMetalLayer != nullptr );
+
     device = MTLCreateSystemDefaultDevice();
 
     metalLayer = aMetalLayer;
@@ -130,7 +143,21 @@ void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
     metalLayer.pixelFormat = MTLPixelFormatBGRA8Unorm;
     // Change this to NO if the compute encoder is used as the last pass on the drawable texture
     metalLayer.framebufferOnly = YES;
+    
+    commandQueue = [device newCommandQueue];
+    defaultLibrary = [device newDefaultLibrary];
+    
+    MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
+    depthStateDesc.depthCompareFunction = MTLCompareFunctionLess;
+    depthStateDesc.depthWriteEnabled = YES;
+    depthState = [device newDepthStencilStateWithDescriptor:depthStateDesc];
+}
 
+void ae3d::GfxDevice::InitOSX( id <MTLDevice> metalDevice, MTKView* view )
+{
+    device = metalDevice;
+    appView = view;
+    
     commandQueue = [device newCommandQueue];
     defaultLibrary = [device newDefaultLibrary];
     
@@ -199,8 +226,13 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
+#if TARGET_OS_IPHONE
         pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
-
+#else
+        // These must match app's view's format.
+        pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+        pipelineStateDescriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+#endif
         NSError* error = NULL;
         MTLRenderPipelineReflection* reflectionObj;
         MTLPipelineOption option = MTLPipelineOptionBufferTypeInfo | MTLPipelineOptionArgumentInfo;

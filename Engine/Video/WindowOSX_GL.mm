@@ -704,8 +704,11 @@ bool ae3d::Window::PollEvent( WindowEvent& outEvent )
 
 void ae3d::Window::SetTitle( const char* title )
 {
-    NSString* tit = [NSString stringWithCString:title encoding:NSUTF8StringEncoding];
-    [window setTitle: tit];
+    if (title != nullptr)
+    {
+        NSString* tit = [NSString stringWithCString:title encoding:NSUTF8StringEncoding];
+        [window setTitle: tit];
+    }
 }
 
 void ae3d::Window::SwapBuffers()

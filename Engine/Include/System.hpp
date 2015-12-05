@@ -6,6 +6,7 @@
 #import <UIKit/UIKit.h>
 #endif
 #import <QuartzCore/CAMetalLayer.h>
+#import <MetalKit/MetalKit.h>
 #endif
 
 /**
@@ -63,7 +64,10 @@
  
    \subsection osx OS X/Xcode
 
-   Build Engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making
+   OpenGL: Build Engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making
+   sure the running folder is set to aether3d_build/Samples.
+
+   Metal: Build Engine/Aether3D_OSX_Metal. Make sure the built library is in aether3d_build. Then build and run Samples/MetalSampleOSX, making
    sure the running folder is set to aether3d_build/Samples.
 
    \subsection osx_cmd OS X and GNU/Linux Command Line
@@ -101,6 +105,8 @@ namespace ae3d
         
 #if AETHER3D_METAL
         void InitMetal( CAMetalLayer* metalLayer );
+        void InitMetalOSX( id< MTLDevice > metalDevice, MTKView* view );
+        void SetCurrentDrawableMetalOSX( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void EndFrame();
         void BeginFrame();
 #endif

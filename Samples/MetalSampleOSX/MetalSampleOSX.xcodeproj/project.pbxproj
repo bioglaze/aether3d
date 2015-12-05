@@ -1,0 +1,517 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		ABCD9C651C12E1C900B94BD0 /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C641C12E1C900B94BD0 /* libAether3D_OSX_Metal.a */; };
+		ABCD9C671C12E1D900B94BD0 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */; };
+		ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C681C12F78200B94BD0 /* MetalKit.framework */; };
+		ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */; };
+		ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6B1C131DA300B94BD0 /* font.png */; };
+		ABE04F801C1216A80025C436 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F7F1C1216A80025C436 /* AppDelegate.m */; };
+		ABE04F831C1216A80025C436 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F821C1216A80025C436 /* main.m */; };
+		ABE04F861C1216A80025C436 /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F851C1216A80025C436 /* GameViewController.mm */; };
+		ABE04F8B1C1216A80025C436 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABE04F8A1C1216A80025C436 /* Assets.xcassets */; };
+		ABE04F8E1C1216A80025C436 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE04F8C1C1216A80025C436 /* MainMenu.xib */; };
+		ABE04F991C1216A80025C436 /* MetalSampleOSXTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F981C1216A80025C436 /* MetalSampleOSXTests.m */; };
+		ABE04FC41C1217F00025C436 /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FBF1C1217F00025C436 /* Moments.metal */; };
+		ABE04FC51C1217F00025C436 /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC01C1217F00025C436 /* SDF.metal */; };
+		ABE04FC61C1217F00025C436 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC11C1217F00025C436 /* Skybox.metal */; };
+		ABE04FC71C1217F00025C436 /* SpriteShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC21C1217F00025C436 /* SpriteShader.metal */; };
+		ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC31C1217F00025C436 /* Unlit.metal */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		ABE04F951C1216A80025C436 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ABE04F731C1216A80025C436 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ABE04F7A1C1216A80025C436;
+			remoteInfo = MetalSampleOSX;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		ABCD9C621C12CE6A00B94BD0 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/Debug/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
+		ABCD9C641C12E1C900B94BD0 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
+		ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		ABCD9C681C12F78200B94BD0 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = font_txt.fnt; path = ../../../../aether3d_build/Samples/font_txt.fnt; sourceTree = "<group>"; };
+		ABCD9C6B1C131DA300B94BD0 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
+		ABE04F7B1C1216A80025C436 /* MetalSampleOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalSampleOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABE04F7E1C1216A80025C436 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		ABE04F7F1C1216A80025C436 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		ABE04F821C1216A80025C436 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		ABE04F841C1216A80025C436 /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
+		ABE04F851C1216A80025C436 /* GameViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GameViewController.mm; sourceTree = "<group>"; };
+		ABE04F8A1C1216A80025C436 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ABE04F8D1C1216A80025C436 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		ABE04F8F1C1216A80025C436 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABE04F941C1216A80025C436 /* MetalSampleOSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSampleOSXTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABE04F981C1216A80025C436 /* MetalSampleOSXTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalSampleOSXTests.m; sourceTree = "<group>"; };
+		ABE04F9A1C1216A80025C436 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABE04FA41C1217A40025C436 /* AudioClip.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioClip.hpp; path = ../../Engine/Include/AudioClip.hpp; sourceTree = "<group>"; };
+		ABE04FA51C1217A40025C436 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../../Engine/Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
+		ABE04FA61C1217A40025C436 /* CameraComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CameraComponent.hpp; path = ../../Engine/Include/CameraComponent.hpp; sourceTree = "<group>"; };
+		ABE04FA71C1217A40025C436 /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Engine/Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
+		ABE04FA81C1217A40025C436 /* FileSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FileSystem.hpp; path = ../../Engine/Include/FileSystem.hpp; sourceTree = "<group>"; };
+		ABE04FA91C1217A40025C436 /* Font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Font.hpp; path = ../../Engine/Include/Font.hpp; sourceTree = "<group>"; };
+		ABE04FAA1C1217A40025C436 /* GameObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GameObject.hpp; path = ../../Engine/Include/GameObject.hpp; sourceTree = "<group>"; };
+		ABE04FAB1C1217A40025C436 /* Macros.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Macros.hpp; path = ../../Engine/Include/Macros.hpp; sourceTree = "<group>"; };
+		ABE04FAC1C1217A40025C436 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../Engine/Include/Material.hpp; sourceTree = "<group>"; };
+		ABE04FAD1C1217A40025C436 /* Matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Matrix.hpp; path = ../../Engine/Include/Matrix.hpp; sourceTree = "<group>"; };
+		ABE04FAE1C1217A40025C436 /* Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../../Engine/Include/Mesh.hpp; sourceTree = "<group>"; };
+		ABE04FAF1C1217A40025C436 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../../Engine/Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
+		ABE04FB01C1217A40025C436 /* Quaternion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Quaternion.hpp; path = ../../Engine/Include/Quaternion.hpp; sourceTree = "<group>"; };
+		ABE04FB11C1217A40025C436 /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../Engine/Include/RenderTexture.hpp; sourceTree = "<group>"; };
+		ABE04FB21C1217A40025C436 /* Scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Scene.hpp; path = ../../Engine/Include/Scene.hpp; sourceTree = "<group>"; };
+		ABE04FB31C1217A40025C436 /* Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = ../../Engine/Include/Shader.hpp; sourceTree = "<group>"; };
+		ABE04FB41C1217A40025C436 /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Engine/Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
+		ABE04FB51C1217A40025C436 /* SpriteRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpriteRendererComponent.hpp; path = ../../Engine/Include/SpriteRendererComponent.hpp; sourceTree = "<group>"; };
+		ABE04FB61C1217A40025C436 /* System.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = System.hpp; path = ../../Engine/Include/System.hpp; sourceTree = "<group>"; };
+		ABE04FB71C1217A40025C436 /* TextRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextRendererComponent.hpp; path = ../../Engine/Include/TextRendererComponent.hpp; sourceTree = "<group>"; };
+		ABE04FB81C1217A40025C436 /* Texture2D.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Texture2D.hpp; path = ../../Engine/Include/Texture2D.hpp; sourceTree = "<group>"; };
+		ABE04FB91C1217A40025C436 /* TextureBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../../Engine/Include/TextureBase.hpp; sourceTree = "<group>"; };
+		ABE04FBA1C1217A40025C436 /* TextureCube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../Engine/Include/TextureCube.hpp; sourceTree = "<group>"; };
+		ABE04FBB1C1217A40025C436 /* TransformComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../../Engine/Include/TransformComponent.hpp; sourceTree = "<group>"; };
+		ABE04FBC1C1217A40025C436 /* Vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Vec3.hpp; path = ../../Engine/Include/Vec3.hpp; sourceTree = "<group>"; };
+		ABE04FBD1C1217A40025C436 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../../Engine/Include/VR.hpp; sourceTree = "<group>"; };
+		ABE04FBE1C1217A40025C436 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../../Engine/Include/Window.hpp; sourceTree = "<group>"; };
+		ABE04FBF1C1217F00025C436 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
+		ABE04FC01C1217F00025C436 /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../Engine/Assets/SDF.metal; sourceTree = "<group>"; };
+		ABE04FC11C1217F00025C436 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
+		ABE04FC21C1217F00025C436 /* SpriteShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SpriteShader.metal; path = ../../../Engine/Assets/SpriteShader.metal; sourceTree = "<group>"; };
+		ABE04FC31C1217F00025C436 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		ABE04F781C1216A80025C436 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */,
+				ABCD9C671C12E1D900B94BD0 /* OpenAL.framework in Frameworks */,
+				ABCD9C651C12E1C900B94BD0 /* libAether3D_OSX_Metal.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ABE04F911C1216A80025C436 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		ABE04F721C1216A80025C436 = {
+			isa = PBXGroup;
+			children = (
+				ABCD9C681C12F78200B94BD0 /* MetalKit.framework */,
+				ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */,
+				ABCD9C641C12E1C900B94BD0 /* libAether3D_OSX_Metal.a */,
+				ABCD9C621C12CE6A00B94BD0 /* libAether3D_OSX_Metal.a */,
+				ABE04FA31C1217830025C436 /* Include */,
+				ABE04F7D1C1216A80025C436 /* MetalSampleOSX */,
+				ABE04F971C1216A80025C436 /* MetalSampleOSXTests */,
+				ABE04F7C1C1216A80025C436 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		ABE04F7C1C1216A80025C436 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ABE04F7B1C1216A80025C436 /* MetalSampleOSX.app */,
+				ABE04F941C1216A80025C436 /* MetalSampleOSXTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ABE04F7D1C1216A80025C436 /* MetalSampleOSX */ = {
+			isa = PBXGroup;
+			children = (
+				ABE04F7E1C1216A80025C436 /* AppDelegate.h */,
+				ABE04F7F1C1216A80025C436 /* AppDelegate.m */,
+				ABE04F841C1216A80025C436 /* GameViewController.h */,
+				ABE04F851C1216A80025C436 /* GameViewController.mm */,
+				ABE04F8A1C1216A80025C436 /* Assets.xcassets */,
+				ABE04F8C1C1216A80025C436 /* MainMenu.xib */,
+				ABE04F8F1C1216A80025C436 /* Info.plist */,
+				ABE04F811C1216A80025C436 /* Supporting Files */,
+			);
+			path = MetalSampleOSX;
+			sourceTree = "<group>";
+		};
+		ABE04F811C1216A80025C436 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */,
+				ABCD9C6B1C131DA300B94BD0 /* font.png */,
+				ABE04FBF1C1217F00025C436 /* Moments.metal */,
+				ABE04FC01C1217F00025C436 /* SDF.metal */,
+				ABE04FC11C1217F00025C436 /* Skybox.metal */,
+				ABE04FC21C1217F00025C436 /* SpriteShader.metal */,
+				ABE04FC31C1217F00025C436 /* Unlit.metal */,
+				ABE04F821C1216A80025C436 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ABE04F971C1216A80025C436 /* MetalSampleOSXTests */ = {
+			isa = PBXGroup;
+			children = (
+				ABE04F981C1216A80025C436 /* MetalSampleOSXTests.m */,
+				ABE04F9A1C1216A80025C436 /* Info.plist */,
+			);
+			path = MetalSampleOSXTests;
+			sourceTree = "<group>";
+		};
+		ABE04FA31C1217830025C436 /* Include */ = {
+			isa = PBXGroup;
+			children = (
+				ABE04FA41C1217A40025C436 /* AudioClip.hpp */,
+				ABE04FA51C1217A40025C436 /* AudioSourceComponent.hpp */,
+				ABE04FA61C1217A40025C436 /* CameraComponent.hpp */,
+				ABE04FA71C1217A40025C436 /* DirectionalLightComponent.hpp */,
+				ABE04FA81C1217A40025C436 /* FileSystem.hpp */,
+				ABE04FA91C1217A40025C436 /* Font.hpp */,
+				ABE04FAA1C1217A40025C436 /* GameObject.hpp */,
+				ABE04FAB1C1217A40025C436 /* Macros.hpp */,
+				ABE04FAC1C1217A40025C436 /* Material.hpp */,
+				ABE04FAD1C1217A40025C436 /* Matrix.hpp */,
+				ABE04FAE1C1217A40025C436 /* Mesh.hpp */,
+				ABE04FAF1C1217A40025C436 /* MeshRendererComponent.hpp */,
+				ABE04FB01C1217A40025C436 /* Quaternion.hpp */,
+				ABE04FB11C1217A40025C436 /* RenderTexture.hpp */,
+				ABE04FB21C1217A40025C436 /* Scene.hpp */,
+				ABE04FB31C1217A40025C436 /* Shader.hpp */,
+				ABE04FB41C1217A40025C436 /* SpotLightComponent.hpp */,
+				ABE04FB51C1217A40025C436 /* SpriteRendererComponent.hpp */,
+				ABE04FB61C1217A40025C436 /* System.hpp */,
+				ABE04FB71C1217A40025C436 /* TextRendererComponent.hpp */,
+				ABE04FB81C1217A40025C436 /* Texture2D.hpp */,
+				ABE04FB91C1217A40025C436 /* TextureBase.hpp */,
+				ABE04FBA1C1217A40025C436 /* TextureCube.hpp */,
+				ABE04FBB1C1217A40025C436 /* TransformComponent.hpp */,
+				ABE04FBC1C1217A40025C436 /* Vec3.hpp */,
+				ABE04FBD1C1217A40025C436 /* VR.hpp */,
+				ABE04FBE1C1217A40025C436 /* Window.hpp */,
+			);
+			name = Include;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		ABE04F7A1C1216A80025C436 /* MetalSampleOSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABE04F9D1C1216A80025C436 /* Build configuration list for PBXNativeTarget "MetalSampleOSX" */;
+			buildPhases = (
+				ABE04F771C1216A80025C436 /* Sources */,
+				ABE04F781C1216A80025C436 /* Frameworks */,
+				ABE04F791C1216A80025C436 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MetalSampleOSX;
+			productName = MetalSampleOSX;
+			productReference = ABE04F7B1C1216A80025C436 /* MetalSampleOSX.app */;
+			productType = "com.apple.product-type.application";
+		};
+		ABE04F931C1216A80025C436 /* MetalSampleOSXTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABE04FA01C1216A80025C436 /* Build configuration list for PBXNativeTarget "MetalSampleOSXTests" */;
+			buildPhases = (
+				ABE04F901C1216A80025C436 /* Sources */,
+				ABE04F911C1216A80025C436 /* Frameworks */,
+				ABE04F921C1216A80025C436 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ABE04F961C1216A80025C436 /* PBXTargetDependency */,
+			);
+			name = MetalSampleOSXTests;
+			productName = MetalSampleOSXTests;
+			productReference = ABE04F941C1216A80025C436 /* MetalSampleOSXTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		ABE04F731C1216A80025C436 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = "Timo Wiren";
+				TargetAttributes = {
+					ABE04F7A1C1216A80025C436 = {
+						CreatedOnToolsVersion = 7.1.1;
+					};
+					ABE04F931C1216A80025C436 = {
+						CreatedOnToolsVersion = 7.1.1;
+						TestTargetID = ABE04F7A1C1216A80025C436;
+					};
+				};
+			};
+			buildConfigurationList = ABE04F761C1216A80025C436 /* Build configuration list for PBXProject "MetalSampleOSX" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = ABE04F721C1216A80025C436;
+			productRefGroup = ABE04F7C1C1216A80025C436 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				ABE04F7A1C1216A80025C436 /* MetalSampleOSX */,
+				ABE04F931C1216A80025C436 /* MetalSampleOSXTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		ABE04F791C1216A80025C436 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */,
+				ABE04F8B1C1216A80025C436 /* Assets.xcassets in Resources */,
+				ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */,
+				ABE04F8E1C1216A80025C436 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ABE04F921C1216A80025C436 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		ABE04F771C1216A80025C436 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */,
+				ABE04F831C1216A80025C436 /* main.m in Sources */,
+				ABE04FC41C1217F00025C436 /* Moments.metal in Sources */,
+				ABE04F861C1216A80025C436 /* GameViewController.mm in Sources */,
+				ABE04FC71C1217F00025C436 /* SpriteShader.metal in Sources */,
+				ABE04F801C1216A80025C436 /* AppDelegate.m in Sources */,
+				ABE04FC51C1217F00025C436 /* SDF.metal in Sources */,
+				ABE04FC61C1217F00025C436 /* Skybox.metal in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ABE04F901C1216A80025C436 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABE04F991C1216A80025C436 /* MetalSampleOSXTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		ABE04F961C1216A80025C436 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ABE04F7A1C1216A80025C436 /* MetalSampleOSX */;
+			targetProxy = ABE04F951C1216A80025C436 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		ABE04F8C1C1216A80025C436 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				ABE04F8D1C1216A80025C436 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		ABE04F9B1C1216A80025C436 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		ABE04F9C1C1216A80025C436 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		ABE04F9E1C1216A80025C436 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_METAL;
+				INFOPLIST_FILE = MetalSampleOSX/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = ../../../aether3d_build;
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleOSX;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ABE04F9F1C1216A80025C436 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_METAL;
+				INFOPLIST_FILE = MetalSampleOSX/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = ../../../aether3d_build;
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleOSX;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		ABE04FA11C1216A80025C436 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				INFOPLIST_FILE = MetalSampleOSXTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleOSXTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalSampleOSX.app/Contents/MacOS/MetalSampleOSX";
+			};
+			name = Debug;
+		};
+		ABE04FA21C1216A80025C436 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = MetalSampleOSXTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleOSXTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalSampleOSX.app/Contents/MacOS/MetalSampleOSX";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		ABE04F761C1216A80025C436 /* Build configuration list for PBXProject "MetalSampleOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABE04F9B1C1216A80025C436 /* Debug */,
+				ABE04F9C1C1216A80025C436 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ABE04F9D1C1216A80025C436 /* Build configuration list for PBXNativeTarget "MetalSampleOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABE04F9E1C1216A80025C436 /* Debug */,
+				ABE04F9F1C1216A80025C436 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ABE04FA01C1216A80025C436 /* Build configuration list for PBXNativeTarget "MetalSampleOSXTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABE04FA11C1216A80025C436 /* Debug */,
+				ABE04FA21C1216A80025C436 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = ABE04F731C1216A80025C436 /* Project object */;
+}

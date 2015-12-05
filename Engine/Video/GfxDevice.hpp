@@ -3,6 +3,7 @@
 
 #if AETHER3D_METAL
 #import <Metal/Metal.h>
+#import <MetalKit/MetalKit.h>
 #import <QuartzCore/CAMetalLayer.h>
 #endif
 
@@ -38,6 +39,8 @@ namespace ae3d
         void Init( int width, int height );
 #if AETHER3D_METAL
         void Init( CAMetalLayer* metalLayer );
+        void InitOSX( id <MTLDevice> metalDevice, MTKView* view );
+        void SetCurrentDrawableMetalOSX( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
         id <MTLDevice> GetMetalDevice();
         id <MTLLibrary> GetDefaultMetalShaderLibrary();

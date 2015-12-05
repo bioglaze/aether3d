@@ -26,6 +26,16 @@ void ae3d::System::InitMetal( CAMetalLayer* metalLayer )
     GfxDevice::Init( metalLayer );
 }
 
+void ae3d::System::InitMetalOSX( id <MTLDevice> device, MTKView* view)
+{
+    GfxDevice::InitOSX( device, view );
+}
+
+void ae3d::System::SetCurrentDrawableMetalOSX( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass )
+{
+    GfxDevice::SetCurrentDrawableMetalOSX( drawable, renderPass );
+}
+
 void ae3d::System::EndFrame()
 {
     GfxDevice::FlipBuffers();
@@ -35,6 +45,7 @@ void ae3d::System::BeginFrame()
 {
     GfxDevice::BeginFrame();
 }
+
 #endif
 
 void ae3d::System::Deinit()
