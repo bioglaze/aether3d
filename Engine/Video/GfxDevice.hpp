@@ -71,6 +71,8 @@ namespace ae3d
         void IncRenderTargetBinds();
         int GetRenderTargetBinds();
         void ResetFrameStatistics();
+        void IncShaderBinds();
+        int GetShaderBinds();
 
         void Present();
         void ReleaseGPUObjects();

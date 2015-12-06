@@ -150,7 +150,7 @@ int main()
     dirLight.AddComponent<DirectionalLightComponent>();
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
@@ -201,8 +201,8 @@ int main()
     scene.Add( &copiedCube );
     //scene.Add( &cube2 );
     scene.Add( &statsContainer );
-    //scene.Add( &dirLight );
-    scene.Add( &spotLight );
+    scene.Add( &dirLight );
+    //scene.Add( &spotLight );
 
     GameObject cubes[ 5 ];
 
@@ -403,6 +403,7 @@ int main()
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
         stats += std::string( "\nRT binds:" ) + std::to_string( System::Statistics::GetRenderTargetBindCount() );
         stats += std::string( "\nTexture binds:" ) + std::to_string( System::Statistics::GetTextureBindCount() );
+        stats += std::string( "\nShader binds:" ) + std::to_string( System::Statistics::GetShaderBindCount() );
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         Window::SwapBuffers();

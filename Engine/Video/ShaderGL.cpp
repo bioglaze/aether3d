@@ -190,7 +190,14 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexGLSL, const F
 
 void ae3d::Shader::Use()
 {
-    glUseProgram( handle );
+    static unsigned boundHandle = 0;
+    
+    if (boundHandle != handle)
+    {
+        GfxDevice::IncShaderBinds();
+        glUseProgram( handle );
+        boundHandle = handle;
+    }
 }
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )

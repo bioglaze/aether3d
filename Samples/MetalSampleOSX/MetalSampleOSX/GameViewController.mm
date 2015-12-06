@@ -66,7 +66,7 @@
     camera3d.AddComponent<ae3d::CameraComponent>();
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
-    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::Depth/*AndColor*/ );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
     camera3d.AddComponent<ae3d::TransformComponent>();
@@ -81,7 +81,7 @@
     text.GetComponent<ae3d::TextRendererComponent>()->SetFont( &font );
     text.GetComponent<ae3d::TextRendererComponent>()->SetColor( ae3d::Vec4( 1, 0, 0, 1 ) );
     text.AddComponent<ae3d::TransformComponent>();
-    text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 40, 0 ) );
+    text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
     text.SetLayer( 2 );
     scene.Add( &text );
     
@@ -131,6 +131,9 @@
     ae3d::Quaternion rotation;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
     cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
+    
+    std::string stats = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
+    text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

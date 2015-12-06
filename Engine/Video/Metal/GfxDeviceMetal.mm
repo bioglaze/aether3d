@@ -15,6 +15,8 @@
 
 extern ae3d::Renderer renderer;
 
+enum class GfxDeviceClearFlag { DepthAndColor, Depth, DontClear };
+
 id <MTLDevice> device;
 id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
@@ -46,8 +48,10 @@ namespace GfxDeviceGlobal
     int textureBinds = 0;
     int vertexBufferBinds = 0;
     int renderTargetBinds = 0;
+    int shaderBinds = 0;
     int backBufferWidth = 0;
     int backBufferHeight = 0;
+    ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Color;
     bool cullBackFaces = true;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     
@@ -116,9 +120,22 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
         renderPassDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
     }
     
+    MTLLoadAction texLoadAction = MTLLoadActionLoad;
+    MTLLoadAction depthLoadAction = MTLLoadActionLoad;
+    
+    if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Color)
+    {
+        texLoadAction = MTLLoadActionClear;
+    }
+
+    if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Depth)
+    {
+        depthLoadAction = MTLLoadActionClear;
+    }
+
     renderPassDescriptor.colorAttachments[0].texture = texture;
     renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-    renderPassDescriptor.colorAttachments[0].loadAction = MTLLoadActionLoad;//Clear;
+    renderPassDescriptor.colorAttachments[0].loadAction = texLoadAction;
     renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
 #if TARGET_OS_IPHONE
     if (!depthTex || (depthTex && (depthTex.width != texture.width || depthTex.height != texture.height)))
@@ -130,7 +147,7 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
         
         renderPassDescriptor.depthAttachment.texture = depthTex;
         renderPassDescriptor.depthAttachment.clearDepth = 1.0f;
-        renderPassDescriptor.depthAttachment.loadAction = MTLLoadActionClear;
+        renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
         renderPassDescriptor.depthAttachment.storeAction = MTLStoreActionDontCare;
     }
 #endif
@@ -202,9 +219,14 @@ int ae3d::GfxDevice::GetRenderTargetBinds()
     return GfxDeviceGlobal::renderTargetBinds;
 }
 
+int ae3d::GfxDevice::GetShaderBinds()
+{
+    return GfxDeviceGlobal::shaderBinds;
+}
+
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
-    // Handled by setupRenderPassDescriptor().
+    GfxDeviceGlobal::clearFlags = (ae3d::GfxDevice::ClearFlags)clearFlags;
 }
 
 std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
@@ -339,12 +361,23 @@ int ae3d::GfxDevice::GetDrawCalls()
     return GfxDeviceGlobal::drawCalls;
 }
 
+void ae3d::GfxDevice::IncTextureBinds()
+{
+    ++GfxDeviceGlobal::textureBinds;
+}
+
+void ae3d::GfxDevice::IncShaderBinds()
+{
+    ++GfxDeviceGlobal::shaderBinds;
+}
+
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
     GfxDeviceGlobal::drawCalls = 0;
     GfxDeviceGlobal::renderTargetBinds = 0;
     GfxDeviceGlobal::textureBinds = 0;
     GfxDeviceGlobal::vertexBufferBinds = 0;
+    GfxDeviceGlobal::shaderBinds = 0;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

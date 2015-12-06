@@ -75,6 +75,7 @@ namespace GfxDeviceGlobal
     int vaoBinds = 0;
     int textureBinds = 0;
     int renderTargetBinds = 0;
+    int shaderBinds = 0;
     
     int backBufferWidth = 640;
     int backBufferHeight = 400;
@@ -182,12 +183,18 @@ void ae3d::GfxDevice::IncVertexBufferBinds()
     ++GfxDeviceGlobal::vaoBinds;
 }
 
+void ae3d::GfxDevice::IncShaderBinds()
+{
+    ++GfxDeviceGlobal::shaderBinds;
+}
+
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
     GfxDeviceGlobal::drawCalls = 0;
     GfxDeviceGlobal::vaoBinds = 0;
     GfxDeviceGlobal::textureBinds = 0;
     GfxDeviceGlobal::renderTargetBinds = 0;
+    GfxDeviceGlobal::shaderBinds = 0;
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
@@ -208,6 +215,11 @@ int ae3d::GfxDevice::GetRenderTargetBinds()
 int ae3d::GfxDevice::GetVertexBufferBinds()
 {
     return GfxDeviceGlobal::vaoBinds;
+}
+
+int ae3d::GfxDevice::GetShaderBinds()
+{
+    return GfxDeviceGlobal::shaderBinds;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

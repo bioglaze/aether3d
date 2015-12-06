@@ -135,3 +135,8 @@ int ae3d::System::Statistics::GetRenderTargetBindCount()
 {
     return GfxDevice::GetRenderTargetBinds();
 }
+
+int ae3d::System::Statistics::GetShaderBindCount()
+{
+    return GfxDevice::GetShaderBinds();
+}
