@@ -26,6 +26,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     {
         System::Print("Failed to create a render texture!\n");
     }
+    
+    metalTexture.label = @"Render Texture";
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )

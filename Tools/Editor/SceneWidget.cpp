@@ -187,7 +187,8 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
 
 void SceneWidget::TransformGizmo::Init( Shader* shader )
 {
-    translateTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
+    translateTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat,
+                       TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
     translateMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "cursor_translate.ae3d" ).c_str() ) );
 
     xAxisMaterial.SetShader( shader );
@@ -254,7 +255,8 @@ void SceneWidget::Init()
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
-    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, 1 );
+    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat,
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
 
     cubeMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "textured_cube.ae3d" ).c_str() ) );
 
@@ -698,7 +700,10 @@ void SceneWidget::RemoveGameObject( int index )
 void SceneWidget::LoadSceneFromFile( const char* path )
 {
     std::vector< ae3d::GameObject > gos;
-    Scene::DeserializeResult result = scene.Deserialize( ae3d::FileSystem::FileContents( path ), gos );
+    std::map< std::string, class Texture2D* > texture2Ds;
+    std::map< std::string, class Material* > materials;
+    std::vector< class Mesh* > meshes;
+    Scene::DeserializeResult result = scene.Deserialize( ae3d::FileSystem::FileContents( path ), gos, texture2Ds, materials, meshes );
 
     if (result == Scene::DeserializeResult::ParseError)
     {

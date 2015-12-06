@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ABCD9C651C12E1C900B94BD0 /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C641C12E1C900B94BD0 /* libAether3D_OSX_Metal.a */; };
+		AB2CA8251C1332A900D4D7C4 /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */; };
+		AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */; };
+		AB2CA8291C13664600D4D7C4 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8281C13664600D4D7C4 /* glider.png */; };
 		ABCD9C671C12E1D900B94BD0 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */; };
 		ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C681C12F78200B94BD0 /* MetalKit.framework */; };
 		ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */; };
@@ -36,8 +38,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		ABCD9C621C12CE6A00B94BD0 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/Debug/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
-		ABCD9C641C12E1C900B94BD0 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
+		AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
+		AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
+		AB2CA8281C13664600D4D7C4 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		ABCD9C681C12F78200B94BD0 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = font_txt.fnt; path = ../../../../aether3d_build/Samples/font_txt.fnt; sourceTree = "<group>"; };
@@ -93,9 +96,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB2CA8251C1332A900D4D7C4 /* libAether3D_OSX_Metal.a in Frameworks */,
 				ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */,
 				ABCD9C671C12E1D900B94BD0 /* OpenAL.framework in Frameworks */,
-				ABCD9C651C12E1C900B94BD0 /* libAether3D_OSX_Metal.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,10 +115,9 @@
 		ABE04F721C1216A80025C436 = {
 			isa = PBXGroup;
 			children = (
+				AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */,
 				ABCD9C681C12F78200B94BD0 /* MetalKit.framework */,
 				ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */,
-				ABCD9C641C12E1C900B94BD0 /* libAether3D_OSX_Metal.a */,
-				ABCD9C621C12CE6A00B94BD0 /* libAether3D_OSX_Metal.a */,
 				ABE04FA31C1217830025C436 /* Include */,
 				ABE04F7D1C1216A80025C436 /* MetalSampleOSX */,
 				ABE04F971C1216A80025C436 /* MetalSampleOSXTests */,
@@ -150,6 +152,8 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB2CA8281C13664600D4D7C4 /* glider.png */,
+				AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */,
 				ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */,
 				ABCD9C6B1C131DA300B94BD0 /* font.png */,
 				ABE04FBF1C1217F00025C436 /* Moments.metal */,
@@ -288,6 +292,8 @@
 				ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */,
 				ABE04F8B1C1216A80025C436 /* Assets.xcassets in Resources */,
 				ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */,
+				AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */,
+				AB2CA8291C13664600D4D7C4 /* glider.png in Resources */,
 				ABE04F8E1C1216A80025C436 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

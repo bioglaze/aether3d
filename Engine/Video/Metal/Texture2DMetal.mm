@@ -77,6 +77,7 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
                                                           height:defaultTexture.height
                                                        mipmapped:NO];
         defaultTexture.metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+        defaultTexture.metalTexture.label = @"Default texture";
 
         const int components = 4;
         int data[ 128 * 128 * components ] = { 0xFFC0CB };
@@ -160,8 +161,9 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
                                                       height:height
                                                    mipmapped:NO];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+    metalTexture.label = @"Texture 2D";
 
-    MTLRegion region = MTLRegionMake2D(0, 0, width, height);
+    MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     const int bytesPerRow = components * width;
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
 
@@ -271,7 +273,8 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
                                                                                              height:height
                                                                                           mipmapped:NO];
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-        
+        metalTexture.label = @"Texture 2D PVR2";
+
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         
         NSData* data = [imageData objectAtIndex:0];
@@ -378,7 +381,8 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
                                                                                          height:height
                                                                                       mipmapped:NO];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-    
+    metalTexture.label = @"Texture 2D PVR3";
+
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     
     NSData* data = [levelDatas objectAtIndex:0];

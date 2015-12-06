@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "Renderer.hpp"
 #include "RenderTexture.hpp"
+#include "Texture2D.hpp"
 
 extern ae3d::Renderer renderer;
 
@@ -20,7 +21,6 @@ id <MTLLibrary> defaultLibrary;
 id <MTLDepthStencilState> depthState;
 id <CAMetalDrawable> currentDrawable;
 
-CAMetalLayer* metalLayer = nullptr;
 MTLRenderPassDescriptor* renderPassDescriptor = nullptr;
 id <MTLTexture> depthTex;
 id<MTLRenderCommandEncoder> renderEncoder;
@@ -29,7 +29,11 @@ id<CAMetalDrawable> drawable;
 id<MTLTexture> texture0;
 id<MTLTexture> texture1;
 id<MTLTexture> currentRenderTarget;
+#if TARGET_OS_IPHONE
+CAMetalLayer* metalLayer = nullptr;
+#else
 MTKView* appView = nullptr;
+#endif
 
 // TODO: Move somewhere else.
 void PlatformInitGamePad()
@@ -53,7 +57,8 @@ namespace GfxDeviceGlobal
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 {
     id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceCPUCacheModeDefaultCache];
-
+    uniformBuffer.label = @"uniform buffer";
+    
     GfxDeviceGlobal::uniformBuffers.push_back( uniformBuffer );
     return uniformBuffer;
 }
@@ -137,33 +142,38 @@ void ae3d::GfxDevice::Init( CAMetalLayer* aMetalLayer )
     assert( aMetalLayer != nullptr );
 
     device = MTLCreateSystemDefaultDevice();
-
+#if TARGET_OS_IPHONE
     metalLayer = aMetalLayer;
     metalLayer.device = device;
     metalLayer.pixelFormat = MTLPixelFormatBGRA8Unorm;
     // Change this to NO if the compute encoder is used as the last pass on the drawable texture
     metalLayer.framebufferOnly = YES;
-    
+#else
+    assert( !"This method should only be called on iOS renderer. Use InitOSX for OS X renderer." );
+#endif
     commandQueue = [device newCommandQueue];
     defaultLibrary = [device newDefaultLibrary];
     
     MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
     depthStateDesc.depthCompareFunction = MTLCompareFunctionLess;
     depthStateDesc.depthWriteEnabled = YES;
+    depthStateDesc.label = @"less write on";
     depthState = [device newDepthStencilStateWithDescriptor:depthStateDesc];
 }
 
 void ae3d::GfxDevice::InitOSX( id <MTLDevice> metalDevice, MTKView* view )
 {
     device = metalDevice;
+#if !TARGET_OS_IPHONE
     appView = view;
-    
+#endif
     commandQueue = [device newCommandQueue];
     defaultLibrary = [device newDefaultLibrary];
     
     MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
     depthStateDesc.depthCompareFunction = MTLCompareFunctionLess;
     depthStateDesc.depthWriteEnabled = YES;
+    depthStateDesc.label = @"less write on";
     depthState = [device newDepthStencilStateWithDescriptor:depthStateDesc];
 }
 
@@ -256,6 +266,15 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 {
     ++GfxDeviceGlobal::drawCalls;
 
+    if (!texture0)
+    {
+        texture0 = Texture2D::GetDefaultTexture()->GetMetalTexture();
+    }
+    if (!texture1)
+    {
+        texture1 = Texture2D::GetDefaultTexture()->GetMetalTexture();
+    }
+    
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
     [renderEncoder setCullMode:GfxDeviceGlobal::cullBackFaces ? MTLCullModeFront : MTLCullModeNone];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];

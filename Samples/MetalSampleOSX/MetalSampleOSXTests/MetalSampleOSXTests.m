@@ -1,11 +1,3 @@
-//
-//  MetalSampleOSXTests.m
-//  MetalSampleOSXTests
-//
-//  Created by Timo Wiren on 04/12/15.
-//  Copyright © 2015 Timo Wiren. All rights reserved.
-//
-
 #import <XCTest/XCTest.h>
 
 @interface MetalSampleOSXTests : XCTestCase

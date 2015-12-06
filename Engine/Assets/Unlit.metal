@@ -3,6 +3,9 @@
 
 using namespace metal;
 
+float linstep( float low, float high, float v );
+float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth );
+
 typedef struct
 {
     matrix_float4x4 _ModelViewProjectionMatrix;

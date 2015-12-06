@@ -2,6 +2,7 @@
 #define QUATERNION_H
 
 #include <cmath>
+#include <cassert>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 
@@ -199,6 +200,8 @@ namespace ae3d
             
             if (trace > 0.0f)
             {
+                assert( trace > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
+                
                 const float S = sqrtf( trace ) * 2.0f;
                 x = ( mat.m[9] - mat.m[6] ) / S;
                 y = ( mat.m[2] - mat.m[8] ) / S;
@@ -207,7 +210,10 @@ namespace ae3d
             }
             else if (mat.m[0] > mat.m[5] && mat.m[0] > mat.m[10])
             {
-                const float S = std::sqrt( 1.0f + mat.m[0] - mat.m[5] - mat.m[10] ) * 2.0f;
+                const float val = 1.0f + mat.m[0] - mat.m[5] - mat.m[10];
+                assert( val > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
+
+                const float S = std::sqrt( val ) * 2.0f;
                 x = 0.25f * S;
                 y = (mat.m[4] + mat.m[1] ) / S;
                 z = (mat.m[2] + mat.m[8] ) / S;
@@ -215,7 +221,10 @@ namespace ae3d
             }
             else if (mat.m[5] > mat.m[10])
             {
-                const float S = std::sqrt( 1.0f + mat.m[5] - mat.m[0] - mat.m[10] ) * 2.0f;
+                const float val =  1.0f + mat.m[5] - mat.m[0] - mat.m[10];
+                assert( val > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
+
+                const float S = std::sqrt(val ) * 2.0f;
                 x = (mat.m[4] + mat.m[1] ) / S;
                 y = 0.25f * S;
                 z = (mat.m[9] + mat.m[6] ) / S;
@@ -223,7 +232,10 @@ namespace ae3d
             }
             else
             {
-                const float S = std::sqrt( 1.0f + mat.m[10] - mat.m[0] - mat.m[5] ) * 2.0f;
+                const float val = 1.0f + mat.m[10] - mat.m[0] - mat.m[5];
+                assert( val > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
+
+                const float S = std::sqrt( val ) * 2.0f;
                 x = (mat.m[2] + mat.m[8] ) / S;
                 y = (mat.m[9] + mat.m[6] ) / S;
                 z = 0.25f * S;
