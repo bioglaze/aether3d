@@ -179,18 +179,18 @@ void ae3d::Font::LoadBMFontMetaText( const FileSystem::FileContentsData& metaDat
             const char c[ 2 ] = { token[ 12 ], 0 };
             const char d[ 2 ] = { token[ 14 ], 0 };
             
-            padding[ 0 ] = std::atoi( a );
-            padding[ 1 ] = std::atoi( b );
-            padding[ 2 ] = std::atoi( c );
-            padding[ 3 ] = std::atoi( d );
+            padding[ 0 ] = std::atoi( &a[ 0 ] );
+            padding[ 1 ] = std::atoi( &b[ 0 ] );
+            padding[ 2 ] = std::atoi( &c[ 0 ] );
+            padding[ 3 ] = std::atoi( &d[ 0 ] );
         }
         else if (token.find( "spacing" ) != std::string::npos)
         {
             const char a[ 2 ] = { token[  8 ], 0 };
             const char b[ 2 ] = { token[ 10 ], 0 };
             
-            spacing[ 0 ] = std::atoi( a );
-            spacing[ 1 ] = std::atoi( b );
+            spacing[ 0 ] = std::atoi( &a[ 0 ] );
+            spacing[ 1 ] = std::atoi( &b[ 0 ] );
         }
     }
     
@@ -264,7 +264,7 @@ void ae3d::Font::LoadBMFontMetaBinary(const FileSystem::FileContentsData& metaDa
 {
     std::stringstream ifs( std::string( metaData.data.begin(), metaData.data.end() ) );
     unsigned char header[ 4 ];
-    ifs.read( (char*)&header, 4 );
+    ifs.read( (char*)&header[ 0 ], 4 );
     const bool validHeaderHead = header[ 0 ] == 66 && header[ 1 ] == 77 && header[ 2 ] == 70;
     
     if (!validHeaderHead)

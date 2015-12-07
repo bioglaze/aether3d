@@ -11,11 +11,12 @@ bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
           const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
           const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
-          TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps )
+          TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace )
 {
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
+    colorSpace = aColorSpace;
 
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };

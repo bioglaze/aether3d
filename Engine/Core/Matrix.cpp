@@ -39,7 +39,7 @@ const float biasDataColMajor[] =
 using namespace ae3d;
 
 const Matrix44 Matrix44::identity;
-const Matrix44 Matrix44::bias( ae3d::biasDataColMajor );
+const Matrix44 Matrix44::bias( &ae3d::biasDataColMajor[ 0 ] );
 
 void Matrix44::InverseTranspose( const float m[ 16 ], float* out )
 {
@@ -114,7 +114,7 @@ void Matrix44::InverseTranspose( const float m[ 16 ], float* out )
     
     if (std::fabs( det ) < acceptableDelta)
     {
-        std::memcpy( out, identity.m, sizeof( Matrix44 ) );
+        std::memcpy( out, &identity.m[ 0 ], sizeof( Matrix44 ) );
         return;
     }
     for (int i = 0; i < 16; ++i)
@@ -130,9 +130,9 @@ void Matrix44::InverseTranspose( const float m[ 16 ], float* out )
 void Matrix44::Invert( const Matrix44& matrix, Matrix44& out )
 {
     float invTrans[ 16 ];
-    InverseTranspose( matrix.m, invTrans );
+    InverseTranspose( &matrix.m[ 0 ], &invTrans[ 0 ] );
     Matrix44 iTrans;
-    iTrans.InitFrom( invTrans );
+    iTrans.InitFrom( &invTrans[ 0 ] );
     iTrans.Transpose( out );
     
 #if DEBUG
@@ -155,7 +155,7 @@ void Matrix44::Multiply( const Matrix44& a, const Matrix44& b, Matrix44& out )
         }
     }
 
-    out.InitFrom( tmp );
+    out.InitFrom( &tmp[ 0 ] );
 #if DEBUG
     ae3d::CheckNaN( out );
 #endif
@@ -207,7 +207,7 @@ void Matrix44::TransformDirection( const Vec3& dir, const Matrix44& mat, Vec3* o
 
 Matrix44::Matrix44( const Matrix44& other )
 {
-    InitFrom( other.m );
+    InitFrom( &other.m[ 0 ] );
 
 #if DEBUG
     ae3d::CheckNaN( other );
@@ -230,7 +230,7 @@ void Matrix44::InitFrom( const float* data )
 
 void Matrix44::MakeIdentity()
 {
-    std::memset( m, 0, sizeof( m ) );
+    std::memset( &m[ 0 ], 0, sizeof( m ) );
 
     m[  0 ] = 1;
     m[  5 ] = 1;
@@ -277,7 +277,7 @@ void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, 
         0, 0, d,  0
     };
 
-    InitFrom( proj );  
+    InitFrom( &proj[ 0 ] );  
 #if DEBUG
     ae3d::CheckNaN( *this );
 #endif
@@ -297,7 +297,7 @@ void Matrix44::MakeProjection( float left, float right, float bottom, float top,
         tx, ty, tz, 1.0f
     };
 
-    InitFrom( ortho );
+    InitFrom( &ortho[ 0 ] );
     
 #if DEBUG
     ae3d::CheckNaN( *this );
@@ -373,7 +373,7 @@ void Matrix44::Transpose( Matrix44& out ) const
     tmp[ 14 ] = m[ 11 ];
     tmp[ 15 ] = m[ 15 ];
 
-    out.InitFrom( tmp );
+    out.InitFrom( &tmp[ 0 ] );
     
 #if DEBUG
     ae3d::CheckNaN( out );

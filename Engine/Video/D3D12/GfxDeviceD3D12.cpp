@@ -34,6 +34,7 @@ namespace GfxDeviceGlobal
     int drawCalls = 0;
     int vaoBinds = 0;
     int textureBinds = 0;
+    int shaderBinds = 0;
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     ID3D12Device* device = nullptr;
@@ -476,7 +477,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
-    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, descHeaps );
+    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
@@ -547,6 +548,11 @@ int ae3d::GfxDevice::GetDrawCalls()
 int ae3d::GfxDevice::GetTextureBinds()
 {
     return GfxDeviceGlobal::textureBinds;
+}
+
+int ae3d::GfxDevice::GetShaderBinds()
+{
+    return GfxDeviceGlobal::shaderBinds;
 }
 
 int ae3d::GfxDevice::GetVertexBufferBinds()
@@ -632,7 +638,7 @@ void ae3d::GfxDevice::Present()
     AE3D_CHECK_D3D( hr, "command list close" );
 
     ID3D12CommandList* ppCommandLists[] = { GfxDeviceGlobal::graphicsCommandList };
-    GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, ppCommandLists );
+    GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, &ppCommandLists[ 0 ] );
 
     hr = GfxDeviceGlobal::swapChain->Present( 1, 0 );
 

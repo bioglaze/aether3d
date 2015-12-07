@@ -499,7 +499,6 @@ void ae3d::Window::PumpEvents()
                     if (client_message_event->data.data32[0] == WindowGlobal::wm_delete_window)
                     {
                         exit(1);
-                        break;
                     }
                  }
                 break;

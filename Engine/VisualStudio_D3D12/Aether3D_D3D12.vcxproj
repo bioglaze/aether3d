@@ -44,6 +44,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
@@ -59,6 +61,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>DEBUG;_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;AETHER3D_D3D12</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -156,7 +159,19 @@
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\Microsoft.Gsl.0.0.1.0\build\native\Microsoft.Gsl.targets" Condition="Exists('packages\Microsoft.Gsl.0.0.1.0\build\native\Microsoft.Gsl.targets')" />
+    <Import Project="packages\Microsoft.CppCoreCheck.14.0.23107.2\build\native\Microsoft.CppCoreCheck.targets" Condition="Exists('packages\Microsoft.CppCoreCheck.14.0.23107.2\build\native\Microsoft.CppCoreCheck.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.Gsl.0.0.1.0\build\native\Microsoft.Gsl.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Gsl.0.0.1.0\build\native\Microsoft.Gsl.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.CppCoreCheck.14.0.23107.2\build\native\Microsoft.CppCoreCheck.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.CppCoreCheck.14.0.23107.2\build\native\Microsoft.CppCoreCheck.targets'))" />
+  </Target>
 </Project>

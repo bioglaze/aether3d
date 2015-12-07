@@ -92,7 +92,7 @@ void ae3d::System::Print(const char* format, ...)
     va_end(ap);
     std::printf("%s", msg);
 #if _MSC_VER
-    OutputDebugStringA(msg);
+    OutputDebugStringA( &msg[ 0 ] );
 #endif
     std::fflush(stdout);
 }

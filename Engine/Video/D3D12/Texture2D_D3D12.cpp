@@ -104,7 +104,7 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
         AE3D_CHECK_D3D( hr, "command list close in texture2d" );
 
         ID3D12CommandList* ppCommandLists[] = { GfxDeviceGlobal::graphicsCommandList };
-        GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, ppCommandLists );
+        GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, &ppCommandLists[ 0 ] );
     }
 }
 
@@ -112,7 +112,7 @@ void TexReload( const std::string& path )
 {
     auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
 
-    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetAnisotropy() );
+    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
 }
 
 const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
@@ -127,13 +127,14 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, float aAnisotropy )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
 {
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
     anisotropy = aAnisotropy;
-    
+    colorSpace = aColorSpace;
+
     if (!fileContents.isLoaded)
     {
         *this = Texture2DGlobal::defaultTexture;

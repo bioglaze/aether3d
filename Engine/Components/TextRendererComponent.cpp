@@ -69,7 +69,7 @@ void ae3d::TextRendererComponent::SetColor( const Vec4& aColor )
 
 void ae3d::TextRendererComponent::SetText( const char* aText )
 {
-    m().text = aText == nullptr ? "" : aText;
+    m().text = aText == nullptr ? std::string( "" ) : std::string( aText );
     m().isDirty = true;
 }
 

@@ -157,7 +157,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
         if (overrideShader)
         {
             shader->Use();
-            shader->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection.m );
+            shader->SetMatrix( "_ModelViewProjectionMatrix", &modelViewProjection.m[ 0 ] );
         }
         else
         {

@@ -328,12 +328,12 @@ namespace ae3d
         wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
         wc.lpszClassName = "WindowClass1";
 
-        wc.hIcon = (HICON)LoadImage(nullptr,
+        wc.hIcon = static_cast< HICON >(LoadImage(nullptr,
             "glider.ico",
             IMAGE_ICON,
             32,
             32,
-            LR_LOADFROMFILE);
+            LR_LOADFROMFILE));
 
         RegisterClassEx(&wc);
 

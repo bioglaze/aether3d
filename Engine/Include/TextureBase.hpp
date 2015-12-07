@@ -14,8 +14,8 @@
 struct GpuResource
 {
     ID3D12Resource* resource = nullptr;
-    D3D12_RESOURCE_STATES usageState;
-    D3D12_RESOURCE_STATES transitioningState;
+    D3D12_RESOURCE_STATES usageState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    D3D12_RESOURCE_STATES transitioningState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress = 0;
 };
 #endif

@@ -63,7 +63,7 @@ void ae3d::Material::Apply()
 
     for (const auto& mat4 : mat4s)
     {
-        shader->SetMatrix( mat4.first.c_str(), mat4.second.m );
+        shader->SetMatrix( mat4.first.c_str(), &mat4.second.m[ 0 ] );
     }
 
     for (const auto& globalTexRT : sTexRTs)

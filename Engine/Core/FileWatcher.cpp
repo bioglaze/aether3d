@@ -30,7 +30,7 @@ void ae3d::FileWatcher::AddFile( const std::string& path, std::function<void(con
 
 void ae3d::FileWatcher::Poll()
 {
-    struct stat inode;
+    struct stat inode = {};
 
     for (auto& entry : pathToEntry)
     {

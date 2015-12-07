@@ -114,7 +114,7 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
 
     WAVE wav;
     
-    ifs.read( (char*)&wav.chunkID, 4 );
+    ifs.read( (char*)&wav.chunkID[ 0 ], 4 );
     if (wav.chunkID[0] != 'R' && wav.chunkID[1] != 'I' &&
         wav.chunkID[2] != 'F' && wav.chunkID[3] != 'F')
     {
@@ -124,7 +124,7 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
     
     ifs.read( (char*)&wav.chunkSize, 4 );
     
-    ifs.read( (char*)&wav.format, 4 );
+    ifs.read( (char*)&wav.format[ 0 ], 4 );
     if (wav.format[0] != 'W' && wav.format[1] != 'A' &&
         wav.format[2] != 'V' && wav.format[3] != 'E')
     {

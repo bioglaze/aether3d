@@ -101,7 +101,7 @@ void ae3d::FileSystem::LoadPakFile( const char* path )
     {
         auto& entry = pakFile.entries[i];
         char entryPath[ 128 ];
-        ifs.read( entryPath, 128 );
+        ifs.read( &entryPath[ 0 ], 128 );
         entry.path = entryPath;
         unsigned entrySize = 0;
         ifs.read( (char*)&entrySize, 4 );
