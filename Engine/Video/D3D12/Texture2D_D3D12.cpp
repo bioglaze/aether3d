@@ -59,7 +59,7 @@ void DestroyTextures()
     }
 }
 
-void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, unsigned dataSize )
+void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data )
 {
     D3D12_HEAP_PROPERTIES heapProps;
     heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -68,22 +68,10 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data, 
     heapProps.CreationNodeMask = 1;
     heapProps.VisibleNodeMask = 1;
 
-    D3D12_RESOURCE_DESC bufferDesc;
-    bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    bufferDesc.Alignment = 0;
-    bufferDesc.Width = dataSize;
-    bufferDesc.Height = 1;
-    bufferDesc.DepthOrArraySize = 1;
-    bufferDesc.MipLevels = 1;
-    bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-    bufferDesc.SampleDesc.Count = 1;
-    bufferDesc.SampleDesc.Quality = 0;
-    bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
     ID3D12Resource* uploadBuffer = nullptr;
+    const UINT64 uploadBufferSize = GetRequiredIntermediateSize( gpuResource.resource, 0, 1 );
 
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &bufferDesc,
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer( uploadBufferSize ),//&bufferDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS( &uploadBuffer ) );
     AE3D_CHECK_D3D( hr, "Failed to create texture upload resource" );
 
@@ -233,11 +221,11 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     heapProps.VisibleNodeMask = 1;
     
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
-                 D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
+        D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
     gpuResource.resource->SetName( L"Texture2D" );
-    gpuResource.usageState = D3D12_RESOURCE_STATE_COMMON;
+    gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     Texture2DGlobal::textures.push_back( gpuResource.resource );
 
     const int bytesPerPixel = 4;
@@ -245,7 +233,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     texResource.pData = data;
     texResource.RowPitch = width * bytesPerPixel;
     texResource.SlicePitch = texResource.RowPitch * height;
-    InitializeTexture( gpuResource, &texResource, width * height * 4 );
+
+    InitializeTexture( gpuResource, &texResource );
 
     stbi_image_free( data );
 }
