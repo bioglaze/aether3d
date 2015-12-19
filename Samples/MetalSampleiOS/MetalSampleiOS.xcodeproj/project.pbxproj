@@ -1,0 +1,441 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AB811CCF1C23433500911AB6 /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; };
+		AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD01C2344BA00911AB6 /* OpenAL.framework */; };
+		AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD21C2346F400911AB6 /* MetalKit.framework */; };
+		ABA29F451C19E1F90098E21D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F441C19E1F90098E21D /* main.m */; };
+		ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F471C19E1F90098E21D /* AppDelegate.m */; };
+		ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F4A1C19E1F90098E21D /* GameViewController.mm */; };
+		ABA29F511C19E1F90098E21D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F4F1C19E1F90098E21D /* Main.storyboard */; };
+		ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F521C19E1F90098E21D /* Assets.xcassets */; };
+		ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F541C19E1F90098E21D /* LaunchScreen.storyboard */; };
+		ABA29F611C19E1F90098E21D /* MetalSampleiOSTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		ABA29F5D1C19E1F90098E21D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ABA29F381C19E1F90098E21D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ABA29F3F1C19E1F90098E21D;
+			remoteInfo = MetalSampleiOS;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aether3D_iOS.framework; path = ../../../../../Desktop/Aether3D_iOS.framework; sourceTree = "<group>"; };
+		AB811CD01C2344BA00911AB6 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		AB811CD21C2346F400911AB6 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		ABA29F401C19E1F90098E21D /* MetalSampleiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalSampleiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABA29F441C19E1F90098E21D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		ABA29F461C19E1F90098E21D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		ABA29F471C19E1F90098E21D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		ABA29F491C19E1F90098E21D /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
+		ABA29F4A1C19E1F90098E21D /* GameViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GameViewController.mm; sourceTree = "<group>"; };
+		ABA29F501C19E1F90098E21D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		ABA29F521C19E1F90098E21D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ABA29F551C19E1F90098E21D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		ABA29F571C19E1F90098E21D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABA29F5C1C19E1F90098E21D /* MetalSampleiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSampleiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MetalSampleiOSTests.mm; sourceTree = "<group>"; };
+		ABA29F621C19E1F90098E21D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		ABA29F3D1C19E1F90098E21D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */,
+				AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */,
+				AB811CCF1C23433500911AB6 /* Aether3D_iOS.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ABA29F591C19E1F90098E21D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		ABA29F371C19E1F90098E21D = {
+			isa = PBXGroup;
+			children = (
+				AB811CD21C2346F400911AB6 /* MetalKit.framework */,
+				AB811CD01C2344BA00911AB6 /* OpenAL.framework */,
+				AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */,
+				ABA29F421C19E1F90098E21D /* MetalSampleiOS */,
+				ABA29F5F1C19E1F90098E21D /* MetalSampleiOSTests */,
+				ABA29F411C19E1F90098E21D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		ABA29F411C19E1F90098E21D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ABA29F401C19E1F90098E21D /* MetalSampleiOS.app */,
+				ABA29F5C1C19E1F90098E21D /* MetalSampleiOSTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ABA29F421C19E1F90098E21D /* MetalSampleiOS */ = {
+			isa = PBXGroup;
+			children = (
+				ABA29F461C19E1F90098E21D /* AppDelegate.h */,
+				ABA29F471C19E1F90098E21D /* AppDelegate.m */,
+				ABA29F491C19E1F90098E21D /* GameViewController.h */,
+				ABA29F4A1C19E1F90098E21D /* GameViewController.mm */,
+				ABA29F4F1C19E1F90098E21D /* Main.storyboard */,
+				ABA29F521C19E1F90098E21D /* Assets.xcassets */,
+				ABA29F541C19E1F90098E21D /* LaunchScreen.storyboard */,
+				ABA29F571C19E1F90098E21D /* Info.plist */,
+				ABA29F431C19E1F90098E21D /* Supporting Files */,
+			);
+			path = MetalSampleiOS;
+			sourceTree = "<group>";
+		};
+		ABA29F431C19E1F90098E21D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				ABA29F441C19E1F90098E21D /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ABA29F5F1C19E1F90098E21D /* MetalSampleiOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */,
+				ABA29F621C19E1F90098E21D /* Info.plist */,
+			);
+			path = MetalSampleiOSTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		ABA29F3F1C19E1F90098E21D /* MetalSampleiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABA29F651C19E1F90098E21D /* Build configuration list for PBXNativeTarget "MetalSampleiOS" */;
+			buildPhases = (
+				ABA29F3C1C19E1F90098E21D /* Sources */,
+				ABA29F3D1C19E1F90098E21D /* Frameworks */,
+				ABA29F3E1C19E1F90098E21D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MetalSampleiOS;
+			productName = MetalSampleiOS;
+			productReference = ABA29F401C19E1F90098E21D /* MetalSampleiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		ABA29F5B1C19E1F90098E21D /* MetalSampleiOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABA29F681C19E1F90098E21D /* Build configuration list for PBXNativeTarget "MetalSampleiOSTests" */;
+			buildPhases = (
+				ABA29F581C19E1F90098E21D /* Sources */,
+				ABA29F591C19E1F90098E21D /* Frameworks */,
+				ABA29F5A1C19E1F90098E21D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ABA29F5E1C19E1F90098E21D /* PBXTargetDependency */,
+			);
+			name = MetalSampleiOSTests;
+			productName = MetalSampleiOSTests;
+			productReference = ABA29F5C1C19E1F90098E21D /* MetalSampleiOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		ABA29F381C19E1F90098E21D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = "Timo Wiren";
+				TargetAttributes = {
+					ABA29F3F1C19E1F90098E21D = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = UKGWYKDBK4;
+					};
+					ABA29F5B1C19E1F90098E21D = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = UKGWYKDBK4;
+						TestTargetID = ABA29F3F1C19E1F90098E21D;
+					};
+				};
+			};
+			buildConfigurationList = ABA29F3B1C19E1F90098E21D /* Build configuration list for PBXProject "MetalSampleiOS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = ABA29F371C19E1F90098E21D;
+			productRefGroup = ABA29F411C19E1F90098E21D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				ABA29F3F1C19E1F90098E21D /* MetalSampleiOS */,
+				ABA29F5B1C19E1F90098E21D /* MetalSampleiOSTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		ABA29F3E1C19E1F90098E21D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */,
+				ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */,
+				ABA29F511C19E1F90098E21D /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ABA29F5A1C19E1F90098E21D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		ABA29F3C1C19E1F90098E21D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */,
+				ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */,
+				ABA29F451C19E1F90098E21D /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ABA29F581C19E1F90098E21D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABA29F611C19E1F90098E21D /* MetalSampleiOSTests.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		ABA29F5E1C19E1F90098E21D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ABA29F3F1C19E1F90098E21D /* MetalSampleiOS */;
+			targetProxy = ABA29F5D1C19E1F90098E21D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		ABA29F4F1C19E1F90098E21D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				ABA29F501C19E1F90098E21D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		ABA29F541C19E1F90098E21D /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				ABA29F551C19E1F90098E21D /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		ABA29F631C19E1F90098E21D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		ABA29F641C19E1F90098E21D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		ABA29F661C19E1F90098E21D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "~/Desktop";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					AETHER3D_METAL,
+				);
+				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ABA29F671C19E1F90098E21D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "~/Desktop";
+				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_METAL;
+				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		ABA29F691C19E1F90098E21D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				INFOPLIST_FILE = MetalSampleiOSTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOSTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalSampleiOS.app/MetalSampleiOS";
+			};
+			name = Debug;
+		};
+		ABA29F6A1C19E1F90098E21D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = MetalSampleiOSTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOSTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalSampleiOS.app/MetalSampleiOS";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		ABA29F3B1C19E1F90098E21D /* Build configuration list for PBXProject "MetalSampleiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABA29F631C19E1F90098E21D /* Debug */,
+				ABA29F641C19E1F90098E21D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ABA29F651C19E1F90098E21D /* Build configuration list for PBXNativeTarget "MetalSampleiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABA29F661C19E1F90098E21D /* Debug */,
+				ABA29F671C19E1F90098E21D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ABA29F681C19E1F90098E21D /* Build configuration list for PBXNativeTarget "MetalSampleiOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABA29F691C19E1F90098E21D /* Debug */,
+				ABA29F6A1C19E1F90098E21D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = ABA29F381C19E1F90098E21D /* Project object */;
+}

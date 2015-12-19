@@ -1,28 +1,25 @@
-#import "GameViewController.h"
-#import <Metal/Metal.h>
 #import <simd/simd.h>
-#import <MetalKit/MetalKit.h>
+#import "GameViewController.h"
 
-#import "CameraComponent.hpp"
-#import "SpriteRendererComponent.hpp"
-#import "TextRendererComponent.hpp"
-#import "MeshRendererComponent.hpp"
-#import "TransformComponent.hpp"
-#import "System.hpp"
-#import "Font.hpp"
-#import "FileSystem.hpp"
-#import "GameObject.hpp"
-#import "Material.hpp"
-#import "Mesh.hpp"
-#import "Texture2D.hpp"
-#import "Shader.hpp"
-#import "Scene.hpp"
+#import "Aether3D_iOS/CameraComponent.hpp"
+#import "Aether3D_iOS/GameObject.hpp"
+#import "Aether3D_iOS/FileSystem.hpp"
+#import "Aether3D_iOS/Scene.hpp"
+#import "Aether3D_iOS/Font.hpp"
+#import "Aether3D_iOS/Mesh.hpp"
+#import "Aether3D_iOS/MeshRendererComponent.hpp"
+#import "Aether3D_iOS/Texture2D.hpp"
+#import "Aether3D_iOS/TransformComponent.hpp"
+#import "Aether3D_iOS/TextRendererComponent.hpp"
+#import "Aether3D_iOS/Shader.hpp"
+#import "Aether3D_iOS/System.hpp"
+#import "Aether3D_iOS/Material.hpp"
 
 @implementation GameViewController
 {
     MTKView* _view;
     id <MTLDevice> device;
-
+    
     ae3d::GameObject camera2d;
     ae3d::GameObject camera3d;
     ae3d::GameObject cube;
@@ -38,21 +35,18 @@
 
 - (void)viewDidLoad
 {
-    // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-    // Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip
-    
     [super viewDidLoad];
-
+    
     device = MTLCreateSystemDefaultDevice();
     assert( device );
     
     ae3d::System::InitMetalOSX( device, _view );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
-
+    
     [self _setupView];
     [self _reshape];
-
+    
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
@@ -62,7 +56,7 @@
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera2d );
-
+    
     camera3d.AddComponent<ae3d::CameraComponent>();
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
@@ -71,7 +65,7 @@
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
     camera3d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera3d );
-
+    
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     
@@ -105,19 +99,16 @@
 - (void)_setupView
 {
     _view = (MTKView *)self.view;
-    _view.delegate = self;
     _view.device = device;
-    _view.sampleCount = 1;
+    _view.delegate = self;
+    
+    // Setup the render target, choose values based on your app
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
 }
 
 - (void)_render
 {
     [self _update];
-    
-    ae3d::System::SetCurrentDrawableMetalOSX( _view.currentDrawable, _view.currentRenderPassDescriptor );
-    scene.Render();
-    ae3d::System::EndFrame();
 }
 
 - (void)_reshape
@@ -126,15 +117,6 @@
 
 - (void)_update
 {
-    static int angle = 0;
-    ++angle;
-    
-    ae3d::Quaternion rotation;
-    rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
-    cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
-    
-    std::string stats = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
-    text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
@@ -142,6 +124,7 @@
     [self _reshape];
 }
 
+// Called whenever the view needs to render
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
     @autoreleasepool {
@@ -150,3 +133,4 @@
 }
 
 @end
+

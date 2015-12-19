@@ -51,7 +51,7 @@ namespace GfxDeviceGlobal
     int shaderBinds = 0;
     int backBufferWidth = 0;
     int backBufferHeight = 0;
-    ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Color;
+    ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     bool cullBackFaces = true;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     

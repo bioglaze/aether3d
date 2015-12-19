@@ -19,7 +19,8 @@ namespace ae3d
         enum ClearFlags : unsigned
         {
             Color = 1 << 0,
-            Depth = 1 << 1
+            Depth = 1 << 1,
+            DontClear = 1 << 2
         };
 
         enum class BlendMode

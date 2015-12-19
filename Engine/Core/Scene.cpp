@@ -353,7 +353,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     }
     else if (camera->GetClearFlag() == CameraComponent::ClearFlag::DontClear)
     {
-        // Nothing to be done here.
+        GfxDevice::ClearScreen( GfxDevice::ClearFlags::DontClear );
     }
     else
     {

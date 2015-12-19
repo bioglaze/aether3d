@@ -69,7 +69,7 @@ namespace ae3d
         void SetTargetTexture( RenderTexture* renderTexture );
 
         /// \param clearFlag Clear flag. Defaults to DepthAndColor.
-        void SetClearFlag( ClearFlag clearFlag );
+        void SetClearFlag( ClearFlag aClearFlag ) { clearFlag = aClearFlag; }
         
         /// \param aLayerMask Layer mask contains OR'd layers that this camera renders into.
         void SetLayerMask( unsigned aLayerMask ) { layerMask = aLayerMask; }
