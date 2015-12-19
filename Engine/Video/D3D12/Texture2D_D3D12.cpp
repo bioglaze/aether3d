@@ -71,7 +71,8 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data )
     ID3D12Resource* uploadBuffer = nullptr;
     const UINT64 uploadBufferSize = GetRequiredIntermediateSize( gpuResource.resource, 0, 1 );
 
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer( uploadBufferSize ),//&bufferDesc,
+    const auto buffer = CD3DX12_RESOURCE_DESC::Buffer( uploadBufferSize );
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &buffer,//&bufferDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS( &uploadBuffer ) );
     AE3D_CHECK_D3D( hr, "Failed to create texture upload resource" );
 

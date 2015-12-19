@@ -60,7 +60,6 @@ namespace ae3d
 #endif
 #if AETHER3D_D3D12
         GpuResource* GetGpuResource() { return &gpuResource; }
-        D3D12_CPU_DESCRIPTOR_HANDLE GetSRV() const { return srv; }
 #endif
         /// \return Color space.
         ColorSpace GetColorSpace() const { return colorSpace; }

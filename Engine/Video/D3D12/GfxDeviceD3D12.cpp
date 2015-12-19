@@ -46,7 +46,7 @@ namespace GfxDeviceGlobal
     ID3D12InfoQueue* infoQueue = nullptr;
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
-    std::unordered_map< std::string, ID3D12PipelineState* > psoCache;
+    std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
     ae3d::Texture2D* texture0 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
 
@@ -177,7 +177,27 @@ void CreateRootSignature()
     GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
 }
 
-std::string GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+// http://stackoverflow.com/questions/8317508/hash-function-for-a-string
+unsigned GetHash( const char* s, unsigned length )
+{
+    const unsigned A = 54059;
+    const unsigned B = 76963;
+    const unsigned C = 86969;
+
+    unsigned h = 31;
+    unsigned i = 0;
+    
+    while (i < length)
+    {
+        h = (h * A) ^ (s[ 0 ] * B);
+        ++s;
+        ++i;
+    }
+
+    return h;
+}
+
+unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
@@ -185,7 +205,8 @@ std::string GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, 
     hashString += std::to_string( (ptrdiff_t)&shader.blobShaderPixel );
     hashString += std::to_string( (unsigned)blendMode );
     hashString += std::to_string( ((unsigned)depthFunc) + 4 );
-    return hashString;
+
+    return GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
 }
 
 void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
@@ -301,12 +322,12 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     descPso.SampleDesc.Count = 1;
 
-    const std::string hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
     ID3D12PipelineState* pso;
     HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO" );
 
+    const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -437,8 +458,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         GfxDeviceGlobal::texture0 = const_cast< Texture2D*>( Texture2D::GetDefaultTexture() );
     }
     
-    const std::string psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
-    
+    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
+
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
@@ -597,18 +618,16 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
-    if (clearFlags == 0) // TODO: replace 0 with enum
+    if (clearFlags == ClearFlags::DontClear)
     {
         return;
     }
-    
-    // Barrier Present -> RenderTarget
+
     GpuResource rtvResource;
     rtvResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
-    rtvResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET; // FIXME: Probably should to be present. Better yet, don't set explicitly.
+    rtvResource.usageState = D3D12_RESOURCE_STATE_PRESENT;
     TransitionResource( rtvResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     
-    // Viewport
     D3D12_VIEWPORT mViewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
     GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &mViewPort );
 
@@ -620,10 +639,19 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
     auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
     descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
-    GfxDeviceGlobal::graphicsCommandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
+    
+    if ((clearFlags & ClearFlags::Color) != 0)
+    {
+        GfxDeviceGlobal::graphicsCommandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
+    }
 
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
-    GfxDeviceGlobal::graphicsCommandList->ClearDepthStencilView( descHandleDsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr );
+
+    if ((clearFlags & ClearFlags::Depth) != 0)
+    {
+        GfxDeviceGlobal::graphicsCommandList->ClearDepthStencilView( descHandleDsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr );
+    }
+
     GfxDeviceGlobal::graphicsCommandList->OMSetRenderTargets( 1, &descHandleRtv, TRUE, &descHandleDsv );
 }
 
@@ -684,7 +712,7 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     GfxDeviceGlobal::clearColor[ 2 ] = blue;
 }
 
-void ae3d::GfxDevice::ErrorCheck(const char* info)
+void ae3d::GfxDevice::ErrorCheck( const char* info )
 {
         (void)info;
 #if defined _DEBUG || defined DEBUG
@@ -692,7 +720,6 @@ void ae3d::GfxDevice::ErrorCheck(const char* info)
 #endif
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned cubeMapFace )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned /*cubeMapFace*/ )
 {
-    cubeMapFace;
 }
