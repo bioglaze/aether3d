@@ -200,7 +200,7 @@ int main()
     scene.Add( &cube );
     scene.Add( &copiedCube );
     //scene.Add( &cube2 );
-    scene.Add( &statsContainer );
+    //scene.Add( &statsContainer );
     scene.Add( &dirLight );
     //scene.Add( &spotLight );
 

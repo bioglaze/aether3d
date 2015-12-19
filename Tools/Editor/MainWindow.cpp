@@ -12,6 +12,7 @@
 #include "DirectionalLightComponent.hpp"
 #include "MainWindow.hpp"
 #include "SceneWidget.hpp"
+#include "System.hpp"
 #include "WindowMenu.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
@@ -73,6 +74,10 @@ MainWindow::MainWindow()
 
     UpdateHierarchy();
     UpdateInspector();
+
+    reloadTimer.setInterval( 1000 );
+    connect( &reloadTimer, &QTimer::timeout, []() { ae3d::System::ReloadChangedAssets(); std::cout << "Reloading assets" << std::endl; } );
+    reloadTimer.start();
 }
 
 void MainWindow::OnGameObjectSelected( std::list< ae3d::GameObject* > /*gameObjects*/ )
@@ -241,9 +246,17 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
 
         UpdateHierarchy();
     }
-    if (event->key() == Qt::Key_F)
+    else if (event->key() == Qt::Key_F)
     {
         sceneWidget->CenterSelected();
+    }
+    else if (event->key() == Qt::Key_D && (event->modifiers() & Qt::KeyboardModifier::ControlModifier) && !sceneWidget->selectedGameObjects.empty())
+    {
+        auto selected = sceneWidget->selectedGameObjects.back();
+        std::cout << "Duplicate" << std::endl;
+        commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
+        *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
+        UpdateHierarchy();
     }
 }
 

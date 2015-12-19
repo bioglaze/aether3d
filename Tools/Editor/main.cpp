@@ -1,12 +1,15 @@
 #include <QApplication>
 #include "MainWindow.hpp"
+#include "System.hpp"
 
 // FIXME: deleting gameobjects causes memory corruption that does not crash instantly.
+// FIXME: sometimes transform gizmo disappears or is misplaced
 // TODO: delete all selected game objects.
 // TODO: game object delete command
 // TODO: game object rename command
 // TODO: Ray-Triangle intersection for selection.
 // TODO: Prevent empty name for game object
+// TODO: Duplicate entire selection
 
 int main( int argc, char *argv[] )
 {

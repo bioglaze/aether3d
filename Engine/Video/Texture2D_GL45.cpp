@@ -184,7 +184,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
   
     opaque = (components == 3 || components == 1);
 
-    if (GfxDevice::HasExtension("GL_ARB_texture_storage"))
+    // FIXME: Disabled because immutable textures cannot be reloaded. Enable for shipping builds for performance.
+    /*if (GfxDevice::HasExtension( "GL_ARB_texture_storage" ))
     {
         glTexStorage2D( GL_TEXTURE_2D, 1, colorSpace == ColorSpace::RGB ? GL_RGBA8 : GL_SRGB8_ALPHA8, width, height );
         glTexSubImage2D( GL_TEXTURE_2D,
@@ -195,7 +196,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
                         GL_UNSIGNED_BYTE,
                         data );
     }
-    else
+    else*/
     {
         glTexImage2D( GL_TEXTURE_2D, 0, colorSpace == ColorSpace::RGB ? GL_RGBA8 : GL_SRGB8_ALPHA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
     }

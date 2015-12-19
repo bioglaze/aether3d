@@ -108,8 +108,9 @@ float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min,
 
 struct CollisionInfo
 {
-    GameObject* go;
+    GameObject* go = nullptr;
     std::vector< int > subMeshIndices;
+    float meshDistance = 0;
 };
 
 SceneWidget::GizmoAxis CollidesWithGizmo( GameObject& camera, GameObject& gizmo, int screenX, int screenY, int width, int height, float maxDistance )
@@ -172,16 +173,19 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
         Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMax(), meshLocalToWorld, &oMax );
 
         const float meshDistance = IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
-        //std::cout << "mesh distance: " << meshDistance << std::endl;
+
         if (0 < meshDistance && meshDistance < maxDistance)
         {
             CollisionInfo collisionInfo;
             collisionInfo.go = go.get();
+            collisionInfo.meshDistance = meshDistance;
             // TODO: submeshindices
             outInfo.emplace_back( collisionInfo );
         }
     }
 
+    auto sortFunction = [](const CollisionInfo& info1, const CollisionInfo& info2) { return info1.meshDistance < info2.meshDistance; };
+    std::sort( std::begin( outInfo ), std::end( outInfo ), sortFunction );
     return outInfo;
 }
 

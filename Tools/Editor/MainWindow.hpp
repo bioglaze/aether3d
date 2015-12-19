@@ -3,6 +3,7 @@
 
 #include <list>
 #include <QMainWindow>
+#include <QTimer>
 #include "WindowMenu.hpp"
 #include "CommandManager.hpp"
 #include "CameraInspector.hpp"
@@ -62,6 +63,7 @@ private:
 
     QWidget* inspectorContainer = nullptr;
     QTreeWidget* sceneTree = nullptr;
+    QTimer reloadTimer;
     SceneWidget* sceneWidget = nullptr;
     TransformInspector transformInspector;
     CameraInspector cameraInspector;
