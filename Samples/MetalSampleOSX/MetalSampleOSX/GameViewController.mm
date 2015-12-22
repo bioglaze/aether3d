@@ -6,6 +6,8 @@
 #import "CameraComponent.hpp"
 #import "SpriteRendererComponent.hpp"
 #import "TextRendererComponent.hpp"
+#import "DirectionalLightComponent.hpp"
+#import "SpotLightComponent.hpp"
 #import "MeshRendererComponent.hpp"
 #import "TransformComponent.hpp"
 #import "System.hpp"
@@ -26,7 +28,11 @@
     ae3d::GameObject camera2d;
     ae3d::GameObject camera3d;
     ae3d::GameObject cube;
+    ae3d::GameObject bigCube;
     ae3d::GameObject text;
+    ae3d::GameObject dirLight;
+    ae3d::GameObject rtCamera;
+    ae3d::GameObject renderTextureContainer;
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -34,6 +40,7 @@
     ae3d::Shader shader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
+    ae3d::RenderTexture rtTex;
 }
 
 - (void)viewDidLoad
@@ -46,7 +53,7 @@
     device = MTLCreateSystemDefaultDevice();
     assert( device );
     
-    ae3d::System::InitMetalOSX( device, _view );
+    ae3d::System::InitMetal( device, _view );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
 
@@ -100,6 +107,37 @@
     cube.AddComponent<ae3d::TransformComponent>();
     cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
     scene.Add( &cube );
+
+    bigCube.AddComponent<ae3d::MeshRendererComponent>();
+    bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    bigCube.AddComponent<ae3d::TransformComponent>();
+    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -8, -10 ) );
+    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
+    scene.Add( &bigCube );
+
+    dirLight.AddComponent<ae3d::TransformComponent>();
+    dirLight.AddComponent<ae3d::DirectionalLightComponent>();
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
+    dirLight.AddComponent<ae3d::TransformComponent>();
+    dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
+    scene.Add( &dirLight );
+    
+    rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    
+    renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
+    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    renderTextureContainer.SetLayer( 2 );
+    scene.Add( &renderTextureContainer );
+    
+    rtCamera.AddComponent<ae3d::CameraComponent>();
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+    rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
+    rtCamera.AddComponent<ae3d::TransformComponent>();
+    rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
+    scene.Add( &rtCamera );
 }
 
 - (void)_setupView
@@ -115,7 +153,7 @@
 {
     [self _update];
     
-    ae3d::System::SetCurrentDrawableMetalOSX( _view.currentDrawable, _view.currentRenderPassDescriptor );
+    ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
     scene.Render();
     ae3d::System::EndFrame();
 }

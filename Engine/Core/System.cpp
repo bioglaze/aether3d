@@ -21,19 +21,14 @@ void ae3d::System::InitGfxDeviceForEditor( int width, int height )
 }
 
 #if AETHER3D_METAL
-void ae3d::System::InitMetal( CAMetalLayer* metalLayer )
+void ae3d::System::InitMetal( id <MTLDevice> device, MTKView* view)
 {
-    GfxDevice::Init( metalLayer );
+    GfxDevice::InitMetal( device, view );
 }
 
-void ae3d::System::InitMetalOSX( id <MTLDevice> device, MTKView* view)
+void ae3d::System::SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass )
 {
-    GfxDevice::InitOSX( device, view );
-}
-
-void ae3d::System::SetCurrentDrawableMetalOSX( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass )
-{
-    GfxDevice::SetCurrentDrawableMetalOSX( drawable, renderPass );
+    GfxDevice::SetCurrentDrawableMetal( drawable, renderPass );
 }
 
 void ae3d::System::EndFrame()

@@ -40,7 +40,7 @@
     device = MTLCreateSystemDefaultDevice();
     assert( device );
     
-    ae3d::System::InitMetalOSX( device, _view );
+    ae3d::System::InitMetal( device, _view );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
     
@@ -109,6 +109,10 @@
 - (void)_render
 {
     [self _update];
+    
+    ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
+    scene.Render();
+    ae3d::System::EndFrame();
 }
 
 - (void)_reshape
@@ -117,6 +121,15 @@
 
 - (void)_update
 {
+    static int angle = 0;
+    ++angle;
+    
+    ae3d::Quaternion rotation;
+    rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
+    cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
+    
+    std::string stats = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
+    text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

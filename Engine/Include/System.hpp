@@ -2,9 +2,6 @@
 #define SYSTEM_H
 
 #if AETHER3D_METAL
-#if TARGET_OS_IPHONE
-#import <UIKit/UIKit.h>
-#endif
 #import <QuartzCore/CAMetalLayer.h>
 #import <MetalKit/MetalKit.h>
 #endif
@@ -104,9 +101,8 @@ namespace ae3d
         void InitGfxDeviceForEditor( int width, int height );
         
 #if AETHER3D_METAL
-        void InitMetal( CAMetalLayer* metalLayer );
-        void InitMetalOSX( id< MTLDevice > metalDevice, MTKView* view );
-        void SetCurrentDrawableMetalOSX( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
+        void InitMetal( id< MTLDevice > metalDevice, MTKView* view );
+        void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void EndFrame();
         void BeginFrame();
 #endif

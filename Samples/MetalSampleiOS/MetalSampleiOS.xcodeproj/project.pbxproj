@@ -17,6 +17,16 @@
 		ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F521C19E1F90098E21D /* Assets.xcassets */; };
 		ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F541C19E1F90098E21D /* LaunchScreen.storyboard */; };
 		ABA29F611C19E1F90098E21D /* MetalSampleiOSTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */; };
+		ABD3AB211C29D6E300E78933 /* Aether3D_iOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB251C29D79F00E78933 /* Moments.metal */; };
+		ABD3AB2B1C29D79F00E78933 /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB261C29D79F00E78933 /* SDF.metal */; };
+		ABD3AB2C1C29D79F00E78933 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB271C29D79F00E78933 /* Skybox.metal */; };
+		ABD3AB2D1C29D79F00E78933 /* SpriteShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB281C29D79F00E78933 /* SpriteShader.metal */; };
+		ABD3AB2E1C29D79F00E78933 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB291C29D79F00E78933 /* Unlit.metal */; };
+		ABD3AB331C29D7F700E78933 /* font_txt.fnt in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB2F1C29D7F700E78933 /* font_txt.fnt */; };
+		ABD3AB341C29D7F700E78933 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB301C29D7F700E78933 /* font.png */; };
+		ABD3AB351C29D7F700E78933 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB311C29D7F700E78933 /* glider.png */; };
+		ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,6 +38,20 @@
 			remoteInfo = MetalSampleiOS;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		ABD3AB221C29D6E400E78933 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				ABD3AB211C29D6E300E78933 /* Aether3D_iOS.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aether3D_iOS.framework; path = ../../../../../Desktop/Aether3D_iOS.framework; sourceTree = "<group>"; };
@@ -46,6 +70,15 @@
 		ABA29F5C1C19E1F90098E21D /* MetalSampleiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSampleiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MetalSampleiOSTests.mm; sourceTree = "<group>"; };
 		ABA29F621C19E1F90098E21D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABD3AB251C29D79F00E78933 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
+		ABD3AB261C29D79F00E78933 /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../Engine/Assets/SDF.metal; sourceTree = "<group>"; };
+		ABD3AB271C29D79F00E78933 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
+		ABD3AB281C29D79F00E78933 /* SpriteShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SpriteShader.metal; path = ../../../Engine/Assets/SpriteShader.metal; sourceTree = "<group>"; };
+		ABD3AB291C29D79F00E78933 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
+		ABD3AB2F1C29D7F700E78933 /* font_txt.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = font_txt.fnt; path = ../../../../aether3d_build/Samples/font_txt.fnt; sourceTree = "<group>"; };
+		ABD3AB301C29D7F700E78933 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
+		ABD3AB311C29D7F700E78933 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
+		ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +126,7 @@
 		ABA29F421C19E1F90098E21D /* MetalSampleiOS */ = {
 			isa = PBXGroup;
 			children = (
+				ABD3AB241C29D78900E78933 /* Shaders */,
 				ABA29F461C19E1F90098E21D /* AppDelegate.h */,
 				ABA29F471C19E1F90098E21D /* AppDelegate.m */,
 				ABA29F491C19E1F90098E21D /* GameViewController.h */,
@@ -109,6 +143,10 @@
 		ABA29F431C19E1F90098E21D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				ABD3AB2F1C29D7F700E78933 /* font_txt.fnt */,
+				ABD3AB301C29D7F700E78933 /* font.png */,
+				ABD3AB311C29D7F700E78933 /* glider.png */,
+				ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */,
 				ABA29F441C19E1F90098E21D /* main.m */,
 			);
 			name = "Supporting Files";
@@ -123,6 +161,18 @@
 			path = MetalSampleiOSTests;
 			sourceTree = "<group>";
 		};
+		ABD3AB241C29D78900E78933 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				ABD3AB251C29D79F00E78933 /* Moments.metal */,
+				ABD3AB261C29D79F00E78933 /* SDF.metal */,
+				ABD3AB271C29D79F00E78933 /* Skybox.metal */,
+				ABD3AB281C29D79F00E78933 /* SpriteShader.metal */,
+				ABD3AB291C29D79F00E78933 /* Unlit.metal */,
+			);
+			name = Shaders;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -133,6 +183,7 @@
 				ABA29F3C1C19E1F90098E21D /* Sources */,
 				ABA29F3D1C19E1F90098E21D /* Frameworks */,
 				ABA29F3E1C19E1F90098E21D /* Resources */,
+				ABD3AB221C29D6E400E78933 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -205,8 +256,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABD3AB331C29D7F700E78933 /* font_txt.fnt in Resources */,
+				ABD3AB341C29D7F700E78933 /* font.png in Resources */,
 				ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */,
 				ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */,
+				ABD3AB351C29D7F700E78933 /* glider.png in Resources */,
+				ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */,
 				ABA29F511C19E1F90098E21D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -225,9 +280,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABD3AB2E1C29D79F00E78933 /* Unlit.metal in Sources */,
 				ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */,
+				ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */,
 				ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */,
+				ABD3AB2D1C29D79F00E78933 /* SpriteShader.metal in Sources */,
 				ABA29F451C19E1F90098E21D /* main.m in Sources */,
+				ABD3AB2B1C29D79F00E78933 /* SDF.metal in Sources */,
+				ABD3AB2C1C29D79F00E78933 /* Skybox.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

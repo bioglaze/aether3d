@@ -39,9 +39,8 @@ namespace ae3d
         
         void Init( int width, int height );
 #if AETHER3D_METAL
-        void Init( CAMetalLayer* metalLayer );
-        void InitOSX( id <MTLDevice> metalDevice, MTKView* view );
-        void SetCurrentDrawableMetalOSX( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
+        void InitMetal( id <MTLDevice> metalDevice, MTKView* view );
+        void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
         id <MTLDevice> GetMetalDevice();
         id <MTLLibrary> GetDefaultMetalShaderLibrary();

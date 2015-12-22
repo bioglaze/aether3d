@@ -203,6 +203,7 @@ int main()
     //scene.Add( &statsContainer );
     scene.Add( &dirLight );
     //scene.Add( &spotLight );
+    scene.Add( &human );
 
     GameObject cubes[ 5 ];
 

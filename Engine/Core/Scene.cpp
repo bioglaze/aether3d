@@ -487,7 +487,10 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     {
         GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     }
-    
+#if AETHER3D_METAL
+    GfxDevice::BeginFrame();
+#endif
+
     Matrix44 view;
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
     cameraTransform->GetLocalRotation().GetMatrix( view );
@@ -549,6 +552,10 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.momentsShader );
     }
     
+#if AETHER3D_METAL
+    GfxDevice::PresentDrawable();
+#endif
+
     GfxDevice::ErrorCheck( "Scene render shadows end" );
 }
 

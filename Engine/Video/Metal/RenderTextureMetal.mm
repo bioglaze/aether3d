@@ -16,7 +16,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     filter = aFilter;
     
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
@@ -24,7 +24,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
 
     if (metalTexture == nullptr)
     {
-        System::Print("Failed to create a render texture!\n");
+        System::Print( "Failed to create a render texture 2D!\n" );
     }
     
     metalTexture.label = @"Render Texture";
