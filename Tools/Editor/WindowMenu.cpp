@@ -25,6 +25,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     componentMenu->addAction( "Add Camera", mainWindow, SLOT(CommandCreateCameraComponent()));
     componentMenu->addAction( "Add Mesh Renderer", mainWindow, SLOT(CommandCreateMeshRendererComponent()));
     componentMenu->addAction( "Add Directional Light", mainWindow, SLOT(CommandCreateDirectionalLightComponent()));
+    componentMenu->addAction( "Add Spot Light", mainWindow, SLOT(CommandCreateSpotLightComponent()));
 }
 
 void WindowMenu::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )

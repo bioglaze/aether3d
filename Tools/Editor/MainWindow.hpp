@@ -8,6 +8,7 @@
 #include "CommandManager.hpp"
 #include "CameraInspector.hpp"
 #include "DirectionalLightInspector.hpp"
+#include "SpotLightInspector.hpp"
 #include "MeshRendererInspector.hpp"
 #include "TransformInspector.hpp"
 
@@ -40,6 +41,7 @@ public slots:
     void CommandCreateGameObject();
     void CommandCreateMeshRendererComponent();
     void CommandCreateDirectionalLightComponent();
+    void CommandCreateSpotLightComponent();
     void CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
     void CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
                               const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor );
@@ -69,6 +71,7 @@ private:
     CameraInspector cameraInspector;
     MeshRendererInspector meshRendererInspector;
     DirectionalLightInspector dirLightInspector;
+    SpotLightInspector spotLightInspector;
     WindowMenu windowMenu;
     CommandManager commandManager;
 };

@@ -697,7 +697,26 @@ ae3d::GameObject* SceneWidget::CreateGameObject()
 
 void SceneWidget::RemoveGameObject( int index )
 {
-    scene.Remove( gameObjects[ index ].get() );
+    if (index < (int)gameObjects.size())
+    {
+        scene.Remove( gameObjects[ index ].get() );
+        gameObjects.erase( gameObjects.begin() + index );
+    }
+}
+
+void SceneWidget::RemoveGameObject( GameObject* gameObject )
+{
+    int index = 0;
+
+    for (std::size_t i = 0; i < gameObjects.size(); ++i)
+    {
+        if (gameObjects[ i ].get() == gameObject)
+        {
+            index = i;
+        }
+    }
+
+    scene.Remove( gameObject );
     gameObjects.erase( gameObjects.begin() + index );
 }
 

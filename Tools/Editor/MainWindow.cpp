@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
+#include "SpotLightComponent.hpp"
 #include "MainWindow.hpp"
 #include "SceneWidget.hpp"
 #include "System.hpp"
@@ -55,12 +56,14 @@ MainWindow::MainWindow()
     cameraInspector.Init( this );
     meshRendererInspector.Init( this );
     dirLightInspector.Init( this );
+    spotLightInspector.Init( this );
 
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->addWidget( transformInspector.GetWidget() );
     inspectorLayout->addWidget( cameraInspector.GetWidget() );
     inspectorLayout->addWidget( meshRendererInspector.GetWidget() );
     inspectorLayout->addWidget( dirLightInspector.GetWidget() );
+    inspectorLayout->addWidget( spotLightInspector.GetWidget() );
 
     inspectorContainer = new QWidget();
     inspectorContainer->setLayout( inspectorLayout );
@@ -75,8 +78,8 @@ MainWindow::MainWindow()
     UpdateHierarchy();
     UpdateInspector();
 
-    reloadTimer.setInterval( 1000 );
-    connect( &reloadTimer, &QTimer::timeout, []() { ae3d::System::ReloadChangedAssets(); std::cout << "Reloading assets" << std::endl; } );
+    reloadTimer.setInterval( 3000 );
+    connect( &reloadTimer, &QTimer::timeout, []() { ae3d::System::ReloadChangedAssets(); } );
     reloadTimer.start();
 }
 
@@ -113,6 +116,7 @@ void MainWindow::UpdateInspector()
         cameraInspector.GetWidget()->hide();
         meshRendererInspector.GetWidget()->hide();
         dirLightInspector.GetWidget()->hide();
+        spotLightInspector.GetWidget()->hide();
     }
     else
     {
@@ -146,6 +150,16 @@ void MainWindow::UpdateInspector()
         else
         {
             dirLightInspector.GetWidget()->hide();
+        }
+
+        auto spotLightComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::SpotLightComponent >();
+        if (spotLightComponent)
+        {
+            spotLightInspector.GetWidget()->show();
+        }
+        else
+        {
+            spotLightInspector.GetWidget()->hide();
         }
     }
 }
@@ -224,26 +238,31 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     }
     else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
     {
-        for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
+        std::vector< ae3d::GameObject* > selectedGameObjects;
+
+        for (auto i : sceneWidget->selectedGameObjects)
+        {
+            selectedGameObjects.push_back( sceneWidget->GetGameObject( i ) );
+        }
+
+        for (auto g : selectedGameObjects)
+        {
+            sceneWidget->RemoveGameObject( g );
+        }
+
+        /*for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
         {
             if (sceneTree->topLevelItem( i )->isSelected())
             {
                 sceneWidget->RemoveGameObject( i );
-                sceneWidget->selectedGameObjects.clear();
-                std::list< ae3d::GameObject* > emptyList;
-                emit GameObjectSelected( emptyList );
-                sceneTree->clearSelection();
-                UpdateInspector();
             }
-        }
-
-        /*for (auto goIndex : sceneWidget->selectedGameObjects)
-        {
-            std::cout << "removed " << sceneWidget->GetGameObject(goIndex)->GetName() << std::endl;
-            sceneWidget->RemoveGameObject( goIndex );
-            sceneWidget->selectedGameObjects.clear();
         }*/
 
+        sceneWidget->selectedGameObjects.clear();
+        std::list< ae3d::GameObject* > emptyList;
+        emit GameObjectSelected( emptyList );
+        sceneTree->clearSelection();
+        UpdateInspector();
         UpdateHierarchy();
     }
     else if (event->key() == Qt::Key_F)
@@ -274,7 +293,13 @@ void MainWindow::CommandCreateMeshRendererComponent()
 
 void MainWindow::CommandCreateDirectionalLightComponent()
 {
-    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget ) );
+    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Directional ) );
+    UpdateInspector();
+}
+
+void MainWindow::CommandCreateSpotLightComponent()
+{
+    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Spot ) );
     UpdateInspector();
 }
 

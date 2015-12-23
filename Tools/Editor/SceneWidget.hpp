@@ -20,6 +20,7 @@
 namespace ae3d
 {
     struct Quaternion;
+    class GameObject;
 }
 
 class SceneWidget : public QOpenGLWidget
@@ -48,6 +49,10 @@ public:
     /// \param index Index.
     /// TODO: Implement as a command.
     void RemoveGameObject( int index );
+
+    /// \param gameObject GameObject.
+    /// TODO: Implement as a command.
+    void RemoveGameObject( ae3d::GameObject* gameObject );
 
     /// \return Game object count.
     int GetGameObjectCount() const { return (int)gameObjects.size(); }

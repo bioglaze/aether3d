@@ -1,14 +1,16 @@
 #include "CreateLightCommand.hpp"
 #include "DirectionalLightComponent.hpp"
+#include "SpotLightComponent.hpp"
 #include "System.hpp"
 #include "Scene.hpp"
 #include "SceneWidget.hpp"
 
-CreateLightCommand::CreateLightCommand( SceneWidget* aSceneWidget )
+CreateLightCommand::CreateLightCommand( SceneWidget* aSceneWidget, Type aType )
 {
     ae3d::System::Assert( aSceneWidget != nullptr, "Create light constructor needs sceneWidget" );
 
     sceneWidget = aSceneWidget;
+    type = aType;
 }
 
 void CreateLightCommand::Execute()
@@ -17,7 +19,15 @@ void CreateLightCommand::Execute()
     ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "Create light needs selection" );
 
     go = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() );
-    go->AddComponent< ae3d::DirectionalLightComponent >();
+
+    if (type == Type::Directional)
+    {
+        go->AddComponent< ae3d::DirectionalLightComponent >();
+    }
+    else if (type == Type::Spot)
+    {
+        go->AddComponent< ae3d::SpotLightComponent >();
+    }
 }
 
 void CreateLightCommand::Undo()
@@ -26,5 +36,12 @@ void CreateLightCommand::Undo()
     ae3d::System::Assert( sceneWidget->GetScene() != nullptr, "Create light undo needs scene" );
     ae3d::System::Assert( go != nullptr, "Create light undo need game object." );
 
-    go->RemoveComponent< ae3d::DirectionalLightComponent >();
+    if (type == Type::Directional)
+    {
+        go->RemoveComponent< ae3d::DirectionalLightComponent >();
+    }
+    else if (type == Type::Spot)
+    {
+        go->RemoveComponent< ae3d::SpotLightComponent >();
+    }
 }

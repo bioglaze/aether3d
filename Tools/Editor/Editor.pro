@@ -61,7 +61,8 @@ SOURCES += \
     ModifyCameraCommand.cpp \
     MeshRendererInspector.cpp \
     DirectionalLightInspector.cpp \
-    CreateLightCommand.cpp
+    CreateLightCommand.cpp \
+    SpotLightInspector.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -77,4 +78,5 @@ HEADERS += \
     ModifyCameraCommand.hpp \
     MeshRendererInspector.hpp \
     DirectionalLightInspector.hpp \
-    CreateLightCommand.hpp
+    CreateLightCommand.hpp \
+    SpotLightInspector.hpp

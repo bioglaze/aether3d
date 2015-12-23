@@ -14,13 +14,16 @@ class SceneWidget;
 class CreateLightCommand : public CommandBase
 {
 public:
-    explicit CreateLightCommand( SceneWidget* sceneWidget );
+    enum class Type { Directional, Spot };
+
+    explicit CreateLightCommand( SceneWidget* sceneWidget, Type type );
     void Execute() override;
     void Undo() override;
 
 private:
     SceneWidget* sceneWidget = nullptr;
     ae3d::GameObject* go = nullptr;
+    Type type = Type::Directional;
 };
 
 #endif
