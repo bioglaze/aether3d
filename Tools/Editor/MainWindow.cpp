@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QWindow>
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "SpotLightComponent.hpp"
@@ -35,19 +36,12 @@ MainWindow::MainWindow()
     sceneWidget = new SceneWidget();
     sceneWidget->SetMainWindow( this );
     setWindowTitle( "Editor" );
-    connect( sceneWidget, SIGNAL(GameObjectsAddedOrDeleted()), this, SLOT(HandleGameObjectsAddedOrDeleted()) );
 
-    connect( &transformInspector, SIGNAL(TransformModified( const ae3d::Vec3&, const ae3d::Quaternion&, float )),
-             this, SLOT(CommandModifyTransform( const ae3d::Vec3&, const ae3d::Quaternion&, float )) );
-
-    connect( sceneWidget, SIGNAL(TransformModified( const ae3d::Vec3&, const ae3d::Quaternion&, float )),
-             this, SLOT(CommandModifyTransform( const ae3d::Vec3&, const ae3d::Quaternion&, float )) );
-
-    connect(this, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
-            this, SLOT(OnGameObjectSelected(std::list< ae3d::GameObject* >)));
-
-    connect( &cameraInspector, SIGNAL(CameraModified(ae3d::CameraComponent::ClearFlag, ae3d::CameraComponent::ProjectionType, const ae3d::Vec4&, const ae3d::Vec4&, const ae3d::Vec3&)),
-             this, SLOT(CommandModifyCamera(ae3d::CameraComponent::ClearFlag, ae3d::CameraComponent::ProjectionType, const ae3d::Vec4&, const ae3d::Vec4&, const ae3d::Vec3&)) );
+    connect( sceneWidget, &SceneWidget::GameObjectsAddedOrDeleted, this, &MainWindow::HandleGameObjectsAddedOrDeleted );
+    connect( &transformInspector, &TransformInspector::TransformModified, this, &MainWindow::CommandModifyTransform );
+    connect( sceneWidget, &SceneWidget::TransformModified, this, &MainWindow::CommandModifyTransform );
+    connect( this, &MainWindow::GameObjectSelected, this, &MainWindow::OnGameObjectSelected );
+    connect( &cameraInspector, &CameraInspector::CameraModified, this, &MainWindow::CommandModifyCamera );
 
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
@@ -307,6 +301,7 @@ void MainWindow::CommandCreateSpotLightComponent()
 void MainWindow::CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
 {
     commandManager.Execute( std::make_shared< ModifyTransformCommand >( sceneWidget, newPosition, newRotation, newScale ) );
+    sceneWidget->UpdateTransformGizmoPosition();
 }
 
 void MainWindow::CommandCreateGameObject()

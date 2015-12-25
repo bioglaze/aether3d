@@ -10,6 +10,7 @@
 #include <QString>
 #include <QHeaderView>
 #include <QPushButton>
+#include "MainWindow.hpp"
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
 #include "Quaternion.hpp"
@@ -100,7 +101,7 @@ void CameraInspector::Init( QWidget* mainWindow )
              this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );
     connect( ortho, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
     connect( persp, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
-    connect( clearFlagsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearFlagsChanged(int) ));
+    connect( clearFlagsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearFlagsChanged(int)) );
     connect( projectionBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ProjectionChanged() ));
     connect( clearColorTable, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
 }

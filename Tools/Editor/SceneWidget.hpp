@@ -43,6 +43,8 @@ public:
 
     void Init();
 
+    void UpdateTransformGizmoPosition();
+
     /// \return Index of created game object.
     /// Should only be called by CreateGoCommand!
     ae3d::GameObject* CreateGameObject();

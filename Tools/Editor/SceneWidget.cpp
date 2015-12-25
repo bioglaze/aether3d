@@ -249,12 +249,12 @@ void SceneWidget::Init()
 {
     System::Assert( mainWindow != nullptr, "mainWindow not set.");
 
-    System::InitGfxDeviceForEditor( width(), height() );
+    System::InitGfxDeviceForEditor( width() * devicePixelRatio(), height() * devicePixelRatio() );
     System::LoadBuiltinAssets();
 
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() ) / height(), 1, 400 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() * devicePixelRatio() ) / (height() * devicePixelRatio()), 1, 400 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetLayerMask( ~0x4 );
     camera.AddComponent<TransformComponent>();
@@ -309,7 +309,7 @@ void SceneWidget::Init()
 
     previewCamera.AddComponent<CameraComponent>();
     previewCamera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    previewCamera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() ) / height(), 1, 400 );
+    previewCamera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() * devicePixelRatio() ) / (height() * devicePixelRatio()), 1, 400 );
     previewCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     previewCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &previewCameraTex );
     previewCamera.AddComponent<TransformComponent>();
@@ -363,8 +363,8 @@ void SceneWidget::paintGL()
 
 void SceneWidget::resizeGL( int width, int height )
 {
-    System::InitGfxDeviceForEditor( width, height );
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width ) / height, 1, 400 );
+    System::InitGfxDeviceForEditor( width * devicePixelRatio(), height * devicePixelRatio() );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width * devicePixelRatio() ) / (height * devicePixelRatio()), 1, 400 );
 }
 
 void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
@@ -450,7 +450,7 @@ void SceneWidget::CenterSelected()
         return;
     }
 
-    camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() - Vec3( 0, 0, 5 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
+    camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 5 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
 }
 
 void SceneWidget::mousePressEvent( QMouseEvent* event )
@@ -555,6 +555,11 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
 
         emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedObjects );
     }
+}
+
+void SceneWidget::UpdateTransformGizmoPosition()
+{
+    transformGizmo.SetPosition( SelectionAveragePosition() );
 }
 
 bool SceneWidget::eventFilter( QObject* /*obj*/, QEvent* event )

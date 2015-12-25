@@ -10,6 +10,7 @@
 // TODO: Prevent empty name for game object
 // TODO: Duplicate entire selection
 // TODO: Remove hard-coded startup scene contents and load them from a startup scene.
+// TODO: Check file dialog async: http://wiki.qt.io/New_Signal_Slot_Syntax
 
 int main( int argc, char *argv[] )
 {
@@ -21,7 +22,6 @@ int main( int argc, char *argv[] )
     mainWindow.setGeometry( 200, 200, 200, 200 );
     mainWindow.showMaximized();
     app.installEventFilter( (QObject*)mainWindow.GetSceneWidget() );
-
     return app.exec();
 }
 
