@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 #if AETHER3D_METAL
-#import <QuartzCore/CAMetalLayer.h>
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #endif
@@ -20,14 +19,14 @@ enum class GfxDeviceClearFlag { DepthAndColor, Depth, DontClear };
 id <MTLDevice> device;
 id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
-id <MTLDepthStencilState> depthState;
-id <CAMetalDrawable> currentDrawable;
+id <MTLDepthStencilState> depthStateLessWriteOn;
+id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
+id <CAMetalDrawable> drawable; // Render texture or currentDrawable
 
 MTLRenderPassDescriptor* renderPassDescriptor = nullptr;
 id <MTLTexture> depthTex;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
-id<CAMetalDrawable> drawable;
 id<MTLTexture> texture0;
 id<MTLTexture> texture1;
 id<MTLTexture> currentRenderTarget;
@@ -84,20 +83,15 @@ void ae3d::GfxDevice::Init( int width, int height )
     GfxDeviceGlobal::backBufferHeight = height;
 }
 
-void ae3d::GfxDevice::SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass )
+void ae3d::GfxDevice::SetCurrentDrawableMetal( id <CAMetalDrawable> aDrawable, MTLRenderPassDescriptor* renderPass )
 {
-    currentDrawable = drawable;
+    currentDrawable = aDrawable;
     renderPassDescriptor = renderPass;
 }
 
 namespace
 {
     float clearColor[] = { 0, 0, 0, 1 };
-
-id<CAMetalDrawable> GetCurrentDrawable()
-{
-    return currentDrawable;
-}
 
 void setupRenderPassDescriptor( id <MTLTexture> texture )
 {
@@ -155,7 +149,7 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view )
     depthStateDesc.depthCompareFunction = MTLCompareFunctionLess;
     depthStateDesc.depthWriteEnabled = YES;
     depthStateDesc.label = @"less write on";
-    depthState = [device newDepthStencilStateWithDescriptor:depthStateDesc];
+    depthStateLessWriteOn = [device newDepthStencilStateWithDescriptor:depthStateDesc];
 }
 
 id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
@@ -263,6 +257,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
     [renderEncoder setFragmentTexture:texture1 atIndex:1];
+    [renderEncoder setDepthStencilState:depthStateLessWriteOn];
+    
     [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                               indexCount:(endIndex - startIndex) * 3
                                indexType:MTLIndexTypeUInt16
@@ -274,26 +270,11 @@ void ae3d::GfxDevice::BeginFrame()
 {
     ResetUniformBuffers();
     
-    if (!currentRenderTarget)
-    {
-        drawable = GetCurrentDrawable();
-        setupRenderPassDescriptor( drawable.texture );
-    }
-    else
-    {
-        setupRenderPassDescriptor( currentRenderTarget );
-    }
-    
     commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
     renderEncoder.label = @"MyRenderEncoder";
-}
-
-void ae3d::GfxDevice::FlipBuffers()
-{
-    currentDrawable = nullptr;
 }
 
 void ae3d::GfxDevice::PresentDrawable()
@@ -355,19 +336,8 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
 
 void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, unsigned cubeMapFace )
 {
-    /*if ((!currentRenderTarget && !renderTexture2d) ||
-        (renderTexture2d != nullptr && renderTexture2d->GetMetalTexture() == currentRenderTarget))
-    {
-        return;
-    }
-    
-    PresentDrawable();*/
-    
-    //setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture );
-
-    //currentRenderTarget = renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : nullptr;
-    //BeginFrame();
-    //currentRenderTarget = renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : nullptr;
+    drawable = currentDrawable;
+    setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture );
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* )

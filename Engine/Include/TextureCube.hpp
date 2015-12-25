@@ -18,10 +18,10 @@ namespace ae3d
         /**
           \param negX Negative X axis texture.
           \param posX Positive X axis texture.
-          \param negY Negative X axis texture.
-          \param posY Positive X axis texture.
-          \param negZ Negative X axis texture.
-          \param posZ Positive X axis texture.
+          \param negY Negative Y axis texture.
+          \param posY Positive Y axis texture.
+          \param negZ Negative Z axis texture.
+          \param posZ Positive Z axis texture.
           \param wrap Wrapping mode.
           \param filter Filtering mode.
           \param mipmaps Should mipmaps be generated and used.

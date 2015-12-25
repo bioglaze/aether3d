@@ -256,6 +256,7 @@ void SceneWidget::Init()
     camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() ) / height(), 1, 400 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
+    camera.GetComponent<CameraComponent>()->SetLayerMask( ~0x4 );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
@@ -285,7 +286,6 @@ void SceneWidget::Init()
     transformGizmo.Init( &unlitShader );
 
     AddEditorObjects();
-    scene.Add( &camera );
     scene.Add( gameObjects[ 0 ].get() );
 
     connect( &myTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
@@ -293,8 +293,37 @@ void SceneWidget::Init()
     connect(mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
             this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
 
+    const ae3d::Vec3 rtDim = { 256, 256, 0 };
+    hudCamera.AddComponent<CameraComponent>();
+    hudCamera.GetComponent<CameraComponent>()->SetProjection( 0, rtDim.x, 0, rtDim.y, 0, 1 );
+    hudCamera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Orthographic );
+    hudCamera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::Depth );
+    hudCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.0f, 0.0f ) );
+    hudCamera.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
+    hudCamera.GetComponent<CameraComponent>()->SetRenderOrder( 2 );
+    hudCamera.AddComponent<TransformComponent>();
+
+    scene.Add( &hudCamera );
+
+    previewCameraTex.Create2D( rtDim.x, rtDim.y, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+
+    previewCamera.AddComponent<CameraComponent>();
+    previewCamera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+    previewCamera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() ) / height(), 1, 400 );
+    previewCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
+    previewCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &previewCameraTex );
+    previewCamera.AddComponent<TransformComponent>();
+    previewCamera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    scene.Add( &previewCamera );
+
+    hud.AddComponent<SpriteRendererComponent>();
+    hud.GetComponent<SpriteRendererComponent>()->SetTexture( &previewCameraTex, Vec3( -50, -150, -0.6f ), Vec3( rtDim.x, rtDim.y, 1 ), Vec4( 0.7f, 0.7f, 1, 1 ) );
+    hud.SetLayer( 2 );
+    scene.Add( &hud );
+
     //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
     //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
+
     emit GameObjectsAddedOrDeleted();
 }
 
@@ -306,6 +335,15 @@ void SceneWidget::RemoveEditorObjects()
 void SceneWidget::AddEditorObjects()
 {
     scene.Add( &camera );
+}
+
+void SceneWidget::SetSelectedCameraTargetToPreview()
+{
+    if (!selectedGameObjects.empty())
+    {
+        gameObjects[ selectedGameObjects.front() ]->GetComponent< ae3d::CameraComponent >()->SetTargetTexture( &previewCameraTex );
+
+    }
 }
 
 void SceneWidget::initializeGL()
@@ -653,16 +691,40 @@ void SceneWidget::UpdateCamera()
     updateGL();
 }
 
-void SceneWidget::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
+void SceneWidget::GameObjectSelected( std::list< GameObject* > gameObjects )
 {
     if (gameObjects.empty())
     {
+        hud.SetLayer( 0x4 );
         scene.Remove( &transformGizmo.go );
         return;
     }
 
     transformGizmo.SetPosition( SelectionAveragePosition() );
     scene.Add( &transformGizmo.go );
+
+    auto cameraTransform = gameObjects.front()->GetComponent< TransformComponent >();
+
+    if (gameObjects.front()->GetComponent< CameraComponent >() && cameraTransform)
+    {
+        hud.SetLayer( 2 );
+
+        Matrix44 eyeView;
+        cameraTransform->GetLocalRotation().GetMatrix( eyeView );
+        Matrix44 translation;
+        translation.Translate( -cameraTransform->GetLocalPosition() );
+        Matrix44::Multiply( translation, eyeView, eyeView );
+
+        const Vec3 eyeViewDir = Vec3( eyeView.m[2], eyeView.m[6], eyeView.m[10] ).Normalized();
+
+        previewCamera.GetComponent< TransformComponent >()->LookAt( gameObjects.front()->GetComponent< TransformComponent >()->GetLocalPosition(),
+                                                                    eyeViewDir,
+                                                                    Vec3( 0, 1, 0 ) );
+    }
+    else
+    {
+        hud.SetLayer( 0x4 );
+    }
 }
 
 ae3d::Vec3 SceneWidget::SelectionAveragePosition()

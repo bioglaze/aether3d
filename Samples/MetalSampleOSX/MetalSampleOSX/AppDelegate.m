@@ -7,7 +7,8 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
+    [_window setTitle: @"Aether3D Metal Sample"];
+    [_window center];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -15,6 +16,21 @@
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+    return YES;
+}
+
+- (void)keyDown:(NSEvent *)theEvent
+{
+    NSLog( @"Key down\n" );
+}
+
+- (void)keyUp:(NSEvent *)theEvent
+{
+    NSLog( @"Key up\n" );
+}
+
+- (BOOL)acceptsFirstResponder
+{
     return YES;
 }
 

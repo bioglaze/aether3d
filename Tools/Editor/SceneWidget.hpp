@@ -10,6 +10,7 @@
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
 #include "SpriteRendererComponent.hpp"
+#include "RenderTexture.hpp"
 #include "Texture2D.hpp"
 #include "Scene.hpp"
 #include "Mesh.hpp"
@@ -64,6 +65,8 @@ public:
 
     void AddEditorObjects();
 
+    void SetSelectedCameraTargetToPreview();
+
     /// \return scene.
     ae3d::Scene* GetScene() { return &scene; }
 
@@ -111,12 +114,17 @@ private:
 
     TransformGizmo transformGizmo;
     ae3d::GameObject camera;
-    ae3d::Texture2D spriteTex;
+    ae3d::GameObject previewCamera;
+    ae3d::GameObject hudCamera;
+    ae3d::GameObject hud;
+    ae3d::RenderTexture previewCameraTex;
     ae3d::Scene scene;
+    ae3d::Vec3 cameraMoveDir;
+
+    ae3d::Texture2D spriteTex;
+    ae3d::Shader unlitShader;
     ae3d::Material cubeMaterial;
     ae3d::Mesh cubeMesh;
-    ae3d::Shader unlitShader;
-    ae3d::Vec3 cameraMoveDir;
 
     MouseMode mouseMode = MouseMode::Normal;
     GizmoAxis dragAxis = GizmoAxis::None;

@@ -31,11 +31,6 @@ void ae3d::System::SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRe
     GfxDevice::SetCurrentDrawableMetal( drawable, renderPass );
 }
 
-void ae3d::System::EndFrame()
-{
-    GfxDevice::FlipBuffers();
-}
-
 void ae3d::System::BeginFrame()
 {
     GfxDevice::BeginFrame();

@@ -103,7 +103,6 @@ namespace ae3d
 #if AETHER3D_METAL
         void InitMetal( id< MTLDevice > metalDevice, MTKView* view );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
-        void EndFrame();
         void BeginFrame();
 #endif
 

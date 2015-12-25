@@ -4,12 +4,12 @@
 
 // FIXME: deleting gameobjects causes memory corruption that does not crash instantly.
 // FIXME: sometimes transform gizmo disappears or is misplaced
-// TODO: delete all selected game objects.
 // TODO: game object delete command
 // TODO: game object rename command
 // TODO: Ray-Triangle intersection for selection.
 // TODO: Prevent empty name for game object
 // TODO: Duplicate entire selection
+// TODO: Remove hard-coded startup scene contents and load them from a startup scene.
 
 int main( int argc, char *argv[] )
 {

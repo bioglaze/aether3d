@@ -20,6 +20,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
 
     if (metalTexture == nullptr)
@@ -27,10 +28,29 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
         System::Print( "Failed to create a render texture 2D!\n" );
     }
     
-    metalTexture.label = @"Render Texture";
+    metalTexture.label = @"Render Texture 2D";
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
 {
-    System::Print( "Cube map RT not implemented!\n" );
+    isCube = true;
+    width = aDimension;
+    height = aDimension;
+    wrap = aWrap;
+    filter = aFilter;
+    
+    MTLTextureDescriptor* textureDescriptor =
+    [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+                                                       size:width
+                                                   mipmapped:NO];
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+    
+    if (metalTexture == nullptr)
+    {
+        System::Print( "Failed to create a render texture Cube!\n" );
+    }
+    
+    metalTexture.label = @"Render Texture Cube";
+
 }

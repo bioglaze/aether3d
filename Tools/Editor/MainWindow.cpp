@@ -282,6 +282,7 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
 void MainWindow::CommandCreateCameraComponent()
 {
     commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
+    sceneWidget->SetSelectedCameraTargetToPreview();
     UpdateInspector();
 }
 
@@ -317,7 +318,10 @@ void MainWindow::CommandCreateGameObject()
 void MainWindow::CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
                                       const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor )
 {
-    auto camera = sceneWidget->GetGameObject( 0 )->GetComponent< ae3d::CameraComponent >();
+    ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "Cannot modify a camera if selection is empty" );
+
+    auto camera = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::CameraComponent >();
+    ae3d::System::Assert( camera, "First selected object doesn't contain a camera component" );
     commandManager.Execute( std::make_shared< ModifyCameraCommand >( camera, clearFlag, projectionType, orthoParams, perspParams, clearColor ) );
 }
 
