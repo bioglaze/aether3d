@@ -13,10 +13,20 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Variance shadow mapping.
   - Audio support for .wav and .ogg.
+  - Hot-reloading of assets.
   - Custom model format with .obj and Blender exporter.
   - Virtual file system for .pak files.
   - XBox controller support.
   - Cross-Platform scene editor.
+  - Statically linked into your application.
+
+# Status (as of 2015-12-26)
+
+  - API is not stable until 1.0 (developing 0.5 now)
+  - OpenGL renderer is the most featureful but others will catch up.
+  - Main branch may or may not compile but releases should always work.
+  - Editor is still missing many features that are needed for proper scene creation.
+  - Lights cast shadows but don't shade objects (planned for 0.6)
 
 # Planned Features
 
@@ -36,7 +46,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 ## OS X / GNU/Linux
 
-  - Open the project Engine/Aether3D_OSX in Xcode and build it or run the Makefile.
+  - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow/OpenWindow.xcodeproj and run it or run the Makefile.
 
 ## iOS

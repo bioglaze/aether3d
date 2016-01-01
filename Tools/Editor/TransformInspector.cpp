@@ -1,13 +1,17 @@
 #include "TransformInspector.hpp"
 #include <QTableWidget>
 #include "GameObject.hpp"
+#include "MainWindow.hpp"
 #include "TransformComponent.hpp"
 #include "System.hpp"
+#include "SceneWidget.hpp"
 
 using namespace ae3d;
 
 void TransformInspector::Init( QWidget* mainWindow )
 {
+    sceneWidget = ((MainWindow*)mainWindow)->GetSceneWidget();
+
     table = new QTableWidget( 3, 3 );
     table->setHorizontalHeaderLabels( QString("X;Y;Z").split(";") );
     table->setVerticalHeaderLabels( QString("Position;Rotation;Scale").split(";") );
@@ -161,5 +165,5 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
 
     rotation = rotation.FromEuler( rotationEuler );
 
-    emit TransformModified( position, rotation, scale );
+    emit TransformModified( sceneWidget->selectedGameObjects.front(), position, rotation, scale );
 }

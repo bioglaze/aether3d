@@ -2,58 +2,40 @@
 #include "SceneWidget.hpp"
 #include "TransformComponent.hpp"
 
-ModifyTransformCommand::ModifyTransformCommand( SceneWidget* aSceneWidget, const ae3d::Vec3& newPosition,
+ModifyTransformCommand::ModifyTransformCommand( int aGameObjectIndex, SceneWidget* aSceneWidget, const ae3d::Vec3& newPosition,
                                                 const ae3d::Quaternion& newRotation, float newScale )
     : sceneWidget( aSceneWidget )
     , position( newPosition )
     , rotation( newRotation )
     , scale( newScale )
+    , gameObjectIndex( aGameObjectIndex )
 {
 }
 
 void ModifyTransformCommand::Execute()
 {
-    selectedGameObjects = sceneWidget->selectedGameObjects;
-    oldPositions.resize( selectedGameObjects.size() );
-    oldRotations.resize( selectedGameObjects.size() );
-    oldScales.resize( selectedGameObjects.size() );
+    auto transform = sceneWidget->GetGameObject( gameObjectIndex )->GetComponent< ae3d::TransformComponent >();
 
-    int i = 0;
-
-    for (auto index : sceneWidget->selectedGameObjects)
+    if (transform)
     {
-        auto transform = sceneWidget->GetGameObject( index )->GetComponent< ae3d::TransformComponent >();
+        oldPosition = transform->GetLocalPosition();
+        oldRotation = transform->GetLocalRotation();
+        oldScale = transform->GetLocalScale();
 
-        if (transform)
-        {
-            oldPositions[ i ] = transform->GetLocalPosition();
-            oldRotations[ i ] = transform->GetLocalRotation();
-            oldScales[ i ] = transform->GetLocalScale();
-
-            transform->SetLocalPosition( position );
-            transform->SetLocalRotation( rotation );
-            transform->SetLocalScale( scale );
-        }
-
-        ++i;
+        transform->SetLocalPosition( position );
+        transform->SetLocalRotation( rotation );
+        transform->SetLocalScale( scale );
     }
 }
 
 void ModifyTransformCommand::Undo()
 {
-    int i = 0;
+    auto transform = sceneWidget->GetGameObject( gameObjectIndex )->GetComponent< ae3d::TransformComponent >();
 
-    for (auto index : selectedGameObjects)
+    if (transform)
     {
-        auto transform = sceneWidget->GetGameObject( index )->GetComponent< ae3d::TransformComponent >();
-
-        if (transform)
-        {
-            transform->SetLocalPosition( oldPositions[ i ] );
-            transform->SetLocalRotation( oldRotations[ i ] );
-            transform->SetLocalScale( oldScales[ i ] );
-        }
-
-        ++i;
+        transform->SetLocalPosition( oldPosition );
+        transform->SetLocalRotation( oldRotation );
+        transform->SetLocalScale( oldScale );
     }
 }

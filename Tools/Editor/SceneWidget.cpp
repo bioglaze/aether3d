@@ -490,15 +490,21 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
                 return;
             }
 
-            auto transform = selectedObjects.front()->GetComponent< TransformComponent >();
+            int i = 0;
 
-            if (transform)
+            for (auto go : selectedObjects)
             {
-                auto pos = transform->GetLocalPosition();
-                auto rot = transform->GetLocalRotation();
-                auto sca = transform->GetLocalScale();
-                emit TransformModified( pos, rot, sca );
-                std::cout << "Drag start: Emitting command" << std::endl;
+                auto transform = go->GetComponent< TransformComponent >();
+
+                if (transform)
+                {
+                    auto pos = transform->GetLocalPosition();
+                    auto rot = transform->GetLocalRotation();
+                    auto sca = transform->GetLocalScale();
+                    emit TransformModified( i, pos, rot, sca );
+
+                    ++i;
+                }
             }
         }
     }

@@ -298,9 +298,9 @@ void MainWindow::CommandCreateSpotLightComponent()
     UpdateInspector();
 }
 
-void MainWindow::CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
+void MainWindow::CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
 {
-    commandManager.Execute( std::make_shared< ModifyTransformCommand >( sceneWidget, newPosition, newRotation, newScale ) );
+    commandManager.Execute( std::make_shared< ModifyTransformCommand >( gameObjectIndex, sceneWidget, newPosition, newRotation, newScale ) );
     sceneWidget->UpdateTransformGizmoPosition();
 }
 

@@ -42,7 +42,7 @@ public slots:
     void CommandCreateMeshRendererComponent();
     void CommandCreateDirectionalLightComponent();
     void CommandCreateSpotLightComponent();
-    void CommandModifyTransform( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
+    void CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
     void CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
                               const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor );
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }

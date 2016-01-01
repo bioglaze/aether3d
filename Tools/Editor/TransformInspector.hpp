@@ -23,7 +23,7 @@ class TransformInspector: public QObject
     void Init( QWidget* mainWindow );
 
 signals:
-    void TransformModified( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
+    void TransformModified( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
 
 private slots:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
@@ -32,5 +32,6 @@ private:
     void FieldsChanged( QTableWidgetItem* item );
 
     QTableWidget* table = nullptr;
+    class SceneWidget* sceneWidget = nullptr; // Owner: MainWindow
 };
 #endif

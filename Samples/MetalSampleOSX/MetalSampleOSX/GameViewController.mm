@@ -151,6 +151,16 @@
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
 }
 
+- (void)keyDown:(NSEvent *)theEvent
+{
+    NSLog(@"onKeyDown Detected; Merry Christmas, by the way.");
+}
+
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
+}
+
 - (void)_render
 {
     [self _update];

@@ -29,7 +29,7 @@ class SceneWidget : public QOpenGLWidget
     Q_OBJECT
 
 signals:
-    void TransformModified( const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
+    void TransformModified( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
 
 public slots:
     void UpdateCamera();
