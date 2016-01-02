@@ -110,6 +110,7 @@ private:
         ae3d::Material yAxisMaterial;
         ae3d::Material zAxisMaterial;
         ae3d::Texture2D translateTex;
+        ae3d::GameObject camera;
     };
 
     ae3d::Vec3 SelectionAveragePosition();

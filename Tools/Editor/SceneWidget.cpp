@@ -217,6 +217,15 @@ void SceneWidget::TransformGizmo::Init( Shader* shader )
     go.GetComponent< MeshRendererComponent >()->SetMaterial( &zAxisMaterial, 0 );
     go.AddComponent< TransformComponent >();
     go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
+    go.SetLayer( 2 );
+
+    camera.AddComponent<CameraComponent>();
+    camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
+    camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::Depth );
+    camera.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
+    camera.AddComponent<TransformComponent>();
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 }
 
 void SceneWidget::TransformGizmo::SetPosition( const ae3d::Vec3& position )
@@ -256,7 +265,7 @@ void SceneWidget::Init()
     camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() * devicePixelRatio() ) / (height() * devicePixelRatio()), 1, 400 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
-    camera.GetComponent<CameraComponent>()->SetLayerMask( ~0x4 );
+    camera.GetComponent<CameraComponent>()->SetLayerMask( ~0x2 );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
@@ -284,6 +293,8 @@ void SceneWidget::Init()
     gameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->SetMaterial( &cubeMaterial, 0 );
 
     transformGizmo.Init( &unlitShader );
+    transformGizmo.camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() * devicePixelRatio() ) / (height() * devicePixelRatio()), 1, 400 );
+    transformGizmo.camera.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
 
     AddEditorObjects();
     scene.Add( gameObjects[ 0 ].get() );
@@ -330,11 +341,13 @@ void SceneWidget::Init()
 void SceneWidget::RemoveEditorObjects()
 {
     scene.Remove( &camera );
+    scene.Remove( &transformGizmo.camera );
 }
 
 void SceneWidget::AddEditorObjects()
 {
     scene.Add( &camera );
+    scene.Add( &transformGizmo.camera );
 }
 
 void SceneWidget::SetSelectedCameraTargetToPreview()
@@ -365,6 +378,7 @@ void SceneWidget::resizeGL( int width, int height )
 {
     System::InitGfxDeviceForEditor( width * devicePixelRatio(), height * devicePixelRatio() );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width * devicePixelRatio() ) / (height * devicePixelRatio()), 1, 400 );
+    transformGizmo.camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width * devicePixelRatio() ) / (height * devicePixelRatio()), 1, 400 );
 }
 
 void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
@@ -451,6 +465,7 @@ void SceneWidget::CenterSelected()
     }
 
     camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 5 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
+    transformGizmo.camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 5 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
 }
 
 void SceneWidget::mousePressEvent( QMouseEvent* event )
@@ -613,6 +628,9 @@ bool SceneWidget::eventFilter( QObject* /*obj*/, QEvent* event )
             camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 0.0f, 1.0f, 0.0f ), deltaX );
             camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 1.0f, 0.0f, 0.0f ), deltaY );
 
+            transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 0.0f, 1.0f, 0.0f ), deltaX );
+            transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->OffsetRotate( Vec3( 1.0f, 0.0f, 0.0f ), deltaY );
+
             lastMousePosition[ 0 ] = x;
             lastMousePosition[ 1 ] = y;
             return true;
@@ -621,8 +639,13 @@ bool SceneWidget::eventFilter( QObject* /*obj*/, QEvent* event )
         {
             cameraMoveDir.x = deltaX * 0.1f;
             cameraMoveDir.y = -deltaY * 0.1f;
+
             camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x );
             camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y );
+
+            transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x );
+            transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y );
+
             cameraMoveDir.x = cameraMoveDir.y = 0;
             lastMousePosition[ 0 ] = QCursor::pos().x();
             lastMousePosition[ 1 ] = QCursor::pos().y();
@@ -691,6 +714,7 @@ void SceneWidget::wheelEvent( QWheelEvent* event )
     const float dir = event->angleDelta().y() < 0 ? -1 : 1;
     const float speed = dir;
     camera.GetComponent< ae3d::TransformComponent >()->MoveForward( speed );
+    transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->MoveForward( speed );
 }
 
 void SceneWidget::UpdateCamera()
@@ -699,6 +723,11 @@ void SceneWidget::UpdateCamera()
     camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x * speed );
     camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y * speed );
     camera.GetComponent< ae3d::TransformComponent >()->MoveForward( cameraMoveDir.z * speed );
+
+    transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->MoveRight( cameraMoveDir.x * speed );
+    transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->MoveUp( cameraMoveDir.y * speed );
+    transformGizmo.camera.GetComponent< ae3d::TransformComponent >()->MoveForward( cameraMoveDir.z * speed );
+
     updateGL();
 }
 
