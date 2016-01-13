@@ -29,6 +29,16 @@ namespace ae3d
         
         /// \param clipId Clip handle from GetClipIdForData.
         void Play( unsigned clipId );
+        
+        /// \param x X coordinate.
+        /// \param y Y coordinate.
+        /// \param z Z coordinate.
+        void SetListenerPosition( float x, float y, float z );
+        
+        /// \param forwardX Forward x.
+        /// \param forwardY Forward y.
+        /// \param forwardZ Forward z.
+        void SetListenerOrientation( float forwardX, float forwardY, float forwardZ );
     }
 }
 

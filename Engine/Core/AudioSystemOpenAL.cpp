@@ -191,18 +191,22 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
     if (wav.numChannels == 1 && wav.bitsPerSample == 8)
     {
         format = AL_FORMAT_MONO8;
+        ae3d::System::Print("mono8\n");
     }
     else if (wav.numChannels == 2 && wav.bitsPerSample == 8)
     {
         format = AL_FORMAT_STEREO8;
+        ae3d::System::Print("stereo8\n");
     }
     else if (wav.numChannels == 1 && wav.bitsPerSample == 16)
     {
         format = AL_FORMAT_MONO16;
+        ae3d::System::Print("mono16\n");
     }
     else if (wav.numChannels == 2 && wav.bitsPerSample == 16)
     {
         format = AL_FORMAT_STEREO16;
+        ae3d::System::Print("stereo16\n");
     }
     else
     {
@@ -349,4 +353,15 @@ void ae3d::AudioSystem::Play( unsigned clipId )
     {
         alSourcePlay( AudioGlobal::clips[ clipId ].srcID );
     }
+}
+
+void ae3d::AudioSystem::SetListenerPosition( float x, float y, float z )
+{
+    alListener3f( AL_POSITION, x, y, z );
+}
+
+void ae3d::AudioSystem::SetListenerOrientation( float forwardX, float forwardY, float forwardZ )
+{
+    const float vec[ 6 ] = { forwardX, forwardY, forwardZ, 0, 1, 0 };
+    alListenerfv( AL_ORIENTATION, vec );
 }

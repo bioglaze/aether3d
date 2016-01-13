@@ -9,9 +9,15 @@ namespace ae3d
     class AudioSourceComponent
     {
     public:
+        /// \return True, if clips played through this source will be affected by this game object's and camera's position.
+        bool Is3D() const { return is3D; }
+        
         /// \param audioClipId Audio clip id.
         void SetClipId( unsigned audioClipId );
 
+        /// \param enable True, if clips played through this source will be affected by this game object's and camera's position.
+        void Set3D( bool enable ) { is3D = enable; }
+        
         /// Plays the clip.
         void Play() const;
 
@@ -31,6 +37,8 @@ namespace ae3d
         static AudioSourceComponent* Get( unsigned index );
         
         unsigned clipId = 0;
+        
+        bool is3D = false;
     };
 }
 

@@ -5,6 +5,7 @@
 #include <vector>
 #include <cmath>
 #include "AudioSourceComponent.hpp"
+#include "AudioSystem.hpp"
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
@@ -254,7 +255,16 @@ void ae3d::Scene::Render()
         if (camera != nullptr && camera->GetComponent<TransformComponent>())
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
+
+            auto cameraPos = cameraTransform->GetLocalPosition();
+            auto cameraDir = cameraTransform->GetViewDirection();
             
+            if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
+            {
+                AudioSystem::SetListenerPosition( cameraPos.x, cameraPos.y, cameraPos.z );
+                AudioSystem::SetListenerOrientation( cameraDir.x, cameraDir.y, cameraDir.z );
+            }
+
             // Shadow pass
             for (auto go : gameObjects)
             {
@@ -307,7 +317,6 @@ void ae3d::Scene::Render()
                     {
                         SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
                         SetupCameraForSpotShadowCasting( lightTransform->GetLocalPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
-
                     }
                     
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );

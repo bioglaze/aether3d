@@ -223,6 +223,14 @@ int main()
     cubes[ 3 ].GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
     cubes[ 3 ].GetComponent< TransformComponent >()->SetParent( cubes[ 2 ].GetComponent< TransformComponent >() );
     
+    AudioClip audioClip;
+    audioClip.Load( FileSystem::FileContents( "sine340.wav" ) );
+    
+    cubes[ 4 ].AddComponent<AudioSourceComponent>();
+    cubes[ 4 ].GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
+    cubes[ 4 ].GetComponent<AudioSourceComponent>()->Set3D( true );
+    cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
+
     bool quit = false;
     
     int lastMouseX = 0;
@@ -283,6 +291,7 @@ int main()
                 else if (keyCode == KeyCode::Space)
                 {
                     VR::RecenterTracking();
+                    cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
                 }
                 else if (keyCode == KeyCode::R)
                 {

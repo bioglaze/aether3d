@@ -47,11 +47,11 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 ## OS X / GNU/Linux
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
-  - Open the project Samples/01_OpenWindow/OpenWindow.xcodeproj and run it or run the Makefile.
+  - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile.
 
 ## iOS
   - Build Aether3D_iOS in Engine. It creates a framework.
-  - Open Samples/02_iOS_Hello and add the framework into the project.
+  - Open Samples/MetalSampleiOS and add the framework into the project.
 
 # License
 
