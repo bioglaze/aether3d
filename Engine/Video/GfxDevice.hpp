@@ -57,6 +57,7 @@ namespace ae3d
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture* target, unsigned cubeMapFace );
         void SetMultiSampling( bool enable );
+        void Set_sRGB_Writes( bool enable );
         
         // TODO: Remove this to prepare for modern API style draw submission (these are provided in Draw())
         void SetBackFaceCulling( bool enable );

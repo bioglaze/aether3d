@@ -7,7 +7,6 @@
 namespace ae3d
 {
     class TextureCube;
-    struct sVec3;
     class CameraComponent;
     
     struct BuiltinShaders

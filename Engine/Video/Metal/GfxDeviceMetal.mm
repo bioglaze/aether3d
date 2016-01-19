@@ -95,11 +95,6 @@ namespace
 
 void setupRenderPassDescriptor( id <MTLTexture> texture )
 {
-    if (renderPassDescriptor == nil)
-    {
-        renderPassDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
-    }
-    
     MTLLoadAction texLoadAction = MTLLoadActionLoad;
     MTLLoadAction depthLoadAction = MTLLoadActionLoad;
     
@@ -114,9 +109,9 @@ void setupRenderPassDescriptor( id <MTLTexture> texture )
     }
 
     renderPassDescriptor.colorAttachments[0].texture = texture;
-    renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+    renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake( clearColor[0], clearColor[1], clearColor[2], clearColor[3] );
     renderPassDescriptor.colorAttachments[0].loadAction = texLoadAction;
-    renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+    renderPassDescriptor.colorAttachments[0].storeAction = [texture sampleCount] > 1 ? MTLStoreActionMultisampleResolve : MTLStoreActionStore;
 /*#if TARGET_OS_IPHONE
     if (!depthTex || (depthTex && (depthTex.width != texture.width || depthTex.height != texture.height)))
     {

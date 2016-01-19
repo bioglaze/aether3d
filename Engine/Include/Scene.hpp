@@ -39,8 +39,8 @@ namespace ae3d
         /// \param serialized Serialized scene contents.
         /// \param outGameObjects Returns game objects that were created from serialized scene contents.
         /// \param outTexture2Ds Returns texture 2Ds that were created from serialized scene contents. Caller is responsible for freeing the memory.
-        /// \param outMaterials Returns materials that were created Caller is responsible for freeing the memory.
-        /// \param outMeshes Returns meshes that were created Caller is responsible for freeing the memory.
+        /// \param outMaterials Returns materials that were created. Caller is responsible for freeing the memory.
+        /// \param outMeshes Returns meshes that were created. Caller is responsible for freeing the memory.
         /// \return Result. Parsing stops on first error and successfully loaded game objects are returned.
         DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects,
                                        std::map< std::string, class Texture2D* >& outTexture2Ds,

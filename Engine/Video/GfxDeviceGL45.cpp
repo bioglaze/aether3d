@@ -135,6 +135,7 @@ void ae3d::GfxDevice::Init( int width, int height )
     }
     
     SetBackBufferDimensionAndFBO( width, height );
+    Set_sRGB_Writes( true );
     glEnable( GL_DEPTH_TEST );
 }
 
@@ -310,7 +311,7 @@ unsigned ae3d::GfxDevice::CreateFboId()
     return outId;
 }
 
-void ae3d::GfxDevice::ClearScreen(unsigned clearFlags)
+void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
     GLbitfield mask = 0;
 
@@ -456,6 +457,18 @@ void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )
     int fboId = 0;
     glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fboId );
     GfxDeviceGlobal::systemFBO = static_cast< unsigned >(fboId);
+}
+
+void ae3d::GfxDevice::Set_sRGB_Writes( bool enable )
+{
+    if (enable)
+    {
+        glEnable( GL_FRAMEBUFFER_SRGB );
+    }
+    else
+    {
+        glDisable( GL_FRAMEBUFFER_SRGB );
+    }
 }
 
 void ae3d::GfxDevice::DebugBlitFBO( unsigned handle, int width, int height )
