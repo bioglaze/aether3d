@@ -4,7 +4,7 @@ ENGINE_LIB := libaether3d_linux.a
 LIBS := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
 
 ifeq ($(UNAME), Darwin)
-COMPILER := clang++
+COMPILER := clang++ -fsanitize=address
 ENGINE_LIB := libaether3d_osx.a
 LIBS := -framework IOKit -framework OpenAL -framework Cocoa -framework OpenGL -framework QuartzCore
 endif

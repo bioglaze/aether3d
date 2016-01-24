@@ -19,6 +19,7 @@
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
 #include "CreateLightCommand.hpp"
+#include "CreateMeshRendererCommand.hpp"
 #include "MeshRendererComponent.hpp"
 #include "ModifyTransformCommand.hpp"
 #include "ModifyCameraCommand.hpp"
@@ -282,7 +283,7 @@ void MainWindow::CommandCreateCameraComponent()
 
 void MainWindow::CommandCreateMeshRendererComponent()
 {
-    //commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
+    commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
     UpdateInspector();
 }
 

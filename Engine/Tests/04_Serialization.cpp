@@ -16,15 +16,20 @@
 
 using namespace ae3d;
 
-Scene gScene;
-std::vector< GameObject > gGameObjects;
-
 int main()
 {
     Window::Create( 512, 512, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
     
-    Scene::DeserializeResult res = gScene.Deserialize( FileSystem::FileContents( "scene.scene" ), gGameObjects );
+    std::vector< GameObject > gameObjects;
+    std::map< std::string, Material* > materialNameToMaterial;
+    std::map< std::string, Texture2D* > textureNameToTexture;
+    std::vector< Mesh* > meshes;
+    Scene scene;
+    
+    auto res = scene.Deserialize( FileSystem::FileContents( "scene.scene" ), gameObjects, textureNameToTexture,
+                                 materialNameToMaterial, meshes );
+
     System::Assert( res == Scene::DeserializeResult::Success, "Scene deserializing failed!" );
 }
 

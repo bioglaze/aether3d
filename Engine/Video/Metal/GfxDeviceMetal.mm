@@ -53,6 +53,46 @@ namespace GfxDeviceGlobal
     std::list< id<MTLBuffer> > uniformBuffers;
 }
 
+namespace
+{
+    float clearColor[] = { 0, 0, 0, 1 };
+    
+    void setupRenderPassDescriptor( id <MTLTexture> texture )
+    {
+        MTLLoadAction texLoadAction = MTLLoadActionLoad;
+        MTLLoadAction depthLoadAction = MTLLoadActionLoad;
+        
+        if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Color)
+        {
+            texLoadAction = MTLLoadActionClear;
+        }
+        
+        if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Depth)
+        {
+            depthLoadAction = MTLLoadActionClear;
+        }
+        
+        renderPassDescriptor.colorAttachments[0].texture = texture;
+        renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake( clearColor[0], clearColor[1], clearColor[2], clearColor[3] );
+        renderPassDescriptor.colorAttachments[0].loadAction = texLoadAction;
+        renderPassDescriptor.colorAttachments[0].storeAction = [texture sampleCount] > 1 ? MTLStoreActionMultisampleResolve : MTLStoreActionStore;
+        /*#if TARGET_OS_IPHONE
+         if (!depthTex || (depthTex && (depthTex.width != texture.width || depthTex.height != texture.height)))
+         {
+         MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat: MTLPixelFormatDepth32Float width: texture.width height: texture.height mipmapped: NO];
+         
+         depthTex = [device newTextureWithDescriptor: desc];
+         depthTex.label = @"Depth";
+         
+         renderPassDescriptor.depthAttachment.texture = depthTex;
+         renderPassDescriptor.depthAttachment.clearDepth = 1.0f;
+         renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
+         renderPassDescriptor.depthAttachment.storeAction = MTLStoreActionDontCare;
+         }
+         #endif*/
+    }
+}
+
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 {
     id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceCPUCacheModeDefaultCache];
@@ -87,46 +127,6 @@ void ae3d::GfxDevice::SetCurrentDrawableMetal( id <CAMetalDrawable> aDrawable, M
 {
     currentDrawable = aDrawable;
     renderPassDescriptor = renderPass;
-}
-
-namespace
-{
-    float clearColor[] = { 0, 0, 0, 1 };
-
-void setupRenderPassDescriptor( id <MTLTexture> texture )
-{
-    MTLLoadAction texLoadAction = MTLLoadActionLoad;
-    MTLLoadAction depthLoadAction = MTLLoadActionLoad;
-    
-    if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Color)
-    {
-        texLoadAction = MTLLoadActionClear;
-    }
-
-    if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Depth)
-    {
-        depthLoadAction = MTLLoadActionClear;
-    }
-
-    renderPassDescriptor.colorAttachments[0].texture = texture;
-    renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake( clearColor[0], clearColor[1], clearColor[2], clearColor[3] );
-    renderPassDescriptor.colorAttachments[0].loadAction = texLoadAction;
-    renderPassDescriptor.colorAttachments[0].storeAction = [texture sampleCount] > 1 ? MTLStoreActionMultisampleResolve : MTLStoreActionStore;
-/*#if TARGET_OS_IPHONE
-    if (!depthTex || (depthTex && (depthTex.width != texture.width || depthTex.height != texture.height)))
-    {
-        MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat: MTLPixelFormatDepth32Float width: texture.width height: texture.height mipmapped: NO];
-        
-        depthTex = [device newTextureWithDescriptor: desc];
-        depthTex.label = @"Depth";
-        
-        renderPassDescriptor.depthAttachment.texture = depthTex;
-        renderPassDescriptor.depthAttachment.clearDepth = 1.0f;
-        renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
-        renderPassDescriptor.depthAttachment.storeAction = MTLStoreActionDontCare;
-    }
-#endif*/
-}
 }
 
 void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view )
