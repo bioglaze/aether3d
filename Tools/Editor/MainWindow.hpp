@@ -8,11 +8,11 @@
 #include "CommandManager.hpp"
 #include "CameraInspector.hpp"
 #include "DirectionalLightInspector.hpp"
-#include "SpotLightInspector.hpp"
+#include "LightingInspector.hpp"
 #include "MeshRendererInspector.hpp"
+#include "SpotLightInspector.hpp"
 #include "TransformInspector.hpp"
 
-class SceneWidget;
 class QTreeWidget;
 class QKeyEvent;
 class QTreeWidgetItem;
@@ -32,7 +32,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-    SceneWidget* GetSceneWidget() const { return sceneWidget; }
+    class SceneWidget* GetSceneWidget() const { return sceneWidget; }
 
 public slots:
     void LoadScene();
@@ -45,6 +45,7 @@ public slots:
     void CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
     void CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
                               const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor );
+    void OpenLightingInspector();
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }
     void HandleGameObjectsAddedOrDeleted();
     void ShowAbout();
@@ -72,6 +73,7 @@ private:
     MeshRendererInspector meshRendererInspector;
     DirectionalLightInspector dirLightInspector;
     SpotLightInspector spotLightInspector;
+    LightingInspector lightingInspector;
     WindowMenu windowMenu;
     CommandManager commandManager;
 };

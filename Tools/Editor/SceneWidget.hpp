@@ -136,6 +136,7 @@ private:
     QDesktopWidget desktop;
     QWidget* mainWindow = nullptr;
     std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
+    ae3d::Texture2D skyboxTextures[ 6 ];
 };
 
 #endif

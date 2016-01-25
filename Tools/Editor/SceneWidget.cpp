@@ -740,8 +740,8 @@ void SceneWidget::GameObjectSelected( std::list< GameObject* > gameObjects )
         return;
     }
 
-    transformGizmo.SetPosition( SelectionAveragePosition() );
     scene.Add( &transformGizmo.go );
+    transformGizmo.SetPosition( SelectionAveragePosition() );
 
     auto cameraTransform = gameObjects.front()->GetComponent< TransformComponent >();
 

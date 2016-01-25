@@ -52,6 +52,7 @@ MainWindow::MainWindow()
     meshRendererInspector.Init( this );
     dirLightInspector.Init( this );
     spotLightInspector.Init( this );
+    lightingInspector.Init( sceneWidget );
 
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->addWidget( transformInspector.GetWidget() );
@@ -59,6 +60,7 @@ MainWindow::MainWindow()
     inspectorLayout->addWidget( meshRendererInspector.GetWidget() );
     inspectorLayout->addWidget( dirLightInspector.GetWidget() );
     inspectorLayout->addWidget( spotLightInspector.GetWidget() );
+    inspectorLayout->addWidget( lightingInspector.GetWidget() );
 
     inspectorContainer = new QWidget();
     inspectorContainer->setLayout( inspectorLayout );
@@ -105,6 +107,8 @@ void MainWindow::UpdateHierarchySelection()
 
 void MainWindow::UpdateInspector()
 {
+    lightingInspector.GetWidget()->hide();
+
     if (sceneWidget->selectedGameObjects.empty())
     {
         transformInspector.GetWidget()->hide();
@@ -159,9 +163,19 @@ void MainWindow::UpdateInspector()
     }
 }
 
+void MainWindow::OpenLightingInspector()
+{
+    transformInspector.GetWidget()->hide();
+    cameraInspector.GetWidget()->hide();
+    meshRendererInspector.GetWidget()->hide();
+    dirLightInspector.GetWidget()->hide();
+    spotLightInspector.GetWidget()->hide();
+    lightingInspector.GetWidget()->show();
+}
+
 void MainWindow::ShowAbout()
 {
-    QMessageBox::about( this, "Controls", "Aether3D Editor by Timo Wiren 2015\n\nControls:\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
+    QMessageBox::about( this, "Controls", "Aether3D Editor by Timo Wiren 2016\n\nControls:\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
 }
 
 void MainWindow::HandleGameObjectsAddedOrDeleted()

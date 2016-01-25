@@ -200,9 +200,9 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
     {
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
         pipelineStateDescriptor.label = @"pipeline";
-        [pipelineStateDescriptor setSampleCount: 1];
-        [pipelineStateDescriptor setVertexFunction:shader.vertexProgram];
-        [pipelineStateDescriptor setFragmentFunction:shader.fragmentProgram];
+        pipelineStateDescriptor.sampleCount = appView.sampleCount;
+        pipelineStateDescriptor.vertexFunction = shader.vertexProgram;
+        pipelineStateDescriptor.fragmentFunction = shader.fragmentProgram;
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
         pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;
         pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;

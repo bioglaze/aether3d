@@ -19,6 +19,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     editMenu->addAction( "Undo", mainWindow, SLOT(Undo()), QKeySequence("Ctrl+Z"));
 
     sceneMenu = menuBar->addMenu( "&Scene" );
+    sceneMenu->addAction( "Lighting", mainWindow, SLOT(OpenLightingInspector()), QKeySequence("Ctrl+L"));
     sceneMenu->addAction( "Create Game Object", mainWindow, SLOT(CommandCreateGameObject()), QKeySequence("Ctrl+N"));
 
     componentMenu = menuBar->addMenu( "&Component" );
