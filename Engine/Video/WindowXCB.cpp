@@ -307,6 +307,13 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     
     xcb_map_window( connection, WindowGlobal::window );
 
+    xcb_atom_t protocols[] =
+    {
+        WindowGlobal::wm_delete_window
+    };
+    xcb_icccm_set_wm_protocols( WindowGlobal::connection, WindowGlobal::window,
+                                WindowGlobal::wm_protocols, 1, protocols );
+    
     if ((flags & ae3d::WindowCreateFlags::Fullscreen) != 0)
     {
         WindowGlobal::EWMHCookie = xcb_ewmh_init_atoms( WindowGlobal::connection, &WindowGlobal::EWMH );
@@ -494,20 +501,34 @@ void ae3d::Window::PumpEvents()
             {
                 const xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
 
-                if (client_message_event->type == WindowGlobal::wm_protocols)
+                //if (client_message_event->type == WindowGlobal::wm_protocols)
                 {
                     if (client_message_event->data.data32[0] == WindowGlobal::wm_delete_window)
                     {
-                        exit(1);
+                        WindowGlobal::IncEventIndex();
+                        WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Close;
                     }
-                 }
+                    else
+                    {
+                        std::cerr << "got client message" << std::endl;
+                    }
+                }
+                //else
+                {
+                    //std::cerr << "got client message" << std::endl;
+                }
                 break;
             }
             case XCB_EXPOSE:
             {
+                break;
             }
+        default:
+            // std::cout << "got respone_type " << response_type << std::endl;
             break;
         }
+
+        free( event );
     }
 
     if (!WindowGlobal::gamePad.isActive)
