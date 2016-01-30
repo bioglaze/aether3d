@@ -182,7 +182,6 @@ unsigned GetHash( const char* s, unsigned length )
 {
     const unsigned A = 54059;
     const unsigned B = 76963;
-    const unsigned C = 86969;
 
     unsigned h = 31;
     unsigned i = 0;
@@ -516,7 +515,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
     GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( &indexBufferView );
-    GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace, 1, startFace, 0, 0 );
+    GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace * 3, 1, startFace * 3, 0, 0 );
 
     GfxDevice::IncDrawCalls();
 }

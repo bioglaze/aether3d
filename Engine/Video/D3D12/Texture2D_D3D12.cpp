@@ -182,7 +182,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 #endif
 }
 
-void ae3d::Texture2D::LoadDDS( const char* path )
+void ae3d::Texture2D::LoadDDS( const char* /*path*/ )
 {
     ae3d::System::Print( ".dds loading not implemented in d3d12!\n" );
 }

@@ -53,14 +53,24 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Build Aether3D_iOS in Engine. It creates a framework.
   - Open Samples/MetalSampleiOS and add the framework into the project.
 
+# Running Tests
+
+## Visual Studio
+
+  - Unit test project can be found in Engine\Tests\UnitTests.
+
+## GCC or Clang
+
+  - You can find Makefiles in Engine/Tests.
+
 # License
 
 The engine is licensed under zlib license.
 
 Third party library licenses are:
 
-  - stb_image.c is public domain
-  - stb_vorbis.c is public domain
+  - stb_image.c is in public domain
+  - stb_vorbis.c is in public domain
   - glxw is under zlib license
   - OpenAL-soft is under LGPLv2 license
 
