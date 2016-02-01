@@ -1,5 +1,5 @@
-#ifndef CREATECAMERACOMMAND_HPP
-#define CREATECAMERACOMMAND_HPP
+#ifndef CREATEAUDIOSOURCECOMMAND_HPP
+#define CREATEAUDIOSOURCECOMMAND_HPP
 
 #include "Command.hpp"
 
@@ -8,10 +8,10 @@ namespace ae3d
     class GameObject;
 }
 
-class CreateCameraCommand : public CommandBase
+class CreateAudioSourceCommand : public CommandBase
 {
 public:
-    explicit CreateCameraCommand( class SceneWidget* sceneWidget );
+    explicit CreateAudioSourceCommand( class SceneWidget* sceneWidget );
     void Execute() override;
     void Undo() override;
 

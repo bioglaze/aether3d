@@ -13,19 +13,12 @@ namespace ae3d
     struct Quaternion;
 }
 
-class QTableWidget;
-class QTableWidgetItem;
-class QWidget;
-class QComboBox;
-class QString;
-class QPushButton;
-
 class CameraInspector : public QObject
 {
     Q_OBJECT
 
   public:
-    QWidget* GetWidget() { return root; }
+    class QWidget* GetWidget() { return root; }
     void Init( QWidget* mainWindow );
 
 signals:
@@ -42,10 +35,10 @@ private:
     void ApplySelectedCameraIntoFields( const ae3d::CameraComponent& camera );
 
     QWidget* root = nullptr;
-    QTableWidget* ortho = nullptr;
+    class QTableWidget* ortho = nullptr;
     QTableWidget* persp = nullptr;
     QTableWidget* clearColorTable = nullptr;
-    QComboBox* clearFlagsBox = nullptr;
+    class QComboBox* clearFlagsBox = nullptr;
     QComboBox* projectionBox = nullptr;
 };
 #endif

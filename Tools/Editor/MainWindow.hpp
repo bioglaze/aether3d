@@ -12,6 +12,7 @@
 #include "MeshRendererInspector.hpp"
 #include "SpotLightInspector.hpp"
 #include "TransformInspector.hpp"
+#include "AudioSourceInspector.hpp"
 
 class QTreeWidget;
 class QKeyEvent;
@@ -37,6 +38,7 @@ public:
 public slots:
     void LoadScene();
     void SaveScene();
+    void CommandCreateAudioSourceComponent();
     void CommandCreateCameraComponent();
     void CommandCreateGameObject();
     void CommandCreateMeshRendererComponent();
@@ -74,6 +76,7 @@ private:
     DirectionalLightInspector dirLightInspector;
     SpotLightInspector spotLightInspector;
     LightingInspector lightingInspector;
+    AudioSourceInspector audioSourceInspector;
     WindowMenu windowMenu;
     CommandManager commandManager;
 };

@@ -64,7 +64,9 @@ SOURCES += \
     CreateLightCommand.cpp \
     SpotLightInspector.cpp \
     CreateMeshRendererCommand.cpp \
-    LightingInspector.cpp
+    LightingInspector.cpp \
+    AudioSourceInspector.cpp \
+    CreateAudioSourceCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -83,4 +85,6 @@ HEADERS += \
     CreateLightCommand.hpp \
     SpotLightInspector.hpp \
     CreateMeshRendererCommand.hpp \
-    LightingInspector.hpp
+    LightingInspector.hpp \
+    AudioSourceInspector.hpp \
+    CreateAudioSourceCommand.hpp

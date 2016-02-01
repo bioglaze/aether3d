@@ -9,22 +9,24 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QWindow>
+#include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
-#include "DirectionalLightComponent.hpp"
-#include "SpotLightComponent.hpp"
-#include "MainWindow.hpp"
-#include "SceneWidget.hpp"
-#include "System.hpp"
-#include "WindowMenu.hpp"
+#include "CreateAudioSourceCommand.hpp"
 #include "CreateCameraCommand.hpp"
 #include "CreateGoCommand.hpp"
 #include "CreateLightCommand.hpp"
 #include "CreateMeshRendererCommand.hpp"
+#include "DirectionalLightComponent.hpp"
+#include "MainWindow.hpp"
 #include "MeshRendererComponent.hpp"
 #include "ModifyTransformCommand.hpp"
 #include "ModifyCameraCommand.hpp"
+#include "SceneWidget.hpp"
+#include "System.hpp"
+#include "SpotLightComponent.hpp"
 #include "TransformInspector.hpp"
 #include "Quaternion.hpp"
+#include "WindowMenu.hpp"
 
 MainWindow::MainWindow()
 {
@@ -52,6 +54,7 @@ MainWindow::MainWindow()
     meshRendererInspector.Init( this );
     dirLightInspector.Init( this );
     spotLightInspector.Init( this );
+    audioSourceInspector.Init( this );
     lightingInspector.Init( sceneWidget );
 
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
@@ -60,6 +63,7 @@ MainWindow::MainWindow()
     inspectorLayout->addWidget( meshRendererInspector.GetWidget() );
     inspectorLayout->addWidget( dirLightInspector.GetWidget() );
     inspectorLayout->addWidget( spotLightInspector.GetWidget() );
+    inspectorLayout->addWidget( audioSourceInspector.GetWidget() );
     inspectorLayout->addWidget( lightingInspector.GetWidget() );
 
     inspectorContainer = new QWidget();
@@ -116,6 +120,7 @@ void MainWindow::UpdateInspector()
         meshRendererInspector.GetWidget()->hide();
         dirLightInspector.GetWidget()->hide();
         spotLightInspector.GetWidget()->hide();
+        audioSourceInspector.GetWidget()->hide();
     }
     else
     {
@@ -160,6 +165,16 @@ void MainWindow::UpdateInspector()
         {
             spotLightInspector.GetWidget()->hide();
         }
+
+        auto audioSourceComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::AudioSourceComponent >();
+        if (audioSourceComponent)
+        {
+            audioSourceInspector.GetWidget()->show();
+        }
+        else
+        {
+            audioSourceInspector.GetWidget()->hide();
+        }
     }
 }
 
@@ -170,12 +185,13 @@ void MainWindow::OpenLightingInspector()
     meshRendererInspector.GetWidget()->hide();
     dirLightInspector.GetWidget()->hide();
     spotLightInspector.GetWidget()->hide();
+    audioSourceInspector.GetWidget()->hide();
     lightingInspector.GetWidget()->show();
 }
 
 void MainWindow::ShowAbout()
 {
-    QMessageBox::about( this, "Controls", "Aether3D Editor by Timo Wiren 2016\n\nControls:\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
+    QMessageBox::about( this, "About", "Aether3D Editor by Timo Wiren 2016\n\nControls:\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
 }
 
 void MainWindow::HandleGameObjectsAddedOrDeleted()
@@ -286,6 +302,12 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
         *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
         UpdateHierarchy();
     }
+}
+
+void MainWindow::CommandCreateAudioSourceComponent()
+{
+    commandManager.Execute( std::make_shared< CreateAudioSourceCommand >( sceneWidget ) );
+    UpdateInspector();
 }
 
 void MainWindow::CommandCreateCameraComponent()

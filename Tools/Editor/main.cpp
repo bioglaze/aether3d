@@ -4,6 +4,7 @@
 
 // FIXME: deleting gameobjects causes memory corruption that does not crash instantly.
 // FIXME: sometimes transform gizmo disappears or is misplaced
+// TODO: inspector vertical scroll bar
 // TODO: game object delete command
 // TODO: game object rename command
 // TODO: Ray-Triangle intersection for selection.

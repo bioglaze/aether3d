@@ -18,7 +18,7 @@ void MeshRendererInspector::Init( QWidget* aMainWindow )
     // TODO: change type into something more intelligible.
     meshTable = new QTableWidget( 1, 1 );
     meshTable->setItem( 0, 0, new QTableWidgetItem() );
-    meshTable->setHorizontalHeaderLabels( QString("s").split(";") );
+    meshTable->setHorizontalHeaderLabels( QString("").split(";") );
     meshTable->setVerticalHeaderLabels( QString("Mesh").split(";") );
 
     QLabel* componentName = new QLabel("Mesh Renderer");
@@ -52,6 +52,11 @@ void MeshRendererInspector::MeshCellClicked( int, int )
         {
             auto meshRendererComponent = gameObject->GetComponent< ae3d::MeshRendererComponent >();
             meshRendererComponent->SetMesh( mesh );
+        }
+        else
+        {
+            ae3d::System::Print( "Unable to load mesh %s\n", path.c_str() );
+            delete mesh;
         }
     }
 }

@@ -12,6 +12,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     fileMenu->addAction( "Save Scene", mainWindow, SLOT(SaveScene()), QKeySequence("Ctrl+S"));
     fileMenu->addAction( "Open Scene", mainWindow, SLOT(LoadScene()), QKeySequence("Ctrl+O"));
     fileMenu->addAction( "About", mainWindow, SLOT(ShowAbout()), QKeySequence("Ctrl+A"));
+    //fileMenu->addAction( "Exit", mainWindow, SLOT(ShowAbout()), QKeySequence("Ctrl+Q"));
 
     //fileMenu->addSeparator();
 
@@ -23,9 +24,10 @@ void WindowMenu::Init( QWidget* mainWindow )
     sceneMenu->addAction( "Create Game Object", mainWindow, SLOT(CommandCreateGameObject()), QKeySequence("Ctrl+N"));
 
     componentMenu = menuBar->addMenu( "&Component" );
+    componentMenu->addAction( "Add Audio Source", mainWindow, SLOT(CommandCreateAudioSourceComponent()));
     componentMenu->addAction( "Add Camera", mainWindow, SLOT(CommandCreateCameraComponent()));
-    componentMenu->addAction( "Add Mesh Renderer", mainWindow, SLOT(CommandCreateMeshRendererComponent()));
     componentMenu->addAction( "Add Directional Light", mainWindow, SLOT(CommandCreateDirectionalLightComponent()));
+    componentMenu->addAction( "Add Mesh Renderer", mainWindow, SLOT(CommandCreateMeshRendererComponent()));
     componentMenu->addAction( "Add Spot Light", mainWindow, SLOT(CommandCreateSpotLightComponent()));
 }
 
