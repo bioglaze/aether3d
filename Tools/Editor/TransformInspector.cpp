@@ -10,7 +10,7 @@ using namespace ae3d;
 
 void TransformInspector::Init( QWidget* mainWindow )
 {
-    sceneWidget = ((MainWindow*)mainWindow)->GetSceneWidget();
+    sceneWidget = static_cast< MainWindow* >( mainWindow )->GetSceneWidget();
 
     table = new QTableWidget( 3, 3 );
     table->setHorizontalHeaderLabels( QString("X;Y;Z").split(";") );

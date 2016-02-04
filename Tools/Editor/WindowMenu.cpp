@@ -28,6 +28,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     componentMenu->addAction( "Add Camera", mainWindow, SLOT(CommandCreateCameraComponent()));
     componentMenu->addAction( "Add Directional Light", mainWindow, SLOT(CommandCreateDirectionalLightComponent()));
     componentMenu->addAction( "Add Mesh Renderer", mainWindow, SLOT(CommandCreateMeshRendererComponent()));
+    componentMenu->addAction( "Add Sprite Renderer", mainWindow, SLOT(CommandCreateSpriteRendererComponent()));
     componentMenu->addAction( "Add Spot Light", mainWindow, SLOT(CommandCreateSpotLightComponent()));
 }
 

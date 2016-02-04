@@ -66,7 +66,9 @@ SOURCES += \
     CreateMeshRendererCommand.cpp \
     LightingInspector.cpp \
     AudioSourceInspector.cpp \
-    CreateAudioSourceCommand.cpp
+    CreateAudioSourceCommand.cpp \
+    SpriteRendererInspector.cpp \
+    CreateSpriteRendererCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -87,4 +89,6 @@ HEADERS += \
     CreateMeshRendererCommand.hpp \
     LightingInspector.hpp \
     AudioSourceInspector.hpp \
-    CreateAudioSourceCommand.hpp
+    CreateAudioSourceCommand.hpp \
+    SpriteRendererInspector.hpp \
+    CreateSpriteRendererCommand.hpp

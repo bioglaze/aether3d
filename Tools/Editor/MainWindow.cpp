@@ -16,6 +16,7 @@
 #include "CreateGoCommand.hpp"
 #include "CreateLightCommand.hpp"
 #include "CreateMeshRendererCommand.hpp"
+#include "CreateSpriteRendererCommand.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "MainWindow.hpp"
 #include "MeshRendererComponent.hpp"
@@ -54,6 +55,7 @@ MainWindow::MainWindow()
     meshRendererInspector.Init( this );
     dirLightInspector.Init( this );
     spotLightInspector.Init( this );
+    spriteRendererInspector.Init( this );
     audioSourceInspector.Init( this );
     lightingInspector.Init( sceneWidget );
 
@@ -64,6 +66,7 @@ MainWindow::MainWindow()
     inspectorLayout->addWidget( dirLightInspector.GetWidget() );
     inspectorLayout->addWidget( spotLightInspector.GetWidget() );
     inspectorLayout->addWidget( audioSourceInspector.GetWidget() );
+    inspectorLayout->addWidget( spriteRendererInspector.GetWidget() );
     inspectorLayout->addWidget( lightingInspector.GetWidget() );
 
     inspectorContainer = new QWidget();
@@ -121,6 +124,7 @@ void MainWindow::UpdateInspector()
         dirLightInspector.GetWidget()->hide();
         spotLightInspector.GetWidget()->hide();
         audioSourceInspector.GetWidget()->hide();
+        spriteRendererInspector.GetWidget()->hide();
     }
     else
     {
@@ -175,6 +179,16 @@ void MainWindow::UpdateInspector()
         {
             audioSourceInspector.GetWidget()->hide();
         }
+
+        auto spriteRendererComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::SpriteRendererComponent >();
+        if (spriteRendererComponent)
+        {
+            spriteRendererInspector.GetWidget()->show();
+        }
+        else
+        {
+            spriteRendererInspector.GetWidget()->hide();
+        }
     }
 }
 
@@ -185,6 +199,7 @@ void MainWindow::OpenLightingInspector()
     meshRendererInspector.GetWidget()->hide();
     dirLightInspector.GetWidget()->hide();
     spotLightInspector.GetWidget()->hide();
+    spriteRendererInspector.GetWidget()->hide();
     audioSourceInspector.GetWidget()->hide();
     lightingInspector.GetWidget()->show();
 }
@@ -320,6 +335,12 @@ void MainWindow::CommandCreateCameraComponent()
 void MainWindow::CommandCreateMeshRendererComponent()
 {
     commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
+    UpdateInspector();
+}
+
+void MainWindow::CommandCreateSpriteRendererComponent()
+{
+    commandManager.Execute( std::make_shared< CreateSpriteRendererCommand >( sceneWidget ) );
     UpdateInspector();
 }
 

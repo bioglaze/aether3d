@@ -4,15 +4,16 @@
 #include <list>
 #include <QMainWindow>
 #include <QTimer>
-#include "WindowMenu.hpp"
+#include "AudioSourceInspector.hpp"
 #include "CommandManager.hpp"
 #include "CameraInspector.hpp"
 #include "DirectionalLightInspector.hpp"
 #include "LightingInspector.hpp"
 #include "MeshRendererInspector.hpp"
 #include "SpotLightInspector.hpp"
+#include "SpriteRendererInspector.hpp"
 #include "TransformInspector.hpp"
-#include "AudioSourceInspector.hpp"
+#include "WindowMenu.hpp"
 
 class QTreeWidget;
 class QKeyEvent;
@@ -42,6 +43,7 @@ public slots:
     void CommandCreateCameraComponent();
     void CommandCreateGameObject();
     void CommandCreateMeshRendererComponent();
+    void CommandCreateSpriteRendererComponent();
     void CommandCreateDirectionalLightComponent();
     void CommandCreateSpotLightComponent();
     void CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
@@ -77,6 +79,7 @@ private:
     SpotLightInspector spotLightInspector;
     LightingInspector lightingInspector;
     AudioSourceInspector audioSourceInspector;
+    SpriteRendererInspector spriteRendererInspector;
     WindowMenu windowMenu;
     CommandManager commandManager;
 };

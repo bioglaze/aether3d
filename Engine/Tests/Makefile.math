@@ -1,3 +1,0 @@
-all:
-	clang++ -std=c++11 -fsanitize=address 01_Math.cpp ../Core/Matrix.cpp -I../Include -o 01_Math
-	clang++ -std=c++11 -fsanitize=address -DSIMD_SSE3 01_Math.cpp ../Core/MatrixSSE3.cpp -I../Include -o 01_MathSSE

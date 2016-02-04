@@ -9,6 +9,7 @@ ModifyTransformCommand::ModifyTransformCommand( int aGameObjectIndex, SceneWidge
     , rotation( newRotation )
     , scale( newScale )
     , gameObjectIndex( aGameObjectIndex )
+    , oldScale( 0 )
 {
 }
 
