@@ -193,7 +193,7 @@ int main()
     }
     // Sponza ends
     
-    scene.SetSkybox( &skybox );
+    //scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );

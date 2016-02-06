@@ -225,7 +225,9 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
-    gpuResource.resource->SetName( L"Texture2D" );
+    wchar_t wstr[ 128 ];
+    std::mbstowcs( wstr, fileContents.path.c_str(), 128 );
+    gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     Texture2DGlobal::textures.push_back( gpuResource.resource );
 

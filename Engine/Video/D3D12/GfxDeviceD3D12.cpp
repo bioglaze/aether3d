@@ -39,7 +39,10 @@ namespace GfxDeviceGlobal
     int backBufferHeight = 400;
     ID3D12Device* device = nullptr;
     IDXGISwapChain3* swapChain = nullptr;
+
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
+    GpuResource rtvResources[ 2 ];
+
     ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
@@ -118,6 +121,7 @@ void CreateBackBuffer()
         AE3D_CHECK_D3D( hr, "Failed to create RTV" );
 
         GfxDeviceGlobal::renderTargets[ i ]->SetName( L"SwapChain_Buffer" );
+        GfxDeviceGlobal::rtvResources[ i ].usageState = D3D12_RESOURCE_STATE_COMMON;
         GfxDeviceGlobal::backBufferWidth = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Width );
         GfxDeviceGlobal::backBufferHeight = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Height );
     }
@@ -622,10 +626,9 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
         return;
     }
 
-    GpuResource rtvResource;
-    rtvResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
-    rtvResource.usageState = D3D12_RESOURCE_STATE_PRESENT;
-    TransitionResource( rtvResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
+    auto i = GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex();
+    GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
+    TransitionResource( GfxDeviceGlobal::rtvResources[ i ], D3D12_RESOURCE_STATE_RENDER_TARGET );
     
     D3D12_VIEWPORT mViewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
     GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &mViewPort );
@@ -656,10 +659,11 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 void ae3d::GfxDevice::Present()
 {
-    GpuResource presentResource;
-    presentResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
-    presentResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    TransitionResource( presentResource, D3D12_RESOURCE_STATE_PRESENT );
+    //GpuResource presentResource;
+    //presentResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
+    //presentResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    //TransitionResource( presentResource, D3D12_RESOURCE_STATE_PRESENT );
+    TransitionResource( GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ], D3D12_RESOURCE_STATE_PRESENT );
 
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Close();
     AE3D_CHECK_D3D( hr, "command list close" );
