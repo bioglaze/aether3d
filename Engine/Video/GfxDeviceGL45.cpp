@@ -124,6 +124,10 @@ void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
         glDepthMask( GL_FALSE );
         glDisable( GL_DEPTH_TEST );
     }
+    else
+    {
+        ae3d::System::Assert( false, "Unhandled depth function." );   
+    }
 }
 
 void ae3d::GfxDevice::Init( int width, int height )

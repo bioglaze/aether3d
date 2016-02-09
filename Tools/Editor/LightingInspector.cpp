@@ -50,7 +50,17 @@ void LightingInspector::SkyboxCellClicked( int row, int col )
     skyboxCube.Load( ae3d::FileSystem::FileContents( skyboxTexturePaths[ 0 ].c_str() ), ae3d::FileSystem::FileContents( skyboxTexturePaths[ 1 ].c_str() ),
                      ae3d::FileSystem::FileContents( skyboxTexturePaths[ 2 ].c_str() ), ae3d::FileSystem::FileContents( skyboxTexturePaths[ 3 ].c_str() ),
                      ae3d::FileSystem::FileContents( skyboxTexturePaths[ 4 ].c_str() ), ae3d::FileSystem::FileContents( skyboxTexturePaths[ 5 ].c_str() ),
-                     ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest,
-                     ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB );
-    //sceneWidget->SetSkybox( skyboxCube );
+                     ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear,
+                     ae3d::Mipmaps::None, ae3d::ColorSpace::RGB );
+
+    /*using namespace ae3d;
+    skyboxCube.Load( FileSystem::FileContents( "/Users/glaze/Documents/src/aether3d_build/Samples/skybox/left.jpg" ), FileSystem::FileContents( "/Users/glaze/Documents/src/aether3d_build/Samples/skybox/right.jpg" ),
+                 FileSystem::FileContents( "/Users/glaze/Documents/src/aether3d_build/Samples/skybox/bottom.jpg" ), FileSystem::FileContents( "/Users/glaze/Documents/src/aether3d_build/Samples/skybox/top.jpg" ),
+                 FileSystem::FileContents( "/Users/glaze/Documents/src/aether3d_build/Samples/skybox/front.jpg" ), FileSystem::FileContents( "/Users/glaze/Documents/src/aether3d_build/Samples/skybox/back.jpg" ),
+                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+*/
+    if (skyboxCube.GetID() != 0)
+    {
+        sceneWidget->GetScene()->SetSkybox( &skyboxCube );
+    }
 }

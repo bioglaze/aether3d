@@ -8,23 +8,21 @@
 
 namespace ae3d
 {
-    class Shader;
-    class Texture2D;
-    class TextureCube;
-    class RenderTexture;
     struct Matrix44;
     
     /// Material is used to render a mesh.
     class Material
     {
   public:
+        enum DepthFunction { NoneWriteOff, LessOrEqualWriteOn };
+
         /// Sets a texture into every material, overriding textures set by SetTexture.
         /// \param name Texture uniform name.
         /// \param renderTexture Render texture.
-        static void SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture );
+        static void SetGlobalRenderTexture( const char* name, class RenderTexture* renderTexture );
 
         /// \return shader.
-        Shader* GetShader() { return shader; }
+        class Shader* GetShader() { return shader; }
 
         /// \return True if the shader exists and has been compiled and linked successfully.
         bool IsValidShader() const;
@@ -35,6 +33,12 @@ namespace ae3d
         /// \param enable Enable backface culling. Defaults to true.
         void SetBackFaceCulling( bool enable ) { cullBackFaces = enable; }
         
+        /// \return Depth function.
+        DepthFunction GetDepthFunction() const { return depthFunction; }
+        
+        /// \param depthFunction Depth function.
+        void SetDepthFunction( DepthFunction aDepthFunction ) { depthFunction = aDepthFunction; }
+        
         /// \param name Name. This is a uniform in the shader.
         /// \param matrix 4x4 matrix.
         void SetMatrix( const char* name, const Matrix44& matrix );
@@ -44,11 +48,11 @@ namespace ae3d
 
         /// \param name Name. This is a uniform in the shader.
         /// \param texture Texture.
-        void SetTexture( const char* name, Texture2D* texture );
+        void SetTexture( const char* name, class Texture2D* texture );
 
         /// \param name Texture uniform name.
         /// \param texture Texture.
-        void SetTexture( const char* name, TextureCube* texture );
+        void SetTexture( const char* name, class TextureCube* texture );
 
         /// \param name Texture uniform name.
         /// \param renderTexture Render texture.
@@ -83,6 +87,7 @@ namespace ae3d
         std::unordered_map< std::string, RenderTexture* > texRTs;
         std::unordered_map< std::string, Matrix44 > mat4s;
         Shader* shader = nullptr;
+        DepthFunction depthFunction = DepthFunction::LessOrEqualWriteOn;
         bool cullBackFaces = true;
     };
 }

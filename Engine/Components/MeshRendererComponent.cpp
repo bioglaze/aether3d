@@ -7,6 +7,7 @@
 #include "Material.hpp"
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
+#include "System.hpp"
 #include "SubMesh.hpp"
 #include "Vec3.hpp"
 
@@ -174,8 +175,24 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
             materials[ subMeshIndex ]->Apply();
         }
         
+        GfxDevice::DepthFunc depthFunc;
+        
+        if (materials[ subMeshIndex ]->GetDepthFunction() == Material::DepthFunction::LessOrEqualWriteOn)
+        {
+            depthFunc = GfxDevice::DepthFunc::LessOrEqualWriteOn;
+        }
+        else if (materials[ subMeshIndex ]->GetDepthFunction() == Material::DepthFunction::NoneWriteOff)
+        {
+            depthFunc = GfxDevice::DepthFunc::NoneWriteOff;
+        }
+        else
+        {
+            System::Assert( false, "material has unhandled depth function" );
+            depthFunc = GfxDevice::DepthFunc::NoneWriteOff;
+        }
+        
         GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount() / 3,
-            *shader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn );
+            *shader, ae3d::GfxDevice::BlendMode::Off, depthFunc );
     }
 }
 
