@@ -344,7 +344,7 @@
 		AB6E12B21C11D7450020A929 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0710;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Timo Wiren";
 				TargetAttributes = {
 					AB6E12B91C11D7450020A929 = {
@@ -497,6 +497,7 @@
 		AB6E12C41C11D7450020A929 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = perConfigPath/../../../../aether3d_build;
 				EXECUTABLE_PREFIX = lib;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
@@ -514,6 +515,7 @@
 		AB6E12C51C11D7450020A929 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = perConfigPath/../../../../aether3d_build;
 				EXECUTABLE_PREFIX = lib;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;

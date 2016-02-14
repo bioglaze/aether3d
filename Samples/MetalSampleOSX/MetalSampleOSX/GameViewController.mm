@@ -34,9 +34,11 @@
     ae3d::GameObject dirLight;
     ae3d::GameObject rtCamera;
     ae3d::GameObject renderTextureContainer;
+    ae3d::GameObject cubePTN; // vertex format: position, texcoord, normal
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
+    ae3d::Mesh cubeMeshPTN;
     ae3d::Material cubeMaterial;
     ae3d::Shader shader;
     ae3d::Texture2D fontTex;
@@ -77,6 +79,7 @@
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::Depth );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
+    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera3d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera3d );
 
@@ -87,7 +90,7 @@
     text.AddComponent<ae3d::TextRendererComponent>();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( "Aether3D Game Engine" );
     text.GetComponent<ae3d::TextRendererComponent>()->SetFont( &font );
-    text.GetComponent<ae3d::TextRendererComponent>()->SetColor( ae3d::Vec4( 1, 0, 0, 1 ) );
+    text.GetComponent<ae3d::TextRendererComponent>()->SetColor( ae3d::Vec4( 0, 1, 0, 1 ) );
     text.AddComponent<ae3d::TransformComponent>();
     text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
     text.SetLayer( 2 );
@@ -109,6 +112,14 @@
     cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
     scene.Add( &cube );
 
+    cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "/textured_cube_ptn.ae3d" ) );
+    cubePTN.AddComponent<ae3d::MeshRendererComponent>();
+    cubePTN.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMeshPTN );
+    cubePTN.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    cubePTN.AddComponent<ae3d::TransformComponent>();
+    cubePTN.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 3, 0, -10 ) );
+    scene.Add( &cubePTN );
+
     bigCube.AddComponent<ae3d::MeshRendererComponent>();
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
@@ -128,6 +139,7 @@
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
     scene.Add( &renderTextureContainer );
     
@@ -153,7 +165,7 @@
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-    NSLog(@"onKeyDown Detected; Merry Christmas, by the way.");
+    NSLog(@"onKeyDown Detected");
 }
 
 - (BOOL)acceptsFirstResponder

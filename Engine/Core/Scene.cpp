@@ -471,16 +471,47 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
         auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
-            
-        Matrix44 mvp;
-        Matrix44::Multiply( meshLocalToWorld, view, mvp );
-        Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
         
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mvp, frustum, meshLocalToWorld, nullptr );
+        Matrix44 mv;
+        Matrix44 mvp;
+        Matrix44::Multiply( meshLocalToWorld, view, mv );
+        Matrix44::Multiply( mv, camera->GetProjection(), mvp );
+        
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, nullptr );
     }
 #if AETHER3D_METAL
     GfxDevice::PresentDrawable();
 #endif
+    GfxDevice::ErrorCheck( "Scene render after rendering" );
+
+    // Depth and normals
+    if (camera->GetDepthNormalsTexture().GetID() == 0)
+    {
+        return;
+    }
+    
+    GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
+#if AETHER3D_METAL
+    GfxDevice::BeginFrame();
+#endif
+    GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+
+    for (auto j : gameObjectsWithMeshRenderer)
+    {
+        auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
+        auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
+        
+        Matrix44 mv;
+        Matrix44 mvp;
+        Matrix44::Multiply( meshLocalToWorld, view, mv );
+        Matrix44::Multiply( mv, camera->GetProjection(), mvp );
+        
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader );
+    }
+#if AETHER3D_METAL
+    GfxDevice::PresentDrawable();
+#endif
+
     GfxDevice::ErrorCheck( "Scene render end" );
 }
 
@@ -554,11 +585,12 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
         auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
         
+        Matrix44 mv;
         Matrix44 mvp;
-        Matrix44::Multiply( meshLocalToWorld, view, mvp );
-        Matrix44::Multiply( mvp, camera->GetProjection(), mvp );
+        Matrix44::Multiply( meshLocalToWorld, view, mv );
+        Matrix44::Multiply( mv, camera->GetProjection(), mvp );
 
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.momentsShader );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.momentsShader );
     }
     
 #if AETHER3D_METAL

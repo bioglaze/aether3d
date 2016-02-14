@@ -66,6 +66,7 @@ void ae3d::System::InitGamePad()
 void ae3d::System::LoadBuiltinAssets()
 {
     renderer.builtinShaders.Load();
+    GfxDevice::ErrorCheck( "Builtin shaders load end" );
 }
 
 void ae3d::System::Print(const char* format, ...)

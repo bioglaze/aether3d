@@ -103,7 +103,7 @@ std::string ae3d::MeshRendererComponent::GetSerialized() const
     return "meshrenderer\n";
 }
 
-void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, const Frustum& cameraFrustum, const Matrix44& localToWorld, Shader* overrideShader )
+void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matrix44& modelViewProjection, const Frustum& cameraFrustum, const Matrix44& localToWorld, Shader* overrideShader )
 {
     // TODO: Separate culling logic from rendering logic.
 
@@ -161,6 +161,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelViewProjection, c
         {
             shader->Use();
             shader->SetMatrix( "_ModelViewProjectionMatrix", &modelViewProjection.m[ 0 ] );
+            shader->SetMatrix( "_ModelViewMatrix", &modelView.m[ 0 ] );
         }
         else
         {

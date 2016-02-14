@@ -4,11 +4,10 @@
 #include <string>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
+#include "RenderTexture.hpp"
 
 namespace ae3d
 {
-    class RenderTexture;
-    
     /// Camera views the scene. Game Object containing a camera component must also contain a transform component to render anything.
     class CameraComponent
     {
@@ -61,6 +60,9 @@ namespace ae3d
 
         /// \return Target texture or null if there is no target texture.
         RenderTexture* GetTargetTexture() { return targetTexture; }
+
+        /// \return Depth and normals texture.
+        RenderTexture& GetDepthNormalsTexture() { return depthNormalsTexture; }
 
         /// \param color Color in range 0-1.
         void SetClearColor( const Vec3& color );
@@ -134,7 +136,8 @@ namespace ae3d
         Matrix44 viewMatrix;
         Vec3 clearColor;
         RenderTexture* targetTexture = nullptr;
-        
+        RenderTexture depthNormalsTexture;
+
         struct OrthoParams
         {
             float left = 0;

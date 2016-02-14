@@ -139,4 +139,40 @@ void ae3d::BuiltinShaders::Load()
     )";
 
     momentsShader.Load( momentsVertexSource, momentsFragmentSource );
+  
+    const char* depthNormalsVertexSource = R"(
+    #version 410 core
+    layout (location = 0) in vec4 aPosition;
+    layout (location = 3) in vec3 aNormal;
+    
+    uniform mat4 _ModelViewProjectionMatrix;
+    uniform mat4 _ModelViewMatrix;
+    
+    out vec3 vPosition;
+    out vec3 vNormal;
+    
+    void main()
+    {
+        gl_Position = _ModelViewProjectionMatrix * aPosition;
+        vPosition = (_ModelViewMatrix * aPosition).xyz;
+        vNormal = mat3( _ModelViewMatrix ) * aNormal;
+    }
+    )";
+    
+    const char* depthNormalsFragmentSource = R"(
+    #version 410 core
+    in vec3 vPosition;
+    in vec3 vNormal;
+    
+    out vec4 outDepthNormal;
+    
+    void main()
+    {
+        float linearDepth = vPosition.z;
+        
+        outDepthNormal = vec4( linearDepth, normalize( vNormal ) );
+    }
+    )";
+
+    depthNormalsShader.Load( depthNormalsVertexSource, depthNormalsFragmentSource );
 }

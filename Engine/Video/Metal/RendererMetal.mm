@@ -8,4 +8,5 @@ void ae3d::BuiltinShaders::Load()
     sdfShader.LoadFromLibrary( "sdf_vertex", "sdf_fragment" );
     skyboxShader.LoadFromLibrary( "skybox_vertex", "skybox_fragment" );
     momentsShader.LoadFromLibrary( "moments_vertex", "moments_fragment" );
+    depthNormalsShader.LoadFromLibrary( "depthnormals_vertex", "depthnormals_fragment" );
 }

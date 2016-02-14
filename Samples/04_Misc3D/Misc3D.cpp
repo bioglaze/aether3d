@@ -53,6 +53,14 @@ int main()
     System::InitAudio();
     System::InitGamePad();
 
+    /*Shader ssaoShader;
+    ssaoShader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents("unlit.hlsl"), FileSystem::FileContents( "unlit.hlsl" ) );
+
+    RenderTexture ssaoTarget;
+    ssaoTarget.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
+
+    Texture2D noiseTex;
+    */
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
@@ -60,9 +68,36 @@ int main()
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 300 );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, -100 }, { 0, 1, 0 } );
-
+    /*camera.AddComponent<ImageEffectComponent>();
+    camera.GetComponent<ImageEffectComponent>()->SetApplyFunc(
+                                                              [ssaoShader, ssaoTarget]() {
+                                                              GfxDevice::Instance().SetRenderTarget( &ssaoTarget );
+                                                              GfxDevice::Instance().ClearScreen();
+                                                              
+                                                              ssaoShader.Use();
+                                                              ssaoShader.SetTexture( "depthNormalMap", &builtinTargets.depthNormalTarget, 0 );
+                                                              ssaoShader.SetTexture( "noiseMap", &noiseTexture, 1 );
+                                                              ssaoShader.SetMatrix( "_ProjectionMatrix", state.projection );
+                                                              
+                                                              const float tanHalfFov = std::tan( fovDegrees * 0.5f * MathUtil::deg2rad );
+                                                              ssaoShader.SetFloat( "uTanHalfFov", tanHalfFov );
+                                                              ssaoShader.SetFloat( "uAspectRatio", Width() / (float)Height() );
+                                                              ssaoShader.SetConstantBuffers();
+                                                              
+                                                              GfxDevice::Instance().Set_sRGB_Writes( false );
+                                                              
+                                                              quadBuffer.Bind();
+                                                              quadBuffer.Draw();
+                                                              
+                                                              ssaoShader.SetTexture( "depthNormalMap", &builtinTargets.depthNormalTarget, 666 );
+                                                              BlurSSAO( builtinTargets.ssaoTarget, builtinTargets.ssaoBlurTarget );
+                                                              GfxDevice::Instance().Set_sRGB_Writes( true );
+                                                              }
+    );*/
+    
     RenderTexture cubeRT;
     cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
     
@@ -121,12 +156,12 @@ int main()
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents("unlit.hlsl"), FileSystem::FileContents( "unlit.hlsl" ) );
 
-    Texture2D asphaltTex;
-    asphaltTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, 1 );
+    Texture2D gliderTex;
+    gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, 1 );
 
     Material material;
     material.SetShader( &shader );
-    material.SetTexture( "textureMap", &asphaltTex );
+    material.SetTexture( "textureMap", &gliderTex );
     material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
     
@@ -193,6 +228,22 @@ int main()
     }
     // Sponza ends
     
+    RenderTexture rtTex;
+    rtTex.Create2D( 512, 512, RenderTexture::DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear );
+    
+    GameObject renderTextureContainer;
+    renderTextureContainer.AddComponent<SpriteRendererComponent>();
+    //renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( 512, 512, 1 ), Vec4( 1, 1, 1, 1 ) );
+    renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture(), Vec3( 150, 250, -0.6f ), Vec3( 256, 256, 1 ), Vec4( 1, 1, 1, 1 ) );
+    renderTextureContainer.SetLayer( 2 );
+
+    GameObject rtCamera;
+    rtCamera.AddComponent<CameraComponent>();
+    rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
+    rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
+    rtCamera.AddComponent<TransformComponent>();
+    
     //scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );
@@ -203,6 +254,8 @@ int main()
     //scene.Add( &statsContainer );
     scene.Add( &dirLight );
     //scene.Add( &spotLight );
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
 
     GameObject cubes[ 5 ];
 
