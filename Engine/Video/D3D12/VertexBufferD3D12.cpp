@@ -9,12 +9,13 @@
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
-    extern ID3D12GraphicsCommandList* commandList;
+    extern ID3D12GraphicsCommandList* graphicsCommandList;
 }
 
 namespace Global
 {
     std::vector< ID3D12Resource* > vbs;
+    std::vector< ID3D12Resource* > frameVBUploads;
 }
 
 void DestroyVertexBuffers()
@@ -72,6 +73,34 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
     bufferProp.SampleDesc.Count = 1;
     bufferProp.SampleDesc.Quality = 0;
     bufferProp.Width = ibOffset + ibSize;
+
+    if (vb != nullptr)
+    {
+        ID3D12Resource* stagingBuffer = nullptr;
+
+        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &uploadProp, D3D12_HEAP_FLAG_NONE, &bufferProp,
+            D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS( &stagingBuffer ) );
+        AE3D_CHECK_D3D( hr, "Failed to create vertex staging resource" );
+        stagingBuffer->SetName( L"VertexBufferStaging" );
+
+        char* vbUploadPtr = nullptr;
+        hr = stagingBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&vbUploadPtr) );
+        if (FAILED( hr ))
+        {
+            ae3d::System::Assert( false, "Unable to map vertex staging buffer!\n" );
+            return;
+        }
+
+        memcpy_s( vbUploadPtr, ibOffset, vertices, ibOffset );
+        memcpy_s( vbUploadPtr + ibOffset, ibSize, faces, ibSize );
+        
+        stagingBuffer->Unmap( 0, nullptr );
+
+        GfxDeviceGlobal::graphicsCommandList->CopyBufferRegion( vb, 0, stagingBuffer, 0, ibOffset + ibSize );
+
+        Global::frameVBUploads.push_back( stagingBuffer );
+        return;
+    }
 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &uploadProp,

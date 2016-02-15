@@ -97,4 +97,37 @@ cbuffer Scene\
         );
 
     skyboxShader.Load( skyboxSource.c_str(), skyboxSource.c_str() );
+    
+    const char* depthNormalsSource = R"(
+
+        struct VSOutput
+        {
+            float4 pos : SV_POSITION;
+            float3 mvPosition : POSITION;
+            float3 normal : NORMAL;
+        };
+
+        cbuffer Scene
+        {
+            float4x4 _ModelViewProjectionMatrix;
+            float4x4 _ModelViewMatrix;
+        };
+
+        VSOutput VSMain( float3 pos : POSITION, float3 normal : NORMAL )
+        {
+            VSOutput vsOut;
+            vsOut.pos = mul( _ModelViewProjectionMatrix, float4( pos, 1.0 ) );
+            vsOut.mvPosition = mul( _ModelViewMatrix, float4( pos, 1.0 ) ).xyz;
+            vsOut.normal = mul( _ModelViewMatrix, float4( normal, 0.0 ) ).xyz;
+            return vsOut;
+        }
+
+        float4 PSMain( VSOutput vsOut ) : SV_Target
+        {
+            float linearDepth = vsOut.mvPosition.z;
+            return float4( linearDepth, vsOut.normal );
+        }
+    )";
+
+    depthNormalsShader.Load( depthNormalsSource, depthNormalsSource );
 }

@@ -60,6 +60,11 @@ namespace GfxDeviceGlobal
     HANDLE fenceEvent;
 }
 
+namespace Global
+{
+    extern std::vector< ID3D12Resource* > frameVBUploads; // Defined in VertexBufferD3D12.cpp
+}
+
 namespace ae3d
 {
     void CreateRenderer( int samples );
@@ -702,6 +707,15 @@ void ae3d::GfxDevice::Present()
     {
         AE3D_SAFE_RELEASE( GfxDeviceGlobal::frameHeaps[ i ] );
     }
+    
+    GfxDeviceGlobal::frameHeaps.clear();
+
+    for (std::size_t i = 0; i < Global::frameVBUploads.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( Global::frameVBUploads[ i ] );
+    }
+
+    Global::frameVBUploads.clear();
 }
 
 void ae3d::GfxDevice::SetBackFaceCulling( bool /*enable*/ )
