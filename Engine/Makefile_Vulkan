@@ -1,0 +1,96 @@
+OUTPUT_DIR := ../../aether3d_build
+
+UNAME := $(shell uname)
+COMPILER ?= g++
+CCOMPILER ?= gcc
+ENGINE_LIB := libaether3d_linux_vulkan.a
+STD_LIB := -std=c++11
+INCLUDES := -IInclude -IVideo -ICore -IThirdParty
+GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
+ -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
+ -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
+ -Wunsafe-loop-optimizations -Wvector-operation-performance -Wzero-as-null-pointer-constant
+CLANGWARNINGS := -Wall -Wextra -ansi -pedantic
+
+ifeq ($(COMPILER), clang)
+WARNINGS := $(CLANGWARNGING)
+endif
+ifeq ($(COMPILER), g++)
+WARNINGS := $(GCCWARNINGS)
+endif
+
+ifeq ($(UNAME), Darwin)
+COMPILER := clang++
+CCOMPILER := clang
+STD_LIB := -std=c++11 -stdlib=libc++
+WARNINGS := -Wall -ansi -pedantic
+ENGINE_LIB := libaether3d_osx_vulkan.a
+endif
+
+DEFINES := -DRENDERER_VULKAN
+
+ifeq ($(OS),Windows_NT)
+ENGINE_LIB := libaether3d_win_vulkan.a
+CCOMPILER := gcc
+WARNINGS := -Wall -ansi -pedantic
+OUTPUT_DIR := ..\..\aether3d_build
+endif
+
+all:
+ifeq ($(OS),Windows_NT)
+	IF exist $(OUTPUT_DIR) ( echo building ) ELSE ( mkdir $(OUTPUT_DIR) )
+endif
+ifeq ($(UNAME), Darwin)
+	mkdir -p $(OUTPUT_DIR)
+	rm -f $(OUTPUT_DIR)/libaether3d_osx_vulkan.a
+endif
+ifeq ($(UNAME), Linux)
+	mkdir -p $(OUTPUT_DIR)
+	rm -f $(OUTPUT_DIR)/libaether3d_linux_vulkan.a
+endif
+	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
+	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/GfxDeviceVulkan.cpp -o $(OUTPUT_DIR)/GfxDeviceVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RenderTextureVulkan.cpp -o $(OUTPUT_DIR)/RenderTextureVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererVulkan.cpp -o $(OUTPUT_DIR)/RendererVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/ShaderVulkan.cpp -o $(OUTPUT_DIR)/ShaderVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Texture2DVulkan.cpp -o $(OUTPUT_DIR)/Texture2DVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCubeVulkan.cpp -o $(OUTPUT_DIR)/TextureCubeVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCommon.cpp -o $(OUTPUT_DIR)/TextureCommon.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/VertexBufferVulkan.cpp -o $(OUTPUT_DIR)/VertexBufferVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o	
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/DirectionalLightComponent.cpp -o $(OUTPUT_DIR)/DirectionalLightComponent.o	
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpotLightComponent.cpp -o $(OUTPUT_DIR)/SpotLightComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/AudioSourceComponent.cpp -o $(OUTPUT_DIR)/AudioSourceComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/MeshRendererComponent.cpp -o $(OUTPUT_DIR)/MeshRendererComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TextRendererComponent.cpp -o $(OUTPUT_DIR)/TextRendererComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/GameObject.cpp -o $(OUTPUT_DIR)/GameObject.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileWatcher.cpp -o $(OUTPUT_DIR)/FileWatcher.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Mesh.cpp -o $(OUTPUT_DIR)/Mesh.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Font.cpp -o $(OUTPUT_DIR)/Font.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioClip.cpp -o $(OUTPUT_DIR)/AudioClip.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioSystemOpenAL.cpp -o $(OUTPUT_DIR)/AudioSystemOpenAL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileSystem.cpp -o $(OUTPUT_DIR)/FileSystem.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Matrix.cpp -o $(OUTPUT_DIR)/Matrix.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Frustum.cpp -o $(OUTPUT_DIR)/Frustum.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o
+ifeq ($(UNAME), Linux)
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowXCB.cpp -o $(OUTPUT_DIR)/Window.o
+endif
+ifeq ($(OS),Windows_NT)
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowWin32.cpp -o $(OUTPUT_DIR)/Window.o
+endif
+	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
+ifeq ($(UNAME), Linux)
+	rm $(OUTPUT_DIR)/*.o
+endif
+ifeq ($(UNAME), Darwin)
+	rm $(OUTPUT_DIR)/*.o
+endif
+
+

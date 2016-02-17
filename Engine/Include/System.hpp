@@ -18,7 +18,7 @@
 
    <ul>
    <li>Windows, OS X, iOS and GNU/Linux.</li>
-   <li>OpenGL 4.1, 4.5, Metal and D3D12 (WIP) renderers.</li>
+   <li>OpenGL 4.1, Vulkan (WIP) Metal and D3D12 (WIP) renderers.</li>
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
@@ -36,7 +36,6 @@
 
    Only 64-bit project files/libraries are provided.
    <br />
-   There are two OpenGL renderers, 4.1 for OS X and 4.5 for Windows and GNU/Linux.
 
    \section Compilation
 
@@ -44,7 +43,7 @@
 
    \subsection win1 Windows/Visual Studio
    
-   You'll need Visual Studio 2015 or newer. Build Engine/VisualStudio_GL45. This creates the library in aether3d_build.
+   You'll need Visual Studio 2015 or newer. Build Engine/VisualStudio_GL45 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    You'll need OpenAL32.dll from OpenAL Soft either in your system directory or in the directory used to run samples/editor.
  

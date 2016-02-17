@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{06F5885C-BFC6-454B-A06C-117E62C4FE73}</ProjectGuid>
+    <RootNamespace>Aether3D_Vulkan</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
+    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>$(ProjectName)_r</TargetName>
+    <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Components\AudioSourceComponent.cpp" />
+    <ClCompile Include="..\Components\CameraComponent.cpp" />
+    <ClCompile Include="..\Components\DirectionalLightComponent.cpp" />
+    <ClCompile Include="..\Components\GameObject.cpp" />
+    <ClCompile Include="..\Components\MeshRendererComponent.cpp" />
+    <ClCompile Include="..\Components\SpotLightComponent.cpp" />
+    <ClCompile Include="..\Components\SpriteRendererComponent.cpp" />
+    <ClCompile Include="..\Components\TextRendererComponent.cpp" />
+    <ClCompile Include="..\Components\TransformComponent.cpp" />
+    <ClCompile Include="..\Core\AudioClip.cpp" />
+    <ClCompile Include="..\Core\AudioSystemOpenAL.cpp" />
+    <ClCompile Include="..\Core\FileSystem.cpp" />
+    <ClCompile Include="..\Core\FileWatcher.cpp" />
+    <ClCompile Include="..\Core\Font.cpp" />
+    <ClCompile Include="..\Core\Frustum.cpp" />
+    <ClCompile Include="..\Core\Matrix.cpp" />
+    <ClCompile Include="..\Core\MatrixSSE3.cpp" />
+    <ClCompile Include="..\Core\Mesh.cpp" />
+    <ClCompile Include="..\Core\Scene.cpp" />
+    <ClCompile Include="..\Core\System.cpp" />
+    <ClCompile Include="..\ThirdParty\stb_image.c" />
+    <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
+    <ClCompile Include="..\Video\Material.cpp" />
+    <ClCompile Include="..\Video\RendererCommon.cpp" />
+    <ClCompile Include="..\Video\TextureCommon.cpp" />
+    <ClCompile Include="..\Video\Vulkan\GfxDeviceVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\RendererVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\RenderTextureVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\ShaderVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\Texture2DVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\TextureCubeVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\VertexBufferVulkan.cpp" />
+    <ClCompile Include="..\Video\WindowWin32.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Core\AudioSystem.hpp" />
+    <ClInclude Include="..\Core\FileWatcher.hpp" />
+    <ClInclude Include="..\Core\Frustum.hpp" />
+    <ClInclude Include="..\Core\SubMesh.hpp" />
+    <ClInclude Include="..\Include\AudioClip.hpp" />
+    <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
+    <ClInclude Include="..\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\Include\DirectionalLightComponent.hpp" />
+    <ClInclude Include="..\Include\FileSystem.hpp" />
+    <ClInclude Include="..\Include\Font.hpp" />
+    <ClInclude Include="..\Include\GameObject.hpp" />
+    <ClInclude Include="..\Include\Macros.hpp" />
+    <ClInclude Include="..\Include\Material.hpp" />
+    <ClInclude Include="..\Include\Matrix.hpp" />
+    <ClInclude Include="..\Include\Mesh.hpp" />
+    <ClInclude Include="..\Include\MeshRendererComponent.hpp" />
+    <ClInclude Include="..\Include\Quaternion.hpp" />
+    <ClInclude Include="..\Include\RenderTexture.hpp" />
+    <ClInclude Include="..\Include\Scene.hpp" />
+    <ClInclude Include="..\Include\Shader.hpp" />
+    <ClInclude Include="..\Include\SpotLightComponent.hpp" />
+    <ClInclude Include="..\Include\SpriteRendererComponent.hpp" />
+    <ClInclude Include="..\Include\System.hpp" />
+    <ClInclude Include="..\Include\TextRendererComponent.hpp" />
+    <ClInclude Include="..\Include\Texture2D.hpp" />
+    <ClInclude Include="..\Include\TextureBase.hpp" />
+    <ClInclude Include="..\Include\TextureCube.hpp" />
+    <ClInclude Include="..\Include\TransformComponent.hpp" />
+    <ClInclude Include="..\Include\Vec3.hpp" />
+    <ClInclude Include="..\Include\VR.hpp" />
+    <ClInclude Include="..\Include\Window.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

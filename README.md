@@ -6,7 +6,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 # Features
 
   - Windows, OS X, iOS and Linux support.
-  - OpenGL 4.1, 4.5, D3D12 (WIP) and Metal renderers.
+  - OpenGL 4.1, Vulkan (WIP), D3D12 (WIP) and Metal renderers.
   - Component-based game object system.
   - Oculus Rift support.
   - Sprite rendering, texture atlasing and batching.
