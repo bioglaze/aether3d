@@ -123,6 +123,9 @@
     <ClCompile Include="..\Video\Vulkan\TextureCubeVulkan.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\OculusRiftSupport.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\AudioClip.hpp">

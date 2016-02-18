@@ -39,13 +39,13 @@ endif
 	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OculusRiftSupport.cpp -o $(OUTPUT_DIR)/OculusRiftSupport.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/ShaderNull.cpp -o $(OUTPUT_DIR)/Shader.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Texture2D_Null.cpp -o $(OUTPUT_DIR)/Texture2D.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCubeNull.cpp -o $(OUTPUT_DIR)/TextureCube.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Null/ShaderNull.cpp -o $(OUTPUT_DIR)/Shader.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Null/Texture2D_Null.cpp -o $(OUTPUT_DIR)/Texture2D.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Null/TextureCubeNull.cpp -o $(OUTPUT_DIR)/TextureCube.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCommon.cpp -o $(OUTPUT_DIR)/TextureCommon.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/VertexBufferNull.cpp -o $(OUTPUT_DIR)/VertexBuffer.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/GfxDeviceNull.cpp -o $(OUTPUT_DIR)/GfxDevice.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Null/VertexBufferNull.cpp -o $(OUTPUT_DIR)/VertexBuffer.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Null/GfxDeviceNull.cpp -o $(OUTPUT_DIR)/GfxDevice.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/DirectionalLightComponent.cpp -o $(OUTPUT_DIR)/DirectionalLightComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpotLightComponent.cpp -o $(OUTPUT_DIR)/SpotLightComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
@@ -65,7 +65,7 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Frustum.cpp -o $(OUTPUT_DIR)/Frustum.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/GameObject.cpp -o $(OUTPUT_DIR)/GameObject.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowNull.cpp -o $(OUTPUT_DIR)/Window.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Null/WindowNull.cpp -o $(OUTPUT_DIR)/Window.o
 	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
 ifeq ($(UNAME), Linux)
 	rm $(OUTPUT_DIR)/*.o

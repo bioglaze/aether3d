@@ -50,15 +50,15 @@ ifeq ($(UNAME), Linux)
 endif
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
 	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/GfxDeviceVulkan.cpp -o $(OUTPUT_DIR)/GfxDeviceVulkan.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RenderTextureVulkan.cpp -o $(OUTPUT_DIR)/RenderTextureVulkan.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererVulkan.cpp -o $(OUTPUT_DIR)/RendererVulkan.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/ShaderVulkan.cpp -o $(OUTPUT_DIR)/ShaderVulkan.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Texture2DVulkan.cpp -o $(OUTPUT_DIR)/Texture2DVulkan.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCubeVulkan.cpp -o $(OUTPUT_DIR)/TextureCubeVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/GfxDeviceVulkan.cpp -o $(OUTPUT_DIR)/GfxDeviceVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RenderTextureVulkan.cpp -o $(OUTPUT_DIR)/RenderTextureVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RendererVulkan.cpp -o $(OUTPUT_DIR)/RendererVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/ShaderVulkan.cpp -o $(OUTPUT_DIR)/ShaderVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/Texture2DVulkan.cpp -o $(OUTPUT_DIR)/Texture2DVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/TextureCubeVulkan.cpp -o $(OUTPUT_DIR)/TextureCubeVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCommon.cpp -o $(OUTPUT_DIR)/TextureCommon.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/VertexBufferVulkan.cpp -o $(OUTPUT_DIR)/VertexBufferVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/VertexBufferVulkan.cpp -o $(OUTPUT_DIR)/VertexBufferVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/DirectionalLightComponent.cpp -o $(OUTPUT_DIR)/DirectionalLightComponent.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpotLightComponent.cpp -o $(OUTPUT_DIR)/SpotLightComponent.o

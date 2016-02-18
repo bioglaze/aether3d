@@ -13,10 +13,10 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{06F5885C-BFC6-454B-A06C-117E62C4FE73}</ProjectGuid>
     <RootNamespace>Aether3D_Vulkan</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
@@ -57,7 +57,7 @@
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -70,7 +70,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -101,6 +101,7 @@
     <ClCompile Include="..\ThirdParty\stb_image.c" />
     <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
     <ClCompile Include="..\Video\Material.cpp" />
+    <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />
     <ClCompile Include="..\Video\TextureCommon.cpp" />
     <ClCompile Include="..\Video\Vulkan\GfxDeviceVulkan.cpp" />

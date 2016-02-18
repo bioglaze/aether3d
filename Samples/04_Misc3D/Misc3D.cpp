@@ -254,7 +254,7 @@ int main()
     //scene.Add( &statsContainer );
     scene.Add( &dirLight );
     //scene.Add( &spotLight );
-    scene.Add( &renderTextureContainer );
+    //scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
 
     GameObject cubes[ 5 ];
