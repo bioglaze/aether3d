@@ -39,7 +39,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.5.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    
@@ -74,6 +74,7 @@
    \subsection Bugs
 
    <ul>
+   <li>Vulkan renderer is in a very early state.</li>
    <li>D3D12 renderer is in a very early state.</li>
    </ul>
 */

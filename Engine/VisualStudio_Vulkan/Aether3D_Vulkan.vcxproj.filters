@@ -221,5 +221,14 @@
     <ClInclude Include="..\Core\SubMesh.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\Video\VertexBuffer.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\GfxDevice.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\Renderer.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

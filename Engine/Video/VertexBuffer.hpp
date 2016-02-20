@@ -4,6 +4,9 @@
 #if AETHER3D_METAL
 #import <Metal/Metal.h>
 #endif
+#if RENDERER_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 #include "Vec3.hpp"
 
 struct ID3D12Resource;
@@ -139,6 +142,15 @@ namespace ae3d
 #if AETHER3D_METAL
         id<MTLBuffer> vertexBuffer;
         id<MTLBuffer> indexBuffer;
+#endif
+#if RENDERER_VULKAN
+        void GenerateVertexBuffer( void* vertexData, int vertexBufferSize, void* indexData, int indexBufferSize );
+
+        VkBuffer vertexBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory vertexMem = VK_NULL_HANDLE;
+
+        VkBuffer indexBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory indexMem = VK_NULL_HANDLE;
 #endif
     };
 }

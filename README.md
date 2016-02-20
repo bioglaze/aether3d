@@ -30,7 +30,6 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 # Planned Features
 
-  - Vulkan renderer.
   - Clustered Forward lighting.
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
 
@@ -41,7 +40,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 ## Windows
 
-  - Open the project in Engine\VisualStudio_GL45 in VS2015 and build it. For MinGW you can use Engine/Makefile.
+  - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile.
   - Build and run Samples\01_OpenWindow.
 
 ## OS X / GNU/Linux

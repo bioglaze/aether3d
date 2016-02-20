@@ -57,7 +57,7 @@
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -70,7 +70,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -145,6 +145,9 @@
     <ClInclude Include="..\Include\Vec3.hpp" />
     <ClInclude Include="..\Include\VR.hpp" />
     <ClInclude Include="..\Include\Window.hpp" />
+    <ClInclude Include="..\Video\GfxDevice.hpp" />
+    <ClInclude Include="..\Video\Renderer.hpp" />
+    <ClInclude Include="..\Video\VertexBuffer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
