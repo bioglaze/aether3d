@@ -425,7 +425,7 @@ namespace ae3d
 #if RENDERER_OPENGL
         ::SwapBuffers( WindowGlobal::hdc );
 #endif
-#if AETHER3D_D3D12
+#if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
         GfxDevice::Present();
 #endif
     }

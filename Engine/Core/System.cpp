@@ -20,7 +20,7 @@ void ae3d::System::InitGfxDeviceForEditor( int width, int height )
     GfxDevice::Init( width, height );
 }
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
 void ae3d::System::InitMetal( id <MTLDevice> device, MTKView* view)
 {
     GfxDevice::InitMetal( device, view );

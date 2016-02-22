@@ -349,8 +349,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
-#if AETHER3D_METAL
+#if RENDERER_METAL
     GfxDevice::BeginFrame();
+#endif
+#if RENDERER_VULKAN
+    GfxDevice::BeginRenderPassAndCommandBuffer();
 #endif
     if (camera->GetClearFlag() == CameraComponent::ClearFlag::DepthAndColor)
     {
@@ -479,8 +482,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, nullptr );
     }
-#if AETHER3D_METAL
+#if RENDERER_METAL
     GfxDevice::PresentDrawable();
+#endif
+#if RENDERER_VULKAN
+    GfxDevice::EndRenderPassAndCommandBuffer();
 #endif
     GfxDevice::ErrorCheck( "Scene render after rendering" );
 
@@ -491,7 +497,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     }
     
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
-#if AETHER3D_METAL
+#if RENDERER_METAL
     GfxDevice::BeginFrame();
 #endif
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
@@ -508,7 +514,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader );
     }
-#if AETHER3D_METAL
+#if RENDERER_METAL
     GfxDevice::PresentDrawable();
 #endif
 
@@ -527,7 +533,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     {
         GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     }
-#if AETHER3D_METAL
+#if RENDERER_METAL
     GfxDevice::BeginFrame();
 #endif
 
@@ -593,7 +599,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.momentsShader );
     }
     
-#if AETHER3D_METAL
+#if RENDERER_METAL
     GfxDevice::PresentDrawable();
 #endif
 

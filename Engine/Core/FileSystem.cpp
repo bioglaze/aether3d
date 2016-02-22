@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
 const char* GetFullPath( const char* fileName )
 {
     NSBundle *b = [NSBundle mainBundle];

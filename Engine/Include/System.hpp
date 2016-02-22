@@ -1,9 +1,13 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
 #import <QuartzCore/CAMetalLayer.h>
 #import <MetalKit/MetalKit.h>
+#endif
+
+#if !defined( RENDERER_D3D12 ) && !defined( RENDERER_VULKAN ) && !defined( RENDERER_METAL ) && !defined( RENDERER_OPENGL )
+#error No renderer defined
 #endif
 
 /**
@@ -100,7 +104,7 @@ namespace ae3d
         /// Loads OpenGL function pointers and sets backbuffer dimension. Doesn't create a context.
         void InitGfxDeviceForEditor( int width, int height );
         
-#if AETHER3D_METAL
+#if RENDERER_METAL
         void InitMetal( id< MTLDevice > metalDevice, MTKView* view );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void BeginFrame();

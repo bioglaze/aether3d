@@ -3,10 +3,10 @@
 
 #include <map>
 #include <string>
-#if AETHER3D_METAL
+#if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #endif
@@ -39,7 +39,7 @@ namespace ae3d
                    const char* metalVertexShaderName, const char* metalFragmentShaderName,
                    const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL );
         
-#if AETHER3D_METAL
+#if RENDERER_METAL
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
 #endif
 
@@ -81,13 +81,13 @@ namespace ae3d
         /// \param vec4 Vec4 contents.
         void SetVector4( const char* name, const float* vec4 );
 
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
         ID3D12Resource* GetConstantBuffer() { return constantBuffer; }
         ID3DBlob* blobShaderVertex = nullptr;
         ID3DBlob* blobShaderPixel = nullptr;
 #endif
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
         enum class UniformType { Float, Float2, Float3, Float4, Matrix4x4 };
         
         struct Uniform
@@ -113,7 +113,7 @@ namespace ae3d
         };
 
     private:
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
         void CreateConstantBuffer();
         void ReflectVariables();
 

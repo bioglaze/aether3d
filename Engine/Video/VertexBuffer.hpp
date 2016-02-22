@@ -1,10 +1,11 @@
 #ifndef VERTEX_BUFFER_H
 #define VERTEX_BUFFER_H
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_VULKAN
+#include <vector>
 #include <vulkan/vulkan.h>
 #endif
 #include "Vec3.hpp"
@@ -72,7 +73,7 @@ namespace ae3d
         /// \return Index buffer size in bytes.
         unsigned GetIBSize() const;
 
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
         /// \return Vertex buffer resource.
         ID3D12Resource* GetVBResource() { return vb; }
 
@@ -113,11 +114,15 @@ namespace ae3d
         /// \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount );
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
         id<MTLBuffer> GetVertexBuffer() const { return vertexBuffer; }
         id<MTLBuffer> GetIndexBuffer() const { return indexBuffer; }
 #endif
+#if RENDERER_VULKAN
+        static const uint32_t VERTEX_BUFFER_BIND_ID = 0;
 
+        VkPipelineVertexInputStateCreateInfo* GetInputState() { return &inputStateCreateInfo; }
+#endif
     private:
         enum class VertexFormat { PTC, PTN, PTNTC };
         static const int posChannel = 0;
@@ -126,7 +131,7 @@ namespace ae3d
         static const int normalChannel = 3;
         static const int tangentChannel = 4;
 
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
         void UploadVB( void* faces, void* vertices, unsigned ibSize );
         // Index buffer is stored in the vertex buffer after vertex data.
         ID3D12Resource* vb = nullptr;
@@ -139,15 +144,18 @@ namespace ae3d
         unsigned vboId = 0;
         unsigned iboId = 0;
         
-#if AETHER3D_METAL
+#if RENDERER_METAL
         id<MTLBuffer> vertexBuffer;
         id<MTLBuffer> indexBuffer;
 #endif
 #if RENDERER_VULKAN
-        void GenerateVertexBuffer( void* vertexData, int vertexBufferSize, void* indexData, int indexBufferSize );
+        void GenerateVertexBuffer( void* vertexData, int vertexBufferSize, int vertexStride, void* indexData, int indexBufferSize );
 
         VkBuffer vertexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory vertexMem = VK_NULL_HANDLE;
+        VkPipelineVertexInputStateCreateInfo inputStateCreateInfo;
+        std::vector< VkVertexInputBindingDescription > bindingDescriptions;
+        std::vector< VkVertexInputAttributeDescription > attributeDescriptions;
 
         VkBuffer indexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory indexMem = VK_NULL_HANDLE;

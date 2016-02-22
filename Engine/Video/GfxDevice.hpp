@@ -1,7 +1,7 @@
 #ifndef GFX_DEVICE_H
 #define GFX_DEVICE_H
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #import <QuartzCore/CAMetalLayer.h>
@@ -38,7 +38,7 @@ namespace ae3d
         };
         
         void Init( int width, int height );
-#if AETHER3D_METAL
+#if RENDERER_METAL
         void InitMetal( id <MTLDevice> metalDevice, MTKView* view );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
@@ -49,6 +49,10 @@ namespace ae3d
         void ResetUniformBuffers();
         void PresentDrawable();
         void BeginFrame();
+#endif
+#if RENDERER_VULKAN
+        void BeginRenderPassAndCommandBuffer();
+        void EndRenderPassAndCommandBuffer();
 #endif
         void ClearScreen( unsigned clearFlags );
         void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc );

@@ -45,7 +45,7 @@ namespace ae3d
           \param textureData Texture data.
           */
         void LoadSTB( const FileSystem::FileContentsData& textureData );
-#if AETHER3D_METAL
+#if RENDERER_METAL
         void LoadPVRv2( const char* path );
         void LoadPVRv3( const char* path );
 #endif

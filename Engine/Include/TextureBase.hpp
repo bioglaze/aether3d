@@ -1,15 +1,15 @@
 #ifndef TEXTURE_BASE_H
 #define TEXTURE_BASE_H
 
-#if AETHER3D_METAL
+#if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
 #include <d3d12.h>
 #endif
 #include "Vec3.hpp"
 
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
 // TODO: Move inside engine
 struct GpuResource
 {
@@ -55,10 +55,10 @@ namespace ae3d
   public:
         /// \return id.
         unsigned GetID() const { return handle; }
-#if AETHER3D_METAL
+#if RENDERER_METAL
         id<MTLTexture> GetMetalTexture() const { return metalTexture; }
 #endif
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
         GpuResource* GetGpuResource() { return &gpuResource; }
 #endif
         /// \return Color space.
@@ -109,10 +109,10 @@ namespace ae3d
         ColorSpace colorSpace = ColorSpace::RGB;
         /// Anisotropy.
         float anisotropy = 1;
-#if AETHER3D_METAL
+#if RENDERER_METAL
         id<MTLTexture> metalTexture;  
 #endif
-#if AETHER3D_D3D12
+#if RENDERER_D3D12
         GpuResource gpuResource;
         D3D12_CPU_DESCRIPTOR_HANDLE srv;
 #endif

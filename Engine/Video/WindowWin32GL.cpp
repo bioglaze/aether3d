@@ -200,7 +200,7 @@ namespace ae3d
         const int contextAttribs[] =
         {
             WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 4, // Not using 4.5 yet because I'm developing also on non-supported GPUs.
+            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
             WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB | otherBits,
             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
             0
