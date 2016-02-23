@@ -42,7 +42,10 @@ namespace ae3d
 #if RENDERER_METAL
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
 #endif
-
+#if RENDERER_OPENGL
+        unsigned GetHandle() const { return handle; }
+#endif
+        
         /// Activates the shader to be used in a draw call.
         void Use();
 

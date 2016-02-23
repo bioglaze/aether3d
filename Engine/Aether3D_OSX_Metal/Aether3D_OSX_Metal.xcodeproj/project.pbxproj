@@ -72,6 +72,7 @@
 		AB6E134B1C11D8BC0020A929 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E13491C11D8BC0020A929 /* stb_image.c */; };
 		AB6E134C1C11D8BD0020A929 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */; };
 		AB6E134E1C11D93E0020A929 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6E134D1C11D93E0020A929 /* Metal.framework */; };
+		ABB6E0AE1C7C55E30014B78B /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -141,6 +142,7 @@
 		AB6E13491C11D8BC0020A929 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_image.c; path = ../ThirdParty/stb_image.c; sourceTree = "<group>"; };
 		AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB6E134D1C11D93E0020A929 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../Video/Metal/TextureCubeMetal.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +219,7 @@
 		AB6E12FA1C11D7B60020A929 /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */,
 				AB6E133C1C11D8A00020A929 /* GfxDevice.hpp */,
 				AB6E133D1C11D8A00020A929 /* Material.cpp */,
 				AB6E133E1C11D8A00020A929 /* Renderer.hpp */,
@@ -404,6 +407,7 @@
 				AB6E12D51C11D79B0020A929 /* SpotLightComponent.cpp in Sources */,
 				AB6E12F91C11D7B00020A929 /* System.cpp in Sources */,
 				AB6E12D31C11D79B0020A929 /* GameObject.cpp in Sources */,
+				ABB6E0AE1C7C55E30014B78B /* TextureCubeMetal.mm in Sources */,
 				AB6E13061C11D7C50020A929 /* VertexBufferMetal.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -501,7 +505,7 @@
 				CONFIGURATION_BUILD_DIR = perConfigPath/../../../../aether3d_build;
 				EXECUTABLE_PREFIX = lib;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
-				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_METAL;
+				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				HEADER_SEARCH_PATHS = (
 					../Include,
@@ -519,7 +523,7 @@
 				CONFIGURATION_BUILD_DIR = perConfigPath/../../../../aether3d_build;
 				EXECUTABLE_PREFIX = lib;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
-				GCC_PREPROCESSOR_DEFINITIONS = AETHER3D_METAL;
+				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				HEADER_SEARCH_PATHS = (
 					../Include,

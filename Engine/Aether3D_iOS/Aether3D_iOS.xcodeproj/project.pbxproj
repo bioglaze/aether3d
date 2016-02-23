@@ -57,7 +57,6 @@
 		4449E8A01B14B576009A869C /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449E89F1B14B576009A869C /* OpenAL.framework */; };
 		4498A00C1B1C397E00C2271C /* RenderTextureMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */; };
 		449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */; };
-		44E5FC961B399E32009AC088 /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC951B399E32009AC088 /* TextureCubeMetal.mm */; };
 		44E5FC991B399E6C009AC088 /* RendererCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC971B399E6C009AC088 /* RendererCommon.cpp */; };
 		44E5FC9A1B399E6C009AC088 /* TextureCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC981B399E6C009AC088 /* TextureCommon.cpp */; };
 		AB190E321B57DE73005ECE49 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB190E311B57DE73005ECE49 /* Material.cpp */; };
@@ -69,6 +68,7 @@
 		AB922E571B404FFB000F3488 /* MeshRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB922E591B405020000F3488 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E581B405020000F3488 /* Mesh.cpp */; };
 		AB922E5B1B405030000F3488 /* MeshRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E5A1B405030000F3488 /* MeshRendererComponent.cpp */; };
+		ABB6E0B01C7C564C0014B78B /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABB6E0AF1C7C564C0014B78B /* TextureCubeMetal.mm */; };
 		ABB79F981BA9B7A5002A1B5F /* DirectionalLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */; };
 		ABB79F9A1BA9B7BC002A1B5F /* DirectionalLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E51B1A277B0017797C /* RenderTexture.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -129,7 +129,6 @@
 		4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../Include/TextureCube.hpp; sourceTree = "<group>"; };
 		4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RenderTextureMetal.mm; path = ../../Video/Metal/RenderTextureMetal.mm; sourceTree = "<group>"; };
 		449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SubMesh.hpp; path = ../../Core/SubMesh.hpp; sourceTree = "<group>"; };
-		44E5FC951B399E32009AC088 /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../../Video/TextureCubeMetal.mm; sourceTree = "<group>"; };
 		44E5FC971B399E6C009AC088 /* RendererCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererCommon.cpp; path = ../../Video/RendererCommon.cpp; sourceTree = "<group>"; };
 		44E5FC981B399E6C009AC088 /* TextureCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCommon.cpp; path = ../../Video/TextureCommon.cpp; sourceTree = "<group>"; };
 		AB190E311B57DE73005ECE49 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Material.cpp; path = ../../Video/Material.cpp; sourceTree = "<group>"; };
@@ -140,6 +139,7 @@
 		AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../../Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
 		AB922E581B405020000F3488 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mesh.cpp; path = ../../Core/Mesh.cpp; sourceTree = "<group>"; };
 		AB922E5A1B405030000F3488 /* MeshRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeshRendererComponent.cpp; path = ../../Components/MeshRendererComponent.cpp; sourceTree = "<group>"; };
+		ABB6E0AF1C7C564C0014B78B /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../../Video/Metal/TextureCubeMetal.mm; sourceTree = "<group>"; };
 		ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DirectionalLightComponent.cpp; path = ../../Components/DirectionalLightComponent.cpp; sourceTree = "<group>"; };
 		ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
 		ABF341E51B1A277B0017797C /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../Include/RenderTexture.hpp; sourceTree = "<group>"; };
@@ -289,8 +289,8 @@
 				4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */,
 				4449E8901B14B4B5009A869C /* ShaderMetal.mm */,
 				4449E8911B14B4B5009A869C /* Texture2DMetal.mm */,
+				ABB6E0AF1C7C564C0014B78B /* TextureCubeMetal.mm */,
 				44E5FC981B399E6C009AC088 /* TextureCommon.cpp */,
-				44E5FC951B399E32009AC088 /* TextureCubeMetal.mm */,
 				4449E8921B14B4B5009A869C /* VertexBufferMetal.mm */,
 				4449E8941B14B4B5009A869C /* VertexBuffer.hpp */,
 			);
@@ -411,7 +411,6 @@
 				AB922E5B1B405030000F3488 /* MeshRendererComponent.cpp in Sources */,
 				4449E8841B14B46C009A869C /* TransformComponent.cpp in Sources */,
 				4449E8771B14B44E009A869C /* System.cpp in Sources */,
-				44E5FC961B399E32009AC088 /* TextureCubeMetal.mm in Sources */,
 				AB3E80111C00B5E80077D8BD /* SpotLightComponent.cpp in Sources */,
 				44E5FC991B399E6C009AC088 /* RendererCommon.cpp in Sources */,
 				AB922E591B405020000F3488 /* Mesh.cpp in Sources */,
@@ -432,6 +431,7 @@
 				4449E87F1B14B46C009A869C /* AudioSourceComponent.cpp in Sources */,
 				4449E88A1B14B48E009A869C /* stb_image.c in Sources */,
 				4449E86E1B14B44E009A869C /* AudioClip.cpp in Sources */,
+				ABB6E0B01C7C564C0014B78B /* TextureCubeMetal.mm in Sources */,
 				4449E8831B14B46C009A869C /* TextRendererComponent.cpp in Sources */,
 				44E5FC9A1B399E6C009AC088 /* TextureCommon.cpp in Sources */,
 				4498A00C1B1C397E00C2271C /* RenderTextureMetal.mm in Sources */,
@@ -558,6 +558,11 @@
 					"$(inherited)",
 					"~/Desktop",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					RENDERER_METAL,
+				);
 				INFOPLIST_FILE = Aether3D_iOS/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -579,6 +584,7 @@
 					"$(inherited)",
 					"~/Desktop",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				INFOPLIST_FILE = Aether3D_iOS/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

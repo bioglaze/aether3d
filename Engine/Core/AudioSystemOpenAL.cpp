@@ -191,22 +191,22 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
     if (wav.numChannels == 1 && wav.bitsPerSample == 8)
     {
         format = AL_FORMAT_MONO8;
-        ae3d::System::Print("mono8\n");
+        //ae3d::System::Print("mono8\n");
     }
     else if (wav.numChannels == 2 && wav.bitsPerSample == 8)
     {
         format = AL_FORMAT_STEREO8;
-        ae3d::System::Print("stereo8\n");
+        //ae3d::System::Print("stereo8\n");
     }
     else if (wav.numChannels == 1 && wav.bitsPerSample == 16)
     {
         format = AL_FORMAT_MONO16;
-        ae3d::System::Print("mono16\n");
+        //ae3d::System::Print("mono16\n");
     }
     else if (wav.numChannels == 2 && wav.bitsPerSample == 16)
     {
         format = AL_FORMAT_STEREO16;
-        ae3d::System::Print("stereo16\n");
+        //ae3d::System::Print("stereo16\n");
     }
     else
     {

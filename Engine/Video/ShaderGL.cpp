@@ -147,6 +147,10 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     glAttachShader( program, fragmentShader );
 
     glLinkProgram( program );
+    
+    glDeleteShader( vertexShader );
+    glDeleteShader( fragmentShader );
+    
     GLint wasLinked;
     glGetProgramiv( program, GL_LINK_STATUS, &wasLinked );
     

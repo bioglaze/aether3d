@@ -8,6 +8,7 @@ TEMPLATE = app
 RC_ICONS = glider.ico
 ICON = Editor.icns
 QMAKE_INFO_PLIST = Info.plist
+DEFINES += RENDERER_OPENGL=1
 
 INCLUDEPATH += $$PWD/../../../aether3d/Engine/Include
 DEPENDPATH += $$PWD/../../../aether3d_build

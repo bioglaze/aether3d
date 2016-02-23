@@ -284,6 +284,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					RENDERER_OPENGL,
+				);
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
@@ -304,6 +309,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_OPENGL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
