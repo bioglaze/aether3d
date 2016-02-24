@@ -26,5 +26,5 @@ endif
 ifneq ($(OS),Windows_NT)
 	mkdir -p ../../../aether3d_build/Samples
 endif
-	$(COMPILER) $(WARNINGS) $(LIB_PATH) -I../../Engine/Include OpenWindow.cpp -std=c++11 ../../../aether3d_build/$(ENGINE_LIB) -o ../../../aether3d_build/Samples/OpenWindow $(LINKER)
+	$(COMPILER) -DRENDERER_OPENGL $(WARNINGS) $(LIB_PATH) -I../../Engine/Include OpenWindow.cpp -std=c++11 ../../../aether3d_build/$(ENGINE_LIB) -o ../../../aether3d_build/Samples/OpenWindow $(LINKER)
 

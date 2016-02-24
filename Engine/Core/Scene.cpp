@@ -176,6 +176,9 @@ void ae3d::Scene::Remove( GameObject* gameObject )
 
 void ae3d::Scene::Render()
 {
+#if RENDERER_VULKAN
+    GfxDevice::BeginFrame();
+#endif
     GenerateAABB();
     GfxDevice::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();

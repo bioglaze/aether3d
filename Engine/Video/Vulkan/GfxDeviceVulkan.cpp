@@ -2,7 +2,6 @@
 #if _MSC_VER
 #include <Windows.h>
 #endif
-#include <array>
 #include <cstdint>
 #include <vector> 
 #include <string>
@@ -40,15 +39,16 @@ namespace GfxDeviceGlobal
     VkInstance instance = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkFormat depthFormat;
     VkClearColorValue clearColor;
     std::vector< VkCommandBuffer > drawCmdBuffers;
+    VkCommandBuffer setupCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer postPresentCmdBuffer = VK_NULL_HANDLE;
     VkSwapchainKHR swapChain = VK_NULL_HANDLE;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     VkRenderPass renderPass = VK_NULL_HANDLE;
     VkPipelineCache pipelineCache = VK_NULL_HANDLE;
     VkFormat colorFormat;
+    VkFormat depthFormat;
     VkColorSpaceKHR colorSpace;
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
@@ -57,11 +57,10 @@ namespace GfxDeviceGlobal
     std::vector< VkImage > swapchainImages;
     std::vector< SwapchainBuffer > swapchainBuffers;
     std::vector< VkFramebuffer > frameBuffers;
-    VkCommandBuffer setupCmdBuffer = VK_NULL_HANDLE;
+    VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-    // Index of the deteced graphics and presenting device queue
     uint32_t queueNodeIndex = UINT32_MAX;
     uint32_t currentBuffer = 0;
 }
@@ -198,7 +197,7 @@ namespace ae3d
         dynamicStateEnables.push_back( VK_DYNAMIC_STATE_SCISSOR );
         dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         dynamicState.pDynamicStates = dynamicStateEnables.data();
-        dynamicState.dynamicStateCount = dynamicStateEnables.size();
+        dynamicState.dynamicStateCount = (uint32_t)dynamicStateEnables.size();
 
         VkPipelineDepthStencilStateCreateInfo depthStencilState = {};
         depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
@@ -257,6 +256,10 @@ namespace ae3d
 
     void AllocateCommandBuffers()
     {
+        System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "command pool not initialized" );
+        System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
+        System::Assert( GfxDeviceGlobal::imageCount > 0, "imageCount is 0" );
+
         GfxDeviceGlobal::drawCmdBuffers.resize( GfxDeviceGlobal::imageCount );
 
         VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
@@ -546,9 +549,11 @@ namespace ae3d
         }
         else
         {
+            System::Print( "Swapchain dimension %dx%d, surface dimension: %dx%d\n", WindowGlobal::windowWidth, WindowGlobal::windowHeight, surfCaps.currentExtent.width, surfCaps.currentExtent.height );
+
             swapchainExtent = surfCaps.currentExtent;
-            //*width = surfCaps.currentExtent.width;
-            //*height = surfCaps.currentExtent.height;
+            WindowGlobal::windowWidth = surfCaps.currentExtent.width;
+            WindowGlobal::windowHeight = surfCaps.currentExtent.height;
         }
 
         // Tries to use mailbox mode, low latency and non-tearing
@@ -756,12 +761,12 @@ namespace ae3d
 
         System::Assert( graphicsQueueIndex < queueCount, "graphicsQueueIndex" );
 
-        std::array<float, 1> queuePriorities = { 0.0f };
+        float queuePriorities = 0;
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = graphicsQueueIndex;
         queueCreateInfo.queueCount = 1;
-        queueCreateInfo.pQueuePriorities = queuePriorities.data();
+        queueCreateInfo.pQueuePriorities = &queuePriorities;
 
         const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
@@ -1053,6 +1058,9 @@ namespace ae3d
 
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
 {
+    VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
+    CheckVulkanResult( res, "vkDeviceWaitIdle" );
+
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     cmdBufInfo.pNext = nullptr;
@@ -1097,9 +1105,6 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
 {
     vkCmdEndRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
 
-    // Add a present memory barrier to the end of the command buffer
-    // This will transform the frame buffer color attachment to a
-    // new layout for presenting it to the windowing system integration 
     VkImageMemoryBarrier prePresentBarrier = {};
     prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     prePresentBarrier.pNext = nullptr;
@@ -1112,7 +1117,6 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
     prePresentBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
     prePresentBarrier.image = GfxDeviceGlobal::swapchainBuffers[ GfxDeviceGlobal::currentBuffer ].image;
 
-    VkImageMemoryBarrier *pMemoryBarrier = &prePresentBarrier;
     vkCmdPipelineBarrier(
         GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ],
         VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
@@ -1123,7 +1127,10 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
         1, &prePresentBarrier );
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
-    CheckVulkanResult( err, "vkBeginCommandBuffer" );
+    CheckVulkanResult( err, "vkEndCommandBuffer" );
+
+    VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
+    CheckVulkanResult( res, "vkDeviceWaitIdle" );
 }
 
 void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
@@ -1193,26 +1200,29 @@ void ae3d::GfxDevice::ErrorCheck( const char* info )
 {
 }
 
-void ae3d::GfxDevice::Present()
+void ae3d::GfxDevice::BeginFrame()
 {
-    ae3d::System::Print("Device::Present\n");
-
-    VkSemaphore presentCompleteSemaphore;
     VkSemaphoreCreateInfo presentCompleteSemaphoreCreateInfo = {};
     presentCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     presentCompleteSemaphoreCreateInfo.pNext = nullptr;
     presentCompleteSemaphoreCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    VkResult err = vkCreateSemaphore( GfxDeviceGlobal::device, &presentCompleteSemaphoreCreateInfo, nullptr, &presentCompleteSemaphore );
+    VkResult err = vkCreateSemaphore( GfxDeviceGlobal::device, &presentCompleteSemaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
     CheckVulkanResult( err, "vkCreateSemaphore" );
 
-    err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
+    err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, GfxDeviceGlobal::presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
     CheckVulkanResult( err, "acquireNextImage" );
+}
+
+void ae3d::GfxDevice::Present()
+{
+    VkResult err;
 
     VkSubmitInfo submitInfo = {};
+    submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &presentCompleteSemaphore;
+    submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
 
@@ -1228,7 +1238,7 @@ void ae3d::GfxDevice::Present()
     err = queuePresentKHR( GfxDeviceGlobal::graphicsQueue, &presentInfo );
     CheckVulkanResult( err, "queuePresent" );
 
-    vkDestroySemaphore( GfxDeviceGlobal::device, presentCompleteSemaphore, nullptr );
+    vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );
 
     VkImageMemoryBarrier postPresentBarrier = {};
     postPresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1260,12 +1270,12 @@ void ae3d::GfxDevice::Present()
     err = vkEndCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer );
     CheckVulkanResult( err, "vkEndCommandBuffer" );
 
-    submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &GfxDeviceGlobal::postPresentCmdBuffer;
+    VkSubmitInfo submitPostInfo = {};
+    submitPostInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitPostInfo.commandBufferCount = 1;
+    submitPostInfo.pCommandBuffers = &GfxDeviceGlobal::postPresentCmdBuffer;
 
-    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitPostInfo, VK_NULL_HANDLE );
     CheckVulkanResult( err, "vkQueueSubmit" );
 
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
@@ -1283,7 +1293,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
 
-    vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
+    //vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
     vkDestroySwapchainKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, nullptr );
     vkDestroyCommandPool( GfxDeviceGlobal::device, GfxDeviceGlobal::cmdPool, nullptr );
     vkDestroyDevice( GfxDeviceGlobal::device, nullptr );

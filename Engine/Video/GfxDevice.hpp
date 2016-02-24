@@ -53,6 +53,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         void BeginRenderPassAndCommandBuffer();
         void EndRenderPassAndCommandBuffer();
+        void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );
         void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc );

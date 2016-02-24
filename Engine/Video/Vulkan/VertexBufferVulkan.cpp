@@ -11,7 +11,7 @@ namespace ae3d
 {
     void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
     
-    VkBool32 GetMemoryType( VkPhysicalDeviceMemoryProperties deviceMemoryProperties, uint32_t typeBits, VkFlags properties, uint32_t * typeIndex )
+    VkBool32 GetMemoryType( const VkPhysicalDeviceMemoryProperties& deviceMemoryProperties, uint32_t typeBits, VkFlags properties, uint32_t * typeIndex )
     {
         for (int i = 0; i < 32; i++)
         {
@@ -124,19 +124,19 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 {
     vertexFormat = VertexFormat::PTC;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * sizeof( Face ) );
+    //GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * sizeof( Face ) );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTN;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * sizeof( Face ) );
+    //GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * sizeof( Face ) );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * sizeof( Face ) );
+    //GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * sizeof( Face ) );
 }

@@ -30,7 +30,7 @@ int main()
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
+    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1.0f, 0.5f, 0.5f ) );
     camera.AddComponent<TransformComponent>();
     
     Texture2D spriteTex;
