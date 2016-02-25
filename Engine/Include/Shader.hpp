@@ -10,6 +10,9 @@
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #endif
+#if RENDERER_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 
 namespace ae3d
 {
@@ -24,20 +27,29 @@ namespace ae3d
     public:
         /// \return True if the shader has been succesfully compiled and linked.
         bool IsValid() const { return handle != 0; }
-        
-        /// \param vertexSource Vertex shader source.
-        /// \param fragmentSource Fragment shader source.
-        void Load( const char* vertexSource, const char* fragmentSource );
 
+        /// Loads a GLSL or HLSL shader from source code. For portability it's better to call the other
+        /// load method that can take all shaders as input.
+        /// \param vertexSource Vertex shader source. Language depends on the renderer.
+        /// \param fragmentSource Fragment shader source. Language depends on the renderer.
+        void Load( const char* vertexSource, const char* fragmentSource );
+#if RENDERER_VULKAN
+        /// Loads SPIR-V shader.
+        /// \param spirvData SPIR-V file contents.
+        void LoadSPIRV( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData );
+#endif
         /// \param vertexDataGLSL GLSL Vertex shader file contents.
         /// \param fragmentDataGLSL GLSL Fragment shader file contents.
         /// \param metalVertexShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param metalFragmentShaderName Fragment shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param vertexDataHLSL HLSL Vertex shader file contents.
         /// \param fragmentDataHLSL HLSL Fragment shader file contents.
+        /// \param vertexDataSPIRV SPIR-V vertex shader file contents.
+        /// \param fragmentDataSPIRV SPIR-V fragment shader file contents.
         void Load( const FileSystem::FileContentsData& vertexDataGLSL, const FileSystem::FileContentsData& fragmentDataGLSL,
                    const char* metalVertexShaderName, const char* metalFragmentShaderName,
-                   const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL );
+                   const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL,
+                   const FileSystem::FileContentsData& vertexDataSPIRV, const FileSystem::FileContentsData& fragmentDataSPIRV );
         
 #if RENDERER_METAL
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
@@ -108,6 +120,12 @@ namespace ae3d
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
 #endif
+#if RENDERER_VULKAN
+        VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
+        VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
+        static VkDescriptorBufferInfo uboDesc;
+
+#endif
         /// Wraps an int that is defaulted to -1. Needed for uniform handling.
         struct IntDefaultedToMinusOne
         {
@@ -116,6 +134,7 @@ namespace ae3d
         };
 
     private:
+
 #if RENDERER_D3D12
         void CreateConstantBuffer();
         void ReflectVariables();
@@ -123,6 +142,17 @@ namespace ae3d
         ID3D12Resource* constantBuffer = nullptr;
         void* constantBufferUpload = nullptr;
         ID3D12ShaderReflection* reflector = nullptr;
+#endif
+#if RENDERER_VULKAN
+        void CreateUBO();
+        void UpdateUniformBuffers();
+
+        VkPipelineShaderStageCreateInfo vertexInfo;
+        VkPipelineShaderStageCreateInfo fragmentInfo;
+        
+        static VkBuffer ubo;
+        static VkDeviceMemory uboMemory;
+        float tempMat4[ 16 ];
 #endif
         unsigned handle = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;

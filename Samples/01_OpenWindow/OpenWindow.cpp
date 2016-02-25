@@ -15,7 +15,7 @@
 
 using namespace ae3d;
 
-// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip
+// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.5.zip
 
 int main()
 {
@@ -56,7 +56,7 @@ int main()
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
-    scene.Add( &textContainer );
+    //scene.Add( &textContainer );
     
     bool quit = false;
     

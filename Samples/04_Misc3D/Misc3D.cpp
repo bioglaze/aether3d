@@ -154,7 +154,10 @@ int main()
     cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -50 } );
 
     Shader shader;
-    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents("unlit.hlsl"), FileSystem::FileContents( "unlit.hlsl" ) );
+    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
+                 "unlitVert", "unlitFrag",
+                 FileSystem::FileContents( "unlit.hlsl" ), FileSystem::FileContents( "unlit.hlsl" ),
+                 FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, 1 );
@@ -171,7 +174,10 @@ int main()
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
 
     Shader shaderCubeMap;
-    shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents( "unlit_cube.hlsl" ), FileSystem::FileContents( "unlit_cube.hlsl" ) );
+    shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ),
+                        "unlitVert", "unlitFrag",
+                        FileSystem::FileContents( "unlit_cube.hlsl" ), FileSystem::FileContents( "unlit_cube.hlsl" ),
+                        FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
@@ -244,14 +250,14 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
     
-    //scene.SetSkybox( &skybox );
+    scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
     scene.Add( &cube );
     scene.Add( &copiedCube );
     //scene.Add( &cube2 );
-    //scene.Add( &statsContainer );
+    scene.Add( &statsContainer );
     scene.Add( &dirLight );
     //scene.Add( &spotLight );
     //scene.Add( &renderTextureContainer );

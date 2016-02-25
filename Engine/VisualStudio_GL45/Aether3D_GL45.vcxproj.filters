@@ -10,14 +10,8 @@
     <ClCompile Include="..\Video\WindowWin32.cpp">
       <Filter>Video</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\GfxDeviceGL45.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\Components\SpriteRendererComponent.cpp">
       <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Video\Texture2D_GL45.cpp">
-      <Filter>Video</Filter>
     </ClCompile>
     <ClCompile Include="..\ThirdParty\stb_image.c">
       <Filter>ThirdParty</Filter>
@@ -31,23 +25,11 @@
     <ClCompile Include="..\Components\GameObject.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\ShaderGL.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\ThirdParty\GL\glxw.c">
       <Filter>ThirdParty\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\VertexBufferGL.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Video\RendererGL.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\Core\FileWatcher.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Video\DDSLoader.cpp">
-      <Filter>Video</Filter>
     </ClCompile>
     <ClCompile Include="..\Components\TransformComponent.cpp">
       <Filter>Components</Filter>
@@ -73,22 +55,13 @@
     <ClCompile Include="..\Components\TextRendererComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\WindowWin32GL.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\Core\FileSystem.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Video\RenderTextureGL.cpp">
-      <Filter>Video</Filter>
     </ClCompile>
     <ClCompile Include="..\Video\RendererCommon.cpp">
       <Filter>Video</Filter>
     </ClCompile>
     <ClCompile Include="..\Video\TextureCommon.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Video\TextureCubeGL.cpp">
       <Filter>Video</Filter>
     </ClCompile>
     <ClCompile Include="..\Components\MeshRendererComponent.cpp">
@@ -111,6 +84,33 @@
     </ClCompile>
     <ClCompile Include="..\Components\SpotLightComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\DDSLoaderGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\GfxDeviceGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\RendererGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\RenderTextureGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\ShaderGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\Texture2D_GL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\TextureCubeGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\VertexBufferGL.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Video\OGL\WindowWin32GL.cpp">
+      <Filter>Video</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,5 +245,10 @@
     <ClInclude Include="..\Include\SpotLightComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Video\OGL\WindowOSX_GL.mm">
+      <Filter>Video</Filter>
+    </None>
   </ItemGroup>
 </Project>

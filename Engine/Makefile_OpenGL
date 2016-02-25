@@ -3,7 +3,7 @@ OUTPUT_DIR := ../../aether3d_build
 UNAME := $(shell uname)
 COMPILER ?= g++
 CCOMPILER ?= gcc
-ENGINE_LIB := libaether3d_linux.a
+ENGINE_LIB := libaether3d_gl_linux.a
 STD_LIB := -std=c++11
 INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
@@ -30,7 +30,7 @@ endif
 DEFINES := -DRENDERER_OPENGL
 
 ifeq ($(OS),Windows_NT)
-ENGINE_LIB := libaether3d_win.a
+ENGINE_LIB := libaether3d_gl_win.a
 CCOMPILER := gcc
 WARNINGS := -Wall -ansi -pedantic
 OUTPUT_DIR := ..\..\aether3d_build
@@ -52,16 +52,16 @@ endif
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
 	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OculusRiftSupport.cpp -o $(OUTPUT_DIR)/OculusRiftSupport.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/GfxDeviceGL45.cpp -o $(OUTPUT_DIR)/GfxDeviceGL45.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RenderTextureGL.cpp -o $(OUTPUT_DIR)/RenderTextureGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/GfxDeviceGL.cpp -o $(OUTPUT_DIR)/GfxDeviceGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/RenderTextureGL.cpp -o $(OUTPUT_DIR)/RenderTextureGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/Texture2D_GL.cpp -o $(OUTPUT_DIR)/Texture2D_GL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/TextureCubeGL.cpp -o $(OUTPUT_DIR)/TextureCube.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/VertexBufferGL.cpp -o $(OUTPUT_DIR)/VertexBufferGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/DDSLoaderGL.cpp -o $(OUTPUT_DIR)/DDSLoaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Texture2D_GL45.cpp -o $(OUTPUT_DIR)/Texture2D_GL45.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCubeGL.cpp -o $(OUTPUT_DIR)/TextureCube.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCommon.cpp -o $(OUTPUT_DIR)/TextureCommon.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/VertexBufferGL.cpp -o $(OUTPUT_DIR)/VertexBufferGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/DDSLoader.cpp -o $(OUTPUT_DIR)/DDSLoader.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/DirectionalLightComponent.cpp -o $(OUTPUT_DIR)/DirectionalLightComponent.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpotLightComponent.cpp -o $(OUTPUT_DIR)/SpotLightComponent.o
@@ -83,14 +83,14 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Frustum.cpp -o $(OUTPUT_DIR)/Frustum.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o
 ifeq ($(UNAME), Darwin)
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowOSX_GL.mm -o $(OUTPUT_DIR)/Window.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/WindowOSX_GL.mm -o $(OUTPUT_DIR)/Window.o
 endif
 ifeq ($(UNAME), Linux)
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowXCB.cpp -o $(OUTPUT_DIR)/Window.o
 endif
 ifeq ($(OS),Windows_NT)
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowWin32.cpp -o $(OUTPUT_DIR)/Window.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowWin32GL.cpp -o $(OUTPUT_DIR)/WindowGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/WindowWin32GL.cpp -o $(OUTPUT_DIR)/WindowGL.o
 endif
 	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
 ifeq ($(UNAME), Linux)

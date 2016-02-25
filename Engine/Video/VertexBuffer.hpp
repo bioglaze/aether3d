@@ -5,6 +5,7 @@
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_VULKAN
+#include <cstdint>
 #include <vector>
 #include <vulkan/vulkan.h>
 #endif
@@ -119,7 +120,7 @@ namespace ae3d
         id<MTLBuffer> GetIndexBuffer() const { return indexBuffer; }
 #endif
 #if RENDERER_VULKAN
-        static const uint32_t VERTEX_BUFFER_BIND_ID = 0;
+        static const std::uint32_t VERTEX_BUFFER_BIND_ID = 0;
 
         VkPipelineVertexInputStateCreateInfo* GetInputState() { return &inputStateCreateInfo; }
 #endif

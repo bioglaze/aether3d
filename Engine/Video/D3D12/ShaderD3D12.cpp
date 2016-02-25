@@ -155,7 +155,8 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/, const FileSystem::FileContentsData& /*fragmentDataGLSL*/,
                          const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/,
-                         const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL )
+                         const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL,
+                         const FileSystem::FileContentsData& /*spirvData*/, const FileSystem::FileContentsData& /*spirvData*/ )
 {
     const std::string vertexStr = std::string( std::begin( vertexDataHLSL.data ), std::end( vertexDataHLSL.data ) );
     const std::string fragmentStr = std::string( std::begin( fragmentDataHLSL.data ), std::end( fragmentDataHLSL.data ) );

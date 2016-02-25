@@ -56,17 +56,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
     <TargetExt>.lib</TargetExt>
-    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetName>Aether3D_GL_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
     <TargetExt>.lib</TargetExt>
-    <TargetName>$(ProjectName)_r</TargetName>
+    <TargetName>Aether3D_GL_r</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">
     <OutDir>$(ProjectDir)..\..\..\aether3d_build\</OutDir>
     <TargetExt>.lib</TargetExt>
-    <TargetName>$(ProjectName)_r</TargetName>
+    <TargetName>Aether3D_GL_Oculus_r</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -159,20 +159,20 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\Video\DDSLoader.cpp" />
-    <ClCompile Include="..\Video\GfxDeviceGL45.cpp" />
     <ClCompile Include="..\Video\Material.cpp" />
     <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
+    <ClCompile Include="..\Video\OGL\DDSLoaderGL.cpp" />
+    <ClCompile Include="..\Video\OGL\GfxDeviceGL.cpp" />
+    <ClCompile Include="..\Video\OGL\RendererGL.cpp" />
+    <ClCompile Include="..\Video\OGL\RenderTextureGL.cpp" />
+    <ClCompile Include="..\Video\OGL\ShaderGL.cpp" />
+    <ClCompile Include="..\Video\OGL\Texture2D_GL.cpp" />
+    <ClCompile Include="..\Video\OGL\TextureCubeGL.cpp" />
+    <ClCompile Include="..\Video\OGL\VertexBufferGL.cpp" />
+    <ClCompile Include="..\Video\OGL\WindowWin32GL.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />
-    <ClCompile Include="..\Video\RendererGL.cpp" />
-    <ClCompile Include="..\Video\RenderTextureGL.cpp" />
-    <ClCompile Include="..\Video\ShaderGL.cpp" />
-    <ClCompile Include="..\Video\Texture2D_GL45.cpp" />
     <ClCompile Include="..\Video\TextureCommon.cpp" />
-    <ClCompile Include="..\Video\TextureCubeGL.cpp" />
-    <ClCompile Include="..\Video\VertexBufferGL.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
-    <ClCompile Include="..\Video\WindowWin32GL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp" />
@@ -212,6 +212,9 @@
     <ClInclude Include="..\Video\GfxDevice.hpp" />
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Video\OGL\WindowOSX_GL.mm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

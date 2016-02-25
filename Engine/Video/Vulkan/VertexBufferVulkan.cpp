@@ -11,7 +11,7 @@ namespace ae3d
 {
     void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
     
-    VkBool32 GetMemoryType( const VkPhysicalDeviceMemoryProperties& deviceMemoryProperties, uint32_t typeBits, VkFlags properties, uint32_t * typeIndex )
+    VkBool32 GetMemoryType( const VkPhysicalDeviceMemoryProperties& deviceMemoryProperties, std::uint32_t typeBits, VkFlags properties, std::uint32_t * typeIndex )
     {
         for (int i = 0; i < 32; i++)
         {
@@ -96,27 +96,32 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
     bindingDescriptions[ 0 ].stride = vertexStride;
     bindingDescriptions[ 0 ].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    // Attribute descriptions
-    // Describes memory layout and shader attribute locations
-    attributeDescriptions.resize( 2 );
+    attributeDescriptions.resize( 3 );
     // Location 0 : Position
     attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
     attributeDescriptions[ 0 ].location = 0;
     attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
     attributeDescriptions[ 0 ].offset = 0;
     attributeDescriptions[ 0 ].binding = 0;
-    // Location 1 : Color
+    // Location 1 : TexCoord
     attributeDescriptions[ 1 ].binding = VERTEX_BUFFER_BIND_ID;
     attributeDescriptions[ 1 ].location = 1;
     attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32B32_SFLOAT;
     attributeDescriptions[ 1 ].offset = sizeof( float ) * 3;
     attributeDescriptions[ 1 ].binding = 0;
 
+    // Location 3 : Color
+    attributeDescriptions[ 2 ].binding = VERTEX_BUFFER_BIND_ID;
+    attributeDescriptions[ 2 ].location = 2;
+    attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[ 2 ].offset = sizeof( float ) * 5;
+    attributeDescriptions[ 2 ].binding = 0;
+
     inputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     inputStateCreateInfo.pNext = nullptr;
-    inputStateCreateInfo.vertexBindingDescriptionCount = (uint32_t)bindingDescriptions.size();
+    inputStateCreateInfo.vertexBindingDescriptionCount = (std::uint32_t)bindingDescriptions.size();
     inputStateCreateInfo.pVertexBindingDescriptions = bindingDescriptions.data();
-    inputStateCreateInfo.vertexAttributeDescriptionCount = (uint32_t)attributeDescriptions.size();
+    inputStateCreateInfo.vertexAttributeDescriptionCount = (std::uint32_t)attributeDescriptions.size();
     inputStateCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 }
 
@@ -124,19 +129,19 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 {
     vertexFormat = VertexFormat::PTC;
     elementCount = faceCount * 3;
-    //GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * sizeof( Face ) );
+    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * sizeof( Face ) );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTN;
     elementCount = faceCount * 3;
-    //GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * sizeof( Face ) );
+    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * sizeof( Face ) );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
-    //GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * sizeof( Face ) );
+    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * sizeof( Face ) );
 }

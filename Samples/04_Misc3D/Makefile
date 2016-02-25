@@ -1,6 +1,6 @@
 UNAME := $(shell uname)
 COMPILER ?= g++
-ENGINE_LIB := libaether3d_linux.a
+ENGINE_LIB := libaether3d_gl_linux.a
 LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
 LIB_PATH := -L.
 
@@ -12,7 +12,7 @@ LIB_PATH := -L.
 endif
 
 ifeq ($(OS),Windows_NT)
-ENGINE_LIB := libaether3d_win.a
+ENGINE_LIB := libaether3d_gl_win.a
 LINKER := -lOpenAL32 -lOpenGL32 -lgdi32
 LIB_PATH := -L../../Engine/ThirdParty/lib
 endif
