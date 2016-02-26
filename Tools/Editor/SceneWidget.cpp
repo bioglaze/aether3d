@@ -278,6 +278,7 @@ void SceneWidget::Init()
 
     unlitShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ),
                       FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag",
+                      FileSystem::FileContents(""), FileSystem::FileContents(""),
                       FileSystem::FileContents(""), FileSystem::FileContents(""));
 
     cubeMaterial.SetShader( &unlitShader );

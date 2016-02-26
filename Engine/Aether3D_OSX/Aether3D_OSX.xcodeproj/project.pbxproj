@@ -13,21 +13,26 @@
 		AB190E2E1B57DB0B005ECE49 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB190E2D1B57DB0B005ECE49 /* Material.cpp */; };
 		AB190E301B57DB27005ECE49 /* Material.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB190E2F1B57DB27005ECE49 /* Material.hpp */; };
 		AB2E39361B3543D8001D493E /* RendererCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB2E39351B3543D8001D493E /* RendererCommon.cpp */; };
-		AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AB3A77DA1AB448500081864C /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB3A77D91AB448500081864C /* System.cpp */; };
 		AB3FD4961AB4330C00D28653 /* System.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4941AB4330C00D28653 /* System.hpp */; };
 		AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3FD4951AB4330C00D28653 /* Window.hpp */; };
+		AB4CD6A21C80C5A900C21006 /* DDSLoaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD6991C80C5A900C21006 /* DDSLoaderGL.cpp */; };
+		AB4CD6A31C80C5A900C21006 /* GfxDeviceGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD69A1C80C5A900C21006 /* GfxDeviceGL.cpp */; };
+		AB4CD6A41C80C5A900C21006 /* RendererGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD69B1C80C5A900C21006 /* RendererGL.cpp */; };
+		AB4CD6A51C80C5A900C21006 /* RenderTextureGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD69C1C80C5A900C21006 /* RenderTextureGL.cpp */; };
+		AB4CD6A61C80C5A900C21006 /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD69D1C80C5A900C21006 /* ShaderGL.cpp */; };
+		AB4CD6A71C80C5A900C21006 /* Texture2D_GL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD69E1C80C5A900C21006 /* Texture2D_GL.cpp */; };
+		AB4CD6A81C80C5A900C21006 /* TextureCubeGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD69F1C80C5A900C21006 /* TextureCubeGL.cpp */; };
+		AB4CD6A91C80C5A900C21006 /* VertexBufferGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD6A01C80C5A900C21006 /* VertexBufferGL.cpp */; };
+		AB4CD6AA1C80C5A900C21006 /* WindowOSX_GL.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB4CD6A11C80C5A900C21006 /* WindowOSX_GL.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AB6CD09B1ACEDF9E00C4FA84 /* MatrixSSE3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */; };
-		AB77FD581B344CB0001858CC /* TextureCubeGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB77FD571B344CB0001858CC /* TextureCubeGL.cpp */; };
 		AB77FD5A1B344FCD001858CC /* TextureCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB77FD591B344FCD001858CC /* TextureCommon.cpp */; };
 		AB78D91C1B19E2E8009928E1 /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB78D91B1B19E2E8009928E1 /* RenderTexture.hpp */; };
 		AB78D91F1B19E5A1009928E1 /* TextureBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB78D91E1B19E5A1009928E1 /* TextureBase.hpp */; };
-		AB78D9211B19E685009928E1 /* RenderTextureGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */; };
 		AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */; };
 		AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */; };
 		AB870F9D1B5EBB0C0004BEE5 /* Frustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB870F9C1B5EBB0C0004BEE5 /* Frustum.cpp */; };
 		AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */; };
-		AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */; };
 		AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889AEF1ABB4C49005BA86D /* Scene.cpp */; };
 		AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */; };
 		AB889AFA1ABB4C5B005BA86D /* GameObject.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB889AF31ABB4C5B005BA86D /* GameObject.hpp */; };
@@ -44,24 +49,19 @@
 		AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */; };
 		AB922E531B404D1E000F3488 /* MeshRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E521B404D1E000F3488 /* MeshRendererComponent.hpp */; };
 		AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB949D341ABC8DDF007D561E /* Shader.hpp */; };
-		AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB949D361ABC8E44007D561E /* ShaderGL.cpp */; };
 		AB94ED061C006703005D6076 /* SpotLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB94ED051C006703005D6076 /* SpotLightComponent.cpp */; };
 		ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */; };
 		ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */; };
 		ABB79F9D1BA9B818002A1B5F /* DirectionalLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB79F9C1BA9B818002A1B5F /* DirectionalLightComponent.cpp */; };
 		ABB79F9F1BA9B828002A1B5F /* DirectionalLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABB79F9E1BA9B828002A1B5F /* DirectionalLightComponent.hpp */; };
 		ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */; };
-		ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */; };
 		ABC1A6841AC4683400C4F401 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */; };
 		ABC1A6871AC4693F00C4F401 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */; };
 		ABC8B6071B0D0C1A00E5C32B /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABC8B6061B0D0C1A00E5C32B /* FileSystem.cpp */; };
-		ABCE07FE1AC9A5C300379611 /* GfxDeviceGL45.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */; };
 		ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */; };
-		ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */; };
 		ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */; };
 		ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0CA21AC06A4000F9EC53 /* glxw.c */; };
 		ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */ = {isa = PBXBuildFile; fileRef = ABCE0CA31AC06A4000F9EC53 /* glxw.h */; };
-		ABCE0CA91AC08BD700F9EC53 /* RendererGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */; };
 		ABCF19C01AE28EA600822E80 /* TextRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */; };
 		ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19C21AE2D08800822E80 /* Font.cpp */; };
 		ABD910F41B78F930005EBB74 /* VR.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABD910F31B78F930005EBB74 /* VR.hpp */; };
@@ -77,25 +77,30 @@
 		AB190E2D1B57DB0B005ECE49 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Material.cpp; path = ../Video/Material.cpp; sourceTree = "<group>"; };
 		AB190E2F1B57DB27005ECE49 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../Include/Material.hpp; sourceTree = "<group>"; };
 		AB2E39351B3543D8001D493E /* RendererCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererCommon.cpp; path = ../Video/RendererCommon.cpp; sourceTree = "<group>"; };
-		AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WindowOSX_GL.mm; path = ../Video/WindowOSX_GL.mm; sourceTree = "<group>"; };
 		AB3A77D91AB448500081864C /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = System.cpp; path = ../Core/System.cpp; sourceTree = "<group>"; };
 		AB3FD4941AB4330C00D28653 /* System.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = System.hpp; path = ../Include/System.hpp; sourceTree = "<group>"; };
 		AB3FD4951AB4330C00D28653 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../Include/Window.hpp; sourceTree = "<group>"; };
+		AB4CD6991C80C5A900C21006 /* DDSLoaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DDSLoaderGL.cpp; path = ../Video/OGL/DDSLoaderGL.cpp; sourceTree = "<group>"; };
+		AB4CD69A1C80C5A900C21006 /* GfxDeviceGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GfxDeviceGL.cpp; path = ../Video/OGL/GfxDeviceGL.cpp; sourceTree = "<group>"; };
+		AB4CD69B1C80C5A900C21006 /* RendererGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererGL.cpp; path = ../Video/OGL/RendererGL.cpp; sourceTree = "<group>"; };
+		AB4CD69C1C80C5A900C21006 /* RenderTextureGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTextureGL.cpp; path = ../Video/OGL/RenderTextureGL.cpp; sourceTree = "<group>"; };
+		AB4CD69D1C80C5A900C21006 /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/OGL/ShaderGL.cpp; sourceTree = "<group>"; };
+		AB4CD69E1C80C5A900C21006 /* Texture2D_GL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Texture2D_GL.cpp; path = ../Video/OGL/Texture2D_GL.cpp; sourceTree = "<group>"; };
+		AB4CD69F1C80C5A900C21006 /* TextureCubeGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCubeGL.cpp; path = ../Video/OGL/TextureCubeGL.cpp; sourceTree = "<group>"; };
+		AB4CD6A01C80C5A900C21006 /* VertexBufferGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VertexBufferGL.cpp; path = ../Video/OGL/VertexBufferGL.cpp; sourceTree = "<group>"; };
+		AB4CD6A11C80C5A900C21006 /* WindowOSX_GL.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WindowOSX_GL.mm; path = ../Video/OGL/WindowOSX_GL.mm; sourceTree = "<group>"; };
 		AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MatrixSSE3.cpp; path = ../Core/MatrixSSE3.cpp; sourceTree = "<group>"; };
 		AB6CD09C1ACEE0B200C4FA84 /* Macros.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Macros.hpp; path = ../Include/Macros.hpp; sourceTree = "<group>"; };
 		AB77FD561B344B26001858CC /* TextureCube.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../Include/TextureCube.hpp; sourceTree = "<group>"; };
-		AB77FD571B344CB0001858CC /* TextureCubeGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCubeGL.cpp; path = ../Video/TextureCubeGL.cpp; sourceTree = "<group>"; };
 		AB77FD591B344FCD001858CC /* TextureCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCommon.cpp; path = ../Video/TextureCommon.cpp; sourceTree = "<group>"; };
 		AB78D91B1B19E2E8009928E1 /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../Include/RenderTexture.hpp; sourceTree = "<group>"; };
 		AB78D91E1B19E5A1009928E1 /* TextureBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../Include/TextureBase.hpp; sourceTree = "<group>"; };
-		AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderTextureGL.cpp; path = ../Video/RenderTextureGL.cpp; sourceTree = "<group>"; };
 		AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AudioSourceComponent.hpp; path = ../Include/AudioSourceComponent.hpp; sourceTree = "<group>"; };
 		AB7EF04E1AE04992008BB657 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
 		AB7EF0501AE04BC1008BB657 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB870F9B1B5EBAA90004BEE5 /* Frustum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Frustum.hpp; path = ../Core/Frustum.hpp; sourceTree = "<group>"; };
 		AB870F9C1B5EBB0C0004BEE5 /* Frustum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Frustum.cpp; path = ../Core/Frustum.cpp; sourceTree = "<group>"; };
 		AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GfxDevice.hpp; path = ../Video/GfxDevice.hpp; sourceTree = "<group>"; };
-		AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Texture2D_GL45.cpp; path = ../Video/Texture2D_GL45.cpp; sourceTree = "<group>"; };
 		AB889AEF1ABB4C49005BA86D /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ../Core/Scene.cpp; sourceTree = "<group>"; };
 		AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = CameraComponent.hpp; path = ../Include/CameraComponent.hpp; sourceTree = "<group>"; };
 		AB889AF31ABB4C5B005BA86D /* GameObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GameObject.hpp; path = ../Include/GameObject.hpp; sourceTree = "<group>"; };
@@ -113,7 +118,6 @@
 		AB922E521B404D1E000F3488 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
 		AB922E5C1B405F5E000F3488 /* SubMesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SubMesh.hpp; path = ../Core/SubMesh.hpp; sourceTree = "<group>"; };
 		AB949D341ABC8DDF007D561E /* Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = ../Include/Shader.hpp; sourceTree = "<group>"; };
-		AB949D361ABC8E44007D561E /* ShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderGL.cpp; path = ../Video/ShaderGL.cpp; sourceTree = "<group>"; };
 		AB94ED041C006621005D6076 /* SpotLightComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
 		AB94ED051C006703005D6076 /* SpotLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpotLightComponent.cpp; path = ../Components/SpotLightComponent.cpp; sourceTree = "<group>"; };
 		ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../Core/Matrix.cpp; sourceTree = "<group>"; };
@@ -123,20 +127,16 @@
 		ABBD9DBF1AC30EFD005AD2ED /* libaether3d_osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libaether3d_osx.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABBD9DC01AC31EBC005AD2ED /* FileWatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileWatcher.cpp; path = ../Core/FileWatcher.cpp; sourceTree = "<group>"; };
 		ABBD9DC21AC31EDB005AD2ED /* FileWatcher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FileWatcher.hpp; path = ../Core/FileWatcher.hpp; sourceTree = "<group>"; };
-		ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DDSLoader.cpp; path = ../Video/DDSLoader.cpp; sourceTree = "<group>"; };
 		ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DDSLoader.hpp; path = ../Video/DDSLoader.hpp; sourceTree = "<group>"; };
 		ABC1A6851AC468A900C4F401 /* TransformComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../Include/TransformComponent.hpp; sourceTree = "<group>"; };
 		ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformComponent.cpp; path = ../Components/TransformComponent.cpp; sourceTree = "<group>"; };
 		ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Quaternion.hpp; path = ../Include/Quaternion.hpp; sourceTree = "<group>"; };
 		ABC8B6061B0D0C1A00E5C32B /* FileSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileSystem.cpp; path = ../Core/FileSystem.cpp; sourceTree = "<group>"; };
-		ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GfxDeviceGL45.cpp; path = ../Video/GfxDeviceGL45.cpp; sourceTree = "<group>"; };
 		ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
-		ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VertexBufferGL.cpp; path = ../Video/VertexBufferGL.cpp; sourceTree = "<group>"; };
 		ABCE0CA11AC06A4000F9EC53 /* glcorearb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glcorearb.h; path = ../ThirdParty/GL/glcorearb.h; sourceTree = "<group>"; };
 		ABCE0CA21AC06A4000F9EC53 /* glxw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = glxw.c; path = ../ThirdParty/GL/glxw.c; sourceTree = "<group>"; };
 		ABCE0CA31AC06A4000F9EC53 /* glxw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glxw.h; path = ../ThirdParty/GL/glxw.h; sourceTree = "<group>"; };
 		ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Renderer.hpp; path = ../Video/Renderer.hpp; sourceTree = "<group>"; };
-		ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererGL.cpp; path = ../Video/RendererGL.cpp; sourceTree = "<group>"; };
 		ABCF19BE1AE28DB200822E80 /* TextRendererComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TextRendererComponent.hpp; path = ../Include/TextRendererComponent.hpp; sourceTree = "<group>"; };
 		ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextRendererComponent.cpp; path = ../Components/TextRendererComponent.cpp; sourceTree = "<group>"; };
 		ABCF19C11AE2CF7200822E80 /* Font.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Font.hpp; path = ../Include/Font.hpp; sourceTree = "<group>"; };
@@ -181,23 +181,23 @@
 		AB3A77DC1AB4486A0081864C /* Video */ = {
 			isa = PBXGroup;
 			children = (
-				ABC1A6811AC4683400C4F401 /* DDSLoader.cpp */,
+				AB4CD6991C80C5A900C21006 /* DDSLoaderGL.cpp */,
 				ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */,
-				ABCE07FD1AC9A5C300379611 /* GfxDeviceGL45.cpp */,
+				AB4CD69A1C80C5A900C21006 /* GfxDeviceGL.cpp */,
+				AB4CD6A11C80C5A900C21006 /* WindowOSX_GL.mm */,
 				AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */,
 				AB190E2D1B57DB0B005ECE49 /* Material.cpp */,
 				ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */,
+				AB4CD69C1C80C5A900C21006 /* RenderTextureGL.cpp */,
+				AB4CD69B1C80C5A900C21006 /* RendererGL.cpp */,
 				ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */,
-				ABCE0CA81AC08BD700F9EC53 /* RendererGL.cpp */,
 				AB2E39351B3543D8001D493E /* RendererCommon.cpp */,
-				AB78D9201B19E685009928E1 /* RenderTextureGL.cpp */,
-				AB949D361ABC8E44007D561E /* ShaderGL.cpp */,
-				AB889AEA1ABB4C3B005BA86D /* Texture2D_GL45.cpp */,
-				AB77FD571B344CB0001858CC /* TextureCubeGL.cpp */,
+				AB4CD69D1C80C5A900C21006 /* ShaderGL.cpp */,
+				AB4CD69E1C80C5A900C21006 /* Texture2D_GL.cpp */,
+				AB4CD69F1C80C5A900C21006 /* TextureCubeGL.cpp */,
 				AB77FD591B344FCD001858CC /* TextureCommon.cpp */,
-				ABCE0C9E1AC069FF00F9EC53 /* VertexBufferGL.cpp */,
+				AB4CD6A01C80C5A900C21006 /* VertexBufferGL.cpp */,
 				ABCE0C9C1AC069F300F9EC53 /* VertexBuffer.hpp */,
-				AB3A77D71AB4483F0081864C /* WindowOSX_GL.mm */,
 			);
 			name = Video;
 			sourceTree = "<group>";
@@ -375,40 +375,40 @@
 			files = (
 				ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */,
 				AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */,
-				ABCE0C9F1AC069FF00F9EC53 /* VertexBufferGL.cpp in Sources */,
-				ABCE0CA91AC08BD700F9EC53 /* RendererGL.cpp in Sources */,
 				ABC1A6871AC4693F00C4F401 /* TransformComponent.cpp in Sources */,
+				AB4CD6A41C80C5A900C21006 /* RendererGL.cpp in Sources */,
 				AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */,
 				AB6CD09B1ACEDF9E00C4FA84 /* MatrixSSE3.cpp in Sources */,
+				AB4CD6A21C80C5A900C21006 /* DDSLoaderGL.cpp in Sources */,
+				AB4CD6A61C80C5A900C21006 /* ShaderGL.cpp in Sources */,
+				AB4CD6A71C80C5A900C21006 /* Texture2D_GL.cpp in Sources */,
 				AB889AF11ABB4C49005BA86D /* Scene.cpp in Sources */,
 				AB07F2121AE1611300669331 /* AudioSystemOpenAL.cpp in Sources */,
 				ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */,
+				AB4CD6A31C80C5A900C21006 /* GfxDeviceGL.cpp in Sources */,
 				ABCF19C01AE28EA600822E80 /* TextRendererComponent.cpp in Sources */,
 				AB7EF04F1AE04992008BB657 /* AudioSourceComponent.cpp in Sources */,
 				AB190E2E1B57DB0B005ECE49 /* Material.cpp in Sources */,
 				AB2E39361B3543D8001D493E /* RendererCommon.cpp in Sources */,
 				AB7EF0511AE04BC1008BB657 /* stb_vorbis.c in Sources */,
+				AB4CD6A91C80C5A900C21006 /* VertexBufferGL.cpp in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
 				ABC8B6071B0D0C1A00E5C32B /* FileSystem.cpp in Sources */,
-				AB78D9211B19E685009928E1 /* RenderTextureGL.cpp in Sources */,
-				AB949D371ABC8E44007D561E /* ShaderGL.cpp in Sources */,
-				ABC1A6831AC4683400C4F401 /* DDSLoader.cpp in Sources */,
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,
-				AB889AED1ABB4C3B005BA86D /* Texture2D_GL45.cpp in Sources */,
 				AB77FD5A1B344FCD001858CC /* TextureCommon.cpp in Sources */,
 				AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */,
 				ABB79F9D1BA9B818002A1B5F /* DirectionalLightComponent.cpp in Sources */,
-				AB3A77D81AB4483F0081864C /* WindowOSX_GL.mm in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
+				AB4CD6A81C80C5A900C21006 /* TextureCubeGL.cpp in Sources */,
 				AB870F9D1B5EBB0C0004BEE5 /* Frustum.cpp in Sources */,
 				AB94ED061C006703005D6076 /* SpotLightComponent.cpp in Sources */,
 				AB922E4E1B4039DB000F3488 /* Mesh.cpp in Sources */,
 				AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */,
-				AB77FD581B344CB0001858CC /* TextureCubeGL.cpp in Sources */,
 				ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */,
 				AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */,
-				ABCE07FE1AC9A5C300379611 /* GfxDeviceGL45.cpp in Sources */,
+				AB4CD6A51C80C5A900C21006 /* RenderTextureGL.cpp in Sources */,
 				ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */,
+				AB4CD6AA1C80C5A900C21006 /* WindowOSX_GL.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

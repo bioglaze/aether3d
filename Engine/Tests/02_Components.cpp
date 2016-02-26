@@ -131,7 +131,7 @@ void TestMesh()
     Mesh::LoadResult loadResult = mesh.Load( FileSystem::FileContents( "notfound" ) );
     System::Assert( loadResult == Mesh::LoadResult::FileNotFound, "Mesh load result FileNotFound failed!" );
 
-    loadResult = mesh.Load( FileSystem::FileContents( "Makefile.math" ) );
+    loadResult = mesh.Load( FileSystem::FileContents( "Makefile" ) );
     System::Assert( loadResult == Mesh::LoadResult::Corrupted, "Mesh load result Corrupted failed!" );
     
     gGo.AddComponent< MeshRendererComponent >();

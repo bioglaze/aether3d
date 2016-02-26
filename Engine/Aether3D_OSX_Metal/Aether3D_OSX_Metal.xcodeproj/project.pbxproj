@@ -505,7 +505,10 @@
 				CONFIGURATION_BUILD_DIR = perConfigPath/../../../../aether3d_build;
 				EXECUTABLE_PREFIX = lib;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
-				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					RENDERER_METAL,
+					DEBUG,
+				);
 				GCC_WARN_PEDANTIC = YES;
 				HEADER_SEARCH_PATHS = (
 					../Include,

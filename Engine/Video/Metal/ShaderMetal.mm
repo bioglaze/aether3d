@@ -15,7 +15,8 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, const FileSystem::FileContentsData& /*fragmentGLSL*/,
                         const char* metalVertexShaderName, const char* metalFragmentShaderName,
-                        const FileSystem::FileContentsData& /*vertexHLSL*/, const FileSystem::FileContentsData& /*fragmentHLSL*/ )
+                        const FileSystem::FileContentsData& /*vertexHLSL*/, const FileSystem::FileContentsData& /*fragmentHLSL*/,
+                        const FileSystem::FileContentsData& /*vertexSPIRV*/, const FileSystem::FileContentsData& /*fragmentSPIRV*/)
 {
     LoadFromLibrary( metalVertexShaderName, metalFragmentShaderName );
 }

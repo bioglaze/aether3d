@@ -81,7 +81,8 @@
     
     shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                 "unlit_vertex", "unlit_fragment",
-                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ) );
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
@@ -112,7 +113,6 @@
     
     ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
     scene.Render();
-    ae3d::System::EndFrame();
 }
 
 - (void)_reshape
