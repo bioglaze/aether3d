@@ -16,7 +16,7 @@ struct ID3D12DescriptorHeap;
 
 namespace ae3d
 {
-    /// Contains geometry used for rendering.
+    /// Contains a vertex and index buffer. Indices are 16-bit.
     class VertexBuffer
     {
     public:
@@ -78,11 +78,11 @@ namespace ae3d
         /// \return Vertex buffer resource.
         ID3D12Resource* GetVBResource() { return vb; }
 
-        /// \return Index count.
-        long GetIndexCount() const { return elementCount; }
-
         /// \return Index buffer offset from the beginning of the vb.
         long GetIBOffset() const { return ibOffset; }
+
+        /// \return Index count.
+        long GetIndexCount() const { return elementCount; }
 #endif
 
         /// Binds the buffer. Must be called before Draw or DrawRange.
@@ -123,6 +123,9 @@ namespace ae3d
         static const std::uint32_t VERTEX_BUFFER_BIND_ID = 0;
 
         VkPipelineVertexInputStateCreateInfo* GetInputState() { return &inputStateCreateInfo; }
+        VkBuffer* GetVertexBuffer() { return &vertexBuffer; }
+        VkBuffer* GetIndexBuffer() { return &indexBuffer; }
+
 #endif
     private:
         enum class VertexFormat { PTC, PTN, PTNTC };

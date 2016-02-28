@@ -68,6 +68,8 @@ namespace GfxDeviceGlobal
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
     std::uint32_t queueNodeIndex = UINT32_MAX;
     std::uint32_t currentBuffer = 0;
+
+    int drawCalls = 0;
 }
 
 namespace debug
@@ -196,12 +198,6 @@ namespace ae3d
 
     void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
     {
-        VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
-
-        pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineCreateInfo.layout = GfxDeviceGlobal::pipelineLayout;
-        pipelineCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
-
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
         inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         inputAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -222,11 +218,6 @@ namespace ae3d
         blendAttachmentState[ 0 ].blendEnable = blendMode != ae3d::GfxDevice::BlendMode::Off ? VK_TRUE : VK_FALSE;
         colorBlendState.attachmentCount = 1;
         colorBlendState.pAttachments = blendAttachmentState;
-
-        VkPipelineViewportStateCreateInfo viewportState = {};
-        viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        viewportState.viewportCount = 1;
-        viewportState.scissorCount = 1;
 
         VkPipelineDynamicStateCreateInfo dynamicState = {};
         std::vector<VkDynamicState> dynamicStateEnables;
@@ -269,7 +260,16 @@ namespace ae3d
         shaderStages[ 0 ] = shader.GetVertexInfo();
         shaderStages[ 1 ] = shader.GetFragmentInfo();
 
-        pipelineCreateInfo.stageCount = 2;
+        VkPipelineViewportStateCreateInfo viewportState = {};
+        viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        viewportState.viewportCount = 1;
+        viewportState.scissorCount = 1;
+
+        VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
+
+        pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineCreateInfo.layout = GfxDeviceGlobal::pipelineLayout;
+        pipelineCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
         pipelineCreateInfo.pVertexInputState = vertexBuffer.GetInputState();
         pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
         pipelineCreateInfo.pRasterizationState = &rasterizationState;
@@ -277,8 +277,8 @@ namespace ae3d
         pipelineCreateInfo.pMultisampleState = &multisampleState;
         pipelineCreateInfo.pViewportState = &viewportState;
         pipelineCreateInfo.pDepthStencilState = &depthStencilState;
+        pipelineCreateInfo.stageCount = 2;
         pipelineCreateInfo.pStages = shaderStages;
-        pipelineCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
         pipelineCreateInfo.pDynamicState = &dynamicState;
 
         VkPipeline pso;
@@ -300,12 +300,12 @@ namespace ae3d
                 if ((GfxDeviceGlobal::deviceMemoryProperties.memoryTypes[ i ].propertyFlags & properties) == properties)
                 {
                     *typeIndex = i;
-                    return true;
+                    return VK_TRUE;
                 }
             }
             typeBits >>= 1;
         }
-        return false;
+        return VK_FALSE;
     }
 
     void AllocateCommandBuffers()
@@ -331,9 +331,6 @@ namespace ae3d
         CheckVulkanResult( err, "vkAllocateCommandBuffers" );
     }
 
-    // Creates an image memory barrier for changing the layout of
-    // an image and puts it into an active command buffer.
-    // See chapter 11.4 "Image Layout" for details
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout )
     {
         System::Assert( cmdbuffer != VK_NULL_HANDLE, "command buffer not initialized" );
@@ -603,8 +600,6 @@ namespace ae3d
         }
         else
         {
-            System::Print( "Swapchain dimension %dx%d, surface dimension: %dx%d\n", WindowGlobal::windowWidth, WindowGlobal::windowHeight, surfCaps.currentExtent.width, surfCaps.currentExtent.height );
-
             swapchainExtent = surfCaps.currentExtent;
             WindowGlobal::windowWidth = surfCaps.currentExtent.width;
             WindowGlobal::windowHeight = surfCaps.currentExtent.height;
@@ -675,7 +670,7 @@ namespace ae3d
         //vkDbgSetObjectName( GfxDeviceGlobal::device, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, 0, 5, "swap" );
         
         GfxDeviceGlobal::swapchainBuffers.resize( GfxDeviceGlobal::imageCount );
-        
+
         for (std::uint32_t i = 0; i < GfxDeviceGlobal::imageCount; ++i)
         {
             VkImageViewCreateInfo colorAttachmentView = {};
@@ -1041,7 +1036,7 @@ namespace ae3d
         descriptorPoolInfo.maxSets = 1;
 
         VkResult err = vkCreateDescriptorPool( GfxDeviceGlobal::device, &descriptorPoolInfo, nullptr, &GfxDeviceGlobal::descriptorPool );
-        CheckVulkanResult( err, "vkAllocateDescriptorSets" );
+        CheckVulkanResult( err, "vkCreateDescriptorPool" );
     }
 
     void AllocateDescriptorSet()
@@ -1228,7 +1223,6 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
 
 void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
 {
-
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
@@ -1241,11 +1235,11 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
+    GfxDeviceGlobal::drawCalls = 0;
 }
 
 void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
 {
-
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
@@ -1277,14 +1271,22 @@ void ae3d::GfxDevice::Init( int width, int height )
 {
 }
 
+void ae3d::GfxDevice::IncDrawCalls()
+{
+    ++GfxDeviceGlobal::drawCalls;
+}
+
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
 {
-    ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
-    ae3d::System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
+    System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
+    System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
+    System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::drawCmdBuffers.size(), "invalid draw buffer index" );
+    System::Assert( GfxDeviceGlobal::descriptorSet != VK_NULL_HANDLE, "invalid descriptorSet" );
+    System::Assert( GfxDeviceGlobal::pipelineLayout != VK_NULL_HANDLE, "invalid pipelineLayout" );
 
     const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
 
@@ -1292,6 +1294,18 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
     }
+
+    vkCmdBindDescriptorSets( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS,
+                             GfxDeviceGlobal::pipelineLayout, 0, 1, &GfxDeviceGlobal::descriptorSet, 0, nullptr );
+
+    vkCmdBindPipeline( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::psoCache[ psoHash ] );
+
+    VkDeviceSize offsets[ 1 ] = { 0 };
+    vkCmdBindVertexBuffers( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0/*VERTEX_BUFFER_BIND_ID*/, 1, vertexBuffer.GetVertexBuffer(), offsets );
+
+    vkCmdBindIndexBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
+    vkCmdDrawIndexed( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
+    IncDrawCalls();
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* info )
@@ -1317,7 +1331,6 @@ void ae3d::GfxDevice::Present()
     VkResult err;
 
     VkSubmitInfo submitInfo = {};
-    submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
@@ -1391,7 +1404,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
 
-    //vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
+    vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
     vkDestroySwapchainKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, nullptr );
     vkDestroyCommandPool( GfxDeviceGlobal::device, GfxDeviceGlobal::cmdPool, nullptr );
     vkDestroyDevice( GfxDeviceGlobal::device, nullptr );

@@ -90,7 +90,6 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
     err = vkBindBufferMemory( GfxDeviceGlobal::device, indexBuffer, indexMem, 0 );
     CheckVulkanResult( err, "vkBindBufferMemory index buffer" );
 
-    // Binding description
     bindingDescriptions.resize( 1 );
     bindingDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
     bindingDescriptions[ 0 ].stride = vertexStride;
@@ -102,20 +101,18 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
     attributeDescriptions[ 0 ].location = 0;
     attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
     attributeDescriptions[ 0 ].offset = 0;
-    attributeDescriptions[ 0 ].binding = 0;
+
     // Location 1 : TexCoord
     attributeDescriptions[ 1 ].binding = VERTEX_BUFFER_BIND_ID;
     attributeDescriptions[ 1 ].location = 1;
-    attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
     attributeDescriptions[ 1 ].offset = sizeof( float ) * 3;
-    attributeDescriptions[ 1 ].binding = 0;
 
-    // Location 3 : Color
+    // Location 2 : Color
     attributeDescriptions[ 2 ].binding = VERTEX_BUFFER_BIND_ID;
     attributeDescriptions[ 2 ].location = 2;
-    attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
     attributeDescriptions[ 2 ].offset = sizeof( float ) * 5;
-    attributeDescriptions[ 2 ].binding = 0;
 
     inputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     inputStateCreateInfo.pNext = nullptr;
