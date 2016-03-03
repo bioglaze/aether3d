@@ -23,21 +23,31 @@ PFN_vkGetSwapchainImagesKHR getSwapchainImagesKHR = nullptr;
 PFN_vkAcquireNextImageKHR acquireNextImageKHR = nullptr;
 PFN_vkQueuePresentKHR queuePresentKHR = nullptr;
 
+namespace Texture2DGlobal
+{
+    extern VkImageView tempImageView;
+}
+
 namespace GfxDeviceGlobal
 {
     struct SwapchainBuffer
     {
-        VkImage image;
-        VkImageView view;
+        VkImage image = VK_NULL_HANDLE;
+        VkImageView view = VK_NULL_HANDLE;
     };
 
     struct DepthStencil
     {
-        VkImage image;
-        VkDeviceMemory mem;
-        VkImageView view;
+        VkImage image = VK_NULL_HANDLE;
+        VkDeviceMemory mem = VK_NULL_HANDLE;
+        VkImageView view = VK_NULL_HANDLE;
     };
-
+    
+    struct Samplers
+    {
+        VkSampler linearRepeat = VK_NULL_HANDLE;
+    } samplers;
+    
     VkInstance instance = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -194,6 +204,31 @@ namespace ae3d
         hashString += std::to_string( ((unsigned)depthFunc) + 4 );
 
         return GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
+    }
+
+    void CreateSamplers()
+    {
+        System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
+
+        VkSamplerCreateInfo sampler = {};
+        sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        sampler.pNext = nullptr;
+        sampler.magFilter = VK_FILTER_NEAREST; // nearest for debugging
+        sampler.minFilter = VK_FILTER_NEAREST;
+        sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        sampler.mipLodBias = 0.0f;
+        sampler.compareOp = VK_COMPARE_OP_NEVER;
+        sampler.minLod = 0.0f;
+        // Max level-of-detail should match mip level count
+        sampler.maxLod = 0;
+        sampler.maxAnisotropy = 8;
+        sampler.anisotropyEnable = VK_TRUE;
+        sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+        VkResult err = vkCreateSampler( GfxDeviceGlobal::device, &sampler, nullptr, &GfxDeviceGlobal::samplers.linearRepeat );
+        CheckVulkanResult( err, "vkCreateSampler" );
     }
 
     void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
@@ -358,6 +393,11 @@ namespace ae3d
         {
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         }
+        
+        if (oldImageLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+        {
+            imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        }
 
         if (oldImageLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
         {
@@ -399,7 +439,7 @@ namespace ae3d
 
         const VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         const VkPipelineStageFlags destStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-
+        //__debugbreak();
         vkCmdPipelineBarrier(
             cmdbuffer,
             srcStageFlags,
@@ -1024,16 +1064,18 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
-        VkDescriptorPoolSize typeCounts[ 1 ];
+        VkDescriptorPoolSize typeCounts[ 2 ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = 1;
-        
+        typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        typeCounts[ 1 ].descriptorCount = 1;
+
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.pNext = nullptr;
-        descriptorPoolInfo.poolSizeCount = 1;
+        descriptorPoolInfo.poolSizeCount = 2;
         descriptorPoolInfo.pPoolSizes = typeCounts;
-        descriptorPoolInfo.maxSets = 1;
+        descriptorPoolInfo.maxSets = 2;
 
         VkResult err = vkCreateDescriptorPool( GfxDeviceGlobal::device, &descriptorPoolInfo, nullptr, &GfxDeviceGlobal::descriptorPool );
         CheckVulkanResult( err, "vkCreateDescriptorPool" );
@@ -1043,6 +1085,8 @@ namespace ae3d
     {
         ae3d::System::Assert( GfxDeviceGlobal::descriptorSetLayout != VK_NULL_HANDLE, "descriptor set not created" );
         ae3d::System::Assert( GfxDeviceGlobal::descriptorPool != VK_NULL_HANDLE, "descriptorPool not created" );
+        ae3d::System::Assert( Texture2DGlobal::tempImageView != VK_NULL_HANDLE, "texture not initted" );
+        ae3d::System::Assert( GfxDeviceGlobal::samplers.linearRepeat != VK_NULL_HANDLE, "linearRepeat not initted" );
 
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -1054,31 +1098,57 @@ namespace ae3d
         CheckVulkanResult( err, "vkAllocateDescriptorSets" );
 
         // Binding 0 : Uniform buffer
-        VkWriteDescriptorSet writeDescriptorSet = {};
-        writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        writeDescriptorSet.dstSet = GfxDeviceGlobal::descriptorSet;
-        writeDescriptorSet.descriptorCount = 1;
-        writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        writeDescriptorSet.pBufferInfo = &Shader::uboDesc;
-        writeDescriptorSet.dstBinding = 0;
+        VkWriteDescriptorSet uboSet = {};
+        uboSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        uboSet.dstSet = GfxDeviceGlobal::descriptorSet;
+        uboSet.descriptorCount = 1;
+        uboSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        uboSet.pBufferInfo = &Shader::uboDesc;
+        uboSet.dstBinding = 0;
 
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 1, &writeDescriptorSet, 0, nullptr );
+        // Binding 1 : Sampler
+        VkDescriptorImageInfo samplerDesc = {};
+        samplerDesc.sampler = GfxDeviceGlobal::samplers.linearRepeat;
+        samplerDesc.imageView = Texture2DGlobal::tempImageView;
+        samplerDesc.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+
+        VkWriteDescriptorSet samplerSet = {};
+        samplerSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        samplerSet.dstSet = GfxDeviceGlobal::descriptorSet;
+        samplerSet.descriptorCount = 1;
+        samplerSet.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerSet.pImageInfo = &samplerDesc;
+        samplerSet.dstBinding = 1;
+
+        VkWriteDescriptorSet sets[ 2 ] = { uboSet, samplerSet };
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 2, sets, 0, nullptr );
     }
 
     void CreateDescriptorSetLayout()
     {
         // Binding 0 : Uniform buffer (Vertex shader)
-        VkDescriptorSetLayoutBinding layoutBinding = {};
-        layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layoutBinding.descriptorCount = 1;
-        layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        layoutBinding.pImmutableSamplers = nullptr;
+        VkDescriptorSetLayoutBinding layoutBindingUBO = {};
+        layoutBindingUBO.binding = 0;
+        layoutBindingUBO.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBindingUBO.descriptorCount = 1;
+        layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBindingUBO.pImmutableSamplers = nullptr;
+
+        // Binding 1 : Sampler (Fragment shader)
+        VkDescriptorSetLayoutBinding layoutBindingSampler = {};
+        layoutBindingSampler.binding = 1;
+        layoutBindingSampler.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        layoutBindingSampler.descriptorCount = 1;
+        layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindingSampler.pImmutableSamplers = nullptr;
+
+        const VkDescriptorSetLayoutBinding bindings[2] = { layoutBindingUBO, layoutBindingSampler };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         descriptorLayout.pNext = nullptr;
-        descriptorLayout.bindingCount = 1;
-        descriptorLayout.pBindings = &layoutBinding;
+        descriptorLayout.bindingCount = 2;
+        descriptorLayout.pBindings = bindings;
 
         VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorLayout, nullptr, &GfxDeviceGlobal::descriptorSetLayout );
         CheckVulkanResult( err, "vkCreateDescriptorSetLayout" );
@@ -1139,6 +1209,7 @@ namespace ae3d
         FlushSetupCommandBuffer();
         CreateDescriptorSetLayout();
         CreateDescriptorPool();
+        CreateSamplers();
 
         GfxDevice::SetClearColor( 0, 0, 0 );
     }

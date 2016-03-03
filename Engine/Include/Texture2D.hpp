@@ -3,6 +3,9 @@
 
 #include "Vec3.hpp"
 #include "TextureBase.hpp"
+#if RENDERER_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 
 namespace ae3d
 {
@@ -48,6 +51,11 @@ namespace ae3d
 #if RENDERER_METAL
         void LoadPVRv2( const char* path );
         void LoadPVRv3( const char* path );
+#endif
+#if RENDERER_VULKAN
+        VkImage image = VK_NULL_HANDLE;
+        VkImageView view = VK_NULL_HANDLE;
+        VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
 #endif
     };
 }

@@ -146,6 +146,10 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
         LoadDDS( fileContents.path.c_str() );
     }
+    else
+    {
+        System::Print( "Unhandled texture extension in file %s\n", fileContents.path.c_str() );
+    }
 
     if (mipmaps == Mipmaps::Generate)
     {
