@@ -206,16 +206,19 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
         idealTextureSize.h = windowHeight;
         const bool isRenderTarget = true;
 
-        Global::eyeRenderTexture[ i ] = new TextureBuffer( Global::hmd, isRenderTarget, true, idealTextureSize, 1, nullptr );
+        Global::eyeRenderTexture[ i ] = new TextureBuffer( Global::hmd, isRenderTarget, Global::HMD.Type != ovrHmd_None ? true : false, idealTextureSize, 1, nullptr );
         Global::eyeDepthBuffer[ i ] = new DepthBuffer( Global::eyeRenderTexture[ i ]->GetSize() );
     }
 
-    ovr_CreateMirrorTextureGL( Global::hmd, GL_RGBA, windowWidth, windowHeight, (ovrTexture**)&Global::mirrorTexture );
-    glGenFramebuffers( 1, &Global::mirrorFBO );
-    glBindFramebuffer( GL_READ_FRAMEBUFFER, Global::mirrorFBO );
-    glFramebufferTexture2D( GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Global::mirrorTexture->OGL.TexId, 0 );
-    glFramebufferRenderbuffer( GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 );
-    glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
+    auto err = ovr_CreateMirrorTextureGL( Global::hmd, GL_RGBA, windowWidth, windowHeight, (ovrTexture**)&Global::mirrorTexture );
+    if (OVR_SUCCESS( err ))
+    {
+        glGenFramebuffers( 1, &Global::mirrorFBO );
+        glBindFramebuffer( GL_READ_FRAMEBUFFER, Global::mirrorFBO );
+        glFramebufferTexture2D( GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Global::mirrorTexture->OGL.TexId, 0 );
+        glFramebufferRenderbuffer( GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 );
+        glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
+    }
 
     Global::EyeRenderDesc[ 0 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Left, Global::HMD.DefaultEyeFov[ 0 ] );
     Global::EyeRenderDesc[ 1 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Right, Global::HMD.DefaultEyeFov[ 1 ] );
@@ -237,13 +240,19 @@ void ae3d::VR::CalcEyePose()
 
 void ae3d::VR::SetEye( int eye )
 {
-    Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex = (Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex + 1) % Global::eyeRenderTexture[ eye ]->TextureSet->TextureCount;
-    Global::eyeRenderTexture[ eye ]->SetAndClearRenderSurface( Global::eyeDepthBuffer[ eye ] );
+    if (Global::eyeRenderTexture[ eye ]->TextureSet)
+    {
+        Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex = (Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex + 1) % Global::eyeRenderTexture[ eye ]->TextureSet->TextureCount;
+        Global::eyeRenderTexture[ eye ]->SetAndClearRenderSurface( Global::eyeDepthBuffer[ eye ] );
+    }
 }
 
 void ae3d::VR::UnsetEye( int eye )
 {
-    Global::eyeRenderTexture[ eye ]->UnsetRenderSurface();
+    if (Global::eyeRenderTexture[ eye ]->TextureSet)
+    {
+        Global::eyeRenderTexture[ eye ]->UnsetRenderSurface();
+    }
 }
 
 void ae3d::VR::SubmitFrame()
@@ -270,12 +279,15 @@ void ae3d::VR::SubmitFrame()
     //isVisible = OVR_SUCCESS( result );
 
     // Blit mirror texture to back buffer
-    glBindFramebuffer( GL_READ_FRAMEBUFFER, Global::mirrorFBO );
-    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
-    const GLint w = Global::mirrorTexture->OGL.Header.TextureSize.w;
-    const GLint h = Global::mirrorTexture->OGL.Header.TextureSize.h;
-    glBlitFramebuffer( 0, h, w, 0, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST );
-    glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
+    if (Global::mirrorTexture)
+    {
+        glBindFramebuffer( GL_READ_FRAMEBUFFER, Global::mirrorFBO );
+        glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+        const GLint w = Global::mirrorTexture->OGL.Header.TextureSize.w;
+        const GLint h = Global::mirrorTexture->OGL.Header.TextureSize.h;
+        glBlitFramebuffer( 0, h, w, 0, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+        glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
+    }
 }
 
 void ae3d::VR::RecenterTracking()

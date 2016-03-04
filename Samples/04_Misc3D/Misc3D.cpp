@@ -25,7 +25,7 @@
 
 using namespace ae3d;
 
-// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.5.zip
 
 int main()
 {
@@ -53,14 +53,6 @@ int main()
     System::InitAudio();
     System::InitGamePad();
 
-    /*Shader ssaoShader;
-    ssaoShader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ), "unlitVert", "unlitFrag", FileSystem::FileContents("unlit.hlsl"), FileSystem::FileContents( "unlit.hlsl" ) );
-
-    RenderTexture ssaoTarget;
-    ssaoTarget.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
-
-    Texture2D noiseTex;
-    */
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
@@ -71,32 +63,6 @@ int main()
     camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, -100 }, { 0, 1, 0 } );
-    /*camera.AddComponent<ImageEffectComponent>();
-    camera.GetComponent<ImageEffectComponent>()->SetApplyFunc(
-                                                              [ssaoShader, ssaoTarget]() {
-                                                              GfxDevice::Instance().SetRenderTarget( &ssaoTarget );
-                                                              GfxDevice::Instance().ClearScreen();
-                                                              
-                                                              ssaoShader.Use();
-                                                              ssaoShader.SetTexture( "depthNormalMap", &builtinTargets.depthNormalTarget, 0 );
-                                                              ssaoShader.SetTexture( "noiseMap", &noiseTexture, 1 );
-                                                              ssaoShader.SetMatrix( "_ProjectionMatrix", state.projection );
-                                                              
-                                                              const float tanHalfFov = std::tan( fovDegrees * 0.5f * MathUtil::deg2rad );
-                                                              ssaoShader.SetFloat( "uTanHalfFov", tanHalfFov );
-                                                              ssaoShader.SetFloat( "uAspectRatio", Width() / (float)Height() );
-                                                              ssaoShader.SetConstantBuffers();
-                                                              
-                                                              GfxDevice::Instance().Set_sRGB_Writes( false );
-                                                              
-                                                              quadBuffer.Bind();
-                                                              quadBuffer.Draw();
-                                                              
-                                                              ssaoShader.SetTexture( "depthNormalMap", &builtinTargets.depthNormalTarget, 666 );
-                                                              BlurSSAO( builtinTargets.ssaoTarget, builtinTargets.ssaoBlurTarget );
-                                                              GfxDevice::Instance().Set_sRGB_Writes( true );
-                                                              }
-    );*/
     
     RenderTexture cubeRT;
     cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
@@ -195,7 +161,7 @@ int main()
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 512 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );

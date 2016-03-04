@@ -64,7 +64,7 @@ namespace ae3d
         static const std::size_t StorageSize = 1384;
         static const std::size_t StorageAlign = 16;
         
-        std::aligned_storage<StorageSize, StorageAlign>::type _storage;
+        std::aligned_storage<StorageSize, StorageAlign>::type _storage = {};
     };
 }
 #endif
