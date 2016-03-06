@@ -91,7 +91,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    const VkFormat format = opaque ? VK_FORMAT_R8G8B8_UNORM : VK_FORMAT_R8G8B8A8_UNORM;
+    //const VkFormat format = opaque ? VK_FORMAT_R8G8B8_UNORM : VK_FORMAT_R8G8B8A8_UNORM;
+    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
     VkFormatProperties formatProperties;
     vkGetPhysicalDeviceFormatProperties( GfxDeviceGlobal::physicalDevice, format, &formatProperties );
@@ -149,7 +150,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     memcpy( mapped, data, dataSize );
 
     vkUnmapMemory( GfxDeviceGlobal::device, mappableMemory );
-    __debugbreak();
+    //__debugbreak();
     // Staging (as opposed to linear loading path)
     {
         VkCommandBufferBeginInfo cmdBufInfo = {};

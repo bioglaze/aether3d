@@ -84,7 +84,7 @@ namespace GfxDeviceGlobal
 
 namespace debug
 {
-    bool enabled = true;
+    bool enabled = false;
     const int validationLayerCount = 9;
     const char *validationLayerNames[] =
     {
@@ -150,7 +150,10 @@ namespace debug
 
     void Free( VkInstance instance )
     {
-        DestroyDebugReportCallback( instance, debugReportCallback, nullptr );
+        if (enabled)
+        {
+            DestroyDebugReportCallback( instance, debugReportCallback, nullptr );
+        }
     }
 }
 
@@ -251,6 +254,24 @@ namespace ae3d
         VkPipelineColorBlendAttachmentState blendAttachmentState[ 1 ] = {};
         blendAttachmentState[ 0 ].colorWriteMask = 0xF;
         blendAttachmentState[ 0 ].blendEnable = blendMode != ae3d::GfxDevice::BlendMode::Off ? VK_TRUE : VK_FALSE;
+        if (blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend)
+        {
+            blendAttachmentState[ 0 ].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+            blendAttachmentState[ 0 ].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            blendAttachmentState[ 0 ].colorBlendOp = VK_BLEND_OP_ADD;
+            blendAttachmentState[ 0 ].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            blendAttachmentState[ 0 ].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+            blendAttachmentState[ 0 ].alphaBlendOp = VK_BLEND_OP_ADD;
+        }
+        else if (blendMode == ae3d::GfxDevice::BlendMode::Additive)
+        {
+            blendAttachmentState[ 0 ].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            blendAttachmentState[ 0 ].dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            blendAttachmentState[ 0 ].colorBlendOp = VK_BLEND_OP_ADD;
+            blendAttachmentState[ 0 ].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            blendAttachmentState[ 0 ].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+            blendAttachmentState[ 0 ].alphaBlendOp = VK_BLEND_OP_ADD;
+        }
         colorBlendState.attachmentCount = 1;
         colorBlendState.pAttachments = blendAttachmentState;
 
