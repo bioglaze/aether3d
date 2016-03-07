@@ -14,6 +14,7 @@ namespace ae3d
     class Material
     {
   public:
+        /// Depth function used when rendering a mesh using material.
         enum DepthFunction { NoneWriteOff, LessOrEqualWriteOn };
 
         /// Sets a texture into every material, overriding textures set by SetTexture.
@@ -36,7 +37,7 @@ namespace ae3d
         /// \return Depth function.
         DepthFunction GetDepthFunction() const { return depthFunction; }
         
-        /// \param depthFunction Depth function.
+        /// \param aDepthFunction Depth function.
         void SetDepthFunction( DepthFunction aDepthFunction ) { depthFunction = aDepthFunction; }
         
         /// \param name Name. This is a uniform in the shader.

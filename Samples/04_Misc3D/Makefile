@@ -17,7 +17,7 @@ LINKER := -lOpenAL32 -lOpenGL32 -lgdi32
 LIB_PATH := -L../../Engine/ThirdParty/lib
 endif
 
-WARNINGS := -pedantic -Wall -Wextra
+WARNINGS := -Wpedantic -Wall -Wextra
 
 all:
 ifeq ($(OS),Windows_NT)

@@ -70,7 +70,7 @@ namespace ae3d
         /// \param renderTexture 2D or Cube render texture.
         void SetTargetTexture( RenderTexture* renderTexture );
 
-        /// \param clearFlag Clear flag. Defaults to DepthAndColor.
+        /// \param aClearFlag Clear flag. Defaults to DepthAndColor.
         void SetClearFlag( ClearFlag aClearFlag ) { clearFlag = aClearFlag; }
         
         /// \param aLayerMask Layer mask contains OR'd layers that this camera renders into.
