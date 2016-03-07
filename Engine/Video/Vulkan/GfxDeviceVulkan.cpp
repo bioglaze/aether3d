@@ -70,6 +70,7 @@ namespace GfxDeviceGlobal
     std::vector< SwapchainBuffer > swapchainBuffers;
     std::vector< VkFramebuffer > frameBuffers;
     VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE;
+    VkSemaphore renderCompleteSemaphore = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
     VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
@@ -84,7 +85,7 @@ namespace GfxDeviceGlobal
 
 namespace debug
 {
-    bool enabled = false;
+    bool enabled = true; // Disable when using RenderDoc.
     const int validationLayerCount = 9;
     const char *validationLayerNames[] =
     {
@@ -122,6 +123,9 @@ namespace debug
         else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
         {
             ae3d::System::Print( "Vulkan warning: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
+#if _MSC_VER && _DEBUG
+            __debugbreak();
+#endif
         }
 
         return false;
@@ -216,8 +220,8 @@ namespace ae3d
         VkSamplerCreateInfo sampler = {};
         sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
         sampler.pNext = nullptr;
-        sampler.magFilter = VK_FILTER_NEAREST; // nearest for debugging
-        sampler.minFilter = VK_FILTER_NEAREST;
+        sampler.magFilter = VK_FILTER_LINEAR;
+        sampler.minFilter = VK_FILTER_LINEAR;
         sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
         sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -460,7 +464,7 @@ namespace ae3d
 
         const VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         const VkPipelineStageFlags destStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-        //__debugbreak();
+
         vkCmdPipelineBarrier(
             cmdbuffer,
             srcStageFlags,
@@ -1232,6 +1236,20 @@ namespace ae3d
         CreateDescriptorPool();
         CreateSamplers();
 
+        VkSemaphoreCreateInfo presentCompleteSemaphoreCreateInfo = {};
+        presentCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        presentCompleteSemaphoreCreateInfo.pNext = nullptr;
+
+        err = vkCreateSemaphore( GfxDeviceGlobal::device, &presentCompleteSemaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
+        CheckVulkanResult( err, "vkCreateSemaphore" );
+
+        VkSemaphoreCreateInfo renderCompleteSemaphoreCreateInfo = {};
+        renderCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        renderCompleteSemaphoreCreateInfo.pNext = nullptr;
+
+        err = vkCreateSemaphore( GfxDeviceGlobal::device, &renderCompleteSemaphoreCreateInfo, nullptr, &GfxDeviceGlobal::renderCompleteSemaphore );
+        CheckVulkanResult( err, "vkCreateSemaphore" );
+
         GfxDevice::SetClearColor( 0, 0, 0 );
     }
 }
@@ -1406,30 +1424,25 @@ void ae3d::GfxDevice::ErrorCheck( const char* info )
 
 void ae3d::GfxDevice::BeginFrame()
 {
-    VkSemaphoreCreateInfo presentCompleteSemaphoreCreateInfo = {};
-    presentCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    presentCompleteSemaphoreCreateInfo.pNext = nullptr;
-    presentCompleteSemaphoreCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-    VkResult err = vkCreateSemaphore( GfxDeviceGlobal::device, &presentCompleteSemaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
-    CheckVulkanResult( err, "vkCreateSemaphore" );
-
-    err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, GfxDeviceGlobal::presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
+    VkResult err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, GfxDeviceGlobal::presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
     CheckVulkanResult( err, "acquireNextImage" );
 }
 
 void ae3d::GfxDevice::Present()
 {
-    VkResult err;
+    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pWaitDstStageMask = &pipelineStages;
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
 
-    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    VkResult err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     CheckVulkanResult( err, "vkQueueSubmit" );
 
     VkPresentInfoKHR presentInfo = {};
@@ -1438,10 +1451,10 @@ void ae3d::GfxDevice::Present()
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = &GfxDeviceGlobal::swapChain;
     presentInfo.pImageIndices = &GfxDeviceGlobal::currentBuffer;
+    presentInfo.pWaitSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
+    presentInfo.waitSemaphoreCount = 1;
     err = queuePresentKHR( GfxDeviceGlobal::graphicsQueue, &presentInfo );
     CheckVulkanResult( err, "queuePresent" );
-
-    vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );
 
     VkImageMemoryBarrier postPresentBarrier = {};
     postPresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1495,7 +1508,9 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     {
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
-
+    
+    vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::renderCompleteSemaphore, nullptr );
+    vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );
     vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
     vkDestroySwapchainKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, nullptr );
     vkDestroyCommandPool( GfxDeviceGlobal::device, GfxDeviceGlobal::cmdPool, nullptr );
@@ -1505,7 +1520,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
-
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool enable )

@@ -28,7 +28,7 @@ int main()
 
     // Temporarily before LoadBuiltinAssets because texture is used in descriptor table that gets initted there.
     Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents( "glider128.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    spriteTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
     System::LoadBuiltinAssets();
 

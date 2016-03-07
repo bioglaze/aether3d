@@ -94,9 +94,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     //const VkFormat format = opaque ? VK_FORMAT_R8G8B8_UNORM : VK_FORMAT_R8G8B8A8_UNORM;
     const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
-    VkFormatProperties formatProperties;
-    vkGetPhysicalDeviceFormatProperties( GfxDeviceGlobal::physicalDevice, format, &formatProperties );
-    
     VkImageCreateInfo imageCreateInfo = {};
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageCreateInfo.pNext = nullptr;
@@ -150,7 +147,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     memcpy( mapped, data, dataSize );
 
     vkUnmapMemory( GfxDeviceGlobal::device, mappableMemory );
-    //__debugbreak();
+
     // Staging (as opposed to linear loading path)
     {
         VkCommandBufferBeginInfo cmdBufInfo = {};
@@ -161,6 +158,12 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
         err = vkBeginCommandBuffer( Texture2DGlobal::texCmdBuffer, &cmdBufInfo );
         CheckVulkanResult( err, "vkBeginCommandBuffer in Texture2D" );
+
+        SetImageLayout( Texture2DGlobal::texCmdBuffer,
+            mappableImage,
+            VK_IMAGE_ASPECT_COLOR_BIT,
+            VK_IMAGE_LAYOUT_GENERAL, // Was UNDEFINED in sample code, but caused a warning.
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
 
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -179,12 +182,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
         err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
         CheckVulkanResult( err, "vkBindImageMemory in Texture2D" );
-
-        SetImageLayout( Texture2DGlobal::texCmdBuffer,
-            mappableImage,
-            VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_GENERAL, // Was UNDEFINED in sample code, but caused a warning.
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
 
         SetImageLayout( Texture2DGlobal::texCmdBuffer,
             image,
@@ -250,13 +247,12 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
-    viewInfo.subresourceRange.levelCount = 1; // texture.mipLevels;
+    viewInfo.subresourceRange.levelCount = 1;
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
     CheckVulkanResult( err, "vkCreateImageView in Texture2D" );
 
     // TODO remove
-    System::Print("setting tempImageView to texture from %s\n", fileContents.path.c_str());
     Texture2DGlobal::tempImageView = view;
 
     stbi_image_free( data );
