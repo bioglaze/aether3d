@@ -38,6 +38,10 @@ namespace ae3d
         /// \param anisotropy Anisotropy. Value range is 1-16 depending on support.
         void LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter, ColorSpace colorSpace, float anisotropy );
 
+#if RENDERER_VULKAN
+        VkImageView& GetView() { return view; }
+#endif
+
     private:
         /// \param path Path.
         void LoadDDS( const char* path );

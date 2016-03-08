@@ -25,11 +25,6 @@ int main()
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
     Window::GetSize( width, height );
-
-    // Temporarily before LoadBuiltinAssets because texture is used in descriptor table that gets initted there.
-    Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
-
     System::LoadBuiltinAssets();
 
     GameObject camera;
@@ -38,6 +33,9 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1.0f, 0.5f, 0.5f ) );
     camera.AddComponent<TransformComponent>();
    
+    Texture2D spriteTex;
+    spriteTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
     spriteContainer.AddComponent<TransformComponent>();
@@ -45,7 +43,7 @@ int main()
     sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
     
     Texture2D fontTex;
-    //fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+    fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
     
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
@@ -58,7 +56,7 @@ int main()
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
-    //scene.Add( &textContainer );
+    scene.Add( &textContainer );
     
     bool quit = false;
     

@@ -32,7 +32,6 @@ namespace Texture2DGlobal
 {
     ae3d::Texture2D defaultTexture;
     VkCommandBuffer texCmdBuffer = VK_NULL_HANDLE;
-    VkImageView tempImageView = VK_NULL_HANDLE;
 }
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
@@ -251,9 +250,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
     CheckVulkanResult( err, "vkCreateImageView in Texture2D" );
-
-    // TODO remove
-    Texture2DGlobal::tempImageView = view;
 
     stbi_image_free( data );
 }

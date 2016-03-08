@@ -7,18 +7,13 @@
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
+    extern ae3d::Texture2D* texture0;
 }
 
 namespace ae3d
 {
     void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
     VkBool32 GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-
-    VkBuffer Shader::ubo;
-    VkDeviceMemory Shader::uboMemory;
-    VkDescriptorBufferInfo Shader::uboDesc;
-
-    void AllocateDescriptorSet();
 }
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -67,14 +62,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         System::Assert( fragmentInfo.module != VK_NULL_HANDLE, "fragment shader module not created" );
     }
 
-    static bool uboCreated = false;
-    if (!uboCreated)
-    {
-        CreateUBO();
-        ae3d::AllocateDescriptorSet();
-        uboCreated = true;
-    }
-
+    CreateConstantBuffer();
     handle = 1;
 }
 
@@ -86,7 +74,7 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, con
     LoadSPIRV( vertexDataSPIRV, fragmentDataSPIRV );
 }
 
-void ae3d::Shader::CreateUBO()
+void ae3d::Shader::CreateConstantBuffer()
 {
     VkBufferCreateInfo bufferInfo = {};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -138,6 +126,7 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
 {
+    GfxDeviceGlobal::texture0 = const_cast< Texture2D* >(texture);
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )

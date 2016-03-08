@@ -123,8 +123,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
         VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
-        static VkDescriptorBufferInfo uboDesc;
-
+        VkDescriptorBufferInfo& GetUBODesc() { return uboDesc; }
 #endif
         /// Wraps an int that is defaulted to -1. Needed for uniform handling.
         struct IntDefaultedToMinusOne
@@ -144,14 +143,16 @@ namespace ae3d
         ID3D12ShaderReflection* reflector = nullptr;
 #endif
 #if RENDERER_VULKAN
-        void CreateUBO();
+        void CreateConstantBuffer();
         void UpdateUniformBuffers();
 
         VkPipelineShaderStageCreateInfo vertexInfo;
         VkPipelineShaderStageCreateInfo fragmentInfo;
         
-        static VkBuffer ubo;
-        static VkDeviceMemory uboMemory;
+        VkBuffer ubo;
+        VkDeviceMemory uboMemory;
+        VkDescriptorBufferInfo uboDesc;
+
         float tempMat4[ 16 ];
 #endif
         unsigned handle = 0;
