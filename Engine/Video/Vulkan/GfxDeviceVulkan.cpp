@@ -1076,7 +1076,7 @@ namespace ae3d
     {
         VkDescriptorPoolSize typeCounts[ 2 ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        typeCounts[ 0 ].descriptorCount = 1;
+        typeCounts[ 0 ].descriptorCount = 10;
         typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         typeCounts[ 1 ].descriptorCount = 10;
 

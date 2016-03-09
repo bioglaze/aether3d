@@ -24,11 +24,16 @@ void ae3d::CameraComponent::SetProjection( float left, float right, float bottom
 {
     orthoParams.left = left;
     orthoParams.right = right;
+#if RENDERER_VULKAN
+    orthoParams.top = bottom;
+    orthoParams.down = top;
+#else
     orthoParams.top = top;
     orthoParams.down = bottom;
+#endif
     nearp = aNear;
     farp = aFar;
-    projectionMatrix.MakeProjection( left, right, bottom, top, nearp, farp );
+    projectionMatrix.MakeProjection( orthoParams.left, orthoParams.right, orthoParams.down, orthoParams.top, nearp, farp );
 }
 
 void ae3d::CameraComponent::SetProjection( float aFovDegrees, float aAspect, float aNear, float aFar )

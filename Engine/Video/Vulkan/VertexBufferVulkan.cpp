@@ -95,24 +95,88 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
     bindingDescriptions[ 0 ].stride = vertexStride;
     bindingDescriptions[ 0 ].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-    attributeDescriptions.resize( 3 );
-    // Location 0 : Position
-    attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
-    attributeDescriptions[ 0 ].location = 0;
-    attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
-    attributeDescriptions[ 0 ].offset = 0;
+    if (vertexFormat == VertexFormat::PTC)
+    {
+        attributeDescriptions.resize( 3 );
 
-    // Location 1 : TexCoord
-    attributeDescriptions[ 1 ].binding = VERTEX_BUFFER_BIND_ID;
-    attributeDescriptions[ 1 ].location = 1;
-    attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
-    attributeDescriptions[ 1 ].offset = sizeof( float ) * 3;
+        // Location 0 : Position
+        attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 0 ].location = 0;
+        attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[ 0 ].offset = 0;
 
-    // Location 2 : Color
-    attributeDescriptions[ 2 ].binding = VERTEX_BUFFER_BIND_ID;
-    attributeDescriptions[ 2 ].location = 2;
-    attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-    attributeDescriptions[ 2 ].offset = sizeof( float ) * 5;
+        // Location 1 : TexCoord
+        attributeDescriptions[ 1 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 1 ].location = 1;
+        attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[ 1 ].offset = sizeof( float ) * 3;
+
+        // Location 2 : Color
+        attributeDescriptions[ 2 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 2 ].location = 2;
+        attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[ 2 ].offset = sizeof( float ) * 5;
+    }
+    else if (vertexFormat == VertexFormat::PTN)
+    {
+        attributeDescriptions.resize( 3 );
+
+        // Location 0 : Position
+        attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 0 ].location = 0;
+        attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[ 0 ].offset = 0;
+
+        // Location 1 : TexCoord
+        attributeDescriptions[ 1 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 1 ].location = 1;
+        attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[ 1 ].offset = sizeof( float ) * 3;
+
+        // Location 2 : Normal
+        attributeDescriptions[ 2 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 2 ].location = 2;
+        attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[ 2 ].offset = sizeof( float ) * 5;
+    }
+    else if (vertexFormat == VertexFormat::PTNTC)
+    {
+        attributeDescriptions.resize( 5 );
+
+        // Location 0 : Position
+        attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 0 ].location = 0;
+        attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[ 0 ].offset = 0;
+
+        // Location 1 : TexCoord
+        attributeDescriptions[ 1 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 1 ].location = 1;
+        attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[ 1 ].offset = sizeof( float ) * 3;
+
+        // Location 2 : Normal
+        attributeDescriptions[ 2 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 2 ].location = 2;
+        attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[ 2 ].offset = sizeof( float ) * 5;
+
+        // Location 3 : Tangent
+        attributeDescriptions[ 3 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 3 ].location = 2;
+        attributeDescriptions[ 3 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[ 3 ].offset = sizeof( float ) * 8;
+
+        // Location 4 : Color
+        attributeDescriptions[ 4 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 4 ].location = 2;
+        attributeDescriptions[ 4 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[ 4 ].offset = sizeof( float ) * 12;
+    }
+    else
+    {
+        System::Assert( false, "unhandled vertex format" );
+    }
 
     inputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     inputStateCreateInfo.pNext = nullptr;
@@ -126,19 +190,19 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 {
     vertexFormat = VertexFormat::PTC;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * sizeof( Face ) );
+    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * 2 );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTN;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * sizeof( Face ) );
+    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * 2 );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * sizeof( Face ) );
+    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * 2 );
 }
