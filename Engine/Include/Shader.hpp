@@ -25,15 +25,14 @@ namespace ae3d
     class Shader
     {
     public:
-        /// \return True if the shader has been succesfully compiled and linked.
-        bool IsValid() const { return handle != 0; }
-
         /// Loads a GLSL or HLSL shader from source code. For portability it's better to call the other
         /// load method that can take all shaders as input.
         /// \param vertexSource Vertex shader source. Language depends on the renderer.
         /// \param fragmentSource Fragment shader source. Language depends on the renderer.
         void Load( const char* vertexSource, const char* fragmentSource );
 #if RENDERER_VULKAN
+        bool IsValid() const { return ubo != VK_NULL_HANDLE; }
+
         /// Loads SPIR-V shader.
         /// \param spirvData SPIR-V file contents.
         void LoadSPIRV( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData );
@@ -55,6 +54,8 @@ namespace ae3d
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
 #endif
 #if RENDERER_OPENGL
+        /// \return True if the shader has been succesfully compiled and linked.
+        bool IsValid() const { return handle != 0; }
         unsigned GetHandle() const { return handle; }
 #endif
         
@@ -97,12 +98,15 @@ namespace ae3d
         void SetVector4( const char* name, const float* vec4 );
 
 #if RENDERER_D3D12
+        bool IsValid() const { return blobShaderVertex != nullptr; }
         ID3D12Resource* GetConstantBuffer() { return constantBuffer; }
         ID3DBlob* blobShaderVertex = nullptr;
         ID3DBlob* blobShaderPixel = nullptr;
 #endif
 
 #if RENDERER_METAL
+        bool IsValid() const { return vertexProgram != nullptr; }
+
         enum class UniformType { Float, Float2, Float3, Float4, Matrix4x4 };
         
         struct Uniform
@@ -141,6 +145,7 @@ namespace ae3d
         ID3D12Resource* constantBuffer = nullptr;
         void* constantBufferUpload = nullptr;
         ID3D12ShaderReflection* reflector = nullptr;
+        std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
 #endif
 #if RENDERER_VULKAN
         void CreateConstantBuffer();
@@ -149,14 +154,16 @@ namespace ae3d
         VkPipelineShaderStageCreateInfo vertexInfo;
         VkPipelineShaderStageCreateInfo fragmentInfo;
         
-        VkBuffer ubo;
+        VkBuffer ubo = VK_NULL_HANDLE;
         VkDeviceMemory uboMemory;
         VkDescriptorBufferInfo uboDesc;
 
         float tempMat4[ 16 ];
 #endif
+#if RENDERER_OPENGL
         unsigned handle = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
+#endif
     };
 }
 #endif

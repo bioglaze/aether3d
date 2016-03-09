@@ -163,13 +163,13 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
 
         // Location 3 : Tangent
         attributeDescriptions[ 3 ].binding = VERTEX_BUFFER_BIND_ID;
-        attributeDescriptions[ 3 ].location = 2;
+        attributeDescriptions[ 3 ].location = 3;
         attributeDescriptions[ 3 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
         attributeDescriptions[ 3 ].offset = sizeof( float ) * 8;
 
         // Location 4 : Color
         attributeDescriptions[ 4 ].binding = VERTEX_BUFFER_BIND_ID;
-        attributeDescriptions[ 4 ].location = 2;
+        attributeDescriptions[ 4 ].location = 4;
         attributeDescriptions[ 4 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
         attributeDescriptions[ 4 ].offset = sizeof( float ) * 12;
     }

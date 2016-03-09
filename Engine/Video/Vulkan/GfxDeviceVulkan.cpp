@@ -196,13 +196,12 @@ namespace ae3d
         return h;
     }
 
-    // FIXME: duplicated in d3d12
     unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
     {
         std::string hashString;
         hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
-        //hashString += std::to_string( (ptrdiff_t)&shader.get );
-        //hashString += std::to_string( (ptrdiff_t)&shader.blobShaderPixel );
+        hashString += std::to_string( (ptrdiff_t)&shader.GetVertexInfo().module );
+        hashString += std::to_string( (ptrdiff_t)&shader.GetFragmentInfo().module );
         hashString += std::to_string( (unsigned)blendMode );
         hashString += std::to_string( ((unsigned)depthFunc) + 4 );
 
@@ -1085,7 +1084,7 @@ namespace ae3d
         descriptorPoolInfo.pNext = nullptr;
         descriptorPoolInfo.poolSizeCount = 2;
         descriptorPoolInfo.pPoolSizes = typeCounts;
-        descriptorPoolInfo.maxSets = 2;
+        descriptorPoolInfo.maxSets = 100;
         descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
         VkResult err = vkCreateDescriptorPool( GfxDeviceGlobal::device, &descriptorPoolInfo, nullptr, &GfxDeviceGlobal::descriptorPool );
@@ -1342,7 +1341,7 @@ void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
 
 int ae3d::GfxDevice::GetDrawCalls()
 {
-    return 0;
+    return GfxDeviceGlobal::drawCalls;
 }
 
 int ae3d::GfxDevice::GetTextureBinds()

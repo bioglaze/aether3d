@@ -18,6 +18,7 @@ namespace ae3d
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
+    CreateConstantBuffer();
 }
 
 void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData )
@@ -63,7 +64,6 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
     }
 
     CreateConstantBuffer();
-    handle = 1;
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, const FileSystem::FileContentsData& /*fragmentGLSL*/,
@@ -106,6 +106,8 @@ void ae3d::Shader::CreateConstantBuffer()
 
 void ae3d::Shader::UpdateUniformBuffers()
 {
+    ae3d::System::Assert( uboMemory != VK_NULL_HANDLE, "ubo memory not allocated" );
+
     uint8_t *pData;
     VkResult err = vkMapMemory( GfxDeviceGlobal::device, uboMemory, 0, sizeof( Matrix44 ), 0, (void **)&pData );
     CheckVulkanResult( err, "vkMapMemory UBO" );
