@@ -12,6 +12,7 @@
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
 #include "Texture2D.hpp"
+#include "TextureCube.hpp"
 
 // Current implementation loosely based on samples by Sascha Willems - https://github.com/SaschaWillems/Vulkan, licensed under MIT license
 
@@ -74,18 +75,19 @@ namespace GfxDeviceGlobal
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
     std::uint32_t queueNodeIndex = UINT32_MAX;
     std::uint32_t currentBuffer = 0;
-    ae3d::Texture2D* texture0 = nullptr;
+    ae3d::Texture2D* texture2d0 = nullptr;
+    ae3d::TextureCube* textureCube0 = nullptr;
     std::vector< VkDescriptorSet > frameHeaps;
     int drawCalls = 0;
 }
 
 namespace debug
 {
-    bool enabled = true; // Disable when using RenderDoc.
+    bool enabled = false; // Disable when using RenderDoc.
     const int validationLayerCount = 9;
     const char *validationLayerNames[] =
     {
-        "VK_LAYER_LUNARG_threading",
+        "VK_LAYER_GOOGLE_threading",
         "VK_LAYER_LUNARG_mem_tracker",
         "VK_LAYER_LUNARG_object_tracker",
         "VK_LAYER_LUNARG_draw_state",
@@ -1037,7 +1039,8 @@ namespace ae3d
 
         err = vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, GfxDeviceGlobal::depthStencil.mem, 0 );
         CheckVulkanResult( err, "depth stencil memory" );
-        SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::depthStencil.image, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
+        SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::depthStencil.image, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+                        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
 
         depthStencilView.image = GfxDeviceGlobal::depthStencil.image;
         err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &GfxDeviceGlobal::depthStencil.view );
@@ -1391,7 +1394,19 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
     }
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( shader.GetUBODesc(), GfxDeviceGlobal::texture0 ? GfxDeviceGlobal::texture0->GetView() : VK_NULL_HANDLE );
+    VkImageView view = VK_NULL_HANDLE;
+
+    // TODO: polymorphism
+    if (GfxDeviceGlobal::texture2d0)
+    {
+        view = GfxDeviceGlobal::texture2d0->GetView();
+    }
+    else if (GfxDeviceGlobal::textureCube0)
+    {
+        view = GfxDeviceGlobal::textureCube0->GetView();
+    }
+
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( shader.GetUBODesc(), view );
     GfxDeviceGlobal::frameHeaps.push_back( descriptorSet );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS,

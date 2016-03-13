@@ -7,7 +7,8 @@
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
-    extern ae3d::Texture2D* texture0;
+    extern ae3d::Texture2D* texture2d0;
+    extern ae3d::TextureCube* textureCube0;
 }
 
 namespace ae3d
@@ -16,7 +17,7 @@ namespace ae3d
     VkBool32 GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
 }
 
-void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
+void ae3d::Shader::Load( const char* /*vertexSourceGLSL*/, const char* /*fragmentSourceGLSL*/ )
 {
     CreateConstantBuffer();
 }
@@ -128,11 +129,14 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
 {
-    GfxDeviceGlobal::texture0 = const_cast< Texture2D* >(texture);
+    GfxDeviceGlobal::textureCube0 = nullptr;
+    GfxDeviceGlobal::texture2d0 = const_cast< Texture2D* >(texture);
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )
 {
+    GfxDeviceGlobal::texture2d0 = nullptr;
+    GfxDeviceGlobal::textureCube0 = const_cast< TextureCube* >(texture);
 }
 
 void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* texture, int textureUnit )

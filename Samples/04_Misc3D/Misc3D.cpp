@@ -179,7 +179,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-    
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -198,6 +198,7 @@ int main()
     {
         scene.Add( &sponzaGameObjects[ i ] );
     }
+#endif
     // Sponza ends
     
     RenderTexture rtTex;
@@ -218,16 +219,16 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
-    scene.Add( &cube );
-    scene.Add( &copiedCube );
+    //scene.Add( &cube );
+    //scene.Add( &copiedCube );
     //scene.Add( &cube2 );
-    scene.Add( &statsContainer );
-    scene.Add( &dirLight );
+    //scene.Add( &statsContainer );
+    //scene.Add( &dirLight );
     //scene.Add( &spotLight );
     //scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
+    //scene.Add( &rtCamera );
 
     GameObject cubes[ 5 ];
 
@@ -239,7 +240,7 @@ int main()
         cubes[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { i * 4.5f - 4, 0, -100 } );
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
-        scene.Add( &cubes[ i ] );
+        //scene.Add( &cubes[ i ] );
     }
 
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );

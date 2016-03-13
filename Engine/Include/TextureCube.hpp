@@ -2,6 +2,9 @@
 #define TEXTURE_CUBE_H
 
 #include <string>
+#if RENDERER_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 #include "TextureBase.hpp"
 
 namespace ae3d
@@ -50,8 +53,17 @@ namespace ae3d
         /// \return Negative Z texture path.
         const std::string& NegZ() const { return negZpath; }
 
+#if RENDERER_VULKAN
+        VkImageView& GetView() { return view; }
+#endif
+
     private:
         std::string posXpath, posYpath, negXpath, negYpath, posZpath, negZpath;
+#if RENDERER_VULKAN
+        VkImage image = VK_NULL_HANDLE;
+        VkImageView view;
+        VkDeviceMemory deviceMemory;
+#endif
     };
 }
 
