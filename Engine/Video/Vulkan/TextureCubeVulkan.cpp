@@ -1,4 +1,5 @@
 #include "TextureCube.hpp"
+#include <cstring>
 #include <vulkan/vulkan.h>
 #include "stb_image.c"
 #include "FileSystem.hpp"
@@ -143,7 +144,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             const int bytesPerPixel = 4;
             std::size_t dataSize = bytesPerPixel * width * height;
-            memcpy( mapped, data, dataSize );
+            std::memcpy( mapped, data, dataSize );
 
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
 

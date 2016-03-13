@@ -1,4 +1,5 @@
 #include "VertexBuffer.hpp"
+#include <cstring>
 #include "System.hpp"
 
 namespace GfxDeviceGlobal
@@ -61,7 +62,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
     err = vkMapMemory( GfxDeviceGlobal::device, vertexMem, 0, vertexBufferSize, 0, &data );
     CheckVulkanResult( err, "vkAllocateMemory" );
 
-    memcpy( data, vertexData, vertexBufferSize );
+    std::memcpy( data, vertexData, vertexBufferSize );
     
     vkUnmapMemory( GfxDeviceGlobal::device, vertexMem );
     err = vkBindBufferMemory( GfxDeviceGlobal::device, vertexBuffer, vertexMem, 0 );
@@ -85,7 +86,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
     err = vkMapMemory( GfxDeviceGlobal::device, indexMem, 0, indexBufferSize, 0, &data );
     CheckVulkanResult( err, "vkMapMemory" );
 
-    memcpy( data, indexData, indexBufferSize );
+    std::memcpy( data, indexData, indexBufferSize );
     vkUnmapMemory( GfxDeviceGlobal::device, indexMem );
     err = vkBindBufferMemory( GfxDeviceGlobal::device, indexBuffer, indexMem, 0 );
     CheckVulkanResult( err, "vkBindBufferMemory index buffer" );

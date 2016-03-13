@@ -1,7 +1,4 @@
 #include "GfxDevice.hpp"
-#if _MSC_VER
-#include <Windows.h>
-#endif
 #include <cstdint>
 #include <map>
 #include <vector> 
@@ -13,6 +10,12 @@
 #include "VertexBuffer.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
+#if VK_USE_PLATFORM_WIN32_KHR
+#include <Windows.h>
+#endif
+#if VK_USE_PLATFORM_XCB_KHR
+#include <X11/Xlib-xcb.h>
+#endif
 
 // Current implementation loosely based on samples by Sascha Willems - https://github.com/SaschaWillems/Vulkan, licensed under MIT license
 
@@ -161,8 +164,12 @@ namespace debug
 
 namespace WindowGlobal
 {
-#if _MSC_VER
+#if VK_USE_PLATFORM_WIN32_KHR
     extern HWND hwnd;
+#endif
+#if VK_USE_PLATFORM_XCB_KHR
+    extern xcb_connection_t* connection;
+    extern xcb_window_t window;
 #endif
     extern int windowWidth;
     extern int windowHeight;
@@ -529,13 +536,14 @@ namespace ae3d
         System::Assert( GfxDeviceGlobal::physicalDevice != VK_NULL_HANDLE, "physicalDevice not initialized." );
 
         VkResult err;
-#if _MSC_VER
+#if VK_USE_PLATFORM_WIN32_KHR
         VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
         surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
         surfaceCreateInfo.hinstance = GetModuleHandle( nullptr );
         surfaceCreateInfo.hwnd = WindowGlobal::hwnd;
         err = vkCreateWin32SurfaceKHR( GfxDeviceGlobal::instance, &surfaceCreateInfo, nullptr, &GfxDeviceGlobal::surface );
-#else
+#endif
+#if VK_USE_PLATFORM_XCB_KHR
         VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
         surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
         surfaceCreateInfo.connection = WindowGlobal::connection;
@@ -808,15 +816,24 @@ namespace ae3d
         {
             instanceCreateInfo.enabledLayerCount = debug::validationLayerCount;
             instanceCreateInfo.ppEnabledLayerNames = debug::validationLayerNames;
-
+#if VK_USE_PLATFORM_WIN32_KHR
             static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME };
+#endif
+#if VK_USE_PLATFORM_XCB_KHR
+            static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME };
+#endif
             instanceCreateInfo.enabledExtensionCount = 3;
             instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
             result = vkCreateInstance( &instanceCreateInfo, nullptr, &GfxDeviceGlobal::instance );
         }
         else
         {
+#if VK_USE_PLATFORM_WIN32_KHR
             static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
+#endif
+#if VK_USE_PLATFORM_XCB_KHR
+            static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME };
+#endif
             instanceCreateInfo.enabledExtensionCount = 2;
             instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
             result = vkCreateInstance( &instanceCreateInfo, nullptr, &GfxDeviceGlobal::instance );

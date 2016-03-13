@@ -3,6 +3,7 @@
 #include "Matrix.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
+#include <cstring>
 
 namespace GfxDeviceGlobal
 {
@@ -113,7 +114,7 @@ void ae3d::Shader::UpdateUniformBuffers()
     VkResult err = vkMapMemory( GfxDeviceGlobal::device, uboMemory, 0, sizeof( Matrix44 ), 0, (void **)&pData );
     CheckVulkanResult( err, "vkMapMemory UBO" );
 
-    memcpy( pData, &tempMat4[ 0 ], sizeof( Matrix44 ) );
+    std::memcpy( pData, &tempMat4[ 0 ], sizeof( Matrix44 ) );
     vkUnmapMemory( GfxDeviceGlobal::device, uboMemory );
 }
 
@@ -123,7 +124,7 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    memcpy( &tempMat4[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
+    std::memcpy( &tempMat4[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
     UpdateUniformBuffers();
 }
 

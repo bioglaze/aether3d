@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <cstring>
 #include <vulkan/vulkan.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
@@ -143,7 +144,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     const int bytesPerPixel = 4;
     std::size_t dataSize = bytesPerPixel * width * height;
-    memcpy( mapped, data, dataSize );
+    std::memcpy( mapped, data, dataSize );
 
     vkUnmapMemory( GfxDeviceGlobal::device, mappableMemory );
 

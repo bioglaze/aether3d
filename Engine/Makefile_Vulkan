@@ -9,7 +9,7 @@ INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
- -Wunsafe-loop-optimizations -Wvector-operation-performance -Wzero-as-null-pointer-constant
+ -Wunsafe-loop-optimizations -Wvector-operation-performance
 CLANGWARNINGS := -Wall -Wextra -ansi -pedantic
 
 ifeq ($(COMPILER), clang)
@@ -27,7 +27,11 @@ WARNINGS := -Wall -ansi -pedantic
 ENGINE_LIB := libaether3d_osx_vulkan.a
 endif
 
+ifeq ($(UNAME), Linux)
+DEFINES := -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
+else
 DEFINES := -DRENDERER_VULKAN
+endif
 
 ifeq ($(OS),Windows_NT)
 ENGINE_LIB := libaether3d_win_vulkan.a
@@ -52,7 +56,7 @@ endif
 	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/GfxDeviceVulkan.cpp -o $(OUTPUT_DIR)/GfxDeviceVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RenderTextureVulkan.cpp -o $(OUTPUT_DIR)/RenderTextureVulkan.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RendererVulkan.cpp -o $(OUTPUT_DIR)/RendererVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/ShaderVulkan.cpp -o $(OUTPUT_DIR)/ShaderVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/Texture2DVulkan.cpp -o $(OUTPUT_DIR)/Texture2DVulkan.o
