@@ -40,8 +40,6 @@ void ae3d::Shader::LoadFromLibrary( const char* vertexShaderName, const char* fr
         NSLog( @"Shader: Could not load %s!\n", fragmentShaderName );
         return;
     }
-    
-    handle = 1;
 }
 
 void ae3d::Shader::Use()

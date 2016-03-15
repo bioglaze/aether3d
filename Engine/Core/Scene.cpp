@@ -499,11 +499,14 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         return;
     }
     
-    GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
 #if RENDERER_METAL
-    GfxDevice::BeginFrame();
-#endif
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+    GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
+    GfxDevice::BeginFrame();
+#else
+    GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
+    GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
+#endif
 
     for (auto j : gameObjectsWithMeshRenderer)
     {

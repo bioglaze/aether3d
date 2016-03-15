@@ -12,6 +12,13 @@
 		AB2CA8291C13664600D4D7C4 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8281C13664600D4D7C4 /* glider.png */; };
 		AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */; };
 		AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7839E31C70CA950065EF51 /* DepthNormals.metal */; };
+		AB9D9A281C96E993009DF897 /* back copy.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A211C96E993009DF897 /* back copy.jpg */; };
+		AB9D9A291C96E993009DF897 /* back.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A221C96E993009DF897 /* back.jpg */; };
+		AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A231C96E993009DF897 /* bottom.jpg */; };
+		AB9D9A2B1C96E993009DF897 /* front.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A241C96E993009DF897 /* front.jpg */; };
+		AB9D9A2C1C96E993009DF897 /* left.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A251C96E993009DF897 /* left.jpg */; };
+		AB9D9A2D1C96E993009DF897 /* right.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A261C96E993009DF897 /* right.jpg */; };
+		AB9D9A2E1C96E993009DF897 /* top.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A271C96E993009DF897 /* top.jpg */; };
 		ABCD9C671C12E1D900B94BD0 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */; };
 		ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C681C12F78200B94BD0 /* MetalKit.framework */; };
 		ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */; };
@@ -45,6 +52,13 @@
 		AB2CA8281C13664600D4D7C4 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
+		AB9D9A211C96E993009DF897 /* back copy.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "back copy.jpg"; path = "../../../../aether3d_build/Samples/skybox/back copy.jpg"; sourceTree = "<group>"; };
+		AB9D9A221C96E993009DF897 /* back.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = back.jpg; path = ../../../../aether3d_build/Samples/skybox/back.jpg; sourceTree = "<group>"; };
+		AB9D9A231C96E993009DF897 /* bottom.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bottom.jpg; path = ../../../../aether3d_build/Samples/skybox/bottom.jpg; sourceTree = "<group>"; };
+		AB9D9A241C96E993009DF897 /* front.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = front.jpg; path = ../../../../aether3d_build/Samples/skybox/front.jpg; sourceTree = "<group>"; };
+		AB9D9A251C96E993009DF897 /* left.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = left.jpg; path = ../../../../aether3d_build/Samples/skybox/left.jpg; sourceTree = "<group>"; };
+		AB9D9A261C96E993009DF897 /* right.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = right.jpg; path = ../../../../aether3d_build/Samples/skybox/right.jpg; sourceTree = "<group>"; };
+		AB9D9A271C96E993009DF897 /* top.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = top.jpg; path = ../../../../aether3d_build/Samples/skybox/top.jpg; sourceTree = "<group>"; };
 		ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		ABCD9C681C12F78200B94BD0 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = font_txt.fnt; path = ../../../../aether3d_build/Samples/font_txt.fnt; sourceTree = "<group>"; };
@@ -156,6 +170,13 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB9D9A211C96E993009DF897 /* back copy.jpg */,
+				AB9D9A221C96E993009DF897 /* back.jpg */,
+				AB9D9A231C96E993009DF897 /* bottom.jpg */,
+				AB9D9A241C96E993009DF897 /* front.jpg */,
+				AB9D9A251C96E993009DF897 /* left.jpg */,
+				AB9D9A261C96E993009DF897 /* right.jpg */,
+				AB9D9A271C96E993009DF897 /* top.jpg */,
 				AB7839E31C70CA950065EF51 /* DepthNormals.metal */,
 				AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */,
 				AB2CA8281C13664600D4D7C4 /* glider.png */,
@@ -295,12 +316,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB9D9A281C96E993009DF897 /* back copy.jpg in Resources */,
 				ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */,
 				ABE04F8B1C1216A80025C436 /* Assets.xcassets in Resources */,
 				ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */,
+				AB9D9A2D1C96E993009DF897 /* right.jpg in Resources */,
+				AB9D9A2B1C96E993009DF897 /* front.jpg in Resources */,
+				AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */,
+				AB9D9A291C96E993009DF897 /* back.jpg in Resources */,
 				AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */,
 				AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */,
 				AB2CA8291C13664600D4D7C4 /* glider.png in Resources */,
+				AB9D9A2E1C96E993009DF897 /* top.jpg in Resources */,
+				AB9D9A2C1C96E993009DF897 /* left.jpg in Resources */,
 				ABE04F8E1C1216A80025C436 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

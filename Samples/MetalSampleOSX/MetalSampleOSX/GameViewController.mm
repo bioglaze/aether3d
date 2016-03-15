@@ -17,6 +17,7 @@
 #import "Material.hpp"
 #import "Mesh.hpp"
 #import "Texture2D.hpp"
+#import "TextureCube.hpp"
 #import "Shader.hpp"
 #import "Scene.hpp"
 #import "Window.hpp"
@@ -43,13 +44,14 @@
     ae3d::Shader shader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
+    ae3d::TextureCube skyTex;
     ae3d::RenderTexture rtTex;
 }
 
 - (void)viewDidLoad
 {
     // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-    // Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.4.zip
+    // Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.5.zip
     
     [super viewDidLoad];
 
@@ -81,10 +83,16 @@
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera3d.AddComponent<ae3d::TransformComponent>();
+    camera3d.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -2, 0 ) );
     scene.Add( &camera3d );
 
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    skyTex.Load( ae3d::FileSystem::FileContents( "/left.jpg" ), ae3d::FileSystem::FileContents( "/right.jpg" ),
+                ae3d::FileSystem::FileContents( "/bottom.jpg" ), ae3d::FileSystem::FileContents( "/top.jpg" ),
+                ae3d::FileSystem::FileContents( "/front.jpg" ), ae3d::FileSystem::FileContents( "/back.jpg" ),
+                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB );
+    scene.SetSkybox( &skyTex );
     
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
     text.AddComponent<ae3d::TextRendererComponent>();
