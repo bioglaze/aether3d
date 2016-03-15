@@ -106,6 +106,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
     imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
     imageCreateInfo.flags = 0;
 
     VkImage mappableImage;
@@ -162,7 +163,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         SetImageLayout( Texture2DGlobal::texCmdBuffer,
             mappableImage,
             VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_GENERAL, // Was UNDEFINED in sample code, but caused a warning.
+            VK_IMAGE_LAYOUT_PREINITIALIZED,
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
 
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;

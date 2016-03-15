@@ -54,6 +54,7 @@ namespace GfxDeviceGlobal
     VkClearColorValue clearColor;
     std::vector< VkCommandBuffer > drawCmdBuffers;
     VkCommandBuffer setupCmdBuffer = VK_NULL_HANDLE;
+    VkCommandBuffer prePresentCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer postPresentCmdBuffer = VK_NULL_HANDLE;
     VkSwapchainKHR swapChain = VK_NULL_HANDLE;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
@@ -393,6 +394,9 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::postPresentCmdBuffer );
         CheckVulkanResult( err, "vkAllocateCommandBuffers" );
+
+        err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::prePresentCmdBuffer );
+        CheckVulkanResult( err, "vkAllocateCommandBuffers" );
     }
 
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout )
@@ -479,23 +483,88 @@ namespace ae3d
             1, &imageMemoryBarrier );
     }
 
-    namespace TextureLoader
+    void SubmitPrePresentBarrier()
     {
-        VkCommandBuffer cmdBuffer = VK_NULL_HANDLE;
+        VkCommandBufferBeginInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        void Init()
-        {
-            VkCommandBufferAllocateInfo cmdBufInfo = {};
-            cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            cmdBufInfo.commandPool = GfxDeviceGlobal::cmdPool;
-            cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            cmdBufInfo.commandBufferCount = 1;
+        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::prePresentCmdBuffer, &cmdBufInfo );
+        CheckVulkanResult( err, "vkBeginCommandBuffer" );
 
-            VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &cmdBuffer );
-            CheckVulkanResult( err, "vkAllocateCommandBuffers" );
-        }
+        VkImageMemoryBarrier prePresentBarrier = {};
+        prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        prePresentBarrier.pNext = nullptr;
+        prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        prePresentBarrier.dstAccessMask = 0;
+        prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        prePresentBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        prePresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        prePresentBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        prePresentBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+        prePresentBarrier.image = GfxDeviceGlobal::swapchainBuffers[ GfxDeviceGlobal::currentBuffer ].image;
+
+        vkCmdPipelineBarrier(
+            GfxDeviceGlobal::prePresentCmdBuffer,
+            VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &prePresentBarrier );
+
+        err = vkEndCommandBuffer( GfxDeviceGlobal::prePresentCmdBuffer );
+        CheckVulkanResult( err, "vkEndCommandBuffer" );
+
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &GfxDeviceGlobal::prePresentCmdBuffer;
+
+        err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+        CheckVulkanResult( err, "vkQueueSubmit" );
     }
 
+    void SubmitPostPresentBarrier()
+    {
+        VkCommandBufferBeginInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer, &cmdBufInfo );
+        CheckVulkanResult( err, "vkBeginCommandBuffer" );
+
+        VkImageMemoryBarrier postPresentBarrier = {};
+        postPresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        postPresentBarrier.pNext = nullptr;
+        postPresentBarrier.srcAccessMask = 0;
+        postPresentBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        postPresentBarrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        postPresentBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        postPresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        postPresentBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        postPresentBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+        postPresentBarrier.image = GfxDeviceGlobal::swapchainBuffers[ GfxDeviceGlobal::currentBuffer ].image;
+
+        vkCmdPipelineBarrier(
+            GfxDeviceGlobal::postPresentCmdBuffer,
+            VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &postPresentBarrier );
+
+        err = vkEndCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer );
+        CheckVulkanResult( err, "vkEndCommandBuffer" );
+
+        VkSubmitInfo submitPostInfo = {};
+        submitPostInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitPostInfo.commandBufferCount = 1;
+        submitPostInfo.pCommandBuffers = &GfxDeviceGlobal::postPresentCmdBuffer;
+
+        err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitPostInfo, VK_NULL_HANDLE );
+        CheckVulkanResult( err, "vkQueueSubmit" );
+    }
+    
     void AllocateSetupCommandBuffer()
     {
         System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized." );
@@ -1310,27 +1379,6 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
 {
     vkCmdEndRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
 
-    VkImageMemoryBarrier prePresentBarrier = {};
-    prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    prePresentBarrier.pNext = nullptr;
-    prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    prePresentBarrier.dstAccessMask = 0;
-    prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    prePresentBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    prePresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    prePresentBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    prePresentBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-    prePresentBarrier.image = GfxDeviceGlobal::swapchainBuffers[ GfxDeviceGlobal::currentBuffer ].image;
-
-    vkCmdPipelineBarrier(
-        GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ],
-        VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-        0,
-        0, nullptr,
-        0, nullptr,
-        1, &prePresentBarrier );
-
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
     CheckVulkanResult( err, "vkEndCommandBuffer" );
 
@@ -1447,6 +1495,8 @@ void ae3d::GfxDevice::BeginFrame()
 {
     VkResult err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, GfxDeviceGlobal::presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
     CheckVulkanResult( err, "acquireNextImage" );
+
+    SubmitPostPresentBarrier();
 }
 
 void ae3d::GfxDevice::Present()
@@ -1466,6 +1516,8 @@ void ae3d::GfxDevice::Present()
     VkResult err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     CheckVulkanResult( err, "vkQueueSubmit" );
 
+    SubmitPrePresentBarrier();
+
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     presentInfo.pNext = nullptr;
@@ -1476,44 +1528,6 @@ void ae3d::GfxDevice::Present()
     presentInfo.waitSemaphoreCount = 1;
     err = queuePresentKHR( GfxDeviceGlobal::graphicsQueue, &presentInfo );
     CheckVulkanResult( err, "queuePresent" );
-
-    VkImageMemoryBarrier postPresentBarrier = {};
-    postPresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    postPresentBarrier.pNext = nullptr;
-    postPresentBarrier.srcAccessMask = 0;
-    postPresentBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    postPresentBarrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    postPresentBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    postPresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    postPresentBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    postPresentBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-    postPresentBarrier.image = GfxDeviceGlobal::swapchainBuffers[ GfxDeviceGlobal::currentBuffer ].image;
-
-    VkCommandBufferBeginInfo cmdBufInfo = {};
-    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    err = vkBeginCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer, &cmdBufInfo );
-    CheckVulkanResult( err, "vkBeginCommandBuffer" );
-
-    vkCmdPipelineBarrier(
-        GfxDeviceGlobal::postPresentCmdBuffer,
-        VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-        0,
-        0, nullptr,
-        0, nullptr,
-        1, &postPresentBarrier );
-
-    err = vkEndCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer );
-    CheckVulkanResult( err, "vkEndCommandBuffer" );
-
-    VkSubmitInfo submitPostInfo = {};
-    submitPostInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitPostInfo.commandBufferCount = 1;
-    submitPostInfo.pCommandBuffers = &GfxDeviceGlobal::postPresentCmdBuffer;
-
-    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitPostInfo, VK_NULL_HANDLE );
-    CheckVulkanResult( err, "vkQueueSubmit" );
 
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     CheckVulkanResult( err, "vkQueueWaitIdle" );
@@ -1546,10 +1560,10 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     vkDestroyInstance( GfxDeviceGlobal::instance, nullptr );
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned /*cubeMapFace*/ )
 {
 }
 
-void ae3d::GfxDevice::SetMultiSampling( bool enable )
+void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
 {
 }
