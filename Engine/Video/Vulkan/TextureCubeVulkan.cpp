@@ -143,8 +143,16 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             CheckVulkanResult( err, "vkMapMemory in TextureCube" );
 
             const int bytesPerPixel = 4;
-            std::size_t dataSize = bytesPerPixel * width * height;
-            std::memcpy( mapped, data, dataSize );
+            const std::size_t rowSize = bytesPerPixel * width;
+            char* mappedPos = (char*)mapped;
+            char* dataPos = (char*)data;
+
+            for (int i = 0; i < height; ++i)
+            {
+                std::memcpy( mappedPos, dataPos, rowSize );
+                mappedPos += subResLayout.rowPitch;
+                dataPos += rowSize;
+            }
 
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
 

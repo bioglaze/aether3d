@@ -144,8 +144,16 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     CheckVulkanResult( err, "vkMapMemory in Texture2D" );
 
     const int bytesPerPixel = 4;
-    std::size_t dataSize = bytesPerPixel * width * height;
-    std::memcpy( mapped, data, dataSize );
+    const std::size_t rowSize = bytesPerPixel * width;
+    char* mappedPos = (char*)mapped;
+    char* dataPos = (char*)data;
+
+    for (int i = 0; i < height; ++i)
+    {
+        std::memcpy( mappedPos, dataPos, rowSize );
+        mappedPos += subResLayout.rowPitch;
+        dataPos += rowSize;
+    }
 
     vkUnmapMemory( GfxDeviceGlobal::device, mappableMemory );
 
