@@ -794,7 +794,7 @@ void SceneWidget::RemoveGameObject( GameObject* gameObject )
     {
         if (gameObjects[ i ].get() == gameObject)
         {
-            index = i;
+            index = (int)i;
         }
     }
 

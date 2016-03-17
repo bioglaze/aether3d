@@ -5,7 +5,7 @@
 #include <QString>
 #include <QTableWidgetItem>
 
-void SpriteRendererInspector::Init( QWidget* mainWindow )
+void SpriteRendererInspector::Init( QWidget* /*mainWindow*/ )
 {
     table = new QTableWidget( 1, 1 );
     table->setItem( 0, 0, new QTableWidgetItem() );

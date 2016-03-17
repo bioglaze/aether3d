@@ -42,6 +42,11 @@ namespace MathUtil
     {
         return f != f;
     }
+
+    bool IsPowerOfTwo( unsigned i )
+    {
+        return ((i & (i - 1)) == 0);
+    }
 }
 
 namespace Global

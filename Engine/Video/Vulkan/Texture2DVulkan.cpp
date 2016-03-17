@@ -21,6 +21,11 @@ namespace ae3d
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout );
 }
 
+namespace MathUtil
+{
+    bool IsPowerOfTwo( unsigned i );
+}
+
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
@@ -91,7 +96,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    //const VkFormat format = opaque ? VK_FORMAT_R8G8B8_UNORM : VK_FORMAT_R8G8B8A8_UNORM;
     const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
     VkImageCreateInfo imageCreateInfo = {};
@@ -144,15 +148,23 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     CheckVulkanResult( err, "vkMapMemory in Texture2D" );
 
     const int bytesPerPixel = 4;
-    const std::size_t rowSize = bytesPerPixel * width;
-    char* mappedPos = (char*)mapped;
-    char* dataPos = (char*)data;
 
-    for (int i = 0; i < height; ++i)
+    if (MathUtil::IsPowerOfTwo( width ) && MathUtil::IsPowerOfTwo( height ))
     {
-        std::memcpy( mappedPos, dataPos, rowSize );
-        mappedPos += subResLayout.rowPitch;
-        dataPos += rowSize;
+        std::memcpy( mapped, data, width * height * bytesPerPixel );
+    }
+    else
+    {
+        const std::size_t rowSize = bytesPerPixel * width;
+        char* mappedPos = (char*)mapped;
+        char* dataPos = (char*)data;
+
+        for (int i = 0; i < height; ++i)
+        {
+            std::memcpy( mappedPos, dataPos, rowSize );
+            mappedPos += subResLayout.rowPitch;
+            dataPos += rowSize;
+        }
     }
 
     vkUnmapMemory( GfxDeviceGlobal::device, mappableMemory );

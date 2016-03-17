@@ -19,11 +19,11 @@ win32 {
     PWD_WIN ~= s,/,\\,g
     DESTDIR_WIN ~= s,/,\\,g
 # Use the following line if you compiled with Visual Studio
-    LIBS += -L$$PWD/../../../aether3d_build/ -lAether3D_GL45_d
+    LIBS += -L$$PWD/../../../aether3d_build/ -lAether3D_GL_d -lUser32 -lGdi32 -lOpenGL32
 
     LIBS += -L$$PWD/../../Engine/ThirdParty/lib/ -llibOpenAL32
 
-#win32-msvc:LIBS += -L$$PWD/../../../aether3d_build/ -lAether3D_GL45_d
+#win32-msvc:LIBS += -L$$PWD/../../../aether3d_build/ -lAether3D_GL_d
 #win32-g++:LIBS += -L$$PWD/../../../aether3d_build/ -laether3d_win
 
     copyfiles.commands = $$quote(cmd /c xcopy /S /I /y $${PWD_WIN}\copy_to_output $${DESTDIR_WIN})

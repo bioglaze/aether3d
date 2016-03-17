@@ -14,7 +14,7 @@ ModifyCameraCommand::ModifyCameraCommand( ae3d::CameraComponent* aCamera,
     , projectionType( aProjectionType )
     , clearColor( aClearColor )
 {
-    ae3d::System::Assert( camera, "Camera command needs camera!" );
+    ae3d::System::Assert( camera != nullptr, "Camera command needs camera!" );
 
     oldPerspParams.x = camera->GetFovDegrees();
     oldPerspParams.y = camera->GetAspect();
@@ -51,7 +51,7 @@ void ModifyCameraCommand::Execute()
 
 void ModifyCameraCommand::Undo()
 {
-    ae3d::System::Assert( camera, "Undo needs camera" );
+    ae3d::System::Assert( camera != nullptr, "Undo needs camera" );
 
     camera->SetClearFlag( oldClearFlag );
     camera->SetClearColor( oldClearColor );

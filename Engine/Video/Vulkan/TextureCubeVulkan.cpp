@@ -14,6 +14,11 @@ namespace ae3d
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout );
 }
 
+namespace MathUtil
+{
+    bool IsPowerOfTwo( unsigned i );
+}
+
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
@@ -143,15 +148,23 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             CheckVulkanResult( err, "vkMapMemory in TextureCube" );
 
             const int bytesPerPixel = 4;
-            const std::size_t rowSize = bytesPerPixel * width;
-            char* mappedPos = (char*)mapped;
-            char* dataPos = (char*)data;
 
-            for (int i = 0; i < height; ++i)
+            if (MathUtil::IsPowerOfTwo( width ) && MathUtil::IsPowerOfTwo( height ))
             {
-                std::memcpy( mappedPos, dataPos, rowSize );
-                mappedPos += subResLayout.rowPitch;
-                dataPos += rowSize;
+                std::memcpy( mapped, data, width * height * bytesPerPixel );
+            }
+            else
+            {
+                const std::size_t rowSize = bytesPerPixel * width;
+                char* mappedPos = (char*)mapped;
+                char* dataPos = (char*)data;
+
+                for (int i = 0; i < height; ++i)
+                {
+                    std::memcpy( mappedPos, dataPos, rowSize );
+                    mappedPos += subResLayout.rowPitch;
+                    dataPos += rowSize;
+                }
             }
 
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
