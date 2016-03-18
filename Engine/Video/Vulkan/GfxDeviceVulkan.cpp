@@ -4,7 +4,6 @@
 #include <vector> 
 #include <string>
 #include <vulkan/vulkan.h>
-#include <vulkan/vk_lunarg_debug_marker.h>
 #include "System.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
@@ -41,7 +40,7 @@ namespace GfxDeviceGlobal
         VkImage image = VK_NULL_HANDLE;
         VkDeviceMemory mem = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
-    };
+    } depthStencil;
     
     struct Samplers
     {
@@ -65,8 +64,6 @@ namespace GfxDeviceGlobal
     VkColorSpaceKHR colorSpace;
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
-    DepthStencil depthStencil;
-    std::uint32_t imageCount = 0;
     std::vector< VkImage > swapchainImages;
     std::vector< SwapchainBuffer > swapchainBuffers;
     std::vector< VkFramebuffer > frameBuffers;
@@ -81,7 +78,8 @@ namespace GfxDeviceGlobal
     std::uint32_t currentBuffer = 0;
     ae3d::Texture2D* texture2d0 = nullptr;
     ae3d::TextureCube* textureCube0 = nullptr;
-    std::vector< VkDescriptorSet > frameHeaps;
+    std::vector< VkDescriptorSet > pendingFreeDescriptorSets;
+    std::vector< VkBuffer > pendingFreeVBs;
     int drawCalls = 0;
 }
 
@@ -130,10 +128,10 @@ namespace debug
 #endif
         }
 
-        return false;
+        return VK_FALSE;
     }
 
-    void Setup( VkInstance instance, VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack )
+    void Setup( VkInstance instance )
     {
         CreateDebugReportCallback = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkCreateDebugReportCallbackEXT" );
         DestroyDebugReportCallback = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkDestroyDebugReportCallbackEXT" );
@@ -145,12 +143,8 @@ namespace debug
         dbgCreateInfo.pNext = nullptr;
         dbgCreateInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)messageCallback;
         dbgCreateInfo.pUserData = nullptr;
-        dbgCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-        VkResult err = CreateDebugReportCallback(
-            instance,
-            &dbgCreateInfo,
-            nullptr,
-            &debugReportCallback );
+        dbgCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+        VkResult err = CreateDebugReportCallback( instance, &dbgCreateInfo, nullptr, &debugReportCallback );
         ae3d::System::Assert( err == VK_SUCCESS, "Unable to create debug report callback" );
     }
 
@@ -377,9 +371,9 @@ namespace ae3d
     {
         System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "command pool not initialized" );
         System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-        System::Assert( GfxDeviceGlobal::imageCount > 0, "imageCount is 0" );
+        System::Assert( GfxDeviceGlobal::swapchainBuffers.size() > 0, "imageCount is 0" );
 
-        GfxDeviceGlobal::drawCmdBuffers.resize( GfxDeviceGlobal::imageCount );
+        GfxDeviceGlobal::drawCmdBuffers.resize( GfxDeviceGlobal::swapchainBuffers.size() );
 
         VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
         commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -791,17 +785,18 @@ namespace ae3d
         err = createSwapchainKHR( GfxDeviceGlobal::device, &swapchainInfo, nullptr, &GfxDeviceGlobal::swapChain );
         CheckVulkanResult( err, "swapchain" );
 
-        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &GfxDeviceGlobal::imageCount, nullptr );
+        std::uint32_t imageCount;
+        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, nullptr );
         CheckVulkanResult( err, "getSwapchainImagesKHR" );
 
-        GfxDeviceGlobal::swapchainImages.resize( GfxDeviceGlobal::imageCount );
+        GfxDeviceGlobal::swapchainImages.resize( imageCount );
 
-        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &GfxDeviceGlobal::imageCount, GfxDeviceGlobal::swapchainImages.data() );
+        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, GfxDeviceGlobal::swapchainImages.data() );
         CheckVulkanResult( err, "getSwapchainImagesKHR" );
 
-        GfxDeviceGlobal::swapchainBuffers.resize( GfxDeviceGlobal::imageCount );
+        GfxDeviceGlobal::swapchainBuffers.resize( imageCount );
 
-        for (std::uint32_t i = 0; i < GfxDeviceGlobal::imageCount; ++i)
+        for (std::uint32_t i = 0; i < imageCount; ++i)
         {
             VkImageViewCreateInfo colorAttachmentView = {};
             colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1014,7 +1009,7 @@ namespace ae3d
         frameBufferCreateInfo.layers = 1;
 
         // Create frame buffers for every swap chain image
-        GfxDeviceGlobal::frameBuffers.resize( GfxDeviceGlobal::imageCount );
+        GfxDeviceGlobal::frameBuffers.resize( GfxDeviceGlobal::swapchainBuffers.size() );
 
         for (std::uint32_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); i++)
         {
@@ -1270,7 +1265,7 @@ namespace ae3d
         
         if (debug::enabled)
         {
-            debug::Setup( GfxDeviceGlobal::instance, VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT, nullptr );
+            debug::Setup( GfxDeviceGlobal::instance );
         }
 
         CreateDevice();
@@ -1472,7 +1467,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     }
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( shader.GetUBODesc(), view );
-    GfxDeviceGlobal::frameHeaps.push_back( descriptorSet );
+    GfxDeviceGlobal::pendingFreeDescriptorSets.push_back( descriptorSet );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1480,7 +1475,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     vkCmdBindPipeline( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::psoCache[ psoHash ] );
 
     VkDeviceSize offsets[ 1 ] = { 0 };
-    vkCmdBindVertexBuffers( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0/*VERTEX_BUFFER_BIND_ID*/, 1, vertexBuffer.GetVertexBuffer(), offsets );
+    vkCmdBindVertexBuffers( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VertexBuffer::VERTEX_BUFFER_BIND_ID, 1, vertexBuffer.GetVertexBuffer(), offsets );
 
     vkCmdBindIndexBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
     vkCmdDrawIndexed( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
@@ -1532,12 +1527,19 @@ void ae3d::GfxDevice::Present()
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     CheckVulkanResult( err, "vkQueueWaitIdle" );
 
-    for (std::size_t i = 0; i < GfxDeviceGlobal::frameHeaps.size(); ++i)
+    for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeDescriptorSets.size(); ++i)
     {
-        vkFreeDescriptorSets( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorPool, 1, &GfxDeviceGlobal::frameHeaps[ i ] );
+        vkFreeDescriptorSets( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorPool, 1, &GfxDeviceGlobal::pendingFreeDescriptorSets[ i ] );
     }
 
-    GfxDeviceGlobal::frameHeaps.clear();
+    GfxDeviceGlobal::pendingFreeDescriptorSets.clear();
+
+    for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeVBs.size(); ++i)
+    {
+        vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeVBs[ i ], nullptr );
+    }
+
+    GfxDeviceGlobal::pendingFreeVBs.clear();
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
