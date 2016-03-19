@@ -71,8 +71,6 @@ void ae3d::Material::Apply()
         shader->SetRenderTexture( globalTexRT.first.c_str(), globalTexRT.second, texUnit );
         ++texUnit;
     }
-    
-    GfxDevice::SetBackFaceCulling( cullBackFaces );
 }
 
 void ae3d::Material::SetMatrix( const char* name, const Matrix44& matrix )

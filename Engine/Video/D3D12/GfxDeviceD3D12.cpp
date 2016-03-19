@@ -206,7 +206,8 @@ unsigned GetHash( const char* s, unsigned length )
     return h;
 }
 
-unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
+                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
@@ -214,15 +215,33 @@ unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3
     hashString += std::to_string( (ptrdiff_t)&shader.blobShaderPixel );
     hashString += std::to_string( (unsigned)blendMode );
     hashString += std::to_string( ((unsigned)depthFunc) + 4 );
+    hashString += std::to_string( ((unsigned)cullMode) + 8 );
 
     return GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
 }
 
-void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
+                ae3d::GfxDevice::CullMode cullMode )
 {
-    D3D12_RASTERIZER_DESC descRaster;
-    ZeroMemory( &descRaster, sizeof( descRaster ) );
-    descRaster.CullMode = D3D12_CULL_MODE_NONE;
+    D3D12_RASTERIZER_DESC descRaster = {};
+
+    if (cullMode == ae3d::GfxDevice::CullMode::Off)
+    {
+        descRaster.CullMode = D3D12_CULL_MODE_NONE;
+    }
+    else if (cullMode == ae3d::GfxDevice::CullMode::Front)
+    {
+        descRaster.CullMode = D3D12_CULL_MODE_FRONT;
+    }
+    else if (cullMode == ae3d::GfxDevice::CullMode::Back)
+    {
+        descRaster.CullMode = D3D12_CULL_MODE_BACK;
+    }
+    else
+    {
+        ae3d::System::Assert( false, "unhandled cull mode" );
+    }
+
     descRaster.DepthBias = 0;
     descRaster.DepthBiasClamp = 0;
     descRaster.DepthClipEnable = TRUE;
@@ -336,7 +355,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO" );
 
-    const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
+    const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -460,13 +479,14 @@ void ae3d::CreateRenderer( int /*samples*/ )
     CreateSampler();
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
+                            CullMode cullMode )
 {   
-    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
+    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
+        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode );
     }
     
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -728,10 +748,6 @@ void ae3d::GfxDevice::Present()
     }
 
     Global::frameVBUploads.clear();
-}
-
-void ae3d::GfxDevice::SetBackFaceCulling( bool /*enable*/ )
-{
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )

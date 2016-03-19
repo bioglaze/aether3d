@@ -103,7 +103,8 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
         shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
         shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
 
-        GfxDevice::Draw( m().vertexBuffer, 0, m().vertexBuffer.GetFaceCount() / 3, *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend, ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff );
+        GfxDevice::Draw( m().vertexBuffer, 0, m().vertexBuffer.GetFaceCount() / 3, *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend,
+                         ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff, ae3d::GfxDevice::CullMode::Off );
     }
 }
 

@@ -31,6 +31,9 @@ namespace ae3d
         /// Applies the uniforms into the shader. Called internally.
         void Apply();
 
+        /// \return True, if backfaces are culled.
+        bool IsBackFaceCulled() const { return cullBackFaces; }
+
         /// \param enable Enable backface culling. Defaults to true.
         void SetBackFaceCulling( bool enable ) { cullBackFaces = enable; }
         

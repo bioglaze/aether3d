@@ -448,8 +448,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         auto transform = gameObject->GetComponent< TransformComponent >();
         auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
 
-        GfxDevice::SetBackFaceCulling( false );
-        
         if (spriteRenderer)
         {
             Matrix44 projectionModel;

@@ -156,7 +156,8 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         }
         
         Shader* shader = overrideShader ? overrideShader : materials[ subMeshIndex ]->GetShader();
-        
+        GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
+
         if (overrideShader)
         {
             shader->Use();
@@ -174,6 +175,10 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
             materials[ subMeshIndex ]->Apply();
+            if (!materials[ subMeshIndex ]->IsBackFaceCulled())
+            {
+                cullMode = GfxDevice::CullMode::Off;
+            }
         }
         
         GfxDevice::DepthFunc depthFunc;
@@ -193,7 +198,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         }
         
         GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount() / 3,
-            *shader, ae3d::GfxDevice::BlendMode::Off, depthFunc );
+                         *shader, ae3d::GfxDevice::BlendMode::Off, depthFunc, cullMode );
     }
 }
 

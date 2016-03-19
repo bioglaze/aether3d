@@ -10,6 +10,8 @@
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #if VK_USE_PLATFORM_WIN32_KHR
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
 #include <Windows.h>
 #endif
 #if VK_USE_PLATFORM_XCB_KHR
@@ -200,7 +202,8 @@ namespace ae3d
         return h;
     }
 
-    unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+    unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
+                         ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode )
     {
         std::string hashString;
         hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
@@ -208,6 +211,7 @@ namespace ae3d
         hashString += std::to_string( (ptrdiff_t)&shader.GetFragmentInfo().module );
         hashString += std::to_string( (unsigned)blendMode );
         hashString += std::to_string( ((unsigned)depthFunc) + 4 );
+        hashString += std::to_string( ((unsigned)cullMode) + 8 );
 
         return GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
     }
@@ -237,7 +241,8 @@ namespace ae3d
         CheckVulkanResult( err, "vkCreateSampler" );
     }
 
-    void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+    void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
+                    ae3d::GfxDevice::CullMode cullMode )
     {
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
         inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -246,7 +251,24 @@ namespace ae3d
         VkPipelineRasterizationStateCreateInfo rasterizationState = {};
         rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
-        rasterizationState.cullMode = VK_CULL_MODE_NONE;
+        
+        if (cullMode == ae3d::GfxDevice::CullMode::Off)
+        {
+            rasterizationState.cullMode = VK_CULL_MODE_NONE;
+        }
+        else if (cullMode == ae3d::GfxDevice::CullMode::Back)
+        {
+            rasterizationState.cullMode = VK_CULL_MODE_BACK_BIT;
+        }
+        else if (cullMode == ae3d::GfxDevice::CullMode::Front)
+        {
+            rasterizationState.cullMode = VK_CULL_MODE_FRONT_BIT;
+        }
+        else
+        {
+            ae3d::System::Assert( false, "unhandled cull mode" );
+        }
+
         rasterizationState.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizationState.depthClampEnable = VK_FALSE;
         rasterizationState.rasterizerDiscardEnable = VK_FALSE;
@@ -346,7 +368,7 @@ namespace ae3d
                                                   nullptr, &pso );
         CheckVulkanResult( err, "vkCreateGraphicsPipelines" );
 
-        const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
+        const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
         GfxDeviceGlobal::psoCache[ hash ] = pso;
     }
 
@@ -1381,10 +1403,6 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
     CheckVulkanResult( res, "vkDeviceWaitIdle" );
 }
 
-void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
-{
-}
-
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 {
     GfxDeviceGlobal::clearColor.float32[ 0 ] = red;
@@ -1440,18 +1458,19 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
+                            CullMode cullMode )
 {
     System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
     System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::drawCmdBuffers.size(), "invalid draw buffer index" );
     System::Assert( GfxDeviceGlobal::pipelineLayout != VK_NULL_HANDLE, "invalid pipelineLayout" );
 
-    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
+    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer, shader, blendMode, depthFunc );
+        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode );
     }
 
     VkImageView view = VK_NULL_HANDLE;

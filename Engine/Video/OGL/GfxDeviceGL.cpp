@@ -143,13 +143,30 @@ void ae3d::GfxDevice::Init( int width, int height )
     glEnable( GL_DEPTH_TEST );
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
+                            CullMode cullMode )
 {
     ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     ae3d::System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
 
     SetBlendMode( blendMode );
     SetDepthFunc( depthFunc );
+
+    if (cullMode == CullMode::Back)
+    {
+        glEnable( GL_CULL_FACE );
+        glCullFace( GL_BACK );
+    }
+    else if (cullMode == CullMode::Front)
+    {
+        glEnable( GL_CULL_FACE );
+        glCullFace( GL_FRONT );
+    }
+    else
+    {
+        glDisable( GL_CULL_FACE );
+    }
+
     shader.Use();
     vertexBuffer.Bind();
     GfxDevice::IncDrawCalls();
@@ -337,18 +354,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     {
         glDepthMask( GL_TRUE );
         glClear( mask );
-    }
-}
-
-void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
-{
-    if (enable)
-    {
-        glEnable( GL_CULL_FACE );
-    }
-    else
-    {
-        glDisable( GL_CULL_FACE );
     }
 }
 

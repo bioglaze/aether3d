@@ -37,6 +37,13 @@ namespace ae3d
             NoneWriteOff
         };
         
+        enum class CullMode
+        {
+            Back,
+            Front,
+            Off
+        };
+
         void Init( int width, int height );
 #if RENDERER_METAL
         void InitMetal( id <MTLDevice> metalDevice, MTKView* view );
@@ -56,7 +63,7 @@ namespace ae3d
         void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );
-        void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc );
+        void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode );
         void ErrorCheck( const char* info );
 
         void SetClearColor( float red, float green, float blue );
@@ -64,9 +71,6 @@ namespace ae3d
         void SetMultiSampling( bool enable );
         void Set_sRGB_Writes( bool enable );
         
-        // TODO: Remove this to prepare for modern API style draw submission (these are provided in Draw())
-        void SetBackFaceCulling( bool enable );
-
         void IncDrawCalls();
         int GetDrawCalls();
         void IncVertexBufferBinds();
