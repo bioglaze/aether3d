@@ -50,7 +50,7 @@ namespace Texture2DGlobal
 #endif
 }
 
-void DestroyTextures()
+void ae3d::Texture2D::DestroyTextures()
 {
     for (std::size_t i = 0; i < Texture2DGlobal::textures.size(); ++i)
     {
@@ -59,7 +59,7 @@ void DestroyTextures()
     }
 }
 
-void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data )
+void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subResources, int subResourceCount )
 {
     D3D12_HEAP_PROPERTIES heapProps;
     heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -72,25 +72,24 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* data )
     const UINT64 uploadBufferSize = GetRequiredIntermediateSize( gpuResource.resource, 0, 1 );
 
     const auto buffer = CD3DX12_RESOURCE_DESC::Buffer( uploadBufferSize );
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &buffer,//&bufferDesc,
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &buffer,
         D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS( &uploadBuffer ) );
     AE3D_CHECK_D3D( hr, "Failed to create texture upload resource" );
 
     if (hr == S_OK)
     {
-        uploadBuffer->SetName( L"Texture2D Upload Buffer" );
+        uploadBuffer->SetName( L"Texture Upload Buffer" );
         Texture2DGlobal::uploadBuffers.push_back( uploadBuffer );
 
         hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
-        AE3D_CHECK_D3D( hr, "command list reset in texture2d" );
+        AE3D_CHECK_D3D( hr, "command list reset in InitializeTexture" );
 
-        // copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
         TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COPY_DEST );
-        UpdateSubresources( GfxDeviceGlobal::graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, 1, data );
+        UpdateSubresources( GfxDeviceGlobal::graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, subResourceCount, subResources );
         TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
 
         hr = GfxDeviceGlobal::graphicsCommandList->Close();
-        AE3D_CHECK_D3D( hr, "command list close in texture2d" );
+        AE3D_CHECK_D3D( hr, "command list close in InitializeTexture" );
 
         ID3D12CommandList* ppCommandLists[] = { GfxDeviceGlobal::graphicsCommandList };
         GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, &ppCommandLists[ 0 ] );
@@ -237,7 +236,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     texResource.RowPitch = width * bytesPerPixel;
     texResource.SlicePitch = texResource.RowPitch * height;
 
-    InitializeTexture( gpuResource, &texResource );
+    InitializeTexture( gpuResource, &texResource, 1 );
 
     stbi_image_free( data );
 }

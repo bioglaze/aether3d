@@ -8,18 +8,18 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include "System.hpp"
-#include "RenderTexture.hpp"
-#include "Shader.hpp"
-#include "VertexBuffer.hpp"
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
+#include "RenderTexture.hpp"
+#include "System.hpp"
+#include "Shader.hpp"
 #include "TextureBase.hpp"
 #include "Texture2D.hpp"
+#include "TextureCube.hpp"
+#include "VertexBuffer.hpp"
 
 void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
-void DestroyTextures(); // Defined in Texture2D_D3D12.cpp
 
 namespace WindowGlobal
 {
@@ -50,7 +50,8 @@ namespace GfxDeviceGlobal
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
-    ae3d::Texture2D* texture0 = nullptr;
+    ae3d::Texture2D* texture2d0 = nullptr;
+    ae3d::TextureCube* textureCube0 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
 
     ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
@@ -221,7 +222,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
 {
     D3D12_RASTERIZER_DESC descRaster;
     ZeroMemory( &descRaster, sizeof( descRaster ) );
-    descRaster.CullMode = D3D12_CULL_MODE_BACK;
+    descRaster.CullMode = D3D12_CULL_MODE_NONE;
     descRaster.DepthBias = 0;
     descRaster.DepthBiasClamp = 0;
     descRaster.DepthClipEnable = TRUE;
@@ -460,12 +461,7 @@ void ae3d::CreateRenderer( int /*samples*/ )
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
-{
-    if (!GfxDeviceGlobal::texture0)
-    {
-        GfxDeviceGlobal::texture0 = const_cast< Texture2D*>( Texture2D::GetDefaultTexture() );
-    }
-    
+{   
     const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
@@ -493,7 +489,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.ViewDimension = GfxDeviceGlobal::texture2d0 != nullptr ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;
     srvDesc.Texture2D.MostDetailedMip = 0;
@@ -502,7 +498,22 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, &srvDesc, handle );
+    ID3D12Resource* texResource = nullptr;
+
+    if (GfxDeviceGlobal::texture2d0 != nullptr)
+    {
+        texResource = GfxDeviceGlobal::texture2d0->GetGpuResource()->resource;
+    }
+    else if (GfxDeviceGlobal::textureCube0 != nullptr)
+    {
+        texResource = GfxDeviceGlobal::textureCube0->GetGpuResource()->resource;
+    }
+    else if (!GfxDeviceGlobal::texture2d0)
+    {
+        texResource = const_cast< Texture2D*>(Texture2D::GetDefaultTexture())->GetGpuResource()->resource;
+    }
+
+    GfxDeviceGlobal::device->CreateShaderResourceView( texResource, &srvDesc, handle );
 
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
@@ -593,7 +604,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 {
     DestroyVertexBuffers();
     DestroyShaders();
-    DestroyTextures();
+    Texture2D::DestroyTextures();
+    TextureCube::DestroyTextures();
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     DescriptorHeapManager::Deinit();

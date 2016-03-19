@@ -72,31 +72,38 @@ cbuffer Scene\
         );
     sdfShader.Load( sdfSource.c_str(), sdfSource.c_str() );
 
-    // TODO: Implement
-    const std::string skyboxSource(
-        "struct VSOutput\
-{\
-    float4 pos : SV_POSITION;\
-    float4 color : COLOR;\
-    };\
-cbuffer Scene\
-    {\
-        float4x4 _ModelViewProjectionMatrix;\
-    };\
-    VSOutput VSMain( float3 pos : POSITION, float2 uv : TEXCOORD, float4 color : COLOR )\
-    {\
-        VSOutput vsOut;\
-        vsOut.pos = mul( _ModelViewProjectionMatrix, float4( pos, 1.0 ) );\
-        vsOut.color = color;\
-        return vsOut;\
-    }\
-    float4 PSMain( VSOutput vsOut ) : SV_Target\
-    {\
-        return float4(0.0, 1.0, 0.0, 1.0);\
-    }"
-        );
+    const char* skyboxSource = R"(
+        struct VSOutput
+        {
+            float4 pos : SV_POSITION;
+            float4 color : COLOR;
+            float3 uv : TEXCOORD;
+        };
 
-    skyboxShader.Load( skyboxSource.c_str(), skyboxSource.c_str() );
+        cbuffer Scene
+        {
+            float4x4 _ModelViewProjectionMatrix;
+        };
+
+        VSOutput VSMain( float3 pos : POSITION, float2 uv : TEXCOORD, float4 color : COLOR )
+        {
+            VSOutput vsOut;
+            vsOut.pos = mul( _ModelViewProjectionMatrix, float4( pos, 1.0 ) );
+            vsOut.color = color;
+            vsOut.uv = pos;
+            return vsOut;
+        }
+
+        TextureCube< float4 > skyMap : register(t0);
+        SamplerState sLinear : register(s0);
+
+        float4 PSMain( VSOutput vsOut ) : SV_Target
+        {
+            return skyMap.Sample( sLinear, vsOut.uv );
+        }
+    )";
+
+    skyboxShader.Load( skyboxSource, skyboxSource );
     
     const char* depthNormalsSource = R"(
 

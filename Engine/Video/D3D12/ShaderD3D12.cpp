@@ -18,7 +18,8 @@ extern ae3d::FileWatcher fileWatcher;
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
-    extern ae3d::Texture2D* texture0;
+    extern ae3d::Texture2D* texture2d0;
+    extern ae3d::TextureCube* textureCube0;
 }
 
 namespace Global
@@ -223,7 +224,8 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int /*textureUnit*/ )
 {
-    GfxDeviceGlobal::texture0 = const_cast< Texture2D* >( texture );
+    GfxDeviceGlobal::texture2d0 = const_cast< Texture2D* >( texture );
+    GfxDeviceGlobal::textureCube0 = nullptr;
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
@@ -231,6 +233,9 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )
 {
+    GfxDeviceGlobal::textureCube0 = const_cast< TextureCube* >(texture);
+    GfxDeviceGlobal::texture2d0 = nullptr;
+
     SetInt( name, textureUnit );
     
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
