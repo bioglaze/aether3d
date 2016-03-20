@@ -11,7 +11,8 @@ namespace ae3d
 {
     void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
     VkBool32 GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout );
+    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
+                         VkImageLayout newImageLayout, unsigned layerCount );
 }
 
 namespace MathUtil
@@ -175,7 +176,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 images[ face ],
                 VK_IMAGE_ASPECT_COLOR_BIT,
                 VK_IMAGE_LAYOUT_PREINITIALIZED,
-                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
+                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1 );
         }
         else if (isDDS)
         {
@@ -202,6 +203,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     CheckVulkanResult( err, "vkBindImageMemory in TextureCube" );
 
+    SetImageLayout( TextureCubeGlobal::texCmdBuffer,
+        image,
+        VK_IMAGE_ASPECT_COLOR_BIT,
+        VK_IMAGE_LAYOUT_PREINITIALIZED,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6 );
+
     for (int face = 0; face < 6; ++face)
     {
         VkImageCopy copyRegion = {};
@@ -226,13 +233,13 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             images[ face ], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1, &copyRegion );
-
-        SetImageLayout( TextureCubeGlobal::texCmdBuffer,
-            image,
-            VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
     }
+
+    SetImageLayout( TextureCubeGlobal::texCmdBuffer,
+        image,
+        VK_IMAGE_ASPECT_COLOR_BIT,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6 );
 
     err = vkEndCommandBuffer( TextureCubeGlobal::texCmdBuffer );
     CheckVulkanResult( err, "vkEndCommandBuffer in TextureCube" );

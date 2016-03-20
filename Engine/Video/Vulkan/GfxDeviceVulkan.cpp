@@ -107,15 +107,8 @@ namespace debug
 
     VkDebugReportCallbackEXT debugReportCallback = nullptr;
 
-    VkBool32 messageCallback(
-        VkDebugReportFlagsEXT flags,
-        VkDebugReportObjectTypeEXT objType,
-        uint64_t srcObject,
-        size_t location,
-        int32_t msgCode,
-        const char* pLayerPrefix,
-        const char* pMsg,
-        void* pUserData )
+    VkBool32 messageCallback( VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, std::uint64_t srcObject,
+                              std::size_t location, std::int32_t msgCode, const char* pLayerPrefix, const char* pMsg, void* pUserData )
     {
         if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
         {
@@ -415,7 +408,8 @@ namespace ae3d
         CheckVulkanResult( err, "vkAllocateCommandBuffers" );
     }
 
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout )
+    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
+                         VkImageLayout newImageLayout, unsigned layerCount )
     {
         System::Assert( cmdbuffer != VK_NULL_HANDLE, "command buffer not initialized" );
 
@@ -431,9 +425,9 @@ namespace ae3d
         imageMemoryBarrier.subresourceRange.aspectMask = aspectMask;
         imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
         imageMemoryBarrier.subresourceRange.levelCount = 1;
-        imageMemoryBarrier.subresourceRange.layerCount = 1;
+        imageMemoryBarrier.subresourceRange.layerCount = layerCount;
 
-        if (oldImageLayout == VK_IMAGE_LAYOUT_PREINITIALIZED)//VK_IMAGE_LAYOUT_UNDEFINED)
+        if (oldImageLayout == VK_IMAGE_LAYOUT_PREINITIALIZED)
         {
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
         }
@@ -741,7 +735,7 @@ namespace ae3d
         CheckVulkanResult( err, "getPhysicalDeviceSurfacePresentModesKHR" );
 
         VkExtent2D swapchainExtent = {};
-        if (surfCaps.currentExtent.width == -1)
+        if (surfCaps.currentExtent.width == 0)
         {
             System::Print("Setting swapchain dimension to %dx%d\n", WindowGlobal::windowWidth, WindowGlobal::windowHeight );
             swapchainExtent.width = WindowGlobal::windowWidth;
@@ -844,7 +838,7 @@ namespace ae3d
             GfxDeviceGlobal::setupCmdBuffer,
             GfxDeviceGlobal::swapchainBuffers[ i ].image,
             VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1 );
             
             colorAttachmentView.image = GfxDeviceGlobal::swapchainBuffers[ i ].image;
 
@@ -1143,7 +1137,7 @@ namespace ae3d
         err = vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, GfxDeviceGlobal::depthStencil.mem, 0 );
         CheckVulkanResult( err, "depth stencil memory" );
         SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::depthStencil.image, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
-                        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
+                        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
 
         depthStencilView.image = GfxDeviceGlobal::depthStencil.image;
         err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &GfxDeviceGlobal::depthStencil.view );

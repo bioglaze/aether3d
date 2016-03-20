@@ -18,7 +18,8 @@ namespace ae3d
 {
     void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
     VkBool32 GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout );
+    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
+                         VkImageLayout newImageLayout, unsigned layerCount );
 }
 
 namespace MathUtil
@@ -184,7 +185,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
             mappableImage,
             VK_IMAGE_ASPECT_COLOR_BIT,
             VK_IMAGE_LAYOUT_PREINITIALIZED,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1 );
 
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
         imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -208,7 +209,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
             image,
             VK_IMAGE_ASPECT_COLOR_BIT,
             VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1 );
 
         VkImageCopy copyRegion = {};
 
@@ -237,7 +238,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
             image,
             VK_IMAGE_ASPECT_COLOR_BIT,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1 );
 
         err = vkEndCommandBuffer( Texture2DGlobal::texCmdBuffer );
         CheckVulkanResult( err, "vkEndCommandBuffer in Texture2D" );
