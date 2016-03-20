@@ -47,7 +47,6 @@ namespace GfxDeviceGlobal
     int backBufferWidth = 0;
     int backBufferHeight = 0;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
-    bool cullBackFaces = true;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     
     std::list< id<MTLBuffer> > uniformBuffers;
@@ -233,7 +232,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
     return GfxDeviceGlobal::psoCache[ psoHash ];
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc )
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode )
 {
     ++GfxDeviceGlobal::drawCalls;
 
@@ -247,7 +246,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     }
     
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
-    [renderEncoder setCullMode:GfxDeviceGlobal::cullBackFaces ? MTLCullModeFront : MTLCullModeNone];
+    [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeFront : MTLCullModeNone];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:1];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
@@ -318,11 +317,6 @@ void ae3d::GfxDevice::ResetFrameStatistics()
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
-}
-
-void ae3d::GfxDevice::SetBackFaceCulling( bool enable )
-{
-    GfxDeviceGlobal::cullBackFaces = enable;
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool enable )
