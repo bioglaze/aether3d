@@ -526,6 +526,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 #if RENDERER_METAL
     GfxDevice::PresentDrawable();
 #endif
+    GfxDevice::SetRenderTarget( nullptr, 0 );
 
     GfxDevice::ErrorCheck( "Scene render end" );
 }
