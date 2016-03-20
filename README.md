@@ -24,7 +24,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
   - API is not stable until 1.0 (developing 0.5 now)
   - OpenGL renderer is the most featureful but others will catch up.
-  - Main branch may or may not compile but releases should always work.
+  - Master branch may or may not compile but releases should always work.
   - Editor is still missing many features that are needed for proper scene creation.
   - Lights cast shadows but don't shade objects (planned for 0.6)
 
@@ -42,7 +42,8 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
   - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile.
   - Build and run Samples\01_OpenWindow.
-
+  - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
+  
 ## OS X / GNU/Linux
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.

@@ -15,6 +15,14 @@ extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
 void PlatformInitGamePad();
 
+#if _MSC_VER
+extern "C"
+{
+    __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
+
 void ae3d::System::InitGfxDeviceForEditor( int width, int height )
 {
     GfxDevice::Init( width, height );
