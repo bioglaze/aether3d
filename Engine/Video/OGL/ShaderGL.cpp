@@ -9,7 +9,14 @@
 #include "TextureCube.hpp"
 #include "RenderTexture.hpp"
 
+//#define WARN_ON_MISSING_BINDINGS
+
 extern ae3d::FileWatcher fileWatcher;
+
+namespace MathUtil
+{
+    bool IsFinite( float f );
+}
 
 namespace
 {
@@ -174,7 +181,9 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexGLSL, const F
     const std::string fragmentStr = std::string( std::begin( fragmentGLSL.data ), std::end( fragmentGLSL.data ) );
 
     Load( vertexStr.c_str(), fragmentStr.c_str() );
-
+    
+    fragmentPath = fragmentGLSL.path;
+    
     bool isInCache = false;
     
     for (const auto& entry : cacheEntries)
@@ -207,6 +216,9 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
+#ifdef WARN_ON_MISSING_BINDINGS
+    if (uniformLocations[ name ].i == -1) { System::Print( "Missing uniform matrix binding %s in vertex or fragment shader %s\n", name, fragmentPath.c_str() ); }
+#endif
     glProgramUniformMatrix4fv( handle, uniformLocations[ name ].i, 1, GL_FALSE, matrix4x4 );
 }
 
@@ -245,20 +257,47 @@ void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
+#ifdef WARN_ON_MISSING_BINDINGS
+    if (uniformLocations[ name ].i == -1) { System::Print( "Missing uniform int binding %s in vertex or fragment shader %s\n", name, fragmentPath.c_str() ); }
+#endif
     glProgramUniform1i( handle, uniformLocations[ name ].i, value );
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )
 {
+#if DEBUG
+    System::Assert( MathUtil::IsFinite( value ), "Shader::SetFloat got an invalid value" );
+#endif
+#ifdef WARN_ON_MISSING_BINDINGS
+    if (uniformLocations[ name ].i == -1) { System::Print( "Missing uniform float binding %s in vertex or fragment shader %s\n", name, fragmentPath.c_str() ); }
+#endif
     glProgramUniform1f( handle, uniformLocations[ name ].i, value );
 }
 
 void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
+#if DEBUG
+    for (int i = 0; i < 3; ++i)
+    {
+        System::Assert( MathUtil::IsFinite( vec3[ i ] ), "Shader::SetVector got an invalid value" );
+    }
+#endif
+#ifdef WARN_ON_MISSING_BINDINGS
+    if (uniformLocations[ name ].i == -1) { System::Print( "Missing uniform vec3 binding %s in vertex or fragment shader %s\n", name, fragmentPath.c_str() ); }
+#endif
     glProgramUniform3fv( handle, uniformLocations[ name ].i, 1, vec3 );
 }
 
 void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
+#if DEBUG
+    for (int i = 0; i < 4; ++i)
+    {
+        System::Assert( MathUtil::IsFinite( vec4[ i ] ), "Shader::SetVector got an invalid value" );
+    }
+#endif
+#ifdef WARN_ON_MISSING_BINDINGS
+    if (uniformLocations[ name ].i == -1) { System::Print( "Missing uniform vec4 binding %s in vertex or fragment shader %s\n", name, fragmentPath.c_str() ); }
+#endif
     glProgramUniform4fv( handle, uniformLocations[ name ].i, 1, vec4 );
 }

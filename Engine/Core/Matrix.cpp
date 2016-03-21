@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cmath>
 #include "Vec3.hpp"
+#include "System.hpp"
 
 #ifndef M_PI
 #    define M_PI 3.14159265358979f
@@ -26,13 +27,15 @@ const float biasDataColMajor[] =
 
     void CheckNaN( const Matrix44& matrix )
     {
+#if DEBUG
         for (int i = 0; i < 16; ++i)
         {
-            if (IsNaN( matrix.m[ i ] ))
+            if (IsNaN( matrix.m[ i ] ) && std::isfinite( matrix.m[ i ]))
             {
-                //std::cerr << "Matrix contains NaN" << std::endl;
+                ae3d::System::Assert( false, "Matrix contains NaN" );
             }
         }
+#endif
     }
 }
 

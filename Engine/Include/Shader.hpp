@@ -137,6 +137,7 @@ namespace ae3d
         };
 
     private:
+        std::string fragmentPath;
 
 #if RENDERER_D3D12
         void CreateConstantBuffer();

@@ -75,7 +75,7 @@ int main()
     cameraCubeRT.GetComponent<CameraComponent>()->SetTargetTexture( &cubeRT );
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
-    cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     GameObject camera2d;
     camera2d.AddComponent<CameraComponent>();
@@ -113,11 +113,11 @@ int main()
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
-    GameObject cube2;
-    cube2.AddComponent< MeshRendererComponent >();
-    cube2.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
-    cube2.AddComponent< TransformComponent >();
-    cube2.GetComponent< TransformComponent >()->SetLocalPosition( { 10, 0, -50 } );
+    GameObject rtCube;
+    rtCube.AddComponent< MeshRendererComponent >();
+    rtCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
+    rtCube.AddComponent< TransformComponent >();
+    rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { 5, 0, -70 } );
 
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
@@ -147,11 +147,11 @@ int main()
 
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
-    materialCubeRT.SetRenderTexture( "textureMap", &cubeRT );
+    materialCubeRT.SetRenderTexture( "skyMap", &cubeRT );
     materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
     materialCubeRT.SetBackFaceCulling( true );
 
-    cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
+    rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
     
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
@@ -179,7 +179,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -219,14 +219,14 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
-    //scene.Add( &cameraCubeRT );
-    //scene.Add( &cube );
-    //scene.Add( &copiedCube );
-    //scene.Add( &cube2 );
-    //scene.Add( &statsContainer );
+    scene.Add( &camera2d );
+    scene.Add( &cameraCubeRT );
+    scene.Add( &cube );
+    scene.Add( &copiedCube );
+    scene.Add( &rtCube );
+    scene.Add( &statsContainer );
     //scene.Add( &dirLight );
-    //scene.Add( &spotLight );
+    scene.Add( &spotLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
 
@@ -240,7 +240,7 @@ int main()
         cubes[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { i * 4.5f - 4, 0, -100 } );
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
-        //scene.Add( &cubes[ i ] );
+        scene.Add( &cubes[ i ] );
     }
 
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );

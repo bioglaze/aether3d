@@ -43,6 +43,16 @@ namespace MathUtil
         return f != f;
     }
 
+    bool IsFinite( float f )
+    {
+        return std::isfinite( f );
+    }
+
+    bool IsFinite( int f )
+    {
+        return std::isfinite( f );
+    }
+
     bool IsPowerOfTwo( unsigned i )
     {
         return ((i & (i - 1)) == 0);
@@ -242,8 +252,8 @@ void ae3d::Scene::Render()
                 
                 static const Vec3 ups[ 6 ] =
                 {
-                    Vec3( 0, -1,  0 ),
-                    Vec3( 0, -1,  0 ),
+                    Vec3( 0,  1,  0 ), // was -1, but one side rendered blue
+                    Vec3( 0,  1,  0 ), // was -1, but one side rendered blue
                     Vec3( 0,  0,  1 ),
                     Vec3( 0,  0, -1 ),
                     Vec3( 0, -1,  0 ),
