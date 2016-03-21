@@ -159,13 +159,26 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                        width:width
                                                       height:height
-                                                   mipmapped:NO];
+                                                   mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     metalTexture.label = @"Texture 2D";
 
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     const int bytesPerRow = components * width;
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
+
+    if (mipmaps == Mipmaps::Generate)
+    {
+        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
+        [commandEncoder generateMipmapsForTexture:metalTexture];
+        [commandEncoder endEncoding];
+        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
+         completionBlock(metalTexture);
+         }];*/
+        [commandBuffer commit];
+    }
 
     stbi_image_free( data );
 }
@@ -256,22 +269,12 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
         // Stores mipmaps.
         width = header->width;
         height = header->height;
-        /*bool hasMipmaps = [imageData count] > 1;
-         
-         for (int i = 0; i < [imageData count]; ++i)
-         {
-         NSData* data = [imageData objectAtIndex:i];
-         glCompressedTexImage2D( GL_TEXTURE_2D, i, !outOpaque ? GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG,
-         outWidth, outHeight, 0, [data length], [data bytes] );
-         outWidth = MAX( outWidth >> 1, 1 );
-         outHeight = MAX( outHeight >> 1, 1 );
-         }*/
         
         auto pixelFormat = MTLPixelFormatPVRTC_RGBA_4BPP;
         MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                                                               width:width
                                                                                              height:height
-                                                                                          mipmapped:NO];
+                                                                                          mipmapped:(mipmaps == Mipmaps::Generate ? YES : NO)];
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
         metalTexture.label = @"Texture 2D PVR2";
 
@@ -280,6 +283,19 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
         NSData* data = [imageData objectAtIndex:0];
         [metalTexture replaceRegion:region mipmapLevel:0 withBytes:[data bytes] bytesPerRow:0];
         
+        if (mipmaps == Mipmaps::Generate)
+        {
+            id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
+            id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+            id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
+            [commandEncoder generateMipmapsForTexture:metalTexture];
+            [commandEncoder endEncoding];
+            /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
+             completionBlock(metalTexture);
+             }];*/
+            [commandBuffer commit];
+        }
+
         [imageData removeAllObjects];
     }
 #endif
@@ -379,7 +395,7 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
     MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                                                           width:width
                                                                                          height:height
-                                                                                      mipmapped:NO];
+                                                                                      mipmapped:(mipmaps == Mipmaps::Generate ? YES : NO)];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
     metalTexture.label = @"Texture 2D PVR3";
 
@@ -388,6 +404,19 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
     NSData* data = [levelDatas objectAtIndex:0];
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:[data bytes] bytesPerRow:0];
     
+    if (mipmaps == Mipmaps::Generate)
+    {
+        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
+        [commandEncoder generateMipmapsForTexture:metalTexture];
+        [commandEncoder endEncoding];
+        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
+         completionBlock(metalTexture);
+         }];*/
+        [commandBuffer commit];
+    }
+
     [levelDatas removeAllObjects];
 #endif
 }
