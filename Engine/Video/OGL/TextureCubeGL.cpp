@@ -74,11 +74,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     if (handle == 0)
     {
         handle = GfxDevice::CreateTextureId();
-
-        if (GfxDevice::HasExtension( "KHR_debug" ))
-        {
-            glObjectLabel( GL_TEXTURE, handle, (GLsizei)negX.path.size(), negX.path.c_str() );
-        }
         
         fileWatcher.AddFile( negX.path, CubeReload );
         fileWatcher.AddFile( posX.path, CubeReload );
@@ -102,6 +97,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        glObjectLabel( GL_TEXTURE, handle, (GLsizei)negX.path.size(), negX.path.c_str() );
+    }
 
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };

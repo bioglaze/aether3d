@@ -194,7 +194,7 @@ namespace ae3d
         }
 
         int otherBits = 0;
-#if _DEBUG
+#if DEBUG
         otherBits = WGL_CONTEXT_DEBUG_BIT_ARB;
 #endif
         const int contextAttribs[] =

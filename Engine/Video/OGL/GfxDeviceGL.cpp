@@ -143,6 +143,27 @@ void ae3d::GfxDevice::Init( int width, int height )
     glEnable( GL_DEPTH_TEST );
 }
 
+void ae3d::GfxDevice::PushGroupMarker( const char* name )
+{
+#if DEBUG
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        const std::string nameStr( name );
+        glPushDebugGroup( GL_DEBUG_SOURCE_APPLICATION, 0, (GLsizei)nameStr.length(), name );
+    }
+#endif
+}
+
+void ae3d::GfxDevice::PopGroupMarker()
+{
+#if DEBUG
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        glPopDebugGroup();
+    }
+#endif
+}
+
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode )
 {
@@ -421,6 +442,7 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
         for (int i = 0; i < count; ++i)
         {
             sExtensions[ i ] = std::string( (const char*)glGetStringi( GL_EXTENSIONS, i ) );
+            System::Print("%s\n", sExtensions[ i ].c_str() );
         }
     }
     

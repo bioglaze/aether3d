@@ -30,9 +30,9 @@ const float biasDataColMajor[] =
 #if DEBUG
         for (int i = 0; i < 16; ++i)
         {
-            if (IsNaN( matrix.m[ i ] ) && std::isfinite( matrix.m[ i ]))
+            if (!std::isfinite( matrix.m[ i ]))
             {
-                ae3d::System::Assert( false, "Matrix contains NaN" );
+                ae3d::System::Assert( false, "Matrix contains NaN or Inf" );
             }
         }
 #endif

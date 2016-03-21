@@ -5,6 +5,7 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <d3dx12.h>
+#include <pix_win.h>
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -477,6 +478,19 @@ void ae3d::CreateRenderer( int /*samples*/ )
     CreateRootSignature();
     CreateDepthStencilView();
     CreateSampler();
+}
+
+void ae3d::GfxDevice::PushGroupMarker( const char* name )
+{
+    wchar_t wstr[ 128 ];
+    std::mbstowcs( wstr, name, 128 );
+    const UINT size = static_cast<UINT>((wcslen( wstr ) + 1) * sizeof( wstr[ 0 ] ));
+    GfxDeviceGlobal::graphicsCommandList->BeginEvent( DirectX::Detail::PIX_EVENT_UNICODE_VERSION, wstr, size );
+}
+
+void ae3d::GfxDevice::PopGroupMarker()
+{
+    GfxDeviceGlobal::graphicsCommandList->EndEvent();
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,

@@ -55,7 +55,8 @@ struct TextureBuffer
         {
             OVR_ASSERT( hmd );
 
-            ovr_CreateSwapTextureSetGL( hmd, GL_RGBA, size.w, size.h, &TextureSet );
+            ovrResult err = ovr_CreateSwapTextureSetGL( hmd, GL_RGBA, size.w, size.h, &TextureSet );
+            System::Assert( OVR_SUCCESS( err ), "failed to create texture set for Oculus Rift" );
 
             for (int i = 0; i < TextureSet->TextureCount; ++i)
             {
@@ -218,6 +219,10 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
         glFramebufferTexture2D( GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Global::mirrorTexture->OGL.TexId, 0 );
         glFramebufferRenderbuffer( GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 );
         glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
+    }
+    else
+    {
+        System::Assert( false, "Failed to create mirror texture for Oculus Rift." );
     }
 
     Global::EyeRenderDesc[ 0 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Left, Global::HMD.DefaultEyeFov[ 0 ] );

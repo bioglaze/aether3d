@@ -71,6 +71,9 @@ namespace ae3d
         void SetMultiSampling( bool enable );
         void Set_sRGB_Writes( bool enable );
         
+        void PushGroupMarker( const char* name );
+        void PopGroupMarker();
+
         void IncDrawCalls();
         int GetDrawCalls();
         void IncVertexBufferBinds();

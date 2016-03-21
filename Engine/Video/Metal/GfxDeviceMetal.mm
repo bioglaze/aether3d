@@ -128,6 +128,16 @@ void ae3d::GfxDevice::SetCurrentDrawableMetal( id <CAMetalDrawable> aDrawable, M
     renderPassDescriptor = renderPass;
 }
 
+void ae3d::GfxDevice::PushGroupMarker( const char* name )
+{
+
+}
+
+void ae3d::GfxDevice::PopGroupMarker()
+{
+
+}
+
 void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view )
 {
     device = metalDevice;

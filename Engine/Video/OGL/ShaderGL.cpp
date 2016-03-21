@@ -145,9 +145,9 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     GLuint program = GfxDevice::CreateProgramId();
 
-    if (GfxDevice::HasExtension( "KHR_debug" ))
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_PROGRAM, handle, (GLsizei)std::string( "shader" ).size(), "shader" );
+        glObjectLabel( GL_PROGRAM, program, (GLsizei)std::string( "shader" ).size(), "shader" );
     }
 
     glAttachShader( program, vertexShader );

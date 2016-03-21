@@ -56,18 +56,18 @@ const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         Texture2DGlobal::defaultTexture.height = 32;
 
         Texture2DGlobal::defaultTexture.handle = GfxDevice::CreateTextureId();
-        
-        if (GfxDevice::HasExtension( "KHR_debug" ))
-        {
-            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.handle, (GLsizei)std::string("default texture 2d").size(), "default texture 2d" );
-        }
     
         glBindTexture( GL_TEXTURE_2D, Texture2DGlobal::defaultTexture.handle );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-   
+
+        if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+        {
+            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.handle, (GLsizei)std::string( "default texture 2d" ).size(), "default texture 2d" );
+        }
+
         int data[ 32 * 32 * 4 ] = { 0xFFC0CB };
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, Texture2DGlobal::defaultTexture.width, Texture2DGlobal::defaultTexture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
         GfxDevice::ErrorCheck( "Load Texture2D" );
@@ -103,11 +103,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
         handle = GfxDevice::CreateTextureId();
         
-        if (GfxDevice::HasExtension( "KHR_debug" ))
-        {
-            glObjectLabel( GL_TEXTURE, handle, (GLsizei)fileContents.path.size(), fileContents.path.c_str() );
-        }
-        
         fileWatcher.AddFile( fileContents.path, TexReload );
     }
 
@@ -130,6 +125,11 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        glObjectLabel( GL_TEXTURE, handle, (GLsizei)fileContents.path.size(), fileContents.path.c_str() );
+    }
 
     if (GfxDevice::HasExtension( "GL_EXT_texture_filter_anisotropic" ) && anisotropy > 1)
     {

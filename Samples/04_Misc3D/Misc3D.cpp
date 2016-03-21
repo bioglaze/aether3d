@@ -161,7 +161,7 @@ int main()
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 512 );
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
@@ -179,7 +179,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -219,14 +219,14 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     scene.Add( &cameraCubeRT );
-    scene.Add( &cube );
-    scene.Add( &copiedCube );
     scene.Add( &rtCube );
-    scene.Add( &statsContainer );
+    //scene.Add( &cube );
+    //scene.Add( &copiedCube );
+    //scene.Add( &statsContainer );
     //scene.Add( &dirLight );
-    scene.Add( &spotLight );
+    //scene.Add( &spotLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
 

@@ -1341,6 +1341,14 @@ namespace ae3d
     }
 }
 
+void ae3d::GfxDevice::PushGroupMarker( const char* name )
+{
+}
+
+void ae3d::GfxDevice::PopGroupMarker()
+{
+}
+
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
 {
     VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );

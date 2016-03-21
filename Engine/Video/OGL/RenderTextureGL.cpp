@@ -20,7 +20,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     handle = GfxDevice::CreateTextureId();
     glBindTexture( GL_TEXTURE_2D, handle );
 
-    if (GfxDevice::HasExtension( "KHR_debug" ))
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
         glObjectLabel( GL_TEXTURE, handle, 17, "render_texture_2d" );
     }
@@ -71,7 +71,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     handle = GfxDevice::CreateTextureId();
     glBindTexture( GL_TEXTURE_CUBE_MAP, handle );
     
-    if (GfxDevice::HasExtension( "KHR_debug" ))
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
         glObjectLabel( GL_TEXTURE, handle, 19, "render_texture_cube" );
     }

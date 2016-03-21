@@ -48,11 +48,6 @@ namespace MathUtil
         return std::isfinite( f );
     }
 
-    bool IsFinite( int f )
-    {
-        return std::isfinite( f );
-    }
-
     bool IsPowerOfTwo( unsigned i )
     {
         return ((i & (i - 1)) == 0);
@@ -232,10 +227,15 @@ void ae3d::Scene::Render()
 
         if (transform && !rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
         {
+            GfxDevice::PushGroupMarker( "2D RT" );
             RenderWithCamera( rtCamera, 0 );
+            GfxDevice::PopGroupMarker();
         }
         else if (transform && rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
         {
+            const Vec3 cameraPos = transform->GetLocalPosition();
+            GfxDevice::PushGroupMarker( "Cube Map RT" );
+
             for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
             {
                 const float scale = 2000;
@@ -252,17 +252,19 @@ void ae3d::Scene::Render()
                 
                 static const Vec3 ups[ 6 ] =
                 {
-                    Vec3( 0,  1,  0 ), // was -1, but one side rendered blue
-                    Vec3( 0,  1,  0 ), // was -1, but one side rendered blue
+                    Vec3( 0,  -1,  0 ),
+                    Vec3( 0,  -1,  0 ),
                     Vec3( 0,  0,  1 ),
                     Vec3( 0,  0, -1 ),
                     Vec3( 0, -1,  0 ),
                     Vec3( 0, -1,  0 )
                 };
                 
-                transform->LookAt( transform->GetLocalPosition(), transform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
+                transform->LookAt( cameraPos, cameraPos + directions[ cubeMapFace ], ups[ cubeMapFace ] );
                 RenderWithCamera( rtCamera, cubeMapFace );
             }
+
+            GfxDevice::PopGroupMarker();
         }
     }
 
@@ -337,8 +339,10 @@ void ae3d::Scene::Render()
                         SetupCameraForSpotShadowCasting( lightTransform->GetLocalPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                     }
                     
+                    GfxDevice::PushGroupMarker( "Shadow maps" );
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
-                    
+                    GfxDevice::PopGroupMarker();
+
                     if (dirLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
@@ -353,7 +357,9 @@ void ae3d::Scene::Render()
             }
         }
         
+        GfxDevice::PushGroupMarker( "Primary Pass" );
         RenderWithCamera( camera, 0 );
+        GfxDevice::PopGroupMarker();
     }
     
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
@@ -512,6 +518,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         return;
     }
     
+    GfxDevice::PushGroupMarker( "DepthNormal" );
+
 #if RENDERER_METAL
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
@@ -537,6 +545,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     GfxDevice::PresentDrawable();
 #endif
     GfxDevice::SetRenderTarget( nullptr, 0 );
+    GfxDevice::PopGroupMarker();
 
     GfxDevice::ErrorCheck( "Scene render end" );
 }
