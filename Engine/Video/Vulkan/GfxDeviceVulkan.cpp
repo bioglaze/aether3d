@@ -118,7 +118,7 @@ namespace debug
         else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
         {
             ae3d::System::Print( "Vulkan warning: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
-#if _MSC_VER && _DEBUG
+#if _MSC_VER && DEBUG
             __debugbreak();
 #endif
         }

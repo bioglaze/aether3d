@@ -25,10 +25,11 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
 
     if (vertexBuffer != VK_NULL_HANDLE)
     {
-        // FIXME: Don't know if it's safe to release these here.
+        // FIXME: I don't know if it's safe to release these here.
         vkFreeMemory( GfxDeviceGlobal::device, vertexMem, nullptr );
         vkFreeMemory( GfxDeviceGlobal::device, indexMem, nullptr );
-        //GfxDeviceGlobal::pendingFreeVBs.push_back( vertexBuffer );
+        GfxDeviceGlobal::pendingFreeVBs.push_back( vertexBuffer );
+        GfxDeviceGlobal::pendingFreeVBs.push_back( indexBuffer );
     }
 
     bool useStaging = true;

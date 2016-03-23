@@ -57,7 +57,7 @@
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
   </ItemDefinitionGroup>
