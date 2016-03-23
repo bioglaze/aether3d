@@ -4,6 +4,7 @@
 #include <cmath>
 #include <pmmintrin.h>
 #include "Vec3.hpp"
+#include "Macros.hpp"
 
 #ifndef M_PI
 #    define M_PI 3.14159265358979f
@@ -155,7 +156,7 @@ void Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4* out )
 {
     Matrix44 transpose;
     mat.Transpose( transpose );
-    Vec4 v4 = vec;
+    ALIGNAS( 16 ) Vec4 v4 = vec;
 
     __m128 vec4 = _mm_load_ps( &v4.x );
     __m128 row1 = _mm_load_ps( &transpose.m[  0 ] );
@@ -176,14 +177,14 @@ void Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4* out )
 
 void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 {
-    Vec4 tmp( vec );
+    ALIGNAS( 16 ) Vec4 tmp( vec );
     TransformPoint( tmp, mat, &tmp );
     *out = Vec3( tmp.x, tmp.y, tmp.z );
 }
 
 void Matrix44::TransformDirection( const Vec3& dir, const Matrix44& mat, Vec3* out )
 {
-    Vec4 tmp( dir.x, dir.y, dir.z, 0 );
+    ALIGNAS( 16 ) Vec4 tmp( dir.x, dir.y, dir.z, 0 );
     TransformPoint( tmp, mat, &tmp );
     *out = Vec3( tmp.x, tmp.y, tmp.z );
 }
@@ -215,31 +216,18 @@ void Matrix44::MakeIdentity()
 
 void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 {
-    Vec3 forward = (center - eye).Normalized();
+    const Vec3 zAxis = (center - eye).Normalized();
+    //const Vec3 xAxis = Vec3::Cross( zAxis, up ).Normalized();
+    //const Vec3 yAxis = Vec3::Cross( xAxis, zAxis );
 
-    Vec3 right = Vec3::Cross( forward, up ).Normalized();
+    // Mirrored (fixes cube map RT camera face orientation):
+    const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
+    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
 
-    const Vec3 newUp = Vec3::Cross( right, forward );
-
-    m[ 0 ] = right.x;
-    m[ 4 ] = right.y;
-    m[ 8 ] = right.z;
-    m[ 12 ] = 0;
-
-    m[ 1 ] = newUp.x;
-    m[ 5 ] = newUp.y;
-    m[ 9 ] = newUp.z;
-    m[13 ] = 0;
-
-    m[ 2 ] = -forward.x;
-    m[ 6 ] = -forward.y;
-    m[10 ] = -forward.z;
-    m[14 ] = 0;
-
-    m[ 3 ] = m[ 7 ] = m[ 11 ] = 0;
-    m[15 ] = 1;
-
-    Translate( -eye );
+    m[ 0 ] = xAxis.x; m[ 1 ] = xAxis.y; m[ 2 ] = xAxis.z; m[ 3 ] = -Vec3::Dot( xAxis, eye );
+    m[ 4 ] = yAxis.x; m[ 5 ] = yAxis.y; m[ 6 ] = yAxis.z; m[ 7 ] = -Vec3::Dot( yAxis, eye );
+    m[ 8 ] = zAxis.x; m[ 9 ] = zAxis.y; m[ 10 ] = zAxis.z; m[ 11 ] = -Vec3::Dot( zAxis, eye );
+    m[ 12 ] = 0; m[ 13 ] = 0; m[ 14 ] = 0; m[ 15 ] = 1;
 }
 
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
