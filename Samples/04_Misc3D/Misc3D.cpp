@@ -62,7 +62,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
     camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera.AddComponent<TransformComponent>();
-    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
     
     RenderTexture cubeRT;
     cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );

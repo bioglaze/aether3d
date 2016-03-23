@@ -9,14 +9,6 @@
 #    define M_PI 3.14159265358979f
 #endif
 
-namespace
-{
-bool IsNaN( float f )
-{
-    return f != f;
-}
-}
-
 namespace ae3d
 {
 const float biasDataColMajor[] =
@@ -243,13 +235,13 @@ void Matrix44::MakeIdentity()
 
 void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 {
-    // GameDev.net user Alundra's implementation.
     const Vec3 zAxis = (center - eye).Normalized();
-    const Vec3 xAxis = Vec3::Cross( zAxis, up ).Normalized();
-    const Vec3 yAxis = Vec3::Cross( xAxis, zAxis );
-    // Mirrored:
-    //const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
-    //const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
+    //const Vec3 xAxis = Vec3::Cross( zAxis, up ).Normalized();
+    //const Vec3 yAxis = Vec3::Cross( xAxis, zAxis );
+
+    // Mirrored (fixes cube map RT camera face orientation):
+    const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
+    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
     
     m[  0 ] = xAxis.x; m[  1 ] = xAxis.y; m[  2 ] = xAxis.z; m[  3 ] = -Vec3::Dot( xAxis, eye );
     m[  4 ] = yAxis.x; m[  5 ] = yAxis.y; m[  6 ] = yAxis.z; m[  7 ] = -Vec3::Dot( yAxis, eye );
