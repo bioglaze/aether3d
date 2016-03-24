@@ -5,7 +5,7 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <d3dx12.h>
-#include <pix_win.h>
+#include <pix.h>
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -521,15 +521,29 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
 
+    // TODO: Get from texture object
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = GfxDeviceGlobal::texture2d0 != nullptr ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
-    srvDesc.Texture2D.MostDetailedMip = 0;
-    srvDesc.Texture2D.PlaneSlice = 0;
-    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-    
+    if (srvDesc.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
+    {
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.PlaneSlice = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+    }
+    else if (srvDesc.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
+    {
+        srvDesc.TextureCube.MipLevels = 1;
+        srvDesc.TextureCube.MostDetailedMip = 0;
+        srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+    }
+    else
+    {
+        System::Assert( false, "unhandled texture dimension" );
+    }
+
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     ID3D12Resource* texResource = nullptr;
@@ -659,15 +673,14 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
 
-/*#if _DEBUG
+/*
     ID3D12DebugDevice* d3dDebug = nullptr;
     GfxDeviceGlobal::device->QueryInterface(__uuidof(ID3D12DebugDevice), reinterpret_cast<void**>(&d3dDebug));
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
     d3dDebug->ReportLiveDeviceObjects( D3D12_RLDO_DETAIL );
     AE3D_SAFE_RELEASE( d3dDebug );
-#else*/
+*/
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
-//#endif
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
@@ -710,10 +723,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 void ae3d::GfxDevice::Present()
 {
-    //GpuResource presentResource;
-    //presentResource.resource = GfxDeviceGlobal::renderTargets[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
-    //presentResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    //TransitionResource( presentResource, D3D12_RESOURCE_STATE_PRESENT );
     TransitionResource( GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ], D3D12_RESOURCE_STATE_PRESENT );
 
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Close();
@@ -771,12 +780,8 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     GfxDeviceGlobal::clearColor[ 2 ] = blue;
 }
 
-void ae3d::GfxDevice::ErrorCheck( const char* info )
+void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
 {
-        (void)info;
-#if defined _DEBUG || defined DEBUG
-
-#endif
 }
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned /*cubeMapFace*/ )

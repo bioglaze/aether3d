@@ -55,6 +55,10 @@ void ae3d::Texture2D::DestroyTextures()
     for (std::size_t i = 0; i < Texture2DGlobal::textures.size(); ++i)
     {
         AE3D_SAFE_RELEASE( Texture2DGlobal::textures[ i ] );
+    }
+
+    for (std::size_t i = 0; i < Texture2DGlobal::uploadBuffers.size(); ++i)
+    {
         AE3D_SAFE_RELEASE( Texture2DGlobal::uploadBuffers[ i ] );
     }
 }
@@ -69,7 +73,7 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subRes
     heapProps.VisibleNodeMask = 1;
 
     ID3D12Resource* uploadBuffer = nullptr;
-    const UINT64 uploadBufferSize = GetRequiredIntermediateSize( gpuResource.resource, 0, 1 );
+    const UINT64 uploadBufferSize = GetRequiredIntermediateSize( gpuResource.resource, 0, subResourceCount );
 
     const auto buffer = CD3DX12_RESOURCE_DESC::Buffer( uploadBufferSize );
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &buffer,

@@ -24,10 +24,10 @@ win32 {
     LIBS += -L$$PWD/../../Engine/ThirdParty/lib/ -llibOpenAL32
 
 #win32-msvc:LIBS += -L$$PWD/../../../aether3d_build/ -lAether3D_GL_d
-#win32-g++:LIBS += -L$$PWD/../../../aether3d_build/ -laether3d_win
+#win32-g++:LIBS += -L$$PWD/../../../aether3d_build/ -laether3d_gl_win
 
     copyfiles.commands = $$quote(cmd /c xcopy /S /I /y $${PWD_WIN}\copy_to_output $${DESTDIR_WIN})
-    #PRE_TARGETDEPS += $$PWD/../../../aether3d_build/libaether3d_win.a
+    #PRE_TARGETDEPS += $$PWD/../../../aether3d_build/libaether3d_gl_win.a
 }
 macx {
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
@@ -40,7 +40,7 @@ macx {
 }
 linux {
     QMAKE_CXXFLAGS += -std=c++11
-    LIBS += -L$$PWD/../../../aether3d_build -laether3d_linux
+    LIBS += -L$$PWD/../../../aether3d_build -laether3d_gl_linux
     LIBS += -ldl -fPIC -lxcb -lxcb-keysyms -lxcb-icccm -lxcb-ewmh -lX11-xcb -lX11 -lGL -lopenal
     copyfiles.commands = cp -r $$PWD/copy_to_output/* $$OUT_PWD
 }
