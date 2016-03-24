@@ -20,6 +20,8 @@ namespace ae3d
     class VertexBuffer
     {
     public:
+        enum class VertexFormat { PTC, PTN, PTNTC };
+
         /// Triangle of 3 vertices.
         struct Face
         {
@@ -91,6 +93,8 @@ namespace ae3d
         /// \return Face count.
         int GetFaceCount() const { return elementCount; }
 
+        VertexFormat GetVertexFormat() const { return vertexFormat; }
+
         /// \return True if the buffer contains geometry ready for rendering.
         bool IsGenerated() const { return elementCount != 0; }
 
@@ -128,7 +132,6 @@ namespace ae3d
 
 #endif
     private:
-        enum class VertexFormat { PTC, PTN, PTNTC };
         static const int posChannel = 0;
         static const int uvChannel = 1;
         static const int colorChannel = 2;

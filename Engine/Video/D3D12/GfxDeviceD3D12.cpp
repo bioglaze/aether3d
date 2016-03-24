@@ -147,9 +147,9 @@ void CreateSampler()
 {
     D3D12_SAMPLER_DESC descSampler;
     descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     descSampler.MinLOD = -FLT_MAX;
     descSampler.MaxLOD = FLT_MAX;
     descSampler.MipLODBias = 0;
@@ -247,7 +247,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descRaster.DepthBiasClamp = 0;
     descRaster.DepthClipEnable = TRUE;
     descRaster.FillMode = D3D12_FILL_MODE_SOLID;
-    descRaster.FrontCounterClockwise = FALSE;
+    descRaster.FrontCounterClockwise = TRUE;
     descRaster.MultisampleEnable = FALSE;
     descRaster.SlopeScaledDepthBias = 0;
 
@@ -303,17 +303,54 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
         ae3d::System::Assert( false, "unhandled blend mode" );
     }
 
-    D3D12_INPUT_ELEMENT_DESC layout[] =
+    D3D12_INPUT_ELEMENT_DESC layoutPTC[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
-    
-    const UINT numElements = sizeof( layout ) / sizeof( layout[ 0 ] );
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC descPso;
-    ZeroMemory( &descPso, sizeof( descPso ) );
+    D3D12_INPUT_ELEMENT_DESC layoutPTN[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+    };
+
+    D3D12_INPUT_ELEMENT_DESC layoutPTNTC[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+    };
+
+    UINT numElements = 0;
+    D3D12_INPUT_ELEMENT_DESC* layout = nullptr;
+    if (vertexBuffer.GetVertexFormat() == ae3d::VertexBuffer::VertexFormat::PTC)
+    {
+        layout = layoutPTC;
+        numElements = 3;
+    }
+    else if (vertexBuffer.GetVertexFormat() == ae3d::VertexBuffer::VertexFormat::PTN)
+    {
+        layout = layoutPTN;
+        numElements = 3;
+    }
+    else if (vertexBuffer.GetVertexFormat() == ae3d::VertexBuffer::VertexFormat::PTNTC)
+    {
+        layout = layoutPTNTC;
+        numElements = 5;
+    }
+    else
+    {
+        ae3d::System::Assert( false, "unhandled vertex layout" );
+        layout = layoutPTC;
+        numElements = 3;
+    }
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC descPso = {};
     descPso.InputLayout = { layout, numElements };
     descPso.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
     descPso.pRootSignature = GfxDeviceGlobal::rootSignature;
