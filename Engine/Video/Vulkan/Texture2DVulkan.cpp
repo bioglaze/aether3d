@@ -7,6 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
 #include "FileSystem.hpp"
+#include "Macros.hpp"
 #include "System.hpp"
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
@@ -16,8 +17,7 @@ void Tokenize( const std::string& str,
 
 namespace ae3d
 {
-    void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
-    VkBool32 GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
+    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
                          VkImageLayout newImageLayout, unsigned layerCount );
 }
@@ -55,7 +55,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         cmdBufInfo.commandBufferCount = 1;
 
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &Texture2DGlobal::texCmdBuffer );
-        CheckVulkanResult( err, "vkAllocateCommandBuffers Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers Texture2D" );
     }
 
     filter = aFilter;
@@ -116,7 +116,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     VkImage mappableImage;
     VkResult err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &mappableImage );
-    CheckVulkanResult( err, "vkCreateImage" );
+    AE3D_CHECK_VULKAN( err, "vkCreateImage" );
 
     VkMemoryRequirements memReqs;
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, mappableImage, &memReqs );
@@ -131,10 +131,10 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     VkDeviceMemory mappableMemory;
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &mappableMemory );
-    CheckVulkanResult( err, "vkAllocateMemory in Texture2D" );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory in Texture2D" );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, mappableImage, mappableMemory, 0 );
-    CheckVulkanResult( err, "vkBindImageMemory in Texture2D" );
+    AE3D_CHECK_VULKAN( err, "vkBindImageMemory in Texture2D" );
 
     VkImageSubresource subRes = {};
     subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -146,7 +146,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     void* mapped;
     err = vkMapMemory( GfxDeviceGlobal::device, mappableMemory, 0, memReqs.size, 0, &mapped );
-    CheckVulkanResult( err, "vkMapMemory in Texture2D" );
+    AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
 
     const int bytesPerPixel = 4;
 
@@ -179,7 +179,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         cmdBufInfo.flags = 0;
 
         err = vkBeginCommandBuffer( Texture2DGlobal::texCmdBuffer, &cmdBufInfo );
-        CheckVulkanResult( err, "vkBeginCommandBuffer in Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
 
         SetImageLayout( Texture2DGlobal::texCmdBuffer,
             mappableImage,
@@ -191,7 +191,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
         err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
-        CheckVulkanResult( err, "vkCreateImage in Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkCreateImage in Texture2D" );
 
         vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
 
@@ -200,10 +200,10 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
 
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
-        CheckVulkanResult( err, "vkAllocateMemory in Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory in Texture2D" );
 
         err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
-        CheckVulkanResult( err, "vkBindImageMemory in Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkBindImageMemory in Texture2D" );
 
         SetImageLayout( Texture2DGlobal::texCmdBuffer,
             image,
@@ -241,7 +241,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1 );
 
         err = vkEndCommandBuffer( Texture2DGlobal::texCmdBuffer );
-        CheckVulkanResult( err, "vkEndCommandBuffer in Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in Texture2D" );
 
         VkFence nullFence = { VK_NULL_HANDLE };
 
@@ -253,10 +253,10 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         submitInfo.pCommandBuffers = &Texture2DGlobal::texCmdBuffer;
 
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, nullFence );
-        CheckVulkanResult( err, "vkQueueSubmit in Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
 
         err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
-        CheckVulkanResult( err, "vkQueueWaitIdle in Texture2D" );
+        AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle in Texture2D" );
     }
 
     VkImageViewCreateInfo viewInfo = {};
@@ -272,7 +272,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     viewInfo.subresourceRange.levelCount = 1;
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
-    CheckVulkanResult( err, "vkCreateImageView in Texture2D" );
+    AE3D_CHECK_VULKAN( err, "vkCreateImageView in Texture2D" );
 
     stbi_image_free( data );
 }

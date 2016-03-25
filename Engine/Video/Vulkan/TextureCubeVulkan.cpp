@@ -3,14 +3,14 @@
 #include <vulkan/vulkan.h>
 #include "stb_image.c"
 #include "FileSystem.hpp"
+#include "Macros.hpp"
 #include "System.hpp"
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
 namespace ae3d
 {
-    void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
-    VkBool32 GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
+    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
                          VkImageLayout newImageLayout, unsigned layerCount );
 }
@@ -50,7 +50,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         cmdBufInfo.commandBufferCount = 1;
 
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &TextureCubeGlobal::texCmdBuffer );
-        CheckVulkanResult( err, "vkAllocateCommandBuffers TextureCube" );
+        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers TextureCube" );
     }
 
     filter = aFilter;
@@ -100,7 +100,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     cmdBufInfo.flags = 0;
 
     VkResult err = vkBeginCommandBuffer( TextureCubeGlobal::texCmdBuffer, &cmdBufInfo );
-    CheckVulkanResult( err, "vkBeginCommandBuffer in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
 
     for (int face = 0; face < 6; ++face)
     {
@@ -122,7 +122,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
 
             err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &images[ face ] );
-            CheckVulkanResult( err, "vkCreateImage" );
+            AE3D_CHECK_VULKAN( err, "vkCreateImage" );
 
             VkMemoryRequirements memReqs;
             vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
@@ -131,10 +131,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
 
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
-            CheckVulkanResult( err, "vkAllocateMemory in TextureCube" );
+            AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
 
             err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
-            CheckVulkanResult( err, "vkBindImageMemory in TextureCube" );
+            AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
 
             VkImageSubresource subRes = {};
             subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -146,7 +146,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             void* mapped;
             err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
-            CheckVulkanResult( err, "vkMapMemory in TextureCube" );
+            AE3D_CHECK_VULKAN( err, "vkMapMemory in TextureCube" );
 
             const int bytesPerPixel = 4;
 
@@ -190,7 +190,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     imageCreateInfo.arrayLayers = 6;
 
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
-    CheckVulkanResult( err, "vkCreateImage in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkCreateImage in TextureCube" );
 
     VkMemoryRequirements memReqs;
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
@@ -198,10 +198,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
-    CheckVulkanResult( err, "vkAllocateMemory in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
-    CheckVulkanResult( err, "vkBindImageMemory in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
 
     SetImageLayout( TextureCubeGlobal::texCmdBuffer,
         image,
@@ -242,7 +242,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6 );
 
     err = vkEndCommandBuffer( TextureCubeGlobal::texCmdBuffer );
-    CheckVulkanResult( err, "vkEndCommandBuffer in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
 
     VkFence nullFence = { VK_NULL_HANDLE };
 
@@ -254,10 +254,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     submitInfo.pCommandBuffers = &TextureCubeGlobal::texCmdBuffer;
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, nullFence );
-    CheckVulkanResult( err, "vkQueueSubmit in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in TextureCube" );
 
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
-    CheckVulkanResult( err, "vkQueueWaitIdle in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle in TextureCube" );
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -272,5 +272,5 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     viewInfo.subresourceRange.levelCount = 1;
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
-    CheckVulkanResult( err, "vkCreateImageView in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkCreateImageView in TextureCube" );
 }

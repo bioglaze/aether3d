@@ -1,5 +1,6 @@
 #include "VertexBuffer.hpp"
 #include <cstring>
+#include "Macros.hpp"
 #include "System.hpp"
 
 namespace GfxDeviceGlobal
@@ -13,8 +14,7 @@ namespace GfxDeviceGlobal
 
 namespace ae3d
 {
-    void CheckVulkanResult( VkResult result, const char* message ); // Defined in GfxDeviceVulkan.cpp 
-    VkBool32 GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
+    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
 }
 
 void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBufferSize, int vertexStride, void* indexData, int indexBufferSize )
@@ -56,14 +56,14 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
 
         VkCommandBuffer copyCommandBuffer;
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &copyCommandBuffer );
-        CheckVulkanResult( err, "copy command buffer" );
+        AE3D_CHECK_VULKAN( err, "copy command buffer" );
 
         VkBufferCreateInfo vertexBufferInfo = {};
         vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         vertexBufferInfo.size = vertexBufferSize;
         vertexBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &vertexBufferInfo, nullptr, &stagingBuffers.vertices.buffer );
-        CheckVulkanResult( err, "vkCreateBuffer vertexBuffer" );
+        AE3D_CHECK_VULKAN( err, "vkCreateBuffer vertexBuffer" );
 
         VkMemoryRequirements memReqs;
         VkMemoryAllocateInfo memAlloc = {};
@@ -73,30 +73,30 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
         memAlloc.allocationSize = memReqs.size;
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAlloc.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &stagingBuffers.vertices.memory );
-        CheckVulkanResult( err, "allocate staging vertex memory" );
+        AE3D_CHECK_VULKAN( err, "allocate staging vertex memory" );
 
         void* data = nullptr;
         err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data );
-        CheckVulkanResult( err, "map vertex memory" );
+        AE3D_CHECK_VULKAN( err, "map vertex memory" );
 
         std::memcpy( data, vertexData, vertexBufferSize );
         vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory );
         err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.buffer, stagingBuffers.vertices.memory, 0 );
-        CheckVulkanResult( err, "bind staging vertex memory" );
+        AE3D_CHECK_VULKAN( err, "bind staging vertex memory" );
 
         vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
         err = vkCreateBuffer( GfxDeviceGlobal::device, &vertexBufferInfo, nullptr, &vertexBuffer );
-        CheckVulkanResult( err, "create vertex buffer" );
+        AE3D_CHECK_VULKAN( err, "create vertex buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, vertexBuffer, &memReqs );
         memAlloc.allocationSize = memReqs.size;
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &vertexMem );
-        CheckVulkanResult( err, "allocate vertex memory" );
+        AE3D_CHECK_VULKAN( err, "allocate vertex memory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, vertexBuffer, vertexMem, 0 );
-        CheckVulkanResult( err, "bind vertex memory" );
+        AE3D_CHECK_VULKAN( err, "bind vertex memory" );
 
         VkBufferCreateInfo indexbufferInfo = {};
         indexbufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -104,34 +104,34 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
         indexbufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
         err = vkCreateBuffer( GfxDeviceGlobal::device, &indexbufferInfo, nullptr, &stagingBuffers.indices.buffer );
-        CheckVulkanResult( err, "create staging index buffer" );
+        AE3D_CHECK_VULKAN( err, "create staging index buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers.indices.buffer, &memReqs );
         memAlloc.allocationSize = memReqs.size;
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAlloc.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &stagingBuffers.indices.memory );
-        CheckVulkanResult( err, "allocate staging index memory" );
+        AE3D_CHECK_VULKAN( err, "allocate staging index memory" );
 
         err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, 0, indexBufferSize, 0, &data );
-        CheckVulkanResult( err, "map staging index memory" );
+        AE3D_CHECK_VULKAN( err, "map staging index memory" );
 
         std::memcpy( data, indexData, indexBufferSize );
         vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory );
         err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers.indices.buffer, stagingBuffers.indices.memory, 0 );
-        CheckVulkanResult( err, "bind staging index memory" );
+        AE3D_CHECK_VULKAN( err, "bind staging index memory" );
 
         indexbufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &indexbufferInfo, nullptr, &indexBuffer );
-        CheckVulkanResult( err, "create index buffer" );
+        AE3D_CHECK_VULKAN( err, "create index buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, indexBuffer, &memReqs );
         memAlloc.allocationSize = memReqs.size;
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &indexMem );
-        CheckVulkanResult( err, "allocate index memory" );
+        AE3D_CHECK_VULKAN( err, "allocate index memory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, indexBuffer, indexMem, 0 );
-        CheckVulkanResult( err, "bind index buffer memory" );
+        AE3D_CHECK_VULKAN( err, "bind index buffer memory" );
 
         VkCommandBufferBeginInfo cmdBufferBeginInfo = {};
         cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -139,7 +139,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
 
         VkBufferCopy copyRegion = {};
         err = vkBeginCommandBuffer( copyCommandBuffer, &cmdBufferBeginInfo );
-        CheckVulkanResult( err, "begin staging copy" );
+        AE3D_CHECK_VULKAN( err, "begin staging copy" );
 
         copyRegion.size = vertexBufferSize;
         vkCmdCopyBuffer( copyCommandBuffer, stagingBuffers.vertices.buffer, vertexBuffer, 1, &copyRegion );
@@ -148,7 +148,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
         vkCmdCopyBuffer( copyCommandBuffer, stagingBuffers.indices.buffer, indexBuffer, 1, &copyRegion );
 
         err = vkEndCommandBuffer( copyCommandBuffer );
-        CheckVulkanResult( err, "end staging copy" );
+        AE3D_CHECK_VULKAN( err, "end staging copy" );
 
         VkSubmitInfo copySubmitInfo = {};
         copySubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -156,10 +156,10 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
         copySubmitInfo.pCommandBuffers = &copyCommandBuffer;
 
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &copySubmitInfo, VK_NULL_HANDLE );
-        CheckVulkanResult( err, "submit staging VB copy" );
+        AE3D_CHECK_VULKAN( err, "submit staging VB copy" );
 
         err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
-        CheckVulkanResult( err, "wait after staging VB copy" );
+        AE3D_CHECK_VULKAN( err, "wait after staging VB copy" );
 
         vkDestroyBuffer( GfxDeviceGlobal::device, stagingBuffers.vertices.buffer, nullptr );
         vkFreeMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, nullptr );
@@ -176,7 +176,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
         bufCreateInfo.size = vertexBufferSize;
         bufCreateInfo.flags = 0;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufCreateInfo, nullptr, &vertexBuffer );
-        CheckVulkanResult( err, "vkCreateBuffer" );
+        AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
 
         VkMemoryAllocateInfo memAllocInfo = {};
         memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -189,17 +189,17 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
         memAllocInfo.allocationSize = memReqs.size;
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &vertexMem );
-        CheckVulkanResult( err, "vkAllocateMemory" );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
 
         void* data = nullptr;
         err = vkMapMemory( GfxDeviceGlobal::device, vertexMem, 0, vertexBufferSize, 0, &data );
-        CheckVulkanResult( err, "vkAllocateMemory" );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
 
         std::memcpy( data, vertexData, vertexBufferSize );
 
         vkUnmapMemory( GfxDeviceGlobal::device, vertexMem );
         err = vkBindBufferMemory( GfxDeviceGlobal::device, vertexBuffer, vertexMem, 0 );
-        CheckVulkanResult( err, "vkBindBufferMemory" );
+        AE3D_CHECK_VULKAN( err, "vkBindBufferMemory" );
 
         VkBufferCreateInfo ibCreateInfo = {};
         ibCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -208,21 +208,21 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBuffe
         ibCreateInfo.size = indexBufferSize;
         ibCreateInfo.flags = 0;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &ibCreateInfo, nullptr, &indexBuffer );
-        CheckVulkanResult( err, "vkCreateBuffer" );
+        AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, indexBuffer, &memReqs );
         memAllocInfo.allocationSize = memReqs.size;
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &indexMem );
-        CheckVulkanResult( err, "vkAllocateMemory" );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
 
         err = vkMapMemory( GfxDeviceGlobal::device, indexMem, 0, indexBufferSize, 0, &data );
-        CheckVulkanResult( err, "vkMapMemory" );
+        AE3D_CHECK_VULKAN( err, "vkMapMemory" );
 
         std::memcpy( data, indexData, indexBufferSize );
         vkUnmapMemory( GfxDeviceGlobal::device, indexMem );
         err = vkBindBufferMemory( GfxDeviceGlobal::device, indexBuffer, indexMem, 0 );
-        CheckVulkanResult( err, "vkBindBufferMemory index buffer" );
+        AE3D_CHECK_VULKAN( err, "vkBindBufferMemory index buffer" );
     }
 
     bindingDescriptions.resize( 1 );

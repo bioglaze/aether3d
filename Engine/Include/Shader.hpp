@@ -151,7 +151,6 @@ namespace ae3d
 #endif
 #if RENDERER_VULKAN
         void CreateConstantBuffer();
-        void UpdateUniformBuffers();
 
         VkPipelineShaderStageCreateInfo vertexInfo;
         VkPipelineShaderStageCreateInfo fragmentInfo;
