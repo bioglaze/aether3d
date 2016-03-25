@@ -32,7 +32,7 @@ namespace ae3d
         /// \param fragmentSource Fragment shader source. Language depends on the renderer.
         void Load( const char* vertexSource, const char* fragmentSource );
 #if RENDERER_VULKAN
-        bool IsValid() const { return ubo != VK_NULL_HANDLE; }
+        bool IsValid() const { return true; }
 
         /// Loads SPIR-V shader.
         /// \param spirvData SPIR-V file contents.
@@ -127,7 +127,6 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
         VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
-        VkDescriptorBufferInfo& GetUBODesc() { return uboDesc; }
 #endif
         /// Wraps an int that is defaulted to -1. Needed for uniform handling.
         struct IntDefaultedToMinusOne
@@ -147,16 +146,8 @@ namespace ae3d
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
 #endif
 #if RENDERER_VULKAN
-        void CreateConstantBuffer();
-
         VkPipelineShaderStageCreateInfo vertexInfo;
-        VkPipelineShaderStageCreateInfo fragmentInfo;
-        
-        VkBuffer ubo = VK_NULL_HANDLE;
-        VkDeviceMemory uboMemory;
-        VkDescriptorBufferInfo uboDesc;
-
-        std::uint8_t* uboData = nullptr;
+        VkPipelineShaderStageCreateInfo fragmentInfo;        
 #endif
 #if RENDERER_OPENGL
         unsigned handle = 0;

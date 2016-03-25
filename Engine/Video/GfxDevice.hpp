@@ -1,6 +1,7 @@
 #ifndef GFX_DEVICE_H
 #define GFX_DEVICE_H
 
+#include <cstdint>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
@@ -62,6 +63,8 @@ namespace ae3d
         void BeginFrame();
 #endif
 #if RENDERER_VULKAN
+        void CreateNewUniformBuffer();
+        std::uint8_t* GetCurrentUbo();
         void BeginRenderPassAndCommandBuffer();
         void EndRenderPassAndCommandBuffer();
         void BeginFrame();

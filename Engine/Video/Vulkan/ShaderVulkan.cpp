@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+#include "GfxDevice.hpp"
 #include "FileSystem.hpp"
 #include "Macros.hpp"
 #include "Matrix.hpp"
@@ -20,7 +21,6 @@ namespace ae3d
 
 void ae3d::Shader::Load( const char* /*vertexSourceGLSL*/, const char* /*fragmentSourceGLSL*/ )
 {
-    CreateConstantBuffer();
 }
 
 void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData )
@@ -42,6 +42,10 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         vertexInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
         vertexInfo.module = shaderModule;
         vertexInfo.pName = "main";
+        vertexInfo.pNext = nullptr;
+        vertexInfo.flags = 0;
+        vertexInfo.pSpecializationInfo = nullptr;
+
         System::Assert( vertexInfo.module != VK_NULL_HANDLE, "vertex shader module not created" );
     }
 
@@ -62,10 +66,12 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         fragmentInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
         fragmentInfo.module = shaderModule;
         fragmentInfo.pName = "main";
+        fragmentInfo.pNext = nullptr;
+        fragmentInfo.flags = 0;
+        fragmentInfo.pSpecializationInfo = nullptr;
+
         System::Assert( fragmentInfo.module != VK_NULL_HANDLE, "fragment shader module not created" );
     }
-
-    CreateConstantBuffer();
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, const FileSystem::FileContentsData& /*fragmentGLSL*/,
@@ -76,45 +82,16 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, con
     LoadSPIRV( vertexDataSPIRV, fragmentDataSPIRV );
 }
 
-void ae3d::Shader::CreateConstantBuffer()
-{
-    VkBufferCreateInfo bufferInfo = {};
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = sizeof( Matrix44 );
-    bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-
-    VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &ubo );
-    AE3D_CHECK_VULKAN( err, "vkCreateBuffer UBO" );
-
-    VkMemoryRequirements memReqs;
-    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, ubo, &memReqs );
-
-    VkMemoryAllocateInfo allocInfo = {};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.pNext = nullptr;
-    allocInfo.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
-    err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &uboMemory );
-    AE3D_CHECK_VULKAN( err, "vkAllocateMemory UBO" );
-
-    err = vkBindBufferMemory( GfxDeviceGlobal::device, ubo, uboMemory, 0 );
-    AE3D_CHECK_VULKAN( err, "vkBindBufferMemory UBO" );
-
-    uboDesc.buffer = ubo;
-    uboDesc.offset = 0;
-    uboDesc.range = sizeof( Matrix44 );
-
-    err = vkMapMemory( GfxDeviceGlobal::device, uboMemory, 0, sizeof( Matrix44 ), 0, (void **)&uboData );
-    AE3D_CHECK_VULKAN( err, "vkMapMemory UBO" );
-}
-
 void ae3d::Shader::Use()
 {
+    System::Assert( IsValid(), "no valid shader" );
+    GfxDevice::CreateNewUniformBuffer();
 }
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    std::memcpy( &uboData[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
+    System::Assert( GfxDevice::GetCurrentUbo() != nullptr, "null ubo" );
+    std::memcpy( &GfxDevice::GetCurrentUbo()[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )

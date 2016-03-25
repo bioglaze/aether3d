@@ -172,7 +172,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraProjectionMatrix, shadowTexProjMatrix );
             Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
             
-            materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
+            //materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
             materials[ subMeshIndex ]->Apply();
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())

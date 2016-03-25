@@ -30,6 +30,14 @@ PFN_vkGetSwapchainImagesKHR getSwapchainImagesKHR = nullptr;
 PFN_vkAcquireNextImageKHR acquireNextImageKHR = nullptr;
 PFN_vkQueuePresentKHR queuePresentKHR = nullptr;
 
+struct Ubo
+{
+    VkBuffer ubo = VK_NULL_HANDLE;
+    VkDeviceMemory uboMemory;
+    VkDescriptorBufferInfo uboDesc;
+    std::uint8_t* uboData = nullptr;
+};
+
 namespace GfxDeviceGlobal
 {
     struct SwapchainBuffer
@@ -83,6 +91,7 @@ namespace GfxDeviceGlobal
     ae3d::TextureCube* textureCube0 = nullptr;
     std::vector< VkDescriptorSet > pendingFreeDescriptorSets;
     std::vector< VkBuffer > pendingFreeVBs;
+    std::vector< Ubo > frameUbos;
     int drawCalls = 0;
 }
 
@@ -1479,7 +1488,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         view = GfxDeviceGlobal::textureCube0->GetView();
     }
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( shader.GetUBODesc(), view );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, view );
     GfxDeviceGlobal::pendingFreeDescriptorSets.push_back( descriptorSet );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -1493,6 +1502,50 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     vkCmdBindIndexBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
     vkCmdDrawIndexed( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
     IncDrawCalls();
+}
+
+void ae3d::GfxDevice::CreateNewUniformBuffer()
+{
+    const VkDeviceSize uboSize = 16 * 4;
+
+    VkBufferCreateInfo bufferInfo = {};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = uboSize;
+    bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+
+    Ubo ubo;
+
+    VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &ubo.ubo );
+    AE3D_CHECK_VULKAN( err, "vkCreateBuffer UBO" );
+
+    VkMemoryRequirements memReqs;
+    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, ubo.ubo, &memReqs );
+
+    VkMemoryAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.pNext = nullptr;
+    allocInfo.allocationSize = memReqs.size;
+    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
+    err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &ubo.uboMemory );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory UBO" );
+
+    err = vkBindBufferMemory( GfxDeviceGlobal::device, ubo.ubo, ubo.uboMemory, 0 );
+    AE3D_CHECK_VULKAN( err, "vkBindBufferMemory UBO" );
+
+    ubo.uboDesc.buffer = ubo.ubo;
+    ubo.uboDesc.offset = 0;
+    ubo.uboDesc.range = uboSize;
+
+    err = vkMapMemory( GfxDeviceGlobal::device, ubo.uboMemory, 0, uboSize, 0, (void **)&ubo.uboData );
+    AE3D_CHECK_VULKAN( err, "vkMapMemory UBO" );
+
+    GfxDeviceGlobal::frameUbos.push_back( ubo );
+}
+
+std::uint8_t* ae3d::GfxDevice::GetCurrentUbo()
+{
+    ae3d::System::Assert( !GfxDeviceGlobal::frameUbos.empty() && GfxDeviceGlobal::frameUbos.back().uboData != nullptr, "no Ubo" );
+    return GfxDeviceGlobal::frameUbos.back().uboData;
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* info )
@@ -1552,7 +1605,14 @@ void ae3d::GfxDevice::Present()
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeVBs[ i ], nullptr );
     }
 
+    for (std::size_t i = 0; i < GfxDeviceGlobal::frameUbos.size(); ++i)
+    {
+        vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::frameUbos[ i ].uboMemory, nullptr );
+        vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::frameUbos[ i ].ubo, nullptr );
+    }
+
     GfxDeviceGlobal::pendingFreeVBs.clear();
+    GfxDeviceGlobal::frameUbos.clear();
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
