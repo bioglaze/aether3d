@@ -104,18 +104,13 @@ void ae3d::Shader::CreateConstantBuffer()
     uboDesc.buffer = ubo;
     uboDesc.offset = 0;
     uboDesc.range = sizeof( Matrix44 );
+
+    err = vkMapMemory( GfxDeviceGlobal::device, uboMemory, 0, sizeof( Matrix44 ), 0, (void **)&uboData );
+    CheckVulkanResult( err, "vkMapMemory UBO" );
 }
 
 void ae3d::Shader::UpdateUniformBuffers()
 {
-    ae3d::System::Assert( uboMemory != VK_NULL_HANDLE, "ubo memory not allocated" );
-
-    uint8_t *pData;
-    VkResult err = vkMapMemory( GfxDeviceGlobal::device, uboMemory, 0, sizeof( Matrix44 ), 0, (void **)&pData );
-    CheckVulkanResult( err, "vkMapMemory UBO" );
-
-    std::memcpy( pData, &tempMat4[ 0 ], sizeof( Matrix44 ) );
-    vkUnmapMemory( GfxDeviceGlobal::device, uboMemory );
 }
 
 void ae3d::Shader::Use()
@@ -124,8 +119,8 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    std::memcpy( &tempMat4[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
-    UpdateUniformBuffers();
+    std::memcpy( &uboData[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
+    //UpdateUniformBuffers();
 }
 
 void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )

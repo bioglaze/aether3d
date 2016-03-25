@@ -12,6 +12,7 @@
 #endif
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
+#include <cstdint>
 #endif
 
 namespace ae3d
@@ -159,7 +160,7 @@ namespace ae3d
         VkDeviceMemory uboMemory;
         VkDescriptorBufferInfo uboDesc;
 
-        float tempMat4[ 16 ];
+        std::uint8_t* uboData = nullptr;
 #endif
 #if RENDERER_OPENGL
         unsigned handle = 0;

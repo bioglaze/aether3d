@@ -87,7 +87,7 @@ namespace GfxDeviceGlobal
 
 namespace debug
 {
-    bool enabled = false; // Disable when using RenderDoc.
+    bool enabled = true; // Disable when using RenderDoc.
     const int validationLayerCount = 9;
     const char *validationLayerNames[] =
     {
@@ -235,7 +235,7 @@ namespace ae3d
     }
 
     void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                    ae3d::GfxDevice::CullMode cullMode )
+                    ae3d::GfxDevice::CullMode cullMode, unsigned hash )
     {
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
         inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -361,7 +361,6 @@ namespace ae3d
                                                   nullptr, &pso );
         CheckVulkanResult( err, "vkCreateGraphicsPipelines" );
 
-        const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
         GfxDeviceGlobal::psoCache[ hash ] = pso;
     }
 
@@ -1472,7 +1471,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode );
+        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, psoHash );
     }
 
     VkImageView view = VK_NULL_HANDLE;
