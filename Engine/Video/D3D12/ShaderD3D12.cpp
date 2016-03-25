@@ -130,7 +130,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
     const std::size_t vertexSourceLength = std::string( vertexSource ).size();
     ID3DBlob* blobError = nullptr;
-    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", 0, 0, &blobShaderVertex, &blobError );
+    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &blobShaderVertex, &blobError );
     if (FAILED( hr ))
     {
         ae3d::System::Print( "Unable to compile vertex shader: %s!\n", blobError->GetBufferPointer() );
@@ -139,7 +139,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     const std::size_t pixelSourceLength = std::string( fragmentSource ).size();
 
-    hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", 0, 0, &blobShaderPixel, &blobError );
+    hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &blobShaderPixel, &blobError );
     if (FAILED( hr ))
     {
         ae3d::System::Print( "Unable to compile pixel shader: %s!\n", blobError->GetBufferPointer() );
@@ -210,15 +210,18 @@ void ae3d::Shader::ReflectVariables()
 
 void ae3d::Shader::Use()
 {
+    System::Assert( IsValid(), "Shader not loaded" );
 }
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
     System::Assert( constantBufferUpload != nullptr, "CreateConstantBuffer probably not called!" );
     
-    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    const int offset = uniformLocations[ name ].i;
+
+    if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 64, matrix4x4, 64 );
+        memcpy_s( (char*)constantBufferUpload + offset, 64, matrix4x4, 64 );
     }
 }
 
@@ -252,32 +255,40 @@ void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
-    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    const int offset = uniformLocations[ name ].i;
+
+    if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 4, &value, 4 );
+        memcpy_s( (char*)constantBufferUpload + offset, 4, &value, 4 );
     }
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )
 {
-    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    const int offset = uniformLocations[ name ].i;
+
+    if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 4, &value, 4 );
+        memcpy_s( (char*)constantBufferUpload + offset, 4, &value, 4 );
     }
 }
 
 void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
-    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    const int offset = uniformLocations[ name ].i;
+
+    if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 3 * 4, vec3, 3 * 4 );
+        memcpy_s( (char*)constantBufferUpload + offset, 3 * 4, vec3, 3 * 4 );
     }
 }
 
 void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
-    if (uniformLocations.find( name ) != std::end( uniformLocations ))
+    const int offset = uniformLocations[ name ].i;
+
+    if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + uniformLocations[ name ].i, 4 * 4, vec4, 4 * 4 );
+        memcpy_s( (char*)constantBufferUpload + offset, 4 * 4, vec4, 4 * 4 );
     }
 }
