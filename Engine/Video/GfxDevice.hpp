@@ -45,6 +45,10 @@ namespace ae3d
         };
 
         void Init( int width, int height );
+#if RENDERER_D3D12
+        void  CreateNewUniformBuffer();
+        void* GetCurrentUniformBuffer();
+#endif
 #if RENDERER_METAL
         void InitMetal( id <MTLDevice> metalDevice, MTKView* view );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );

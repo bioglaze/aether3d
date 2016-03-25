@@ -100,7 +100,6 @@ namespace ae3d
 
 #if RENDERER_D3D12
         bool IsValid() const { return blobShaderVertex != nullptr; }
-        ID3D12Resource* GetConstantBuffer() { return constantBuffer; }
         ID3DBlob* blobShaderVertex = nullptr;
         ID3DBlob* blobShaderPixel = nullptr;
 #endif
@@ -144,8 +143,6 @@ namespace ae3d
         void CreateConstantBuffer();
         void ReflectVariables();
 
-        ID3D12Resource* constantBuffer = nullptr;
-        void* constantBufferUpload = nullptr;
         ID3D12ShaderReflection* reflector = nullptr;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
 #endif

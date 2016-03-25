@@ -54,6 +54,8 @@ namespace GfxDeviceGlobal
     ae3d::Texture2D* texture2d0 = nullptr;
     ae3d::TextureCube* textureCube0 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
+    std::vector< ID3D12Resource* > frameConstantBuffers;
+    void* currentConstantBuffer = nullptr;
 
     ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
     ID3D12CommandQueue* commandQueue = nullptr;
@@ -517,6 +519,64 @@ void ae3d::CreateRenderer( int /*samples*/ )
     CreateSampler();
 }
 
+void ae3d::GfxDevice::CreateNewUniformBuffer()
+{
+    D3D12_HEAP_PROPERTIES prop = {};
+    prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+    prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    prop.CreationNodeMask = 1;
+    prop.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC buf = {};
+    buf.Alignment = 0;
+    buf.DepthOrArraySize = 1;
+    buf.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    buf.Flags = D3D12_RESOURCE_FLAG_NONE;
+    buf.Format = DXGI_FORMAT_UNKNOWN;
+    buf.Height = 1;
+    buf.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    buf.MipLevels = 1;
+    buf.SampleDesc.Count = 1;
+    buf.SampleDesc.Quality = 0;
+    buf.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+
+    ID3D12Resource* constantBuffer;
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &prop,
+        D3D12_HEAP_FLAG_NONE,
+        &buf,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS( &constantBuffer ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Print( "Unable to create shader constant buffer!" );
+        return;
+    }
+
+    GfxDeviceGlobal::frameConstantBuffers.push_back( constantBuffer );
+
+    constantBuffer->SetName( L"ConstantBuffer" );
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+    cbvDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();
+    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
+    GfxDeviceGlobal::device->CreateConstantBufferView(
+        &cbvDesc,
+        DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart() );
+    hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&GfxDeviceGlobal::currentConstantBuffer) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Print( "Unable to map shader constant buffer!" );
+    }
+
+}
+
+void* ae3d::GfxDevice::GetCurrentUniformBuffer()
+{
+    return GfxDeviceGlobal::currentConstantBuffer;
+}
+
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
     wchar_t wstr[ 128 ];
@@ -554,7 +614,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = shader.GetConstantBuffer()->GetGPUVirtualAddress();
+    cbvDesc.BufferLocation = GfxDeviceGlobal::frameConstantBuffers.back()->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
 
@@ -807,6 +867,12 @@ void ae3d::GfxDevice::Present()
         AE3D_SAFE_RELEASE( Global::frameVBUploads[ i ] );
     }
 
+    for (std::size_t i = 0; i < GfxDeviceGlobal::frameConstantBuffers.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( GfxDeviceGlobal::frameConstantBuffers[ i ] );
+    }
+    
+    GfxDeviceGlobal::frameConstantBuffers.clear();
     Global::frameVBUploads.clear();
 }
 

@@ -25,7 +25,6 @@ namespace GfxDeviceGlobal
 namespace Global
 {
     std::vector< ID3DBlob* > shaders;
-    std::vector< ID3D12Resource* > constantBuffers;
 }
 
 void DestroyShaders()
@@ -33,11 +32,6 @@ void DestroyShaders()
     for (std::size_t i = 0; i < Global::shaders.size(); ++i)
     {
         AE3D_SAFE_RELEASE( Global::shaders[ i ] );
-    }
-
-    for (std::size_t i = 0; i < Global::constantBuffers.size(); ++i)
-    {
-        AE3D_SAFE_RELEASE( Global::constantBuffers[ i ] );
     }
 }
 
@@ -77,53 +71,6 @@ void ShaderReload( const std::string& path )
 
 void ae3d::Shader::CreateConstantBuffer()
 {
-    D3D12_HEAP_PROPERTIES prop = {};
-    prop.Type = D3D12_HEAP_TYPE_UPLOAD;
-    prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-    prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-    prop.CreationNodeMask = 1;
-    prop.VisibleNodeMask = 1;
-
-    D3D12_RESOURCE_DESC buf = {};
-    buf.Alignment = 0;
-    buf.DepthOrArraySize = 1;
-    buf.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    buf.Flags = D3D12_RESOURCE_FLAG_NONE;
-    buf.Format = DXGI_FORMAT_UNKNOWN;
-    buf.Height = 1;
-    buf.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    buf.MipLevels = 1;
-    buf.SampleDesc.Count = 1;
-    buf.SampleDesc.Quality = 0;
-    buf.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
-
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &buf,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS( &constantBuffer ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Print( "Unable to create shader constant buffer!" );
-        return;
-    }
-
-    Global::constantBuffers.push_back( constantBuffer );
-
-    constantBuffer->SetName( L"ConstantBuffer" );
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
-    GfxDeviceGlobal::device->CreateConstantBufferView(
-        &cbvDesc,
-        DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart() );
-    hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &constantBufferUpload ) );
-    if (FAILED( hr ))
-    {
-        ae3d::System::Print( "Unable to map shader constant buffer!" );
-    }
 }
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -211,17 +158,18 @@ void ae3d::Shader::ReflectVariables()
 void ae3d::Shader::Use()
 {
     System::Assert( IsValid(), "Shader not loaded" );
+    GfxDevice::CreateNewUniformBuffer();
 }
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    System::Assert( constantBufferUpload != nullptr, "CreateConstantBuffer probably not called!" );
+    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
     
     const int offset = uniformLocations[ name ].i;
 
     if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + offset, 64, matrix4x4, 64 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, 64, matrix4x4, 64 );
     }
 }
 
@@ -259,7 +207,7 @@ void ae3d::Shader::SetInt( const char* name, int value )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + offset, 4, &value, 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, 4, &value, 4 );
     }
 }
 
@@ -269,7 +217,7 @@ void ae3d::Shader::SetFloat( const char* name, float value )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + offset, 4, &value, 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, 4, &value, 4 );
     }
 }
 
@@ -279,7 +227,7 @@ void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + offset, 3 * 4, vec3, 3 * 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, 3 * 4, vec3, 3 * 4 );
     }
 }
 
@@ -289,6 +237,6 @@ void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)constantBufferUpload + offset, 4 * 4, vec4, 4 * 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, 4 * 4, vec4, 4 * 4 );
     }
 }
