@@ -164,7 +164,7 @@ void ae3d::Scene::Add( GameObject* gameObject )
         }
     }
 
-    if (nextFreeGameObject == gameObjects.size())
+    if (nextFreeGameObject >= gameObjects.size())
     {
         gameObjects.resize( gameObjects.size() + 10 );
     }
@@ -488,8 +488,18 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         }
     }
 
-    auto meshSorterByMesh = [&](unsigned j, unsigned k) { return gameObjects[ j ]->GetComponent< MeshRendererComponent >()->GetMesh() ==
-                                                                 gameObjects[ k ]->GetComponent< MeshRendererComponent >()->GetMesh(); };
+    auto meshSorterByMesh = [&](unsigned j, unsigned k)
+    {
+        if (gameObjects[ j ]->GetComponent< MeshRendererComponent >() != nullptr &&
+            gameObjects[ k ]->GetComponent< MeshRendererComponent >() != nullptr)
+        {
+            return gameObjects[ j ]->GetComponent< MeshRendererComponent >()->GetMesh() <
+                   gameObjects[ k ]->GetComponent< MeshRendererComponent >()->GetMesh();
+        }
+
+        return false;
+    };
+
     std::sort( std::begin( gameObjectsWithMeshRenderer ), std::end( gameObjectsWithMeshRenderer ), meshSorterByMesh );
     
     for (auto j : gameObjectsWithMeshRenderer)

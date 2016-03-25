@@ -262,7 +262,7 @@ void SceneWidget::Init()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetLayerMask( ~0x2 );
     camera.AddComponent<TransformComponent>();
-    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
     spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat,
                     TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
