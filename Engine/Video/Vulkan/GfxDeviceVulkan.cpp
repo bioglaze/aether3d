@@ -56,6 +56,9 @@ namespace GfxDeviceGlobal
     struct Samplers
     {
         VkSampler linearRepeat = VK_NULL_HANDLE;
+        VkSampler linearClamp = VK_NULL_HANDLE;
+        VkSampler pointRepeat = VK_NULL_HANDLE;
+        VkSampler pointClamp = VK_NULL_HANDLE;
     } samplers;
     
     VkInstance instance = VK_NULL_HANDLE;
@@ -223,15 +226,32 @@ namespace ae3d
         sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        sampler.mipLodBias = 0.0f;
+        sampler.mipLodBias = 0;
         sampler.compareOp = VK_COMPARE_OP_NEVER;
-        sampler.minLod = 0.0f;
+        sampler.minLod = 0;
         // Max level-of-detail should match mip level count
         sampler.maxLod = 0;
-        sampler.maxAnisotropy = 8;
-        sampler.anisotropyEnable = VK_TRUE;
+        sampler.maxAnisotropy = 1;
+        sampler.anisotropyEnable = VK_FALSE;
         sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
         VkResult err = vkCreateSampler( GfxDeviceGlobal::device, &sampler, nullptr, &GfxDeviceGlobal::samplers.linearRepeat );
+        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+
+        sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        err = vkCreateSampler( GfxDeviceGlobal::device, &sampler, nullptr, &GfxDeviceGlobal::samplers.linearClamp );
+        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+
+        sampler.magFilter = VK_FILTER_NEAREST;
+        sampler.minFilter = VK_FILTER_NEAREST;
+        err = vkCreateSampler( GfxDeviceGlobal::device, &sampler, nullptr, &GfxDeviceGlobal::samplers.pointClamp );
+        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+
+        sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        err = vkCreateSampler( GfxDeviceGlobal::device, &sampler, nullptr, &GfxDeviceGlobal::samplers.pointRepeat );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     }
 
@@ -1192,7 +1212,30 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateDescriptorPool" );
     }
 
-    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view )
+    VkSampler GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter )
+    {
+        if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Linear)
+        {
+            return GfxDeviceGlobal::samplers.linearClamp;
+        }
+        if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Nearest)
+        {
+            return GfxDeviceGlobal::samplers.pointClamp;
+        }
+        if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Linear)
+        {
+            return GfxDeviceGlobal::samplers.linearRepeat;
+        }
+        if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Nearest)
+        {
+            return GfxDeviceGlobal::samplers.pointRepeat;
+        }
+
+        System::Assert( false, "unhandled sampler" );
+        return GfxDeviceGlobal::samplers.pointRepeat;
+    }
+
+    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler )
     {
         ae3d::System::Assert( GfxDeviceGlobal::descriptorSetLayout != VK_NULL_HANDLE, "descriptor set not created" );
         ae3d::System::Assert( GfxDeviceGlobal::descriptorPool != VK_NULL_HANDLE, "descriptorPool not created" );
@@ -1219,7 +1262,7 @@ namespace ae3d
 
         // Binding 1 : Sampler
         VkDescriptorImageInfo samplerDesc = {};
-        samplerDesc.sampler = GfxDeviceGlobal::samplers.linearRepeat;
+        samplerDesc.sampler = sampler;
         samplerDesc.imageView = view;
         samplerDesc.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
@@ -1477,18 +1520,23 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     }
 
     VkImageView view = VK_NULL_HANDLE;
+    VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+    VkSampler sampler = VK_NULL_HANDLE;
 
     // TODO: polymorphism
     if (GfxDeviceGlobal::texture2d0)
     {
         view = GfxDeviceGlobal::texture2d0->GetView();
+        sampler = GetSampler( GfxDeviceGlobal::texture2d0->GetMipmaps(), GfxDeviceGlobal::texture2d0->GetWrap(), GfxDeviceGlobal::texture2d0->GetFilter() );
     }
     else if (GfxDeviceGlobal::textureCube0)
     {
         view = GfxDeviceGlobal::textureCube0->GetView();
+        sampler = GetSampler( GfxDeviceGlobal::textureCube0->GetMipmaps(), GfxDeviceGlobal::textureCube0->GetWrap(), GfxDeviceGlobal::textureCube0->GetFilter() );
     }
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, view );
+    descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, view, sampler );
+
     GfxDeviceGlobal::pendingFreeDescriptorSets.push_back( descriptorSet );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS,
