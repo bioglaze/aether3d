@@ -490,14 +490,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 
     auto meshSorterByMesh = [&](unsigned j, unsigned k)
     {
-        if (gameObjects[ j ]->GetComponent< MeshRendererComponent >() != nullptr &&
-            gameObjects[ k ]->GetComponent< MeshRendererComponent >() != nullptr)
-        {
-            return gameObjects[ j ]->GetComponent< MeshRendererComponent >()->GetMesh() <
-                   gameObjects[ k ]->GetComponent< MeshRendererComponent >()->GetMesh();
-        }
-
-        return false;
+        return gameObjects[ j ]->GetComponent< MeshRendererComponent >()->GetMesh() <
+               gameObjects[ k ]->GetComponent< MeshRendererComponent >()->GetMesh();
     };
 
     std::sort( std::begin( gameObjectsWithMeshRenderer ), std::end( gameObjectsWithMeshRenderer ), meshSorterByMesh );

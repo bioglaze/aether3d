@@ -95,6 +95,9 @@ namespace GfxDeviceGlobal
     std::vector< VkDescriptorSet > pendingFreeDescriptorSets;
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > frameUbos;
+    VkImage resolvedColor = VK_NULL_HANDLE;
+    VkDeviceMemory resolvedColorMem = VK_NULL_HANDLE;
+    VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int drawCalls = 0;
 }
 
@@ -348,7 +351,7 @@ namespace ae3d
         VkPipelineMultisampleStateCreateInfo multisampleState = {};
         multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
         multisampleState.pSampleMask = nullptr;
-        multisampleState.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+        multisampleState.rasterizationSamples = GfxDeviceGlobal::msaaSampleBits;
 
         VkPipelineShaderStageCreateInfo shaderStages[ 2 ] = { {},{} };
 
@@ -1056,11 +1059,29 @@ namespace ae3d
         }
     }
 
+    VkSampleCountFlagBits GetSampleBits( int msaaSampleCount )
+    {
+        if (msaaSampleCount == 4)
+        {
+            return VK_SAMPLE_COUNT_4_BIT;
+        }
+        else if (msaaSampleCount == 8)
+        {
+            return VK_SAMPLE_COUNT_8_BIT;
+        }
+        else if (msaaSampleCount == 16)
+        {
+            return VK_SAMPLE_COUNT_16_BIT;
+        }
+
+        return VK_SAMPLE_COUNT_1_BIT;
+    }
+
     void CreateRenderPass()
     {
         VkAttachmentDescription attachments[ 2 ];
         attachments[ 0 ].format = GfxDeviceGlobal::colorFormat;
-        attachments[ 0 ].samples = VK_SAMPLE_COUNT_1_BIT;
+        attachments[ 0 ].samples = GfxDeviceGlobal::msaaSampleBits;
         attachments[ 0 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 0 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -1069,7 +1090,7 @@ namespace ae3d
         attachments[ 0 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
         attachments[ 1 ].format = GfxDeviceGlobal::depthFormat;
-        attachments[ 1 ].samples = VK_SAMPLE_COUNT_1_BIT;
+        attachments[ 1 ].samples = GfxDeviceGlobal::msaaSampleBits;
         attachments[ 1 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         attachments[ 1 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 1 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -1109,6 +1130,42 @@ namespace ae3d
 
         VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &GfxDeviceGlobal::renderPass );
         AE3D_CHECK_VULKAN( err, "vkCreateRenderPass" );
+
+        if (GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT)
+        {
+            VkImageCreateInfo resImageInfo = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
+            resImageInfo.imageType = VK_IMAGE_TYPE_2D;
+            resImageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+            resImageInfo.extent.width = WindowGlobal::windowWidth;
+            resImageInfo.extent.height = WindowGlobal::windowHeight;
+            resImageInfo.extent.depth = 1;
+            resImageInfo.mipLevels = 1;
+            resImageInfo.arrayLayers = 1;
+            resImageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+            resImageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+            resImageInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+            resImageInfo.flags = 0;
+            resImageInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+
+            err = vkCreateImage( GfxDeviceGlobal::device, &resImageInfo, nullptr, &GfxDeviceGlobal::resolvedColor );
+            AE3D_CHECK_VULKAN( err, "create resolve image" );
+
+            VkMemoryAllocateInfo mem_alloc = {};
+            mem_alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            mem_alloc.pNext = nullptr;
+            mem_alloc.allocationSize = 0;
+            mem_alloc.memoryTypeIndex = 0;
+
+            VkMemoryRequirements memReqs;
+            vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::resolvedColor, &memReqs );
+            VkMemoryAllocateInfo memInfo;
+            mem_alloc.allocationSize = memReqs.size;
+            GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mem_alloc.memoryTypeIndex );
+            err = vkAllocateMemory( GfxDeviceGlobal::device, &mem_alloc, nullptr, &GfxDeviceGlobal::resolvedColorMem );
+            AE3D_CHECK_VULKAN( err, "resolved color memory" );
+            err = vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::resolvedColor, GfxDeviceGlobal::resolvedColorMem, 0 );
+            AE3D_CHECK_VULKAN( err, "bind resolved color memory" );
+        }
     }
 
     void CreateDepthStencil()
@@ -1121,7 +1178,7 @@ namespace ae3d
         image.extent = { static_cast< std::uint32_t >( WindowGlobal::windowWidth ), static_cast< std::uint32_t >( WindowGlobal::windowHeight ), 1 };
         image.mipLevels = 1;
         image.arrayLayers = 1;
-        image.samples = VK_SAMPLE_COUNT_1_BIT;
+        image.samples = GfxDeviceGlobal::msaaSampleBits;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
         image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
         image.flags = 0;
@@ -1321,6 +1378,7 @@ namespace ae3d
 
     void CreateRenderer( int samples )
     {
+        GfxDeviceGlobal::msaaSampleBits = GetSampleBits( samples );
         CreateInstance();
         
         if (debug::enabled)
@@ -1673,7 +1731,17 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     {
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
-    
+
+    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.linearClamp, nullptr );
+    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.linearRepeat, nullptr );
+    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.pointClamp, nullptr );
+    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.pointRepeat, nullptr );
+
+    if (GfxDeviceGlobal::resolvedColor != VK_NULL_HANDLE)
+    {
+        vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::resolvedColor, nullptr );
+    }
+
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::renderCompleteSemaphore, nullptr );
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );
     vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );

@@ -67,15 +67,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc2D_GL_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc2D_Vulkan_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug D3D12|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc2D_D3D12_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc2D_GL_r</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -146,7 +150,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_GL45_r.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_GL_r.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>

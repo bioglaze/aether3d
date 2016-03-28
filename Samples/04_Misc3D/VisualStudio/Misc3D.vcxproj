@@ -94,21 +94,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_GL_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_Vulkan_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='D3D12 Debug|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_D3D12_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='D3D12 Release|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_D3D12_r</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_GL_r</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_Oculus_r</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
