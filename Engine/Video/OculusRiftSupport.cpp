@@ -42,12 +42,12 @@ struct DepthBuffer
 
 struct TextureBuffer
 {
-    ovrSwapTextureSet* TextureSet = nullptr;
+    ovrTextureSwapChain TextureSet = nullptr;
     GLuint texId;
     GLuint fboId;
     OVR::Sizei texSize;
 
-    TextureBuffer( ovrHmd hmd, bool rendertarget, bool displayableOnHmd, OVR::Sizei size, int mipLevels, unsigned char * data )
+    TextureBuffer( ovrSession session, bool rendertarget, bool displayableOnHmd, OVR::Sizei size, int mipLevels, unsigned char * data )
     {
         texSize = size;
 
@@ -55,13 +55,26 @@ struct TextureBuffer
         {
             OVR_ASSERT( hmd );
 
-            ovrResult err = ovr_CreateSwapTextureSetGL( hmd, GL_RGBA, size.w, size.h, &TextureSet );
+            ovrTextureSwapChainDesc desc = {};
+            desc.Type = ovrTexture_2D;
+            desc.ArraySize = 1;
+            desc.Width = size.w;
+            desc.Height = size.h;
+            desc.MipLevels = 1;
+            desc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+            desc.SampleCount = 1;
+            desc.StaticImage = ovrFalse;
+            ovrResult err = ovr_CreateTextureSwapChainGL( session, &desc, &TextureSet );
             System::Assert( OVR_SUCCESS( err ), "failed to create texture set for Oculus Rift" );
 
-            for (int i = 0; i < TextureSet->TextureCount; ++i)
+            int length = 0;
+            ovr_GetTextureSwapChainLength( session, TextureSet, &length );
+
+            for (int i = 0; i < length; ++i)
             {
-                ovrGLTexture* tex = (ovrGLTexture*)&TextureSet->Textures[ i ];
-                glBindTexture( GL_TEXTURE_2D, tex->OGL.TexId );
+                GLuint chainTexId;
+                ovr_GetTextureSwapChainBufferGL( session, TextureSet, i, &chainTexId );
+                glBindTexture( GL_TEXTURE_2D, chainTexId );
 
                 if (rendertarget)
                 {
@@ -115,14 +128,18 @@ struct TextureBuffer
         return texSize;
     }
 
-    void SetAndClearRenderSurface( DepthBuffer * dbuffer )
+    void SetAndClearRenderSurface( ovrSession session, DepthBuffer * dbuffer )
     {
         GfxDevice::SetSystemFBO( fboId );
 
-        ovrGLTexture* tex = (ovrGLTexture*)&TextureSet->Textures[ TextureSet->CurrentIndex ];
+        int curIndex;
+        ovr_GetTextureSwapChainCurrentIndex( session, TextureSet, &curIndex );
+
+        GLuint chainTexId;
+        ovr_GetTextureSwapChainBufferGL( session, TextureSet, curIndex, &chainTexId );
 
         glBindFramebuffer( GL_FRAMEBUFFER, fboId );
-        glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->OGL.TexId, 0 );
+        glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, chainTexId, 0 );
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, dbuffer->texId, 0 );
 
         glViewport( 0, 0, texSize.w, texSize.h );
@@ -135,6 +152,14 @@ struct TextureBuffer
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0 );
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0 );
     }
+
+    void Commit( ovrSession session )
+    {
+        if (TextureSet != nullptr)
+        {
+            ovr_CommitTextureSwapChain( session, TextureSet );
+        }
+    }
 };
 
 namespace Global
@@ -143,9 +168,9 @@ namespace Global
     ovrEyeRenderDesc EyeRenderDesc[ 2 ];
     TextureBuffer* eyeRenderTexture[ 2 ] = {};
     DepthBuffer* eyeDepthBuffer[ 2 ] = {};
-    ovrHmd hmd;
+    ovrSession session = nullptr;
     ovrHmdDesc HMD;
-    ovrGLTexture* mirrorTexture = nullptr;
+    ovrMirrorTexture mirrorTexture = nullptr;
     GLuint mirrorFBO = 0;
     ovrPosef EyeRenderPose[ 2 ];
     ovrVector3f ViewOffset[ 2 ];
@@ -171,7 +196,7 @@ void ae3d::VR::Init()
     }
 
     ovrGraphicsLuid luid;
-    ovrResult result = ovr_Create( &Global::hmd, &luid );
+    ovrResult result = ovr_Create( &Global::session, &luid );
 
     if (!OVR_SUCCESS( result ))
     {
@@ -180,7 +205,7 @@ void ae3d::VR::Init()
         return;
     }
 
-    Global::HMD = ovr_GetHmdDesc( Global::hmd );
+    Global::HMD = ovr_GetHmdDesc( Global::session );
 
     if (Global::HMD.ProductName[ 0 ] == '\0')
     {
@@ -190,7 +215,7 @@ void ae3d::VR::Init()
 
 void ae3d::VR::GetIdealWindowSize( int& outWidth, int& outHeight )
 {
-   const ovrSizei idealTextureSize = ovr_GetFovTextureSize( Global::hmd, (ovrEyeType)0, Global::HMD.DefaultEyeFov[ 0 ], 1 );
+   const ovrSizei idealTextureSize = ovr_GetFovTextureSize( Global::session, (ovrEyeType)0, Global::HMD.DefaultEyeFov[ 0 ], 1 );
    outWidth = idealTextureSize.w;
    outHeight = idealTextureSize.h;
 }
@@ -200,6 +225,11 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
     OVR::GLEContext::SetCurrentContext( &Global::GLEContext );
     Global::GLEContext.Init();
 
+    if (Global::session == nullptr)
+    {
+        return;
+    }
+
     for (int i = 0; i < 2; ++i)
     {
         ovrSizei idealTextureSize;
@@ -207,16 +237,24 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
         idealTextureSize.h = windowHeight;
         const bool isRenderTarget = true;
 
-        Global::eyeRenderTexture[ i ] = new TextureBuffer( Global::hmd, isRenderTarget, Global::HMD.Type != ovrHmd_None ? true : false, idealTextureSize, 1, nullptr );
+        Global::eyeRenderTexture[ i ] = new TextureBuffer( Global::session, isRenderTarget, Global::HMD.Type != ovrHmd_None ? true : false, idealTextureSize, 1, nullptr );
         Global::eyeDepthBuffer[ i ] = new DepthBuffer( Global::eyeRenderTexture[ i ]->GetSize() );
     }
 
-    auto err = ovr_CreateMirrorTextureGL( Global::hmd, GL_RGBA, windowWidth, windowHeight, (ovrTexture**)&Global::mirrorTexture );
+    ovrMirrorTextureDesc desc;
+    memset( &desc, 0, sizeof( desc ) );
+    desc.Width = windowWidth;
+    desc.Height = windowHeight;
+    desc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+    auto err = ovr_CreateMirrorTextureGL( Global::session, &desc, &Global::mirrorTexture );
     if (OVR_SUCCESS( err ))
     {
+        GLuint texId;
+        ovr_GetMirrorTextureBufferGL( Global::session, Global::mirrorTexture, &texId );
+
         glGenFramebuffers( 1, &Global::mirrorFBO );
         glBindFramebuffer( GL_READ_FRAMEBUFFER, Global::mirrorFBO );
-        glFramebufferTexture2D( GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Global::mirrorTexture->OGL.TexId, 0 );
+        glFramebufferTexture2D( GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texId, 0 );
         glFramebufferRenderbuffer( GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 );
         glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
     }
@@ -225,36 +263,34 @@ void ae3d::VR::StartTracking( int windowWidth, int windowHeight )
         System::Assert( false, "Failed to create mirror texture for Oculus Rift." );
     }
 
-    Global::EyeRenderDesc[ 0 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Left, Global::HMD.DefaultEyeFov[ 0 ] );
-    Global::EyeRenderDesc[ 1 ] = ovr_GetRenderDesc( Global::hmd, ovrEye_Right, Global::HMD.DefaultEyeFov[ 1 ] );
-
-    ovr_SetEnabledCaps( Global::hmd, 0 );
+    Global::EyeRenderDesc[ 0 ] = ovr_GetRenderDesc( Global::session, ovrEye_Left, Global::HMD.DefaultEyeFov[ 0 ] );
+    Global::EyeRenderDesc[ 1 ] = ovr_GetRenderDesc( Global::session, ovrEye_Right, Global::HMD.DefaultEyeFov[ 1 ] );
 
     wglSwapIntervalEXT( 0 );
 }
 
 void ae3d::VR::CalcEyePose()
 {
-    Global::ViewOffset[ 0 ] = Global::EyeRenderDesc[ 0 ].HmdToEyeViewOffset;
-    Global::ViewOffset[ 1 ] = Global::EyeRenderDesc[ 1 ].HmdToEyeViewOffset;
+    Global::ViewOffset[ 0 ] = Global::EyeRenderDesc[ 0 ].HmdToEyeOffset;
+    Global::ViewOffset[ 1 ] = Global::EyeRenderDesc[ 1 ].HmdToEyeOffset;
 
-    double ftiming = ovr_GetPredictedDisplayTime( Global::hmd, 0 );
-    ovrTrackingState hmdState = ovr_GetTrackingState( Global::hmd, ftiming, ovrTrue );
+    double ftiming = ovr_GetPredictedDisplayTime( Global::session, 0 );
+    ovrTrackingState hmdState = ovr_GetTrackingState( Global::session, ftiming, ovrTrue );
     ovr_CalcEyePoses( hmdState.HeadPose.ThePose, Global::ViewOffset, Global::EyeRenderPose );
 }
 
 void ae3d::VR::SetEye( int eye )
 {
-    if (Global::eyeRenderTexture[ eye ]->TextureSet)
+    if (Global::session && Global::eyeRenderTexture[ eye ]->TextureSet)
     {
-        Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex = (Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex + 1) % Global::eyeRenderTexture[ eye ]->TextureSet->TextureCount;
-        Global::eyeRenderTexture[ eye ]->SetAndClearRenderSurface( Global::eyeDepthBuffer[ eye ] );
+        //Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex = (Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex + 1) % Global::eyeRenderTexture[ eye ]->TextureSet->TextureCount;
+        Global::eyeRenderTexture[ eye ]->SetAndClearRenderSurface( Global::session, Global::eyeDepthBuffer[ eye ] );
     }
 }
 
 void ae3d::VR::UnsetEye( int eye )
 {
-    if (Global::eyeRenderTexture[ eye ]->TextureSet)
+    if (Global::session && Global::eyeRenderTexture[ eye ]->TextureSet)
     {
         Global::eyeRenderTexture[ eye ]->UnsetRenderSurface();
     }
@@ -264,32 +300,43 @@ void ae3d::VR::SubmitFrame()
 {
     ovrViewScaleDesc viewScaleDesc;
     viewScaleDesc.HmdSpaceToWorldScaleInMeters = 1.0f;
-    viewScaleDesc.HmdToEyeViewOffset[ 0 ] = Global::ViewOffset[ 0 ];
-    viewScaleDesc.HmdToEyeViewOffset[ 1 ] = Global::ViewOffset[ 1 ];
+    viewScaleDesc.HmdToEyeOffset[ 0 ] = Global::ViewOffset[ 0 ];
+    viewScaleDesc.HmdToEyeOffset[ 1 ] = Global::ViewOffset[ 1 ];
 
-    ovrLayerEyeFov ld;
-    ld.Header.Type = ovrLayerType_EyeFov;
-    ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft | ovrLayerFlag_HighQuality;
-
-    for (int eye = 0; eye < 2; ++eye)
+    if (Global::session)
     {
-        ld.ColorTexture[ eye ] = Global::eyeRenderTexture[ eye ]->TextureSet;
-        ld.Viewport[ eye ] = OVR::Recti( Global::eyeRenderTexture[ eye ]->GetSize() );
-        ld.Fov[ eye ] = Global::HMD.DefaultEyeFov[ eye ];
-        ld.RenderPose[ eye ] = Global::EyeRenderPose[ eye ];
+        ovrLayerEyeFov ld;
+        ld.Header.Type = ovrLayerType_EyeFov;
+        ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft | ovrLayerFlag_HighQuality;
+
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            ld.ColorTexture[ eye ] = Global::eyeRenderTexture[ eye ]->TextureSet;
+            ld.Viewport[ eye ] = OVR::Recti( Global::eyeRenderTexture[ eye ]->GetSize() );
+            ld.Fov[ eye ] = Global::HMD.DefaultEyeFov[ eye ];
+            ld.RenderPose[ eye ] = Global::EyeRenderPose[ eye ];
+        }
+
+        ovrLayerHeader* layers = &ld.Header;
+        /*ovrResult result = */ovr_SubmitFrame( Global::session, 0, &viewScaleDesc, &layers, 1 );
+        //isVisible = OVR_SUCCESS( result );
     }
 
-    ovrLayerHeader* layers = &ld.Header;
-    /*ovrResult result = */ovr_SubmitFrame( Global::hmd, 0, &viewScaleDesc, &layers, 1 );
-    //isVisible = OVR_SUCCESS( result );
+    ovrSessionStatus sessionStatus;
+    ovr_GetSessionStatus( Global::session, &sessionStatus );
+    
+    if (sessionStatus.ShouldRecenter)
+    {
+        ovr_RecenterTrackingOrigin( Global::session );
+    }
 
     // Blit mirror texture to back buffer
     if (Global::mirrorTexture)
     {
         glBindFramebuffer( GL_READ_FRAMEBUFFER, Global::mirrorFBO );
         glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
-        const GLint w = Global::mirrorTexture->OGL.Header.TextureSize.w;
-        const GLint h = Global::mirrorTexture->OGL.Header.TextureSize.h;
+        const GLint w = Global::eyeRenderTexture[ 0 ]->texSize.w;
+        const GLint h = Global::eyeRenderTexture[ 0 ]->texSize.h;
         glBlitFramebuffer( 0, h, w, 0, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST );
         glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
     }
@@ -297,7 +344,7 @@ void ae3d::VR::SubmitFrame()
 
 void ae3d::VR::RecenterTracking()
 {
-    ovr_RecenterPose( Global::hmd );
+    ovr_RecenterTrackingOrigin( Global::session );
 }
 
 void ae3d::VR::CalcCameraForEye( GameObject& camera, float yawDegrees, int eye )
@@ -321,7 +368,7 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float yawDegrees, int eye )
     const float farPlane = camera.GetComponent< CameraComponent >()->GetFar();
 
     OVR::Matrix4f view = OVR::Matrix4f::LookAtRH( shiftedEyePos, shiftedEyePos + finalForward, finalUp );
-    OVR::Matrix4f proj = ovrMatrix4f_Projection( Global::HMD.DefaultEyeFov[ eye ], nearPlane, farPlane, ovrProjection_RightHanded );
+    OVR::Matrix4f proj = ovrMatrix4f_Projection( Global::HMD.DefaultEyeFov[ eye ], nearPlane, farPlane, 0 );
 
     Matrix44 viewMat;
     view.Transpose();
