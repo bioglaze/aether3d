@@ -171,10 +171,13 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraViewMatrix, shadowTexProjMatrix );
             Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraProjectionMatrix, shadowTexProjMatrix );
             Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
-            
-            //materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
+#ifndef RENDERER_VULKAN
+            // Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
+            materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
+#endif
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
             materials[ subMeshIndex ]->Apply();
+
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())
             {
                 cullMode = GfxDevice::CullMode::Off;

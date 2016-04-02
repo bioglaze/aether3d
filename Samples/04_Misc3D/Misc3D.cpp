@@ -220,8 +220,8 @@ int main()
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     //scene.Add( &camera2d );
-    scene.Add( &cameraCubeRT );
-    scene.Add( &rtCube );
+    //scene.Add( &cameraCubeRT );
+    //scene.Add( &rtCube );
     //scene.Add( &cube );
     //scene.Add( &copiedCube );
     //scene.Add( &statsContainer );

@@ -61,6 +61,17 @@ namespace GfxDeviceGlobal
         VkSampler pointClamp = VK_NULL_HANDLE;
     } samplers;
     
+    struct MsaaTarget
+    {
+        VkImage colorImage = VK_NULL_HANDLE;
+        VkImageView colorView = VK_NULL_HANDLE;
+        VkDeviceMemory colorMem = VK_NULL_HANDLE;
+
+        VkImage depthImage = VK_NULL_HANDLE;
+        VkImageView depthView = VK_NULL_HANDLE;
+        VkDeviceMemory depthMem = VK_NULL_HANDLE;
+    } msaaTarget;
+
     VkInstance instance = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -95,15 +106,13 @@ namespace GfxDeviceGlobal
     std::vector< VkDescriptorSet > pendingFreeDescriptorSets;
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > frameUbos;
-    VkImage resolvedColor = VK_NULL_HANDLE;
-    VkDeviceMemory resolvedColorMem = VK_NULL_HANDLE;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int drawCalls = 0;
 }
 
 namespace debug
 {
-    bool enabled = true; // Disable when using RenderDoc.
+    bool enabled = false; // Disable when using RenderDoc.
     const int validationLayerCount = 9;
     const char *validationLayerNames[] =
     {
@@ -123,8 +132,8 @@ namespace debug
 
     VkDebugReportCallbackEXT debugReportCallback = nullptr;
 
-    VkBool32 messageCallback( VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, std::uint64_t srcObject,
-                              std::size_t location, std::int32_t msgCode, const char* pLayerPrefix, const char* pMsg, void* pUserData )
+    VkBool32 messageCallback( VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*objType*/, std::uint64_t /*srcObject*/,
+                              std::size_t /*location*/, std::int32_t msgCode, const char* pLayerPrefix, const char* pMsg, void* /*pUserData*/ )
     {
         if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
         {
@@ -214,6 +223,123 @@ namespace ae3d
         hashString += std::to_string( ((unsigned)cullMode) + 8 );
 
         return GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
+    }
+
+    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex )
+    {
+        for (std::uint32_t i = 0; i < 32; i++)
+        {
+            if ((typeBits & 1) == 1)
+            {
+                if ((GfxDeviceGlobal::deviceMemoryProperties.memoryTypes[ i ].propertyFlags & properties) == properties)
+                {
+                    *typeIndex = i;
+                    return;
+                }
+            }
+            typeBits >>= 1;
+        }
+
+        ae3d::System::Assert( false, "could not get memory type" );
+    }
+
+    void CreateMsaaColor()
+    {
+        //assert( (deviceProperties.limits.framebufferColorSampleCounts >= SampleCount) && (deviceProperties.limits.framebufferDepthSampleCounts >= SAMPLE_COUNT) );
+
+        VkImageCreateInfo info = {};
+        info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        info.imageType = VK_IMAGE_TYPE_2D;
+        info.format = GfxDeviceGlobal::colorFormat;
+        info.extent.width = WindowGlobal::windowWidth;
+        info.extent.height = WindowGlobal::windowHeight;
+        info.extent.depth = 1;
+        info.mipLevels = 1;
+        info.arrayLayers = 1;
+        info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        info.tiling = VK_IMAGE_TILING_OPTIMAL;
+        info.samples = GfxDeviceGlobal::msaaSampleBits;
+        info.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        VkResult err = vkCreateImage( GfxDeviceGlobal::device, &info, nullptr, &GfxDeviceGlobal::msaaTarget.colorImage );
+        AE3D_CHECK_VULKAN( err, "Create MSAA color" );
+
+        VkMemoryRequirements memReqs;
+        vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorImage, &memReqs );
+        VkMemoryAllocateInfo memAlloc = {};
+        memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        memAlloc.allocationSize = memReqs.size;
+        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
+        
+        err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.colorMem );
+        AE3D_CHECK_VULKAN( err, "Create MSAA color" );
+
+        vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorImage, GfxDeviceGlobal::msaaTarget.colorMem, 0 );
+
+        VkImageViewCreateInfo viewInfo = {};
+        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        viewInfo.image = GfxDeviceGlobal::msaaTarget.colorImage;
+        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewInfo.format = GfxDeviceGlobal::colorFormat;
+        viewInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+        viewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+        viewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+        viewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+        viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        viewInfo.subresourceRange.levelCount = 1;
+        viewInfo.subresourceRange.layerCount = 1;
+
+        err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &GfxDeviceGlobal::msaaTarget.colorView );
+        AE3D_CHECK_VULKAN( err, "Create MSAA view" );
+    }
+
+    void CreateMsaaDepth()
+    {
+        VkImageCreateInfo info = {};
+        info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        info.imageType = VK_IMAGE_TYPE_2D;
+        info.format = GfxDeviceGlobal::depthFormat;
+        info.extent.width = WindowGlobal::windowWidth;
+        info.extent.height = WindowGlobal::windowHeight;
+        info.extent.depth = 1;
+        info.mipLevels = 1;
+        info.arrayLayers = 1;
+        info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        info.tiling = VK_IMAGE_TILING_OPTIMAL;
+        info.samples = GfxDeviceGlobal::msaaSampleBits;
+        info.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        VkResult err = vkCreateImage( GfxDeviceGlobal::device, &info, nullptr, &GfxDeviceGlobal::msaaTarget.depthImage );
+        AE3D_CHECK_VULKAN( err, "MSAA depth image" );
+
+        VkMemoryRequirements memReqs;
+        vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, &memReqs );
+        VkMemoryAllocateInfo memAlloc = {};
+        memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        memAlloc.allocationSize = memReqs.size;
+        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
+
+        err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.depthMem );
+        vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, GfxDeviceGlobal::msaaTarget.depthMem, 0 );
+
+        // Create image view for the MSAA target
+        VkImageViewCreateInfo viewInfo = {};
+        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        viewInfo.image = GfxDeviceGlobal::msaaTarget.depthImage;
+        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewInfo.format = GfxDeviceGlobal::depthFormat;
+        viewInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+        viewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+        viewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+        viewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+        viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+        viewInfo.subresourceRange.levelCount = 1;
+        viewInfo.subresourceRange.layerCount = 1;
+
+        err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &GfxDeviceGlobal::msaaTarget.depthView );
+        AE3D_CHECK_VULKAN( err, "MSAA depth image" );
     }
 
     void CreateSamplers()
@@ -388,24 +514,6 @@ namespace ae3d
         GfxDeviceGlobal::psoCache[ hash ] = pso;
     }
 
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex )
-    {
-        for (std::uint32_t i = 0; i < 32; i++)
-        {
-            if ((typeBits & 1) == 1)
-            {
-                if ((GfxDeviceGlobal::deviceMemoryProperties.memoryTypes[ i ].propertyFlags & properties) == properties)
-                {
-                    *typeIndex = i;
-                    return;
-                }
-            }
-            typeBits >>= 1;
-        }
-
-        ae3d::System::Assert( false, "could not get memory type" );
-    }
-
     void AllocateCommandBuffers()
     {
         System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "command pool not initialized" );
@@ -502,6 +610,12 @@ namespace ae3d
         {
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
             imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        }
+
+        // Testing
+        if (oldImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
+        {
+            imageMemoryBarrier.srcAccessMask = 0;
         }
 
         const VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -1031,8 +1145,10 @@ namespace ae3d
         System::Assert( depthFormatFound, "No suitable depth format found" );
     }
 
-    void CreateFramebuffer()
+    void CreateFramebufferNonMSAA()
     {
+        // FIXME: Review this method
+
         VkImageView attachments[ 2 ];
 
         // Depth/Stencil attachment is the same for all frame buffers
@@ -1040,7 +1156,7 @@ namespace ae3d
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        frameBufferCreateInfo.pNext = NULL;
+        frameBufferCreateInfo.pNext = nullptr;
         frameBufferCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
         frameBufferCreateInfo.attachmentCount = 2;
         frameBufferCreateInfo.pAttachments = attachments;
@@ -1054,6 +1170,38 @@ namespace ae3d
         for (std::uint32_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); i++)
         {
             attachments[ 0 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
+            VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
+            AE3D_CHECK_VULKAN( err, "vkCreateFramebuffer" );
+        }
+    }
+
+    void CreateFramebufferMSAA()
+    {
+        System::Assert( GfxDeviceGlobal::msaaTarget.colorImage != VK_NULL_HANDLE, "MSAA image not created" );
+
+        VkImageView attachments[ 4 ] = {};
+        attachments[ 0 ] = GfxDeviceGlobal::msaaTarget.colorView;
+        // attachment[1] = swapchain image
+        attachments[ 2 ] = GfxDeviceGlobal::msaaTarget.depthView;
+        attachments[ 3 ] = GfxDeviceGlobal::depthStencil.view;
+
+        VkFramebufferCreateInfo frameBufferCreateInfo = {};
+        frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        frameBufferCreateInfo.pNext = nullptr;
+        frameBufferCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
+        frameBufferCreateInfo.attachmentCount = 4;
+        frameBufferCreateInfo.pAttachments = attachments;
+        frameBufferCreateInfo.width = static_cast< std::uint32_t >(WindowGlobal::windowWidth);
+        frameBufferCreateInfo.height = static_cast< std::uint32_t >(WindowGlobal::windowHeight);
+        frameBufferCreateInfo.layers = 1;
+
+        // Create frame buffers for every swap chain image
+        GfxDeviceGlobal::frameBuffers.resize( GfxDeviceGlobal::swapchainBuffers.size() );
+
+        for (std::uint32_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); i++)
+        {
+            // FIXME: check index
+            attachments[ 1 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
             VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
             AE3D_CHECK_VULKAN( err, "vkCreateFramebuffer" );
         }
@@ -1077,7 +1225,7 @@ namespace ae3d
         return VK_SAMPLE_COUNT_1_BIT;
     }
 
-    void CreateRenderPass()
+    void CreateRenderPassNonMSAA()
     {
         VkAttachmentDescription attachments[ 2 ];
         attachments[ 0 ].format = GfxDeviceGlobal::colorFormat;
@@ -1129,43 +1277,86 @@ namespace ae3d
         renderPassInfo.pDependencies = nullptr;
 
         VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &GfxDeviceGlobal::renderPass );
+        AE3D_CHECK_VULKAN( err, "vkCreateRenderPass" );   
+    }
+
+    void CreateRenderPassMSAA()
+    {
+        VkAttachmentDescription attachments[ 4 ];
+
+        // Multisampled attachment that we render to
+        attachments[ 0 ].format = GfxDeviceGlobal::colorFormat;
+        attachments[ 0 ].samples = GfxDeviceGlobal::msaaSampleBits;
+        attachments[ 0 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 0 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachments[ 0 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 0 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachments[ 0 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        // This is the frame buffer attachment to where the multisampled image
+        // will be resolved to and which will be presented to the swapchain.
+        attachments[ 1 ].format = GfxDeviceGlobal::colorFormat;
+        attachments[ 1 ].samples = VK_SAMPLE_COUNT_1_BIT;
+        attachments[ 1 ].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachments[ 1 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attachments[ 1 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachments[ 1 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 1 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachments[ 1 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        // Multisampled depth attachment we render to
+        attachments[ 2 ].format = GfxDeviceGlobal::depthFormat;
+        attachments[ 2 ].samples = GfxDeviceGlobal::msaaSampleBits;
+        attachments[ 2 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachments[ 2 ].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 2 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachments[ 2 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 2 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attachments[ 2 ].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        // Depth resolve attachment
+        attachments[ 3 ].format = GfxDeviceGlobal::depthFormat;
+        attachments[ 3 ].samples = VK_SAMPLE_COUNT_1_BIT;
+        attachments[ 3 ].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachments[ 3 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attachments[ 3 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachments[ 3 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 3 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attachments[ 3 ].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference colorReference = {};
+        colorReference.attachment = 0;
+        colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference depthReference = {};
+        depthReference.attachment = 2;
+        depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        // Two resolve attachment references for color and depth
+        VkAttachmentReference resolveReferences[ 2 ] = {};
+        resolveReferences[ 0 ].attachment = 1;
+        resolveReferences[ 0 ].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        resolveReferences[ 1 ].attachment = 3;
+        resolveReferences[ 1 ].layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpass = {};
+        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments = &colorReference;
+        // Pass our resolve attachments to the sub pass
+        subpass.pResolveAttachments = &resolveReferences[ 0 ];
+        subpass.pDepthStencilAttachment = &depthReference;
+
+        VkRenderPassCreateInfo renderPassInfo = {};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = 4;
+        renderPassInfo.pAttachments = &attachments[ 0 ];
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+
+        VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &GfxDeviceGlobal::renderPass );
         AE3D_CHECK_VULKAN( err, "vkCreateRenderPass" );
-
-        if (GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT)
-        {
-            VkImageCreateInfo resImageInfo = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
-            resImageInfo.imageType = VK_IMAGE_TYPE_2D;
-            resImageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-            resImageInfo.extent.width = WindowGlobal::windowWidth;
-            resImageInfo.extent.height = WindowGlobal::windowHeight;
-            resImageInfo.extent.depth = 1;
-            resImageInfo.mipLevels = 1;
-            resImageInfo.arrayLayers = 1;
-            resImageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-            resImageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-            resImageInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-            resImageInfo.flags = 0;
-            resImageInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-
-            err = vkCreateImage( GfxDeviceGlobal::device, &resImageInfo, nullptr, &GfxDeviceGlobal::resolvedColor );
-            AE3D_CHECK_VULKAN( err, "create resolve image" );
-
-            VkMemoryAllocateInfo mem_alloc = {};
-            mem_alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-            mem_alloc.pNext = nullptr;
-            mem_alloc.allocationSize = 0;
-            mem_alloc.memoryTypeIndex = 0;
-
-            VkMemoryRequirements memReqs;
-            vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::resolvedColor, &memReqs );
-            VkMemoryAllocateInfo memInfo;
-            mem_alloc.allocationSize = memReqs.size;
-            GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mem_alloc.memoryTypeIndex );
-            err = vkAllocateMemory( GfxDeviceGlobal::device, &mem_alloc, nullptr, &GfxDeviceGlobal::resolvedColorMem );
-            AE3D_CHECK_VULKAN( err, "resolved color memory" );
-            err = vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::resolvedColor, GfxDeviceGlobal::resolvedColorMem, 0 );
-            AE3D_CHECK_VULKAN( err, "bind resolved color memory" );
-        }
     }
 
     void CreateDepthStencil()
@@ -1412,14 +1603,37 @@ namespace ae3d
         SetupSwapChain();
         AllocateCommandBuffers();
         CreateDepthStencil();
-        CreateRenderPass();
+
+        if (samples > 1)
+        {
+            CreateRenderPassMSAA();
+            CreateMsaaColor();
+            CreateMsaaDepth();
+
+            SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::msaaTarget.colorImage, VK_IMAGE_ASPECT_COLOR_BIT,
+                VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1 );
+            SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::msaaTarget.depthImage, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+                VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
+        }
+        else
+        {
+            CreateRenderPassNonMSAA();
+        }
 
         VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
         pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
         VkResult err = vkCreatePipelineCache( GfxDeviceGlobal::device, &pipelineCacheCreateInfo, nullptr, &GfxDeviceGlobal::pipelineCache );
         AE3D_CHECK_VULKAN( err, "vkCreatePipelineCache" );
 
-        CreateFramebuffer();
+        if (samples > 1)
+        {
+            CreateFramebufferMSAA();
+        }
+        else
+        {
+            CreateFramebufferNonMSAA();
+        }
+
         FlushSetupCommandBuffer();
         CreateDescriptorSetLayout();
         CreateDescriptorPool();
@@ -1443,7 +1657,7 @@ namespace ae3d
     }
 }
 
-void ae3d::GfxDevice::PushGroupMarker( const char* name )
+void ae3d::GfxDevice::PushGroupMarker( const char* /*name*/ )
 {
 }
 
@@ -1460,9 +1674,20 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     cmdBufInfo.pNext = nullptr;
 
-    VkClearValue clearValues[ 2 ];
-    clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
-    clearValues[ 1 ].depthStencil = { 1.0f, 0 };
+    std::vector< VkClearValue > clearValues;
+    if (GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT)
+    {
+        clearValues.resize( 3 );
+        clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
+        clearValues[ 1 ].color = GfxDeviceGlobal::clearColor;
+        clearValues[ 2 ].depthStencil = { 1.0f, 0 };
+    }
+    else
+    {
+        clearValues.resize( 2 );
+        clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
+        clearValues[ 1 ].depthStencil = { 1.0f, 0 };
+    }
 
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -1472,8 +1697,8 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     renderPassBeginInfo.renderArea.offset.y = 0;
     renderPassBeginInfo.renderArea.extent.width = WindowGlobal::windowWidth;
     renderPassBeginInfo.renderArea.extent.height = WindowGlobal::windowHeight;
-    renderPassBeginInfo.clearValueCount = 2;
-    renderPassBeginInfo.pClearValues = clearValues;
+    renderPassBeginInfo.clearValueCount = (std::uint32_t)clearValues.size();
+    renderPassBeginInfo.pClearValues = clearValues.data();
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], &cmdBufInfo );
@@ -1549,7 +1774,7 @@ int ae3d::GfxDevice::GetShaderBinds()
     return 0;
 }
 
-void ae3d::GfxDevice::Init( int width, int height )
+void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
 {
 }
 
@@ -1558,7 +1783,7 @@ void ae3d::GfxDevice::IncDrawCalls()
     ++GfxDeviceGlobal::drawCalls;
 }
 
-void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
+void ae3d::GfxDevice::ClearScreen( unsigned /*clearFlags*/ )
 {
 }
 
@@ -1654,7 +1879,7 @@ std::uint8_t* ae3d::GfxDevice::GetCurrentUbo()
     return GfxDeviceGlobal::frameUbos.back().uboData;
 }
 
-void ae3d::GfxDevice::ErrorCheck( const char* info )
+void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
 {
 }
 
@@ -1737,9 +1962,12 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.pointClamp, nullptr );
     vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.pointRepeat, nullptr );
 
-    if (GfxDeviceGlobal::resolvedColor != VK_NULL_HANDLE)
+    if (GfxDeviceGlobal::msaaTarget.colorImage != VK_NULL_HANDLE)
     {
-        vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::resolvedColor, nullptr );
+        vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorImage, nullptr );
+        vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, nullptr );
+        vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorView, nullptr );
+        vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthView, nullptr );
     }
 
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::renderCompleteSemaphore, nullptr );
