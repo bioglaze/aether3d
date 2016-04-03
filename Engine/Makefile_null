@@ -3,7 +3,7 @@ OUTPUT_DIR := ../../aether3d_build
 UNAME := $(shell uname)
 COMPILER := g++
 CCOMPILER := gcc
-ENGINE_LIB := libaether3d_linux.a
+ENGINE_LIB := libaether3d_linux_null.a
 STD_LIB := -std=c++11
 INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 
@@ -11,14 +11,14 @@ ifeq ($(UNAME), Darwin)
 COMPILER := clang++
 CCOMPILER := clang
 STD_LIB := -std=c++11 -stdlib=libc++
-ENGINE_LIB := libaether3d_osx.a
+ENGINE_LIB := libaether3d_osx_null.a
 endif
 
 WARNINGS := -Wall -ansi -pedantic
 DEFINES := -DRENDERER_NULL
 
 ifeq ($(OS),Windows_NT)
-ENGINE_LIB := libaether3d_win.a
+ENGINE_LIB := libaether3d_win_null.a
 CCOMPILER := gcc
 OUTPUT_DIR := ..\..\aether3d_build
 endif
@@ -29,11 +29,11 @@ ifeq ($(OS),Windows_NT)
 endif
 ifeq ($(UNAME), Darwin)
 	mkdir -p $(OUTPUT_DIR)
-	rm -f $(OUTPUT_DIR)/libaether3d_osx.a
+	rm -f $(OUTPUT_DIR)/libaether3d_osx_null.a
 endif
 ifeq ($(UNAME), Linux)
 	mkdir -p $(OUTPUT_DIR)
-	rm -f $(OUTPUT_DIR)/libaether3d_linux.a
+	rm -f $(OUTPUT_DIR)/libaether3d_linux_null.a
 endif
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
 	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o

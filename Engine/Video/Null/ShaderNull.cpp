@@ -15,8 +15,6 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexDataGLSL, con
 {
 }
 
-bool ae3d::Shader::IsValid() const { return true; }
-
 void ae3d::Shader::Use()
 {
 }

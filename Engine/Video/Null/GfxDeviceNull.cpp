@@ -8,7 +8,7 @@ void ae3d::BuiltinShaders::Load()
 {
 }
 
-void ae3d::GfxDevice::Draw(ae3d::VertexBuffer&, int, int, ae3d::Shader&, ae3d::GfxDevice::BlendMode, ae3d::GfxDevice::DepthFunc)
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode )
 {
 }
 
@@ -59,10 +59,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned )
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* )
-{
-}
-
-void ae3d::GfxDevice::SetBackFaceCulling( bool )
 {
 }
 
