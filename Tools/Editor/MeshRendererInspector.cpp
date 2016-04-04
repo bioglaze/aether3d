@@ -10,6 +10,9 @@
 #include "System.hpp"
 #include "MeshRendererComponent.hpp"
 #include "Mesh.hpp"
+#include "Material.hpp"
+
+extern ae3d::Material* gCubeMaterial;
 
 void MeshRendererInspector::Init( QWidget* aMainWindow )
 {
@@ -52,6 +55,11 @@ void MeshRendererInspector::MeshCellClicked( int, int )
         {
             auto meshRendererComponent = gameObject->GetComponent< ae3d::MeshRendererComponent >();
             meshRendererComponent->SetMesh( mesh );
+
+            for (int i = 0, length = meshRendererComponent->GetMesh()->GetSubMeshCount(); i < length; ++i)
+            {
+                meshRendererComponent->SetMaterial( gCubeMaterial, i );
+            }
         }
         else
         {

@@ -72,7 +72,10 @@ public:
     /// \return scene.
     ae3d::Scene* GetScene() { return &scene; }
 
-    ae3d::GameObject* GetGameObject( int index ) { return gameObjects.at( index ).get(); }
+    ae3d::GameObject* GetGameObject( int index )
+    {
+        return index < (int)gameObjects.size() ? gameObjects.at( index ).get() : nullptr;
+    }
 
     void SetMainWindow( QWidget* aMainWindow ) { mainWindow = aMainWindow; }
 

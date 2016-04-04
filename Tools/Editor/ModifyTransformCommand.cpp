@@ -31,12 +31,17 @@ void ModifyTransformCommand::Execute()
 
 void ModifyTransformCommand::Undo()
 {
-    auto transform = sceneWidget->GetGameObject( gameObjectIndex )->GetComponent< ae3d::TransformComponent >();
+    auto go = sceneWidget->GetGameObject( gameObjectIndex );
 
-    if (transform)
+    if (go != nullptr)
     {
-        transform->SetLocalPosition( oldPosition );
-        transform->SetLocalRotation( oldRotation );
-        transform->SetLocalScale( oldScale );
+        auto transform = go->GetComponent< ae3d::TransformComponent >();
+
+        if (transform)
+        {
+            transform->SetLocalPosition( oldPosition );
+            transform->SetLocalRotation( oldRotation );
+            transform->SetLocalScale( oldScale );
+        }
     }
 }

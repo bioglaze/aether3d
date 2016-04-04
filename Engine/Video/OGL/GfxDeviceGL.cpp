@@ -442,7 +442,6 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
         for (int i = 0; i < count; ++i)
         {
             sExtensions[ i ] = std::string( (const char*)glGetStringi( GL_EXTENSIONS, i ) );
-            System::Print("%s\n", sExtensions[ i ].c_str() );
         }
     }
     

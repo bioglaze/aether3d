@@ -19,6 +19,7 @@
 #include <iostream>
 
 using namespace ae3d;
+ae3d::Material* gCubeMaterial = nullptr;
 
 std::string AbsoluteFilePath( const std::string& relativePath )
 {
@@ -285,6 +286,7 @@ void SceneWidget::Init()
     cubeMaterial.SetTexture( "textureMap", &spriteTex );
     cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     cubeMaterial.SetBackFaceCulling( true );
+    gCubeMaterial = &cubeMaterial;
 
     gameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->SetMaterial( &cubeMaterial, 0 );
 
@@ -430,11 +432,27 @@ void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
     }
     else if (aEvent->key() == Qt::Key_Delete || aEvent->key() == macDelete)
     {
+        std::vector< GameObject* > pendingRemove;
+
         for (auto i : selectedGameObjects)
         {
             scene.Remove( gameObjects[ i ].get() );
+            pendingRemove.push_back( gameObjects[ i ].get() );
         }
-        // TODO: Remove gameObjects entries that were removed from scene.
+
+        for (std::size_t i = 0; i < selectedGameObjects.size(); ++i)
+        {
+            for (std::size_t p = 0; p < pendingRemove.size(); ++p)
+            {
+                if (!gameObjects.empty() && !pendingRemove.empty() && gameObjects[ i ].get() == pendingRemove[ p ])
+                {
+                    gameObjects.erase( gameObjects.begin() + i );
+                    i = 0;
+                    p = 0;
+                }
+            }
+        }
+
         selectedGameObjects.clear();
         emit GameObjectsAddedOrDeleted();
         std::list< ae3d::GameObject* > emptySelection;
