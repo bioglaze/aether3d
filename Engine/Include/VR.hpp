@@ -10,6 +10,9 @@ namespace ae3d
         /// Inits the device. Must be called as early as possible.
         void Init();
 
+		/// Releases resources.
+		void Deinit();
+
         /// \param outWidth Returns optimal width for window.
         /// \param outHeight Returns optimal height for window.
         void GetIdealWindowSize( int& outWidth, int& outHeight );

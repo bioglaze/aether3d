@@ -213,6 +213,25 @@ void ae3d::VR::Init()
     }
 }
 
+void ae3d::VR::Deinit()
+{
+	if( Global::session )
+	{
+		glDeleteFramebuffers( 1, &Global::mirrorFBO );
+		ovr_DestroyMirrorTexture( Global::session, Global::mirrorTexture );
+
+		for( int eye = 0; eye < 2; ++eye )
+		{
+			delete Global::eyeRenderTexture[ eye ];
+			delete Global::eyeDepthBuffer[ eye ];
+		}
+
+		Global::GLEContext.Shutdown();
+		ovr_Destroy( Global::session );
+		ovr_Shutdown();
+	}
+}
+
 void ae3d::VR::GetIdealWindowSize( int& outWidth, int& outHeight )
 {
    const ovrSizei idealTextureSize = ovr_GetFovTextureSize( Global::session, (ovrEyeType)0, Global::HMD.DefaultEyeFov[ 0 ], 1 );
@@ -283,7 +302,6 @@ void ae3d::VR::SetEye( int eye )
 {
     if (Global::session && Global::eyeRenderTexture[ eye ]->TextureSet)
     {
-        //Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex = (Global::eyeRenderTexture[ eye ]->TextureSet->CurrentIndex + 1) % Global::eyeRenderTexture[ eye ]->TextureSet->TextureCount;
         Global::eyeRenderTexture[ eye ]->SetAndClearRenderSurface( Global::session, Global::eyeDepthBuffer[ eye ] );
     }
 }
@@ -293,6 +311,7 @@ void ae3d::VR::UnsetEye( int eye )
     if (Global::session && Global::eyeRenderTexture[ eye ]->TextureSet)
     {
         Global::eyeRenderTexture[ eye ]->UnsetRenderSurface();
+		Global::eyeRenderTexture[ eye ]->Commit( Global::session );
     }
 }
 
@@ -386,6 +405,10 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float yawDegrees, int eye )
 using namespace ae3d;
 
 void ae3d::VR::Init()
+{
+}
+
+void ae3d::VR::Deinit()
 {
 }
 

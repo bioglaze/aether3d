@@ -406,7 +406,7 @@ int main()
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }
             if (event.type == WindowEventType::GamePadLeftThumbState)
-            {
+            {           
                 gamePadLeftThumbX = event.gamePadThumbX;
                 gamePadLeftThumbY = event.gamePadThumbY;
             }
@@ -459,5 +459,6 @@ int main()
         delete t.second;
     }
 
+	VR::Deinit();
     System::Deinit();
 }
