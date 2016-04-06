@@ -59,6 +59,15 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 return;
             }
             
+            const int rowBytes = width * components;
+            
+            if (rowBytes < 400)
+            {
+                System::Print( "%s failed to load. On Metal renderer width * components must be >= 400\n", paths[ face ].c_str() );
+                stbi_image_free( data );
+                return;
+            }
+
             opaque = (components == 3 || components == 1);
             
             [metalTexture replaceRegion:region

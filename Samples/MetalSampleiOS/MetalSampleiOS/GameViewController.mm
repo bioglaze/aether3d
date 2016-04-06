@@ -40,12 +40,12 @@
     device = MTLCreateSystemDefaultDevice();
     assert( device );
     
+    [self _setupView];
+    [self _reshape];
+
     ae3d::System::InitMetal( device, _view );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
-    
-    [self _setupView];
-    [self _reshape];
     
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
@@ -105,6 +105,7 @@
     
     // Setup the render target, choose values based on your app
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+    _view.sampleCount = 1;
 }
 
 - (void)_render

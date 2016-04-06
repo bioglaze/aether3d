@@ -10,6 +10,7 @@
 		AB811CCF1C23433500911AB6 /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; };
 		AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD01C2344BA00911AB6 /* OpenAL.framework */; };
 		AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD21C2346F400911AB6 /* MetalKit.framework */; };
+		AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */; };
 		ABA29F451C19E1F90098E21D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F441C19E1F90098E21D /* main.m */; };
 		ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F471C19E1F90098E21D /* AppDelegate.m */; };
 		ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F4A1C19E1F90098E21D /* GameViewController.mm */; };
@@ -57,6 +58,7 @@
 		AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aether3D_iOS.framework; path = ../../../../../Desktop/Aether3D_iOS.framework; sourceTree = "<group>"; };
 		AB811CD01C2344BA00911AB6 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		AB811CD21C2346F400911AB6 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
 		ABA29F401C19E1F90098E21D /* MetalSampleiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalSampleiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA29F441C19E1F90098E21D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		ABA29F461C19E1F90098E21D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 		ABD3AB241C29D78900E78933 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */,
 				ABD3AB251C29D79F00E78933 /* Moments.metal */,
 				ABD3AB261C29D79F00E78933 /* SDF.metal */,
 				ABD3AB271C29D79F00E78933 /* Skybox.metal */,
@@ -286,6 +289,7 @@
 				ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */,
 				ABD3AB2D1C29D79F00E78933 /* SpriteShader.metal in Sources */,
 				ABA29F451C19E1F90098E21D /* main.m in Sources */,
+				AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */,
 				ABD3AB2B1C29D79F00E78933 /* SDF.metal in Sources */,
 				ABD3AB2C1C29D79F00E78933 /* Skybox.metal in Sources */,
 			);

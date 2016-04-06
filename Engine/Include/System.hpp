@@ -58,8 +58,8 @@
 
    \subsection win_oculus Windows/Oculus Rift
 
-   Copy LibOVR and LibOVRKernel folders from Oculus SDK into Engine \ ThirdParty and compile their release versions using VS2015.
-   Open Engine/VisualStudio_GL45 and build target Release.
+   Copy LibOVR, Logging and LibOVRKernel folders from Oculus SDK into Engine \ ThirdParty and compile their x64 release versions using VS2015.
+   Open Engine/VisualStudio_GL45 and build target Oculus Release.
    Open Samples/04_Misc3D and build target Oculus Release.
  
    \subsection osx OS X/Xcode
@@ -73,13 +73,12 @@
    \subsection osx_cmd OS X and GNU/Linux Command Line
 
    Run the Makefile in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
-   On GNU/Linux you need at least the following packages: libopenal-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+   On GNU/Linux you need at least the following packages: libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
 
    \subsection Bugs
 
    <ul>
-   <li>Vulkan renderer is in a very early state.</li>
-   <li>D3D12 renderer is in a very early state.</li>
+   <li>Vulkan renderer leaks memory when vertex buffers are reallocated (eg. updating TextRendererComponent's text).</li>
    </ul>
 */
 namespace ae3d

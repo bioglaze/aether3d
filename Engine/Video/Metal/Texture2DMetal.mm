@@ -149,7 +149,16 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     if (data == nullptr)
     {
         const std::string reason( stbi_failure_reason() );
-        System::Print( "%s failed to load. stb_image's reason: %s", fileContents.path.c_str(), reason.c_str() );
+        System::Print( "%s failed to load. stb_image's reason: %s\n", fileContents.path.c_str(), reason.c_str() );
+        return;
+    }
+    
+    const int rowBytes = width * components;
+
+    if (rowBytes < 400)
+    {
+        System::Print( "%s failed to load. On Metal renderer width * components must be >= 400\n", fileContents.path.c_str() );
+        stbi_image_free( data );
         return;
     }
     
