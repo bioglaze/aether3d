@@ -18,7 +18,7 @@ namespace ae3d
         /// \return Clip's handle.
         unsigned GetId() const { return handle; }
 
-        /// \return Clip's length in seconds.
+        /// \return Clip's length in seconds or 1 if the clip is not loaded.
         float LengthInSeconds() const { return length; }
         
       private:

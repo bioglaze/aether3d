@@ -79,7 +79,7 @@ namespace ae3d
         /// \return Render order.
         unsigned GetRenderOrder() const { return renderOrder; }
 
-        /// \param order Order.
+        /// \param order Order. Higher values are rendered after lower values.
         void SetRenderOrder( unsigned order ) { renderOrder = order; }
         
         /// \return Layer mask.

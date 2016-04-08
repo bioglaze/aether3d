@@ -372,9 +372,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
+#ifndef RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
-#if RENDERER_METAL
-    GfxDevice::BeginFrame();
 #endif
 #if RENDERER_VULKAN
     GfxDevice::BeginRenderPassAndCommandBuffer();
@@ -395,7 +394,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         System::Assert( false, "Unhandled clear flag." );
     }
-
+#if RENDERER_METAL
+    GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
+    GfxDevice::BeginFrame();
+#endif
+    
     Matrix44 view;
 
     if (skybox != nullptr)
