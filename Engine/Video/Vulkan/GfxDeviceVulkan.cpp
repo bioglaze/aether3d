@@ -113,14 +113,14 @@ namespace GfxDeviceGlobal
 namespace debug
 {
     bool enabled = false; // Disable when using RenderDoc.
-    const int validationLayerCount = 9;
+    const int validationLayerCount = 7;
+
+    // These are named according to LunarG SDK 1.0.8.0.
     const char *validationLayerNames[] =
     {
         "VK_LAYER_GOOGLE_threading",
-        "VK_LAYER_LUNARG_mem_tracker",
         "VK_LAYER_LUNARG_object_tracker",
-        "VK_LAYER_LUNARG_draw_state",
-        "VK_LAYER_LUNARG_param_checker",
+        "VK_LAYER_LUNARG_parameter_validation",
         "VK_LAYER_LUNARG_swapchain",
         "VK_LAYER_LUNARG_device_limits",
         "VK_LAYER_LUNARG_image",
@@ -1032,6 +1032,16 @@ namespace ae3d
 
         if (debug::enabled)
         {
+            /*std::uint32_t instanceValidationLayerCount;
+            vkEnumerateInstanceLayerProperties( &instanceValidationLayerCount, nullptr );
+            std::vector< VkLayerProperties > instanceValidationLayers( instanceValidationLayerCount );
+            vkEnumerateInstanceLayerProperties( &instanceValidationLayerCount, instanceValidationLayers.data() );
+
+            for (auto& i : instanceValidationLayers)
+            {
+                System::Print( "instance layer: %s\n", i.layerName );
+            }*/
+
             instanceCreateInfo.enabledLayerCount = debug::validationLayerCount;
             instanceCreateInfo.ppEnabledLayerNames = debug::validationLayerNames;
 #if VK_USE_PLATFORM_WIN32_KHR

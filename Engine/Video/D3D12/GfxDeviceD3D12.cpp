@@ -141,7 +141,11 @@ void CreateBackBuffer()
     {
         D3D12_CPU_DESCRIPTOR_HANDLE handle = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
         handle.ptr += i * rtvStep;
-        GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], nullptr, handle );
+
+        D3D12_RENDER_TARGET_VIEW_DESC descRtv = {};
+        descRtv.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+        GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], &descRtv, handle );
     }
 }
 
@@ -386,7 +390,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descPso.SampleMask = UINT_MAX;
     descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     descPso.NumRenderTargets = 1;
-    descPso.RTVFormats[ 0 ] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descPso.RTVFormats[ 0 ] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     descPso.SampleDesc.Count = 1;
 
