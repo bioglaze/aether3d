@@ -60,12 +60,12 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* p
         }
     }
 
-    std::ifstream in( GetFullPath( path ), std::ifstream::ate | std::ifstream::binary );
+    std::ifstream in( GetFullPath( outData.path.c_str() ), std::ifstream::ate | std::ifstream::binary );
     outData.isLoaded = in.is_open();
 
     if (!outData.isLoaded)
     {
-        System::Print( "FileSystem: Could not open %s.\n", path );
+        System::Print( "FileSystem: Could not open %s.\n", outData.path.c_str() );
         return outData;
     }
 

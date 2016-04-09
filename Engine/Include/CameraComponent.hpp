@@ -8,7 +8,7 @@
 
 namespace ae3d
 {
-    /// Camera views the scene. Game Object containing a camera component must also contain a transform component to render anything.
+    /// Camera views the scene. GameObject containing a camera component must also contain a TransformComponent to render anything.
     class CameraComponent
     {
     public:

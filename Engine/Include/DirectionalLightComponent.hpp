@@ -6,7 +6,7 @@
 
 namespace ae3d
 {
-    /// Directional light illuminates the scene from a given direction. Ideal for sunlight.
+    /// Directional light illuminates the Scene from a given direction. Ideal for sunlight.
     class DirectionalLightComponent
     {
     public:

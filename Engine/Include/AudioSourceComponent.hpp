@@ -5,7 +5,7 @@
 
 namespace ae3d
 {
-    /// Contains an audio clip and methods to play it.
+    /// Contains an audio clip and methods to play it. \see AudioClip
     class AudioSourceComponent
     {
     public:
@@ -15,7 +15,7 @@ namespace ae3d
         /// \param audioClipId Audio clip id.
         void SetClipId( unsigned audioClipId );
 
-        /// \param enable True, if clips played through this source will be affected by this game object's and camera's position.
+        /// \param enable True, if clips played through this source will be affected by this GameObject's and camera's position.
         void Set3D( bool enable ) { is3D = enable; }
         
         /// Plays the clip.

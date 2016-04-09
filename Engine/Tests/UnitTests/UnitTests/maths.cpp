@@ -1,8 +1,9 @@
 #include <cmath>
 #include "CppUnitTest.h"
-#include "Vec3.hpp"
+#include "FileSystem.hpp"
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
+#include "Vec3.hpp"
 
 using namespace ae3d;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -288,5 +289,17 @@ namespace UnitTests
             const float acceptableDelta = 0.01f;
             Assert::IsTrue( 45.005f - euler.x < acceptableDelta );
         }
-	};
+
+        TEST_METHOD( FileSystemNullPath )
+        {
+            auto contents = FileSystem::FileContents( nullptr );
+            Assert::IsTrue( !contents.isLoaded );
+        }
+    
+        TEST_METHOD( FileSystemNotFoundPath )
+        {
+            auto contents = FileSystem::FileContents( "can't find me" );
+            Assert::IsTrue( !contents.isLoaded );
+        }
+    };
 }

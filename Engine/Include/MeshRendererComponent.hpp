@@ -6,7 +6,7 @@
 
 namespace ae3d
 {
-    /// Contains a mesh.
+    /// Contains a Mesh.
     class MeshRendererComponent
     {
     public:
