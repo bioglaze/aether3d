@@ -43,7 +43,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DES
         {
             HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &cbvSrvUavHeap ) );
             AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
-            cbvSrvUavHeap->SetName( L"CBV Heap" );
+            cbvSrvUavHeap->SetName( L"CBV_SRV_UAV Heap" );
             currentCbvSrvUavHandle = cbvSrvUavHeap->GetCPUDescriptorHandleForHeapStart();
         }
 
@@ -69,7 +69,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DES
         {
             HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &rtvHeap ) );
             AE3D_CHECK_D3D( hr, "Failed to create RTV descriptor heap" );
-            rtvHeap->SetName( L"CBV Heap" );
+            rtvHeap->SetName( L"RTV Heap" );
             currentRtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
         }
 
@@ -82,7 +82,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DES
         {
             HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &dsvHeap ) );
             AE3D_CHECK_D3D( hr, "Failed to create DSV descriptor heap" );
-            dsvHeap->SetName( L"CBV Heap" );
+            dsvHeap->SetName( L"DSV Heap" );
             currentDsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
         }
 

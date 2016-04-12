@@ -93,6 +93,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release D3D12|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
     <TargetName>Misc2D_D3D12_r</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>

@@ -20,9 +20,8 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Cross-Platform scene editor.
   - Statically linked into your application.
 
-# Status (as of 2015-12-26)
+# Status (as of 2016-04-12)
 
-  - API is not stable until 1.0 (developing 0.5 now)
   - OpenGL renderer is the most featureful but others will catch up.
   - Master branch may or may not compile but releases should always work.
   - Editor is still missing many features that are needed for proper scene creation.
