@@ -29,6 +29,11 @@ namespace WindowGlobal
     extern int windowHeight;
 }
 
+namespace MathUtil
+{
+    unsigned GetHash( const char* s, unsigned length );
+}
+
 namespace GfxDeviceGlobal
 {
     const unsigned BufferCount = 2;
@@ -40,6 +45,11 @@ namespace GfxDeviceGlobal
     int backBufferHeight = 400;
     ID3D12Device* device = nullptr;
     IDXGISwapChain3* swapChain = nullptr;
+
+    // Not backbuffer.
+    GpuResource* currentRenderTarget = nullptr;
+    D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetDSV;
+    D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetRTV;
 
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
     GpuResource rtvResources[ 2 ];
@@ -135,12 +145,9 @@ void CreateBackBuffer()
         GfxDeviceGlobal::backBufferHeight = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Height );
     }
 
-    auto rtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
-
     for (auto i = 0u; i < GfxDeviceGlobal::BufferCount; ++i)
     {
-        D3D12_CPU_DESCRIPTOR_HANDLE handle = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
-        handle.ptr += i * rtvStep;
+        D3D12_CPU_DESCRIPTOR_HANDLE handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
 
         D3D12_RENDER_TARGET_VIEW_DESC descRtv = {};
         descRtv.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -151,12 +158,12 @@ void CreateBackBuffer()
 
 void CreateSampler()
 {
-    D3D12_SAMPLER_DESC descSampler;
+    D3D12_SAMPLER_DESC descSampler = {};
     descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
     descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
     descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    descSampler.MinLOD = -FLT_MAX;
+    descSampler.MinLOD = 0;
     descSampler.MaxLOD = FLT_MAX;
     descSampler.MipLODBias = 0;
     descSampler.MaxAnisotropy = 0;
@@ -194,27 +201,8 @@ void CreateRootSignature()
     GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
 }
 
-// http://stackoverflow.com/questions/8317508/hash-function-for-a-string
-unsigned GetHash( const char* s, unsigned length )
-{
-    const unsigned A = 54059;
-    const unsigned B = 76963;
-
-    unsigned h = 31;
-    unsigned i = 0;
-    
-    while (i < length)
-    {
-        h = (h * A) ^ (s[ 0 ] * B);
-        ++s;
-        ++i;
-    }
-
-    return h;
-}
-
 unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode )
+                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
@@ -223,12 +211,13 @@ unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3
     hashString += std::to_string( (unsigned)blendMode );
     hashString += std::to_string( ((unsigned)depthFunc) + 4 );
     hashString += std::to_string( ((unsigned)cullMode) + 8 );
+    hashString += std::to_string( ((unsigned)rtvFormat) + 12 );
 
-    return GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
+    return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
 }
 
 void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                ae3d::GfxDevice::CullMode cullMode )
+                ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat )
 {
     D3D12_RASTERIZER_DESC descRaster = {};
 
@@ -390,7 +379,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     descPso.SampleMask = UINT_MAX;
     descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     descPso.NumRenderTargets = 1;
-    descPso.RTVFormats[ 0 ] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    descPso.RTVFormats[ 0 ] = rtvFormat;
     descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     descPso.SampleDesc.Count = 1;
 
@@ -399,7 +388,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO" );
 
-    const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
+    const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, rtvFormat );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -512,7 +501,6 @@ void ae3d::CreateRenderer( int /*samples*/ )
     AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
     factory->Release();
 
-    D3D12_CPU_DESCRIPTOR_HANDLE initRtvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
     D3D12_CPU_DESCRIPTOR_HANDLE initSamplerHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
     D3D12_CPU_DESCRIPTOR_HANDLE initDsvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
     D3D12_CPU_DESCRIPTOR_HANDLE initCbvSrvUavHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
@@ -573,7 +561,6 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
     {
         ae3d::System::Print( "Unable to map shader constant buffer!" );
     }
-
 }
 
 void* ae3d::GfxDevice::GetCurrentUniformBuffer()
@@ -597,11 +584,12 @@ void ae3d::GfxDevice::PopGroupMarker()
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode )
 {   
-    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
+    const DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, rtvFormat );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode );
+        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, rtvFormat );
     }
     
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -614,6 +602,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &tempHeap ) );
     AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
     GfxDeviceGlobal::frameHeaps.push_back( tempHeap );
+    tempHeap->SetName( L"tempHeap" );
 
     D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -627,6 +616,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = GfxDeviceGlobal::texture2d0 != nullptr ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
     if (srvDesc.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
     {
         srvDesc.Texture2D.MipLevels = 1;
@@ -755,6 +745,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     DestroyShaders();
     Texture2D::DestroyTextures();
     TextureCube::DestroyTextures();
+    RenderTexture::DestroyTextures();
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     DescriptorHeapManager::Deinit();
@@ -793,26 +784,40 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     auto i = GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex();
     GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
-    TransitionResource( GfxDeviceGlobal::rtvResources[ i ], D3D12_RESOURCE_STATE_RENDER_TARGET );
+
+    GpuResource* resource = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget : &GfxDeviceGlobal::rtvResources[ i ];
+
+    TransitionResource( *resource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     
-    D3D12_VIEWPORT mViewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
-    GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &mViewPort );
+    D3D12_VIEWPORT viewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
+    GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &viewPort );
 
     D3D12_RECT scissor = {};
     scissor.right = (LONG)GfxDeviceGlobal::backBufferWidth;
     scissor.bottom = (LONG)GfxDeviceGlobal::backBufferHeight;
     GfxDeviceGlobal::graphicsCommandList->RSSetScissorRects( 1, &scissor );
 
-    D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
     auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
-    descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
-    
+
+    D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv;
+
+    if (GfxDeviceGlobal::currentRenderTarget)
+    {
+        descHandleRtv = GfxDeviceGlobal::currentRenderTargetRTV;
+    }
+    else
+    {
+        descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
+        descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
+    }
+
     if ((clearFlags & ClearFlags::Color) != 0)
     {
         GfxDeviceGlobal::graphicsCommandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
     }
 
-    D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTargetDSV : 
+                                                       DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
 
     if ((clearFlags & ClearFlags::Depth) != 0)
     {
@@ -891,6 +896,13 @@ void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
 {
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned /*cubeMapFace*/ )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMapFace*/ )
 {
+    GfxDeviceGlobal::currentRenderTarget = !target ? nullptr : target->GetGpuResource();
+    
+    if (target)
+    {
+        GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
+        GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
+    }
 }

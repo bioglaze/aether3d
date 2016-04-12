@@ -52,6 +52,24 @@ namespace MathUtil
     {
         return ((i & (i - 1)) == 0);
     }
+
+    unsigned GetHash( const char* s, unsigned length )
+    {
+        const unsigned A = 54059;
+        const unsigned B = 76963;
+
+        unsigned h = 31;
+        unsigned i = 0;
+
+        while (i < length)
+        {
+            h = (h * A) ^ (s[ 0 ] * B);
+            ++s;
+            ++i;
+        }
+
+        return h;
+    }
 }
 
 namespace Global

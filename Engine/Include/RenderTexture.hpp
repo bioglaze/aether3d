@@ -17,6 +17,9 @@ namespace ae3d
             Float
         };
 
+        /// Destroys graphics API objects.
+        static void DestroyTextures();
+
         /// \param width Width.
         /// \param height Height.
         /// \param dataType Data type.
@@ -33,12 +36,16 @@ namespace ae3d
         /// \return True, if the texture is a cube map.
         bool IsCube() const { return isCube; }
         
+#if RENDERER_OPENGL
         /// \return FBO.
         unsigned GetFBO() const { return fboId; }
-        
+#endif
+
   private:
+#if RENDERER_OPENGL
         unsigned rboId = 0;
         unsigned fboId = 0;
+#endif
         bool isCube = false;
     };
 }

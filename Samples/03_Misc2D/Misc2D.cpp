@@ -111,7 +111,7 @@ int main()
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
     statsContainer.GetComponent<TransformComponent>()->SetParent( statsParent.GetComponent<TransformComponent>() );
 
-    /*RenderTexture rtTex;
+    RenderTexture rtTex;
     rtTex.Create2D( 512, 512, RenderTexture::DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear );
     
     GameObject renderTextureContainer;
@@ -124,17 +124,16 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
-    */
 
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     //scene.Add( &textContainerSDF );
-    scene.Add( &statsContainer );
+    //scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    //scene.Add( &renderTextureContainer );
-    //scene.Add( &rtCamera );
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;

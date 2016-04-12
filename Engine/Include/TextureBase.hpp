@@ -60,6 +60,8 @@ namespace ae3d
 #endif
 #if RENDERER_D3D12
         GpuResource* GetGpuResource() { return &gpuResource; }
+        D3D12_CPU_DESCRIPTOR_HANDLE& GetDSV() { return dsv; }
+        D3D12_CPU_DESCRIPTOR_HANDLE& GetRTV() { return rtv; }
 #endif
         /// \return Color space.
         ColorSpace GetColorSpace() const { return colorSpace; }
@@ -114,7 +116,11 @@ namespace ae3d
 #endif
 #if RENDERER_D3D12
         GpuResource gpuResource;
-        D3D12_CPU_DESCRIPTOR_HANDLE srv;
+        GpuResource gpuResourceDepth;
+
+        D3D12_CPU_DESCRIPTOR_HANDLE srv = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
 #endif
     };
 }
