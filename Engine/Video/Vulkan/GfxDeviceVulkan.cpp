@@ -108,6 +108,7 @@ namespace GfxDeviceGlobal
     std::vector< Ubo > frameUbos;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int drawCalls = 0;
+    int barrierCalls = 0;
 }
 
 namespace debug
@@ -629,6 +630,8 @@ namespace ae3d
             0, nullptr,
             0, nullptr,
             1, &imageMemoryBarrier );
+
+        ++GfxDeviceGlobal::barrierCalls;
     }
 
     void SubmitPrePresentBarrier()
@@ -659,6 +662,7 @@ namespace ae3d
             0, nullptr,
             0, nullptr,
             1, &prePresentBarrier );
+        ++GfxDeviceGlobal::barrierCalls;
 
         err = vkEndCommandBuffer( GfxDeviceGlobal::prePresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
@@ -700,6 +704,7 @@ namespace ae3d
             0, nullptr,
             0, nullptr,
             1, &postPresentBarrier );
+        ++GfxDeviceGlobal::barrierCalls;
 
         err = vkEndCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
@@ -1753,6 +1758,7 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
     GfxDeviceGlobal::drawCalls = 0;
+    GfxDeviceGlobal::barrierCalls = 0;
 }
 
 void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
@@ -1782,6 +1788,17 @@ int ae3d::GfxDevice::GetVertexBufferBinds()
 int ae3d::GfxDevice::GetShaderBinds()
 {
     return 0;
+}
+
+void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
+{
+    outUsedMBytes = 0;
+    outBudgetMBytes = 0;
+}
+
+int ae3d::GfxDevice::GetBarrierCalls()
+{
+    return GfxDeviceGlobal::barrierCalls;
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )

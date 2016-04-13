@@ -130,10 +130,10 @@ int main()
     scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     //scene.Add( &textContainerSDF );
-    //scene.Add( &statsContainer );
+    scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
+    //scene.Add( &renderTextureContainer );
+    //scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;
@@ -176,8 +176,16 @@ int main()
             }
         }
 
-        const std::string drawCalls = text + std::to_string( System::Statistics::GetDrawCallCount() );
-        statsContainer.GetComponent<TextRendererComponent>()->SetText( drawCalls.c_str() );
+        std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
+
+        //stats += std::string( "\nbarriers: " ) + std::to_string( System::Statistics::GetBarrierCallCount() );
+
+        /*unsigned gpuUsage, gpuBudget;
+        System::Statistics::GetGpuMemoryUsage( gpuUsage, gpuBudget );
+        stats += std::string( "\nused VRAM: " ) + std::to_string( gpuUsage ) + std::string( " MB, budget: " ) +
+            std::to_string( gpuBudget ) + std::string( " MB" );
+          */  
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         scene.Render();
 

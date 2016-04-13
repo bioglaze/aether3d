@@ -41,10 +41,12 @@ namespace GfxDeviceGlobal
     int vaoBinds = 0;
     int textureBinds = 0;
     int shaderBinds = 0;
+    int barrierCalls = 0;
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     ID3D12Device* device = nullptr;
     IDXGISwapChain3* swapChain = nullptr;
+    IDXGIAdapter3* adapter = nullptr;
 
     // Not backbuffer.
     GpuResource* currentRenderTarget = nullptr;
@@ -129,6 +131,7 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
 
     gpuResource.usageState = newState;
 
+    ++GfxDeviceGlobal::barrierCalls;
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
 }
 
@@ -438,19 +441,22 @@ void ae3d::CreateRenderer( int /*samples*/ )
         OutputDebugStringA( "Failed to create debug layer!\n" );
     }
 #endif
-    IDXGIAdapter* adapter = nullptr;
+    //IDXGIAdapter* adapter = nullptr;
     IDXGIFactory4* factory = nullptr;
     HRESULT hr = CreateDXGIFactory1( IID_PPV_ARGS( &factory ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP factory" );
+
+    factory->EnumAdapters( 0, reinterpret_cast<IDXGIAdapter**>(&GfxDeviceGlobal::adapter) );
+
     bool useWarp = false;
 
     if (useWarp)
     {
-        hr = factory->EnumWarpAdapter( IID_PPV_ARGS( &adapter ) );
+        hr = factory->EnumWarpAdapter( IID_PPV_ARGS( &GfxDeviceGlobal::adapter ) );
         AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP adapter" );
     }
 
-    hr = D3D12CreateDevice( adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
+    hr = D3D12CreateDevice( GfxDeviceGlobal::adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
 #ifdef DEBUG
     // Prevents GPU from over/underclocking to get consistent timing information.
@@ -712,6 +718,7 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     GfxDeviceGlobal::drawCalls = 0;
     GfxDeviceGlobal::vaoBinds = 0;
     GfxDeviceGlobal::textureBinds = 0;
+    GfxDeviceGlobal::barrierCalls = 0;
 
     // TODO: Figure out a better place for this.
 
@@ -737,6 +744,20 @@ int ae3d::GfxDevice::GetShaderBinds()
 int ae3d::GfxDevice::GetVertexBufferBinds()
 {
     return GfxDeviceGlobal::vaoBinds;
+}
+
+int ae3d::GfxDevice::GetBarrierCalls()
+{
+    return GfxDeviceGlobal::barrierCalls;
+}
+
+void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
+{
+    DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
+    GfxDeviceGlobal::adapter->QueryVideoMemoryInfo( 0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo );
+
+    outUsedMBytes = (unsigned)videoMemoryInfo.CurrentUsage / (1024 * 1024);
+    outBudgetMBytes = (unsigned)videoMemoryInfo.Budget / (1024 * 1024);
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

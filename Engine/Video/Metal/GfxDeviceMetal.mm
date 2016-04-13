@@ -186,6 +186,17 @@ int ae3d::GfxDevice::GetShaderBinds()
     return GfxDeviceGlobal::shaderBinds;
 }
 
+int ae3d::GfxDevice::GetBarrierCalls()
+{
+    return 0;
+}
+
+void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outGpuUsageMBytes, unsigned& outGpuBudgetMBytes )
+{
+    outGpuUsageMBytes = 0;
+    outGpuBudgetMBytes = 0;
+}
+
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
     GfxDeviceGlobal::clearFlags = (ae3d::GfxDevice::ClearFlags)clearFlags;

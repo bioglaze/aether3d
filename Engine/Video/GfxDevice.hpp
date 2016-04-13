@@ -92,6 +92,8 @@ namespace ae3d
         void ResetFrameStatistics();
         void IncShaderBinds();
         int GetShaderBinds();
+        int GetBarrierCalls();
+        void GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes );
 
         void Present();
         void ReleaseGPUObjects();

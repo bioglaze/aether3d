@@ -140,3 +140,13 @@ int ae3d::System::Statistics::GetShaderBindCount()
 {
     return GfxDevice::GetShaderBinds();
 }
+
+void ae3d::System::Statistics::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
+{
+    GfxDevice::GetGpuMemoryUsage( outUsedMBytes, outBudgetMBytes );
+}
+
+int ae3d::System::Statistics::GetBarrierCallCount()
+{
+    return GfxDevice::GetBarrierCalls();
+}

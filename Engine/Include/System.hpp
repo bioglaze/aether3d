@@ -136,6 +136,8 @@ namespace ae3d
             int GetTextureBindCount();
             int GetShaderBindCount();
             int GetRenderTargetBindCount();
+            int GetBarrierCallCount();
+            void GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes );
         }
     }
 }

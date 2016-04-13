@@ -270,6 +270,34 @@ int ae3d::GfxDevice::GetShaderBinds()
     return GfxDeviceGlobal::shaderBinds;
 }
 
+int ae3d::GfxDevice::GetBarrierCalls()
+{
+    return 0;
+}
+
+void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outGpuUsageMBytes, unsigned& outGpuBudgetMBytes )
+{
+    if (HasExtension( "GL_NVX_gpu_memory_info" ))
+    {
+        const unsigned GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX = 0x9048;
+        const unsigned GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX = 0x9049;
+
+        GLint totalMemoryInKB = 0;
+        glGetIntegerv( GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &totalMemoryInKB );
+
+        GLint curAvailMemoryInKB = 0;
+        glGetIntegerv( GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &curAvailMemoryInKB );
+
+        outGpuUsageMBytes = (unsigned)(totalMemoryInKB - curAvailMemoryInKB) / 1024;
+        outGpuBudgetMBytes = (unsigned)totalMemoryInKB / 1024;
+    }
+    else
+    {
+        outGpuUsageMBytes = 0;
+        outGpuBudgetMBytes = 0;
+    }
+}
+
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
     if (!GfxDeviceGlobal::vaoIds.empty())

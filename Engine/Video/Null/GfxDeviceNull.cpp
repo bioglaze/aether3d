@@ -42,6 +42,17 @@ int ae3d::GfxDevice::GetShaderBinds()
     return 0;
 }
 
+int ae3d::GfxDevice::GetBarrierCalls()
+{
+    return 0;
+}
+
+void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
+{
+    outUsedMBytes = 0;
+    outBudgetMBytes = 0;
+}
+
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
 }
