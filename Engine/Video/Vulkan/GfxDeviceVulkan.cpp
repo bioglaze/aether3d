@@ -38,6 +38,13 @@ struct Ubo
     std::uint8_t* uboData = nullptr;
 };
 
+namespace Stats
+{
+    int drawCalls = 0;
+    int barrierCalls = 0;
+    int fenceCalls = 0;
+}
+
 namespace GfxDeviceGlobal
 {
     struct SwapchainBuffer
@@ -107,16 +114,13 @@ namespace GfxDeviceGlobal
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > frameUbos;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
-    int drawCalls = 0;
-    int barrierCalls = 0;
 }
 
 namespace debug
 {
-    bool enabled = false; // Disable when using RenderDoc.
+    bool enabled = true; // Disable when using RenderDoc.
     const int validationLayerCount = 7;
 
-    // These are named according to LunarG SDK 1.0.8.0.
     const char *validationLayerNames[] =
     {
         "VK_LAYER_GOOGLE_threading",
@@ -125,7 +129,9 @@ namespace debug
         "VK_LAYER_LUNARG_swapchain",
         "VK_LAYER_LUNARG_device_limits",
         "VK_LAYER_LUNARG_image",
-        "VK_LAYER_GOOGLE_unique_objects",
+        "VK_LAYER_GOOGLE_unique_objects"
+
+        //"VK_LAYER_LUNARG_standard_validation"
     };
     PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = nullptr;
     PFN_vkDestroyDebugReportCallbackEXT DestroyDebugReportCallback = nullptr;
@@ -191,27 +197,13 @@ namespace WindowGlobal
     extern int windowHeight;
 }
 
+namespace MathUtil
+{
+    unsigned GetHash( const char* s, unsigned length );
+}
+
 namespace ae3d
 {
-    // FIXME: duplicated in d3d12
-    unsigned GetHash( const char* s, unsigned length )
-    {
-        const unsigned A = 54059;
-        const unsigned B = 76963;
-
-        unsigned h = 31;
-        unsigned i = 0;
-
-        while (i < length)
-        {
-            h = (h * A) ^ (s[ 0 ] * B);
-            ++s;
-            ++i;
-        }
-
-        return h;
-    }
-
     unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
                          ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode )
     {
@@ -223,7 +215,7 @@ namespace ae3d
         hashString += std::to_string( ((unsigned)depthFunc) + 4 );
         hashString += std::to_string( ((unsigned)cullMode) + 8 );
 
-        return GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
+        return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
     }
 
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex )
@@ -631,7 +623,7 @@ namespace ae3d
             0, nullptr,
             1, &imageMemoryBarrier );
 
-        ++GfxDeviceGlobal::barrierCalls;
+        ++Stats::barrierCalls;
     }
 
     void SubmitPrePresentBarrier()
@@ -662,7 +654,7 @@ namespace ae3d
             0, nullptr,
             0, nullptr,
             1, &prePresentBarrier );
-        ++GfxDeviceGlobal::barrierCalls;
+        ++Stats::barrierCalls;
 
         err = vkEndCommandBuffer( GfxDeviceGlobal::prePresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
@@ -704,7 +696,7 @@ namespace ae3d
             0, nullptr,
             0, nullptr,
             1, &postPresentBarrier );
-        ++GfxDeviceGlobal::barrierCalls;
+        ++Stats::barrierCalls;
 
         err = vkEndCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
@@ -1026,7 +1018,7 @@ namespace ae3d
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "Aether3D";
         appInfo.pEngineName = "Aether3D";
-        appInfo.apiVersion = VK_MAKE_VERSION( 1, 0, 2 );
+        appInfo.apiVersion = VK_MAKE_VERSION( 1, 0, 6 );
 
         VkInstanceCreateInfo instanceCreateInfo = {};
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -1120,6 +1112,9 @@ namespace ae3d
         queueCreateInfo.pQueuePriorities = &queuePriorities;
 
         const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
+        //VkPhysicalDeviceFeatures features = {};
+        //features.shaderClipDistance = VK_TRUE;
 
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -1757,8 +1752,9 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
-    GfxDeviceGlobal::drawCalls = 0;
-    GfxDeviceGlobal::barrierCalls = 0;
+    Stats::drawCalls = 0;
+    Stats::barrierCalls = 0;
+    Stats::fenceCalls = 0;
 }
 
 void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
@@ -1767,7 +1763,7 @@ void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
 
 int ae3d::GfxDevice::GetDrawCalls()
 {
-    return GfxDeviceGlobal::drawCalls;
+    return Stats::drawCalls;
 }
 
 int ae3d::GfxDevice::GetTextureBinds()
@@ -1798,7 +1794,12 @@ void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outB
 
 int ae3d::GfxDevice::GetBarrierCalls()
 {
-    return GfxDeviceGlobal::barrierCalls;
+    return Stats::barrierCalls;
+}
+
+int ae3d::GfxDevice::GetFenceCalls()
+{
+    return Stats::fenceCalls;
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
@@ -1807,7 +1808,7 @@ void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
 
 void ae3d::GfxDevice::IncDrawCalls()
 {
-    ++GfxDeviceGlobal::drawCalls;
+    ++Stats::drawCalls;
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned /*clearFlags*/ )

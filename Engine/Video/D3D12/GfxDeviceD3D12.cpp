@@ -34,16 +34,22 @@ namespace MathUtil
     unsigned GetHash( const char* s, unsigned length );
 }
 
-namespace GfxDeviceGlobal
+namespace Stats
 {
-    const unsigned BufferCount = 2;
     int drawCalls = 0;
     int vaoBinds = 0;
     int textureBinds = 0;
     int shaderBinds = 0;
     int barrierCalls = 0;
+    int fenceCalls = 0;
+}
+
+namespace GfxDeviceGlobal
+{
+    const unsigned BufferCount = 2;
     int backBufferWidth = 640;
     int backBufferHeight = 400;
+
     ID3D12Device* device = nullptr;
     IDXGISwapChain3* swapChain = nullptr;
     IDXGIAdapter3* adapter = nullptr;
@@ -92,6 +98,7 @@ void WaitForPreviousFrame()
     HRESULT hr = GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, fenceValue );
     AE3D_CHECK_D3D( hr, "command queue signal" );
     ++GfxDeviceGlobal::fenceValue;
+    ++Stats::fenceCalls;
 
     if (GfxDeviceGlobal::fence->GetCompletedValue() < fenceValue)
     {
@@ -131,7 +138,7 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
 
     gpuResource.usageState = newState;
 
-    ++GfxDeviceGlobal::barrierCalls;
+    ++Stats::barrierCalls;
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
 }
 
@@ -660,13 +667,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     GfxDeviceGlobal::device->CreateShaderResourceView( texResource, &srvDesc, handle );
 
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
-    ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
-    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
-    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
-
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
     vertexBufferView.StrideInBytes = vertexBuffer.GetStride();
@@ -677,6 +677,12 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     indexBufferView.SizeInBytes = vertexBuffer.GetIBSize();
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 
+    ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
+    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
     GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
     GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( &indexBufferView );
@@ -700,25 +706,26 @@ int ae3d::GfxDevice::GetRenderTargetBinds()
 
 void ae3d::GfxDevice::IncDrawCalls()
 {
-    ++GfxDeviceGlobal::drawCalls;
+    ++Stats::drawCalls;
 }
 
 void ae3d::GfxDevice::IncTextureBinds()
 {
-    ++GfxDeviceGlobal::textureBinds;
+    ++Stats::textureBinds;
 }
 
 void ae3d::GfxDevice::IncVertexBufferBinds()
 {
-    ++GfxDeviceGlobal::vaoBinds;
+    ++Stats::vaoBinds;
 }
 
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
-    GfxDeviceGlobal::drawCalls = 0;
-    GfxDeviceGlobal::vaoBinds = 0;
-    GfxDeviceGlobal::textureBinds = 0;
-    GfxDeviceGlobal::barrierCalls = 0;
+    Stats::drawCalls = 0;
+    Stats::vaoBinds = 0;
+    Stats::textureBinds = 0;
+    Stats::barrierCalls = 0;
+    Stats::fenceCalls = 0;
 
     // TODO: Figure out a better place for this.
 
@@ -728,27 +735,32 @@ void ae3d::GfxDevice::ResetFrameStatistics()
 
 int ae3d::GfxDevice::GetDrawCalls()
 {
-    return GfxDeviceGlobal::drawCalls;
+    return Stats::drawCalls;
 }
 
 int ae3d::GfxDevice::GetTextureBinds()
 {
-    return GfxDeviceGlobal::textureBinds;
+    return Stats::textureBinds;
 }
 
 int ae3d::GfxDevice::GetShaderBinds()
 {
-    return GfxDeviceGlobal::shaderBinds;
+    return Stats::shaderBinds;
 }
 
 int ae3d::GfxDevice::GetVertexBufferBinds()
 {
-    return GfxDeviceGlobal::vaoBinds;
+    return Stats::vaoBinds;
 }
 
 int ae3d::GfxDevice::GetBarrierCalls()
 {
-    return GfxDeviceGlobal::barrierCalls;
+    return Stats::barrierCalls;
+}
+
+int ae3d::GfxDevice::GetFenceCalls()
+{
+    return Stats::fenceCalls;
 }
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )

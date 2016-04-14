@@ -93,6 +93,7 @@ namespace ae3d
         void IncShaderBinds();
         int GetShaderBinds();
         int GetBarrierCalls();
+        int GetFenceCalls();
         void GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes );
 
         void Present();

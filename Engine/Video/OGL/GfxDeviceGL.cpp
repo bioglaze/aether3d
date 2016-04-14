@@ -275,6 +275,11 @@ int ae3d::GfxDevice::GetBarrierCalls()
     return 0;
 }
 
+int ae3d::GfxDevice::GetFenceCalls()
+{
+    return 0;
+}
+
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outGpuUsageMBytes, unsigned& outGpuBudgetMBytes )
 {
     if (HasExtension( "GL_NVX_gpu_memory_info" ))

@@ -150,3 +150,8 @@ int ae3d::System::Statistics::GetBarrierCallCount()
 {
     return GfxDevice::GetBarrierCalls();
 }
+
+int ae3d::System::Statistics::GetFenceCallCount()
+{
+    return GfxDevice::GetFenceCalls();
+}
