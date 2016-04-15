@@ -321,7 +321,7 @@ void Mesh::SolveVertexTangents()
         // Handedness. TBN must form a right-handed coordinate system,
         // i.e. cross(n,t) must have the same orientation as b.
         const ae3d::Vec3 cp = ae3d::Vec3::Cross( normal, ae3d::Vec3( tangent.x, tangent.y, tangent.z ) );
-        tangent.w = ae3d::Vec3::Dot( cp, vbitangents[v] ) >= 0 ? 1 : -1;
+        tangent.w = ae3d::Vec3::Dot( cp, vbitangents[v] ) >= 0 ? 1.0f : -1.0f;
     }
 }
 

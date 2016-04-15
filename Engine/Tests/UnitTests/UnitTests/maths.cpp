@@ -1,8 +1,10 @@
 #include <cmath>
 #include "CppUnitTest.h"
 #include "FileSystem.hpp"
+#include "GameObject.hpp"
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
+#include "Scene.hpp"
 #include "Vec3.hpp"
 
 using namespace ae3d;
@@ -293,13 +295,25 @@ namespace UnitTests
         TEST_METHOD( FileSystemNullPath )
         {
             auto contents = FileSystem::FileContents( nullptr );
-            Assert::IsTrue( !contents.isLoaded );
+            Assert::IsFalse( contents.isLoaded );
         }
     
         TEST_METHOD( FileSystemNotFoundPath )
         {
             auto contents = FileSystem::FileContents( "can't find me" );
-            Assert::IsTrue( !contents.isLoaded );
+            Assert::IsFalse( contents.isLoaded );
+        }
+
+        TEST_METHOD( SceneSerialization )
+        {
+            Scene scene;
+            GameObject go;
+            go.SetName( "my game object" );
+            scene.Add( &go );
+
+            auto serialized = scene.GetSerialized();
+
+            Assert::IsTrue( serialized.find( "my game object" ) != std::string::npos );
         }
     };
 }
