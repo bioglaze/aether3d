@@ -109,6 +109,7 @@
     <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\ThirdParty\stb_image.c" />
     <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
+    <ClCompile Include="..\Video\D3D12\ComputeShaderD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\DescriptorHeapManager.cpp" />
     <ClCompile Include="..\Video\D3D12\GfxDeviceD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\RendererD3D12.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="..\Include\AudioClip.hpp" />
     <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\Include\ComputeShader.hpp" />
     <ClInclude Include="..\Include\DirectionalLightComponent.hpp" />
     <ClInclude Include="..\Include\FileSystem.hpp" />
     <ClInclude Include="..\Include\Font.hpp" />

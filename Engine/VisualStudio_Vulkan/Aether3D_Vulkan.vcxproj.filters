@@ -126,6 +126,9 @@
     <ClCompile Include="..\Video\OculusRiftSupport.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\Vulkan\ComputeShaderVulkan.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\AudioClip.hpp">
@@ -229,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="..\Video\Renderer.hpp">
       <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ComputeShader.hpp">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

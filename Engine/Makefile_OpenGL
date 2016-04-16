@@ -55,6 +55,7 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/GfxDeviceGL.cpp -o $(OUTPUT_DIR)/GfxDeviceGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/RenderTextureGL.cpp -o $(OUTPUT_DIR)/RenderTextureGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/ComputeShaderGL.cpp -o $(OUTPUT_DIR)/ComputeShaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/Texture2D_GL.cpp -o $(OUTPUT_DIR)/Texture2D_GL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/TextureCubeGL.cpp -o $(OUTPUT_DIR)/TextureCube.o

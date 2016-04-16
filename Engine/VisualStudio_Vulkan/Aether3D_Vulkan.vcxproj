@@ -105,6 +105,7 @@
     <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />
     <ClCompile Include="..\Video\TextureCommon.cpp" />
+    <ClCompile Include="..\Video\Vulkan\ComputeShaderVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\GfxDeviceVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\RendererVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\RenderTextureVulkan.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="..\Include\AudioClip.hpp" />
     <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />
+    <ClInclude Include="..\Include\ComputeShader.hpp" />
     <ClInclude Include="..\Include\DirectionalLightComponent.hpp" />
     <ClInclude Include="..\Include\FileSystem.hpp" />
     <ClInclude Include="..\Include\Font.hpp" />

@@ -83,10 +83,13 @@ namespace GfxDeviceGlobal
     VkDevice device = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkClearColorValue clearColor;
+    
     std::vector< VkCommandBuffer > drawCmdBuffers;
     VkCommandBuffer setupCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer prePresentCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer postPresentCmdBuffer = VK_NULL_HANDLE;
+    VkCommandBuffer computeCmdBuffer = VK_NULL_HANDLE;
+
     VkSwapchainKHR swapChain = VK_NULL_HANDLE;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     VkRenderPass renderPass = VK_NULL_HANDLE;
@@ -96,6 +99,7 @@ namespace GfxDeviceGlobal
     VkColorSpaceKHR colorSpace;
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
+    VkQueue computeQueue = VK_NULL_HANDLE;
     std::vector< VkImage > swapchainImages;
     std::vector< SwapchainBuffer > swapchainBuffers;
     std::vector< VkFramebuffer > frameBuffers;
@@ -531,6 +535,15 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::prePresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+
+        VkCommandBufferAllocateInfo computeBufAllocateInfo = {};
+        computeBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        computeBufAllocateInfo.commandPool = GfxDeviceGlobal::cmdPool;
+        computeBufAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        computeBufAllocateInfo.commandBufferCount = 1;
+
+        err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &computeBufAllocateInfo, &GfxDeviceGlobal::computeCmdBuffer );
+        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
     }
 
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
@@ -783,13 +796,20 @@ namespace ae3d
                 &supportsPresent[ i ] );
         }
 
-        // Search for a graphics and a present queue in the array of queue
-        // families, try to find one that supports both
         std::uint32_t graphicsQueueNodeIndex = UINT32_MAX;
         std::uint32_t presentQueueNodeIndex = UINT32_MAX;
+        std::uint32_t computeQueueNodeIndex = UINT32_MAX;
 
         for (std::uint32_t i = 0; i < queueCount; ++i)
         {
+            if ((queueProps[ i ].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0)
+            {
+                if (computeQueueNodeIndex == UINT32_MAX)
+                {
+                    computeQueueNodeIndex = i;
+                }
+            }
+            
             if ((queueProps[ i ].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0)
             {
                 if (graphicsQueueNodeIndex == UINT32_MAX)
@@ -827,8 +847,18 @@ namespace ae3d
 
         if (graphicsQueueNodeIndex != presentQueueNodeIndex)
         {
-            System::Assert( false, "graphics and present queue have the same index" );
+            System::Assert( false, "graphics and present queues must have the same index" );
         }
+
+        if (computeQueueNodeIndex == UINT32_MAX)
+        {
+            System::Assert( false, "compute queue not found" );
+        }
+
+        VkDeviceQueueCreateInfo queueCreateInfo = {};
+        queueCreateInfo.queueFamilyIndex = computeQueueNodeIndex;
+        queueCreateInfo.queueCount = 1;
+        vkGetDeviceQueue( GfxDeviceGlobal::device, computeQueueNodeIndex, 0, &GfxDeviceGlobal::computeQueue );
 
         GfxDeviceGlobal::queueNodeIndex = graphicsQueueNodeIndex;
 

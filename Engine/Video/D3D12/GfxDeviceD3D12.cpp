@@ -21,6 +21,7 @@
 
 void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
+void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 
 namespace WindowGlobal
 {
@@ -776,6 +777,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 {
     DestroyVertexBuffers();
     DestroyShaders();
+    DestroyComputeShaders();
     Texture2D::DestroyTextures();
     TextureCube::DestroyTextures();
     RenderTexture::DestroyTextures();
@@ -791,6 +793,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::infoQueue );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 0 ] );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 1 ] );
+    GfxDeviceGlobal::swapChain->SetFullscreenState( FALSE, nullptr );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
 
