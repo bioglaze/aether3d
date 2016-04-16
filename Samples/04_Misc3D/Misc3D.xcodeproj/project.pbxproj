@@ -62,6 +62,7 @@
 		AB7112E51B43098400C4EE78 /* TransformComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransformComponent.hpp; path = ../../Engine/Include/TransformComponent.hpp; sourceTree = "<group>"; };
 		AB7112E61B43098400C4EE78 /* Vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Vec3.hpp; path = ../../Engine/Include/Vec3.hpp; sourceTree = "<group>"; };
 		AB7112E71B43098400C4EE78 /* Window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Window.hpp; path = ../../Engine/Include/Window.hpp; sourceTree = "<group>"; };
+		AB921DB61CC21B91008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../Engine/Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		ABB79F9B1BA9B7F9002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Engine/Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
 		ABD910F71B78F97A005EBB74 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../../Engine/Include/VR.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -117,10 +118,10 @@
 		AB7112D01B43095C00C4EE78 /* Include */ = {
 			isa = PBXGroup;
 			children = (
-				AB670F241C00A8B60041E6B0 /* SpotLightComponent.hpp */,
 				AB7112D11B43098400C4EE78 /* AudioClip.hpp */,
 				AB7112D21B43098400C4EE78 /* AudioSourceComponent.hpp */,
 				AB7112D31B43098400C4EE78 /* CameraComponent.hpp */,
+				AB921DB61CC21B91008F5750 /* ComputeShader.hpp */,
 				ABB79F9B1BA9B7F9002A1B5F /* DirectionalLightComponent.hpp */,
 				AB7112D41B43098400C4EE78 /* FileSystem.hpp */,
 				AB7112D51B43098400C4EE78 /* Font.hpp */,
@@ -135,6 +136,7 @@
 				AB7112DD1B43098400C4EE78 /* Scene.hpp */,
 				AB7112DE1B43098400C4EE78 /* Shader.hpp */,
 				AB7112DF1B43098400C4EE78 /* SpriteRendererComponent.hpp */,
+				AB670F241C00A8B60041E6B0 /* SpotLightComponent.hpp */,
 				AB7112E01B43098400C4EE78 /* System.hpp */,
 				AB7112E11B43098400C4EE78 /* TextRendererComponent.hpp */,
 				AB7112E21B43098400C4EE78 /* Texture2D.hpp */,

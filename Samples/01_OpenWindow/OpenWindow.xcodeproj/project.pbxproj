@@ -29,6 +29,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AB921DB71CC21BDC008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../Engine/Include/ComputeShader.hpp; sourceTree = "<group>"; };
+		AB921DB81CC21BDC008F5750 /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Engine/Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
+		AB921DB91CC21BDC008F5750 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../Engine/Include/Material.hpp; sourceTree = "<group>"; };
+		AB921DBA1CC21BDC008F5750 /* Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../../Engine/Include/Mesh.hpp; sourceTree = "<group>"; };
+		AB921DBB1CC21BDC008F5750 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../../Engine/Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
+		AB921DBC1CC21BDC008F5750 /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Engine/Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
+		AB921DBD1CC21BDC008F5750 /* TextureCube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../Engine/Include/TextureCube.hpp; sourceTree = "<group>"; };
+		AB921DBE1CC21BDC008F5750 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../../Engine/Include/VR.hpp; sourceTree = "<group>"; };
 		ABAEEDB01B103EF10008E252 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		ABC1E00B1AF394BD002C8AB3 /* OpenWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenWindow.cpp; sourceTree = SOURCE_ROOT; };
 		ABC1E00D1AF39574002C8AB3 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
@@ -121,22 +129,30 @@
 				ABF341D11B1A27280017797C /* AudioClip.hpp */,
 				ABF341D21B1A27280017797C /* AudioSourceComponent.hpp */,
 				ABF341D31B1A27280017797C /* CameraComponent.hpp */,
+				AB921DB71CC21BDC008F5750 /* ComputeShader.hpp */,
+				AB921DB81CC21BDC008F5750 /* DirectionalLightComponent.hpp */,
 				ABF341D41B1A27280017797C /* FileSystem.hpp */,
 				ABF341D51B1A27280017797C /* Font.hpp */,
 				ABF341D61B1A27280017797C /* GameObject.hpp */,
 				ABF341D71B1A27280017797C /* Macros.hpp */,
 				ABF341D81B1A27280017797C /* Matrix.hpp */,
+				AB921DB91CC21BDC008F5750 /* Material.hpp */,
+				AB921DBA1CC21BDC008F5750 /* Mesh.hpp */,
+				AB921DBB1CC21BDC008F5750 /* MeshRendererComponent.hpp */,
 				ABF341D91B1A27280017797C /* Quaternion.hpp */,
 				ABF341DA1B1A27280017797C /* RenderTexture.hpp */,
 				ABF341DB1B1A27280017797C /* Scene.hpp */,
 				ABF341DC1B1A27280017797C /* Shader.hpp */,
 				ABF341DD1B1A27280017797C /* SpriteRendererComponent.hpp */,
+				AB921DBC1CC21BDC008F5750 /* SpotLightComponent.hpp */,
 				ABF341DE1B1A27280017797C /* System.hpp */,
 				ABF341DF1B1A27280017797C /* TextRendererComponent.hpp */,
 				ABF341E01B1A27280017797C /* Texture2D.hpp */,
+				AB921DBD1CC21BDC008F5750 /* TextureCube.hpp */,
 				ABF341E11B1A27280017797C /* TextureBase.hpp */,
 				ABF341E21B1A27280017797C /* TransformComponent.hpp */,
 				ABF341E31B1A27280017797C /* Vec3.hpp */,
+				AB921DBE1CC21BDC008F5750 /* VR.hpp */,
 				ABF341E41B1A27280017797C /* Window.hpp */,
 			);
 			name = Include;

@@ -44,6 +44,8 @@
 		AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */; };
 		AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B061ABB4FDE005BA86D /* GameObject.cpp */; };
 		AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */; };
+		AB921DAB1CC21A8E008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DAA1CC21A8E008F5750 /* ComputeShader.hpp */; };
+		AB921DAD1CC21AA4008F5750 /* ComputeShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB921DAC1CC21AA4008F5750 /* ComputeShaderGL.cpp */; };
 		AB922E4C1B4039A7000F3488 /* Mesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E4B1B4039A7000F3488 /* Mesh.hpp */; };
 		AB922E4E1B4039DB000F3488 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E4D1B4039DB000F3488 /* Mesh.cpp */; };
 		AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */; };
@@ -112,6 +114,8 @@
 		AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CameraComponent.cpp; path = ../Components/CameraComponent.cpp; sourceTree = "<group>"; };
 		AB889B061ABB4FDE005BA86D /* GameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameObject.cpp; path = ../Components/GameObject.cpp; sourceTree = "<group>"; };
 		AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpriteRendererComponent.cpp; path = ../Components/SpriteRendererComponent.cpp; sourceTree = "<group>"; };
+		AB921DAA1CC21A8E008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../Include/ComputeShader.hpp; sourceTree = "<group>"; };
+		AB921DAC1CC21AA4008F5750 /* ComputeShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ComputeShaderGL.cpp; path = ../Video/OGL/ComputeShaderGL.cpp; sourceTree = "<group>"; };
 		AB922E4B1B4039A7000F3488 /* Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../Include/Mesh.hpp; sourceTree = "<group>"; };
 		AB922E4D1B4039DB000F3488 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mesh.cpp; path = ../Core/Mesh.cpp; sourceTree = "<group>"; };
 		AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeshRendererComponent.cpp; path = ../Components/MeshRendererComponent.cpp; sourceTree = "<group>"; };
@@ -181,6 +185,7 @@
 		AB3A77DC1AB4486A0081864C /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				AB921DAC1CC21AA4008F5750 /* ComputeShaderGL.cpp */,
 				AB4CD6991C80C5A900C21006 /* DDSLoaderGL.cpp */,
 				ABC1A6821AC4683400C4F401 /* DDSLoader.hpp */,
 				AB4CD69A1C80C5A900C21006 /* GfxDeviceGL.cpp */,
@@ -220,6 +225,7 @@
 				AB7EF04B1AE04899008BB657 /* AudioSourceComponent.hpp */,
 				AB07F20F1AE15CC400669331 /* AudioClip.hpp */,
 				AB889AF21ABB4C5B005BA86D /* CameraComponent.hpp */,
+				AB921DAA1CC21A8E008F5750 /* ComputeShader.hpp */,
 				ABB79F9E1BA9B828002A1B5F /* DirectionalLightComponent.hpp */,
 				442A12AF1B0CBD8D00D21520 /* FileSystem.hpp */,
 				ABCF19C11AE2CF7200822E80 /* Font.hpp */,
@@ -310,6 +316,7 @@
 				AB889AEB1ABB4C3B005BA86D /* GfxDevice.hpp in Headers */,
 				AB78D91F1B19E5A1009928E1 /* TextureBase.hpp in Headers */,
 				AB922E4C1B4039A7000F3488 /* Mesh.hpp in Headers */,
+				AB921DAB1CC21A8E008F5750 /* ComputeShader.hpp in Headers */,
 				ABCE0CA61AC06A4000F9EC53 /* glxw.h in Headers */,
 				AB889AFA1ABB4C5B005BA86D /* GameObject.hpp in Headers */,
 				AB889AFC1ABB4C5B005BA86D /* Scene.hpp in Headers */,
@@ -374,6 +381,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABA6B0CD1ABF25CC00D84140 /* Matrix.cpp in Sources */,
+				AB921DAD1CC21AA4008F5750 /* ComputeShaderGL.cpp in Sources */,
 				AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */,
 				ABC1A6871AC4693F00C4F401 /* TransformComponent.cpp in Sources */,
 				AB4CD6A41C80C5A900C21006 /* RendererGL.cpp in Sources */,

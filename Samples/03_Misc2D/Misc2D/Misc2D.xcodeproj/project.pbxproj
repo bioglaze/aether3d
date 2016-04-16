@@ -37,6 +37,11 @@
 		AB7E96AB1B19AED1004A3289 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		AB7E96AD1B19AEE1004A3289 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AB7E96AF1B19AF28004A3289 /* libaether3d_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libaether3d_osx.a; path = ../../../../aether3d_build/libaether3d_osx.a; sourceTree = "<group>"; };
+		AB921DBF1CC21C2F008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../../Engine/Include/ComputeShader.hpp; sourceTree = "<group>"; };
+		AB921DC01CC21C2F008F5750 /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../../Engine/Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
+		AB921DC11CC21C2F008F5750 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../../Engine/Include/Material.hpp; sourceTree = "<group>"; };
+		AB921DC21CC21C2F008F5750 /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../../Engine/Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
+		AB921DC31CC21C2F008F5750 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../../../Engine/Include/VR.hpp; sourceTree = "<group>"; };
 		AB922E491B403523000F3488 /* TextureCube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../../Engine/Include/TextureCube.hpp; sourceTree = "<group>"; };
 		AB922E4A1B4036C9000F3488 /* Mesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../../../Engine/Include/Mesh.hpp; sourceTree = "<group>"; };
 		AB922E4F1B404B71000F3488 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../../../Engine/Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
@@ -116,9 +121,12 @@
 				AB9AB6EE1B19E07300C9F006 /* AudioClip.hpp */,
 				AB9AB6EF1B19E07300C9F006 /* AudioSourceComponent.hpp */,
 				AB9AB6F01B19E07300C9F006 /* CameraComponent.hpp */,
+				AB921DBF1CC21C2F008F5750 /* ComputeShader.hpp */,
+				AB921DC01CC21C2F008F5750 /* DirectionalLightComponent.hpp */,
 				AB9AB6F11B19E07300C9F006 /* FileSystem.hpp */,
 				AB9AB6F21B19E07300C9F006 /* Font.hpp */,
 				AB9AB6F31B19E07300C9F006 /* GameObject.hpp */,
+				AB921DC11CC21C2F008F5750 /* Material.hpp */,
 				AB9AB6F41B19E07300C9F006 /* Macros.hpp */,
 				AB9AB6F51B19E07300C9F006 /* Matrix.hpp */,
 				AB922E4A1B4036C9000F3488 /* Mesh.hpp */,
@@ -128,12 +136,14 @@
 				AB9AB6F71B19E07300C9F006 /* Scene.hpp */,
 				AB9AB6F81B19E07300C9F006 /* Shader.hpp */,
 				AB9AB6F91B19E07300C9F006 /* SpriteRendererComponent.hpp */,
+				AB921DC21CC21C2F008F5750 /* SpotLightComponent.hpp */,
 				AB9AB6FA1B19E07300C9F006 /* System.hpp */,
 				AB9AB6FB1B19E07300C9F006 /* TextRendererComponent.hpp */,
 				AB78D91D1B19E405009928E1 /* TextureBase.hpp */,
 				AB922E491B403523000F3488 /* TextureCube.hpp */,
 				AB9AB6FC1B19E07300C9F006 /* Texture2D.hpp */,
 				AB9AB6FD1B19E07300C9F006 /* TransformComponent.hpp */,
+				AB921DC31CC21C2F008F5750 /* VR.hpp */,
 				AB9AB6FE1B19E07300C9F006 /* Vec3.hpp */,
 				AB9AB6FF1B19E07300C9F006 /* Window.hpp */,
 			);

@@ -64,6 +64,8 @@
 		AB3E80111C00B5E80077D8BD /* SpotLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */; };
 		AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB521D111BC045BC004CDF06 /* TextureCube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB921DB31CC21B34008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB21CC21B34008F5750 /* ComputeShader.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB921DB51CC21B4B008F5750 /* ComputeShaderMetal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB921DB41CC21B4B008F5750 /* ComputeShaderMetal.cpp */; };
 		AB922E561B404FFB000F3488 /* Mesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E541B404FFB000F3488 /* Mesh.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB922E571B404FFB000F3488 /* MeshRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB922E591B405020000F3488 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB922E581B405020000F3488 /* Mesh.cpp */; };
@@ -135,6 +137,8 @@
 		AB190E331B57DE85005ECE49 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../Include/Material.hpp; sourceTree = "<group>"; };
 		AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpotLightComponent.cpp; path = ../../Components/SpotLightComponent.cpp; sourceTree = "<group>"; };
 		AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
+		AB921DB21CC21B34008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../Include/ComputeShader.hpp; sourceTree = "<group>"; };
+		AB921DB41CC21B4B008F5750 /* ComputeShaderMetal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ComputeShaderMetal.cpp; path = ../../Video/Metal/ComputeShaderMetal.cpp; sourceTree = "<group>"; };
 		AB922E541B404FFB000F3488 /* Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../../Include/Mesh.hpp; sourceTree = "<group>"; };
 		AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MeshRendererComponent.hpp; path = ../../Include/MeshRendererComponent.hpp; sourceTree = "<group>"; };
 		AB922E581B405020000F3488 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Mesh.cpp; path = ../../Core/Mesh.cpp; sourceTree = "<group>"; };
@@ -204,6 +208,7 @@
 				4449E8411B14B423009A869C /* AudioClip.hpp */,
 				4449E8421B14B423009A869C /* AudioSourceComponent.hpp */,
 				4449E8431B14B423009A869C /* CameraComponent.hpp */,
+				AB921DB21CC21B34008F5750 /* ComputeShader.hpp */,
 				ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */,
 				4449E8441B14B423009A869C /* FileSystem.hpp */,
 				4449E8451B14B423009A869C /* Font.hpp */,
@@ -280,6 +285,7 @@
 		4449E88C1B14B494009A869C /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				AB921DB41CC21B4B008F5750 /* ComputeShaderMetal.cpp */,
 				4449E88D1B14B4B5009A869C /* GfxDevice.hpp */,
 				4449E88E1B14B4B5009A869C /* GfxDeviceMetal.mm */,
 				AB190E311B57DE73005ECE49 /* Material.cpp */,
@@ -305,6 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4449E8531B14B423009A869C /* AudioSourceComponent.hpp in Headers */,
+				AB921DB31CC21B34008F5750 /* ComputeShader.hpp in Headers */,
 				4449E8551B14B423009A869C /* FileSystem.hpp in Headers */,
 				AB922E571B404FFB000F3488 /* MeshRendererComponent.hpp in Headers */,
 				ABB79F9A1BA9B7BC002A1B5F /* DirectionalLightComponent.hpp in Headers */,
@@ -422,6 +429,7 @@
 				4449E8701B14B44E009A869C /* AudioSystemOpenAL.cpp in Sources */,
 				4449E8971B14B4B5009A869C /* RendererMetal.mm in Sources */,
 				4449E8821B14B46C009A869C /* SpriteRendererComponent.cpp in Sources */,
+				AB921DB51CC21B4B008F5750 /* ComputeShaderMetal.cpp in Sources */,
 				4449E8711B14B44E009A869C /* FileSystem.cpp in Sources */,
 				4449E8721B14B44E009A869C /* FileWatcher.cpp in Sources */,
 				4449E8801B14B46C009A869C /* CameraComponent.cpp in Sources */,
