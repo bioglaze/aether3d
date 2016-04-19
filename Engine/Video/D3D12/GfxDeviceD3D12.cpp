@@ -212,22 +212,22 @@ void CreateRootSignature()
     GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
 }
 
-unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
+unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
                      ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat )
 {
     std::string hashString;
-    hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
+    hashString += std::to_string( (unsigned)vertexFormat );
     hashString += std::to_string( (ptrdiff_t)&shader.blobShaderVertex );
     hashString += std::to_string( (ptrdiff_t)&shader.blobShaderPixel );
     hashString += std::to_string( (unsigned)blendMode );
-    hashString += std::to_string( ((unsigned)depthFunc) + 4 );
-    hashString += std::to_string( ((unsigned)cullMode) + 8 );
-    hashString += std::to_string( ((unsigned)rtvFormat) + 12 );
+    hashString += std::to_string( ((unsigned)depthFunc) );
+    hashString += std::to_string( ((unsigned)cullMode) );
+    hashString += std::to_string( ((unsigned)rtvFormat) );
 
     return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
 }
 
-void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
+void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
                 ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat )
 {
     D3D12_RASTERIZER_DESC descRaster = {};
@@ -334,24 +334,24 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
 
     UINT numElements = 0;
     D3D12_INPUT_ELEMENT_DESC* layout = nullptr;
-    if (vertexBuffer.GetVertexFormat() == ae3d::VertexBuffer::VertexFormat::PTC)
+    if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTC)
     {
         layout = layoutPTC;
         numElements = 3;
     }
-    else if (vertexBuffer.GetVertexFormat() == ae3d::VertexBuffer::VertexFormat::PTN)
+    else if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTN)
     {
         layout = layoutPTN;
         numElements = 3;
     }
-    else if (vertexBuffer.GetVertexFormat() == ae3d::VertexBuffer::VertexFormat::PTNTC)
+    else if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTNTC)
     {
         layout = layoutPTNTC;
         numElements = 5;
     }
     else
     {
-        ae3d::System::Assert( false, "unhandled vertex layout" );
+        ae3d::System::Assert( false, "unhandled vertex format" );
         layout = layoutPTC;
         numElements = 3;
     }
@@ -399,7 +399,7 @@ void CreatePSO( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::Gf
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO" );
 
-    const unsigned hash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, rtvFormat );
+    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, rtvFormat );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -599,11 +599,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
                             CullMode cullMode )
 {   
     const DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, rtvFormat );
+    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, rtvFormat );
+        CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat );
     }
     
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
