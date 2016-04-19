@@ -1,6 +1,9 @@
 #ifndef RENDER_TEXTURE_H
 #define RENDER_TEXTURE_H
 
+#if RENDERER_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 #include "TextureBase.hpp"
 #include "Vec3.hpp"
 
@@ -40,11 +43,33 @@ namespace ae3d
         /// \return FBO.
         unsigned GetFBO() const { return fboId; }
 #endif
+#if RENDERER_VULKAN
+        VkFramebuffer GetFrameBuffer() { return frameBuffer; }
+        VkImageView GetColorView() { return color.view; }
+#endif
 
   private:
+
 #if RENDERER_OPENGL
         unsigned rboId = 0;
         unsigned fboId = 0;
+#endif
+#if RENDERER_VULKAN
+        VkFramebuffer frameBuffer;
+
+        struct FrameBufferAttachment
+        {
+            VkImage image;
+            VkDeviceMemory mem;
+            VkImageView view;
+        };
+
+        FrameBufferAttachment color;
+        FrameBufferAttachment depth;
+        VkImage image;
+        VkImageLayout imageLayout;
+        VkDeviceMemory deviceMemory;
+        VkImageView view;
 #endif
         bool isCube = false;
     };

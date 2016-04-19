@@ -5,6 +5,7 @@
 #include <string>
 #include <vulkan/vulkan.h>
 #include "Macros.hpp"
+#include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
@@ -112,8 +113,10 @@ namespace GfxDeviceGlobal
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
     std::uint32_t queueNodeIndex = UINT32_MAX;
     std::uint32_t currentBuffer = 0;
-    ae3d::Texture2D* texture2d0 = nullptr;
-    ae3d::TextureCube* textureCube0 = nullptr;
+    ae3d::RenderTexture* renderTexture0 = nullptr;
+    VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
+    VkImageView view0 = VK_NULL_HANDLE;
+    VkSampler sampler0 = VK_NULL_HANDLE;
     std::vector< VkDescriptorSet > pendingFreeDescriptorSets;
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > frameUbos;
@@ -1729,17 +1732,21 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
         clearValues[ 1 ].depthStencil = { 1.0f, 0 };
     }
 
+    const uint32_t width = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetWidth() : WindowGlobal::windowWidth;
+    const uint32_t height = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetHeight() : WindowGlobal::windowHeight;
+
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBeginInfo.pNext = nullptr;
     renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderPass;
     renderPassBeginInfo.renderArea.offset.x = 0;
     renderPassBeginInfo.renderArea.offset.y = 0;
-    renderPassBeginInfo.renderArea.extent.width = WindowGlobal::windowWidth;
-    renderPassBeginInfo.renderArea.extent.height = WindowGlobal::windowHeight;
+    renderPassBeginInfo.renderArea.extent.width = width;
+    renderPassBeginInfo.renderArea.extent.height = height;
     renderPassBeginInfo.clearValueCount = (std::uint32_t)clearValues.size();
     renderPassBeginInfo.pClearValues = clearValues.data();
-    renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
+    renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0 != VK_NULL_HANDLE ? GfxDeviceGlobal::frameBuffer0 : 
+                                      GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
@@ -1747,15 +1754,15 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     vkCmdBeginRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
 
     VkViewport viewport = {};
-    viewport.height = (float)WindowGlobal::windowHeight;
-    viewport.width = (float)WindowGlobal::windowWidth;
+    viewport.height = (float)height;
+    viewport.width = (float)width;
     viewport.minDepth = (float) 0.0f;
     viewport.maxDepth = (float) 1.0f;
     vkCmdSetViewport( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0, 1, &viewport );
 
     VkRect2D scissor = {};
-    scissor.extent.width = WindowGlobal::windowWidth;
-    scissor.extent.height = WindowGlobal::windowHeight;
+    scissor.extent.width = width;
+    scissor.extent.height = height;
     scissor.offset.x = 0;
     scissor.offset.y = 0;
     vkCmdSetScissor( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0, 1, &scissor );
@@ -1853,6 +1860,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::drawCmdBuffers.size(), "invalid draw buffer index" );
     System::Assert( GfxDeviceGlobal::pipelineLayout != VK_NULL_HANDLE, "invalid pipelineLayout" );
 
+    if (GfxDeviceGlobal::view0 == VK_NULL_HANDLE || GfxDeviceGlobal::sampler0 == VK_NULL_HANDLE)
+    {
+        return;
+    }
+
     const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
@@ -1860,23 +1872,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, psoHash );
     }
 
-    VkImageView view = VK_NULL_HANDLE;
-    VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
-    VkSampler sampler = VK_NULL_HANDLE;
-
-    // TODO: polymorphism
-    if (GfxDeviceGlobal::texture2d0)
-    {
-        view = GfxDeviceGlobal::texture2d0->GetView();
-        sampler = GetSampler( GfxDeviceGlobal::texture2d0->GetMipmaps(), GfxDeviceGlobal::texture2d0->GetWrap(), GfxDeviceGlobal::texture2d0->GetFilter() );
-    }
-    else if (GfxDeviceGlobal::textureCube0)
-    {
-        view = GfxDeviceGlobal::textureCube0->GetView();
-        sampler = GetSampler( GfxDeviceGlobal::textureCube0->GetMipmaps(), GfxDeviceGlobal::textureCube0->GetWrap(), GfxDeviceGlobal::textureCube0->GetFilter() );
-    }
-
-    descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, view, sampler );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
 
     GfxDeviceGlobal::pendingFreeDescriptorSets.push_back( descriptorSet );
 
@@ -2037,8 +2033,10 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     vkDestroyInstance( GfxDeviceGlobal::instance, nullptr );
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture* /*target*/, unsigned /*cubeMapFace*/ )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMapFace*/ )
 {
+    GfxDeviceGlobal::renderTexture0 = target;
+    GfxDeviceGlobal::frameBuffer0 = target ? target->GetFrameBuffer() : VK_NULL_HANDLE;
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )

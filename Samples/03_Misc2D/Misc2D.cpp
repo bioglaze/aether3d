@@ -133,7 +133,7 @@ int main()
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
     //scene.Add( &renderTextureContainer );
-    //scene.Add( &rtCamera );
+    scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;

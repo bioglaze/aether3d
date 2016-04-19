@@ -4,19 +4,24 @@
 #include "Macros.hpp"
 #include "Matrix.hpp"
 #include "System.hpp"
+#include "Texture2D.hpp"
+#include "TextureCube.hpp"
+#include "RenderTexture.hpp"
 #include "Vec3.hpp"
 #include <cstring>
 
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
-    extern ae3d::Texture2D* texture2d0;
-    extern ae3d::TextureCube* textureCube0;
+    extern VkImageView view0;
+    extern ae3d::RenderTexture* renderTexture0;
+    extern VkSampler sampler0;
 }
 
 namespace ae3d
 {
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
+    VkSampler GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter );
 }
 
 void ae3d::Shader::Load( const char* /*vertexSourceGLSL*/, const char* /*fragmentSourceGLSL*/ )
@@ -94,20 +99,31 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     std::memcpy( &GfxDevice::GetCurrentUbo()[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
 }
 
-void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int textureUnit )
 {
-    GfxDeviceGlobal::textureCube0 = nullptr;
-    GfxDeviceGlobal::texture2d0 = const_cast< Texture2D* >(texture);
+    if (texture)
+    {
+        GfxDeviceGlobal::view0 = const_cast<Texture2D*>(texture)->GetView();
+        GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
+    }
 }
 
-void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, const TextureCube* texture, int textureUnit )
 {
-    GfxDeviceGlobal::texture2d0 = nullptr;
-    GfxDeviceGlobal::textureCube0 = const_cast< TextureCube* >(texture);
+    if (texture)
+    {
+        GfxDeviceGlobal::view0 = const_cast<TextureCube*>(texture)->GetView();
+        GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
+    }
 }
 
-void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* name, const RenderTexture* texture, int textureUnit )
 {
+    if (texture)
+    {
+        GfxDeviceGlobal::view0 = const_cast<RenderTexture*>(texture)->GetColorView();
+        GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
+    }
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )
