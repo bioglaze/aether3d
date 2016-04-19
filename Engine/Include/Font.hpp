@@ -19,10 +19,10 @@ namespace ae3d
           \param fontTex Font texture. No outline support.
           \param metaData BMFont metadata. Must be text or binary.
          */
-        void LoadBMFont( const class Texture2D* fontTex, const FileSystem::FileContentsData& metaData );
+        void LoadBMFont( class Texture2D* fontTex, const FileSystem::FileContentsData& metaData );
         
         /** \return Font texture. */
-        const Texture2D* GetTexture() const { return texture; }
+        Texture2D* GetTexture() { return texture; }
         
         /// \return Text width.
         int TextWidth( const char* text ) const;
@@ -64,7 +64,7 @@ namespace ae3d
         int base = 32;
         
         Character chars[ 256 ];
-        const Texture2D* texture = nullptr;
+        Texture2D* texture = nullptr;
     };
 }
 

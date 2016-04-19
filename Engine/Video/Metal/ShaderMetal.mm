@@ -109,17 +109,17 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     memcpy( bufferPointer, matrix4x4, 16 * 4 );
 }
 
-void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int textureUnit )
 {
     if (texture != nullptr)
     {
         if (textureUnit == 0)
         {
-            texture0 = const_cast< Texture2D* >( texture )->GetMetalTexture();
+            texture0 = texture->GetMetalTexture();
         }
         else if (textureUnit == 1)
         {
-            texture1 = const_cast< Texture2D* >( texture )->GetMetalTexture();
+            texture1 = texture->GetMetalTexture();
         }
         else
         {
@@ -132,7 +132,7 @@ void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int t
     }
 }
 
-void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* renderTexture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* renderTexture, int textureUnit )
 {
     if (renderTexture != nullptr)
     {
@@ -156,17 +156,17 @@ void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture
     }
 }
 
-void ae3d::Shader::SetTexture( const char* name, const TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textureUnit )
 {
     if (texture != nullptr)
     {
         if (textureUnit == 0)
         {
-            texture0 = const_cast<TextureCube*>( texture )->GetMetalTexture();
+            texture0 = texture->GetMetalTexture();
         }
         else if (textureUnit == 1)
         {
-            texture1 = const_cast<TextureCube*>( texture )->GetMetalTexture();
+            texture1 = texture->GetMetalTexture();
         }
         else
         {

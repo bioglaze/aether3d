@@ -29,7 +29,7 @@ namespace ae3d
         
         void GenerateSkybox();
 
-        void RenderSkybox( const TextureCube* skyTexture, const CameraComponent& camera );
+        void RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera );
 
         BuiltinShaders builtinShaders;
         

@@ -19,7 +19,7 @@ namespace ae3d
     {
     public:
         /// Gets a default texture that is always available after System::LoadBuiltinAssets().
-        static const Texture2D* GetDefaultTexture();
+        static Texture2D* GetDefaultTexture();
         
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.

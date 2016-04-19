@@ -63,7 +63,7 @@ namespace
     ae3d::Texture2D defaultTexture;
 }
 
-const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
+ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (defaultTexture.GetWidth() == 0 && GfxDevice::GetMetalDevice() != nullptr)
     {

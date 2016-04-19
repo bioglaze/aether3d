@@ -30,7 +30,7 @@ namespace ae3d
         void Render();
 
         /// \param skyTexture Skybox texture. If this is the first time a valid skybox texture is provided, skybox geometry will also be generated.
-        void SetSkybox( const class TextureCube* skyTexture );
+        void SetSkybox( class TextureCube* skyTexture );
         
         /// \return Scene's contents in a textual format that can be saved into file etc.
         std::string GetSerialized() const;
@@ -54,7 +54,7 @@ namespace ae3d
 
         std::vector< GameObject* > gameObjects;
         unsigned nextFreeGameObject = 0;
-        const TextureCube* skybox = nullptr;
+        TextureCube* skybox = nullptr;
         Vec3 aabbMin;
         Vec3 aabbMax;
     };

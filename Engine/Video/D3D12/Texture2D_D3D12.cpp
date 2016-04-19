@@ -107,7 +107,7 @@ void TexReload( const std::string& path )
     tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
 }
 
-const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
+ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (Texture2DGlobal::defaultTexture.GetWidth() == 0)
     {

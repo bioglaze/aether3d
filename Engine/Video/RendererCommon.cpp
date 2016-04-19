@@ -41,7 +41,7 @@ void ae3d::Renderer::GenerateSkybox()
     skyboxBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
 }
 
-void ae3d::Renderer::RenderSkybox( const TextureCube* skyTexture, const CameraComponent& camera )
+void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera )
 {
     Matrix44 modelViewProjection;
     Matrix44::Multiply( camera.GetView(), camera.GetProjection(), modelViewProjection );

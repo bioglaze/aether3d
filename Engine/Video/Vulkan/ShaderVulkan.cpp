@@ -99,29 +99,29 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     std::memcpy( &GfxDevice::GetCurrentUbo()[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
 }
 
-void ae3d::Shader::SetTexture( const char* name, const Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int textureUnit )
 {
     if (texture)
     {
-        GfxDeviceGlobal::view0 = const_cast<Texture2D*>(texture)->GetView();
+        GfxDeviceGlobal::view0 = texture->GetView();
         GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
     }
 }
 
-void ae3d::Shader::SetTexture( const char* name, const TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textureUnit )
 {
     if (texture)
     {
-        GfxDeviceGlobal::view0 = const_cast<TextureCube*>(texture)->GetView();
+        GfxDeviceGlobal::view0 = texture->GetView();
         GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
     }
 }
 
-void ae3d::Shader::SetRenderTexture( const char* name, const RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* name, RenderTexture* texture, int textureUnit )
 {
     if (texture)
     {
-        GfxDeviceGlobal::view0 = const_cast<RenderTexture*>(texture)->GetColorView();
+        GfxDeviceGlobal::view0 = texture->GetColorView();
         GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
     }
 }

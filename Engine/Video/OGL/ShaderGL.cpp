@@ -222,7 +222,7 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     glProgramUniformMatrix4fv( handle, uniformLocations[ name ].i, 1, GL_FALSE, matrix4x4 );
 }
 
-void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_2D, texture->GetID() );
@@ -233,7 +233,7 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture,
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
-void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int textureUnit )
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_CUBE_MAP, texture->GetID() );
@@ -244,7 +244,7 @@ void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* textur
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
-void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* texture, int textureUnit )
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( texture->IsCube() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, texture->GetID() );

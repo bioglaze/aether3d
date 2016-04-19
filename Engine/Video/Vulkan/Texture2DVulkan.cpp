@@ -277,7 +277,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     stbi_image_free( data );
 }
 
-const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
+ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     Texture2DGlobal::defaultTexture.handle = 1;
     Texture2DGlobal::defaultTexture.width = 256;

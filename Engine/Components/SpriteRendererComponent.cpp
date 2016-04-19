@@ -161,7 +161,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
     
     for (auto& drawable : drawables)
     {
-        renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (const ae3d::Texture2D*)drawable.texture, 0 );
+        renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (ae3d::Texture2D*)drawable.texture, 0 );
         ae3d::GfxDevice::Draw( vertexBuffer, drawable.bufferStart, drawable.bufferEnd, renderer.builtinShaders.spriteRendererShader, blendMode,
                                ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Off );
     }

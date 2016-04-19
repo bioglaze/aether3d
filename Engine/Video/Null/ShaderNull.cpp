@@ -23,15 +23,15 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
 }
 
-void ae3d::Shader::SetTexture( const char* name, const ae3d::Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
 {
 }
 
-void ae3d::Shader::SetTexture( const char* name, const ae3d::TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int textureUnit )
 {
 }
 
-void ae3d::Shader::SetRenderTexture( const char* name, const ae3d::RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* texture, int textureUnit )
 {
 }
 

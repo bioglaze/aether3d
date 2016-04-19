@@ -660,7 +660,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     GfxDevice::ErrorCheck( "Scene render shadows end" );
 }
 
-void ae3d::Scene::SetSkybox( const TextureCube* skyTexture )
+void ae3d::Scene::SetSkybox( TextureCube* skyTexture )
 {
     skybox = skyTexture;
 
