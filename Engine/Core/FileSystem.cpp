@@ -60,7 +60,7 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* p
         }
     }
 
-    std::ifstream in( GetFullPath( outData.path.c_str() ), std::ifstream::ate | std::ifstream::binary );
+    std::ifstream in( outData.path.c_str(), std::ifstream::ate | std::ifstream::binary );
     outData.isLoaded = in.is_open();
 
     if (!outData.isLoaded)
