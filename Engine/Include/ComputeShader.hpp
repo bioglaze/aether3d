@@ -63,6 +63,10 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;
 #endif
+#if RENDERER_METAL
+        id <MTLFunction> function;
+        id<MTLComputePipelineState> pipeline;
+#endif
     };
 }
 #endif

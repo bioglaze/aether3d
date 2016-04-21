@@ -73,8 +73,8 @@
 		AB6E134C1C11D8BD0020A929 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */; };
 		AB6E134E1C11D93E0020A929 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6E134D1C11D93E0020A929 /* Metal.framework */; };
 		AB6E85851CB571A10041C8CB /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */; };
-		AB921DAF1CC21AE8008F5750 /* ComputeShaderMetal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB921DAE1CC21AE8008F5750 /* ComputeShaderMetal.cpp */; };
 		AB921DB11CC21AF4008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */; };
+		ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */; };
 		ABB6E0AE1C7C55E30014B78B /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */; };
 /* End PBXBuildFile section */
 
@@ -146,8 +146,8 @@
 		AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB6E134D1C11D93E0020A929 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
-		AB921DAE1CC21AE8008F5750 /* ComputeShaderMetal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ComputeShaderMetal.cpp; path = ../Video/Metal/ComputeShaderMetal.cpp; sourceTree = "<group>"; };
 		AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../Include/ComputeShader.hpp; sourceTree = "<group>"; };
+		ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ComputeShaderMetal.mm; path = ../Video/Metal/ComputeShaderMetal.mm; sourceTree = "<group>"; };
 		ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../Video/Metal/TextureCubeMetal.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -225,7 +225,7 @@
 		AB6E12FA1C11D7B60020A929 /* Video */ = {
 			isa = PBXGroup;
 			children = (
-				AB921DAE1CC21AE8008F5750 /* ComputeShaderMetal.cpp */,
+				ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */,
 				AB6E133C1C11D8A00020A929 /* GfxDevice.hpp */,
 				AB6E12FB1C11D7C50020A929 /* GfxDeviceMetal.mm */,
 				AB6E133D1C11D8A00020A929 /* Material.cpp */,
@@ -396,6 +396,7 @@
 				AB6E134B1C11D8BC0020A929 /* stb_image.c in Sources */,
 				AB6E13431C11D8A00020A929 /* Material.cpp in Sources */,
 				AB6E12F51C11D7B00020A929 /* MatrixSSE3.cpp in Sources */,
+				ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */,
 				AB6E13451C11D8A00020A929 /* RendererCommon.cpp in Sources */,
 				AB6E12D41C11D79B0020A929 /* MeshRendererComponent.cpp in Sources */,
 				AB6E13051C11D7C50020A929 /* Texture2DMetal.mm in Sources */,
@@ -411,7 +412,6 @@
 				AB6E12EC1C11D7B00020A929 /* AudioSystemOpenAL.cpp in Sources */,
 				AB6E13461C11D8A00020A929 /* TextureCommon.cpp in Sources */,
 				AB6E13021C11D7C50020A929 /* RendererMetal.mm in Sources */,
-				AB921DAF1CC21AE8008F5750 /* ComputeShaderMetal.cpp in Sources */,
 				AB6E12F31C11D7B00020A929 /* Matrix.cpp in Sources */,
 				AB6E12D71C11D79B0020A929 /* TextRendererComponent.cpp in Sources */,
 				AB6E134C1C11D8BD0020A929 /* stb_vorbis.c in Sources */,
