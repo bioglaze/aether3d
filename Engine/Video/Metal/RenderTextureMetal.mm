@@ -15,6 +15,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     wrap = aWrap;
     filter = aFilter;
     handle = 1;
+    isRenderTexture = true;
     
     MTLTextureDescriptor* textureDescriptor =
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
@@ -40,7 +41,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     wrap = aWrap;
     filter = aFilter;
     handle = 1;
-
+    isRenderTexture = true;
+    
     MTLTextureDescriptor* textureDescriptor =
     [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
                                                        size:width

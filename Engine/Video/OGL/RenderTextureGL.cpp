@@ -16,6 +16,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     wrap = aWrap;
     filter = aFilter;
     isCube = false;
+    isRenderTexture = true;
 
     handle = GfxDevice::CreateTextureId();
     glBindTexture( GL_TEXTURE_2D, handle );
@@ -67,7 +68,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     wrap = aWrap;
     filter = aFilter;
     isCube = true;
-
+    isRenderTexture = true;
+    
     handle = GfxDevice::CreateTextureId();
     glBindTexture( GL_TEXTURE_CUBE_MAP, handle );
     

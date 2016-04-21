@@ -90,6 +90,9 @@ namespace ae3d
         /// \return True, if the texture does not contain an alpha channel.
         bool IsOpaque() const { return opaque; }
 
+        /// \return True, if the texture is a RenderTexture.
+        bool IsRenderTexture() const { return isRenderTexture; }
+
   protected:
         /// Width in pixels.
         int width = 0;
@@ -122,6 +125,7 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
 #endif
+        bool isRenderTexture = false;
     };
 }
 

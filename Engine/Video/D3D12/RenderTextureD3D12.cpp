@@ -35,7 +35,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType /*dataType
     height = aHeight;
     wrap = aWrap;
     filter = aFilter;
-
+    isRenderTexture = true;
+    
     D3D12_RESOURCE_DESC descTex = {};
     descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     descTex.Width = width;
@@ -111,4 +112,5 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType /*dataType*/, Tex
     width = height = aDimension;
     wrap = aWrap;
     filter = aFilter;
+    isRenderTexture = true;
 }

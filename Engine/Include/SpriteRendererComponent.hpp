@@ -39,7 +39,7 @@ namespace ae3d
 
           // TODO [2015-03-28]: Set pivot, maybe also rotation.
          */
-        void SetTexture( const class TextureBase* texture, const struct Vec3& position, const Vec3& dimensionPixels, const struct Vec4& tintColor );
+        void SetTexture( class TextureBase* texture, const struct Vec3& position, const Vec3& dimensionPixels, const struct Vec4& tintColor );
 
     private:
         friend class GameObject;

@@ -32,7 +32,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     wrap = aWrap;
     filter = aFilter;
     isCube = false;
-
+    isRenderTexture = true;
+    
     // Color
 
     const VkFormat colorFormat = VK_FORMAT_R8G8B8A8_UNORM;
@@ -162,4 +163,5 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     wrap = aWrap;
     filter = aFilter;
     isCube = true;
+    isRenderTexture = true;
 }
