@@ -94,7 +94,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
 
     // Depth/Stencil
 
-    VkFormat depthFormat = VK_FORMAT_D24_UNORM_S8_UINT;
+    VkFormat depthFormat = VK_FORMAT_D32_SFLOAT;
     VkImageCreateInfo depthImage = colorImage;
     depthImage.format = depthFormat;
     depthImage.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
@@ -105,7 +105,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     depthStencilView.format = depthFormat;
     depthStencilView.flags = 0;
     depthStencilView.subresourceRange = {};
-    depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+    depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
     depthStencilView.subresourceRange.baseMipLevel = 0;
     depthStencilView.subresourceRange.levelCount = 1;
     depthStencilView.subresourceRange.baseArrayLayer = 0;
