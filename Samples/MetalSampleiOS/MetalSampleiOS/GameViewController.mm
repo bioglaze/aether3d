@@ -43,14 +43,14 @@
     [self _setupView];
     [self _reshape];
 
-    ae3d::System::InitMetal( device, _view );
+    ae3d::System::InitMetal( device, _view, 1 );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
     
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
-    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::Depth );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.0f, 0.0f ) );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
@@ -60,7 +60,7 @@
     camera3d.AddComponent<ae3d::CameraComponent>();
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
-    camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::Depth );
+    camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
     camera3d.AddComponent<ae3d::TransformComponent>();
@@ -104,7 +104,8 @@
     _view.delegate = self;
     
     // Setup the render target, choose values based on your app
-    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+    //_view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     _view.sampleCount = 1;
 }
 

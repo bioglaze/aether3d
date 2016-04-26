@@ -8,13 +8,12 @@
 #include "GfxDevice.hpp"
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
+#include "System.hpp"
 #include "Renderer.hpp"
 #include "RenderTexture.hpp"
 #include "Texture2D.hpp"
 
 extern ae3d::Renderer renderer;
-
-enum class GfxDeviceClearFlag { DepthAndColor, Depth, DontClear };
 
 id <MTLDevice> device;
 id <MTLCommandQueue> commandQueue;
@@ -24,12 +23,14 @@ id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
 id <CAMetalDrawable> drawable; // Render texture or currentDrawable
 
 MTLRenderPassDescriptor* renderPassDescriptor = nullptr;
-id <MTLTexture> depthTex;
+//id <MTLTexture> depthTex;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
 id<MTLTexture> texture0;
 id<MTLTexture> texture1;
 id<MTLTexture> currentRenderTarget;
+id<MTLTexture> msaaColorTarget;
+id<MTLTexture> msaaDepthTarget;
 MTKView* appView = nullptr;
 
 // TODO: Move somewhere else.
@@ -37,15 +38,20 @@ void PlatformInitGamePad()
 {
 }
 
-namespace GfxDeviceGlobal
+namespace Statistics
 {
     int drawCalls = 0;
     int textureBinds = 0;
     int vertexBufferBinds = 0;
     int renderTargetBinds = 0;
     int shaderBinds = 0;
+}
+
+namespace GfxDeviceGlobal
+{
     int backBufferWidth = 0;
     int backBufferHeight = 0;
+    int sampleCount = 1;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     
@@ -71,24 +77,28 @@ namespace
             depthLoadAction = MTLLoadActionClear;
         }
         
-        renderPassDescriptor.colorAttachments[0].texture = texture;
+        if (GfxDeviceGlobal::sampleCount > 1)
+        {
+            renderPassDescriptor.colorAttachments[0].texture = msaaColorTarget;
+            renderPassDescriptor.colorAttachments[0].resolveTexture = texture;
+            renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionMultisampleResolve;
+        }
+        else
+        {
+            renderPassDescriptor.colorAttachments[0].texture = texture;
+            renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+        }
         renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake( clearColor[0], clearColor[1], clearColor[2], clearColor[3] );
         renderPassDescriptor.colorAttachments[0].loadAction = texLoadAction;
-        renderPassDescriptor.colorAttachments[0].storeAction = [texture sampleCount] > 1 ? MTLStoreActionMultisampleResolve : MTLStoreActionStore;
-        /*#if TARGET_OS_IPHONE
-         if (!depthTex || (depthTex && (depthTex.width != texture.width || depthTex.height != texture.height)))
-         {
-         MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat: MTLPixelFormatDepth32Float width: texture.width height: texture.height mipmapped: NO];
-         
-         depthTex = [device newTextureWithDescriptor: desc];
-         depthTex.label = @"Depth";
-         
-         renderPassDescriptor.depthAttachment.texture = depthTex;
-         renderPassDescriptor.depthAttachment.clearDepth = 1.0f;
-         renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
-         renderPassDescriptor.depthAttachment.storeAction = MTLStoreActionDontCare;
-         }
-         #endif*/
+        
+        renderPassDescriptor.stencilAttachment = nil;
+
+        if (GfxDeviceGlobal::sampleCount > 1)
+        {
+            renderPassDescriptor.depthAttachment.texture = msaaDepthTarget;
+            renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
+            renderPassDescriptor.depthAttachment.clearDepth = 1.0;
+        }
     }
 }
 
@@ -130,16 +140,22 @@ void ae3d::GfxDevice::SetCurrentDrawableMetal( id <CAMetalDrawable> aDrawable, M
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
-
+    NSString* fName = [NSString stringWithUTF8String: name];
+    [renderEncoder pushDebugGroup:fName];
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
-
+    [renderEncoder popDebugGroup];
 }
 
-void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view )
+void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount )
 {
+    if (sampleCount < 1 || sampleCount > 8)
+    {
+        sampleCount = 1;
+    }
+    
     device = metalDevice;
     appView = view;
 
@@ -148,12 +164,42 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view )
 
     GfxDeviceGlobal::backBufferWidth = view.bounds.size.width;
     GfxDeviceGlobal::backBufferHeight = view.bounds.size.height;
-
+    GfxDeviceGlobal::sampleCount = sampleCount;
+    
     MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
     depthStateDesc.depthCompareFunction = MTLCompareFunctionLess;
     depthStateDesc.depthWriteEnabled = YES;
     depthStateDesc.label = @"less write on";
     depthStateLessWriteOn = [device newDepthStencilStateWithDescriptor:depthStateDesc];
+    
+    if (sampleCount == 1)
+    {
+        return;
+    }
+    
+    MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+                                                                                        width:GfxDeviceGlobal::backBufferWidth * 2
+                                                                                       height:GfxDeviceGlobal::backBufferHeight * 2
+                                                                                    mipmapped:NO];
+        
+    desc.textureType = MTLTextureType2DMultisample;
+    desc.sampleCount = sampleCount;
+    desc.resourceOptions = MTLResourceStorageModePrivate;
+    desc.usage = MTLTextureUsageRenderTarget;
+    
+    msaaColorTarget = [device newTextureWithDescriptor:desc];
+
+    MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
+                                                                                    width:GfxDeviceGlobal::backBufferWidth * 2
+                                                                                   height:GfxDeviceGlobal::backBufferHeight * 2
+                                                                                mipmapped:NO];
+
+    depthDesc.textureType = MTLTextureType2DMultisample;
+    depthDesc.sampleCount = sampleCount;
+    depthDesc.resourceOptions = MTLResourceStorageModePrivate;
+    depthDesc.usage = MTLTextureUsageRenderTarget;
+    
+    msaaDepthTarget = [device newTextureWithDescriptor:depthDesc];
 }
 
 id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
@@ -168,22 +214,22 @@ id <MTLLibrary> ae3d::GfxDevice::GetDefaultMetalShaderLibrary()
 
 int ae3d::GfxDevice::GetTextureBinds()
 {
-    return GfxDeviceGlobal::textureBinds;
+    return Statistics::textureBinds;
 }
 
 int ae3d::GfxDevice::GetVertexBufferBinds()
 {
-    return GfxDeviceGlobal::vertexBufferBinds;
+    return Statistics::vertexBufferBinds;
 }
 
 int ae3d::GfxDevice::GetRenderTargetBinds()
 {
-    return GfxDeviceGlobal::renderTargetBinds;
+    return Statistics::renderTargetBinds;
 }
 
 int ae3d::GfxDevice::GetShaderBinds()
 {
-    return GfxDeviceGlobal::shaderBinds;
+    return Statistics::shaderBinds;
 }
 
 int ae3d::GfxDevice::GetBarrierCalls()
@@ -225,7 +271,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
     {
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
         pipelineStateDescriptor.label = @"pipeline";
-        pipelineStateDescriptor.sampleCount = appView.sampleCount;
+        pipelineStateDescriptor.sampleCount = GfxDeviceGlobal::sampleCount;
         pipelineStateDescriptor.vertexFunction = shader.vertexProgram;
         pipelineStateDescriptor.fragmentFunction = shader.fragmentProgram;
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
@@ -236,9 +282,9 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
-        // These must match app's view's format.
-        pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
-        pipelineStateDescriptor.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+        // This must match app's view's format.
+        pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+        
         NSError* error = NULL;
         MTLRenderPipelineReflection* reflectionObj;
         MTLPipelineOption option = MTLPipelineOptionBufferTypeInfo | MTLPipelineOptionArgumentInfo;
@@ -260,7 +306,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode )
 {
-    ++GfxDeviceGlobal::drawCalls;
+    ++Statistics::drawCalls;
 
     if (!texture0)
     {
@@ -314,31 +360,31 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 
 void ae3d::GfxDevice::IncDrawCalls()
 {
-    ++GfxDeviceGlobal::drawCalls;
+    ++Statistics::drawCalls;
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
 {
-    return GfxDeviceGlobal::drawCalls;
+    return Statistics::drawCalls;
 }
 
 void ae3d::GfxDevice::IncTextureBinds()
 {
-    ++GfxDeviceGlobal::textureBinds;
+    ++Statistics::textureBinds;
 }
 
 void ae3d::GfxDevice::IncShaderBinds()
 {
-    ++GfxDeviceGlobal::shaderBinds;
+    ++Statistics::shaderBinds;
 }
 
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
-    GfxDeviceGlobal::drawCalls = 0;
-    GfxDeviceGlobal::renderTargetBinds = 0;
-    GfxDeviceGlobal::textureBinds = 0;
-    GfxDeviceGlobal::vertexBufferBinds = 0;
-    GfxDeviceGlobal::shaderBinds = 0;
+    Statistics::drawCalls = 0;
+    Statistics::renderTargetBinds = 0;
+    Statistics::textureBinds = 0;
+    Statistics::vertexBufferBinds = 0;
+    Statistics::shaderBinds = 0;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

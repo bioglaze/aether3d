@@ -51,7 +51,7 @@ namespace ae3d
         void* GetCurrentUniformBuffer();
 #endif
 #if RENDERER_METAL
-        void InitMetal( id <MTLDevice> metalDevice, MTKView* view );
+        void InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
         id <MTLDevice> GetMetalDevice();

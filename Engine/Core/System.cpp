@@ -29,9 +29,9 @@ void ae3d::System::InitGfxDeviceForEditor( int width, int height )
 }
 
 #if RENDERER_METAL
-void ae3d::System::InitMetal( id <MTLDevice> device, MTKView* view)
+void ae3d::System::InitMetal( id <MTLDevice> device, MTKView* view, int sampleCount )
 {
-    GfxDevice::InitMetal( device, view );
+    GfxDevice::InitMetal( device, view, sampleCount );
 }
 
 void ae3d::System::SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass )

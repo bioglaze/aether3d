@@ -80,6 +80,19 @@
    <ul>
    <li>Vulkan renderer leaks memory when vertex buffers are reallocated (eg. updating TextRendererComponent's text).</li>
    </ul>
+ 
+   \section Tools
+ 
+   \subsection editor Editor
+ 
+   Editor is used to create scenes by placing and moving GameObjects, adding components etc. It's built on top of Qt 5 so you'll need to
+   install Qt development files.
+ 
+   \subsection CombineFiles
+ 
+   Aether3D internals almost never read raw files, all file access is abstracted by FileSystem to allow file contents to come from various sources.
+   CombineFiles creates .pak files that contain contents of multiple files. You run it with command CombineFiles inputFile outputFile where
+   inputFile is just a text file containing a list of file paths, each on their own line.
 */
 namespace ae3d
 {
@@ -104,7 +117,7 @@ namespace ae3d
         void InitGfxDeviceForEditor( int width, int height );
         
 #if RENDERER_METAL
-        void InitMetal( id< MTLDevice > metalDevice, MTKView* view );
+        void InitMetal( id< MTLDevice > metalDevice, MTKView* view, int sampleCount );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void BeginFrame();
 #endif

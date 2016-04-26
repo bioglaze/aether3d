@@ -61,7 +61,7 @@
     [self _setupView];
     [self _reshape];
     
-    ae3d::System::InitMetal( device, _view );
+    ae3d::System::InitMetal( device, _view, 4 );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
 
@@ -81,7 +81,7 @@
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
-    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+    //camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera3d.AddComponent<ae3d::TransformComponent>();
     //camera3d.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -2, 0 ) );
     //camera3d.GetComponent<ae3d::TransformComponent>()->LookAt( ae3d::Vec3( 0, -2, 0 ), ae3d::Vec3( 0, 0, -100 ), ae3d::Vec3( 0, 1, 0 ) );
@@ -151,7 +151,7 @@
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
-    scene.Add( &renderTextureContainer );
+    //scene.Add( &renderTextureContainer );
     
     rtCamera.AddComponent<ae3d::CameraComponent>();
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
@@ -161,7 +161,7 @@
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<ae3d::TransformComponent>();
     //rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
-    scene.Add( &rtCamera );
+    //scene.Add( &rtCamera );
 }
 
 - (void)_setupView
@@ -169,8 +169,7 @@
     _view = (MTKView *)self.view;
     _view.delegate = self;
     _view.device = device;
-    _view.sampleCount = 1;
-    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
 }
 
 - (void)keyDown:(NSEvent *)theEvent
