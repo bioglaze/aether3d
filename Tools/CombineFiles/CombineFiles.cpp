@@ -11,7 +11,6 @@
     128       file length
     132       file contents
 */
-#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <fstream>
 #include <sstream>
