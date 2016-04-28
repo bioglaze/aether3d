@@ -154,7 +154,11 @@ namespace debug
             ae3d::System::Print( "Vulkan error: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
             ae3d::System::Assert( false, "Vulkan error" );
         }
-        else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
+		else if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
+		{
+			ae3d::System::Print( "Vulkan perf warning: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
+		}
+		else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
         {
             ae3d::System::Print( "Vulkan warning: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
 #if _MSC_VER && DEBUG
@@ -415,7 +419,8 @@ namespace ae3d
         rasterizationState.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizationState.depthClampEnable = VK_FALSE;
         rasterizationState.rasterizerDiscardEnable = VK_FALSE;
-        rasterizationState.depthBiasEnable = VK_FALSE;
+		rasterizationState.depthBiasEnable = VK_FALSE;
+		rasterizationState.lineWidth = 1;
 
         VkPipelineColorBlendStateCreateInfo colorBlendState = {};
         colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -916,21 +921,6 @@ namespace ae3d
             WindowGlobal::windowHeight = surfCaps.currentExtent.height;
         }
 
-        // Tries to use mailbox mode, low latency and non-tearing
-        VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
-        for (size_t i = 0; i < presentModeCount; ++i)
-        {
-            if (presentModes[ i ] == VK_PRESENT_MODE_MAILBOX_KHR)
-            {
-                swapchainPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
-                break;
-            }
-            if ((swapchainPresentMode != VK_PRESENT_MODE_MAILBOX_KHR) && (presentModes[ i ] == VK_PRESENT_MODE_IMMEDIATE_KHR))
-            {
-                swapchainPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
-            }
-        }
-
         std::uint32_t desiredNumberOfSwapchainImages = surfCaps.minImageCount + 1;
 
         if ((surfCaps.maxImageCount > 0) && (desiredNumberOfSwapchainImages > surfCaps.maxImageCount))
@@ -962,7 +952,7 @@ namespace ae3d
         swapchainInfo.imageArrayLayers = 1;
         swapchainInfo.queueFamilyIndexCount = 0;
         swapchainInfo.pQueueFamilyIndices = nullptr;
-        swapchainInfo.presentMode = swapchainPresentMode;
+        swapchainInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
         swapchainInfo.clipped = VK_TRUE;
         swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
@@ -2002,7 +1992,8 @@ void ae3d::GfxDevice::Present()
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
-    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+    VkResult err = vkDeviceWaitIdle( GfxDeviceGlobal::device );
+	AE3D_CHECK_VULKAN( err, "vkDeviceWaitIdle" );
 
     debug::Free( GfxDeviceGlobal::instance );
     
