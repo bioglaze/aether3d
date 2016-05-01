@@ -1,6 +1,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include <string>
+
 #if RENDERER_METAL
 #import <QuartzCore/CAMetalLayer.h>
 #import <MetalKit/MetalKit.h>
@@ -141,9 +143,10 @@ namespace ae3d
 
         /// Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often.
         void ReloadChangedAssets();
-        
+
         namespace Statistics
         {
+			std::string GetStatistics();
             int GetDrawCallCount();
             int GetVertexBufferBindCount();
             int GetTextureBindCount();

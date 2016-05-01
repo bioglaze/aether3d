@@ -89,7 +89,7 @@ void ae3d::RenderTexture::CreateCube( int, RenderTexture::DataType, TextureWrap,
 {
 }
 
-const ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
+ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (Texture2DGlobal::defaultTexture.GetWidth() == 0)
     {

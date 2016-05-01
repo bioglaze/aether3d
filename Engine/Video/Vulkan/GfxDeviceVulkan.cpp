@@ -3,6 +3,7 @@
 #include <map>
 #include <vector> 
 #include <string>
+#include <sstream>
 #include <vulkan/vulkan.h>
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
@@ -121,6 +122,25 @@ namespace GfxDeviceGlobal
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > frameUbos;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
+}
+
+namespace ae3d
+{
+    namespace System
+    {
+        namespace Statistics
+        {
+            std::string GetStatistics()
+            {
+                std::stringstream stm;
+                stm << "draw calls: " << Stats::drawCalls << "\n";
+                stm << "barrier calls: " << Stats::barrierCalls << "\n";
+                stm << "fence calls: " << Stats::fenceCalls << "\n";
+
+                return stm.str();
+            }
+        }
+    }
 }
 
 namespace debug
@@ -952,7 +972,7 @@ namespace ae3d
         swapchainInfo.imageArrayLayers = 1;
         swapchainInfo.queueFamilyIndexCount = 0;
         swapchainInfo.pQueueFamilyIndices = nullptr;
-        swapchainInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+        swapchainInfo.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;// VK_PRESENT_MODE_FIFO_KHR; // FIXME: Crash inside AMD driver 16.4.1 on exit with FIFO
         swapchainInfo.clipped = VK_TRUE;
         swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
@@ -1262,7 +1282,7 @@ namespace ae3d
     {
         VkAttachmentDescription attachments[ 2 ];
         attachments[ 0 ].format = GfxDeviceGlobal::colorFormat;
-        attachments[ 0 ].samples = GfxDeviceGlobal::msaaSampleBits;
+        attachments[ 0 ].samples = VK_SAMPLE_COUNT_1_BIT;
         attachments[ 0 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 0 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -1271,7 +1291,7 @@ namespace ae3d
         attachments[ 0 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
         attachments[ 1 ].format = GfxDeviceGlobal::depthFormat;
-        attachments[ 1 ].samples = GfxDeviceGlobal::msaaSampleBits;
+        attachments[ 1 ].samples = VK_SAMPLE_COUNT_1_BIT;
         attachments[ 1 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         attachments[ 1 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 1 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;

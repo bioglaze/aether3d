@@ -9,6 +9,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <sstream>
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
@@ -43,6 +44,24 @@ namespace Stats
     int shaderBinds = 0;
     int barrierCalls = 0;
     int fenceCalls = 0;
+}
+
+namespace ae3d
+{
+	namespace System
+	{
+		namespace Statistics
+		{
+			std::string GetStatistics()
+			{
+				std::stringstream stm;
+				stm << "draw calls: " << Stats::drawCalls << "\n";
+				stm << "barrier calls: " << Stats::barrierCalls << "\n";
+
+				return stm.str();
+			}
+		}
+	}
 }
 
 namespace GfxDeviceGlobal
@@ -81,6 +100,11 @@ namespace GfxDeviceGlobal
     ID3D12Fence* fence = nullptr;
     UINT64 fenceValue = 1;
     HANDLE fenceEvent;
+	int sampleCount = 1;
+	ID3D12Resource* msaaColor = nullptr;
+	ID3D12Resource* msaaDepth = nullptr;
+    D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
+    D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
 }
 
 namespace Global
@@ -165,6 +189,64 @@ void CreateBackBuffer()
         descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], &descRtv, handle );
     }
+}
+
+void CreateMSAA()
+{
+    if (GfxDeviceGlobal::sampleCount == 1)
+    {
+        return;
+    }
+
+    // MSAA color
+
+    D3D12_CLEAR_VALUE clearValue = {};
+    clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+    D3D12_HEAP_PROPERTIES heapProp = {};
+    heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    D3D12_RESOURCE_DESC rtDesc = {};
+    rtDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    rtDesc.Width = GfxDeviceGlobal::backBufferWidth;
+    rtDesc.Height = GfxDeviceGlobal::backBufferHeight;
+    rtDesc.DepthOrArraySize = 1;
+    rtDesc.MipLevels = 1;
+    rtDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    rtDesc.SampleDesc.Count = GfxDeviceGlobal::sampleCount;
+    rtDesc.SampleDesc.Quality = DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN;
+    rtDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProp, D3D12_HEAP_FLAG_NONE, &rtDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, &clearValue, IID_PPV_ARGS( &GfxDeviceGlobal::msaaColor ) );
+    AE3D_CHECK_D3D( hr, "Failed to create MSAA color" );
+    GfxDeviceGlobal::msaaColor->SetName( L"MSAA color" );
+
+    GfxDeviceGlobal::msaaColorHandle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
+    GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::msaaColor, nullptr, GfxDeviceGlobal::msaaColorHandle );
+
+    // MSAA depth
+
+    clearValue.Format = DXGI_FORMAT_D32_FLOAT;
+    clearValue.DepthStencil.Depth = 1;
+
+    heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    rtDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    rtDesc.Width = GfxDeviceGlobal::backBufferWidth;
+    rtDesc.Height = GfxDeviceGlobal::backBufferHeight;
+    rtDesc.DepthOrArraySize = 1;
+    rtDesc.MipLevels = 1;
+    rtDesc.Format = DXGI_FORMAT_D32_FLOAT;
+    rtDesc.SampleDesc.Count = GfxDeviceGlobal::sampleCount;
+    rtDesc.SampleDesc.Quality = DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN;
+    rtDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+    hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProp, D3D12_HEAP_FLAG_NONE, &rtDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &clearValue, IID_PPV_ARGS( &GfxDeviceGlobal::msaaDepth ) );
+    AE3D_CHECK_D3D( hr, "Failed to create MSAA depth" );
+    GfxDeviceGlobal::msaaDepth->SetName( L"MSAA depth" );
+
+    GfxDeviceGlobal::msaaDepthHandle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
+    GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::msaaDepth, nullptr, GfxDeviceGlobal::msaaDepthHandle );
 }
 
 void CreateSampler()
@@ -254,7 +336,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     descRaster.DepthClipEnable = TRUE;
     descRaster.FillMode = D3D12_FILL_MODE_SOLID;
     descRaster.FrontCounterClockwise = TRUE;
-    descRaster.MultisampleEnable = FALSE;
+    descRaster.MultisampleEnable = GfxDeviceGlobal::sampleCount > 1 ? TRUE : FALSE;
     descRaster.SlopeScaledDepthBias = 0;
 
     D3D12_BLEND_DESC descBlend = {};
@@ -392,7 +474,8 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     descPso.NumRenderTargets = 1;
     descPso.RTVFormats[ 0 ] = rtvFormat;
     descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    descPso.SampleDesc.Count = 1;
+	descPso.SampleDesc.Count = GfxDeviceGlobal::sampleCount;
+	descPso.SampleDesc.Quality = GfxDeviceGlobal::sampleCount > 1 ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
 
     ID3D12PipelineState* pso;
     HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
@@ -403,7 +486,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
-void CreateDepthStencilView()
+void CreateDepthStencil()
 {
     auto descResource = CD3DX12_RESOURCE_DESC::Tex2D(
         DXGI_FORMAT_R32_TYPELESS, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
@@ -434,8 +517,13 @@ void CreateDepthStencilView()
     GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &descDsv, DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
-void ae3d::CreateRenderer( int /*samples*/ )
+void ae3d::CreateRenderer( int samples )
 {
+	if (samples > 0 && samples < 17)
+	{
+		GfxDeviceGlobal::sampleCount = samples;
+	}
+
 #ifdef DEBUG
     ID3D12Debug* debugController;
     const HRESULT dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &debugController ) );
@@ -449,7 +537,6 @@ void ae3d::CreateRenderer( int /*samples*/ )
         OutputDebugStringA( "Failed to create debug layer!\n" );
     }
 #endif
-    //IDXGIAdapter* adapter = nullptr;
     IDXGIFactory4* factory = nullptr;
     HRESULT hr = CreateDXGIFactory1( IID_PPV_ARGS( &factory ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP factory" );
@@ -520,8 +607,9 @@ void ae3d::CreateRenderer( int /*samples*/ )
     D3D12_CPU_DESCRIPTOR_HANDLE initCbvSrvUavHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     CreateBackBuffer();
+    CreateMSAA();
     CreateRootSignature();
-    CreateDepthStencilView();
+    CreateDepthStencil();
     CreateSampler();
 }
 
@@ -598,7 +686,13 @@ void ae3d::GfxDevice::PopGroupMarker()
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode )
 {   
-    const DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    
+    if (GfxDeviceGlobal::sampleCount > 1)
+    {
+        rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+    }
+
     const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
@@ -781,6 +875,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     Texture2D::DestroyTextures();
     TextureCube::DestroyTextures();
     RenderTexture::DestroyTextures();
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::msaaColor );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::msaaDepth );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     DescriptorHeapManager::Deinit();
@@ -819,7 +915,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     }
 
     auto i = GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex();
-    GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
+	GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
 
     GpuResource* resource = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget : &GfxDeviceGlobal::rtvResources[ i ];
 
@@ -843,8 +939,15 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     }
     else
     {
-        descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
-        descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
+        if (GfxDeviceGlobal::sampleCount > 1)
+        {
+            descHandleRtv = GfxDeviceGlobal::msaaColorHandle;
+        }
+        else
+        {
+            descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
+            descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
+        }
     }
 
     if ((clearFlags & ClearFlags::Color) != 0)
@@ -854,6 +957,10 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTargetDSV : 
                                                        DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
+    if (GfxDeviceGlobal::sampleCount > 1)
+    {
+        descHandleDsv = GfxDeviceGlobal::msaaDepthHandle;
+    }
 
     if ((clearFlags & ClearFlags::Depth) != 0)
     {
@@ -866,6 +973,21 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 void ae3d::GfxDevice::Present()
 {
     TransitionResource( GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ], D3D12_RESOURCE_STATE_PRESENT );
+
+	if (GfxDeviceGlobal::sampleCount > 1)
+	{
+		GpuResource msaaColorGpuResource;
+		msaaColorGpuResource.resource = GfxDeviceGlobal::msaaColor;
+		msaaColorGpuResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		
+		auto backBufferRT = GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
+
+		TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RESOLVE_SOURCE );
+		TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_RESOLVE_DEST );
+		GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( backBufferRT.resource, 0, GfxDeviceGlobal::msaaColor, 0, DXGI_FORMAT_R8G8B8A8_UNORM );
+		TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_PRESENT );
+		TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
+	}
 
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Close();
     AE3D_CHECK_D3D( hr, "command list close" );
