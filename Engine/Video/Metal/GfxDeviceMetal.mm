@@ -4,6 +4,7 @@
 #import <MetalKit/MetalKit.h>
 #endif
 #include <unordered_map>
+#include <sstream>
 #include <list>
 #include "GfxDevice.hpp"
 #include "VertexBuffer.hpp"
@@ -45,6 +46,23 @@ namespace Statistics
     int vertexBufferBinds = 0;
     int renderTargetBinds = 0;
     int shaderBinds = 0;
+}
+
+namespace ae3d
+{
+    namespace System
+    {
+        namespace Statistics
+        {
+            std::string GetStatistics()
+            {
+                std::stringstream stm;
+                stm << "draw calls: " << ::Statistics::drawCalls << "\n";
+                
+                return stm.str();
+            }
+        }
+    }
 }
 
 namespace GfxDeviceGlobal

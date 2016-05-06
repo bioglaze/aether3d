@@ -205,6 +205,12 @@
     
     std::string stats = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
+    
+    // Testing vertex buffer growing
+    if (angle == 5)
+    {
+        text.GetComponent<ae3d::TextRendererComponent>()->SetText( "this is a long string. this is a long string" );
+    }
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

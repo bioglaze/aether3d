@@ -153,15 +153,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         return;
     }
     
-    const int rowBytes = width * components;
+    const int bytesPerRow = width * components < 400 ? 400 : (width * components);
 
-    if (rowBytes < 400)
-    {
-        System::Print( "%s failed to load. On Metal renderer width * components must be >= 400\n", fileContents.path.c_str() );
-        stbi_image_free( data );
-        return;
-    }
-    
     opaque = (components == 3 || components == 1);
 
     MTLTextureDescriptor* textureDescriptor =
@@ -173,7 +166,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     metalTexture.label = @"Texture 2D";
 
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
-    const int bytesPerRow = components * width;
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
 
     if (mipmaps == Mipmaps::Generate)
