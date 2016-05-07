@@ -17,7 +17,7 @@ namespace ae3d
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
 }
 
-void ae3d::VertexBuffer::GenerateVertexBuffer( void* vertexData, int vertexBufferSize, int vertexStride, void* indexData, int indexBufferSize )
+void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int vertexBufferSize, int vertexStride, const void* indexData, int indexBufferSize )
 {
     System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
     System::Assert( vertexData != nullptr, "vertexData not initialized" );
@@ -325,19 +325,19 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 {
     vertexFormat = VertexFormat::PTC;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * 2 );
+    GenerateVertexBuffer( (const void*)vertices, vertexCount * sizeof( VertexPTC ), sizeof( VertexPTC ), (void*)faces, elementCount * 2 );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTN;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * 2 );
+    GenerateVertexBuffer( (const void*)vertices, vertexCount * sizeof( VertexPTN ), sizeof( VertexPTN ), (void*)faces, elementCount * 2 );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
-    GenerateVertexBuffer( (void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * 2 );
+    GenerateVertexBuffer( (const void*)vertices, vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), (void*)faces, elementCount * 2 );
 }

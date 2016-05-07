@@ -156,7 +156,7 @@ namespace ae3d
         id<MTLBuffer> indexBuffer;
 #endif
 #if RENDERER_VULKAN
-        void GenerateVertexBuffer( void* vertexData, int vertexBufferSize, int vertexStride, void* indexData, int indexBufferSize );
+        void GenerateVertexBuffer( const void* vertexData, int vertexBufferSize, int vertexStride, const void* indexData, int indexBufferSize );
 
         VkBuffer vertexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory vertexMem = VK_NULL_HANDLE;

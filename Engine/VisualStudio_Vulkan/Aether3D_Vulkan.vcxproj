@@ -113,6 +113,7 @@
     <ClCompile Include="..\Video\Vulkan\Texture2DVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\TextureCubeVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\VertexBufferVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\VulkanUtils.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />
   </ItemGroup>
   <ItemGroup>

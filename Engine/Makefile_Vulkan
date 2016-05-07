@@ -63,6 +63,7 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/ComputeShaderVulkan.cpp -o $(OUTPUT_DIR)/ComputeShaderVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/Texture2DVulkan.cpp -o $(OUTPUT_DIR)/Texture2DVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/TextureCubeVulkan.cpp -o $(OUTPUT_DIR)/TextureCubeVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/VulkanUtils.cpp -o $(OUTPUT_DIR)/VulkanUtils.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCommon.cpp -o $(OUTPUT_DIR)/TextureCommon.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/VertexBufferVulkan.cpp -o $(OUTPUT_DIR)/VertexBufferVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o	
