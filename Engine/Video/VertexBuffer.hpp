@@ -143,6 +143,7 @@ namespace ae3d
         // Index buffer is stored in the vertex buffer after vertex data.
         ID3D12Resource* vb = nullptr;
         long ibOffset = 0;
+        int sizeBytes = 0;
 #endif
         int elementCount = 0;
         VertexFormat vertexFormat = VertexFormat::PTC;

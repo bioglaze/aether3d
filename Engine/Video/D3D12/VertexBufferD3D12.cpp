@@ -74,7 +74,7 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
     bufferProp.SampleDesc.Quality = 0;
     bufferProp.Width = ibOffset + ibSize;
 
-    if (vb != nullptr)
+    if (vb != nullptr && bufferProp.Width <= sizeBytes)
     {
         ID3D12Resource* stagingBuffer = nullptr;
 
@@ -99,8 +99,12 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
         GfxDeviceGlobal::graphicsCommandList->CopyBufferRegion( vb, 0, stagingBuffer, 0, ibOffset + ibSize );
 
         Global::frameVBUploads.push_back( stagingBuffer );
+        sizeBytes = ibOffset + ibSize;
+
         return;
     }
+    
+    sizeBytes = ibOffset + ibSize;
 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &uploadProp,
