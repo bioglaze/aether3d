@@ -10,6 +10,9 @@ namespace ae3d
     class SpotLightComponent
     {
     public:
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+
         /// \return True, if the light casts a shadow.
         bool CastsShadow() const { return castsShadow; }
         
@@ -41,6 +44,7 @@ namespace ae3d
         
         RenderTexture shadowMap;
         float coneAngle = 45;
+        GameObject* gameObject = nullptr;
         bool castsShadow = false;
     };
 }

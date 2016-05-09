@@ -9,6 +9,9 @@ namespace ae3d
     class AudioSourceComponent
     {
     public:
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+
         /// \return True, if clips played through this source will be affected by this game object's and camera's position.
         bool Is3D() const { return is3D; }
         
@@ -37,7 +40,7 @@ namespace ae3d
         static AudioSourceComponent* Get( unsigned index );
         
         unsigned clipId = 0;
-        
+        GameObject* gameObject = nullptr;
         bool is3D = false;
     };
 }

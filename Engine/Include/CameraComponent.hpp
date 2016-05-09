@@ -12,6 +12,9 @@ namespace ae3d
     class CameraComponent
     {
     public:
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+
         /// Projection type
         enum class ProjectionType { Orthographic, Perspective };
         
@@ -154,6 +157,7 @@ namespace ae3d
         unsigned renderOrder = 0;
         ProjectionType projectionType = ProjectionType::Orthographic;
         ClearFlag clearFlag = ClearFlag::DepthAndColor;
+        GameObject* gameObject = nullptr;
     };
 }
 #endif

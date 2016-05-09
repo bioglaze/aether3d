@@ -245,7 +245,7 @@ int main()
 
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-    
+
     cubes[ 3 ].GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
     cubes[ 3 ].GetComponent< TransformComponent >()->SetParent( cubes[ 2 ].GetComponent< TransformComponent >() );
     
@@ -318,6 +318,7 @@ int main()
                 {
                     VR::RecenterTracking();
                     cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
+                    cubes[ 3 ].SetEnabled( false );
                 }
                 else if (keyCode == KeyCode::R)
                 {

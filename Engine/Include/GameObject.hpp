@@ -21,7 +21,8 @@ namespace ae3d
             {
                 components[ index ].handle = T::New();
                 components[ index ].type = T::Type();
-            }
+                GetComponent< T >()->gameObject = this;
+            }            
         }
 
         /// Remove a component from the game object.
@@ -31,6 +32,7 @@ namespace ae3d
             {
                 if (components[ i ].type == T::Type())
                 {
+                    GetComponent< T >()->gameObject = nullptr;
                     components[ i ].handle = 0;
                     components[ i ].type = -1;
                     return;
@@ -64,6 +66,12 @@ namespace ae3d
         /// \param aName Game Object's name.
         void SetName( const char* aName ) { name = aName; }
         
+        /// \param enabled True if the game object should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+        
+        /// \return True if this game object and all its parents are enabled.
+        bool IsEnabled() const;
+    
         /// \return Game Object's name.
         const std::string& GetName() const { return name; }
         
@@ -90,6 +98,7 @@ namespace ae3d
         ComponentEntry components[ MaxComponents ];
         std::string name;
         unsigned layer = 1;
+        bool isEnabled = true;
     };
 }
 #endif

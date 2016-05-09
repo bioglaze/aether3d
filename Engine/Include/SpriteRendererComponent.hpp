@@ -22,6 +22,9 @@ namespace ae3d
         /// \param other Other.
         SpriteRendererComponent& operator=( const SpriteRendererComponent& other );
 
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+
         /// \return Textual representation of component.
         std::string GetSerialized() const;
 
@@ -65,6 +68,8 @@ namespace ae3d
         static const std::size_t StorageAlign = 16;
         
         std::aligned_storage<StorageSize, StorageAlign>::type _storage = {};
+        
+        GameObject* gameObject = nullptr;
     };
 }
 #endif

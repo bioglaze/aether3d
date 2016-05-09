@@ -25,6 +25,9 @@ namespace ae3d
         /// \param other Other.
         TextRendererComponent& operator=( const TextRendererComponent& other );
 
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+
         /// \param color Color in range 0-1.
         void SetColor( const struct Vec4& color );
 
@@ -64,6 +67,8 @@ namespace ae3d
         static const std::size_t StorageAlign = 16;
         
         std::aligned_storage<StorageSize, StorageAlign>::type _storage = {};
+        
+        GameObject* gameObject = nullptr;
     };
 }
 

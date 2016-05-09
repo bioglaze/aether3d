@@ -218,7 +218,7 @@ void ae3d::Scene::Render()
     
     for (auto gameObject : gameObjects)
     {
-        if (gameObject == nullptr)
+        if (gameObject == nullptr || !gameObject->IsEnabled())
         {
             continue;
         }
@@ -306,7 +306,7 @@ void ae3d::Scene::Render()
             // Shadow pass
             for (auto go : gameObjects)
             {
-                if (!go)
+                if (!go || !go->IsEnabled())
                 {
                     continue;
                 }
@@ -477,7 +477,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         ++i;
         
-        if (gameObject == nullptr || (gameObject->GetLayer() & camera->GetLayerMask()) == 0)
+        if (gameObject == nullptr || (gameObject->GetLayer() & camera->GetLayerMask()) == 0 || !gameObject->IsEnabled())
         {
             continue;
         }

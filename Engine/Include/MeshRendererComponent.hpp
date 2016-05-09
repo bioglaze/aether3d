@@ -10,6 +10,9 @@ namespace ae3d
     class MeshRendererComponent
     {
     public:
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+
         /// \return Mesh.
         class Mesh* GetMesh() { return mesh; }
         
@@ -44,6 +47,7 @@ namespace ae3d
 
         Mesh* mesh = nullptr;
         std::vector< Material* > materials;
+        GameObject* gameObject = nullptr;
     };
 }
 

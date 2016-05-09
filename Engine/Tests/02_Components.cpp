@@ -1,6 +1,7 @@
 #include <iostream>
 #include "AudioClip.hpp"
 #include "CameraComponent.hpp"
+#include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "Font.hpp"
 #include "GameObject.hpp"
@@ -10,6 +11,7 @@
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "SpriteRendererComponent.hpp"
+#include "SpotLightComponent.hpp"
 #include "System.hpp"
 #include "TransformComponent.hpp"
 #include "TextRendererComponent.hpp"
@@ -33,6 +35,8 @@ void TestManyInstances()
         gos[ i ].AddComponent< MeshRendererComponent >();
         gos[ i ].AddComponent< SpriteRendererComponent >();
         gos[ i ].AddComponent< TextRendererComponent >();
+        gos[ i ].AddComponent< SpotLightComponent >();
+        gos[ i ].AddComponent< DirectionalLightComponent >();
     }
 }
 
@@ -165,6 +169,24 @@ void TestMissingFiles()
     font.LoadBMFont( &tex2d, FileSystem::FileContents("not_found.fnt") );
 }
 
+void TestGameObjectEnabling()
+{
+    GameObject go;
+    go.AddComponent< TransformComponent >();
+    System::Assert( go.GetComponent< TransformComponent >()->GetGameObject() == &go, "invalid owner" );
+    
+    go.SetEnabled( false );
+    
+    GameObject child;
+    child.AddComponent< TransformComponent >();
+    child.GetComponent< TransformComponent >()->SetParent( go.GetComponent< TransformComponent >() );
+    
+    System::Assert( !child.IsEnabled(), "child should be disabled if parent is disabled" );
+    
+    GameObject go2 = go;
+    System::Assert( !go.IsEnabled(), "copied game object should be disabled if original is disabled" );
+}
+
 int main()
 {
     Window::Create( 512, 512, WindowCreateFlags::Empty );
@@ -178,6 +200,7 @@ int main()
     TestMesh();
     TestAddition();
     TestGameObjectCopying();
+    TestGameObjectEnabling();
     TestMissingFiles();
 }
 

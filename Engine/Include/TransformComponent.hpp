@@ -21,6 +21,9 @@ namespace ae3d
         /// \return Local scale.
         float GetLocalScale() const { return localScale; }
         
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+        
         /// \param localPosition Local position.
         /// \param center Point we're looking at.
         /// \param up Up vector.
@@ -97,6 +100,7 @@ namespace ae3d
 #if OCULUS_RIFT
         Matrix44 hmdView; // For VR
 #endif
+        GameObject* gameObject = nullptr;
     };
 }
 

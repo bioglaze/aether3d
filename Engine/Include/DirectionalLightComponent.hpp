@@ -10,6 +10,9 @@ namespace ae3d
     class DirectionalLightComponent
     {
     public:
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+
         /// \return True, if the light casts a shadow.
         bool CastsShadow() const { return castsShadow; }
         
@@ -34,6 +37,7 @@ namespace ae3d
         static DirectionalLightComponent* Get( unsigned index );
 
         RenderTexture shadowMap;
+        GameObject* gameObject = nullptr;
         bool castsShadow = false;
     };
 }

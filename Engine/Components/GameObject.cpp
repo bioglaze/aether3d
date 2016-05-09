@@ -75,12 +75,30 @@ GameObject& ae3d::GameObject::operator=( const GameObject& go )
     return *this;
 }
 
+bool ae3d::GameObject::IsEnabled() const
+{
+    const TransformComponent* transform = GetComponent< TransformComponent >();
+
+    while (transform)
+    {
+        if (transform->GetGameObject() && !transform->GetGameObject()->isEnabled)
+        {
+            return false;
+        }
+        
+        transform = transform->parent;
+    }
+    
+    return isEnabled;
+}
+
 std::string ae3d::GameObject::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "gameobject\n";
     outStream << "name " << name << "\n";
     outStream << "layer " << layer << "\n";
+    outStream << "enabled " << (isEnabled ? 1 : 0) << "\n";
 
     return outStream.str();
 }
