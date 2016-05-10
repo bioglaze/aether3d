@@ -9,9 +9,13 @@
 // TODO: game object delete command
 // TODO: game object rename command
 // TODO: Ray-Triangle intersection for selection.
-// TODO: Prevent empty name for game object
 // TODO: Duplicate entire selection
-// TODO: Remove hard-coded startup scene contents and load them from a startup scene.
+/*qDebug( "debug" );
+qInfo( "info" );
+qCritical( "critical" );
+qFatal( "fatal" );
+qWarning( "average position: %f, %f, %f", SelectionAveragePosition().x, SelectionAveragePosition().y, SelectionAveragePosition().z );
+*/
 
 int main( int argc, char *argv[] )
 {

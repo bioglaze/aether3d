@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QWindow>
+#include <QScrollArea>
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "CreateAudioSourceCommand.hpp"
@@ -28,6 +29,24 @@
 #include "TransformInspector.hpp"
 #include "Quaternion.hpp"
 #include "WindowMenu.hpp"
+
+//#define AE3D_RUN_UNIT_TESTS 1
+
+#if AE3D_RUN_UNIT_TESTS
+void TestCommands( MainWindow* mainWindow, SceneWidget* sceneWidget )
+{
+    using namespace ae3d;
+
+    mainWindow->CommandCreateGameObject();
+    System::Assert( sceneWidget->selectedGameObjects.size() == 1, "adding game object didn't update selection correctly" );
+
+    mainWindow->CommandCreateAudioSourceComponent();
+    System::Assert( sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< AudioSourceComponent >(), "audio source component was not added" );
+
+    System::Print( "ran unit tests\n" );
+    exit( 0 );
+}
+#endif
 
 MainWindow::MainWindow()
 {
@@ -72,6 +91,7 @@ MainWindow::MainWindow()
     inspectorContainer = new QWidget();
     inspectorContainer->setLayout( inspectorLayout );
     inspectorContainer->setMinimumWidth( 380 );
+    inspectorContainer->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
     QSplitter* splitter = new QSplitter();
     splitter->addWidget( sceneTree );
@@ -85,6 +105,10 @@ MainWindow::MainWindow()
     reloadTimer.setInterval( 3000 );
     connect( &reloadTimer, &QTimer::timeout, []() { ae3d::System::ReloadChangedAssets(); } );
     reloadTimer.start();
+
+#if AE3D_RUN_UNIT_TESTS
+    TestCommands( this, sceneWidget );
+#endif
 }
 
 void MainWindow::OnGameObjectSelected( std::list< ae3d::GameObject* > /*gameObjects*/ )
@@ -206,7 +230,8 @@ void MainWindow::OpenLightingInspector()
 
 void MainWindow::ShowAbout()
 {
-    QMessageBox::about( this, "About", "Aether3D Editor by Timo Wiren 2016\n\nControls:\nRight mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan");
+    QMessageBox::about( this, "About", "Aether3D Editor by Timo Wiren 2016\n\nControls:\n\
+Right mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan\nCtrl-D: duplicate\nF: Focus on selected");
 }
 
 void MainWindow::HandleGameObjectsAddedOrDeleted()
@@ -227,7 +252,11 @@ void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
         }
     }
 
-    sceneWidget->GetGameObject( renamedIndex )->SetName( item->text( 0 ).toUtf8().constData() );
+    if (item->text( 0 ).length() > 0)
+    {
+        sceneWidget->GetGameObject( renamedIndex )->SetName( item->text( 0 ).toUtf8().constData() );
+    }
+
     UpdateHierarchy();
 }
 

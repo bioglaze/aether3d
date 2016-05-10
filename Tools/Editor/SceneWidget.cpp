@@ -238,16 +238,11 @@ SceneWidget::SceneWidget( QWidget* parent ) : QOpenGLWidget( parent )
     }
 
     QSurfaceFormat fmt;
-#if __APPLE__
     fmt.setVersion( 4, 1 );
-#else
-    fmt.setVersion( 4, 4 );
-#endif
     fmt.setProfile( QSurfaceFormat::CoreProfile );
     fmt.setDepthBufferSize( 24 );
     setFormat( fmt );
     QSurfaceFormat::setDefaultFormat( fmt );
-    std::cout << "depth size: " << fmt.depthBufferSize() << std::endl;
 }
 
 void SceneWidget::Init()
@@ -275,7 +270,7 @@ void SceneWidget::Init()
     gameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     gameObjects[ 0 ]->AddComponent< TransformComponent >();
     gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
-    gameObjects[ 0 ]->SetName( "Game Object" );
+    gameObjects[ 0 ]->SetName( "Cube" );
 
     unlitShader.Load( FileSystem::FileContents( AbsoluteFilePath("unlit.vsh").c_str() ),
                       FileSystem::FileContents( AbsoluteFilePath("unlit.fsh").c_str() ), "unlitVert", "unlitFrag",
@@ -350,7 +345,6 @@ void SceneWidget::SetSelectedCameraTargetToPreview()
     if (!selectedGameObjects.empty())
     {
         gameObjects[ selectedGameObjects.front() ]->GetComponent< ae3d::CameraComponent >()->SetTargetTexture( &previewCameraTex );
-
     }
 }
 
@@ -474,7 +468,7 @@ void SceneWidget::CenterSelected()
         return;
     }
 
-    camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 5 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
+    camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 20 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
 }
 
 void SceneWidget::mousePressEvent( QMouseEvent* event )
@@ -487,6 +481,7 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
         setCursor( Qt::BlankCursor );
         lastMousePosition[ 0 ] = QCursor::pos().x();//event->pos().x();
         lastMousePosition[ 1 ] = QCursor::pos().y();//event->pos().y();
+        QApplication::setOverrideCursor( Qt::CrossCursor );
         //std::cout << "button down pos: " << lastMousePosition[ 0 ] << ", " << lastMousePosition[ 1 ] << std::endl;
     }
     else if (event->button() == Qt::MiddleButton)
@@ -494,7 +489,8 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
         mouseMode = MouseMode::Pan;
         lastMousePosition[ 0 ] = QCursor::pos().x();
         lastMousePosition[ 1 ] = QCursor::pos().y();
-        cursor().setShape( Qt::ClosedHandCursor );
+        //cursor().setShape( Qt::ClosedHandCursor );
+        //QApplication::setOverrideCursor( Qt::ClosedHandCursor );
     }
     else if (event->button() == Qt::LeftButton)
     {
@@ -536,6 +532,8 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
 
 void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
 {
+    QApplication::restoreOverrideCursor();
+
     if (dragAxis != GizmoAxis::None)
     {
         dragAxis = GizmoAxis::None;
