@@ -34,6 +34,11 @@ void TransformInspector::GameObjectSelected( std::list< ae3d::GameObject* > game
 
     ae3d::GameObject* go = gameObjects.front();
 
+    if (!go->GetComponent< ae3d::TransformComponent >())
+    {
+        return;
+    }
+
     // Position.
     const Vec3& position = go->GetComponent< ae3d::TransformComponent >()->GetLocalPosition();
 

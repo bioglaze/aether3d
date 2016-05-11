@@ -9,6 +9,8 @@
 #    define M_PI 3.14159265358979f
 #endif
 
+//#define AE3D_CHECK_FOR_NAN 1
+
 namespace ae3d
 {
 const float biasDataColMajor[] =
@@ -117,8 +119,8 @@ void Matrix44::InverseTranspose( const float m[ 16 ], float* out )
         out[ i ] /= det;
     }
     
-#if DEBUG
-    //ae3d::CheckNaN( out );
+#if AE3D_CHECK_FOR_NAN
+    ae3d::CheckNaN( out );
 #endif
 }
 
@@ -130,7 +132,7 @@ void Matrix44::Invert( const Matrix44& matrix, Matrix44& out )
     iTrans.InitFrom( &invTrans[ 0 ] );
     iTrans.Transpose( out );
     
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( out );
 #endif
 }
@@ -151,7 +153,7 @@ void Matrix44::Multiply( const Matrix44& a, const Matrix44& b, Matrix44& out )
     }
 
     out.InitFrom( &tmp[ 0 ] );
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( out );
 #endif
 }
@@ -166,7 +168,7 @@ void ae3d::Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4*
 
     *out = tmp;
 
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
 #endif
 }
@@ -180,7 +182,7 @@ void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 
     *out = tmp;
     
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
 #endif
 }
@@ -195,7 +197,7 @@ void Matrix44::TransformDirection( const Vec3& dir, const Matrix44& mat, Vec3* o
 
     *out = tmp;
     
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
 #endif
 }
@@ -204,7 +206,7 @@ Matrix44::Matrix44( const Matrix44& other )
 {
     InitFrom( &other.m[ 0 ] );
 
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( other );
 #endif
 }
@@ -213,7 +215,7 @@ Matrix44::Matrix44( const float* data )
 {
     InitFrom( data );
 
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( *this );
 #endif
 }
@@ -273,7 +275,7 @@ void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, 
     };
 
     InitFrom( &proj[ 0 ] );  
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( *this );
 #endif
 }
@@ -294,7 +296,7 @@ void Matrix44::MakeProjection( float left, float right, float bottom, float top,
 
     InitFrom( &ortho[ 0 ] );
     
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( *this );
 #endif
 }
@@ -326,7 +328,7 @@ void Matrix44::MakeRotationXYZ( float xDeg, float yDeg, float zDeg )
     m[14 ] = 0;
     m[15 ] = 1;
     
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( *this );
 #endif
 }
@@ -370,7 +372,7 @@ void Matrix44::Transpose( Matrix44& out ) const
 
     out.InitFrom( &tmp[ 0 ] );
     
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( out );
 #endif
 }
@@ -385,7 +387,7 @@ void Matrix44::Translate( const Vec3& v )
 
     Multiply( *this, translateMatrix, *this );
     
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( *this );
 #endif
 }

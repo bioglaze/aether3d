@@ -749,6 +749,19 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outGameObjects.back().SetName( name.c_str() );
         }
 
+        if (token == "name")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found name but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            std::string name;
+            lineStream >> name;
+            outGameObjects.back().SetName( name.c_str() );
+        }
+
         if (token == "dirlight")
         {
             if (outGameObjects.empty())

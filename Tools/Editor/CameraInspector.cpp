@@ -152,7 +152,8 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     }
     catch (std::invalid_argument&)
     {
-        fov = 0;
+        fov = 45;
+        persp->item( 0, 0 )->setText( "45" );
     }
 
     try
@@ -162,6 +163,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         aspect = 1;
+        persp->item( 0, 1 )->setText( "1" );
     }
 
     try
@@ -171,6 +173,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         perspNear = 1;
+        persp->item( 0, 2 )->setText( "1" );
     }
 
     try
@@ -180,6 +183,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         perspFar = 1;
+        persp->item( 0, 3 )->setText( "1" );
     }
 
     try
@@ -189,6 +193,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         width = 1;
+        ortho->item( 0, 0 )->setText( "1" );
     }
 
     try
@@ -198,6 +203,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         height = 1;
+        ortho->item( 0, 1 )->setText( "1" );
     }
 
 
@@ -208,6 +214,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         orthoNear = 1;
+        ortho->item( 0, 2 )->setText( "1" );
     }
 
     try
@@ -217,6 +224,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         orthoFar = 1;
+        ortho->item( 0, 3 )->setText( "1" );
     }
 
     const ae3d::Vec4 orthoParams { width, height, orthoNear, orthoFar };
@@ -232,6 +240,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         clearColor.x = 0;
+        clearColorTable->item( 0, 0 )->setText( "0" );
     }
 
     try
@@ -241,6 +250,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         clearColor.y = 0;
+        clearColorTable->item( 0, 1 )->setText( "0" );
     }
 
     try
@@ -250,6 +260,7 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     catch (std::invalid_argument&)
     {
         clearColor.z = 0;
+        clearColorTable->item( 0, 2 )->setText( "0" );
     }
 
     ae3d::CameraComponent::ProjectionType projectionType = ae3d::CameraComponent::ProjectionType::Perspective;

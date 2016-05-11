@@ -252,6 +252,7 @@ void SceneWidget::Init()
     System::InitGfxDeviceForEditor( width() * devicePixelRatio(), height() * devicePixelRatio() );
     System::LoadBuiltinAssets();
 
+    camera.SetName( "Camera" );
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width() * devicePixelRatio() ) / (height() * devicePixelRatio()), 1, 400 );
@@ -260,7 +261,13 @@ void SceneWidget::Init()
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
-    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat,
+    lightTex.Load( FileSystem::FileContents( AbsoluteFilePath( "light.png" ).c_str() ), TextureWrap::Repeat,
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+
+    cameraTex.Load( FileSystem::FileContents( AbsoluteFilePath( "camera.png" ).c_str() ), TextureWrap::Repeat,
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+
+    spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath( "glider.png" ).c_str() ), TextureWrap::Repeat,
                     TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
 
     cubeMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "textured_cube.ae3d" ).c_str() ) );
@@ -296,6 +303,7 @@ void SceneWidget::Init()
             this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
 
     const ae3d::Vec3 rtDim = { 256, 256, 0 };
+    hudCamera.SetName( "HUD Camera" );
     hudCamera.AddComponent<CameraComponent>();
     hudCamera.GetComponent<CameraComponent>()->SetProjection( 0, rtDim.x, 0, rtDim.y, 0, 1 );
     hudCamera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Orthographic );
@@ -319,6 +327,7 @@ void SceneWidget::Init()
     previewCamera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, -100 }, { 0, 1, 0 } );
     scene.Add( &previewCamera );
 
+    hud.SetName( "HUD" );
     hud.AddComponent<SpriteRendererComponent>();
     hud.GetComponent<SpriteRendererComponent>()->SetTexture( &previewCameraTex, Vec3( -50, -150, -0.6f ), Vec3( rtDim.x, rtDim.y, 1 ), Vec4( 0.7f, 0.7f, 1, 1 ) );
     hud.SetLayer( 2 );
@@ -330,14 +339,50 @@ void SceneWidget::Init()
     emit GameObjectsAddedOrDeleted();
 }
 
+void SceneWidget::DrawLightSprites()
+{
+    const Vec3 cameraPos = camera.GetComponent< TransformComponent >()->GetLocalPosition();
+
+    /*const float distance = (cameraPos - light->GetPosition()).Length();
+    const float lerpDistance = 10;
+    float opacity = 1;
+
+    if (distance < lerpDistance)
+    {
+        opacity = distance / lerpDistance;
+    }
+
+    const Vec3 screenPoint = editorCamera->ScreenPoint( light->GetPosition() );
+
+    const Vec3 viewDir = editorCamera->ViewDirection();
+    const Vec3 lightDir = (light->GetPosition() - cameraPos).Normalized();
+    const float viewDotLight = Vec3::Dot( viewDir, lightDir ) ;
+
+    if (viewDotLight <= 0 &&
+        screenPoint.x > -lightTex->Width() && screenPoint.y > -lightTex->Height() &&
+        screenPoint.x < renderer->Width() && screenPoint.y < renderer->Height())
+    {
+        const Vec3 color = static_cast<Light*>( light )->GetColor();
+        const float size = renderer->Height() / distance;
+
+        renderer->Draw(lightTex, screenPoint.x, screenPoint.y, size, size, Vec4( color.x, color.y, color.z, opacity ) );
+    }*/
+}
+
 void SceneWidget::RemoveEditorObjects()
 {
     scene.Remove( &camera );
+    scene.Remove( &previewCamera );
+    scene.Remove( &hudCamera );
+    scene.Remove( &hud );
 }
 
 void SceneWidget::AddEditorObjects()
 {
     scene.Add( &camera );
+    scene.Add( &previewCamera );
+    scene.Add( &hudCamera );
+    scene.Add( &hud );
 }
 
 void SceneWidget::SetSelectedCameraTargetToPreview()
@@ -361,6 +406,7 @@ void SceneWidget::updateGL()
 void SceneWidget::paintGL()
 {
     scene.Render();
+    DrawLightSprites();
 }
 
 void SceneWidget::resizeGL( int width, int height )
