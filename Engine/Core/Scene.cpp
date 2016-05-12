@@ -734,6 +734,9 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     
     std::string currentMaterialName;
     
+    enum CurrentLightType { Directional, Spot, Point, None };
+    CurrentLightType currentLightType = CurrentLightType::None;
+    
     while (!stream.eof())
     {
         std::getline( stream, line );
@@ -758,7 +761,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             }
 
             std::string name;
-            lineStream >> name;
+            std::getline( lineStream, name );
+            //lineStream >> name;
             outGameObjects.back().SetName( name.c_str() );
         }
 
@@ -769,10 +773,28 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 System::Print( "Failed to parse %s: found dirlight but there are no game objects defined before this line.\n", serialized.path.c_str() );
                 return DeserializeResult::ParseError;
             }
-
+            
+            currentLightType = CurrentLightType::Directional;
             outGameObjects.back().AddComponent< DirectionalLightComponent >();
         }
 
+        if (token == "spotlight")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found spotlight but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+            
+            currentLightType = CurrentLightType::Spot;
+            outGameObjects.back().AddComponent< SpotLightComponent >();
+            
+            float coneAngleDegrees;
+            lineStream >> coneAngleDegrees;
+            outGameObjects.back().GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
+            
+        }
+        
         if (token == "shadow")
         {
             if (outGameObjects.empty())
@@ -783,7 +805,19 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             int enabled;
             lineStream >> enabled;
-            outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+
+            if (currentLightType == CurrentLightType::Directional)
+            {
+                outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+            }
+            else if (currentLightType == CurrentLightType::Spot)
+            {
+                outGameObjects.back().GetComponent< SpotLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+            }
+            if (currentLightType == CurrentLightType::Point)
+            {
+                //outGameObjects.back().GetComponent< PointLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+            }
         }
 
         if (token == "camera")

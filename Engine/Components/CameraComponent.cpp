@@ -20,6 +20,21 @@ ae3d::CameraComponent* ae3d::CameraComponent::Get( unsigned index )
     return &cameraComponents[ index ];
 }
 
+ae3d::Vec3 ae3d::CameraComponent::GetScreenPoint( const ae3d::Vec3 &worldPoint, float viewWidth, float viewHeight ) const
+{
+    Matrix44 viewProjection;
+    Matrix44::Multiply( viewMatrix, projectionMatrix, viewProjection );
+    Vec4 pos( worldPoint );
+    Matrix44::TransformPoint( pos, viewProjection, &pos );
+    pos.x /= pos.w;
+    pos.y /= pos.w;
+    
+    const float halfWidth = viewWidth * 0.5f;
+    const float halfHeight = viewHeight * 0.5f;
+    
+    return Vec3( pos.x * halfWidth + halfWidth, -pos.y * halfHeight + halfHeight, pos.z );
+}
+
 void ae3d::CameraComponent::SetProjection( float left, float right, float bottom, float top, float aNear, float aFar )
 {
     orthoParams.left = left;

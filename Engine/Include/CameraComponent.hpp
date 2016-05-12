@@ -27,6 +27,12 @@ namespace ae3d
         /// \return View matrix.
         const Matrix44& GetView() const { return viewMatrix; }
 
+        /// \param worldPoint Point in the world.
+        /// \param viewWidth Camera's viewport width.
+        /// \param viewHeight Camera's viewport height.
+        /// \return Screen point for worldPoint.
+        Vec3 GetScreenPoint( const Vec3& worldPoint, float viewWidth, float viewHeight ) const;
+        
         /// \return Projection type.
         ProjectionType GetProjectionType() const { return projectionType; }
 
