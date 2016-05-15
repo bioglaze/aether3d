@@ -26,9 +26,9 @@ constexpr sampler s(coord::normalized,
                     address::repeat,
                     filter::linear);
 
-vertex ColorInOut skybox_vertex(device vertex_t* vertex_array [[ buffer(0) ]],
-                                constant uniforms_t& uniforms [[ buffer(1) ]],
-                                unsigned int vid [[ vertex_id ]])
+vertex ColorInOut skybox_vertex( device vertex_t* vertex_array [[ buffer(0) ]],
+                                 constant uniforms_t& uniforms [[ buffer(5) ]],
+                                 unsigned int vid [[ vertex_id ]])
 {
     ColorInOut out;
     

@@ -206,7 +206,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     desc.usage = MTLTextureUsageRenderTarget;
     
     msaaColorTarget = [device newTextureWithDescriptor:desc];
-
+    msaaColorTarget.label = @"MSAA Color Target";
+    
     MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
                                                                                     width:GfxDeviceGlobal::backBufferWidth * 2
                                                                                    height:GfxDeviceGlobal::backBufferHeight * 2
@@ -218,6 +219,7 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     depthDesc.usage = MTLTextureUsageRenderTarget;
     
     msaaDepthTarget = [device newTextureWithDescriptor:depthDesc];
+    msaaDepthTarget.label = @"MSAA Depth Target";
 }
 
 id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
@@ -271,27 +273,30 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     GfxDeviceGlobal::clearFlags = (ae3d::GfxDevice::ClearFlags)clearFlags;
 }
 
-std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
+                        ae3d::VertexBuffer::VertexFormat vertexFormat )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&shader.vertexProgram );
     hashString += std::to_string( (ptrdiff_t)&shader.fragmentProgram );
     hashString += std::to_string( (unsigned)blendMode );
-    hashString += std::to_string( ((unsigned)depthFunc) + 4 );
+    hashString += std::to_string( ((unsigned)depthFunc) );
+    hashString += std::to_string( ((unsigned)vertexFormat) );
     return hashString;
 }
 
-id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc )
+id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
+                                    ae3d::VertexBuffer::VertexFormat vertexFormat )
 {
-    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc );
+    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineStateDescriptor.label = @"pipeline";
         pipelineStateDescriptor.sampleCount = GfxDeviceGlobal::sampleCount;
         pipelineStateDescriptor.vertexFunction = shader.vertexProgram;
         pipelineStateDescriptor.fragmentFunction = shader.fragmentProgram;
+        pipelineStateDescriptor.inputPrimitiveTopology = MTLPrimitiveTopologyClassTriangle;
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
         pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;
         pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
@@ -302,6 +307,107 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
         // This must match app's view's format.
         pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+        
+        MTLVertexDescriptor* vertexDesc = [MTLVertexDescriptor vertexDescriptor];
+        
+        if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTNTC)
+        {
+            pipelineStateDescriptor.label = @"pipeline PTNTC";
+
+            // Position
+            vertexDesc.attributes[0].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[0].bufferIndex = 0;
+            vertexDesc.attributes[0].offset = 0;
+            
+            // Texcoord
+            vertexDesc.attributes[1].format = MTLVertexFormatFloat2;
+            vertexDesc.attributes[1].bufferIndex = 0;
+            vertexDesc.attributes[1].offset = 4 * 3;
+
+            // Normal
+            vertexDesc.attributes[3].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[3].bufferIndex = 0;
+            vertexDesc.attributes[3].offset = 4 * 5;
+
+            // Tangent
+            vertexDesc.attributes[4].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[4].bufferIndex = 0;
+            vertexDesc.attributes[4].offset = 4 * 8;
+
+            // Color
+            vertexDesc.attributes[2].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[2].bufferIndex = 0;
+            vertexDesc.attributes[2].offset = 4 * 12;
+
+            vertexDesc.layouts[0].stride = sizeof( ae3d::VertexBuffer::VertexPTNTC );
+            vertexDesc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
+        }
+        else if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTN)
+        {
+            pipelineStateDescriptor.label = @"pipeline PTN";
+            
+            // Position
+            vertexDesc.attributes[0].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[0].bufferIndex = 0;
+            vertexDesc.attributes[0].offset = 0;
+            
+            // Texcoord
+            vertexDesc.attributes[1].format = MTLVertexFormatFloat2;
+            vertexDesc.attributes[1].bufferIndex = 0;
+            vertexDesc.attributes[1].offset = 4 * 3;
+
+            // Color
+            vertexDesc.attributes[2].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[2].bufferIndex = 1;
+            vertexDesc.attributes[2].offset = 0;
+
+            // Normal
+            vertexDesc.attributes[3].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[3].bufferIndex = 0;
+            vertexDesc.attributes[3].offset = 4 * 5;
+            
+            vertexDesc.layouts[0].stride = sizeof( ae3d::VertexBuffer::VertexPTN );
+            vertexDesc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
+
+            vertexDesc.layouts[1].stride = 4 * 4;
+            vertexDesc.layouts[1].stepFunction = MTLVertexStepFunctionPerVertex;
+        }
+        else if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTC)
+        {
+            pipelineStateDescriptor.label = @"pipeline PTC";
+            
+            // Position
+            vertexDesc.attributes[0].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[0].bufferIndex = 0;
+            vertexDesc.attributes[0].offset = 0;
+            
+            // Texcoord
+            vertexDesc.attributes[1].format = MTLVertexFormatFloat2;
+            vertexDesc.attributes[1].bufferIndex = 0;
+            vertexDesc.attributes[1].offset = 4 * 3;
+            
+            // Color
+            vertexDesc.attributes[2].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[2].bufferIndex = 0;
+            vertexDesc.attributes[2].offset = 4 * 5;
+            
+            // Normal
+            vertexDesc.attributes[3].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[3].bufferIndex = 1;
+            vertexDesc.attributes[3].offset = 0;
+            
+            vertexDesc.layouts[0].stride = sizeof( ae3d::VertexBuffer::VertexPTC );
+            vertexDesc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
+            
+            vertexDesc.layouts[1].stride = 3 * 4;
+            vertexDesc.layouts[1].stepFunction = MTLVertexStepFunctionPerVertex;
+        }
+        else
+        {
+            ae3d::System::Assert( false, "unimplemented vertex format" );
+        }
+        
+        pipelineStateDescriptor.vertexDescriptor = vertexDesc;
         
         NSError* error = NULL;
         MTLRenderPipelineReflection* reflectionObj;
@@ -335,19 +441,36 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         texture1 = Texture2D::GetDefaultTexture()->GetMetalTexture();
     }
     
-    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc )];
-    [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeFront : MTLCullModeNone];
+    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat() )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
-    [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:1];
+    [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
+    [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeFront : MTLCullModeNone];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
     [renderEncoder setFragmentTexture:texture1 atIndex:1];
     [renderEncoder setDepthStencilState:depthStateLessWriteOn];
+
+    if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
+    {
+        // No need to se extra buffers as vertexBuffer contains all attributes.
+    }
+    else if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTN)
+    {
+        [renderEncoder setVertexBuffer:vertexBuffer.colorBuffer offset:0 atIndex:1];
+    }
+    else if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTC)
+    {
+        [renderEncoder setVertexBuffer:vertexBuffer.normalBuffer offset:0 atIndex:1];
+    }
+    else
+    {
+        System::Assert( false, "Unhandled vertex format" );
+    }
     
     [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                               indexCount:(endIndex - startIndex) * 3
                                indexType:MTLIndexTypeUInt16
                              indexBuffer:vertexBuffer.GetIndexBuffer()
-                       indexBufferOffset:startIndex * 2 * 3];
+                       indexBufferOffset:startIndex * 2 * 3];    
 }
 
 void ae3d::GfxDevice::BeginFrame()

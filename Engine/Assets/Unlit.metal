@@ -59,17 +59,24 @@ float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float d
     return clamp( max( p, pMax ), 0.0, 1.0 );
 }
 
-vertex ColorInOut unlit_vertex(device vertex_t* vertex_array [[ buffer(0) ]],
-                                constant uniforms_t& uniforms [[ buffer(1) ]],
-                                unsigned int vid [[ vertex_id ]])
+struct Vertex
+{
+    float3 position [[attribute(0)]];
+    float2 texcoord [[attribute(1)]];
+    float4 color [[attribute(2)]];
+};
+
+vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
+                               constant uniforms_t& uniforms [[ buffer(5) ]],
+                               unsigned int vid [[ vertex_id ]])
 {
     ColorInOut out;
     
-    float4 in_position = float4( float3( vertex_array[ vid ].position ), 1.0 );
+    float4 in_position = float4( float3( vert.position ), 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     
-    out.color = half4( vertex_array[vid].color );
-    out.texCoords = float2( vertex_array[ vid ].texcoord );
+    out.color = half4( vert.color );
+    out.texCoords = float2( vert.texcoord );
     out.tintColor = uniforms.tintColor;
     return out;
 }

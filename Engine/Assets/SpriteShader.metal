@@ -18,7 +18,8 @@ typedef struct
     packed_float4 color;
 } vertex_t;
 
-typedef struct {
+typedef struct
+{
     float4 position [[position]];
     half4  color;
     float2 texCoords;
@@ -29,7 +30,7 @@ constexpr sampler s(coord::normalized,
                     filter::linear);
 
 vertex ColorInOut sprite_vertex(device vertex_t* vertex_array [[ buffer(0) ]],
-                                  constant uniforms_t& uniforms [[ buffer(1) ]],
+                                  constant uniforms_t& uniforms [[ buffer(5) ]],
                                   unsigned int vid [[ vertex_id ]])
 {
     ColorInOut out;

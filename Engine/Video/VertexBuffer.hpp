@@ -122,6 +122,14 @@ namespace ae3d
 #if RENDERER_METAL
         id<MTLBuffer> GetVertexBuffer() const { return vertexBuffer; }
         id<MTLBuffer> GetIndexBuffer() const { return indexBuffer; }
+#if 1
+        id<MTLBuffer> positionBuffer;
+        id<MTLBuffer> texcoordBuffer;
+        id<MTLBuffer> colorBuffer;
+        id<MTLBuffer> normalBuffer;
+        id<MTLBuffer> tangentBuffer;
+#endif
+        
 #endif
 #if RENDERER_VULKAN
         static const std::uint32_t VERTEX_BUFFER_BIND_ID = 0;
@@ -131,12 +139,13 @@ namespace ae3d
         VkBuffer* GetIndexBuffer() { return &indexBuffer; }
 
 #endif
-    private:
         static const int posChannel = 0;
         static const int uvChannel = 1;
         static const int colorChannel = 2;
         static const int normalChannel = 3;
         static const int tangentChannel = 4;
+        
+    private:
 
 #if RENDERER_D3D12
         void UploadVB( void* faces, void* vertices, unsigned ibSize );

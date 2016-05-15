@@ -30,7 +30,7 @@ constexpr sampler s(coord::normalized,
                     filter::linear);
 
 vertex ColorInOut sdf_vertex(device vertex_t* vertex_array [[ buffer(0) ]],
-                                  constant uniforms_t& uniforms [[ buffer(1) ]],
+                                  constant uniforms_t& uniforms [[ buffer(5) ]],
                                   unsigned int vid [[ vertex_id ]])
 {
     ColorInOut out;
