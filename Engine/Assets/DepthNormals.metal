@@ -13,7 +13,7 @@ struct Vertex
 {
     float3 position [[attribute(0)]];
     float2 texcoord [[attribute(1)]];
-    float4 normal [[attribute(3)]];
+    float3 normal [[attribute(3)]];
 };
 
 typedef struct

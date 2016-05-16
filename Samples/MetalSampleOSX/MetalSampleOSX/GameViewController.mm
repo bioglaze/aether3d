@@ -145,15 +145,15 @@
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
-    //scene.Add( &dirLight );
+    scene.Add( &dirLight );
     
-    //rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
-    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
-    //scene.Add( &renderTextureContainer );
+    scene.Add( &renderTextureContainer );
     
     rtCamera.AddComponent<ae3d::CameraComponent>();
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
@@ -162,8 +162,8 @@
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0, 0 ) );
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<ae3d::TransformComponent>();
-    //rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
-    //scene.Add( &rtCamera );
+    rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 20 ) );
+    scene.Add( &rtCamera );
 }
 
 - (void)_setupView

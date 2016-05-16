@@ -104,16 +104,14 @@ namespace ae3d
         TextureWrap wrap = TextureWrap::Repeat;
         /// Filtering mode.
         TextureFilter filter = TextureFilter::Nearest;
-        /// Mipmaps.
-        Mipmaps mipmaps = Mipmaps::None;
         /// Scale (tiling) and offset.
         Vec4 scaleOffset{ 1, 1, 0, 0 };
-        /// Is the texture opaque.
-        bool opaque = true;
-        /// Color space.
-        ColorSpace colorSpace = ColorSpace::RGB;
+        /// Mipmaps.
+        Mipmaps mipmaps = Mipmaps::None;
         /// Anisotropy.
         float anisotropy = 1;
+        /// Color space.
+        ColorSpace colorSpace = ColorSpace::RGB;
 #if RENDERER_METAL
         id<MTLTexture> metalTexture;  
 #endif
@@ -125,6 +123,8 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
 #endif
+        /// Is the texture opaque.
+        bool opaque = true;
         bool isRenderTexture = false;
     };
 }

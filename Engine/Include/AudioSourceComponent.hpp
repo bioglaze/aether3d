@@ -39,8 +39,8 @@ namespace ae3d
         /// \return Component at index or null if index is invalid.
         static AudioSourceComponent* Get( unsigned index );
         
-        unsigned clipId = 0;
         GameObject* gameObject = nullptr;
+        unsigned clipId = 0;
         bool is3D = false;
     };
 }
