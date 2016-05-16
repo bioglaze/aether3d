@@ -38,7 +38,7 @@ FbxScene* ImportScene( const std::string& path )
 {
     sdkManager = FbxManager::Create();
 
-    if (!sdkManager)
+    if (sdkManager)
     {
         std::cout << "Autodesk FBX SDK version " << sdkManager->GetVersion() << std::endl;
     }
@@ -113,9 +113,10 @@ void ProcessVertices( FbxNode* node )
     for (int i = 0; i < vertexCount; ++i)
     {
         Vec3 vertex;
-        vertex.x = static_cast<float>(mesh->GetControlPointAt( i ).mData[ 0 ]);
-        vertex.y = static_cast<float>(mesh->GetControlPointAt( i ).mData[ 1 ]);
-        vertex.z = static_cast<float>(mesh->GetControlPointAt( i ).mData[ 2 ]);
+        auto point = mesh->GetControlPointAt( i );
+        vertex.x = static_cast<float>( point.mData[ 0 ] );
+        vertex.y = static_cast<float>( point.mData[ 1 ] );
+        vertex.z = static_cast<float>( point.mData[ 2 ] );
         gMeshes.back().vertex[ i ] = vertex;
     }
     
@@ -338,8 +339,8 @@ void LoadFBX( const std::string& path )
         exit( 1 );
     }
 
-    FbxScene* const scene = ImportScene( path );
-    FbxNode* rootNode = scene->GetRootNode();
+    FbxScene* const theScene = ImportScene( path );
+    FbxNode* rootNode = theScene->GetRootNode();
 
     ImportMeshNodes( rootNode );
 }
@@ -370,4 +371,5 @@ int main( int paramCount, char** params )
     outFile.append( "ae3d" );
 
     WriteAe3d( outFile, VertexFormat::PTNTC );
+    return 0;
 }
