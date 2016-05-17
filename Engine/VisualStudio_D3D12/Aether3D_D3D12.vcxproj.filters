@@ -129,6 +129,9 @@
     <ClCompile Include="..\Video\D3D12\ComputeShaderD3D12.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\PointLightComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -240,6 +243,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\ComputeShader.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PointLightComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

@@ -115,6 +115,9 @@
     <ClCompile Include="..\Video\OGL\ComputeShaderGL.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\PointLightComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -249,6 +252,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\ComputeShader.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\PointLightComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

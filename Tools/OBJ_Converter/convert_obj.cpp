@@ -508,4 +508,5 @@ int main( int paramCount, char** params )
     }
     
     WriteAe3d( outFile, vertexFormat );
+    return 0;
 }
