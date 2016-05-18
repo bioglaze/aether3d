@@ -73,6 +73,8 @@
 		AB6E134C1C11D8BD0020A929 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */; };
 		AB6E134E1C11D93E0020A929 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6E134D1C11D93E0020A929 /* Metal.framework */; };
 		AB6E85851CB571A10041C8CB /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */; };
+		AB8E83F71CEBAE7600A8E9E8 /* PointLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */; };
+		AB8E83F91CEBAE9A00A8E9E8 /* PointLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB8E83F81CEBAE9A00A8E9E8 /* PointLightComponent.cpp */; };
 		AB921DB11CC21AF4008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */; };
 		ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */; };
 		ABB6E0AE1C7C55E30014B78B /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */; };
@@ -146,6 +148,8 @@
 		AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB6E134D1C11D93E0020A929 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
+		AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../Include/PointLightComponent.hpp; sourceTree = "<group>"; };
+		AB8E83F81CEBAE9A00A8E9E8 /* PointLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointLightComponent.cpp; path = ../Components/PointLightComponent.cpp; sourceTree = "<group>"; };
 		AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ComputeShaderMetal.mm; path = ../Video/Metal/ComputeShaderMetal.mm; sourceTree = "<group>"; };
 		ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../Video/Metal/TextureCubeMetal.mm; sourceTree = "<group>"; };
@@ -192,6 +196,7 @@
 				AB6E12C91C11D79B0020A929 /* DirectionalLightComponent.cpp */,
 				AB6E12CA1C11D79B0020A929 /* GameObject.cpp */,
 				AB6E12CB1C11D79B0020A929 /* MeshRendererComponent.cpp */,
+				AB8E83F81CEBAE9A00A8E9E8 /* PointLightComponent.cpp */,
 				AB6E12CC1C11D79B0020A929 /* SpotLightComponent.cpp */,
 				AB6E12CD1C11D79B0020A929 /* SpriteRendererComponent.cpp */,
 				AB6E12CE1C11D79B0020A929 /* TextRendererComponent.cpp */,
@@ -260,6 +265,7 @@
 				AB6E13111C11D8020020A929 /* Matrix.hpp */,
 				AB6E13121C11D8020020A929 /* Mesh.hpp */,
 				AB6E13131C11D8020020A929 /* MeshRendererComponent.hpp */,
+				AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */,
 				AB6E13141C11D8020020A929 /* Quaternion.hpp */,
 				AB6E13151C11D8020020A929 /* RenderTexture.hpp */,
 				AB6E13161C11D8020020A929 /* Scene.hpp */,
@@ -326,6 +332,7 @@
 				AB6E13281C11D8020020A929 /* GameObject.hpp in Headers */,
 				AB6E13251C11D8020020A929 /* DirectionalLightComponent.hpp in Headers */,
 				AB6E12F21C11D7B00020A929 /* Frustum.hpp in Headers */,
+				AB8E83F71CEBAE7600A8E9E8 /* PointLightComponent.hpp in Headers */,
 				AB6E13361C11D8020020A929 /* Texture2D.hpp in Headers */,
 				AB6E132A1C11D8020020A929 /* Material.hpp in Headers */,
 			);
@@ -389,6 +396,7 @@
 			files = (
 				AB6E12EE1C11D7B00020A929 /* FileWatcher.cpp in Sources */,
 				AB6E12F11C11D7B00020A929 /* Frustum.cpp in Sources */,
+				AB8E83F91CEBAE9A00A8E9E8 /* PointLightComponent.cpp in Sources */,
 				AB6E12ED1C11D7B00020A929 /* FileSystem.cpp in Sources */,
 				AB6E12D11C11D79B0020A929 /* CameraComponent.cpp in Sources */,
 				AB6E12D01C11D79B0020A929 /* AudioSourceComponent.cpp in Sources */,

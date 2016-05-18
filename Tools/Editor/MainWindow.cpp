@@ -23,11 +23,12 @@
 #include "MeshRendererComponent.hpp"
 #include "ModifyTransformCommand.hpp"
 #include "ModifyCameraCommand.hpp"
+#include "PointLightComponent.hpp"
+#include "Quaternion.hpp"
 #include "SceneWidget.hpp"
 #include "System.hpp"
 #include "SpotLightComponent.hpp"
 #include "TransformInspector.hpp"
-#include "Quaternion.hpp"
 #include "WindowMenu.hpp"
 
 //#define AE3D_RUN_UNIT_TESTS 1
@@ -73,6 +74,7 @@ MainWindow::MainWindow()
     cameraInspector.Init( this );
     meshRendererInspector.Init( this );
     dirLightInspector.Init( this );
+    pointLightInspector.Init( this );
     spotLightInspector.Init( this );
     spriteRendererInspector.Init( this );
     audioSourceInspector.Init( this );
@@ -83,6 +85,7 @@ MainWindow::MainWindow()
     inspectorLayout->addWidget( cameraInspector.GetWidget() );
     inspectorLayout->addWidget( meshRendererInspector.GetWidget() );
     inspectorLayout->addWidget( dirLightInspector.GetWidget() );
+    inspectorLayout->addWidget( pointLightInspector.GetWidget() );
     inspectorLayout->addWidget( spotLightInspector.GetWidget() );
     inspectorLayout->addWidget( audioSourceInspector.GetWidget() );
     inspectorLayout->addWidget( spriteRendererInspector.GetWidget() );
@@ -146,6 +149,7 @@ void MainWindow::UpdateInspector()
         cameraInspector.GetWidget()->hide();
         meshRendererInspector.GetWidget()->hide();
         dirLightInspector.GetWidget()->hide();
+        pointLightInspector.GetWidget()->hide();
         spotLightInspector.GetWidget()->hide();
         audioSourceInspector.GetWidget()->hide();
         spriteRendererInspector.GetWidget()->hide();
@@ -182,6 +186,16 @@ void MainWindow::UpdateInspector()
         else
         {
             dirLightInspector.GetWidget()->hide();
+        }
+
+        auto pointLightComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::PointLightComponent >();
+        if (pointLightComponent)
+        {
+            pointLightInspector.GetWidget()->show();
+        }
+        else
+        {
+            pointLightInspector.GetWidget()->hide();
         }
 
         auto spotLightComponent = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::SpotLightComponent >();
@@ -382,6 +396,12 @@ void MainWindow::CommandCreateDirectionalLightComponent()
 void MainWindow::CommandCreateSpotLightComponent()
 {
     commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Spot ) );
+    UpdateInspector();
+}
+
+void MainWindow::CommandCreatePointLightComponent()
+{
+    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Point ) );
     UpdateInspector();
 }
 

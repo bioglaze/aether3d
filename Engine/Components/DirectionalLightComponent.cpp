@@ -36,6 +36,6 @@ std::string ae3d::DirectionalLightComponent::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "dirlight\n";
-    outStream << (castsShadow ? 1 : 0);
+    outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
     return outStream.str();
 }

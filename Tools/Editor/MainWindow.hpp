@@ -10,6 +10,7 @@
 #include "DirectionalLightInspector.hpp"
 #include "LightingInspector.hpp"
 #include "MeshRendererInspector.hpp"
+#include "PointLightInspector.hpp"
 #include "SpotLightInspector.hpp"
 #include "SpriteRendererInspector.hpp"
 #include "TransformInspector.hpp"
@@ -46,6 +47,7 @@ public slots:
     void CommandCreateSpriteRendererComponent();
     void CommandCreateDirectionalLightComponent();
     void CommandCreateSpotLightComponent();
+    void CommandCreatePointLightComponent();
     void CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
     void CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
                               const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor );
@@ -76,6 +78,7 @@ private:
     CameraInspector cameraInspector;
     MeshRendererInspector meshRendererInspector;
     DirectionalLightInspector dirLightInspector;
+    PointLightInspector pointLightInspector;
     SpotLightInspector spotLightInspector;
     LightingInspector lightingInspector;
     AudioSourceInspector audioSourceInspector;

@@ -44,6 +44,8 @@
 		AB889B081ABB4FDE005BA86D /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */; };
 		AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B061ABB4FDE005BA86D /* GameObject.cpp */; };
 		AB889B0A1ABB4FDE005BA86D /* SpriteRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */; };
+		AB8E83FB1CEBAEB900A8E9E8 /* PointLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB8E83FA1CEBAEB900A8E9E8 /* PointLightComponent.hpp */; };
+		AB8E83FD1CEBAECC00A8E9E8 /* PointLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB8E83FC1CEBAECC00A8E9E8 /* PointLightComponent.cpp */; };
 		AB921DAB1CC21A8E008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DAA1CC21A8E008F5750 /* ComputeShader.hpp */; };
 		AB921DAD1CC21AA4008F5750 /* ComputeShaderGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB921DAC1CC21AA4008F5750 /* ComputeShaderGL.cpp */; };
 		AB922E4C1B4039A7000F3488 /* Mesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB922E4B1B4039A7000F3488 /* Mesh.hpp */; };
@@ -114,6 +116,8 @@
 		AB889B051ABB4FDE005BA86D /* CameraComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CameraComponent.cpp; path = ../Components/CameraComponent.cpp; sourceTree = "<group>"; };
 		AB889B061ABB4FDE005BA86D /* GameObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameObject.cpp; path = ../Components/GameObject.cpp; sourceTree = "<group>"; };
 		AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpriteRendererComponent.cpp; path = ../Components/SpriteRendererComponent.cpp; sourceTree = "<group>"; };
+		AB8E83FA1CEBAEB900A8E9E8 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../Include/PointLightComponent.hpp; sourceTree = "<group>"; };
+		AB8E83FC1CEBAECC00A8E9E8 /* PointLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointLightComponent.cpp; path = ../Components/PointLightComponent.cpp; sourceTree = "<group>"; };
 		AB921DAA1CC21A8E008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		AB921DAC1CC21AA4008F5750 /* ComputeShaderGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ComputeShaderGL.cpp; path = ../Video/OGL/ComputeShaderGL.cpp; sourceTree = "<group>"; };
 		AB922E4B1B4039A7000F3488 /* Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Mesh.hpp; path = ../Include/Mesh.hpp; sourceTree = "<group>"; };
@@ -235,6 +239,7 @@
 				ABA6B0CE1ABF25DC00D84140 /* Matrix.hpp */,
 				AB922E4B1B4039A7000F3488 /* Mesh.hpp */,
 				AB922E521B404D1E000F3488 /* MeshRendererComponent.hpp */,
+				AB8E83FA1CEBAEB900A8E9E8 /* PointLightComponent.hpp */,
 				ABC1A6881AC4775C00C4F401 /* Quaternion.hpp */,
 				AB78D91B1B19E2E8009928E1 /* RenderTexture.hpp */,
 				AB889AF51ABB4C5B005BA86D /* Scene.hpp */,
@@ -272,6 +277,7 @@
 				ABB79F9C1BA9B818002A1B5F /* DirectionalLightComponent.cpp */,
 				AB889B061ABB4FDE005BA86D /* GameObject.cpp */,
 				AB922E501B404CFD000F3488 /* MeshRendererComponent.cpp */,
+				AB8E83FC1CEBAECC00A8E9E8 /* PointLightComponent.cpp */,
 				AB889B071ABB4FDE005BA86D /* SpriteRendererComponent.cpp */,
 				ABC1A6861AC4693F00C4F401 /* TransformComponent.cpp */,
 				ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */,
@@ -309,6 +315,7 @@
 				AB889AFD1ABB4C5B005BA86D /* SpriteRendererComponent.hpp in Headers */,
 				ABB79F9F1BA9B828002A1B5F /* DirectionalLightComponent.hpp in Headers */,
 				ABCE0CA41AC06A4000F9EC53 /* glcorearb.h in Headers */,
+				AB8E83FB1CEBAEB900A8E9E8 /* PointLightComponent.hpp in Headers */,
 				AB78D91C1B19E2E8009928E1 /* RenderTexture.hpp in Headers */,
 				AB3FD4961AB4330C00D28653 /* System.hpp in Headers */,
 				442A12B01B0CBD8D00D21520 /* FileSystem.hpp in Headers */,
@@ -405,6 +412,7 @@
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,
 				AB77FD5A1B344FCD001858CC /* TextureCommon.cpp in Sources */,
 				AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */,
+				AB8E83FD1CEBAECC00A8E9E8 /* PointLightComponent.cpp in Sources */,
 				ABB79F9D1BA9B818002A1B5F /* DirectionalLightComponent.cpp in Sources */,
 				AB889B021ABB4C70005BA86D /* stb_image.c in Sources */,
 				AB4CD6A81C80C5A900C21006 /* TextureCubeGL.cpp in Sources */,

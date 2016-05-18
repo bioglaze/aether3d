@@ -7,6 +7,8 @@
 #include "AudioSourceComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "TextRendererComponent.hpp"
+#include "SpotLightComponent.hpp"
+#include "PointLightComponent.hpp"
 
 using namespace ae3d;
 
@@ -72,6 +74,18 @@ GameObject& ae3d::GameObject::operator=( const GameObject& go )
         *GetComponent< TextRendererComponent >() = *go.GetComponent< TextRendererComponent >();
     }
 
+    if (go.GetComponent< SpotLightComponent >())
+    {
+        AddComponent< SpotLightComponent >();
+        *GetComponent< SpotLightComponent >() = *go.GetComponent< SpotLightComponent >();
+    }
+
+    if (go.GetComponent< PointLightComponent >())
+    {
+        AddComponent< PointLightComponent >();
+        *GetComponent< PointLightComponent >() = *go.GetComponent< PointLightComponent >();
+    }
+
     return *this;
 }
 
@@ -94,9 +108,10 @@ bool ae3d::GameObject::IsEnabled() const
 
 std::string ae3d::GameObject::GetSerialized() const
 {
+    const std::string serializedName = name.empty() ? "empty" : name;
     std::stringstream outStream;
     outStream << "gameobject\n";
-    outStream << "name " << name << "\n";
+    outStream << "name " << serializedName << "\n";
     outStream << "layer " << layer << "\n";
     outStream << "enabled " << (isEnabled ? 1 : 0) << "\n";
 

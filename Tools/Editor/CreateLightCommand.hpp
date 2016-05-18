@@ -14,7 +14,7 @@ class SceneWidget;
 class CreateLightCommand : public CommandBase
 {
 public:
-    enum class Type { Directional, Spot };
+    enum class Type { Directional, Spot, Point };
 
     explicit CreateLightCommand( SceneWidget* sceneWidget, Type type );
     void Execute() override;

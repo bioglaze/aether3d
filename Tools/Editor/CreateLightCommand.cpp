@@ -1,5 +1,6 @@
 #include "CreateLightCommand.hpp"
 #include "DirectionalLightComponent.hpp"
+#include "PointLightComponent.hpp"
 #include "SpotLightComponent.hpp"
 #include "System.hpp"
 #include "Scene.hpp"
@@ -28,6 +29,10 @@ void CreateLightCommand::Execute()
     {
         go->AddComponent< ae3d::SpotLightComponent >();
     }
+    else if (type == Type::Point)
+    {
+        go->AddComponent< ae3d::PointLightComponent >();
+    }
 }
 
 void CreateLightCommand::Undo()
@@ -43,5 +48,9 @@ void CreateLightCommand::Undo()
     else if (type == Type::Spot)
     {
         go->RemoveComponent< ae3d::SpotLightComponent >();
+    }
+    else if (type == Type::Point)
+    {
+        go->RemoveComponent< ae3d::PointLightComponent >();
     }
 }

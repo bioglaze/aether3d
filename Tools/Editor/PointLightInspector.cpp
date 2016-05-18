@@ -1,14 +1,14 @@
-#include "SpotLightInspector.hpp"
+#include "PointLightInspector.hpp"
 #include "GameObject.hpp"
-#include "SpotLightComponent.hpp"
+#include "PointLightComponent.hpp"
 #include "System.hpp"
 #include <QLabel>
 #include <QBoxLayout>
 #include <QCheckBox>
 
-void SpotLightInspector::Init( QWidget* mainWindow )
+void PointLightInspector::Init( QWidget* mainWindow )
 {
-    auto componentName = new QLabel( "Spot Light" );
+    auto componentName = new QLabel( "Point Light" );
     auto shadowCheck = new QCheckBox( "Casts Shadow" );
 
     auto inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
@@ -24,15 +24,15 @@ void SpotLightInspector::Init( QWidget* mainWindow )
              this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );
 }
 
-void SpotLightInspector::ShadowStateChanged( int enabled )
+void PointLightInspector::ShadowStateChanged( int enabled )
 {
     ae3d::System::Assert( gameObject, "Needs game object" );
-    ae3d::System::Assert( gameObject->GetComponent< ae3d::SpotLightComponent >() != nullptr, "Needs spot light" );
+    ae3d::System::Assert( gameObject->GetComponent< ae3d::PointLightComponent >() != nullptr, "Needs point light" );
 
-    gameObject->GetComponent< ae3d::SpotLightComponent >()->SetCastShadow( enabled != 0, 512 );
+    gameObject->GetComponent< ae3d::PointLightComponent >()->SetCastShadow( enabled != 0, 512 );
 }
 
-void SpotLightInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
+void PointLightInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
 {
     if (gameObjects.empty())
     {

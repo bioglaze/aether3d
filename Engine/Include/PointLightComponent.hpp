@@ -1,5 +1,5 @@
-#ifndef SPOT_LIGHT_HPP
-#define SPOT_LIGHT_HPP
+#ifndef POINT_LIGHT_HPP
+#define POINT_LIGHT_HPP
 
 #include <string>
 #include "RenderTexture.hpp"
@@ -20,11 +20,11 @@ namespace ae3d
         /// \param shadowMapSize Shadow map size in pixels. If it's invalid, it falls back to 512.
         void SetCastShadow( bool enable, int shadowMapSize );
         
-        /// \return Cone angle in degrees.
-        float GetConeAngle() const { return coneAngle; }
+        /// \return radius.
+        float GetRadius() const { return radius; }
         
-        /// \param degrees Angle in degrees.
-        void SetConeAngle( float degrees ) { coneAngle = degrees; }
+        /// \param aRadius radius
+        void SetRadius( float aRadius ) { radius = aRadius; }
         
         /// \return Serialized data.
         std::string GetSerialized() const;
@@ -43,7 +43,7 @@ namespace ae3d
         static PointLightComponent* Get( unsigned index );
         
         RenderTexture shadowMap;
-        float coneAngle = 45;
+        float radius = 10;
         GameObject* gameObject = nullptr;
         bool castsShadow = false;
     };

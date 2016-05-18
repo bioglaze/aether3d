@@ -17,6 +17,7 @@
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
 #include "RenderTexture.hpp"
+#include "PointLightComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "SpotLightComponent.hpp"
 #include "TextRendererComponent.hpp"
@@ -716,6 +717,10 @@ std::string ae3d::Scene::GetSerialized() const
         {
             outSerialized += gameObject->GetComponent<SpotLightComponent>()->GetSerialized();
         }
+        if (gameObject->GetComponent<PointLightComponent>())
+        {
+            outSerialized += gameObject->GetComponent<PointLightComponent>()->GetSerialized();
+        }
     }
     return outSerialized;
 }
@@ -776,6 +781,12 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             currentLightType = CurrentLightType::Directional;
             outGameObjects.back().AddComponent< DirectionalLightComponent >();
+            
+            int castsShadow = 0;
+            std::string shadowStr;
+            lineStream >> shadowStr;
+            lineStream >> castsShadow;
+            outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
         }
 
         if (token == "spotlight")
@@ -789,10 +800,37 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             currentLightType = CurrentLightType::Spot;
             outGameObjects.back().AddComponent< SpotLightComponent >();
             
+            int castsShadow = 0;
+            lineStream >> castsShadow;
+            outGameObjects.back().GetComponent< SpotLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
+            
             float coneAngleDegrees;
             lineStream >> coneAngleDegrees;
             outGameObjects.back().GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
+        }
+        
+        if (token == "pointlight")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found pointlight but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
             
+            currentLightType = CurrentLightType::Point;
+            outGameObjects.back().AddComponent< PointLightComponent >();
+            
+            int castsShadow = 0;
+            std::string shadowStr;
+            lineStream >> shadowStr;
+            lineStream >> castsShadow;
+            outGameObjects.back().GetComponent< PointLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
+
+            float radius;
+            std::string radiusStr;
+            lineStream >> radiusStr;
+            lineStream >> radius;
+            outGameObjects.back().GetComponent< PointLightComponent >()->SetRadius( radius );
         }
         
         if (token == "shadow")
@@ -808,15 +846,15 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             if (currentLightType == CurrentLightType::Directional)
             {
-                outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+                outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled != 0, 512 );
             }
             else if (currentLightType == CurrentLightType::Spot)
             {
-                outGameObjects.back().GetComponent< SpotLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+                outGameObjects.back().GetComponent< SpotLightComponent >()->SetCastShadow( enabled != 0, 512 );
             }
             if (currentLightType == CurrentLightType::Point)
             {
-                //outGameObjects.back().GetComponent< PointLightComponent >()->SetCastShadow( enabled ? true : false, 512 );
+                outGameObjects.back().GetComponent< PointLightComponent >()->SetCastShadow( enabled != 0, 512 );
             }
         }
 

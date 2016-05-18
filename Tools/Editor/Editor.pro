@@ -69,7 +69,8 @@ SOURCES += \
     AudioSourceInspector.cpp \
     CreateAudioSourceCommand.cpp \
     SpriteRendererInspector.cpp \
-    CreateSpriteRendererCommand.cpp
+    CreateSpriteRendererCommand.cpp \
+    PointLightInspector.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -92,4 +93,5 @@ HEADERS += \
     AudioSourceInspector.hpp \
     CreateAudioSourceCommand.hpp \
     SpriteRendererInspector.hpp \
-    CreateSpriteRendererCommand.hpp
+    CreateSpriteRendererCommand.hpp \
+    PointLightInspector.hpp

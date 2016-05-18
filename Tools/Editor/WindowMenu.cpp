@@ -30,6 +30,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     componentMenu->addAction( "Add Mesh Renderer", mainWindow, SLOT(CommandCreateMeshRendererComponent()));
     componentMenu->addAction( "Add Sprite Renderer", mainWindow, SLOT(CommandCreateSpriteRendererComponent()));
     componentMenu->addAction( "Add Spot Light", mainWindow, SLOT(CommandCreateSpotLightComponent()));
+    componentMenu->addAction( "Add Point Light", mainWindow, SLOT(CommandCreatePointLightComponent()));
 }
 
 void WindowMenu::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
