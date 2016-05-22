@@ -71,6 +71,16 @@ namespace MathUtil
 
         return h;
     }
+
+    int Max( int x, int y )
+    {
+        return x > y ? x : y;
+    }
+
+    int GetMipmapCount( int width, int height )
+    {
+        return 1 + static_cast< int >(std::floor( std::log2( Max( width, height ) ) ));
+    }
 }
 
 namespace Global

@@ -1,9 +1,7 @@
 #include "Material.hpp"
-#include "GfxDevice.hpp"
 #include "Texture2D.hpp"
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
-#include "System.hpp"
 
 std::unordered_map< std::string, ae3d::RenderTexture* > ae3d::Material::sTexRTs;
 

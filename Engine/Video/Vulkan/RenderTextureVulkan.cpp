@@ -149,6 +149,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     fbufCreateInfo.layers = 1;
 
     err = vkCreateFramebuffer( GfxDeviceGlobal::device, &fbufCreateInfo, nullptr, &frameBuffer );
+    AE3D_CHECK_VULKAN( err, "rendertexture framebuffer" );
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )

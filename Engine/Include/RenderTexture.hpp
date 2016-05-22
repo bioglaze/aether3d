@@ -5,7 +5,6 @@
 #include <vulkan/vulkan.h>
 #endif
 #include "TextureBase.hpp"
-#include "Vec3.hpp"
 
 namespace ae3d
 {

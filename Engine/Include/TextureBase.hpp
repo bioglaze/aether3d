@@ -5,6 +5,7 @@
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_D3D12
+#include <vector>
 #include <d3d12.h>
 #endif
 #include "Vec3.hpp"
@@ -122,6 +123,7 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE srv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
+        std::vector< D3D12_CPU_DESCRIPTOR_HANDLE > uavs;
 #endif
         /// Is the texture opaque.
         bool opaque = true;

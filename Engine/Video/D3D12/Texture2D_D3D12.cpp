@@ -1,5 +1,4 @@
 #include "Texture2D.hpp"
-#include <algorithm>
 #include <vector>
 #include <map>
 #include <d3d12.h>
@@ -16,6 +15,11 @@
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
+
+namespace MathUtil
+{
+    int GetMipmapCount( int width, int height );
+}
 
 namespace GfxDeviceGlobal
 {
@@ -160,11 +164,13 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         ae3d::System::Print("Unknown texture file extension: %s\n", fileContents.path.c_str() );
     }
     
+    const UINT mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< UINT >( MathUtil::GetMipmapCount( width, height ) ) : 1;
+    
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1; 
+    srvDesc.Texture2D.MipLevels = mipLevelCount; 
     srvDesc.Texture2D.MostDetailedMip = 0;
     srvDesc.Texture2D.PlaneSlice = 0;
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
@@ -176,6 +182,19 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (mipmaps == Mipmaps::Generate)
     {
+        uavs.resize( mipLevelCount );
+
+        for (UINT i = 0; i < mipLevelCount; ++i)
+        {
+            D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+            uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+            uavDesc.Texture2D.MipSlice = i;
+            uavDesc.Texture2D.PlaneSlice = 0;
+
+            uavs[ i ] = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+            GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResource.resource, nullptr, &uavDesc, uavs[ i ] );
+        }
     }
 
     Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
@@ -205,17 +224,19 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
+    const UINT mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< UINT >(MathUtil::GetMipmapCount( width, height )) : 1;
+
     D3D12_RESOURCE_DESC descTex = {};
     descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     descTex.Width = width;
-    descTex.Height = (UINT)height;
+    descTex.Height = static_cast< UINT >( height );
     descTex.DepthOrArraySize = 1;
-    descTex.MipLevels = 1;
+    descTex.MipLevels = static_cast< UINT16 >( mipLevelCount );
     descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
+    descTex.Flags = mipLevelCount > 1 ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
 
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;

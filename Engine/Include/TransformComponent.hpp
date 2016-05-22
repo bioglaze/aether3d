@@ -90,8 +90,6 @@ namespace ae3d
 
         void SolveLocalMatrix();
 
-        void UpdateViewMatrix();
-        
         Vec3 localPosition;
         Quaternion localRotation;
         float localScale = 1;

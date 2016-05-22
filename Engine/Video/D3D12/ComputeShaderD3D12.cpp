@@ -2,7 +2,6 @@
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include "FileSystem.hpp"
-#include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Macros.hpp"
 

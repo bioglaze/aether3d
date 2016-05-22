@@ -85,6 +85,7 @@ namespace GfxDeviceGlobal
     ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
+    ID3D12RootSignature* genMipsRootSignature = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
@@ -266,32 +267,85 @@ void CreateSampler()
 
 void CreateRootSignature()
 {
-    CD3DX12_DESCRIPTOR_RANGE descRange1[ 2 ];
-    descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-    descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
+    // Graphics
+    {
+        CD3DX12_DESCRIPTOR_RANGE descRange1[ 2 ];
+        descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
 
-    CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
-    descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0 );
+        CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
+        descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0 );
 
-    CD3DX12_ROOT_PARAMETER rootParam[ 2 ];
-    rootParam[ 0 ].InitAsDescriptorTable( 2, descRange1 );
-    rootParam[ 1 ].InitAsDescriptorTable( 1, descRange2, D3D12_SHADER_VISIBILITY_PIXEL );
+        CD3DX12_ROOT_PARAMETER rootParam[ 2 ];
+        rootParam[ 0 ].InitAsDescriptorTable( 2, descRange1 );
+        rootParam[ 1 ].InitAsDescriptorTable( 1, descRange2, D3D12_SHADER_VISIBILITY_PIXEL );
 
-    ID3DBlob* pOutBlob = nullptr;
-    ID3DBlob* pErrorBlob = nullptr;
-    D3D12_ROOT_SIGNATURE_DESC descRootSignature;
-    descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-    descRootSignature.NumParameters = 2;
-    descRootSignature.NumStaticSamplers = 0;
-    descRootSignature.pParameters = rootParam;
-    descRootSignature.pStaticSamplers = nullptr;
+        ID3DBlob* pOutBlob = nullptr;
+        ID3DBlob* pErrorBlob = nullptr;
+        D3D12_ROOT_SIGNATURE_DESC descRootSignature;
+        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        descRootSignature.NumParameters = 2;
+        descRootSignature.NumStaticSamplers = 0;
+        descRootSignature.pParameters = rootParam;
+        descRootSignature.pStaticSamplers = nullptr;
 
-    HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
-    AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
+        HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
+        AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
 
-    hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
-    AE3D_CHECK_D3D( hr, "Failed to create root signature" );
-    GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
+        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
+        AE3D_CHECK_D3D( hr, "Failed to create root signature" );
+        GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
+    }
+
+    // GenerateMips
+    {
+        D3D12_STATIC_SAMPLER_DESC descLinearClamp = {};
+        descLinearClamp.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        descLinearClamp.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descLinearClamp.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descLinearClamp.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descLinearClamp.MinLOD = 0;
+        descLinearClamp.MaxLOD = FLT_MAX;
+        descLinearClamp.MipLODBias = 0;
+        descLinearClamp.MaxAnisotropy = 0;
+        descLinearClamp.RegisterSpace = 0;
+        descLinearClamp.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+
+        // TODO: Fix heap location
+        //GfxDeviceGlobal::device->CreateSampler( &descLinearClamp, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
+
+        CD3DX12_ROOT_PARAMETER rootParams[ 3 ] = {};
+        rootParams[ 0 ].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+        rootParams[ 0 ].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+        rootParams[ 0 ].Constants.Num32BitValues = 4;
+        rootParams[ 0 ].Constants.ShaderRegister = 0;
+        rootParams[ 0 ].Constants.RegisterSpace = 0;
+
+        CD3DX12_DESCRIPTOR_RANGE descRange1;
+        descRange1.Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
+
+        CD3DX12_DESCRIPTOR_RANGE descRange2;
+        descRange2.Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0 );
+
+        rootParams[ 1 ].InitAsDescriptorTable( 1, &descRange1 );
+        rootParams[ 2 ].InitAsDescriptorTable( 1, &descRange2 );
+
+        ID3DBlob* pOutBlob = nullptr;
+        ID3DBlob* pErrorBlob = nullptr;
+        D3D12_ROOT_SIGNATURE_DESC descRootSignature;
+        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        descRootSignature.NumParameters = 2;
+        descRootSignature.NumStaticSamplers = 0;
+        descRootSignature.pParameters = &rootParams[ 0 ];
+        descRootSignature.pStaticSamplers = nullptr;
+
+        HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
+        AE3D_CHECK_D3D( hr, "Failed to serialize generatemips root signature" );
+
+        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::genMipsRootSignature ) );
+        AE3D_CHECK_D3D( hr, "Failed to create generatemips root signature" );
+        GfxDeviceGlobal::genMipsRootSignature->SetName( L"GenerateMips Root Signature" );
+    }
 }
 
 unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
@@ -892,6 +946,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     GfxDeviceGlobal::swapChain->SetFullscreenState( FALSE, nullptr );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::genMipsRootSignature );
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
@@ -1060,6 +1115,8 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMap
     
     if (target)
     {
+		System::Assert( target->GetGpuResource() != nullptr, "no GPU resource in render target!" );
+		System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
         GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
         GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
     }

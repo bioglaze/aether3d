@@ -63,8 +63,8 @@ namespace ae3d
         std::string posXpath, posYpath, negXpath, negYpath, posZpath, negZpath;
 #if RENDERER_VULKAN
         VkImage image = VK_NULL_HANDLE;
-        VkImageView view;
-        VkDeviceMemory deviceMemory;
+        VkImageView view = VK_NULL_HANDLE;
+        VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
 #endif
     };
 }

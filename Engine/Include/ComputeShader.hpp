@@ -1,12 +1,11 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef COMPUTE_SHADER_H
+#define COMPUTE_SHADER_H
 
 #include <string>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_D3D12
-#include <d3d12.h>
 #include <d3dcompiler.h>
 #endif
 #if RENDERER_VULKAN

@@ -1,7 +1,6 @@
 #ifndef TEXTURE_2D_H
 #define TEXTURE_2D_H
 
-#include "Vec3.hpp"
 #include "TextureBase.hpp"
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>

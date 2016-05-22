@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 #include <string>
-#include "System.hpp"
+#include "FileSystem.hpp"
 
 ae3d::Renderer renderer;
 
@@ -137,4 +137,9 @@ cbuffer Scene\
     )";
 
     depthNormalsShader.Load( depthNormalsSource, depthNormalsSource );
+
+    auto fc = FileSystem::FileContents( "GenerateMipsCS.hlsl" ).data;
+    std::string fileData( std::begin( fc ), std::end( fc ) );
+
+    generateMipsShader.Load( fileData.c_str() );
 }

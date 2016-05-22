@@ -11,7 +11,6 @@
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
 #include "Texture2D.hpp"
-#include "TextureCube.hpp"
 #if VK_USE_PLATFORM_WIN32_KHR
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
@@ -274,6 +273,7 @@ namespace ae3d
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
 
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.depthMem );
+        AE3D_CHECK_VULKAN( err, "MSAA depth image" );
         vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, GfxDeviceGlobal::msaaTarget.depthMem, 0 );
 
         // Create image view for the MSAA target
@@ -676,9 +676,9 @@ namespace ae3d
             System::Assert( false, "compute queue not found" );
         }
 
-        VkDeviceQueueCreateInfo queueCreateInfo = {};
-        queueCreateInfo.queueFamilyIndex = computeQueueNodeIndex;
-        queueCreateInfo.queueCount = 1;
+       // VkDeviceQueueCreateInfo queueCreateInfo = {};
+        //queueCreateInfo.queueFamilyIndex = computeQueueNodeIndex;
+        //queueCreateInfo.queueCount = 1;
         vkGetDeviceQueue( GfxDeviceGlobal::device, computeQueueNodeIndex, 0, &GfxDeviceGlobal::computeQueue );
 
         GfxDeviceGlobal::queueNodeIndex = graphicsQueueNodeIndex;

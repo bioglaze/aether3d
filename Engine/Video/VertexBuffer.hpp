@@ -70,13 +70,13 @@ namespace ae3d
             Vec3 normal;
         };
 
+#if RENDERER_D3D12
         /// Return Stride in bytes.
         unsigned GetStride() const;
 
         /// \return Index buffer size in bytes.
         unsigned GetIBSize() const;
 
-#if RENDERER_D3D12
         /// \return Vertex buffer resource.
         ID3D12Resource* GetVBResource() { return vb; }
 

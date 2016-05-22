@@ -1,6 +1,5 @@
 #include "ComputeShader.hpp"
 #include "FileSystem.hpp"
-#include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Macros.hpp"
 
@@ -38,6 +37,11 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
 
     System::Assert( info.module != VK_NULL_HANDLE, "compute shader module not created" );
 
+}
+
+void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& contents )
+{
+    
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )

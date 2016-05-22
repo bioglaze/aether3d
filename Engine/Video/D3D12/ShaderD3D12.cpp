@@ -5,7 +5,6 @@
 #include <d3dcompiler.h>
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
-#include "DescriptorHeapManager.hpp"
 #include "GfxDevice.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
