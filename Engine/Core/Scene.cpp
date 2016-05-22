@@ -464,6 +464,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     Matrix44 translation;
     translation.Translate( -cameraTransform->GetLocalPosition() );
     Matrix44::Multiply( translation, view, view );
+    camera->SetView( view );
 #endif
     
     Frustum frustum;
@@ -674,11 +675,6 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 void ae3d::Scene::SetSkybox( TextureCube* skyTexture )
 {
     skybox = skyTexture;
-
-    if (skybox != nullptr && !renderer.IsSkyboxGenerated())
-    {
-        renderer.GenerateSkybox();
-    }
 }
 
 std::string ae3d::Scene::GetSerialized() const

@@ -16,8 +16,9 @@
 #include "MainWindow.hpp"
 #include "MeshRendererComponent.hpp"
 #include "Mesh.hpp"
-#include "Vec3.hpp"
+#include "PointLightComponent.hpp"
 #include "SpotLightComponent.hpp"
+#include "Vec3.hpp"
 
 using namespace ae3d;
 ae3d::Material* gCubeMaterial = nullptr;
@@ -355,7 +356,8 @@ void SceneWidget::DrawLightSprites()
         }
 
         if (go->GetComponent< DirectionalLightComponent >() ||
-            go->GetComponent< SpotLightComponent >())
+            go->GetComponent< SpotLightComponent >() ||
+            go->GetComponent< PointLightComponent >())
         {
             const float distance = (cameraPos - goTransform->GetLocalPosition()).Length();
             const float lerpDistance = 10;
@@ -379,7 +381,7 @@ void SceneWidget::DrawLightSprites()
                 const Vec3 color( 1, 1, 1 );// = static_cast<Light*>( light )->GetColor();
                 const float size = height() / distance;
 
-                //renderer->Draw(lightTex, screenPoint.x, screenPoint.y, size, size, Vec4( color.x, color.y, color.z, opacity ) );
+                ae3d::System::Draw( &lightTex, screenPoint.x, screenPoint.y, size, size, width(), height() );
             }
         }
     }

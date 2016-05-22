@@ -41,6 +41,25 @@ void ae3d::Renderer::GenerateSkybox()
     skyboxBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
 }
 
+void ae3d::Renderer::GenerateQuadBuffer()
+{
+    const std::vector< VertexBuffer::VertexPTC > vertices =
+    {
+        { Vec3( 0, 0, 0 ), 0, 0 },
+        { Vec3( 1, 0, 0 ), 1, 0 },
+        { Vec3( 1, 1, 0 ), 1, 1 },
+        { Vec3( 0, 1, 0 ), 0, 1 }
+    };
+    
+    const std::vector< VertexBuffer::Face > indices =
+    {
+        { 0, 1, 2 },
+        { 2, 3, 0 }
+    };
+    
+    quadBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
+}
+
 void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera )
 {
     Matrix44 modelViewProjection;

@@ -26,9 +26,12 @@ namespace ae3d
     class Renderer
     {
     public:
+        VertexBuffer& GetQuadBuffer() { return quadBuffer; }
+        
         /// \return True if skybox has been generated.
         bool IsSkyboxGenerated() const { return skyboxBuffer.IsGenerated(); }
         
+        void GenerateQuadBuffer();
         void GenerateSkybox();
 
         void RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera );
@@ -37,6 +40,7 @@ namespace ae3d
         
     private:
         VertexBuffer skyboxBuffer;
+        VertexBuffer quadBuffer;
     };    
 }
 

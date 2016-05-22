@@ -9,7 +9,10 @@
 #include "AudioSystem.hpp"
 #include "GfxDevice.hpp"
 #include "FileWatcher.hpp"
+#include "Matrix.hpp"
 #include "Renderer.hpp"
+#include "Texture2D.hpp"
+#include "Shader.hpp"
 
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
@@ -75,26 +78,28 @@ void ae3d::System::InitGamePad()
 void ae3d::System::LoadBuiltinAssets()
 {
     renderer.builtinShaders.Load();
+    renderer.GenerateQuadBuffer();
+    renderer.GenerateSkybox();
     GfxDevice::ErrorCheck( "Builtin shaders load end" );
 }
 
-void ae3d::System::Print(const char* format, ...)
+void ae3d::System::Print( const char* format, ... )
 {
     va_list ap;
     va_start(ap, format);
 
     static char msg[ 1024 ];
 #if _MSC_VER
-    vsnprintf_s(msg, sizeof(msg), format, ap);
+    vsnprintf_s( msg, sizeof(msg), format, ap );
 #else
-    vsnprintf(msg, sizeof(msg), format, ap);
+    vsnprintf( msg, sizeof(msg), format, ap );
 #endif
     va_end(ap);
-    std::printf("%s", msg);
+    std::printf( "%s", msg );
 #if _MSC_VER
     OutputDebugStringA( &msg[ 0 ] );
 #endif
-    std::fflush(stdout);
+    std::fflush( stdout );
 }
 
 void ae3d::System::Assert(bool condition, const char* message)
@@ -109,6 +114,28 @@ void ae3d::System::Assert(bool condition, const char* message)
         assert(false);
 #endif
     }
+}
+
+void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize )
+{
+    Matrix44 proj;
+    proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
+    
+    Matrix44 translate;
+    translate.Translate( Vec3( x, y, 0 ) );
+    
+    Matrix44 scale;
+    scale.Scale( xSize, ySize, 1 );
+    
+    Matrix44 mvp;
+    Matrix44::Multiply( scale, translate, scale );
+    Matrix44::Multiply( scale, proj, mvp );
+    
+    renderer.builtinShaders.spriteRendererShader.Use();
+    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &mvp.m[ 0 ] );
+    renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
+    
+    GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend, GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off );
 }
 
 void ae3d::System::ReloadChangedAssets()

@@ -7,6 +7,7 @@
 #import <QuartzCore/CAMetalLayer.h>
 #import <MetalKit/MetalKit.h>
 #endif
+#include "Vec3.hpp"
 
 #if !defined( RENDERER_D3D12 ) && !defined( RENDERER_VULKAN ) && !defined( RENDERER_METAL ) && !defined( RENDERER_OPENGL ) && !defined( RENDERER_NULL )
 #error No renderer defined
@@ -98,6 +99,8 @@
 */
 namespace ae3d
 {
+    class Texture2D;
+
     namespace System
     {
         /// Inits audio system.
@@ -106,6 +109,16 @@ namespace ae3d
         /// Inits the gamepad.
         void InitGamePad();
 
+        /// Draws a texture into the screen. Should be called after Scene::Render().
+        /// \param texture Texture
+        /// \param x X screen coordinate in pixels
+        /// \param y Y screen coordinate in pixels
+        /// \param xSize X size in pixels
+        /// \param ySize Y size in pixels
+        /// \param xScreenSize X viewport size in pixels
+        /// \param yScreenSize Y viewport size in pixels
+        void Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize );
+        
         /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();
 
