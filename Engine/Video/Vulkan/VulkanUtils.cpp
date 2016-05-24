@@ -12,24 +12,20 @@ namespace Stats
 
 namespace debug
 {
-    bool enabled = true; // Disable when using RenderDoc.
-    int validationLayerCount = 7;
+    bool enabled = false; // Disable when using RenderDoc.
+    int validationLayerCount = 1;
 
     const char *validationLayerNames[] =
     {
-        "VK_LAYER_GOOGLE_threading",
-        "VK_LAYER_LUNARG_object_tracker",
-        "VK_LAYER_LUNARG_parameter_validation",
-        "VK_LAYER_LUNARG_swapchain",
-        "VK_LAYER_LUNARG_device_limits",
-        "VK_LAYER_LUNARG_image",
-        "VK_LAYER_GOOGLE_unique_objects"
-
-        //"VK_LAYER_LUNARG_standard_validation"
+        "VK_LAYER_LUNARG_standard_validation"
     };
+
     PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = nullptr;
     PFN_vkDestroyDebugReportCallbackEXT DestroyDebugReportCallback = nullptr;
     PFN_vkDebugReportMessageEXT dbgBreakCallback = nullptr;
+    PFN_vkDebugMarkerSetObjectNameEXT DebugMarkerSetObjectName = nullptr;
+    PFN_vkCmdDebugMarkerBeginEXT CmdDebugMarkerBegin = nullptr;
+    PFN_vkCmdDebugMarkerEndEXT CmdDebugMarkerEnd = nullptr;
 
     VkDebugReportCallbackEXT debugReportCallback = nullptr;
 
@@ -61,6 +57,7 @@ namespace debug
         CreateDebugReportCallback = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkCreateDebugReportCallbackEXT" );
         DestroyDebugReportCallback = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkDestroyDebugReportCallbackEXT" );
         dbgBreakCallback = (PFN_vkDebugReportMessageEXT)vkGetInstanceProcAddr( instance, "vkDebugReportMessageEXT" );
+
         ae3d::System::Assert( CreateDebugReportCallback != nullptr, "CreateDebugReportCallback" );
 
         VkDebugReportCallbackCreateInfoEXT dbgCreateInfo;
@@ -70,7 +67,32 @@ namespace debug
         dbgCreateInfo.pUserData = nullptr;
         dbgCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
         VkResult err = CreateDebugReportCallback( instance, &dbgCreateInfo, nullptr, &debugReportCallback );
-        ae3d::System::Assert( err == VK_SUCCESS, "Unable to create debug report callback" );
+        AE3D_CHECK_VULKAN( err, "Unable to create debug report callback" );
+    }
+
+    void SetupDevice( VkDevice device )
+    {
+        DebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr( device, "vkDebugMarkerSetObjectNameEXT" );
+        CmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerBeginEXT" );
+        CmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerEndEXT" );
+
+        if (!DebugMarkerSetObjectName)
+        {
+            ae3d::System::Print( "Could not load Vulkan debug marker extensions, object naming is disabled.\n" );
+        }
+    }
+
+    void SetObjectName( VkDevice device, std::uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name )
+    {
+        if (DebugMarkerSetObjectName)
+        {
+            VkDebugMarkerObjectNameInfoEXT nameInfo = {};
+            nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+            nameInfo.objectType = objectType;
+            nameInfo.object = object;
+            nameInfo.pObjectName = name;
+            DebugMarkerSetObjectName( device, &nameInfo );
+        }
     }
 
     void Free( VkInstance instance )

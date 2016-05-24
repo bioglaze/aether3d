@@ -9,6 +9,7 @@
 #include "FileSystem.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
+#include "VulkanUtils.hpp"
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 void Tokenize( const std::string& str,
@@ -18,8 +19,6 @@ void Tokenize( const std::string& str,
 namespace ae3d
 {
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
-                         VkImageLayout newImageLayout, unsigned layerCount );
 }
 
 namespace MathUtil
@@ -184,7 +183,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         SetImageLayout( Texture2DGlobal::texCmdBuffer,
             mappableImage,
             VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_PREINITIALIZED,
+            VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1 );
 
         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -192,6 +191,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
         err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
         AE3D_CHECK_VULKAN( err, "vkCreateImage in Texture2D" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, fileContents.path.c_str() );
 
         vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
 
@@ -237,7 +237,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         SetImageLayout( Texture2DGlobal::texCmdBuffer,
             image,
             VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1 );
 
         err = vkEndCommandBuffer( Texture2DGlobal::texCmdBuffer );

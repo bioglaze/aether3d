@@ -1,4 +1,7 @@
-#version 450 core
+#version 450
+
+// Prevents generating code that needs ClipDistance which is not available.
+out gl_PerVertex { vec4 gl_Position; };
 
 layout (location = 0) in vec3 aPosition;
 

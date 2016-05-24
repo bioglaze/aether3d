@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
 #include "Texture2D.hpp"
+#include "VulkanUtils.hpp"
 #if VK_USE_PLATFORM_WIN32_KHR
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
@@ -155,27 +156,8 @@ namespace WindowGlobal
     extern int windowHeight;
 }
 
-namespace debug
-{
-    extern bool enabled;
-    extern int validationLayerCount;
-    extern const char *validationLayerNames[];
-    void Setup( VkInstance instance );
-    void Free( VkInstance instance );
-}
-
 namespace ae3d
 {
-    void CreateSamplers( VkDevice device, VkSampler* linearRepeat, VkSampler* linearClamp, VkSampler* pointClamp, VkSampler* pointRepeat );
-
-    unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-        ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode );
-
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
-        VkImageLayout newImageLayout, unsigned layerCount );
-    
-    void CreateInstance( VkInstance* outInstance );
-
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex )
     {
         for (std::uint32_t i = 0; i < 32; i++)
@@ -892,7 +874,7 @@ namespace ae3d
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriorities;
 
-        const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+        const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_DEBUG_MARKER_EXTENSION_NAME };
 
         //VkPhysicalDeviceFeatures features = {};
         //features.shaderClipDistance = VK_TRUE;
@@ -903,7 +885,7 @@ namespace ae3d
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.pEnabledFeatures = nullptr;
-        deviceCreateInfo.enabledExtensionCount = 1;
+        deviceCreateInfo.enabledExtensionCount = 1;// debug::enabled ? 2 : 1;
         deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
         
         if (debug::enabled)
@@ -1027,6 +1009,7 @@ namespace ae3d
         attachments[ 0 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 0 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         attachments[ 0 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachments[ 0 ].flags = 0;
 
         attachments[ 1 ].format = GfxDeviceGlobal::depthFormat;
         attachments[ 1 ].samples = VK_SAMPLE_COUNT_1_BIT;
@@ -1036,6 +1019,7 @@ namespace ae3d
         attachments[ 1 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 1 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         attachments[ 1 ].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attachments[ 1 ].flags = 0;
 
         VkAttachmentReference colorReference = {};
         colorReference.attachment = 0;
@@ -1084,6 +1068,7 @@ namespace ae3d
         attachments[ 0 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 0 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         attachments[ 0 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachments[ 0 ].flags = 0;
 
         // This is the frame buffer attachment to where the multisampled image
         // will be resolved to and which will be presented to the swapchain.
@@ -1095,6 +1080,7 @@ namespace ae3d
         attachments[ 1 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 1 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         attachments[ 1 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachments[ 1 ].flags = 0;
 
         // Multisampled depth attachment we render to
         attachments[ 2 ].format = GfxDeviceGlobal::depthFormat;
@@ -1105,6 +1091,7 @@ namespace ae3d
         attachments[ 2 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 2 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         attachments[ 2 ].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attachments[ 2 ].flags = 0;
 
         // Depth resolve attachment
         attachments[ 3 ].format = GfxDeviceGlobal::depthFormat;
@@ -1115,6 +1102,7 @@ namespace ae3d
         attachments[ 3 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 3 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         attachments[ 3 ].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attachments[ 3 ].flags = 0;
 
         VkAttachmentReference colorReference = {};
         colorReference.attachment = 0;
@@ -1369,6 +1357,11 @@ namespace ae3d
         }
 
         CreateDevice();
+
+        if (debug::enabled)
+        {
+            debug::SetupDevice( GfxDeviceGlobal::device );
+        }
 
         std::vector< VkFormat > depthFormats = { VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D16_UNORM_S8_UINT, VK_FORMAT_D16_UNORM };
         bool depthFormatFound = false;

@@ -2,12 +2,11 @@
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
+#include "VulkanUtils.hpp"
 
 namespace ae3d
 {
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
-        VkImageLayout newImageLayout, unsigned layerCount );
     void AllocateSetupCommandBuffer();
     void FlushSetupCommandBuffer();
 }
@@ -44,6 +43,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     colorImage.format = colorFormat;
     colorImage.extent.width = width;
     colorImage.extent.height = height;
+    colorImage.extent.depth = 1;
     colorImage.mipLevels = 1;
     colorImage.arrayLayers = 1;
     colorImage.samples = VK_SAMPLE_COUNT_1_BIT;

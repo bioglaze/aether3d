@@ -5,14 +5,13 @@
 #include "FileSystem.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
+#include "VulkanUtils.hpp"
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
 namespace ae3d
 {
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
-                         VkImageLayout newImageLayout, unsigned layerCount );
 }
 
 namespace MathUtil
@@ -175,7 +174,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             SetImageLayout( TextureCubeGlobal::texCmdBuffer,
                 images[ face ],
                 VK_IMAGE_ASPECT_COLOR_BIT,
-                VK_IMAGE_LAYOUT_PREINITIALIZED,
+                VK_IMAGE_LAYOUT_UNDEFINED,//VK_IMAGE_LAYOUT_PREINITIALIZED,
                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1 );
         }
         else if (isDDS)
@@ -206,7 +205,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     SetImageLayout( TextureCubeGlobal::texCmdBuffer,
         image,
         VK_IMAGE_ASPECT_COLOR_BIT,
-        VK_IMAGE_LAYOUT_PREINITIALIZED,
+        VK_IMAGE_LAYOUT_UNDEFINED,//VK_IMAGE_LAYOUT_PREINITIALIZED,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6 );
 
     for (int face = 0; face < 6; ++face)
@@ -238,7 +237,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     SetImageLayout( TextureCubeGlobal::texCmdBuffer,
         image,
         VK_IMAGE_ASPECT_COLOR_BIT,
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        VK_IMAGE_LAYOUT_UNDEFINED,//VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6 );
 
     err = vkEndCommandBuffer( TextureCubeGlobal::texCmdBuffer );
@@ -268,7 +267,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.baseArrayLayer = 0;
-    viewInfo.subresourceRange.layerCount = 1;
+    viewInfo.subresourceRange.layerCount = 6;
     viewInfo.subresourceRange.levelCount = 1;
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );

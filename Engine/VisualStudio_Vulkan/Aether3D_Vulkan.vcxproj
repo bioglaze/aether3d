@@ -154,6 +154,7 @@
     <ClInclude Include="..\Video\GfxDevice.hpp" />
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />
+    <ClInclude Include="..\Video\Vulkan\VulkanUtils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

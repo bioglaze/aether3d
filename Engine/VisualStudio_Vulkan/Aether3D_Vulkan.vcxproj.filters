@@ -245,5 +245,8 @@
     <ClInclude Include="..\Include\PointLightComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\Video\Vulkan\VulkanUtils.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

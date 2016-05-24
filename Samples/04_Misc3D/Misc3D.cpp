@@ -287,7 +287,7 @@ int main()
         VR::SubmitFrame();
 #else
         scene.Render();
-        System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
+        //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
 #endif
 
         Window::PumpEvents();
