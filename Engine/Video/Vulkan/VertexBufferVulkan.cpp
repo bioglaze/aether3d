@@ -2,6 +2,7 @@
 #include <cstring>
 #include "Macros.hpp"
 #include "System.hpp"
+#include "VulkanUtils.hpp"
 
 namespace GfxDeviceGlobal
 {
@@ -64,6 +65,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         vertexBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &vertexBufferInfo, nullptr, &stagingBuffers.vertices.buffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer vertexBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingBuffers.vertices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "staging vertex buffer" );
 
         VkMemoryRequirements memReqs;
         VkMemoryAllocateInfo memAlloc = {};
@@ -88,6 +90,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
 
         err = vkCreateBuffer( GfxDeviceGlobal::device, &vertexBufferInfo, nullptr, &vertexBuffer );
         AE3D_CHECK_VULKAN( err, "create vertex buffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "vertex buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, vertexBuffer, &memReqs );
         memAlloc.allocationSize = memReqs.size;
@@ -105,6 +108,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
 
         err = vkCreateBuffer( GfxDeviceGlobal::device, &indexbufferInfo, nullptr, &stagingBuffers.indices.buffer );
         AE3D_CHECK_VULKAN( err, "create staging index buffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingBuffers.indices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "staging index buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers.indices.buffer, &memReqs );
         memAlloc.allocationSize = memReqs.size;
@@ -123,6 +127,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         indexbufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &indexbufferInfo, nullptr, &indexBuffer );
         AE3D_CHECK_VULKAN( err, "create index buffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)indexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "index buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, indexBuffer, &memReqs );
         memAlloc.allocationSize = memReqs.size;
@@ -177,6 +182,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         bufCreateInfo.flags = 0;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufCreateInfo, nullptr, &vertexBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "vertex buffer" );
 
         VkMemoryAllocateInfo memAllocInfo = {};
         memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -209,6 +215,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         ibCreateInfo.flags = 0;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &ibCreateInfo, nullptr, &indexBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)indexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "index buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, indexBuffer, &memReqs );
         memAllocInfo.allocationSize = memReqs.size;

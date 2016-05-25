@@ -12,7 +12,7 @@ namespace Stats
 
 namespace debug
 {
-    bool enabled = false; // Disable when using RenderDoc.
+    bool enabled = true; // Disable when using RenderDoc.
     int validationLayerCount = 1;
 
     const char *validationLayerNames[] =

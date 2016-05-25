@@ -753,6 +753,7 @@ namespace ae3d
 
         err = createSwapchainKHR( GfxDeviceGlobal::device, &swapchainInfo, nullptr, &GfxDeviceGlobal::swapChain );
         AE3D_CHECK_VULKAN( err, "swapchain" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::swapChain, VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT, "swap chain" );
 
         std::uint32_t imageCount;
         err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, nullptr );
@@ -874,10 +875,17 @@ namespace ae3d
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriorities;
 
-        const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_DEBUG_MARKER_EXTENSION_NAME };
+        /*std::uint32_t deviceExtensionCount;
+        vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, nullptr );
+        std::vector< VkExtensionProperties > availableDeviceExtensions( deviceExtensionCount );
+        vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.data() );
 
-        //VkPhysicalDeviceFeatures features = {};
-        //features.shaderClipDistance = VK_TRUE;
+        for (auto& i : availableDeviceExtensions)
+        {
+        System::Print( "device extension: %s\n", i.extensionName );
+        }*/
+
+        const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_DEBUG_MARKER_EXTENSION_NAME };
 
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
