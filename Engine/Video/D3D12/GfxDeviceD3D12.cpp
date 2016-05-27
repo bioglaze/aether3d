@@ -650,7 +650,7 @@ void ae3d::CreateRenderer( int samples )
     swapChainDesc1.Height = WindowGlobal::windowHeight;
     swapChainDesc1.SampleDesc.Count = 1;
     swapChainDesc1.SampleDesc.Quality = 0;
-    swapChainDesc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+    swapChainDesc1.SwapEffect = samples > 1 ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL : DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
     hr = factory->CreateSwapChainForHwnd( GfxDeviceGlobal::commandQueue, WindowGlobal::hwnd, &swapChainDesc1, nullptr, nullptr, (IDXGISwapChain1**)&GfxDeviceGlobal::swapChain );
     AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
@@ -1115,7 +1115,6 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMap
     
     if (target)
     {
-		System::Assert( target->GetGpuResource() != nullptr, "no GPU resource in render target!" );
 		System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
         GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
         GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
