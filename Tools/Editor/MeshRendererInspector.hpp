@@ -9,14 +9,11 @@ namespace ae3d
     class GameObject;
 }
 
-class QTableWidget;
-class QWidget;
-
 class MeshRendererInspector : public QObject
 {
     Q_OBJECT
 public:
-    QWidget* GetWidget() { return root; }
+    class QWidget* GetWidget() { return root; }
     void Init( QWidget* mainWindow );
 
 private slots:
@@ -25,8 +22,9 @@ private slots:
 
 private:
     QWidget* root = nullptr;
-    QTableWidget* meshTable = nullptr;
+    class QTableWidget* meshTable = nullptr;
     QWidget* mainWindow = nullptr;
+    class QPushButton* removeButton = nullptr;
     ae3d::GameObject* gameObject = nullptr;
 };
 

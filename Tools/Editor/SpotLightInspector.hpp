@@ -25,6 +25,7 @@ private slots:
 
   private:
     QWidget* root = nullptr;
+    class QPushButton* removeButton = nullptr;
     ae3d::GameObject* gameObject = nullptr;
 };
 

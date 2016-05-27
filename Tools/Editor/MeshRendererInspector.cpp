@@ -1,6 +1,7 @@
 #include "MeshRendererInspector.hpp"
 #include <QBoxLayout>
 #include <QLabel>
+#include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QFileDialog>
@@ -25,10 +26,16 @@ void MeshRendererInspector::Init( QWidget* aMainWindow )
     meshTable->setVerticalHeaderLabels( QString("Mesh").split(";") );
 
     QLabel* componentName = new QLabel("Mesh Renderer");
+    removeButton = new QPushButton("remove");
+    QBoxLayout* headerLayout = new QBoxLayout( QBoxLayout::LeftToRight );
+    headerLayout->addWidget( componentName );
+    headerLayout->addWidget( removeButton );
+    QWidget* header = new QWidget();
+    header->setLayout( headerLayout );
 
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->setContentsMargins( 1, 1, 1, 1 );
-    inspectorLayout->addWidget( componentName );
+    inspectorLayout->addWidget( header );
     inspectorLayout->addWidget( meshTable );
 
     root = new QWidget();
@@ -37,6 +44,7 @@ void MeshRendererInspector::Init( QWidget* aMainWindow )
     connect( meshTable, SIGNAL(cellClicked(int,int)), this, SLOT(MeshCellClicked(int,int)) );
     connect( mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
              this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );
+    connect( removeButton, SIGNAL(clicked(bool)), mainWindow, SLOT(CommandRemoveMeshRendererComponent()));
 }
 
 void MeshRendererInspector::MeshCellClicked( int, int )

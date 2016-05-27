@@ -85,9 +85,16 @@ void CameraInspector::Init( QWidget* mainWindow )
     QWidget* projectionWidget = new QWidget();
     projectionWidget->setLayout( projectionLayout );
 
+    removeButton = new QPushButton("remove");
+    QBoxLayout* headerLayout = new QBoxLayout( QBoxLayout::LeftToRight );
+    headerLayout->addWidget( componentName );
+    headerLayout->addWidget( removeButton );
+    QWidget* header = new QWidget();
+    header->setLayout( headerLayout );
+
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->setContentsMargins( 1, 1, 1, 1 );
-    inspectorLayout->addWidget( componentName );
+    inspectorLayout->addWidget( header );
     inspectorLayout->addWidget( clearWidget );
     inspectorLayout->addWidget( clearColorWidget );
     inspectorLayout->addWidget( projectionWidget );
@@ -104,6 +111,7 @@ void CameraInspector::Init( QWidget* mainWindow )
     connect( clearFlagsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ClearFlagsChanged(int)) );
     connect( projectionBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ProjectionChanged() ));
     connect( clearColorTable, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
+    connect( removeButton, SIGNAL(clicked(bool)), mainWindow, SLOT(CommandRemoveCameraComponent()));
 }
 
 void CameraInspector::ProjectionChanged()

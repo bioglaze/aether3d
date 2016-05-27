@@ -24,6 +24,7 @@ private slots:
   private:
     QWidget* root = nullptr;
     class QTableWidget* audioClipTable = nullptr;
+    class QPushButton* removeButton = nullptr;
 };
 
 #endif

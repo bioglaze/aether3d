@@ -13,6 +13,7 @@ class SpriteRendererInspector : public QObject
 
   private:
     QWidget* root = nullptr;
+    class QPushButton* removeButton = nullptr;
     class QTableWidget* table = nullptr;
 };
 

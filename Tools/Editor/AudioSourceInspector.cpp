@@ -6,6 +6,7 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QWidget>
+#include <QPushButton>
 #include "AudioSourceComponent.hpp"
 #include "AudioClip.hpp"
 #include "FileSystem.hpp"
@@ -13,8 +14,6 @@
 
 void AudioSourceInspector::Init( QWidget* mainWindow )
 {
-    auto componentName = new QLabel( "Audio Source" );
-
     audioClipTable = new QTableWidget( 1, 1 );
     audioClipTable->setItem( 0, 0, new QTableWidgetItem() );
     audioClipTable->setHorizontalHeaderLabels( QString("").split(";") );
@@ -22,14 +21,23 @@ void AudioSourceInspector::Init( QWidget* mainWindow )
 
     audioClipTable->setItem( 0, 0, new QTableWidgetItem() );
 
+    QLabel* componentName = new QLabel("Audio Source");
+    removeButton = new QPushButton("remove");
+    QBoxLayout* headerLayout = new QBoxLayout( QBoxLayout::LeftToRight );
+    headerLayout->addWidget( componentName );
+    headerLayout->addWidget( removeButton );
+    QWidget* header = new QWidget();
+    header->setLayout( headerLayout );
+
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->setContentsMargins( 1, 1, 1, 1 );
-    inspectorLayout->addWidget( componentName );
+    inspectorLayout->addWidget( header );
     inspectorLayout->addWidget( audioClipTable );
 
     root = new QWidget();
     root->setLayout( inspectorLayout );
 
+    connect( removeButton, SIGNAL(clicked(bool)), mainWindow, SLOT(CommandRemoveAudioSourceComponent()));
     connect( audioClipTable, SIGNAL(cellClicked(int,int)), this, SLOT(AudioCellClicked(int, int)) );
     connect( mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
              this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)) );

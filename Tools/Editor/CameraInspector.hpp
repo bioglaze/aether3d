@@ -35,6 +35,7 @@ private:
     void ApplySelectedCameraIntoFields( const ae3d::CameraComponent& camera );
 
     QWidget* root = nullptr;
+    class QPushButton* removeButton = nullptr;
     class QTableWidget* ortho = nullptr;
     QTableWidget* persp = nullptr;
     QTableWidget* clearColorTable = nullptr;

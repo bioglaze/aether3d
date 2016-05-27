@@ -70,7 +70,8 @@ SOURCES += \
     CreateAudioSourceCommand.cpp \
     SpriteRendererInspector.cpp \
     CreateSpriteRendererCommand.cpp \
-    PointLightInspector.cpp
+    PointLightInspector.cpp \
+    RemoveComponentCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -94,4 +95,5 @@ HEADERS += \
     CreateAudioSourceCommand.hpp \
     SpriteRendererInspector.hpp \
     CreateSpriteRendererCommand.hpp \
-    PointLightInspector.hpp
+    PointLightInspector.hpp \
+    RemoveComponentCommand.hpp

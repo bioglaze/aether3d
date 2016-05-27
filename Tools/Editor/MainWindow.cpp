@@ -25,6 +25,7 @@
 #include "ModifyCameraCommand.hpp"
 #include "PointLightComponent.hpp"
 #include "Quaternion.hpp"
+#include "RemoveComponentCommand.hpp"
 #include "SceneWidget.hpp"
 #include "System.hpp"
 #include "SpotLightComponent.hpp"
@@ -368,10 +369,24 @@ void MainWindow::CommandCreateAudioSourceComponent()
     UpdateInspector();
 }
 
+void MainWindow::CommandRemoveAudioSourceComponent()
+{
+    auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::AudioSourceComponent >();
+    commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    UpdateInspector();
+}
+
 void MainWindow::CommandCreateCameraComponent()
 {
     commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
     sceneWidget->SetSelectedCameraTargetToPreview();
+    UpdateInspector();
+}
+
+void MainWindow::CommandRemoveCameraComponent()
+{
+    auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::CameraComponent >();
+    commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     UpdateInspector();
 }
 
@@ -381,9 +396,23 @@ void MainWindow::CommandCreateMeshRendererComponent()
     UpdateInspector();
 }
 
+void MainWindow::CommandRemoveMeshRendererComponent()
+{
+    auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::MeshRendererComponent >();
+    commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    UpdateInspector();
+}
+
 void MainWindow::CommandCreateSpriteRendererComponent()
 {
     commandManager.Execute( std::make_shared< CreateSpriteRendererCommand >( sceneWidget ) );
+    UpdateInspector();
+}
+
+void MainWindow::CommandRemoveSpriteRendererComponent()
+{
+    auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::SpriteRendererComponent >();
+    commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     UpdateInspector();
 }
 
@@ -393,15 +422,36 @@ void MainWindow::CommandCreateDirectionalLightComponent()
     UpdateInspector();
 }
 
+void MainWindow::CommandRemoveDirectionalLightComponent()
+{
+    auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::DirectionalLightComponent >();
+    commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    UpdateInspector();
+}
+
 void MainWindow::CommandCreateSpotLightComponent()
 {
     commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Spot ) );
     UpdateInspector();
 }
 
+void MainWindow::CommandRemoveSpotLightComponent()
+{
+    auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::SpotLightComponent >();
+    commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    UpdateInspector();
+}
+
 void MainWindow::CommandCreatePointLightComponent()
 {
     commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Point ) );
+    UpdateInspector();
+}
+
+void MainWindow::CommandRemovePointLightComponent()
+{
+    auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::PointLightComponent >();
+    commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     UpdateInspector();
 }
 
