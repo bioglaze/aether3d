@@ -66,6 +66,14 @@ namespace ae3d
 
 namespace GfxDeviceGlobal
 {
+    struct Samplers
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE linearRepeat = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE linearClamp = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE pointRepeat = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE pointClamp = {};
+    } samplers;
+ 
     const unsigned BufferCount = 2;
     int backBufferWidth = 640;
     int backBufferHeight = 400;
@@ -262,7 +270,36 @@ void CreateSampler()
     descSampler.MipLODBias = 0;
     descSampler.MaxAnisotropy = 0;
     descSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-    GfxDeviceGlobal::device->CreateSampler( &descSampler, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
+    //GfxDeviceGlobal::device->CreateSampler( &descSampler, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart();
+    
+    GfxDeviceGlobal::samplers.linearRepeat = handle;
+    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.linearRepeat );
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+
+    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+
+    GfxDeviceGlobal::samplers.linearClamp = handle;
+    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.linearClamp );
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+
+    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+    GfxDeviceGlobal::samplers.pointRepeat = handle;
+    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.pointRepeat );
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+
+    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    GfxDeviceGlobal::samplers.pointClamp = handle;
+    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.pointClamp );
 }
 
 void CreateRootSignature()
@@ -299,21 +336,6 @@ void CreateRootSignature()
 
     // GenerateMips
     {
-        D3D12_STATIC_SAMPLER_DESC descLinearClamp = {};
-        descLinearClamp.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-        descLinearClamp.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        descLinearClamp.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        descLinearClamp.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        descLinearClamp.MinLOD = 0;
-        descLinearClamp.MaxLOD = FLT_MAX;
-        descLinearClamp.MipLODBias = 0;
-        descLinearClamp.MaxAnisotropy = 0;
-        descLinearClamp.RegisterSpace = 0;
-        descLinearClamp.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-
-        // TODO: Fix heap location
-        //GfxDeviceGlobal::device->CreateSampler( &descLinearClamp, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
-
         CD3DX12_ROOT_PARAMETER rootParams[ 3 ] = {};
         rootParams[ 0 ].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
         rootParams[ 0 ].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
@@ -538,6 +560,32 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
 
     const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, rtvFormat );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter )
+{
+    D3D12_GPU_DESCRIPTOR_HANDLE outHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
+
+    // NOTE: Pointer indexing must match creation order in CreateSampler()
+
+    if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Linear)
+    {
+        outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+    }
+    if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Nearest)
+    {
+        outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER ) * 3;
+    }
+    if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Linear)
+    {
+        //outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+    }
+    if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Nearest)
+    {
+        outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER ) * 2;
+    }
+
+    return outHandle;
 }
 
 void CreateDepthStencil()
@@ -826,11 +874,19 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     indexBufferView.SizeInBytes = vertexBuffer.GetIBSize();
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 
+    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
+
+    if (GfxDeviceGlobal::texture2d0)
+    {
+        samplerHandle = GetSampler( GfxDeviceGlobal::texture2d0->GetMipmaps(), GfxDeviceGlobal::texture2d0->GetWrap(),
+            GfxDeviceGlobal::texture2d0->GetFilter() );
+    }
+
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
     GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
