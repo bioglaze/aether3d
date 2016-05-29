@@ -14,7 +14,7 @@ class MeshRendererInspector : public QObject
     Q_OBJECT
 public:
     class QWidget* GetWidget() { return root; }
-    void Init( QWidget* mainWindow );
+    void Init( QWidget* mainWindow, class SceneWidget* sceneWidget );
 
 private slots:
     void MeshCellClicked( int, int );
@@ -26,6 +26,7 @@ private:
     QWidget* mainWindow = nullptr;
     class QPushButton* removeButton = nullptr;
     ae3d::GameObject* gameObject = nullptr;
+    SceneWidget* sceneWidget = nullptr;
 };
 
 #endif

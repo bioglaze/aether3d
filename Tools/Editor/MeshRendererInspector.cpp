@@ -1,4 +1,6 @@
 #include "MeshRendererInspector.hpp"
+#include <vector>
+#include <map>
 #include <QBoxLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -8,22 +10,26 @@
 #include <QMainWindow>
 #include "GameObject.hpp"
 #include "FileSystem.hpp"
+#include "SceneWidget.hpp"
 #include "System.hpp"
 #include "MeshRendererComponent.hpp"
 #include "Mesh.hpp"
 #include "Material.hpp"
+#include "GameObject.hpp"
+
+using namespace ae3d;
 
 extern ae3d::Material* gCubeMaterial;
 
-void MeshRendererInspector::Init( QWidget* aMainWindow )
+void MeshRendererInspector::Init( QWidget* aMainWindow, SceneWidget* aSceneWidget )
 {
     mainWindow = aMainWindow;
+    sceneWidget = aSceneWidget;
 
     // TODO: change type into something more intelligible.
-    meshTable = new QTableWidget( 1, 1 );
+    meshTable = new QTableWidget( 1, 2 );
     meshTable->setItem( 0, 0, new QTableWidgetItem() );
-    meshTable->setHorizontalHeaderLabels( QString("").split(";") );
-    meshTable->setVerticalHeaderLabels( QString("Mesh").split(";") );
+    meshTable->setHorizontalHeaderLabels( QString("Mesh;Material").split(";") );
 
     QLabel* componentName = new QLabel("Mesh Renderer");
     removeButton = new QPushButton("remove");
@@ -47,12 +53,49 @@ void MeshRendererInspector::Init( QWidget* aMainWindow )
     connect( removeButton, SIGNAL(clicked(bool)), mainWindow, SLOT(CommandRemoveMeshRendererComponent()));
 }
 
-void MeshRendererInspector::MeshCellClicked( int, int )
+void MeshRendererInspector::MeshCellClicked( int row, int col )
 {
     // TOOD: Asset library, this is only an ugly placeholder.
 
-    //QMainWindow* qMainWindow = static_cast< QMainWindow* >( mainWindow );
-    const std::string path = QFileDialog::getOpenFileName( root/*qMainWindow->centralWidget()*/, "Open Mesh", "", "Meshes (*.ae3d)" ).toStdString();
+    // Material
+    if (col == 1)
+    {
+        const std::string path = QFileDialog::getOpenFileName( root, "Open Material", "", "Materials (*.material)" ).toStdString();
+
+        if (!path.empty() && gameObject)
+        {
+            std::vector< GameObject > gameObjects;
+            std::map< std::string, Material* > materialNameToMaterial;
+            std::map< std::string, Texture2D* > textureNameToTexture;
+            std::vector< Mesh* > meshes;
+
+            auto res = sceneWidget->GetScene()->Deserialize( FileSystem::FileContents( path.c_str() ), gameObjects, textureNameToTexture,
+                                         materialNameToMaterial, meshes );
+
+            if (res != Scene::DeserializeResult::Success)
+            {
+                System::Print( "Could not parse %s\n", path.c_str() );
+            }
+
+            if (!materialNameToMaterial.empty())
+            {
+                ae3d::System::Print("loaded material\n");
+                auto meshRendererComponent = gameObject->GetComponent< ae3d::MeshRendererComponent >();
+                meshRendererComponent->SetMaterial( materialNameToMaterial.begin()->second, row );
+            }
+            else
+            {
+                ae3d::System::Print( "Could not find material definition in %s\n", path.c_str() );
+            }
+            //ae3d::FileSystem::FileContentsData contents = ae3d::FileSystem::FileContents( path.c_str() );
+            //std::string contentsStr( contents.data.begin(), contents.data.end() );
+           // material->Deserialize(  );
+        }
+
+        return;
+    }
+
+    const std::string path = QFileDialog::getOpenFileName( root, "Open Mesh", "", "Meshes (*.ae3d)" ).toStdString();
 
     if (!path.empty() && gameObject)
     {

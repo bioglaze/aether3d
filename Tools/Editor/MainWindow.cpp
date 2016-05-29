@@ -73,7 +73,7 @@ MainWindow::MainWindow()
 
     transformInspector.Init( this );
     cameraInspector.Init( this );
-    meshRendererInspector.Init( this );
+    meshRendererInspector.Init( this, sceneWidget );
     dirLightInspector.Init( this );
     pointLightInspector.Init( this );
     spotLightInspector.Init( this );
