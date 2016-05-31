@@ -69,11 +69,13 @@ public slots:
 
 private slots:
     void OnGameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
+    void ShowContextMenu(const class QPoint& pos);
 
 signals:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
 
 private:
+    void DeleteSelectedGameObjects();
     void UpdateHierarchy();
     void UpdateHierarchySelection();
     void keyPressEvent( QKeyEvent* event );

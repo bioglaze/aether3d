@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <QBoxLayout>
+#include <QMenu>
 #include <QSplitter>
 #include <QTreeWidget>
 #include <QKeyEvent>
@@ -57,6 +58,8 @@ MainWindow::MainWindow()
     connect( sceneTree, &QTreeWidget::itemSelectionChanged, [&]() { HierarchySelectionChanged(); });
     connect( sceneTree, &QTreeWidget::itemChanged, [&](QTreeWidgetItem* item, int /* column */) { HierarchyItemRenamed( item ); });
     sceneTree->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
+    sceneTree->setContextMenuPolicy( Qt::CustomContextMenu );
+    connect( sceneTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
 
     sceneWidget = new SceneWidget();
     sceneWidget->SetMainWindow( this );
@@ -115,6 +118,46 @@ MainWindow::MainWindow()
 #endif
 }
 
+void MainWindow::ShowContextMenu( const QPoint& pos )
+{
+    if (sceneTree->selectedItems().empty())
+    {
+        return;
+    }
+
+    QPoint globalPos = sceneTree->mapToGlobal( pos );
+
+    QMenu myMenu;
+    myMenu.addAction( "Rename" );
+    myMenu.addAction( "Duplicate" );
+    myMenu.addAction( "Delete" );
+
+    QAction* selectedItem = myMenu.exec( globalPos );
+
+    if (selectedItem && sceneTree->selectedItems().length() == 1)
+    {
+        if (selectedItem->text() == "Rename")
+        {
+            sceneTree->editItem( sceneTree->selectedItems().front() );
+        }
+        else if (selectedItem->text() == "Duplicate")
+        {
+            auto selected = sceneWidget->selectedGameObjects.back();
+            std::cout << "Duplicate" << std::endl;
+            commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
+            *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
+            UpdateHierarchy();
+        }
+        else if (selectedItem->text() == "Delete")
+        {
+            DeleteSelectedGameObjects();
+        }
+    }
+    else
+    {
+        // nothing was chosen
+    }
+}
 void MainWindow::OnGameObjectSelected( std::list< ae3d::GameObject* > /*gameObjects*/ )
 {
     UpdateHierarchySelection();
@@ -308,6 +351,36 @@ void MainWindow::HierarchySelectionChanged()
     emit GameObjectSelected( selectedObjects );
 }
 
+void MainWindow::DeleteSelectedGameObjects()
+{
+    std::vector< ae3d::GameObject* > selectedGameObjects;
+
+    for (auto i : sceneWidget->selectedGameObjects)
+    {
+        selectedGameObjects.push_back( sceneWidget->GetGameObject( i ) );
+    }
+
+    for (auto g : selectedGameObjects)
+    {
+        sceneWidget->RemoveGameObject( g );
+    }
+
+    /*for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
+    {
+        if (sceneTree->topLevelItem( i )->isSelected())
+        {
+            sceneWidget->RemoveGameObject( i );
+        }
+    }*/
+
+    sceneWidget->selectedGameObjects.clear();
+    std::list< ae3d::GameObject* > emptyList;
+    emit GameObjectSelected( emptyList );
+    sceneTree->clearSelection();
+    UpdateInspector();
+    UpdateHierarchy();
+}
+
 void MainWindow::keyPressEvent( QKeyEvent* event )
 {
     const int macDelete = 16777219;
@@ -322,32 +395,7 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     }
     else if (event->key() == Qt::Key_Delete || event->key() == macDelete)
     {
-        std::vector< ae3d::GameObject* > selectedGameObjects;
-
-        for (auto i : sceneWidget->selectedGameObjects)
-        {
-            selectedGameObjects.push_back( sceneWidget->GetGameObject( i ) );
-        }
-
-        for (auto g : selectedGameObjects)
-        {
-            sceneWidget->RemoveGameObject( g );
-        }
-
-        /*for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
-        {
-            if (sceneTree->topLevelItem( i )->isSelected())
-            {
-                sceneWidget->RemoveGameObject( i );
-            }
-        }*/
-
-        sceneWidget->selectedGameObjects.clear();
-        std::list< ae3d::GameObject* > emptyList;
-        emit GameObjectSelected( emptyList );
-        sceneTree->clearSelection();
-        UpdateInspector();
-        UpdateHierarchy();
+        DeleteSelectedGameObjects();
     }
     else if (event->key() == Qt::Key_F)
     {
