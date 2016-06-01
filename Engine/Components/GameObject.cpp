@@ -113,7 +113,7 @@ std::string ae3d::GameObject::GetSerialized() const
     outStream << "gameobject\n";
     outStream << "name " << serializedName << "\n";
     outStream << "layer " << layer << "\n";
-    outStream << "enabled " << (isEnabled ? 1 : 0) << "\n";
+    outStream << "enabled " << (isEnabled ? 1 : 0) << "\n\n";
 
     return outStream.str();
 }

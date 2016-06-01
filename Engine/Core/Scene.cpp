@@ -804,15 +804,16 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             }
             
             currentLightType = CurrentLightType::Spot;
-            outGameObjects.back().AddComponent< SpotLightComponent >();
+            GameObject& go = outGameObjects.back();
+            go.AddComponent< SpotLightComponent >();
             
             int castsShadow = 0;
             lineStream >> castsShadow;
-            outGameObjects.back().GetComponent< SpotLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
+            go.GetComponent< SpotLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
             
             float coneAngleDegrees;
             lineStream >> coneAngleDegrees;
-            outGameObjects.back().GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
+            go.GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
         }
         
         if (token == "pointlight")
@@ -1091,6 +1092,18 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> uniformName >> textureName;
             outMaterials[ currentMaterialName ]->SetTexture( uniformName.c_str(), outTexture2Ds[ textureName ]);
         }
+
+        if (token == "audiosource")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found audiosource but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            outGameObjects.back().AddComponent< AudioSourceComponent >();
+        }
+
     }
 
     return DeserializeResult::Success;

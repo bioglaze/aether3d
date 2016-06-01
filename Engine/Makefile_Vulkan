@@ -29,7 +29,8 @@ endif
 
 ifeq ($(UNAME), Linux)
 DEFINES := -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
-else
+endif
+ifeq ($(UNAME), Darwin)
 DEFINES := -DRENDERER_VULKAN
 endif
 
@@ -38,6 +39,7 @@ ENGINE_LIB := libaether3d_win_vulkan.a
 CCOMPILER := gcc
 WARNINGS := -Wall -ansi -pedantic
 OUTPUT_DIR := ..\..\aether3d_build
+DEFINES := -DRENDERER_VULKAN -DVK_USE_PLATFORM_WIN32_KHR
 endif
 
 all:
@@ -69,7 +71,8 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/DirectionalLightComponent.cpp -o $(OUTPUT_DIR)/DirectionalLightComponent.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpotLightComponent.cpp -o $(OUTPUT_DIR)/SpotLightComponent.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/PointLightComponent.cpp -o $(OUTPUT_DIR)/PointLightComponentNull.o	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/PointLightComponent.cpp -o $(OUTPUT_DIR)/PointLightComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/AudioSourceComponent.cpp -o $(OUTPUT_DIR)/AudioSourceComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/MeshRendererComponent.cpp -o $(OUTPUT_DIR)/MeshRendererComponent.o

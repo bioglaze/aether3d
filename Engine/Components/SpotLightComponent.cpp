@@ -37,7 +37,7 @@ std::string ae3d::SpotLightComponent::GetSerialized() const
     std::stringstream outStream;
     outStream << "spotlight\n";
     outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
-    outStream << "coneangle " << coneAngle << "\n";
+    outStream << "coneangle " << coneAngle << "\n\n";
 
     return outStream.str();
 }
