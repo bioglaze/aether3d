@@ -112,13 +112,14 @@ namespace GfxDeviceGlobal
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     std::map< unsigned, VkPipeline > psoCache;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+	std::vector< VkDescriptorSet > descriptorSets;
+	int descriptorSetIndex = 0;
     std::uint32_t queueNodeIndex = UINT32_MAX;
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
     VkImageView view0 = VK_NULL_HANDLE;
     VkSampler sampler0 = VK_NULL_HANDLE;
-    std::vector< VkDescriptorSet > pendingFreeDescriptorSets;
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > frameUbos;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
@@ -1231,9 +1232,9 @@ namespace ae3d
     {
         VkDescriptorPoolSize typeCounts[ 2 ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        typeCounts[ 0 ].descriptorCount = 10;
+        typeCounts[ 0 ].descriptorCount = 100;
         typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        typeCounts[ 1 ].descriptorCount = 10;
+        typeCounts[ 1 ].descriptorCount = 100;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1245,6 +1246,20 @@ namespace ae3d
 
         VkResult err = vkCreateDescriptorPool( GfxDeviceGlobal::device, &descriptorPoolInfo, nullptr, &GfxDeviceGlobal::descriptorPool );
         AE3D_CHECK_VULKAN( err, "vkCreateDescriptorPool" );
+
+		GfxDeviceGlobal::descriptorSets.resize( 100 );
+
+		for (std::size_t i = 0; i < GfxDeviceGlobal::descriptorSets.size(); ++i)
+		{
+			VkDescriptorSetAllocateInfo allocInfo = {};
+			allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			allocInfo.descriptorPool = GfxDeviceGlobal::descriptorPool;
+			allocInfo.descriptorSetCount = 1;
+			allocInfo.pSetLayouts = &GfxDeviceGlobal::descriptorSetLayout;
+
+			err = vkAllocateDescriptorSets( GfxDeviceGlobal::device, &allocInfo, &GfxDeviceGlobal::descriptorSets[ i ] );
+			AE3D_CHECK_VULKAN( err, "vkAllocateDescriptorSets" );
+		}
     }
 
     VkSampler GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter )
@@ -1272,19 +1287,8 @@ namespace ae3d
 
     VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler )
     {
-        ae3d::System::Assert( GfxDeviceGlobal::descriptorSetLayout != VK_NULL_HANDLE, "descriptor set not created" );
-        ae3d::System::Assert( GfxDeviceGlobal::descriptorPool != VK_NULL_HANDLE, "descriptorPool not created" );
-        ae3d::System::Assert( GfxDeviceGlobal::samplers.linearRepeat != VK_NULL_HANDLE, "linearRepeat not initted" );
-
-        VkDescriptorSetAllocateInfo allocInfo = {};
-        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = GfxDeviceGlobal::descriptorPool;
-        allocInfo.descriptorSetCount = 1;
-        allocInfo.pSetLayouts = &GfxDeviceGlobal::descriptorSetLayout;
-
-        VkDescriptorSet outDescriptorSet;
-        VkResult err = vkAllocateDescriptorSets( GfxDeviceGlobal::device, &allocInfo, &outDescriptorSet );
-        AE3D_CHECK_VULKAN( err, "vkAllocateDescriptorSets" );
+		VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
+		GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
 
         // Binding 0 : Uniform buffer
         VkWriteDescriptorSet uboSet = {};
@@ -1311,7 +1315,7 @@ namespace ae3d
 
         VkWriteDescriptorSet sets[ 2 ] = { uboSet, samplerSet };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, 2, sets, 0, nullptr );
-        
+
         return outDescriptorSet;
     }
 
@@ -1623,8 +1627,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
 
-    GfxDeviceGlobal::pendingFreeDescriptorSets.push_back( descriptorSet );
-
     vkCmdBindDescriptorSets( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
 
@@ -1726,13 +1728,6 @@ void ae3d::GfxDevice::Present()
 
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
-
-    for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeDescriptorSets.size(); ++i)
-    {
-        vkFreeDescriptorSets( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorPool, 1, &GfxDeviceGlobal::pendingFreeDescriptorSets[ i ] );
-    }
-
-    GfxDeviceGlobal::pendingFreeDescriptorSets.clear();
 
     for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeVBs.size(); ++i)
     {
