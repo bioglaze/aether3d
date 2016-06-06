@@ -22,6 +22,9 @@ namespace ae3d
         /// Destroys graphics API objects.
         static void DestroyTextures();
 
+        /// \return Data type.
+        DataType GetDataType() const { return dataType; }
+        
         /// \param width Width.
         /// \param height Height.
         /// \param dataType Data type.
@@ -70,6 +73,7 @@ namespace ae3d
         VkDeviceMemory deviceMemory;
         VkImageView view;
 #endif
+        DataType dataType = DataType::UByte;
         bool isCube = false;
     };
 }

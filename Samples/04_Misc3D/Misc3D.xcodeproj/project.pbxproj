@@ -65,6 +65,7 @@
 		AB921DB61CC21B91008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../Engine/Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		ABB79F9B1BA9B7F9002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Engine/Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
 		ABD910F71B78F97A005EBB74 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../../Engine/Include/VR.hpp; sourceTree = "<group>"; };
+		ABF091F31D040A0E00551F30 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../../Engine/Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +134,7 @@
 				AB7112DA1B43098400C4EE78 /* MeshRendererComponent.hpp */,
 				AB7112DB1B43098400C4EE78 /* Quaternion.hpp */,
 				AB7112DC1B43098400C4EE78 /* RenderTexture.hpp */,
+				ABF091F31D040A0E00551F30 /* PointLightComponent.hpp */,
 				AB7112DD1B43098400C4EE78 /* Scene.hpp */,
 				AB7112DE1B43098400C4EE78 /* Shader.hpp */,
 				AB7112DF1B43098400C4EE78 /* SpriteRendererComponent.hpp */,

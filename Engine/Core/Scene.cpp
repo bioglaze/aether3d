@@ -325,8 +325,10 @@ void ae3d::Scene::Render()
                 auto lightTransform = go->GetComponent<TransformComponent>();
                 auto dirLight = go->GetComponent<DirectionalLightComponent>();
                 auto spotLight = go->GetComponent<SpotLightComponent>();
-
-                if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow())))
+                auto pointLight = go->GetComponent<PointLightComponent>();
+                
+                if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
+                                       (pointLight && pointLight->CastsShadow())))
                 {
                     Frustum eyeFrustum;
                     
@@ -367,9 +369,48 @@ void ae3d::Scene::Render()
                         SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
                         SetupCameraForSpotShadowCasting( lightTransform->GetLocalPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                     }
+                    else if (pointLight)
+                    {
+                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<PointLightComponent>()->shadowMap );
+                    }
                     
                     GfxDevice::PushGroupMarker( "Shadow maps" );
-                    RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
+                    
+                    if (pointLight)
+                    {
+                        for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
+                        {
+                            const float scale = 2000;
+                            
+                            static const Vec3 directions[ 6 ] =
+                            {
+                                Vec3(  1,  0,  0 ) * scale, // posX
+                                Vec3( -1,  0,  0 ) * scale, // negX
+                                Vec3(  0,  1,  0 ) * scale, // posY
+                                Vec3(  0, -1,  0 ) * scale, // negY
+                                Vec3(  0,  0,  1 ) * scale, // posZ
+                                Vec3(  0,  0, -1 ) * scale  // negZ
+                            };
+                            
+                            static const Vec3 ups[ 6 ] =
+                            {
+                                Vec3( 0,  -1,  0 ),
+                                Vec3( 0,  -1,  0 ),
+                                Vec3( 0,  0,  1 ),
+                                Vec3( 0,  0, -1 ),
+                                Vec3( 0, -1,  0 ),
+                                Vec3( 0, -1,  0 )
+                            };
+                            
+                            lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
+                            RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
+                        }
+                    }
+                    else
+                    {
+                        RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
+                    }
+                    
                     GfxDevice::PopGroupMarker();
 
                     if (dirLight)
@@ -380,6 +421,11 @@ void ae3d::Scene::Render()
                     else if (spotLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
+                        //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
+                    }
+                    else if (pointLight)
+                    {
+                        Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
                         //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
                     }
                 }

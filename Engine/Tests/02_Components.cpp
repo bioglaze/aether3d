@@ -7,6 +7,7 @@
 #include "GameObject.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
+#include "PointLightComponent.hpp"
 #include "RenderTexture.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
@@ -37,6 +38,7 @@ void TestManyInstances()
         gos[ i ].AddComponent< TextRendererComponent >();
         gos[ i ].AddComponent< SpotLightComponent >();
         gos[ i ].AddComponent< DirectionalLightComponent >();
+        gos[ i ].AddComponent< PointLightComponent >();
     }
 }
 

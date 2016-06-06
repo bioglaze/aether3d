@@ -24,15 +24,12 @@ id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
 id <CAMetalDrawable> drawable; // Render texture or currentDrawable
 
 MTLRenderPassDescriptor* renderPassDescriptor = nullptr;
-//id <MTLTexture> depthTex;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
 id<MTLTexture> texture0;
 id<MTLTexture> texture1;
-id<MTLTexture> currentRenderTarget;
 id<MTLTexture> msaaColorTarget;
 id<MTLTexture> msaaDepthTarget;
-MTKView* appView = nullptr;
 
 // TODO: Move somewhere else.
 void PlatformInitGamePad()
@@ -175,7 +172,6 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     }
     
     device = metalDevice;
-    appView = view;
 
     commandQueue = [device newCommandQueue];
     defaultLibrary = [device newDefaultLibrary];
@@ -274,7 +270,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 }
 
 std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                        ae3d::VertexBuffer::VertexFormat vertexFormat )
+                       ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&shader.vertexProgram );
@@ -282,13 +278,14 @@ std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMo
     hashString += std::to_string( (unsigned)blendMode );
     hashString += std::to_string( ((unsigned)depthFunc) );
     hashString += std::to_string( ((unsigned)vertexFormat) );
+    hashString += std::to_string( ((unsigned)pixelFormat) );
     return hashString;
 }
 
 id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                                    ae3d::VertexBuffer::VertexFormat vertexFormat )
+                                    ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat )
 {
-    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat );
+    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
@@ -299,7 +296,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 #if (__i386__)
         pipelineStateDescriptor.inputPrimitiveTopology = MTLPrimitiveTopologyClassTriangle;
 #endif
-        pipelineStateDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+        pipelineStateDescriptor.colorAttachments[0].pixelFormat = (pixelFormat == ae3d::RenderTexture::DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float);
         pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;
         pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
@@ -443,7 +440,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         texture1 = Texture2D::GetDefaultTexture()->GetMetalTexture();
     }
     
-    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat() )];
+    RenderTexture::DataType pixelFormat = RenderTexture::DataType::UByte;
+    
+    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
     [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeFront : MTLCullModeNone];

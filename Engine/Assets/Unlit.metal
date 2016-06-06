@@ -6,36 +6,30 @@ using namespace metal;
 float linstep( float low, float high, float v );
 float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth );
 
-typedef struct
+struct uniforms_t
 {
     matrix_float4x4 _ModelViewProjectionMatrix;
     float4 tintColor;
     matrix_float4x4 _ShadowProjectionMatrix;
-} uniforms_t;
+};
 
-typedef struct
+struct vertex_t
 {
     packed_float3 position;
     packed_float2 texcoord;
     packed_float3 normal;
     packed_float4 tangent;
     packed_float4 color;
-} vertex_t;
+};
 
-/*typedef struct
-{
-    packed_float3 position;
-    packed_float2 texcoord;
-    packed_float4 color;
-} vertex_t;*/
-
-typedef struct
+struct ColorInOut
 {
     float4 position [[position]];
-    half4  color;
-    float2 texCoords;
     float4 tintColor;
-} ColorInOut;
+    float4 projCoord;
+    float2 texCoords;
+    half4  color;
+};
 
 constexpr sampler s(coord::normalized,
                     address::repeat,
@@ -78,17 +72,18 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
     out.color = half4( vert.color );
     out.texCoords = float2( vert.texcoord );
     out.tintColor = uniforms.tintColor;
+    out.projCoord = uniforms._ShadowProjectionMatrix * in_position;
     return out;
 }
 
 fragment half4 unlit_fragment( ColorInOut in [[stage_in]],
                                texture2d<float, access::sample> textureMap [[texture(0)]],
-                               texture2d<float, access::sample> shadowMap [[texture(1)]] )
+                               texture2d<float, access::sample> _ShadowMap [[texture(1)]] )
 {
     half4 sampledColor = half4( textureMap.sample( s, in.texCoords ) ) * half4( in.tintColor );
 
-    //float depth = 1.0;//vProjCoord.z / vProjCoord.w;
-    //float4 shadow = VSM( shadowMap, float4( 0.0, 0.0, 0.0, 0.0 ), depth );
+    //float depth = in.projCoord.z / in.projCoord.w;
+    //float4 shadow = VSM( _ShadowMap, in.projCoord, depth );
 
     return half4( sampledColor );// * half4( shadow );
 }

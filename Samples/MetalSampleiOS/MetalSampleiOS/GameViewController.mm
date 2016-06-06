@@ -2,15 +2,18 @@
 #import "GameViewController.h"
 
 #import "Aether3D_iOS/CameraComponent.hpp"
+#import "Aether3D_iOS/DirectionalLightComponent.hpp"
 #import "Aether3D_iOS/GameObject.hpp"
 #import "Aether3D_iOS/FileSystem.hpp"
 #import "Aether3D_iOS/Scene.hpp"
 #import "Aether3D_iOS/Font.hpp"
 #import "Aether3D_iOS/Mesh.hpp"
 #import "Aether3D_iOS/MeshRendererComponent.hpp"
+#import "Aether3D_iOS/PointLightComponent.hpp"
 #import "Aether3D_iOS/Texture2D.hpp"
 #import "Aether3D_iOS/TransformComponent.hpp"
 #import "Aether3D_iOS/TextRendererComponent.hpp"
+#import "Aether3D_iOS/SpotLightComponent.hpp"
 #import "Aether3D_iOS/Shader.hpp"
 #import "Aether3D_iOS/System.hpp"
 #import "Aether3D_iOS/Material.hpp"
@@ -23,7 +26,9 @@
     ae3d::GameObject camera2d;
     ae3d::GameObject camera3d;
     ae3d::GameObject cube;
+    ae3d::GameObject cubeFloor;
     ae3d::GameObject text;
+    ae3d::GameObject dirLight;
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -89,12 +94,27 @@
     cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
     
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );
+    
     cube.AddComponent<ae3d::MeshRendererComponent>();
     cube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     cube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     cube.AddComponent<ae3d::TransformComponent>();
     cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
     scene.Add( &cube );
+
+    cubeFloor.AddComponent<ae3d::MeshRendererComponent>();
+    cubeFloor.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    cubeFloor.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    cubeFloor.AddComponent<ae3d::TransformComponent>();
+    cubeFloor.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -7, -10 ) );
+    cubeFloor.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 4 );
+    scene.Add( &cubeFloor );
+
+    dirLight.AddComponent<ae3d::TransformComponent>();
+    dirLight.AddComponent<ae3d::DirectionalLightComponent>();
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
+    scene.Add( &dirLight );
 }
 
 - (void)_setupView

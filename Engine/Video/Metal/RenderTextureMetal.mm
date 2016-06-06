@@ -2,7 +2,7 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -16,9 +16,10 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     filter = aFilter;
     handle = 1;
     isRenderTexture = true;
+    dataType = aDataType;
     
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm//(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
@@ -33,7 +34,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     metalTexture.label = @"Render Texture 2D";
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     isCube = true;
     width = aDimension;
@@ -42,9 +43,10 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     filter = aFilter;
     handle = 1;
     isRenderTexture = true;
+    dataType = aDataType;
     
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+    [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm//(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
                                                        size:width
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;

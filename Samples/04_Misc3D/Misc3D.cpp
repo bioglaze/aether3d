@@ -5,6 +5,7 @@
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "MeshRendererComponent.hpp"
+#include "PointLightComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "SpotLightComponent.hpp"
 #include "TextRendererComponent.hpp"
@@ -155,7 +156,7 @@ int main()
     
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
 
@@ -165,6 +166,12 @@ int main()
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+
+    GameObject pointLight;
+    pointLight.AddComponent<PointLightComponent>();
+    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( true, 512 );
+    pointLight.GetComponent<PointLightComponent>()->SetRadius( 100 );
+    pointLight.AddComponent<TransformComponent>();
 
     Scene scene;
     
@@ -225,8 +232,9 @@ int main()
     //scene.Add( &cube );
     //scene.Add( &copiedCube );
 //    scene.Add( &statsContainer );
-    //scene.Add( &dirLight );
+    scene.Add( &dirLight );
     //scene.Add( &spotLight );
+    //scene.Add( &pointLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
 
