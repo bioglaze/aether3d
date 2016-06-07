@@ -648,6 +648,9 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #if RENDERER_METAL
     GfxDevice::BeginFrame();
 #endif
+#if RENDERER_VULKAN
+	GfxDevice::BeginRenderPassAndCommandBuffer();
+#endif
 
     Matrix44 view;
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
@@ -713,6 +716,9 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     
 #if RENDERER_METAL
     GfxDevice::PresentDrawable();
+#endif
+#if RENDERER_VULKAN
+	GfxDevice::EndRenderPassAndCommandBuffer();
 #endif
 
     GfxDevice::ErrorCheck( "Scene render shadows end" );

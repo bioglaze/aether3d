@@ -24,14 +24,14 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
     System::Assert( vertexData != nullptr, "vertexData not initialized" );
     System::Assert( indexData != nullptr, "indexData not initialized" );
 
-    // FIXME: This causes random hangs so it's disabled. However, now it causes massive memleak.
-    /*if (vertexBuffer != VK_NULL_HANDLE)
+    // FIXME: If this leads to a crash, find out some saner way to free memory
+    if (vertexBuffer != VK_NULL_HANDLE)
     {
         vkFreeMemory( GfxDeviceGlobal::device, vertexMem, nullptr );
         vkFreeMemory( GfxDeviceGlobal::device, indexMem, nullptr );
         GfxDeviceGlobal::pendingFreeVBs.push_back( vertexBuffer );
         GfxDeviceGlobal::pendingFreeVBs.push_back( indexBuffer );
-    }*/
+    }
 
     bool useStaging = true;
 

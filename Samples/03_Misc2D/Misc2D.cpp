@@ -132,7 +132,7 @@ int main()
     //scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    //scene.Add( &renderTextureContainer );
+    scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 

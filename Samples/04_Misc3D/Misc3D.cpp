@@ -156,9 +156,9 @@ int main()
     
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
+	dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
@@ -169,7 +169,7 @@ int main()
 
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
-    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( true, 512 );
+    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( false, 512 );
     pointLight.GetComponent<PointLightComponent>()->SetRadius( 100 );
     pointLight.AddComponent<TransformComponent>();
 

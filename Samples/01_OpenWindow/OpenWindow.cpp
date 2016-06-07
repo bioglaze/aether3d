@@ -60,7 +60,8 @@ int main()
     scene.Add( &textContainer );
     
     bool quit = false;
-    
+	int frame = 0;
+
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -91,6 +92,9 @@ int main()
 
         scene.Render();
         Window::SwapBuffers();
+
+		++frame;
+		textContainer.GetComponent<TextRendererComponent>()->SetText( (frame % 5 == 0) ? "Aether3D \nGame Engine" : "Aether3D" );
     }
 
     System::Deinit();
