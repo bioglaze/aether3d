@@ -11,12 +11,17 @@ endif
 
 ifeq ($(OS),Windows_NT)
 ENGINE_LIB := libaether3d_gl_win.a
-LIBS := -lOpenAL32 -lOpenGL32 -lgdi32
+LIBS := -L../ThirdParty/lib -lOpenAL32 -lOpenGL32 -lgdi32
 endif
 
 all:
 	$(COMPILER) -DRENDERER_OPENGL -std=c++11 04_Serialization.cpp ../Core/Matrix.cpp -I../Include -o 04_Serialization ../../../aether3d_build/$(ENGINE_LIB) $(LIBS)
 	$(COMPILER) -DRENDERER_OPENGL -std=c++11 02_Components.cpp ../Core/Matrix.cpp -I../Include -o 02_Components ../../../aether3d_build/$(ENGINE_LIB) $(LIBS)
 	$(COMPILER) -DRENDERER_OPENGL -std=c++11 03_Simple3D.cpp ../Core/Matrix.cpp -I../Include -o 03_Simple3D ../../../aether3d_build/$(ENGINE_LIB) $(LIBS)
-	clang++ -DRENDERER_OPENGL -std=c++11 -fsanitize=address 01_Math.cpp ../Core/Matrix.cpp -I../Include -o 01_Math
+ifeq ($(OS),Windows_NT)
+	g++ -Wall -march=native -std=c++11 -DRENDERER_OPENGL -DSIMD_SSE3 01_Math.cpp ../Core/MatrixSSE3.cpp -I../Include -o 01_MathSSE
+	g++ -Wall -DRENDERER_OPENGL -std=c++11 01_Math.cpp ../Core/Matrix.cpp -I../Include -o 01_Math
+else
 	clang++ -DRENDERER_OPENGL -std=c++11 -march=native -fsanitize=address -DSIMD_SSE3 01_Math.cpp ../Core/MatrixSSE3.cpp -I../Include -o 01_MathSSE
+	clang++ -DRENDERER_OPENGL -std=c++11 -fsanitize=address 01_Math.cpp ../Core/Matrix.cpp -I../Include -o 01_Math
+endif

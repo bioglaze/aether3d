@@ -101,5 +101,8 @@ endif
 ifeq ($(UNAME), Darwin)
 	rm $(OUTPUT_DIR)/*.o
 endif
+ifeq ($(OS),Windows_NT)
+	del $(OUTPUT_DIR)\*.o
+endif
 
 
