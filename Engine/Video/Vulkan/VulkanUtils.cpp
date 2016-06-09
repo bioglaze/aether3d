@@ -233,7 +233,7 @@ namespace ae3d
     }
 
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
-        VkImageLayout newImageLayout, unsigned layerCount )
+        VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount )
     {
         System::Assert( cmdbuffer != VK_NULL_HANDLE, "command buffer not initialized" );
 
@@ -247,8 +247,8 @@ namespace ae3d
         imageMemoryBarrier.newLayout = newImageLayout;
         imageMemoryBarrier.image = image;
         imageMemoryBarrier.subresourceRange.aspectMask = aspectMask;
-        imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
-        imageMemoryBarrier.subresourceRange.levelCount = 1;
+        imageMemoryBarrier.subresourceRange.baseMipLevel = mipLevel;
+        imageMemoryBarrier.subresourceRange.levelCount = mipLevelCount;
         imageMemoryBarrier.subresourceRange.layerCount = layerCount;
 
         if (oldImageLayout == VK_IMAGE_LAYOUT_PREINITIALIZED)

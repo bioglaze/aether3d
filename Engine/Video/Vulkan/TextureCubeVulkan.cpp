@@ -32,6 +32,7 @@ namespace TextureCubeGlobal
     ae3d::TextureCube defaultTexture;
     VkCommandBuffer texCmdBuffer = VK_NULL_HANDLE;
 }
+
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                               const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
                               const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
@@ -175,7 +176,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 images[ face ],
                 VK_IMAGE_ASPECT_COLOR_BIT,
                 VK_IMAGE_LAYOUT_UNDEFINED,//VK_IMAGE_LAYOUT_PREINITIALIZED,
-                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1 );
+                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 0, 1 );
         }
         else if (isDDS)
         {
@@ -206,8 +207,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     SetImageLayout( TextureCubeGlobal::texCmdBuffer,
         image,
         VK_IMAGE_ASPECT_COLOR_BIT,
-        VK_IMAGE_LAYOUT_UNDEFINED,//VK_IMAGE_LAYOUT_PREINITIALIZED,
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6 );
+        VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6, 0, 1 );
 
     for (int face = 0; face < 6; ++face)
     {
@@ -238,8 +239,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     SetImageLayout( TextureCubeGlobal::texCmdBuffer,
         image,
         VK_IMAGE_ASPECT_COLOR_BIT,
-        VK_IMAGE_LAYOUT_UNDEFINED,//VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6 );
+        VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6, 0, 1 );
 
     err = vkEndCommandBuffer( TextureCubeGlobal::texCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );

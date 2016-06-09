@@ -21,6 +21,10 @@
       <Configuration>Oculus Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Vulkan|x64">
+      <Configuration>Release Vulkan</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
@@ -63,6 +67,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vulkan|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -88,6 +99,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Vulkan|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -109,6 +123,10 @@
     <TargetName>Misc3D_D3D12_r</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_GL_r</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vulkan|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
     <TargetName>Misc3D_GL_r</TargetName>
   </PropertyGroup>
@@ -203,6 +221,28 @@
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Vulkan|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\..\Engine\Include;..\..\..\Engine\ThirdParty</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_VULKAN</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_Vulkan_r.lib;vulkan-1.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
@@ -242,6 +282,7 @@
     <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Mesh.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\MeshRendererComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\PointLightComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\RenderTexture.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Scene.hpp" />

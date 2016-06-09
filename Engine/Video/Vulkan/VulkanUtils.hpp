@@ -7,7 +7,7 @@
 namespace ae3d
 {
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
-        VkImageLayout newImageLayout, unsigned layerCount );
+        VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount );
     void CreateSamplers( VkDevice device, VkSampler* linearRepeat, VkSampler* linearClamp, VkSampler* pointClamp, VkSampler* pointRepeat );
 
     unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,

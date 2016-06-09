@@ -98,5 +98,8 @@
     <ClInclude Include="..\..\..\Engine\Include\ComputeShader.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\PointLightComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

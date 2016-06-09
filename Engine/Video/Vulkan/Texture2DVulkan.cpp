@@ -23,7 +23,7 @@ namespace ae3d
 
 namespace MathUtil
 {
-    bool IsPowerOfTwo( unsigned i );
+    int GetMipmapCount( int width, int height );
 }
 
 namespace GfxDeviceGlobal
@@ -96,168 +96,147 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    VkMemoryAllocateInfo memAllocInfo = {};
+    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memAllocInfo.pNext = nullptr;
+    memAllocInfo.memoryTypeIndex = 0;
+    memAllocInfo.allocationSize = 0;
+
+    VkBuffer stagingBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory stagingMemory = VK_NULL_HANDLE;
+
+    VkBufferCreateInfo bufferCreateInfo = {};
+    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCreateInfo.size = width * height * 4;
+    bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffer );
+    AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
+
+    VkMemoryRequirements memReqs = {};
+    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffer, &memReqs );
+
+    memAllocInfo.allocationSize = memReqs.size;
+    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
+
+    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory staging" );
+
+    err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffer, stagingMemory, 0 );
+    AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
+
+    std::uint8_t* stagingData;
+    err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory, 0, memReqs.size, 0, (void **)&stagingData );
+    std::memcpy( stagingData, data, width * height * 4 );
+    vkUnmapMemory( GfxDeviceGlobal::device, stagingMemory );
+
+    std::vector<VkBufferImageCopy> bufferCopyRegions;
+    std::uint32_t offset = 0;
+
+    const auto format = VK_FORMAT_R8G8B8A8_UNORM;
+    const int mipLevels = 1;// mipmaps == Mipmaps::Generate ? static_cast<int>(MathUtil::GetMipmapCount( width, height )) : 1;
+
+    for (int i = 0; i < mipLevels; ++i)
+    {
+        VkBufferImageCopy bufferCopyRegion = {};
+        bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        bufferCopyRegion.imageSubresource.mipLevel = i;
+        bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
+        bufferCopyRegion.imageSubresource.layerCount = 1;
+        bufferCopyRegion.imageExtent.width = width;
+        bufferCopyRegion.imageExtent.height = height;
+        bufferCopyRegion.imageExtent.depth = 1;
+        bufferCopyRegion.bufferOffset = offset;
+
+        bufferCopyRegions.push_back( bufferCopyRegion );
+
+        offset += width * height * 4;
+    }
 
     VkImageCreateInfo imageCreateInfo = {};
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageCreateInfo.pNext = nullptr;
     imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     imageCreateInfo.format = format;
-    imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
-    imageCreateInfo.mipLevels = 1;
+    imageCreateInfo.mipLevels = mipLevels;
     imageCreateInfo.arrayLayers = 1;
     imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
-    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-    imageCreateInfo.flags = 0;
+    imageCreateInfo.extent = { static_cast<std::uint32_t>( width ), static_cast<std::uint32_t>( height ), 1 };
+    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-    VkImage mappableImage;
-    VkResult err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &mappableImage );
+    err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage" );
 
-    VkMemoryRequirements memReqs;
-    vkGetImageMemoryRequirements( GfxDeviceGlobal::device, mappableImage, &memReqs );
+    vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
 
-    VkMemoryAllocateInfo memAllocInfo = {};
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memAllocInfo.pNext = nullptr;
-    memAllocInfo.memoryTypeIndex = 0;
     memAllocInfo.allocationSize = memReqs.size;
+    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
 
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
+    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
 
-    VkDeviceMemory mappableMemory;
-    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &mappableMemory );
-    AE3D_CHECK_VULKAN( err, "vkAllocateMemory in Texture2D" );
+    err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
+    AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
 
-    err = vkBindImageMemory( GfxDeviceGlobal::device, mappableImage, mappableMemory, 0 );
-    AE3D_CHECK_VULKAN( err, "vkBindImageMemory in Texture2D" );
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufInfo.pNext = nullptr;
+    cmdBufInfo.pInheritanceInfo = nullptr;
+    cmdBufInfo.flags = 0;
 
-    VkImageSubresource subRes = {};
-    subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    subRes.mipLevel = 0;
-    subRes.arrayLayer = 0;
+    err = vkBeginCommandBuffer( Texture2DGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
 
-    VkSubresourceLayout subResLayout;
-    vkGetImageSubresourceLayout( GfxDeviceGlobal::device, mappableImage, &subRes, &subResLayout );
+    SetImageLayout(
+        Texture2DGlobal::texCmdBuffer,
+        image,
+        VK_IMAGE_ASPECT_COLOR_BIT,
+        VK_IMAGE_LAYOUT_UNDEFINED,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        1,
+        0,
+        mipLevels );
 
-    void* mapped;
-    err = vkMapMemory( GfxDeviceGlobal::device, mappableMemory, 0, memReqs.size, 0, &mapped );
-    AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
+    vkCmdCopyBufferToImage(
+        Texture2DGlobal::texCmdBuffer,
+        stagingBuffer,
+        image,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        static_cast<std::uint32_t>( bufferCopyRegions.size() ),
+        bufferCopyRegions.data()
+    );
 
-    const int bytesPerPixel = 4;
+    auto imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    SetImageLayout(
+        Texture2DGlobal::texCmdBuffer,
+        image,
+        VK_IMAGE_ASPECT_COLOR_BIT,
+        VK_IMAGE_LAYOUT_UNDEFINED,
+        imageLayout,
+        1,
+        0,
+        mipLevels );
 
-    if (MathUtil::IsPowerOfTwo( width ) && MathUtil::IsPowerOfTwo( height ))
-    {
-        std::memcpy( mapped, data, width * height * bytesPerPixel );
-    }
-    else
-    {
-        const std::size_t rowSize = bytesPerPixel * width;
-        char* mappedPos = (char*)mapped;
-        char* dataPos = (char*)data;
+    err = vkEndCommandBuffer( Texture2DGlobal::texCmdBuffer );
+    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in Texture2D" );
 
-        for (int i = 0; i < height; ++i)
-        {
-            std::memcpy( mappedPos, dataPos, rowSize );
-            mappedPos += subResLayout.rowPitch;
-            dataPos += rowSize;
-        }
-    }
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &Texture2DGlobal::texCmdBuffer;
 
-    vkUnmapMemory( GfxDeviceGlobal::device, mappableMemory );
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
 
-    // Staging (as opposed to linear loading path)
-    {
-        VkCommandBufferBeginInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        cmdBufInfo.pNext = nullptr;
-        cmdBufInfo.pInheritanceInfo = nullptr;
-        cmdBufInfo.flags = 0;
+    err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle in Texture2D" );
 
-        err = vkBeginCommandBuffer( Texture2DGlobal::texCmdBuffer, &cmdBufInfo );
-        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
-
-        SetImageLayout( Texture2DGlobal::texCmdBuffer,
-            mappableImage,
-            VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1 );
-
-        imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-        imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-
-        err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
-        AE3D_CHECK_VULKAN( err, "vkCreateImage in Texture2D" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, fileContents.path.c_str() );
-
-        vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
-
-        memAllocInfo.allocationSize = memReqs.size;
-
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
-
-        err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
-        AE3D_CHECK_VULKAN( err, "vkAllocateMemory in Texture2D" );
-
-        err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
-        AE3D_CHECK_VULKAN( err, "vkBindImageMemory in Texture2D" );
-
-        SetImageLayout( Texture2DGlobal::texCmdBuffer,
-            image,
-            VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1 );
-
-        VkImageCopy copyRegion = {};
-
-        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        copyRegion.srcSubresource.baseArrayLayer = 0;
-        copyRegion.srcSubresource.mipLevel = 0;
-        copyRegion.srcSubresource.layerCount = 1;
-        copyRegion.srcOffset = { 0, 0, 0 };
-
-        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        copyRegion.dstSubresource.baseArrayLayer = 0;
-        copyRegion.dstSubresource.mipLevel = 0;
-        copyRegion.dstSubresource.layerCount = 1;
-        copyRegion.dstOffset = { 0, 0, 0 };
-
-        copyRegion.extent.width = width;
-        copyRegion.extent.height = height;
-        copyRegion.extent.depth = 1;
-
-        vkCmdCopyImage( Texture2DGlobal::texCmdBuffer,
-            mappableImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            1, &copyRegion );
-
-        SetImageLayout( Texture2DGlobal::texCmdBuffer,
-            image,
-            VK_IMAGE_ASPECT_COLOR_BIT,
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1 );
-
-        err = vkEndCommandBuffer( Texture2DGlobal::texCmdBuffer );
-        AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in Texture2D" );
-
-        VkFence nullFence = { VK_NULL_HANDLE };
-
-        VkSubmitInfo submitInfo = {};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.pNext = nullptr;
-        submitInfo.waitSemaphoreCount = 0;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &Texture2DGlobal::texCmdBuffer;
-
-        err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, nullFence );
-        AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
-
-        err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
-        AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle in Texture2D" );
-    }
+    vkFreeMemory( GfxDeviceGlobal::device, stagingMemory, nullptr );
+    vkDestroyBuffer( GfxDeviceGlobal::device, stagingBuffer, nullptr );
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;

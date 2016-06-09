@@ -18,7 +18,7 @@ namespace GfxDeviceGlobal
     extern VkRenderPass renderPass;
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -32,7 +32,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     filter = aFilter;
     isCube = false;
     isRenderTexture = true;
-    
+    dataType = aDataType;
+
     // Color
 
     const VkFormat colorFormat = VK_FORMAT_R8G8B8A8_UNORM;
@@ -87,7 +88,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
         color.image,
         VK_IMAGE_ASPECT_COLOR_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED,
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1 );
+        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
     
     colorImageView.image = color.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageView, nullptr, &color.view );
@@ -130,7 +131,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
         depth.image,
         VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED,
-        VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
+        VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
     depthStencilView.image = depth.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &depth.view );
@@ -157,7 +158,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, "render texture 2d framebuffer" );
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aDimension <= 0)
     {
@@ -170,4 +171,5 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     filter = aFilter;
     isCube = true;
     isRenderTexture = true;
+    dataType = aDataType;
 }

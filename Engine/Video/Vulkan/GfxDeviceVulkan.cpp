@@ -793,7 +793,7 @@ namespace ae3d
             GfxDeviceGlobal::setupCmdBuffer,
             GfxDeviceGlobal::swapchainBuffers[ i ].image,
             VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1 );
+            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 0, 1 );
             
             colorAttachmentView.image = GfxDeviceGlobal::swapchainBuffers[ i ].image;
 
@@ -1194,7 +1194,7 @@ namespace ae3d
         err = vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, GfxDeviceGlobal::depthStencil.mem, 0 );
         AE3D_CHECK_VULKAN( err, "depth stencil memory" );
         SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::depthStencil.image, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
-                        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
+                        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
         depthStencilView.image = GfxDeviceGlobal::depthStencil.image;
         err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &GfxDeviceGlobal::depthStencil.view );
@@ -1407,9 +1407,9 @@ namespace ae3d
             CreateMsaaDepth();
 
             SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::msaaTarget.colorImage, VK_IMAGE_ASPECT_COLOR_BIT,
-                VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1 );
+                VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
             SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::msaaTarget.depthImage, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
-                VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
+                VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
         }
         else
         {
