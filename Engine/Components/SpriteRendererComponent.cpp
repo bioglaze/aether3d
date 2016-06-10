@@ -178,6 +178,12 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
 
 struct ae3d::SpriteRendererComponent::Impl
 {
+    Impl()
+    {
+        static_assert( sizeof( ae3d::SpriteRendererComponent::Impl ) <= ae3d::SpriteRendererComponent::StorageSize, "Impl too big!");
+        static_assert( ae3d::SpriteRendererComponent::StorageAlign % alignof( ae3d::SpriteRendererComponent::Impl ) == 0, "Impl misaligned!");
+    }
+
     RenderQueue opaqueRenderQueue;
     RenderQueue transparentRenderQueue;
 };

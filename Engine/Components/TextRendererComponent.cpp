@@ -30,6 +30,12 @@ ae3d::TextRendererComponent* ae3d::TextRendererComponent::Get( unsigned index )
 
 struct ae3d::TextRendererComponent::Impl
 {
+    Impl()
+    {
+        static_assert( sizeof( ae3d::TextRendererComponent::Impl ) <= ae3d::TextRendererComponent::StorageSize, "Impl too big!");
+        static_assert( ae3d::TextRendererComponent::StorageAlign % alignof( ae3d::TextRendererComponent::Impl ) == 0, "Impl misaligned!");
+    }
+
     VertexBuffer vertexBuffer;
     std::string text = "text";
     Font* font = nullptr;
