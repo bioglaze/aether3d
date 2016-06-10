@@ -3,7 +3,7 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -17,7 +17,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     filter = aFilter;
     isCube = false;
     isRenderTexture = true;
-
+    dataType = aDataType;
+    
     handle = GfxDevice::CreateTextureId();
     glBindTexture( GL_TEXTURE_2D, handle );
 
@@ -56,7 +57,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType dataType, 
     GfxDevice::ErrorCheck( "CreateRenderTexture2D end" );
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aDimension <= 0)
     {
@@ -69,6 +70,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     filter = aFilter;
     isCube = true;
     isRenderTexture = true;
+    dataType = aDataType;
     
     handle = GfxDevice::CreateTextureId();
     glBindTexture( GL_TEXTURE_CUBE_MAP, handle );
@@ -109,7 +111,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType dataType, Texture
     glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId );
     glBindTexture( GL_TEXTURE_CUBE_MAP, 0 );
     
-    glBindFramebuffer( GL_FRAMEBUFFER, GfxDevice::GetSystemFBO() );
+    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
     GfxDevice::ErrorCheckFBO();
     GfxDevice::ErrorCheck( "CreateRenderTextureCube end" );
