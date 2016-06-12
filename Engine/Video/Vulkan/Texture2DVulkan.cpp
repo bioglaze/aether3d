@@ -134,9 +134,10 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     std::uint32_t offset = 0;
 
     const auto format = VK_FORMAT_R8G8B8A8_UNORM;
-    const int mipLevels = 1;// mipmaps == Mipmaps::Generate ? static_cast<int>(MathUtil::GetMipmapCount( width, height )) : 1;
+    const int mipLevels = mipmaps == Mipmaps::Generate ? static_cast<int>(MathUtil::GetMipmapCount( width, height )) : 1;
 
-    for (int i = 0; i < mipLevels; ++i)
+    // We're generating mips at runtime, so no need to loop.
+    for (int i = 0; i < 1/*mipLevels*/; ++i)
     {
         VkBufferImageCopy bufferCopyRegion = {};
         bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -166,7 +167,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
     imageCreateInfo.extent = { static_cast<std::uint32_t>( width ), static_cast<std::uint32_t>( height ), 1 };
-    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    //imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage" );
@@ -209,6 +211,30 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         static_cast<std::uint32_t>( bufferCopyRegions.size() ),
         bufferCopyRegions.data()
     );
+
+    for (int i = 1; i < mipLevels; ++i)
+    {
+        const std::int32_t mipWidth = width >> i;
+        const std::int32_t mipHeight = height >> i;
+        
+        VkImageBlit imageBlit = {};
+        imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        imageBlit.srcSubresource.baseArrayLayer = 0;
+        imageBlit.srcSubresource.layerCount = 1;
+        imageBlit.srcSubresource.mipLevel = 0;
+        imageBlit.srcOffsets[ 0 ] = { 0, 0, 0 };
+        imageBlit.srcOffsets[ 1 ] = { width, height, 1 };
+
+        imageBlit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        imageBlit.dstSubresource.baseArrayLayer = 0;
+        imageBlit.dstSubresource.layerCount = 1;
+        imageBlit.dstSubresource.mipLevel = i;
+        imageBlit.dstOffsets[ 0 ] = { 0, 0, 0 };
+        imageBlit.dstOffsets[ 1 ] = { mipWidth, mipHeight, 1 };
+
+        vkCmdBlitImage( Texture2DGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlit, VK_FILTER_LINEAR );
+    }
 
     auto imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     SetImageLayout(
