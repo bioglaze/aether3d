@@ -876,17 +876,21 @@ namespace ae3d
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriorities;
 
-        /*std::uint32_t deviceExtensionCount;
+		std::vector< const char* > deviceExtensions;
+		deviceExtensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
+
+        std::uint32_t deviceExtensionCount;
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, nullptr );
         std::vector< VkExtensionProperties > availableDeviceExtensions( deviceExtensionCount );
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.data() );
 
         for (auto& i : availableDeviceExtensions)
         {
-        System::Print( "device extension: %s\n", i.extensionName );
-        }*/
-
-        const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_DEBUG_MARKER_EXTENSION_NAME };
+			if (std::string( i.extensionName ) == std::string( VK_EXT_DEBUG_MARKER_EXTENSION_NAME ))
+			{
+				deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
+			}
+		}
 
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -894,14 +898,25 @@ namespace ae3d
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.pEnabledFeatures = nullptr;
-        deviceCreateInfo.enabledExtensionCount = 1;// debug::enabled ? 2 : 1;
-        deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
+		deviceCreateInfo.enabledExtensionCount = static_cast< std::uint32_t >( deviceExtensions.size() );
+        deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
         
+		std::vector< const char* > deviceLayers;
+		std::uint32_t deviceValidationLayerCount;
+		vkEnumerateDeviceLayerProperties( GfxDeviceGlobal::physicalDevice, &deviceValidationLayerCount, nullptr );
+		std::vector< VkLayerProperties > deviceValidationLayers( deviceValidationLayerCount );
+		vkEnumerateDeviceLayerProperties( GfxDeviceGlobal::physicalDevice, &deviceValidationLayerCount, deviceValidationLayers.data() );
+
         if (debug::enabled)
         {
-            deviceCreateInfo.enabledLayerCount = debug::validationLayerCount;
-            deviceCreateInfo.ppEnabledLayerNames = debug::validationLayerNames;
-        }
+			for (auto& i : deviceValidationLayers)
+			{
+				deviceLayers.push_back( i.layerName );
+			}
+
+			deviceCreateInfo.enabledLayerCount = static_cast< std::uint32_t >( deviceLayers.size() );
+			deviceCreateInfo.ppEnabledLayerNames = deviceLayers.data();
+		}
 
         result = vkCreateDevice( GfxDeviceGlobal::physicalDevice, &deviceCreateInfo, nullptr, &GfxDeviceGlobal::device );
         AE3D_CHECK_VULKAN( result, "device" );

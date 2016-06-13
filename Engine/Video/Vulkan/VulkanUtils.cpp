@@ -12,7 +12,7 @@ namespace Stats
 
 namespace debug
 {
-    bool enabled = false; // Disable when using RenderDoc.
+    bool enabled = false;
     int validationLayerCount = 1;
 
     const char *validationLayerNames[] =
@@ -75,11 +75,6 @@ namespace debug
         DebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr( device, "vkDebugMarkerSetObjectNameEXT" );
         CmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerBeginEXT" );
         CmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerEndEXT" );
-
-        if (!DebugMarkerSetObjectName)
-        {
-            ae3d::System::Print( "Could not load Vulkan debug marker extensions, object naming is disabled.\n" );
-        }
     }
 
     void SetObjectName( VkDevice device, std::uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name )
@@ -134,7 +129,7 @@ namespace ae3d
         sampler.pNext = nullptr;
         sampler.magFilter = VK_FILTER_LINEAR;
         sampler.minFilter = VK_FILTER_LINEAR;
-        sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
         sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -157,7 +152,8 @@ namespace ae3d
 
         sampler.magFilter = VK_FILTER_NEAREST;
         sampler.minFilter = VK_FILTER_NEAREST;
-        err = vkCreateSampler( device, &sampler, nullptr, pointClamp );
+		sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+		err = vkCreateSampler( device, &sampler, nullptr, pointClamp );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
 
         sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -167,70 +163,40 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     }
 
-    void CreateInstance( VkInstance* outInstance )
-    {
-        VkApplicationInfo appInfo = {};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Aether3D";
-        appInfo.pEngineName = "Aether3D";
-        appInfo.apiVersion = VK_MAKE_VERSION( 1, 0, 6 );
+	void CreateInstance( VkInstance* outInstance )
+	{
+		VkApplicationInfo appInfo = {};
+		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		appInfo.pApplicationName = "Aether3D";
+		appInfo.pEngineName = "Aether3D";
+		appInfo.apiVersion = VK_API_VERSION_1_0;
 
-        VkInstanceCreateInfo instanceCreateInfo = {};
-        instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        instanceCreateInfo.pNext = nullptr;
-        instanceCreateInfo.pApplicationInfo = &appInfo;
+		VkInstanceCreateInfo instanceCreateInfo = {};
+		instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		instanceCreateInfo.pNext = nullptr;
+		instanceCreateInfo.pApplicationInfo = &appInfo;
 
-        VkResult result;
-
-        if (debug::enabled)
-        {
-            /*std::uint32_t instanceValidationLayerCount;
-            vkEnumerateInstanceLayerProperties( &instanceValidationLayerCount, nullptr );
-            std::vector< VkLayerProperties > instanceValidationLayers( instanceValidationLayerCount );
-            vkEnumerateInstanceLayerProperties( &instanceValidationLayerCount, instanceValidationLayers.data() );
-
-            for (auto& i : instanceValidationLayers)
-            {
-            System::Print( "instance layer: %s\n", i.layerName );
-            }*/
-
-            /*std::uint32_t instanceExtensionCount;
-            vkEnumerateInstanceExtensionProperties( nullptr, &instanceExtensionCount, nullptr );
-            std::vector< VkExtensionProperties > instanceExtensions( instanceExtensionCount );
-            vkEnumerateInstanceExtensionProperties( nullptr, &instanceExtensionCount, instanceExtensions.data() );
-
-            for (auto& i : instanceExtensions)
-            {
-            System::Print( "instance extension: %s\n", i.extensionName );
-            }*/
-
-            instanceCreateInfo.enabledLayerCount = debug::validationLayerCount;
-            instanceCreateInfo.ppEnabledLayerNames = debug::validationLayerNames;
+		std::vector< const char* > enabledExtensions;
+		enabledExtensions.push_back( VK_KHR_SURFACE_EXTENSION_NAME );
 #if VK_USE_PLATFORM_WIN32_KHR
-            static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME };
+		enabledExtensions.push_back( VK_KHR_WIN32_SURFACE_EXTENSION_NAME );
 #endif
 #if VK_USE_PLATFORM_XCB_KHR
-            static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME };
-#endif
-            instanceCreateInfo.enabledExtensionCount = 3;
-            instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
-            result = vkCreateInstance( &instanceCreateInfo, nullptr, outInstance );
-        }
-        else
-        {
-#if VK_USE_PLATFORM_WIN32_KHR
-            static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
-#endif
-#if VK_USE_PLATFORM_XCB_KHR
-            static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME };
-#endif
-            instanceCreateInfo.enabledExtensionCount = 2;
-            instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
-            result = vkCreateInstance( &instanceCreateInfo, nullptr, outInstance );
-        }
+		enabledExtensions.push_back( VK_KHR_XCB_SURFACE_EXTENSION_NAME );
 
-        AE3D_CHECK_VULKAN( result, "instance" );
-    }
+		static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME };
+#endif
+		if (debug::enabled)
+		{
+			enabledExtensions.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
+		}
+
+		instanceCreateInfo.enabledExtensionCount = static_cast<std::uint32_t>(enabledExtensions.size());
+		instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
+
+		VkResult result = vkCreateInstance( &instanceCreateInfo, nullptr, outInstance );
+		AE3D_CHECK_VULKAN( result, "instance" );
+	}
 
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
         VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount )
