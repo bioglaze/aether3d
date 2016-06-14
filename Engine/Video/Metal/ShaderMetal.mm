@@ -9,6 +9,11 @@
 extern id<MTLTexture> texture0;
 extern id<MTLTexture> texture1;
 
+namespace GfxDeviceGlobal
+{
+    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap );
+}
+
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
 }
@@ -125,6 +130,8 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
         {
             System::Print( "Shader tried to set a texture into unit that is not handled\n" );
         }
+
+        GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap() );
     }
     else
     {
@@ -149,6 +156,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* rend
             System::Print( "Shader tried to set a texture into unit that is not handled\n" );
         }
 
+        GfxDeviceGlobal::SetSampler( textureUnit, renderTexture->GetFilter(), renderTexture->GetWrap() );
     }
     else
     {
@@ -172,6 +180,8 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
         {
             System::Print( "Shader tried to set a texture into unit that is not handled\n" );
         }
+        
+        GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap() );
     }
     else
     {

@@ -69,8 +69,88 @@ namespace GfxDeviceGlobal
     int sampleCount = 1;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
-    
+    id<MTLSamplerState> samplerStates[ 2 ];
     std::list< id<MTLBuffer> > uniformBuffers;
+    
+    struct Samplers
+    {
+        id<MTLSamplerState> linearRepeat;
+        id<MTLSamplerState> linearClamp;
+        id<MTLSamplerState> pointRepeat;
+        id<MTLSamplerState> pointClamp;
+    } samplers;
+    
+    void CreateSamplers()
+    {
+        MTLSamplerDescriptor *samplerDescriptor = [MTLSamplerDescriptor new];
+
+        samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
+        samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
+        samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
+        samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
+        samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
+        samplerDescriptor.label = @"linear repeat";
+        samplers.linearRepeat = [device newSamplerStateWithDescriptor:samplerDescriptor];
+
+        samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
+        samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
+        samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
+        samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
+        samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
+        samplerDescriptor.label = @"linear clamp";
+        samplers.linearClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
+
+        samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
+        samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
+        samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
+        samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
+        samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
+        samplerDescriptor.label = @"point repeat";
+        samplers.pointRepeat = [device newSamplerStateWithDescriptor:samplerDescriptor];
+
+        samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
+        samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
+        samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
+        samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
+        samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
+        samplerDescriptor.label = @"point clamp";
+        samplers.pointClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
+        
+        samplerStates[ 0 ] = samplers.pointClamp;
+        samplerStates[ 1 ] = samplers.pointClamp;
+        
+        ae3d::System::Print( "created samplers\n" );
+    }
+    
+    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap )
+    {
+        if (textureUnit > 1)
+        {
+            ae3d::System::Print( "Trying to set a sampler with too high index\n" );
+            return;
+        }
+        
+        if (filter == ae3d::TextureFilter::Nearest && wrap == ae3d::TextureWrap::Clamp)
+        {
+            samplerStates[ textureUnit ] = samplers.pointClamp;
+        }
+        else if (filter == ae3d::TextureFilter::Nearest && wrap == ae3d::TextureWrap::Repeat)
+        {
+            samplerStates[ textureUnit ] = samplers.pointRepeat;
+        }
+        else if (filter == ae3d::TextureFilter::Linear && wrap == ae3d::TextureWrap::Clamp)
+        {
+            samplerStates[ textureUnit ] = samplers.linearClamp;
+        }
+        else if (filter == ae3d::TextureFilter::Linear && wrap == ae3d::TextureWrap::Repeat)
+        {
+            samplerStates[ textureUnit ] = samplers.linearRepeat;
+        }
+        else
+        {
+            ae3d::System::Assert( false, "unhandled texture state" );
+        }
+    }
 }
 
 namespace
@@ -186,6 +266,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     depthStateDesc.label = @"less write on";
     depthStateLessWriteOn = [device newDepthStencilStateWithDescriptor:depthStateDesc];
     
+    GfxDeviceGlobal::CreateSamplers();
+
     if (sampleCount == 1)
     {
         return;
@@ -449,7 +531,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
     [renderEncoder setFragmentTexture:texture1 atIndex:1];
     [renderEncoder setDepthStencilState:depthStateLessWriteOn];
-
+    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 0 ] atIndex:0];
+    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 1 ] atIndex:1];
+    
     if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
     {
         // No need to se extra buffers as vertexBuffer contains all attributes.
