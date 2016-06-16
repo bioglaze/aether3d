@@ -183,8 +183,6 @@ namespace ae3d
 #endif
 #if VK_USE_PLATFORM_XCB_KHR
 		enabledExtensions.push_back( VK_KHR_XCB_SURFACE_EXTENSION_NAME );
-
-		static const char* enabledExtensions[] = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_XCB_SURFACE_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_EXTENSION_NAME };
 #endif
 		if (debug::enabled)
 		{
