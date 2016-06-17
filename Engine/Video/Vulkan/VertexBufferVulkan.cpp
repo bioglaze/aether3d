@@ -18,6 +18,11 @@ namespace ae3d
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
 }
 
+void ae3d::VertexBuffer::SetDebugName( const char* name )
+{
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, name );
+}
+
 void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int vertexBufferSize, int vertexStride, const void* indexData, int indexBufferSize )
 {
     System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );

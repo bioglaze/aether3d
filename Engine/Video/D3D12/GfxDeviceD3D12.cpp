@@ -747,23 +747,27 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
         IID_PPV_ARGS( &constantBuffer ) );
     if (FAILED( hr ))
     {
-        ae3d::System::Print( "Unable to create shader constant buffer!" );
+        System::Print( "Unable to create shader constant buffer!" );
         return;
     }
 
+    constantBuffer->SetName( L"ConstantBuffer" );
+
+    auto handle = DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart();
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV ) * GfxDeviceGlobal::frameConstantBuffers.size();
+
     GfxDeviceGlobal::frameConstantBuffers.push_back( constantBuffer );
 
-    constantBuffer->SetName( L"ConstantBuffer" );
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView(
         &cbvDesc,
-        DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart() );
+        handle );
     hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&GfxDeviceGlobal::currentConstantBuffer) );
     if (FAILED( hr ))
     {
-        ae3d::System::Print( "Unable to map shader constant buffer!" );
+        System::Print( "Unable to map shader constant buffer!" );
     }
 }
 
@@ -787,7 +791,9 @@ void ae3d::GfxDevice::PopGroupMarker()
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode )
-{   
+{
+    System::Assert( !GfxDeviceGlobal::frameConstantBuffers.empty(), "no shader has called Use()" );
+
     DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     
     if (GfxDeviceGlobal::sampleCount > 1)
@@ -820,7 +826,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     cbvDesc.BufferLocation = GfxDeviceGlobal::frameConstantBuffers.back()->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
-
+    
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    
     // TODO: Get from texture object
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -844,8 +852,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     {
         System::Assert( false, "unhandled texture dimension" );
     }
-
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     ID3D12Resource* texResource = nullptr;
 
@@ -1048,17 +1054,14 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     {
         descHandleRtv = GfxDeviceGlobal::currentRenderTargetRTV;
     }
+    else if (GfxDeviceGlobal::sampleCount > 1)
+    {
+        descHandleRtv = GfxDeviceGlobal::msaaColorHandle;
+    }
     else
     {
-        if (GfxDeviceGlobal::sampleCount > 1)
-        {
-            descHandleRtv = GfxDeviceGlobal::msaaColorHandle;
-        }
-        else
-        {
-            descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
-            descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
-        }
+        descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
+        descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
     }
 
     if ((clearFlags & ClearFlags::Color) != 0)
@@ -1142,16 +1145,18 @@ void ae3d::GfxDevice::Present()
 
     for (std::size_t i = 0; i < Global::frameVBUploads.size(); ++i)
     {
-        AE3D_SAFE_RELEASE( Global::frameVBUploads[ i ] );
+       AE3D_SAFE_RELEASE( Global::frameVBUploads[ i ] );
     }
-
+    
+    Global::frameVBUploads.clear();
+    
     for (std::size_t i = 0; i < GfxDeviceGlobal::frameConstantBuffers.size(); ++i)
     {
         AE3D_SAFE_RELEASE( GfxDeviceGlobal::frameConstantBuffers[ i ] );
     }
     
     GfxDeviceGlobal::frameConstantBuffers.clear();
-    Global::frameVBUploads.clear();
+    GfxDeviceGlobal::currentConstantBuffer = nullptr;
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )

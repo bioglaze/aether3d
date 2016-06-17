@@ -105,7 +105,7 @@ int main()
     
     GameObject statsContainer;
     statsContainer.AddComponent<TextRendererComponent>();
-    statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
+    statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine jee" );
     statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     statsContainer.AddComponent<TransformComponent>();
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
@@ -127,17 +127,17 @@ int main()
 
     Scene scene;
     scene.Add( &camera );
-    scene.Add( &spriteContainer );
+    //scene.Add( &spriteContainer );
     scene.Add( &textContainer );
     //scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
+    //scene.Add( &renderTextureContainer );
+    //scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;
-    
+
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -185,7 +185,7 @@ int main()
         stats += std::string( "\nused VRAM: " ) + std::to_string( gpuUsage ) + std::string( " MB, budget: " ) +
             std::to_string( gpuBudget ) + std::string( " MB" );
           */  
-        statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
+        //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         scene.Render();
 

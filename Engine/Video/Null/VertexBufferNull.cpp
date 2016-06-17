@@ -1,5 +1,10 @@
 #include "VertexBuffer.hpp"
 
+
+void ae3d::VertexBuffer::SetDebugName( const char* )
+{
+}
+
 void ae3d::VertexBuffer::Generate(ae3d::VertexBuffer::Face const*, int, ae3d::VertexBuffer::VertexPTC const*, int)
 {
 }

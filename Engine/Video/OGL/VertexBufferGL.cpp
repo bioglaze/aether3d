@@ -50,6 +50,15 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     glVertexAttribPointer( colorChannel, 4, GL_FLOAT, GL_FALSE, sizeof( VertexPTC ), (GLvoid*)offsetof( struct VertexPTC, color ) );
 }
 
+void ae3d::VertexBuffer::SetDebugName( const char* name )
+{
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        const int nameLength = static_cast< int >( std::string( name ).length() );
+        glObjectLabel( GL_BUFFER, vboId, nameLength, name );
+    }
+}
+
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
 {
     vertexFormat = VertexFormat::PTN;
@@ -90,7 +99,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
         if (GfxDevice::HasExtension( "GL_KHR_debug" ))
         {
-            glObjectLabel( GL_BUFFER, vboId, 3, "ibo" );
+            glObjectLabel( GL_BUFFER, iboId, 3, "ibo" );
         }
     }
     

@@ -52,6 +52,16 @@ unsigned ae3d::VertexBuffer::GetStride() const
     }
 }
 
+void ae3d::VertexBuffer::SetDebugName( const char* name )
+{
+    if (vb)
+    {
+        wchar_t wname[ 128 ];
+        std::mbstowcs( wname, name, 128 );
+        vb->SetName( wname );
+    }
+}
+
 void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize )
 {
     D3D12_HEAP_PROPERTIES uploadProp = {};

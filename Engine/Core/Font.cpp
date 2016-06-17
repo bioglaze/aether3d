@@ -133,6 +133,7 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
     }
     
     outVertexBuffer.Generate( faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()) );
+    outVertexBuffer.SetDebugName( text );
 }
 
 void ae3d::Font::LoadBMFont( Texture2D* fontTex, const FileSystem::FileContentsData& metaData )

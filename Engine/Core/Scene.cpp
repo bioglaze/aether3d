@@ -877,19 +877,20 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             }
             
             currentLightType = CurrentLightType::Point;
-            outGameObjects.back().AddComponent< PointLightComponent >();
+            auto lastGo = outGameObjects.back();
+            lastGo.AddComponent< PointLightComponent >();
             
             int castsShadow = 0;
             std::string shadowStr;
             lineStream >> shadowStr;
             lineStream >> castsShadow;
-            outGameObjects.back().GetComponent< PointLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
+            lastGo.GetComponent< PointLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
 
             float radius;
             std::string radiusStr;
             lineStream >> radiusStr;
             lineStream >> radius;
-            outGameObjects.back().GetComponent< PointLightComponent >()->SetRadius( radius );
+            lastGo.GetComponent< PointLightComponent >()->SetRadius( radius );
         }
         
         if (token == "shadow")

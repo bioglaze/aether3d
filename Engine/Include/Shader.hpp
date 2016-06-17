@@ -142,7 +142,6 @@ namespace ae3d
         std::string fragmentPath;
 
 #if RENDERER_D3D12
-        void CreateConstantBuffer();
         void ReflectVariables();
 
         ID3D12ShaderReflection* reflector = nullptr;

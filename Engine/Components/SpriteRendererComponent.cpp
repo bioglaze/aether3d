@@ -86,7 +86,8 @@ void CreateVertexBuffer( std::vector< Sprite >& sprites, ae3d::VertexBuffer& out
         tri2.c = i * quadVertexCount + 0;
     }
     
-    outVertexBuffer.Generate(faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()));
+    outVertexBuffer.Generate( faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()) );
+    outVertexBuffer.SetDebugName( "sprite buffer" );
 }
 
 void CreateDrawables( const std::vector< Sprite >& sprites, std::vector< Drawable >& outDrawables )
@@ -178,7 +179,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
 
 struct ae3d::SpriteRendererComponent::Impl
 {
-    Impl()
+    Impl() : opaqueRenderQueue(), transparentRenderQueue()
     {
         static_assert( sizeof( ae3d::SpriteRendererComponent::Impl ) <= ae3d::SpriteRendererComponent::StorageSize, "Impl too big!");
         static_assert( ae3d::SpriteRendererComponent::StorageAlign % alignof( ae3d::SpriteRendererComponent::Impl ) == 0, "Impl misaligned!");
@@ -280,6 +281,6 @@ void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
     
-    m().opaqueRenderQueue.Render(ae3d::GfxDevice::BlendMode::Off);
-    m().transparentRenderQueue.Render(ae3d::GfxDevice::BlendMode::AlphaBlend);
+    m().opaqueRenderQueue.Render( ae3d::GfxDevice::BlendMode::Off );
+    m().transparentRenderQueue.Render( ae3d::GfxDevice::BlendMode::AlphaBlend );
 }

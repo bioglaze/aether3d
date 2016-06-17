@@ -30,7 +30,7 @@ ae3d::TextRendererComponent* ae3d::TextRendererComponent::Get( unsigned index )
 
 struct ae3d::TextRendererComponent::Impl
 {
-    Impl()
+    Impl() : vertexBuffer()
     {
         static_assert( sizeof( ae3d::TextRendererComponent::Impl ) <= ae3d::TextRendererComponent::StorageSize, "Impl too big!");
         static_assert( ae3d::TextRendererComponent::StorageAlign % alignof( ae3d::TextRendererComponent::Impl ) == 0, "Impl misaligned!");

@@ -214,6 +214,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         m().subMeshes.resize( 1 );
         auto& firstSubMesh = m().subMeshes[ 0 ];
         firstSubMesh.vertexBuffer.Generate( indices.data(), static_cast< int >(indices.size()), vertices.data(), static_cast< int >(vertices.size()) );
+        firstSubMesh.vertexBuffer.SetDebugName( "default mesh" );
         firstSubMesh.aabbMin = {-s, -s, -s};
         firstSubMesh.aabbMax = {s, s, s};
         return LoadResult::FileNotFound;
@@ -315,6 +316,13 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         {
             subMesh.vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), verticesPTN.data(), static_cast< int >( verticesPTN.size() ) );
         }
+        else
+        {
+            ae3d::System::Assert( false, "unhandled vertex format" );
+        }
+
+        std::string subMeshDebugName = meshData.path + std::string( ":" ) + subMesh.name;
+        subMesh.vertexBuffer.SetDebugName( subMeshDebugName.c_str() );
     }
     
     uint8_t terminator;
