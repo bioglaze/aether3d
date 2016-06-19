@@ -106,6 +106,7 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
     if (uniforms.find( name ) == std::end( uniforms ))
     {
+        //System::Print( "SetMatrix: could not find %s\n", name );
         return;
     }
     

@@ -163,8 +163,18 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
-    metalTexture.label = @"Texture 2D";
-
+    
+    std::size_t pos = fileContents.path.find_last_of( "/" );
+    if (pos != std::string::npos)
+    {
+        std::string fileName = fileContents.path.substr( pos );
+        metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+    }
+    else
+    {
+        metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
+    }
+    
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
 

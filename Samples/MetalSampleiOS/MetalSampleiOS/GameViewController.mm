@@ -113,7 +113,7 @@
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
-    dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
+    dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
     scene.Add( &dirLight );
 }
 

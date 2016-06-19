@@ -71,6 +71,7 @@ namespace GfxDeviceGlobal
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     id<MTLSamplerState> samplerStates[ 2 ];
     std::list< id<MTLBuffer> > uniformBuffers;
+    ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
     
     struct Samplers
     {
@@ -118,8 +119,6 @@ namespace GfxDeviceGlobal
         
         samplerStates[ 0 ] = samplers.pointClamp;
         samplerStates[ 1 ] = samplers.pointClamp;
-        
-        ae3d::System::Print( "created samplers\n" );
     }
     
     void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap )
@@ -522,7 +521,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         texture1 = Texture2D::GetDefaultTexture()->GetMetalTexture();
     }
     
-    RenderTexture::DataType pixelFormat = RenderTexture::DataType::UByte;
+    RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
     
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
@@ -625,6 +624,15 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, uns
 {
     drawable = currentDrawable;
     setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture );
+    
+    if (!renderTexture2d)
+    {
+        GfxDeviceGlobal::currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
+    }
+    else
+    {
+        GfxDeviceGlobal::currentRenderTargetDataType = renderTexture2d->GetDataType();
+    }
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* )

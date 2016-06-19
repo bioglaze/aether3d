@@ -19,7 +19,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     dataType = aDataType;
     
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm//(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
+    //[MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];

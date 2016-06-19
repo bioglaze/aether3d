@@ -7,6 +7,11 @@ void ae3d::VertexBuffer::Bind() const
 {
 }
 
+void ae3d::VertexBuffer::SetDebugName( const char* name )
+{
+    vertexBuffer.label = [NSString stringWithUTF8String:name];
+}
+
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
 {
     if (faceCount > 0)
