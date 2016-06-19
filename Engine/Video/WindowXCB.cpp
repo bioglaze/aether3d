@@ -8,8 +8,10 @@
 #include <X11/XF86keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
+#if RENDERER_OPENGL
 #include <GL/glxw.h>
 #include <GL/glx.h>
+#endif
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -89,7 +91,9 @@ namespace WindowGlobal
     
     int windowWidth = 640;
     int windowHeight = 480;
+#if RENDERER_OPENGL
     GLXDrawable drawable = 0;
+#endif
     GamePad gamePad;
     float lastLeftThumbX = 0;
     float lastLeftThumbY = 0;
@@ -210,6 +214,7 @@ void LoadAtoms()
 static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
     int num_fb_configs = 0;
+#if RENDERER_OPENGL
     GLXFBConfig* fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
     
     if (!fb_configs || num_fb_configs == 0)
@@ -277,13 +282,15 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         std::cerr << "glXCreateNewContext failed." << std::endl;
         return -1;
     }
+#endif
     
     xcb_colormap_t colormap = xcb_generate_id( connection );
     WindowGlobal::window = xcb_generate_id( connection );
 
     WindowGlobal::windowWidth = width == 0 ? screen->width_in_pixels : width;
     WindowGlobal::windowHeight = height == 0 ? screen->height_in_pixels : height;
-    
+
+#if RENDERER_OPENGL    
     xcb_create_colormap( connection, XCB_COLORMAP_ALLOC_NONE, colormap, screen->root, visualID );
     
     const uint32_t eventmask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE |
@@ -306,6 +313,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                       );
     
     xcb_map_window( connection, WindowGlobal::window );
+#endif
 
     xcb_atom_t protocols[] =
     {
@@ -340,6 +348,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         }
     }
     
+#if RENDERER_OPENGL    
     GLXWindow glxwindow = glXCreateWindow( display, fb_config, WindowGlobal::window, nullptr );
 
     if (!glxwindow)
@@ -352,7 +361,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     }
     
     WindowGlobal::drawable = glxwindow;
-    
+
     if (!glXMakeContextCurrent( display, WindowGlobal::drawable, WindowGlobal::drawable, context ))
     {
         xcb_destroy_window( connection, WindowGlobal::window );
@@ -361,6 +370,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         std::cerr << "glXMakeContextCurrent failed" << std::endl;
         return -1;
     }
+#endif
 
     return 0;
 }
@@ -651,7 +661,9 @@ void ae3d::Window::PumpEvents()
 
 void ae3d::Window::SwapBuffers()
 {
+#if RENDERER_OPENGL
     glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
+#endif
 }
 
 bool ae3d::Window::PollEvent( WindowEvent& outEvent )
