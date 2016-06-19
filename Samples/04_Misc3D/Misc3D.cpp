@@ -58,7 +58,7 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 300 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
     //camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
@@ -156,9 +156,9 @@ int main()
     
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
     dirLight.AddComponent<TransformComponent>();
-	dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
+	dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();

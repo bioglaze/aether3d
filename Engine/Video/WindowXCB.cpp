@@ -370,6 +370,13 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         std::cerr << "glXMakeContextCurrent failed" << std::endl;
         return -1;
     }
+
+    static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC) glXGetProcAddressARB((const GLubyte*)"glXSwapIntervalEXT");
+
+    if (glXSwapIntervalEXT)
+    {
+        glXSwapIntervalEXT( display, WindowGlobal::drawable, 1 );
+    }
 #endif
 
     return 0;
