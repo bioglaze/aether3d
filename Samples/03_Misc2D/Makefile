@@ -20,10 +20,6 @@ endif
 
 WARNINGS := -Wpedantic -Wall -Wextra
 
-vulkan:
-	mkdir -p ../../../aether3d_build/Samples
-	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -I/home/glaze/Downloads/VulkanSDK/1.0.13.0/x86_64/include -I../../Engine/Include Misc2D.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/Misc2D $(VULKAN_LINKER)
-
 all:
 ifeq ($(OS),Windows_NT)
 	IF exist ..\..\..\aether3d_build\Samples ( echo building ) ELSE ( mkdir ..\..\..\aether3d_build\Samples )
@@ -33,3 +29,6 @@ ifneq ($(OS),Windows_NT)
 endif
 	$(COMPILER) -DRENDERER_OPENGL $(WARNINGS) $(LIB_PATH) -I../../Engine/Include Misc2D.cpp -std=c++11 ../../../aether3d_build/$(ENGINE_LIB) -o ../../../aether3d_build/Samples/Misc2D $(LINKER)
 
+vulkan:
+	mkdir -p ../../../aether3d_build/Samples
+	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -I/home/glaze/Downloads/VulkanSDK/1.0.13.0/x86_64/include -I../../Engine/Include Misc2D.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/Misc2D $(VULKAN_LINKER)

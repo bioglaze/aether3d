@@ -5,7 +5,7 @@ LIBS := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lo
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++ -fsanitize=address
-ENGINE_LIB := libaether3d_osx.a
+ENGINE_LIB := libaether3d_gl_osx.a
 LIBS := -framework IOKit -framework OpenAL -framework Cocoa -framework OpenGL -framework QuartzCore
 endif
 

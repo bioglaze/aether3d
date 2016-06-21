@@ -3,8 +3,8 @@ COMPILER := clang++ -Ifbx_sdk/include -Lfbx_sdk/lib/linux/x64 -ldl -lfbxsdk
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++ --stdlib=libc++ -ldl -framework CoreFoundation
-FBX_INCLUDE := -I"/Applications/Autodesk/FBX SDK/2015.1/include"
-FBX_LIB := "/Applications/Autodesk/FBX SDK/2015.1/lib/clang/release/libfbxsdk.a"
+FBX_INCLUDE := -I"/Applications/Autodesk/FBX SDK/2016.1.1/include"
+FBX_LIB := "/Applications/Autodesk/FBX SDK/2016.1.1/lib/clang/release/libfbxsdk.a"
 endif
 
 all:
