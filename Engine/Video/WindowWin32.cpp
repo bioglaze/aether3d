@@ -311,14 +311,13 @@ namespace ae3d
     void Window::Create(int width, int height, WindowCreateFlags flags)
     {
         InitKeyMap();
-        WindowGlobal::windowWidth = width == 0 ? GetSystemMetrics(SM_CXSCREEN) : width;
+        WindowGlobal::windowWidth = width == 0 ? GetSystemMetrics( SM_CXSCREEN ) : width;
         WindowGlobal::windowHeight = height == 0 ? GetSystemMetrics( SM_CYSCREEN ) : height;
 
-        const HINSTANCE hInstance = GetModuleHandle(nullptr);
+        const HINSTANCE hInstance = GetModuleHandle( nullptr );
         const bool fullscreen = (flags & WindowCreateFlags::Fullscreen) != 0;
 
-        WNDCLASSEX wc;
-        ZeroMemory( &wc, sizeof( WNDCLASSEX ) );
+		WNDCLASSEX wc = {};
 
         wc.cbSize = sizeof( WNDCLASSEX );
         wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -335,7 +334,12 @@ namespace ae3d
             32,
             LR_LOADFROMFILE));
 
-        RegisterClassEx(&wc);
+        auto ret = RegisterClassEx(&wc);
+		
+		if (ret == 0)
+		{
+			System::Assert( false, "failed to register window class" );
+		}
 
         WindowGlobal::hwnd = CreateWindowExA( fullscreen ? WS_EX_TOOLWINDOW | WS_EX_TOPMOST : 0,
             "WindowClass1",    // name of the window class

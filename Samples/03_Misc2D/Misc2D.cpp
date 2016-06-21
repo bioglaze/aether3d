@@ -105,7 +105,7 @@ int main()
     
     GameObject statsContainer;
     statsContainer.AddComponent<TextRendererComponent>();
-    statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine jee" );
+    statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
     statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     statsContainer.AddComponent<TransformComponent>();
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 80, 0 ) );
@@ -116,19 +116,19 @@ int main()
     
     GameObject renderTextureContainer;
     renderTextureContainer.AddComponent<SpriteRendererComponent>();
-    renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( (float)spriteTex.GetWidth() * 2, (float)spriteTex.GetHeight() * 2, 1 ), Vec4( 1, 1, 1, 1 ) );
     
     GameObject rtCamera;
     rtCamera.AddComponent<CameraComponent>();
     rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
-    rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
+    rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
 
     Scene scene;
     scene.Add( &camera );
     //scene.Add( &spriteContainer );
-    scene.Add( &textContainer );
+    //scene.Add( &textContainer );
     //scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );

@@ -98,7 +98,8 @@ namespace GfxDeviceGlobal
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
-    ae3d::Texture2D* texture2d0 = nullptr;
+	ae3d::RenderTexture* renderTexture0 = nullptr;
+	ae3d::Texture2D* texture2d0 = nullptr;
     ae3d::TextureCube* textureCube0 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
     std::vector< ID3D12Resource* > frameConstantBuffers;
@@ -829,10 +830,12 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     
+	const bool is2D = (GfxDeviceGlobal::texture2d0 != nullptr) || (GfxDeviceGlobal::renderTexture0 != nullptr && !GfxDeviceGlobal::renderTexture0->IsCube());
+
     // TODO: Get from texture object
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srvDesc.ViewDimension = GfxDeviceGlobal::texture2d0 != nullptr ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
+    srvDesc.ViewDimension = is2D ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
     if (srvDesc.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
@@ -859,7 +862,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     {
         texResource = GfxDeviceGlobal::texture2d0->GetGpuResource()->resource;
     }
-    else if (GfxDeviceGlobal::textureCube0 != nullptr)
+	else if (GfxDeviceGlobal::renderTexture0 != nullptr)
+	{
+		texResource = GfxDeviceGlobal::renderTexture0->GetGpuResource()->resource;
+	}
+	else if (GfxDeviceGlobal::textureCube0 != nullptr)
     {
         texResource = GfxDeviceGlobal::textureCube0->GetGpuResource()->resource;
     }
@@ -882,11 +889,22 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
 
+	// FIXME: badly needs polymorphism
     if (GfxDeviceGlobal::texture2d0)
     {
         samplerHandle = GetSampler( GfxDeviceGlobal::texture2d0->GetMipmaps(), GfxDeviceGlobal::texture2d0->GetWrap(),
             GfxDeviceGlobal::texture2d0->GetFilter() );
     }
+	else if (GfxDeviceGlobal::textureCube0)
+	{
+		samplerHandle = GetSampler( GfxDeviceGlobal::textureCube0->GetMipmaps(), GfxDeviceGlobal::textureCube0->GetWrap(),
+			GfxDeviceGlobal::textureCube0->GetFilter() );
+	}
+	else if (GfxDeviceGlobal::renderTexture0)
+	{
+		samplerHandle = GetSampler( GfxDeviceGlobal::renderTexture0->GetMipmaps(), GfxDeviceGlobal::renderTexture0->GetWrap(),
+			GfxDeviceGlobal::renderTexture0->GetFilter() );
+	}
 
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
@@ -1071,7 +1089,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTargetDSV : 
                                                        DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
-    if (GfxDeviceGlobal::sampleCount > 1)
+    if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::currentRenderTarget)
     {
         descHandleDsv = GfxDeviceGlobal::msaaDepthHandle;
     }
