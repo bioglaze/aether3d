@@ -117,6 +117,11 @@ ae3d::Mesh::Mesh( const Mesh& other )
 
 ae3d::Mesh& ae3d::Mesh::operator=( const Mesh& other )
 {
+    if (this == &other)
+    {
+        return *this;
+    }
+
     new(&_storage)Impl();
     reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
     return *this;

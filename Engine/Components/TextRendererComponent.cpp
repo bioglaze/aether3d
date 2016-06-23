@@ -58,6 +58,11 @@ ae3d::TextRendererComponent::TextRendererComponent( const TextRendererComponent&
 
 ae3d::TextRendererComponent& ae3d::TextRendererComponent::operator=( const TextRendererComponent& other )
 {
+    if (this == &other)
+    {
+        return *this;
+    }
+
     new(&_storage)Impl();
     reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
     gameObject = other.gameObject;

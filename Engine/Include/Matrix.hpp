@@ -96,6 +96,11 @@ namespace ae3d
          */
         Matrix44& operator=( const Matrix44& other )
         {
+            if (this == &other)
+            {
+                return *this;
+            }
+
             InitFrom( &other.m[ 0 ] );
             return *this;
         }

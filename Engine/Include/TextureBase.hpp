@@ -127,6 +127,7 @@ namespace ae3d
 #endif
         /// Is the texture opaque.
         bool opaque = true;
+        /// Is the texture a render texture.
         bool isRenderTexture = false;
     };
 }

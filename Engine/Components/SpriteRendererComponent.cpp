@@ -229,6 +229,11 @@ ae3d::SpriteRendererComponent::SpriteRendererComponent( const SpriteRendererComp
 
 ae3d::SpriteRendererComponent& ae3d::SpriteRendererComponent::operator=( const SpriteRendererComponent& other )
 {
+    if (this == &other)
+    {
+        return *this;
+    }
+
     new(&_storage)Impl();
     reinterpret_cast<Impl&>(_storage) = reinterpret_cast<Impl const&>(other._storage);
     gameObject = other.gameObject;

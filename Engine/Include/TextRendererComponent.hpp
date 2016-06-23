@@ -6,7 +6,7 @@
 
 namespace ae3d
 {
-    /// Contains text loaded from AngelCode BMFont: http://www.angelcode.com/products/bmfont/
+    /// Contains text.
     class TextRendererComponent
     {
       public:

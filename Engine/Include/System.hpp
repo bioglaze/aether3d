@@ -14,7 +14,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.5 Documentation
+   \mainpage Aether3D Game Engine v0.5.5 Documentation
 
    \section Introduction
 
@@ -24,14 +24,14 @@
    \section Features
 
    <ul>
-   <li>Windows, OS X, iOS and GNU/Linux.</li>
+   <li>Windows, macOS, iOS and GNU/Linux.</li>
    <li>OpenGL 4.1, Vulkan (WIP) Metal and D3D12 (WIP) renderers.</li>
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
    <li>Virtual file system aka .pak archive files for faster loading.</li>
-   <li>Custom mesh format, converters included for .obj and Blender.</li>
-   <li>Shadow mapping from a directional light (no lighting yet)</li>
+   <li>Custom mesh format, converters included for .obj, .fbx and Blender.</li>
+   <li>Shadow mapping from a directional or spot light (no lighting yet)</li>
    <li>Oculus Rift support.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Scene serialization.</li>
@@ -61,11 +61,11 @@
 
    \subsection win_oculus Windows/Oculus Rift
 
-   Copy LibOVR, Logging and LibOVRKernel folders from Oculus SDK into Engine \ ThirdParty and compile their x64 release versions using VS2015.
+   Compile LibOVR, Logging and LibOVRKernel x64 release versions using VS2015. Copy those folders from Oculus SDK into Engine \ ThirdParty and 
    Open Engine/VisualStudio_GL45 and build target Oculus Release.
    Open Samples/04_Misc3D and build target Oculus Release.
  
-   \subsection osx OS X/Xcode
+   \subsection osx macOS/Xcode
 
    OpenGL: Build Engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making
    sure the running folder is set to aether3d_build/Samples.
@@ -73,7 +73,7 @@
    Metal: Build Engine/Aether3D_OSX_Metal. Make sure the built library is in aether3d_build. Then build and run Samples/MetalSampleOSX, making
    sure the running folder is set to aether3d_build/Samples.
 
-   \subsection osx_cmd OS X and GNU/Linux Command Line
+   \subsection osx_cmd macOS and GNU/Linux Command Line
 
    Run the Makefile in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    On GNU/Linux you need at least the following packages: libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
@@ -81,21 +81,30 @@
    \subsection Bugs
 
    <ul>
-   <li>Vulkan renderer leaks memory when vertex buffers are reallocated (eg. updating TextRendererComponent's text).</li>
+   <li>D3D12: If MSAA is used, render-to-texture doesn't work.</li>
+   <li>D3D12: Render textures look weird.</li>
+   <li>D3D12: Crash on certain combinations of SpriteRendererComponent and TextRendererComponent.</li>
+   <li>Vulkan: Linux support is not complete.</li>
+   <li>Metal: Shadow maps don't show.</li>
+   <li>Oculus: Mirror texture is broken if SDK initialization fails.</li>
    </ul>
  
    \section Tools
  
-   \subsection editor Editor
+   \subsection Editor
  
    Editor is used to create scenes by placing and moving GameObjects, adding components etc. It's built on top of Qt 5 so you'll need to
-   install Qt development files.
+   install Qt development files. The .pro project can be opened with QtCreator or other tool.
  
    \subsection CombineFiles
  
    Aether3D internals almost never read raw files, all file access is abstracted by FileSystem to allow file contents to come from various sources.
    CombineFiles creates .pak files that contain contents of multiple files. You run it with command CombineFiles inputFile outputFile where
    inputFile is just a text file containing a list of file paths, each on their own line.
+
+   \subsection SDF_Generator
+
+   Generates a signed-distance field from a texture, useful for high-quality font rendering.
 */
 namespace ae3d
 {

@@ -138,6 +138,43 @@ cbuffer Scene\
 
     depthNormalsShader.Load( depthNormalsSource, depthNormalsSource );
 
+    const char* momentsSource = R"(
+
+        struct VSOutput
+        {
+            float4 pos : SV_POSITION;
+            float3 mvPosition : POSITION;
+            float3 normal : NORMAL;
+        };
+
+        cbuffer Scene
+        {
+            float4x4 _ModelViewProjectionMatrix;
+        };
+
+        VSOutput VSMain( float3 pos : POSITION, float3 normal : NORMAL )
+        {
+            VSOutput vsOut;
+            vsOut.pos = mul( _ModelViewProjectionMatrix, float4( pos, 1.0 ) );
+            return vsOut;
+        }
+
+        float4 PSMain( VSOutput vsOut ) : SV_Target
+        {
+            float linearDepth = vsOut.pos.z;
+    
+            float dx = ddx( linearDepth );
+            float dy = ddy( linearDepth );
+    
+            float moment1 = linearDepth;
+            float moment2 = linearDepth * linearDepth + 0.25 * (dx * dx + dy * dy);
+    
+            return float4( moment1, moment2, 0.0, 1.0 );
+        }
+    )";
+
+    momentsShader.Load( momentsSource, momentsSource );
+
     auto fc = FileSystem::FileContents( "GenerateMipsCS.hlsl" ).data;
     std::string fileData( std::begin( fc ), std::end( fc ) );
 
