@@ -63,6 +63,10 @@ namespace ae3d
         GpuResource* GetGpuResource() { return &gpuResource; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetDSV() { return dsv; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetRTV() { return rtv; }
+
+        GpuResource* GetCubeGpuResource( unsigned cubeMapFace ) { return &cubeGpuResources[ cubeMapFace ]; }
+        D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeDSV( unsigned cubeMapFace ) { return cubeDsvs[ cubeMapFace ]; }
+        D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeRTV( unsigned cubeMapFace ) { return cubeRtvs[ cubeMapFace ]; }
 #endif
         /// \return Color space.
         ColorSpace GetColorSpace() const { return colorSpace; }
@@ -124,6 +128,11 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
         std::vector< D3D12_CPU_DESCRIPTOR_HANDLE > uavs;
+
+        GpuResource cubeGpuResources[ 6 ];
+
+        D3D12_CPU_DESCRIPTOR_HANDLE cubeRtvs[ 6 ] = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE cubeDsvs[ 6 ] = {};
 #endif
         /// Is the texture opaque.
         bool opaque = true;

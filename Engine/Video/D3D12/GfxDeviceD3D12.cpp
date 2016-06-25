@@ -1188,14 +1188,32 @@ void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
 {
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMapFace*/ )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
-    GfxDeviceGlobal::currentRenderTarget = !target ? nullptr : target->GetGpuResource();
-    
-    if (target)
+    System::Assert( !target || target->IsRenderTexture(), "target must be render texture" );
+    System::Assert( cubeMapFace < 6, "invalid cube map face" );
+
+    if (target && target->IsCube())
     {
-		System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
-        GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
-        GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
+        GfxDeviceGlobal::currentRenderTarget = target->GetCubeGpuResource( cubeMapFace );
+
+        if (target)
+        {
+            System::Assert( target->GetCubeGpuResource( cubeMapFace )->resource != nullptr, "no GPU resource's resource in render target!" );
+            GfxDeviceGlobal::currentRenderTargetDSV = target->GetCubeDSV( cubeMapFace );
+            GfxDeviceGlobal::currentRenderTargetRTV = target->GetCubeRTV( cubeMapFace );
+        }
+
+    }
+    else
+    {
+        GfxDeviceGlobal::currentRenderTarget = !target ? nullptr : target->GetGpuResource();
+
+        if (target)
+        {
+            System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
+            GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
+            GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
+        }
     }
 }

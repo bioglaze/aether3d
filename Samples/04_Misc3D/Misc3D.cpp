@@ -156,7 +156,7 @@ int main()
     
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<TransformComponent>();
 	dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
@@ -227,8 +227,8 @@ int main()
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     //scene.Add( &camera2d );
-    //scene.Add( &cameraCubeRT );
-    //scene.Add( &rtCube );
+    scene.Add( &cameraCubeRT );
+    scene.Add( &rtCube );
     //scene.Add( &cube );
     //scene.Add( &copiedCube );
 //    scene.Add( &statsContainer );
