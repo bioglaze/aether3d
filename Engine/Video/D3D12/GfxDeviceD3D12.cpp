@@ -656,6 +656,7 @@ void ae3d::CreateRenderer( int samples )
 
     hr = D3D12CreateDevice( GfxDeviceGlobal::adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
+    GfxDeviceGlobal::device->SetName( L"D3D12 device" );
 #ifdef DEBUG
     // Prevents GPU from over/underclocking to get consistent timing information.
     GfxDeviceGlobal::device->SetStablePowerState( TRUE );
@@ -819,7 +820,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &tempHeap ) );
     AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
     GfxDeviceGlobal::frameHeaps.push_back( tempHeap );
-    tempHeap->SetName( L"tempHeap" );
+    wchar_t wname[ 128 ];
+    std::string heapName( "tempHeap_faces_" );
+    heapName += std::to_string( vertexBuffer.GetFaceCount() );
+    std::mbstowcs( wname, heapName.c_str(), 128 );
+    tempHeap->SetName( wname );
 
     D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -864,7 +869,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     }
 	else if (GfxDeviceGlobal::renderTexture0 != nullptr)
 	{
-		texResource = GfxDeviceGlobal::renderTexture0->GetGpuResource()->resource;
+        if (GfxDeviceGlobal::renderTexture0->IsCube())
+        {
+            texResource = GfxDeviceGlobal::renderTexture0->GetCubeGpuResource( 0 )->resource;
+        }
+        else
+        {
+            texResource = GfxDeviceGlobal::renderTexture0->GetGpuResource()->resource;
+        }
 	}
 	else if (GfxDeviceGlobal::textureCube0 != nullptr)
     {
@@ -1056,12 +1068,24 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     TransitionResource( *resource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     
-    D3D12_VIEWPORT viewPort{ 0, 0, static_cast<float>(GfxDeviceGlobal::backBufferWidth), static_cast<float>(GfxDeviceGlobal::backBufferHeight), 0, 1 };
+    FLOAT vpWidth = static_cast< FLOAT >( GfxDeviceGlobal::backBufferWidth );
+    FLOAT vpHeight = static_cast< FLOAT >( GfxDeviceGlobal::backBufferHeight );
+
+    if (GfxDeviceGlobal::currentRenderTarget)
+    {
+        if (GfxDeviceGlobal::renderTexture0)
+        {
+            vpWidth = static_cast< FLOAT >( GfxDeviceGlobal::renderTexture0->GetWidth() );
+            vpHeight = static_cast< FLOAT >( GfxDeviceGlobal::renderTexture0->GetHeight() );
+        }
+    }
+
+    D3D12_VIEWPORT viewPort{ 0, 0, vpWidth, vpHeight, 0, 1 };
     GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &viewPort );
 
     D3D12_RECT scissor = {};
-    scissor.right = (LONG)GfxDeviceGlobal::backBufferWidth;
-    scissor.bottom = (LONG)GfxDeviceGlobal::backBufferHeight;
+    scissor.right = static_cast< LONG >( vpWidth );
+    scissor.bottom = static_cast< LONG >( vpHeight );
     GfxDeviceGlobal::graphicsCommandList->RSSetScissorRects( 1, &scissor );
 
     auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );

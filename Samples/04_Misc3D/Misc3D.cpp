@@ -145,14 +145,6 @@ int main()
                         "unlitVert", "unlitFrag",
                         FileSystem::FileContents( "unlit_cube.hlsl" ), FileSystem::FileContents( "unlit_cube.hlsl" ),
                         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
-
-    Material materialCubeRT;
-    materialCubeRT.SetShader( &shaderCubeMap );
-    materialCubeRT.SetRenderTexture( "skyMap", &cubeRT );
-    materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
-    materialCubeRT.SetBackFaceCulling( true );
-
-    rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
     
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
@@ -180,6 +172,16 @@ int main()
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+
+    Material materialCubeRT;
+    materialCubeRT.SetShader( &shaderCubeMap );
+    //materialCubeRT.SetRenderTexture( "skyMap", &cubeRT );
+    materialCubeRT.SetTexture( "skyMap", &skybox );
+    materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
+    materialCubeRT.SetBackFaceCulling( true );
+
+    rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
+    //rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
     // Sponza begins.
     std::vector< GameObject > sponzaGameObjects;
@@ -227,7 +229,7 @@ int main()
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     //scene.Add( &camera2d );
-    scene.Add( &cameraCubeRT );
+    //scene.Add( &cameraCubeRT );
     scene.Add( &rtCube );
     //scene.Add( &cube );
     //scene.Add( &copiedCube );

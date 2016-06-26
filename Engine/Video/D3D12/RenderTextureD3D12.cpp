@@ -184,7 +184,13 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
             D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &cubeGpuResources[ i ].resource ) );
         AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
-        cubeGpuResources[ i ].resource->SetName( L"Render Texture Cube" );
+
+        wchar_t wstr[ 128 ];
+        std::string name( "Render Texture Cube face " );
+        name += std::to_string( i );
+        std::mbstowcs( wstr, name.c_str(), 128 );
+        cubeGpuResources[ i ].resource->SetName( wstr );
+
         RenderTextureGlobal::renderTextures.push_back( cubeGpuResources[ i ].resource );
     }
 

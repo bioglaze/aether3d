@@ -171,7 +171,7 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 
 void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int /*textureUnit*/ )
 {
-    GfxDeviceGlobal::texture2d0 = const_cast< Texture2D* >( texture );
+    GfxDeviceGlobal::texture2d0 = texture;
     GfxDeviceGlobal::textureCube0 = nullptr;
     GfxDeviceGlobal::renderTexture0 = nullptr;
 
@@ -181,7 +181,7 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int /
 
 void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int textureUnit )
 {
-    GfxDeviceGlobal::textureCube0 = const_cast< TextureCube* >(texture);
+    GfxDeviceGlobal::textureCube0 = texture;
     GfxDeviceGlobal::texture2d0 = nullptr;
 	GfxDeviceGlobal::renderTexture0 = nullptr;
 
