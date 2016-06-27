@@ -175,13 +175,11 @@ int main()
 
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
-    //materialCubeRT.SetRenderTexture( "skyMap", &cubeRT );
-    materialCubeRT.SetTexture( "skyMap", &skybox );
+    materialCubeRT.SetRenderTexture( "skyMap", &cubeRT );
     materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
     materialCubeRT.SetBackFaceCulling( true );
 
     rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
-    //rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
     // Sponza begins.
     std::vector< GameObject > sponzaGameObjects;
@@ -229,7 +227,7 @@ int main()
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     //scene.Add( &camera2d );
-    //scene.Add( &cameraCubeRT );
+    scene.Add( &cameraCubeRT );
     scene.Add( &rtCube );
     //scene.Add( &cube );
     //scene.Add( &copiedCube );

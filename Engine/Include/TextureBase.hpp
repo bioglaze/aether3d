@@ -64,7 +64,6 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE& GetDSV() { return dsv; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetRTV() { return rtv; }
 
-        GpuResource* GetCubeGpuResource( unsigned cubeMapFace ) { return &cubeGpuResources[ cubeMapFace ]; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeDSV( unsigned cubeMapFace ) { return cubeDsvs[ cubeMapFace ]; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeRTV( unsigned cubeMapFace ) { return cubeRtvs[ cubeMapFace ]; }
 #endif
@@ -128,8 +127,6 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
         std::vector< D3D12_CPU_DESCRIPTOR_HANDLE > uavs;
-
-        GpuResource cubeGpuResources[ 6 ];
 
         D3D12_CPU_DESCRIPTOR_HANDLE cubeRtvs[ 6 ] = {};
         D3D12_CPU_DESCRIPTOR_HANDLE cubeDsvs[ 6 ] = {};
