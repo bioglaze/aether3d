@@ -35,7 +35,7 @@
    <li>Oculus Rift support.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Scene serialization.</li>
-   <li>Scene editor built using Qt.</li>
+   <li>Scene editor built using Qt and WYSIWYG rendering.</li>
    <li>XBox controller support.</li>
    </ul>
 
@@ -46,7 +46,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.5.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.5.5.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    
@@ -82,7 +82,7 @@
 
    <ul>
    <li>D3D12: If MSAA is used, render-to-texture doesn't work.</li>
-   <li>D3D12: Render textures look weird.</li>
+   <li>D3D12: 2D Render textures look weird.</li>
    <li>D3D12: Crash on certain combinations of SpriteRendererComponent and TextRendererComponent.</li>
    <li>Vulkan: Linux support is not complete.</li>
    <li>Metal: Shadow maps don't show.</li>
@@ -94,7 +94,7 @@
    \subsection Editor
  
    Editor is used to create scenes by placing and moving GameObjects, adding components etc. It's built on top of Qt 5 so you'll need to
-   install Qt development files. The .pro project can be opened with QtCreator or other tool.
+   install Qt development files. The .pro project can be opened with QtCreator or other tool. On Windows, you'll need OpenAL32.dll in aether3d\Tools\Editor\copy_to_output
  
    \subsection CombineFiles
  

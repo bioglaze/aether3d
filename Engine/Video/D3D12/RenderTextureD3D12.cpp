@@ -192,9 +192,14 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         descDepth.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         descDepth.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
+        D3D12_CLEAR_VALUE dsClear = {};
+        dsClear.Format = descDepth.Format;
+        dsClear.DepthStencil.Depth = 1;
+        dsClear.DepthStencil.Stencil = 0;
+
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descDepth,
-            D3D12_RESOURCE_STATE_DEPTH_WRITE, nullptr, IID_PPV_ARGS( &gpuResourceDepth.resource ) );
-        AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+            D3D12_RESOURCE_STATE_DEPTH_WRITE, &dsClear, IID_PPV_ARGS( &gpuResourceDepth.resource ) );
+        AE3D_CHECK_D3D( hr, "Unable to create depth resource" );
 
         gpuResourceDepth.resource->SetName( L"Render Texture Depth Cube" );
         RenderTextureGlobal::renderTextures.push_back( gpuResourceDepth.resource );

@@ -17,12 +17,11 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Custom model format with .obj, .fbx and Blender exporter.
   - Virtual file system for .pak files.
   - XBox controller support.
-  - Cross-Platform scene editor.
+  - Cross-Platform WYSIWYG scene editor.
   - Statically linked into your application.
 
-# Status (as of 2016-04-12)
+# Status (as of 2016-06-29)
 
-  - OpenGL renderer is the most featureful but others will catch up.
   - Master branch may or may not compile but releases should always work.
   - Editor is still missing many features that are needed for proper scene creation.
   - Lights cast shadows but don't shade objects (planned for 0.6)
@@ -37,7 +36,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
-  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.5.zip) and extract it into aether3d_build/Samples after building.
+  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.5.5.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 
@@ -60,7 +59,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 ## Visual Studio
 
-  - Unit test project can be found in Engine\Tests\UnitTests.
+  - Unit test project can be found in Engine\Tests\UnitTests. You'll need to set it to run in x64 and copy OpenAL32.dll into the build folder.
 
 ## GCC or Clang
 

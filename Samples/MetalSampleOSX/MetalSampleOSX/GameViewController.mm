@@ -51,7 +51,7 @@
 - (void)viewDidLoad
 {
     // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-    // Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.5.zip
+    // Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.5.5.zip
     
     [super viewDidLoad];
 
