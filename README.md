@@ -43,13 +43,13 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile.
   - Build and run Samples\01_OpenWindow.
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
-  - FBX converter tries to find FBX SDK 2015.1 in its default install location (English language localization)
+  - FBX converter tries to find FBX SDK 2016.1.1 in its default install location (English language localization)
   
 ## OS X / GNU/Linux
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile.
-  - FBX converter tries to find FBX SDK 2015.1 in its default install location
+  - FBX converter tries to find FBX SDK 2016.1.1 in its default install location
 
 ## iOS
   - Build Aether3D_iOS in Engine. It creates a framework.

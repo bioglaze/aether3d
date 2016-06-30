@@ -126,7 +126,6 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE srv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
-        std::vector< D3D12_CPU_DESCRIPTOR_HANDLE > uavs;
 
         D3D12_CPU_DESCRIPTOR_HANDLE cubeRtvs[ 6 ] = {};
         D3D12_CPU_DESCRIPTOR_HANDLE cubeDsvs[ 6 ] = {};

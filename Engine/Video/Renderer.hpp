@@ -19,7 +19,6 @@ namespace ae3d
         Shader skyboxShader;
         Shader momentsShader;
         Shader depthNormalsShader;
-        ComputeShader generateMipsShader;
     };
 
     /// High-level rendering stuff.

@@ -180,23 +180,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 
-    if (mipmaps == Mipmaps::Generate)
-    {
-        uavs.resize( mipLevelCount );
-
-        for (UINT i = 0; i < mipLevelCount; ++i)
-        {
-            D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-            uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-            uavDesc.Texture2D.MipSlice = i;
-            uavDesc.Texture2D.PlaneSlice = 0;
-
-            uavs[ i ] = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-            GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResource.resource, nullptr, &uavDesc, uavs[ i ] );
-        }
-    }
-
     Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
 #if DEBUG
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
@@ -255,13 +238,62 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     Texture2DGlobal::textures.push_back( gpuResource.resource );
 
-    const int bytesPerPixel = 4;
-    D3D12_SUBRESOURCE_DATA texResource;
-    texResource.pData = data;
-    texResource.RowPitch = width * bytesPerPixel;
-    texResource.SlicePitch = texResource.RowPitch * height;
+    if (mipLevelCount == 1)
+    {
+        const int bytesPerPixel = 4;
+        D3D12_SUBRESOURCE_DATA texResource = {};
+        texResource.pData = data;
+        texResource.RowPitch = width * bytesPerPixel;
+        texResource.SlicePitch = texResource.RowPitch * height;
+        InitializeTexture( gpuResource, &texResource, 1 );
+    }
+    else
+    {
+        const int bytesPerPixel = 4;
+        std::vector< D3D12_SUBRESOURCE_DATA > texResources( mipLevelCount );
+        texResources[ 0 ].pData = data;
+        texResources[ 0 ].RowPitch = width * bytesPerPixel;
+        texResources[ 0 ].SlicePitch = texResources[ 0 ].RowPitch * height;
 
-    InitializeTexture( gpuResource, &texResource, 1 );
+        std::vector< std::vector< std::uint8_t > > mipLevels( mipLevelCount - 1 );
+        for (std::size_t i = 1; i < mipLevelCount; ++i)
+        {
+            const std::int32_t mipWidth = width >> i;
+            const std::int32_t mipHeight = height >> i;
+            mipLevels[ i-1 ].resize( mipWidth * mipHeight * 4 );
+        }
+
+        for (std::size_t i = 1; i < mipLevelCount; ++i)
+        {
+            const std::int32_t mipWidth = width >> i;
+            const std::int32_t mipHeight = height >> i;
+
+            for (int mipY = 0; mipY < mipHeight; ++mipY)
+            {
+                for (int mipX = 0; mipX < mipWidth; ++mipX)
+                {
+                    const int yInBase = mipY << i;
+                    const int xInBase = mipX << i;
+
+                    const std::uint8_t red = data[ (yInBase * height + xInBase) * 4 + 0 ];
+                    const std::uint8_t green = data[ (yInBase * height + xInBase) * 4 + 1 ];
+                    const std::uint8_t blue = data[ (yInBase * height + xInBase) * 4 + 2 ];
+                    const std::uint8_t alpha = data[ (yInBase * height + xInBase) * 4 + 3 ];
+
+                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 0 ] = red;
+                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 1 ] = green;
+                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 2 ] = blue;
+                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 3 ] = alpha;
+                }
+            }
+
+            texResources[ i ].pData = mipLevels[ i - 1 ].data();
+            texResources[ i ].RowPitch = mipWidth * bytesPerPixel;
+            texResources[ i ].SlicePitch = texResources[ i ].RowPitch * mipHeight;
+        }
+
+        InitializeTexture( gpuResource, texResources.data(), mipLevelCount );
+    }
 
     stbi_image_free( data );
 }

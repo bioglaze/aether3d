@@ -174,9 +174,4 @@ cbuffer Scene\
     )";
 
     momentsShader.Load( momentsSource, momentsSource );
-
-    auto fc = FileSystem::FileContents( "GenerateMipsCS.hlsl" ).data;
-    std::string fileData( std::begin( fc ), std::end( fc ) );
-
-    generateMipsShader.Load( fileData.c_str() );
 }
