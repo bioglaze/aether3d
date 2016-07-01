@@ -44,6 +44,11 @@ struct GamePad
     short deadZone;
 };
 
+namespace ae3d
+{
+    void CreateRenderer( int samples );
+}
+
 namespace
 {
     // TODO: DRY. Duplicated in WindowWin32.cpp
@@ -213,8 +218,8 @@ void LoadAtoms()
 
 static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
-    int num_fb_configs = 0;
 #if RENDERER_OPENGL
+    int num_fb_configs = 0;
     GLXFBConfig* fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
     
     if (!fb_configs || num_fb_configs == 0)
@@ -283,6 +288,9 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         return -1;
     }
 #endif
+#if RENDERER_VULKAN
+    int visualID = screen->root_visual;
+#endif
     
     xcb_colormap_t colormap = xcb_generate_id( connection );
     WindowGlobal::window = xcb_generate_id( connection );
@@ -290,7 +298,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     WindowGlobal::windowWidth = width == 0 ? screen->width_in_pixels : width;
     WindowGlobal::windowHeight = height == 0 ? screen->height_in_pixels : height;
 
-#if RENDERER_OPENGL    
     xcb_create_colormap( connection, XCB_COLORMAP_ALLOC_NONE, colormap, screen->root, visualID );
     
     const uint32_t eventmask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE |
@@ -313,7 +320,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                       );
     
     xcb_map_window( connection, WindowGlobal::window );
-#endif
 
     xcb_atom_t protocols[] =
     {
@@ -421,8 +427,11 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     {
         return;
     }
-    
+
     GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
+#if RENDERER_VULKAN
+    ae3d::CreateRenderer( 1 );
+#endif
     SetTitle( "Aether3D Game Engine" );
     WindowGlobal::isOpen = true;
 }

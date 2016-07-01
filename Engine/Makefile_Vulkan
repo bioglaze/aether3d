@@ -6,7 +6,7 @@ CCOMPILER ?= gcc
 ENGINE_LIB := libaether3d_linux_vulkan.a
 STD_LIB := -std=c++11
 INCLUDES := -IInclude -IVideo -ICore -IThirdParty
-GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
+GCCWARNINGS := -g -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
  -Wunsafe-loop-optimizations -Wvector-operation-performance

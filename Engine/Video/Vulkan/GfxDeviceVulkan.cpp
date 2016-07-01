@@ -1705,6 +1705,9 @@ void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
 
 void ae3d::GfxDevice::BeginFrame()
 {
+    ae3d::System::Assert( acquireNextImageKHR != nullptr, "function pointers not loaded" );
+    ae3d::System::Assert( GfxDeviceGlobal::swapChain != VK_NULL_HANDLE, "swap chain not initialized" );
+    
     VkResult err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, GfxDeviceGlobal::presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
     AE3D_CHECK_VULKAN( err, "acquireNextImage" );
 
