@@ -41,8 +41,8 @@ int main()
     spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
     Texture2D spriteTex2;
-    //spriteTex2.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, 1 );
-    spriteTex2.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    spriteTex2.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    //spriteTex2.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
     Texture2D spriteTexFromAtlas;
     spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, 1 );
@@ -59,7 +59,7 @@ int main()
     spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
 
     AudioClip audioClip;
-    audioClip.Load(FileSystem::FileContents("explosion.wav"));
+    audioClip.Load( FileSystem::FileContents( "sine340.wav" ) );
     
     GameObject audioContainer;
     audioContainer.AddComponent<AudioSourceComponent>();
@@ -127,7 +127,7 @@ int main()
 
     Scene scene;
     scene.Add( &camera );
-    //scene.Add( &spriteContainer );
+    scene.Add( &spriteContainer );
     //scene.Add( &textContainer );
     //scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );

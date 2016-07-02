@@ -2,11 +2,9 @@
 *.o
 *.dSYM
 *.dylib
-*.xcsettings
 *.sdf
 *.exp
 *.pdb
 *.ilk
 *.suo
-xcuserdata
 
