@@ -32,6 +32,11 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 {
     System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
     
+    if (!vertexData.isLoaded || !fragmentData.isLoaded)
+    {
+        return;
+    }
+
     // Vertex shader
     {
         VkShaderModuleCreateInfo moduleCreateInfo;

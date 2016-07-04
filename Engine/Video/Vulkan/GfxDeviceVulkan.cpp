@@ -1633,6 +1633,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
 
+    if (shader.GetVertexInfo().module == VK_NULL_HANDLE || shader.GetFragmentInfo().module == VK_NULL_HANDLE)
+    {
+        return;
+    }
+
     const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))

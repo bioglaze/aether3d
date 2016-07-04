@@ -10,7 +10,7 @@ ICON = Editor.icns
 QMAKE_INFO_PLIST = Info.plist
 DEFINES += RENDERER_OPENGL=1
 
-INCLUDEPATH += $$PWD/../../../aether3d/Engine/Include
+INCLUDEPATH += $$PWD/../../Engine/Include
 DEPENDPATH += $$PWD/../../../aether3d_build
 
 win32 {
