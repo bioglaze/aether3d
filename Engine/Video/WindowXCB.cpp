@@ -289,6 +289,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     }
 #endif
 #if RENDERER_VULKAN
+    (void)default_screen;
     int visualID = screen->root_visual;
 #endif
     
@@ -679,6 +680,9 @@ void ae3d::Window::SwapBuffers()
 {
 #if RENDERER_OPENGL
     glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
+#endif
+#if RENDERER_VULKAN
+    GfxDevice::Present();
 #endif
 }
 

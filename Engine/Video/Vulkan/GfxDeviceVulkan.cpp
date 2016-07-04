@@ -659,9 +659,6 @@ namespace ae3d
             System::Assert( false, "compute queue not found" );
         }
 
-       // VkDeviceQueueCreateInfo queueCreateInfo = {};
-        //queueCreateInfo.queueFamilyIndex = computeQueueNodeIndex;
-        //queueCreateInfo.queueCount = 1;
         vkGetDeviceQueue( GfxDeviceGlobal::device, computeQueueNodeIndex, 0, &GfxDeviceGlobal::computeQueue );
 
         GfxDeviceGlobal::queueNodeIndex = graphicsQueueNodeIndex;
@@ -669,7 +666,8 @@ namespace ae3d
         std::uint32_t formatCount;
         err = getPhysicalDeviceSurfaceFormatsKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &formatCount, nullptr );
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfaceFormatsKHR" );
-
+        ae3d::System::Assert( formatCount > 0, "no formats" );
+        
         std::vector< VkSurfaceFormatKHR > surfFormats( formatCount );
         err = getPhysicalDeviceSurfaceFormatsKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &formatCount, surfFormats.data() );
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfaceFormatsKHR" );
@@ -698,7 +696,8 @@ namespace ae3d
         std::uint32_t presentModeCount = 0;
         err = getPhysicalDeviceSurfacePresentModesKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &presentModeCount, nullptr );
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfacePresentModesKHR" );
-
+        ae3d::System::Assert( presentModeCount > 0, "no present modes" );
+        
         std::vector< VkPresentModeKHR > presentModes( presentModeCount );
         err = getPhysicalDeviceSurfacePresentModesKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &presentModeCount, presentModes.data() );
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfacePresentModesKHR" );
@@ -706,7 +705,6 @@ namespace ae3d
         VkExtent2D swapchainExtent = {};
         if (surfCaps.currentExtent.width == 0)
         {
-            System::Print("Setting swapchain dimension to %dx%d\n", WindowGlobal::windowWidth, WindowGlobal::windowHeight );
             swapchainExtent.width = WindowGlobal::windowWidth;
             swapchainExtent.height = WindowGlobal::windowHeight;
         }
@@ -746,6 +744,7 @@ namespace ae3d
         swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         swapchainInfo.preTransform = (VkSurfaceTransformFlagBitsKHR)preTransform;
         swapchainInfo.imageArrayLayers = 1;
+        swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         swapchainInfo.queueFamilyIndexCount = 0;
         swapchainInfo.pQueueFamilyIndices = nullptr;
         swapchainInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
@@ -759,7 +758,8 @@ namespace ae3d
         std::uint32_t imageCount;
         err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, nullptr );
         AE3D_CHECK_VULKAN( err, "getSwapchainImagesKHR" );
-
+        ae3d::System::Assert( imageCount > 0, "imageCount" );
+        
         GfxDeviceGlobal::swapchainImages.resize( imageCount );
 
         err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, GfxDeviceGlobal::swapchainImages.data() );
@@ -944,8 +944,6 @@ namespace ae3d
 
     void CreateFramebufferNonMSAA()
     {
-        // FIXME: Review this method
-
         VkImageView attachments[ 2 ];
 
         // Depth/Stencil attachment is the same for all frame buffers
@@ -963,7 +961,7 @@ namespace ae3d
 
         // Create frame buffers for every swap chain image
         GfxDeviceGlobal::frameBuffers.resize( GfxDeviceGlobal::swapchainBuffers.size() );
-
+        
         for (std::uint32_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); i++)
         {
             attachments[ 0 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
