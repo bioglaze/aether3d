@@ -226,12 +226,12 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
     scene.Add( &cameraCubeRT );
     scene.Add( &rtCube );
     //scene.Add( &cube );
     //scene.Add( &copiedCube );
-//    scene.Add( &statsContainer );
+    scene.Add( &statsContainer );
     scene.Add( &dirLight );
     //scene.Add( &spotLight );
     //scene.Add( &pointLight );

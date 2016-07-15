@@ -413,8 +413,11 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
 
 void MainWindow::CommandCreateAudioSourceComponent()
 {
-    commandManager.Execute( std::make_shared< CreateAudioSourceCommand >( sceneWidget ) );
-    UpdateInspector();
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< CreateAudioSourceCommand >( sceneWidget ) );
+        UpdateInspector();
+    }
 }
 
 void MainWindow::CommandRemoveAudioSourceComponent()
@@ -426,9 +429,12 @@ void MainWindow::CommandRemoveAudioSourceComponent()
 
 void MainWindow::CommandCreateCameraComponent()
 {
-    commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
-    sceneWidget->SetSelectedCameraTargetToPreview();
-    UpdateInspector();
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
+        sceneWidget->SetSelectedCameraTargetToPreview();
+        UpdateInspector();
+    }
 }
 
 void MainWindow::CommandRemoveCameraComponent()
@@ -440,8 +446,11 @@ void MainWindow::CommandRemoveCameraComponent()
 
 void MainWindow::CommandCreateMeshRendererComponent()
 {
-    commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
-    UpdateInspector();
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
+        UpdateInspector();
+    }
 }
 
 void MainWindow::CommandRemoveMeshRendererComponent()
@@ -453,8 +462,11 @@ void MainWindow::CommandRemoveMeshRendererComponent()
 
 void MainWindow::CommandCreateSpriteRendererComponent()
 {
-    commandManager.Execute( std::make_shared< CreateSpriteRendererCommand >( sceneWidget ) );
-    UpdateInspector();
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< CreateSpriteRendererCommand >( sceneWidget ) );
+        UpdateInspector();
+    }
 }
 
 void MainWindow::CommandRemoveSpriteRendererComponent()
@@ -466,8 +478,11 @@ void MainWindow::CommandRemoveSpriteRendererComponent()
 
 void MainWindow::CommandCreateDirectionalLightComponent()
 {
-    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Directional ) );
-    UpdateInspector();
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Directional ) );
+        UpdateInspector();
+    }
 }
 
 void MainWindow::CommandRemoveDirectionalLightComponent()
@@ -479,8 +494,11 @@ void MainWindow::CommandRemoveDirectionalLightComponent()
 
 void MainWindow::CommandCreateSpotLightComponent()
 {
-    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Spot ) );
-    UpdateInspector();
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Spot ) );
+        UpdateInspector();
+    }
 }
 
 void MainWindow::CommandRemoveSpotLightComponent()
@@ -492,8 +510,11 @@ void MainWindow::CommandRemoveSpotLightComponent()
 
 void MainWindow::CommandCreatePointLightComponent()
 {
-    commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Point ) );
-    UpdateInspector();
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Point ) );
+        UpdateInspector();
+    }
 }
 
 void MainWindow::CommandRemovePointLightComponent()

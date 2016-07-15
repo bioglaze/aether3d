@@ -1,5 +1,5 @@
 #include "SceneWidget.hpp"
-//#include <iostream>
+#include <iostream>
 #include <vector>
 #include <cmath>
 #include <QKeyEvent>
@@ -393,6 +393,7 @@ void SceneWidget::RemoveEditorObjects()
     scene.Remove( &previewCamera );
     scene.Remove( &hudCamera );
     scene.Remove( &hud );
+    scene.Remove( &transformGizmo.go );
 }
 
 void SceneWidget::AddEditorObjects()
@@ -566,6 +567,7 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
 
             for (auto& go : selectedGameObjects)
             {
+                std::cout << "selected: " << go << std::endl;
                 selectedObjects.push_back( gameObjects[ go ].get() );
             }
 

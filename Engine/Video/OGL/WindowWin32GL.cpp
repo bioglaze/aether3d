@@ -59,6 +59,7 @@ LRESULT CALLBACK DummyGLWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
     return DefWindowProc( hWnd, msg, wParam, lParam );
 }
+
 namespace ae3d
 {
     bool CreateDummyGLWindow()
@@ -152,6 +153,7 @@ namespace ae3d
             WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
             WGL_SAMPLE_BUFFERS_ARB, samples > 0 ? 1 : 0,
             WGL_SAMPLES_ARB, samples,
+            WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB, GL_TRUE,
             0, 0
         };
 
