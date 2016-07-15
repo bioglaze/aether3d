@@ -1213,12 +1213,9 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     if (target && target->IsCube())
     {
 		GfxDeviceGlobal::currentRenderTarget = target->GetGpuResource();
-
-        if (target)
-        {
-            GfxDeviceGlobal::currentRenderTargetDSV = target->GetCubeDSV( cubeMapFace );
-            GfxDeviceGlobal::currentRenderTargetRTV = target->GetCubeRTV( cubeMapFace );
-        }
+        GfxDeviceGlobal::currentRenderTargetDSV = target->GetCubeDSV( cubeMapFace );
+        GfxDeviceGlobal::currentRenderTargetRTV = target->GetCubeRTV( cubeMapFace );
+        TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
     }
     else
     {
@@ -1229,6 +1226,7 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
             System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
             GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
             GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
+            TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
         }
     }
 }
