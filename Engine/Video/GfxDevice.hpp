@@ -81,6 +81,8 @@ namespace ae3d
         void PushGroupMarker( const char* name );
         void PopGroupMarker();
 
+        void SetPolygonOffset( bool enable, float factor, float units );
+
         void IncDrawCalls();
         int GetDrawCalls();
         void IncVertexBufferBinds();

@@ -202,19 +202,24 @@ void SceneWidget::TransformGizmo::Init( Shader* shader )
     xAxisMaterial.SetTexture( "textureMap", &translateTex );
     xAxisMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
     xAxisMaterial.SetBackFaceCulling( true );
-    xAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::NoneWriteOff );
+    xAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
+    float factor = -100;
+    float units = 0;
+    xAxisMaterial.SetDepthOffset( factor, units );
+    yAxisMaterial.SetDepthOffset( factor, units );
+    zAxisMaterial.SetDepthOffset( factor, units );
 
     yAxisMaterial.SetShader( shader );
     yAxisMaterial.SetTexture( "textureMap", &translateTex );
     yAxisMaterial.SetVector( "tint", { 0, 1, 0, 1 } );
     yAxisMaterial.SetBackFaceCulling( true );
-    yAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::NoneWriteOff );
+    yAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
 
     zAxisMaterial.SetShader( shader );
     zAxisMaterial.SetTexture( "textureMap", &translateTex );
     zAxisMaterial.SetVector( "tint", { 0, 0, 1, 1 } );
     zAxisMaterial.SetBackFaceCulling( true );
-    zAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::NoneWriteOff );
+    zAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
 
     go.AddComponent< MeshRendererComponent >();
     go.GetComponent< MeshRendererComponent >()->SetMesh( &translateMesh );
@@ -563,33 +568,15 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
 
         if (dragAxis != GizmoAxis::None)
         {
-            std::list< ae3d::GameObject* > selectedObjects;
-
             for (auto& go : selectedGameObjects)
             {
-                std::cout << "selected: " << go << std::endl;
-                selectedObjects.push_back( gameObjects[ go ].get() );
-            }
-
-            if (selectedObjects.empty())
-            {
-                return;
-            }
-
-            int i = 0;
-
-            for (auto go : selectedObjects)
-            {
-                auto transform = go->GetComponent< TransformComponent >();
-
+                auto transform = gameObjects[ go ]->GetComponent< TransformComponent >();
                 if (transform)
                 {
                     auto pos = transform->GetLocalPosition();
                     auto rot = transform->GetLocalRotation();
                     auto sca = transform->GetLocalScale();
-                    emit TransformModified( i, pos, rot, sca );
-
-                    ++i;
+                    emit TransformModified( go, pos, rot, sca );
                 }
             }
         }

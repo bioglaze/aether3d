@@ -16,6 +16,10 @@ void ae3d::GfxDevice::Init( int, int )
 {
 }
 
+void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
+{
+}
+
 int ae3d::GfxDevice::GetDrawCalls()
 {
     return 0;

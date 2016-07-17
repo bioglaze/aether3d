@@ -215,6 +215,10 @@ id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
     return GfxDeviceGlobal::uniformBuffers.back();
 }
 
+void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
+{
+}
+
 void ae3d::GfxDevice::ResetUniformBuffers()
 {
     GfxDeviceGlobal::uniformBuffers.clear();

@@ -43,6 +43,10 @@ namespace ae3d
         /// \param aDepthFunction Depth function.
         void SetDepthFunction( DepthFunction aDepthFunction ) { depthFunction = aDepthFunction; }
         
+        /// \param aOffset Depth offset
+        /// \param aSlope Depth slope
+        void SetDepthOffset( float aOffset, float aSlope ) { depthFactor = aOffset; depthUnits = aSlope; }
+        
         /// \param name Name. This is a uniform in the shader.
         /// \param matrix 4x4 matrix.
         void SetMatrix( const char* name, const Matrix44& matrix );
@@ -93,6 +97,8 @@ namespace ae3d
         Shader* shader = nullptr;
         DepthFunction depthFunction = DepthFunction::LessOrEqualWriteOn;
         bool cullBackFaces = true;
+        float depthFactor = 0;
+        float depthUnits = 0;
     };
 }
 

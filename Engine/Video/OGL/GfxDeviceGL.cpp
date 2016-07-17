@@ -130,6 +130,20 @@ void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
     }
 }
 
+void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
+{
+    if (enable)
+    {
+        glEnable( GL_POLYGON_OFFSET_FILL );
+    }
+    else
+    {
+        glDisable( GL_POLYGON_OFFSET_FILL );
+    }
+    
+    glPolygonOffset( factor, units );
+}
+
 void ae3d::GfxDevice::Init( int width, int height )
 {
     if (glxwInit() != 0)

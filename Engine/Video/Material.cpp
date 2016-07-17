@@ -1,4 +1,5 @@
 #include "Material.hpp"
+#include "GfxDevice.hpp"
 #include "Texture2D.hpp"
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
@@ -68,6 +69,15 @@ void ae3d::Material::Apply()
     {
         shader->SetRenderTexture( globalTexRT.first.c_str(), globalTexRT.second, texUnit );
         ++texUnit;
+    }
+    
+    if (depthUnits != 0 || depthFactor != 0)
+    {
+        GfxDevice::SetPolygonOffset( true, depthFactor, depthUnits );
+    }
+    else
+    {
+        GfxDevice::SetPolygonOffset( false, 0, 0 );
     }
 }
 
