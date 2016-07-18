@@ -1,5 +1,6 @@
 #include "FileSystem.hpp"
 #include "System.hpp"
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -16,12 +17,10 @@ const char* GetFullPath( const char* fileName )
 #else
 const char* GetFullPath( const char* fileName )
 {
-    //static std::string fName;
-    //fName = fileName;
-    //fName.replace( std::begin( fName ), std::end( fName ), '\\', '/' );
-    //return fName.c_str();
-    
-    return fileName;
+    static std::string fName;
+    fName = fileName;
+    std::replace( std::begin( fName ), std::end( fName ), '\\', '/' );
+    return fName.c_str();
 }
 #endif
 

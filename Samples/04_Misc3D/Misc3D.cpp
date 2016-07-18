@@ -154,7 +154,7 @@ int main()
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 512 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
@@ -171,7 +171,7 @@ int main()
     skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
 
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
@@ -232,15 +232,16 @@ int main()
     //scene.Add( &cube );
     //scene.Add( &copiedCube );
     scene.Add( &statsContainer );
-    scene.Add( &dirLight );
-    //scene.Add( &spotLight );
+    //scene.Add( &dirLight );
+    scene.Add( &spotLight );
     //scene.Add( &pointLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
 
-    GameObject cubes[ 5 ];
+    const int cubeCount = 10;
+    GameObject cubes[ cubeCount ];
 
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < cubeCount; ++i)
     {
         cubes[ i ].AddComponent< MeshRendererComponent >();
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
@@ -253,6 +254,21 @@ int main()
 
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
+
+    cubes[ 5 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -110 } );
+    cubes[ 5 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
+
+    cubes[ 6 ].GetComponent< TransformComponent >()->SetLocalPosition( { -12, -10, -100 } );
+    cubes[ 6 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
+
+    cubes[ 7 ].GetComponent< TransformComponent >()->SetLocalPosition( { 12, -10, -100 } );
+    cubes[ 7 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
+
+    cubes[ 8 ].GetComponent< TransformComponent >()->SetLocalPosition( { -12, 0, -110 } );
+    cubes[ 8 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
+
+    cubes[ 9 ].GetComponent< TransformComponent >()->SetLocalPosition( { 12, 0, -110 } );
+    cubes[ 9 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
 
     cubes[ 3 ].GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
     cubes[ 3 ].GetComponent< TransformComponent >()->SetParent( cubes[ 2 ].GetComponent< TransformComponent >() );
