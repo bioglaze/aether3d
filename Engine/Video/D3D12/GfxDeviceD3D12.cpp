@@ -372,7 +372,7 @@ void CreateRootSignature()
 }
 
 unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat )
+                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat, int sampleCount )
 {
     std::string hashString;
     hashString += std::to_string( (unsigned)vertexFormat );
@@ -382,12 +382,13 @@ unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader
     hashString += std::to_string( ((unsigned)depthFunc) );
     hashString += std::to_string( ((unsigned)cullMode) );
     hashString += std::to_string( ((unsigned)rtvFormat) );
+    hashString += std::to_string( ((unsigned)sampleCount) );
 
     return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
 }
 
 void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat )
+                ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat, int sampleCount )
 {
     D3D12_RASTERIZER_DESC descRaster = {};
 
@@ -413,7 +414,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     descRaster.DepthClipEnable = TRUE;
     descRaster.FillMode = D3D12_FILL_MODE_SOLID;
     descRaster.FrontCounterClockwise = TRUE;
-    descRaster.MultisampleEnable = GfxDeviceGlobal::sampleCount > 1 ? TRUE : FALSE;
+    descRaster.MultisampleEnable = sampleCount > 1;
     descRaster.SlopeScaledDepthBias = 0;
 
     D3D12_BLEND_DESC descBlend = {};
@@ -551,15 +552,15 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     descPso.NumRenderTargets = 1;
     descPso.RTVFormats[ 0 ] = rtvFormat;
     descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-	descPso.SampleDesc.Count = GfxDeviceGlobal::sampleCount;
-	descPso.SampleDesc.Quality = GfxDeviceGlobal::sampleCount > 1 ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
+	descPso.SampleDesc.Count = sampleCount;
+	descPso.SampleDesc.Quality = sampleCount > 1 ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
 
     ID3D12PipelineState* pso;
     HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO" );
 
-    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, rtvFormat );
+    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, rtvFormat, sampleCount );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -717,6 +718,14 @@ void ae3d::CreateRenderer( int samples )
     CreateSampler();
 }
 
+void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )
+{
+    if (enable)
+    {
+        ae3d::System::Print( "SetPolygonOffset is unimplemented on D3D12 renderer" );
+    }
+}
+
 void ae3d::GfxDevice::CreateNewUniformBuffer()
 {
     D3D12_HEAP_PROPERTIES prop = {};
@@ -803,11 +812,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
     }
 
-    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat );
+    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat );
+        CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
     }
     
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
