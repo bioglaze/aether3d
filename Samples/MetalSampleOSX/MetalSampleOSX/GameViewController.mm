@@ -31,11 +31,13 @@
     ae3d::GameObject camera3d;
     ae3d::GameObject cube;
     ae3d::GameObject bigCube;
+    ae3d::GameObject bigCube2;
     ae3d::GameObject text;
     ae3d::GameObject dirLight;
     ae3d::GameObject rtCamera;
     ae3d::GameObject renderTextureContainer;
     ae3d::GameObject cubePTN; // vertex format: position, texcoord, normal
+    ae3d::GameObject cubePTN2;
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -85,8 +87,6 @@
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
     //camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera3d.AddComponent<ae3d::TransformComponent>();
-    //camera3d.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -2, 0 ) );
-    //camera3d.GetComponent<ae3d::TransformComponent>()->LookAt( ae3d::Vec3( 0, -2, 0 ), ae3d::Vec3( 0, 0, -100 ), ae3d::Vec3( 0, 1, 0 ) );
     scene.Add( &camera3d );
 
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
@@ -132,6 +132,13 @@
     cubePTN.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 3, 0, -10 ) );
     scene.Add( &cubePTN );
 
+    cubePTN2.AddComponent<ae3d::MeshRendererComponent>();
+    cubePTN2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh/*PTN*/ );
+    cubePTN2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    cubePTN2.AddComponent<ae3d::TransformComponent>();
+    cubePTN2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, 5, -10 ) );
+    scene.Add( &cubePTN2 );
+
     bigCube.AddComponent<ae3d::MeshRendererComponent>();
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
@@ -140,11 +147,20 @@
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
     scene.Add( &bigCube );
 
+    bigCube2.AddComponent<ae3d::MeshRendererComponent>();
+    bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    bigCube2.AddComponent<ae3d::TransformComponent>();
+    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
+    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
+    scene.Add( &bigCube2 );
+
+    
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
     dirLight.AddComponent<ae3d::TransformComponent>();
-    dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( -0.5f, -0.5f, 0 ).Normalized(), { 0, 1, 0 } );
+    dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
     scene.Add( &dirLight );
     
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );

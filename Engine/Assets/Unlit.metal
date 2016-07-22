@@ -13,15 +13,6 @@ struct uniforms_t
     float4 tintColor;
 };
 
-struct vertex_t
-{
-    packed_float3 position;
-    packed_float2 texcoord;
-    packed_float3 normal;
-    packed_float4 tangent;
-    packed_float4 color;
-};
-
 struct ColorInOut
 {
     float4 position [[position]];
@@ -30,10 +21,6 @@ struct ColorInOut
     float2 texCoords;
     half4  color;
 };
-
-constexpr sampler s(coord::normalized,
-                    address::repeat,
-                    filter::linear);
 
 constexpr sampler shadowSampler(coord::normalized,
                                 address::clamp_to_edge,

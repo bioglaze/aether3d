@@ -61,6 +61,7 @@ namespace ae3d
         void ResetUniformBuffers();
         void PresentDrawable();
         void BeginFrame();
+        void InsertDebugBoundary();
 #endif
 #if RENDERER_VULKAN
         void CreateNewUniformBuffer();

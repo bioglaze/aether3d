@@ -3,41 +3,36 @@
 
 using namespace metal;
 
-typedef struct
+struct uniforms_t
 {
     matrix_float4x4 _ModelViewProjectionMatrix;
-} uniforms_t;
+};
 
-typedef struct
+struct Vertex
 {
-    packed_float3 position;
-    packed_float2 texcoord;
-    packed_float3 normal;
-    packed_float4 tangent;
-    packed_float4 color;
-} vertex_t;
+    float3 position [[attribute(0)]];
+};
 
-typedef struct
+struct ColorInOut
 {
     float4 position [[position]];
-} ColorInOut;
+};
 
-vertex ColorInOut moments_vertex(device vertex_t* vertex_array [[ buffer(0) ]],
+vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
                                constant uniforms_t& uniforms [[ buffer(5) ]],
                                unsigned int vid [[ vertex_id ]])
 {
     ColorInOut out;
     
-    float4 in_position = float4( float3( vertex_array[ vid ].position ), 1.0 );
+    float4 in_position = float4( float3( vert.position ), 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     
     return out;
 }
 
-fragment half4 moments_fragment(ColorInOut in [[stage_in]],
-                              texture2d<float, access::sample> textureMap [[texture(0)]])
+fragment half4 moments_fragment( ColorInOut in [[stage_in]] )
 {
-    float linearDepth = in.position.z; // gl_FragCoord.z
+    float linearDepth = in.position.z;
     
     float dx = dfdx( linearDepth );
     float dy = dfdy( linearDepth );

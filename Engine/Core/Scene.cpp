@@ -215,6 +215,9 @@ void ae3d::Scene::Remove( GameObject* gameObject )
 
 void ae3d::Scene::Render()
 {
+#if RENDERER_METAL
+    GfxDevice::InsertDebugBoundary();
+#endif
 #if RENDERER_VULKAN
     GfxDevice::BeginFrame();
 #endif
@@ -357,6 +360,8 @@ void ae3d::Scene::Render()
                         SceneGlobal::shadowCamera.AddComponent< CameraComponent >();
                         SceneGlobal::shadowCamera.AddComponent< TransformComponent >();
                         SceneGlobal::isShadowCameraCreated = true;
+                        // Component adding can invalidate lightTransform pointer.
+                        lightTransform = go->GetComponent<TransformComponent>();
                     }
                     
                     if (dirLight)
@@ -711,6 +716,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
 
+        //renderer.builtinShaders.momentsShader.Use();
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.momentsShader );
     }
     

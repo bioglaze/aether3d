@@ -19,7 +19,9 @@ extern ae3d::Renderer renderer;
 id <MTLDevice> device;
 id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
-id <MTLDepthStencilState> depthStateLessWriteOn;
+id <MTLDepthStencilState> depthStateLessEqualWriteOn;
+id <MTLDepthStencilState> depthStateLessEqualWriteOff;
+id <MTLDepthStencilState> depthStateNoneWriteOff;
 id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
 id <CAMetalDrawable> drawable; // Render texture or currentDrawable
 
@@ -264,11 +266,21 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     GfxDeviceGlobal::sampleCount = sampleCount;
     
     MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
-    depthStateDesc.depthCompareFunction = MTLCompareFunctionLess;
+    depthStateDesc.depthCompareFunction = MTLCompareFunctionLessEqual;
     depthStateDesc.depthWriteEnabled = YES;
-    depthStateDesc.label = @"less write on";
-    depthStateLessWriteOn = [device newDepthStencilStateWithDescriptor:depthStateDesc];
-    
+    depthStateDesc.label = @"lessEqual write on";
+    depthStateLessEqualWriteOn = [device newDepthStencilStateWithDescriptor:depthStateDesc];
+
+    depthStateDesc.depthCompareFunction = MTLCompareFunctionLessEqual;
+    depthStateDesc.depthWriteEnabled = NO;
+    depthStateDesc.label = @"lessEqual write off";
+    depthStateLessEqualWriteOff = [device newDepthStencilStateWithDescriptor:depthStateDesc];
+
+    depthStateDesc.depthCompareFunction = MTLCompareFunctionNever;
+    depthStateDesc.depthWriteEnabled = NO;
+    depthStateDesc.label = @"none write off";
+    depthStateNoneWriteOff = [device newDepthStencilStateWithDescriptor:depthStateDesc];
+
     GfxDeviceGlobal::CreateSamplers();
 
     if (sampleCount == 1)
@@ -530,16 +542,35 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
-    [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeFront : MTLCullModeNone];
+    [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
+    [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
     [renderEncoder setFragmentTexture:texture1 atIndex:1];
-    [renderEncoder setDepthStencilState:depthStateLessWriteOn];
+    
+    if (depthFunc == DepthFunc::LessOrEqualWriteOff)
+    {
+        [renderEncoder setDepthStencilState:depthStateLessEqualWriteOff];
+    }
+    else if (depthFunc == DepthFunc::LessOrEqualWriteOn)
+    {
+        [renderEncoder setDepthStencilState:depthStateLessEqualWriteOn];
+    }
+    else if (depthFunc == DepthFunc::NoneWriteOff)
+    {
+        [renderEncoder setDepthStencilState:depthStateNoneWriteOff];
+    }
+    else
+    {
+        System::Assert( false, "unhandled depth function" );
+        [renderEncoder setDepthStencilState:depthStateLessEqualWriteOn];
+    }
+    
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 0 ] atIndex:0];
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 1 ] atIndex:1];
     
     if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
     {
-        // No need to se extra buffers as vertexBuffer contains all attributes.
+        // No need to set extra buffers as vertexBuffer contains all attributes.
     }
     else if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTN)
     {
@@ -559,6 +590,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
                                indexType:MTLIndexTypeUInt16
                              indexBuffer:vertexBuffer.GetIndexBuffer()
                        indexBufferOffset:startIndex * 2 * 3];    
+}
+
+void ae3d::GfxDevice::InsertDebugBoundary()
+{
+    [commandQueue insertDebugCaptureBoundary];
 }
 
 void ae3d::GfxDevice::BeginFrame()
