@@ -892,31 +892,20 @@ namespace ae3d
 			}
 		}
 
+        VkPhysicalDeviceFeatures enabledFeatures = {};
+        enabledFeatures.tessellationShader = true;
+        enabledFeatures.shaderTessellationAndGeometryPointSize = true;
+        enabledFeatures.shaderClipDistance = true;
+        enabledFeatures.shaderCullDistance = true;
+
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         deviceCreateInfo.pNext = nullptr;
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-        deviceCreateInfo.pEnabledFeatures = nullptr;
+        deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
 		deviceCreateInfo.enabledExtensionCount = static_cast< std::uint32_t >( deviceExtensions.size() );
         deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
-        
-		std::vector< const char* > deviceLayers;
-		std::uint32_t deviceValidationLayerCount;
-		vkEnumerateDeviceLayerProperties( GfxDeviceGlobal::physicalDevice, &deviceValidationLayerCount, nullptr );
-		std::vector< VkLayerProperties > deviceValidationLayers( deviceValidationLayerCount );
-		vkEnumerateDeviceLayerProperties( GfxDeviceGlobal::physicalDevice, &deviceValidationLayerCount, deviceValidationLayers.data() );
-
-        if (debug::enabled)
-        {
-			for (auto& i : deviceValidationLayers)
-			{
-				deviceLayers.push_back( i.layerName );
-			}
-
-			deviceCreateInfo.enabledLayerCount = static_cast< std::uint32_t >( deviceLayers.size() );
-			deviceCreateInfo.ppEnabledLayerNames = deviceLayers.data();
-		}
 
         result = vkCreateDevice( GfxDeviceGlobal::physicalDevice, &deviceCreateInfo, nullptr, &GfxDeviceGlobal::device );
         AE3D_CHECK_VULKAN( result, "device" );
@@ -1464,6 +1453,10 @@ namespace ae3d
 
         GfxDevice::SetClearColor( 0, 0, 0 );
     }
+}
+
+void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )
+{
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* /*name*/ )

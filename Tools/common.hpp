@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <cassert>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -85,6 +86,7 @@ struct Mesh
     void SolveVertexNormals();
     void SolveVertexTangents();
     void CopyInterleavedVerticesToPTN();
+    void OptimizeForCache(); // Implements https://tomforsyth1000.github.io/papers/fast_vert_cache_opt.html
 
     bool AlmostEquals( const ae3d::Vec3& v1, const ae3d::Vec3& v2 ) const;
     bool AlmostEquals( const ae3d::Vec4& v1, const ae3d::Vec4& v2 ) const;
@@ -125,6 +127,83 @@ void Mesh::CopyInterleavedVerticesToPTN()
         interleavedVerticesPTN[ i ].texCoord = interleavedVertices[ i ].texCoord;
         interleavedVerticesPTN[ i ].normal = interleavedVertices[ i ].normal;
     }
+}
+
+struct VertexData
+{
+    int cacheTag = 0;
+    int numActiveTris = 0;
+};
+
+struct VertexPTNTCWithData
+{
+    ae3d::Vec3 position;
+    TexCoord texCoord;
+    ae3d::Vec3 normal;
+    ae3d::Vec4 tangent;
+    ae3d::Vec4 color;
+    VertexData data;
+};
+
+float FindVertexScore( VertexData& vertexData )
+{
+    const float findVertexScore_CacheDecayPower = 1.5f;
+    const float findVertexScore_LastTriScore = 0.75f;
+    const float findVertexScore_ValenceBoostScale = 2.0f;
+    const float findVertexScore_ValenceBoostPower = 0.5f;
+    
+    const int MaxSizeVertexCache = 32;
+
+    if (vertexData.numActiveTris == 0)
+    {
+        // No tri needs this vertex!
+        return -1;
+    }
+
+    float score = 0;
+    int cachePosition = vertexData.cacheTag;
+    if (cachePosition < 0)
+    {
+        // Vertex is not in FIFO -> no score
+    }
+    else
+    {
+        if (cachePosition < 3)
+        {
+            // This vertex was used in the last triangle,
+            // so it has a fixed score, whichever of the three
+            // it's in. Otherwise, you can get very different
+            // answers depending on whether you add
+            // the triangle 1,2,3 or 3,1,2 - which is silly.
+            score = findVertexScore_LastTriScore;
+        }
+        else
+        {
+            assert( cachePosition < MaxSizeVertexCache && "Cache position exceeds the cache size" );
+            const float scaler = 1.0f / (MaxSizeVertexCache - 3);
+            score = 1.0f - (cachePosition - 3) * scaler;
+            score = std::pow( score, findVertexScore_CacheDecayPower );
+        }
+    }
+
+    float valenceBoost = std::pow( static_cast<float>(vertexData.numActiveTris), -findVertexScore_ValenceBoostPower );
+    score += findVertexScore_ValenceBoostScale * valenceBoost;
+
+    return score;
+}
+
+void Mesh::OptimizeForCache()
+{
+    /*
+    -Pick off the highest - score triangle( or approx highest, if using high score cache )
+        - Add to "draw" list
+        - Adjust num tris for each vertex not drawn
+        - Add tri to vertex cache
+        - Update changed vertex scores
+        - Updated changed tri scores
+        */
+
+
 }
 
 void Mesh::SolveAABB()
