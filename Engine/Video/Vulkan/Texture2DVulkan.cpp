@@ -100,7 +100,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAllocInfo.pNext = nullptr;
     memAllocInfo.memoryTypeIndex = 0;
-    memAllocInfo.allocationSize = 0;
 
     VkBuffer stagingBuffer = VK_NULL_HANDLE;
     VkDeviceMemory stagingMemory = VK_NULL_HANDLE;

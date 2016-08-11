@@ -139,6 +139,7 @@ namespace ae3d
         };
 
     private:
+        std::string vertexPath;
         std::string fragmentPath;
 
 #if RENDERER_D3D12

@@ -63,6 +63,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
     gpuResource.resource->SetName( L"Render Texture 2D" );
+    gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     RenderTextureGlobal::renderTextures.push_back( gpuResource.resource );
 
     {
@@ -148,6 +149,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
             D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
         AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
         gpuResource.resource->SetName( L"Cube map RT base" );
+        gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
         RenderTextureGlobal::renderTextures.push_back( gpuResource.resource );
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

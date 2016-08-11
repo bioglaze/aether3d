@@ -111,6 +111,7 @@
     <ClCompile Include="..\ThirdParty\stb_image.c" />
     <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
     <ClCompile Include="..\Video\D3D12\ComputeShaderD3D12.cpp" />
+    <ClCompile Include="..\Video\D3D12\DDSLoaderD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\DescriptorHeapManager.cpp" />
     <ClCompile Include="..\Video\D3D12\GfxDeviceD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\RendererD3D12.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="..\Include\Window.hpp" />
     <ClInclude Include="..\ThirdParty\d3dx12.h" />
     <ClInclude Include="..\Video\D3D12\DescriptorHeapManager.hpp" />
+    <ClInclude Include="..\Video\DDSLoader.hpp" />
     <ClInclude Include="..\Video\GfxDevice.hpp" />
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />

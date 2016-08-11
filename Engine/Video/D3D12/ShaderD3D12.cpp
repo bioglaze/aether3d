@@ -76,7 +76,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &blobShaderVertex, &blobError );
     if (FAILED( hr ))
     {
-        ae3d::System::Print( "Unable to compile vertex shader: %s!\n", blobError->GetBufferPointer() );
+        ae3d::System::Print( "Unable to compile vertex shader %s: %s!\n", vertexPath.c_str(), blobError->GetBufferPointer() );
         return;
     }
 
@@ -85,7 +85,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &blobShaderPixel, &blobError );
     if (FAILED( hr ))
     {
-        ae3d::System::Print( "Unable to compile pixel shader: %s!\n", blobError->GetBufferPointer() );
+        ae3d::System::Print( "Unable to compile pixel shader %s: %s!\n", fragmentPath.c_str(), blobError->GetBufferPointer() );
         return;
     }
 
@@ -102,6 +102,9 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/,
 {
     const std::string vertexStr = std::string( std::begin( vertexDataHLSL.data ), std::end( vertexDataHLSL.data ) );
     const std::string fragmentStr = std::string( std::begin( fragmentDataHLSL.data ), std::end( fragmentDataHLSL.data ) );
+
+    vertexPath = vertexDataHLSL.path;
+    fragmentPath = fragmentDataHLSL.path;
 
     Load( vertexStr.c_str(), fragmentStr.c_str() );
 

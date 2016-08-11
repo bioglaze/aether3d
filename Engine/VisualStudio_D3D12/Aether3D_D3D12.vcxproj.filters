@@ -132,6 +132,9 @@
     <ClCompile Include="..\Components\PointLightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\D3D12\DDSLoaderD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\PointLightComponent.hpp">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\DDSLoader.hpp">
+      <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

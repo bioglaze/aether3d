@@ -5,12 +5,13 @@
 #include <d3dx12.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
-#include "GfxDevice.hpp"
+#include "DescriptorHeapManager.hpp"
 #include "FileWatcher.hpp"
 #include "FileSystem.hpp"
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
-#include "DescriptorHeapManager.hpp"
+#include "DDSLoader.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
@@ -187,9 +188,14 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 #endif
 }
 
-void ae3d::Texture2D::LoadDDS( const char* /*path*/ )
+void ae3d::Texture2D::LoadDDS( const char* path )
 {
-    ae3d::System::Print( ".dds loading not implemented in d3d12!\n" );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( path, 0, width, height, opaque );
+
+    if (loadResult != DDSLoader::LoadResult::Success)
+    {
+        ae3d::System::Print( "DDS Loader could not load %s", path );
+    }
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
