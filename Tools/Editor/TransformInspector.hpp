@@ -19,7 +19,7 @@ class TransformInspector: public QObject
     Q_OBJECT
 
   public:
-    QWidget* GetWidget() { return (QWidget*)table; }
+    QWidget* GetWidget() { return reinterpret_cast<QWidget*>(table); }
     void Init( QWidget* mainWindow );
 
 signals:

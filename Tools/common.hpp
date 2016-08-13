@@ -86,7 +86,9 @@ struct Mesh
     void SolveVertexNormals();
     void SolveVertexTangents();
     void CopyInterleavedVerticesToPTN();
+    
     void OptimizeForCache(); // Implements https://tomforsyth1000.github.io/papers/fast_vert_cache_opt.html
+    void ComputeVertexCacheScores();
 
     bool AlmostEquals( const ae3d::Vec3& v1, const ae3d::Vec3& v2 ) const;
     bool AlmostEquals( const ae3d::Vec4& v1, const ae3d::Vec4& v2 ) const;
@@ -192,18 +194,40 @@ float FindVertexScore( VertexData& vertexData )
     return score;
 }
 
+void Mesh::ComputeVertexCacheScores()
+{
+    // Finds active tris
+    for (std::size_t f = 0; f < indices.size(); ++f)
+    {
+        verticesWithCachedata[ indices[ f ].a ].data.numActiveTris++;
+        verticesWithCachedata[ indices[ f ].b ].data.numActiveTris++;
+        verticesWithCachedata[ indices[ f ].c ].data.numActiveTris++;
+    }
+
+}
+
 void Mesh::OptimizeForCache()
 {
-    /*
-    -Pick off the highest - score triangle( or approx highest, if using high score cache )
-        - Add to "draw" list
-        - Adjust num tris for each vertex not drawn
-        - Add tri to vertex cache
-        - Update changed vertex scores
-        - Updated changed tri scores
-        */
+    std::vector< VertexPTNTCWithData > verticesWithCachedata( interleavedVertices.size() );
 
+    for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
+    {
+        verticesWithCachedata[ i ].color = interleavedVertices[ i ].color;
+        verticesWithCachedata[ i ].texCoord = interleavedVertices[ i ].texCoord;
+        verticesWithCachedata[ i ].position = interleavedVertices[ i ].position;
+        verticesWithCachedata[ i ].tangent = interleavedVertices[ i ].tangent;
+        verticesWithCachedata[ i ].normal = interleavedVertices[ i ].normal;
+    }
 
+    ComputeVertexCacheScores( verticesWithCachedata );
+
+    for (std::size_t i = 0; i < verticesWithCachedata.size(); ++i)
+    {
+        float score = FindVertexScore( verticesWithCachedata[ i ].data );
+        std::cout << "vertex " << i << " score: " << score << std::endl;
+    }
+
+    std::cout << "jee";
 }
 
 void Mesh::SolveAABB()
@@ -599,6 +623,7 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         }
 
         gMeshes[ m ].Interleave();
+        gMeshes[ m ].OptimizeForCache();
 
         gMeshes[ m ].SolveFaceNormals();
         gMeshes[ m ].SolveFaceTangents();

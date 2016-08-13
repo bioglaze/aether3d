@@ -101,6 +101,9 @@ namespace GfxDeviceGlobal
 	ae3d::RenderTexture* renderTexture0 = nullptr;
 	ae3d::Texture2D* texture2d0 = nullptr;
     ae3d::TextureCube* textureCube0 = nullptr;
+    ae3d::RenderTexture* renderTexture1 = nullptr;
+    ae3d::Texture2D* texture2d1 = nullptr;
+    ae3d::TextureCube* textureCube1 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
     std::vector< ID3D12Resource* > frameConstantBuffers;
     void* currentConstantBuffer = nullptr;

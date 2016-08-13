@@ -20,6 +20,9 @@ namespace GfxDeviceGlobal
 	extern ae3d::RenderTexture* renderTexture0;
 	extern ae3d::Texture2D* texture2d0;
     extern ae3d::TextureCube* textureCube0;
+    extern ae3d::RenderTexture* renderTexture1;
+    extern ae3d::Texture2D* texture2d1;
+    extern ae3d::TextureCube* textureCube1;
 }
 
 namespace Global
@@ -172,11 +175,20 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     }
 }
 
-void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int /*textureUnit*/ )
+void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
 {
-    GfxDeviceGlobal::texture2d0 = texture;
-    GfxDeviceGlobal::textureCube0 = nullptr;
-    GfxDeviceGlobal::renderTexture0 = nullptr;
+    if (textureUnit == 0)
+    {
+        GfxDeviceGlobal::texture2d0 = texture;
+        GfxDeviceGlobal::textureCube0 = nullptr;
+        GfxDeviceGlobal::renderTexture0 = nullptr;
+    }
+    else if (textureUnit == 1)
+    {
+        GfxDeviceGlobal::texture2d1 = texture;
+        GfxDeviceGlobal::textureCube1 = nullptr;
+        GfxDeviceGlobal::renderTexture1 = nullptr;
+    }
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
@@ -184,9 +196,18 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int /
 
 void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int textureUnit )
 {
-    GfxDeviceGlobal::textureCube0 = texture;
-    GfxDeviceGlobal::texture2d0 = nullptr;
-	GfxDeviceGlobal::renderTexture0 = nullptr;
+    if (textureUnit == 0)
+    {
+        GfxDeviceGlobal::textureCube0 = texture;
+        GfxDeviceGlobal::texture2d0 = nullptr;
+        GfxDeviceGlobal::renderTexture0 = nullptr;
+    }
+    else if (textureUnit == 1)
+    {
+        GfxDeviceGlobal::textureCube1 = texture;
+        GfxDeviceGlobal::texture2d1 = nullptr;
+        GfxDeviceGlobal::renderTexture1 = nullptr;
+    }
 
     SetInt( name, textureUnit );
     
@@ -196,9 +217,18 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int
 
 void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* texture, int textureUnit )
 {
-	GfxDeviceGlobal::textureCube0 = nullptr;
-	GfxDeviceGlobal::texture2d0 = nullptr;
-	GfxDeviceGlobal::renderTexture0 = texture;
+    if (textureUnit == 0)
+    {
+        GfxDeviceGlobal::textureCube0 = nullptr;
+        GfxDeviceGlobal::texture2d0 = nullptr;
+        GfxDeviceGlobal::renderTexture0 = texture;
+    }
+    else if (textureUnit == 1)
+    {
+        GfxDeviceGlobal::textureCube1 = nullptr;
+        GfxDeviceGlobal::texture2d1 = nullptr;
+        GfxDeviceGlobal::renderTexture1 = texture;
+    }
 
     SetInt( name, textureUnit );
 
