@@ -2,6 +2,7 @@
 #include <vector>
 #include "stb_image.c"
 #include "TextureCube.hpp"
+#include "DDSLoader.hpp"
 #include "GfxDevice.hpp"
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
@@ -131,7 +132,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
         else if (isDDS)
         {
-            //LoadDDS( fileContents.path.c_str() );
+            const DDSLoader::LoadResult result = DDSLoader::Load( paths[ face ].c_str(), face + 1, width, height, opaque );
+            
+            if (result != DDSLoader::LoadResult::Success)
+            {
+                System::Print( "Could not load cube map face %d: %s\n", face + 1, paths[ face ].c_str() );
+            }
         }
     }
 
