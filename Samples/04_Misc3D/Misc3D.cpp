@@ -223,6 +223,23 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
+
+    Texture2D transTex;
+    transTex.Load( FileSystem::FileContents( "trans50.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, 1 );
+
+    Material transMaterial;
+    transMaterial.SetShader( &shader );
+    transMaterial.SetTexture( "textureMap", &transTex );
+    transMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
+    transMaterial.SetBackFaceCulling( true );
+    transMaterial.SetBlendingMode( Material::BlendingMode::Alpha );
+    
+    GameObject transCube1;
+    transCube1.AddComponent< MeshRendererComponent >();
+    transCube1.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    transCube1.GetComponent< MeshRendererComponent >()->SetMaterial( &transMaterial, 0 );
+    transCube1.AddComponent< TransformComponent >();
+    transCube1.GetComponent< TransformComponent >()->SetLocalPosition( { 2, 0, -70 } );
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
@@ -237,7 +254,8 @@ int main()
     //scene.Add( &pointLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
-
+    scene.Add( &transCube1 );
+    
     const int cubeCount = 10;
     GameObject cubes[ cubeCount ];
 

@@ -30,10 +30,66 @@ using namespace ae3d;
 extern ae3d::Renderer renderer;
 float GetVRFov();
 
+// TODO: Move into own file
 namespace MathUtil
 {
-    void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax );
-    
+    void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax )
+    {
+        if (!aPoints.empty())
+        {
+            outMin = aPoints[ 0 ];
+            outMax = aPoints[ 0 ];
+        }
+        
+        for (std::size_t i = 1; i < aPoints.size(); ++i)
+        {
+            if (aPoints[ i ].x < outMin.x)
+            {
+                outMin.x = aPoints[ i ].x;
+            }
+            
+            if (aPoints[ i ].y < outMin.y)
+            {
+                outMin.y = aPoints[ i ].y;
+            }
+            
+            if (aPoints[ i ].z < outMin.z)
+            {
+                outMin.z = aPoints[ i ].z;
+            }
+            
+            if (aPoints[ i ].x > outMax.x)
+            {
+                outMax.x = aPoints[ i ].x;
+            }
+            
+            if (aPoints[ i ].y > outMax.y)
+            {
+                outMax.y = aPoints[ i ].y;
+            }
+            
+            if (aPoints[ i ].z > outMax.z)
+            {
+                outMax.z = aPoints[ i ].z;
+            }
+        }
+    }
+
+    void GetCorners( const Vec3& min, const Vec3& max, std::vector< Vec3 >& outCorners )
+    {
+        outCorners =
+        {
+            Vec3( min.x, min.y, min.z ),
+            Vec3( max.x, min.y, min.z ),
+            Vec3( min.x, max.y, min.z ),
+            Vec3( min.x, min.y, max.z ),
+            Vec3( max.x, max.y, min.z ),
+            Vec3( min.x, max.y, max.z ),
+            Vec3( max.x, max.y, max.z ),
+            Vec3( max.x, min.y, max.z )
+        };
+    }
+
     float Floor( float f )
     {
         return std::floor( f );
@@ -590,7 +646,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
         
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, nullptr );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, nullptr );
     }
 #if RENDERER_METAL
     GfxDevice::PresentDrawable();
@@ -627,7 +684,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
         
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader );
     }
 #if RENDERER_METAL
     GfxDevice::PresentDrawable();
@@ -717,7 +775,8 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
 
         //renderer.builtinShaders.momentsShader.Use();
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, frustum, meshLocalToWorld, &renderer.builtinShaders.momentsShader );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.momentsShader );
     }
     
 #if RENDERER_METAL

@@ -39,15 +39,20 @@ namespace ae3d
         /// \return Component at index or null if index is invalid.
         static MeshRendererComponent* Get( unsigned index );
         
+        /// \param cameraFrustum cameraFrustum
+        /// \param localToWorld Local-to-World matrix
+        void Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld );
+        
         /// \param modelView Model-view matrix.
         /// \param modelViewProjectionMatrix Model-view-projection matrix.
-        /// \param cameraFrustum Camera frustum.
         /// \param localToWorld Transforms mesh AABB from mesh-local space into world-space.
-        void Render( const struct Matrix44& modelView, const Matrix44& modelViewProjectionMatrix, const class Frustum& cameraFrustum, const Matrix44& localToWorld, class Shader* overrideShader );
+        void Render( const struct Matrix44& modelView, const Matrix44& modelViewProjectionMatrix, const Matrix44& localToWorld, class Shader* overrideShader );
 
         Mesh* mesh = nullptr;
         std::vector< Material* > materials;
+        std::vector< bool > isSubMeshCulled;
         GameObject* gameObject = nullptr;
+        bool isCulled = false;
     };
 }
 

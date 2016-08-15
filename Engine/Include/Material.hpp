@@ -14,6 +14,9 @@ namespace ae3d
     class Material
     {
   public:
+        /// Blending mode
+        enum BlendingMode { Alpha, Off };
+        
         /// Depth function used when rendering a mesh using material.
         enum DepthFunction { NoneWriteOff, LessOrEqualWriteOn };
 
@@ -46,6 +49,12 @@ namespace ae3d
         /// \param aOffset Depth offset
         /// \param aSlope Depth slope
         void SetDepthOffset( float aOffset, float aSlope ) { depthFactor = aOffset; depthUnits = aSlope; }
+        
+        /// \return blending mode.
+        BlendingMode GetBlendingMode() const { return blendingMode; }
+        
+        /// \param blending Blending mode. Defaults to off.
+        void SetBlendingMode( BlendingMode blending ) { blendingMode = blending; }
         
         /// \param name Name. This is a uniform in the shader.
         /// \param matrix 4x4 matrix.
@@ -96,9 +105,10 @@ namespace ae3d
         std::unordered_map< std::string, Matrix44 > mat4s;
         Shader* shader = nullptr;
         DepthFunction depthFunction = DepthFunction::LessOrEqualWriteOn;
-        bool cullBackFaces = true;
+        BlendingMode blendingMode = BlendingMode::Off;
         float depthFactor = 0;
         float depthUnits = 0;
+        bool cullBackFaces = true;
     };
 }
 

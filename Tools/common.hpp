@@ -76,6 +76,22 @@ struct VertexPTN
     ae3d::Vec3 normal;
 };
 
+struct VertexData
+{
+    int cacheTag = 0;
+    int numActiveTris = 0;
+};
+
+struct VertexPTNTCWithData
+{
+    ae3d::Vec3 position;
+    TexCoord texCoord;
+    ae3d::Vec3 normal;
+    ae3d::Vec4 tangent;
+    ae3d::Vec4 color;
+    VertexData data;
+};
+
 struct Mesh
 {
     void BuildVertexInfluences();
@@ -102,7 +118,8 @@ struct Mesh
     std::vector< ae3d::Vec3 > fnormal;
     std::vector< TexCoord > tcoord;
     std::vector< Face >     face;
-
+    std::vector< VertexPTNTCWithData > verticesWithCachedata;
+    
     // Separate element arrays combined to one.
     // These are written to the .ae3d file.
     std::vector< VertexPTNTC > interleavedVertices;
@@ -130,22 +147,6 @@ void Mesh::CopyInterleavedVerticesToPTN()
         interleavedVerticesPTN[ i ].normal = interleavedVertices[ i ].normal;
     }
 }
-
-struct VertexData
-{
-    int cacheTag = 0;
-    int numActiveTris = 0;
-};
-
-struct VertexPTNTCWithData
-{
-    ae3d::Vec3 position;
-    TexCoord texCoord;
-    ae3d::Vec3 normal;
-    ae3d::Vec4 tangent;
-    ae3d::Vec4 color;
-    VertexData data;
-};
 
 float FindVertexScore( VertexData& vertexData )
 {
@@ -208,7 +209,7 @@ void Mesh::ComputeVertexCacheScores()
 
 void Mesh::OptimizeForCache()
 {
-    std::vector< VertexPTNTCWithData > verticesWithCachedata( interleavedVertices.size() );
+    verticesWithCachedata.resize( interleavedVertices.size() );
 
     for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
     {
@@ -219,7 +220,7 @@ void Mesh::OptimizeForCache()
         verticesWithCachedata[ i ].normal = interleavedVertices[ i ].normal;
     }
 
-    ComputeVertexCacheScores( verticesWithCachedata );
+    ComputeVertexCacheScores();
 
     for (std::size_t i = 0; i < verticesWithCachedata.size(); ++i)
     {
