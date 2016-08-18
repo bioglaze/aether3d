@@ -118,6 +118,31 @@ MainWindow::MainWindow()
 #endif
 }
 
+void MainWindow::closeEvent( QCloseEvent *event )
+{
+    if (commandManager.HasUnsavedChanges())
+    {
+        switch( QMessageBox::information( this, "Qt Application Example",
+                                              "The document has been changed since "
+                                              "the last save.",
+                                              "Save Now", "Cancel", "Leave Anyway",
+                                              0, 1 ) )
+        {
+            case 0:
+                SaveScene();
+                event->accept();
+                break;
+            case 1:
+            default: // just for sanity
+                event->ignore();
+                break;
+            case 2:
+                event->accept();
+                break;
+        }
+    }
+}
+
 void MainWindow::ShowContextMenu( const QPoint& pos )
 {
     if (sceneTree->selectedItems().empty())
@@ -576,6 +601,10 @@ void MainWindow::SaveScene()
     if (!saveSuccess && !fileName.isEmpty())
     {
         QMessageBox::critical( this, "Unable to Save!", "Scene could not be saved." );
+    }
+    else
+    {
+        commandManager.SceneSaved();
     }
 }
 

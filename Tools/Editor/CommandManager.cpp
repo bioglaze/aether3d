@@ -5,6 +5,7 @@ void CommandManager::Execute( std::shared_ptr< CommandBase > command )
 {
     command->Execute();
     undoStack.push( command );
+    hasUnsavedChanges = true;
 }
 
 void CommandManager::Undo()

@@ -82,6 +82,7 @@ private:
     void HierarchySelectionChanged();
     void HierarchyItemRenamed( QTreeWidgetItem* item );
     void UpdateInspector();
+    void closeEvent(QCloseEvent *event);
 
     QWidget* inspectorContainer = nullptr;
     QTreeWidget* sceneTree = nullptr;
