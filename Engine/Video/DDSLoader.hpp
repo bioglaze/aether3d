@@ -1,6 +1,8 @@
 #ifndef DDSLOADER_H
 #define DDSLOADER_H
 #include <stdint.h>
+#include <vector>
+#include "FileSystem.hpp"
 
 #define DDS_MAGIC 0x20534444 ///<  little-endian
 
@@ -91,23 +93,59 @@
   ((pf.dwFlags & DDPF_INDEXED) && \
    (pf.dwRGBBitCount == 8))
 
+struct DDSInfo
+{
+    DDSInfo( bool aIsCompressed, bool aSwap, bool aHasPalette, int aDivSize, int aBlockBytes
+#if RENDERER_OPENGL
+        , int aInternalFormat, int aExternalFormat, int aType
+#endif
+    )
+        : isCompressed( aIsCompressed )
+        , swap( aSwap )
+        , hasPalette( aHasPalette )
+        , divSize( aDivSize )
+        , blockBytes( aBlockBytes )
+#if RENDERER_OPENGL
+        , internalFormat( aInternalFormat )
+        , externalFormat( aExternalFormat )
+        , type( aType )
+#endif
+    {}
+
+    bool isCompressed; ///< Is the file compressed.
+    bool swap;
+    bool hasPalette; ///< Does the file contain a palette.
+    unsigned divSize;
+    unsigned blockBytes;
+    std::vector< unsigned char > imageData;
+    int mipMapCount = 0;
+#if RENDERER_OPENGL
+    int internalFormat;
+    int externalFormat;
+    int type;
+#endif
+};
+
 /// Loads a .dds (DirectDraw Surface)
 namespace DDSLoader
 {
     enum class LoadResult { Success, UnknownPixelFormat, FileNotFound };
-    
+ 
     /**
-     Loads a .dds file and stores it to currently bound texture.
+     Loads a .dds file.
+     
+     OpenGL renderer:
+     Stores the image data into the currently bound texture.
      Texture must be bound before calling this method.
 
-     \param path Path of .dds file.
+     \param fileContents Contents of .dds file.
      \param cubeMapFace Cube map face index 1-6. For 2D textures use 0.
      \param outWidth Stores the width of the texture in pixels.
      \param outHeight Stores the height of the texture in pixels.
      \param outOpaque Stores info about alpha channel.
      \return Load result.
      */
-    LoadResult Load( const char* path, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque );
+    LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque );
 
     namespace
     {

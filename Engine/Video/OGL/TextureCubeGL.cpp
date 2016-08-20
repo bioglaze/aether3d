@@ -132,7 +132,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
         else if (isDDS)
         {
-            const DDSLoader::LoadResult result = DDSLoader::Load( paths[ face ].c_str(), face + 1, width, height, opaque );
+            const DDSLoader::LoadResult result = DDSLoader::Load( FileSystem::FileContents( paths[ face ].c_str() ), face + 1, width, height, opaque );
             
             if (result != DDSLoader::LoadResult::Success)
             {

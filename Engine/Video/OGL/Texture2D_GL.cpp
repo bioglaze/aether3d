@@ -166,7 +166,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-    const DDSLoader::LoadResult loadResult = DDSLoader::Load( path, 0, width, height, opaque );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( FileSystem::FileContents( path ), 0, width, height, opaque );
 
     if (loadResult != DDSLoader::LoadResult::Success)
     {

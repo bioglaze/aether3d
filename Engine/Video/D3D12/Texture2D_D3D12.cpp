@@ -116,9 +116,66 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (Texture2DGlobal::defaultTexture.GetWidth() == 0)
     {
-        Texture2DGlobal::defaultTexture.width = 32;
-        Texture2DGlobal::defaultTexture.height = 32;
-// TODO: Init default texture.
+        Texture2DGlobal::defaultTexture.width = 128;
+        Texture2DGlobal::defaultTexture.height = 128;
+
+        D3D12_RESOURCE_DESC descTex = {};
+        descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        descTex.Width = Texture2DGlobal::defaultTexture.width;
+        descTex.Height = static_cast< UINT >(Texture2DGlobal::defaultTexture.height);
+        descTex.DepthOrArraySize = 1;
+        descTex.MipLevels = 1;
+        descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        descTex.SampleDesc.Count = 1;
+        descTex.SampleDesc.Quality = 0;
+        descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+        D3D12_HEAP_PROPERTIES heapProps = {};
+        heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+        heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        heapProps.CreationNodeMask = 1;
+        heapProps.VisibleNodeMask = 1;
+
+        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
+            D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &Texture2DGlobal::defaultTexture.gpuResource.resource ) );
+        AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+
+        Texture2DGlobal::defaultTexture.gpuResource.resource->SetName( L"default texture 2D" );
+        Texture2DGlobal::defaultTexture.gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
+        Texture2DGlobal::textures.push_back( Texture2DGlobal::defaultTexture.gpuResource.resource );
+
+        const int bytesPerPixel = 4;
+        std::vector< std::uint8_t > data( Texture2DGlobal::defaultTexture.width * Texture2DGlobal::defaultTexture.height * bytesPerPixel );
+        for (std::size_t i = 0; i < data.size() / 4; ++i)
+        {
+            data[ i * 4 + 0 ] = 255;
+            data[ i * 4 + 1 ] = 0;
+            data[ i * 4 + 2 ] = 255;
+            data[ i * 4 + 3 ] = 255;
+        }
+
+        D3D12_SUBRESOURCE_DATA texResource = {};
+        texResource.pData = data.data();
+        texResource.RowPitch = Texture2DGlobal::defaultTexture.width * bytesPerPixel;
+        texResource.SlicePitch = texResource.RowPitch * Texture2DGlobal::defaultTexture.height;
+        InitializeTexture( Texture2DGlobal::defaultTexture.gpuResource, &texResource, 1 );
+
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.PlaneSlice = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+        Texture2DGlobal::defaultTexture.srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        Texture2DGlobal::defaultTexture.handle = static_cast< unsigned >(Texture2DGlobal::defaultTexture.srv.ptr);
+
+        GfxDeviceGlobal::device->CreateShaderResourceView( Texture2DGlobal::defaultTexture.gpuResource.resource, &srvDesc, Texture2DGlobal::defaultTexture.srv );
+        ae3d::System::Print( "created default texture\n" );
     }
     
     return &Texture2DGlobal::defaultTexture;
@@ -134,7 +191,9 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (!fileContents.isLoaded)
     {
-        *this = Texture2DGlobal::defaultTexture;
+        ae3d::System::Print( "loading default texture\n" );
+
+        *this = *Texture2D::GetDefaultTexture();
         return;
     }
     
@@ -157,7 +216,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
     else if (isDDS)
     {
-        *this = Texture2DGlobal::defaultTexture;
         LoadDDS( fileContents.path.c_str() );
     }
     else
@@ -190,7 +248,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-    const DDSLoader::LoadResult loadResult = DDSLoader::Load( path, 0, width, height, opaque );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( FileSystem::FileContents( path ), 0, width, height, opaque );
 
     if (loadResult != DDSLoader::LoadResult::Success)
     {

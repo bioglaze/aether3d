@@ -1,9 +1,9 @@
 #include "DDSLoader.hpp"
 #include <GL/glxw.h>
 #include <cassert>
+#include <memory>
 #include <cstdio>
 #include <cstdlib>
-#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -43,24 +43,6 @@
 #define COMPRESSED_SRGB_EXT 0x8C48
 #endif
 
-namespace
-{
-    /**
-    Information block.
-    */
-    struct DDSInfo
-    {
-        bool isCompressed; ///< Is the file compressed.
-        bool swap;
-        bool hasPalette; ///< Does the file contain a palette.
-        unsigned divSize;
-        unsigned blockBytes;
-        GLenum internalFormat;
-        GLenum externalFormat;
-        GLenum type;
-    };
-}
-
 DDSInfo loadInfoDXT1 = { true, false, false, 4, 8, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_RGBA, GL_UNSIGNED_BYTE };
 
 DDSInfo loadInfoDXT3 = { true, false, false, 4, 16, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, GL_RGBA, GL_UNSIGNED_BYTE };
@@ -77,37 +59,37 @@ DDSInfo loadInfoBGR565 = { false, true, false, 1, 2, GL_RGB5, GL_RGB, GL_UNSIGNE
 
 DDSInfo loadInfoIndex8 = { false, false, true, 1, 1, GL_RGB8, GL_BGRA, GL_UNSIGNED_BYTE };
 
-DDSLoader::LoadResult DDSLoader::Load( const char* path, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque )
+DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque )
 {
     assert( cubeMapFace >= 0 && cubeMapFace < 7 );
 
-    DDSHeader hdr;
+    DDSHeader header;
     int mipMapCount = 0;
-    std::ifstream ifs( path, std::ios::binary );
 
-    if (!ifs)
+    if (!fileContents.isLoaded)
     {
         outWidth = 512;
         outHeight = 512;
         return LoadResult::FileNotFound;
     }
 
-    ifs.read((char*) &hdr, sizeof( hdr ) );
-    assert( hdr.sHeader.dwMagic == DDS_MAGIC );
-    assert( hdr.sHeader.dwSize == 124 );
+    std::memcpy( &header, fileContents.data.data(), sizeof( header ) );
+
+    assert( header.sHeader.dwMagic == DDS_MAGIC );
+    assert( header.sHeader.dwSize == 124 );
   
-    if (!(hdr.sHeader.dwFlags & DDSD_PIXELFORMAT) ||
-        !(hdr.sHeader.dwFlags & DDSD_CAPS) )
+    if (!(header.sHeader.dwFlags & DDSD_PIXELFORMAT) ||
+        !(header.sHeader.dwFlags & DDSD_CAPS) )
     {
-        std::cerr << "Error! Texture " << path << " doesn't have pixelformat or caps." << std::endl;
+        std::cerr << "Error! Texture " << fileContents.path << " doesn't have pixelformat or caps." << std::endl;
         outWidth    = 32;
         outHeight   = 32;
         outOpaque = true;
         return LoadResult::UnknownPixelFormat;
     }
 
-    const uint32_t xSize = hdr.sHeader.dwWidth;
-    const uint32_t ySize = hdr.sHeader.dwHeight;
+    const uint32_t xSize = header.sHeader.dwWidth;
+    const uint32_t ySize = header.sHeader.dwHeight;
     assert( !( xSize & (xSize - 1) ) );
     assert( !( ySize & (ySize - 1) ) );
 
@@ -115,49 +97,49 @@ DDSLoader::LoadResult DDSLoader::Load( const char* path, int cubeMapFace, int& o
     outHeight = ySize;
     DDSInfo* li = nullptr;
 
-    if (PF_IS_DXT1( hdr.sHeader.sPixelFormat ))
+    if (PF_IS_DXT1( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoDXT1;
         outOpaque = true;
     }
-    else if (PF_IS_DXT3( hdr.sHeader.sPixelFormat ))
+    else if (PF_IS_DXT3( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoDXT3;
         outOpaque = false;
     }
-    else if (PF_IS_DXT5( hdr.sHeader.sPixelFormat ))
+    else if (PF_IS_DXT5( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoDXT5;
         outOpaque = false;
     }
-    else if (PF_IS_BGRA8( hdr.sHeader.sPixelFormat ))
+    else if (PF_IS_BGRA8( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGRA8;
         outOpaque = false;
     }
-    else if (PF_IS_BGR8( hdr.sHeader.sPixelFormat ))
+    else if (PF_IS_BGR8( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGR8;
         outOpaque = true;
     }
-    else if (PF_IS_BGR5A1( hdr.sHeader.sPixelFormat ))
+    else if (PF_IS_BGR5A1( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGR5A1;
         outOpaque = false;
     }
-    else if (PF_IS_BGR565( hdr.sHeader.sPixelFormat ))
+    else if (PF_IS_BGR565( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGR565;
         outOpaque = true;
     }
-    else if (PF_IS_INDEX8( hdr.sHeader.sPixelFormat ))
+    else if (PF_IS_INDEX8( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoIndex8;
         outOpaque = true;
     }
     else
     {
-        std::cerr << "Error! Texture " << path << " has unknown pixel format." << std::endl;
+        std::cerr << "Error! Texture " << fileContents.path << " has unknown pixel format." << std::endl;
         outWidth    = 32;
         outHeight   = 32;
         outOpaque = true;
@@ -167,24 +149,26 @@ DDSLoader::LoadResult DDSLoader::Load( const char* path, int cubeMapFace, int& o
     unsigned x = xSize;
     unsigned y = ySize;
     std::size_t size;
-    mipMapCount = (hdr.sHeader.dwFlags & DDSD_MIPMAPCOUNT) ? hdr.sHeader.dwMipMapCount : 1;
+    mipMapCount = (header.sHeader.dwFlags & DDSD_MIPMAPCOUNT) ? header.sHeader.dwMipMapCount : 1;
 
     if (mipMapCount == 0)
     {
         glTexParameteri( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     }
     
+    std::size_t fileOffset = sizeof( header );
+
     if (li->isCompressed)
     {
         size = max( li->divSize, x ) / li->divSize * max( li->divSize, y ) / li->divSize * li->blockBytes;
-        assert( size == hdr.sHeader.dwPitchOrLinearSize );
-        assert( hdr.sHeader.dwFlags & DDSD_LINEARSIZE );
+        assert( size == header.sHeader.dwPitchOrLinearSize );
+        assert( header.sHeader.dwFlags & DDSD_LINEARSIZE );
 
         std::vector< unsigned char > data( size );
 
         if (data.empty())
         {
-            std::cerr << "Error loading texture " << path << std::endl;
+            std::cerr << "Error loading texture " << fileContents.path << std::endl;
             outWidth    = 32;
             outHeight   = 32;
             outOpaque = true;
@@ -193,7 +177,10 @@ DDSLoader::LoadResult DDSLoader::Load( const char* path, int cubeMapFace, int& o
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            ifs.read( (char*) &data[0], size );
+            //ifs.read( (char*) &data[0], size );
+            std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
+            fileOffset += size;
+
             glCompressedTexImage2D( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace - 1 : GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, (GLsizei)size, &data[0] );
             x = (x + 1) >> 1;
             y = (y + 1) >> 1;
@@ -202,19 +189,23 @@ DDSLoader::LoadResult DDSLoader::Load( const char* path, int cubeMapFace, int& o
     }
     else if (li->hasPalette)
     {
-        assert( hdr.sHeader.dwFlags & DDSD_PITCH );
-        assert( hdr.sHeader.sPixelFormat.dwRGBBitCount == 8 );
-        size = hdr.sHeader.dwPitchOrLinearSize * ySize;
+        assert( header.sHeader.dwFlags & DDSD_PITCH );
+        assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8 );
+        size = header.sHeader.dwPitchOrLinearSize * ySize;
         assert( size == x * y * li->blockBytes );
         std::vector< unsigned char > data( size );
         unsigned palette[ 256 ];
         std::vector< unsigned > unpacked( size * 4 );
 
-        ifs.read( (char *) palette, 4 * 256 );
+        //ifs.read( (char *) palette, 4 * 256 );
+        std::memcpy( &palette[ 0 ], fileContents.data.data() + fileOffset, 4 * 256 );
+        fileOffset += 4 * 256;
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            ifs.read( (char *) &data[ 0 ], size );
+            //ifs.read( (char *) &data[ 0 ], size );
+            std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
+            fileOffset += size;
 
             for (unsigned zz = 0; zz < size; ++zz)
             {
@@ -240,7 +231,10 @@ DDSLoader::LoadResult DDSLoader::Load( const char* path, int cubeMapFace, int& o
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            ifs.read( (char*) &data[ 0 ], size );            
+            //ifs.read( (char*) &data[ 0 ], size );    
+            std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
+            fileOffset += size;
+
             glPixelStorei( GL_UNPACK_ROW_LENGTH, y );
             glTexImage2D( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace - 1 : GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, li->externalFormat, li->type, &data[ 0 ] );
             x = (x + 1)>>1;
