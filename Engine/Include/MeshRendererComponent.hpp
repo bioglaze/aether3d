@@ -30,6 +30,8 @@ namespace ae3d
         friend class GameObject;
         friend class Scene;
         
+        enum class RenderType { Opaque, Transparent };
+        
         /// \return Component's type code. Must be unique for each component type.
         static int Type() { return 5; }
         
@@ -46,7 +48,8 @@ namespace ae3d
         /// \param modelView Model-view matrix.
         /// \param modelViewProjectionMatrix Model-view-projection matrix.
         /// \param localToWorld Transforms mesh AABB from mesh-local space into world-space.
-        void Render( const struct Matrix44& modelView, const Matrix44& modelViewProjectionMatrix, const Matrix44& localToWorld, class Shader* overrideShader );
+        void Render( const struct Matrix44& modelView, const Matrix44& modelViewProjectionMatrix, const Matrix44& localToWorld,
+                     class Shader* overrideShader, RenderType renderType );
 
         Mesh* mesh = nullptr;
         std::vector< Material* > materials;

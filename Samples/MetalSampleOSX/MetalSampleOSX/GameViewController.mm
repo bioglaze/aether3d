@@ -29,7 +29,7 @@
 
     ae3d::GameObject camera2d;
     ae3d::GameObject camera3d;
-    ae3d::GameObject cube;
+    ae3d::GameObject rotatingCube;
     ae3d::GameObject bigCube;
     ae3d::GameObject bigCube2;
     ae3d::GameObject text;
@@ -43,9 +43,11 @@
     ae3d::Mesh cubeMesh;
     ae3d::Mesh cubeMeshPTN;
     ae3d::Material cubeMaterial;
+    ae3d::Material transMaterial;
     ae3d::Shader shader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
+    ae3d::Texture2D transTex;
     ae3d::TextureCube skyTex;
     ae3d::RenderTexture rtTex;
 }
@@ -117,12 +119,12 @@
     cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
     
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );
-    cube.AddComponent<ae3d::MeshRendererComponent>();
-    cube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    cube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
-    cube.AddComponent<ae3d::TransformComponent>();
-    cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
-    scene.Add( &cube );
+    rotatingCube.AddComponent<ae3d::MeshRendererComponent>();
+    rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    rotatingCube.AddComponent<ae3d::TransformComponent>();
+    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
+    scene.Add( &rotatingCube );
 
     cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "/textured_cube_ptn.ae3d" ) );
     cubePTN.AddComponent<ae3d::MeshRendererComponent>();
@@ -155,7 +157,6 @@
     bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
     scene.Add( &bigCube2 );
 
-    
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
@@ -180,6 +181,16 @@
     rtCamera.AddComponent<ae3d::TransformComponent>();
     rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 20 ) );
     //scene.Add( &rtCamera );
+    
+    transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, 1 );
+    
+    transMaterial.SetShader( &shader );
+    transMaterial.SetTexture( "textureMap", &transTex );
+    transMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
+
+    transMaterial.SetBackFaceCulling( true );
+    transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );
+    rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &transMaterial, 0 );
 }
 
 - (void)_setupView
@@ -219,7 +230,7 @@
     
     ae3d::Quaternion rotation;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
-    cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
+    rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
     std::string stats = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );

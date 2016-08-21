@@ -102,7 +102,8 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
     }
 }
 
-void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matrix44& modelViewProjection, const Matrix44& localToWorld, Shader* overrideShader )
+void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matrix44& modelViewProjection, const Matrix44& localToWorld,
+                                          Shader* overrideShader, RenderType renderType )
 {
     if (isCulled || !mesh)
     {
@@ -130,6 +131,11 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         }
         else
         {
+            if (materials[ subMeshIndex ]->GetBlendingMode() != Material::BlendingMode::Off && renderType == RenderType::Opaque)
+            {
+                continue;
+            }
+
             Matrix44 shadowTexProjMatrix = localToWorld;
             
             Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraViewMatrix, shadowTexProjMatrix );
