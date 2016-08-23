@@ -90,11 +90,12 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         return;
     }
     
-    const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
+    const std::string cacheHash = GetCacheHash( fileContents.path, aWrap, aFilter, aMipmaps, aColorSpace, aAnisotropy );
+    const bool isCached = Texture2DGlobal::pathToCachedTexture.find( cacheHash ) != Texture2DGlobal::pathToCachedTexture.end();
 
     if (isCached && handle == 0)
     {
-        *this = Texture2DGlobal::pathToCachedTexture[ fileContents.path ];
+        *this = Texture2DGlobal::pathToCachedTexture[ cacheHash ];
         return;
     }
     
@@ -123,8 +124,10 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     glBindTexture( GL_TEXTURE_2D, handle );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (wrap == TextureWrap::Repeat) ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (wrap == TextureWrap::Repeat) ? GL_REPEAT : GL_CLAMP_TO_EDGE );
 
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
@@ -156,7 +159,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         glGenerateMipmap( GL_TEXTURE_2D );
     }
 
-    Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
+    Texture2DGlobal::pathToCachedTexture[ cacheHash ] = *this;
 #if DEBUG
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
     //Texture2DGlobal::PrintMemoryUsage();

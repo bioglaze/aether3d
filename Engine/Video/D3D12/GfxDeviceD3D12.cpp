@@ -93,7 +93,6 @@ namespace GfxDeviceGlobal
     ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
-    ID3D12RootSignature* genMipsRootSignature = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
@@ -312,7 +311,7 @@ void CreateRootSignature()
     {
         CD3DX12_DESCRIPTOR_RANGE descRange1[ 2 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0 );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
         descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0 );
@@ -336,41 +335,6 @@ void CreateRootSignature()
         hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
         AE3D_CHECK_D3D( hr, "Failed to create root signature" );
         GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
-    }
-
-    // GenerateMips
-    {
-        CD3DX12_ROOT_PARAMETER rootParams[ 3 ] = {};
-        rootParams[ 0 ].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-        rootParams[ 0 ].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-        rootParams[ 0 ].Constants.Num32BitValues = 4;
-        rootParams[ 0 ].Constants.ShaderRegister = 0;
-        rootParams[ 0 ].Constants.RegisterSpace = 0;
-
-        CD3DX12_DESCRIPTOR_RANGE descRange1;
-        descRange1.Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
-
-        CD3DX12_DESCRIPTOR_RANGE descRange2;
-        descRange2.Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0 );
-
-        rootParams[ 1 ].InitAsDescriptorTable( 1, &descRange1 );
-        rootParams[ 2 ].InitAsDescriptorTable( 1, &descRange2 );
-
-        ID3DBlob* pOutBlob = nullptr;
-        ID3DBlob* pErrorBlob = nullptr;
-        D3D12_ROOT_SIGNATURE_DESC descRootSignature;
-        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-        descRootSignature.NumParameters = 2;
-        descRootSignature.NumStaticSamplers = 0;
-        descRootSignature.pParameters = &rootParams[ 0 ];
-        descRootSignature.pStaticSamplers = nullptr;
-
-        HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
-        AE3D_CHECK_D3D( hr, "Failed to serialize generatemips root signature" );
-
-        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::genMipsRootSignature ) );
-        AE3D_CHECK_D3D( hr, "Failed to create generatemips root signature" );
-        GfxDeviceGlobal::genMipsRootSignature->SetName( L"GenerateMips Root Signature" );
     }
 }
 
@@ -771,6 +735,7 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV ) * GfxDeviceGlobal::frameConstantBuffers.size();
 
     GfxDeviceGlobal::frameConstantBuffers.push_back( constantBuffer );
+    ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::frameConstantBuffers.size(), "There are more constant buffers than descriptors" );
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();
@@ -824,7 +789,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = 100;
+    desc.NumDescriptors = DescriptorHeapManager::numDescriptors;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     desc.NodeMask = 1;
 
@@ -847,52 +812,100 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     
-	const bool is2D = (GfxDeviceGlobal::texture2d0 != nullptr) || (GfxDeviceGlobal::renderTexture0 != nullptr && !GfxDeviceGlobal::renderTexture0->IsCube());
+	const bool is2D0 = (GfxDeviceGlobal::texture2d0 != nullptr) || (GfxDeviceGlobal::renderTexture0 != nullptr && !GfxDeviceGlobal::renderTexture0->IsCube());
 
     // TODO: Get from texture object
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srvDesc.ViewDimension = is2D ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
+    srvDesc0.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc0.ViewDimension = is2D0 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
+    srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-    if (srvDesc.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
+    if (srvDesc0.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
     {
-        srvDesc.Texture2D.MipLevels = 1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.PlaneSlice = 0;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        srvDesc0.Texture2D.MipLevels = 1;
+        srvDesc0.Texture2D.MostDetailedMip = 0;
+        srvDesc0.Texture2D.PlaneSlice = 0;
+        srvDesc0.Texture2D.ResourceMinLODClamp = 0.0f;
     }
-    else if (srvDesc.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
+    else if (srvDesc0.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
     {
-        srvDesc.TextureCube.MipLevels = 1;
-        srvDesc.TextureCube.MostDetailedMip = 0;
-        srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
+        srvDesc0.TextureCube.MipLevels = 1;
+        srvDesc0.TextureCube.MostDetailedMip = 0;
+        srvDesc0.TextureCube.ResourceMinLODClamp = 0.0f;
     }
     else
     {
         System::Assert( false, "unhandled texture dimension" );
     }
 
-    ID3D12Resource* texResource = nullptr;
+    const bool is2D1 = (GfxDeviceGlobal::texture2d1 != nullptr) || (GfxDeviceGlobal::renderTexture1 != nullptr && !GfxDeviceGlobal::renderTexture1->IsCube());
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
+    srvDesc1.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc1.ViewDimension = is2D1 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
+    srvDesc1.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+    if (srvDesc1.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
+    {
+        srvDesc1.Texture2D.MipLevels = 1;
+        srvDesc1.Texture2D.MostDetailedMip = 0;
+        srvDesc1.Texture2D.PlaneSlice = 0;
+        srvDesc1.Texture2D.ResourceMinLODClamp = 0.0f;
+    }
+    else if (srvDesc1.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
+    {
+        srvDesc1.TextureCube.MipLevels = 1;
+        srvDesc1.TextureCube.MostDetailedMip = 0;
+        srvDesc1.TextureCube.ResourceMinLODClamp = 0.0f;
+    }
+    else
+    {
+        //System::Assert( false, "unhandled texture dimension" );
+    }
+
+    ID3D12Resource* texResource0 = nullptr;
 
     if (GfxDeviceGlobal::texture2d0 != nullptr)
     {
-        texResource = GfxDeviceGlobal::texture2d0->GetGpuResource()->resource;
+        texResource0 = GfxDeviceGlobal::texture2d0->GetGpuResource()->resource;
     }
 	else if (GfxDeviceGlobal::renderTexture0 != nullptr)
 	{
-		texResource = GfxDeviceGlobal::renderTexture0->GetGpuResource()->resource;
+        texResource0 = GfxDeviceGlobal::renderTexture0->GetGpuResource()->resource;
 	}
 	else if (GfxDeviceGlobal::textureCube0 != nullptr)
     {
-        texResource = GfxDeviceGlobal::textureCube0->GetGpuResource()->resource;
+        texResource0 = GfxDeviceGlobal::textureCube0->GetGpuResource()->resource;
     }
     else if (!GfxDeviceGlobal::texture2d0)
     {
-        texResource = const_cast< Texture2D*>(Texture2D::GetDefaultTexture())->GetGpuResource()->resource;
+        texResource0 = const_cast< Texture2D*>(Texture2D::GetDefaultTexture())->GetGpuResource()->resource;
     }
 
-    GfxDeviceGlobal::device->CreateShaderResourceView( texResource, &srvDesc, handle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( texResource0, &srvDesc0, handle );
+
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+    ID3D12Resource* texResource1 = nullptr;
+
+    if (GfxDeviceGlobal::texture2d1 != nullptr)
+    {
+        texResource1 = GfxDeviceGlobal::texture2d1->GetGpuResource()->resource;
+    }
+    else if (GfxDeviceGlobal::renderTexture1 != nullptr)
+    {
+        texResource1 = GfxDeviceGlobal::renderTexture1->GetGpuResource()->resource;
+    }
+    else if (GfxDeviceGlobal::textureCube1 != nullptr)
+    {
+        texResource1 = GfxDeviceGlobal::textureCube1->GetGpuResource()->resource;
+    }
+    else if (!GfxDeviceGlobal::texture2d1)
+    {
+        texResource1 = const_cast< Texture2D*>(Texture2D::GetDefaultTexture())->GetGpuResource()->resource;
+    }
+
+    GfxDeviceGlobal::device->CreateShaderResourceView( texResource1, &srvDesc1, handle );
 
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
@@ -1043,7 +1056,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     GfxDeviceGlobal::swapChain->SetFullscreenState( FALSE, nullptr );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::genMipsRootSignature );
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );

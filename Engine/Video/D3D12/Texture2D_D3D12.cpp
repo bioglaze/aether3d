@@ -175,7 +175,6 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         Texture2DGlobal::defaultTexture.handle = static_cast< unsigned >(Texture2DGlobal::defaultTexture.srv.ptr);
 
         GfxDeviceGlobal::device->CreateShaderResourceView( Texture2DGlobal::defaultTexture.gpuResource.resource, &srvDesc, Texture2DGlobal::defaultTexture.srv );
-        ae3d::System::Print( "created default texture\n" );
     }
     
     return &Texture2DGlobal::defaultTexture;
@@ -191,17 +190,16 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (!fileContents.isLoaded)
     {
-        ae3d::System::Print( "loading default texture\n" );
-
         *this = *Texture2D::GetDefaultTexture();
         return;
     }
     
-    const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
+    const std::string cacheHash = GetCacheHash( fileContents.path, aWrap, aFilter, aMipmaps, aColorSpace, aAnisotropy );
+    const bool isCached = Texture2DGlobal::pathToCachedTexture.find( cacheHash ) != Texture2DGlobal::pathToCachedTexture.end();
 
     if (isCached && handle == 0)
     {
-        *this = Texture2DGlobal::pathToCachedTexture[ fileContents.path ];
+        *this = Texture2DGlobal::pathToCachedTexture[ cacheHash ];
         return;
     }
     
@@ -239,7 +237,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 
-    Texture2DGlobal::pathToCachedTexture[ fileContents.path ] = *this;
+    Texture2DGlobal::pathToCachedTexture[ cacheHash ] = *this;
 #if DEBUG
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
     //Texture2DGlobal::PrintMemoryUsage();

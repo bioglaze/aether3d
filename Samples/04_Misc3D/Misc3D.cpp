@@ -105,11 +105,20 @@ int main()
     Mesh cubeMesh;
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
+    Mesh cubeMeshScaledUV;
+    cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
+
     GameObject cube;
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+
+    GameObject cubeScaledUV;
+    cubeScaledUV.AddComponent< MeshRendererComponent >();
+    cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshScaledUV );
+    cubeScaledUV.AddComponent< TransformComponent >();
+    cubeScaledUV.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -84 } );
 
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
@@ -129,6 +138,15 @@ int main()
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, 1 );
 
+    Texture2D gliderClampTex;
+    gliderClampTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, 1 );
+
+    Material materialClamp;
+    materialClamp.SetShader( &shader );
+    materialClamp.SetTexture( "textureMap", &gliderClampTex );
+    materialClamp.SetVector( "tint", { 1, 0, 0, 1 } );
+    materialClamp.SetBackFaceCulling( true );
+
     Material material;
     material.SetShader( &shader );
     material.SetTexture( "textureMap", &gliderTex );
@@ -136,9 +154,11 @@ int main()
     material.SetBackFaceCulling( true );
     
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
 
     GameObject copiedCube = cube;
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
+    copiedCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
     Shader shaderCubeMap;
     shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ),
@@ -246,8 +266,8 @@ int main()
     scene.Add( &camera2d );
     scene.Add( &cameraCubeRT );
     scene.Add( &rtCube );
-    //scene.Add( &cube );
-    //scene.Add( &copiedCube );
+    scene.Add( &cubeScaledUV );
+    scene.Add( &copiedCube );
     scene.Add( &statsContainer );
     //scene.Add( &dirLight );
     scene.Add( &spotLight );

@@ -121,6 +121,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='D3D12 Release|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
     <TargetName>Misc3D_D3D12_r</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
@@ -191,6 +192,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_D3D12</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

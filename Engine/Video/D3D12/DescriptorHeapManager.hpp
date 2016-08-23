@@ -12,6 +12,7 @@ public:
     static ID3D12DescriptorHeap* GetDSVHeap() { return dsvHeap; }
     static D3D12_CPU_DESCRIPTOR_HANDLE AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE type );
     static void Deinit();
+    static const UINT numDescriptors = 150;
 
 private:
     static ID3D12DescriptorHeap* cbvSrvUavHeap;
