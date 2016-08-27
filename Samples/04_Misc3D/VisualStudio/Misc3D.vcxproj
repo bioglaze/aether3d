@@ -21,6 +21,10 @@
       <Configuration>Oculus Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release OpenVR|x64">
+      <Configuration>Release OpenVR</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Vulkan|x64">
       <Configuration>Release Vulkan</Configuration>
       <Platform>x64</Platform>
@@ -67,6 +71,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenVR|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vulkan|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -99,6 +110,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenVR|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Vulkan|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -124,6 +138,10 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <TargetName>Misc3D_GL_r</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenVR|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
     <TargetName>Misc3D_GL_r</TargetName>
   </PropertyGroup>
@@ -220,6 +238,28 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_GL_r.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release OpenVR|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\..\Engine\Include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <PreprocessorDefinitions>AE3D_OPENVR;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>openvr_api.lib;libOpenAL32.dll.a;Aether3D_GL_OpenVR_r.lib;OpenGL32.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>

@@ -45,6 +45,11 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
   - FBX converter tries to find FBX SDK 2016.1.1 in its default install location (English language localization)
   
+### Oculus Rift
+  - Build Oculus SDK's `LibOVR` and `LibOVRKernel`'s `Release x64` target in VS2015 and copy these folders into `Engine/ThirdParty`: LibOVR, LibOVRKernel, Logging
+  - Open OpenGL renderer's Visual Studio solution and select target ***Oculus Release***
+  - Build and run Samples/04_Misc3D target ***Oculus Release*** in VS2015.
+
 ## OS X / GNU/Linux
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.

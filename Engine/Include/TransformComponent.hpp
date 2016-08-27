@@ -55,7 +55,7 @@ namespace ae3d
         void SetParent( TransformComponent* parent );
 
         /// \return View matrix for VR that was set by SetVrView.
-#if OCULUS_RIFT
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
         const Matrix44& GetVrView() const { return hmdView; }
 #else
         const Matrix44& GetVrView() const { return Matrix44::identity; }
@@ -95,7 +95,7 @@ namespace ae3d
         float localScale = 1;
         Matrix44 localMatrix;
         TransformComponent* parent = nullptr;
-#if OCULUS_RIFT
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
         Matrix44 hmdView; // For VR
 #endif
         GameObject* gameObject = nullptr;

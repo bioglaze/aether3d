@@ -400,7 +400,7 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float yawDegrees, int eye )
     camera.GetComponent< CameraComponent >()->SetProjection( projMat );
 }
 
-#else
+#elif !AE3D_OPENVR
 
 using namespace ae3d;
 

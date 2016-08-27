@@ -118,6 +118,7 @@
     <ClCompile Include="..\Components\PointLightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\OGL\OpenVRSupport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

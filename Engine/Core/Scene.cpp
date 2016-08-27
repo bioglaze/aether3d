@@ -541,7 +541,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         auto cameraTrans = cameraGo->GetComponent< TransformComponent >();
         cameraTrans->GetLocalRotation().GetMatrix( view );
-#if OCULUS_RIFT
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
         Matrix44 vrView = cameraTrans->GetVrView();
         // Cancels translation.
         vrView.m[ 14 ] = 0;
@@ -559,7 +559,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     Vec3 position;
 
     // TODO: Maybe add a VR flag into camera to select between HMD and normal pose.
-#if OCULUS_RIFT
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
     view = cameraGo->GetComponent< TransformComponent >()->GetVrView();
     position = Global::vrEyePosition;
     fovDegrees = GetVRFov();
@@ -1097,14 +1097,44 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 return DeserializeResult::ParseError;
             }
 
-            std::string meshFile;
-            lineStream >> meshFile;
-            
             outGameObjects.back().AddComponent< MeshRendererComponent >();
             
             outMeshes.push_back( new Mesh() );
+        }
+
+        if (token == "meshpath")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found meshFile but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            if (!outGameObjects.back().GetComponent< MeshRendererComponent >())
+            {
+                System::Print( "Failed to parse %s: found meshpath but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            std::string meshFile;
+            lineStream >> meshFile;
+
             outMeshes.back()->Load( FileSystem::FileContents( meshFile.c_str() ) );
             outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMesh( outMeshes.back() );
+
+            // FIXME: These ensure that the mesh is rendered. A proper fix would be to serialize materials.
+            Shader* tempShader = new Shader();
+            tempShader->Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
+                "unlitVert", "unlitFrag",
+                FileSystem::FileContents( "unlit.hlsl" ), FileSystem::FileContents( "unlit.hlsl" ),
+                FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+
+            Material* tempMaterial = new Material();
+            tempMaterial->SetShader( tempShader );
+            tempMaterial->SetTexture( "textureMap", Texture2D::GetDefaultTexture() );
+            tempMaterial->SetVector( "tint", { 1, 1, 1, 1 } );
+            tempMaterial->SetBackFaceCulling( true );
+            outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMaterial( tempMaterial, 0 );
         }
 
         if (token == "position")

@@ -42,12 +42,14 @@ int main()
     }
     
     System::EnableWindowsMemleakDetection();
-    VR::Init();
-#if OCULUS_RIFT
+    //VR::Init(); oculus
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
     VR::GetIdealWindowSize( width, height );
 #endif
+
     Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
     Window::GetSize( width, height );
+    VR::Init(); // Vive
     VR::StartTracking( width, height );
     Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();
@@ -263,14 +265,14 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
-    scene.Add( &cameraCubeRT );
-    scene.Add( &rtCube );
+    //scene.Add( &camera2d );
+    //scene.Add( &cameraCubeRT );
+    //scene.Add( &rtCube );
     scene.Add( &cubeScaledUV );
     scene.Add( &copiedCube );
-    scene.Add( &statsContainer );
+    //scene.Add( &statsContainer );
     //scene.Add( &dirLight );
-    scene.Add( &spotLight );
+    //scene.Add( &spotLight );
     //scene.Add( &pointLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
@@ -335,7 +337,7 @@ int main()
 
     while (Window::IsOpen() && !quit)
     {
-#if OCULUS_RIFT
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
         VR::CalcEyePose();
         
         for (int eye = 0; eye < 2; ++eye)
