@@ -129,6 +129,12 @@ struct DDSInfo
 /// Loads a .dds (DirectDraw Surface)
 namespace DDSLoader
 {
+    struct Output
+    {
+        std::vector< unsigned char > imageData;
+        std::vector< std::size_t > dataOffsets; // Mipmap offsets in imageData
+    };
+
     enum class LoadResult { Success, UnknownPixelFormat, FileNotFound };
  
     /**
@@ -145,7 +151,7 @@ namespace DDSLoader
      \param outOpaque Stores info about alpha channel.
      \return Load result.
      */
-    LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque );
+    LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& output );
 
     namespace
     {

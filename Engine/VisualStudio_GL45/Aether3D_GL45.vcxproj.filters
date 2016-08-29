@@ -85,9 +85,6 @@
     <ClCompile Include="..\Components\SpotLightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\OGL\DDSLoaderGL.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\Video\OGL\GfxDeviceGL.cpp">
       <Filter>Video</Filter>
     </ClCompile>
@@ -119,6 +116,9 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Video\OGL\OpenVRSupport.cpp" />
+    <ClCompile Include="..\Video\DDSLoader.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

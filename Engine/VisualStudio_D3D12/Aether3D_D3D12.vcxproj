@@ -111,7 +111,6 @@
     <ClCompile Include="..\ThirdParty\stb_image.c" />
     <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
     <ClCompile Include="..\Video\D3D12\ComputeShaderD3D12.cpp" />
-    <ClCompile Include="..\Video\D3D12\DDSLoaderD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\DescriptorHeapManager.cpp" />
     <ClCompile Include="..\Video\D3D12\GfxDeviceD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\RendererD3D12.cpp" />
@@ -120,6 +119,7 @@
     <ClCompile Include="..\Video\D3D12\Texture2D_D3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\TextureCubeD3D12.cpp" />
     <ClCompile Include="..\Video\D3D12\VertexBufferD3D12.cpp" />
+    <ClCompile Include="..\Video\DDSLoader.cpp" />
     <ClCompile Include="..\Video\Material.cpp" />
     <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />

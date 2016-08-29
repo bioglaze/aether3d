@@ -66,6 +66,8 @@ namespace ae3d
         GpuResource* GetGpuResource() { return &gpuResource; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetDSV() { return dsv; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetRTV() { return rtv; }
+        DXGI_FORMAT GetDXGIFormat() const { return dxgiFormat; }
+        int GetMipLevelCount() const { return mipLevelCount; }
 
         D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeDSV( unsigned cubeMapFace ) { return cubeDsvs[ cubeMapFace ]; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeRTV( unsigned cubeMapFace ) { return cubeRtvs[ cubeMapFace ]; }
@@ -115,6 +117,8 @@ namespace ae3d
         Vec4 scaleOffset{ 1, 1, 0, 0 };
         /// Mipmaps.
         Mipmaps mipmaps = Mipmaps::None;
+        /// Mipmap count.
+        int mipLevelCount = 1;
         /// Anisotropy.
         float anisotropy = 1;
         /// Color space.
@@ -132,6 +136,7 @@ namespace ae3d
 
         D3D12_CPU_DESCRIPTOR_HANDLE cubeRtvs[ 6 ] = {};
         D3D12_CPU_DESCRIPTOR_HANDLE cubeDsvs[ 6 ] = {};
+        DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 #endif
         /// Is the texture opaque.
         bool opaque = true;

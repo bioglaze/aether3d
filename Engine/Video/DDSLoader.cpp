@@ -1,15 +1,21 @@
 #include "DDSLoader.hpp"
+#if RENDERER_OPENGL
 #include <GL/glxw.h>
+#endif
 #include <cassert>
 #include <memory>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include "System.hpp"
 
-#ifndef max
-#define max(a,b) (a > b ? a : b)
-#endif
+unsigned MyMax( unsigned a, unsigned b )
+{
+    return (a > b ? a : b);
+}
+
+#if RENDERER_OPENGL
 
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT 0x83F1
@@ -58,8 +64,26 @@ DDSInfo loadInfoBGR5A1 = { false, true, false, 1, 2, GL_RGB5_A1, GL_BGRA, GL_UNS
 DDSInfo loadInfoBGR565 = { false, true, false, 1, 2, GL_RGB5, GL_RGB, GL_UNSIGNED_SHORT_5_6_5 };
 
 DDSInfo loadInfoIndex8 = { false, false, true, 1, 1, GL_RGB8, GL_BGRA, GL_UNSIGNED_BYTE };
+#endif
+#if RENDERER_D3D12
+DDSInfo loadInfoDXT1 = { true, false, false, 4, 8 };
 
-DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque )
+DDSInfo loadInfoDXT3 = { true, false, false, 4, 16 };
+
+DDSInfo loadInfoDXT5 = { true, false, false, 4, 16 };
+
+DDSInfo loadInfoBGRA8 = { false, false, false, 1, 4 };
+
+DDSInfo loadInfoBGR8 = { false, false, false, 1, 3 };
+
+DDSInfo loadInfoBGR5A1 = { false, true, false, 1, 2 };
+
+DDSInfo loadInfoBGR565 = { false, true, false, 1, 2 };
+
+DDSInfo loadInfoIndex8 = { false, false, true, 1, 1 };
+#endif
+
+DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& output )
 {
     assert( cubeMapFace >= 0 && cubeMapFace < 7 );
 
@@ -153,14 +177,16 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
     if (mipMapCount == 0)
     {
+#if RENDERER_OPENGL
         glTexParameteri( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+#endif
     }
     
     std::size_t fileOffset = sizeof( header );
 
     if (li->isCompressed)
     {
-        size = max( li->divSize, x ) / li->divSize * max( li->divSize, y ) / li->divSize * li->blockBytes;
+        size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
         assert( size == header.sHeader.dwPitchOrLinearSize );
         assert( header.sHeader.dwFlags & DDSD_LINEARSIZE );
 
@@ -175,20 +201,28 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
             return LoadResult::FileNotFound;
         }
 
+        ae3d::System::Print( "li->isCompressed, mipmap count: %d\n", mipMapCount );
+        output.imageData = fileContents.data;
+        output.dataOffsets.resize( mipMapCount );
+
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            //ifs.read( (char*) &data[0], size );
             std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
-            fileOffset += size;
+            output.dataOffsets[ ix ] = fileOffset;
 
+            fileOffset += size;
+#if RENDERER_OPENGL
             glCompressedTexImage2D( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace - 1 : GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, (GLsizei)size, &data[0] );
+#endif
             x = (x + 1) >> 1;
             y = (y + 1) >> 1;
-            size = max( li->divSize, x ) / li->divSize * max( li->divSize, y ) / li->divSize * li->blockBytes;
+            size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
         }
     }
     else if (li->hasPalette)
     {
+        ae3d::System::Print( "li->hasPalette\n" );
+
         assert( header.sHeader.dwFlags & DDSD_PITCH );
         assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8 );
         size = header.sHeader.dwPitchOrLinearSize * ySize;
@@ -197,13 +231,11 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         unsigned palette[ 256 ];
         std::vector< unsigned > unpacked( size * 4 );
 
-        //ifs.read( (char *) palette, 4 * 256 );
         std::memcpy( &palette[ 0 ], fileContents.data.data() + fileOffset, 4 * 256 );
         fileOffset += 4 * 256;
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            //ifs.read( (char *) &data[ 0 ], size );
             std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
             fileOffset += size;
 
@@ -211,9 +243,10 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
             {
                 unpacked[ zz ] = palette[ data[ zz ] ];
             }
-
+#if RENDERER_OPENGL
             glPixelStorei( GL_UNPACK_ROW_LENGTH, y );
             glTexImage2D( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace - 1 : GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, li->externalFormat, li->type, &unpacked[ 0 ] );
+#endif
             x = (x + 1) >> 1;
             y = (y + 1) >> 1;
             size = x * y * li->blockBytes;
@@ -221,9 +254,13 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else
     {
+        ae3d::System::Print( "li->else\n" );
+
         if (li->swap)
         {
+#if RENDERER_OPENGL
             glPixelStorei( GL_UNPACK_SWAP_BYTES, GL_TRUE );
+#endif
         }
 
         size = x * y * li->blockBytes;        
@@ -231,20 +268,24 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            //ifs.read( (char*) &data[ 0 ], size );    
             std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
             fileOffset += size;
 
+#if RENDERER_OPENGL
             glPixelStorei( GL_UNPACK_ROW_LENGTH, y );
             glTexImage2D( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace - 1 : GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, li->externalFormat, li->type, &data[ 0 ] );
+#endif
             x = (x + 1)>>1;
             y = (y + 1)>>1;
             size = x * y * li->blockBytes;
         }
-    
+#if RENDERER_OPENGL
         glPixelStorei( GL_UNPACK_SWAP_BYTES, GL_FALSE );
+#endif
     }
 
+#if RENDERER_OPENGL
     glTexParameteri( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1 );
+#endif
     return LoadResult::Success;
 }

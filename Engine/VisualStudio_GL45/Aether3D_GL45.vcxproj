@@ -204,10 +204,10 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OpenVR Release|x64'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Oculus Release|x64'">_CRT_SECURE_NO_WARNINGS;RENDERER_OPENGL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="..\Video\DDSLoader.cpp" />
     <ClCompile Include="..\Video\Material.cpp" />
     <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
     <ClCompile Include="..\Video\OGL\ComputeShaderGL.cpp" />
-    <ClCompile Include="..\Video\OGL\DDSLoaderGL.cpp" />
     <ClCompile Include="..\Video\OGL\GfxDeviceGL.cpp" />
     <ClCompile Include="..\Video\OGL\OpenVRSupport.cpp" />
     <ClCompile Include="..\Video\OGL\RendererGL.cpp" />

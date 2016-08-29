@@ -97,8 +97,8 @@ namespace GfxDeviceGlobal
     unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
-	ae3d::RenderTexture* renderTexture0 = nullptr;
-	ae3d::Texture2D* texture2d0 = nullptr;
+    ae3d::RenderTexture* renderTexture0 = nullptr;
+    ae3d::Texture2D* texture2d0 = nullptr;
     ae3d::TextureCube* textureCube0 = nullptr;
     ae3d::RenderTexture* renderTexture1 = nullptr;
     ae3d::Texture2D* texture2d1 = nullptr;
@@ -112,9 +112,9 @@ namespace GfxDeviceGlobal
     ID3D12Fence* fence = nullptr;
     UINT64 fenceValue = 1;
     HANDLE fenceEvent;
-	int sampleCount = 1;
-	ID3D12Resource* msaaColor = nullptr;
-	ID3D12Resource* msaaDepth = nullptr;
+    int sampleCount = 1;
+    ID3D12Resource* msaaColor = nullptr;
+    ID3D12Resource* msaaDepth = nullptr;
     D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
 }
@@ -626,9 +626,6 @@ void ae3d::CreateRenderer( int samples )
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
     GfxDeviceGlobal::device->SetName( L"D3D12 device" );
 #ifdef DEBUG
-    // Prevents GPU from over/underclocking to get consistent timing information.
-    GfxDeviceGlobal::device->SetStablePowerState( TRUE );
-
     hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
     AE3D_CHECK_D3D( hr, "Infoqueue failed" );
     GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
@@ -812,24 +809,37 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     
-	const bool is2D0 = (GfxDeviceGlobal::texture2d0 != nullptr) || (GfxDeviceGlobal::renderTexture0 != nullptr && !GfxDeviceGlobal::renderTexture0->IsCube());
+    const bool is2D0 = (GfxDeviceGlobal::texture2d0 != nullptr) || (GfxDeviceGlobal::renderTexture0 != nullptr && !GfxDeviceGlobal::renderTexture0->IsCube());
+    DXGI_FORMAT format0 = DXGI_FORMAT_R8G8B8A8_UNORM;
+    int mipLevelCount0 = 1;
+
+    if (GfxDeviceGlobal::texture2d0 != nullptr)
+    {
+        format0 = GfxDeviceGlobal::texture2d0->GetDXGIFormat();
+        mipLevelCount0 = GfxDeviceGlobal::texture2d0->GetMipLevelCount();
+    }
+    else if (GfxDeviceGlobal::renderTexture0 != nullptr)
+    {
+        format0 = GfxDeviceGlobal::renderTexture0->GetDXGIFormat();
+        mipLevelCount0 = GfxDeviceGlobal::renderTexture0->GetMipLevelCount();
+    }
 
     // TODO: Get from texture object
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
-    srvDesc0.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc0.Format = format0;
     srvDesc0.ViewDimension = is2D0 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
     if (srvDesc0.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
     {
-        srvDesc0.Texture2D.MipLevels = 1;
+        srvDesc0.Texture2D.MipLevels = mipLevelCount0;
         srvDesc0.Texture2D.MostDetailedMip = 0;
         srvDesc0.Texture2D.PlaneSlice = 0;
         srvDesc0.Texture2D.ResourceMinLODClamp = 0.0f;
     }
     else if (srvDesc0.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
     {
-        srvDesc0.TextureCube.MipLevels = 1;
+        srvDesc0.TextureCube.MipLevels = mipLevelCount0;
         srvDesc0.TextureCube.MostDetailedMip = 0;
         srvDesc0.TextureCube.ResourceMinLODClamp = 0.0f;
     }
@@ -839,22 +849,34 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     }
 
     const bool is2D1 = (GfxDeviceGlobal::texture2d1 != nullptr) || (GfxDeviceGlobal::renderTexture1 != nullptr && !GfxDeviceGlobal::renderTexture1->IsCube());
+    DXGI_FORMAT format1 = DXGI_FORMAT_R8G8B8A8_UNORM;
+    int mipLevelCount1 = 1;
+    if (GfxDeviceGlobal::texture2d1 != nullptr)
+    {
+        format1 = GfxDeviceGlobal::texture2d1->GetDXGIFormat();
+        mipLevelCount1 = GfxDeviceGlobal::texture2d1->GetMipLevelCount();
+    }
+    else if (GfxDeviceGlobal::renderTexture1 != nullptr)
+    {
+        format1 = GfxDeviceGlobal::renderTexture1->GetDXGIFormat();
+        mipLevelCount1 = GfxDeviceGlobal::renderTexture1->GetMipLevelCount();
+    }
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
-    srvDesc1.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc1.Format = format1;
     srvDesc1.ViewDimension = is2D1 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc1.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
     if (srvDesc1.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
     {
-        srvDesc1.Texture2D.MipLevels = 1;
+        srvDesc1.Texture2D.MipLevels = mipLevelCount1;
         srvDesc1.Texture2D.MostDetailedMip = 0;
         srvDesc1.Texture2D.PlaneSlice = 0;
         srvDesc1.Texture2D.ResourceMinLODClamp = 0.0f;
     }
     else if (srvDesc1.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
     {
-        srvDesc1.TextureCube.MipLevels = 1;
+        srvDesc1.TextureCube.MipLevels = mipLevelCount1;
         srvDesc1.TextureCube.MostDetailedMip = 0;
         srvDesc1.TextureCube.ResourceMinLODClamp = 0.0f;
     }
@@ -869,11 +891,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     {
         texResource0 = GfxDeviceGlobal::texture2d0->GetGpuResource()->resource;
     }
-	else if (GfxDeviceGlobal::renderTexture0 != nullptr)
-	{
+    else if (GfxDeviceGlobal::renderTexture0 != nullptr)
+    {
         texResource0 = GfxDeviceGlobal::renderTexture0->GetGpuResource()->resource;
-	}
-	else if (GfxDeviceGlobal::textureCube0 != nullptr)
+    }
+    else if (GfxDeviceGlobal::textureCube0 != nullptr)
     {
         texResource0 = GfxDeviceGlobal::textureCube0->GetGpuResource()->resource;
     }
@@ -919,7 +941,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
 
-	// FIXME: badly needs polymorphism
+    // FIXME: badly needs polymorphism
     if (GfxDeviceGlobal::texture2d0)
     {
         samplerHandle = GetSampler( GfxDeviceGlobal::texture2d0->GetMipmaps(), GfxDeviceGlobal::texture2d0->GetWrap(),
@@ -1147,20 +1169,20 @@ void ae3d::GfxDevice::Present()
 {
     TransitionResource( GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ], D3D12_RESOURCE_STATE_PRESENT );
 
-	if (GfxDeviceGlobal::sampleCount > 1)
-	{
-		GpuResource msaaColorGpuResource;
-		msaaColorGpuResource.resource = GfxDeviceGlobal::msaaColor;
-		msaaColorGpuResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    if (GfxDeviceGlobal::sampleCount > 1)
+    {
+        GpuResource msaaColorGpuResource;
+        msaaColorGpuResource.resource = GfxDeviceGlobal::msaaColor;
+        msaaColorGpuResource.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		
-		auto backBufferRT = GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
+        auto backBufferRT = GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ];
 
-		TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RESOLVE_SOURCE );
-		TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_RESOLVE_DEST );
-		GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( backBufferRT.resource, 0, GfxDeviceGlobal::msaaColor, 0, DXGI_FORMAT_R8G8B8A8_UNORM );
-		TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_PRESENT );
-		TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
-	}
+        TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RESOLVE_SOURCE );
+        TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_RESOLVE_DEST );
+        GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( backBufferRT.resource, 0, GfxDeviceGlobal::msaaColor, 0, DXGI_FORMAT_R8G8B8A8_UNORM );
+        TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_PRESENT );
+        TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
+    }
 
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Close();
     AE3D_CHECK_D3D( hr, "command list close" );
@@ -1236,7 +1258,7 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
 
     if (target && target->IsCube())
     {
-		GfxDeviceGlobal::currentRenderTarget = target->GetGpuResource();
+        GfxDeviceGlobal::currentRenderTarget = target->GetGpuResource();
         GfxDeviceGlobal::currentRenderTargetDSV = target->GetCubeDSV( cubeMapFace );
         GfxDeviceGlobal::currentRenderTargetRTV = target->GetCubeRTV( cubeMapFace );
         TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );

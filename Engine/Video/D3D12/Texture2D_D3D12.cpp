@@ -214,6 +214,8 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
     else if (isDDS)
     {
+        ae3d::System::Print( "Loading dds\n" );
+
         LoadDDS( fileContents.path.c_str() );
     }
     else
@@ -221,10 +223,8 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         ae3d::System::Print("Unknown texture file extension: %s\n", fileContents.path.c_str() );
     }
     
-    const UINT mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< UINT >( MathUtil::GetMipmapCount( width, height ) ) : 1;
-    
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.Format = dxgiFormat;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = mipLevelCount; 
@@ -246,12 +246,69 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
 void ae3d::Texture2D::LoadDDS( const char* path )
 {
-    const DDSLoader::LoadResult loadResult = DDSLoader::Load( FileSystem::FileContents( path ), 0, width, height, opaque );
+    DDSLoader::Output ddsOutput;
+    auto fileContents = FileSystem::FileContents( path );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
 
     if (loadResult != DDSLoader::LoadResult::Success)
     {
         ae3d::System::Print( "DDS Loader could not load %s", path );
+        return;
     }
+
+    mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );
+    dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC1_UNORM : DXGI_FORMAT_BC1_UNORM_SRGB;
+
+    D3D12_RESOURCE_DESC descTex = {};
+    descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    descTex.Width = width;
+    descTex.Height = static_cast< UINT >(height);
+    descTex.DepthOrArraySize = 1;
+    descTex.MipLevels = static_cast< UINT16 >( mipLevelCount );
+    descTex.Format = dxgiFormat;
+    descTex.SampleDesc.Count = 1;
+    descTex.SampleDesc.Quality = 0;
+    descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    D3D12_HEAP_PROPERTIES heapProps = {};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+    heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    heapProps.CreationNodeMask = 1;
+    heapProps.VisibleNodeMask = 1;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
+        D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
+    AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+
+    wchar_t wstr[ 128 ];
+    std::mbstowcs( wstr, path, 128 );
+    gpuResource.resource->SetName( wstr );
+    gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
+    Texture2DGlobal::textures.push_back( gpuResource.resource );
+
+    const int bytesPerPixel = 2;
+
+    std::vector< D3D12_SUBRESOURCE_DATA > texResources( mipLevelCount );
+    texResources[ 0 ].pData = &ddsOutput.imageData[ ddsOutput.dataOffsets[ 0 ] ];
+    texResources[ 0 ].RowPitch = width * bytesPerPixel;
+    texResources[ 0 ].SlicePitch = texResources[ 0 ].RowPitch * height;
+
+    unsigned mipWidth = width;
+    unsigned mipHeight = height;
+
+    for (int i = 1; i < mipLevelCount; ++i)
+    {
+        mipWidth = (mipWidth + 1) >> 1;
+        mipHeight = (mipHeight + 1) >> 1;
+
+        texResources[ i ].pData = &ddsOutput.imageData[ ddsOutput.dataOffsets[ i - 1 ] ];
+        texResources[ i ].RowPitch = mipWidth * bytesPerPixel;
+        texResources[ i ].SlicePitch = texResources[ i ].RowPitch * mipHeight;
+    }
+
+    InitializeTexture( gpuResource, texResources.data(), mipLevelCount );
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
@@ -269,7 +326,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    const UINT mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< UINT >(MathUtil::GetMipmapCount( width, height )) : 1;
+    mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< int >(MathUtil::GetMipmapCount( width, height )) : 1;
+    dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
     D3D12_RESOURCE_DESC descTex = {};
     descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -277,11 +335,11 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     descTex.Height = static_cast< UINT >( height );
     descTex.DepthOrArraySize = 1;
     descTex.MipLevels = static_cast< UINT16 >( mipLevelCount );
-    descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descTex.Format = dxgiFormat;
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    descTex.Flags = mipLevelCount > 1 ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
+    descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
 
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
