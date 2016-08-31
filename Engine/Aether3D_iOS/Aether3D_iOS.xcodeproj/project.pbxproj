@@ -61,6 +61,7 @@
 		44E5FC9A1B399E6C009AC088 /* TextureCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC981B399E6C009AC088 /* TextureCommon.cpp */; };
 		AB190E321B57DE73005ECE49 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB190E311B57DE73005ECE49 /* Material.cpp */; };
 		AB190E341B57DE85005ECE49 /* Material.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB190E331B57DE85005ECE49 /* Material.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB29D44A1D773E6800E998FC /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB29D4491D773E6800E998FC /* DDSLoader.hpp */; };
 		AB2DCE461CC9309900951EF2 /* ComputeShaderMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = AB2DCE451CC9309900951EF2 /* ComputeShaderMetal.mm */; };
 		AB3E80111C00B5E80077D8BD /* SpotLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */; };
 		AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -137,6 +138,7 @@
 		44E5FC981B399E6C009AC088 /* TextureCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCommon.cpp; path = ../../Video/TextureCommon.cpp; sourceTree = "<group>"; };
 		AB190E311B57DE73005ECE49 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Material.cpp; path = ../../Video/Material.cpp; sourceTree = "<group>"; };
 		AB190E331B57DE85005ECE49 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../Include/Material.hpp; sourceTree = "<group>"; };
+		AB29D4491D773E6800E998FC /* DDSLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DDSLoader.hpp; path = ../../Video/DDSLoader.hpp; sourceTree = "<group>"; };
 		AB2DCE451CC9309900951EF2 /* ComputeShaderMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ComputeShaderMetal.mm; path = ../../Video/Metal/ComputeShaderMetal.mm; sourceTree = "<group>"; };
 		AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpotLightComponent.cpp; path = ../../Components/SpotLightComponent.cpp; sourceTree = "<group>"; };
 		AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 				4449E8421B14B423009A869C /* AudioSourceComponent.hpp */,
 				4449E8431B14B423009A869C /* CameraComponent.hpp */,
 				AB921DB21CC21B34008F5750 /* ComputeShader.hpp */,
+				AB29D4491D773E6800E998FC /* DDSLoader.hpp */,
 				ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */,
 				4449E8441B14B423009A869C /* FileSystem.hpp */,
 				4449E8451B14B423009A869C /* Font.hpp */,
@@ -329,6 +332,7 @@
 				4449E8601B14B423009A869C /* Texture2D.hpp in Headers */,
 				4449E8541B14B423009A869C /* CameraComponent.hpp in Headers */,
 				4449E85E1B14B423009A869C /* System.hpp in Headers */,
+				AB29D44A1D773E6800E998FC /* DDSLoader.hpp in Headers */,
 				449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */,
 				4449E85B1B14B423009A869C /* Scene.hpp in Headers */,
 				4449E8571B14B423009A869C /* GameObject.hpp in Headers */,

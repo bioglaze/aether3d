@@ -48,6 +48,7 @@
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
     ae3d::Texture2D transTex;
+    ae3d::Texture2D dxt1Tex;
     ae3d::TextureCube skyTex;
     ae3d::RenderTexture rtTex;
 }
@@ -93,6 +94,7 @@
 
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    dxt1Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     skyTex.Load( ae3d::FileSystem::FileContents( "/left.jpg" ), ae3d::FileSystem::FileContents( "/right.jpg" ),
                 ae3d::FileSystem::FileContents( "/bottom.jpg" ), ae3d::FileSystem::FileContents( "/top.jpg" ),
                 ae3d::FileSystem::FileContents( "/front.jpg" ), ae3d::FileSystem::FileContents( "/back.jpg" ),
@@ -115,7 +117,8 @@
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     
     cubeMaterial.SetShader( &shader );
-    cubeMaterial.SetTexture( "textureMap", &gliderTex );
+    //cubeMaterial.SetTexture( "textureMap", &gliderTex );
+    cubeMaterial.SetTexture( "textureMap", &dxt1Tex );
     cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
     
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );

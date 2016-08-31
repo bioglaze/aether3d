@@ -11,6 +11,8 @@
 #include "Matrix.hpp"
 #include "Vec3.hpp"
 
+// Cache optimization code adapted from http://gameangst.com/wp-content/uploads/2009/03/forsythtriangleorderoptimizer.cpp
+
 struct TexCoord
 {
     TexCoord() : u( 0 ), v( 0 ) {}
@@ -78,8 +80,11 @@ struct VertexPTN
 
 struct VertexData
 {
-    int cacheTag = 0;
-    int numActiveTris = 0;
+    float    score = 0;
+    unsigned activeFaceListStart = 0;
+    unsigned activeFaceListSize = 0;
+    unsigned cachePos0 = 0;
+    unsigned cachePos1 = 0;
 };
 
 struct VertexPTNTCWithData
@@ -103,8 +108,8 @@ struct Mesh
     void SolveVertexTangents();
     void CopyInterleavedVerticesToPTN();
     
-    void OptimizeForCache(); // Implements https://tomforsyth1000.github.io/papers/fast_vert_cache_opt.html
-    void ComputeVertexCacheScores();
+    void OptimizeFaces(); // Implements https://tomforsyth1000.github.io/papers/fast_vert_cache_opt.html
+    bool ComputeVertexScores();
 
     bool AlmostEquals( const ae3d::Vec3& v1, const ae3d::Vec3& v2 ) const;
     bool AlmostEquals( const ae3d::Vec4& v1, const ae3d::Vec4& v2 ) const;
@@ -136,6 +141,12 @@ struct Mesh
 
 std::vector< Mesh > gMeshes;
 
+const unsigned MaxVertexCacheSize = 64;
+const unsigned MaxPrecomputedVertexValenceScores = 64;
+
+float gVertexCacheScores[ MaxVertexCacheSize + 1 ][ MaxVertexCacheSize ];
+float gVertexValenceScores[ MaxPrecomputedVertexValenceScores ];
+
 void Mesh::CopyInterleavedVerticesToPTN()
 {
     interleavedVerticesPTN.resize( interleavedVertices.size() );
@@ -148,23 +159,13 @@ void Mesh::CopyInterleavedVerticesToPTN()
     }
 }
 
-float FindVertexScore( VertexData& vertexData )
+float ComputeVertexCacheScore( int cachePosition, int vertexCacheSize )
 {
     const float findVertexScore_CacheDecayPower = 1.5f;
     const float findVertexScore_LastTriScore = 0.75f;
-    const float findVertexScore_ValenceBoostScale = 2.0f;
-    const float findVertexScore_ValenceBoostPower = 0.5f;
-    
-    const int MaxSizeVertexCache = 32;
-
-    if (vertexData.numActiveTris == 0)
-    {
-        // No tri needs this vertex!
-        return -1;
-    }
 
     float score = 0;
-    int cachePosition = vertexData.cacheTag;
+
     if (cachePosition < 0)
     {
         // Vertex is not in FIFO -> no score
@@ -182,32 +183,51 @@ float FindVertexScore( VertexData& vertexData )
         }
         else
         {
-            assert( cachePosition < MaxSizeVertexCache && "Cache position exceeds the cache size" );
-            const float scaler = 1.0f / (MaxSizeVertexCache - 3);
+            assert( cachePosition < vertexCacheSize && "Cache position exceeds the cache size" );
+            const float scaler = 1.0f / (vertexCacheSize - 3);
             score = 1.0f - (cachePosition - 3) * scaler;
             score = std::pow( score, findVertexScore_CacheDecayPower );
         }
     }
 
-    float valenceBoost = std::pow( static_cast<float>(vertexData.numActiveTris), -findVertexScore_ValenceBoostPower );
-    score += findVertexScore_ValenceBoostScale * valenceBoost;
-
     return score;
 }
 
-void Mesh::ComputeVertexCacheScores()
+float ComputeVertexValenceScore(uint numActiveFaces)
 {
-    // Finds active tris
-    for (std::size_t f = 0; f < indices.size(); ++f)
-    {
-        verticesWithCachedata[ indices[ f ].a ].data.numActiveTris++;
-        verticesWithCachedata[ indices[ f ].b ].data.numActiveTris++;
-        verticesWithCachedata[ indices[ f ].c ].data.numActiveTris++;
-    }
-
+    const float FindVertexScore_ValenceBoostScale = 2.0f;
+    const float FindVertexScore_ValenceBoostPower = 0.5f;
+    
+    float score = 0;
+    
+    // Bonus points for having a low number of tris still to
+    // use the vert, so we get rid of lone verts quickly.
+    float valenceBoost = std::pow( static_cast< float >( numActiveFaces ),
+                               -FindVertexScore_ValenceBoostPower );
+    score += FindVertexScore_ValenceBoostScale * valenceBoost;
+    
+    return score;
 }
 
-void Mesh::OptimizeForCache()
+bool Mesh::ComputeVertexScores()
+{
+    for (unsigned cacheSize = 0; cacheSize <= MaxVertexCacheSize; ++cacheSize)
+    {
+        for (unsigned cachePos = 0; cachePos < cacheSize; ++cachePos)
+        {
+            gVertexCacheScores[ cacheSize ][ cachePos ] = ComputeVertexCacheScore( cachePos, cacheSize );
+        }
+    }
+    
+    for (unsigned valence = 0; valence < MaxPrecomputedVertexValenceScores; ++valence)
+    {
+        gVertexValenceScores[ valence ] = ComputeVertexValenceScore( valence );
+    }
+    
+    return true;
+}
+
+void Mesh::OptimizeFaces()
 {
     verticesWithCachedata.resize( interleavedVertices.size() );
 
@@ -220,15 +240,39 @@ void Mesh::OptimizeForCache()
         verticesWithCachedata[ i ].normal = interleavedVertices[ i ].normal;
     }
 
-    ComputeVertexCacheScores();
+    bool vertexScoresComputed = ComputeVertexScores();
+    
+    // Face count per vertex
+    for (std::size_t i = 0; i < indices.size(); ++i)
+    {
+        ++verticesWithCachedata[ indices[ i ].a ].data.activeFaceListSize;
+        ++verticesWithCachedata[ indices[ i ].b ].data.activeFaceListSize;
+        ++verticesWithCachedata[ indices[ i ].c ].data.activeFaceListSize;
+    }
+    
+    //std::vector< Face > activeFaceList;
+
+    for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
+    {
+        std::cout << "non-optimized vertex " << i << ": " <<
+        interleavedVertices[i].position.x  << ", " <<
+        interleavedVertices[i].position.y << ", " <<
+        interleavedVertices[i].position.z << std::endl;
+    }
 
     for (std::size_t i = 0; i < verticesWithCachedata.size(); ++i)
     {
-        float score = FindVertexScore( verticesWithCachedata[ i ].data );
-        std::cout << "vertex " << i << " score: " << score << std::endl;
+        std::cout << "optimized vertex " << i << ": " <<
+        verticesWithCachedata[i].position.x  << ", " <<
+        verticesWithCachedata[i].position.y << ", " <<
+        verticesWithCachedata[i].position.z << std::endl;
     }
-
-    std::cout << "jee";
+    
+    for (std::size_t i = 0; i < indices.size(); ++i)
+    {
+        std::cout << "non-optimized face " << i <<
+        ": " << indices[ i ].a << ", " << indices[ i ].b << ", " << indices[ i ].c << std::endl;
+    }
 }
 
 void Mesh::SolveAABB()
@@ -624,7 +668,7 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         }
 
         gMeshes[ m ].Interleave();
-        gMeshes[ m ].OptimizeForCache();
+        gMeshes[ m ].OptimizeFaces();
 
         gMeshes[ m ].SolveFaceNormals();
         gMeshes[ m ].SolveFaceTangents();

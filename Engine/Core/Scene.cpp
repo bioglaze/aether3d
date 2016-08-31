@@ -537,7 +537,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     
     Matrix44 view;
 
-    if (skybox != nullptr)
+    if (skybox != nullptr && camera->GetProjectionType() != ae3d::CameraComponent::ProjectionType::Orthographic)
     {
         auto cameraTrans = cameraGo->GetComponent< TransformComponent >();
         cameraTrans->GetLocalRotation().GetMatrix( view );

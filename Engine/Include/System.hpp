@@ -14,7 +14,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.5.5 Documentation
+   \mainpage Aether3D Game Engine v0.6 Documentation
 
    \section Introduction
 
@@ -81,10 +81,6 @@
    \subsection Bugs
 
    <ul>
-   <li>D3D12: If MSAA is used, render-to-texture doesn't work.</li>
-   <li>D3D12: 2D Render textures look weird.</li>
-   <li>D3D12: Crash on certain combinations of SpriteRendererComponent and TextRendererComponent.</li>
-   <li>Vulkan: Linux support is not complete.</li>
    <li>Metal: Shadow maps don't show.</li>
    <li>Oculus: Mirror texture is broken if SDK initialization fails.</li>
    </ul>

@@ -129,13 +129,17 @@ struct DDSInfo
 /// Loads a .dds (DirectDraw Surface)
 namespace DDSLoader
 {
+    /// Load result
+    enum class LoadResult { Success, UnknownPixelFormat, FileNotFound };
+    /// Format
+    enum class Format { Invalid, BC1, BC2, BC3 };
+
     struct Output
     {
         std::vector< unsigned char > imageData;
         std::vector< std::size_t > dataOffsets; // Mipmap offsets in imageData
+        Format format = Format::Invalid;
     };
-
-    enum class LoadResult { Success, UnknownPixelFormat, FileNotFound };
  
     /**
      Loads a .dds file.
@@ -149,9 +153,10 @@ namespace DDSLoader
      \param outWidth Stores the width of the texture in pixels.
      \param outHeight Stores the height of the texture in pixels.
      \param outOpaque Stores info about alpha channel.
+     \param outOutput Stores information needed to create D3D12 and Metal API objects. Not used in OpenGL.
      \return Load result.
      */
-    LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& output );
+    LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& outOutput );
 
     namespace
     {

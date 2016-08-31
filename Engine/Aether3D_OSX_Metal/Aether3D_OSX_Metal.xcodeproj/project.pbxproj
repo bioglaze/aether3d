@@ -73,6 +73,8 @@
 		AB6E134C1C11D8BD0020A929 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */; };
 		AB6E134E1C11D93E0020A929 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6E134D1C11D93E0020A929 /* Metal.framework */; };
 		AB6E85851CB571A10041C8CB /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */; };
+		AB7C8AC01D74C8CB0066EC28 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7C8ABE1D74C8CB0066EC28 /* DDSLoader.cpp */; };
+		AB7C8AC11D74C8CB0066EC28 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB7C8ABF1D74C8CB0066EC28 /* DDSLoader.hpp */; };
 		AB8E83F71CEBAE7600A8E9E8 /* PointLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */; };
 		AB8E83F91CEBAE9A00A8E9E8 /* PointLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB8E83F81CEBAE9A00A8E9E8 /* PointLightComponent.cpp */; };
 		AB921DB11CC21AF4008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */; };
@@ -148,6 +150,8 @@
 		AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB6E134D1C11D93E0020A929 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
+		AB7C8ABE1D74C8CB0066EC28 /* DDSLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DDSLoader.cpp; path = ../Video/DDSLoader.cpp; sourceTree = "<group>"; };
+		AB7C8ABF1D74C8CB0066EC28 /* DDSLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DDSLoader.hpp; path = ../Video/DDSLoader.hpp; sourceTree = "<group>"; };
 		AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 		AB8E83F81CEBAE9A00A8E9E8 /* PointLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointLightComponent.cpp; path = ../Components/PointLightComponent.cpp; sourceTree = "<group>"; };
 		AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../Include/ComputeShader.hpp; sourceTree = "<group>"; };
@@ -231,6 +235,8 @@
 			isa = PBXGroup;
 			children = (
 				ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */,
+				AB7C8ABE1D74C8CB0066EC28 /* DDSLoader.cpp */,
+				AB7C8ABF1D74C8CB0066EC28 /* DDSLoader.hpp */,
 				AB6E133C1C11D8A00020A929 /* GfxDevice.hpp */,
 				AB6E12FB1C11D7C50020A929 /* GfxDeviceMetal.mm */,
 				AB6E133D1C11D8A00020A929 /* Material.cpp */,
@@ -313,6 +319,7 @@
 				AB6E13311C11D8020020A929 /* Shader.hpp in Headers */,
 				AB6E12EF1C11D7B00020A929 /* FileWatcher.hpp in Headers */,
 				AB6E13231C11D8020020A929 /* AudioSourceComponent.hpp in Headers */,
+				AB7C8AC11D74C8CB0066EC28 /* DDSLoader.hpp in Headers */,
 				AB6E13381C11D8020020A929 /* TextureCube.hpp in Headers */,
 				AB6E13291C11D8020020A929 /* Macros.hpp in Headers */,
 				AB6E13341C11D8020020A929 /* System.hpp in Headers */,
@@ -410,6 +417,7 @@
 				AB6E13051C11D7C50020A929 /* Texture2DMetal.mm in Sources */,
 				AB6E12D81C11D79B0020A929 /* TransformComponent.cpp in Sources */,
 				AB6E12D21C11D79B0020A929 /* DirectionalLightComponent.cpp in Sources */,
+				AB7C8AC01D74C8CB0066EC28 /* DDSLoader.cpp in Sources */,
 				AB6E12D61C11D79B0020A929 /* SpriteRendererComponent.cpp in Sources */,
 				AB6E12F01C11D7B00020A929 /* Font.cpp in Sources */,
 				AB6E12EA1C11D7B00020A929 /* AudioClip.cpp in Sources */,

@@ -64,8 +64,7 @@ DDSInfo loadInfoBGR5A1 = { false, true, false, 1, 2, GL_RGB5_A1, GL_BGRA, GL_UNS
 DDSInfo loadInfoBGR565 = { false, true, false, 1, 2, GL_RGB5, GL_RGB, GL_UNSIGNED_SHORT_5_6_5 };
 
 DDSInfo loadInfoIndex8 = { false, false, true, 1, 1, GL_RGB8, GL_BGRA, GL_UNSIGNED_BYTE };
-#endif
-#if RENDERER_D3D12
+#else
 DDSInfo loadInfoDXT1 = { true, false, false, 4, 8 };
 
 DDSInfo loadInfoDXT3 = { true, false, false, 4, 16 };
@@ -125,41 +124,49 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     {
         li = &loadInfoDXT1;
         outOpaque = true;
+        output.format = DDSLoader::Format::BC1;
     }
     else if (PF_IS_DXT3( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoDXT3;
         outOpaque = false;
+        output.format = DDSLoader::Format::BC2;
     }
     else if (PF_IS_DXT5( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoDXT5;
         outOpaque = false;
+        output.format = DDSLoader::Format::BC3;
     }
     else if (PF_IS_BGRA8( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGRA8;
         outOpaque = false;
+        output.format = DDSLoader::Format::Invalid;
     }
     else if (PF_IS_BGR8( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGR8;
         outOpaque = true;
+        output.format = DDSLoader::Format::Invalid;
     }
     else if (PF_IS_BGR5A1( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGR5A1;
         outOpaque = false;
+        output.format = DDSLoader::Format::Invalid;
     }
     else if (PF_IS_BGR565( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoBGR565;
         outOpaque = true;
+        output.format = DDSLoader::Format::Invalid;
     }
     else if (PF_IS_INDEX8( header.sHeader.sPixelFormat ))
     {
         li = &loadInfoIndex8;
         outOpaque = true;
+        output.format = DDSLoader::Format::Invalid;
     }
     else
     {
@@ -201,7 +208,6 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
             return LoadResult::FileNotFound;
         }
 
-        ae3d::System::Print( "li->isCompressed, mipmap count: %d\n", mipMapCount );
         output.imageData = fileContents.data;
         output.dataOffsets.resize( mipMapCount );
 
@@ -221,8 +227,6 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else if (li->hasPalette)
     {
-        ae3d::System::Print( "li->hasPalette\n" );
-
         assert( header.sHeader.dwFlags & DDSD_PITCH );
         assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8 );
         size = header.sHeader.dwPitchOrLinearSize * ySize;
@@ -254,8 +258,6 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else
     {
-        ae3d::System::Print( "li->else\n" );
-
         if (li->swap)
         {
 #if RENDERER_OPENGL

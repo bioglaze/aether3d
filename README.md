@@ -5,7 +5,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 # Features
 
-  - Windows, OS X, iOS and Linux support.
+  - Windows, macOS, iOS and Linux support.
   - OpenGL 4.1, Vulkan (WIP), D3D12 (WIP) and Metal renderers.
   - Component-based game object system.
   - Oculus Rift support.
@@ -50,7 +50,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Open OpenGL renderer's Visual Studio solution and select target ***Oculus Release***
   - Build and run Samples/04_Misc3D target ***Oculus Release*** in VS2015.
 
-## OS X / GNU/Linux
+## macOS / GNU/Linux
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile.

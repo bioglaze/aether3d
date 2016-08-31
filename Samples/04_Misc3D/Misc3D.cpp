@@ -265,16 +265,16 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     scene.Add( &cubeScaledUV );
     scene.Add( &copiedCube );
-    //scene.Add( &statsContainer );
-    //scene.Add( &dirLight );
+    scene.Add( &statsContainer );
+    scene.Add( &dirLight );
     //scene.Add( &spotLight );
     //scene.Add( &pointLight );
-    //scene.Add( &renderTextureContainer );
+    scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
     scene.Add( &transCube1 );
     

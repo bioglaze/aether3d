@@ -8,6 +8,7 @@
 #define STBI_NEON
 #endif
 #include "stb_image.c"
+#include "DDSLoader.hpp"
 #include "FileSystem.hpp"
 #include "System.hpp"
 #include "GfxDevice.hpp"
@@ -112,6 +113,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }*/
     
     const bool isPVR = fileContents.path.find( ".pvr" ) != std::string::npos || fileContents.path.find( ".PVR" ) != std::string::npos;
+    const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".dds" ) != std::string::npos;
     
     if (HasStbExtension( fileContents.path ))
     {
@@ -134,6 +136,57 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         {
             LoadPVRv2( fileContents.path.c_str() );
         }
+    }
+    else if (isDDS)
+    {
+#if !TARGET_OS_IPHONE
+        DDSLoader::Output output;
+        DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, output );
+        
+        if (ddsLoadResult != DDSLoader::LoadResult::Success)
+        {
+            ae3d::System::Print( "Could not load %s\n", fileContents.path.c_str() );
+            return;
+        }
+        
+        const int bytesPerRow = width * 2;
+        
+        MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm;
+        
+        if (output.format == DDSLoader::Format::BC1)
+        {
+            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
+        }
+        else if (output.format == DDSLoader::Format::BC2)
+        {
+            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
+        }
+        else if (output.format == DDSLoader::Format::BC3)
+        {
+            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
+        }
+
+        MTLTextureDescriptor* textureDescriptor =
+        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
+                                                           width:width
+                                                          height:height
+                                                       mipmapped:NO];//(mipmaps == Mipmaps::None ? NO : YES)];
+        metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+        
+        std::size_t pos = fileContents.path.find_last_of( "/" );
+        if (pos != std::string::npos)
+        {
+            std::string fileName = fileContents.path.substr( pos );
+            metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+        }
+        else
+        {
+            metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
+        }
+        
+        MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
+        [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&output.imageData[ output.dataOffsets[ 0 ] ] bytesPerRow:bytesPerRow];
+#endif
     }
     else
     {
