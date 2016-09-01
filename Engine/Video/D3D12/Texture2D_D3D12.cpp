@@ -214,8 +214,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
     else if (isDDS)
     {
-        ae3d::System::Print( "Loading dds\n" );
-
         LoadDDS( fileContents.path.c_str() );
     }
     else
@@ -257,7 +255,20 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     }
 
     mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );
+    int bytesPerPixel = 2;
+
     dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC1_UNORM : DXGI_FORMAT_BC1_UNORM_SRGB;
+
+    if (ddsOutput.format == DDSLoader::Format::BC2)
+    {
+        dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC2_UNORM : DXGI_FORMAT_BC2_UNORM_SRGB;
+        bytesPerPixel = 4;
+    }
+    if (ddsOutput.format == DDSLoader::Format::BC3)
+    {
+        dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC3_UNORM : DXGI_FORMAT_BC3_UNORM_SRGB;
+        bytesPerPixel = 4;
+    }
 
     D3D12_RESOURCE_DESC descTex = {};
     descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -287,8 +298,6 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     Texture2DGlobal::textures.push_back( gpuResource.resource );
-
-    const int bytesPerPixel = 2;
 
     std::vector< D3D12_SUBRESOURCE_DATA > texResources( mipLevelCount );
     texResources[ 0 ].pData = &ddsOutput.imageData[ ddsOutput.dataOffsets[ 0 ] ];

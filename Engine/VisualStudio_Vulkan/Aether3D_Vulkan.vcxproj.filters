@@ -135,6 +135,9 @@
     <ClCompile Include="..\Components\PointLightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\DDSLoader.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\AudioClip.hpp">
@@ -246,6 +249,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Video\Vulkan\VulkanUtils.hpp">
+      <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\DDSLoader.hpp">
       <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>

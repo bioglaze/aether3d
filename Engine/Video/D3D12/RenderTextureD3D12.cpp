@@ -39,13 +39,15 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     dataType = aDataType;
     isCube = false;
 
+    dxgiFormat = (dataType == DataType::UByte) ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R32G32B32A32_FLOAT;
+
     D3D12_RESOURCE_DESC descTex = {};
     descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     descTex.Width = width;
     descTex.Height = (UINT)height;
     descTex.DepthOrArraySize = 1;
     descTex.MipLevels = 1;
-    descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descTex.Format = dxgiFormat;
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -70,7 +72,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         rtv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
 
         D3D12_RENDER_TARGET_VIEW_DESC descRtv = {};
-        descRtv.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        descRtv.Format = dxgiFormat;
         descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateRenderTargetView( gpuResource.resource, &descRtv, rtv );
     }
@@ -123,6 +125,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     isRenderTexture = true;
     dataType = aDataType;
     isCube = true;
+    dxgiFormat = (dataType == DataType::UByte) ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R32G32B32A32_FLOAT;
 
     // Base resources
     {
@@ -132,7 +135,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         descTex.Height = (UINT)height;
         descTex.DepthOrArraySize = 6;
         descTex.MipLevels = 1;
-        descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        descTex.Format = dxgiFormat;
         descTex.SampleDesc.Count = 1;
         descTex.SampleDesc.Quality = 0;
         descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -153,7 +156,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         RenderTextureGlobal::renderTextures.push_back( gpuResource.resource );
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        srvDesc.Format = dxgiFormat;
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srvDesc.Texture2D.MipLevels = 1;
@@ -172,7 +175,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         cubeRtvs[ i ] = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
 
         D3D12_RENDER_TARGET_VIEW_DESC descRtv = {};
-        descRtv.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        descRtv.Format = dxgiFormat;
         descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
 		descRtv.Texture2DArray.FirstArraySlice = i;
 		descRtv.Texture2DArray.ArraySize = 1;

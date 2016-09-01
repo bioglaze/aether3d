@@ -40,9 +40,14 @@ int main()
     Texture2D spriteTex;
     spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
-    Texture2D spriteTex2;
-    spriteTex2.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
-    //spriteTex2.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    Texture2D bc1Tex;
+    bc1Tex.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+
+    Texture2D bc2Tex;
+    bc2Tex.Load( FileSystem::FileContents( "test_dxt3.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+
+    Texture2D bc3Tex;
+    bc3Tex.Load( FileSystem::FileContents( "test_dxt5.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
     Texture2D spriteTexFromAtlas;
     spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "marble", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, 1 );
@@ -52,7 +57,9 @@ int main()
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
     sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
     sprite->SetTexture( &spriteTex, Vec3( 340, 80, -0.5f ), Vec3( (float)spriteTex.GetWidth()/2, (float)spriteTex.GetHeight()/2, 1 ), Vec4( 0.5f, 1, 0.5f, 1 ) );
-    sprite->SetTexture( &spriteTex2, Vec3( 280, 60, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    sprite->SetTexture( &bc1Tex, Vec3( 120, 60, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    sprite->SetTexture( &bc2Tex, Vec3( 120, 170, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    sprite->SetTexture( &bc3Tex, Vec3( 120, 270, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     sprite->SetTexture( &spriteTexFromAtlas, Vec3( 260, 160, -0.5f ), Vec3( (float)spriteTexFromAtlas.GetWidth(), (float)spriteTexFromAtlas.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
 
     spriteContainer.AddComponent<TransformComponent>();
