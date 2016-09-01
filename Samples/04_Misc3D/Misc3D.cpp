@@ -506,7 +506,7 @@ int main()
         stats += std::string( "\nTexture binds:" ) + std::to_string( System::Statistics::GetTextureBindCount() );
         stats += std::string( "\nShader binds:" ) + std::to_string( System::Statistics::GetShaderBindCount() );
 		statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
-		//statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
+		statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
 
         Window::SwapBuffers();
     }

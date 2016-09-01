@@ -1,7 +1,9 @@
 #include "GfxDevice.hpp"
 #include <algorithm>
+#include <chrono>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <GL/glxw.h>
 #include "System.hpp"
 #include "RenderTexture.hpp"
@@ -76,11 +78,40 @@ namespace GfxDeviceGlobal
     int textureBinds = 0;
     int renderTargetBinds = 0;
     int shaderBinds = 0;
-    
+    float frameTimeMS = 0;
+    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
+
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     GLuint systemFBO = 0;
     GLuint cachedFBO = 0;
+}
+
+void UpdateFrameTiming()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - GfxDeviceGlobal::startFrameTimePoint ).count();
+    GfxDeviceGlobal::frameTimeMS = static_cast< float >(tDiff);
+}
+
+namespace ae3d
+{
+    namespace System
+    {
+        namespace Statistics
+        {
+            std::string GetStatistics()
+            {
+                std::stringstream stm;
+                stm << "frame time: " << GfxDeviceGlobal::frameTimeMS << "ms\n";
+                stm << "draw calls: " << GfxDeviceGlobal::drawCalls << "\n";
+                stm << "texture binds: " << GfxDeviceGlobal::textureBinds << "\n";
+                stm << "render target binds: " << GfxDeviceGlobal::renderTargetBinds << "\n";
+
+                return stm.str();
+            }
+        }
+    }
 }
 
 void SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
@@ -257,6 +288,7 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     GfxDeviceGlobal::textureBinds = 0;
     GfxDeviceGlobal::renderTargetBinds = 0;
     GfxDeviceGlobal::shaderBinds = 0;
+    GfxDeviceGlobal::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 int ae3d::GfxDevice::GetDrawCalls()

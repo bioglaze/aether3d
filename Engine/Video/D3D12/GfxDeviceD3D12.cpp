@@ -1,4 +1,5 @@
 #include "GfxDevice.hpp"
+#include <chrono>
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <Windows.h>
@@ -44,6 +45,8 @@ namespace Stats
     int shaderBinds = 0;
     int barrierCalls = 0;
     int fenceCalls = 0;
+    int createConstantBufferCalls = 0;
+    float frameTimeMS = 0;
 }
 
 namespace ae3d
@@ -55,8 +58,10 @@ namespace ae3d
 			std::string GetStatistics()
 			{
 				std::stringstream stm;
-				stm << "draw calls: " << Stats::drawCalls << "\n";
-				stm << "barrier calls: " << Stats::barrierCalls << "\n";
+                stm << "frame time: " << Stats::frameTimeMS << "ms\n";
+                stm << "draw calls: " << Stats::drawCalls << "\n";
+                stm << "barrier calls: " << Stats::barrierCalls << "\n";
+                stm << "create constant buffer calls: " << Stats::createConstantBufferCalls << "\n";
 
 				return stm.str();
 			}
@@ -117,6 +122,7 @@ namespace GfxDeviceGlobal
     ID3D12Resource* msaaDepth = nullptr;
     D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
+    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
 }
 
 namespace Global
@@ -745,6 +751,8 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
     {
         System::Print( "Unable to map shader constant buffer!" );
     }
+
+    ++Stats::createConstantBufferCalls;
 }
 
 void* ae3d::GfxDevice::GetCurrentUniformBuffer()
@@ -1007,11 +1015,14 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     Stats::textureBinds = 0;
     Stats::barrierCalls = 0;
     Stats::fenceCalls = 0;
+    Stats::createConstantBufferCalls = 0;
 
     // TODO: Figure out a better place for this.
 
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
     AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
+
+    GfxDeviceGlobal::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
@@ -1238,6 +1249,10 @@ void ae3d::GfxDevice::Present()
     
     GfxDeviceGlobal::frameConstantBuffers.clear();
     GfxDeviceGlobal::currentConstantBuffer = nullptr;
+
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - GfxDeviceGlobal::startFrameTimePoint ).count();
+    Stats::frameTimeMS = static_cast< float >( tDiff );
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )

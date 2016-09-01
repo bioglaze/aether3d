@@ -6,6 +6,8 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
+void UpdateFrameTiming(); // Defined in GfxDeviceGL.cpp
+
 typedef DWORD WINAPI x_input_get_state( DWORD dwUserIndex, XINPUT_STATE* pState );
 
 DWORD WINAPI XInputGetStateStub( DWORD /*dwUserIndex*/, XINPUT_STATE* /*pState*/ )
@@ -428,6 +430,7 @@ namespace ae3d
     {
 #if RENDERER_OPENGL
         ::SwapBuffers( WindowGlobal::hdc );
+        UpdateFrameTiming();
 #endif
 #if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
         GfxDevice::Present();

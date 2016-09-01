@@ -1,5 +1,6 @@
 #include "GfxDevice.hpp"
 #include <cstdint>
+#include <chrono>
 #include <map>
 #include <vector> 
 #include <string>
@@ -45,6 +46,8 @@ namespace Stats
     int drawCalls = 0;
     int barrierCalls = 0;
     int fenceCalls = 0;
+    float frameTimeMS = 0;
+    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
 }
 
 namespace GfxDeviceGlobal
@@ -134,6 +137,7 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
+                stm << "frame time: " << Stats::frameTimeMS << " ms\n";
                 stm << "draw calls: " << Stats::drawCalls << "\n";
                 stm << "barrier calls: " << Stats::barrierCalls << "\n";
                 stm << "fence calls: " << Stats::fenceCalls << "\n";
@@ -525,6 +529,10 @@ namespace ae3d
 
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitPostInfo, VK_NULL_HANDLE );
         AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+
+        auto tEnd = std::chrono::high_resolution_clock::now();
+        auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startFrameTimePoint ).count();
+        Stats::frameTimeMS = static_cast< float >(tDiff);
     }
     
     void AllocateSetupCommandBuffer()
@@ -1551,6 +1559,7 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     Stats::drawCalls = 0;
     Stats::barrierCalls = 0;
     Stats::fenceCalls = 0;
+    Stats::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
