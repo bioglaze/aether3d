@@ -59,6 +59,7 @@ namespace ae3d
         void LoadPVRv3( const char* path );
 #endif
 #if RENDERER_VULKAN
+        void CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format );
         VkImage image = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
         VkDeviceMemory deviceMemory = VK_NULL_HANDLE;

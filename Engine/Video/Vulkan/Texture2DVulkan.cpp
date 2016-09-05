@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
+#include "DDSLoader.hpp"
 #include "FileSystem.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
@@ -42,6 +43,7 @@ namespace Texture2DGlobal
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
 {
+    // TODO: Move somewhere else.
     if (Texture2DGlobal::texCmdBuffer == VK_NULL_HANDLE)
     {
         System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
@@ -72,30 +74,24 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         return;
     }
 
+    const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
+
     if (HasStbExtension( fileContents.path ))
     {
         LoadSTB( fileContents );
     }
+    else if (isDDS)
+    {
+        LoadDDS( fileContents.path.c_str() );
+    }
+    else
+    {
+        ae3d::System::Print( "Unknown texture file extension: %s\n", fileContents.path.c_str() );
+    }
 }
 
-void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
+void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
 {
-    System::Assert( GfxDeviceGlobal::graphicsQueue != VK_NULL_HANDLE, "queue not initialized" );
-    System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-    System::Assert( Texture2DGlobal::texCmdBuffer != VK_NULL_HANDLE, "texCmdBuffer not initialized" );
-
-    int components;
-    unsigned char* data = stbi_load_from_memory( fileContents.data.data(), static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
-
-    if (data == nullptr)
-    {
-        const std::string reason( stbi_failure_reason() );
-        System::Print( "%s failed to load. stb_image's reason: %s\n", fileContents.path.c_str(), reason.c_str() );
-        return;
-    }
-
-    opaque = (components == 3 || components == 1);
-
     VkMemoryAllocateInfo memAllocInfo = {};
     memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAllocInfo.pNext = nullptr;
@@ -132,7 +128,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     std::vector<VkBufferImageCopy> bufferCopyRegions;
     std::uint32_t offset = 0;
 
-    const auto format = VK_FORMAT_R8G8B8A8_UNORM;
     const int mipLevels = mipmaps == Mipmaps::Generate ? static_cast<int>(MathUtil::GetMipmapCount( width, height )) : 1;
 
     // We're generating mips at runtime, so no need to loop.
@@ -164,7 +159,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-    imageCreateInfo.extent = { static_cast<std::uint32_t>( width ), static_cast<std::uint32_t>( height ), 1 };
+    imageCreateInfo.extent = { static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height), 1 };
     imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
@@ -205,7 +200,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         stagingBuffer,
         image,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        static_cast<std::uint32_t>( bufferCopyRegions.size() ),
+        static_cast<std::uint32_t>(bufferCopyRegions.size()),
         bufferCopyRegions.data()
     );
 
@@ -213,7 +208,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     {
         const std::int32_t mipWidth = width >> i;
         const std::int32_t mipHeight = height >> i;
-        
+
         VkImageBlit imageBlit = {};
         imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         imageBlit.srcSubresource.baseArrayLayer = 0;
@@ -275,6 +270,61 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
     AE3D_CHECK_VULKAN( err, "vkCreateImageView in Texture2D" );
+}
+
+void ae3d::Texture2D::LoadDDS( const char* path )
+{
+    DDSLoader::Output ddsOutput;
+    auto fileContents = FileSystem::FileContents( path );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
+
+    if (loadResult != DDSLoader::LoadResult::Success)
+    {
+        ae3d::System::Print( "DDS Loader could not load %s", path );
+        return;
+    }
+
+    mipLevelCount = static_cast< int >(ddsOutput.dataOffsets.size());
+    int bytesPerPixel = 1;
+
+    VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+
+    if (!opaque)
+    {
+        format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+    }
+
+    if (ddsOutput.format == DDSLoader::Format::BC2)
+    {
+        format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
+    }
+    if (ddsOutput.format == DDSLoader::Format::BC3)
+    {
+        format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
+    }
+
+    CreateVulkanObjects( &fileContents.data[ ddsOutput.dataOffsets[ 0 ] ], 1, format );
+}
+
+void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
+{
+    System::Assert( GfxDeviceGlobal::graphicsQueue != VK_NULL_HANDLE, "queue not initialized" );
+    System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
+    System::Assert( Texture2DGlobal::texCmdBuffer != VK_NULL_HANDLE, "texCmdBuffer not initialized" );
+
+    int components;
+    unsigned char* data = stbi_load_from_memory( fileContents.data.data(), static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );
+
+    if (data == nullptr)
+    {
+        const std::string reason( stbi_failure_reason() );
+        System::Print( "%s failed to load. stb_image's reason: %s\n", fileContents.path.c_str(), reason.c_str() );
+        return;
+    }
+
+    opaque = (components == 3 || components == 1);
+
+    CreateVulkanObjects( data, 4, VK_FORMAT_R8G8B8A8_UNORM );
 
     stbi_image_free( data );
 }
