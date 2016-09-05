@@ -8,6 +8,7 @@
 #import "TextRendererComponent.hpp"
 #import "DirectionalLightComponent.hpp"
 #import "SpotLightComponent.hpp"
+#import "SpriteRendererComponent.hpp"
 #import "MeshRendererComponent.hpp"
 #import "TransformComponent.hpp"
 #import "System.hpp"
@@ -21,6 +22,8 @@
 #import "Shader.hpp"
 #import "Scene.hpp"
 #import "Window.hpp"
+
+using namespace ae3d;
 
 @implementation GameViewController
 {
@@ -38,6 +41,7 @@
     ae3d::GameObject renderTextureContainer;
     ae3d::GameObject cubePTN; // vertex format: position, texcoord, normal
     ae3d::GameObject cubePTN2;
+    ae3d::GameObject spriteContainer;
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -48,7 +52,9 @@
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
     ae3d::Texture2D transTex;
-    ae3d::Texture2D dxt1Tex;
+    ae3d::Texture2D bc1Tex;
+    ae3d::Texture2D bc2Tex;
+    ae3d::Texture2D bc3Tex;
     ae3d::TextureCube skyTex;
     ae3d::RenderTexture rtTex;
 }
@@ -79,7 +85,7 @@
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
 
     camera3d.SetName( "Camera3D" );
     camera3d.AddComponent<ae3d::CameraComponent>();
@@ -94,7 +100,9 @@
 
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
-    dxt1Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    bc1Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    bc2Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt3.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    bc3Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt5.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     skyTex.Load( ae3d::FileSystem::FileContents( "/left.jpg" ), ae3d::FileSystem::FileContents( "/right.jpg" ),
                 ae3d::FileSystem::FileContents( "/bottom.jpg" ), ae3d::FileSystem::FileContents( "/top.jpg" ),
                 ae3d::FileSystem::FileContents( "/front.jpg" ), ae3d::FileSystem::FileContents( "/back.jpg" ),
@@ -111,14 +119,26 @@
     text.SetLayer( 2 );
     scene.Add( &text );
     
+    spriteContainer.AddComponent<ae3d::SpriteRendererComponent>();
+    auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
+    sprite->SetTexture( &bc1Tex, Vec3( 120, 60, -0.6f ), Vec3( (float)bc1Tex.GetWidth(), (float)bc1Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    sprite->SetTexture( &bc2Tex, Vec3( 120, 170, -0.5f ), Vec3( (float)bc2Tex.GetWidth(), (float)bc2Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    sprite->SetTexture( &bc3Tex, Vec3( 120, 270, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    //sprite->SetTexture( &gliderTex, Vec3( 220, 70, -0.5f ), Vec3( (float)gliderTex.GetWidth(), (float)gliderTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    
+    spriteContainer.AddComponent<TransformComponent>();
+    //spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
+    spriteContainer.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
+    spriteContainer.SetLayer( 2 );
+    scene.Add( &spriteContainer );
+
     shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                 "unlit_vertex", "unlit_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     
     cubeMaterial.SetShader( &shader );
-    //cubeMaterial.SetTexture( "textureMap", &gliderTex );
-    cubeMaterial.SetTexture( "textureMap", &dxt1Tex );
+    cubeMaterial.SetTexture( "textureMap", &gliderTex );
     cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
     
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );
@@ -162,18 +182,18 @@
 
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
-    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
-    scene.Add( &dirLight );
+    //scene.Add( &dirLight );
     
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
-    //scene.Add( &renderTextureContainer );
+    scene.Add( &renderTextureContainer );
     
     rtCamera.AddComponent<ae3d::CameraComponent>();
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
@@ -183,7 +203,7 @@
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<ae3d::TransformComponent>();
     rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 20 ) );
-    //scene.Add( &rtCamera );
+    scene.Add( &rtCamera );
     
     transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, 1 );
     

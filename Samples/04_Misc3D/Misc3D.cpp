@@ -271,8 +271,8 @@ int main()
     scene.Add( &cubeScaledUV );
     scene.Add( &copiedCube );
     scene.Add( &statsContainer );
-    scene.Add( &dirLight );
-    //scene.Add( &spotLight );
+    //scene.Add( &dirLight );
+    scene.Add( &spotLight );
     //scene.Add( &pointLight );
     scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );

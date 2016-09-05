@@ -103,7 +103,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     mipmaps = aMipmaps;
     colorSpace = aColorSpace;
     anisotropy = aAnisotropy;
-    
+
     /*const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
     
     if (isCached && handle == 0)
@@ -149,7 +149,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
             return;
         }
         
-        const int bytesPerRow = width * 2;
+        int bytesPerRow = width * 2;
         
         MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm;
         
@@ -160,10 +160,12 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         else if (output.format == DDSLoader::Format::BC2)
         {
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
+            bytesPerRow = width * 4;
         }
         else if (output.format == DDSLoader::Format::BC3)
         {
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
+            bytesPerRow = width * 4;
         }
 
         MTLTextureDescriptor* textureDescriptor =
@@ -183,6 +185,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         {
             metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
         }
+        
         
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&output.imageData[ output.dataOffsets[ 0 ] ] bytesPerRow:bytesPerRow];
@@ -205,8 +208,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         System::Print( "%s failed to load. stb_image's reason: %s\n", fileContents.path.c_str(), reason.c_str() );
         return;
     }
-    
-    const int bytesPerRow = width * components < 400 ? 400 : (width * components);
 
     opaque = (components == 3 || components == 1);
 
@@ -228,6 +229,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
     }
     
+    const int bytesPerRow = width * components < 400 ? 400 : (width * components);
+
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
 

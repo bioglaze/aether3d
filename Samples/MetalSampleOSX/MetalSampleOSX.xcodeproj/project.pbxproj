@@ -24,6 +24,8 @@
 		ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C681C12F78200B94BD0 /* MetalKit.framework */; };
 		ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */; };
 		ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6B1C131DA300B94BD0 /* font.png */; };
+		ABCFF6B51D79C2D300BD7AF0 /* test_dxt3.dds in Resources */ = {isa = PBXBuildFile; fileRef = ABCFF6B31D79C2D300BD7AF0 /* test_dxt3.dds */; };
+		ABCFF6B61D79C2D300BD7AF0 /* test_dxt5.dds in Resources */ = {isa = PBXBuildFile; fileRef = ABCFF6B41D79C2D300BD7AF0 /* test_dxt5.dds */; };
 		ABE04F801C1216A80025C436 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F7F1C1216A80025C436 /* AppDelegate.m */; };
 		ABE04F831C1216A80025C436 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F821C1216A80025C436 /* main.m */; };
 		ABE04F861C1216A80025C436 /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F851C1216A80025C436 /* GameViewController.mm */; };
@@ -65,6 +67,8 @@
 		ABCD9C681C12F78200B94BD0 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = font_txt.fnt; path = ../../../../aether3d_build/Samples/font_txt.fnt; sourceTree = "<group>"; };
 		ABCD9C6B1C131DA300B94BD0 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
+		ABCFF6B31D79C2D300BD7AF0 /* test_dxt3.dds */ = {isa = PBXFileReference; lastKnownFileType = file; name = test_dxt3.dds; path = ../../../../aether3d_build/Samples/test_dxt3.dds; sourceTree = "<group>"; };
+		ABCFF6B41D79C2D300BD7AF0 /* test_dxt5.dds */ = {isa = PBXFileReference; lastKnownFileType = file; name = test_dxt5.dds; path = ../../../../aether3d_build/Samples/test_dxt5.dds; sourceTree = "<group>"; };
 		ABE04F7B1C1216A80025C436 /* MetalSampleOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalSampleOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABE04F7E1C1216A80025C436 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		ABE04F7F1C1216A80025C436 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -172,6 +176,8 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				ABCFF6B31D79C2D300BD7AF0 /* test_dxt3.dds */,
+				ABCFF6B41D79C2D300BD7AF0 /* test_dxt5.dds */,
 				AB29D4471D772C7400E998FC /* test_dxt1.dds */,
 				AB9D9A211C96E993009DF897 /* back copy.jpg */,
 				AB9D9A221C96E993009DF897 /* back.jpg */,
@@ -323,10 +329,12 @@
 				ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */,
 				ABE04F8B1C1216A80025C436 /* Assets.xcassets in Resources */,
 				ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */,
+				ABCFF6B61D79C2D300BD7AF0 /* test_dxt5.dds in Resources */,
 				AB9D9A2D1C96E993009DF897 /* right.jpg in Resources */,
 				AB9D9A2B1C96E993009DF897 /* front.jpg in Resources */,
 				AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */,
 				AB29D4481D772C7400E998FC /* test_dxt1.dds in Resources */,
+				ABCFF6B51D79C2D300BD7AF0 /* test_dxt3.dds in Resources */,
 				AB9D9A291C96E993009DF897 /* back.jpg in Resources */,
 				AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */,
 				AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */,

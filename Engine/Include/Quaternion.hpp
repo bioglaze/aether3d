@@ -40,19 +40,11 @@ namespace ae3d
          */
         Vec3 operator*( const Vec3& vec ) const
         {
-            // FIXME: vec was originally normalized here but I removed normalization because it caused
-            //        too fast camera movement and errorneous movement at slow speeds. [2014-12-08]
+            const Vec3 wComponent( w, w, w );
+            const Vec3 two( 2.0f, 2.0f, 2.0f );
             
-            Quaternion vecQuat, resQuat;
-            vecQuat.x = vec.x;
-            vecQuat.y = vec.y;
-            vecQuat.z = vec.z;
-            vecQuat.w = 0.0f;
-            
-            resQuat = vecQuat * Conjugate();
-            resQuat = *this * resQuat;
-            
-            return Vec3( resQuat.x, resQuat.y, resQuat.z );
+            const Vec3 vT = two * Vec3::Cross( Vec3( x, y, z ), vec );
+            return vec + (wComponent * vT) + Vec3::Cross( Vec3( x, y, z ), vT );
         }
         
         /**

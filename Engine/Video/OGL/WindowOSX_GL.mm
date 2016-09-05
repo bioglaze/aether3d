@@ -8,6 +8,8 @@
 // Based on https://github.com/vbo/handmadehero_osx_platform_layer/blob/day_29/code/osx_handmade.m
 // XBox One controller driver: https://github.com/FranticRain/Xone-OSX
 
+void UpdateFrameTiming();
+
 struct GamePad
 {
     bool isConnected = false;
@@ -714,5 +716,6 @@ void ae3d::Window::SetTitle( const char* title )
 void ae3d::Window::SwapBuffers()
 {
     [WindowGlobal::glContext flushBuffer];
+    UpdateFrameTiming();
 }
 

@@ -276,7 +276,7 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     depthStateDesc.label = @"lessEqual write off";
     depthStateLessEqualWriteOff = [device newDepthStencilStateWithDescriptor:depthStateDesc];
 
-    depthStateDesc.depthCompareFunction = MTLCompareFunctionNever;
+    depthStateDesc.depthCompareFunction = MTLCompareFunctionAlways;
     depthStateDesc.depthWriteEnabled = NO;
     depthStateDesc.label = @"none write off";
     depthStateNoneWriteOff = [device newDepthStencilStateWithDescriptor:depthStateDesc];
