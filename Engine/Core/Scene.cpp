@@ -128,6 +128,11 @@ namespace MathUtil
         return h;
     }
 
+	int Min( int x, int y )
+	{
+		return x < y ? x : y;
+	}
+
     int Max( int x, int y )
     {
         return x > y ? x : y;
@@ -135,7 +140,7 @@ namespace MathUtil
 
     int GetMipmapCount( int width, int height )
     {
-        return 1 + static_cast< int >(std::floor( std::log2( Max( width, height ) ) ));
+		return 1 + static_cast< int >(std::floor( std::log2( Min( width, height ) ) ));
     }
 }
 

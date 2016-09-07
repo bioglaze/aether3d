@@ -69,6 +69,7 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCommon.cpp -o $(OUTPUT_DIR)/TextureCommon.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/VertexBufferVulkan.cpp -o $(OUTPUT_DIR)/VertexBufferVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o	
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/DDSLoader.cpp -o $(OUTPUT_DIR)/DDSLoader.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/DirectionalLightComponent.cpp -o $(OUTPUT_DIR)/DirectionalLightComponent.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpotLightComponent.cpp -o $(OUTPUT_DIR)/SpotLightComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/PointLightComponent.cpp -o $(OUTPUT_DIR)/PointLightComponent.o

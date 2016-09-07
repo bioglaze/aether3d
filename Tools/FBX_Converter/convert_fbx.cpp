@@ -139,18 +139,20 @@ void ProcessNormal( FbxMesh* mesh, int vertexIndex, int vertexCounter, Vec3& out
         {
         case FbxGeometryElement::eDirect:
         {
-            outNormal.x = static_cast<float>(vertexNormal->GetDirectArray().GetAt( vertexIndex ).mData[ 0 ]);
-            outNormal.y = static_cast<float>(vertexNormal->GetDirectArray().GetAt( vertexIndex ).mData[ 1 ]);
-            outNormal.z = static_cast<float>(vertexNormal->GetDirectArray().GetAt( vertexIndex ).mData[ 2 ]);
+			const auto vn = vertexNormal->GetDirectArray().GetAt( vertexIndex );
+            outNormal.x = static_cast<float>( vn.mData[ 0 ] );
+            outNormal.y = static_cast<float>( vn.mData[ 1 ] );
+            outNormal.z = static_cast<float>( vn.mData[ 2 ]);
         }
             break;
 
         case FbxGeometryElement::eIndexToDirect:
         {
-            int index = vertexNormal->GetIndexArray().GetAt( vertexIndex );
-            outNormal.x = static_cast<float>(vertexNormal->GetDirectArray().GetAt( index ).mData[ 0 ]);
-            outNormal.y = static_cast<float>(vertexNormal->GetDirectArray().GetAt( index ).mData[ 1 ]);
-            outNormal.z = static_cast<float>(vertexNormal->GetDirectArray().GetAt( index ).mData[ 2 ]);
+            const int index = vertexNormal->GetIndexArray().GetAt( vertexIndex );
+			const auto vn = vertexNormal->GetDirectArray().GetAt( index );
+            outNormal.x = static_cast<float>( vn.mData[ 0 ] );
+            outNormal.y = static_cast<float>( vn.mData[ 1 ] );
+            outNormal.z = static_cast<float>( vn.mData[ 2 ] );
         }
             break;
 
@@ -276,6 +278,7 @@ void ImportMeshNodes( FbxNode* node )
         }
 
         gMeshes.push_back( Mesh() );
+		gMeshes.back().name = mesh->GetName();
 
         ProcessVertices( node );
 

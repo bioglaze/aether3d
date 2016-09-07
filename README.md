@@ -8,7 +8,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Windows, macOS, iOS and Linux support.
   - OpenGL 4.1, Vulkan (WIP), D3D12 (WIP) and Metal renderers.
   - Component-based game object system.
-  - Oculus Rift support.
+  - VR support. Tested on HTC Vive and Oculus Rift.
   - Sprite rendering, texture atlasing and batching.
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Variance shadow mapping.

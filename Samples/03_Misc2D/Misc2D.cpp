@@ -49,6 +49,9 @@ int main()
     Texture2D bc3Tex;
     bc3Tex.Load( FileSystem::FileContents( "test_dxt5.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
 
+	Texture2D nonSquareTex;
+	nonSquareTex.Load( FileSystem::FileContents( "textures/chain_texture.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, 1 );
+
     Texture2D spriteTexFromAtlas;
     spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "marble", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, 1 );
 

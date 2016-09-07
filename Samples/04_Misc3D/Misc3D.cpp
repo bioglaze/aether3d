@@ -176,7 +176,7 @@ int main()
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 512 );
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
@@ -216,6 +216,11 @@ int main()
     {
         System::Print( "Could not parse Sponza\n" );
     }
+
+	/*for (int i = 0; i < sponzaMeshes[0]->GetSubMeshCount(); ++i)
+	{
+		System::Print( "mesh name: %s\n", sponzaMeshes[ 0 ]->GetSubMeshName( i ) );
+	}*/
 
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
@@ -274,7 +279,7 @@ int main()
     //scene.Add( &dirLight );
     scene.Add( &spotLight );
     //scene.Add( &pointLight );
-    scene.Add( &renderTextureContainer );
+    //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
     scene.Add( &transCube1 );
     

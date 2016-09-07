@@ -335,7 +335,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< int >(MathUtil::GetMipmapCount( width, height )) : 1;
+	mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< int >(MathUtil::GetMipmapCount( width, height )) : 1;
     dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
     D3D12_RESOURCE_DESC descTex = {};
@@ -404,15 +404,15 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
                     const int yInBase = mipY << i;
                     const int xInBase = mipX << i;
 
-                    const std::uint8_t red = data[ (yInBase * height + xInBase) * 4 + 0 ];
-                    const std::uint8_t green = data[ (yInBase * height + xInBase) * 4 + 1 ];
-                    const std::uint8_t blue = data[ (yInBase * height + xInBase) * 4 + 2 ];
-                    const std::uint8_t alpha = data[ (yInBase * height + xInBase) * 4 + 3 ];
+                    const std::uint8_t red = data[ (yInBase * width + xInBase) * 4 + 0 ];
+                    const std::uint8_t green = data[ (yInBase * width + xInBase) * 4 + 1 ];
+                    const std::uint8_t blue = data[ (yInBase * width + xInBase) * 4 + 2 ];
+                    const std::uint8_t alpha = data[ (yInBase * width + xInBase) * 4 + 3 ];
 
-                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 0 ] = red;
-                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 1 ] = green;
-                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 2 ] = blue;
-                    mipLevels[ i - 1 ][ (mipY * mipHeight + mipX) * 4 + 3 ] = alpha;
+                    mipLevels[ i - 1 ][ (mipY * mipWidth + mipX) * 4 + 0 ] = red;
+                    mipLevels[ i - 1 ][ (mipY * mipWidth + mipX) * 4 + 1 ] = green;
+                    mipLevels[ i - 1 ][ (mipY * mipWidth + mipX) * 4 + 2 ] = blue;
+                    mipLevels[ i - 1 ][ (mipY * mipWidth + mipX) * 4 + 3 ] = alpha;
                 }
             }
 

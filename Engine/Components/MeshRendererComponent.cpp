@@ -51,6 +51,11 @@ std::string ae3d::MeshRendererComponent::GetSerialized() const
 
 void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld )
 {
+	if (!mesh)
+	{
+		return;
+	}
+
     isCulled = false;
     
     std::vector< Vec3 > aabbWorld;

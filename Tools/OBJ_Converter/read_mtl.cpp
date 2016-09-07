@@ -13,6 +13,7 @@
 void ReadObj( const std::string& path )
 {
     std::ifstream ifs( path );
+	std::ofstream ofs( "read_obj_output.txt" );
 
     while (!ifs.eof())
     {
@@ -30,18 +31,22 @@ void ReadObj( const std::string& path )
             std::string meshName;
             stm >> meshName;
             std::cout << "mesh_material " << meshName;
+			ofs << "mesh_material " << meshName;
         }
         if (token == "usemtl")
         {
             std::string matName;
             stm >> matName;
             std::cout << " " << matName << std::endl;
+			ofs << " " << matName << "\n";
         }
     }
 }
 
 void ReadMtl( const std::string& path )
 {
+	std::ofstream ofs( "read_mtl_output.txt" );
+
     // Generates textures
     {
         std::ifstream ifs( path );
@@ -62,6 +67,7 @@ void ReadMtl( const std::string& path )
                 std::string texPath;
                 stm >> texPath;
                 std::cout << "texture2d " << texPath << " " << texPath << std::endl;
+				ofs << "texture2d " << texPath << " " << texPath << "\n";
             }
         }
     }
@@ -87,18 +93,27 @@ void ReadMtl( const std::string& path )
             std::cout << "shaders cook_torrance cook_torrance" << std::endl;
             std::cout << "param_float roughness 0.2" << std::endl;
             std::cout << "param_vec3 materialSpecular 0.2 0.2 0.2" << std::endl;
+
+			ofs << "material " << materialName << std::endl;
+			ofs << "shaders cook_torrance cook_torrance" << std::endl;
+			ofs << "param_float roughness 0.2" << std::endl;
+			ofs << "param_vec3 materialSpecular 0.2 0.2 0.2" << std::endl;
         }
         else if (token == "map_Kd")
         {
             std::string texPath;
             stm >> texPath;
-            std::cout << "param_texture diffuseMap " << texPath << std::endl;
+			std::cout << "param_texture diffuseMap " << texPath << std::endl;
+			
+			ofs << "param_texture diffuseMap " << texPath << std::endl;
         }
         else if (token == "map_bump")
         {
             std::string texPath;
             stm >> texPath;
-            std::cout << "param_texture normalMap " << texPath << std::endl;
+			std::cout << "param_texture normalMap " << texPath << std::endl;
+			
+			ofs << "param_texture normalMap " << texPath << std::endl;
         }
     }
 }
@@ -129,4 +144,6 @@ int main( int argCount, char** argStrings )
     {
         ReadMtl( std::string( argStrings[ 1 ] ) );
     }
+
+	return 0;
 }
