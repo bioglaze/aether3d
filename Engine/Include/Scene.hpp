@@ -50,6 +50,8 @@ namespace ae3d
     private:
         void RenderWithCamera( GameObject* cameraGo, int cubeMapFace );
         void RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace );
+        void RenderDepthAndNormals( class CameraComponent* camera, struct Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
+                                    int cubeMapFace, const class Frustum& frustum );
         void GenerateAABB();
 
         std::vector< GameObject* > gameObjects;

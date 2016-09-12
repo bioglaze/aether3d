@@ -13,7 +13,6 @@
 		AB2CA8291C13664600D4D7C4 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8281C13664600D4D7C4 /* glider.png */; };
 		AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */; };
 		AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7839E31C70CA950065EF51 /* DepthNormals.metal */; };
-		AB9D9A281C96E993009DF897 /* back copy.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A211C96E993009DF897 /* back copy.jpg */; };
 		AB9D9A291C96E993009DF897 /* back.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A221C96E993009DF897 /* back.jpg */; };
 		AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A231C96E993009DF897 /* bottom.jpg */; };
 		AB9D9A2B1C96E993009DF897 /* front.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A241C96E993009DF897 /* front.jpg */; };
@@ -37,6 +36,7 @@
 		ABE04FC61C1217F00025C436 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC11C1217F00025C436 /* Skybox.metal */; };
 		ABE04FC71C1217F00025C436 /* SpriteShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC21C1217F00025C436 /* SpriteShader.metal */; };
 		ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC31C1217F00025C436 /* Unlit.metal */; };
+		ABFD71AC1D81E55B003770D4 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFD71AB1D81E55B003770D4 /* LightCuller.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +56,6 @@
 		AB2CA8281C13664600D4D7C4 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
-		AB9D9A211C96E993009DF897 /* back copy.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "back copy.jpg"; path = "../../../../aether3d_build/Samples/skybox/back copy.jpg"; sourceTree = "<group>"; };
 		AB9D9A221C96E993009DF897 /* back.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = back.jpg; path = ../../../../aether3d_build/Samples/skybox/back.jpg; sourceTree = "<group>"; };
 		AB9D9A231C96E993009DF897 /* bottom.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bottom.jpg; path = ../../../../aether3d_build/Samples/skybox/bottom.jpg; sourceTree = "<group>"; };
 		AB9D9A241C96E993009DF897 /* front.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = front.jpg; path = ../../../../aether3d_build/Samples/skybox/front.jpg; sourceTree = "<group>"; };
@@ -113,6 +112,7 @@
 		ABE04FC11C1217F00025C436 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
 		ABE04FC21C1217F00025C436 /* SpriteShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SpriteShader.metal; path = ../../../Engine/Assets/SpriteShader.metal; sourceTree = "<group>"; };
 		ABE04FC31C1217F00025C436 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
+		ABFD71AB1D81E55B003770D4 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,7 +179,6 @@
 				ABCFF6B31D79C2D300BD7AF0 /* test_dxt3.dds */,
 				ABCFF6B41D79C2D300BD7AF0 /* test_dxt5.dds */,
 				AB29D4471D772C7400E998FC /* test_dxt1.dds */,
-				AB9D9A211C96E993009DF897 /* back copy.jpg */,
 				AB9D9A221C96E993009DF897 /* back.jpg */,
 				AB9D9A231C96E993009DF897 /* bottom.jpg */,
 				AB9D9A241C96E993009DF897 /* front.jpg */,
@@ -192,6 +191,7 @@
 				ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */,
 				ABCD9C6B1C131DA300B94BD0 /* font.png */,
 				AB7839E31C70CA950065EF51 /* DepthNormals.metal */,
+				ABFD71AB1D81E55B003770D4 /* LightCuller.metal */,
 				ABE04FBF1C1217F00025C436 /* Moments.metal */,
 				ABE04FC01C1217F00025C436 /* SDF.metal */,
 				ABE04FC11C1217F00025C436 /* Skybox.metal */,
@@ -325,7 +325,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AB9D9A281C96E993009DF897 /* back copy.jpg in Resources */,
 				ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */,
 				ABE04F8B1C1216A80025C436 /* Assets.xcassets in Resources */,
 				ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */,
@@ -368,6 +367,7 @@
 				AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */,
 				ABE04FC51C1217F00025C436 /* SDF.metal in Sources */,
 				ABE04FC61C1217F00025C436 /* Skybox.metal in Sources */,
+				ABFD71AC1D81E55B003770D4 /* LightCuller.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

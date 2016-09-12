@@ -19,6 +19,7 @@ namespace ae3d
         Shader skyboxShader;
         Shader momentsShader;
         Shader depthNormalsShader;
+        ComputeShader lightCullShader;
     };
 
     /// High-level rendering stuff.

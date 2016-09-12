@@ -2,6 +2,7 @@
 #define COMPUTE_SHADER_H
 
 #include <string>
+#include <vector>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
@@ -15,6 +16,8 @@
 
 namespace ae3d
 {
+    class Texture2D;
+    
     namespace FileSystem
     {
         struct FileContentsData;
@@ -56,6 +59,18 @@ namespace ae3d
         VkPipelineShaderStageCreateInfo& GetVertexInfo() { return info; }
 #endif
 
+        /// Sets a render texture into a slot.
+        /// \param renderTexture render texture.
+        /// \param slot slot index.
+        void SetRenderTexture( class RenderTexture* renderTexture, unsigned slot );
+        
+        /// Sets a uniform buffer.
+        /// \param Uniform buffer
+        /// \param bufferSize Buffer's size in bytes
+        void SetUniformBuffer( void* buffer, int bufferSize );
+        
+        void Test( Texture2D* texture, ae3d::RenderTexture* outTexture );
+        
     private:
         std::string path;
 
@@ -65,7 +80,9 @@ namespace ae3d
 #if RENDERER_METAL
         id <MTLFunction> function;
         id<MTLComputePipelineState> pipeline;
+        id<MTLBuffer> uniforms;
 #endif
+        std::vector< RenderTexture* > renderTextures;
     };
 }
 #endif

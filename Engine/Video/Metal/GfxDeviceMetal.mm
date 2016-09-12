@@ -3,10 +3,12 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #endif
+#include <chrono>
 #include <unordered_map>
 #include <sstream>
 #include <list>
 #include "GfxDevice.hpp"
+#include "LightTiler.hpp"
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
 #include "System.hpp"
@@ -45,6 +47,7 @@ namespace Statistics
     int vertexBufferBinds = 0;
     int renderTargetBinds = 0;
     int shaderBinds = 0;
+    float frameTimeMS = 0;
 }
 
 namespace ae3d
@@ -56,8 +59,8 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
+                stm << "frame time: " << ::Statistics::frameTimeMS << "\n";
                 stm << "draw calls: " << ::Statistics::drawCalls << "\n";
-                
                 return stm.str();
             }
         }
@@ -74,7 +77,9 @@ namespace GfxDeviceGlobal
     id<MTLSamplerState> samplerStates[ 2 ];
     std::list< id<MTLBuffer> > uniformBuffers;
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
-    
+    ae3d::LightTiler lightTiler;
+    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
+
     struct Samplers
     {
         id<MTLSamplerState> linearRepeat;
@@ -152,6 +157,13 @@ namespace GfxDeviceGlobal
             ae3d::System::Assert( false, "unhandled texture state" );
         }
     }
+}
+
+void UpdateFrameTiming()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - GfxDeviceGlobal::startFrameTimePoint ).count();
+    Statistics::frameTimeMS = static_cast< float >(tDiff);
 }
 
 namespace
@@ -313,6 +325,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     
     msaaDepthTarget = [device newTextureWithDescriptor:depthDesc];
     msaaDepthTarget.label = @"MSAA Depth Target";
+    
+    GfxDeviceGlobal::lightTiler.Init();
 }
 
 id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
@@ -650,6 +664,7 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     Statistics::textureBinds = 0;
     Statistics::vertexBufferBinds = 0;
     Statistics::shaderBinds = 0;
+    GfxDeviceGlobal::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

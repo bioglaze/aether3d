@@ -25,10 +25,14 @@
 #include "Texture2D.hpp"
 #include "Renderer.hpp"
 #include "System.hpp"
+#if defined( RENDERER_METAL )
+#include "LightTiler.hpp"
+#endif
 
 using namespace ae3d;
-extern ae3d::Renderer renderer;
+extern Renderer renderer;
 float GetVRFov();
+void UpdateFrameTiming();
 
 // TODO: Move into own file
 namespace MathUtil
@@ -148,6 +152,13 @@ namespace Global
 {
     extern Vec3 vrEyePosition;
 }
+
+#if defined( RENDERER_METAL )
+namespace GfxDeviceGlobal
+{
+    extern ae3d::LightTiler lightTiler;
+}
+#endif
 
 namespace SceneGlobal
 {
@@ -504,6 +515,9 @@ void ae3d::Scene::Render()
     }
     
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
+#if RENDERER_METAL
+    UpdateFrameTiming();
+#endif
 }
 
 void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
@@ -678,13 +692,22 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     GfxDevice::ErrorCheck( "Scene render after rendering" );
 
     // Depth and normals
-    if (camera->GetDepthNormalsTexture().GetID() == 0)
+    if (camera->GetDepthNormalsTexture().GetID() != 0)
     {
-        return;
-    }
+        RenderDepthAndNormals( camera, view, gameObjectsWithMeshRenderer, cubeMapFace, frustum );
     
-    GfxDevice::PushGroupMarker( "DepthNormal" );
+#if defined( RENDERER_METAL )
+    GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, camera->GetProjection(), camera->GetView(), camera->GetDepthNormalsTexture() );
+#endif
+    }
+}
 
+void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
+                                         int cubeMapFace, const Frustum& frustum )
+{
+#if 0
+    GfxDevice::PushGroupMarker( "DepthNormal" );
+    
 #if RENDERER_METAL
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
@@ -693,7 +716,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
 #endif
-
+    
     for (auto j : gameObjectsWithMeshRenderer)
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
@@ -704,7 +727,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
         
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
+        // Already culled if this method is called after rendering others.
+        //gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
     }
@@ -714,8 +738,9 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 #endif
     GfxDevice::SetRenderTarget( nullptr, 0 );
     GfxDevice::PopGroupMarker();
-
-    GfxDevice::ErrorCheck( "Scene render end" );
+    
+    GfxDevice::ErrorCheck( "depthnormals render end" );
+#endif
 }
 
 void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace )

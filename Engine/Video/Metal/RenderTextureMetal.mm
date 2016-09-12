@@ -24,7 +24,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
-    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
 
     if (metalTexture == nullptr)
@@ -50,7 +50,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm//(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
                                                        size:width
                                                    mipmapped:NO];
-    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     
     if (metalTexture == nullptr)
@@ -59,5 +59,4 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     }
     
     metalTexture.label = @"Render Texture Cube";
-
 }

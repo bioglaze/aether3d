@@ -32,7 +32,7 @@
    <li>Virtual file system aka .pak archive files for faster loading.</li>
    <li>Custom mesh format, converters included for .obj, .fbx and Blender.</li>
    <li>Shadow mapping from a directional or spot light (no lighting yet)</li>
-   <li>Oculus Rift support.</li>
+   <li>VR support. Tested on HTC Vive and Oculus Rift.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Scene serialization.</li>
    <li>Scene editor built using Qt and WYSIWYG rendering.</li>

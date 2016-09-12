@@ -99,7 +99,7 @@ using namespace ae3d;
     scene.Add( &camera3d );
 
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
-    gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     bc1Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     bc2Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt3.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     bc3Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt5.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
@@ -139,7 +139,8 @@ using namespace ae3d;
     
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
-    cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
+    //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
+    cubeMaterial.SetVector( "tintColor", { 1, 1, 1, 1 } );
     
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );
     rotatingCube.AddComponent<ae3d::MeshRendererComponent>();
@@ -191,7 +192,7 @@ using namespace ae3d;
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 100, -0.6f ), ae3d::Vec3( 768*2, 512*2, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
     scene.Add( &renderTextureContainer );
     
@@ -255,7 +256,8 @@ using namespace ae3d;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
     rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
-    std::string stats = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
+    //std::string drawCalls = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
+    std::string stats = ae3d::System::Statistics::GetStatistics();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
     
     // Testing vertex buffer growing
