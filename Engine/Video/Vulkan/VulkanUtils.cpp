@@ -12,7 +12,11 @@ namespace Stats
 
 namespace debug
 {
+#if DEBUG
+    bool enabled = true;
+#else
     bool enabled = false;
+#endif
     int validationLayerCount = 1;
 
     const char *validationLayerNames[] =
@@ -143,24 +147,28 @@ namespace ae3d
         sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
         VkResult err = vkCreateSampler( device, &sampler, nullptr, linearRepeat );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+        debug::SetObjectName( device, (std::uint64_t)*linearRepeat, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "linearRepeat" );
 
         sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         err = vkCreateSampler( device, &sampler, nullptr, linearClamp );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+        debug::SetObjectName( device, (std::uint64_t)*linearClamp, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "linearClamp" );
 
         sampler.magFilter = VK_FILTER_NEAREST;
         sampler.minFilter = VK_FILTER_NEAREST;
 		sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 		err = vkCreateSampler( device, &sampler, nullptr, pointClamp );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+        debug::SetObjectName( device, (std::uint64_t)*pointClamp, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "pointClamp" );
 
         sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         err = vkCreateSampler( device, &sampler, nullptr, pointRepeat );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+        debug::SetObjectName( device, (std::uint64_t)*pointRepeat, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "pointRepeat" );
     }
 
 	void CreateInstance( VkInstance* outInstance )

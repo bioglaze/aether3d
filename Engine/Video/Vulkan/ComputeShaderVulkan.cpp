@@ -39,9 +39,19 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
 
 }
 
-void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& contents )
+void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& /*contents*/ )
 {
     
+}
+
+void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* /*renderTexture*/, unsigned /*slot*/ )
+{
+	System::Print("SetRenderTexture unimplemented\n");
+}
+
+void ae3d::ComputeShader::SetUniformBuffer( void* /*buffer*/, int /*bufferSize*/ )
+{
+	System::Print( "SetUniformBuffer unimplemented\n" );
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )

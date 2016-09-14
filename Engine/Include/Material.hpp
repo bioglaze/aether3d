@@ -92,7 +92,6 @@ namespace ae3d
         void SetVector( const char* name, const Vec4& vec );
 
   private:
-        // TODO: String hash instead of string and get rid of STL *map.
         static std::unordered_map< std::string, RenderTexture* > sTexRTs;
 
         std::unordered_map< std::string, float > floats;

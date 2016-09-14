@@ -88,6 +88,9 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
         ae3d::System::Print( "Unknown texture file extension: %s\n", fileContents.path.c_str() );
     }
+
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, fileContents.path.c_str() );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, fileContents.path.c_str() );
 }
 
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
@@ -102,7 +105,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     VkBufferCreateInfo bufferCreateInfo = {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = width * height * 4;
+    bufferCreateInfo.size = width * height * bytesPerPixel;
     bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffer );
@@ -122,13 +125,13 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     std::uint8_t* stagingData;
     err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory, 0, memReqs.size, 0, (void **)&stagingData );
-    std::memcpy( stagingData, data, width * height * 4 );
+    std::memcpy( stagingData, data, width * height * bytesPerPixel );
     vkUnmapMemory( GfxDeviceGlobal::device, stagingMemory );
 
     std::vector<VkBufferImageCopy> bufferCopyRegions;
     std::uint32_t offset = 0;
 
-    const int mipLevels = mipmaps == Mipmaps::Generate ? static_cast<int>(MathUtil::GetMipmapCount( width, height )) : 1;
+    mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast<int>(MathUtil::GetMipmapCount( width, height )) : 1;
 
     // We're generating mips at runtime, so no need to loop.
     for (int i = 0; i < 1/*mipLevels*/; ++i)
@@ -145,7 +148,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
         bufferCopyRegions.push_back( bufferCopyRegion );
 
-        offset += width * height * 4;
+        offset += width * height * bytesPerPixel;
     }
 
     VkImageCreateInfo imageCreateInfo = {};
@@ -153,7 +156,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     imageCreateInfo.pNext = nullptr;
     imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     imageCreateInfo.format = format;
-    imageCreateInfo.mipLevels = mipLevels;
+    imageCreateInfo.mipLevels = mipLevelCount;
     imageCreateInfo.arrayLayers = 1;
     imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -193,7 +196,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         1,
         0,
-        mipLevels );
+        mipLevelCount );
 
     vkCmdCopyBufferToImage(
         Texture2DGlobal::texCmdBuffer,
@@ -204,7 +207,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
         bufferCopyRegions.data()
     );
 
-    for (int i = 1; i < mipLevels; ++i)
+    for (int i = 1; i < mipLevelCount; ++i)
     {
         const std::int32_t mipWidth = width >> i;
         const std::int32_t mipHeight = height >> i;
@@ -237,7 +240,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
         imageLayout,
         1,
         0,
-        mipLevels );
+        mipLevelCount );
 
     err = vkEndCommandBuffer( Texture2DGlobal::texCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in Texture2D" );
@@ -285,7 +288,7 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     }
 
     mipLevelCount = static_cast< int >(ddsOutput.dataOffsets.size());
-    int bytesPerPixel = 1;
+    int bytesPerPixel = 2;
 
     VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
 
@@ -297,13 +300,15 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     if (ddsOutput.format == DDSLoader::Format::BC2)
     {
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
+        bytesPerPixel = 2;
     }
     if (ddsOutput.format == DDSLoader::Format::BC3)
     {
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
+        bytesPerPixel = 2;
     }
 
-    CreateVulkanObjects( &fileContents.data[ ddsOutput.dataOffsets[ 0 ] ], 1, format );
+    CreateVulkanObjects( &fileContents.data[ ddsOutput.dataOffsets[ 0 ] ], bytesPerPixel, format );
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )

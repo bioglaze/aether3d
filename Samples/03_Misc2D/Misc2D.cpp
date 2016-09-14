@@ -25,7 +25,7 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, WindowCreateFlags::Empty );
+    Window::Create( width, height, WindowCreateFlags::MSAA4 );
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
@@ -38,7 +38,7 @@ int main()
     camera.AddComponent<TransformComponent>();
 
     Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, 1 );
 
     Texture2D bc1Tex;
     bc1Tex.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
@@ -132,6 +132,7 @@ int main()
     rtCamera.AddComponent<CameraComponent>();
     rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
+    rtCamera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
 
@@ -139,7 +140,7 @@ int main()
     scene.Add( &camera );
     scene.Add( &spriteContainer );
     //scene.Add( &textContainer );
-    //scene.Add( &textContainerSDF );
+    scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
     //scene.Add( &renderTextureContainer );

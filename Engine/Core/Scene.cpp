@@ -531,6 +531,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
 #if RENDERER_VULKAN
+	// TODO: add vkCmdClearColorImage here, but after command buffer begin
     GfxDevice::BeginRenderPassAndCommandBuffer();
 #endif
     if (camera->GetClearFlag() == CameraComponent::ClearFlag::DepthAndColor)
@@ -705,7 +706,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
                                          int cubeMapFace, const Frustum& frustum )
 {
-#if 0
     GfxDevice::PushGroupMarker( "DepthNormal" );
     
 #if RENDERER_METAL
@@ -740,7 +740,6 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view
     GfxDevice::PopGroupMarker();
     
     GfxDevice::ErrorCheck( "depthnormals render end" );
-#endif
 }
 
 void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace )
@@ -1140,7 +1139,9 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 return DeserializeResult::ParseError;
             }
 
-            if (!outGameObjects.back().GetComponent< MeshRendererComponent >())
+			auto meshRenderer = outGameObjects.back().GetComponent< MeshRendererComponent >();
+
+            if (!meshRenderer)
             {
                 System::Print( "Failed to parse %s: found meshpath but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str() );
                 return DeserializeResult::ParseError;
@@ -1150,7 +1151,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> meshFile;
 
             outMeshes.back()->Load( FileSystem::FileContents( meshFile.c_str() ) );
-            outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMesh( outMeshes.back() );
+			meshRenderer->SetMesh( outMeshes.back() );
 
             // FIXME: These ensure that the mesh is rendered. A proper fix would be to serialize materials.
             Shader* tempShader = new Shader();
@@ -1164,7 +1165,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             tempMaterial->SetTexture( "textureMap", Texture2D::GetDefaultTexture() );
             tempMaterial->SetVector( "tint", { 1, 1, 1, 1 } );
             tempMaterial->SetBackFaceCulling( true );
-            outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMaterial( tempMaterial, 0 );
+			meshRenderer->SetMaterial( tempMaterial, 0 );
         }
 
         if (token == "position")

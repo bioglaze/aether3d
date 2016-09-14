@@ -30,7 +30,7 @@ using namespace ae3d;
 
 int main()
 {
-    bool fullScreen = true;
+    bool fullScreen = false;
 
     int width = 640;
     int height = 480;
@@ -208,7 +208,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -270,7 +270,7 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     scene.Add( &cubeScaledUV );

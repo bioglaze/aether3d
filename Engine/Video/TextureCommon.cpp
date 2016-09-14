@@ -43,7 +43,7 @@ void Tokenize( const std::string& str,
 
 namespace ae3d
 {
-    std::string GetCacheHash( std::string path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, float anisotropy )
+    std::string GetCacheHash( const std::string& path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, float anisotropy )
     {
         return path + std::to_string( static_cast<int>(wrap) ) + std::to_string( static_cast<int>(filter) ) +
             std::to_string( static_cast<int>(mipmaps) ) + std::to_string( static_cast<int>(colorSpace) ) + std::to_string( anisotropy );

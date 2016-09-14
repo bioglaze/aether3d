@@ -89,6 +89,7 @@ namespace GfxDeviceGlobal
 
     // Not backbuffer.
     GpuResource* currentRenderTarget = nullptr;
+    DXGI_FORMAT currentRenderTargetFormat;
     D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetDSV;
     D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetRTV;
 
@@ -320,7 +321,7 @@ void CreateRootSignature()
         descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0 );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
-        descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0 );
+        descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 2, 0 );
 
         CD3DX12_ROOT_PARAMETER rootParam[ 2 ];
         rootParam[ 0 ].InitAsDescriptorTable( 2, descRange1 );
@@ -778,7 +779,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 {
     System::Assert( !GfxDeviceGlobal::frameConstantBuffers.empty(), "no shader has called Use()" );
 
-    DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTargetFormat;
     
     if (GfxDeviceGlobal::sampleCount > 1)
     {
@@ -948,6 +949,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
+
+    // TODO: Handle samplers for multiple textures, same logic as for SRV
 
     // FIXME: badly needs polymorphism
     if (GfxDeviceGlobal::texture2d0)
@@ -1123,6 +1126,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     if (GfxDeviceGlobal::currentRenderTarget)
     {
+        // FIXME: Probably wrong, because renderTexture0 is RT that is bound for reading in a shader and is not necessarily currently rendered-to RT.
         if (GfxDeviceGlobal::renderTexture0)
         {
             vpWidth = static_cast< FLOAT >( GfxDeviceGlobal::renderTexture0->GetWidth() );
@@ -1274,6 +1278,7 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     if (target && target->IsCube())
     {
         GfxDeviceGlobal::currentRenderTarget = target->GetGpuResource();
+        GfxDeviceGlobal::currentRenderTargetFormat = target->GetDXGIFormat();
         GfxDeviceGlobal::currentRenderTargetDSV = target->GetCubeDSV( cubeMapFace );
         GfxDeviceGlobal::currentRenderTargetRTV = target->GetCubeRTV( cubeMapFace );
         TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
@@ -1285,9 +1290,14 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
         if (target)
         {
             System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
+            GfxDeviceGlobal::currentRenderTargetFormat = target->GetDXGIFormat();
             GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
             GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
             TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
+        }
+        else
+        {
+            GfxDeviceGlobal::currentRenderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         }
     }
 }

@@ -38,6 +38,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isRenderTexture = true;
     dataType = aDataType;
     isCube = false;
+    handle = 1;
 
     dxgiFormat = (dataType == DataType::UByte) ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R32G32B32A32_FLOAT;
 

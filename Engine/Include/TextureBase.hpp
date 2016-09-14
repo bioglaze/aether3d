@@ -51,7 +51,7 @@ namespace ae3d
         SRGB
     };
     
-    std::string GetCacheHash( std::string path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, float anisotropy );
+    std::string GetCacheHash( const std::string& path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, float anisotropy );
 
     /// Base class for textures.
     class TextureBase

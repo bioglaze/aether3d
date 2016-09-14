@@ -138,7 +138,6 @@ void ae3d::Shader::ReflectVariables()
     reflector->GetDesc( &descShader );
     AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
-    // FIXME: This doesn't differentiate between constant buffers, but currently I only have one [TimoW, 2015-10-11]
     for (UINT i = 0; i < descShader.ConstantBuffers; ++i)
     {
         auto buffer = reflector->GetConstantBufferByIndex( i );
@@ -147,13 +146,16 @@ void ae3d::Shader::ReflectVariables()
         hr = buffer->GetDesc( &desc );
         AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
-        auto var = buffer->GetVariableByIndex( 0 );
-        D3D12_SHADER_VARIABLE_DESC descVar;
-        hr = var->GetDesc( &descVar );
-        AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
+        for (UINT j = 0; j < desc.Variables; ++j)
+        {
+            auto var = buffer->GetVariableByIndex( j );
+            D3D12_SHADER_VARIABLE_DESC descVar;
+            hr = var->GetDesc( &descVar );
+            AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
-        uniformLocations[ std::string( descVar.Name) ].i = descVar.StartOffset;
-        ae3d::System::Assert( descVar.StartOffset + descVar.Size < D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, "too big constant buffer" );
+            uniformLocations[ std::string( descVar.Name ) ].i = descVar.StartOffset;
+            ae3d::System::Assert( descVar.StartOffset + descVar.Size < D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, "too big constant buffer" );
+        }
     }
 }
 

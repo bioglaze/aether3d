@@ -33,6 +33,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isCube = false;
     isRenderTexture = true;
     dataType = aDataType;
+	handle = 1;
 
     // Color
 
@@ -172,4 +173,5 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     isCube = true;
     isRenderTexture = true;
     dataType = aDataType;
+	handle = 1;
 }
