@@ -11,6 +11,7 @@
 		AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD01C2344BA00911AB6 /* OpenAL.framework */; };
 		AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD21C2346F400911AB6 /* MetalKit.framework */; };
 		AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */; };
+		AB9CA0011D8ECA760049A3AF /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9CA0001D8ECA760049A3AF /* Standard.metal */; };
 		ABA29F451C19E1F90098E21D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F441C19E1F90098E21D /* main.m */; };
 		ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F471C19E1F90098E21D /* AppDelegate.m */; };
 		ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F4A1C19E1F90098E21D /* GameViewController.mm */; };
@@ -28,6 +29,7 @@
 		ABD3AB341C29D7F700E78933 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB301C29D7F700E78933 /* font.png */; };
 		ABD3AB351C29D7F700E78933 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB311C29D7F700E78933 /* glider.png */; };
 		ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */; };
+		ABFE40681D8D1DE000195AD2 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFE40671D8D1DE000195AD2 /* LightCuller.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +61,7 @@
 		AB811CD01C2344BA00911AB6 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		AB811CD21C2346F400911AB6 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
+		AB9CA0001D8ECA760049A3AF /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		ABA29F401C19E1F90098E21D /* MetalSampleiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalSampleiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA29F441C19E1F90098E21D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		ABA29F461C19E1F90098E21D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -81,6 +84,7 @@
 		ABD3AB301C29D7F700E78933 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
 		ABD3AB311C29D7F700E78933 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
+		ABFE40671D8D1DE000195AD2 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,11 +170,13 @@
 		ABD3AB241C29D78900E78933 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				ABFE40671D8D1DE000195AD2 /* LightCuller.metal */,
 				AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */,
 				ABD3AB251C29D79F00E78933 /* Moments.metal */,
 				ABD3AB261C29D79F00E78933 /* SDF.metal */,
 				ABD3AB271C29D79F00E78933 /* Skybox.metal */,
 				ABD3AB281C29D79F00E78933 /* SpriteShader.metal */,
+				AB9CA0001D8ECA760049A3AF /* Standard.metal */,
 				ABD3AB291C29D79F00E78933 /* Unlit.metal */,
 			);
 			name = Shaders;
@@ -221,7 +227,7 @@
 		ABA29F381C19E1F90098E21D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0710;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Timo Wiren";
 				TargetAttributes = {
 					ABA29F3F1C19E1F90098E21D = {
@@ -286,12 +292,14 @@
 				ABD3AB2E1C29D79F00E78933 /* Unlit.metal in Sources */,
 				ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */,
 				ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */,
+				AB9CA0011D8ECA760049A3AF /* Standard.metal in Sources */,
 				ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */,
 				ABD3AB2D1C29D79F00E78933 /* SpriteShader.metal in Sources */,
 				ABA29F451C19E1F90098E21D /* main.m in Sources */,
 				AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */,
 				ABD3AB2B1C29D79F00E78933 /* SDF.metal in Sources */,
 				ABD3AB2C1C29D79F00E78933 /* Skybox.metal in Sources */,
+				ABFE40681D8D1DE000195AD2 /* LightCuller.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -346,8 +354,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -390,8 +400,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

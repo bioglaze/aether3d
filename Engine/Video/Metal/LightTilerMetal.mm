@@ -5,8 +5,11 @@
 #include "System.hpp"
 #include "Vec3.hpp"
 
-unsigned screenWidth = 480;
-unsigned screenHeight = 480;
+namespace GfxDeviceGlobal
+{
+    extern int backBufferWidth;
+    extern int backBufferHeight;
+}
 
 void ae3d::LightTiler::Init()
 {
@@ -27,12 +30,12 @@ int ae3d::LightTiler::GetNextPointLightBufferIndex()
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
 {
-    return (unsigned)((screenWidth + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDeviceGlobal::backBufferWidth + TileRes - 1) / (float)TileRes);
 }
 
 unsigned ae3d::LightTiler::GetNumTilesY() const
 {
-    return (unsigned)((screenHeight + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDeviceGlobal::backBufferWidth + TileRes - 1) / (float)TileRes);
 }
 
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& position, float radius )
@@ -47,7 +50,7 @@ unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
     const unsigned adjustmentMultipier = 32;
     
     // I haven't tested at greater than 1080p, so cap it
-    const unsigned height = (screenHeight > 1080) ? 1080 : screenHeight;
+    const unsigned height = (GfxDeviceGlobal::backBufferHeight > 1080) ? 1080 : GfxDeviceGlobal::backBufferHeight;
     
     // adjust max lights per tile down as height increases
     return (MaxLightsPerTile - (adjustmentMultipier * (height / 120)));
@@ -57,26 +60,42 @@ using namespace ae3d;
 
 struct CullerUniforms
 {
+    unsigned windowWidth;
+    unsigned windowHeight;
+    unsigned numLights;
+    int maxNumLightsPerTile;
     Matrix44 invProjection;
-    Matrix44 view;
-    Vec4 windowSize;
+    Matrix44 viewMatrix;
 };
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& view, RenderTexture& depthNormalTarget )
 {
     if (pointLightCenterAndRadiusRT.GetID() == 0)
     {
-        pointLightCenterAndRadiusRT.Create2D( depthNormalTarget.GetWidth(), depthNormalTarget.GetHeight(),ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+        pointLightCenterAndRadiusRT.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight,
+                                              ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     }
-    
+
+    if (perTileLightIndexBufferRT.GetID() == 0)
+    {
+        perTileLightIndexBufferRT.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight,
+                                            ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+    }
+
+
     shader.SetRenderTexture( &depthNormalTarget, 0 );
     shader.SetRenderTexture( &pointLightCenterAndRadiusRT, 1 );
-    shader.SetRenderTexture( &depthNormalTarget, 2 );
+    shader.SetRenderTexture( &perTileLightIndexBufferRT, 2 );
     CullerUniforms uniforms;
 
     Matrix44::Invert( projection, uniforms.invProjection );
-    uniforms.view = view;
-    uniforms.windowSize = Vec4( depthNormalTarget.GetWidth(), depthNormalTarget.GetHeight(), 0, 0 );
+    uniforms.viewMatrix = view;
+    uniforms.windowWidth = depthNormalTarget.GetWidth();
+    uniforms.windowHeight = depthNormalTarget.GetHeight();
+    unsigned activeSpotLights = 0;
+    uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
+    uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
+
     shader.SetUniformBuffer( &uniforms, sizeof( CullerUniforms ) );
     
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );

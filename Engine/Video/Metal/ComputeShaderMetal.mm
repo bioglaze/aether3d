@@ -45,7 +45,10 @@ void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsign
 
 void ae3d::ComputeShader::SetUniformBuffer( void* buffer, int bufferSize )
 {
-
+    uniforms = [GfxDevice::GetMetalDevice() newBufferWithBytes:buffer
+                       length:bufferSize
+                      options:MTLResourceOptionCPUCacheModeDefault];
+    uniforms.label = @"Uniform buffer CS";
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
@@ -58,7 +61,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     
     id<MTLComputeCommandEncoder> commandEncoder = [commandBuffer computeCommandEncoder];
     [commandEncoder setComputePipelineState:pipeline];
-    
+    [commandEncoder setBuffer:uniforms offset:0 atIndex:0];
+
     for (std::size_t i = 0; i < renderTextures.size(); ++i)
     {
         [commandEncoder setTexture:(renderTextures[ i ] ? renderTextures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
@@ -73,7 +77,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
 void ae3d::ComputeShader::Test( ae3d::Texture2D* texture, ae3d::RenderTexture* outTexture )
 {
-    MTLSize threadgroupCounts = MTLSizeMake(8, 8, 1);
+    MTLSize threadgroupCounts = MTLSizeMake( 8, 8, 1 );
     MTLSize threadgroups = MTLSizeMake( texture->GetWidth() / threadgroupCounts.width,
                                         texture->GetHeight() / threadgroupCounts.height,
                                        1);

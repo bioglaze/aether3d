@@ -22,6 +22,7 @@ namespace ae3d
         unsigned GetMaxNumLightsPerTile() const;
 
         RenderTexture pointLightCenterAndRadiusRT;
+        RenderTexture perTileLightIndexBufferRT;
         std::vector< Vec4 > pointLightCenterAndRadius;
         int activePointLights = 0;
         static const int TileRes = 16;
