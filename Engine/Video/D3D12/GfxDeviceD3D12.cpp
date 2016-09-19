@@ -526,8 +526,8 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     descPso.NumRenderTargets = 1;
     descPso.RTVFormats[ 0 ] = rtvFormat;
     descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-	descPso.SampleDesc.Count = sampleCount;
-	descPso.SampleDesc.Quality = sampleCount > 1 ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
+    descPso.SampleDesc.Count = sampleCount;
+    descPso.SampleDesc.Quality = sampleCount > 1 ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
 
     ID3D12PipelineState* pso;
     HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
@@ -597,17 +597,26 @@ void CreateDepthStencil()
 
 void ae3d::CreateRenderer( int samples )
 {
-	if (samples > 0 && samples < 17)
-	{
-		GfxDeviceGlobal::sampleCount = samples;
-	}
+    if (samples > 0 && samples < 17)
+    {
+        GfxDeviceGlobal::sampleCount = samples;
+    }
 
 #ifdef DEBUG
     ID3D12Debug* debugController;
-    const HRESULT dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &debugController ) );
+    HRESULT dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &debugController ) );
     if (dhr == S_OK)
     {
         debugController->EnableDebugLayer();
+
+        ID3D12Debug1* debugController1;
+        dhr = debugController->QueryInterface( IID_PPV_ARGS( &debugController1 ) );
+
+        if (dhr == S_OK)
+        {
+            debugController1->SetEnableGPUBasedValidation( true );
+        }
+
         debugController->Release();
     }
     else
@@ -635,7 +644,9 @@ void ae3d::CreateRenderer( int samples )
 #ifdef DEBUG
     hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
     AE3D_CHECK_D3D( hr, "Infoqueue failed" );
-    GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
+    //GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
+    // Win 10 Anniversary edition has a false error: http://forums.directxtech.com/index.php?topic=5738.0
+    //GfxDeviceGlobal::infoQueue->SetBreakOnID( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_INCOMPATIBLE_RESOURCE_STATE, FALSE );
 #endif
 
     hr = GfxDeviceGlobal::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( &GfxDeviceGlobal::commandListAllocator ) );
@@ -779,6 +790,12 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 {
     System::Assert( !GfxDeviceGlobal::frameConstantBuffers.empty(), "no shader has called Use()" );
 
+    // Prevents feedback. Currently disabled because it also prevents drawing a sprite that uses render texture.
+    /*if (GfxDeviceGlobal::renderTexture0 && GfxDeviceGlobal::currentRenderTargetRTV.ptr == GfxDeviceGlobal::renderTexture0->GetRTV().ptr)
+    {
+        return;
+    }*/
+
     DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTargetFormat;
     
     if (GfxDeviceGlobal::sampleCount > 1)
@@ -820,6 +837,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     const bool is2D0 = (GfxDeviceGlobal::texture2d0 != nullptr) || (GfxDeviceGlobal::renderTexture0 != nullptr && !GfxDeviceGlobal::renderTexture0->IsCube());
     DXGI_FORMAT format0 = DXGI_FORMAT_R8G8B8A8_UNORM;
+    D3D12_SRV_DIMENSION viewDimension0 = D3D12_SRV_DIMENSION_TEXTURE2D;
     int mipLevelCount0 = 1;
 
     if (GfxDeviceGlobal::texture2d0 != nullptr)
@@ -827,16 +845,23 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         format0 = GfxDeviceGlobal::texture2d0->GetDXGIFormat();
         mipLevelCount0 = GfxDeviceGlobal::texture2d0->GetMipLevelCount();
     }
+    else if (GfxDeviceGlobal::textureCube0 != nullptr)
+    {
+        format0 = GfxDeviceGlobal::textureCube0->GetDXGIFormat();
+        mipLevelCount0 = GfxDeviceGlobal::textureCube0->GetMipLevelCount();
+        viewDimension0 = D3D12_SRV_DIMENSION_TEXTURECUBE;
+    }
     else if (GfxDeviceGlobal::renderTexture0 != nullptr)
     {
         format0 = GfxDeviceGlobal::renderTexture0->GetDXGIFormat();
         mipLevelCount0 = GfxDeviceGlobal::renderTexture0->GetMipLevelCount();
+        viewDimension0 = GfxDeviceGlobal::renderTexture0->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
     }
 
     // TODO: Get from texture object
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
     srvDesc0.Format = format0;
-    srvDesc0.ViewDimension = is2D0 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
+    srvDesc0.ViewDimension = viewDimension0;
     srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
     if (srvDesc0.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
@@ -858,22 +883,31 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     }
 
     const bool is2D1 = (GfxDeviceGlobal::texture2d1 != nullptr) || (GfxDeviceGlobal::renderTexture1 != nullptr && !GfxDeviceGlobal::renderTexture1->IsCube());
+
     DXGI_FORMAT format1 = DXGI_FORMAT_R8G8B8A8_UNORM;
+    D3D12_SRV_DIMENSION viewDimension1 = D3D12_SRV_DIMENSION_TEXTURE2D;
     int mipLevelCount1 = 1;
     if (GfxDeviceGlobal::texture2d1 != nullptr)
     {
         format1 = GfxDeviceGlobal::texture2d1->GetDXGIFormat();
         mipLevelCount1 = GfxDeviceGlobal::texture2d1->GetMipLevelCount();
     }
+    else if (GfxDeviceGlobal::textureCube1 != nullptr)
+    {
+        format1 = GfxDeviceGlobal::textureCube1->GetDXGIFormat();
+        mipLevelCount1 = GfxDeviceGlobal::textureCube1->GetMipLevelCount();
+        viewDimension1 = D3D12_SRV_DIMENSION_TEXTURECUBE;
+    }
     else if (GfxDeviceGlobal::renderTexture1 != nullptr)
     {
         format1 = GfxDeviceGlobal::renderTexture1->GetDXGIFormat();
         mipLevelCount1 = GfxDeviceGlobal::renderTexture1->GetMipLevelCount();
+        viewDimension1 = GfxDeviceGlobal::renderTexture1->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
     }
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
     srvDesc1.Format = format1;
-    srvDesc1.ViewDimension = is2D1 ? D3D12_SRV_DIMENSION_TEXTURE2D : D3D12_SRV_DIMENSION_TEXTURECUBE;
+    srvDesc1.ViewDimension = viewDimension1;
     srvDesc1.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
     if (srvDesc1.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
@@ -1253,6 +1287,15 @@ void ae3d::GfxDevice::Present()
     
     GfxDeviceGlobal::frameConstantBuffers.clear();
     GfxDeviceGlobal::currentConstantBuffer = nullptr;
+
+    GfxDeviceGlobal::currentRenderTargetRTV.ptr = 0;
+    GfxDeviceGlobal::currentRenderTarget = nullptr;
+    GfxDeviceGlobal::texture2d0 = nullptr;
+    GfxDeviceGlobal::texture2d1 = nullptr;
+    GfxDeviceGlobal::textureCube0 = nullptr;
+    GfxDeviceGlobal::textureCube1 = nullptr;
+    GfxDeviceGlobal::renderTexture0 = nullptr;
+    GfxDeviceGlobal::renderTexture1 = nullptr;
 
     auto tEnd = std::chrono::high_resolution_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - GfxDeviceGlobal::startFrameTimePoint ).count();

@@ -270,7 +270,7 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     scene.Add( &cubeScaledUV );

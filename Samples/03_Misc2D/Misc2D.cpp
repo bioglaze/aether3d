@@ -25,7 +25,7 @@ int main()
     const int height = 480;
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, WindowCreateFlags::MSAA4 );
+    Window::Create( width, height, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
@@ -143,8 +143,8 @@ int main()
     scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    //scene.Add( &renderTextureContainer );
-    //scene.Add( &rtCamera );
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;
