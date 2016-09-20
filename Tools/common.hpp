@@ -13,6 +13,11 @@
 
 // Cache optimization code adapted from http://gameangst.com/wp-content/uploads/2009/03/forsythtriangleorderoptimizer.cpp
 
+static unsigned short Min( unsigned short a, unsigned short b )
+{
+    return a < b ? a : b;
+}
+
 struct TexCoord
 {
     TexCoord() : u( 0 ), v( 0 ) {}
@@ -143,9 +148,12 @@ std::vector< Mesh > gMeshes;
 
 const unsigned MaxVertexCacheSize = 64;
 const unsigned MaxPrecomputedVertexValenceScores = 64;
+const unsigned short lruCacheSize = 64;
 
 float gVertexCacheScores[ MaxVertexCacheSize + 1 ][ MaxVertexCacheSize ];
 float gVertexValenceScores[ MaxPrecomputedVertexValenceScores ];
+
+std::vector< unsigned short > newIndexList;
 
 void Mesh::CopyInterleavedVerticesToPTN()
 {
@@ -197,15 +205,41 @@ float ComputeVertexValenceScore( unsigned numActiveFaces )
 {
     const float FindVertexScore_ValenceBoostScale = 2.0f;
     const float FindVertexScore_ValenceBoostPower = 0.5f;
-    
+
     float score = 0;
-    
+
     // Bonus points for having a low number of tris still to
     // use the vert, so we get rid of lone verts quickly.
-    float valenceBoost = std::pow( static_cast< float >( numActiveFaces ),
-                               -FindVertexScore_ValenceBoostPower );
+    float valenceBoost = std::pow( static_cast< float >(numActiveFaces),
+        -FindVertexScore_ValenceBoostPower );
     score += FindVertexScore_ValenceBoostScale * valenceBoost;
-    
+
+    return score;
+}
+
+float FindVertexScore( unsigned numActiveFaces, unsigned cachePosition, unsigned vertexCacheSize )
+{
+    if (numActiveFaces == 0)
+    {
+        // No tri needs this vertex!
+        return -1.0f;
+    }
+
+    float score = 0.f;
+    if (cachePosition < vertexCacheSize)
+    {
+        score += gVertexCacheScores[ vertexCacheSize ][ cachePosition ];
+    }
+
+    if (numActiveFaces < MaxPrecomputedVertexValenceScores)
+    {
+        score += gVertexValenceScores[ numActiveFaces ];
+    }
+    else
+    {
+        score += ComputeVertexValenceScore( numActiveFaces );
+    }
+
     return score;
 }
 
@@ -250,7 +284,248 @@ void Mesh::OptimizeFaces()
         ++verticesWithCachedata[ indices[ i ].c ].data.activeFaceListSize;
     }
     
-    //std::vector< Face > activeFaceList;
+    std::vector< unsigned > activeFaceList;
+
+    const unsigned short kEvictedCacheIndex = std::numeric_limits<unsigned short>::max();
+
+    {
+        // allocate face list per vertex
+        unsigned curActiveFaceListPos = 0;
+
+        for (std::size_t i = 0; i < verticesWithCachedata.size(); ++i)
+        {
+            VertexPTNTCWithData& vertexData = verticesWithCachedata[ i ];
+            vertexData.data.cachePos0 = kEvictedCacheIndex;
+            vertexData.data.cachePos1 = kEvictedCacheIndex;
+            vertexData.data.activeFaceListStart = curActiveFaceListPos;
+            curActiveFaceListPos += vertexData.data.activeFaceListSize;
+            vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos0, lruCacheSize );
+            vertexData.data.activeFaceListSize = 0;
+        }
+        activeFaceList.resize( curActiveFaceListPos );
+    }
+
+    // fill out face list per vertex
+    for (std::size_t i = 0; i < indices.size(); ++i)
+    {
+        unsigned short index = indices[ i ].a;
+        VertexPTNTCWithData& vertexDataA = verticesWithCachedata[ index ];
+        activeFaceList[ vertexDataA.data.activeFaceListStart + vertexDataA.data.activeFaceListSize ] = i;
+        ++vertexDataA.data.activeFaceListSize;
+
+        index = indices[ i ].b;
+        VertexPTNTCWithData& vertexDataB = verticesWithCachedata[ index ];
+        activeFaceList[ vertexDataB.data.activeFaceListStart + vertexDataB.data.activeFaceListSize ] = i;
+        ++vertexDataB.data.activeFaceListSize;
+
+        index = indices[ i ].c;
+        VertexPTNTCWithData& vertexDataC = verticesWithCachedata[ index ];
+        activeFaceList[ vertexDataC.data.activeFaceListStart + vertexDataC.data.activeFaceListSize ] = i;
+        ++vertexDataC.data.activeFaceListSize;
+    }
+
+    std::vector<std::uint8_t> processedFaceList;
+    processedFaceList.resize( indices.size() );
+
+    unsigned short vertexCacheBuffer[ (MaxVertexCacheSize + 3) * 2 ];
+    unsigned short* cache0 = vertexCacheBuffer;
+    unsigned short* cache1 = vertexCacheBuffer + (MaxVertexCacheSize + 3);
+    unsigned short entriesInCache0 = 0;
+
+    unsigned bestFace = 0;
+    float bestScore = -1.f;
+
+    const float maxValenceScore = FindVertexScore( 1, kEvictedCacheIndex, lruCacheSize ) * 3.0f;
+
+    for (unsigned i = 0; i < indices.size(); ++i)
+    {
+        if (bestScore < 0.f)
+        {
+            // no verts in the cache are used by any unprocessed faces so
+            // search all unprocessed faces for a new starting point
+            for (unsigned j = 0; j < indices.size(); ++j)
+            {
+                if (processedFaceList[ j ] == 0)
+                {
+                    unsigned fface = j;
+                    float faceScore = 0.f;
+                   
+                    unsigned short indexA = indices[ fface ].a;
+                    VertexPTNTCWithData& vertexDataA = verticesWithCachedata[ indexA ];
+                    assert( vertexDataA.data.activeFaceListSize > 0 );
+                    assert( vertexDataA.data.cachePos0 >= lruCacheSize );
+                    faceScore += vertexDataA.data.score;
+
+                    unsigned short indexB = indices[ fface ].b;
+                    VertexPTNTCWithData& vertexDataB = verticesWithCachedata[ indexB ];
+                    assert( vertexDataB.data.activeFaceListSize > 0 );
+                    assert( vertexDataB.data.cachePos0 >= lruCacheSize );
+                    faceScore += vertexDataB.data.score;
+
+                    unsigned short indexC = indices[ fface ].c;
+                    VertexPTNTCWithData& vertexDataC = verticesWithCachedata[ indexC ];
+                    assert( vertexDataC.data.activeFaceListSize > 0 );
+                    assert( vertexDataC.data.cachePos0 >= lruCacheSize );
+                    faceScore += vertexDataC.data.score;
+
+                    if (faceScore > bestScore)
+                    {
+                        bestScore = faceScore;
+                        bestFace = fface;
+
+                        assert( bestScore <= maxValenceScore );
+                        if (bestScore >= maxValenceScore)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            assert( bestScore >= 0.f );
+        }
+
+        processedFaceList[ bestFace ] = 1;
+        unsigned short entriesInCache1 = 0;
+
+        newIndexList.resize( indices.size() );
+
+        // add bestFace to LRU cache and to newIndexList
+        {
+            unsigned short indexA = indices[ bestFace ].a;
+            newIndexList[ i ] = indexA;
+
+            VertexPTNTCWithData& vertexData = verticesWithCachedata[ indexA ];
+
+            if (vertexData.data.cachePos1 >= entriesInCache1)
+            {
+                vertexData.data.cachePos1 = entriesInCache1;
+                cache1[ entriesInCache1++ ] = indexA;
+
+                if (vertexData.data.activeFaceListSize == 1)
+                {
+                    --vertexData.data.activeFaceListSize;
+                    continue;
+                }
+            }
+
+            assert( vertexData.data.activeFaceListSize > 0 );
+            unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
+            unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
+            unsigned* it = std::find( begin, end, bestFace );
+            assert( it != end );
+            std::swap( *it, *(end - 1) );
+            --vertexData.data.activeFaceListSize;
+            vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
+
+        }
+
+        {
+            unsigned short indexB = indices[ bestFace ].b;
+            newIndexList[ i ] = indexB;
+
+            VertexPTNTCWithData& vertexData = verticesWithCachedata[ indexB ];
+
+            if (vertexData.data.cachePos1 >= entriesInCache1)
+            {
+                vertexData.data.cachePos1 = entriesInCache1;
+                cache1[ entriesInCache1++ ] = indexB;
+
+                if (vertexData.data.activeFaceListSize == 1)
+                {
+                    --vertexData.data.activeFaceListSize;
+                    continue;
+                }
+            }
+
+            assert( vertexData.data.activeFaceListSize > 0 );
+            unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
+            unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
+            unsigned* it = std::find( begin, end, bestFace );
+            assert( it != end );
+            std::swap( *it, *(end - 1) );
+            --vertexData.data.activeFaceListSize;
+            vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
+
+        }
+
+        {
+            unsigned short indexC = indices[ bestFace ].c;
+            newIndexList[ i ] = indexC;
+
+            VertexPTNTCWithData& vertexData = verticesWithCachedata[ indexC ];
+
+            if (vertexData.data.cachePos1 >= entriesInCache1)
+            {
+                vertexData.data.cachePos1 = entriesInCache1;
+                cache1[ entriesInCache1++ ] = indexC;
+
+                if (vertexData.data.activeFaceListSize == 1)
+                {
+                    --vertexData.data.activeFaceListSize;
+                    continue;
+                }
+            }
+
+            assert( vertexData.data.activeFaceListSize > 0 );
+            unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
+            unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
+            unsigned* it = std::find( begin, end, bestFace );
+            assert( it != end );
+            std::swap( *it, *(end - 1) );
+            --vertexData.data.activeFaceListSize;
+            vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
+
+        }
+        // move the rest of the old verts in the cache down and compute their new scores
+        for (unsigned c0 = 0; c0 < entriesInCache0; ++c0)
+        {
+            unsigned short index = cache0[ c0 ];
+            VertexPTNTCWithData& vertexData = verticesWithCachedata[ index ];
+
+            if (vertexData.data.cachePos1 >= entriesInCache1)
+            {
+                vertexData.data.cachePos1 = entriesInCache1;
+                cache1[ entriesInCache1++ ] = index;
+                vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
+            }
+        }
+
+        // find the best scoring triangle in the current cache (including up to 3 that were just evicted)
+        bestScore = -1.f;
+        for (unsigned c1 = 0; c1 < entriesInCache1; ++c1)
+        {
+            unsigned short index = cache1[ c1 ];
+            VertexPTNTCWithData& vertexData = verticesWithCachedata[ index ];
+            vertexData.data.cachePos0 = vertexData.data.cachePos1;
+            vertexData.data.cachePos1 = kEvictedCacheIndex;
+            for (unsigned j = 0; j < vertexData.data.activeFaceListSize; ++j)
+            {
+                unsigned fface = activeFaceList[ vertexData.data.activeFaceListStart + j ];
+                float faceScore = 0.f;
+                    
+                unsigned short faceIndexA = indices[ fface ].a;
+                VertexPTNTCWithData& faceVertexDataA = verticesWithCachedata[ faceIndexA ];
+                faceScore += faceVertexDataA.data.score;
+
+                unsigned short faceIndexB = indices[ fface ].b;
+                VertexPTNTCWithData& faceVertexDataB = verticesWithCachedata[ faceIndexB ];
+                faceScore += faceVertexDataB.data.score;
+
+                unsigned short faceIndexC = indices[ fface ].c;
+                VertexPTNTCWithData& faceVertexDataC = verticesWithCachedata[ faceIndexC ];
+                faceScore += faceVertexDataC.data.score;
+
+                if (faceScore > bestScore)
+                {
+                    bestScore = faceScore;
+                    bestFace = fface;
+                }
+            }
+        }
+
+        std::swap( cache0, cache1 );
+        entriesInCache0 = Min( entriesInCache1, lruCacheSize );
+    }
 
     for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
     {

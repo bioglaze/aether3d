@@ -32,9 +32,11 @@ int main()
 {
     bool fullScreen = false;
 
+    //int width = 1512;
+    //int height = 1680;
     int width = 640;
     int height = 480;
-    
+
     if (fullScreen)
     {
         width = 0;
@@ -176,7 +178,7 @@ int main()
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 512 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
@@ -271,8 +273,8 @@ int main()
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );
-    //scene.Add( &cameraCubeRT );
-    //scene.Add( &rtCube );
+    scene.Add( &cameraCubeRT );
+    scene.Add( &rtCube );
     scene.Add( &cubeScaledUV );
     scene.Add( &copiedCube );
     scene.Add( &statsContainer );

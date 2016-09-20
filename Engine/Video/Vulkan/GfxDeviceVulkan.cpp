@@ -1467,12 +1467,14 @@ void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )
 {
 }
 
-void ae3d::GfxDevice::PushGroupMarker( const char* /*name*/ )
+void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
+    debug::BeginRegion( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], name, 0, 1, 0 );
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
+    debug::EndRegion( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
 }
 
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()

@@ -239,7 +239,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
     }
 
     SetInt( name, textureUnit );
-    TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
+    //TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );

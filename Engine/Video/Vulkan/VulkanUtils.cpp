@@ -30,6 +30,7 @@ namespace debug
     PFN_vkDebugMarkerSetObjectNameEXT DebugMarkerSetObjectName = nullptr;
     PFN_vkCmdDebugMarkerBeginEXT CmdDebugMarkerBegin = nullptr;
     PFN_vkCmdDebugMarkerEndEXT CmdDebugMarkerEnd = nullptr;
+    PFN_vkCmdDebugMarkerInsertEXT CmdDebugMarkerInsertEXT = nullptr;
 
     VkDebugReportCallbackEXT debugReportCallback = nullptr;
 
@@ -79,6 +80,7 @@ namespace debug
         DebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr( device, "vkDebugMarkerSetObjectNameEXT" );
         CmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerBeginEXT" );
         CmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerEndEXT" );
+        CmdDebugMarkerInsertEXT = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerInsertEXT" );
     }
 
     void SetObjectName( VkDevice device, std::uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name )
@@ -91,6 +93,27 @@ namespace debug
             nameInfo.object = object;
             nameInfo.pObjectName = name;
             DebugMarkerSetObjectName( device, &nameInfo );
+        }
+    }
+
+    void BeginRegion( VkCommandBuffer cmdbuffer, const char* pMarkerName, float r, float g, float b )
+    {
+        if (CmdDebugMarkerBegin)
+        {
+            float color[ 4 ] = { r, g, b, 1 };
+            VkDebugMarkerMarkerInfoEXT markerInfo = {};
+            markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
+            memcpy( markerInfo.color, &color[ 0 ], sizeof( float ) * 4 );
+            markerInfo.pMarkerName = pMarkerName;
+            CmdDebugMarkerBegin( cmdbuffer, &markerInfo );
+        }
+    }
+
+    void EndRegion( VkCommandBuffer cmdBuffer )
+    {
+        if (CmdDebugMarkerEnd)
+        {
+            CmdDebugMarkerEnd( cmdBuffer );
         }
     }
 

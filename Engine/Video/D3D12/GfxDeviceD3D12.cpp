@@ -17,6 +17,7 @@
 #include "System.hpp"
 #include "Shader.hpp"
 #include "TextureBase.hpp"
+#include "RenderTexture.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
@@ -88,10 +89,8 @@ namespace GfxDeviceGlobal
     IDXGIAdapter3* adapter = nullptr;
 
     // Not backbuffer.
-    GpuResource* currentRenderTarget = nullptr;
-    DXGI_FORMAT currentRenderTargetFormat;
-    D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetDSV;
-    D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetRTV;
+    ae3d::RenderTexture* currentRenderTarget = nullptr;
+    unsigned currentRenderTargetCubeMapFace = 0;
 
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
     GpuResource rtvResources[ 2 ];
@@ -608,7 +607,7 @@ void ae3d::CreateRenderer( int samples )
     if (dhr == S_OK)
     {
         debugController->EnableDebugLayer();
-
+#if 0
         ID3D12Debug1* debugController1;
         dhr = debugController->QueryInterface( IID_PPV_ARGS( &debugController1 ) );
 
@@ -616,7 +615,7 @@ void ae3d::CreateRenderer( int samples )
         {
             debugController1->SetEnableGPUBasedValidation( true );
         }
-
+#endif
         debugController->Release();
     }
     else
@@ -796,7 +795,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         return;
     }*/
 
-    DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTargetFormat;
+    DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     
     if (GfxDeviceGlobal::sampleCount > 1)
     {
@@ -835,7 +834,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     
-    const bool is2D0 = (GfxDeviceGlobal::texture2d0 != nullptr) || (GfxDeviceGlobal::renderTexture0 != nullptr && !GfxDeviceGlobal::renderTexture0->IsCube());
     DXGI_FORMAT format0 = DXGI_FORMAT_R8G8B8A8_UNORM;
     D3D12_SRV_DIMENSION viewDimension0 = D3D12_SRV_DIMENSION_TEXTURE2D;
     int mipLevelCount0 = 1;
@@ -881,8 +879,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     {
         System::Assert( false, "unhandled texture dimension" );
     }
-
-    const bool is2D1 = (GfxDeviceGlobal::texture2d1 != nullptr) || (GfxDeviceGlobal::renderTexture1 != nullptr && !GfxDeviceGlobal::renderTexture1->IsCube());
 
     DXGI_FORMAT format1 = DXGI_FORMAT_R8G8B8A8_UNORM;
     D3D12_SRV_DIMENSION viewDimension1 = D3D12_SRV_DIMENSION_TEXTURE2D;
@@ -983,8 +979,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
-
-    // TODO: Handle samplers for multiple textures, same logic as for SRV
 
     // FIXME: badly needs polymorphism
     if (GfxDeviceGlobal::texture2d0)
@@ -1151,7 +1145,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     auto i = GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex();
 	GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
 
-    GpuResource* resource = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget : &GfxDeviceGlobal::rtvResources[ i ];
+    GpuResource* resource = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetGpuResource() : &GfxDeviceGlobal::rtvResources[ i ];
 
     TransitionResource( *resource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     
@@ -1160,12 +1154,8 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     if (GfxDeviceGlobal::currentRenderTarget)
     {
-        // FIXME: Probably wrong, because renderTexture0 is RT that is bound for reading in a shader and is not necessarily currently rendered-to RT.
-        if (GfxDeviceGlobal::renderTexture0)
-        {
-            vpWidth = static_cast< FLOAT >( GfxDeviceGlobal::renderTexture0->GetWidth() );
-            vpHeight = static_cast< FLOAT >( GfxDeviceGlobal::renderTexture0->GetHeight() );
-        }
+        vpWidth = static_cast< FLOAT >( GfxDeviceGlobal::currentRenderTarget->GetWidth() );
+        vpHeight = static_cast< FLOAT >( GfxDeviceGlobal::currentRenderTarget->GetHeight() );
     }
 
     D3D12_VIEWPORT viewPort{ 0, 0, vpWidth, vpHeight, 0, 1 };
@@ -1182,7 +1172,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     if (GfxDeviceGlobal::currentRenderTarget)
     {
-        descHandleRtv = GfxDeviceGlobal::currentRenderTargetRTV;
+        descHandleRtv = GfxDeviceGlobal::currentRenderTarget->IsCube() ? GfxDeviceGlobal::currentRenderTarget->GetCubeRTV( GfxDeviceGlobal::currentRenderTargetCubeMapFace ) : GfxDeviceGlobal::currentRenderTarget->GetRTV();
     }
     else if (GfxDeviceGlobal::sampleCount > 1)
     {
@@ -1199,8 +1189,20 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
         GfxDeviceGlobal::graphicsCommandList->ClearRenderTargetView( descHandleRtv, GfxDeviceGlobal::clearColor, 0, nullptr );
     }
 
-    D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTargetDSV : 
-                                                       DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE descHandleDsv;
+    if (GfxDeviceGlobal::currentRenderTarget && GfxDeviceGlobal::currentRenderTarget->IsCube())
+    {
+        descHandleDsv = GfxDeviceGlobal::currentRenderTarget->GetCubeDSV( GfxDeviceGlobal::currentRenderTargetCubeMapFace );
+    }
+    else if (GfxDeviceGlobal::currentRenderTarget && !GfxDeviceGlobal::currentRenderTarget->IsCube())
+    {
+        descHandleDsv = GfxDeviceGlobal::currentRenderTarget->GetDSV();
+    }
+    else
+    {
+        descHandleDsv = DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart();
+    }
+
     if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::currentRenderTarget)
     {
         descHandleDsv = GfxDeviceGlobal::msaaDepthHandle;
@@ -1288,7 +1290,6 @@ void ae3d::GfxDevice::Present()
     GfxDeviceGlobal::frameConstantBuffers.clear();
     GfxDeviceGlobal::currentConstantBuffer = nullptr;
 
-    GfxDeviceGlobal::currentRenderTargetRTV.ptr = 0;
     GfxDeviceGlobal::currentRenderTarget = nullptr;
     GfxDeviceGlobal::texture2d0 = nullptr;
     GfxDeviceGlobal::texture2d1 = nullptr;
@@ -1318,29 +1319,16 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     System::Assert( !target || target->IsRenderTexture(), "target must be render texture" );
     System::Assert( cubeMapFace < 6, "invalid cube map face" );
 
+    GfxDeviceGlobal::currentRenderTarget = target;
+    GfxDeviceGlobal::currentRenderTargetCubeMapFace = cubeMapFace;
+
     if (target && target->IsCube())
     {
-        GfxDeviceGlobal::currentRenderTarget = target->GetGpuResource();
-        GfxDeviceGlobal::currentRenderTargetFormat = target->GetDXGIFormat();
-        GfxDeviceGlobal::currentRenderTargetDSV = target->GetCubeDSV( cubeMapFace );
-        GfxDeviceGlobal::currentRenderTargetRTV = target->GetCubeRTV( cubeMapFace );
         TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
     }
-    else
+    else if (target)
     {
-        GfxDeviceGlobal::currentRenderTarget = !target ? nullptr : target->GetGpuResource();
-
-        if (target)
-        {
-            System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
-            GfxDeviceGlobal::currentRenderTargetFormat = target->GetDXGIFormat();
-            GfxDeviceGlobal::currentRenderTargetDSV = target->GetDSV();
-            GfxDeviceGlobal::currentRenderTargetRTV = target->GetRTV();
-            TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
-        }
-        else
-        {
-            GfxDeviceGlobal::currentRenderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-        }
+        System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
+        TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
     }
 }

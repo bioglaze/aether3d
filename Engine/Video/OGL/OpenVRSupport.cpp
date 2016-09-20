@@ -42,6 +42,12 @@ struct VertexDataLens
     Vector2 texCoordBlue;
 };
 
+namespace WindowGlobal
+{
+    extern int windowWidth;
+    extern int windowHeight;
+}
+
 namespace Global
 {
     vr::IVRSystem* hmd = nullptr;
@@ -270,18 +276,23 @@ void ConvertSteamVRMatrixToMatrix4( const vr::HmdMatrix34_t &steamMatrix, Matrix
     outMatrix.m[14 ] = 0;
     outMatrix.m[15 ] = 1;
 
-    //std::memcpy( &outMatrix.m[ 0 ], &steamMatrix.m[ 0 ][ 0 ], sizeof( Matrix44 ) );
+    outMatrix.Transpose( outMatrix );
 }
 
 void RenderDistortion()
 {
     System::Assert( Global::lensDistort.IsValid(), "lens distortion shader is not valid" );
 
+    glDisable( GL_CULL_FACE ); // glaze test
+
     glDisable( GL_DEPTH_TEST );
     glViewport( 0, 0, Global::width, Global::height );
 
     glBindVertexArray( Global::lensVAO );
     Global::lensDistort.Use();
+
+    glActiveTexture( GL_TEXTURE0 );
+    glProgramUniform1i( Global::lensDistort.GetHandle(), glGetUniformLocation( Global::lensDistort.GetHandle(), "mytexture" ), 0 );
 
     //render left lens (first half of index array )
     glBindTexture( GL_TEXTURE_2D, Global::leftEyeDesc.resolveTextureId );
@@ -366,8 +377,6 @@ void ae3d::VR::Init()
         System::Print( "Unable to get OpenVR render models: %s\n", vr::VR_GetVRInitErrorAsEnglishDescription( eError ) );
     }
 
-    // SDL create window was here in the sample code
-
     std::string driver = GetTrackedDeviceString( Global::hmd, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String );
     std::string display = GetTrackedDeviceString( Global::hmd, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String );
     System::Print( "OpenVR driver: %s, display: %s\n", driver.c_str(), display.c_str() );
@@ -393,6 +402,8 @@ void ae3d::VR::Init()
 
 void ae3d::VR::Deinit()
 {
+    System::Print("window size: %d x %d\n", WindowGlobal::windowWidth, WindowGlobal::windowHeight );
+
     if (Global::hmd)
     {
         vr::VR_Shutdown();
@@ -429,7 +440,6 @@ void ae3d::VR::SubmitFrame()
         return;
     }
 
-    //RenderStereoTargets();
     RenderDistortion();
 
     vr::Texture_t leftEyeTexture = { (void*)Global::leftEyeDesc.resolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
@@ -438,7 +448,6 @@ void ae3d::VR::SubmitFrame()
     vr::VRCompositor()->Submit( vr::Eye_Right, &rightEyeTexture );
 
     glFinish();
-
 }
 
 void ae3d::VR::SetEye( int eye )
@@ -450,7 +459,7 @@ void ae3d::VR::SetEye( int eye )
 
     if (eye == 0)
     {
-        glClearColor( 0.55f, 0.15f, 0.18f, 1.0f );
+        glClearColor( 0.15f, 0.15f, 0.58f, 1.0f );
     }
     if (eye == 1)
     {
@@ -506,6 +515,7 @@ void ae3d::VR::CalcEyePose()
             ++Global::validPoseCount;
             ConvertSteamVRMatrixToMatrix4( Global::trackedDevicePose[ nDevice ].mDeviceToAbsoluteTracking, Global::devicePose[ nDevice ] );
             Global::vrEyePosition = Vec3( 0, 0, -80 );// Vec3( Global::devicePose[ nDevice ].m[ 12 ], Global::devicePose[ nDevice ].m[ 13 ], Global::devicePose[ nDevice ].m[ 14 ] );
+            Global::vrEyePosition = Vec3( Global::devicePose[ nDevice ].m[ 12 ], Global::devicePose[ nDevice ].m[ 13 ], Global::devicePose[ nDevice ].m[ 14 ] );
             
             if (Global::devClassChar[ nDevice ] == 0)
             {
