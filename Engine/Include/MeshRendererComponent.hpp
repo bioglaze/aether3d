@@ -49,7 +49,7 @@ namespace ae3d
         /// \param modelViewProjectionMatrix Model-view-projection matrix.
         /// \param localToWorld Transforms mesh AABB from mesh-local space into world-space.
         void Render( const struct Matrix44& modelView, const Matrix44& modelViewProjectionMatrix, const Matrix44& localToWorld,
-                     class Shader* overrideShader, RenderType renderType );
+                     const Matrix44& shadowView, const Matrix44& shadowProjection, class Shader* overrideShader, RenderType renderType );
 
         Mesh* mesh = nullptr;
         std::vector< Material* > materials;

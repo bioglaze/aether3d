@@ -13,13 +13,6 @@
 
 using namespace ae3d;
 
-// TODO: Try to design these away.
-namespace SceneGlobal
-{
-    extern Matrix44 shadowCameraViewMatrix;
-    extern Matrix44 shadowCameraProjectionMatrix;
-}
-
 namespace MathUtil
 {
     void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax );
@@ -108,7 +101,7 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
 }
 
 void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matrix44& modelViewProjection, const Matrix44& localToWorld,
-                                          Shader* overrideShader, RenderType renderType )
+                                          const Matrix44& shadowView, const Matrix44& shadowProjection, Shader* overrideShader, RenderType renderType )
 {
     if (isCulled || !mesh)
     {
@@ -143,8 +136,8 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
 
             Matrix44 shadowTexProjMatrix = localToWorld;
             
-            Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraViewMatrix, shadowTexProjMatrix );
-            Matrix44::Multiply( shadowTexProjMatrix, SceneGlobal::shadowCameraProjectionMatrix, shadowTexProjMatrix );
+            Matrix44::Multiply( shadowTexProjMatrix, shadowView, shadowTexProjMatrix );
+            Matrix44::Multiply( shadowTexProjMatrix, shadowProjection, shadowTexProjMatrix );
             Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
 #ifndef RENDERER_VULKAN
             // Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.

@@ -153,7 +153,7 @@ const unsigned short lruCacheSize = 64;
 float gVertexCacheScores[ MaxVertexCacheSize + 1 ][ MaxVertexCacheSize ];
 float gVertexValenceScores[ MaxPrecomputedVertexValenceScores ];
 
-std::vector< unsigned short > newIndexList;
+std::vector< VertexInd > newIndexList;
 
 void Mesh::CopyInterleavedVerticesToPTN()
 {
@@ -274,8 +274,6 @@ void Mesh::OptimizeFaces()
         verticesWithCachedata[ i ].normal = interleavedVertices[ i ].normal;
     }
 
-    bool vertexScoresComputed = ComputeVertexScores();
-    
     // Face count per vertex
     for (std::size_t i = 0; i < indices.size(); ++i)
     {
@@ -306,7 +304,7 @@ void Mesh::OptimizeFaces()
     }
 
     // fill out face list per vertex
-    for (std::size_t i = 0; i < indices.size(); ++i)
+    for (unsigned i = 0; i < static_cast< unsigned >( indices.size() ); ++i)
     {
         unsigned short index = indices[ i ].a;
         VertexPTNTCWithData& vertexDataA = verticesWithCachedata[ index ];
@@ -336,6 +334,8 @@ void Mesh::OptimizeFaces()
     float bestScore = -1.f;
 
     const float maxValenceScore = FindVertexScore( 1, kEvictedCacheIndex, lruCacheSize ) * 3.0f;
+
+    newIndexList.resize( indices.size() );
 
     for (unsigned i = 0; i < indices.size(); ++i)
     {
@@ -387,14 +387,13 @@ void Mesh::OptimizeFaces()
         processedFaceList[ bestFace ] = 1;
         unsigned short entriesInCache1 = 0;
 
-        newIndexList.resize( indices.size() );
-
         // add bestFace to LRU cache and to newIndexList
         {
             unsigned short indexA = indices[ bestFace ].a;
-            newIndexList[ i ] = indexA;
+            newIndexList[ i ].a = indexA;
 
             VertexPTNTCWithData& vertexData = verticesWithCachedata[ indexA ];
+            bool skip = false;
 
             if (vertexData.data.cachePos1 >= entriesInCache1)
             {
@@ -404,26 +403,29 @@ void Mesh::OptimizeFaces()
                 if (vertexData.data.activeFaceListSize == 1)
                 {
                     --vertexData.data.activeFaceListSize;
-                    continue;
+                    skip = true;
                 }
             }
 
-            assert( vertexData.data.activeFaceListSize > 0 );
-            unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
-            unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
-            unsigned* it = std::find( begin, end, bestFace );
-            assert( it != end );
-            std::swap( *it, *(end - 1) );
-            --vertexData.data.activeFaceListSize;
-            vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
-
+            if (!skip)
+            {
+                assert( vertexData.data.activeFaceListSize > 0 );
+                unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
+                unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
+                unsigned* it = std::find( begin, end, bestFace );
+                assert( it != end );
+                std::swap( *it, *(end - 1) );
+                --vertexData.data.activeFaceListSize;
+                vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
+            }
         }
 
         {
             unsigned short indexB = indices[ bestFace ].b;
-            newIndexList[ i ] = indexB;
+            newIndexList[ i ].b = indexB;
 
             VertexPTNTCWithData& vertexData = verticesWithCachedata[ indexB ];
+            bool skip = false;
 
             if (vertexData.data.cachePos1 >= entriesInCache1)
             {
@@ -433,26 +435,29 @@ void Mesh::OptimizeFaces()
                 if (vertexData.data.activeFaceListSize == 1)
                 {
                     --vertexData.data.activeFaceListSize;
-                    continue;
+                    skip = true;
                 }
             }
 
-            assert( vertexData.data.activeFaceListSize > 0 );
-            unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
-            unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
-            unsigned* it = std::find( begin, end, bestFace );
-            assert( it != end );
-            std::swap( *it, *(end - 1) );
-            --vertexData.data.activeFaceListSize;
-            vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
-
+            if (!skip)
+            {
+                assert( vertexData.data.activeFaceListSize > 0 );
+                unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
+                unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
+                unsigned* it = std::find( begin, end, bestFace );
+                assert( it != end );
+                std::swap( *it, *(end - 1) );
+                --vertexData.data.activeFaceListSize;
+                vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
+            }
         }
 
         {
             unsigned short indexC = indices[ bestFace ].c;
-            newIndexList[ i ] = indexC;
+            newIndexList[ i ].c = indexC;
 
             VertexPTNTCWithData& vertexData = verticesWithCachedata[ indexC ];
+            bool skip = false;
 
             if (vertexData.data.cachePos1 >= entriesInCache1)
             {
@@ -462,19 +467,21 @@ void Mesh::OptimizeFaces()
                 if (vertexData.data.activeFaceListSize == 1)
                 {
                     --vertexData.data.activeFaceListSize;
-                    continue;
+                    skip = true;
                 }
             }
 
-            assert( vertexData.data.activeFaceListSize > 0 );
-            unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
-            unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
-            unsigned* it = std::find( begin, end, bestFace );
-            assert( it != end );
-            std::swap( *it, *(end - 1) );
-            --vertexData.data.activeFaceListSize;
-            vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
-
+            if (!skip)
+            {
+                assert( vertexData.data.activeFaceListSize > 0 );
+                unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
+                unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
+                unsigned* it = std::find( begin, end, bestFace );
+                assert( it != end );
+                std::swap( *it, *(end - 1) );
+                --vertexData.data.activeFaceListSize;
+                vertexData.data.score = FindVertexScore( vertexData.data.activeFaceListSize, vertexData.data.cachePos1, lruCacheSize );
+            }
         }
         // move the rest of the old verts in the cache down and compute their new scores
         for (unsigned c0 = 0; c0 < entriesInCache0; ++c0)
@@ -527,7 +534,7 @@ void Mesh::OptimizeFaces()
         entriesInCache0 = Min( entriesInCache1, lruCacheSize );
     }
 
-    for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
+    /*for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
     {
         std::cout << "non-optimized vertex " << i << ": " <<
         interleavedVertices[i].position.x  << ", " <<
@@ -548,6 +555,14 @@ void Mesh::OptimizeFaces()
         std::cout << "non-optimized face " << i <<
         ": " << indices[ i ].a << ", " << indices[ i ].b << ", " << indices[ i ].c << std::endl;
     }
+
+    for (std::size_t i = 0; i < newIndexList.size(); ++i)
+    {
+        std::cout << "optimized face " << i <<
+            ": " << newIndexList[ i ].a << ", " << newIndexList[ i ].b << ", " << newIndexList[ i ].c << std::endl;
+    }*/
+
+    indices = newIndexList;
 }
 
 void Mesh::SolveAABB()
@@ -943,7 +958,7 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         }
 
         gMeshes[ m ].Interleave();
-        //gMeshes[ m ].OptimizeFaces();
+        gMeshes[ m ].OptimizeFaces();
 
         gMeshes[ m ].SolveFaceNormals();
         gMeshes[ m ].SolveFaceTangents();

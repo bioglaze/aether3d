@@ -668,7 +668,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         
         auto* meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
         meshRenderer->Cull( frustum, meshLocalToWorld );
-        meshRenderer->Render( mv, mvp, meshLocalToWorld, nullptr, MeshRendererComponent::RenderType::Opaque );
+        meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, MeshRendererComponent::RenderType::Opaque );
     }
 
     for (auto j : gameObjectsWithMeshRenderer)
@@ -681,7 +681,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
         
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, nullptr, MeshRendererComponent::RenderType::Transparent );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, MeshRendererComponent::RenderType::Transparent );
     }
     
 #if RENDERER_METAL
@@ -755,8 +755,8 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view
         
         // Already culled if this method is called after rendering others.
         //gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
     }
     
 #if RENDERER_METAL
@@ -849,8 +849,8 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         auto* meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
 
         meshRenderer->Cull( frustum, meshLocalToWorld );
-        meshRenderer->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Opaque );
-        meshRenderer->Render( mv, mvp, meshLocalToWorld, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Transparent );
+        meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Opaque );
+        meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Transparent );
     }
     
 #if RENDERER_METAL
