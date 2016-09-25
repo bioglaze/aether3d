@@ -7,6 +7,7 @@
 #import "SpriteRendererComponent.hpp"
 #import "TextRendererComponent.hpp"
 #import "DirectionalLightComponent.hpp"
+#import "PointLightComponent.hpp"
 #import "SpotLightComponent.hpp"
 #import "SpriteRendererComponent.hpp"
 #import "MeshRendererComponent.hpp"
@@ -37,10 +38,12 @@ using namespace ae3d;
     ae3d::GameObject bigCube2;
     ae3d::GameObject text;
     ae3d::GameObject dirLight;
+    ae3d::GameObject pointLight;
     ae3d::GameObject rtCamera;
     ae3d::GameObject renderTextureContainer;
     ae3d::GameObject cubePTN; // vertex format: position, texcoord, normal
     ae3d::GameObject cubePTN2;
+    ae3d::GameObject standardCube;
     ae3d::GameObject spriteContainer;
     ae3d::Scene scene;
     ae3d::Font font;
@@ -48,7 +51,9 @@ using namespace ae3d;
     ae3d::Mesh cubeMeshPTN;
     ae3d::Material cubeMaterial;
     ae3d::Material transMaterial;
+    ae3d::Material standardMaterial;
     ae3d::Shader shader;
+    ae3d::Shader standardShader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
     ae3d::Texture2D transTex;
@@ -94,7 +99,7 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
-    //camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera3d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera3d );
 
@@ -141,7 +146,14 @@ using namespace ae3d;
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
     cubeMaterial.SetVector( "tintColor", { 1, 1, 1, 1 } );
-    
+
+    standardShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+                "standard_vertex", "standard_fragment",
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
+    standardMaterial.SetShader( &standardShader );
+    standardMaterial.SetTexture( "textureMap", &gliderTex );
+
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );
     rotatingCube.AddComponent<ae3d::MeshRendererComponent>();
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -149,6 +161,13 @@ using namespace ae3d;
     rotatingCube.AddComponent<ae3d::TransformComponent>();
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
     scene.Add( &rotatingCube );
+
+    standardCube.AddComponent<ae3d::MeshRendererComponent>();
+    standardCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCube.AddComponent<ae3d::TransformComponent>();
+    standardCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -3, 0, -10 ) );
+    scene.Add( &standardCube );
 
     cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "/textured_cube_ptn.ae3d" ) );
     cubePTN.AddComponent<ae3d::MeshRendererComponent>();
@@ -181,13 +200,18 @@ using namespace ae3d;
     bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
     scene.Add( &bigCube2 );
 
-    dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
     //scene.Add( &dirLight );
-    
+
+    pointLight.AddComponent<ae3d::PointLightComponent>();
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 512 );
+    pointLight.AddComponent<ae3d::TransformComponent>();
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
+    scene.Add( &pointLight );
+
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();

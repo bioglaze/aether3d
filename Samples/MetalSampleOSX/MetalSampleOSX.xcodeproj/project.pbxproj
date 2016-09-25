@@ -55,6 +55,8 @@
 		AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
 		AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
 		AB2CA8281C13664600D4D7C4 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
+		AB3616691D945400001149E0 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../Engine/Include/ComputeShader.hpp; sourceTree = "<group>"; };
+		AB36166A1D945400001149E0 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../../Engine/Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 		AB4ADC291D8EB2800032CBDD /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 				ABE04FA41C1217A40025C436 /* AudioClip.hpp */,
 				ABE04FA51C1217A40025C436 /* AudioSourceComponent.hpp */,
 				ABE04FA61C1217A40025C436 /* CameraComponent.hpp */,
+				AB3616691D945400001149E0 /* ComputeShader.hpp */,
 				ABE04FA71C1217A40025C436 /* DirectionalLightComponent.hpp */,
 				ABE04FA81C1217A40025C436 /* FileSystem.hpp */,
 				ABE04FA91C1217A40025C436 /* Font.hpp */,
@@ -229,6 +232,7 @@
 				ABE04FAD1C1217A40025C436 /* Matrix.hpp */,
 				ABE04FAE1C1217A40025C436 /* Mesh.hpp */,
 				ABE04FAF1C1217A40025C436 /* MeshRendererComponent.hpp */,
+				AB36166A1D945400001149E0 /* PointLightComponent.hpp */,
 				ABE04FB01C1217A40025C436 /* Quaternion.hpp */,
 				ABE04FB11C1217A40025C436 /* RenderTexture.hpp */,
 				ABE04FB21C1217A40025C436 /* Scene.hpp */,

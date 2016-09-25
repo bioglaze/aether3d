@@ -41,7 +41,8 @@ unsigned ae3d::LightTiler::GetNumTilesY() const
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& position, float radius )
 {
     System::Assert( handle < MaxLights, "tried to set a too high light index" );
-    
+
+    System::Print("setting point light params\n");
     pointLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
 }
 
@@ -79,13 +80,13 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     if (perTileLightIndexBufferRT.GetID() == 0)
     {
         perTileLightIndexBufferRT.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight,
-                                            ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+                                            ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     }
-
 
     shader.SetRenderTexture( &depthNormalTarget, 0 );
     shader.SetRenderTexture( &pointLightCenterAndRadiusRT, 1 );
     shader.SetRenderTexture( &perTileLightIndexBufferRT, 2 );
+
     CullerUniforms uniforms;
 
     Matrix44::Invert( projection, uniforms.invProjection );
@@ -97,6 +98,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
     shader.SetUniformBuffer( &uniforms, sizeof( CullerUniforms ) );
-    
-    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
+    //shader.SetUniformBuffer( 1, &lightListBuffer, sizeof( lightListBuffer ) );
+
+    System::Print("culling lights\n");
+    shader.Dispatch( 30/*GetNumTilesX()*/, 30/*GetNumTilesY()*/, 1 );
 }

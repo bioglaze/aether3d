@@ -19,12 +19,7 @@ struct Uniforms
     matrix_float4x4 viewMatrix;
 };
 
-// was shared
-//shared uint ldsLightIdx[ MAX_NUM_LIGHTS_PER_TILE ];
-//shared float ldsZMax;
-//shared float ldsZMin;
-
-float4 ConvertProjToView( float4 p, matrix_float4x4 invProjection )
+static float4 ConvertProjToView( float4 p, matrix_float4x4 invProjection )
 {
     p = invProjection * p;
     p /= p.w;
@@ -35,7 +30,7 @@ float4 ConvertProjToView( float4 p, matrix_float4x4 invProjection )
 
 // this creates the standard Hessian-normal-form plane equation from three points,
 // except it is simplified for the case where the first point is the origin
-float4 CreatePlaneEquation( float4 b, float4 c )
+static float4 CreatePlaneEquation( float4 b, float4 c )
 {
     float4 n;
 
@@ -48,34 +43,23 @@ float4 CreatePlaneEquation( float4 b, float4 c )
     return n;
 }
 
-uint GetNumTilesX( uint windowWidth )
+static uint GetNumTilesX( uint windowWidth )
 {
     return uint(( ( windowWidth + TILE_RES - 1 ) / float(TILE_RES) ));
 }
 
-uint GetNumTilesY( uint windowHeight )
+static uint GetNumTilesY( uint windowHeight )
 {
     return uint(( ( windowHeight + TILE_RES - 1 ) / float(TILE_RES) ));
 }
 
 // point-plane distance, simplified for the case where
 // the plane passes through the origin
-float GetSignedDistanceFromPlane( float4 p, float4 eqn )
+static float GetSignedDistanceFromPlane( float4 p, float4 eqn )
 {
     // dot( eqn.xyz, p.xyz ) + eqn.w, , except we know eqn.w is zero
     // (see CreatePlaneEquation above)
     return dot( eqn.xyz, p.xyz );
-}
-
-void CalculateMinMaxDepthInLds( uint2 globalThreadIdx, texture2d<float, access::read> depthNormalsTexture )
-{
-    float depth = -depthNormalsTexture.read( uint2( globalThreadIdx.x, globalThreadIdx.y ) ).x;
-
-    if (depth != 0.f)
-    {
-        atomicMax( ldsZMax, depth );
-        atomicMin( ldsZMin, depth );
-    }
 }
 
 // https://developer.apple.com/library/content/documentation/Metal/Reference/MetalShadingLanguageGuide/func-var-qual/func-var-qual.html
@@ -86,9 +70,13 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                          constant Uniforms& uniforms [[ buffer(0) ]],
                           uint2 gid [[thread_position_in_grid]],
                           uint2 tid [[thread_position_in_threadgroup]],
-                          uint2 dtid [[threadgroup_position_in_grid]],
-                          uint ldsLightIdxCounter [[ threadgroup(0) ]])
+                          uint2 dtid [[threadgroup_position_in_grid]])
 {
+    threadgroup uint ldsLightIdx[ MAX_NUM_LIGHTS_PER_TILE ];
+    threadgroup atomic_uint ldsZMax;
+    threadgroup atomic_uint ldsZMin;
+    threadgroup atomic_uint ldsLightIdxCounter;
+
     uint2 globalIdx = tid;
     uint2 localIdx = dtid;
     uint2 groupIdx = gid;
@@ -96,11 +84,12 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     uint localIdxFlattened = localIdx.x + localIdx.y * TILE_RES;
     uint tileIdxFlattened = groupIdx.x + groupIdx.y * GetNumTilesX( uniforms.windowWidth );
 
+
     if (localIdxFlattened == 0)
     {
-        ldsZMin = 0xffffffff;
-        ldsZMax = 0;
-        ldsLightIdxCounter = 0;
+        atomic_store_explicit( &ldsZMin, 0xffffffff, memory_order_relaxed );
+        atomic_store_explicit( &ldsZMax, 0, memory_order_relaxed );
+        atomic_store_explicit( &ldsLightIdxCounter, 0, memory_order_relaxed );
     }
 
     float4 frustumEqn[ 4 ];
@@ -139,14 +128,23 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     float minZ = FLT_MAX;
     float maxZ = 0.0f;
 
-    CalculateMinMaxDepthInLds( globalIdx, depthNormalsTexture );
+    float depth = -depthNormalsTexture.read( uint2( globalIdx.x, globalIdx.y ) ).x;
+    uint z = as_type< uint >( depth );
+
+    if (depth != 0.f)
+    {
+        /*uint i =*/ atomic_fetch_min_explicit( &ldsZMin, z, memory_order::memory_order_relaxed );
+        /*uint j =*/ atomic_fetch_max_explicit( &ldsZMax, z, memory_order::memory_order_relaxed );
+    }
 
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
     // FIXME: swapped min and max to prevent false culling near depth discontinuities.
     //        AMD's ForwarPlus11 sample uses reverse depth test so maybe that's why this swap is needed. [2014-07-07]
-    minZ = ldsZMax;
-    maxZ = ldsZMin;
+    uint zMin = atomic_load_explicit( &ldsZMin, memory_order::memory_order_relaxed );
+    uint zMax = atomic_load_explicit( &ldsZMax, memory_order::memory_order_relaxed );
+    minZ = as_type< float >( zMax );
+    maxZ = as_type< float >( zMin );
 
     // loop over the point lights and do a sphere vs. frustum intersection test
     uint numPointLights = uniforms.numLights & 0xFFFFu;
@@ -173,7 +171,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                     // do a thread-safe increment of the list counter
                     // and put the index of this light into the list
                     //uint dstIdx = atomicAdd( ldsLightIdxCounter, 1 );
-                    uint dstIdx = atomic_fetch_add_explicit( ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
+                    uint dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
                     ldsLightIdx[ dstIdx ] = il;
                 }
             }
@@ -182,7 +180,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
-    uint uNumPointLightsInThisTile = ldsLightIdxCounter;
+    uint uNumPointLightsInThisTile = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
 #if 0
     // Spot lights.
     uint numSpotLights = (numLights & 0xFFFF0000u) >> 16;
@@ -226,7 +224,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             perTileLightIndexBufferOut.write( uint4( ldsLightIdx[ i ] ), int( startOffset + i ) );
         }
 
-        for (uint j = (localIdxFlattened + uNumPointLightsInThisTile); j < ldsLightIdxCounter; j += NUM_THREADS_PER_TILE)
+        uint jMax = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
+        for (uint j = (localIdxFlattened + uNumPointLightsInThisTile); j < jMax; j += NUM_THREADS_PER_TILE)
         {
             // per-tile list of light indices
             //imageStore( perTileLightIndexBufferOut, int( startOffset + j + 1), uvec4( ldsLightIdx[ j ] ) );
@@ -242,7 +241,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             // mark the end of each per-tile list with a sentinel (spot lights)
             //g_PerTileLightIndexBufferOut[ startOffset + ldsLightIdxCounter + 1 ] = LIGHT_INDEX_BUFFER_SENTINEL;
             //imageStore( perTileLightIndexBufferOut, int( startOffset + ldsLightIdxCounter + 1 ), uvec4( LIGHT_INDEX_BUFFER_SENTINEL ) );
-            perTileLightIndexBufferOut.write( uint4( LIGHT_INDEX_BUFFER_SENTINEL ), int( startOffset + ldsLightIdxCounter + 1 ) );
+            uint offs = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
+            perTileLightIndexBufferOut.write( uint4( LIGHT_INDEX_BUFFER_SENTINEL ), int( startOffset + offs + 1 ) );
         }
     }
 }

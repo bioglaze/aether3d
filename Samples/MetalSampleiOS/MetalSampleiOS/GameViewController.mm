@@ -29,6 +29,7 @@
     ae3d::GameObject cubeFloor;
     ae3d::GameObject text;
     ae3d::GameObject dirLight;
+    ae3d::GameObject pointLight;
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -110,11 +111,17 @@
     cubeFloor.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 4 );
     scene.Add( &cubeFloor );
 
-    dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
     scene.Add( &dirLight );
+
+    pointLight.AddComponent<ae3d::PointLightComponent>();
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 512 );
+    pointLight.AddComponent<ae3d::TransformComponent>();
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
+    scene.Add( &pointLight );
 }
 
 - (void)_setupView

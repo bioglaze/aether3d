@@ -29,7 +29,7 @@ void ae3d::ComputeShader::Load( const char* metalShaderName, const FileSystem::F
 
     if (!pipeline)
     {
-        NSLog( @"Error occurred when building compute pipeline for function %s", metalShaderName );
+        NSLog( @"Error occurred when building compute pipeline for function %s: %@", metalShaderName, [error localizedDescription] );
     }
     
     renderTextures.resize( 5 );
