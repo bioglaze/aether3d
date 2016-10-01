@@ -30,6 +30,7 @@ void ae3d::Shader::LoadFromLibrary( const char* vertexShaderName, const char* fr
 {
     NSString* vertexName = [NSString stringWithUTF8String:vertexShaderName ];
     vertexProgram = [GfxDevice::GetDefaultMetalShaderLibrary() newFunctionWithName:vertexName];
+    metalVertexShaderName = std::string( vertexShaderName );
 
     if (vertexProgram == nullptr)
     {
@@ -192,6 +193,7 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
+    System::Print( "Shader::SetInt unimplemented. Tried to set %s to %d\n", name, value );
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )

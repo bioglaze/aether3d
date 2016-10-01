@@ -110,6 +110,8 @@ namespace ae3d
 #if RENDERER_METAL
         bool IsValid() const { return vertexProgram != nullptr; }
 
+        const std::string& GetMetalVertexShaderName() const { return metalVertexShaderName; }
+        
         enum class UniformType { Float, Float2, Float3, Float4, Matrix4x4 };
         
         struct Uniform
@@ -119,7 +121,8 @@ namespace ae3d
             float floatValue[ 4 ];
             float matrix4x4[ 16 ];
         };
-        
+
+        // TODO: make private
         std::map< std::string, Uniform > uniforms;
         
         void LoadUniforms( MTLRenderPipelineReflection* reflection );
@@ -155,6 +158,9 @@ namespace ae3d
 #if RENDERER_OPENGL
         unsigned handle = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
+#endif
+#if RENDERER_METAL
+        std::string metalVertexShaderName;
 #endif
     };
 }

@@ -50,23 +50,6 @@ namespace Statistics
     float frameTimeMS = 0;
 }
 
-namespace ae3d
-{
-    namespace System
-    {
-        namespace Statistics
-        {
-            std::string GetStatistics()
-            {
-                std::stringstream stm;
-                stm << "frame time: " << ::Statistics::frameTimeMS << "\n";
-                stm << "draw calls: " << ::Statistics::drawCalls << "\n";
-                return stm.str();
-            }
-        }
-    }
-}
-
 namespace GfxDeviceGlobal
 {
     int backBufferWidth = 0;
@@ -155,6 +138,24 @@ namespace GfxDeviceGlobal
         else
         {
             ae3d::System::Assert( false, "unhandled texture state" );
+        }
+    }
+}
+
+namespace ae3d
+{
+    namespace System
+    {
+        namespace Statistics
+        {
+            std::string GetStatistics()
+            {
+                std::stringstream stm;
+                stm << "frame time: " << ::Statistics::frameTimeMS << "\n";
+                stm << "draw calls: " << ::Statistics::drawCalls << "\n";
+                stm << "create uniform buffer calls: " << GfxDeviceGlobal::uniformBuffers.size() << "\n";
+                return stm.str();
+            }
         }
     }
 }
@@ -294,6 +295,7 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     depthStateNoneWriteOff = [device newDepthStencilStateWithDescriptor:depthStateDesc];
 
     GfxDeviceGlobal::CreateSamplers();
+    GfxDeviceGlobal::lightTiler.Init();
 
     if (sampleCount == 1)
     {
@@ -325,8 +327,6 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     
     msaaDepthTarget = [device newTextureWithDescriptor:depthDesc];
     msaaDepthTarget.label = @"MSAA Depth Target";
-    
-    GfxDeviceGlobal::lightTiler.Init();
 }
 
 id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
@@ -556,6 +556,13 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
+
+    if (shader.GetMetalVertexShaderName() == "standard_vertex")
+    {
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPerTileLightIndexBuffer() offset:0 atIndex:6];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetCullerUniforms() offset:0 atIndex:8];
+    }
+
     [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
     [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];

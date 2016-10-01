@@ -697,8 +697,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     {
         RenderDepthAndNormals( camera, view, gameObjectsWithMeshRenderer, cubeMapFace, frustum );
     
-/*#if defined( RENDERER_METAL )
-        std::vector< unsigned > gameObjectsWithPointLight;
+#if defined( RENDERER_METAL )
+        /*std::vector< unsigned > gameObjectsWithPointLight;
 
         int i = -1;
 
@@ -722,10 +722,10 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
                 auto worldPos = transform->GetLocalPosition();
                 GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius(0, worldPos, pointLight->GetRadius());
             }
-        }
+        }*/
 
         GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, camera->GetProjection(), camera->GetView(), camera->GetDepthNormalsTexture() );
-#endif*/
+#endif
     }
 }
 

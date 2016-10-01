@@ -19,6 +19,8 @@ struct Uniforms
     matrix_float4x4 viewMatrix;
 };
 
+//float4 PointLightCenterAndRadius;
+
 static float4 ConvertProjToView( float4 p, matrix_float4x4 invProjection )
 {
     p = invProjection * p;
@@ -65,9 +67,9 @@ static float GetSignedDistanceFromPlane( float4 p, float4 eqn )
 // https://developer.apple.com/library/content/documentation/Metal/Reference/MetalShadingLanguageGuide/func-var-qual/func-var-qual.html
 
 kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[texture(0)]],
-                         texture2d<float, access::read> pointLightBufferCenterAndRadius [[texture(1)]],
-                         texture2d<uint, access::write> perTileLightIndexBufferOut [[texture(2)]],
                          constant Uniforms& uniforms [[ buffer(0) ]],
+                         constant float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
+                         device int* perTileLightIndexBufferOut [[ buffer(2) ]],
                           uint2 gid [[thread_position_in_grid]],
                           uint2 tid [[thread_position_in_threadgroup]],
                           uint2 dtid [[threadgroup_position_in_grid]])
@@ -77,13 +79,12 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     threadgroup atomic_uint ldsZMin;
     threadgroup atomic_uint ldsLightIdxCounter;
 
-    uint2 globalIdx = tid;
-    uint2 localIdx = dtid;
-    uint2 groupIdx = gid;
+    uint2 globalIdx = dtid;
+    uint2 localIdx = tid;
+    uint2 groupIdx = dtid;
 
     uint localIdxFlattened = localIdx.x + localIdx.y * TILE_RES;
     uint tileIdxFlattened = groupIdx.x + groupIdx.y * GetNumTilesX( uniforms.windowWidth );
-
 
     if (localIdxFlattened == 0)
     {
@@ -155,8 +156,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
         if (il < numPointLights)
         {
-            //float4 center = imageLoad( pointLightBufferCenterAndRadius, int( il ) );
-            float4 center = pointLightBufferCenterAndRadius.read( int( il ) );
+            float4 center = pointLightBufferCenterAndRadius[ int( il ) ];
             float r = center.w;
             center.xyz = (uniforms.viewMatrix * float4( center.xyz, 1.0f ) ).xyz;
 
@@ -170,7 +170,6 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                 {
                     // do a thread-safe increment of the list counter
                     // and put the index of this light into the list
-                    //uint dstIdx = atomicAdd( ldsLightIdxCounter, 1 );
                     uint dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
                     ldsLightIdx[ dstIdx ] = il;
                 }
@@ -181,9 +180,9 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
     uint uNumPointLightsInThisTile = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
-#if 0
+
     // Spot lights.
-    uint numSpotLights = (numLights & 0xFFFF0000u) >> 16;
+    uint numSpotLights = (uniforms.numLights & 0xFFFF0000u) >> 16;
 
     for (uint i = 0; i < numSpotLights; i += NUM_THREADS_PER_TILE)
     {
@@ -191,9 +190,9 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
         if (il < numSpotLights)
         {
-            vec4 center = imageLoad( spotLightBufferCenterAndRadius, int( il ) );
+            float4 center = float4( 0, 0, 0, 1 );//spotLightBufferCenterAndRadius[ il ];
             float r = center.w * 5.0f; // FIXME: Multiply was added, but more clever culling should be done instead.
-            center.xyz = (viewMatrix * vec4( center.xyz, 1.0f )).xyz;
+            center.xyz = (uniforms.viewMatrix * float4( center.xyz, 1.0f )).xyz;
 
             // test if sphere is intersecting or inside frustum
             if (-center.z + minZ < r && center.z - maxZ < r)
@@ -205,13 +204,12 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                 {
                     // do a thread-safe increment of the list counter
                     // and put the index of this light into the list
-                    uint dstIdx = atomicAdd( ldsLightIdxCounter, 1 );
+                    uint dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
                     ldsLightIdx[ dstIdx ] = il;
                 }
             }
         }
     }
-#endif
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
     {   // write back
@@ -220,29 +218,24 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         for (uint i = localIdxFlattened; i < uNumPointLightsInThisTile; i += NUM_THREADS_PER_TILE)
         {
             // per-tile list of light indices
-            //imageStore( perTileLightIndexBufferOut, int( startOffset + i ), uint4( ldsLightIdx[ i ] ) );
-            perTileLightIndexBufferOut.write( uint4( ldsLightIdx[ i ] ), int( startOffset + i ) );
+            perTileLightIndexBufferOut[ startOffset + i ] = int( ldsLightIdx[ i ] );
         }
 
         uint jMax = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
         for (uint j = (localIdxFlattened + uNumPointLightsInThisTile); j < jMax; j += NUM_THREADS_PER_TILE)
         {
             // per-tile list of light indices
-            //imageStore( perTileLightIndexBufferOut, int( startOffset + j + 1), uvec4( ldsLightIdx[ j ] ) );
-            perTileLightIndexBufferOut.write( uint4( ldsLightIdx[ j ] ), int( startOffset + j + 1 ) );
+            perTileLightIndexBufferOut[ startOffset + j + 1 ] = int( ldsLightIdx[ j ] );
         }
 
         if (localIdxFlattened == 0)
         {
             // mark the end of each per-tile list with a sentinel (point lights)
-            //imageStore( perTileLightIndexBufferOut, int( startOffset + uNumPointLightsInThisTile ), uvec4( LIGHT_INDEX_BUFFER_SENTINEL ) );
-            perTileLightIndexBufferOut.write( uint4( LIGHT_INDEX_BUFFER_SENTINEL ), int( startOffset + uNumPointLightsInThisTile ) );
+            perTileLightIndexBufferOut[ startOffset + uNumPointLightsInThisTile ] = int( LIGHT_INDEX_BUFFER_SENTINEL );
 
             // mark the end of each per-tile list with a sentinel (spot lights)
-            //g_PerTileLightIndexBufferOut[ startOffset + ldsLightIdxCounter + 1 ] = LIGHT_INDEX_BUFFER_SENTINEL;
-            //imageStore( perTileLightIndexBufferOut, int( startOffset + ldsLightIdxCounter + 1 ), uvec4( LIGHT_INDEX_BUFFER_SENTINEL ) );
             uint offs = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
-            perTileLightIndexBufferOut.write( uint4( LIGHT_INDEX_BUFFER_SENTINEL ), int( startOffset + offs + 1 ) );
+            perTileLightIndexBufferOut[ startOffset + offs + 1 ] = int( LIGHT_INDEX_BUFFER_SENTINEL );
         }
     }
 }

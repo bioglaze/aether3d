@@ -1,5 +1,6 @@
 #include "LightTiler.hpp"
 #include "ComputeShader.hpp"
+#include "GfxDevice.hpp"
 #include "Matrix.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
@@ -11,9 +12,38 @@ namespace GfxDeviceGlobal
     extern int backBufferHeight;
 }
 
+using namespace ae3d;
+
+struct CullerUniforms
+{
+    unsigned windowWidth;
+    unsigned windowHeight;
+    unsigned numLights;
+    int maxNumLightsPerTile;
+    Matrix44 invProjection;
+    Matrix44 viewMatrix;
+};
+
 void ae3d::LightTiler::Init()
 {
     pointLightCenterAndRadius.resize( MaxLights );
+    pointLightCenterAndRadius[ 0 ] = Vec4( 0, 0, -5, 10 );
+    activePointLights = 1;
+
+    pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * 4 * sizeof( float )
+                                 options:MTLResourceCPUCacheModeDefaultCache];
+    pointLightCenterAndRadiusBuffer.label = @"pointLightCenterAndRadiusBuffer";
+
+    uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
+    memcpy( bufferPointer, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+
+    perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( int )
+                  options:MTLResourceCPUCacheModeDefaultCache];
+    perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
+
+    uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )
+                                 options:MTLResourceCPUCacheModeDefaultCache];
+    uniformBuffer.label = @"CullerUniforms";
 }
 
 int ae3d::LightTiler::GetNextPointLightBufferIndex()
@@ -42,7 +72,6 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& positio
 {
     System::Assert( handle < MaxLights, "tried to set a too high light index" );
 
-    System::Print("setting point light params\n");
     pointLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
 }
 
@@ -57,35 +86,9 @@ unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
     return (MaxLightsPerTile - (adjustmentMultipier * (height / 120)));
 }
 
-using namespace ae3d;
-
-struct CullerUniforms
-{
-    unsigned windowWidth;
-    unsigned windowHeight;
-    unsigned numLights;
-    int maxNumLightsPerTile;
-    Matrix44 invProjection;
-    Matrix44 viewMatrix;
-};
-
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& view, RenderTexture& depthNormalTarget )
 {
-    if (pointLightCenterAndRadiusRT.GetID() == 0)
-    {
-        pointLightCenterAndRadiusRT.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight,
-                                              ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
-    }
-
-    if (perTileLightIndexBufferRT.GetID() == 0)
-    {
-        perTileLightIndexBufferRT.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight,
-                                            ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
-    }
-
     shader.SetRenderTexture( &depthNormalTarget, 0 );
-    shader.SetRenderTexture( &pointLightCenterAndRadiusRT, 1 );
-    shader.SetRenderTexture( &perTileLightIndexBufferRT, 2 );
 
     CullerUniforms uniforms;
 
@@ -97,9 +100,12 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
-    shader.SetUniformBuffer( &uniforms, sizeof( CullerUniforms ) );
-    //shader.SetUniformBuffer( 1, &lightListBuffer, sizeof( lightListBuffer ) );
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents];
+    memcpy( bufferPointer, &uniforms, sizeof( CullerUniforms ) );
 
-    System::Print("culling lights\n");
-    shader.Dispatch( 30/*GetNumTilesX()*/, 30/*GetNumTilesY()*/, 1 );
+    shader.SetUniformBuffer( 0, uniformBuffer );
+    shader.SetUniformBuffer( 1, pointLightCenterAndRadiusBuffer );
+    shader.SetUniformBuffer( 2, perTileLightIndexBuffer);
+
+    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 }

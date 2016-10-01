@@ -43,25 +43,27 @@ void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsign
     }
 }
 
-void ae3d::ComputeShader::SetUniformBuffer( void* buffer, int bufferSize )
+void ae3d::ComputeShader::SetUniformBuffer( int slotIndex, id< MTLBuffer > buffer )
 {
-    uniforms = [GfxDevice::GetMetalDevice() newBufferWithBytes:buffer
-                       length:bufferSize
-                      options:MTLResourceOptionCPUCacheModeDefault];
-    uniforms.label = @"Uniform buffer CS";
+    uniforms[ slotIndex ] = buffer;
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
 {
-    MTLSize threadgroupCounts = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
-    MTLSize threadgroups = MTLSizeMake( 1, 1, 1 );
-    
+    MTLSize threadgroupCounts = MTLSizeMake( 16, 16, 1 );
+    MTLSize threadgroups = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
+
+    //MTLSize threadgroupCounts = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
+    //MTLSize threadgroups = MTLSizeMake( 1, 1, 1 );
+
     id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"ComputeCommand";
     
     id<MTLComputeCommandEncoder> commandEncoder = [commandBuffer computeCommandEncoder];
     [commandEncoder setComputePipelineState:pipeline];
-    [commandEncoder setBuffer:uniforms offset:0 atIndex:0];
+    [commandEncoder setBuffer:uniforms[ 0 ] offset:0 atIndex:0];
+    [commandEncoder setBuffer:uniforms[ 1 ] offset:0 atIndex:1];
+    [commandEncoder setBuffer:uniforms[ 2 ] offset:0 atIndex:2];
 
     for (std::size_t i = 0; i < renderTextures.size(); ++i)
     {
@@ -88,7 +90,7 @@ void ae3d::ComputeShader::Test( ae3d::Texture2D* texture, ae3d::RenderTexture* o
     [commandEncoder setComputePipelineState:pipeline];
     [commandEncoder setTexture:texture->GetMetalTexture() atIndex:0];
     [commandEncoder setTexture:outTexture->GetMetalTexture() atIndex:1];
-    [commandEncoder setBuffer:uniforms offset:0 atIndex:0];
+    [commandEncoder setBuffer:uniforms[0] offset:0 atIndex:0];
     [commandEncoder dispatchThreadgroups:threadgroups threadsPerThreadgroup:threadgroupCounts];
     [commandEncoder endEncoding];
     [commandBuffer commit];

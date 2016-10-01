@@ -43,7 +43,10 @@ using namespace ae3d;
     ae3d::GameObject renderTextureContainer;
     ae3d::GameObject cubePTN; // vertex format: position, texcoord, normal
     ae3d::GameObject cubePTN2;
-    ae3d::GameObject standardCube;
+    ae3d::GameObject standardCubeBL; // bottom left
+    ae3d::GameObject standardCubeTL;
+    ae3d::GameObject standardCubeBR;
+    ae3d::GameObject standardCubeTR;
     ae3d::GameObject spriteContainer;
     ae3d::Scene scene;
     ae3d::Font font;
@@ -90,7 +93,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
 
     camera3d.SetName( "Camera3D" );
     camera3d.AddComponent<ae3d::CameraComponent>();
@@ -162,12 +165,33 @@ using namespace ae3d;
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
     scene.Add( &rotatingCube );
 
-    standardCube.AddComponent<ae3d::MeshRendererComponent>();
-    standardCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCube.AddComponent<ae3d::TransformComponent>();
-    standardCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -3, 0, -10 ) );
-    scene.Add( &standardCube );
+    standardCubeBL.AddComponent<ae3d::MeshRendererComponent>();
+    standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCubeBL.AddComponent<ae3d::TransformComponent>();
+    standardCubeBL.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -4, -4, -10 ) );
+    scene.Add( &standardCubeBL );
+
+    standardCubeTL.AddComponent<ae3d::MeshRendererComponent>();
+    standardCubeTL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCubeTL.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCubeTL.AddComponent<ae3d::TransformComponent>();
+    standardCubeTL.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -4, 4, -10 ) );
+    scene.Add( &standardCubeTL );
+
+    standardCubeTR.AddComponent<ae3d::MeshRendererComponent>();
+    standardCubeTR.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCubeTR.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCubeTR.AddComponent<ae3d::TransformComponent>();
+    standardCubeTR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 4, 4, -10 ) );
+    scene.Add( &standardCubeTR );
+
+    standardCubeBR.AddComponent<ae3d::MeshRendererComponent>();
+    standardCubeBR.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCubeBR.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCubeBR.AddComponent<ae3d::TransformComponent>();
+    standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 4, -4, -10 ) );
+    scene.Add( &standardCubeBR );
 
     cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "/textured_cube_ptn.ae3d" ) );
     cubePTN.AddComponent<ae3d::MeshRendererComponent>();
@@ -190,7 +214,7 @@ using namespace ae3d;
     bigCube.AddComponent<ae3d::TransformComponent>();
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -8, -10 ) );
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
-    scene.Add( &bigCube );
+    //scene.Add( &bigCube );
 
     bigCube2.AddComponent<ae3d::MeshRendererComponent>();
     bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -204,7 +228,7 @@ using namespace ae3d;
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
-    //scene.Add( &dirLight );
+    scene.Add( &dirLight );
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 512 );
@@ -212,7 +236,7 @@ using namespace ae3d;
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
     scene.Add( &pointLight );
 
-    rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    //rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
@@ -228,7 +252,7 @@ using namespace ae3d;
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<ae3d::TransformComponent>();
     rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 20 ) );
-    scene.Add( &rtCamera );
+    //scene.Add( &rtCamera );
     
     transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, 1 );
     

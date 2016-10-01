@@ -51,7 +51,12 @@ namespace ae3d
         
 #if RENDERER_METAL
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
-#endif  
+
+        /// Sets a uniform buffer.
+        /// \param slotIndex slot index
+        /// \param buffer Uniform buffer
+        void SetUniformBuffer( int slotIndex, id< MTLBuffer > buffer );
+#endif
 #if RENDERER_D3D12
         ID3DBlob* blobShader = nullptr;
 #endif
@@ -63,12 +68,7 @@ namespace ae3d
         /// \param renderTexture render texture.
         /// \param slot slot index.
         void SetRenderTexture( class RenderTexture* renderTexture, unsigned slot );
-        
-        /// Sets a uniform buffer.
-        /// \param Uniform buffer
-        /// \param bufferSize Buffer's size in bytes
-        void SetUniformBuffer( void* buffer, int bufferSize );
-        
+
         void Test( Texture2D* texture, ae3d::RenderTexture* outTexture );
         
     private:
@@ -80,7 +80,7 @@ namespace ae3d
 #if RENDERER_METAL
         id <MTLFunction> function;
         id<MTLComputePipelineState> pipeline;
-        id<MTLBuffer> uniforms;
+        id<MTLBuffer> uniforms[ 3 ];
 #endif
         std::vector< RenderTexture* > renderTextures;
     };
