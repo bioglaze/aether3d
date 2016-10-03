@@ -37,7 +37,12 @@ void ae3d::LightTiler::Init()
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
     memcpy( bufferPointer, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
 
-    perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( int )
+    const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
+    const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
+    System::Print("max num lights per tile: %u, numTiles: %d\n", maxNumLightsPerTile, numTiles);
+    System::Print("backbuffer: %d x %d\n", GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
+    
+    perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( int )
                   options:MTLResourceCPUCacheModeDefaultCache];
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
 

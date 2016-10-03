@@ -95,7 +95,8 @@ void ae3d::Shader::LoadUniforms( MTLRenderPipelineReflection* reflection )
                     }
                     
                     uniform.offsetFromBufferStart = reflectedUniform.offset;
-                    
+                    System::Assert( uniform.offsetFromBufferStart + 16 * 4 < 256, "Uniform buffer is too small" );
+
                     uniforms[ reflectedUniform.name.UTF8String ] = uniform;
                 }
             }

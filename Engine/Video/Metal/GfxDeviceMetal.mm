@@ -55,6 +55,7 @@ namespace GfxDeviceGlobal
     int backBufferWidth = 0;
     int backBufferHeight = 0;
     int sampleCount = 1;
+    bool isRenderingToTexture = false;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     id<MTLSamplerState> samplerStates[ 2 ];
@@ -186,7 +187,7 @@ namespace
             depthLoadAction = MTLLoadActionClear;
         }
         
-        if (GfxDeviceGlobal::sampleCount > 1)
+        if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::isRenderingToTexture)
         {
             renderPassDescriptor.colorAttachments[0].texture = msaaColorTarget;
             renderPassDescriptor.colorAttachments[0].resolveTexture = texture;
@@ -202,7 +203,7 @@ namespace
         
         renderPassDescriptor.stencilAttachment = nil;
 
-        if (GfxDeviceGlobal::sampleCount > 1)
+        if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::isRenderingToTexture)
         {
             renderPassDescriptor.depthAttachment.texture = msaaDepthTarget;
             renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
@@ -381,7 +382,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 }
 
 std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                       ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat )
+                       ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat, int sampleCount )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&shader.vertexProgram );
@@ -390,18 +391,20 @@ std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMo
     hashString += std::to_string( ((unsigned)depthFunc) );
     hashString += std::to_string( ((unsigned)vertexFormat) );
     hashString += std::to_string( ((unsigned)pixelFormat) );
+    hashString += std::to_string( sampleCount );
     return hashString;
 }
 
 id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                                    ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat )
+                                    ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
+                                    int sampleCount )
 {
-    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat );
+    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, sampleCount );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
         MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-        pipelineStateDescriptor.sampleCount = GfxDeviceGlobal::sampleCount;
+        pipelineStateDescriptor.sampleCount = sampleCount;
         pipelineStateDescriptor.vertexFunction = shader.vertexProgram;
         pipelineStateDescriptor.fragmentFunction = shader.fragmentProgram;
 #if (__i386__)
@@ -552,8 +555,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     }
     
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
-    
-    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat )];
+
+    const int sampleCount = GfxDeviceGlobal::isRenderingToTexture ? 1 : GfxDeviceGlobal::sampleCount;
+    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat, sampleCount )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
 
@@ -684,6 +688,8 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
 
 void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, unsigned cubeMapFace )
 {
+    GfxDeviceGlobal::isRenderingToTexture = renderTexture2d != nullptr;
+
     drawable = currentDrawable;
     setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture );
     
