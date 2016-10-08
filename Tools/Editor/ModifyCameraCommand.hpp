@@ -12,7 +12,7 @@ public:
                          ae3d::CameraComponent::ClearFlag clearFlag,
                          ae3d::CameraComponent::ProjectionType projectionType,
                          const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams,
-                         const ae3d::Vec3& clearColor );
+                         const ae3d::Vec3& clearColor, int renderOrder );
     void Execute() override;
     void Undo() override;
 
@@ -23,12 +23,14 @@ public:
     ae3d::CameraComponent::ClearFlag clearFlag;
     ae3d::CameraComponent::ProjectionType projectionType;
     ae3d::Vec3 clearColor;
+    int renderOrder;
 
     ae3d::Vec4 oldOrthoParams;
     ae3d::Vec4 oldPerspParams;
     ae3d::CameraComponent::ClearFlag oldClearFlag;
     ae3d::CameraComponent::ProjectionType oldProjectionType;
     ae3d::Vec3 oldClearColor;
+    int oldRenderOrder;
 };
 
 #endif

@@ -6,6 +6,15 @@
 
 namespace ae3d
 {
+    // Sprite's path and dimensions.
+    struct SpriteInfo
+    {
+        std::string path;
+        float x, y;
+        float width, height;
+        bool valid;
+    };
+
     /// Renders sprites.
     class SpriteRendererComponent
     {
@@ -30,7 +39,10 @@ namespace ae3d
 
         /// Removes all textures that were added using SetTexture.
         void Clear();
-        
+
+        /// \return Sprite info for index.
+        SpriteInfo GetSpriteInfo( int index ) const;
+
         /**
           Adds a texture to be rendered. The same texture can be added multiple
           times.

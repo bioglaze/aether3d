@@ -59,6 +59,9 @@ namespace ae3d
   public:
         /// \return id.
         unsigned GetID() const { return handle; }
+
+        std::string GetPath() const { return path; }
+
 #if RENDERER_METAL
         id<MTLTexture> GetMetalTexture() const { return metalTexture; }
 #endif
@@ -142,6 +145,8 @@ namespace ae3d
         bool opaque = true;
         /// Is the texture a render texture.
         bool isRenderTexture = false;
+
+        std::string path;
     };
 }
 

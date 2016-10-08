@@ -476,6 +476,11 @@ void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
             cameraMoveDir.z = speed;
         }
     }
+    else if (aEvent->key() == Qt::Key_D && (aEvent->modifiers() & Qt::KeyboardModifier::ControlModifier) && !selectedGameObjects.empty())
+    {
+        MainWindow* window = static_cast< MainWindow* >( mainWindow );
+        window->DuplicateSelected();
+    }
  }
 
 void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )

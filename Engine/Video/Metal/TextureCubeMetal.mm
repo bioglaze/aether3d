@@ -26,7 +26,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     wrap = aWrap;
     mipmaps = aMipmaps;
     colorSpace = aColorSpace;
-    
+    path = negX.path;
+
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
 

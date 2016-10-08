@@ -6,13 +6,14 @@ ModifyCameraCommand::ModifyCameraCommand( ae3d::CameraComponent* aCamera,
                                           ae3d::CameraComponent::ClearFlag aClearFlag,
                                           ae3d::CameraComponent::ProjectionType aProjectionType,
                                           const ae3d::Vec4& aOrthoParams, const ae3d::Vec4& aPerspParams,
-                                          const ae3d::Vec3& aClearColor )
+                                          const ae3d::Vec3& aClearColor, int aRenderOrder )
     : camera( aCamera )
     , orthoParams( aOrthoParams )
     , perspParams( aPerspParams )
     , clearFlag( aClearFlag )
     , projectionType( aProjectionType )
     , clearColor( aClearColor )
+    , renderOrder( aRenderOrder )
 {
     ae3d::System::Assert( camera != nullptr, "Camera command needs camera!" );
 
@@ -29,12 +30,15 @@ ModifyCameraCommand::ModifyCameraCommand( ae3d::CameraComponent* aCamera,
     oldClearFlag = camera->GetClearFlag();
     oldProjectionType = camera->GetProjectionType();
     oldClearColor = camera->GetClearColor();
+
+    oldRenderOrder = camera->GetRenderOrder();
 }
 
 void ModifyCameraCommand::Execute()
 {
     camera->SetClearFlag( clearFlag );
     camera->SetClearColor( clearColor );
+    camera->SetRenderOrder( renderOrder );
     camera->SetProjectionType( projectionType );
 
     if (projectionType == ae3d::CameraComponent::ProjectionType::Orthographic)
@@ -55,6 +59,7 @@ void ModifyCameraCommand::Undo()
 
     camera->SetClearFlag( oldClearFlag );
     camera->SetClearColor( oldClearColor );
+    camera->SetRenderOrder( oldRenderOrder );
     camera->SetProjectionType( oldProjectionType );
 
     if (oldProjectionType == ae3d::CameraComponent::ProjectionType::Orthographic)

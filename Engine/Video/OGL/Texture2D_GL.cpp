@@ -83,6 +83,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     mipmaps = aMipmaps;
     anisotropy = aAnisotropy;
     colorSpace = aColorSpace;
+    path = fileContents.path;
 
     if (!fileContents.isLoaded)
     {
@@ -124,8 +125,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     glBindTexture( GL_TEXTURE_2D, handle );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (wrap == TextureWrap::Repeat) ? GL_REPEAT : GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (wrap == TextureWrap::Repeat) ? GL_REPEAT : GL_CLAMP_TO_EDGE );
 

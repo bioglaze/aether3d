@@ -70,6 +70,7 @@
 		ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19C21AE2D08800822E80 /* Font.cpp */; };
 		ABD910F41B78F930005EBB74 /* VR.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABD910F31B78F930005EBB74 /* VR.hpp */; };
 		ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */; };
+		ABE40D4F1DA54ABA0000951B /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABE40D4E1DA54ABA0000951B /* MathUtil.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -151,6 +152,7 @@
 		ABCF19C21AE2D08800822E80 /* Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Font.cpp; path = ../Core/Font.cpp; sourceTree = "<group>"; };
 		ABD910F31B78F930005EBB74 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../Include/VR.hpp; sourceTree = "<group>"; };
 		ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
+		ABE40D4E1DA54ABA0000951B /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../Core/MathUtil.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +178,7 @@
 				ABCF19C21AE2D08800822E80 /* Font.cpp */,
 				AB870F9C1B5EBB0C0004BEE5 /* Frustum.cpp */,
 				AB870F9B1B5EBAA90004BEE5 /* Frustum.hpp */,
+				ABE40D4E1DA54ABA0000951B /* MathUtil.cpp */,
 				AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */,
 				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
 				AB922E4D1B4039DB000F3488 /* Mesh.cpp */,
@@ -408,6 +411,7 @@
 				AB4CD6A91C80C5A900C21006 /* VertexBufferGL.cpp in Sources */,
 				AB3A77DA1AB448500081864C /* System.cpp in Sources */,
 				ABC8B6071B0D0C1A00E5C32B /* FileSystem.cpp in Sources */,
+				ABE40D4F1DA54ABA0000951B /* MathUtil.cpp in Sources */,
 				ABCE0CA51AC06A4000F9EC53 /* glxw.c in Sources */,
 				AB77FD5A1B344FCD001858CC /* TextureCommon.cpp in Sources */,
 				AB922E511B404CFD000F3488 /* MeshRendererComponent.cpp in Sources */,

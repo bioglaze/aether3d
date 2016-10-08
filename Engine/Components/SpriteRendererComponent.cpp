@@ -1,6 +1,7 @@
 #include "SpriteRendererComponent.hpp"
-#include <vector>
 #include <algorithm>
+#include <sstream>
+#include <vector>
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
 #include "RenderTexture.hpp"
@@ -187,6 +188,7 @@ struct ae3d::SpriteRendererComponent::Impl
 
     RenderQueue opaqueRenderQueue;
     RenderQueue transparentRenderQueue;
+    std::vector< SpriteInfo > spriteInfos;
 };
 
 unsigned ae3d::SpriteRendererComponent::New()
@@ -197,6 +199,16 @@ unsigned ae3d::SpriteRendererComponent::New()
     }
 
     return nextFreeSpriteComponent++;
+}
+
+ae3d::SpriteInfo ae3d::SpriteRendererComponent::GetSpriteInfo( int index ) const
+{
+    if (index > 0 && index < static_cast< int >( m().spriteInfos.size() ))
+    {
+        return m().spriteInfos[ index ];
+    }
+
+    return SpriteInfo{ "", 0, 0, 0, 0, false };
 }
 
 ae3d::SpriteRendererComponent* ae3d::SpriteRendererComponent::Get( unsigned index )
@@ -242,7 +254,16 @@ ae3d::SpriteRendererComponent& ae3d::SpriteRendererComponent::operator=( const S
 
 std::string ae3d::SpriteRendererComponent::GetSerialized() const
 {
-    return "spriterenderer\n";
+    std::stringstream outStream;
+    outStream << "spriterenderer\n";
+
+    for (std::size_t spriteIndex = 0; spriteIndex < m().spriteInfos.size(); ++spriteIndex)
+    {
+        const auto& info = m().spriteInfos[ spriteIndex ];
+        outStream << "sprite " << info.path << " " << info.x << " " << info.y << " " << info.width << " " << info.height << "\n";
+    }
+
+    return outStream.str();
 }
 
 void ae3d::SpriteRendererComponent::Clear()
@@ -251,7 +272,8 @@ void ae3d::SpriteRendererComponent::Clear()
     m().transparentRenderQueue.Clear();
 }
 
-void ae3d::SpriteRendererComponent::SetTexture( TextureBase* aTexture, const Vec3& position, const Vec3& dimensionPixels, const Vec4& tintColor )
+void ae3d::SpriteRendererComponent::SetTexture( TextureBase* aTexture, const Vec3& position, const Vec3& dimensionPixels,
+                                                 const Vec4& tintColor )
 {
     if (aTexture == nullptr)
     {
@@ -263,7 +285,9 @@ void ae3d::SpriteRendererComponent::SetTexture( TextureBase* aTexture, const Vec
     sprite.position = position;
     sprite.dimension = dimensionPixels;
     sprite.tint = tintColor;
-    
+
+    m().spriteInfos.emplace_back( SpriteInfo{ aTexture->GetPath(), position.x, position.y, dimensionPixels.x, dimensionPixels.y, true } );
+
     if (!aTexture->IsOpaque() || static_cast<int>(tintColor.w) != 1)
     {
         m().transparentRenderQueue.sprites.emplace_back( sprite );

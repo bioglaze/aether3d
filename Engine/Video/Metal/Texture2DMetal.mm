@@ -103,6 +103,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     mipmaps = aMipmaps;
     colorSpace = aColorSpace;
     anisotropy = aAnisotropy;
+    path = fileContents.path;
 
     /*const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
     

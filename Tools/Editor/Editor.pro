@@ -71,7 +71,8 @@ SOURCES += \
     SpriteRendererInspector.cpp \
     CreateSpriteRendererCommand.cpp \
     PointLightInspector.cpp \
-    RemoveComponentCommand.cpp
+    RemoveComponentCommand.cpp \
+    ModifySpriteRendererCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -96,4 +97,5 @@ HEADERS += \
     SpriteRendererInspector.hpp \
     CreateSpriteRendererCommand.hpp \
     PointLightInspector.hpp \
-    RemoveComponentCommand.hpp
+    RemoveComponentCommand.hpp \
+    ModifySpriteRendererCommand.hpp

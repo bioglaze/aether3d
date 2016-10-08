@@ -24,6 +24,7 @@
 #include "MeshRendererComponent.hpp"
 #include "ModifyTransformCommand.hpp"
 #include "ModifyCameraCommand.hpp"
+#include "ModifySpriteRendererCommand.hpp"
 #include "PointLightComponent.hpp"
 #include "Quaternion.hpp"
 #include "RemoveComponentCommand.hpp"
@@ -70,6 +71,7 @@ MainWindow::MainWindow()
     connect( sceneWidget, &SceneWidget::TransformModified, this, &MainWindow::CommandModifyTransform );
     connect( this, &MainWindow::GameObjectSelected, this, &MainWindow::OnGameObjectSelected );
     connect( &cameraInspector, &CameraInspector::CameraModified, this, &MainWindow::CommandModifyCamera );
+    connect( &spriteRendererInspector, &SpriteRendererInspector::SpriteRendererModified, this, &MainWindow::CommandModifySpriteRenderer );
 
     windowMenu.Init( this );
     setMenuBar( windowMenu.menuBar );
@@ -428,12 +430,17 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
     }
     else if (event->key() == Qt::Key_D && (event->modifiers() & Qt::KeyboardModifier::ControlModifier) && !sceneWidget->selectedGameObjects.empty())
     {
-        auto selected = sceneWidget->selectedGameObjects.back();
-        std::cout << "Duplicate" << std::endl;
-        commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
-        *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
-        UpdateHierarchy();
+        DuplicateSelected();
     }
+}
+
+void MainWindow::DuplicateSelected()
+{
+    auto selected = sceneWidget->selectedGameObjects.back();
+    std::cout << "Duplicate" << std::endl;
+    commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
+    *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
+    UpdateHierarchy();
 }
 
 void MainWindow::CommandCreateAudioSourceComponent()
@@ -562,13 +569,24 @@ void MainWindow::CommandCreateGameObject()
 }
 
 void MainWindow::CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
-                                      const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor )
+                                      const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor,
+                                      int renderOrder )
 {
     ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "Cannot modify a camera if selection is empty" );
 
     auto camera = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::CameraComponent >();
     ae3d::System::Assert( camera, "First selected object doesn't contain a camera component" );
-    commandManager.Execute( std::make_shared< ModifyCameraCommand >( camera, clearFlag, projectionType, orthoParams, perspParams, clearColor ) );
+    commandManager.Execute( std::make_shared< ModifyCameraCommand >( camera, clearFlag, projectionType, orthoParams, perspParams,
+                                                                     clearColor, renderOrder ) );
+}
+
+void MainWindow::CommandModifySpriteRenderer( std::string path, float x, float y, float width, float height )
+{
+    ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "Cannot modify a sprite renderer if selection is empty" );
+
+    auto spriteRenderer = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::SpriteRendererComponent >();
+    ae3d::System::Assert( spriteRenderer, "First selected object doesn't contain a sprite renderer component" );
+    commandManager.Execute( std::make_shared< ModifySpriteRendererCommand >( spriteRenderer, path, x, y, width, height ) );
 }
 
 void MainWindow::LoadScene()

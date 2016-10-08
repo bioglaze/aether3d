@@ -9,7 +9,9 @@
 #include <QComboBox>
 #include <QString>
 #include <QHeaderView>
+#include <QIntValidator>
 #include <QPushButton>
+#include <QLineEdit>
 #include "MainWindow.hpp"
 #include "GameObject.hpp"
 #include "CameraComponent.hpp"
@@ -55,6 +57,18 @@ void CameraInspector::Init( QWidget* mainWindow )
     QLabel* clearTitle = new QLabel("Clear");
     QLabel* clearColorTitle = new QLabel("Clear Color");
     QLabel* projectionTitle = new QLabel("Projection");
+    QLabel* orderTitle = new QLabel("Render order");
+
+    orderInput = new QLineEdit();
+    orderInput->setMaxLength( 3 );
+    orderInput->setMaximumWidth( 40 );
+    orderInput->setValidator( new QIntValidator() );
+
+    QWidget* orderWidget = new QWidget();
+    QBoxLayout* orderLayout = new QBoxLayout( QBoxLayout::LeftToRight );
+    orderLayout->addWidget( orderTitle );
+    orderLayout->addWidget( orderInput );
+    orderWidget->setLayout( orderLayout );
 
     clearFlagsBox = new QComboBox();
     clearFlagsBox->addItem("Color and depth");
@@ -95,6 +109,7 @@ void CameraInspector::Init( QWidget* mainWindow )
     QBoxLayout* inspectorLayout = new QBoxLayout( QBoxLayout::TopToBottom );
     inspectorLayout->setContentsMargins( 1, 1, 1, 1 );
     inspectorLayout->addWidget( header );
+    inspectorLayout->addWidget( orderWidget );
     inspectorLayout->addWidget( clearWidget );
     inspectorLayout->addWidget( clearColorWidget );
     inspectorLayout->addWidget( projectionWidget );
@@ -112,6 +127,7 @@ void CameraInspector::Init( QWidget* mainWindow )
     connect( projectionBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ProjectionChanged() ));
     connect( clearColorTable, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
     connect( removeButton, SIGNAL(clicked(bool)), mainWindow, SLOT(CommandRemoveCameraComponent()));
+    connect( orderInput, &QLineEdit::textChanged, [&](const QString &/*text*/) { ApplyFieldsIntoSelectedCamera(); });
 }
 
 void CameraInspector::ProjectionChanged()
@@ -214,7 +230,6 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
         ortho->item( 0, 1 )->setText( "1" );
     }
 
-
     try
     {
         orthoNear = std::stof( ortho->item( 0, 2 )->text().toUtf8().constData() );
@@ -271,9 +286,20 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
         clearColorTable->item( 0, 2 )->setText( "0" );
     }
 
+    int renderOrder = 0;
+
+    try
+    {
+        renderOrder = std::stof( orderInput->text().toUtf8().constData() );
+    }
+    catch (std::invalid_argument&)
+    {
+
+    }
+
     ae3d::CameraComponent::ProjectionType projectionType = ae3d::CameraComponent::ProjectionType::Perspective;
 
-    emit CameraModified( CameraComponent::ClearFlag::DepthAndColor, projectionType, orthoParams, perspParams, clearColor );
+    emit CameraModified( CameraComponent::ClearFlag::DepthAndColor, projectionType, orthoParams, perspParams, clearColor, renderOrder );
 }
 
 void CameraInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )

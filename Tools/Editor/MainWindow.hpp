@@ -36,6 +36,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
     class SceneWidget* GetSceneWidget() const { return sceneWidget; }
+    void DuplicateSelected();
 
 public slots:
     void LoadScene();
@@ -60,7 +61,8 @@ public slots:
 
     void CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
     void CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
-                              const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor );
+                              const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor, int renderOrder );
+    void CommandModifySpriteRenderer( std::string path, float x, float y, float width, float height );
 
     void OpenLightingInspector();
     void Undo() { commandManager.Undo(); UpdateHierarchy(); }

@@ -36,22 +36,16 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     info.pSpecializationInfo = nullptr;
 
     System::Assert( info.module != VK_NULL_HANDLE, "compute shader module not created" );
-
 }
 
 void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& /*contents*/ )
 {
-    
+	System::Print("LoadSPIRV unimplemented\n");
 }
 
 void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* /*renderTexture*/, unsigned /*slot*/ )
 {
 	System::Print("SetRenderTexture unimplemented\n");
-}
-
-void ae3d::ComputeShader::SetUniformBuffer( void* /*buffer*/, int /*bufferSize*/ )
-{
-	System::Print( "SetUniformBuffer unimplemented\n" );
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )

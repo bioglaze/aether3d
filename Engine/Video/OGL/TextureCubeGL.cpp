@@ -71,7 +71,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     wrap = aWrap;
     mipmaps = aMipmaps;
     colorSpace = aColorSpace;
-    
+    path = negX.path;
+
     if (handle == 0)
     {
         handle = GfxDevice::CreateTextureId();

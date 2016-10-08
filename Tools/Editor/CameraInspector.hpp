@@ -23,7 +23,7 @@ class CameraInspector : public QObject
 
 signals:
     void CameraModified( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
-                         const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor );
+                         const ae3d::Vec4& orthoParams, const ae3d::Vec4& perspParams, const ae3d::Vec3& clearColor, int renderOrder );
 
 private slots:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
@@ -41,5 +41,6 @@ private:
     QTableWidget* clearColorTable = nullptr;
     class QComboBox* clearFlagsBox = nullptr;
     QComboBox* projectionBox = nullptr;
+    class QLineEdit* orderInput = nullptr;
 };
 #endif
