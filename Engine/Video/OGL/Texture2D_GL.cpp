@@ -166,14 +166,14 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     GfxDevice::ErrorCheck( "Load Texture2D" );
 }
 
-void ae3d::Texture2D::LoadDDS( const char* path )
+void ae3d::Texture2D::LoadDDS( const char* aPath )
 {
     DDSLoader::Output unusedOutput;
-    const DDSLoader::LoadResult loadResult = DDSLoader::Load( FileSystem::FileContents( path ), 0, width, height, opaque, unusedOutput );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( FileSystem::FileContents( aPath ), 0, width, height, opaque, unusedOutput );
 
     if (loadResult != DDSLoader::LoadResult::Success)
     {
-        ae3d::System::Print( "DDS Loader could not load %s", path );
+        ae3d::System::Print( "DDS Loader could not load %s", aPath );
     }
 }
 

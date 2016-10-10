@@ -213,6 +213,12 @@ void ae3d::Scene::Render()
         }
     }
     
+    if (cameras.empty())
+    {
+        GfxDevice::BeginRenderPassAndCommandBuffer();
+        GfxDevice::EndRenderPassAndCommandBuffer();
+    }
+
     auto cameraSortFunction = [](GameObject* g1, GameObject* g2) { return g1->GetComponent< CameraComponent >()->GetRenderOrder() <
         g2->GetComponent< CameraComponent >()->GetRenderOrder(); };
     std::sort( std::begin( cameras ), std::end( cameras ), cameraSortFunction );
@@ -724,8 +730,11 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         }
     }
     
-    auto meshSorterByMesh = [&](unsigned j, unsigned k) { return gameObjects[ j ]->GetComponent< MeshRendererComponent >()->GetMesh() ==
-        gameObjects[ k ]->GetComponent< MeshRendererComponent >()->GetMesh(); };
+    auto meshSorterByMesh = [&](unsigned j, unsigned k)
+    {
+        return gameObjects[ j ]->GetComponent< MeshRendererComponent >()->GetMesh() <
+               gameObjects[ k ]->GetComponent< MeshRendererComponent >()->GetMesh();
+    };
     std::sort( std::begin( gameObjectsWithMeshRenderer ), std::end( gameObjectsWithMeshRenderer ), meshSorterByMesh );
     
     for (auto j : gameObjectsWithMeshRenderer)

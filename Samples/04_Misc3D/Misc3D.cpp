@@ -112,6 +112,16 @@ int main()
     Mesh cubeMeshScaledUV;
     cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
 
+    Mesh skinnedMesh;
+    skinnedMesh.Load( FileSystem::FileContents( "Fan_Done5_Rigged.ae3d" ) );
+
+    GameObject skinnedGO;
+    skinnedGO.AddComponent< MeshRendererComponent >();
+    skinnedGO.GetComponent< MeshRendererComponent >()->SetMesh( &skinnedMesh );
+    skinnedGO.AddComponent< TransformComponent >();
+    skinnedGO.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -80 } );
+    skinnedGO.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
+
     GameObject cube;
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
@@ -157,6 +167,11 @@ int main()
     material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
     
+    for (int skinSubMeshIndex = 0; skinSubMeshIndex < skinnedMesh.GetSubMeshCount(); ++skinSubMeshIndex)
+    {
+        skinnedGO.GetComponent< MeshRendererComponent >()->SetMaterial( &material, skinSubMeshIndex );
+    }
+
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
 
@@ -174,11 +189,11 @@ int main()
     dirLight.AddComponent<DirectionalLightComponent>();
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<TransformComponent>();
-	dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 512 );
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
@@ -210,7 +225,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -284,7 +299,8 @@ int main()
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
     scene.Add( &transCube1 );
-    
+    scene.Add( &skinnedGO );
+
     const int cubeCount = 10;
     GameObject cubes[ cubeCount ];
 

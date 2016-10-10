@@ -187,6 +187,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     mipmaps = aMipmaps;
     anisotropy = aAnisotropy;
     colorSpace = aColorSpace;
+    path = fileContents.path;
 
     if (!fileContents.isLoaded)
     {
@@ -242,15 +243,15 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 #endif
 }
 
-void ae3d::Texture2D::LoadDDS( const char* path )
+void ae3d::Texture2D::LoadDDS( const char* aPath )
 {
     DDSLoader::Output ddsOutput;
-    auto fileContents = FileSystem::FileContents( path );
+    auto fileContents = FileSystem::FileContents( aPath );
     const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
 
     if (loadResult != DDSLoader::LoadResult::Success)
     {
-        ae3d::System::Print( "DDS Loader could not load %s", path );
+        ae3d::System::Print( "DDS Loader could not load %s", aPath );
         return;
     }
 
@@ -294,7 +295,7 @@ void ae3d::Texture2D::LoadDDS( const char* path )
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
     wchar_t wstr[ 128 ];
-    std::mbstowcs( wstr, path, 128 );
+    std::mbstowcs( wstr, aPath, 128 );
     gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     Texture2DGlobal::textures.push_back( gpuResource.resource );

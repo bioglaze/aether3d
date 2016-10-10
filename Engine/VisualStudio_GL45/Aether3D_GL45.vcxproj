@@ -187,6 +187,7 @@
     <ClCompile Include="..\Core\FileWatcher.cpp" />
     <ClCompile Include="..\Core\Font.cpp" />
     <ClCompile Include="..\Core\Frustum.cpp" />
+    <ClCompile Include="..\Core\MathUtil.cpp" />
     <ClCompile Include="..\Core\Matrix.cpp" />
     <ClCompile Include="..\Core\MatrixSSE3.cpp" />
     <ClCompile Include="..\Core\Mesh.cpp" />

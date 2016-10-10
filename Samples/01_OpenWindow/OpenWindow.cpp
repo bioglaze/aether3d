@@ -55,13 +55,13 @@ int main()
     textContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
                                                                        
     Scene scene;
-    scene.Add( &camera );
-    scene.Add( &spriteContainer );
-    scene.Add( &textContainer );
+    //scene.Add( &camera );
+    //scene.Add( &spriteContainer );
+    //scene.Add( &textContainer );
     sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
 
     bool quit = false;
-	int frame = 0;
+    int frame = 0;
 
     while (Window::IsOpen() && !quit)
     {
@@ -92,8 +92,7 @@ int main()
         }
 
         // Tests renderer by rendering an empty frame or adding stuff while running
-        // FIXME: Commented out because crashes on Vulkan
-        /*if (frame == 1)
+        if (frame == 1)
         {
             scene.Add( &camera );
         }
@@ -105,7 +104,7 @@ int main()
         else if (frame == 3)
         {
             sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-        }*/
+        }
 
         scene.Render();
 

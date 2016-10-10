@@ -121,6 +121,9 @@
     <ClCompile Include="..\Video\OGL\OpenVRSupport.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\MathUtil.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

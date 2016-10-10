@@ -115,8 +115,8 @@ namespace GfxDeviceGlobal
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     std::map< unsigned, VkPipeline > psoCache;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-	std::vector< VkDescriptorSet > descriptorSets;
-	int descriptorSetIndex = 0;
+    std::vector< VkDescriptorSet > descriptorSets;
+    int descriptorSetIndex = 0;
     std::uint32_t queueNodeIndex = UINT32_MAX;
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
@@ -312,8 +312,8 @@ namespace ae3d
         rasterizationState.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizationState.depthClampEnable = VK_FALSE;
         rasterizationState.rasterizerDiscardEnable = VK_FALSE;
-		rasterizationState.depthBiasEnable = VK_FALSE;
-		rasterizationState.lineWidth = 1;
+        rasterizationState.depthBiasEnable = VK_FALSE;
+        rasterizationState.lineWidth = 1;
 
         VkPipelineColorBlendStateCreateInfo colorBlendState = {};
         colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -342,12 +342,12 @@ namespace ae3d
         colorBlendState.pAttachments = blendAttachmentState;
 
         VkPipelineDynamicStateCreateInfo dynamicState = {};
-        std::vector<VkDynamicState> dynamicStateEnables;
-        dynamicStateEnables.push_back( VK_DYNAMIC_STATE_VIEWPORT );
-        dynamicStateEnables.push_back( VK_DYNAMIC_STATE_SCISSOR );
+        VkDynamicState dynamicStateEnables[ 2 ];
+        dynamicStateEnables[ 0 ] = VK_DYNAMIC_STATE_VIEWPORT;
+        dynamicStateEnables[ 1 ] = VK_DYNAMIC_STATE_SCISSOR;
         dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-        dynamicState.pDynamicStates = dynamicStateEnables.data();
-        dynamicState.dynamicStateCount = (std::uint32_t)dynamicStateEnables.size();
+        dynamicState.pDynamicStates = &dynamicStateEnables[ 0 ];
+        dynamicState.dynamicStateCount = 2;
 
         VkPipelineDepthStencilStateCreateInfo depthStencilState = {};
         depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
@@ -614,12 +614,9 @@ namespace ae3d
 
         for (std::uint32_t i = 0; i < queueCount; ++i)
         {
-            if ((queueProps[ i ].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0)
+            if ((queueProps[ i ].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0 && computeQueueNodeIndex == UINT32_MAX)
             {
-                if (computeQueueNodeIndex == UINT32_MAX)
-                {
-                    computeQueueNodeIndex = i;
-                }
+                computeQueueNodeIndex = i;
             }
             
             if ((queueProps[ i ].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0)
@@ -884,8 +881,8 @@ namespace ae3d
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriorities;
 
-		std::vector< const char* > deviceExtensions;
-		deviceExtensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
+        std::vector< const char* > deviceExtensions;
+        deviceExtensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
 
         std::uint32_t deviceExtensionCount;
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, nullptr );
@@ -894,11 +891,11 @@ namespace ae3d
 
         for (auto& i : availableDeviceExtensions)
         {
-			if (std::string( i.extensionName ) == std::string( VK_EXT_DEBUG_MARKER_EXTENSION_NAME ))
-			{
-				deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
-			}
-		}
+            if (std::string( i.extensionName ) == std::string( VK_EXT_DEBUG_MARKER_EXTENSION_NAME ))
+            {
+                deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
+            }
+        }
 
         VkPhysicalDeviceFeatures enabledFeatures = {};
         enabledFeatures.tessellationShader = true;
@@ -912,7 +909,7 @@ namespace ae3d
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
-		deviceCreateInfo.enabledExtensionCount = static_cast< std::uint32_t >( deviceExtensions.size() );
+        deviceCreateInfo.enabledExtensionCount = static_cast< std::uint32_t >( deviceExtensions.size() );
         deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
         result = vkCreateDevice( GfxDeviceGlobal::physicalDevice, &deviceCreateInfo, nullptr, &GfxDeviceGlobal::device );
@@ -992,7 +989,6 @@ namespace ae3d
 
         for (std::uint32_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); i++)
         {
-            // FIXME: check index
             attachments[ 1 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
             VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
             AE3D_CHECK_VULKAN( err, "vkCreateFramebuffer" );
@@ -1257,19 +1253,19 @@ namespace ae3d
         VkResult err = vkCreateDescriptorPool( GfxDeviceGlobal::device, &descriptorPoolInfo, nullptr, &GfxDeviceGlobal::descriptorPool );
         AE3D_CHECK_VULKAN( err, "vkCreateDescriptorPool" );
 
-		GfxDeviceGlobal::descriptorSets.resize( 100 );
+        GfxDeviceGlobal::descriptorSets.resize( 100 );
 
-		for (std::size_t i = 0; i < GfxDeviceGlobal::descriptorSets.size(); ++i)
-		{
-			VkDescriptorSetAllocateInfo allocInfo = {};
-			allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			allocInfo.descriptorPool = GfxDeviceGlobal::descriptorPool;
-			allocInfo.descriptorSetCount = 1;
-			allocInfo.pSetLayouts = &GfxDeviceGlobal::descriptorSetLayout;
+        for (std::size_t i = 0; i < GfxDeviceGlobal::descriptorSets.size(); ++i)
+        {
+            VkDescriptorSetAllocateInfo allocInfo = {};
+            allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            allocInfo.descriptorPool = GfxDeviceGlobal::descriptorPool;
+            allocInfo.descriptorSetCount = 1;
+            allocInfo.pSetLayouts = &GfxDeviceGlobal::descriptorSetLayout;
 
-			err = vkAllocateDescriptorSets( GfxDeviceGlobal::device, &allocInfo, &GfxDeviceGlobal::descriptorSets[ i ] );
-			AE3D_CHECK_VULKAN( err, "vkAllocateDescriptorSets" );
-		}
+            err = vkAllocateDescriptorSets( GfxDeviceGlobal::device, &allocInfo, &GfxDeviceGlobal::descriptorSets[ i ] );
+            AE3D_CHECK_VULKAN( err, "vkAllocateDescriptorSets" );
+        }
     }
 
     VkSampler GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter )
@@ -1297,8 +1293,8 @@ namespace ae3d
 
     VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler )
     {
-		VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
-		GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
+        VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
+        GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
 
         // Binding 0 : Uniform buffer
         VkWriteDescriptorSet uboSet = {};

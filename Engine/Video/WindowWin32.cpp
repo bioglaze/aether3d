@@ -319,7 +319,7 @@ namespace ae3d
         const HINSTANCE hInstance = GetModuleHandle( nullptr );
         const bool fullscreen = (flags & WindowCreateFlags::Fullscreen) != 0;
 
-		WNDCLASSEX wc = {};
+        WNDCLASSEX wc = {};
 
         wc.cbSize = sizeof( WNDCLASSEX );
         wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -338,10 +338,10 @@ namespace ae3d
 
         auto ret = RegisterClassEx(&wc);
 		
-		if (ret == 0)
-		{
-			System::Assert( false, "failed to register window class" );
-		}
+        if (ret == 0)
+        {
+            System::Assert( false, "failed to register window class" );
+        }
 
         WindowGlobal::hwnd = CreateWindowExA( fullscreen ? WS_EX_TOOLWINDOW | WS_EX_TOPMOST : 0,
             "WindowClass1",    // name of the window class

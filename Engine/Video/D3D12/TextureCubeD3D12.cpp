@@ -43,6 +43,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     wrap = aWrap;
     mipmaps = aMipmaps;
     colorSpace = aColorSpace;
+    path = negX.path;
 
     // Gets dimension
     {

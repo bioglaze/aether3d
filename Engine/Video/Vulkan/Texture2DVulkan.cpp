@@ -67,6 +67,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     handle = 1;
     width = 256;
     height = 256;
+    path = fileContents.path;
 
     if (!fileContents.isLoaded)
     {
@@ -275,15 +276,15 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     AE3D_CHECK_VULKAN( err, "vkCreateImageView in Texture2D" );
 }
 
-void ae3d::Texture2D::LoadDDS( const char* path )
+void ae3d::Texture2D::LoadDDS( const char* aPath )
 {
     DDSLoader::Output ddsOutput;
-    auto fileContents = FileSystem::FileContents( path );
+    auto fileContents = FileSystem::FileContents( aPath );
     const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
 
     if (loadResult != DDSLoader::LoadResult::Success)
     {
-        ae3d::System::Print( "DDS Loader could not load %s", path );
+        ae3d::System::Print( "DDS Loader could not load %s", aPath );
         return;
     }
 
