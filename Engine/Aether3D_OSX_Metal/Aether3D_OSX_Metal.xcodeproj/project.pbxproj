@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB61DA531DAD62F80068A5FE /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB61DA521DAD62F80068A5FE /* MathUtil.cpp */; };
 		AB6E12D01C11D79B0020A929 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */; };
 		AB6E12D11C11D79B0020A929 /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C81C11D79B0020A929 /* CameraComponent.cpp */; };
 		AB6E12D21C11D79B0020A929 /* DirectionalLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C91C11D79B0020A929 /* DirectionalLightComponent.cpp */; };
@@ -84,6 +85,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AB61DA521DAD62F80068A5FE /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../Core/MathUtil.cpp; sourceTree = "<group>"; };
 		AB6E12BA1C11D7450020A929 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAether3D_OSX_Metal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
 		AB6E12C81C11D79B0020A929 /* CameraComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CameraComponent.cpp; path = ../Components/CameraComponent.cpp; sourceTree = "<group>"; };
@@ -226,6 +228,7 @@
 				AB6E12E21C11D7B00020A929 /* Frustum.hpp */,
 				AB6E12E31C11D7B00020A929 /* Matrix.cpp */,
 				AB6E12E51C11D7B00020A929 /* MatrixSSE3.cpp */,
+				AB61DA521DAD62F80068A5FE /* MathUtil.cpp */,
 				AB6E12E61C11D7B00020A929 /* Mesh.cpp */,
 				AB6E12E71C11D7B00020A929 /* Scene.cpp */,
 				AB6E12E81C11D7B00020A929 /* SubMesh.hpp */,
@@ -417,6 +420,7 @@
 				AB6E134B1C11D8BC0020A929 /* stb_image.c in Sources */,
 				AB6E13431C11D8A00020A929 /* Material.cpp in Sources */,
 				AB6E12F51C11D7B00020A929 /* MatrixSSE3.cpp in Sources */,
+				AB61DA531DAD62F80068A5FE /* MathUtil.cpp in Sources */,
 				ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */,
 				AB6E13451C11D8A00020A929 /* RendererCommon.cpp in Sources */,
 				AB6E12D41C11D79B0020A929 /* MeshRendererComponent.cpp in Sources */,

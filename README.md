@@ -28,10 +28,15 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 # Planned Features
 
-  - Clustered Forward lighting.
-  - Post-processing effects.
+  - Physically-based shading
+  - Clustered Forward lighting
+  - Post-processing effects
   - Animation
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
+
+# API documentation
+
+[link](http://twiren.kapsi.fi/doc_v0.5.5/html/)
 
 # Build
 
@@ -54,7 +59,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile.
-  - FBX converter tries to find FBX SDK 2016.1.1 in its default install location
+  - FBX converter tries to find FBX SDK 2016.1.1 in its default install location.
 
 ## iOS
   - Build Aether3D_iOS in Engine. It creates a framework.

@@ -123,10 +123,6 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     {
         sampledColor = half4( 0, 0, 0, 1 );
     }
-    else if (numLights == 0x7fffffff)
-    {
-        sampledColor = half4( 0, 0, 1, 1 );
-    }
     else if (numLights == 1)
     {
         sampledColor = half4( 0, 1, 0, 1 );
@@ -136,7 +132,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         sampledColor = half4( 1, 0, 0, 1 );
     }
 
-    nTileIndex = numLights;
+    /*nTileIndex = numLights;
     sampledColor = half4( 1, 0, 0, 1 );
     if (nTileIndex % 1)
     {
@@ -149,6 +145,6 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     if (nTileIndex % 3)
     {
         sampledColor = half4( 1, 1, 1, 1 );
-    }
+    }*/
     return sampledColor;
 }

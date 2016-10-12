@@ -68,6 +68,7 @@
 		AB3E80111C00B5E80077D8BD /* SpotLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */; };
 		AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB521D111BC045BC004CDF06 /* TextureCube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB61DA551DAD633F0068A5FE /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB61DA541DAD633F0068A5FE /* MathUtil.cpp */; };
 		AB8E83FF1CEBAEEF00A8E9E8 /* PointLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB8E83FE1CEBAEEF00A8E9E8 /* PointLightComponent.cpp */; };
 		AB8E84011CEBAF0100A8E9E8 /* PointLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB8E84001CEBAF0100A8E9E8 /* PointLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB921DB31CC21B34008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB21CC21B34008F5750 /* ComputeShader.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -146,6 +147,7 @@
 		AB3016D31D831DCA00832A69 /* LightTilerMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = LightTilerMetal.mm; path = ../../Video/Metal/LightTilerMetal.mm; sourceTree = "<group>"; };
 		AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpotLightComponent.cpp; path = ../../Components/SpotLightComponent.cpp; sourceTree = "<group>"; };
 		AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
+		AB61DA541DAD633F0068A5FE /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../../Core/MathUtil.cpp; sourceTree = "<group>"; };
 		AB8E83FE1CEBAEEF00A8E9E8 /* PointLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointLightComponent.cpp; path = ../../Components/PointLightComponent.cpp; sourceTree = "<group>"; };
 		AB8E84001CEBAF0100A8E9E8 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../../Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 		AB921DB21CC21B34008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../Include/ComputeShader.hpp; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 				441392041B6F441500B98C1E /* Frustum.hpp */,
 				4449E86B1B14B44E009A869C /* MatrixNEON.cpp */,
 				AB922E581B405020000F3488 /* Mesh.cpp */,
+				AB61DA541DAD633F0068A5FE /* MathUtil.cpp */,
 				4449E86C1B14B44E009A869C /* Scene.cpp */,
 				449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */,
 				4449E86D1B14B44E009A869C /* System.cpp */,
@@ -455,6 +458,7 @@
 				4449E8991B14B4B5009A869C /* Texture2DMetal.mm in Sources */,
 				4449E88B1B14B48E009A869C /* stb_vorbis.c in Sources */,
 				ABB79F981BA9B7A5002A1B5F /* DirectionalLightComponent.cpp in Sources */,
+				AB61DA551DAD633F0068A5FE /* MathUtil.cpp in Sources */,
 				4449E87F1B14B46C009A869C /* AudioSourceComponent.cpp in Sources */,
 				4449E88A1B14B48E009A869C /* stb_image.c in Sources */,
 				4449E86E1B14B44E009A869C /* AudioClip.cpp in Sources */,

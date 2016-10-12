@@ -212,12 +212,13 @@ void ae3d::Scene::Render()
             cameras.push_back( gameObject );
         }
     }
-    
+#if RENDERER_VULKAN
     if (cameras.empty())
     {
         GfxDevice::BeginRenderPassAndCommandBuffer();
         GfxDevice::EndRenderPassAndCommandBuffer();
     }
+#endif
 
     auto cameraSortFunction = [](GameObject* g1, GameObject* g2) { return g1->GetComponent< CameraComponent >()->GetRenderOrder() <
         g2->GetComponent< CameraComponent >()->GetRenderOrder(); };

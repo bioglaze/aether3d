@@ -79,7 +79,14 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     threadgroup atomic_uint ldsZMin;
     threadgroup atomic_uint ldsLightIdxCounter;
 
-    uint2 globalIdx = dtid;
+    // gl_GlobalInvocationID is a uvec3 variable giving the global ID of the thread,
+    // gl_LocalInvocationID is the local index within the work group, and
+    // gl_WorkGroupID is the work group's index
+    //uvec3 globalIdx = gl_GlobalInvocationID;
+    //uvec3 localIdx = gl_LocalInvocationID;
+    //uvec3 groupIdx = gl_WorkGroupID;
+
+    uint2 globalIdx = gid;//dtid;
     uint2 localIdx = tid;
     uint2 groupIdx = dtid;
 

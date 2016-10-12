@@ -76,7 +76,7 @@
    \subsection osx_cmd macOS and GNU/Linux Command Line
 
    Run the Makefile in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
-   On GNU/Linux you need at least the following packages: libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+   On GNU/Linux you need at least the following packages: <pre>libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev</pre>
 
    \subsection Bugs
 
@@ -90,7 +90,7 @@
    \subsection Editor
  
    Editor is used to create scenes by placing and moving GameObjects, adding components etc. It's built on top of Qt 5 so you'll need to
-   install Qt development files. The .pro project can be opened with QtCreator or other tool. On Windows, you'll need OpenAL32.dll in aether3d\Tools\Editor\copy_to_output
+   install Qt development files. The .pro project can be opened with QtCreator or other tool. On Windows, you'll need OpenAL32.dll in aether3d/Tools/Editor/copy_to_output
  
    \subsection CombineFiles
  

@@ -6,12 +6,20 @@
 
 namespace ae3d
 {
-    // Sprite's path and dimensions.
+    /// Sprite's path and dimensions.
     struct SpriteInfo
     {
+        /// Path
         std::string path;
-        float x, y;
-        float width, height;
+        /// X-coordinate in pixels
+        float x;
+        /// Y-coordinate in pixels
+        float y;
+        /// Width in pixels
+        float width;
+        /// Height in pixels
+        float height;
+        /// True, if the sprite has been loaded without errors
         bool valid;
     };
 

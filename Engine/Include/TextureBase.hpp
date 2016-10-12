@@ -60,6 +60,7 @@ namespace ae3d
         /// \return id.
         unsigned GetID() const { return handle; }
 
+        /// \return Path where this texture was loaded from, if it was loaded from a file.
         std::string GetPath() const { return path; }
 
 #if RENDERER_METAL
@@ -145,7 +146,7 @@ namespace ae3d
         bool opaque = true;
         /// Is the texture a render texture.
         bool isRenderTexture = false;
-
+        /// Path where this texture was loaded from, if it was loaded from a file.
         std::string path;
     };
 }

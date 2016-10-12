@@ -27,7 +27,7 @@ struct CullerUniforms
 void ae3d::LightTiler::Init()
 {
     pointLightCenterAndRadius.resize( MaxLights );
-    pointLightCenterAndRadius[ 0 ] = Vec4( 0, 0, -5, 10 );
+    pointLightCenterAndRadius[ 0 ] = Vec4( -4, 4, 10, 10 );
     activePointLights = 1;
 
     pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * 4 * sizeof( float )
