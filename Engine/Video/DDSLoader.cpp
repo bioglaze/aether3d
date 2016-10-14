@@ -3,7 +3,7 @@
 #include <GL/glxw.h>
 #endif
 #include <cassert>
-#include <memory>
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>

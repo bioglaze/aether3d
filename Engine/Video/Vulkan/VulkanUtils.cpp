@@ -1,4 +1,5 @@
 #include <vulkan/vulkan.h>
+#include <cstring>
 #include "Macros.hpp"
 #include "System.hpp"
 #include "VertexBuffer.hpp"

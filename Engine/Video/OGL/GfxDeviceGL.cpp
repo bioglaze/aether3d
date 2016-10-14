@@ -79,7 +79,7 @@ namespace GfxDeviceGlobal
     int renderTargetBinds = 0;
     int shaderBinds = 0;
     float frameTimeMS = 0;
-    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
+    std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
 
     int backBufferWidth = 640;
     int backBufferHeight = 400;

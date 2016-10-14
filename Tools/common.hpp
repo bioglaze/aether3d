@@ -5,6 +5,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
@@ -444,7 +445,7 @@ void Mesh::OptimizeFaces()
                 assert( vertexData.data.activeFaceListSize > 0 );
                 unsigned* begin = &activeFaceList[ vertexData.data.activeFaceListStart ];
                 unsigned* end = &activeFaceList[ vertexData.data.activeFaceListStart + vertexData.data.activeFaceListSize ];
-                unsigned* it = std::find( begin, end, bestFace );
+                auto it = std::find( begin, end, bestFace );
                 assert( it != end );
                 std::swap( *it, *(end - 1) );
                 --vertexData.data.activeFaceListSize;
