@@ -16,18 +16,19 @@ using namespace ae3d;
 
 struct CullerUniforms
 {
+    Matrix44 invProjection;
+    Matrix44 viewMatrix;
     unsigned windowWidth;
     unsigned windowHeight;
     unsigned numLights;
     int maxNumLightsPerTile;
-    Matrix44 invProjection;
-    Matrix44 viewMatrix;
 };
 
 void ae3d::LightTiler::Init()
 {
     pointLightCenterAndRadius.resize( MaxLights );
-    pointLightCenterAndRadius[ 0 ] = Vec4( -4, 4, 10, 10 );
+    //pointLightCenterAndRadius[ 0 ] = Vec4( -4, 4, 10, 10 );
+    pointLightCenterAndRadius[ 0 ] = Vec4( -4, 4, 10, 5 );
     activePointLights = 1;
 
     pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * 4 * sizeof( float )
@@ -39,9 +40,11 @@ void ae3d::LightTiler::Init()
 
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
+
     System::Print("max num lights per tile: %u, numTiles: %d\n", maxNumLightsPerTile, numTiles);
     System::Print("backbuffer: %d x %d\n", GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
-    
+    System::Print( "numTiles: %dx%d\n", GetNumTilesX(), GetNumTilesY() );
+
     perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( int )
                   options:MTLResourceCPUCacheModeDefaultCache];
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
@@ -70,7 +73,7 @@ unsigned ae3d::LightTiler::GetNumTilesX() const
 
 unsigned ae3d::LightTiler::GetNumTilesY() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDeviceGlobal::backBufferHeight + TileRes - 1) / (float)TileRes);
 }
 
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& position, float radius )
@@ -94,7 +97,6 @@ unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& view, RenderTexture& depthNormalTarget )
 {
     shader.SetRenderTexture( &depthNormalTarget, 0 );
-
     CullerUniforms uniforms;
 
     Matrix44::Invert( projection, uniforms.invProjection );
@@ -105,6 +107,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
+    cullerUniformsCreated = true;
+    
     uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents];
     memcpy( bufferPointer, &uniforms, sizeof( CullerUniforms ) );
 

@@ -95,7 +95,7 @@
    \subsection CombineFiles
  
    Aether3D internals almost never read raw files, all file access is abstracted by FileSystem to allow file contents to come from various sources.
-   CombineFiles creates .pak files that contain contents of multiple files. You run it with command CombineFiles inputFile outputFile where
+   CombineFiles creates .pak files that contain contents of multiple files. You run it with command <code>CombineFiles inputFile outputFile</code> where
    inputFile is just a text file containing a list of file paths, each on their own line.
 
    \subsection SDF_Generator

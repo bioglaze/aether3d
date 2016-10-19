@@ -53,9 +53,6 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     MTLSize threadgroupCounts = MTLSizeMake( 16, 16, 1 );
     MTLSize threadgroups = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
 
-    //MTLSize threadgroupCounts = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
-    //MTLSize threadgroups = MTLSizeMake( 1, 1, 1 );
-
     id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"ComputeCommand";
     

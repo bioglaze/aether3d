@@ -10,7 +10,7 @@
 void SpotLightInspector::Init( QWidget* mainWindow )
 {
     auto componentName = new QLabel( "Spot Light" );
-    auto shadowCheck = new QCheckBox( "Casts Shadow" );
+    shadowCheck = new QCheckBox( "Casts Shadow" );
 
     removeButton = new QPushButton("remove");
     QBoxLayout* headerLayout = new QBoxLayout( QBoxLayout::LeftToRight );
@@ -50,5 +50,12 @@ void SpotLightInspector::GameObjectSelected( std::list< ae3d::GameObject* > game
     else
     {
         gameObject = gameObjects.front();
+
+        auto spotLight = gameObject->GetComponent< ae3d::SpotLightComponent >();
+
+        if (spotLight != nullptr)
+        {
+            shadowCheck->setChecked( spotLight->CastsShadow() );
+        }
     }
 }

@@ -17,7 +17,8 @@ namespace ae3d
         int GetNextPointLightBufferIndex();
         void SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius );
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
-
+        bool CullerUniformsCreated() const { return cullerUniformsCreated; }
+        
 #if RENDERER_METAL
         id< MTLBuffer > GetPerTileLightIndexBuffer() { return perTileLightIndexBuffer; }
         id< MTLBuffer > GetPointLightCenterAndRadiusBuffer() { return pointLightCenterAndRadiusBuffer; }
@@ -36,6 +37,7 @@ namespace ae3d
 #endif
         std::vector< Vec4 > pointLightCenterAndRadius;
         int activePointLights = 0;
+        bool cullerUniformsCreated = false;
         static const int TileRes = 16;
         static const int MaxLights = 2048;
         static const unsigned MaxLightsPerTile = 544;

@@ -32,41 +32,51 @@ struct StandardVertex
 
 struct CullerUniforms
 {
+    matrix_float4x4 invProjection;
+    matrix_float4x4 viewMatrix;
     uint windowWidth;
     uint windowHeight;
     uint numLights;
     int maxNumLightsPerTile;
-    matrix_float4x4 invProjection;
-    matrix_float4x4 viewMatrix;
 };
 
 static uint GetNumLightsInThisTile( uint nTileIndex, uint maxNumLightsPerTile, constant int* perTileLightIndexBuffer )
 {
-    uint nNumLightsInThisTile = 0;
-    uint nIndex = maxNumLightsPerTile * nTileIndex;
-    uint nNextLightIndex = perTileLightIndexBuffer[ nIndex ];
+    uint numLightsInThisTile = 0;
+    uint index = maxNumLightsPerTile * nTileIndex;
+    uint nextLightIndex = perTileLightIndexBuffer[ index ];
 
     int iterations = 0;
 
     // count point lights
-    while (nNextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL && iterations < 100)
+    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL && iterations < 100)
     {
-        nNumLightsInThisTile++;
-        nIndex++;
-        nNextLightIndex = perTileLightIndexBuffer[ nIndex ];
+        ++numLightsInThisTile;
+        ++index;
+        nextLightIndex = perTileLightIndexBuffer[ index ];
 
         ++iterations;
     }
 
-    return nNumLightsInThisTile;
+    // count spot lights
+    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL && iterations < 100)
+    {
+        ++numLightsInThisTile;
+        ++index;
+        nextLightIndex = perTileLightIndexBuffer[ index ];
+
+        ++iterations;
+    }
+
+    return numLightsInThisTile;
 }
 
 static uint GetTileIndex( float2 ScreenPos, int windowWidth )
 {
-    float fTileRes = float( TILE_RES );
-    uint nNumCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
-    uint nTileIdx = uint( floor( ScreenPos.x / fTileRes ) + floor( ScreenPos.y / fTileRes ) * nNumCellsX );
-    return nTileIdx;
+    float tileRes = float( TILE_RES );
+    uint numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
+    uint tileIdx = uint( floor( ScreenPos.x / tileRes ) + floor( ScreenPos.y / tileRes ) * numCellsX );
+    return tileIdx;
 }
 
 // calculate the number of tiles in the horizontal direction
@@ -127,13 +137,16 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     {
         sampledColor = half4( 0, 1, 0, 1 );
     }
+    else if (numLights == 100)
+    {
+        sampledColor = half4( 0, 1, 1, 1 );
+    }
     else
     {
         sampledColor = half4( 1, 0, 0, 1 );
     }
 
-    /*nTileIndex = numLights;
-    sampledColor = half4( 1, 0, 0, 1 );
+    /*sampledColor = half4( 1, 0, 0, 1 );
     if (nTileIndex % 1)
     {
         sampledColor = half4( 0, 1, 0, 1 );
@@ -141,10 +154,6 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     if (nTileIndex % 2)
     {
         sampledColor = half4( 0, 0, 1, 1 );
-    }
-    if (nTileIndex % 3)
-    {
-        sampledColor = half4( 1, 1, 1, 1 );
     }*/
     return sampledColor;
 }

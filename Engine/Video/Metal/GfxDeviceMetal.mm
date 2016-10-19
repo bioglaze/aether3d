@@ -543,6 +543,13 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode )
 {
+#if RENDERER_METAL
+    if (!GfxDeviceGlobal::lightTiler.CullerUniformsCreated())
+    {
+        return;
+    }
+#endif
+
     ++Statistics::drawCalls;
 
     if (!texture0)

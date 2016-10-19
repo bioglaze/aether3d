@@ -10,7 +10,7 @@
 void DirectionalLightInspector::Init( QWidget* mainWindow )
 {
     auto componentName = new QLabel( "Directional Light" );
-    auto shadowCheck = new QCheckBox("Casts Shadow");
+    shadowCheck = new QCheckBox( "Casts Shadow" );
 
     removeButton = new QPushButton("remove");
     QBoxLayout* headerLayout = new QBoxLayout( QBoxLayout::LeftToRight );
@@ -50,5 +50,11 @@ void DirectionalLightInspector::GameObjectSelected( std::list< ae3d::GameObject*
     else
     {
         gameObject = gameObjects.front();
+        auto dirLight = gameObject->GetComponent< ae3d::DirectionalLightComponent >();
+
+        if (dirLight != nullptr)
+        {
+            shadowCheck->setChecked( dirLight->CastsShadow() );
+        }
     }
 }
