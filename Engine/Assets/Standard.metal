@@ -40,32 +40,30 @@ struct CullerUniforms
     int maxNumLightsPerTile;
 };
 
-static uint GetNumLightsInThisTile( uint nTileIndex, uint maxNumLightsPerTile, constant int* perTileLightIndexBuffer )
+static uint GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, const device uint* perTileLightIndexBuffer )
 {
     uint numLightsInThisTile = 0;
-    uint index = maxNumLightsPerTile * nTileIndex;
+    uint index = maxNumLightsPerTile * tileIndex;
     uint nextLightIndex = perTileLightIndexBuffer[ index ];
 
-    int iterations = 0;
-
     // count point lights
-    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL && iterations < 100)
+    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
         ++numLightsInThisTile;
         ++index;
         nextLightIndex = perTileLightIndexBuffer[ index ];
-
-        ++iterations;
     }
 
     // count spot lights
-    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL && iterations < 100)
+    
+    // Moves past sentinel
+    ++index;
+
+    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
         ++numLightsInThisTile;
         ++index;
         nextLightIndex = perTileLightIndexBuffer[ index ];
-
-        ++iterations;
     }
 
     return numLightsInThisTile;
@@ -109,26 +107,16 @@ vertex StandardColorInOut standard_vertex(StandardVertex vert [[stage_in]],
 fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> textureMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
-                               constant int* perTileLightIndexBuffer [[ buffer(6) ]],
+                               const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
                                //constant float* pointLightBufferCenterAndRadius [[ buffer(7) ]],
-                               constant CullerUniforms* cullerUniforms  [[ buffer(8) ]],
+                               constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
     half4 sampledColor = half4( textureMap.sample( sampler0, in.texCoords ) );
 
-    uint nTileIndex = GetTileIndex( in.position.xy, cullerUniforms->windowWidth );
-    //uint nIndex = cullerUniforms->maxNumLightsPerTile * nTileIndex;
-    //uint nNextLightIndex = perTileLightIndexBuffer[ nIndex ];
+    const uint tileIndex = GetTileIndex( in.position.xy, cullerUniforms.windowWidth );
+    const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 
-    // Loops over point lights.
-    /*while (nNextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
-    {
-        uint nLightIndex = nNextLightIndex;
-        nIndex++;
-        nNextLightIndex = perTileLightIndexBuffer[ nIndex ];
-    }*/
-
-    uint numLights = GetNumLightsInThisTile( nTileIndex, cullerUniforms->maxNumLightsPerTile, perTileLightIndexBuffer );
     if (numLights == 0)
     {
         sampledColor = half4( 0, 0, 0, 1 );
@@ -137,23 +125,14 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     {
         sampledColor = half4( 0, 1, 0, 1 );
     }
-    else if (numLights == 100)
+    else if (numLights == 2)
     {
-        sampledColor = half4( 0, 1, 1, 1 );
+        sampledColor = half4( 1, 1, 0, 1 );
     }
     else
     {
         sampledColor = half4( 1, 0, 0, 1 );
     }
 
-    /*sampledColor = half4( 1, 0, 0, 1 );
-    if (nTileIndex % 1)
-    {
-        sampledColor = half4( 0, 1, 0, 1 );
-    }
-    if (nTileIndex % 2)
-    {
-        sampledColor = half4( 0, 0, 1, 1 );
-    }*/
     return sampledColor;
 }

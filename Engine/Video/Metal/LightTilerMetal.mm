@@ -27,11 +27,12 @@ struct CullerUniforms
 void ae3d::LightTiler::Init()
 {
     pointLightCenterAndRadius.resize( MaxLights );
-    //pointLightCenterAndRadius[ 0 ] = Vec4( -4, 4, 10, 10 );
-    pointLightCenterAndRadius[ 0 ] = Vec4( -4, 4, 10, 5 );
-    activePointLights = 1;
+    pointLightCenterAndRadius[ 0 ] = Vec4( -2, 4, -8, 1.5f ); // top left
+    pointLightCenterAndRadius[ 1 ] = Vec4(  0, 0, -8, 0.5f );
 
-    pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * 4 * sizeof( float )
+    activePointLights = 2;
+
+    pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                  options:MTLResourceCPUCacheModeDefaultCache];
     pointLightCenterAndRadiusBuffer.label = @"pointLightCenterAndRadiusBuffer";
 
@@ -45,7 +46,8 @@ void ae3d::LightTiler::Init()
     System::Print("backbuffer: %d x %d\n", GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
     System::Print( "numTiles: %dx%d\n", GetNumTilesX(), GetNumTilesY() );
 
-    perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( int )
+    // TODO: make storage mode MTLResourceStorageModePrivate if it works and is faster.
+    perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( unsigned )
                   options:MTLResourceCPUCacheModeDefaultCache];
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
 
@@ -68,12 +70,12 @@ int ae3d::LightTiler::GetNextPointLightBufferIndex()
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDeviceGlobal::backBufferWidth * 2 + TileRes - 1) / (float)TileRes);
 }
 
 unsigned ae3d::LightTiler::GetNumTilesY() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferHeight + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDeviceGlobal::backBufferHeight * 2 + TileRes - 1) / (float)TileRes);
 }
 
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& position, float radius )
@@ -85,6 +87,7 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& positio
 
 unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
 {
+    // FIXME: Should this be the same as the tile size?
     const unsigned adjustmentMultipier = 32;
     
     // I haven't tested at greater than 1080p, so cap it
@@ -100,9 +103,10 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     CullerUniforms uniforms;
 
     Matrix44::Invert( projection, uniforms.invProjection );
+
     uniforms.viewMatrix = view;
-    uniforms.windowWidth = depthNormalTarget.GetWidth();
-    uniforms.windowHeight = depthNormalTarget.GetHeight();
+    uniforms.windowWidth = depthNormalTarget.GetWidth() * 2; // * 2 because of retina resolution
+    uniforms.windowHeight = depthNormalTarget.GetHeight() * 2;
     unsigned activeSpotLights = 0;
     uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();

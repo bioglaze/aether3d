@@ -24,7 +24,8 @@ static float4 ConvertProjToView( float4 p, matrix_float4x4 invProjection )
     p = invProjection * p;
     p /= p.w;
     // FIXME: Added the following line, not needed in D3D11 or ForwardPlus11 example. [2014-07-07]
-    p.y = -p.y;
+    //p.y = -p.y;
+
     return p;
 }
 
@@ -53,12 +54,10 @@ static uint GetNumTilesY( uint windowHeight )
     return uint(( ( windowHeight + TILE_RES - 1 ) / float(TILE_RES) ));
 }
 
-// point-plane distance, simplified for the case where
-// the plane passes through the origin
+// point-plane distance, simplified for the case where the plane passes through the origin
 static float GetSignedDistanceFromPlane( float4 p, float4 eqn )
 {
-    // dot( eqn.xyz, p.xyz ) + eqn.w, , except we know eqn.w is zero
-    // (see CreatePlaneEquation above)
+    // dot( eqn.xyz, p.xyz ) + eqn.w, , except we know eqn.w is zero (see CreatePlaneEquation above)
     return dot( eqn.xyz, p.xyz );
 }
 
@@ -120,7 +119,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         // with the positive half-space outside the frustum (and remember,
         // view space is left handed, so use the left-hand rule to determine
         // cross product direction)
-        for (uint i = 0; i < 4; i++)
+        for (uint i = 0; i < 4; ++i)
         {
             frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ], frustum[ (i + 1) & 3 ] );
         }
@@ -134,7 +133,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     float minZ = FLT_MAX;
     float maxZ = 0.0f;
 
-    float depth = -depthNormalsTexture.read( uint2( globalIdx.x, globalIdx.y ) ).x;
+    float depth = -depthNormalsTexture.read( globalIdx.xy ).x;
     uint z = as_type< uint >( depth );
 
     if (depth != 0.0f)
@@ -162,12 +161,12 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
         if (il < numPointLights)
         {
-            float4 center = pointLightBufferCenterAndRadius[ int( il ) ];
+            float4 center = pointLightBufferCenterAndRadius[ il ];
             float r = center.w;
             center.xyz = (uniforms.viewMatrix * float4( center.xyz, 1.0f ) ).xyz;
 
             // test if sphere is intersecting or inside frustum
-            if (-center.z + minZ < r && center.z - maxZ < r)
+            //if (-center.z + minZ < r && center.z - maxZ < r)
             {
                 if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < r) &&
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < r) &&
@@ -185,7 +184,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
-    uint uNumPointLightsInThisTile = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
+    uint numPointLightsInThisTile = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
 
     // Spot lights.
     uint numSpotLights = (uniforms.numLights & 0xFFFF0000u) >> 16;
@@ -221,14 +220,14 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     {   // write back
         uint startOffset = uniforms.maxNumLightsPerTile * tileIdxFlattened;
 
-        for (uint i = localIdxFlattened; i < uNumPointLightsInThisTile; i += NUM_THREADS_PER_TILE)
+        for (uint i = localIdxFlattened; i < numPointLightsInThisTile; i += NUM_THREADS_PER_TILE)
         {
             // per-tile list of light indices
             perTileLightIndexBufferOut[ startOffset + i ] = ldsLightIdx[ i ];
         }
 
         uint jMax = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
-        for (uint j = (localIdxFlattened + uNumPointLightsInThisTile); j < jMax; j += NUM_THREADS_PER_TILE)
+        for (uint j = localIdxFlattened + numPointLightsInThisTile; j < jMax; j += NUM_THREADS_PER_TILE)
         {
             // per-tile list of light indices
             perTileLightIndexBufferOut[ startOffset + j + 1 ] = ldsLightIdx[ j ];
@@ -237,7 +236,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         if (localIdxFlattened == 0)
         {
             // mark the end of each per-tile list with a sentinel (point lights)
-            perTileLightIndexBufferOut[ startOffset + uNumPointLightsInThisTile ] = LIGHT_INDEX_BUFFER_SENTINEL;
+            perTileLightIndexBufferOut[ startOffset + numPointLightsInThisTile ] = LIGHT_INDEX_BUFFER_SENTINEL;
 
             // mark the end of each per-tile list with a sentinel (spot lights)
             uint offs = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
