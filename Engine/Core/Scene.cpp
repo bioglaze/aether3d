@@ -752,7 +752,6 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 
         meshRenderer->Cull( frustum, meshLocalToWorld );
         meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Opaque );
-        meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Transparent );
     }
     
 #if RENDERER_METAL

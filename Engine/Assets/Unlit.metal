@@ -23,7 +23,7 @@ struct ColorInOut
 };
 
 constexpr sampler shadowSampler(coord::normalized,
-                                address::clamp_to_edge,
+                                address::clamp_to_zero,
                                 filter::linear);
 
 float linstep( float low, float high, float v )
@@ -34,10 +34,10 @@ float linstep( float low, float high, float v )
 float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth )
 {
     float2 moments = shadowMap.sample( shadowSampler, projCoord.xy / projCoord.w ).rg;
-    
-    //float variance = max( moments.y - moments.x * moments.x, -0.001 );
+
+    // Tested to range between 0 - 0.5
     float variance = max( moments.y - moments.x * moments.x, -0.001 );
-    
+
     float delta = depth - moments.x;
     float p = smoothstep( depth - 0.02, depth, moments.x );
     float pMax = linstep( 0.2, 1.0, variance / (variance + delta * delta) );
@@ -76,7 +76,7 @@ fragment half4 unlit_fragment( ColorInOut in [[stage_in]],
     half4 sampledColor = half4( textureMap.sample( sampler0, in.texCoords ) ) * half4( in.tintColor );
 
     float depth = in.projCoord.z / in.projCoord.w;
-    float shadow = VSM( _ShadowMap, in.projCoord, depth );
+    float shadow = max( 0.2, VSM( _ShadowMap, in.projCoord, depth ) );
     
-    return sampledColor * half4( shadow );
+    return sampledColor * half4( shadow, shadow, shadow, 1 );
 }

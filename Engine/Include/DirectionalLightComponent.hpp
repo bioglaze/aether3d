@@ -20,6 +20,9 @@ namespace ae3d
         /// \param shadowMapSize Shadow map size in pixels. If it's invalid, it falls back to 512.
         void SetCastShadow( bool enable, int shadowMapSize );
 
+        /// \return Shadow map
+        RenderTexture* GetShadowMap() { return &shadowMap; }
+
         /// \return Serialized data.
         std::string GetSerialized() const;
         

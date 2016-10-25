@@ -1,8 +1,6 @@
 #import <Foundation/Foundation.h>
-#if AETHER3D_METAL
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#endif
 #include <chrono>
 #include <unordered_map>
 #include <sstream>
@@ -27,7 +25,8 @@ id <MTLDepthStencilState> depthStateNoneWriteOff;
 id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
 id <CAMetalDrawable> drawable; // Render texture or currentDrawable
 
-MTLRenderPassDescriptor* renderPassDescriptor = nullptr;
+MTLRenderPassDescriptor* renderPassDescriptorApp = nullptr;
+MTLRenderPassDescriptor* renderPassDescriptorFBO = nullptr;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
 id<MTLTexture> texture0;
@@ -172,11 +171,13 @@ namespace
 {
     float clearColor[] = { 0, 0, 0, 1 };
     
-    void setupRenderPassDescriptor( id <MTLTexture> texture )
+    void setupRenderPassDescriptor( id <MTLTexture> texture, id <MTLTexture> depthTexture )
     {
         MTLLoadAction texLoadAction = MTLLoadActionLoad;
         MTLLoadAction depthLoadAction = MTLLoadActionLoad;
-        
+
+        auto renderPassDescriptor = GfxDeviceGlobal::isRenderingToTexture ? renderPassDescriptorFBO : renderPassDescriptorApp;
+
         if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Color)
         {
             texLoadAction = MTLLoadActionClear;
@@ -206,6 +207,12 @@ namespace
         if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::isRenderingToTexture)
         {
             renderPassDescriptor.depthAttachment.texture = msaaDepthTarget;
+            renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
+            renderPassDescriptor.depthAttachment.clearDepth = 1.0;
+        }
+        else if (GfxDeviceGlobal::sampleCount == 1 && GfxDeviceGlobal::isRenderingToTexture)
+        {
+            renderPassDescriptor.depthAttachment.texture = depthTexture;
             renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
             renderPassDescriptor.depthAttachment.clearDepth = 1.0;
         }
@@ -249,7 +256,7 @@ void ae3d::GfxDevice::Init( int width, int height )
 void ae3d::GfxDevice::SetCurrentDrawableMetal( id <CAMetalDrawable> aDrawable, MTLRenderPassDescriptor* renderPass )
 {
     currentDrawable = aDrawable;
-    renderPassDescriptor = renderPass;
+    renderPassDescriptorApp = renderPass;
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
@@ -274,6 +281,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
 
     commandQueue = [device newCommandQueue];
     defaultLibrary = [device newDefaultLibrary];
+
+    renderPassDescriptorFBO = [MTLRenderPassDescriptor renderPassDescriptor];
 
     GfxDeviceGlobal::backBufferWidth = view.bounds.size.width;
     GfxDeviceGlobal::backBufferHeight = view.bounds.size.height;
@@ -407,7 +416,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.sampleCount = sampleCount;
         pipelineStateDescriptor.vertexFunction = shader.vertexProgram;
         pipelineStateDescriptor.fragmentFunction = shader.fragmentProgram;
-#if (__i386__)
+#if !TARGET_OS_IPHONE
         pipelineStateDescriptor.inputPrimitiveTopology = MTLPrimitiveTopologyClassTriangle;
 #endif
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = (pixelFormat == ae3d::RenderTexture::DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float);
@@ -420,7 +429,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
         // This must match app's view's format.
         pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
-        
+
         MTLVertexDescriptor* vertexDesc = [MTLVertexDescriptor vertexDescriptor];
         
         if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTNTC)
@@ -543,12 +552,10 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode )
 {
-#if RENDERER_METAL
     if (!GfxDeviceGlobal::lightTiler.CullerUniformsCreated())
     {
         return;
     }
-#endif
 
     ++Statistics::drawCalls;
 
@@ -636,7 +643,7 @@ void ae3d::GfxDevice::BeginFrame()
     commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
 
-    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:GfxDeviceGlobal::isRenderingToTexture ? renderPassDescriptorFBO : renderPassDescriptorApp];
     renderEncoder.label = @"MyRenderEncoder";
 }
 
@@ -698,7 +705,8 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, uns
     GfxDeviceGlobal::isRenderingToTexture = renderTexture2d != nullptr;
 
     drawable = currentDrawable;
-    setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture );
+    setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture,
+                               renderTexture2d != nullptr ? renderTexture2d->GetMetalDepthTexture() : nil );
     
     if (!renderTexture2d)
     {

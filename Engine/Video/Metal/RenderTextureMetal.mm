@@ -19,12 +19,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     dataType = aDataType;
     
     MTLTextureDescriptor* textureDescriptor =
-    //[MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
-    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
 
     if (metalTexture == nullptr)
@@ -33,6 +32,19 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     }
     
     metalTexture.label = @"Render Texture 2D";
+
+    MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
+                                                                                         width:width
+                                                                                        height:height
+                                                                                     mipmapped:NO];
+
+    depthDesc.textureType = MTLTextureType2D;
+    depthDesc.sampleCount = 1;
+    depthDesc.resourceOptions = MTLResourceStorageModePrivate;
+    depthDesc.usage = MTLTextureUsageUnknown;
+
+    metalDepthTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:depthDesc];
+    metalDepthTexture.label = @"Render Texture depth";
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
@@ -47,10 +59,10 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     dataType = aDataType;
     
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm//(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
+    [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
                                                        size:width
                                                    mipmapped:NO];
-    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     
     if (metalTexture == nullptr)

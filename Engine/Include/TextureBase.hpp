@@ -65,6 +65,7 @@ namespace ae3d
 
 #if RENDERER_METAL
         id<MTLTexture> GetMetalTexture() const { return metalTexture; }
+        id<MTLTexture> GetMetalDepthTexture() const { return metalDepthTexture; }
 #endif
 #if RENDERER_D3D12
         GpuResource* GetGpuResource() { return &gpuResource; }
@@ -128,7 +129,8 @@ namespace ae3d
         /// Color space.
         ColorSpace colorSpace = ColorSpace::RGB;
 #if RENDERER_METAL
-        id<MTLTexture> metalTexture;  
+        id<MTLTexture> metalTexture;
+        id<MTLTexture> metalDepthTexture;
 #endif
 #if RENDERER_D3D12
         GpuResource gpuResource;

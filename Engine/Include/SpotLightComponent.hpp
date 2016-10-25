@@ -19,7 +19,10 @@ namespace ae3d
         /// \param enable If true, the light will cast a shadow.
         /// \param shadowMapSize Shadow map size in pixels. If it's invalid, it falls back to 512.
         void SetCastShadow( bool enable, int shadowMapSize );
-        
+
+        /// \return Shadow map
+        RenderTexture* GetShadowMap() { return &shadowMap; }
+
         /// \return Cone angle in degrees.
         float GetConeAngle() const { return coneAngle; }
         
