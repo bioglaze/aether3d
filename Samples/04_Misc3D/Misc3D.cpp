@@ -30,7 +30,7 @@ using namespace ae3d;
 
 int main()
 {
-    bool fullScreen = false;
+    bool fullScreen = true;
 
     //int width = 1512;
     //int height = 1680;
@@ -128,6 +128,13 @@ int main()
     cube.AddComponent< TransformComponent >();
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
 
+    GameObject rotatingCube;
+    rotatingCube.AddComponent< MeshRendererComponent >();
+    rotatingCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    rotatingCube.AddComponent< TransformComponent >();
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, 0 } );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
+
     GameObject cubeScaledUV;
     cubeScaledUV.AddComponent< MeshRendererComponent >();
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshScaledUV );
@@ -167,12 +174,13 @@ int main()
     material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
     
-    for (int skinSubMeshIndex = 0; skinSubMeshIndex < skinnedMesh.GetSubMeshCount(); ++skinSubMeshIndex)
+    for (int skinSubMeshIndex = 0; skinSubMeshIndex < static_cast< int >( skinnedMesh.GetSubMeshCount() ); ++skinSubMeshIndex)
     {
         skinnedGO.GetComponent< MeshRendererComponent >()->SetMaterial( &material, skinSubMeshIndex );
     }
 
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
 
     GameObject copiedCube = cube;
@@ -225,7 +233,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -287,19 +295,20 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
-    scene.Add( &cameraCubeRT );
-    scene.Add( &rtCube );
-    scene.Add( &cubeScaledUV );
+    //scene.Add( &camera2d );
+    //scene.Add( &cameraCubeRT );
+    //scene.Add( &rtCube );
+    //scene.Add( &cubeScaledUV );
     scene.Add( &copiedCube );
-    scene.Add( &statsContainer );
+    scene.Add( &rotatingCube );
+    //scene.Add( &statsContainer );
     //scene.Add( &dirLight );
-    scene.Add( &spotLight );
+    //scene.Add( &spotLight );
     //scene.Add( &pointLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
-    scene.Add( &transCube1 );
-    scene.Add( &skinnedGO );
+    //scene.Add( &transCube1 );
+    //scene.Add( &skinnedGO );
 
     const int cubeCount = 10;
     GameObject cubes[ cubeCount ];
@@ -312,7 +321,7 @@ int main()
         cubes[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { i * 4.5f - 4, 0, -100 } );
         cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
-        scene.Add( &cubes[ i ] );
+        //scene.Add( &cubes[ i ] );
     }
 
     cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );
@@ -382,9 +391,13 @@ int main()
         
         ++angle;
         Quaternion rotation;
-        const Vec3 axis( 0, 1, 0 );
+        Vec3 axis( 0, 1, 0 );
         rotation.FromAxisAngle( axis, angle );
         cubes[ 2 ].GetComponent< TransformComponent >()->SetLocalRotation( rotation );
+
+        axis = Vec3( 1, 1, 1 ).Normalized();
+        rotation.FromAxisAngle( axis, angle );
+        rotatingCube.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
         while (Window::PollEvent( event ))
         {

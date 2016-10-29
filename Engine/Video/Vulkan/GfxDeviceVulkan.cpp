@@ -22,6 +22,8 @@
 #include <X11/Xlib-xcb.h>
 #endif
 
+#define AE3D_DESCRIPTOR_SETS_COUNT 250
+
 // Current implementation loosely based on samples by Sascha Willems - https://github.com/SaschaWillems/Vulkan, licensed under MIT license
 
 PFN_vkCreateSwapchainKHR createSwapchainKHR = nullptr;
@@ -1238,22 +1240,22 @@ namespace ae3d
     {
         VkDescriptorPoolSize typeCounts[ 2 ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        typeCounts[ 0 ].descriptorCount = 100;
+        typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        typeCounts[ 1 ].descriptorCount = 100;
+        typeCounts[ 1 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.pNext = nullptr;
         descriptorPoolInfo.poolSizeCount = 2;
         descriptorPoolInfo.pPoolSizes = typeCounts;
-        descriptorPoolInfo.maxSets = 100;
+        descriptorPoolInfo.maxSets = AE3D_DESCRIPTOR_SETS_COUNT;
         descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
         VkResult err = vkCreateDescriptorPool( GfxDeviceGlobal::device, &descriptorPoolInfo, nullptr, &GfxDeviceGlobal::descriptorPool );
         AE3D_CHECK_VULKAN( err, "vkCreateDescriptorPool" );
 
-        GfxDeviceGlobal::descriptorSets.resize( 100 );
+        GfxDeviceGlobal::descriptorSets.resize( AE3D_DESCRIPTOR_SETS_COUNT );
 
         for (std::size_t i = 0; i < GfxDeviceGlobal::descriptorSets.size(); ++i)
         {
@@ -1295,6 +1297,11 @@ namespace ae3d
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
+
+        if (GfxDeviceGlobal::descriptorSetIndex >= static_cast<int>(GfxDeviceGlobal::descriptorSets.size()))
+        {
+            System::Print( "Too many descriptor sets: %d, max %u\n", GfxDeviceGlobal::descriptorSetIndex, GfxDeviceGlobal::descriptorSets.size() );
+        }
 
         // Binding 0 : Uniform buffer
         VkWriteDescriptorSet uboSet = {};

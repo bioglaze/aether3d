@@ -80,6 +80,7 @@ void ae3d::System::LoadBuiltinAssets()
     renderer.builtinShaders.Load();
     renderer.GenerateQuadBuffer();
     renderer.GenerateSkybox();
+    renderer.GenerateTextures();
     GfxDevice::ErrorCheck( "Builtin shaders load end" );
 }
 

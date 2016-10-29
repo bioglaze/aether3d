@@ -1,10 +1,16 @@
 #include "Renderer.hpp"
 #include "CameraComponent.hpp"
+#include "FileSystem.hpp"
 #include "GfxDevice.hpp"
 #include "Matrix.hpp"
 #include <vector>
 #include "Vec3.hpp"
 #include "VertexBuffer.hpp"
+
+void ae3d::Renderer::GenerateTextures()
+{
+    whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, 1 );
+}
 
 void ae3d::Renderer::GenerateSkybox()
 {

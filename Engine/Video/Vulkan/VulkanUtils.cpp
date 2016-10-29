@@ -182,8 +182,8 @@ namespace ae3d
 
         sampler.magFilter = VK_FILTER_NEAREST;
         sampler.minFilter = VK_FILTER_NEAREST;
-		sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
-		err = vkCreateSampler( device, &sampler, nullptr, pointClamp );
+	sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+	err = vkCreateSampler( device, &sampler, nullptr, pointClamp );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
         debug::SetObjectName( device, (std::uint64_t)*pointClamp, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "pointClamp" );
 

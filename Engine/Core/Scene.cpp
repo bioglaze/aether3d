@@ -273,6 +273,11 @@ void ae3d::Scene::Render()
 
     //unsigned debugShadowFBO = 0;
 
+    // Defaults for a case where there are no lights.
+    Texture2D& whiteTexture = renderer.GetWhiteTexture();
+    Material::SetGlobalTexture2D( "_ShadowMap", &whiteTexture );
+    Material::SetGlobalFloat( "_ShadowMinAmbient", 1 );
+
     for (auto camera : cameras)
     {
         if (camera != nullptr && camera->GetComponent<TransformComponent>())
@@ -392,16 +397,19 @@ void ae3d::Scene::Render()
                     if (dirLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                        Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
                         //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
                     }
                     else if (spotLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
+                        Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
                         //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
                     }
                     else if (pointLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
+                        Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
                         //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
                     }
                 }

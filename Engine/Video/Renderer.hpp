@@ -4,6 +4,7 @@
 #include "ComputeShader.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
+#include "Texture2D.hpp"
 
 namespace ae3d
 {
@@ -33,14 +34,18 @@ namespace ae3d
         
         void GenerateQuadBuffer();
         void GenerateSkybox();
+        void GenerateTextures();
 
         void RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera );
+
+        Texture2D& GetWhiteTexture() { return whiteTexture; }
 
         BuiltinShaders builtinShaders;
         
     private:
         VertexBuffer skyboxBuffer;
         VertexBuffer quadBuffer;
+        Texture2D whiteTexture;
     };    
 }
 

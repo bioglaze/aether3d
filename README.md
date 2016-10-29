@@ -24,7 +24,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
   - Master branch may or may not compile but releases should always work.
   - Editor is still missing many features that are needed for proper scene creation.
-  - Lights cast shadows but don't shade objects (planned for 0.6)
+  - Lights cast shadows but don't shade objects (planned for 0.7)
 
 # Planned Features
 

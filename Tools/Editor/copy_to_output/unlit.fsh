@@ -3,11 +3,10 @@
 uniform sampler2D textureMap;
 uniform sampler2D _ShadowMap;
 uniform sampler2D _ShadowMapCube;
+uniform float _ShadowMinAmbient;
 uniform vec4 tint;
 
 in vec2 vTexCoord;
-#define SHADOW_MAP
-#ifdef SHADOW_MAP
 in vec4 vProjCoord;
 
 float linstep(float low, float high, float v)
@@ -27,17 +26,15 @@ float VSM( in float depth )
     
     return clamp( max( p, pMax ), 0.0, 1.0 );
 }
-#endif
 
 out vec4 fragColor;
 
 void main()
 {
     float shadow = 1.0;
-#ifdef SHADOW_MAP
     float depth = vProjCoord.z / vProjCoord.w;
-    shadow = max( 0.2, VSM( depth ) );
-#endif
+    shadow = max( _ShadowMinAmbient, VSM( depth ) );
+
     fragColor = tint * texture( textureMap, vTexCoord ) * shadow;
 }
 

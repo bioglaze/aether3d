@@ -5,6 +5,8 @@
 #include "Shader.hpp"
 
 std::unordered_map< std::string, ae3d::RenderTexture* > ae3d::Material::sTexRTs;
+std::unordered_map< std::string, ae3d::Texture2D* > ae3d::Material::sTex2ds;
+std::unordered_map< std::string, float > ae3d::Material::sFloats;
 
 bool ae3d::Material::IsValidShader() const
 {
@@ -70,7 +72,18 @@ void ae3d::Material::Apply()
         shader->SetRenderTexture( globalTexRT.first.c_str(), globalTexRT.second, texUnit );
         ++texUnit;
     }
-    
+
+    for (const auto& globalTex2d : sTex2ds)
+    {
+        shader->SetTexture( globalTex2d.first.c_str(), globalTex2d.second, texUnit );
+        ++texUnit;
+    }
+
+    for (const auto& globalFloat : sFloats)
+    {
+        shader->SetFloat( globalFloat.first.c_str(), globalFloat.second );
+    }
+
     if (depthUnits != 0 || depthFactor != 0)
     {
         GfxDevice::SetPolygonOffset( true, depthFactor, depthUnits );
@@ -109,6 +122,16 @@ void ae3d::Material::SetRenderTexture( const char* name, RenderTexture* renderTe
 void ae3d::Material::SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture )
 {
     sTexRTs[ name ] = renderTexture;
+}
+
+void ae3d::Material::SetGlobalTexture2D( const char* name, Texture2D* texture2d )
+{
+    sTex2ds[ name ] = texture2d;
+}
+
+void ae3d::Material::SetGlobalFloat( const char* name, float value )
+{
+    sFloats[ name ] = value;
 }
 
 void ae3d::Material::SetInt( const char* name, int value )
