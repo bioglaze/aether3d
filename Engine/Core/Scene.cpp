@@ -274,9 +274,11 @@ void ae3d::Scene::Render()
     //unsigned debugShadowFBO = 0;
 
     // Defaults for a case where there are no lights.
+#if !RENDERER_VULKAN
     Texture2D& whiteTexture = renderer.GetWhiteTexture();
     Material::SetGlobalTexture2D( "_ShadowMap", &whiteTexture );
     Material::SetGlobalFloat( "_ShadowMinAmbient", 1 );
+#endif
 
     for (auto camera : cameras)
     {
@@ -1250,6 +1252,33 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                     mr->SetMaterial( outMaterials[ materialName ], i );
                 }
             }
+        }
+
+        if (token == "param_float")
+        {
+            std::string uniformName;
+            float floatValue;
+
+            lineStream >> uniformName >> floatValue;
+            outMaterials[ currentMaterialName ]->SetFloat( uniformName.c_str(), floatValue );
+        }
+
+        if (token == "param_vec3")
+        {
+            std::string uniformName;
+            Vec3 vec3;
+
+            lineStream >> uniformName >> vec3.x >> vec3.y >> vec3.z;
+            outMaterials[ currentMaterialName ]->SetVector( uniformName.c_str(), vec3 );
+        }
+
+        if (token == "param_vec4")
+        {
+            std::string uniformName;
+            Vec4 vec4;
+
+            lineStream >> uniformName >> vec4.x >> vec4.y >> vec4.z >> vec4.w;
+            outMaterials[ currentMaterialName ]->SetVector( uniformName.c_str(), vec4 );
         }
 
         if (token == "param_texture")

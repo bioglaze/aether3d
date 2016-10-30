@@ -242,15 +242,14 @@ int main()
         System::Print( "Could not parse Sponza\n" );
     }
 
-	/*for (int i = 0; i < sponzaMeshes[0]->GetSubMeshCount(); ++i)
-	{
-		System::Print( "mesh name: %s\n", sponzaMeshes[ 0 ]->GetSubMeshName( i ) );
-	}*/
+    /*for (int i = 0; i < sponzaMeshes[0]->GetSubMeshCount(); ++i)
+    {
+        System::Print( "mesh name: %s\n", sponzaMeshes[ 0 ]->GetSubMeshName( i ) );
+    }*/
 
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
         mat.second->SetShader( &shader );
-        mat.second->SetVector( "tint", { 1, 1, 1, 1 } );
     }
     
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
