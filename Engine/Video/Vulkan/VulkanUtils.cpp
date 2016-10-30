@@ -148,53 +148,6 @@ namespace ae3d
         return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
     }
 
-    void CreateSamplers( VkDevice device, VkSampler* linearRepeat, VkSampler* linearClamp, VkSampler* pointClamp, VkSampler* pointRepeat )
-    {
-        System::Assert( device != VK_NULL_HANDLE, "device not initialized" );
-
-        VkSamplerCreateInfo sampler = {};
-        sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        sampler.pNext = nullptr;
-        sampler.magFilter = VK_FILTER_LINEAR;
-        sampler.minFilter = VK_FILTER_LINEAR;
-        sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-        sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        sampler.mipLodBias = 0;
-        sampler.compareOp = VK_COMPARE_OP_NEVER;
-        sampler.minLod = 0;
-        // Max level-of-detail should match mip level count
-        sampler.maxLod = 0;
-        sampler.maxAnisotropy = 1;
-        sampler.anisotropyEnable = VK_FALSE;
-        sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-        VkResult err = vkCreateSampler( device, &sampler, nullptr, linearRepeat );
-        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
-        debug::SetObjectName( device, (std::uint64_t)*linearRepeat, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "linearRepeat" );
-
-        sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-        err = vkCreateSampler( device, &sampler, nullptr, linearClamp );
-        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
-        debug::SetObjectName( device, (std::uint64_t)*linearClamp, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "linearClamp" );
-
-        sampler.magFilter = VK_FILTER_NEAREST;
-        sampler.minFilter = VK_FILTER_NEAREST;
-	sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
-	err = vkCreateSampler( device, &sampler, nullptr, pointClamp );
-        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
-        debug::SetObjectName( device, (std::uint64_t)*pointClamp, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "pointClamp" );
-
-        sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        sampler.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        sampler.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        err = vkCreateSampler( device, &sampler, nullptr, pointRepeat );
-        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
-        debug::SetObjectName( device, (std::uint64_t)*pointRepeat, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "pointRepeat" );
-    }
-
     void CreateInstance( VkInstance* outInstance )
     {
         VkApplicationInfo appInfo = {};

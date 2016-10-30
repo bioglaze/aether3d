@@ -30,7 +30,7 @@ using namespace ae3d;
 
 int main()
 {
-    bool fullScreen = true;
+    bool fullScreen = false;
 
     //int width = 1512;
     //int height = 1680;

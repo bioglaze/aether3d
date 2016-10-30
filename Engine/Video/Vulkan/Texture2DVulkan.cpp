@@ -14,8 +14,8 @@
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 void Tokenize( const std::string& str,
-    std::vector< std::string >& tokens,
-    const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
+std::vector< std::string >& tokens,
+const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
 
 namespace ae3d
 {
@@ -270,10 +270,30 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
-    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.levelCount = mipLevelCount;
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
     AE3D_CHECK_VULKAN( err, "vkCreateImageView in Texture2D" );
+
+    VkSamplerCreateInfo samplerInfo = {};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext = nullptr;
+    samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+    samplerInfo.minFilter = samplerInfo.magFilter;
+    samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.addressModeU =  wrap == ae3d::TextureWrap::Repeat ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeV = samplerInfo.addressModeU;
+    samplerInfo.addressModeW = samplerInfo.addressModeU;
+    samplerInfo.mipLodBias = 0;
+    samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
+    samplerInfo.minLod = 0;
+    samplerInfo.maxLod = static_cast< float >(mipLevelCount);
+    samplerInfo.maxAnisotropy = 1;
+    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
+    AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
 
 void ae3d::Texture2D::LoadDDS( const char* aPath )

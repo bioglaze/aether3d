@@ -67,14 +67,6 @@ namespace GfxDeviceGlobal
         VkImageView view = VK_NULL_HANDLE;
     } depthStencil;
     
-    struct Samplers
-    {
-        VkSampler linearRepeat = VK_NULL_HANDLE;
-        VkSampler linearClamp = VK_NULL_HANDLE;
-        VkSampler pointRepeat = VK_NULL_HANDLE;
-        VkSampler pointClamp = VK_NULL_HANDLE;
-    } samplers;
-    
     struct MsaaTarget
     {
         VkImage colorImage = VK_NULL_HANDLE;
@@ -1270,29 +1262,6 @@ namespace ae3d
         }
     }
 
-    VkSampler GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter )
-    {
-        if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Linear)
-        {
-            return GfxDeviceGlobal::samplers.linearClamp;
-        }
-        if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Nearest)
-        {
-            return GfxDeviceGlobal::samplers.pointClamp;
-        }
-        if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Linear)
-        {
-            return GfxDeviceGlobal::samplers.linearRepeat;
-        }
-        if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Nearest)
-        {
-            return GfxDeviceGlobal::samplers.pointRepeat;
-        }
-
-        System::Assert( false, "unhandled sampler" );
-        return GfxDeviceGlobal::samplers.pointRepeat;
-    }
-
     VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
@@ -1446,7 +1415,6 @@ namespace ae3d
         FlushSetupCommandBuffer();
         CreateDescriptorSetLayout();
         CreateDescriptorPool();
-        CreateSamplers( GfxDeviceGlobal::device, &GfxDeviceGlobal::samplers.linearRepeat, &GfxDeviceGlobal::samplers.linearClamp, &GfxDeviceGlobal::samplers.pointClamp, &GfxDeviceGlobal::samplers.pointRepeat );
 
         VkSemaphoreCreateInfo presentCompleteSemaphoreCreateInfo = {};
         presentCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -1783,11 +1751,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     {
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
-
-    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.linearClamp, nullptr );
-    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.linearRepeat, nullptr );
-    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.pointClamp, nullptr );
-    vkDestroySampler( GfxDeviceGlobal::device, GfxDeviceGlobal::samplers.pointRepeat, nullptr );
 
     if (GfxDeviceGlobal::msaaTarget.colorImage != VK_NULL_HANDLE)
     {

@@ -21,7 +21,6 @@ namespace GfxDeviceGlobal
 namespace ae3d
 {
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-    VkSampler GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter );
 }
 
 void ae3d::Shader::Load( const char* /*vertexSourceGLSL*/, const char* /*fragmentSourceGLSL*/ )
@@ -111,7 +110,7 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
     if (texture)
     {
         GfxDeviceGlobal::view0 = texture->GetView();
-        GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
+        GfxDeviceGlobal::sampler0 = texture->GetSampler();
     }
 }
 
@@ -120,7 +119,7 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
     if (texture)
     {
         GfxDeviceGlobal::view0 = texture->GetView();
-        GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
+        GfxDeviceGlobal::sampler0 = texture->GetSampler();
     }
 }
 
@@ -129,7 +128,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, RenderTexture* texture, i
     if (texture)
     {
         GfxDeviceGlobal::view0 = texture->GetColorView();
-        GfxDeviceGlobal::sampler0 = GetSampler( texture->GetMipmaps(), texture->GetWrap(), texture->GetFilter() );
+        GfxDeviceGlobal::sampler0 = texture->GetSampler();
     }
 }
 

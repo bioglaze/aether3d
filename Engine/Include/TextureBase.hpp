@@ -10,6 +10,9 @@
 #include <d3d12.h>
 #endif
 #include "Vec3.hpp"
+#if RENDERER_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 
 #if RENDERER_D3D12
 // TODO: Move inside engine
@@ -63,6 +66,9 @@ namespace ae3d
         /// \return Path where this texture was loaded from, if it was loaded from a file.
         std::string GetPath() const { return path; }
 
+#if RENDERER_VULKAN
+        VkSampler GetSampler() const { return sampler; }
+#endif
 #if RENDERER_METAL
         id<MTLTexture> GetMetalTexture() const { return metalTexture; }
         id<MTLTexture> GetMetalDepthTexture() const { return metalDepthTexture; }
@@ -150,6 +156,9 @@ namespace ae3d
         bool isRenderTexture = false;
         /// Path where this texture was loaded from, if it was loaded from a file.
         std::string path;
+#if RENDERER_VULKAN
+        VkSampler sampler = VK_NULL_HANDLE;
+#endif
     };
 }
 

@@ -33,7 +33,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isCube = false;
     isRenderTexture = true;
     dataType = aDataType;
-	handle = 1;
+    handle = 1;
 
     // Color
 
@@ -157,6 +157,26 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     err = vkCreateFramebuffer( GfxDeviceGlobal::device, &fbufCreateInfo, nullptr, &frameBuffer );
     AE3D_CHECK_VULKAN( err, "rendertexture framebuffer" );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, "render texture 2d framebuffer" );
+
+    VkSamplerCreateInfo samplerInfo = {};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext = nullptr;
+    samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+    samplerInfo.minFilter = samplerInfo.magFilter;
+    samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.addressModeU = wrap == ae3d::TextureWrap::Repeat ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeV = samplerInfo.addressModeU;
+    samplerInfo.addressModeW = samplerInfo.addressModeU;
+    samplerInfo.mipLodBias = 0;
+    samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
+    samplerInfo.minLod = 0;
+    samplerInfo.maxLod = 1;
+    samplerInfo.maxAnisotropy = 1;
+    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
+    AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
@@ -173,5 +193,25 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     isCube = true;
     isRenderTexture = true;
     dataType = aDataType;
-	handle = 1;
+    handle = 1;
+
+    VkSamplerCreateInfo samplerInfo = {};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext = nullptr;
+    samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+    samplerInfo.minFilter = samplerInfo.magFilter;
+    samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.addressModeU = wrap == ae3d::TextureWrap::Repeat ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeV = samplerInfo.addressModeU;
+    samplerInfo.addressModeW = samplerInfo.addressModeU;
+    samplerInfo.mipLodBias = 0;
+    samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
+    samplerInfo.minLod = 0;
+    samplerInfo.maxLod = static_cast< float >(mipLevelCount);
+    samplerInfo.maxAnisotropy = 1;
+    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    VkResult err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
+    AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
