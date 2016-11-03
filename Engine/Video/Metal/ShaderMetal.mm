@@ -19,11 +19,11 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, const FileSystem::FileContentsData& /*fragmentGLSL*/,
-                        const char* metalVertexShaderName, const char* metalFragmentShaderName,
+                        const char* aMetalVertexShaderName, const char* aMetalFragmentShaderName,
                         const FileSystem::FileContentsData& /*vertexHLSL*/, const FileSystem::FileContentsData& /*fragmentHLSL*/,
                         const FileSystem::FileContentsData& /*vertexSPIRV*/, const FileSystem::FileContentsData& /*fragmentSPIRV*/)
 {
-    LoadFromLibrary( metalVertexShaderName, metalFragmentShaderName );
+    LoadFromLibrary( aMetalVertexShaderName, aMetalFragmentShaderName );
 }
 
 void ae3d::Shader::LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName )
@@ -131,7 +131,7 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
         }
         else
         {
-            System::Print( "Shader tried to set a texture into unit that is not handled\n" );
+            System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
         }
 
         GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap() );
@@ -156,7 +156,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* rend
         }
         else
         {
-            System::Print( "Shader tried to set a texture into unit that is not handled\n" );
+            System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
         }
 
         GfxDeviceGlobal::SetSampler( textureUnit, renderTexture->GetFilter(), renderTexture->GetWrap() );
@@ -181,7 +181,7 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
         }
         else
         {
-            System::Print( "Shader tried to set a texture into unit that is not handled\n" );
+            System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
         }
         
         GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap() );

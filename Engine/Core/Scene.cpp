@@ -230,14 +230,11 @@ void ae3d::Scene::Render()
 
         if (transform && !rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
         {
-            GfxDevice::PushGroupMarker( "2D RT" );
-            RenderWithCamera( rtCamera, 0 );
-            GfxDevice::PopGroupMarker();
+            RenderWithCamera( rtCamera, 0, "2D RT" );
         }
         else if (transform && rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
         {
             const Vec3 cameraPos = transform->GetLocalPosition();
-            GfxDevice::PushGroupMarker( "Cube Map RT" );
 
             for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
             {
@@ -264,10 +261,8 @@ void ae3d::Scene::Render()
                 };
                 
                 transform->LookAt( cameraPos, cameraPos + directions[ cubeMapFace ], ups[ cubeMapFace ] );
-                RenderWithCamera( rtCamera, cubeMapFace );
+                RenderWithCamera( rtCamera, cubeMapFace, "Cube Map RT" );
             }
-
-            GfxDevice::PopGroupMarker();
         }
     }
 
@@ -356,9 +351,7 @@ void ae3d::Scene::Render()
                     {
                         SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<PointLightComponent>()->shadowMap );
                     }
-                    
-                    GfxDevice::PushGroupMarker( "Shadow maps" );
-                    
+
                     if (pointLight)
                     {
                         for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
@@ -393,8 +386,6 @@ void ae3d::Scene::Render()
                     {
                         RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     }
-                    
-                    GfxDevice::PopGroupMarker();
 
                     if (dirLight)
                     {
@@ -418,9 +409,7 @@ void ae3d::Scene::Render()
             }
         }
         
-        GfxDevice::PushGroupMarker( "Primary Pass" );
-        RenderWithCamera( camera, 0 );
-        GfxDevice::PopGroupMarker();
+        RenderWithCamera( camera, 0, "Primary Pass" );
     }
     
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
@@ -429,7 +418,7 @@ void ae3d::Scene::Render()
 #endif
 }
 
-void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
+void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const char* debugGroupName )
 {
     ae3d::System::Assert( 0 <= cubeMapFace && cubeMapFace < 6, "invalid cube map face" );
 
@@ -438,6 +427,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
     GfxDevice::SetClearColor( color.x, color.y, color.z );
 #ifndef RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
+    GfxDevice::PushGroupMarker( debugGroupName );
 #endif
 #if RENDERER_VULKAN
 	// TODO: add vkCmdClearColorImage here, but after command buffer begin
@@ -462,6 +452,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 #if RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
     GfxDevice::BeginFrame();
+    GfxDevice::PushGroupMarker( debugGroupName );
 #endif
     
     Matrix44 view;
@@ -592,7 +583,9 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
         
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, MeshRendererComponent::RenderType::Transparent );
     }
-    
+
+    GfxDevice::PopGroupMarker();
+
 #if RENDERER_METAL
     GfxDevice::PresentDrawable();
 #endif
@@ -641,8 +634,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace )
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
                                          int cubeMapFace, const Frustum& frustum )
 {
-    GfxDevice::PushGroupMarker( "DepthNormal" );
-    
 #if RENDERER_METAL
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
@@ -651,7 +642,8 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
 #endif
-    
+    GfxDevice::PushGroupMarker( "DepthNormal" );
+
     for (auto j : gameObjectsWithMeshRenderer)
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
@@ -667,13 +659,14 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
     }
-    
+
+    GfxDevice::PopGroupMarker();
+
 #if RENDERER_METAL
     GfxDevice::PresentDrawable();
 #endif
     GfxDevice::SetRenderTarget( nullptr, 0 );
-    GfxDevice::PopGroupMarker();
-    
+
     GfxDevice::ErrorCheck( "depthnormals render end" );
 }
 
@@ -695,6 +688,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #if RENDERER_VULKAN
 	GfxDevice::BeginRenderPassAndCommandBuffer();
 #endif
+    GfxDevice::PushGroupMarker( "Shadow maps" );
 
     Matrix44 view;
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
@@ -763,7 +757,9 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         meshRenderer->Cull( frustum, meshLocalToWorld );
         meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Opaque );
     }
-    
+
+    GfxDevice::PopGroupMarker();
+
 #if RENDERER_METAL
     GfxDevice::PresentDrawable();
 #endif

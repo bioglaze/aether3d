@@ -48,7 +48,7 @@ namespace ae3d
                                        std::vector< class Mesh* >& outMeshes ) const;
         
     private:
-        void RenderWithCamera( GameObject* cameraGo, int cubeMapFace );
+        void RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const char* debugGroupName );
         void RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace );
         void RenderDepthAndNormals( class CameraComponent* camera, struct Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
                                     int cubeMapFace, const class Frustum& frustum );
