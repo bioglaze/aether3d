@@ -427,11 +427,12 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     GfxDevice::SetClearColor( color.x, color.y, color.z );
 #ifndef RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
-    GfxDevice::PushGroupMarker( debugGroupName );
 #endif
 #if RENDERER_VULKAN
-	// TODO: add vkCmdClearColorImage here, but after command buffer begin
     GfxDevice::BeginRenderPassAndCommandBuffer();
+#endif
+#ifndef RENDERER_METAL
+    GfxDevice::PushGroupMarker( debugGroupName );
 #endif
     if (camera->GetClearFlag() == CameraComponent::ClearFlag::DepthAndColor)
     {

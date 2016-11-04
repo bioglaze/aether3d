@@ -190,23 +190,19 @@ void ae3d::GfxDevice::Init( int width, int height )
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
-#if DEBUG
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
         const std::string nameStr( name );
         glPushDebugGroup( GL_DEBUG_SOURCE_APPLICATION, 0, (GLsizei)nameStr.length(), name );
     }
-#endif
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
-#if DEBUG
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
         glPopDebugGroup();
     }
-#endif
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,

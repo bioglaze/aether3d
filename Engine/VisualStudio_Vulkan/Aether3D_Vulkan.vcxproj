@@ -57,8 +57,9 @@
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG;VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SIMD_SSE3;DEBUG;VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -70,8 +71,9 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SIMD_SSE3;VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;DEBUG;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
