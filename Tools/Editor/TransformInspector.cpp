@@ -77,10 +77,20 @@ void TransformInspector::GameObjectSelected( std::list< ae3d::GameObject* > game
 
 void TransformInspector::FieldsChanged( QTableWidgetItem* item )
 {
+    ae3d::TransformComponent* transform = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::TransformComponent >();
     Vec3 position;
+    if (transform)
+    {
+        position = transform->GetLocalPosition();
+    }
+
     Quaternion rotation;
     Vec3 rotationEuler;
     float scale = 1;
+    if (transform)
+    {
+        scale = transform->GetLocalScale();
+    }
 
     const std::string newValue = item->text().toStdString();
 
