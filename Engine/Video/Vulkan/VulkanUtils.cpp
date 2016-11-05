@@ -18,12 +18,7 @@ namespace debug
 #else
     bool enabled = false;
 #endif
-    int validationLayerCount = 1;
-
-    const char *validationLayerNames[] =
-    {
-        "VK_LAYER_LUNARG_standard_validation"
-    };
+    bool hasMarker = false;
 
     PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = nullptr;
     PFN_vkDestroyDebugReportCallbackEXT DestroyDebugReportCallback = nullptr;
@@ -81,12 +76,12 @@ namespace debug
         DebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr( device, "vkDebugMarkerSetObjectNameEXT" );
         CmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerBeginEXT" );
         CmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerEndEXT" );
-        CmdDebugMarkerInsertEXT = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerInsertEXT" );
+        CmdDebugMarkerInsertEXT = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerInsertEXT" );   
     }
 
     void SetObjectName( VkDevice device, std::uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name )
     {
-        if (DebugMarkerSetObjectName)
+        if (DebugMarkerSetObjectName && hasMarker)
         {
             VkDebugMarkerObjectNameInfoEXT nameInfo = {};
             nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
@@ -99,7 +94,7 @@ namespace debug
 
     void BeginRegion( VkCommandBuffer cmdbuffer, const char* pMarkerName, float r, float g, float b )
     {
-        if (CmdDebugMarkerBegin)
+        if (CmdDebugMarkerBegin && hasMarker)
         {
             float color[ 4 ] = { r, g, b, 1 };
             VkDebugMarkerMarkerInfoEXT markerInfo = {};
@@ -112,7 +107,7 @@ namespace debug
 
     void EndRegion( VkCommandBuffer cmdBuffer )
     {
-        if (CmdDebugMarkerEnd)
+        if (CmdDebugMarkerEnd && hasMarker)
         {
             CmdDebugMarkerEnd( cmdBuffer );
         }
@@ -172,6 +167,14 @@ namespace ae3d
         if (debug::enabled)
         {
             enabledExtensions.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
+            
+            const char *validationLayerNames[] =
+            {
+                "VK_LAYER_LUNARG_standard_validation"
+            };
+
+            instanceCreateInfo.ppEnabledLayerNames = validationLayerNames;
+            instanceCreateInfo.enabledLayerCount = 1;
         }
 
         instanceCreateInfo.enabledExtensionCount = static_cast<std::uint32_t>(enabledExtensions.size());
@@ -256,6 +259,11 @@ namespace ae3d
         if (oldImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
         {
             imageMemoryBarrier.srcAccessMask = 0;
+        }
+
+        if (newImageLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+        {
+            imageMemoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         }
 
         const VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;

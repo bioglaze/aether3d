@@ -453,7 +453,7 @@ namespace ae3d
         prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         prePresentBarrier.pNext = nullptr;
         prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-        prePresentBarrier.dstAccessMask = 0;
+        prePresentBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         prePresentBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         prePresentBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -494,7 +494,7 @@ namespace ae3d
         VkImageMemoryBarrier postPresentBarrier = {};
         postPresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         postPresentBarrier.pNext = nullptr;
-        postPresentBarrier.srcAccessMask = 0;
+        postPresentBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         postPresentBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         postPresentBarrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         postPresentBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -888,6 +888,7 @@ namespace ae3d
             if (std::string( i.extensionName ) == std::string( VK_EXT_DEBUG_MARKER_EXTENSION_NAME ))
             {
                 deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
+                debug::hasMarker = true;
             }
         }
 

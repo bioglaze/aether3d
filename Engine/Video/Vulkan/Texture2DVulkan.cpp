@@ -94,6 +94,22 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, fileContents.path.c_str() );
 }
 
+bool isBC1( VkFormat format )
+{
+    return format == VK_FORMAT_BC1_RGB_UNORM_BLOCK || format == VK_FORMAT_BC1_RGB_SRGB_BLOCK ||
+           format == VK_FORMAT_BC1_RGBA_UNORM_BLOCK || format == VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+}
+
+bool isBC2( VkFormat format )
+{
+    return format == VK_FORMAT_BC2_UNORM_BLOCK || format == VK_FORMAT_BC2_SRGB_BLOCK;
+}
+
+bool isBC3( VkFormat format )
+{
+    return format == VK_FORMAT_BC3_UNORM_BLOCK || format == VK_FORMAT_BC3_SRGB_BLOCK;
+}
+
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
 {
     VkMemoryAllocateInfo memAllocInfo = {};
@@ -104,9 +120,13 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     VkBuffer stagingBuffer = VK_NULL_HANDLE;
     VkDeviceMemory stagingMemory = VK_NULL_HANDLE;
 
+    VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
+    VkDeviceSize bc1Size = (width / 4) * (height / 4) * bc1BlockSize;
+    VkDeviceSize imageSize = (isBC1( format ) || isBC2( format ) || isBC3( format )) ? bc1Size : (width * height * bytesPerPixel);
+
     VkBufferCreateInfo bufferCreateInfo = {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = width * height * bytesPerPixel;
+    bufferCreateInfo.size = imageSize;
     bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffer );
@@ -126,7 +146,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     std::uint8_t* stagingData;
     err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory, 0, memReqs.size, 0, (void **)&stagingData );
-    std::memcpy( stagingData, data, width * height * bytesPerPixel );
+    std::memcpy( stagingData, data, imageSize );
     vkUnmapMemory( GfxDeviceGlobal::device, stagingMemory );
 
     std::vector<VkBufferImageCopy> bufferCopyRegions;
@@ -309,7 +329,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     }
 
     mipLevelCount = static_cast< int >(ddsOutput.dataOffsets.size());
-    int bytesPerPixel = 2;
+    int bytesPerPixel = 1;
 
     VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
 
@@ -323,11 +343,13 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
         bytesPerPixel = 2;
     }
-    if (ddsOutput.format == DDSLoader::Format::BC3)
+    else if (ddsOutput.format == DDSLoader::Format::BC3)
     {
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
         bytesPerPixel = 2;
     }
+    
+    ae3d::System::Assert( ddsOutput.dataOffsets.size() > 0, "DDS reader error: dataoffsets is empty" );
 
     CreateVulkanObjects( &fileContents.data[ ddsOutput.dataOffsets[ 0 ] ], bytesPerPixel, format );
 }
