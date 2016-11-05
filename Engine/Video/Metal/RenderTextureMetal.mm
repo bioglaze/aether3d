@@ -71,4 +71,17 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     }
     
     metalTexture.label = @"Render Texture Cube";
+
+    MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
+                                                                                         width:width
+                                                                                        height:height
+                                                                                     mipmapped:NO];
+
+    depthDesc.textureType = MTLTextureTypeCube;
+    depthDesc.sampleCount = 1;
+    depthDesc.resourceOptions = MTLResourceStorageModePrivate;
+    depthDesc.usage = MTLTextureUsageUnknown;
+
+    metalDepthTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:depthDesc];
+    metalDepthTexture.label = @"Render Texture Cube depth";
 }

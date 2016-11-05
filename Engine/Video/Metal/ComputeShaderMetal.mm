@@ -71,7 +71,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     [commandEncoder endEncoding];
     
     [commandBuffer commit];
-    [commandBuffer waitUntilCompleted];
+    //[commandBuffer waitUntilCompleted];
 }
 
 void ae3d::ComputeShader::Test( ae3d::Texture2D* texture, ae3d::RenderTexture* outTexture )

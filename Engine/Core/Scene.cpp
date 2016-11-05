@@ -268,12 +268,7 @@ void ae3d::Scene::Render()
 
     //unsigned debugShadowFBO = 0;
 
-    // Defaults for a case where there are no lights.
-#if !RENDERER_VULKAN
-    Texture2D& whiteTexture = renderer.GetWhiteTexture();
-    Material::SetGlobalTexture2D( "_ShadowMap", &whiteTexture );
-    Material::SetGlobalFloat( "_ShadowMinAmbient", 1 );
-#endif
+    bool hasShadow = false;
 
     for (auto camera : cameras)
     {
@@ -392,23 +387,36 @@ void ae3d::Scene::Render()
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                         Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
                         //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
+                        hasShadow = true;
                     }
                     else if (spotLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
                         Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
                         //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
+                        hasShadow = true;
                     }
                     else if (pointLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
                         Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
                         //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
+                        hasShadow = true;
                     }
                 }
             }
         }
-        
+
+        // Defaults for a case where there are no shadow casting lights.
+#if !RENDERER_VULKAN
+        if (!hasShadow)
+        {
+            Texture2D& whiteTexture = renderer.GetWhiteTexture();
+            Material::SetGlobalTexture2D( "_ShadowMap", &whiteTexture );
+            Material::SetGlobalFloat( "_ShadowMinAmbient", 1 );
+        }
+#endif
+
         RenderWithCamera( camera, 0, "Primary Pass" );
     }
     

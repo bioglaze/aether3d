@@ -24,6 +24,7 @@ id <MTLDepthStencilState> depthStateLessEqualWriteOff;
 id <MTLDepthStencilState> depthStateNoneWriteOff;
 id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
 id <CAMetalDrawable> drawable; // Render texture or currentDrawable
+int currentCubeMapFace = 0;
 
 MTLRenderPassDescriptor* renderPassDescriptorApp = nullptr;
 MTLRenderPassDescriptor* renderPassDescriptorFBO = nullptr;
@@ -46,6 +47,7 @@ namespace Statistics
     int vertexBufferBinds = 0;
     int renderTargetBinds = 0;
     int shaderBinds = 0;
+    int createUniformBufferCalls = 0;
     float frameTimeMS = 0;
 }
 
@@ -153,7 +155,7 @@ namespace ae3d
                 std::stringstream stm;
                 stm << "frame time: " << ::Statistics::frameTimeMS << "\n";
                 stm << "draw calls: " << ::Statistics::drawCalls << "\n";
-                stm << "create uniform buffer calls: " << GfxDeviceGlobal::uniformBuffers.size() << "\n";
+                stm << "create uniform buffer calls: " << ::Statistics::createUniformBufferCalls << "\n";
                 return stm.str();
             }
         }
@@ -196,6 +198,7 @@ namespace
         }
         else
         {
+            renderPassDescriptor.colorAttachments[0].slice = currentCubeMapFace;
             renderPassDescriptor.colorAttachments[0].texture = texture;
             renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
         }
@@ -212,6 +215,7 @@ namespace
         }
         else if (GfxDeviceGlobal::sampleCount == 1 && GfxDeviceGlobal::isRenderingToTexture)
         {
+            renderPassDescriptor.depthAttachment.slice = currentCubeMapFace;
             renderPassDescriptor.depthAttachment.texture = depthTexture;
             renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
             renderPassDescriptor.depthAttachment.clearDepth = 1.0;
@@ -223,7 +227,8 @@ id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 {
     id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceCPUCacheModeDefaultCache];
     uniformBuffer.label = @"uniform buffer";
-    
+
+    ++Statistics::createUniformBufferCalls;
     GfxDeviceGlobal::uniformBuffers.push_back( uniformBuffer );
     return uniformBuffer;
 }
@@ -689,6 +694,7 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     Statistics::textureBinds = 0;
     Statistics::vertexBufferBinds = 0;
     Statistics::shaderBinds = 0;
+    Statistics::createUniformBufferCalls = 0;
     GfxDeviceGlobal::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
@@ -704,6 +710,7 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, uns
 {
     GfxDeviceGlobal::isRenderingToTexture = renderTexture2d != nullptr;
 
+    currentCubeMapFace = cubeMapFace;
     drawable = currentDrawable;
     setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture,
                                renderTexture2d != nullptr ? renderTexture2d->GetMetalDepthTexture() : nil );

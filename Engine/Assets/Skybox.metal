@@ -10,33 +10,33 @@ typedef struct
 
 typedef struct
 {
-    packed_float3 position;
-    packed_float2 texcoord;
-    packed_float4 color;
-} vertex_t;
-
-typedef struct
-{
     float4 position [[position]];
     half4  color;
     float3 texCoords;
 } ColorInOut;
 
+struct Vertex
+{
+    float3 position [[attribute(0)]];
+    float2 texcoord [[attribute(1)]];
+    float4 color [[attribute(2)]];
+};
+
 constexpr sampler s(coord::normalized,
                     address::repeat,
                     filter::linear);
 
-vertex ColorInOut skybox_vertex( device vertex_t* vertex_array [[ buffer(0) ]],
-                                 constant uniforms_t& uniforms [[ buffer(5) ]],
-                                 unsigned int vid [[ vertex_id ]])
+vertex ColorInOut skybox_vertex( Vertex vert [[stage_in]],
+                                constant uniforms_t& uniforms [[ buffer(5) ]],
+                                unsigned int vid [[ vertex_id ]])
 {
     ColorInOut out;
-    
-    float4 in_position = float4(float3(vertex_array[vid].position), 1.0);
+
+    float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
-    
-    out.color = half4( vertex_array[vid].color );
-    out.texCoords = float3(vertex_array[vid].position);
+
+    out.color = half4( vert.color );
+    out.texCoords = vert.position;
     return out;
 }
 
