@@ -243,11 +243,12 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
             std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
             fileOffset += size;
 
+#if RENDERER_OPENGL
             for (unsigned zz = 0; zz < size; ++zz)
             {
                 unpacked[ zz ] = palette[ data[ zz ] ];
             }
-#if RENDERER_OPENGL
+
             glPixelStorei( GL_UNPACK_ROW_LENGTH, y );
             glTexImage2D( cubeMapFace > 0 ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace - 1 : GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, li->externalFormat, li->type, &unpacked[ 0 ] );
 #endif

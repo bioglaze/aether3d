@@ -99,13 +99,13 @@ void ae3d::Shader::Use()
     GfxDevice::CreateNewUniformBuffer();
 }
 
-void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
+void ae3d::Shader::SetMatrix( const char* /*name*/, const float* matrix4x4 )
 {
     System::Assert( GfxDevice::GetCurrentUbo() != nullptr, "null ubo" );
     std::memcpy( &GfxDevice::GetCurrentUbo()[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
 }
 
-void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int /*textureUnit*/ )
 {
     if (texture)
     {
@@ -114,7 +114,7 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
     }
 }
 
-void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* /*name*/, TextureCube* texture, int /*textureUnit*/ )
 {
     if (texture)
     {
@@ -123,7 +123,7 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
     }
 }
 
-void ae3d::Shader::SetRenderTexture( const char* name, RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* /*name*/, RenderTexture* texture, int /*textureUnit*/ )
 {
     if (texture)
     {
@@ -132,18 +132,18 @@ void ae3d::Shader::SetRenderTexture( const char* name, RenderTexture* texture, i
     }
 }
 
-void ae3d::Shader::SetInt( const char* name, int value )
+void ae3d::Shader::SetInt( const char* /*name*/, int /*value*/ )
 {
 }
 
-void ae3d::Shader::SetFloat( const char* name, float value )
+void ae3d::Shader::SetFloat( const char* /*name*/, float /*value*/ )
 {
 }
 
-void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
+void ae3d::Shader::SetVector3( const char* /*name*/, const float* /*vec3*/ )
 {
 }
 
-void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
+void ae3d::Shader::SetVector4( const char* /*name*/, const float* /*vec4*/ )
 {
 }

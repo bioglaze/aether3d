@@ -268,10 +268,10 @@ void ae3d::Scene::Render()
 
     //unsigned debugShadowFBO = 0;
 
-    bool hasShadow = false;
-
     for (auto camera : cameras)
     {
+        bool hasShadow = false;
+
         if (camera != nullptr && camera->GetComponent<TransformComponent>())
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
@@ -641,7 +641,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 }
 
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
-                                         int cubeMapFace, const Frustum& frustum )
+                                         int cubeMapFace, const Frustum& /*frustum*/ )
 {
 #if RENDERER_METAL
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );

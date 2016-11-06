@@ -3,6 +3,7 @@
 #include "Texture2D.hpp"
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
+#include <cmath>
 
 std::unordered_map< std::string, ae3d::RenderTexture* > ae3d::Material::sTexRTs;
 std::unordered_map< std::string, ae3d::Texture2D* > ae3d::Material::sTex2ds;
@@ -84,7 +85,7 @@ void ae3d::Material::Apply()
         shader->SetFloat( globalFloat.first.c_str(), globalFloat.second );
     }
 
-    if (depthUnits != 0 || depthFactor != 0)
+    if (std::abs( depthUnits ) > 0.0001f || std::abs( depthFactor ) > 0.0001f)
     {
         GfxDevice::SetPolygonOffset( true, depthFactor, depthUnits );
     }

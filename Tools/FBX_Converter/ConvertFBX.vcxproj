@@ -14,6 +14,9 @@
     <ClCompile Include="..\..\Engine\Core\Matrix.cpp" />
     <ClCompile Include="convert_fbx.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BA497D54-8968-4B73-83A0-E2C46457A32D}</ProjectGuid>
     <RootNamespace>ConvertFBX</RootNamespace>

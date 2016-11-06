@@ -164,14 +164,14 @@ namespace ae3d
 #if VK_USE_PLATFORM_XCB_KHR
         enabledExtensions.push_back( VK_KHR_XCB_SURFACE_EXTENSION_NAME );
 #endif
+        const char *validationLayerNames[] =
+        {
+            "VK_LAYER_LUNARG_standard_validation"
+        };
+
         if (debug::enabled)
         {
             enabledExtensions.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
-            
-            const char *validationLayerNames[] =
-            {
-                "VK_LAYER_LUNARG_standard_validation"
-            };
 
             instanceCreateInfo.ppEnabledLayerNames = validationLayerNames;
             instanceCreateInfo.enabledLayerCount = 1;
