@@ -23,6 +23,8 @@
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
 // Event tutorial: http://xcb.freedesktop.org/tutorial/events/
 
+PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;
+
 struct GamePad
 {
     bool isActive = false;
@@ -358,6 +360,26 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
 #if RENDERER_OPENGL    
     GLXWindow glxwindow = glXCreateWindow( display, fb_config, WindowGlobal::window, nullptr );
 
+    glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)glXGetProcAddress( (const GLubyte*)"glXCreateContextAttribsARB");
+
+    if (glXCreateContextAttribsARB != nullptr)
+    {
+        const int contextAttrs[] =
+        {
+            GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+            GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+            GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0,
+        };
+
+        GLXContext coreContext = glXCreateContextAttribsARB( WindowGlobal::display, fb_config, nullptr, true, contextAttrs );
+
+        if (coreContext != nullptr)
+        {
+            context = coreContext;
+        }
+    }
+    
     if (!glxwindow)
     {
         xcb_destroy_window( connection, WindowGlobal::window );
