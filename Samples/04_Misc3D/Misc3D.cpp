@@ -263,12 +263,14 @@ int main()
     rtTex.Create2D( 512, 512, RenderTexture::DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear );
     
     GameObject renderTextureContainer;
+    renderTextureContainer.SetName( "renderTextureContainer" );
     renderTextureContainer.AddComponent<SpriteRendererComponent>();
     //renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( 512, 512, 1 ), Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture(), Vec3( 150, 250, -0.6f ), Vec3( 256, 256, 1 ), Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
 
     GameObject rtCamera;
+    rtCamera.SetName( "RT camera" );
     rtCamera.AddComponent<CameraComponent>();
     rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
@@ -286,6 +288,7 @@ int main()
     transMaterial.SetBlendingMode( Material::BlendingMode::Alpha );
     
     GameObject transCube1;
+    transCube1.SetName( "transCube1" );
     transCube1.AddComponent< MeshRendererComponent >();
     transCube1.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     transCube1.GetComponent< MeshRendererComponent >()->SetMaterial( &transMaterial, 0 );

@@ -16,6 +16,8 @@ namespace GfxDeviceGlobal
     extern VkDevice device;
     extern VkCommandBuffer setupCmdBuffer;
     extern VkRenderPass renderPass;
+    extern VkFormat colorFormat;
+    extern VkFormat depthFormat;
 }
 
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
@@ -37,7 +39,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     // Color
 
-    const VkFormat colorFormat = VK_FORMAT_B8G8R8A8_UNORM;// VK_FORMAT_R8G8B8A8_UNORM;
+    const VkFormat colorFormat = GfxDeviceGlobal::colorFormat;
 
     VkImageCreateInfo colorImage = {};
     colorImage.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -98,7 +100,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     // Depth/Stencil
 
-    VkFormat depthFormat = VK_FORMAT_D16_UNORM_S8_UINT;// VK_FORMAT_D32_SFLOAT;
+    const VkFormat depthFormat = GfxDeviceGlobal::depthFormat;
     VkImageCreateInfo depthImage = colorImage;
     depthImage.format = depthFormat;
     depthImage.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;

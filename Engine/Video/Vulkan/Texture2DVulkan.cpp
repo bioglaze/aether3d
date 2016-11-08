@@ -372,7 +372,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    CreateVulkanObjects( data, 4, VK_FORMAT_R8G8B8A8_UNORM );
+    CreateVulkanObjects( data, 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB );
 
     stbi_image_free( data );
 }

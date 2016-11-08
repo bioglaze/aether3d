@@ -671,7 +671,23 @@ namespace ae3d
         err = getPhysicalDeviceSurfaceFormatsKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &formatCount, surfFormats.data() );
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfaceFormatsKHR" );
 
-        if (formatCount == 1 && surfFormats[ 0 ].format == VK_FORMAT_UNDEFINED)
+        bool foundSRGB = false;
+        VkFormat sRGBFormat = VK_FORMAT_B8G8R8A8_SRGB;
+
+        for (std::size_t formatIndex = 0; formatIndex < surfFormats.size(); ++formatIndex)
+        {
+            if (surfFormats[ formatIndex ].format == VK_FORMAT_B8G8R8A8_SRGB || surfFormats[ formatIndex ].format == VK_FORMAT_R8G8B8A8_SRGB)
+            {
+                sRGBFormat = surfFormats[ formatIndex ].format;
+                foundSRGB = true;
+            }
+        }
+
+        if (foundSRGB)
+        {
+            GfxDeviceGlobal::colorFormat = sRGBFormat;
+        }
+        else if (formatCount == 1 && surfFormats[ 0 ].format == VK_FORMAT_UNDEFINED)
         {
             GfxDeviceGlobal::colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
         }
