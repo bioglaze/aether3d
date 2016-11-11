@@ -132,8 +132,15 @@ int main()
     rotatingCube.AddComponent< MeshRendererComponent >();
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     rotatingCube.AddComponent< TransformComponent >();
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, 0 } );
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -80 } );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 1 );
+
+    GameObject childCube;
+    childCube.AddComponent< MeshRendererComponent >();
+    childCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    childCube.AddComponent< TransformComponent >();
+    childCube.GetComponent< TransformComponent >()->SetLocalPosition( { 3, 0, 0 } );
+    childCube.GetComponent< TransformComponent >()->SetParent( rotatingCube.GetComponent< TransformComponent >() );
 
     GameObject cubeScaledUV;
     cubeScaledUV.AddComponent< MeshRendererComponent >();
@@ -180,6 +187,7 @@ int main()
     }
 
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    childCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
 
@@ -233,7 +241,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -301,6 +309,7 @@ int main()
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
+    scene.Add( &childCube );
     scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
     //scene.Add( &statsContainer );

@@ -100,7 +100,7 @@ bool ae3d::GameObject::IsEnabled() const
             return false;
         }
         
-        transform = transform->parent;
+        transform = transform->GetParent();
     }
     
     return isEnabled;

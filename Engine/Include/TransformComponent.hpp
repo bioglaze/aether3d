@@ -72,6 +72,9 @@ namespace ae3d
         /// \return View direction (normalized)
         Vec3 GetViewDirection() const;
 
+        /// \return Parent transform or null if there is no parent.
+        TransformComponent* GetParent() const;
+
     private:
         friend class GameObject;
         friend class Scene;
@@ -94,7 +97,7 @@ namespace ae3d
         Quaternion localRotation;
         float localScale = 1;
         Matrix44 localMatrix;
-        TransformComponent* parent = nullptr;
+        int parent = -1;
 #if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
         Matrix44 hmdView; // For VR
 #endif

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cmath>
 #include "Matrix.hpp"
+#include "System.hpp"
 
 namespace
 {
@@ -27,7 +28,14 @@ unsigned ae3d::TransformComponent::New()
 
 ae3d::TransformComponent* ae3d::TransformComponent::Get( unsigned index )
 {
+    System::Assert( index < static_cast< unsigned >( transformComponents.size() ), "invalid transform index" );
     return &transformComponents[ index ];
+}
+
+ae3d::TransformComponent* ae3d::TransformComponent::GetParent() const
+{
+    System::Assert( parent < static_cast< int >( transformComponents.size() ), "invalid parent transform index" );
+    return parent == -1 ? nullptr : &transformComponents[ parent ];
 }
 
 void ae3d::TransformComponent::LookAt( const Vec3& aLocalPosition, const Vec3& center, const Vec3& up )
@@ -120,9 +128,9 @@ void ae3d::TransformComponent::SolveLocalMatrix()
     localMatrix.Scale( localScale, localScale, localScale );
     localMatrix.Translate( localPosition );
     
-    if (parent != nullptr)
+    if (parent != -1)
     {
-        Matrix44::Multiply( localMatrix, parent->GetLocalMatrix(), localMatrix );
+        Matrix44::Multiply( localMatrix, transformComponents[ parent ].GetLocalMatrix(), localMatrix );
     }
 }
 
@@ -147,10 +155,17 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
             return;
         }
         
-        testComponent = testComponent->parent;
+        testComponent = testComponent->parent == -1 ? nullptr : &transformComponents[ testComponent->parent ];
     }
 
-    parent = aParent;
+    for (std::size_t componentIndex = 0; componentIndex < transformComponents.size(); ++componentIndex)
+    {
+        if (&transformComponents[ componentIndex ] == aParent)
+        {
+            parent = static_cast< int >( componentIndex );
+            return;
+        }
+    }
 }
 
 std::string ae3d::TransformComponent::GetSerialized() const

@@ -84,6 +84,11 @@ void CheckOpenALError( const char* info )
 
 void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info )
 {
+    if (AudioGlobal::device == nullptr)
+    {
+        return;
+    }
+
     short* decoded = nullptr;
     int channels = 0;
     int samplerate = 0;
@@ -110,6 +115,11 @@ void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
 
 void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info )
 {
+    if (AudioGlobal::device == nullptr)
+    {
+        return;
+    }
+
     std::istringstream ifs( std::string( clipData.data.begin(), clipData.data.end() ) );
 
     WAVE wav;
