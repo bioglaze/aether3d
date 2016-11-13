@@ -27,6 +27,13 @@ QString FloatToQString( float f )
     return QString::fromStdString( out.str() );
 }
 
+QString IntToQString( int i )
+{
+    std::ostringstream out;
+    out << i;
+    return QString::fromStdString( out.str() );
+}
+
 void CameraInspector::Init( QWidget* mainWindow )
 {
     ortho = new QTableWidget( 1, 4 );
@@ -72,6 +79,7 @@ void CameraInspector::Init( QWidget* mainWindow )
 
     clearFlagsBox = new QComboBox();
     clearFlagsBox->addItem("Color and depth");
+    clearFlagsBox->addItem("Depth");
     clearFlagsBox->addItem("Don't clear");
 
     projectionBox = new QComboBox();
@@ -146,7 +154,19 @@ void CameraInspector::ApplySelectedCameraIntoFields( const ae3d::CameraComponent
     disconnect( persp, &QTableWidget::itemChanged, persp, nullptr );
 
     projectionBox->setCurrentIndex( camera.GetProjectionType() == ae3d::CameraComponent::ProjectionType::Orthographic ? 0 : 1 );
-    clearFlagsBox->setCurrentIndex( camera.GetClearFlag() == ae3d::CameraComponent::ClearFlag::DepthAndColor ? 0 : 1 );
+
+    if (camera.GetClearFlag() == ae3d::CameraComponent::ClearFlag::DepthAndColor)
+    {
+        clearFlagsBox->setCurrentIndex( 0 );
+    }
+    else if (camera.GetClearFlag() == ae3d::CameraComponent::ClearFlag::DontClear)
+    {
+        clearFlagsBox->setCurrentIndex( 2 );
+    }
+    else if (camera.GetClearFlag() == ae3d::CameraComponent::ClearFlag::Depth)
+    {
+        clearFlagsBox->setCurrentIndex( 1 );
+    }
 
     persp->item( 0, 0 )->setText( FloatToQString( camera.GetFovDegrees() ) );
     persp->item( 0, 1 )->setText( FloatToQString( camera.GetAspect() ) );
@@ -161,6 +181,8 @@ void CameraInspector::ApplySelectedCameraIntoFields( const ae3d::CameraComponent
     clearColorTable->item( 0, 0 )->setText( FloatToQString( camera.GetClearColor().x ) );
     clearColorTable->item( 0, 1 )->setText( FloatToQString( camera.GetClearColor().y ) );
     clearColorTable->item( 0, 2 )->setText( FloatToQString( camera.GetClearColor().z ) );
+
+    orderInput->setText( IntToQString( (int)camera.GetRenderOrder() ) );
 
     connect( ortho, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
     connect( persp, &QTableWidget::itemChanged, [&](QTableWidgetItem* /*item*/) { ApplyFieldsIntoSelectedCamera(); });
@@ -297,9 +319,21 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
 
     }
 
-    ae3d::CameraComponent::ProjectionType projectionType = ae3d::CameraComponent::ProjectionType::Perspective;
+    ae3d::CameraComponent::ProjectionType projectionType = projectionBox->currentIndex() == 1 ?
+                ae3d::CameraComponent::ProjectionType::Perspective : ae3d::CameraComponent::ProjectionType::Orthographic;
 
-    emit CameraModified( CameraComponent::ClearFlag::DepthAndColor, projectionType, orthoParams, perspParams, clearColor, renderOrder );
+    CameraComponent::ClearFlag clearFlag = CameraComponent::ClearFlag::DontClear;
+
+    if (clearFlagsBox->currentIndex() == 0)
+    {
+        clearFlag = CameraComponent::ClearFlag::DepthAndColor;
+    }
+    else if (clearFlagsBox->currentIndex() == 1)
+    {
+        clearFlag = CameraComponent::ClearFlag::Depth;
+    }
+
+    emit CameraModified( clearFlag, projectionType, orthoParams, perspParams, clearColor, renderOrder );
 }
 
 void CameraInspector::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )

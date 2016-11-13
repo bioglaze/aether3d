@@ -20,6 +20,7 @@ class CameraInspector : public QObject
   public:
     class QWidget* GetWidget() { return root; }
     void Init( QWidget* mainWindow );
+    void ApplySelectedCameraIntoFields( const ae3d::CameraComponent& camera );
 
 signals:
     void CameraModified( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
@@ -32,7 +33,6 @@ private slots:
 
 private:
     void ApplyFieldsIntoSelectedCamera();
-    void ApplySelectedCameraIntoFields( const ae3d::CameraComponent& camera );
 
     QWidget* root = nullptr;
     class QPushButton* removeButton = nullptr;

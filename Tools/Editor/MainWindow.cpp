@@ -137,9 +137,12 @@ void MainWindow::closeEvent( QCloseEvent *event )
             case 1:
             default: // just for sanity
                 event->ignore();
+                std::cout << "case 1 or default" << std::endl;
                 break;
             case 2:
                 event->accept();
+                exit( 0 );
+                std::cout << "case 2" << std::endl;
                 break;
         }
     }
@@ -233,6 +236,7 @@ void MainWindow::UpdateInspector()
         if (cameraComponent)
         {
             cameraInspector.GetWidget()->show();
+            cameraInspector.ApplySelectedCameraIntoFields( *cameraComponent );
         }
         else
         {
@@ -308,6 +312,7 @@ void MainWindow::OpenLightingInspector()
     meshRendererInspector.GetWidget()->hide();
     dirLightInspector.GetWidget()->hide();
     spotLightInspector.GetWidget()->hide();
+    pointLightInspector.GetWidget()->hide();
     spriteRendererInspector.GetWidget()->hide();
     audioSourceInspector.GetWidget()->hide();
     lightingInspector.GetWidget()->show();

@@ -86,6 +86,7 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
 
     Quaternion rotation;
     Vec3 rotationEuler;
+
     float scale = 1;
     if (transform)
     {

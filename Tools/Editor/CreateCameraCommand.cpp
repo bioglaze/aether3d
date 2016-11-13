@@ -4,6 +4,8 @@
 #include "SceneWidget.hpp"
 #include "System.hpp"
 
+#include <iostream>
+
 CreateCameraCommand::CreateCameraCommand( SceneWidget* aSceneWidget )
 {
     sceneWidget = aSceneWidget;
@@ -16,6 +18,9 @@ void CreateCameraCommand::Execute()
 
     gameObject = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() );
     gameObject->AddComponent< ae3d::CameraComponent >();
+    gameObject->GetComponent< ae3d::CameraComponent >()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    gameObject->GetComponent< ae3d::CameraComponent >()->SetProjection( 45, 1, 1, 200 );
+    std::cout << "created camera" << std::endl;
 }
 
 void CreateCameraCommand::Undo()

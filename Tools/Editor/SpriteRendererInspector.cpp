@@ -16,10 +16,12 @@ void SpriteRendererInspector::Init( QWidget* mainWindow )
 {
     table = new QTableWidget( 1, 5 );
     table->setItem( 0, 0, new QTableWidgetItem() );
+    table->setItem( 0, 1, new QTableWidgetItem() );
+    table->setItem( 0, 2, new QTableWidgetItem() );
+    table->setItem( 0, 3, new QTableWidgetItem() );
+    table->setItem( 0, 4, new QTableWidgetItem() );
     table->setHorizontalHeaderLabels( QString("path;x;y;x scale;y scale").split(";") );
     table->setVerticalHeaderLabels( QString("Sprite").split(";") );
-
-    table->setItem( 0, 0, new QTableWidgetItem() );
 
     removeButton = new QPushButton("remove");
     QBoxLayout* headerLayout = new QBoxLayout( QBoxLayout::LeftToRight );
