@@ -50,6 +50,8 @@ namespace WindowGlobal
 
 namespace Global
 {
+    extern GLuint activeVao;
+
     vr::IVRSystem* hmd = nullptr;
     vr::IVRRenderModels* renderModels = nullptr;
     std::uint32_t width, height;
@@ -210,6 +212,7 @@ void SetupDistortion()
 
     glGenVertexArrays( 1, &Global::lensVAO );
     glBindVertexArray( Global::lensVAO );
+    Global::activeVao = Global::lensVAO;
 
     glGenBuffers( 1, &Global::idVertexBuffer );
     glBindBuffer( GL_ARRAY_BUFFER, Global::idVertexBuffer );
@@ -232,6 +235,7 @@ void SetupDistortion()
     glVertexAttribPointer( 3, 2, GL_FLOAT, GL_FALSE, sizeof( VertexDataLens ), (void *)offsetof( VertexDataLens, texCoordBlue ) );
 
     glBindVertexArray( 0 );
+    Global::activeVao = 0;
 
     glDisableVertexAttribArray( 0 );
     glDisableVertexAttribArray( 1 );
@@ -289,6 +293,7 @@ void RenderDistortion()
     glViewport( 0, 0, Global::width, Global::height );
 
     glBindVertexArray( Global::lensVAO );
+    Global::activeVao = Global::lensVAO;
     Global::lensDistort.Use();
 
     glActiveTexture( GL_TEXTURE0 );
@@ -311,7 +316,7 @@ void RenderDistortion()
     glDrawElements( GL_TRIANGLES, Global::indexSize / 2, GL_UNSIGNED_SHORT, (const void *)(Global::indexSize) );
 
     glBindVertexArray( 0 );
-    //glUseProgram( 0 );
+    Global::activeVao = 0;
 }
 
 void CompileShaders()
@@ -446,8 +451,7 @@ void ae3d::VR::SubmitFrame()
     vr::VRCompositor()->Submit( vr::Eye_Left, &leftEyeTexture );
     vr::Texture_t rightEyeTexture = { (void*)Global::rightEyeDesc.resolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
     vr::VRCompositor()->Submit( vr::Eye_Right, &rightEyeTexture );
-
-    glFinish();
+    vr::VRCompositor()->PostPresentHandoff();
 }
 
 void ae3d::VR::SetEye( int eye )
@@ -542,12 +546,7 @@ void ae3d::VR::CalcEyePose()
 
 void ae3d::VR::CalcCameraForEye( GameObject& camera, float /*yawDegrees*/, int eye )
 {
-    if (!Global::hmd)
-    {
-        return;
-    }
-
-    if (!camera.GetComponent< TransformComponent >() || !camera.GetComponent< CameraComponent >())
+    if (!Global::hmd || !camera.GetComponent< TransformComponent >() || !camera.GetComponent< CameraComponent >())
     {
         return;
     }
@@ -558,13 +557,14 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float /*yawDegrees*/, int e
     vr::HmdMatrix44_t mat = Global::hmd->GetProjectionMatrix( eye == 0 ? vr::Hmd_Eye::Eye_Left : vr::Hmd_Eye::Eye_Right, nearPlane, farPlane, vr::API_OpenGL );
     Matrix44 projMat;
     std::memcpy( &projMat.m[ 0 ], &mat.m[ 0 ][ 0 ], sizeof( Matrix44 ) );
+    projMat.Transpose( projMat );
 
     Matrix44 view;
     Matrix44::Multiply( Global::mat4HMDPose, eye == 0 ? Global::eyePosLeft : Global::eyePosRight, view );
     camera.GetComponent< TransformComponent >()->SetVrView( view );
     camera.GetComponent< CameraComponent >()->SetProjection( projMat );
 
-    Global::vrFov = float( std::atan( Global::height / nearPlane ) ) * (180.0f / 3.14159265f) * 2.0f;
-    Global::vrFov *= 0.5f;
+    Global::vrFov = float( std::atan( Global::height / nearPlane ) ) * (180.0f / 3.14159265f);
+    //System::Print("vrFor: %f\n", Global::vrFov );
 }
 #endif

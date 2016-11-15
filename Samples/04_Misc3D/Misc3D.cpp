@@ -62,7 +62,11 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 0.1f, 200 );
+#else
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
+#endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
     //camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
@@ -309,9 +313,11 @@ int main()
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
+    
     scene.Add( &childCube );
     scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
+    
     //scene.Add( &statsContainer );
     //scene.Add( &dirLight );
     //scene.Add( &spotLight );
@@ -389,9 +395,7 @@ int main()
             VR::CalcCameraForEye( camera, yaw, eye );
             scene.Render();
             VR::UnsetEye( eye );
-        }
-        
-        VR::SubmitFrame();
+        }   
 #else
         scene.Render();
         //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
@@ -555,6 +559,9 @@ int main()
 		statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
 		statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
 
+#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+        VR::SubmitFrame();
+#endif
         Window::SwapBuffers();
     }
 
