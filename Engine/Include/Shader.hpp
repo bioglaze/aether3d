@@ -134,6 +134,8 @@ namespace ae3d
         VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
         VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
 #endif
+        static void DestroyShaders();
+
         /// Wraps an int that is defaulted to -1. Needed for uniform handling.
         struct IntDefaultedToMinusOne
         {

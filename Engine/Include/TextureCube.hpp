@@ -56,9 +56,8 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkImageView& GetView() { return view; }
 #endif
-#if RENDERER_D3D12
         static void DestroyTextures();
-#endif
+    
     private:
         std::string posXpath, posYpath, negXpath, negYpath, posZpath, negZpath;
 #if RENDERER_VULKAN

@@ -1,4 +1,5 @@
 #include "VertexBuffer.hpp"
+#include <vector>
 #include <cstring>
 #include "Macros.hpp"
 #include "System.hpp"
@@ -16,6 +17,19 @@ namespace GfxDeviceGlobal
 namespace ae3d
 {
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
+}
+
+namespace VertexBufferGlobal
+{
+    std::vector< VkBuffer > buffersToReleaseAtExit;
+}
+
+void ae3d::VertexBuffer::DestroyBuffers()
+{
+    for (std::size_t bufferIndex = 0; bufferIndex < VertexBufferGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
+    {
+        vkDestroyBuffer( GfxDeviceGlobal::device, VertexBufferGlobal::buffersToReleaseAtExit[ bufferIndex ], nullptr );
+    }
 }
 
 void ae3d::VertexBuffer::SetDebugName( const char* name )
@@ -95,6 +109,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
 
         err = vkCreateBuffer( GfxDeviceGlobal::device, &vertexBufferInfo, nullptr, &vertexBuffer );
         AE3D_CHECK_VULKAN( err, "create vertex buffer" );
+        VertexBufferGlobal::buffersToReleaseAtExit.push_back( vertexBuffer );
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "vertex buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, vertexBuffer, &memReqs );
@@ -132,6 +147,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         indexbufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &indexbufferInfo, nullptr, &indexBuffer );
         AE3D_CHECK_VULKAN( err, "create index buffer" );
+        VertexBufferGlobal::buffersToReleaseAtExit.push_back( indexBuffer );
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)indexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "index buffer" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, indexBuffer, &memReqs );

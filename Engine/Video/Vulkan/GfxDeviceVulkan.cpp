@@ -12,6 +12,7 @@
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
 #include "Texture2D.hpp"
+#include "TextureCube.hpp"
 #include "VulkanUtils.hpp"
 #if VK_USE_PLATFORM_WIN32_KHR
 #define WIN32_LEAN_AND_MEAN
@@ -1769,6 +1770,14 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
 
+    for (std::size_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); ++i)
+    {
+        vkDestroyFramebuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::frameBuffers[ i ], nullptr );
+    }
+
+    vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, nullptr );
+    vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.view, nullptr );
+
     if (GfxDeviceGlobal::msaaTarget.colorImage != VK_NULL_HANDLE)
     {
         vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorImage, nullptr );
@@ -1776,6 +1785,12 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorView, nullptr );
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthView, nullptr );
     }
+
+    Shader::DestroyShaders();
+    Texture2D::DestroyTextures();
+    TextureCube::DestroyTextures();
+    RenderTexture::DestroyTextures();
+    VertexBuffer::DestroyBuffers();
 
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::renderCompleteSemaphore, nullptr );
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );

@@ -143,6 +143,9 @@ namespace ae3d
         VkBuffer* GetIndexBuffer() { return &indexBuffer; }
 
 #endif
+        /// Destroys graphics API objects.
+        static void DestroyBuffers();
+
         static const int posChannel = 0;
         static const int uvChannel = 1;
         static const int colorChannel = 2;

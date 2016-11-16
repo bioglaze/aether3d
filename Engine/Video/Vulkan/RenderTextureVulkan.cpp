@@ -1,4 +1,5 @@
 #include "RenderTexture.hpp"
+#include <vector>
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
@@ -18,6 +19,31 @@ namespace GfxDeviceGlobal
     extern VkRenderPass renderPass;
     extern VkFormat colorFormat;
     extern VkFormat depthFormat;
+}
+
+namespace RenderTextureGlobal
+{
+    std::vector< VkSampler > samplersToReleaseAtExit;
+    std::vector< VkImage > imagesToReleaseAtExit;
+    std::vector< VkImageView > imageViewsToReleaseAtExit;
+}
+
+void ae3d::RenderTexture::DestroyTextures()
+{
+    for (std::size_t samplerIndex = 0; samplerIndex < RenderTextureGlobal::samplersToReleaseAtExit.size(); ++samplerIndex)
+    {
+        vkDestroySampler( GfxDeviceGlobal::device, RenderTextureGlobal::samplersToReleaseAtExit[ samplerIndex ], nullptr );
+    }
+
+    for (std::size_t imageIndex = 0; imageIndex < RenderTextureGlobal::imagesToReleaseAtExit.size(); ++imageIndex)
+    {
+        vkDestroyImage( GfxDeviceGlobal::device, RenderTextureGlobal::imagesToReleaseAtExit[ imageIndex ], nullptr );
+    }
+
+    for (std::size_t imageViewIndex = 0; imageViewIndex < RenderTextureGlobal::imageViewsToReleaseAtExit.size(); ++imageViewIndex)
+    {
+        vkDestroyImageView( GfxDeviceGlobal::device, RenderTextureGlobal::imageViewsToReleaseAtExit[ imageViewIndex ], nullptr );
+    }
 }
 
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
@@ -69,6 +95,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     VkResult err = vkCreateImage( GfxDeviceGlobal::device, &colorImage, nullptr, &color.image );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image" );
+    RenderTextureGlobal::imagesToReleaseAtExit.push_back( color.image );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, "render texture 2d color" );
 
     VkMemoryRequirements memReqs;
@@ -96,6 +123,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     colorImageView.image = color.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageView, nullptr, &color.view );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image view" );
+    RenderTextureGlobal::imageViewsToReleaseAtExit.push_back( color.view );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture 2d color view" );
 
     // Depth/Stencil
@@ -119,7 +147,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     err = vkCreateImage( GfxDeviceGlobal::device, &depthImage, nullptr, &depth.image );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth image" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, "render texture 2d depth" );
+    RenderTextureGlobal::imagesToReleaseAtExit.push_back( depth.image );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)depth.image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, "render texture 2d depth" );
 
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, depth.image, &memReqs );
     memAlloc.allocationSize = memReqs.size;
@@ -139,7 +168,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     depthStencilView.image = depth.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &depth.view );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth view" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture 2d depth view" );
+    RenderTextureGlobal::imageViewsToReleaseAtExit.push_back( depth.view );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)depth.view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture 2d depth view" );
 
     FlushSetupCommandBuffer();
 
@@ -178,6 +208,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+    RenderTextureGlobal::samplersToReleaseAtExit.push_back( sampler );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
 
@@ -215,5 +246,6 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
     VkResult err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+    RenderTextureGlobal::samplersToReleaseAtExit.push_back( sampler );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }

@@ -39,6 +39,27 @@ namespace Texture2DGlobal
 {
     ae3d::Texture2D defaultTexture;
     VkCommandBuffer texCmdBuffer = VK_NULL_HANDLE;
+    std::vector< VkSampler > samplersToReleaseAtExit;
+    std::vector< VkImage > imagesToReleaseAtExit;
+    std::vector< VkImageView > imageViewsToReleaseAtExit;
+}
+
+void ae3d::Texture2D::DestroyTextures()
+{
+    for (std::size_t samplerIndex = 0; samplerIndex < Texture2DGlobal::samplersToReleaseAtExit.size(); ++samplerIndex)
+    {
+        vkDestroySampler( GfxDeviceGlobal::device, Texture2DGlobal::samplersToReleaseAtExit[ samplerIndex ], nullptr );
+    }
+
+    for (std::size_t imageIndex = 0; imageIndex < Texture2DGlobal::imagesToReleaseAtExit.size(); ++imageIndex)
+    {
+        vkDestroyImage( GfxDeviceGlobal::device, Texture2DGlobal::imagesToReleaseAtExit[ imageIndex ], nullptr );
+    }
+
+    for (std::size_t imageViewIndex = 0; imageViewIndex < Texture2DGlobal::imageViewsToReleaseAtExit.size(); ++imageViewIndex)
+    {
+        vkDestroyImageView( GfxDeviceGlobal::device, Texture2DGlobal::imageViewsToReleaseAtExit[ imageViewIndex ], nullptr );
+    }
 }
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
@@ -188,6 +209,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage" );
+    Texture2DGlobal::imagesToReleaseAtExit.push_back( image );
 
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
 
@@ -294,6 +316,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
     AE3D_CHECK_VULKAN( err, "vkCreateImageView in Texture2D" );
+    Texture2DGlobal::imageViewsToReleaseAtExit.push_back( view );
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -313,6 +336,8 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+    Texture2DGlobal::samplersToReleaseAtExit.push_back( sampler );
+
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
 

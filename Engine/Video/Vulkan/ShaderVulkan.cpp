@@ -9,6 +9,7 @@
 #include "RenderTexture.hpp"
 #include "Vec3.hpp"
 #include <cstring>
+#include <vector>
 
 namespace GfxDeviceGlobal
 {
@@ -21,6 +22,19 @@ namespace GfxDeviceGlobal
 namespace ae3d
 {
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
+}
+
+namespace ShaderGlobal
+{
+    std::vector< VkShaderModule > modulesToReleaseAtExit;
+}
+
+void ae3d::Shader::DestroyShaders()
+{
+    for (std::size_t moduleIndex = 0; moduleIndex < ShaderGlobal::modulesToReleaseAtExit.size(); ++moduleIndex)
+    {
+        vkDestroyShaderModule( GfxDeviceGlobal::device, ShaderGlobal::modulesToReleaseAtExit[ moduleIndex ], nullptr );
+    }
 }
 
 void ae3d::Shader::Load( const char* /*vertexSourceGLSL*/, const char* /*fragmentSourceGLSL*/ )
@@ -48,6 +62,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         VkShaderModule shaderModule;
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
         AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
+        ShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
 
         vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         vertexInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -72,6 +87,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         VkShaderModule shaderModule;
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
         AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
+        ShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
 
         fragmentInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         fragmentInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
