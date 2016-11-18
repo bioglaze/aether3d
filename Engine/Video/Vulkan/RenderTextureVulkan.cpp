@@ -26,6 +26,8 @@ namespace RenderTextureGlobal
     std::vector< VkSampler > samplersToReleaseAtExit;
     std::vector< VkImage > imagesToReleaseAtExit;
     std::vector< VkImageView > imageViewsToReleaseAtExit;
+    std::vector< VkDeviceMemory > memoryToReleaseAtExit;
+    std::vector< VkFramebuffer > fbsToReleaseAtExit;
 }
 
 void ae3d::RenderTexture::DestroyTextures()
@@ -43,6 +45,16 @@ void ae3d::RenderTexture::DestroyTextures()
     for (std::size_t imageViewIndex = 0; imageViewIndex < RenderTextureGlobal::imageViewsToReleaseAtExit.size(); ++imageViewIndex)
     {
         vkDestroyImageView( GfxDeviceGlobal::device, RenderTextureGlobal::imageViewsToReleaseAtExit[ imageViewIndex ], nullptr );
+    }
+
+    for (std::size_t memoryIndex = 0; memoryIndex < RenderTextureGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
+    {
+        vkFreeMemory( GfxDeviceGlobal::device, RenderTextureGlobal::memoryToReleaseAtExit[ memoryIndex ], nullptr );
+    }
+
+    for (std::size_t fbIndex = 0; fbIndex < RenderTextureGlobal::fbsToReleaseAtExit.size(); ++fbIndex)
+    {
+        vkDestroyFramebuffer( GfxDeviceGlobal::device, RenderTextureGlobal::fbsToReleaseAtExit[ fbIndex ], nullptr );
     }
 }
 
@@ -108,6 +120,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &color.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image memory" );
+    RenderTextureGlobal::memoryToReleaseAtExit.push_back( color.mem );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, color.image, color.mem, 0 );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image bind memory" );
@@ -155,6 +168,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &depth.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth memory" );
+    RenderTextureGlobal::memoryToReleaseAtExit.push_back( depth.mem );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, depth.image, depth.mem, 0 );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth bind" );
@@ -188,6 +202,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     err = vkCreateFramebuffer( GfxDeviceGlobal::device, &fbufCreateInfo, nullptr, &frameBuffer );
     AE3D_CHECK_VULKAN( err, "rendertexture framebuffer" );
+    RenderTextureGlobal::fbsToReleaseAtExit.push_back( frameBuffer );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, "render texture 2d framebuffer" );
 
     VkSamplerCreateInfo samplerInfo = {};

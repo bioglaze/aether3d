@@ -34,6 +34,7 @@ namespace TextureCubeGlobal
     std::vector< VkSampler > samplersToReleaseAtExit;
     std::vector< VkImage > imagesToReleaseAtExit;
     std::vector< VkImageView > imageViewsToReleaseAtExit;
+    std::vector< VkDeviceMemory > memoryToReleaseAtExit;
 }
 
 void ae3d::TextureCube::DestroyTextures()
@@ -51,6 +52,11 @@ void ae3d::TextureCube::DestroyTextures()
     for (std::size_t imageViewIndex = 0; imageViewIndex < TextureCubeGlobal::imageViewsToReleaseAtExit.size(); ++imageViewIndex)
     {
         vkDestroyImageView( GfxDeviceGlobal::device, TextureCubeGlobal::imageViewsToReleaseAtExit[ imageViewIndex ], nullptr );
+    }
+
+    for (std::size_t memoryIndex = 0; memoryIndex < TextureCubeGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
+    {
+        vkFreeMemory( GfxDeviceGlobal::device, TextureCubeGlobal::memoryToReleaseAtExit[ memoryIndex ], nullptr );
     }
 }
 
@@ -154,6 +160,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
             AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
+            TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemories[ face ] );
 
             err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
             AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
@@ -223,6 +230,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
+    TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );

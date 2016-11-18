@@ -540,12 +540,15 @@ namespace ae3d
             GfxDeviceGlobal::setupCmdBuffer = VK_NULL_HANDLE;
         }
 
-        VkCommandPoolCreateInfo cmdPoolInfo = {};
-        cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        cmdPoolInfo.queueFamilyIndex = GfxDeviceGlobal::queueNodeIndex;
-        cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        VkResult err = vkCreateCommandPool( GfxDeviceGlobal::device, &cmdPoolInfo, nullptr, &GfxDeviceGlobal::cmdPool );
-        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+        if (GfxDeviceGlobal::cmdPool == VK_NULL_HANDLE)
+        {
+            VkCommandPoolCreateInfo cmdPoolInfo = {};
+            cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+            cmdPoolInfo.queueFamilyIndex = GfxDeviceGlobal::queueNodeIndex;
+            cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+            VkResult err = vkCreateCommandPool( GfxDeviceGlobal::device, &cmdPoolInfo, nullptr, &GfxDeviceGlobal::cmdPool );
+            AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+        }
 
         VkCommandBufferAllocateInfo info = {};
         info.commandBufferCount = 1;
@@ -554,7 +557,7 @@ namespace ae3d
         info.pNext = nullptr;
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 
-        err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &info, &GfxDeviceGlobal::setupCmdBuffer );
+        VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &info, &GfxDeviceGlobal::setupCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
 
         VkCommandBufferBeginInfo cmdBufInfo = {};
@@ -1777,6 +1780,11 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
     vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, nullptr );
     vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.view, nullptr );
+    vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.mem, nullptr );
+
+    vkDestroyDescriptorSetLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorSetLayout, nullptr );
+    vkDestroyDescriptorPool( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorPool, nullptr );
+    vkDestroyRenderPass( GfxDeviceGlobal::device, GfxDeviceGlobal::renderPass, nullptr );
 
     if (GfxDeviceGlobal::msaaTarget.colorImage != VK_NULL_HANDLE)
     {
@@ -1792,10 +1800,17 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     RenderTexture::DestroyTextures();
     VertexBuffer::DestroyBuffers();
 
+    for (auto pso : GfxDeviceGlobal::psoCache)
+    {
+        vkDestroyPipeline( GfxDeviceGlobal::device, pso.second, nullptr );
+    }
+
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::renderCompleteSemaphore, nullptr );
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );
     vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
+    vkDestroyPipelineCache( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, nullptr );
     vkDestroySwapchainKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, nullptr );
+    vkDestroySurfaceKHR( GfxDeviceGlobal::instance, GfxDeviceGlobal::surface, nullptr );
     vkDestroyCommandPool( GfxDeviceGlobal::device, GfxDeviceGlobal::cmdPool, nullptr );
     vkDestroyDevice( GfxDeviceGlobal::device, nullptr );
     vkDestroyInstance( GfxDeviceGlobal::instance, nullptr );

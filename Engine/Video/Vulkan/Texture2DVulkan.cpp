@@ -42,6 +42,7 @@ namespace Texture2DGlobal
     std::vector< VkSampler > samplersToReleaseAtExit;
     std::vector< VkImage > imagesToReleaseAtExit;
     std::vector< VkImageView > imageViewsToReleaseAtExit;
+    std::vector< VkDeviceMemory > memoryToReleaseAtExit;
 }
 
 void ae3d::Texture2D::DestroyTextures()
@@ -59,6 +60,11 @@ void ae3d::Texture2D::DestroyTextures()
     for (std::size_t imageViewIndex = 0; imageViewIndex < Texture2DGlobal::imageViewsToReleaseAtExit.size(); ++imageViewIndex)
     {
         vkDestroyImageView( GfxDeviceGlobal::device, Texture2DGlobal::imageViewsToReleaseAtExit[ imageViewIndex ], nullptr );
+    }
+
+    for (std::size_t memoryIndex = 0; memoryIndex < Texture2DGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
+    {
+        vkFreeMemory( GfxDeviceGlobal::device, Texture2DGlobal::memoryToReleaseAtExit[ memoryIndex ], nullptr );
     }
 }
 
@@ -218,6 +224,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+    Texture2DGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );

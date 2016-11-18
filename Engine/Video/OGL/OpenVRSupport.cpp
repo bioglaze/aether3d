@@ -129,16 +129,17 @@ void SetupDistortion()
     std::vector< VertexDataLens > vVerts( 0 );
     VertexDataLens vert;
 
-    //left eye distortion verts
+    // Left eye distortion verts
     float Xoffset = -1;
-    for (int y = 0; y<m_iLensGridSegmentCountV; ++y)
+    for (int y = 0; y < m_iLensGridSegmentCountV; ++y)
     {
-        for (int x = 0; x<m_iLensGridSegmentCountH; ++x)
+        for (int x = 0; x < m_iLensGridSegmentCountH; ++x)
         {
             u = x * w; v = 1 - y * h;
             vert.position = Vector2( Xoffset + u, -1 + 2 * y*h );
 
-            vr::DistortionCoordinates_t dc0 = Global::hmd->ComputeDistortion( vr::Eye_Left, u, v );
+            vr::DistortionCoordinates_t dc0;
+            const bool success = Global::hmd->ComputeDistortion( vr::Eye_Left, u, v, &dc0 );
 
             vert.texCoordRed = Vector2( dc0.rfRed[ 0 ], 1 - dc0.rfRed[ 1 ] );
             vert.texCoordGreen = Vector2( dc0.rfGreen[ 0 ], 1 - dc0.rfGreen[ 1 ] );
@@ -148,16 +149,17 @@ void SetupDistortion()
         }
     }
 
-    //right eye distortion verts
+    // Right eye distortion verts
     Xoffset = 0;
-    for (int y = 0; y<m_iLensGridSegmentCountV; y++)
+    for (int y = 0; y < m_iLensGridSegmentCountV; ++y)
     {
-        for (int x = 0; x<m_iLensGridSegmentCountH; x++)
+        for (int x = 0; x < m_iLensGridSegmentCountH; ++x)
         {
-            u = x*w; v = 1 - y*h;
-            vert.position = Vector2( Xoffset + u, -1 + 2 * y*h );
+            u = x * w; v = 1 - y * h;
+            vert.position = Vector2( Xoffset + u, -1 + 2 * y * h );
 
-            vr::DistortionCoordinates_t dc0 = Global::hmd->ComputeDistortion( vr::Eye_Right, u, v );
+            vr::DistortionCoordinates_t dc0;
+            const bool success = Global::hmd->ComputeDistortion( vr::Eye_Right, u, v, &dc0 );
 
             vert.texCoordRed = Vector2( dc0.rfRed[ 0 ], 1 - dc0.rfRed[ 1 ] );
             vert.texCoordGreen = Vector2( dc0.rfGreen[ 0 ], 1 - dc0.rfGreen[ 1 ] );

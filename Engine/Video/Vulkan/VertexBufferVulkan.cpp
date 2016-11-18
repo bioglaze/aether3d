@@ -22,6 +22,7 @@ namespace ae3d
 namespace VertexBufferGlobal
 {
     std::vector< VkBuffer > buffersToReleaseAtExit;
+    std::vector< VkDeviceMemory > memoryToReleaseAtExit;
 }
 
 void ae3d::VertexBuffer::DestroyBuffers()
@@ -29,6 +30,11 @@ void ae3d::VertexBuffer::DestroyBuffers()
     for (std::size_t bufferIndex = 0; bufferIndex < VertexBufferGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
     {
         vkDestroyBuffer( GfxDeviceGlobal::device, VertexBufferGlobal::buffersToReleaseAtExit[ bufferIndex ], nullptr );
+    }
+
+    for (std::size_t memoryIndex = 0; memoryIndex < VertexBufferGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
+    {
+        vkFreeMemory( GfxDeviceGlobal::device, VertexBufferGlobal::memoryToReleaseAtExit[ memoryIndex ], nullptr );
     }
 }
 
@@ -117,6 +123,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &vertexMem );
         AE3D_CHECK_VULKAN( err, "allocate vertex memory" );
+        VertexBufferGlobal::memoryToReleaseAtExit.push_back( vertexMem );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, vertexBuffer, vertexMem, 0 );
         AE3D_CHECK_VULKAN( err, "bind vertex memory" );
@@ -155,6 +162,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &indexMem );
         AE3D_CHECK_VULKAN( err, "allocate index memory" );
+        VertexBufferGlobal::memoryToReleaseAtExit.push_back( indexMem );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, indexBuffer, indexMem, 0 );
         AE3D_CHECK_VULKAN( err, "bind index buffer memory" );
