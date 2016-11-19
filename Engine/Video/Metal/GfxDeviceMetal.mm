@@ -433,7 +433,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
         // This must match app's view's format.
-        pipelineStateDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
+        pipelineStateDescriptor.depthAttachmentPixelFormat = (GfxDeviceGlobal::sampleCount > 1 && GfxDeviceGlobal::isRenderingToTexture) ?  MTLPixelFormatInvalid : MTLPixelFormatDepth32Float;
 
         MTLVertexDescriptor* vertexDesc = [MTLVertexDescriptor vertexDescriptor];
         

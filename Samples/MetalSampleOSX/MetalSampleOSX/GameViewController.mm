@@ -24,6 +24,8 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
+#define MULTISAMPLE_COUNT 1
+
 using namespace ae3d;
 
 @implementation GameViewController
@@ -88,7 +90,7 @@ using namespace ae3d;
     [self _setupView];
     [self _reshape];
     
-    ae3d::System::InitMetal( device, _view, 1 );
+    ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
 
@@ -333,6 +335,7 @@ using namespace ae3d;
     _view.delegate = self;
     _view.device = device;
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
+    _view.sampleCount = MULTISAMPLE_COUNT;
 }
 
 - (void)keyDown:(NSEvent *)theEvent
