@@ -32,7 +32,6 @@
 using namespace ae3d;
 extern Renderer renderer;
 float GetVRFov();
-void UpdateFrameTiming();
 
 namespace MathUtil
 {
@@ -46,6 +45,7 @@ namespace Global
 }
 
 #if defined( RENDERER_METAL )
+void UpdateFrameTiming();
 namespace GfxDeviceGlobal
 {
     extern ae3d::LightTiler lightTiler;
@@ -855,6 +855,20 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     enum CurrentLightType { Directional, Spot, Point, None };
     CurrentLightType currentLightType = CurrentLightType::None;
     
+    // FIXME: These ensure that the mesh is rendered. A proper fix would be to serialize materials.
+    static Shader tempShader;
+    tempShader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
+        "unlitVert", "unlitFrag",
+        FileSystem::FileContents( "unlit.hlsl" ), FileSystem::FileContents( "unlit.hlsl" ),
+        FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+
+    Material* tempMaterial = new Material();
+    tempMaterial->SetShader( &tempShader );
+    tempMaterial->SetTexture( "textureMap", Texture2D::GetDefaultTexture() );
+    tempMaterial->SetVector( "tint", { 1, 1, 1, 1 } );
+    tempMaterial->SetBackFaceCulling( true );
+    outMaterials[ "temp material" ] = tempMaterial;
+
     while (!stream.eof())
     {
         std::getline( stream, line );
@@ -1116,7 +1130,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 return DeserializeResult::ParseError;
             }
 
-			auto meshRenderer = outGameObjects.back().GetComponent< MeshRendererComponent >();
+            auto meshRenderer = outGameObjects.back().GetComponent< MeshRendererComponent >();
 
             if (!meshRenderer)
             {
@@ -1130,19 +1144,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outMeshes.back()->Load( FileSystem::FileContents( meshFile.c_str() ) );
 			meshRenderer->SetMesh( outMeshes.back() );
 
-            // FIXME: These ensure that the mesh is rendered. A proper fix would be to serialize materials.
-            Shader* tempShader = new Shader();
-            tempShader->Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
-                "unlitVert", "unlitFrag",
-                FileSystem::FileContents( "unlit.hlsl" ), FileSystem::FileContents( "unlit.hlsl" ),
-                FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
-
-            Material* tempMaterial = new Material();
-            tempMaterial->SetShader( tempShader );
-            tempMaterial->SetTexture( "textureMap", Texture2D::GetDefaultTexture() );
-            tempMaterial->SetVector( "tint", { 1, 1, 1, 1 } );
-            tempMaterial->SetBackFaceCulling( true );
-			meshRenderer->SetMaterial( tempMaterial, 0 );
+            meshRenderer->SetMaterial( tempMaterial, 0 );
         }
 
         if (token == "position")

@@ -984,18 +984,18 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     if (GfxDeviceGlobal::texture2d0)
     {
         samplerHandle = GetSampler( GfxDeviceGlobal::texture2d0->GetMipmaps(), GfxDeviceGlobal::texture2d0->GetWrap(),
-            GfxDeviceGlobal::texture2d0->GetFilter() );
+                                    GfxDeviceGlobal::texture2d0->GetFilter() );
     }
-	else if (GfxDeviceGlobal::textureCube0)
-	{
-		samplerHandle = GetSampler( GfxDeviceGlobal::textureCube0->GetMipmaps(), GfxDeviceGlobal::textureCube0->GetWrap(),
-			GfxDeviceGlobal::textureCube0->GetFilter() );
-	}
-	else if (GfxDeviceGlobal::renderTexture0)
-	{
-		samplerHandle = GetSampler( GfxDeviceGlobal::renderTexture0->GetMipmaps(), GfxDeviceGlobal::renderTexture0->GetWrap(),
-			GfxDeviceGlobal::renderTexture0->GetFilter() );
-	}
+    else if (GfxDeviceGlobal::textureCube0)
+    {
+        samplerHandle = GetSampler( GfxDeviceGlobal::textureCube0->GetMipmaps(), GfxDeviceGlobal::textureCube0->GetWrap(),
+                                    GfxDeviceGlobal::textureCube0->GetFilter() );
+    }
+    else if (GfxDeviceGlobal::renderTexture0)
+    {
+        samplerHandle = GetSampler( GfxDeviceGlobal::renderTexture0->GetMipmaps(), GfxDeviceGlobal::renderTexture0->GetWrap(),
+                                    GfxDeviceGlobal::renderTexture0->GetFilter() );
+    }
 
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
@@ -1132,6 +1132,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     d3dDebug->ReportLiveDeviceObjects( D3D12_RLDO_DETAIL );
     AE3D_SAFE_RELEASE( d3dDebug );
 */
+
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
 }
 
