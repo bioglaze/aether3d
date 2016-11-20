@@ -116,16 +116,6 @@ int main()
     Mesh cubeMeshScaledUV;
     cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
 
-    Mesh skinnedMesh;
-    skinnedMesh.Load( FileSystem::FileContents( "Fan_Done5_Rigged.ae3d" ) );
-
-    GameObject skinnedGO;
-    skinnedGO.AddComponent< MeshRendererComponent >();
-    skinnedGO.GetComponent< MeshRendererComponent >()->SetMesh( &skinnedMesh );
-    skinnedGO.AddComponent< TransformComponent >();
-    skinnedGO.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -80 } );
-    skinnedGO.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
-
     GameObject cube;
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
@@ -136,7 +126,7 @@ int main()
     rotatingCube.AddComponent< MeshRendererComponent >();
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     rotatingCube.AddComponent< TransformComponent >();
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -80 } );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -100 } );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 1 );
 
     GameObject childCube;
@@ -185,11 +175,6 @@ int main()
     material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
     
-    for (int skinSubMeshIndex = 0; skinSubMeshIndex < static_cast< int >( skinnedMesh.GetSubMeshCount() ); ++skinSubMeshIndex)
-    {
-        skinnedGO.GetComponent< MeshRendererComponent >()->SetMaterial( &material, skinSubMeshIndex );
-    }
-
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     childCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
@@ -240,24 +225,19 @@ int main()
 
     rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
 
-    // Sponza begins.
+    // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
-                                 sponzaMaterialNameToMaterial, sponzaMeshes );
+                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
     if (res != Scene::DeserializeResult::Success)
     {
         System::Print( "Could not parse Sponza\n" );
     }
-
-    /*for (int i = 0; i < sponzaMeshes[0]->GetSubMeshCount(); ++i)
-    {
-        System::Print( "mesh name: %s\n", sponzaMeshes[ 0 ]->GetSubMeshName( i ) );
-    }*/
 
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
@@ -325,7 +305,6 @@ int main()
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
     //scene.Add( &transCube1 );
-    //scene.Add( &skinnedGO );
 
     const int cubeCount = 10;
     GameObject cubes[ cubeCount ];
