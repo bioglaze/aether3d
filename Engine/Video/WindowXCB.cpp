@@ -23,7 +23,9 @@
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
 // Event tutorial: http://xcb.freedesktop.org/tutorial/events/
 
+#if RENDERER_OPENGL
 PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;
+#endif
 
 struct GamePad
 {
