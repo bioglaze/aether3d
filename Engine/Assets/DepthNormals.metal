@@ -24,8 +24,7 @@ typedef struct
 } ColorInOut;
 
 vertex ColorInOut depthnormals_vertex( Vertex vert [[stage_in]],
-                                       constant uniforms_t& uniforms [[ buffer(5) ]],
-                                       unsigned int vid [[ vertex_id ]])
+                                       constant uniforms_t& uniforms [[ buffer(5) ]])
 {
     ColorInOut out;
     

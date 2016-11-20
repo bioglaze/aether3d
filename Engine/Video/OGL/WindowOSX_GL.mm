@@ -336,7 +336,7 @@ bool ae3d::Window::IsOpen()
     // Post empty event to get the app visible.
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     NSEvent* event =
-    [NSEvent otherEventWithType: NSApplicationDefined
+    [NSEvent otherEventWithType: NSEventTypeApplicationDefined
                        location: NSMakePoint(0, 0)
                   modifierFlags: 0
                       timestamp: 0
@@ -480,11 +480,11 @@ static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
     
     if (flags & ae3d::WindowCreateFlags::Fullscreen)
     {
-        windowStyleMask = NSBorderlessWindowMask;
+        windowStyleMask = NSWindowStyleMaskBorderless;
     }
     else
     {
-        windowStyleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
+        windowStyleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
     }
     
     window =
@@ -637,7 +637,7 @@ void cocoaProcessEvents()
     while (true)
     {
         NSEvent* event =
-        [WindowGlobal::application nextEventMatchingMask: NSAnyEventMask
+        [WindowGlobal::application nextEventMatchingMask: NSEventMaskAny
                                  untilDate: [NSDate distantPast]
                                     inMode: NSDefaultRunLoopMode
                                    dequeue: YES];
@@ -648,19 +648,19 @@ void cocoaProcessEvents()
         
         switch ([event type])
         {
-            case NSKeyUp:
-            case NSKeyDown:
+            case NSEventTypeKeyUp:
+            case NSEventTypeKeyDown:
             {
-                const int isDown = ([event type] == NSKeyDown);
+                const int isDown = ([event type] == NSEventTypeKeyDown);
                 const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
                 
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
                 
-                int hotkeyMask = NSCommandKeyMask
-                | NSAlternateKeyMask
-                | NSControlKeyMask
-                | NSAlphaShiftKeyMask;
+                int hotkeyMask = NSEventModifierFlagCommand
+                | NSEventModifierFlagOption
+                | NSEventModifierFlagControl
+                | NSEventModifierFlagCapsLock;
                 if ([event modifierFlags] & hotkeyMask)
                 {
                     // Handle events like cmd+q etc

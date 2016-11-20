@@ -39,6 +39,7 @@ using namespace ae3d;
     GameObject bigCube;
     GameObject bigCube2;
     GameObject text;
+    GameObject textSDF;
     GameObject dirLight;
     GameObject spotLight;
     GameObject pointLight;
@@ -57,6 +58,7 @@ using namespace ae3d;
     GameObject cameraCubeRT;
     Scene scene;
     Font font;
+    Font fontSDF;
     Mesh cubeMesh;
     Mesh cubeMeshPTN;
     Material cubeMaterial;
@@ -67,6 +69,7 @@ using namespace ae3d;
     Shader skyboxShader;
     Shader standardShader;
     Texture2D fontTex;
+    Texture2D fontTexSDF;
     Texture2D gliderTex;
     Texture2D transTex;
     Texture2D bc1Tex;
@@ -89,7 +92,7 @@ using namespace ae3d;
 
     [self _setupView];
     [self _reshape];
-    
+
     ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
@@ -117,6 +120,8 @@ using namespace ae3d;
     scene.Add( &camera3d );
 
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
+    // TODO: SDF texture
+    fontTexSDF.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     bc1Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
     bc2Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt3.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
@@ -128,6 +133,8 @@ using namespace ae3d;
     scene.SetSkybox( &skyTex );
     
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
+    fontSDF.LoadBMFont( &fontTexSDF, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
+
     text.AddComponent<ae3d::TextRendererComponent>();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( "Aether3D Game Engine" );
     text.GetComponent<ae3d::TextRendererComponent>()->SetFont( &font );
@@ -136,7 +143,17 @@ using namespace ae3d;
     text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
     text.SetLayer( 2 );
     scene.Add( &text );
-    
+
+    textSDF.AddComponent<ae3d::TextRendererComponent>();
+    textSDF.GetComponent<ae3d::TextRendererComponent>()->SetText( "This is SDF text" );
+    textSDF.GetComponent<ae3d::TextRendererComponent>()->SetFont( &fontSDF );
+    textSDF.GetComponent<ae3d::TextRendererComponent>()->SetShader( ae3d::TextRendererComponent::ShaderType::SDF );
+    textSDF.GetComponent<ae3d::TextRendererComponent>()->SetColor( ae3d::Vec4( 0, 1, 0, 1 ) );
+    textSDF.AddComponent<ae3d::TransformComponent>();
+    textSDF.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 450, 5, 0 ) );
+    textSDF.SetLayer( 2 );
+    scene.Add( &textSDF );
+
     spriteContainer.AddComponent<ae3d::SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
     sprite->SetTexture( &bc1Tex, Vec3( 120, 60, -0.6f ), Vec3( (float)bc1Tex.GetWidth(), (float)bc1Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
@@ -191,7 +208,7 @@ using namespace ae3d;
     rtCube.AddComponent<ae3d::TransformComponent>();
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -4, 0, -10 ) );
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
-    scene.Add( &rtCube );
+    //scene.Add( &rtCube );
 
     standardCubeBL.AddComponent<ae3d::MeshRendererComponent>();
     standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -229,6 +246,7 @@ using namespace ae3d;
     standardCubeBR.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
     standardCubeBR.AddComponent<ae3d::TransformComponent>();
     standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, -4, -10 ) );
+    standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -10 ) );
 
     scene.Add( &standardCubeBR );
     scene.Add( &standardCubeBL );
@@ -315,8 +333,7 @@ using namespace ae3d;
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
-    scene.Add( &cameraCubeRT );
-    scene.Add( &rtCube );
+    //scene.Add( &cameraCubeRT );
 
     transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, 1 );
     

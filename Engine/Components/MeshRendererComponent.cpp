@@ -134,6 +134,11 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
                 continue;
             }
 
+            if (materials[ subMeshIndex ]->GetBlendingMode() == Material::BlendingMode::Off && renderType == RenderType::Transparent)
+            {
+                continue;
+            }
+
             Matrix44 shadowTexProjMatrix = localToWorld;
             
             Matrix44::Multiply( shadowTexProjMatrix, shadowView, shadowTexProjMatrix );

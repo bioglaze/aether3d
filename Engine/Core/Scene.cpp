@@ -326,6 +326,7 @@ void ae3d::Scene::Render()
                     if (!SceneGlobal::isShadowCameraCreated)
                     {
                         SceneGlobal::shadowCamera.AddComponent< CameraComponent >();
+                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
                         SceneGlobal::shadowCamera.AddComponent< TransformComponent >();
                         SceneGlobal::isShadowCameraCreated = true;
                         // Component adding can invalidate lightTransform pointer.

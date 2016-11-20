@@ -20,14 +20,13 @@ struct ColorInOut
 };
 
 vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
-                               constant uniforms_t& uniforms [[ buffer(5) ]],
-                               unsigned int vid [[ vertex_id ]])
+                               constant uniforms_t& uniforms [[ buffer(5) ]])
 {
     ColorInOut out;
     
     float4 in_position = float4( float3( vert.position ), 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
-    out.z = out.position.z * 0.5 + 0.5; // OpenGL->D3D11 unit cube fixup.;
+    out.z = out.position.z * 0.5 + 0.5; // OpenGL->D3D11 unit cube fixup.
     return out;
 }
 
