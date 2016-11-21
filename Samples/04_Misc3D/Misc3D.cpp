@@ -26,7 +26,7 @@
 
 using namespace ae3d;
                       
-// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.5.5.zip
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.6.zip
 
 int main()
 {

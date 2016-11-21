@@ -25,8 +25,6 @@
 
 #define AE3D_DESCRIPTOR_SETS_COUNT 250
 
-// Current implementation loosely based on samples by Sascha Willems - https://github.com/SaschaWillems/Vulkan, licensed under MIT license
-
 PFN_vkCreateSwapchainKHR createSwapchainKHR = nullptr;
 PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR getPhysicalDeviceSurfaceCapabilitiesKHR = nullptr;
 PFN_vkGetPhysicalDeviceSurfacePresentModesKHR getPhysicalDeviceSurfacePresentModesKHR = nullptr;
@@ -1287,11 +1285,6 @@ namespace ae3d
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
-
-        if (GfxDeviceGlobal::descriptorSetIndex >= static_cast<int>(GfxDeviceGlobal::descriptorSets.size()))
-        {
-            System::Print( "Too many descriptor sets: %d, max %u\n", GfxDeviceGlobal::descriptorSetIndex, GfxDeviceGlobal::descriptorSets.size() );
-        }
 
         // Binding 0 : Uniform buffer
         VkWriteDescriptorSet uboSet = {};

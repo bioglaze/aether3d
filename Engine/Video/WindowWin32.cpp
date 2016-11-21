@@ -50,11 +50,16 @@ namespace WindowGlobal
     bool isOpen = false;
     HWND hwnd;
     HDC hdc;
-    ae3d::KeyCode keyMap[ 256 ] = { ae3d::KeyCode::A };
+    ae3d::KeyCode keyMap[ 256 ];
 }
 
 static void InitKeyMap()
 {
+    for (int keyIndex = 0; keyIndex < 256; ++keyIndex)
+    {
+        WindowGlobal::keyMap[ keyIndex ] = ae3d::KeyCode::N;
+    }
+
     WindowGlobal::keyMap[ 13 ] = ae3d::KeyCode::Enter;
     WindowGlobal::keyMap[ 37 ] = ae3d::KeyCode::Left;
     WindowGlobal::keyMap[ 38 ] = ae3d::KeyCode::Up;
@@ -104,6 +109,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             break;
         case WM_SYSKEYUP:
         case WM_KEYUP:
+            ae3d::System::Assert( wParam < 256, "too high keycode" );
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyUp;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
@@ -112,9 +118,10 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
         {
+            ae3d::System::Assert( wParam < 256, "too high keycode" );
             WindowGlobal::IncEventIndex();
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::KeyDown;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyDown;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
         }
         break;
         case WM_SYSCOMMAND:

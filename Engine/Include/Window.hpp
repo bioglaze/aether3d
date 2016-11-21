@@ -58,7 +58,7 @@ namespace ae3d
         /// Event type.
         WindowEventType type = WindowEventType::None;
         /// Key code.
-        KeyCode keyCode = KeyCode::A;
+        KeyCode keyCode = KeyCode::N;
         /// X coordinate in window. Origin: left.
         int mouseX = 0; 
         /// Y coordinate in window. Origin: bottom.
