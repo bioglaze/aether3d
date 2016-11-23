@@ -18,6 +18,8 @@
 #import "Aether3D_iOS/System.hpp"
 #import "Aether3D_iOS/Material.hpp"
 
+#define MULTISAMPLE_COUNT 1
+
 @implementation GameViewController
 {
     MTKView* _view;
@@ -25,11 +27,13 @@
     
     ae3d::GameObject camera2d;
     ae3d::GameObject camera3d;
+    ae3d::GameObject rtCamera;
     ae3d::GameObject cube;
     ae3d::GameObject cubeFloor;
     ae3d::GameObject text;
     ae3d::GameObject dirLight;
     ae3d::GameObject pointLight;
+    ae3d::GameObject spotLight;
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -49,7 +53,7 @@
     [self _setupView];
     [self _reshape];
 
-    ae3d::System::InitMetal( device, _view, 1 );
+    ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
     
@@ -61,15 +65,21 @@
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
+    camera2d.SetName( "camera2d" );
     scene.Add( &camera2d );
-    
+
+    const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
+
     camera3d.AddComponent<ae3d::CameraComponent>();
-    camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
-    camera3d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
+    camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, aspect, 1, 200 );
+    camera3d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 1.0f, 0.5f, 0.5f ) );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
+    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera3d.AddComponent<ae3d::TransformComponent>();
+    camera3d.SetName( "camera3d" );
+    camera3d.SetLayer( 1 );
     scene.Add( &camera3d );
     
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, 1 );
@@ -83,6 +93,7 @@
     text.AddComponent<ae3d::TransformComponent>();
     text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
     text.SetLayer( 2 );
+    text.SetName( "text" );
     scene.Add( &text );
     
     shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
@@ -101,6 +112,7 @@
     cube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     cube.AddComponent<ae3d::TransformComponent>();
     cube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -10 ) );
+    cube.SetName( "cube" );
     scene.Add( &cube );
 
     cubeFloor.AddComponent<ae3d::MeshRendererComponent>();
@@ -109,19 +121,30 @@
     cubeFloor.AddComponent<ae3d::TransformComponent>();
     cubeFloor.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -7, -10 ) );
     cubeFloor.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 4 );
-    scene.Add( &cubeFloor );
+    cubeFloor.SetName( "cubeFloor" );
+    //scene.Add( &cubeFloor );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
-    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
-    scene.Add( &dirLight );
+    dirLight.SetName( "dirLight" );
+    //scene.Add( &dirLight );
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 512 );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
-    scene.Add( &pointLight );
+    pointLight.SetName( "pointLight" );
+    //scene.Add( &pointLight );
+
+    spotLight.AddComponent<ae3d::SpotLightComponent>();
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( false, 512 );
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetConeAngle( 45 );
+    spotLight.AddComponent<ae3d::TransformComponent>();
+    spotLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
+    spotLight.SetName( "spotLight" );
+    //scene.Add( &pointLight );
 }
 
 - (void)_setupView
@@ -133,15 +156,17 @@
     // Setup the render target, choose values based on your app
     //_view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
-    _view.sampleCount = 1;
+    _view.sampleCount = MULTISAMPLE_COUNT;
 }
 
 - (void)_render
 {
     [self _update];
-    
+
     ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
+    ae3d::System::BeginFrame();
     scene.Render();
+    ae3d::System::EndFrame();
 }
 
 - (void)_reshape

@@ -47,6 +47,11 @@ void ae3d::System::BeginFrame()
     GfxDevice::BeginFrame();
 }
 
+void ae3d::System::EndFrame()
+{
+    GfxDevice::PresentDrawable();
+}
+
 #endif
 
 void ae3d::System::Deinit()

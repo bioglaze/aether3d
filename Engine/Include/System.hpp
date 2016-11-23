@@ -140,6 +140,7 @@ namespace ae3d
         void InitMetal( id< MTLDevice > metalDevice, MTKView* view, int sampleCount );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void BeginFrame();
+        void EndFrame();
 #endif
 
         /**

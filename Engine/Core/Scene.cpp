@@ -177,11 +177,92 @@ void ae3d::Scene::Remove( GameObject* gameObject )
     }
 }
 
+void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >& cameras )
+{
+    for (auto camera : cameras)
+    {
+        CameraComponent* cameraComponent = camera->GetComponent< CameraComponent >();
+
+        if (cameraComponent->GetDepthNormalsTexture().GetID() != 0)
+        {
+            std::vector< unsigned > gameObjectsWithMeshRenderer;
+            gameObjectsWithMeshRenderer.reserve( gameObjects.size() );
+            int i = -1;
+
+            for (auto gameObject : gameObjects)
+            {
+                ++i;
+
+                if (gameObject == nullptr || (gameObject->GetLayer() & cameraComponent->GetLayerMask()) == 0 || !gameObject->IsEnabled())
+                {
+                    continue;
+                }
+
+                auto meshRenderer = gameObject->GetComponent< MeshRendererComponent >();
+
+                if (meshRenderer)
+                {
+                    gameObjectsWithMeshRenderer.push_back( i );
+                }
+            }
+
+            Frustum frustum;
+
+            if (cameraComponent->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
+            {
+                frustum.SetProjection( cameraComponent->GetFovDegrees(), cameraComponent->GetAspect(), cameraComponent->GetNear(), cameraComponent->GetFar() );
+            }
+            else
+            {
+                frustum.SetProjection( cameraComponent->GetLeft(), cameraComponent->GetRight(), cameraComponent->GetBottom(),
+                                       cameraComponent->GetTop(), cameraComponent->GetNear(), cameraComponent->GetFar() );
+            }
+
+            auto cameraTransform = camera->GetComponent< TransformComponent >();
+            // TODO: world position
+            Vec3 position = cameraTransform ? cameraTransform->GetLocalPosition() : Vec3( 0, 0, 0 );
+
+            const Vec3 viewDir = Vec3( cameraComponent->GetView().m[2], cameraComponent->GetView().m[6], cameraComponent->GetView().m[10] ).Normalized();
+            frustum.Update( position, viewDir );
+
+            RenderDepthAndNormals( cameraComponent, cameraComponent->GetView(), gameObjectsWithMeshRenderer, 0, frustum );
+
+#if defined( RENDERER_METAL )
+            /*std::vector< unsigned > gameObjectsWithPointLight;
+
+             int i = -1;
+
+             for (auto gameObject : gameObjects)
+             {
+             ++i;
+
+             if (gameObject == nullptr || (gameObject->GetLayer() & camera->GetLayerMask()) == 0 || !gameObject->IsEnabled())
+             {
+             continue;
+             }
+
+             auto transform = gameObject->GetComponent< TransformComponent >();
+             auto pointLight = gameObject->GetComponent< PointLightComponent >();
+
+             if (transform && pointLight)
+             {
+             gameObjectsWithPointLight.push_back( i );
+
+             // TODO: Transform into world pos
+             auto worldPos = transform->GetLocalPosition();
+             GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius(0, worldPos, pointLight->GetRadius());
+             }
+             }*/
+            
+            GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, cameraComponent->GetProjection(),
+                                                   cameraComponent->GetView(), cameraComponent->GetDepthNormalsTexture() );
+#endif
+        }
+    }
+}
+
 void ae3d::Scene::Render()
 {
-#if RENDERER_METAL
-    GfxDevice::InsertDebugBoundary();
-#endif
 #if RENDERER_VULKAN
     GfxDevice::BeginFrame();
 #endif
@@ -278,7 +359,7 @@ void ae3d::Scene::Render()
 
             auto cameraPos = cameraTransform->GetLocalPosition();
             auto cameraDir = cameraTransform->GetViewDirection();
-            
+
             if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
             {
                 AudioSystem::SetListenerPosition( cameraPos.x, cameraPos.y, cameraPos.z );
@@ -417,12 +498,24 @@ void ae3d::Scene::Render()
             Material::SetGlobalFloat( "_ShadowMinAmbient", 1 );
         }
 #endif
-
+#if !RENDERER_METAL
         RenderWithCamera( camera, 0, "Primary Pass" );
+#endif
     }
     
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
+
+    RenderDepthAndNormalsForAllCameras( cameras );
+
 #if RENDERER_METAL
+    GfxDevice::BeginBackBufferEncoding();
+
+    for (auto camera : cameras)
+    {
+        RenderWithCamera( camera, 0, "Primary Pass" );
+    }
+
+    GfxDevice::EndBackBufferEncoding();
     UpdateFrameTiming();
 #endif
 }
@@ -461,7 +554,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     }
 #if RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
-    GfxDevice::BeginFrame();
     GfxDevice::PushGroupMarker( debugGroupName );
 #endif
     
@@ -597,57 +689,20 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     GfxDevice::PopGroupMarker();
 
 #if RENDERER_METAL
-    GfxDevice::PresentDrawable();
+    GfxDevice::UnsetRenderTarget();
 #endif
 #if RENDERER_VULKAN
     GfxDevice::EndRenderPassAndCommandBuffer();
 #endif
     GfxDevice::ErrorCheck( "Scene render after rendering" );
-
-    // Depth and normals
-    if (camera->GetDepthNormalsTexture().GetID() != 0)
-    {
-        RenderDepthAndNormals( camera, view, gameObjectsWithMeshRenderer, cubeMapFace, frustum );
-    
-#if defined( RENDERER_METAL )
-        /*std::vector< unsigned > gameObjectsWithPointLight;
-
-        int i = -1;
-
-        for (auto gameObject : gameObjects)
-        {
-            ++i;
-
-            if (gameObject == nullptr || (gameObject->GetLayer() & camera->GetLayerMask()) == 0 || !gameObject->IsEnabled())
-            {
-                continue;
-            }
-
-            auto transform = gameObject->GetComponent< TransformComponent >();
-            auto pointLight = gameObject->GetComponent< PointLightComponent >();
-
-            if (transform && pointLight)
-            {
-                gameObjectsWithPointLight.push_back( i );
-
-                // TODO: Transform into world pos
-                auto worldPos = transform->GetLocalPosition();
-                GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius(0, worldPos, pointLight->GetRadius());
-            }
-        }*/
-
-        GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, camera->GetProjection(), camera->GetView(), camera->GetDepthNormalsTexture() );
-#endif
-    }
 }
 
-void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
+void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
                                          int cubeMapFace, const Frustum& /*frustum*/ )
 {
 #if RENDERER_METAL
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
-    GfxDevice::BeginFrame();
 #else
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
@@ -673,18 +728,20 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, Matrix44& view
     GfxDevice::PopGroupMarker();
 
 #if RENDERER_METAL
-    GfxDevice::PresentDrawable();
-#endif
+    GfxDevice::UnsetRenderTarget();
+#else
     GfxDevice::SetRenderTarget( nullptr, 0 );
-
+#endif
     GfxDevice::ErrorCheck( "depthnormals render end" );
 }
 
 void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace )
 {
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
+#if !RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
-    
+#endif
+
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     
@@ -693,7 +750,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     }
 #if RENDERER_METAL
-    GfxDevice::BeginFrame();
+    GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
 #if RENDERER_VULKAN
 	GfxDevice::BeginRenderPassAndCommandBuffer();
@@ -771,7 +828,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     GfxDevice::PopGroupMarker();
 
 #if RENDERER_METAL
-    GfxDevice::PresentDrawable();
+    GfxDevice::UnsetRenderTarget();
 #endif
 #if RENDERER_VULKAN
 	GfxDevice::EndRenderPassAndCommandBuffer();

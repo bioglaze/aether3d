@@ -108,9 +108,11 @@ using namespace ae3d;
     camera2d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera2d );
 
+    const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
+
     camera3d.SetName( "Camera3D" );
     camera3d.AddComponent<ae3d::CameraComponent>();
-    camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
+    camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, aspect, 1, 200 );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.5f, 0.5f ) );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
@@ -208,7 +210,7 @@ using namespace ae3d;
     rtCube.AddComponent<ae3d::TransformComponent>();
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -4, 0, -10 ) );
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
-    //scene.Add( &rtCube );
+    scene.Add( &rtCube );
 
     standardCubeBL.AddComponent<ae3d::MeshRendererComponent>();
     standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -248,12 +250,12 @@ using namespace ae3d;
     standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, -4, -10 ) );
     standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -10 ) );
 
-    scene.Add( &standardCubeBR );
-    scene.Add( &standardCubeBL );
-    scene.Add( &standardCubeTR );
-    scene.Add( &standardCubeTL2 );
+    //scene.Add( &standardCubeBR );
+    //scene.Add( &standardCubeBL );
+    //scene.Add( &standardCubeTR );
+    //scene.Add( &standardCubeTL2 );
     scene.Add( &standardCubeTopCenter );
-    scene.Add( &standardCubeTL );
+    //scene.Add( &standardCubeTL );
 
     cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "/textured_cube_ptn.ae3d" ) );
     cubePTN.AddComponent<ae3d::MeshRendererComponent>();
@@ -292,8 +294,8 @@ using namespace ae3d;
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
     scene.Add( &dirLight );
 
-    /*spotLight.AddComponent<ae3d::DirectionalLightComponent>();
-    spotLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    /*spotLight.AddComponent<ae3d::SpotLightComponent>();
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 512 );
     spotLight.AddComponent<ae3d::TransformComponent>();
     spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 8, -10 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
     scene.Add( &spotLight );*/
@@ -304,12 +306,12 @@ using namespace ae3d;
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
     //scene.Add( &pointLight );
 
-    //rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 100, -0.6f ), ae3d::Vec3( 768*2, 512*2, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( dirLight.GetComponent<ae3d::DirectionalLightComponent>()->GetShadowMap(), ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 512, 512, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 100, -0.6f ), ae3d::Vec3( 768*2, 512*2, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( dirLight.GetComponent<ae3d::DirectionalLightComponent>()->GetShadowMap(), ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 512, 512, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
     //scene.Add( &renderTextureContainer );
     
@@ -321,7 +323,7 @@ using namespace ae3d;
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<ae3d::TransformComponent>();
     rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 20 ) );
-    //scene.Add( &rtCamera );
+    scene.Add( &rtCamera );
 
     cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
 
@@ -333,7 +335,7 @@ using namespace ae3d;
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
-    //scene.Add( &cameraCubeRT );
+    scene.Add( &cameraCubeRT );
 
     transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, 1 );
     
@@ -351,7 +353,7 @@ using namespace ae3d;
     _view = (MTKView *)self.view;
     _view.delegate = self;
     _view.device = device;
-    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
+    //_view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     _view.sampleCount = MULTISAMPLE_COUNT;
 }
 
@@ -370,7 +372,9 @@ using namespace ae3d;
     [self _update];
     
     ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
+    ae3d::System::BeginFrame();
     scene.Render();
+    ae3d::System::EndFrame();
 }
 
 - (void)_reshape

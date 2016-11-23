@@ -62,6 +62,8 @@ namespace ae3d
         void PresentDrawable();
         void BeginFrame();
         void InsertDebugBoundary();
+        void BeginBackBufferEncoding();
+        void EndBackBufferEncoding();
 #endif
 #if RENDERER_VULKAN
         void CreateNewUniformBuffer();
@@ -76,6 +78,7 @@ namespace ae3d
 
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture* target, unsigned cubeMapFace );
+        void UnsetRenderTarget();
         void SetMultiSampling( bool enable );
         void Set_sRGB_Writes( bool enable );
         

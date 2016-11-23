@@ -23,8 +23,6 @@ id <MTLDepthStencilState> depthStateLessEqualWriteOn;
 id <MTLDepthStencilState> depthStateLessEqualWriteOff;
 id <MTLDepthStencilState> depthStateNoneWriteOff;
 id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
-id <CAMetalDrawable> drawable; // Render texture or currentDrawable
-int currentCubeMapFace = 0;
 
 MTLRenderPassDescriptor* renderPassDescriptorApp = nullptr;
 MTLRenderPassDescriptor* renderPassDescriptorFBO = nullptr;
@@ -172,55 +170,6 @@ void UpdateFrameTiming()
 namespace
 {
     float clearColor[] = { 0, 0, 0, 1 };
-    
-    void setupRenderPassDescriptor( id <MTLTexture> texture, id <MTLTexture> depthTexture )
-    {
-        MTLLoadAction texLoadAction = MTLLoadActionLoad;
-        MTLLoadAction depthLoadAction = MTLLoadActionLoad;
-
-        auto renderPassDescriptor = GfxDeviceGlobal::isRenderingToTexture ? renderPassDescriptorFBO : renderPassDescriptorApp;
-
-        if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Color)
-        {
-            texLoadAction = MTLLoadActionClear;
-        }
-        
-        if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Depth)
-        {
-            depthLoadAction = MTLLoadActionClear;
-        }
-        
-        if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::isRenderingToTexture)
-        {
-            renderPassDescriptor.colorAttachments[0].texture = msaaColorTarget;
-            renderPassDescriptor.colorAttachments[0].resolveTexture = texture;
-            renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionMultisampleResolve;
-        }
-        else
-        {
-            renderPassDescriptor.colorAttachments[0].slice = currentCubeMapFace;
-            renderPassDescriptor.colorAttachments[0].texture = texture;
-            renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
-        }
-        renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake( clearColor[0], clearColor[1], clearColor[2], clearColor[3] );
-        renderPassDescriptor.colorAttachments[0].loadAction = texLoadAction;
-        
-        renderPassDescriptor.stencilAttachment = nil;
-
-        if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::isRenderingToTexture)
-        {
-            renderPassDescriptor.depthAttachment.texture = msaaDepthTarget;
-            renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
-            renderPassDescriptor.depthAttachment.clearDepth = 1.0;
-        }
-        else if (GfxDeviceGlobal::sampleCount == 1 && GfxDeviceGlobal::isRenderingToTexture)
-        {
-            renderPassDescriptor.depthAttachment.slice = currentCubeMapFace;
-            renderPassDescriptor.depthAttachment.texture = depthTexture;
-            renderPassDescriptor.depthAttachment.loadAction = depthLoadAction;
-            renderPassDescriptor.depthAttachment.clearDepth = 1.0;
-        }
-    }
 }
 
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
@@ -396,7 +345,8 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 }
 
 std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                       ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat, int sampleCount )
+                       ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
+                       MTLPixelFormat depthFormat, int sampleCount )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&shader.vertexProgram );
@@ -405,15 +355,16 @@ std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMo
     hashString += std::to_string( ((unsigned)depthFunc) );
     hashString += std::to_string( ((unsigned)vertexFormat) );
     hashString += std::to_string( ((unsigned)pixelFormat) );
+    hashString += std::to_string( ((unsigned)depthFormat) );
     hashString += std::to_string( sampleCount );
     return hashString;
 }
 
 id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
                                     ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
-                                    int sampleCount )
+                                    MTLPixelFormat depthFormat, int sampleCount )
 {
-    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, sampleCount );
+    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, depthFormat, sampleCount );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
@@ -432,8 +383,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].alphaBlendOperation = MTLBlendOperationAdd;
-        // This must match app's view's format.
-        pipelineStateDescriptor.depthAttachmentPixelFormat = (GfxDeviceGlobal::sampleCount > 1 && GfxDeviceGlobal::isRenderingToTexture) ?  MTLPixelFormatInvalid : MTLPixelFormatDepth32Float;
+        pipelineStateDescriptor.depthAttachmentPixelFormat = depthFormat;
 
         MTLVertexDescriptor* vertexDesc = [MTLVertexDescriptor vertexDescriptor];
         
@@ -561,7 +511,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         return;
     }
-
+    
     ++Statistics::drawCalls;
 
     if (!texture0)
@@ -576,7 +526,43 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
 
     const int sampleCount = GfxDeviceGlobal::isRenderingToTexture ? 1 : GfxDeviceGlobal::sampleCount;
-    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat, sampleCount )];
+    MTLPixelFormat depthFormat = MTLPixelFormatInvalid;
+
+#if TARGET_OS_IPHONE
+    if (GfxDeviceGlobal::sampleCount == 1)
+    {
+        depthFormat = MTLPixelFormatDepth32Float;
+    }
+    if (GfxDeviceGlobal::sampleCount > 1)
+    {
+        depthFormat = MTLPixelFormatDepth32Float;
+    }
+    if (GfxDeviceGlobal::isRenderingToTexture)
+    {
+        depthFormat = MTLPixelFormatInvalid;
+    }
+    if (GfxDeviceGlobal::sampleCount == 1 && GfxDeviceGlobal::isRenderingToTexture)
+    {
+        depthFormat = MTLPixelFormatDepth32Float;
+    }
+
+#else
+    if (GfxDeviceGlobal::sampleCount == 1 && GfxDeviceGlobal::isRenderingToTexture)
+    {
+        depthFormat = MTLPixelFormatDepth32Float;
+    }
+    if (GfxDeviceGlobal::sampleCount > 1 && GfxDeviceGlobal::isRenderingToTexture)
+    {
+        depthFormat = MTLPixelFormatInvalid;
+    }
+    if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::isRenderingToTexture)
+    {
+        depthFormat = MTLPixelFormatInvalid;
+    }
+#endif
+
+    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat,
+                                                  depthFormat, sampleCount )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
 
@@ -647,16 +633,11 @@ void ae3d::GfxDevice::BeginFrame()
     
     commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
-
-    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:GfxDeviceGlobal::isRenderingToTexture ? renderPassDescriptorFBO : renderPassDescriptorApp];
-    renderEncoder.label = @"MyRenderEncoder";
 }
 
 void ae3d::GfxDevice::PresentDrawable()
 {
-    [renderEncoder endEncoding];
-    
-    [commandBuffer presentDrawable:drawable];
+    [commandBuffer presentDrawable:currentDrawable];
     [commandBuffer commit];
 }
 
@@ -706,23 +687,72 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
 {
 }
 
-void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture2d, unsigned cubeMapFace )
+void ae3d::GfxDevice::BeginBackBufferEncoding()
 {
-    GfxDeviceGlobal::isRenderingToTexture = renderTexture2d != nullptr;
+    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptorApp];
+    renderEncoder.label = @"BackBufferRenderEncoder";
 
-    currentCubeMapFace = cubeMapFace;
-    drawable = currentDrawable;
-    setupRenderPassDescriptor( renderTexture2d != nullptr ? renderTexture2d->GetMetalTexture() : drawable.texture,
-                               renderTexture2d != nullptr ? renderTexture2d->GetMetalDepthTexture() : nil );
-    
-    if (!renderTexture2d)
+    GfxDeviceGlobal::currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
+}
+
+void ae3d::GfxDevice::EndBackBufferEncoding()
+{
+    [renderEncoder endEncoding];
+}
+
+void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsigned cubeMapFace )
+{
+    GfxDeviceGlobal::isRenderingToTexture = renderTexture != nullptr;
+
+    if (!renderTexture || renderTexture->GetMetalTexture() == nil)
     {
-        GfxDeviceGlobal::currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
+        return;
     }
-    else
+
+    auto texture = renderTexture->GetMetalTexture();
+    auto depthTexture = renderTexture->GetMetalDepthTexture();
+
+    MTLLoadAction texLoadAction = MTLLoadActionLoad;
+    MTLLoadAction depthLoadAction = MTLLoadActionLoad;
+
+    if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Color)
     {
-        GfxDeviceGlobal::currentRenderTargetDataType = renderTexture2d->GetDataType();
+        texLoadAction = MTLLoadActionClear;
     }
+
+    if (GfxDeviceGlobal::clearFlags & ae3d::GfxDevice::ClearFlags::Depth)
+    {
+        depthLoadAction = MTLLoadActionClear;
+    }
+
+    renderPassDescriptorFBO.colorAttachments[0].slice = cubeMapFace;
+    renderPassDescriptorFBO.colorAttachments[0].texture = texture;
+    renderPassDescriptorFBO.colorAttachments[0].storeAction = MTLStoreActionStore;
+    renderPassDescriptorFBO.colorAttachments[0].clearColor = MTLClearColorMake( clearColor[0], clearColor[1], clearColor[2], clearColor[3] );
+    renderPassDescriptorFBO.colorAttachments[0].loadAction = texLoadAction;
+    renderPassDescriptorFBO.stencilAttachment = nil;
+
+    if (GfxDeviceGlobal::sampleCount == 1)
+    {
+        renderPassDescriptorFBO.depthAttachment.slice = cubeMapFace;
+        renderPassDescriptorFBO.depthAttachment.texture = depthTexture;
+        renderPassDescriptorFBO.depthAttachment.loadAction = depthLoadAction;
+        renderPassDescriptorFBO.depthAttachment.clearDepth = 1.0;
+    }
+
+    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptorFBO];
+    renderEncoder.label = @"FboRenderEncoder";
+
+    GfxDeviceGlobal::currentRenderTargetDataType = renderTexture->GetDataType();
+}
+
+void ae3d::GfxDevice::UnsetRenderTarget()
+{
+    if (GfxDeviceGlobal::isRenderingToTexture)
+    {
+        [renderEncoder endEncoding];
+    }
+    GfxDeviceGlobal::isRenderingToTexture = false;
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* )
