@@ -24,6 +24,8 @@
 #include "Window.hpp"
 #include "VR.hpp"
 
+#define TEST_RENDER_TEXTURE_2D
+
 using namespace ae3d;
                       
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.6.zip
@@ -257,14 +259,18 @@ int main()
     GameObject renderTextureContainer;
     renderTextureContainer.SetName( "renderTextureContainer" );
     renderTextureContainer.AddComponent<SpriteRendererComponent>();
-    //renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( 512, 512, 1 ), Vec4( 1, 1, 1, 1 ) );
-    renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture(), Vec3( 150, 250, -0.6f ), Vec3( 256, 256, 1 ), Vec4( 1, 1, 1, 1 ) );
+#ifdef TEST_RENDER_TEXTURE_2D
+    renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( 512, 512, 1 ), Vec4( 1, 1, 1, 1 ) );
+#endif
+    //renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture(), Vec3( 150, 250, -0.6f ), Vec3( 256, 256, 1 ), Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
 
     GameObject rtCamera;
     rtCamera.SetName( "RT camera" );
     rtCamera.AddComponent<CameraComponent>();
-    rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    //rtCamera.GetComponent<CameraComponent>()->SetProjection( 0, (float)rtTex.GetWidth(), 0,(float)rtTex.GetHeight(), 0, 1 );
+    rtCamera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
+    rtCamera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
@@ -289,7 +295,7 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
@@ -302,8 +308,10 @@ int main()
     //scene.Add( &dirLight );
     //scene.Add( &spotLight );
     //scene.Add( &pointLight );
-    //scene.Add( &renderTextureContainer );
-    //scene.Add( &rtCamera );
+#ifdef TEST_RENDER_TEXTURE_2D
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
+#endif
     //scene.Add( &transCube1 );
 
     const int cubeCount = 10;

@@ -1,4 +1,5 @@
 #include "PointLightComponent.hpp"
+#include <locale>
 #include <vector>
 #include <sstream>
 
@@ -35,6 +36,9 @@ void ae3d::PointLightComponent::SetCastShadow( bool enable, int shadowMapSize )
 std::string ae3d::PointLightComponent::GetSerialized() const
 {
     std::stringstream outStream;
+    std::locale c_locale( "C" );
+    outStream.imbue( c_locale );
+
     outStream << "pointlight\n";
     outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
     outStream << "radius " << radius << "\n";

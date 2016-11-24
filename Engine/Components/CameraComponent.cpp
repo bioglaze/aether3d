@@ -1,5 +1,6 @@
 #include "CameraComponent.hpp"
 #include <vector>
+#include <locale>
 #include <sstream>
 
 std::vector< ae3d::CameraComponent > cameraComponents;
@@ -73,6 +74,9 @@ void ae3d::CameraComponent::SetTargetTexture( ae3d::RenderTexture* renderTexture
 std::string ae3d::CameraComponent::GetSerialized() const
 {
     std::stringstream outStream;
+    std::locale c_locale( "C" );
+    outStream.imbue( c_locale );
+
     outStream << "camera\n";
 
     outStream << "ortho " << orthoParams.left << " " << orthoParams.right << " " << orthoParams.top << " " << orthoParams.down <<

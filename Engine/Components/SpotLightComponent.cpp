@@ -1,4 +1,5 @@
 #include "SpotLightComponent.hpp"
+#include <locale>
 #include <vector>
 #include <sstream>
 
@@ -35,6 +36,9 @@ void ae3d::SpotLightComponent::SetCastShadow( bool enable, int shadowMapSize )
 std::string ae3d::SpotLightComponent::GetSerialized() const
 {
     std::stringstream outStream;
+    std::locale c_locale( "C" );
+    outStream.imbue( c_locale );
+
     outStream << "spotlight\n";
     outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
     outStream << "coneangle " << coneAngle << "\n\n";

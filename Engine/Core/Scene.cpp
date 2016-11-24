@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 #include <algorithm>
+#include <locale>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -931,6 +932,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     {
         std::getline( stream, line );
         std::stringstream lineStream( line );
+        std::locale c_locale( "C" );
+        lineStream.imbue( c_locale );
         std::string token;
         lineStream >> token;
         

@@ -1,4 +1,5 @@
 #include "TextRendererComponent.hpp"
+#include <locale>
 #include <vector>
 #include <sstream>
 #include "Font.hpp"
@@ -129,6 +130,9 @@ void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )
 std::string ae3d::TextRendererComponent::GetSerialized() const
 {
     std::stringstream outStream;
+    std::locale c_locale( "C" );
+    outStream.imbue( c_locale );
+
     outStream << "textrenderer\n";
     const auto& color = m().color;
     outStream << "color " << color.x << " " << color.y << " " << color.z << " " << color.w << "\n";

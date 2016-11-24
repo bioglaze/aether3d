@@ -1,4 +1,5 @@
 #include "TransformComponent.hpp"
+#include <locale>
 #include <vector>
 #include <sstream>
 #include <cmath>
@@ -171,6 +172,9 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
 std::string ae3d::TransformComponent::GetSerialized() const
 {
     std::stringstream outStream;
+    std::locale c_locale( "C" );
+    outStream.imbue( c_locale );
+
     outStream << "transform\nposition " << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\nrotation ";
     outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\nscale " <<
         localScale << "\n\n";
