@@ -31,4 +31,4 @@ endif
 
 vulkan:
 	mkdir -p ../../../aether3d_build/Samples
-	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -I/home/glaze/Downloads/VulkanSDK/1.0.33.0/x86_64/include -I../../Engine/Include Misc3D.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/Misc3D_vulkan $(VULKAN_LINKER)
+	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -I../../Engine/ThirdParty -I../../Engine/Include Misc3D.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/Misc3D_vulkan $(VULKAN_LINKER)

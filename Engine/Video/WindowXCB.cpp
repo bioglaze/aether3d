@@ -517,9 +517,16 @@ void ae3d::Window::PumpEvents()
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b3Type;
                 }
+                else if (be->detail == 4)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollUp;  
+                }
+                else if (be->detail == 5)
+		{
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollDown;
+		}
                 else
                 {
-                    std::cerr << "Unhandled mouse button." << std::endl;
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b1Type;
                 }
                 
@@ -537,7 +544,7 @@ void ae3d::Window::PumpEvents()
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
                 const xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
-                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ keysym ];
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = (WindowGlobal::keyMap.find( keysym ) == WindowGlobal::keyMap.end() ) ? ae3d::KeyCode::N : WindowGlobal::keyMap[ keysym ];
             }
             case XCB_MOTION_NOTIFY:
             {
