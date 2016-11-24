@@ -20,12 +20,6 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Cross-Platform WYSIWYG scene editor.
   - Statically linked into your application.
 
-# Status (as of 2016-06-29)
-
-  - Master branch may or may not compile but releases should always work.
-  - Editor is still missing many features that are needed for proper scene creation.
-  - Lights cast shadows but don't shade objects (planned for 0.7)
-
 # Planned Features
 
   - Physically-based shading
@@ -48,7 +42,7 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
   - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile.
   - Build and run Samples\01_OpenWindow.
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
-  - FBX converter tries to find FBX SDK 2016.1.1 in its default install location (English language localization)
+  - FBX converter tries to find FBX SDK 2017.0.1 in its default install location (English language localization)
   
 ### Oculus Rift
   - Build Oculus SDK's `LibOVR` and `LibOVRKernel`'s `Release x64` target in VS2015 and copy these folders into `Engine/ThirdParty`: LibOVR, LibOVRKernel, Logging
@@ -58,8 +52,8 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 ## macOS / GNU/Linux
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
-  - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile.
-  - FBX converter tries to find FBX SDK 2016.1.1 in its default install location.
+  - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile (`make` builds GL version, `make vulkan` builds Vulkan version).
+  - FBX converter tries to find FBX SDK 2017.0.1 in its default install location.
 
 ## iOS
   - Build Aether3D_iOS in Engine. It creates a framework.

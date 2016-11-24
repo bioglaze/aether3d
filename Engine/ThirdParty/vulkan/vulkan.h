@@ -43,7 +43,7 @@ extern "C" {
 #define VK_VERSION_MINOR(version) (((uint32_t)(version) >> 12) & 0x3ff)
 #define VK_VERSION_PATCH(version) ((uint32_t)(version) & 0xfff)
     // Version of this file
-#define VK_HEADER_VERSION 25
+#define VK_HEADER_VERSION 33
 
 
 #define VK_NULL_HANDLE 0
@@ -213,7 +213,6 @@ extern "C" {
         VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR = 1000008000,
         VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR = 1000009000,
         VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT = 1000011000,
-        VK_STRUCTURE_TYPE_DEBUG_REPORT_VALIDATION_FLAGS_EXT = 1000011002,
         VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_RASTERIZATION_ORDER_AMD = 1000018000,
         VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT = 1000022000,
         VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT = 1000022001,
@@ -226,6 +225,7 @@ extern "C" {
         VK_STRUCTURE_TYPE_IMPORT_MEMORY_WIN32_HANDLE_INFO_NV = 1000057000,
         VK_STRUCTURE_TYPE_EXPORT_MEMORY_WIN32_HANDLE_INFO_NV = 1000057001,
         VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_NV = 1000058000,
+        VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT = 1000061000,
         VK_STRUCTURE_TYPE_BEGIN_RANGE = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         VK_STRUCTURE_TYPE_END_RANGE = VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO,
         VK_STRUCTURE_TYPE_RANGE_SIZE = (VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO - VK_STRUCTURE_TYPE_APPLICATION_INFO + 1),
@@ -3735,7 +3735,7 @@ extern "C" {
 #define VK_EXT_debug_report 1
     VK_DEFINE_NON_DISPATCHABLE_HANDLE( VkDebugReportCallbackEXT )
 
-#define VK_EXT_DEBUG_REPORT_SPEC_VERSION  4
+#define VK_EXT_DEBUG_REPORT_SPEC_VERSION  3
 #define VK_EXT_DEBUG_REPORT_EXTENSION_NAME "VK_EXT_debug_report"
 #define VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT
 
@@ -3806,12 +3806,6 @@ extern "C" {
         const char*                                 pMessage,
         void*                                       pUserData);
 
-
-    typedef struct VkDebugReportLayerFlagsEXT {
-        VkStructureType    sType;
-        const void*        pNext;
-        uint64_t           enabledValidationFlags;
-    } VkDebugReportLayerFlagsEXT;
 
     typedef struct VkDebugReportCallbackCreateInfoEXT {
         VkStructureType                 sType;
@@ -3979,8 +3973,8 @@ extern "C" {
 
 
 #define VK_AMD_draw_indirect_count 1
-#define VK_AMD_EXTENSION_DRAW_INDIRECT_COUNT_SPEC_VERSION 1
-#define VK_AMD_EXTENSION_DRAW_INDIRECT_COUNT_EXTENSION_NAME "VK_AMD_draw_indirect_count"
+#define VK_AMD_DRAW_INDIRECT_COUNT_SPEC_VERSION 1
+#define VK_AMD_DRAW_INDIRECT_COUNT_EXTENSION_NAME "VK_AMD_draw_indirect_count"
 
     typedef void (VKAPI_PTR *PFN_vkCmdDrawIndirectCountAMD)(VkCommandBuffer commandBuffer, VkBuffer buffer, VkDeviceSize offset, VkBuffer countBuffer, VkDeviceSize countBufferOffset, uint32_t maxDrawCount, uint32_t stride);
     typedef void (VKAPI_PTR *PFN_vkCmdDrawIndexedIndirectCountAMD)(VkCommandBuffer commandBuffer, VkBuffer buffer, VkDeviceSize offset, VkBuffer countBuffer, VkDeviceSize countBufferOffset, uint32_t maxDrawCount, uint32_t stride);
@@ -4005,6 +3999,21 @@ extern "C" {
         uint32_t                                    stride );
 #endif
 
+#define VK_AMD_negative_viewport_height 1
+#define VK_AMD_NEGATIVE_VIEWPORT_HEIGHT_SPEC_VERSION 1
+#define VK_AMD_NEGATIVE_VIEWPORT_HEIGHT_EXTENSION_NAME "VK_AMD_negative_viewport_height"
+
+
+#define VK_AMD_gpu_shader_half_float 1
+#define VK_AMD_GPU_SHADER_HALF_FLOAT_SPEC_VERSION 1
+#define VK_AMD_GPU_SHADER_HALF_FLOAT_EXTENSION_NAME "VK_AMD_gpu_shader_half_float"
+
+
+#define VK_AMD_shader_ballot 1
+#define VK_AMD_SHADER_BALLOT_SPEC_VERSION 1
+#define VK_AMD_SHADER_BALLOT_EXTENSION_NAME "VK_AMD_shader_ballot"
+
+
 #define VK_IMG_format_pvrtc 1
 #define VK_IMG_FORMAT_PVRTC_SPEC_VERSION  1
 #define VK_IMG_FORMAT_PVRTC_EXTENSION_NAME "VK_IMG_format_pvrtc"
@@ -4022,6 +4031,7 @@ extern "C" {
         VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_IMAGE_KMT_BIT_NV = 0x00000008,
         VK_EXTERNAL_MEMORY_HANDLE_TYPE_FLAG_BITS_MAX_ENUM_NV = 0x7FFFFFFF
     } VkExternalMemoryHandleTypeFlagBitsNV;
+    typedef VkFlags VkExternalMemoryHandleTypeFlagsNV;
 
     typedef enum VkExternalMemoryFeatureFlagBitsNV {
         VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT_NV = 0x00000001,
@@ -4029,8 +4039,6 @@ extern "C" {
         VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT_NV = 0x00000004,
         VK_EXTERNAL_MEMORY_FEATURE_FLAG_BITS_MAX_ENUM_NV = 0x7FFFFFFF
     } VkExternalMemoryFeatureFlagBitsNV;
-
-    typedef VkFlags VkExternalMemoryHandleTypeFlagsNV;
     typedef VkFlags VkExternalMemoryFeatureFlagsNV;
 
     typedef struct VkExternalImageFormatPropertiesNV {
@@ -4123,6 +4131,28 @@ extern "C" {
 
 
 #endif /* VK_USE_PLATFORM_WIN32_KHR */
+
+#define VK_EXT_validation_flags 1
+#define VK_EXT_VALIDATION_FLAGS_SPEC_VERSION 1
+#define VK_EXT_VALIDATION_FLAGS_EXTENSION_NAME "VK_EXT_validation_flags"
+
+
+    typedef enum VkValidationCheckEXT {
+        VK_VALIDATION_CHECK_ALL_EXT = 0,
+        VK_VALIDATION_CHECK_BEGIN_RANGE_EXT = VK_VALIDATION_CHECK_ALL_EXT,
+        VK_VALIDATION_CHECK_END_RANGE_EXT = VK_VALIDATION_CHECK_ALL_EXT,
+        VK_VALIDATION_CHECK_RANGE_SIZE_EXT = (VK_VALIDATION_CHECK_ALL_EXT - VK_VALIDATION_CHECK_ALL_EXT + 1),
+        VK_VALIDATION_CHECK_MAX_ENUM_EXT = 0x7FFFFFFF
+    } VkValidationCheckEXT;
+
+    typedef struct VkValidationFlagsEXT {
+        VkStructureType          sType;
+        const void*              pNext;
+        uint32_t                 disabledValidationCheckCount;
+        VkValidationCheckEXT*    pDisabledValidationChecks;
+    } VkValidationFlagsEXT;
+
+
 
 #ifdef __cplusplus
 }
