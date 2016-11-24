@@ -21,15 +21,15 @@ void CreateLightCommand::Execute()
 
     go = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() );
 
-    if (type == Type::Directional)
+    if (type == Type::Directional && !go->GetComponent< ae3d::DirectionalLightComponent >())
     {
         go->AddComponent< ae3d::DirectionalLightComponent >();
     }
-    else if (type == Type::Spot)
+    else if (type == Type::Spot && !go->GetComponent< ae3d::SpotLightComponent >())
     {
         go->AddComponent< ae3d::SpotLightComponent >();
     }
-    else if (type == Type::Point)
+    else if (type == Type::Point && !go->GetComponent< ae3d::PointLightComponent >())
     {
         go->AddComponent< ae3d::PointLightComponent >();
     }

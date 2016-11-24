@@ -699,7 +699,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 }
 
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
-                                         int cubeMapFace, const Frustum& /*frustum*/ )
+                                         int cubeMapFace, const Frustum& frustum )
 {
 #if RENDERER_METAL
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
@@ -720,8 +720,7 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
         
-        // Already culled if this method is called after rendering others.
-        //gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
         gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
     }

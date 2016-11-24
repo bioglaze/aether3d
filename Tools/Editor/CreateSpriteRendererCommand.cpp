@@ -15,7 +15,11 @@ void CreateSpriteRendererCommand::Execute()
     ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "no gameobjects selected." );
 
     gameObject = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() );
-    gameObject->AddComponent< ae3d::SpriteRendererComponent >();
+
+    if (!gameObject->GetComponent< ae3d::SpriteRendererComponent >())
+    {
+        gameObject->AddComponent< ae3d::SpriteRendererComponent >();
+    }
 }
 
 void CreateSpriteRendererCommand::Undo()

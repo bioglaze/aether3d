@@ -15,7 +15,11 @@ void CreateMeshRendererCommand::Execute()
     ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "no gameobjects selected." );
 
     gameObject = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() );
-    gameObject->AddComponent< ae3d::MeshRendererComponent >();
+
+    if (!gameObject->GetComponent< ae3d::MeshRendererComponent >())
+    {
+        gameObject->AddComponent< ae3d::MeshRendererComponent >();
+    }
 }
 
 void CreateMeshRendererCommand::Undo()

@@ -15,7 +15,11 @@ void CreateAudioSourceCommand::Execute()
     ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "no gameobjects selected." );
 
     gameObject = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() );
-    gameObject->AddComponent< ae3d::AudioSourceComponent >();
+
+    if (!gameObject->GetComponent< ae3d::AudioSourceComponent >())
+    {
+        gameObject->AddComponent< ae3d::AudioSourceComponent >();
+    }
 }
 
 void CreateAudioSourceCommand::Undo()
