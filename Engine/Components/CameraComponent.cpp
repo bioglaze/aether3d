@@ -2,6 +2,7 @@
 #include <vector>
 #include <locale>
 #include <sstream>
+#include "Macros.hpp"
 
 std::vector< ae3d::CameraComponent > cameraComponents;
 unsigned nextFreeCameraComponent = 0;
@@ -25,7 +26,7 @@ ae3d::Vec3 ae3d::CameraComponent::GetScreenPoint( const ae3d::Vec3 &worldPoint, 
 {
     Matrix44 viewProjection;
     Matrix44::Multiply( viewMatrix, projectionMatrix, viewProjection );
-    Vec4 pos( worldPoint );
+    ALIGNAS( 16 ) Vec4 pos( worldPoint );
     Matrix44::TransformPoint( pos, viewProjection, &pos );
     pos.x /= pos.w;
     pos.y /= pos.w;

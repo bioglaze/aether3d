@@ -89,7 +89,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
-    anisotropy = aAnisotropy;
+    anisotropy = (aAnisotropy > 0 && aAnisotropy < 17) ? aAnisotropy : 1;
     colorSpace = aColorSpace;
     handle = 1;
     width = 256;
@@ -331,15 +331,15 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
     samplerInfo.minFilter = samplerInfo.magFilter;
     samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
-    samplerInfo.addressModeU =  wrap == ae3d::TextureWrap::Repeat ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeU = wrap == ae3d::TextureWrap::Repeat ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
     samplerInfo.addressModeV = samplerInfo.addressModeU;
     samplerInfo.addressModeW = samplerInfo.addressModeU;
     samplerInfo.mipLodBias = 0;
     samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
     samplerInfo.minLod = 0;
     samplerInfo.maxLod = static_cast< float >(mipLevelCount);
-    samplerInfo.maxAnisotropy = 1;
-    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.maxAnisotropy = anisotropy;
+    samplerInfo.anisotropyEnable = (anisotropy > 1) ? VK_TRUE : VK_FALSE;
     samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );

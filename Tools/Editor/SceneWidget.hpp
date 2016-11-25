@@ -41,6 +41,8 @@ public:
 
     void CenterSelected();
 
+    void HideHUD();
+
     void Init();
 
     void UpdateTransformGizmoPosition();

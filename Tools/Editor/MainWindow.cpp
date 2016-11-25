@@ -479,6 +479,7 @@ void MainWindow::CommandRemoveCameraComponent()
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::CameraComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     UpdateInspector();
+    sceneWidget->HideHUD();
 }
 
 void MainWindow::CommandCreateMeshRendererComponent()

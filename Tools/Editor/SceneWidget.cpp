@@ -309,7 +309,7 @@ void SceneWidget::Init()
     connect(mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
             this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
 
-    const ae3d::Vec3 rtDim = { 256, 256, 0 };
+    const ae3d::Vec3 rtDim = { 640, 480, 0 };
     hudCamera.SetName( "HUD Camera" );
     hudCamera.AddComponent<CameraComponent>();
     hudCamera.GetComponent<CameraComponent>()->SetProjection( 0, rtDim.x, 0, rtDim.y, 0, 1 );
@@ -336,8 +336,9 @@ void SceneWidget::Init()
 
     hud.SetName( "HUD" );
     hud.AddComponent<SpriteRendererComponent>();
-    hud.GetComponent<SpriteRendererComponent>()->SetTexture( &previewCameraTex, Vec3( -50, -150, -0.6f ), Vec3( rtDim.x, rtDim.y, 1 ), Vec4( 0.7f, 0.7f, 1, 1 ) );
-    hud.SetLayer( 2 );
+    hud.GetComponent<SpriteRendererComponent>()->SetTexture( &previewCameraTex, Vec3( 0, -100, -0.6f ), Vec3( 320, 240, 1 ), Vec4( 0.7f, 0.7f, 1, 1 ) );
+    //hud.SetLayer( 2 );
+    hud.SetLayer( 4 );
     scene.Add( &hud );
 
     //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
@@ -415,6 +416,11 @@ void SceneWidget::SetSelectedCameraTargetToPreview()
     {
         gameObjects[ selectedGameObjects.front() ]->GetComponent< ae3d::CameraComponent >()->SetTargetTexture( &previewCameraTex );
     }
+}
+
+void SceneWidget::HideHUD()
+{
+    hud.SetLayer( 0x4 );
 }
 
 void SceneWidget::initializeGL()

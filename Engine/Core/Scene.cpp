@@ -222,11 +222,11 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
             auto cameraTransform = camera->GetComponent< TransformComponent >();
             // TODO: world position
             Vec3 position = cameraTransform ? cameraTransform->GetLocalPosition() : Vec3( 0, 0, 0 );
-
-            const Vec3 viewDir = Vec3( cameraComponent->GetView().m[2], cameraComponent->GetView().m[6], cameraComponent->GetView().m[10] ).Normalized();
+            const Matrix44& view = cameraComponent->GetView();
+            const Vec3 viewDir = Vec3( view.m[ 2 ], view.m[ 6 ], view.m[ 10 ] ).Normalized();
             frustum.Update( position, viewDir );
 
-            RenderDepthAndNormals( cameraComponent, cameraComponent->GetView(), gameObjectsWithMeshRenderer, 0, frustum );
+            RenderDepthAndNormals( cameraComponent, view, gameObjectsWithMeshRenderer, 0, frustum );
 
 #if defined( RENDERER_METAL )
             /*std::vector< unsigned > gameObjectsWithPointLight;
@@ -720,9 +720,11 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
         
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Cull( frustum, meshLocalToWorld );
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
+        auto meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
+
+        meshRenderer->Cull( frustum, meshLocalToWorld );
+        meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
+        meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
     }
 
     GfxDevice::PopGroupMarker();

@@ -233,8 +233,9 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         assert( size == x * y * li->blockBytes );
         std::vector< unsigned char > data( size );
         unsigned palette[ 256 ];
+#if RENDERER_OPENGL
         std::vector< unsigned > unpacked( size * 4 );
-
+#endif
         std::memcpy( &palette[ 0 ], fileContents.data.data() + fileOffset, 4 * 256 );
         fileOffset += 4 * 256;
 

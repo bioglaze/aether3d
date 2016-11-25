@@ -20,6 +20,7 @@ void CreateLightCommand::Execute()
     ae3d::System::Assert( !sceneWidget->selectedGameObjects.empty(), "Create light needs selection" );
 
     go = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() );
+    ae3d::System::Assert( go != nullptr, "Create light Execute needs game object" );
 
     if (type == Type::Directional && !go->GetComponent< ae3d::DirectionalLightComponent >())
     {
