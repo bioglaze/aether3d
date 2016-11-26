@@ -25,6 +25,7 @@ namespace ae3d
 namespace MathUtil
 {
     int GetMipmapCount( int width, int height );
+    bool IsPowerOfTwo( unsigned i );
 }
 
 namespace GfxDeviceGlobal
@@ -139,6 +140,13 @@ bool isBC3( VkFormat format )
 
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
 {
+    if ((!MathUtil::IsPowerOfTwo( width ) || MathUtil::IsPowerOfTwo( height )) && mipmaps == Mipmaps::Generate)
+    {
+        System::Print( "Mipmaps not generated for %s because the dimension (%dx%d) is not power-of-two.\n", path.c_str(), width, height );
+        mipLevelCount = 1;
+        mipmaps = Mipmaps::None;
+    }
+
     VkMemoryAllocateInfo memAllocInfo = {};
     memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAllocInfo.pNext = nullptr;

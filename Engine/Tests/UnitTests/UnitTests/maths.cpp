@@ -18,14 +18,14 @@ bool IsAlmost( float f1, float f2 )
 
 namespace UnitTests
 {		
-	TEST_CLASS(MathTests)
-	{
-	public:
+    TEST_CLASS(MathTests)
+    {
+    public:
 		
-		TEST_METHOD( Vec4Constructor )
-		{
+        TEST_METHOD( Vec4Constructor )
+        {
             Assert::IsTrue( Vec4( 1, 2, 3, 4 ).IsAlmost( Vec4( 1, 2, 3, 4 ) ) );
-		}
+        }
 
         TEST_METHOD( Vec4DefaultConstructor )
         {

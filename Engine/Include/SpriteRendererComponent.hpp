@@ -23,7 +23,7 @@ namespace ae3d
         bool valid;
     };
 
-    /// Renders sprites.
+    /// Renders sprites. Can contain multiple sprites.
     class SpriteRendererComponent
     {
     public:

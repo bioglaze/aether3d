@@ -52,22 +52,22 @@ namespace Stats
 
 namespace ae3d
 {
-	namespace System
-	{
-		namespace Statistics
-		{
-			std::string GetStatistics()
-			{
-				std::stringstream stm;
+    namespace System
+    {
+        namespace Statistics
+        {
+            std::string GetStatistics()
+            {
+                std::stringstream stm;
                 stm << "frame time: " << Stats::frameTimeMS << "ms\n";
                 stm << "draw calls: " << Stats::drawCalls << "\n";
                 stm << "barrier calls: " << Stats::barrierCalls << "\n";
                 stm << "create constant buffer calls: " << Stats::createConstantBufferCalls << "\n";
 
-				return stm.str();
-			}
-		}
-	}
+                return stm.str();
+	    }
+        }
+    }
 }
 
 namespace GfxDeviceGlobal
@@ -194,6 +194,7 @@ void CreateBackBuffer()
 
         GfxDeviceGlobal::renderTargets[ i ]->SetName( L"SwapChain_Buffer" );
         GfxDeviceGlobal::rtvResources[ i ].usageState = D3D12_RESOURCE_STATE_COMMON;
+        GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
         GfxDeviceGlobal::backBufferWidth = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Width );
         GfxDeviceGlobal::backBufferHeight = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Height );
     }
@@ -1143,10 +1144,10 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
         return;
     }
 
-    auto i = GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex();
-	GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
+    const auto backBufferIndex = GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex();
+    GfxDeviceGlobal::rtvResources[ backBufferIndex ].resource = GfxDeviceGlobal::renderTargets[ backBufferIndex ];
 
-    GpuResource* resource = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetGpuResource() : &GfxDeviceGlobal::rtvResources[ i ];
+    GpuResource* resource = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetGpuResource() : &GfxDeviceGlobal::rtvResources[ backBufferIndex ];
 
     TransitionResource( *resource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     

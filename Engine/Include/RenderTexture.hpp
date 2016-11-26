@@ -8,7 +8,7 @@
 
 namespace ae3d
 {
-    /// Render texture.
+    /// Render texture. Can be 2D or cube map.
     class RenderTexture : public TextureBase
     {
   public:

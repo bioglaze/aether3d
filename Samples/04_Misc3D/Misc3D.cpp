@@ -24,7 +24,7 @@
 #include "Window.hpp"
 #include "VR.hpp"
 
-#define TEST_RENDER_TEXTURE_2D
+//#define TEST_RENDER_TEXTURE_2D
 
 using namespace ae3d;
                       
@@ -295,7 +295,7 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );

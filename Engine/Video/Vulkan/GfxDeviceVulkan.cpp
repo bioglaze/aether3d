@@ -253,7 +253,7 @@ namespace ae3d
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
 
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.depthMem );
-        AE3D_CHECK_VULKAN( err, "MSAA depth image" );
+        AE3D_CHECK_VULKAN( err, "MSAA depth memory" );
         vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, GfxDeviceGlobal::msaaTarget.depthMem, 0 );
 
         // Create image view for the MSAA target
@@ -271,7 +271,7 @@ namespace ae3d
         viewInfo.subresourceRange.layerCount = 1;
 
         err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &GfxDeviceGlobal::msaaTarget.depthView );
-        AE3D_CHECK_VULKAN( err, "MSAA depth image" );
+        AE3D_CHECK_VULKAN( err, "MSAA depth view" );
     }
 
     void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
@@ -1123,7 +1123,7 @@ namespace ae3d
 
         // Depth resolve attachment
         attachments[ 3 ].format = GfxDeviceGlobal::depthFormat;
-        attachments[ 3 ].samples = VK_SAMPLE_COUNT_1_BIT;
+        attachments[ 3 ].samples = GfxDeviceGlobal::msaaSampleBits;
         attachments[ 3 ].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachments[ 3 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 3 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -1757,7 +1757,7 @@ void ae3d::GfxDevice::Present()
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
     VkResult err = vkDeviceWaitIdle( GfxDeviceGlobal::device );
-	AE3D_CHECK_VULKAN( err, "vkDeviceWaitIdle" );
+    AE3D_CHECK_VULKAN( err, "vkDeviceWaitIdle" );
 
     debug::Free( GfxDeviceGlobal::instance );
     
@@ -1785,6 +1785,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, nullptr );
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorView, nullptr );
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthView, nullptr );
+        vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthMem, nullptr );
+        vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorMem, nullptr );
     }
 
     Shader::DestroyShaders();

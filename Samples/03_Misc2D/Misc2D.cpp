@@ -55,6 +55,8 @@ int main()
     Texture2D nonSquareTex;
     nonSquareTex.Load( FileSystem::FileContents( "textures/chain_texture.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, 1 );
 
+    Texture2D notLoadedTex;
+
     Texture2D spriteTexFromAtlas;
     spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "marble", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, 1 );
 
@@ -66,6 +68,7 @@ int main()
     sprite->SetTexture( &bc1Tex, Vec3( 120, 60, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     sprite->SetTexture( &bc2Tex, Vec3( 120, 170, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     sprite->SetTexture( &bc3Tex, Vec3( 120, 270, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    //sprite->SetTexture( &notLoadedTex, Vec3( 120, 370, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     sprite->SetTexture( &spriteTexFromAtlas, Vec3( 260, 160, -0.5f ), Vec3( (float)spriteTexFromAtlas.GetWidth(), (float)spriteTexFromAtlas.GetHeight(), 1 ), Vec4( 1, 0, 1, 1 ) );
 
     spriteContainer.AddComponent<TransformComponent>();
@@ -146,8 +149,8 @@ int main()
     scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
+    //scene.Add( &renderTextureContainer );
+    //scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
     bool quit = false;

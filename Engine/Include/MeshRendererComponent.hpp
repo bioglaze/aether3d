@@ -6,7 +6,7 @@
 
 namespace ae3d
 {
-    /// Contains a Mesh.
+    /// Contains a Mesh. The game object must also contain a TransformComponent to be able to render the mesh.
     class MeshRendererComponent
     {
     public:
