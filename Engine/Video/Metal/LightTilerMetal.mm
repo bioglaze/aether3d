@@ -42,10 +42,6 @@ void ae3d::LightTiler::Init()
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
-    System::Print("max num lights per tile: %u, numTiles: %d\n", maxNumLightsPerTile, numTiles);
-    System::Print("backbuffer: %d x %d\n", GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
-    System::Print( "numTiles: %dx%d\n", GetNumTilesX(), GetNumTilesY() );
-
     // TODO: make storage mode MTLResourceStorageModePrivate if it works and is faster.
     perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( unsigned )
                   options:MTLResourceCPUCacheModeDefaultCache];

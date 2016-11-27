@@ -9,7 +9,12 @@
 
 void ae3d::Renderer::GenerateTextures()
 {
+#if RENDERER_METAL
+    // FIXME: Intentionally wrong path because the texture doesn't load correctly.
     whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, 1 );
+#else
+    whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, 1 );
+#endif
 }
 
 void ae3d::Renderer::GenerateSkybox()

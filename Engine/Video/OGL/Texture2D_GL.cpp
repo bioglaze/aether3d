@@ -155,8 +155,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     colorSpace = aColorSpace;
     path = fileContents.path;
 
-    ae3d::System::Print("Tex2D load %s\n", fileContents.path.c_str() );
-
     if (!fileContents.isLoaded)
     {
         *this = Texture2DGlobal::defaultTexture;

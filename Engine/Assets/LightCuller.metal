@@ -46,22 +46,20 @@ static float4 CreatePlaneEquation( float4 b, float4 c )
 
 static uint GetNumTilesX( uint windowWidth )
 {
-    return uint(( ( windowWidth + TILE_RES - 1 ) / float(TILE_RES) ));
+    return uint(( ( windowWidth + TILE_RES - 1 ) / float( TILE_RES ) ));
 }
 
 static uint GetNumTilesY( uint windowHeight )
 {
-    return uint(( ( windowHeight + TILE_RES - 1 ) / float(TILE_RES) ));
+    return uint(( ( windowHeight + TILE_RES - 1 ) / float( TILE_RES ) ));
 }
 
 // point-plane distance, simplified for the case where the plane passes through the origin
 static float GetSignedDistanceFromPlane( float4 p, float4 eqn )
 {
-    // dot( eqn.xyz, p.xyz ) + eqn.w, , except we know eqn.w is zero (see CreatePlaneEquation above)
+    // dot( eqn.xyz, p.xyz ) + eqn.w, except we know eqn.w is zero (see CreatePlaneEquation above)
     return dot( eqn.xyz, p.xyz );
 }
-
-// https://developer.apple.com/library/content/documentation/Metal/Reference/MetalShadingLanguageGuide/func-var-qual/func-var-qual.html
 
 kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[texture(0)]],
                          constant Uniforms& uniforms [[ buffer(0) ]],
@@ -75,13 +73,6 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     threadgroup atomic_uint ldsZMax;
     threadgroup atomic_uint ldsZMin;
     threadgroup atomic_uint ldsLightIdxCounter;
-
-    // gl_GlobalInvocationID is a uvec3 variable giving the global ID of the thread,
-    // gl_LocalInvocationID is the local index within the work group, and
-    // gl_WorkGroupID is the work group's index
-    //uvec3 globalIdx = gl_GlobalInvocationID;
-    //uvec3 localIdx = gl_LocalInvocationID;
-    //uvec3 groupIdx = gl_WorkGroupID;
 
     uint2 globalIdx = gid;
     uint2 localIdx = tid;
@@ -105,15 +96,21 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         uint pxp = TILE_RES * (groupIdx.x + 1);
         uint pyp = TILE_RES * (groupIdx.y + 1);
 
-        uint uWindowWidthEvenlyDivisibleByTileRes  = TILE_RES * GetNumTilesX( uniforms.windowWidth );
-        uint uWindowHeightEvenlyDivisibleByTileRes = TILE_RES * GetNumTilesY( uniforms.windowHeight );
+        // Evenly divisible by tile res
+        float winWidth  = float( TILE_RES * GetNumTilesX( uniforms.windowWidth ) );
+        float winHeight = float( TILE_RES * GetNumTilesY( uniforms.windowHeight) );
+
+        float4 v0 = float4( pxm / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
+        float4 v1 = float4( pxp / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
+        float4 v2 = float4( pxp / winWidth * 2.0f - 1.0f, (winHeight - pyp) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
+        float4 v3 = float4( pxm / winWidth * 2.0f - 1.0f, (winHeight - pyp) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
 
         // four corners of the tile, clockwise from top-left
         float4 frustum[ 4 ];
-        frustum[ 0 ] = ConvertProjToView( float4(pxm / float( uWindowWidthEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, (uWindowHeightEvenlyDivisibleByTileRes - pym) / float( uWindowHeightEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, 1.0f, 1.0f), uniforms.invProjection );
-        frustum[ 1 ] = ConvertProjToView( float4(pxp / float( uWindowWidthEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, (uWindowHeightEvenlyDivisibleByTileRes - pym) / float( uWindowHeightEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, 1.0f, 1.0f), uniforms.invProjection );
-        frustum[ 2 ] = ConvertProjToView( float4(pxp / float( uWindowWidthEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, (uWindowHeightEvenlyDivisibleByTileRes - pyp) / float( uWindowHeightEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, 1.0f, 1.0f), uniforms.invProjection );
-        frustum[ 3 ] = ConvertProjToView( float4(pxm / float( uWindowWidthEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, (uWindowHeightEvenlyDivisibleByTileRes - pyp) / float( uWindowHeightEvenlyDivisibleByTileRes ) * 2.0f - 1.0f, 1.0f, 1.0f), uniforms.invProjection );
+        frustum[ 0 ] = ConvertProjToView( v0, uniforms.invProjection );
+        frustum[ 1 ] = ConvertProjToView( v1, uniforms.invProjection );
+        frustum[ 2 ] = ConvertProjToView( v2, uniforms.invProjection );
+        frustum[ 3 ] = ConvertProjToView( v3, uniforms.invProjection );
 
         // create plane equations for the four sides of the frustum,
         // with the positive half-space outside the frustum (and remember,
@@ -162,16 +159,16 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         if (il < numPointLights)
         {
             float4 center = pointLightBufferCenterAndRadius[ il ];
-            float r = center.w;
+            float radius = center.w;
             center.xyz = (uniforms.viewMatrix * float4( center.xyz, 1.0f ) ).xyz;
 
             // test if sphere is intersecting or inside frustum
-            //if (-center.z + minZ < r && center.z - maxZ < r)
+            //if (-center.z - minZ < radius && center.z + maxZ < radius)
             {
-                if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < r) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < r) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < r) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < r))
+                if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < radius))
                 {
                     // do a thread-safe increment of the list counter
                     // and put the index of this light into the list

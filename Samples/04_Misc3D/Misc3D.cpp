@@ -498,8 +498,12 @@ int main()
                 {
                     moveDir.x = 0;
                 }
+                else if (keyCode == KeyCode::R)
+                {
+                    System::ReloadChangedAssets();
+                }
             }
-            
+
             if (event.type == WindowEventType::MouseMove)
             {
                 const int mouseDeltaX = event.mouseX - lastMouseX;
