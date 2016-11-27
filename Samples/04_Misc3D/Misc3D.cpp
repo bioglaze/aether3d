@@ -25,6 +25,7 @@
 #include "VR.hpp"
 
 //#define TEST_RENDER_TEXTURE_2D
+//#define TEST_VERTEX_LAYOUTS
 
 using namespace ae3d;
                       
@@ -147,6 +148,17 @@ int main()
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
+#ifdef TEST_VERTEX_LAYOUTS
+    Mesh cubeMeshPTN;
+    cubeMeshPTN.Load( FileSystem::FileContents( "pnt_quads_2_meshes.ae3d" ) );
+
+    GameObject cubePTN;
+    cubePTN.AddComponent< MeshRendererComponent >();
+    cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
+    cubePTN.AddComponent< TransformComponent >();
+    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+#endif
+
     GameObject rtCube;
     rtCube.AddComponent< MeshRendererComponent >();
     rtCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
@@ -178,6 +190,11 @@ int main()
     material.SetBackFaceCulling( true );
     
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+
+#ifdef TEST_VERTEX_LAYOUTS
+    cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+#endif
+
     childCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
@@ -299,7 +316,9 @@ int main()
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
-    
+#ifdef TEST_VERTEX_LAYOUTS
+    scene.Add( &cubePTN );
+#endif
     scene.Add( &childCube );
     scene.Add( &copiedCube );
     scene.Add( &rotatingCube );

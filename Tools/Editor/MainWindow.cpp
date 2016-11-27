@@ -137,12 +137,10 @@ void MainWindow::closeEvent( QCloseEvent *event )
             case 1:
             default: // just for sanity
                 event->ignore();
-                std::cout << "case 1 or default" << std::endl;
                 break;
             case 2:
                 event->accept();
                 exit( 0 );
-                std::cout << "case 2" << std::endl;
                 break;
         }
     }

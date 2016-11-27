@@ -75,14 +75,14 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     if (vboId == 0)
     {
         vboId = GfxDevice::CreateBufferId();
-
-        if (GfxDevice::HasExtension( "GL_KHR_debug" ))
-        {
-            glObjectLabel( GL_BUFFER, vboId, 3, "vbo" );
-        }
     }
     
     glBindBuffer( GL_ARRAY_BUFFER, vboId );
+
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        glObjectLabel( GL_BUFFER, vboId, 3, "vbo" );
+    }
 
     if (GfxDevice::HasExtension( "GL_ARB_buffer_storage" ))
     {
@@ -97,14 +97,14 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     if (iboId == 0)
     {
         iboId = GfxDevice::CreateBufferId();
-
-        if (GfxDevice::HasExtension( "GL_KHR_debug" ))
-        {
-            glObjectLabel( GL_BUFFER, iboId, 3, "ibo" );
-        }
     }
     
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iboId );
+
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        glObjectLabel( GL_BUFFER, iboId, 3, "ibo" );
+    }
 
     if (GfxDevice::HasExtension( "GL_ARB_buffer_storage" ))
     {

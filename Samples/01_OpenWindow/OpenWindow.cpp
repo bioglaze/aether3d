@@ -32,7 +32,7 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1.0f, 0.5f, 0.5f ) );
-    //camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DontClear );
+    camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DontClear );
     camera.AddComponent<TransformComponent>();
    
     Texture2D spriteTex;
@@ -106,13 +106,22 @@ int main()
         {
             sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
         }
+        else if (frame == 4)
+        {
+            camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+        }
+        else if (frame == 5)
+        {
+            Vec3 screenPoint = camera.GetComponent<CameraComponent>()->GetScreenPoint( Vec3( 320, 200, 0 ), width, height );
+            System::Print( "screen point: %f, %f, %f\n", screenPoint.x, screenPoint.y, screenPoint.z );
+        }
 
         scene.Render();
 
         Window::SwapBuffers();
 
         ++frame;
-        //textContainer.GetComponent<TextRendererComponent>()->SetText( (frame % 5 == 0) ? "Aether3D \nGame Engine" : "Aether3D" );
+        textContainer.GetComponent<TextRendererComponent>()->SetText( (frame % 5 == 0) ? "Aether3D \nGame Engine" : "Aether3D" );
         textContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
     }
 

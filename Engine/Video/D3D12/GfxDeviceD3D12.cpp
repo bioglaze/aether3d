@@ -628,7 +628,7 @@ void ae3d::CreateRenderer( int samples )
     HRESULT hr = CreateDXGIFactory1( IID_PPV_ARGS( &factory ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP factory" );
 
-    factory->EnumAdapters( 0, reinterpret_cast<IDXGIAdapter**>(&GfxDeviceGlobal::adapter) );
+    factory->EnumAdapters( 0, reinterpret_cast< IDXGIAdapter** >( &GfxDeviceGlobal::adapter ) );
 
     bool useWarp = false;
 
@@ -644,9 +644,7 @@ void ae3d::CreateRenderer( int samples )
 #ifdef DEBUG
     hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
     AE3D_CHECK_D3D( hr, "Infoqueue failed" );
-    //GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
-    // Win 10 Anniversary edition has a false error: http://forums.directxtech.com/index.php?topic=5738.0
-    //GfxDeviceGlobal::infoQueue->SetBreakOnID( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_INCOMPATIBLE_RESOURCE_STATE, FALSE );
+    GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
 #endif
 
     hr = GfxDeviceGlobal::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( &GfxDeviceGlobal::commandListAllocator ) );
@@ -1139,11 +1137,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 {
-    if (clearFlags == ClearFlags::DontClear)
-    {
-        return;
-    }
-
     const auto backBufferIndex = GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex();
     GfxDeviceGlobal::rtvResources[ backBufferIndex ].resource = GfxDeviceGlobal::renderTargets[ backBufferIndex ];
 
