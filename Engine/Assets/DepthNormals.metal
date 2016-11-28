@@ -3,11 +3,11 @@
 
 using namespace metal;
 
-typedef struct
+struct Uniforms
 {
     matrix_float4x4 _ModelViewProjectionMatrix;
     matrix_float4x4 _ModelViewMatrix;
-} uniforms_t;
+};
 
 struct Vertex
 {
@@ -16,28 +16,27 @@ struct Vertex
     float3 normal [[attribute(3)]];
 };
 
-typedef struct
+struct ColorInOut
 {
     float4 position [[position]];
     float4 mvPosition;
     float4 normal;
-} ColorInOut;
+};
 
 vertex ColorInOut depthnormals_vertex( Vertex vert [[stage_in]],
-                                       constant uniforms_t& uniforms [[ buffer(5) ]])
+                                       constant Uniforms& uniforms [[ buffer(5) ]])
 {
     ColorInOut out;
     
-    float4 in_position = float4( float3( vert.position ), 1.0 );
-    float4 in_normal = float4( float3( vert.normal ), 0.0 );
+    float4 in_position = float4( vert.position.xyz, 1.0 );
+    float4 in_normal = float4( vert.normal.xyz, 0.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     out.mvPosition = uniforms._ModelViewMatrix * in_position;
     out.normal = uniforms._ModelViewMatrix * in_normal;
     return out;
 }
 
-fragment float4 depthnormals_fragment(ColorInOut in [[stage_in]],
-                              texture2d<float, access::sample> textureMap [[texture(0)]])
+fragment float4 depthnormals_fragment( ColorInOut in [[stage_in]] )
 {
     float linearDepth = in.mvPosition.z;
 

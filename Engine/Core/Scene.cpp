@@ -254,9 +254,8 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
              GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius(0, worldPos, pointLight->GetRadius());
              }
              }*/
-            
             GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, cameraComponent->GetProjection(),
-                                                   cameraComponent->GetView(), cameraComponent->GetDepthNormalsTexture() );
+                                                   view, cameraComponent->GetDepthNormalsTexture() );
 #endif
         }
     }

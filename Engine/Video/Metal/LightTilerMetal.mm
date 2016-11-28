@@ -28,7 +28,7 @@ void ae3d::LightTiler::Init()
 {
     pointLightCenterAndRadius.resize( MaxLights );
     pointLightCenterAndRadius[ 0 ] = Vec4( -2, 4, -8, 1.5f ); // top left
-    pointLightCenterAndRadius[ 1 ] = Vec4(  0, 0, -8, 0.5f );
+    pointLightCenterAndRadius[ 1 ] = Vec4(  0, 0, -7, 0.5f );
 
     activePointLights = 2;
 
