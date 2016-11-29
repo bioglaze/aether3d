@@ -229,31 +229,28 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
             RenderDepthAndNormals( cameraComponent, view, gameObjectsWithMeshRenderer, 0, frustum );
 
 #if defined( RENDERER_METAL )
-            /*std::vector< unsigned > gameObjectsWithPointLight;
+            int goWithPointLightIndex = 0;
 
-             int i = -1;
+            for (auto gameObject : gameObjects)
+            {
+                if (gameObject == nullptr || (gameObject->GetLayer() & cameraComponent->GetLayerMask()) == 0 || !gameObject->IsEnabled())
+                {
+                    continue;
+                }
 
-             for (auto gameObject : gameObjects)
-             {
-             ++i;
+                auto transform = gameObject->GetComponent< TransformComponent >();
+                auto pointLight = gameObject->GetComponent< PointLightComponent >();
 
-             if (gameObject == nullptr || (gameObject->GetLayer() & camera->GetLayerMask()) == 0 || !gameObject->IsEnabled())
-             {
-             continue;
-             }
+                if (transform && pointLight)
+                {
+                    // TODO: Transform into world pos
+                    auto worldPos = transform->GetLocalPosition();
+                    GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius( goWithPointLightIndex, worldPos, pointLight->GetRadius());
+                    ++goWithPointLightIndex;
+                }
+            }
 
-             auto transform = gameObject->GetComponent< TransformComponent >();
-             auto pointLight = gameObject->GetComponent< PointLightComponent >();
-
-             if (transform && pointLight)
-             {
-             gameObjectsWithPointLight.push_back( i );
-
-             // TODO: Transform into world pos
-             auto worldPos = transform->GetLocalPosition();
-             GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius(0, worldPos, pointLight->GetRadius());
-             }
-             }*/
+            GfxDeviceGlobal::lightTiler.UpdateLightBuffers();
             GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, cameraComponent->GetProjection(),
                                                    view, cameraComponent->GetDepthNormalsTexture() );
 #endif

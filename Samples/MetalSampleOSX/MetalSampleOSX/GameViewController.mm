@@ -2,6 +2,7 @@
 #import <Metal/Metal.h>
 #import <simd/simd.h>
 #import <MetalKit/MetalKit.h>
+#include <cmath>
 
 #import "CameraComponent.hpp"
 #import "SpriteRendererComponent.hpp"
@@ -302,9 +303,10 @@ using namespace ae3d;
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 512 );
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 0.5f );
     pointLight.AddComponent<ae3d::TransformComponent>();
-    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
-    //scene.Add( &pointLight );
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -7 ) );
+    scene.Add( &pointLight );
 
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
     
@@ -399,6 +401,8 @@ using namespace ae3d;
     {
         text.GetComponent<ae3d::TextRendererComponent>()->SetText( "this is a long string. this is a long string" );
     }
+
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( std::sin( angle / 2 ) * 2, 0, -7 ) );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

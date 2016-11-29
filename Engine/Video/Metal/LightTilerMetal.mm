@@ -1,4 +1,5 @@
 #include "LightTiler.hpp"
+#include <cmath>
 #include "ComputeShader.hpp"
 #include "GfxDevice.hpp"
 #include "Matrix.hpp"
@@ -27,10 +28,6 @@ struct CullerUniforms
 void ae3d::LightTiler::Init()
 {
     pointLightCenterAndRadius.resize( MaxLights );
-    pointLightCenterAndRadius[ 0 ] = Vec4( -2, 4, -8, 1.5f ); // top left
-    pointLightCenterAndRadius[ 1 ] = Vec4(  0, 0, -7, 0.5f );
-
-    activePointLights = 2;
 
     pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                  options:MTLResourceCPUCacheModeDefaultCache];
@@ -42,7 +39,7 @@ void ae3d::LightTiler::Init()
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
-    // TODO: make storage mode MTLResourceStorageModePrivate if it works and is faster.
+    // TODO: See if some other cache mode is better as this is never read/written by CPU.
     perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( unsigned )
                   options:MTLResourceCPUCacheModeDefaultCache];
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
@@ -50,18 +47,6 @@ void ae3d::LightTiler::Init()
     uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )
                                  options:MTLResourceCPUCacheModeDefaultCache];
     uniformBuffer.label = @"CullerUniforms";
-}
-
-int ae3d::LightTiler::GetNextPointLightBufferIndex()
-{
-    if (activePointLights < MaxLights)
-    {
-        ++activePointLights;
-        return activePointLights - 1;
-    }
-    
-    System::Assert( false, "tried to get a point light when buffer is full" );
-    return -1;
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
@@ -78,7 +63,11 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& positio
 {
     System::Assert( handle < MaxLights, "tried to set a too high light index" );
 
-    pointLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
+    if (handle < MaxLights)
+    {
+        activePointLights = std::max( handle, activePointLights ) + 1;
+        pointLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
+    }
 }
 
 unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
@@ -118,3 +107,10 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 }
+
+void ae3d::LightTiler::UpdateLightBuffers()
+{
+    uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
+    memcpy( bufferPointer, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+}
+

@@ -14,8 +14,8 @@ namespace ae3d
     {
     public:
         void Init();
-        int GetNextPointLightBufferIndex();
         void SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius );
+        void UpdateLightBuffers();
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
         bool CullerUniformsCreated() const { return cullerUniformsCreated; }
         
