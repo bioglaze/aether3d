@@ -25,6 +25,11 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
+//#define TEST_FORWARD_PLUS
+#define TEST_SHADOWS_DIR
+//#define TEST_SHADOWS_SPOT
+//#define TEST_SHADOWS_POINT
+
 #define MULTISAMPLE_COUNT 1
 
 using namespace ae3d;
@@ -107,7 +112,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -118,7 +123,9 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
+#ifdef TEST_FORWARD_PLUS
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+#endif
     camera3d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera3d );
 
@@ -211,7 +218,7 @@ using namespace ae3d;
     rtCube.AddComponent<ae3d::TransformComponent>();
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -4, 0, -10 ) );
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
-    scene.Add( &rtCube );
+    //scene.Add( &rtCube );
 
     standardCubeBL.AddComponent<ae3d::MeshRendererComponent>();
     standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -251,12 +258,14 @@ using namespace ae3d;
     standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, -4, -10 ) );
     standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -10 ) );
 
+#ifdef TEST_FORWARD_PLUS
     //scene.Add( &standardCubeBR );
     //scene.Add( &standardCubeBL );
     //scene.Add( &standardCubeTR );
     //scene.Add( &standardCubeTL2 );
     scene.Add( &standardCubeTopCenter );
     //scene.Add( &standardCubeTL );
+#endif
 
     cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "/textured_cube_ptn.ae3d" ) );
     cubePTN.AddComponent<ae3d::MeshRendererComponent>();
@@ -290,19 +299,25 @@ using namespace ae3d;
     //scene.Add( &bigCube2 );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
-    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
+#ifdef TEST_SHADOWS_DIR
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 1024 );
+#endif
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
     scene.Add( &dirLight );
 
-    /*spotLight.AddComponent<ae3d::SpotLightComponent>();
-    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 512 );
+    spotLight.AddComponent<ae3d::SpotLightComponent>();
+#ifdef TEST_SHADOWS_SPOT
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
+#endif
     spotLight.AddComponent<ae3d::TransformComponent>();
     spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 8, -10 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
-    scene.Add( &spotLight );*/
+    scene.Add( &spotLight );
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
-    pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 512 );
+#ifdef TEST_SHADOWS_POINT
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( true, 1024 );
+#endif
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 0.5f );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -7 ) );

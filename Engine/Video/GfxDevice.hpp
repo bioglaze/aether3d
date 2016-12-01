@@ -61,7 +61,6 @@ namespace ae3d
         void ResetUniformBuffers();
         void PresentDrawable();
         void BeginFrame();
-        void InsertDebugBoundary();
         void BeginBackBufferEncoding();
         void EndBackBufferEncoding();
 #endif

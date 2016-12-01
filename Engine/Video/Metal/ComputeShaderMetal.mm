@@ -73,23 +73,3 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     [commandBuffer commit];
     //[commandBuffer waitUntilCompleted];
 }
-
-void ae3d::ComputeShader::Test( ae3d::Texture2D* texture, ae3d::RenderTexture* outTexture )
-{
-    MTLSize threadgroupCounts = MTLSizeMake( 8, 8, 1 );
-    MTLSize threadgroups = MTLSizeMake( texture->GetWidth() / threadgroupCounts.width,
-                                        texture->GetHeight() / threadgroupCounts.height,
-                                       1);
-    id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
-    commandBuffer.label = @"ComputeCommand";
-    
-    id<MTLComputeCommandEncoder> commandEncoder = [commandBuffer computeCommandEncoder];
-    [commandEncoder setComputePipelineState:pipeline];
-    [commandEncoder setTexture:texture->GetMetalTexture() atIndex:0];
-    [commandEncoder setTexture:outTexture->GetMetalTexture() atIndex:1];
-    [commandEncoder setBuffer:uniforms[0] offset:0 atIndex:0];
-    [commandEncoder dispatchThreadgroups:threadgroups threadsPerThreadgroup:threadgroupCounts];
-    [commandEncoder endEncoding];
-    [commandBuffer commit];
-    [commandBuffer waitUntilCompleted];
-}

@@ -68,8 +68,6 @@ namespace ae3d
         /// \param renderTexture render texture.
         /// \param slot slot index.
         void SetRenderTexture( class RenderTexture* renderTexture, unsigned slot );
-
-        void Test( Texture2D* texture, ae3d::RenderTexture* outTexture );
         
     private:
         std::string path;

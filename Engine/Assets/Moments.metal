@@ -6,6 +6,7 @@ using namespace metal;
 struct uniforms_t
 {
     matrix_float4x4 _ModelViewProjectionMatrix;
+    matrix_float4x4 _ModelViewMatrix;
 };
 
 struct Vertex
@@ -24,7 +25,7 @@ vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
 {
     ColorInOut out;
     
-    float4 in_position = float4( float3( vert.position ), 1.0 );
+    float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     out.z = out.position.z * 0.5 + 0.5; // OpenGL->D3D11 unit cube fixup.
     return out;
@@ -34,7 +35,7 @@ fragment float4 moments_fragment( ColorInOut in [[stage_in]] )
 {
     //float linearDepth = in.position.z;
     float linearDepth = in.z;
-    
+
     float dx = dfdx( linearDepth );
     float dy = dfdy( linearDepth );
     

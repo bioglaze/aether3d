@@ -35,14 +35,14 @@ float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float d
 {
     float2 moments = shadowMap.sample( shadowSampler, projCoord.xy / projCoord.w ).rg;
 
-    // Tested to range between 0 - 0.5
     float variance = max( moments.y - moments.x * moments.x, -0.001 );
 
     float delta = depth - moments.x;
     float p = smoothstep( depth - 0.02, depth, moments.x );
     float pMax = linstep( 0.2, 1.0, variance / (variance + delta * delta) );
     
-    return clamp( max( p, pMax ), 0.0, 1.0 );
+    //return clamp( max( p, pMax ), 0.0, 1.0 );
+    return (depth <= moments.x) ? 0.2 : 1.0;
 }
 
 struct Vertex
@@ -57,7 +57,7 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
 {
     ColorInOut out;
     
-    float4 in_position = float4( float3( vert.position ), 1.0 );
+    float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     
     out.color = half4( vert.color );
@@ -67,15 +67,15 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
     return out;
 }
 
-fragment half4 unlit_fragment( ColorInOut in [[stage_in]],
+fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
                                texture2d<float, access::sample> textureMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
                                sampler sampler0 [[sampler(0)]] )
 {
-    half4 sampledColor = half4( textureMap.sample( sampler0, in.texCoords ) ) * half4( in.tintColor );
+    float4 sampledColor = textureMap.sample( sampler0, in.texCoords ) * in.tintColor;
 
     float depth = in.projCoord.z / in.projCoord.w;
     float shadow = max( 0.2, VSM( _ShadowMap, in.projCoord, depth ) );
     
-    return sampledColor * half4( shadow, shadow, shadow, 1 );
+    return sampledColor * float4( shadow, shadow, shadow, 1 );
 }

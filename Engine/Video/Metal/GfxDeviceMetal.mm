@@ -622,11 +622,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
                        indexBufferOffset:startIndex * 2 * 3];    
 }
 
-void ae3d::GfxDevice::InsertDebugBoundary()
-{
-    [commandQueue insertDebugCaptureBoundary];
-}
-
 void ae3d::GfxDevice::BeginFrame()
 {
     ResetUniformBuffers();
