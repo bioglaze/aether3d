@@ -81,6 +81,8 @@
 		ABB79F9A1BA9B7BC002A1B5F /* DirectionalLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E51B1A277B0017797C /* RenderTexture.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E61B1A277B0017797C /* TextureBase.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		ABF549B51DF3368C00EFF25D /* Statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABF549B31DF3368C00EFF25D /* Statistics.cpp */; };
+		ABF549B61DF3368C00EFF25D /* Statistics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF549B41DF3368C00EFF25D /* Statistics.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -160,6 +162,8 @@
 		ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
 		ABF341E51B1A277B0017797C /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../Include/RenderTexture.hpp; sourceTree = "<group>"; };
 		ABF341E61B1A277B0017797C /* TextureBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../../Include/TextureBase.hpp; sourceTree = "<group>"; };
+		ABF549B31DF3368C00EFF25D /* Statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Statistics.cpp; path = ../../Core/Statistics.cpp; sourceTree = "<group>"; };
+		ABF549B41DF3368C00EFF25D /* Statistics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Statistics.hpp; path = ../../Core/Statistics.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -265,6 +269,8 @@
 				AB922E581B405020000F3488 /* Mesh.cpp */,
 				AB61DA541DAD633F0068A5FE /* MathUtil.cpp */,
 				4449E86C1B14B44E009A869C /* Scene.cpp */,
+				ABF549B31DF3368C00EFF25D /* Statistics.cpp */,
+				ABF549B41DF3368C00EFF25D /* Statistics.hpp */,
 				449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */,
 				4449E86D1B14B44E009A869C /* System.cpp */,
 			);
@@ -353,6 +359,7 @@
 				4449E85A1B14B423009A869C /* Quaternion.hpp in Headers */,
 				4449E85F1B14B423009A869C /* TextRendererComponent.hpp in Headers */,
 				4449E8561B14B423009A869C /* Font.hpp in Headers */,
+				ABF549B61DF3368C00EFF25D /* Statistics.hpp in Headers */,
 				AB190E341B57DE85005ECE49 /* Material.hpp in Headers */,
 				AB8E84011CEBAF0100A8E9E8 /* PointLightComponent.hpp in Headers */,
 				AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */,
@@ -454,6 +461,7 @@
 				4449E8821B14B46C009A869C /* SpriteRendererComponent.cpp in Sources */,
 				4449E8711B14B44E009A869C /* FileSystem.cpp in Sources */,
 				4449E8721B14B44E009A869C /* FileWatcher.cpp in Sources */,
+				ABF549B51DF3368C00EFF25D /* Statistics.cpp in Sources */,
 				4449E8801B14B46C009A869C /* CameraComponent.cpp in Sources */,
 				4449E8991B14B4B5009A869C /* Texture2DMetal.mm in Sources */,
 				4449E88B1B14B48E009A869C /* stb_vorbis.c in Sources */,

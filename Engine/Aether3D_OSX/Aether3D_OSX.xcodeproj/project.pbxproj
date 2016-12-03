@@ -71,6 +71,8 @@
 		ABD910F41B78F930005EBB74 /* VR.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABD910F31B78F930005EBB74 /* VR.hpp */; };
 		ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */; };
 		ABE40D4F1DA54ABA0000951B /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABE40D4E1DA54ABA0000951B /* MathUtil.cpp */; };
+		ABF549B11DF3364600EFF25D /* Statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABF549AF1DF3364600EFF25D /* Statistics.cpp */; };
+		ABF549B21DF3364600EFF25D /* Statistics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF549B01DF3364600EFF25D /* Statistics.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -153,6 +155,8 @@
 		ABD910F31B78F930005EBB74 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../Include/VR.hpp; sourceTree = "<group>"; };
 		ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
 		ABE40D4E1DA54ABA0000951B /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../Core/MathUtil.cpp; sourceTree = "<group>"; };
+		ABF549AF1DF3364600EFF25D /* Statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Statistics.cpp; path = ../Core/Statistics.cpp; sourceTree = "<group>"; };
+		ABF549B01DF3364600EFF25D /* Statistics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Statistics.hpp; path = ../Core/Statistics.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +186,8 @@
 				AB6CD09A1ACEDF9E00C4FA84 /* MatrixSSE3.cpp */,
 				ABA6B0CC1ABF25CC00D84140 /* Matrix.cpp */,
 				AB922E4D1B4039DB000F3488 /* Mesh.cpp */,
+				ABF549AF1DF3364600EFF25D /* Statistics.cpp */,
+				ABF549B01DF3364600EFF25D /* Statistics.hpp */,
 				AB889AEF1ABB4C49005BA86D /* Scene.cpp */,
 				AB3A77D91AB448500081864C /* System.cpp */,
 				AB922E5C1B405F5E000F3488 /* SubMesh.hpp */,
@@ -309,6 +315,7 @@
 				AB3FD4971AB4330C00D28653 /* Window.hpp in Headers */,
 				ABA6B0CF1ABF25DC00D84140 /* Matrix.hpp in Headers */,
 				AB922E531B404D1E000F3488 /* MeshRendererComponent.hpp in Headers */,
+				ABF549B21DF3364600EFF25D /* Statistics.hpp in Headers */,
 				AB889AF91ABB4C5B005BA86D /* CameraComponent.hpp in Headers */,
 				ABCE0C9D1AC069F300F9EC53 /* VertexBuffer.hpp in Headers */,
 				AB949D351ABC8DDF007D561E /* Shader.hpp in Headers */,
@@ -424,6 +431,7 @@
 				AB922E4E1B4039DB000F3488 /* Mesh.cpp in Sources */,
 				AB07F20E1AE15C9800669331 /* AudioClip.cpp in Sources */,
 				ABBD9DC11AC31EBC005AD2ED /* FileWatcher.cpp in Sources */,
+				ABF549B11DF3364600EFF25D /* Statistics.cpp in Sources */,
 				AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */,
 				AB4CD6A51C80C5A900C21006 /* RenderTextureGL.cpp in Sources */,
 				ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */,

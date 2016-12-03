@@ -81,6 +81,8 @@
 		AB921DB11CC21AF4008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */; };
 		ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */; };
 		ABB6E0AE1C7C55E30014B78B /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */; };
+		ABF549B91DF337D500EFF25D /* Statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABF549B71DF337D500EFF25D /* Statistics.cpp */; };
+		ABF549BA1DF337D500EFF25D /* Statistics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF549B81DF337D500EFF25D /* Statistics.hpp */; };
 		ABFD71AA1D81B73A003770D4 /* LightTilerMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABFD71A91D81B73A003770D4 /* LightTilerMetal.mm */; };
 /* End PBXBuildFile section */
 
@@ -160,6 +162,8 @@
 		AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ComputeShaderMetal.mm; path = ../Video/Metal/ComputeShaderMetal.mm; sourceTree = "<group>"; };
 		ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../Video/Metal/TextureCubeMetal.mm; sourceTree = "<group>"; };
+		ABF549B71DF337D500EFF25D /* Statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Statistics.cpp; path = ../Core/Statistics.cpp; sourceTree = "<group>"; };
+		ABF549B81DF337D500EFF25D /* Statistics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Statistics.hpp; path = ../Core/Statistics.hpp; sourceTree = "<group>"; };
 		ABFD71A81D81B5E4003770D4 /* LightTiler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = LightTiler.hpp; path = ../Video/LightTiler.hpp; sourceTree = "<group>"; };
 		ABFD71A91D81B73A003770D4 /* LightTilerMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = LightTilerMetal.mm; path = ../Video/Metal/LightTilerMetal.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -231,6 +235,8 @@
 				AB61DA521DAD62F80068A5FE /* MathUtil.cpp */,
 				AB6E12E61C11D7B00020A929 /* Mesh.cpp */,
 				AB6E12E71C11D7B00020A929 /* Scene.cpp */,
+				ABF549B71DF337D500EFF25D /* Statistics.cpp */,
+				ABF549B81DF337D500EFF25D /* Statistics.hpp */,
 				AB6E12E81C11D7B00020A929 /* SubMesh.hpp */,
 				AB6E12E91C11D7B00020A929 /* System.cpp */,
 			);
@@ -339,6 +345,7 @@
 				AB6E13271C11D8020020A929 /* Font.hpp in Headers */,
 				AB6E13301C11D8020020A929 /* Scene.hpp in Headers */,
 				AB6E13321C11D8020020A929 /* SpotLightComponent.hpp in Headers */,
+				ABF549BA1DF337D500EFF25D /* Statistics.hpp in Headers */,
 				AB6E12F81C11D7B00020A929 /* SubMesh.hpp in Headers */,
 				AB6E13421C11D8A00020A929 /* GfxDevice.hpp in Headers */,
 				AB6E13471C11D8A00020A929 /* VertexBuffer.hpp in Headers */,
@@ -421,6 +428,7 @@
 				AB6E13431C11D8A00020A929 /* Material.cpp in Sources */,
 				AB6E12F51C11D7B00020A929 /* MatrixSSE3.cpp in Sources */,
 				AB61DA531DAD62F80068A5FE /* MathUtil.cpp in Sources */,
+				ABF549B91DF337D500EFF25D /* Statistics.cpp in Sources */,
 				ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */,
 				AB6E13451C11D8A00020A929 /* RendererCommon.cpp in Sources */,
 				AB6E12D41C11D79B0020A929 /* MeshRendererComponent.cpp in Sources */,
@@ -543,6 +551,7 @@
 		AB6E12C41C11D7450020A929 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = perConfigPath/../../../../aether3d_build;
@@ -569,6 +578,7 @@
 		AB6E12C51C11D7450020A929 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = perConfigPath/../../../../aether3d_build;

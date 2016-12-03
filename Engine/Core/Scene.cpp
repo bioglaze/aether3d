@@ -47,7 +47,6 @@ namespace Global
 }
 
 #if defined( RENDERER_METAL )
-void UpdateFrameTiming();
 namespace GfxDeviceGlobal
 {
     extern ae3d::LightTiler lightTiler;
@@ -537,7 +536,7 @@ void ae3d::Scene::Render()
     }
 
     GfxDevice::EndBackBufferEncoding();
-    UpdateFrameTiming();
+    Statistics::EndFrameTimeProfiling();
 #endif
 }
 

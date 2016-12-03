@@ -15,7 +15,7 @@ namespace ae3d
     { 0.5f, 0, 0, 0,
         0, 0.5f, 0, 0,
         0, 0, 0.5f, 0,
-        0, 0.5f, 0.5f, 1 };
+        0.5f, 0.5f, 0.5f, 1 };
 }
 
 using namespace ae3d;

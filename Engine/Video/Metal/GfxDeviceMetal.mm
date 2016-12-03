@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#include <chrono>
 #include <unordered_map>
 #include <sstream>
 #include <list>
@@ -10,6 +9,7 @@
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "Renderer.hpp"
 #include "RenderTexture.hpp"
 #include "Texture2D.hpp"
@@ -36,22 +36,6 @@ id<MTLTexture> msaaDepthTarget;
 // TODO: Move somewhere else.
 void PlatformInitGamePad()
 {
-}
-
-namespace Statistics
-{
-    int drawCalls = 0;
-    int textureBinds = 0;
-    int vertexBufferBinds = 0;
-    int renderTargetBinds = 0;
-    int shaderBinds = 0;
-    int createUniformBufferCalls = 0;
-    float frameTimeMS = 0;
-    float shadowMapTimeMS = 0;
-    float depthNormalsTimeMS = 0;
-    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
-    std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
 }
 
 namespace GfxDeviceGlobal
@@ -155,22 +139,15 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
-                stm << "frame time: " << ::Statistics::frameTimeMS << "\n";
-                stm << "shadow map time: " << ::Statistics::shadowMapTimeMS << " ms\n";
-                stm << "depth pass time: " << ::Statistics::depthNormalsTimeMS << " ms\n";
-                stm << "draw calls: " << ::Statistics::drawCalls << "\n";
-                stm << "create uniform buffer calls: " << ::Statistics::createUniformBufferCalls << "\n";
+                stm << "frame time: " << ::Statistics::GetFrameTimeMS() << "\n";
+                stm << "shadow map time: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
+                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
+                stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
+                stm << "create uniform buffer calls: " << ::Statistics::GetCreateConstantBufferCalls() << "\n";
                 return stm.str();
             }
         }
     }
-}
-
-void UpdateFrameTiming()
-{
-    auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startFrameTimePoint ).count();
-    Statistics::frameTimeMS = static_cast< float >(tDiff);
 }
 
 namespace
@@ -178,36 +155,12 @@ namespace
     float clearColor[] = { 0, 0, 0, 1 };
 }
 
-void ae3d::GfxDevice::BeginShadowMapProfiling()
-{
-    Statistics::startShadowMapTimePoint = std::chrono::high_resolution_clock::now();
-}
-
-void ae3d::GfxDevice::EndShadowMapProfiling()
-{
-    auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startShadowMapTimePoint ).count();
-    Statistics::shadowMapTimeMS = static_cast< float >(tDiff);
-}
-
-void ae3d::GfxDevice::BeginDepthNormalsProfiling()
-{
-    Statistics::startDepthNormalsTimePoint = std::chrono::high_resolution_clock::now();
-}
-
-void ae3d::GfxDevice::EndDepthNormalsProfiling()
-{
-    auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startDepthNormalsTimePoint ).count();
-    Statistics::depthNormalsTimeMS = static_cast< float >(tDiff);
-}
-
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 {
     id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceCPUCacheModeDefaultCache];
     uniformBuffer.label = @"uniform buffer";
 
-    ++Statistics::createUniformBufferCalls;
+    Statistics::IncCreateConstantBufferCalls();
     GfxDeviceGlobal::uniformBuffers.push_back( uniformBuffer );
     return uniformBuffer;
 }
@@ -331,36 +284,6 @@ id <MTLDevice> ae3d::GfxDevice::GetMetalDevice()
 id <MTLLibrary> ae3d::GfxDevice::GetDefaultMetalShaderLibrary()
 {
     return defaultLibrary;
-}
-
-int ae3d::GfxDevice::GetTextureBinds()
-{
-    return Statistics::textureBinds;
-}
-
-int ae3d::GfxDevice::GetVertexBufferBinds()
-{
-    return Statistics::vertexBufferBinds;
-}
-
-int ae3d::GfxDevice::GetRenderTargetBinds()
-{
-    return Statistics::renderTargetBinds;
-}
-
-int ae3d::GfxDevice::GetShaderBinds()
-{
-    return Statistics::shaderBinds;
-}
-
-int ae3d::GfxDevice::GetBarrierCalls()
-{
-    return 0;
-}
-
-int ae3d::GfxDevice::GetFenceCalls()
-{
-    return 0;
 }
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outGpuUsageMBytes, unsigned& outGpuBudgetMBytes )
@@ -542,7 +465,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
     
-    ++Statistics::drawCalls;
+    Statistics::IncDrawCalls();
 
     if (!texture0)
     {
@@ -671,37 +594,6 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     clearColor[ 0 ] = red;
     clearColor[ 1 ] = green;
     clearColor[ 2 ] = blue;
-}
-
-void ae3d::GfxDevice::IncDrawCalls()
-{
-    ++Statistics::drawCalls;
-}
-
-int ae3d::GfxDevice::GetDrawCalls()
-{
-    return Statistics::drawCalls;
-}
-
-void ae3d::GfxDevice::IncTextureBinds()
-{
-    ++Statistics::textureBinds;
-}
-
-void ae3d::GfxDevice::IncShaderBinds()
-{
-    ++Statistics::shaderBinds;
-}
-
-void ae3d::GfxDevice::ResetFrameStatistics()
-{
-    Statistics::drawCalls = 0;
-    Statistics::renderTargetBinds = 0;
-    Statistics::textureBinds = 0;
-    Statistics::vertexBufferBinds = 0;
-    Statistics::shaderBinds = 0;
-    Statistics::createUniformBufferCalls = 0;
-    Statistics::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

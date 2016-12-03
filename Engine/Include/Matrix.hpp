@@ -119,7 +119,7 @@ namespace ae3d
         void MakeIdentity();
         
         /**
-         Makes a lookat matrix.
+         Makes a lookat matrix (left-handed).
          
          \param eye Eye (camera) position.
          \param center Target position.
@@ -128,7 +128,7 @@ namespace ae3d
         void MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up );
         
         /**
-         Sets perspective projection (right-handed).
+         Sets perspective projection (left-handed).
          Calculated as in gluPerspective (http://www.opengl.org/wiki/GluPerspective_code)
          
          \param fovDegrees Field-of-View in degrees.
