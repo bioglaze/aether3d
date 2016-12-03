@@ -1,6 +1,5 @@
 #include "GfxDevice.hpp"
 #include <cstdint>
-#include <chrono>
 #include <map>
 #include <vector> 
 #include <string>
@@ -10,6 +9,7 @@
 #include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
+#include "Statistics.hpp"
 #include "VertexBuffer.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
@@ -41,15 +41,6 @@ struct Ubo
     VkDescriptorBufferInfo uboDesc;
     std::uint8_t* uboData = nullptr;
 };
-
-namespace Stats
-{
-    int drawCalls = 0;
-    int barrierCalls = 0;
-    int fenceCalls = 0;
-    float frameTimeMS = 0;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
-}
 
 namespace GfxDeviceGlobal
 {
@@ -130,10 +121,12 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
-                stm << "frame time: " << Stats::frameTimeMS << " ms\n";
-                stm << "draw calls: " << Stats::drawCalls << "\n";
-                stm << "barrier calls: " << Stats::barrierCalls << "\n";
-                stm << "fence calls: " << Stats::fenceCalls << "\n";
+                stm << "frame time: " << ::Statistics::GetFrameTimeMS() << " ms\n";
+                stm << "shadow pass time: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
+                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
+                stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
+                stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
+                stm << "fence calls: " << ::Statistics::GetFenceCalls() << "\n";
 
                 return stm.str();
             }
@@ -468,7 +461,7 @@ namespace ae3d
             0, nullptr,
             0, nullptr,
             1, &prePresentBarrier );
-        ++Stats::barrierCalls;
+        Statistics::IncBarrierCalls();
 
         err = vkEndCommandBuffer( GfxDeviceGlobal::prePresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
@@ -510,7 +503,7 @@ namespace ae3d
             0, nullptr,
             0, nullptr,
             1, &postPresentBarrier );
-        ++Stats::barrierCalls;
+        Statistics::IncBarrierCalls();
 
         err = vkEndCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
@@ -523,9 +516,7 @@ namespace ae3d
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitPostInfo, VK_NULL_HANDLE );
         AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
 
-        auto tEnd = std::chrono::high_resolution_clock::now();
-        auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startFrameTimePoint ).count();
-        Stats::frameTimeMS = static_cast< float >(tDiff);
+        Statistics::EndFrameTimeProfiling();
     }
     
     void AllocateSetupCommandBuffer()
@@ -1448,6 +1439,10 @@ namespace ae3d
     }
 }
 
+void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
+{
+}
+
 void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )
 {
 }
@@ -1541,66 +1536,14 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     GfxDeviceGlobal::clearColor.float32[ 3 ] = 1.0f;
 }
 
-void ae3d::GfxDevice::ResetFrameStatistics()
-{
-    Stats::drawCalls = 0;
-    Stats::barrierCalls = 0;
-    Stats::fenceCalls = 0;
-    Stats::startFrameTimePoint = std::chrono::high_resolution_clock::now();
-}
-
 void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
 {
-}
-
-int ae3d::GfxDevice::GetDrawCalls()
-{
-    return Stats::drawCalls;
-}
-
-int ae3d::GfxDevice::GetTextureBinds()
-{
-    return 0;
-}
-
-int ae3d::GfxDevice::GetRenderTargetBinds()
-{
-    return 0;
-}
-
-int ae3d::GfxDevice::GetVertexBufferBinds()
-{
-    return 0;
-}
-
-int ae3d::GfxDevice::GetShaderBinds()
-{
-    return 0;
 }
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
 {
     outUsedMBytes = 0;
     outBudgetMBytes = 0;
-}
-
-int ae3d::GfxDevice::GetBarrierCalls()
-{
-    return Stats::barrierCalls;
-}
-
-int ae3d::GfxDevice::GetFenceCalls()
-{
-    return Stats::fenceCalls;
-}
-
-void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
-{
-}
-
-void ae3d::GfxDevice::IncDrawCalls()
-{
-    ++Stats::drawCalls;
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned /*clearFlags*/ )
@@ -1644,7 +1587,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     vkCmdBindIndexBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
     vkCmdDrawIndexed( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
-    IncDrawCalls();
+    Statistics::IncDrawCalls();
 }
 
 void ae3d::GfxDevice::CreateNewUniformBuffer()

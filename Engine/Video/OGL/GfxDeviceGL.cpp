@@ -1,11 +1,11 @@
 #include "GfxDevice.hpp"
 #include <algorithm>
-#include <chrono>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <GL/glxw.h>
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
 #include "VertexBuffer.hpp"
@@ -79,28 +79,6 @@ namespace GfxDeviceGlobal
     GLuint cachedFBO = 0;
 }
 
-namespace Stats
-{
-    int drawCalls = 0;
-    int vaoBinds = 0;
-    int textureBinds = 0;
-    int renderTargetBinds = 0;
-    int shaderBinds = 0;
-    float frameTimeMS = 0;
-    float shadowMapTimeMs = 0;
-    float depthNormalsTimeMs = 0;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
-}
-
-void UpdateFrameTiming()
-{
-    auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startFrameTimePoint ).count();
-    Stats::frameTimeMS = static_cast< float >(tDiff);
-}
-
 namespace ae3d
 {
     namespace System
@@ -110,12 +88,12 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
-                stm << "frame time: " << Stats::frameTimeMS << " ms\n";
-                stm << "shadow map time: " << Stats::shadowMapTimeMs << " ms\n";
-                stm << "depth pass time: " << Stats::depthNormalsTimeMs << " ms\n";
-                stm << "draw calls: " << Stats::drawCalls << "\n";
-                stm << "texture binds: " << Stats::textureBinds << "\n";
-                stm << "render target binds: " << Stats::renderTargetBinds << "\n";
+                stm << "frame time: " << ::Statistics::GetFrameTimeMS() << " ms\n";
+                stm << "shadow map time: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
+                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
+                stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
+                stm << "texture binds: " << ::Statistics::GetTextureBinds() << "\n";
+                stm << "render target binds: " << ::Statistics::GetRenderTargetBinds() << "\n";
 
                 return stm.str();
             }
@@ -187,30 +165,6 @@ void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
     }
 }
 
-void ae3d::GfxDevice::BeginShadowMapProfiling()
-{
-    Stats::startShadowMapTimePoint = std::chrono::high_resolution_clock::now();
-}
-
-void ae3d::GfxDevice::EndShadowMapProfiling()
-{
-    auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startShadowMapTimePoint ).count();
-    Stats::shadowMapTimeMs = static_cast< float >(tDiff);
-}
-
-void ae3d::GfxDevice::BeginDepthNormalsProfiling()
-{
-    Stats::startDepthNormalsTimePoint = std::chrono::high_resolution_clock::now();
-}
-
-void ae3d::GfxDevice::EndDepthNormalsProfiling()
-{
-    auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startDepthNormalsTimePoint ).count();
-    Stats::depthNormalsTimeMs = static_cast< float >(tDiff);
-}
-
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
 {
     if (enable)
@@ -267,7 +221,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     shader.Use();
     vertexBuffer.Bind();
-    GfxDevice::IncDrawCalls();
+    Statistics::IncDrawCalls();
 
 #if DEBUG
     glValidateProgram( shader.GetHandle() );
@@ -286,76 +240,6 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
     {
         glDisable( GL_MULTISAMPLE );
     }
-}
-
-void ae3d::GfxDevice::IncDrawCalls()
-{
-    ++Stats::drawCalls;
-}
-
-void ae3d::GfxDevice::IncTextureBinds()
-{
-    ++Stats::textureBinds;
-}
-
-void ae3d::GfxDevice::IncRenderTargetBinds()
-{
-    ++Stats::renderTargetBinds;
-}
-
-void ae3d::GfxDevice::IncVertexBufferBinds()
-{
-    ++Stats::vaoBinds;
-}
-
-void ae3d::GfxDevice::IncShaderBinds()
-{
-    ++Stats::shaderBinds;
-}
-
-void ae3d::GfxDevice::ResetFrameStatistics()
-{
-    Stats::drawCalls = 0;
-    Stats::vaoBinds = 0;
-    Stats::textureBinds = 0;
-    Stats::renderTargetBinds = 0;
-    Stats::shaderBinds = 0;
-    Stats::startFrameTimePoint = std::chrono::high_resolution_clock::now();
-}
-
-int ae3d::GfxDevice::GetDrawCalls()
-{
-    return Stats::drawCalls;
-}
-
-int ae3d::GfxDevice::GetTextureBinds()
-{
-    return Stats::textureBinds;
-}
-
-int ae3d::GfxDevice::GetRenderTargetBinds()
-{
-    return Stats::renderTargetBinds;
-}
-
-int ae3d::GfxDevice::GetVertexBufferBinds()
-{
-    return Stats::vaoBinds;
-}
-
-int ae3d::GfxDevice::GetShaderBinds()
-{
-    return Stats::shaderBinds;
-}
-
-int ae3d::GfxDevice::GetBarrierCalls()
-{
-    return 0;
-}
-
-int ae3d::GfxDevice::GetFenceCalls()
-{
-    return 0;
 }
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outGpuUsageMBytes, unsigned& outGpuBudgetMBytes )
@@ -571,7 +455,7 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     }
 
     const GLuint fbo = target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
-    IncRenderTargetBinds();
+    Statistics::IncRenderTargetBinds();
     glBindFramebuffer( GL_FRAMEBUFFER, fbo );
     GfxDeviceGlobal::cachedFBO = fbo;
 

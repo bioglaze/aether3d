@@ -3,6 +3,7 @@
 #include <vector>
 #include <GL/glxw.h>
 #include "GfxDevice.hpp"
+#include "Statistics.hpp"
 #include "Vec3.hpp"
 
 namespace Global
@@ -202,6 +203,6 @@ void ae3d::VertexBuffer::Bind() const
     {
         glBindVertexArray( vaoId );
         Global::activeVao = vaoId;
-        GfxDevice::IncVertexBufferBinds();
+        Statistics::IncVertexBufferBinds();
     }
 }

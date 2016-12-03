@@ -47,6 +47,7 @@ namespace ae3d
 
         void Init( int width, int height );
 #if RENDERER_D3D12
+        void ResetCommandList();
         void  CreateNewUniformBuffer();
         void* GetCurrentUniformBuffer();
 #endif
@@ -86,25 +87,6 @@ namespace ae3d
 
         void SetPolygonOffset( bool enable, float factor, float units );
 
-        void BeginShadowMapProfiling();
-        void EndShadowMapProfiling();
-
-        void BeginDepthNormalsProfiling();
-        void EndDepthNormalsProfiling();
-
-        void IncDrawCalls();
-        int GetDrawCalls();
-        void IncVertexBufferBinds();
-        int GetVertexBufferBinds();
-        void IncTextureBinds();
-        int GetTextureBinds();
-        void IncRenderTargetBinds();
-        int GetRenderTargetBinds();
-        void ResetFrameStatistics();
-        void IncShaderBinds();
-        int GetShaderBinds();
-        int GetBarrierCalls();
-        int GetFenceCalls();
         void GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes );
 
         void Present();

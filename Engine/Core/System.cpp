@@ -13,6 +13,7 @@
 #include "Renderer.hpp"
 #include "Texture2D.hpp"
 #include "Shader.hpp"
+#include "Statistics.hpp"
 
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
@@ -151,27 +152,27 @@ void ae3d::System::ReloadChangedAssets()
 
 int ae3d::System::Statistics::GetDrawCallCount()
 {
-    return GfxDevice::GetDrawCalls();
+    return ::Statistics::GetDrawCalls();
 }
 
 int ae3d::System::Statistics::GetVertexBufferBindCount()
 {
-    return GfxDevice::GetVertexBufferBinds();
+    return ::Statistics::GetVertexBufferBinds();
 }
 
 int ae3d::System::Statistics::GetTextureBindCount()
 {
-    return GfxDevice::GetTextureBinds();
+    return ::Statistics::GetTextureBinds();
 }
 
 int ae3d::System::Statistics::GetRenderTargetBindCount()
 {
-    return GfxDevice::GetRenderTargetBinds();
+    return ::Statistics::GetRenderTargetBinds();
 }
 
 int ae3d::System::Statistics::GetShaderBindCount()
 {
-    return GfxDevice::GetShaderBinds();
+    return ::Statistics::GetShaderBinds();
 }
 
 void ae3d::System::Statistics::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
@@ -181,10 +182,10 @@ void ae3d::System::Statistics::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsig
 
 int ae3d::System::Statistics::GetBarrierCallCount()
 {
-    return GfxDevice::GetBarrierCalls();
+    return ::Statistics::GetBarrierCalls();
 }
 
 int ae3d::System::Statistics::GetFenceCallCount()
 {
-    return GfxDevice::GetFenceCalls();
+    return ::Statistics::GetFenceCalls();
 }

@@ -1,5 +1,4 @@
 #include "GfxDevice.hpp"
-#include <chrono>
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <Windows.h>
@@ -16,6 +15,7 @@
 #include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
+#include "Statistics.hpp"
 #include "TextureBase.hpp"
 #include "RenderTexture.hpp"
 #include "Texture2D.hpp"
@@ -38,18 +38,6 @@ namespace MathUtil
     unsigned GetHash( const char* s, unsigned length );
 }
 
-namespace Stats
-{
-    int drawCalls = 0;
-    int vaoBinds = 0;
-    int textureBinds = 0;
-    int shaderBinds = 0;
-    int barrierCalls = 0;
-    int fenceCalls = 0;
-    int createConstantBufferCalls = 0;
-    float frameTimeMS = 0;
-}
-
 namespace ae3d
 {
     namespace System
@@ -59,10 +47,12 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
-                stm << "frame time: " << Stats::frameTimeMS << "ms\n";
-                stm << "draw calls: " << Stats::drawCalls << "\n";
-                stm << "barrier calls: " << Stats::barrierCalls << "\n";
-                stm << "create constant buffer calls: " << Stats::createConstantBufferCalls << "\n";
+                stm << "frame time: " << ::Statistics::GetFrameTimeMS() << "ms\n";
+                stm << "shadow pass time: " << ::Statistics::GetShadowMapTimeMS() << "ms\n";
+                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
+                stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
+                stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
+                stm << "create constant buffer calls: " << ::Statistics::GetCreateConstantBufferCalls() << "\n";
 
                 return stm.str();
 	    }
@@ -122,7 +112,6 @@ namespace GfxDeviceGlobal
     ID3D12Resource* msaaDepth = nullptr;
     D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
-    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
 }
 
 namespace Global
@@ -141,7 +130,7 @@ void WaitForPreviousFrame()
     HRESULT hr = GfxDeviceGlobal::commandQueue->Signal( GfxDeviceGlobal::fence, fenceValue );
     AE3D_CHECK_D3D( hr, "command queue signal" );
     ++GfxDeviceGlobal::fenceValue;
-    ++Stats::fenceCalls;
+    Statistics::IncFenceCalls();
 
     if (GfxDeviceGlobal::fence->GetCompletedValue() < fenceValue)
     {
@@ -181,7 +170,7 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
 
     gpuResource.usageState = newState;
 
-    ++Stats::barrierCalls;
+    Statistics::IncBarrierCalls();
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
 }
 
@@ -762,7 +751,7 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
         System::Print( "Unable to map shader constant buffer!" );
     }
 
-    ++Stats::createConstantBufferCalls;
+    Statistics::IncCreateConstantBufferCalls();
 }
 
 void* ae3d::GfxDevice::GetCurrentUniformBuffer()
@@ -1007,7 +996,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( &indexBufferView );
     GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace * 3, 1, startFace * 3, 0, 0 );
 
-    GfxDevice::IncDrawCalls();
+    Statistics::IncDrawCalls();
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
@@ -1018,71 +1007,10 @@ void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
 {
 }
 
-int ae3d::GfxDevice::GetRenderTargetBinds()
+void ae3d::GfxDevice::ResetCommandList()
 {
-    return 0;
-}
-
-void ae3d::GfxDevice::IncDrawCalls()
-{
-    ++Stats::drawCalls;
-}
-
-void ae3d::GfxDevice::IncTextureBinds()
-{
-    ++Stats::textureBinds;
-}
-
-void ae3d::GfxDevice::IncVertexBufferBinds()
-{
-    ++Stats::vaoBinds;
-}
-
-void ae3d::GfxDevice::ResetFrameStatistics()
-{
-    Stats::drawCalls = 0;
-    Stats::vaoBinds = 0;
-    Stats::textureBinds = 0;
-    Stats::barrierCalls = 0;
-    Stats::fenceCalls = 0;
-    Stats::createConstantBufferCalls = 0;
-
-    // TODO: Figure out a better place for this.
-
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
     AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
-
-    GfxDeviceGlobal::startFrameTimePoint = std::chrono::high_resolution_clock::now();
-}
-
-int ae3d::GfxDevice::GetDrawCalls()
-{
-    return Stats::drawCalls;
-}
-
-int ae3d::GfxDevice::GetTextureBinds()
-{
-    return Stats::textureBinds;
-}
-
-int ae3d::GfxDevice::GetShaderBinds()
-{
-    return Stats::shaderBinds;
-}
-
-int ae3d::GfxDevice::GetVertexBufferBinds()
-{
-    return Stats::vaoBinds;
-}
-
-int ae3d::GfxDevice::GetBarrierCalls()
-{
-    return Stats::barrierCalls;
-}
-
-int ae3d::GfxDevice::GetFenceCalls()
-{
-    return Stats::fenceCalls;
 }
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
@@ -1293,9 +1221,7 @@ void ae3d::GfxDevice::Present()
     GfxDeviceGlobal::renderTexture0 = nullptr;
     GfxDeviceGlobal::renderTexture1 = nullptr;
 
-    auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - GfxDeviceGlobal::startFrameTimePoint ).count();
-    Stats::frameTimeMS = static_cast< float >( tDiff );
+    Statistics::EndFrameTimeProfiling();
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )

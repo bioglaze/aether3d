@@ -196,6 +196,7 @@
     <ClCompile Include="..\Core\MatrixSSE3.cpp" />
     <ClCompile Include="..\Core\Mesh.cpp" />
     <ClCompile Include="..\Core\Scene.cpp" />
+    <ClCompile Include="..\Core\Statistics.cpp" />
     <ClCompile Include="..\Core\System.cpp" />
     <ClCompile Include="..\ThirdParty\GL\glxw.c" />
     <ClCompile Include="..\ThirdParty\stb_image.c" />
@@ -230,6 +231,7 @@
     <ClInclude Include="..\Core\AudioSystem.hpp" />
     <ClInclude Include="..\Core\FileWatcher.hpp" />
     <ClInclude Include="..\Core\Frustum.hpp" />
+    <ClInclude Include="..\Core\Statistics.hpp" />
     <ClInclude Include="..\Include\AudioClip.hpp" />
     <ClInclude Include="..\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\Include\CameraComponent.hpp" />

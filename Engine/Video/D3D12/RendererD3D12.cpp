@@ -156,6 +156,7 @@ cbuffer Scene\
         {
             VSOutput vsOut;
             vsOut.pos = mul( _ModelViewProjectionMatrix, float4( pos, 1.0 ) );
+            vsOut.pos.y = -vsOut.pos.y;
             return vsOut;
         }
 

@@ -124,6 +124,9 @@
     <ClCompile Include="..\Core\MathUtil.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\Statistics.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -262,6 +265,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\PointLightComponent.hpp">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Statistics.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

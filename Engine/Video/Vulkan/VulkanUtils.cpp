@@ -4,12 +4,8 @@
 #include "System.hpp"
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
+#include "Statistics.hpp"
 #include "GfxDevice.hpp"
-
-namespace Stats
-{
-    extern int barrierCalls;
-}
 
 namespace debug
 {
@@ -278,6 +274,6 @@ namespace ae3d
             0, nullptr,
             1, &imageMemoryBarrier );
 
-        ++Stats::barrierCalls;
+        Statistics::IncBarrierCalls();
     }
 }

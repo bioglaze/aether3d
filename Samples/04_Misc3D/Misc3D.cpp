@@ -73,7 +73,7 @@ int main()
 #endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
-    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+    //camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
     
@@ -111,8 +111,8 @@ int main()
     statsContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
     statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     statsContainer.AddComponent<TransformComponent>();
-    statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( { 20, 0, 0 } );
-    statsContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
+    statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( { 20, 40, 0 } );
+    //statsContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
     statsContainer.SetLayer( 2 );
     
     Mesh cubeMesh;

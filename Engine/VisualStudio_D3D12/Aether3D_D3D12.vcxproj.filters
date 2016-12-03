@@ -138,6 +138,9 @@
     <ClCompile Include="..\Core\MathUtil.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Core\Statistics.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -256,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="..\Video\DDSLoader.hpp">
       <Filter>Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\Statistics.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

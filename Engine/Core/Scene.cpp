@@ -21,6 +21,7 @@
 #include "PointLightComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "SpotLightComponent.hpp"
+#include "Statistics.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "Texture2D.hpp"
@@ -180,6 +181,8 @@ void ae3d::Scene::Remove( GameObject* gameObject )
 
 void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >& cameras )
 {
+    Statistics::BeginDepthNormalsProfiling();
+
     for (auto camera : cameras)
     {
         CameraComponent* cameraComponent = camera->GetComponent< CameraComponent >();
@@ -256,15 +259,23 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 #endif
         }
     }
+
+    Statistics::EndDepthNormalsProfiling();
 }
 
 void ae3d::Scene::Render()
 {
+#if RENDERER_OPENGL
+    Statistics::BeginFrameTimeProfiling();
+#endif
 #if RENDERER_VULKAN
     GfxDevice::BeginFrame();
 #endif
     GenerateAABB();
-    GfxDevice::ResetFrameStatistics();
+#if RENDERER_D3D12
+    GfxDevice::ResetCommandList();
+#endif
+    Statistics::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();
 
     std::vector< GameObject* > rtCameras;
@@ -381,7 +392,7 @@ void ae3d::Scene::Render()
                 if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
                                        (pointLight && pointLight->CastsShadow())))
                 {
-                    GfxDevice::BeginShadowMapProfiling();
+                    Statistics::BeginShadowMapProfiling();
 
                     Frustum eyeFrustum;
                     
@@ -494,7 +505,7 @@ void ae3d::Scene::Render()
                         hasShadow = true;
                     }
 
-                    GfxDevice::EndShadowMapProfiling();
+                    Statistics::EndShadowMapProfiling();
                 }
             }
         }
@@ -515,9 +526,7 @@ void ae3d::Scene::Render()
     
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
 
-    GfxDevice::BeginDepthNormalsProfiling();
     RenderDepthAndNormalsForAllCameras( cameras );
-    GfxDevice::EndDepthNormalsProfiling();
 
 #if RENDERER_METAL
     GfxDevice::BeginBackBufferEncoding();

@@ -5,6 +5,7 @@
 #include "FileWatcher.hpp"
 #include "GfxDevice.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "RenderTexture.hpp"
@@ -208,7 +209,7 @@ void ae3d::Shader::Use()
     
     if (boundHandle != handle)
     {
-        GfxDevice::IncShaderBinds();
+        Statistics::IncShaderBinds();
         glUseProgram( handle );
         boundHandle = handle;
     }
@@ -226,7 +227,7 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int t
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_2D, texture->GetID() );
-    GfxDevice::IncTextureBinds();
+    Statistics::IncTextureBinds();
     SetInt( name, textureUnit );
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
@@ -237,7 +238,7 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( GL_TEXTURE_CUBE_MAP, texture->GetID() );
-    GfxDevice::IncTextureBinds();
+    Statistics::IncTextureBinds();
     SetInt( name, textureUnit );
     
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
@@ -248,7 +249,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
 {
     glActiveTexture( GL_TEXTURE0 + textureUnit );
     glBindTexture( texture->IsCube() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, texture->GetID() );
-    GfxDevice::IncTextureBinds();
+    Statistics::IncTextureBinds();
     SetInt( name, textureUnit );
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
