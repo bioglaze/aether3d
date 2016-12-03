@@ -47,6 +47,11 @@ namespace Statistics
     int shaderBinds = 0;
     int createUniformBufferCalls = 0;
     float frameTimeMS = 0;
+    float shadowMapTimeMS = 0;
+    float depthNormalsTimeMS = 0;
+    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
+    std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
+    std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
 }
 
 namespace GfxDeviceGlobal
@@ -61,7 +66,6 @@ namespace GfxDeviceGlobal
     std::list< id<MTLBuffer> > uniformBuffers;
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
     ae3d::LightTiler lightTiler;
-    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
 
     struct Samplers
     {
@@ -152,6 +156,8 @@ namespace ae3d
             {
                 std::stringstream stm;
                 stm << "frame time: " << ::Statistics::frameTimeMS << "\n";
+                stm << "shadow map time: " << ::Statistics::shadowMapTimeMS << " ms\n";
+                stm << "depth pass time: " << ::Statistics::depthNormalsTimeMS << " ms\n";
                 stm << "draw calls: " << ::Statistics::drawCalls << "\n";
                 stm << "create uniform buffer calls: " << ::Statistics::createUniformBufferCalls << "\n";
                 return stm.str();
@@ -163,13 +169,37 @@ namespace ae3d
 void UpdateFrameTiming()
 {
     auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - GfxDeviceGlobal::startFrameTimePoint ).count();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startFrameTimePoint ).count();
     Statistics::frameTimeMS = static_cast< float >(tDiff);
 }
 
 namespace
 {
     float clearColor[] = { 0, 0, 0, 1 };
+}
+
+void ae3d::GfxDevice::BeginShadowMapProfiling()
+{
+    Statistics::startShadowMapTimePoint = std::chrono::high_resolution_clock::now();
+}
+
+void ae3d::GfxDevice::EndShadowMapProfiling()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startShadowMapTimePoint ).count();
+    Statistics::shadowMapTimeMS = static_cast< float >(tDiff);
+}
+
+void ae3d::GfxDevice::BeginDepthNormalsProfiling()
+{
+    Statistics::startDepthNormalsTimePoint = std::chrono::high_resolution_clock::now();
+}
+
+void ae3d::GfxDevice::EndDepthNormalsProfiling()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startDepthNormalsTimePoint ).count();
+    Statistics::depthNormalsTimeMS = static_cast< float >(tDiff);
 }
 
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
@@ -671,7 +701,7 @@ void ae3d::GfxDevice::ResetFrameStatistics()
     Statistics::vertexBufferBinds = 0;
     Statistics::shaderBinds = 0;
     Statistics::createUniformBufferCalls = 0;
-    GfxDeviceGlobal::startFrameTimePoint = std::chrono::high_resolution_clock::now();
+    Statistics::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()

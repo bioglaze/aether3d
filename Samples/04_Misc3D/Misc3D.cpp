@@ -73,7 +73,7 @@ int main()
 #endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
-    //camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
     
@@ -112,6 +112,7 @@ int main()
     statsContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
     statsContainer.AddComponent<TransformComponent>();
     statsContainer.GetComponent<TransformComponent>()->SetLocalPosition( { 20, 0, 0 } );
+    statsContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
     statsContainer.SetLayer( 2 );
     
     Mesh cubeMesh;
@@ -261,7 +262,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -324,7 +325,8 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
+    scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
@@ -335,7 +337,6 @@ int main()
     scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
     
-    //scene.Add( &statsContainer );
     //scene.Add( &dirLight );
 #ifdef TEST_SHADOWS_SPOT
     scene.Add( &spotLight );

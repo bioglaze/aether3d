@@ -381,6 +381,8 @@ void ae3d::Scene::Render()
                 if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
                                        (pointLight && pointLight->CastsShadow())))
                 {
+                    GfxDevice::BeginShadowMapProfiling();
+
                     Frustum eyeFrustum;
                     
                     auto cameraComponent = camera->GetComponent< CameraComponent >();
@@ -491,6 +493,8 @@ void ae3d::Scene::Render()
                         //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
                         hasShadow = true;
                     }
+
+                    GfxDevice::EndShadowMapProfiling();
                 }
             }
         }
@@ -511,7 +515,9 @@ void ae3d::Scene::Render()
     
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
 
+    GfxDevice::BeginDepthNormalsProfiling();
     RenderDepthAndNormalsForAllCameras( cameras );
+    GfxDevice::EndDepthNormalsProfiling();
 
 #if RENDERER_METAL
     GfxDevice::BeginBackBufferEncoding();

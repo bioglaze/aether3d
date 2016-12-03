@@ -86,6 +86,12 @@ namespace ae3d
 
         void SetPolygonOffset( bool enable, float factor, float units );
 
+        void BeginShadowMapProfiling();
+        void EndShadowMapProfiling();
+
+        void BeginDepthNormalsProfiling();
+        void EndDepthNormalsProfiling();
+
         void IncDrawCalls();
         int GetDrawCalls();
         void IncVertexBufferBinds();

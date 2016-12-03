@@ -72,14 +72,6 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > programIds;
     std::vector< GLuint > rboIds;
     std::vector< GLuint > fboIds;
-    
-    int drawCalls = 0;
-    int vaoBinds = 0;
-    int textureBinds = 0;
-    int renderTargetBinds = 0;
-    int shaderBinds = 0;
-    float frameTimeMS = 0;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
 
     int backBufferWidth = 640;
     int backBufferHeight = 400;
@@ -87,11 +79,26 @@ namespace GfxDeviceGlobal
     GLuint cachedFBO = 0;
 }
 
+namespace Stats
+{
+    int drawCalls = 0;
+    int vaoBinds = 0;
+    int textureBinds = 0;
+    int renderTargetBinds = 0;
+    int shaderBinds = 0;
+    float frameTimeMS = 0;
+    float shadowMapTimeMs = 0;
+    float depthNormalsTimeMs = 0;
+    std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
+    std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
+    std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
+}
+
 void UpdateFrameTiming()
 {
     auto tEnd = std::chrono::high_resolution_clock::now();
-    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - GfxDeviceGlobal::startFrameTimePoint ).count();
-    GfxDeviceGlobal::frameTimeMS = static_cast< float >(tDiff);
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startFrameTimePoint ).count();
+    Stats::frameTimeMS = static_cast< float >(tDiff);
 }
 
 namespace ae3d
@@ -103,10 +110,12 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
-                stm << "frame time: " << GfxDeviceGlobal::frameTimeMS << "ms\n";
-                stm << "draw calls: " << GfxDeviceGlobal::drawCalls << "\n";
-                stm << "texture binds: " << GfxDeviceGlobal::textureBinds << "\n";
-                stm << "render target binds: " << GfxDeviceGlobal::renderTargetBinds << "\n";
+                stm << "frame time: " << Stats::frameTimeMS << " ms\n";
+                stm << "shadow map time: " << Stats::shadowMapTimeMs << " ms\n";
+                stm << "depth pass time: " << Stats::depthNormalsTimeMs << " ms\n";
+                stm << "draw calls: " << Stats::drawCalls << "\n";
+                stm << "texture binds: " << Stats::textureBinds << "\n";
+                stm << "render target binds: " << Stats::renderTargetBinds << "\n";
 
                 return stm.str();
             }
@@ -136,6 +145,23 @@ void SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
     }
 }
 
+void SetCullMode( ae3d::GfxDevice::CullMode cullMode )
+{
+    if (cullMode == ae3d::GfxDevice::CullMode::Back)
+    {
+        glEnable( GL_CULL_FACE );
+        glCullFace( GL_BACK );
+    }
+    else if (cullMode == ae3d::GfxDevice::CullMode::Front)
+    {
+        glEnable( GL_CULL_FACE );
+        glCullFace( GL_FRONT );
+    }
+    else
+    {
+        glDisable( GL_CULL_FACE );
+    }
+}
 void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
 {
     if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
@@ -159,6 +185,30 @@ void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
     {
         ae3d::System::Assert( false, "Unhandled depth function." );   
     }
+}
+
+void ae3d::GfxDevice::BeginShadowMapProfiling()
+{
+    Stats::startShadowMapTimePoint = std::chrono::high_resolution_clock::now();
+}
+
+void ae3d::GfxDevice::EndShadowMapProfiling()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startShadowMapTimePoint ).count();
+    Stats::shadowMapTimeMs = static_cast< float >(tDiff);
+}
+
+void ae3d::GfxDevice::BeginDepthNormalsProfiling()
+{
+    Stats::startDepthNormalsTimePoint = std::chrono::high_resolution_clock::now();
+}
+
+void ae3d::GfxDevice::EndDepthNormalsProfiling()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Stats::startDepthNormalsTimePoint ).count();
+    Stats::depthNormalsTimeMs = static_cast< float >(tDiff);
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
@@ -213,21 +263,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     SetBlendMode( blendMode );
     SetDepthFunc( depthFunc );
-
-    if (cullMode == CullMode::Back)
-    {
-        glEnable( GL_CULL_FACE );
-        glCullFace( GL_BACK );
-    }
-    else if (cullMode == CullMode::Front)
-    {
-        glEnable( GL_CULL_FACE );
-        glCullFace( GL_FRONT );
-    }
-    else
-    {
-        glDisable( GL_CULL_FACE );
-    }
+    SetCullMode( cullMode );
 
     shader.Use();
     vertexBuffer.Bind();
@@ -254,62 +290,62 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
 
 void ae3d::GfxDevice::IncDrawCalls()
 {
-    ++GfxDeviceGlobal::drawCalls;
+    ++Stats::drawCalls;
 }
 
 void ae3d::GfxDevice::IncTextureBinds()
 {
-    ++GfxDeviceGlobal::textureBinds;
+    ++Stats::textureBinds;
 }
 
 void ae3d::GfxDevice::IncRenderTargetBinds()
 {
-    ++GfxDeviceGlobal::renderTargetBinds;
+    ++Stats::renderTargetBinds;
 }
 
 void ae3d::GfxDevice::IncVertexBufferBinds()
 {
-    ++GfxDeviceGlobal::vaoBinds;
+    ++Stats::vaoBinds;
 }
 
 void ae3d::GfxDevice::IncShaderBinds()
 {
-    ++GfxDeviceGlobal::shaderBinds;
+    ++Stats::shaderBinds;
 }
 
 void ae3d::GfxDevice::ResetFrameStatistics()
 {
-    GfxDeviceGlobal::drawCalls = 0;
-    GfxDeviceGlobal::vaoBinds = 0;
-    GfxDeviceGlobal::textureBinds = 0;
-    GfxDeviceGlobal::renderTargetBinds = 0;
-    GfxDeviceGlobal::shaderBinds = 0;
-    GfxDeviceGlobal::startFrameTimePoint = std::chrono::high_resolution_clock::now();
+    Stats::drawCalls = 0;
+    Stats::vaoBinds = 0;
+    Stats::textureBinds = 0;
+    Stats::renderTargetBinds = 0;
+    Stats::shaderBinds = 0;
+    Stats::startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }
 
 int ae3d::GfxDevice::GetDrawCalls()
 {
-    return GfxDeviceGlobal::drawCalls;
+    return Stats::drawCalls;
 }
 
 int ae3d::GfxDevice::GetTextureBinds()
 {
-    return GfxDeviceGlobal::textureBinds;
+    return Stats::textureBinds;
 }
 
 int ae3d::GfxDevice::GetRenderTargetBinds()
 {
-    return GfxDeviceGlobal::renderTargetBinds;
+    return Stats::renderTargetBinds;
 }
 
 int ae3d::GfxDevice::GetVertexBufferBinds()
 {
-    return GfxDeviceGlobal::vaoBinds;
+    return Stats::vaoBinds;
 }
 
 int ae3d::GfxDevice::GetShaderBinds()
 {
-    return GfxDeviceGlobal::shaderBinds;
+    return Stats::shaderBinds;
 }
 
 int ae3d::GfxDevice::GetBarrierCalls()
