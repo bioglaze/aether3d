@@ -194,7 +194,14 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
-    System::Print( "Shader::SetInt unimplemented. Tried to set %s to %d\n", name, value );
+    if (uniforms.find( name ) == std::end( uniforms ))
+    {
+        return;
+    }
+
+    id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniforms[ name ].offsetFromBufferStart;
+    memcpy( bufferPointer, &value, 4 );
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )

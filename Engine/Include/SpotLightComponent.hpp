@@ -3,6 +3,7 @@
 
 #include <string>
 #include "RenderTexture.hpp"
+#include "Vec3.hpp"
 
 namespace ae3d
 {
@@ -12,6 +13,9 @@ namespace ae3d
     public:
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
+
+        /// \return Color
+        const Vec3& GetColor() const { return color; }
 
         /// \return True, if the light casts a shadow.
         bool CastsShadow() const { return castsShadow; }
@@ -28,7 +32,10 @@ namespace ae3d
         
         /// \param degrees Angle in degrees.
         void SetConeAngle( float degrees ) { coneAngle = degrees; }
-        
+
+        /// \param aColor Color in range 0-1.
+        void SetColor( const Vec3& aColor ) { color = aColor; }
+
         /// \return Serialized data.
         std::string GetSerialized() const;
         
@@ -46,8 +53,9 @@ namespace ae3d
         static SpotLightComponent* Get( unsigned index );
         
         RenderTexture shadowMap;
-        float coneAngle = 45;
         GameObject* gameObject = nullptr;
+        Vec3 color{ 1, 1, 1 };
+        float coneAngle = 45;
         bool castsShadow = false;
     };
 }

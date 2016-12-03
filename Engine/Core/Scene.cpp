@@ -364,6 +364,8 @@ void ae3d::Scene::Render()
             }
 
             // Shadow pass
+            Material::SetGlobalInt( "_LightType", 0 );
+
             for (auto go : gameObjects)
             {
                 if (!go || !go->IsEnabled())
@@ -375,7 +377,7 @@ void ae3d::Scene::Render()
                 auto dirLight = go->GetComponent<DirectionalLightComponent>();
                 auto spotLight = go->GetComponent<SpotLightComponent>();
                 auto pointLight = go->GetComponent<PointLightComponent>();
-                
+
                 if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
                                        (pointLight && pointLight->CastsShadow())))
                 {
@@ -472,6 +474,13 @@ void ae3d::Scene::Render()
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
                         Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
+#if RENDERER_OPENGL
+                        Material::SetGlobalFloat( "_LightConeAngleCos", std::cos( spotLight->GetConeAngle() * 3.14159265f / 180.0f ) );
+                        Material::SetGlobalVector( "_LightPosition", lightTransform->GetLocalPosition() );
+                        Material::SetGlobalVector( "_LightDirection", lightTransform->GetViewDirection() );
+                        Material::SetGlobalVector( "_LightColor", spotLight->GetColor() );
+                        Material::SetGlobalInt( "_LightType", 1 );
+#endif
                         //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
                         hasShadow = true;
                     }
@@ -659,12 +668,12 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
         auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
-        
+
         Matrix44 mv;
         Matrix44 mvp;
         Matrix44::Multiply( meshLocalToWorld, view, mv );
         Matrix44::Multiply( mv, camera->GetProjection(), mvp );
-        
+
         auto* meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
         meshRenderer->Cull( frustum, meshLocalToWorld );
         meshRenderer->Render( mv, mvp, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, MeshRendererComponent::RenderType::Opaque );
@@ -1366,6 +1375,17 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outGameObjects.back().AddComponent< AudioSourceComponent >();
         }
 
+        if (token == "color")
+        {
+            Vec3 color;
+
+            lineStream >> color.x >> color.y >> color.z;
+
+            if (currentLightType == CurrentLightType::Spot)
+            {
+                outGameObjects.back().GetComponent< SpotLightComponent >()->SetColor( color );
+            }
+        }
     }
 
     return DeserializeResult::Success;

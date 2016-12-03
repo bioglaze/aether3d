@@ -25,8 +25,8 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
-#define TEST_SHADOWS_DIR
+#define TEST_FORWARD_PLUS
+//#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 
@@ -112,7 +112,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 

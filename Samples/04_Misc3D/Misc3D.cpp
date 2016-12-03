@@ -26,6 +26,7 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
+#define TEST_SHADOWS_SPOT
 
 using namespace ae3d;
                       
@@ -217,14 +218,25 @@ int main()
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 512 );
-    spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 45 );
+#ifdef TEST_SHADOWS_SPOT
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 1024 );
+#else
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 1024 );
+#endif
+    spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 25 );
+    spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
     spotLight.AddComponent<TransformComponent>();
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 3, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    //spotLight.GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
+    //spotLight.GetComponent<TransformComponent>()->SetParent( rotatingCube.GetComponent< TransformComponent >() );
 
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
-    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( false, 512 );
+#ifdef TEST_SHADOWS_POINT
+    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( false, 1024 );
+#else
+    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( true, 1024 );
+#endif
     pointLight.GetComponent<PointLightComponent>()->SetRadius( 100 );
     pointLight.AddComponent<TransformComponent>();
 
@@ -325,7 +337,9 @@ int main()
     
     //scene.Add( &statsContainer );
     //scene.Add( &dirLight );
-    //scene.Add( &spotLight );
+#ifdef TEST_SHADOWS_SPOT
+    scene.Add( &spotLight );
+#endif
     //scene.Add( &pointLight );
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );
@@ -415,6 +429,8 @@ int main()
         Vec3 axis( 0, 1, 0 );
         rotation.FromAxisAngle( axis, angle );
         cubes[ 2 ].GetComponent< TransformComponent >()->SetLocalRotation( rotation );
+
+        //spotLight.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
         axis = Vec3( 1, 1, 1 ).Normalized();
         rotation.FromAxisAngle( axis, angle );

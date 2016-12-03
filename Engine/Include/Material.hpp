@@ -35,6 +35,16 @@ namespace ae3d
         /// \param value Float value.
         static void SetGlobalFloat( const char* name, float value );
 
+        /// Sets an int into every material, overriding ints set by SetInt.
+        /// \param name Int uniform name.
+        /// \param value Int value.
+        static void SetGlobalInt( const char* name, int value );
+
+        /// Sets a Vec3 into every material, overriding Vec3s set by SetVector.
+        /// \param name Vec3 uniform name.
+        /// \param value Vec3 value.
+        static void SetGlobalVector( const char* name, const Vec3& value );
+
         /// \return shader.
         class Shader* GetShader() { return shader; }
 
@@ -102,9 +112,11 @@ namespace ae3d
         void SetVector( const char* name, const Vec4& vec );
 
   private:
-      static std::unordered_map< std::string, RenderTexture* > sTexRTs;
-      static std::unordered_map< std::string, Texture2D* > sTex2ds;
-      static std::unordered_map< std::string, float > sFloats;
+        static std::unordered_map< std::string, RenderTexture* > sTexRTs;
+        static std::unordered_map< std::string, Texture2D* > sTex2ds;
+        static std::unordered_map< std::string, float > sFloats;
+        static std::unordered_map< std::string, int > sInts;
+        static std::unordered_map< std::string, Vec3 > sVec3s;
 
         std::unordered_map< std::string, float > floats;
         std::unordered_map< std::string, int > ints;

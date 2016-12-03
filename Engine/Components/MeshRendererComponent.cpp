@@ -147,6 +147,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
 #ifndef RENDERER_VULKAN
             // Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
+            materials[ subMeshIndex ]->SetMatrix( "_ModelMatrix", localToWorld );
 #endif
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
             materials[ subMeshIndex ]->Apply();
