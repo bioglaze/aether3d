@@ -94,7 +94,8 @@ namespace GfxDeviceGlobal
     ae3d::TextureBase* texture1 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
     std::vector< ID3D12Resource* > frameConstantBuffers;
-    void* currentConstantBuffer = nullptr;
+    std::vector< ID3D12Resource* > mappedConstantBuffers;
+    int currentConstantBufferIndex = 0;
 
     ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
     ID3D12CommandQueue* commandQueue = nullptr;
@@ -578,6 +579,63 @@ void CreateDepthStencil()
     GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &descDsv, DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
+void CreateConstantBuffers()
+{
+    GfxDeviceGlobal::frameConstantBuffers.resize( 300 );
+    GfxDeviceGlobal::mappedConstantBuffers.resize( GfxDeviceGlobal::frameConstantBuffers.size() );
+    ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::frameConstantBuffers.size(), "There are more constant buffers than descriptors" );
+
+    for (std::size_t bufferIndex = 0; bufferIndex < GfxDeviceGlobal::frameConstantBuffers.size(); ++bufferIndex)
+    {
+        D3D12_HEAP_PROPERTIES prop = {};
+        prop.Type = D3D12_HEAP_TYPE_UPLOAD;
+        prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        prop.CreationNodeMask = 1;
+        prop.VisibleNodeMask = 1;
+
+        D3D12_RESOURCE_DESC buf = {};
+        buf.Alignment = 0;
+        buf.DepthOrArraySize = 1;
+        buf.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        buf.Flags = D3D12_RESOURCE_FLAG_NONE;
+        buf.Format = DXGI_FORMAT_UNKNOWN;
+        buf.Height = 1;
+        buf.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        buf.MipLevels = 1;
+        buf.SampleDesc.Count = 1;
+        buf.SampleDesc.Quality = 0;
+        buf.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+
+        ID3D12Resource* constantBuffer;
+        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+            &prop,
+            D3D12_HEAP_FLAG_NONE,
+            &buf,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS( &constantBuffer ) );
+        if (FAILED( hr ))
+        {
+            ae3d::System::Print( "Unable to create shader constant buffer!" );
+            return;
+        }
+
+        constantBuffer->SetName( L"ConstantBuffer" );
+
+        auto handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );// DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart();
+        //handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV ) * (bufferIndex);
+
+        GfxDeviceGlobal::frameConstantBuffers[ bufferIndex ] = constantBuffer;
+
+        hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &GfxDeviceGlobal::mappedConstantBuffers[ bufferIndex ] ) );
+        if (FAILED( hr ))
+        {
+            ae3d::System::Print( "Unable to map shader constant buffer!" );
+        }
+    }
+}
+
 void ae3d::CreateRenderer( int samples )
 {
     if (samples > 0 && samples < 17)
@@ -679,6 +737,7 @@ void ae3d::CreateRenderer( int samples )
     CreateRootSignature();
     CreateDepthStencil();
     CreateSampler();
+    CreateConstantBuffers();
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )
@@ -691,60 +750,17 @@ void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )
 
 void ae3d::GfxDevice::CreateNewUniformBuffer()
 {
-    D3D12_HEAP_PROPERTIES prop = {};
-    prop.Type = D3D12_HEAP_TYPE_UPLOAD;
-    prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-    prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-    prop.CreationNodeMask = 1;
-    prop.VisibleNodeMask = 1;
+    ++GfxDeviceGlobal::currentConstantBufferIndex;
 
-    D3D12_RESOURCE_DESC buf = {};
-    buf.Alignment = 0;
-    buf.DepthOrArraySize = 1;
-    buf.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    buf.Flags = D3D12_RESOURCE_FLAG_NONE;
-    buf.Format = DXGI_FORMAT_UNKNOWN;
-    buf.Height = 1;
-    buf.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    buf.MipLevels = 1;
-    buf.SampleDesc.Count = 1;
-    buf.SampleDesc.Quality = 0;
-    buf.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
-
-    ID3D12Resource* constantBuffer;
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &buf,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS( &constantBuffer ) );
-    if (FAILED( hr ))
+    if (GfxDeviceGlobal::currentConstantBufferIndex == GfxDeviceGlobal::mappedConstantBuffers.size())
     {
-        System::Print( "Unable to create shader constant buffer!" );
-        return;
+        GfxDeviceGlobal::currentConstantBufferIndex = 0;
     }
-
-    constantBuffer->SetName( L"ConstantBuffer" );
-
-    auto handle = DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart();
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV ) * GfxDeviceGlobal::frameConstantBuffers.size();
-
-    GfxDeviceGlobal::frameConstantBuffers.push_back( constantBuffer );
-    ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::frameConstantBuffers.size(), "There are more constant buffers than descriptors" );
-
-    hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&GfxDeviceGlobal::currentConstantBuffer) );
-    if (FAILED( hr ))
-    {
-        System::Print( "Unable to map shader constant buffer!" );
-    }
-
-    Statistics::IncCreateConstantBufferCalls();
 }
 
 void* ae3d::GfxDevice::GetCurrentUniformBuffer()
 {
-    return GfxDeviceGlobal::currentConstantBuffer;
+    return GfxDeviceGlobal::mappedConstantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ];
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
@@ -763,8 +779,6 @@ void ae3d::GfxDevice::PopGroupMarker()
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode )
 {
-    System::Assert( !GfxDeviceGlobal::frameConstantBuffers.empty(), "no shader has called Use()" );
-
     // Prevents feedback. Currently disabled because it also prevents drawing a sprite that uses render texture.
     /*if (GfxDeviceGlobal::renderTexture0 && GfxDeviceGlobal::currentRenderTargetRTV.ptr == GfxDeviceGlobal::renderTexture0->GetRTV().ptr)
     {
@@ -804,7 +818,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = GfxDeviceGlobal::frameConstantBuffers.back()->GetGPUVirtualAddress();
+    cbvDesc.BufferLocation = GfxDeviceGlobal::frameConstantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
     
@@ -1113,13 +1127,6 @@ void ae3d::GfxDevice::Present()
     
     Global::frameVBUploads.clear();
     
-    for (std::size_t i = 0; i < GfxDeviceGlobal::frameConstantBuffers.size(); ++i)
-    {
-        AE3D_SAFE_RELEASE( GfxDeviceGlobal::frameConstantBuffers[ i ] );
-    }
-    
-    GfxDeviceGlobal::frameConstantBuffers.clear();
-    GfxDeviceGlobal::currentConstantBuffer = nullptr;
     GfxDeviceGlobal::currentRenderTarget = nullptr;
 
     Statistics::EndFrameTimeProfiling();
