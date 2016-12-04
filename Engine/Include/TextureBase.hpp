@@ -63,6 +63,9 @@ namespace ae3d
         /// \return id.
         unsigned GetID() const { return handle; }
 
+        /// \return True, if the texture is a cube map.
+        bool IsCube() const { return isCube; }
+
         /// \return Path where this texture was loaded from, if it was loaded from a file.
         std::string GetPath() const { return path; }
 
@@ -134,6 +137,9 @@ namespace ae3d
         float anisotropy = 1;
         /// Color space.
         ColorSpace colorSpace = ColorSpace::RGB;
+        /// Is the texture a cube map?
+        bool isCube = false;
+
 #if RENDERER_METAL
         id<MTLTexture> metalTexture;
         id<MTLTexture> metalDepthTexture;

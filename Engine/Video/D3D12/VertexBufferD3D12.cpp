@@ -21,7 +21,7 @@ namespace Global
     std::vector< ID3D12Resource* > frameVBUploads;
 }
 
-void DestroyVertexBuffers()
+void ae3d::VertexBuffer::DestroyBuffers()
 {
     for (std::size_t i = 0; i < Global::vbs.size(); ++i)
     {

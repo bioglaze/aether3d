@@ -12,7 +12,6 @@
 #include "Vec3.hpp"
 
 struct ID3D12Resource;
-struct ID3D12DescriptorHeap;
 
 namespace ae3d
 {
@@ -82,12 +81,9 @@ namespace ae3d
 
         /// \return Index buffer offset from the beginning of the vb.
         long GetIBOffset() const { return ibOffset; }
-
-        /// \return Index count.
-        long GetIndexCount() const { return elementCount; }
 #endif
 
-        /// Binds the buffer. Must be called before Draw or DrawRange.
+        /// Binds the buffer. Must be called before GfxDevice::Draw.
         void Bind() const;
 
         /// \return Face count.

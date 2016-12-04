@@ -22,7 +22,6 @@
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
 
-void DestroyVertexBuffers(); // Defined in VertexBufferD3D12.cpp
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 
@@ -89,15 +88,10 @@ namespace GfxDeviceGlobal
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignature = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
-    unsigned frameIndex = 0;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
-    ae3d::RenderTexture* renderTexture0 = nullptr;
-    ae3d::Texture2D* texture2d0 = nullptr;
-    ae3d::TextureCube* textureCube0 = nullptr;
-    ae3d::RenderTexture* renderTexture1 = nullptr;
-    ae3d::Texture2D* texture2d1 = nullptr;
-    ae3d::TextureCube* textureCube1 = nullptr;
+    ae3d::TextureBase* texture0 = nullptr;
+    ae3d::TextureBase* texture1 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
     std::vector< ID3D12Resource* > frameConstantBuffers;
     void* currentConstantBuffer = nullptr;
@@ -739,12 +733,6 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
     GfxDeviceGlobal::frameConstantBuffers.push_back( constantBuffer );
     ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::frameConstantBuffers.size(), "There are more constant buffers than descriptors" );
 
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
-    GfxDeviceGlobal::device->CreateConstantBufferView(
-        &cbvDesc,
-        handle );
     hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&GfxDeviceGlobal::currentConstantBuffer) );
     if (FAILED( hr ))
     {
@@ -822,27 +810,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     
-    DXGI_FORMAT format0 = DXGI_FORMAT_R8G8B8A8_UNORM;
-    D3D12_SRV_DIMENSION viewDimension0 = D3D12_SRV_DIMENSION_TEXTURE2D;
-    int mipLevelCount0 = 1;
-
-    if (GfxDeviceGlobal::texture2d0 != nullptr)
-    {
-        format0 = GfxDeviceGlobal::texture2d0->GetDXGIFormat();
-        mipLevelCount0 = GfxDeviceGlobal::texture2d0->GetMipLevelCount();
-    }
-    else if (GfxDeviceGlobal::textureCube0 != nullptr)
-    {
-        format0 = GfxDeviceGlobal::textureCube0->GetDXGIFormat();
-        mipLevelCount0 = GfxDeviceGlobal::textureCube0->GetMipLevelCount();
-        viewDimension0 = D3D12_SRV_DIMENSION_TEXTURECUBE;
-    }
-    else if (GfxDeviceGlobal::renderTexture0 != nullptr)
-    {
-        format0 = GfxDeviceGlobal::renderTexture0->GetDXGIFormat();
-        mipLevelCount0 = GfxDeviceGlobal::renderTexture0->GetMipLevelCount();
-        viewDimension0 = GfxDeviceGlobal::renderTexture0->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
-    }
+    const DXGI_FORMAT format0 = GfxDeviceGlobal::texture0->GetDXGIFormat();
+    const int mipLevelCount0 = GfxDeviceGlobal::texture0->GetMipLevelCount();
+    const D3D12_SRV_DIMENSION viewDimension0 = GfxDeviceGlobal::texture0->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
 
     // TODO: Get from texture object
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
@@ -868,26 +838,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         System::Assert( false, "unhandled texture dimension" );
     }
 
-    DXGI_FORMAT format1 = DXGI_FORMAT_R8G8B8A8_UNORM;
-    D3D12_SRV_DIMENSION viewDimension1 = D3D12_SRV_DIMENSION_TEXTURE2D;
-    int mipLevelCount1 = 1;
-    if (GfxDeviceGlobal::texture2d1 != nullptr)
-    {
-        format1 = GfxDeviceGlobal::texture2d1->GetDXGIFormat();
-        mipLevelCount1 = GfxDeviceGlobal::texture2d1->GetMipLevelCount();
-    }
-    else if (GfxDeviceGlobal::textureCube1 != nullptr)
-    {
-        format1 = GfxDeviceGlobal::textureCube1->GetDXGIFormat();
-        mipLevelCount1 = GfxDeviceGlobal::textureCube1->GetMipLevelCount();
-        viewDimension1 = D3D12_SRV_DIMENSION_TEXTURECUBE;
-    }
-    else if (GfxDeviceGlobal::renderTexture1 != nullptr)
-    {
-        format1 = GfxDeviceGlobal::renderTexture1->GetDXGIFormat();
-        mipLevelCount1 = GfxDeviceGlobal::renderTexture1->GetMipLevelCount();
-        viewDimension1 = GfxDeviceGlobal::renderTexture1->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
-    }
+    const DXGI_FORMAT format1 = GfxDeviceGlobal::texture1->GetDXGIFormat();
+    const int mipLevelCount1 = GfxDeviceGlobal::texture1->GetMipLevelCount();
+    const D3D12_SRV_DIMENSION viewDimension1 = GfxDeviceGlobal::texture1->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
     srvDesc1.Format = format1;
@@ -912,47 +865,13 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         //System::Assert( false, "unhandled texture dimension" );
     }
 
-    ID3D12Resource* texResource0 = nullptr;
-
-    if (GfxDeviceGlobal::texture2d0 != nullptr)
-    {
-        texResource0 = GfxDeviceGlobal::texture2d0->GetGpuResource()->resource;
-    }
-    else if (GfxDeviceGlobal::renderTexture0 != nullptr)
-    {
-        texResource0 = GfxDeviceGlobal::renderTexture0->GetGpuResource()->resource;
-    }
-    else if (GfxDeviceGlobal::textureCube0 != nullptr)
-    {
-        texResource0 = GfxDeviceGlobal::textureCube0->GetGpuResource()->resource;
-    }
-    else if (!GfxDeviceGlobal::texture2d0)
-    {
-        texResource0 = const_cast< Texture2D*>(Texture2D::GetDefaultTexture())->GetGpuResource()->resource;
-    }
+    ID3D12Resource* texResource0 = GfxDeviceGlobal::texture0->GetGpuResource()->resource;
 
     GfxDeviceGlobal::device->CreateShaderResourceView( texResource0, &srvDesc0, handle );
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    ID3D12Resource* texResource1 = nullptr;
-
-    if (GfxDeviceGlobal::texture2d1 != nullptr)
-    {
-        texResource1 = GfxDeviceGlobal::texture2d1->GetGpuResource()->resource;
-    }
-    else if (GfxDeviceGlobal::renderTexture1 != nullptr)
-    {
-        texResource1 = GfxDeviceGlobal::renderTexture1->GetGpuResource()->resource;
-    }
-    else if (GfxDeviceGlobal::textureCube1 != nullptr)
-    {
-        texResource1 = GfxDeviceGlobal::textureCube1->GetGpuResource()->resource;
-    }
-    else if (!GfxDeviceGlobal::texture2d1)
-    {
-        texResource1 = const_cast< Texture2D*>(Texture2D::GetDefaultTexture())->GetGpuResource()->resource;
-    }
+    ID3D12Resource* texResource1 = GfxDeviceGlobal::texture1->GetGpuResource()->resource;
 
     GfxDeviceGlobal::device->CreateShaderResourceView( texResource1, &srvDesc1, handle );
 
@@ -968,22 +887,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
 
-    // FIXME: badly needs polymorphism
-    if (GfxDeviceGlobal::texture2d0)
-    {
-        samplerHandle = GetSampler( GfxDeviceGlobal::texture2d0->GetMipmaps(), GfxDeviceGlobal::texture2d0->GetWrap(),
-                                    GfxDeviceGlobal::texture2d0->GetFilter() );
-    }
-    else if (GfxDeviceGlobal::textureCube0)
-    {
-        samplerHandle = GetSampler( GfxDeviceGlobal::textureCube0->GetMipmaps(), GfxDeviceGlobal::textureCube0->GetWrap(),
-                                    GfxDeviceGlobal::textureCube0->GetFilter() );
-    }
-    else if (GfxDeviceGlobal::renderTexture0)
-    {
-        samplerHandle = GetSampler( GfxDeviceGlobal::renderTexture0->GetMipmaps(), GfxDeviceGlobal::renderTexture0->GetWrap(),
-                                    GfxDeviceGlobal::renderTexture0->GetFilter() );
-    }
+    samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
+        GfxDeviceGlobal::texture0->GetFilter() );
 
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
@@ -1011,6 +916,9 @@ void ae3d::GfxDevice::ResetCommandList()
 {
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
     AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
+
+    GfxDeviceGlobal::texture0 = Texture2D::GetDefaultTexture();
+    GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
 }
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
@@ -1024,7 +932,7 @@ void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outB
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
 {
-    DestroyVertexBuffers();
+    VertexBuffer::DestroyBuffers();
     DestroyShaders();
     DestroyComputeShaders();
     Texture2D::DestroyTextures();
@@ -1212,14 +1120,7 @@ void ae3d::GfxDevice::Present()
     
     GfxDeviceGlobal::frameConstantBuffers.clear();
     GfxDeviceGlobal::currentConstantBuffer = nullptr;
-
     GfxDeviceGlobal::currentRenderTarget = nullptr;
-    GfxDeviceGlobal::texture2d0 = nullptr;
-    GfxDeviceGlobal::texture2d1 = nullptr;
-    GfxDeviceGlobal::textureCube0 = nullptr;
-    GfxDeviceGlobal::textureCube1 = nullptr;
-    GfxDeviceGlobal::renderTexture0 = nullptr;
-    GfxDeviceGlobal::renderTexture1 = nullptr;
 
     Statistics::EndFrameTimeProfiling();
 }

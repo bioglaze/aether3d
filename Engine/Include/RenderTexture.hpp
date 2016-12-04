@@ -37,9 +37,6 @@ namespace ae3d
         /// \param wrap Wrapping mode.
         /// \param filter Filtering mode.
         void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter );
-
-        /// \return True, if the texture is a cube map.
-        bool IsCube() const { return isCube; }
         
 #if RENDERER_OPENGL
         /// \return FBO.
@@ -74,7 +71,6 @@ namespace ae3d
         VkImageView view;
 #endif
         DataType dataType = DataType::UByte;
-        bool isCube = false;
     };
 }
 #endif

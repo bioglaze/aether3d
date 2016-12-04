@@ -17,12 +17,8 @@ extern ae3d::FileWatcher fileWatcher;
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
-	extern ae3d::RenderTexture* renderTexture0;
-	extern ae3d::Texture2D* texture2d0;
-    extern ae3d::TextureCube* textureCube0;
-    extern ae3d::RenderTexture* renderTexture1;
-    extern ae3d::Texture2D* texture2d1;
-    extern ae3d::TextureCube* textureCube1;
+    extern ae3d::TextureBase* texture0;
+    extern ae3d::TextureBase* texture1;
 }
 
 namespace Global
@@ -181,15 +177,11 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int t
 {
     if (textureUnit == 0)
     {
-        GfxDeviceGlobal::texture2d0 = texture;
-        GfxDeviceGlobal::textureCube0 = nullptr;
-        GfxDeviceGlobal::renderTexture0 = nullptr;
+        GfxDeviceGlobal::texture0 = texture;
     }
     else if (textureUnit == 1)
     {
-        GfxDeviceGlobal::texture2d1 = texture;
-        GfxDeviceGlobal::textureCube1 = nullptr;
-        GfxDeviceGlobal::renderTexture1 = nullptr;
+        GfxDeviceGlobal::texture1 = texture;
     }
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
@@ -200,15 +192,11 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int
 {
     if (textureUnit == 0)
     {
-        GfxDeviceGlobal::textureCube0 = texture;
-        GfxDeviceGlobal::texture2d0 = nullptr;
-        GfxDeviceGlobal::renderTexture0 = nullptr;
+        GfxDeviceGlobal::texture0 = texture;
     }
     else if (textureUnit == 1)
     {
-        GfxDeviceGlobal::textureCube1 = texture;
-        GfxDeviceGlobal::texture2d1 = nullptr;
-        GfxDeviceGlobal::renderTexture1 = nullptr;
+        GfxDeviceGlobal::texture1 = texture;
     }
 
     SetInt( name, textureUnit );
@@ -227,15 +215,11 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
 {
     if (textureUnit == 0)
     {
-        GfxDeviceGlobal::textureCube0 = nullptr;
-        GfxDeviceGlobal::texture2d0 = nullptr;
-        GfxDeviceGlobal::renderTexture0 = texture;
+        GfxDeviceGlobal::texture0 = texture;
     }
     else if (textureUnit == 1)
     {
-        GfxDeviceGlobal::textureCube1 = nullptr;
-        GfxDeviceGlobal::texture2d1 = nullptr;
-        GfxDeviceGlobal::renderTexture1 = texture;
+        GfxDeviceGlobal::texture1 = texture;
     }
 
     SetInt( name, textureUnit );
