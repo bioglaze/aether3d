@@ -143,6 +143,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
     }
 
+    if (mipmaps == Mipmaps::Generate)
+    {
+        glGenerateMipmap( GL_TEXTURE_CUBE_MAP );
+    }
+
     if (!isCached)
     {
         TextureCubeGlobal::cachedTextures.push_back( *this );

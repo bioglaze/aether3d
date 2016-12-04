@@ -13,36 +13,38 @@ namespace MathUtil
             outMax = aPoints[ 0 ];
         }
 
-        for (std::size_t i = 1; i < aPoints.size(); ++i)
+        for (std::size_t i = 1, s = aPoints.size(); i < s; ++i)
         {
-            if (aPoints[ i ].x < outMin.x)
+            const Vec3& point = aPoints[ i ];
+
+            if (point.x < outMin.x)
             {
-                outMin.x = aPoints[ i ].x;
+                outMin.x = point.x;
             }
 
-            if (aPoints[ i ].y < outMin.y)
+            if (point.y < outMin.y)
             {
-                outMin.y = aPoints[ i ].y;
+                outMin.y = point.y;
             }
 
-            if (aPoints[ i ].z < outMin.z)
+            if (point.z < outMin.z)
             {
-                outMin.z = aPoints[ i ].z;
+                outMin.z = point.z;
             }
 
-            if (aPoints[ i ].x > outMax.x)
+            if (point.x > outMax.x)
             {
-                outMax.x = aPoints[ i ].x;
+                outMax.x = point.x;
             }
 
-            if (aPoints[ i ].y > outMax.y)
+            if (point.y > outMax.y)
             {
-                outMax.y = aPoints[ i ].y;
+                outMax.y = point.y;
             }
 
-            if (aPoints[ i ].z > outMax.z)
+            if (point.z > outMax.z)
             {
-                outMax.z = aPoints[ i ].z;
+                outMax.z = point.z;
             }
         }
     }

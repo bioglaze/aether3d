@@ -243,7 +243,7 @@ namespace ae3d
             glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
         }
 
-		PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress( "wglSwapIntervalEXT" );
-		wglSwapIntervalEXT( 1 );
+        PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress( "wglSwapIntervalEXT" );
+        wglSwapIntervalEXT( 1 );
     }
 }

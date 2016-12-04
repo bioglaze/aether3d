@@ -56,7 +56,7 @@ static void InitKeyMap()
 {
     for (int keyIndex = 0; keyIndex < 256; ++keyIndex)
     {
-        WindowGlobal::keyMap[ keyIndex ] = ae3d::KeyCode::N;
+        WindowGlobal::keyMap[ keyIndex ] = ae3d::KeyCode::None;
     }
 
     WindowGlobal::keyMap[ 13 ] = ae3d::KeyCode::Enter;

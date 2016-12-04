@@ -14,7 +14,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.6 Documentation
+   \mainpage Aether3D Game Engine v0.6.5 Documentation
 
    \section Introduction
 
@@ -82,6 +82,7 @@
 
    <ul>
    <li>Metal: Shadow maps don't show.</li>
+   <li>Metal: Small textures don't load.</li>
    <li>Oculus: Mirror texture is broken if SDK initialization fails.</li>
    </ul>
  
@@ -106,6 +107,7 @@ namespace ae3d
 {
     class Texture2D;
 
+    /// High-level functions
     namespace System
     {
         /// Inits audio system.
@@ -165,7 +167,7 @@ namespace ae3d
 
         namespace Statistics
         {
-			std::string GetStatistics();
+            std::string GetStatistics();
             int GetDrawCallCount();
             int GetVertexBufferBindCount();
             int GetTextureBindCount();

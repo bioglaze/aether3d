@@ -39,7 +39,7 @@ namespace ae3d
     enum class KeyCode
     {
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-        Left, Right, Up, Down, Space, Escape, Enter
+        Left, Right, Up, Down, Space, Escape, Enter, None
     };
     
     /// Create flags.
@@ -58,7 +58,7 @@ namespace ae3d
         /// Event type.
         WindowEventType type = WindowEventType::None;
         /// Key code.
-        KeyCode keyCode = KeyCode::N;
+        KeyCode keyCode = KeyCode::None;
         /// X coordinate in window. Origin: left.
         int mouseX = 0; 
         /// Y coordinate in window. Origin: bottom.
