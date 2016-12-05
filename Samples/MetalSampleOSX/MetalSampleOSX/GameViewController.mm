@@ -98,6 +98,7 @@ using namespace ae3d;
 
     [self _setupView];
     [self _reshape];
+    //self.nextResponder = super.nextResponder;
 
     ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT );
     ae3d::System::LoadBuiltinAssets();
@@ -139,7 +140,7 @@ using namespace ae3d;
     skyTex.Load( ae3d::FileSystem::FileContents( "/left.jpg" ), ae3d::FileSystem::FileContents( "/right.jpg" ),
                 ae3d::FileSystem::FileContents( "/bottom.jpg" ), ae3d::FileSystem::FileContents( "/top.jpg" ),
                 ae3d::FileSystem::FileContents( "/front.jpg" ), ae3d::FileSystem::FileContents( "/back.jpg" ),
-                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB );
+                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB );
     scene.SetSkybox( &skyTex );
     
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
@@ -377,6 +378,11 @@ using namespace ae3d;
 - (void)keyDown:(NSEvent *)theEvent
 {
     NSLog(@"onKeyDown Detected");
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+    NSLog(@"mouseDown Detected");
 }
 
 - (BOOL)acceptsFirstResponder

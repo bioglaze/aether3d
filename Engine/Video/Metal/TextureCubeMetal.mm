@@ -1,7 +1,11 @@
 #include "TextureCube.hpp"
 #include <string>
 #include <vector>
+#if TARGET_OS_IPHONE
+#define STBI_NEON
+#endif
 #include "stb_image.c"
+#include "DDSLoader.hpp"
 #include "GfxDevice.hpp"
 #include "FileSystem.hpp"
 #include "System.hpp"
@@ -30,6 +34,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
+    const std::vector< const FileSystem::FileContentsData* > fileContents = { &posX, &negX, &negY, &posY, &negZ, &posZ };
 
     int firstImageComponents;
     unsigned char* firstImageData = stbi_load_from_memory( datas[ 0 ]->data(), static_cast<int>(datas[ 0 ]->size()), &width, &height, &firstImageComponents, 4 );
@@ -37,18 +42,20 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                                                           size:width
-                                                                                      mipmapped:NO];
+                                                                                        mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
     metalTexture.label = @"Cube Map";
     
     const NSUInteger bytesPerPixel = 4;
-    const NSUInteger bytesPerRow = bytesPerPixel * width;
+    NSUInteger bytesPerRow = bytesPerPixel * width;
     const NSUInteger bytesPerImage = bytesPerRow * width;
     
     MTLRegion region = MTLRegionMake2D( 0, 0, width, width );
 
     for (int face = 0; face < 6; ++face)
     {
+        const bool isDDS = paths[ face ].find( ".dds" ) != std::string::npos || paths[ face ].find( ".dds" ) != std::string::npos;
+
         if (HasStbExtension( paths[ face ] ))
         {
             int components;
@@ -74,9 +81,76 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             stbi_image_free( data );
         }
+        else if (isDDS)
+        {
+#if !TARGET_OS_IPHONE
+            DDSLoader::Output output;
+            DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( *fileContents[ face ], 0, width, height, opaque, output );
+
+            if (ddsLoadResult != DDSLoader::LoadResult::Success)
+            {
+                ae3d::System::Print( "Could not load %s\n", fileContents[ face ]->path.c_str() );
+                return;
+            }
+
+            bytesPerRow = width * 2;
+
+            MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm;
+
+            if (output.format == DDSLoader::Format::BC1)
+            {
+                pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
+            }
+            else if (output.format == DDSLoader::Format::BC2)
+            {
+                pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
+                bytesPerRow = width * 4;
+            }
+            else if (output.format == DDSLoader::Format::BC3)
+            {
+                pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
+                bytesPerRow = width * 4;
+            }
+
+            MTLTextureDescriptor* textureDescriptor =
+            [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
+                                                               width:width
+                                                              height:height
+                                                           mipmapped:NO];//(mipmaps == Mipmaps::None ? NO : YES)];
+            metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+
+            std::size_t pos = fileContents[ face ]->path.find_last_of( "/" );
+            if (pos != std::string::npos)
+            {
+                std::string fileName = fileContents[ face ]->path.substr( pos );
+                metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+            }
+            else
+            {
+                metalTexture.label = [NSString stringWithUTF8String:fileContents[ face ]->path.c_str()];
+            }
+
+
+            region = MTLRegionMake2D( 0, 0, width, height );
+            [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&output.imageData[ output.dataOffsets[ 0 ] ] bytesPerRow:bytesPerRow];
+#endif
+        }
         else
         {
             System::Print("Cube map texture has unsupported extension %s. Only .bmp, .jpg, .tga, .gif etc. are supported.\n", paths[ face ].c_str() );
         }
+    }
+
+    if (mipmaps == Mipmaps::Generate)
+    {
+        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
+        [commandEncoder generateMipmapsForTexture:metalTexture];
+        [commandEncoder endEncoding];
+        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
+         completionBlock(metalTexture);
+         }];*/
+        [commandBuffer commit];
     }
 }

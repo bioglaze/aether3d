@@ -39,9 +39,8 @@ void ae3d::LightTiler::Init()
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
-    // TODO: See if some other cache mode is better as this is never read/written by CPU.
     perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( unsigned )
-                  options:MTLResourceCPUCacheModeDefaultCache];
+                  options:MTLResourceStorageModePrivate];
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
 
     uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )

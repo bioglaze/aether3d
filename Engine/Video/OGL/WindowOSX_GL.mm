@@ -49,6 +49,11 @@ namespace WindowGlobal
 
     void InitKeyMap()
     {
+        for (int keyIndex = 0; keyIndex < 256; ++keyIndex)
+        {
+            keyMap[ keyIndex ] = ae3d::KeyCode::None;
+        }
+
         keyMap[ 0 ] = ae3d::KeyCode::A;
         keyMap[ 11 ] = ae3d::KeyCode::B;
         keyMap[ 8 ] = ae3d::KeyCode::C;
