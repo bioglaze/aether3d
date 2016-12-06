@@ -170,6 +170,7 @@ namespace ae3d
 #endif
 #if RENDERER_VULKAN
         void GenerateVertexBuffer( const void* vertexData, int vertexBufferSize, int vertexStride, const void* indexData, int indexBufferSize );
+        void CreateInputState( int vertexStride );
 
         VkBuffer vertexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory vertexMem = VK_NULL_HANDLE;

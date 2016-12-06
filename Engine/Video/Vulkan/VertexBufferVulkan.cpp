@@ -43,64 +43,8 @@ void ae3d::VertexBuffer::SetDebugName( const char* name )
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, name );
 }
 
-void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int vertexBufferSize, int vertexStride, const void* indexData, int indexBufferSize )
+void CopyBuffer( VkBuffer source, VkBuffer& destination, int bufferSize )
 {
-    System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-    System::Assert( vertexData != nullptr, "vertexData not initialized" );
-    System::Assert( indexData != nullptr, "indexData not initialized" );
-
-    if (vertexBuffer != VK_NULL_HANDLE)
-    {
-        for (std::size_t memoryIndex = 0; memoryIndex < VertexBufferGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
-        {
-            if (VertexBufferGlobal::memoryToReleaseAtExit[ memoryIndex ] == vertexMem)
-            {
-                VertexBufferGlobal::memoryToReleaseAtExit.erase( std::begin( VertexBufferGlobal::memoryToReleaseAtExit ) + memoryIndex );
-            }
-        }
-
-        for (std::size_t memoryIndex = 0; memoryIndex < VertexBufferGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
-        {
-            if (VertexBufferGlobal::memoryToReleaseAtExit[ memoryIndex ] == indexMem)
-            {
-                VertexBufferGlobal::memoryToReleaseAtExit.erase( std::begin( VertexBufferGlobal::memoryToReleaseAtExit ) + memoryIndex );
-            }
-        }
-
-        for (std::size_t bufferIndex = 0; bufferIndex < VertexBufferGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
-        {
-            if (VertexBufferGlobal::buffersToReleaseAtExit[ bufferIndex ] == vertexBuffer)
-            {
-                VertexBufferGlobal::buffersToReleaseAtExit.erase( std::begin( VertexBufferGlobal::buffersToReleaseAtExit ) + bufferIndex );
-            }
-        }
-
-        for (std::size_t bufferIndex = 0; bufferIndex < VertexBufferGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
-        {
-            if (VertexBufferGlobal::buffersToReleaseAtExit[ bufferIndex ] == indexBuffer)
-            {
-                VertexBufferGlobal::buffersToReleaseAtExit.erase( std::begin( VertexBufferGlobal::buffersToReleaseAtExit ) + bufferIndex );
-            }
-        }
-
-        vkFreeMemory( GfxDeviceGlobal::device, vertexMem, nullptr );
-        vkFreeMemory( GfxDeviceGlobal::device, indexMem, nullptr );
-        GfxDeviceGlobal::pendingFreeVBs.push_back( vertexBuffer );
-        GfxDeviceGlobal::pendingFreeVBs.push_back( indexBuffer );
-    }
-
-    struct StagingBuffer
-    {
-        VkDeviceMemory memory;
-        VkBuffer buffer;
-    };
-
-    struct
-    {
-        StagingBuffer vertices;
-        StagingBuffer indices;
-    } stagingBuffers;
-
     VkCommandBufferAllocateInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     cmdBufInfo.commandPool = GfxDeviceGlobal::cmdPool;
@@ -111,102 +55,17 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
     VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &copyCommandBuffer );
     AE3D_CHECK_VULKAN( err, "copy command buffer" );
 
-    VkBufferCreateInfo vertexBufferInfo = {};
-    vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    vertexBufferInfo.size = vertexBufferSize;
-    vertexBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    err = vkCreateBuffer( GfxDeviceGlobal::device, &vertexBufferInfo, nullptr, &stagingBuffers.vertices.buffer );
-    AE3D_CHECK_VULKAN( err, "vkCreateBuffer vertexBuffer" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingBuffers.vertices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "staging vertex buffer" );
-
-    VkMemoryRequirements memReqs;
-    VkMemoryAllocateInfo memAlloc = {};
-    memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-
-    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers.vertices.buffer, &memReqs );
-    memAlloc.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAlloc.memoryTypeIndex );
-    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &stagingBuffers.vertices.memory );
-    AE3D_CHECK_VULKAN( err, "allocate staging vertex memory" );
-
-    void* data = nullptr;
-    err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data );
-    AE3D_CHECK_VULKAN( err, "map vertex memory" );
-
-    std::memcpy( data, vertexData, vertexBufferSize );
-    vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory );
-    err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.buffer, stagingBuffers.vertices.memory, 0 );
-    AE3D_CHECK_VULKAN( err, "bind staging vertex memory" );
-
-    vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-
-    err = vkCreateBuffer( GfxDeviceGlobal::device, &vertexBufferInfo, nullptr, &vertexBuffer );
-    AE3D_CHECK_VULKAN( err, "create vertex buffer" );
-    VertexBufferGlobal::buffersToReleaseAtExit.push_back( vertexBuffer );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "vertex buffer" );
-
-    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, vertexBuffer, &memReqs );
-    memAlloc.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
-    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &vertexMem );
-    AE3D_CHECK_VULKAN( err, "allocate vertex memory" );
-    VertexBufferGlobal::memoryToReleaseAtExit.push_back( vertexMem );
-
-    err = vkBindBufferMemory( GfxDeviceGlobal::device, vertexBuffer, vertexMem, 0 );
-    AE3D_CHECK_VULKAN( err, "bind vertex memory" );
-
-    VkBufferCreateInfo indexbufferInfo = {};
-    indexbufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    indexbufferInfo.size = indexBufferSize;
-    indexbufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-
-    err = vkCreateBuffer( GfxDeviceGlobal::device, &indexbufferInfo, nullptr, &stagingBuffers.indices.buffer );
-    AE3D_CHECK_VULKAN( err, "create staging index buffer" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingBuffers.indices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "staging index buffer" );
-
-    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers.indices.buffer, &memReqs );
-    memAlloc.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAlloc.memoryTypeIndex );
-    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &stagingBuffers.indices.memory );
-    AE3D_CHECK_VULKAN( err, "allocate staging index memory" );
-
-    err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, 0, indexBufferSize, 0, &data );
-    AE3D_CHECK_VULKAN( err, "map staging index memory" );
-
-    std::memcpy( data, indexData, indexBufferSize );
-    vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory );
-    err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers.indices.buffer, stagingBuffers.indices.memory, 0 );
-    AE3D_CHECK_VULKAN( err, "bind staging index memory" );
-
-    indexbufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-    err = vkCreateBuffer( GfxDeviceGlobal::device, &indexbufferInfo, nullptr, &indexBuffer );
-    AE3D_CHECK_VULKAN( err, "create index buffer" );
-    VertexBufferGlobal::buffersToReleaseAtExit.push_back( indexBuffer );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)indexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "index buffer" );
-
-    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, indexBuffer, &memReqs );
-    memAlloc.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
-    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &indexMem );
-    AE3D_CHECK_VULKAN( err, "allocate index memory" );
-    VertexBufferGlobal::memoryToReleaseAtExit.push_back( indexMem );
-
-    err = vkBindBufferMemory( GfxDeviceGlobal::device, indexBuffer, indexMem, 0 );
-    AE3D_CHECK_VULKAN( err, "bind index buffer memory" );
-
     VkCommandBufferBeginInfo cmdBufferBeginInfo = {};
     cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     cmdBufferBeginInfo.pNext = nullptr;
 
     VkBufferCopy copyRegion = {};
+    copyRegion.size = bufferSize;
+
     err = vkBeginCommandBuffer( copyCommandBuffer, &cmdBufferBeginInfo );
     AE3D_CHECK_VULKAN( err, "begin staging copy" );
 
-    copyRegion.size = vertexBufferSize;
-    vkCmdCopyBuffer( copyCommandBuffer, stagingBuffers.vertices.buffer, vertexBuffer, 1, &copyRegion );
-
-    copyRegion.size = indexBufferSize;
-    vkCmdCopyBuffer( copyCommandBuffer, stagingBuffers.indices.buffer, indexBuffer, 1, &copyRegion );
+    vkCmdCopyBuffer( copyCommandBuffer, source, destination, 1, &copyRegion );
 
     err = vkEndCommandBuffer( copyCommandBuffer );
     AE3D_CHECK_VULKAN( err, "end staging copy" );
@@ -222,12 +81,136 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "wait after staging VB copy" );
 
+    vkFreeCommandBuffers( GfxDeviceGlobal::device, cmdBufInfo.commandPool, 1, &copyCommandBuffer );
+}
+
+void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryFlags, const char* debugName )
+{
+    VkBufferCreateInfo bufferInfo = {};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = bufferSize;
+    bufferInfo.usage = usageFlags;
+    VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &buffer );
+    AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, debugName );
+
+    VkMemoryRequirements memReqs;
+    VkMemoryAllocateInfo memAlloc = {};
+    memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+
+    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, buffer, &memReqs );
+    memAlloc.allocationSize = memReqs.size;
+    ae3d::GetMemoryType( memReqs.memoryTypeBits, memoryFlags, &memAlloc.memoryTypeIndex );
+    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &memory );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+
+    err = vkBindBufferMemory( GfxDeviceGlobal::device, buffer, memory, 0 );
+    AE3D_CHECK_VULKAN( err, "vkBindBufferMemory" );
+}
+
+void MarkForFreeing( VkBuffer vertexBuffer, VkDeviceMemory vertexMem, VkBuffer indexBuffer, VkDeviceMemory indexMem )
+{
+    for (std::size_t memoryIndex = 0; memoryIndex < VertexBufferGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
+    {
+        if (VertexBufferGlobal::memoryToReleaseAtExit[ memoryIndex ] == vertexMem)
+        {
+            VertexBufferGlobal::memoryToReleaseAtExit.erase( std::begin( VertexBufferGlobal::memoryToReleaseAtExit ) + memoryIndex );
+        }
+    }
+
+    for (std::size_t memoryIndex = 0; memoryIndex < VertexBufferGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
+    {
+        if (VertexBufferGlobal::memoryToReleaseAtExit[ memoryIndex ] == indexMem)
+        {
+            VertexBufferGlobal::memoryToReleaseAtExit.erase( std::begin( VertexBufferGlobal::memoryToReleaseAtExit ) + memoryIndex );
+        }
+    }
+
+    for (std::size_t bufferIndex = 0; bufferIndex < VertexBufferGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
+    {
+        if (VertexBufferGlobal::buffersToReleaseAtExit[ bufferIndex ] == vertexBuffer)
+        {
+            VertexBufferGlobal::buffersToReleaseAtExit.erase( std::begin( VertexBufferGlobal::buffersToReleaseAtExit ) + bufferIndex );
+        }
+    }
+
+    for (std::size_t bufferIndex = 0; bufferIndex < VertexBufferGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
+    {
+        if (VertexBufferGlobal::buffersToReleaseAtExit[ bufferIndex ] == indexBuffer)
+        {
+            VertexBufferGlobal::buffersToReleaseAtExit.erase( std::begin( VertexBufferGlobal::buffersToReleaseAtExit ) + bufferIndex );
+        }
+    }
+
+    vkFreeMemory( GfxDeviceGlobal::device, vertexMem, nullptr );
+    vkFreeMemory( GfxDeviceGlobal::device, indexMem, nullptr );
+    GfxDeviceGlobal::pendingFreeVBs.push_back( vertexBuffer );
+    GfxDeviceGlobal::pendingFreeVBs.push_back( indexBuffer );
+}
+
+void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int vertexBufferSize, int vertexStride, const void* indexData, int indexBufferSize )
+{
+    System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
+    System::Assert( vertexData != nullptr, "vertexData not initialized" );
+    System::Assert( indexData != nullptr, "indexData not initialized" );
+
+    if (vertexBuffer != VK_NULL_HANDLE)
+    {
+        MarkForFreeing( vertexBuffer, vertexMem, indexBuffer, indexMem );
+    }
+
+    struct Buffer
+    {
+        VkDeviceMemory memory;
+        VkBuffer buffer;
+    };
+
+    struct
+    {
+        Buffer vertices;
+        Buffer indices;
+    } stagingBuffers;
+
+    // Vertex buffer
+    CreateBuffer( stagingBuffers.vertices.buffer, vertexBufferSize, stagingBuffers.vertices.memory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "staging vertex buffer" );
+
+    void* bufferData = nullptr;
+    VkResult err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, 0, vertexBufferSize, 0, &bufferData );
+    AE3D_CHECK_VULKAN( err, "map vertex memory" );
+
+    std::memcpy( bufferData, vertexData, vertexBufferSize );
+    vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory );
+
+    CreateBuffer( vertexBuffer, vertexBufferSize, vertexMem, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "vertex buffer" );
+    VertexBufferGlobal::buffersToReleaseAtExit.push_back( vertexBuffer );
+    VertexBufferGlobal::memoryToReleaseAtExit.push_back( vertexMem );
+    CopyBuffer( stagingBuffers.vertices.buffer, vertexBuffer, vertexBufferSize );
+
     vkDestroyBuffer( GfxDeviceGlobal::device, stagingBuffers.vertices.buffer, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, nullptr );
+
+    // Index buffer
+    CreateBuffer( stagingBuffers.indices.buffer, indexBufferSize, stagingBuffers.indices.memory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "staging index buffer" );
+
+    err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, 0, indexBufferSize, 0, &bufferData );
+    AE3D_CHECK_VULKAN( err, "map staging index memory" );
+
+    std::memcpy( bufferData, indexData, indexBufferSize );
+    vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory );
+
+    CreateBuffer( indexBuffer, indexBufferSize, indexMem, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "index buffer" );
+    VertexBufferGlobal::buffersToReleaseAtExit.push_back( indexBuffer );
+    VertexBufferGlobal::memoryToReleaseAtExit.push_back( indexMem );
+    CopyBuffer( stagingBuffers.indices.buffer, indexBuffer, indexBufferSize );
+
     vkDestroyBuffer( GfxDeviceGlobal::device, stagingBuffers.indices.buffer, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, nullptr );
-    vkFreeCommandBuffers( GfxDeviceGlobal::device, cmdBufInfo.commandPool, 1, &copyCommandBuffer );
 
+    CreateInputState( vertexStride );
+}
+
+void ae3d::VertexBuffer::CreateInputState( int vertexStride )
+{
     bindingDescriptions.resize( 1 );
     bindingDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
     bindingDescriptions[ 0 ].stride = vertexStride;

@@ -2,6 +2,7 @@
 #include <cstring>
 #include <vulkan/vulkan.h>
 #include "stb_image.c"
+#include "DDSLoader.hpp"
 #include "FileSystem.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
@@ -204,12 +205,102 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             SetImageLayout( TextureCubeGlobal::texCmdBuffer,
                 images[ face ],
                 VK_IMAGE_ASPECT_COLOR_BIT,
-                VK_IMAGE_LAYOUT_UNDEFINED,//VK_IMAGE_LAYOUT_PREINITIALIZED,
+                VK_IMAGE_LAYOUT_UNDEFINED,
                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 0, 1 );
         }
         else if (isDDS)
         {
-            //LoadDDS( fileContents.path.c_str() );
+            DDSLoader::Output ddsOutput;
+            auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
+            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
+
+            if (loadResult != DDSLoader::LoadResult::Success)
+            {
+                ae3d::System::Print( "DDS Loader could not load %s", paths[ face ].c_str() );
+                return;
+            }
+
+            mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );
+            int bytesPerPixel = 1;
+
+            imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+
+            if (!opaque)
+            {
+                imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+            }
+
+            if (ddsOutput.format == DDSLoader::Format::BC2)
+            {
+                imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
+                bytesPerPixel = 2;
+            }
+            else if (ddsOutput.format == DDSLoader::Format::BC3)
+            {
+                imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
+                bytesPerPixel = 2;
+            }
+
+            ae3d::System::Assert( ddsOutput.dataOffsets.size() > 0, "DDS reader error: dataoffsets is empty" );
+
+            imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
+
+            err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &images[ face ] );
+            AE3D_CHECK_VULKAN( err, "vkCreateImage" );
+            TextureCubeGlobal::imagesToReleaseAtExit.push_back( images[ face ] );
+
+            VkMemoryRequirements memReqs;
+            vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
+            memAllocInfo.allocationSize = memReqs.size;
+
+            GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
+
+            err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
+            AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
+            TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemories[ face ] );
+
+            err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
+            AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
+
+            VkImageSubresource subRes = {};
+            subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            subRes.mipLevel = 0;
+            subRes.arrayLayer = 0;
+
+            VkSubresourceLayout subResLayout;
+            vkGetImageSubresourceLayout( GfxDeviceGlobal::device, images[ face ], &subRes, &subResLayout );
+
+            void* mapped;
+            err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
+            AE3D_CHECK_VULKAN( err, "vkMapMemory in TextureCube" );
+
+            bytesPerPixel = 4;
+
+            if (MathUtil::IsPowerOfTwo( width ) && MathUtil::IsPowerOfTwo( height ))
+            {
+                std::memcpy( mapped, &fileContents.data[ ddsOutput.dataOffsets[ face ] ], width * height * bytesPerPixel );
+            }
+            else
+            {
+                const std::size_t rowSize = bytesPerPixel * width;
+                char* mappedPos = (char*)mapped;
+                char* dataPos = (char*)&fileContents.data[ ddsOutput.dataOffsets[ face ] ];
+
+                for (int i = 0; i < height; ++i)
+                {
+                    std::memcpy( mappedPos, dataPos, rowSize );
+                    mappedPos += subResLayout.rowPitch;
+                    dataPos += rowSize;
+                }
+            }
+
+            vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
+
+            SetImageLayout( TextureCubeGlobal::texCmdBuffer,
+                images[ face ],
+                VK_IMAGE_ASPECT_COLOR_BIT,
+                VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 0, 1 );
         }
     }
  
