@@ -6,6 +6,7 @@
 #include "FileSystem.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "VulkanUtils.hpp"
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
@@ -162,6 +163,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
             AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
             TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemories[ face ] );
+            Statistics::IncAllocCalls();
 
             err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
             AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
@@ -258,6 +260,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
             AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
             TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemories[ face ] );
+            Statistics::IncAllocCalls();
 
             err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
             AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
@@ -322,6 +325,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
     TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
+    Statistics::IncAllocCalls();
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );

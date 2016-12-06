@@ -29,6 +29,7 @@ int main()
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
+    System::RunUnitTests();
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -193,7 +194,10 @@ int main()
             }
         }
 
-        std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
+        //std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
+        
+        //std::string stats = System::Statistics::GetStatistics();
+        //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         //stats += std::string( "\nbarriers: " ) + std::to_string( System::Statistics::GetBarrierCallCount() );
 

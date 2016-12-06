@@ -11,6 +11,7 @@ namespace Statistics
     int renderTargetBinds = 0;
     int vertexBufferBinds = 0;
     int createConstantBufferCalls = 0;
+    int allocCalls = 0;
     float depthNormalsTimeMS = 0;
     float shadowMapTimeMS = 0;
     float frameTimeMS = 0;
@@ -58,6 +59,16 @@ void Statistics::EndFrameTimeProfiling()
 void Statistics::IncFenceCalls()
 {
     ++Statistics::fenceCalls;
+}
+
+void Statistics::IncAllocCalls()
+{
+    ++Statistics::allocCalls;
+}
+
+int Statistics::GetAllocCalls()
+{
+    return Statistics::allocCalls;
 }
 
 void Statistics::IncCreateConstantBufferCalls()
@@ -152,14 +163,15 @@ void Statistics::IncBarrierCalls()
 
 void Statistics::ResetFrameStatistics()
 {
-    Statistics::drawCalls = 0;
-    Statistics::barrierCalls = 0;
-    Statistics::fenceCalls = 0;
-    Statistics::textureBinds = 0;
-    Statistics::shaderBinds = 0;
-    Statistics::vertexBufferBinds = 0;
-    Statistics::renderTargetBinds = 0;
-    Statistics::createConstantBufferCalls = 0;
+    drawCalls = 0;
+    barrierCalls = 0;
+    fenceCalls = 0;
+    textureBinds = 0;
+    shaderBinds = 0;
+    vertexBufferBinds = 0;
+    renderTargetBinds = 0;
+    createConstantBufferCalls = 0;
+    allocCalls = 0;
 
-    Statistics::startFrameTimePoint = std::chrono::high_resolution_clock::now();
+    startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }

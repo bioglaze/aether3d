@@ -33,6 +33,8 @@ namespace Statistics
     int GetBarrierCalls();
     void IncFenceCalls();
     int GetFenceCalls();
+    void IncAllocCalls();
+    int GetAllocCalls();
 }
 
 #endif

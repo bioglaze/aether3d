@@ -3,6 +3,7 @@
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "VulkanUtils.hpp"
 
 namespace ae3d
@@ -121,6 +122,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &color.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( color.mem );
+    Statistics::IncAllocCalls();
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, color.image, color.mem, 0 );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image bind memory" );
@@ -169,6 +171,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &depth.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( depth.mem );
+    Statistics::IncAllocCalls();
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, depth.image, depth.mem, 0 );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth bind" );

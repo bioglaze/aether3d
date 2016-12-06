@@ -5,7 +5,6 @@
 
 namespace ae3d
 {
-    class GameObject;
     class AudioSourceComponent;
     class CameraComponent;
     class MeshRendererComponent;

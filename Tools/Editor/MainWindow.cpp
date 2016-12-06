@@ -28,6 +28,7 @@
 #include "PointLightComponent.hpp"
 #include "Quaternion.hpp"
 #include "RemoveComponentCommand.hpp"
+#include "RenameGameObjectCommand.hpp"
 #include "SceneWidget.hpp"
 #include "System.hpp"
 #include "SpotLightComponent.hpp"
@@ -342,7 +343,8 @@ void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
 
     if (item->text( 0 ).length() > 0)
     {
-        sceneWidget->GetGameObject( renamedIndex )->SetName( item->text( 0 ).toUtf8().constData() );
+        //sceneWidget->GetGameObject( renamedIndex )->SetName( item->text( 0 ).toUtf8().constData() );
+        CommandRenameGameObject( sceneWidget->GetGameObject( renamedIndex ), item->text( 0 ).toStdString() );
     }
 
     UpdateHierarchy();
@@ -444,6 +446,14 @@ void MainWindow::DuplicateSelected()
     commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
     *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
     UpdateHierarchy();
+}
+
+void MainWindow::CommandRenameGameObject( ae3d::GameObject* gameObject, const std::string& newName )
+{
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< RenameGameObjectCommand >( gameObject, newName ) );
+    }
 }
 
 void MainWindow::CommandCreateAudioSourceComponent()

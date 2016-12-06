@@ -4,6 +4,7 @@
 #define VC_EXTRALEAN
 #include <Windows.h>
 #endif
+#include <vector>
 #include <cstdarg>
 #include <cassert>
 #include "AudioSystem.hpp"
@@ -14,10 +15,24 @@
 #include "Texture2D.hpp"
 #include "Shader.hpp"
 #include "Statistics.hpp"
+#include "Vec3.hpp"
 
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
 void PlatformInitGamePad();
+
+using namespace ae3d;
+
+namespace MathUtil
+{
+    void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax );
+    void GetCorners( const Vec3& min, const Vec3& max, std::vector< Vec3 >& outCorners );
+    bool IsPowerOfTwo( unsigned i );
+    unsigned GetHash( const char* s, unsigned length );
+    int Min( int x, int y );
+    int Max( int x, int y );
+    int GetMipmapCount( int width, int height );
+}
 
 #if _MSC_VER
 extern "C"
@@ -188,4 +203,34 @@ int ae3d::System::Statistics::GetBarrierCallCount()
 int ae3d::System::Statistics::GetFenceCallCount()
 {
     return ::Statistics::GetFenceCalls();
+}
+
+void ae3d::System::RunUnitTests()
+{
+    const bool isPowerOfTwo2 = MathUtil::IsPowerOfTwo( 2 );
+    Assert( isPowerOfTwo2, "IsPowerOfTwo failed" );
+
+    const bool isPowerOfTwo0 = MathUtil::IsPowerOfTwo( 0 );
+    Assert( isPowerOfTwo0, "IsPowerOfTwo failed" );
+
+    const int min1 = MathUtil::Min( 1, 2 );
+    Assert( min1 == 1, "Min failed" );
+
+    const int min2 = MathUtil::Min( 2, 1 );
+    Assert( min2 == 1, "Min failed" );
+
+    const int min3 = MathUtil::Min( 1, 1 );
+    Assert( min3 == 1, "Min failed" );
+
+    const int min4 = MathUtil::Min( -1, 1 );
+    Assert( min4 == -1, "Min failed" );
+
+    const int min5 = MathUtil::Min( -1, -2 );
+    Assert( min5 == -2, "Min failed" );
+
+    const int max1 = MathUtil::Max( 1, 2 );
+    Assert( max1 == 2, "Max failed" );
+
+    const int max2 = MathUtil::Max( -1, 2 );
+    Assert( max2 == 2, "Max failed" );
 }

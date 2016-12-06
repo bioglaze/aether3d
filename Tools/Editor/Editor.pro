@@ -72,7 +72,8 @@ SOURCES += \
     CreateSpriteRendererCommand.cpp \
     PointLightInspector.cpp \
     RemoveComponentCommand.cpp \
-    ModifySpriteRendererCommand.cpp
+    ModifySpriteRendererCommand.cpp \
+    RenameGameObjectCommand.cpp
 
 HEADERS += \
     MainWindow.hpp \
@@ -98,4 +99,5 @@ HEADERS += \
     CreateSpriteRendererCommand.hpp \
     PointLightInspector.hpp \
     RemoveComponentCommand.hpp \
-    ModifySpriteRendererCommand.hpp
+    ModifySpriteRendererCommand.hpp \
+    RenameGameObjectCommand.hpp

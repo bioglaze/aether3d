@@ -127,6 +127,7 @@ namespace ae3d
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "fence calls: " << ::Statistics::GetFenceCalls() << "\n";
+                stm << "mem alloc calls: " << ::Statistics::GetAllocCalls() << "\n";
 
                 return stm.str();
             }
@@ -1614,6 +1615,7 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
     GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &ubo.uboMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory UBO" );
+    Statistics::IncAllocCalls();
 
     err = vkBindBufferMemory( GfxDeviceGlobal::device, ubo.ubo, ubo.uboMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindBufferMemory UBO" );

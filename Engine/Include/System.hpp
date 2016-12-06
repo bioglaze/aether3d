@@ -165,6 +165,8 @@ namespace ae3d
         /// Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often.
         void ReloadChangedAssets();
 
+        void RunUnitTests();
+
         namespace Statistics
         {
             std::string GetStatistics();

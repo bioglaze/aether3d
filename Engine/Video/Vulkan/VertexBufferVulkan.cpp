@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstring>
 #include "Macros.hpp"
+#include "Statistics.hpp"
 #include "System.hpp"
 #include "VulkanUtils.hpp"
 
@@ -103,6 +104,7 @@ void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkB
     ae3d::GetMemoryType( memReqs.memoryTypeBits, memoryFlags, &memAlloc.memoryTypeIndex );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &memory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+    Statistics::IncAllocCalls();
 
     err = vkBindBufferMemory( GfxDeviceGlobal::device, buffer, memory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindBufferMemory" );
