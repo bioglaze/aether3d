@@ -144,14 +144,16 @@ namespace WindowGlobal
     };
 }
 
+// readdir( dir, &entry, &result ) && result
 void PlatformInitGamePad()
 {
     DIR* dir = opendir( "/dev/input" );
-    dirent entry;
-    dirent* result;
+    dirent* result = readdir( dir );
 
-    while (!readdir_r( dir, &entry, &result ) && result)
+    while (result != nullptr)
     {
+        dirent& entry = *result;
+        
         if ((entry.d_name[0] == 'j') && (entry.d_name[1] == 's'))
         {
             char full_device_path[ 260 ];
@@ -202,6 +204,8 @@ void PlatformInitGamePad()
             
             fcntl( fd, F_SETFL, O_NONBLOCK );
         }
+
+        result = readdir( dir );
     }
 
     closedir( dir );
