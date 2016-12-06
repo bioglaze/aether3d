@@ -538,6 +538,9 @@ void ae3d::Scene::Render()
     GfxDevice::EndBackBufferEncoding();
     Statistics::EndFrameTimeProfiling();
 #endif
+#if RENDERER_OPENGL
+    Statistics::EndFrameTimeProfiling();
+#endif
 }
 
 void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const char* debugGroupName )
