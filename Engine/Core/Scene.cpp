@@ -538,9 +538,6 @@ void ae3d::Scene::Render()
     GfxDevice::EndBackBufferEncoding();
     Statistics::EndFrameTimeProfiling();
 #endif
-#if RENDERER_OPENGL
-    Statistics::EndFrameTimeProfiling();
-#endif
 }
 
 void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const char* debugGroupName )
@@ -652,7 +649,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         if (spriteRenderer)
         {
             Matrix44 projectionModel;
-            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
+            Matrix44::Multiply( transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
             spriteRenderer->Render( projectionModel.m );
         }
         
@@ -661,7 +658,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         if (textRenderer)
         {
             Matrix44 projectionModel;
-            Matrix44::Multiply( transform ? transform->GetLocalMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
+            Matrix44::Multiply( transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
             textRenderer->Render( projectionModel.m );
         }
         
@@ -684,7 +681,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     for (auto j : gameObjectsWithMeshRenderer)
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
-        auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
+        auto meshLocalToWorld = transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity;
 
         Matrix44 mv;
         Matrix44 mvp;
@@ -699,7 +696,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     for (auto j : gameObjectsWithMeshRenderer)
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
-        auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
+        auto meshLocalToWorld = transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity;
         
         Matrix44 mv;
         Matrix44 mvp;
@@ -735,7 +732,7 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
     for (auto j : gameObjectsWithMeshRenderer)
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
-        auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
+        auto meshLocalToWorld = transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity;
         
         Matrix44 mv;
         Matrix44 mvp;
@@ -836,7 +833,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     for (auto j : gameObjectsWithMeshRenderer)
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
-        auto meshLocalToWorld = transform ? transform->GetLocalMatrix() : Matrix44::identity;
+        auto meshLocalToWorld = transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity;
         
         Matrix44 mv;
         Matrix44 mvp;
@@ -1432,8 +1429,8 @@ void ae3d::Scene::GenerateAABB()
         Vec3 oAABBmin = meshRenderer->GetMesh() ? meshRenderer->GetMesh()->GetAABBMin() : Vec3( -1, -1, -1 );
         Vec3 oAABBmax = meshRenderer->GetMesh() ? meshRenderer->GetMesh()->GetAABBMax() : Vec3(  1,  1,  1 );
         
-        Matrix44::TransformPoint( oAABBmin, meshTransform->GetLocalMatrix(), &oAABBmin );
-        Matrix44::TransformPoint( oAABBmax, meshTransform->GetLocalMatrix(), &oAABBmax );
+        Matrix44::TransformPoint( oAABBmin, meshTransform->GetLocalToWorldMatrix(), &oAABBmin );
+        Matrix44::TransformPoint( oAABBmax, meshTransform->GetLocalToWorldMatrix(), &oAABBmax );
         
         if (oAABBmin.x < aabbMin.x)
         {

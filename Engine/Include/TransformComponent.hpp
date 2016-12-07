@@ -20,7 +20,13 @@ namespace ae3d
 
         /// \return Local scale.
         float GetLocalScale() const { return localScale; }
-        
+
+        /// \return World position.
+        const Vec3& GetWorldPosition() const { return globalPosition; }
+
+        /// \return World rotation.
+        const Quaternion& GetWorldRotation() const { return globalRotation; }
+
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
         
@@ -65,7 +71,10 @@ namespace ae3d
 
         /// \return Local transform matrix.
         const Matrix44& GetLocalMatrix();
-        
+
+        /// \return Local-to-world transform matrix.
+        const Matrix44& GetLocalToWorldMatrix() { return localToWorldMatrix; }
+
         /// \return Textual representation of component.
         std::string GetSerialized() const;
 
@@ -96,7 +105,10 @@ namespace ae3d
         Vec3 localPosition;
         Quaternion localRotation;
         float localScale = 1;
+        Vec3 globalPosition;
+        Quaternion globalRotation;
         Matrix44 localMatrix;
+        Matrix44 localToWorldMatrix;
         int parent = -1;
 #if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
         Matrix44 hmdView; // For VR

@@ -97,9 +97,25 @@ void ae3d::TransformComponent::OffsetRotate( const Vec3& axis, float angleDeg )
 
 void ae3d::TransformComponent::UpdateLocalMatrices()
 {
-    for (unsigned c = 0; c < nextFreeTransformComponent; ++c)
+    for (unsigned componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex)
     {
-        transformComponents[ c ].SolveLocalMatrix();
+        transformComponents[ componentIndex ].SolveLocalMatrix();
+    }
+
+    for (unsigned componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex)
+    {
+        int parent = transformComponents[ componentIndex ].parent;
+
+        Matrix44 transform = transformComponents[ componentIndex ].localMatrix;
+
+        while (parent != -1)
+        {
+            Matrix44::Multiply( transform, transformComponents[ parent ].GetLocalMatrix(), transform );
+            parent = transformComponents[ parent ].parent;
+        }
+
+        transformComponents[ componentIndex ].localToWorldMatrix = transform;
+        Matrix44::TransformPoint( transformComponents[ componentIndex ].localPosition, transform, &transformComponents[ componentIndex ].globalPosition );
     }
 }
 
@@ -128,11 +144,6 @@ void ae3d::TransformComponent::SolveLocalMatrix()
     localRotation.GetMatrix( localMatrix );
     localMatrix.Scale( localScale, localScale, localScale );
     localMatrix.Translate( localPosition );
-    
-    if (parent != -1)
-    {
-        Matrix44::Multiply( localMatrix, transformComponents[ parent ].GetLocalMatrix(), localMatrix );
-    }
 }
 
 void ae3d::TransformComponent::SetVrView( const Matrix44& view )
