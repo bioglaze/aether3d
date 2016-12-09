@@ -12,12 +12,23 @@ namespace Statistics
     int vertexBufferBinds = 0;
     int createConstantBufferCalls = 0;
     int allocCalls = 0;
+    int triangleCount = 0;
     float depthNormalsTimeMS = 0;
     float shadowMapTimeMS = 0;
     float frameTimeMS = 0;
     std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
+}
+
+void Statistics::IncTriangleCount( int triangles )
+{
+    triangleCount += triangles;
+}
+
+int Statistics::GetTriangleCount()
+{
+    return triangleCount;
 }
 
 void Statistics::BeginShadowMapProfiling()
@@ -172,6 +183,7 @@ void Statistics::ResetFrameStatistics()
     renderTargetBinds = 0;
     createConstantBufferCalls = 0;
     allocCalls = 0;
+    triangleCount = 0;
 
     startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }

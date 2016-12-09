@@ -94,6 +94,7 @@ namespace ae3d
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "texture binds: " << ::Statistics::GetTextureBinds() << "\n";
                 stm << "render target binds: " << ::Statistics::GetRenderTargetBinds() << "\n";
+                stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
 
                 return stm.str();
             }
@@ -190,6 +191,15 @@ void ae3d::GfxDevice::Init( int width, int height )
     SetBackBufferDimensionAndFBO( width, height );
     Set_sRGB_Writes( true );
     glEnable( GL_DEPTH_TEST );
+
+    GLint v;
+    glGetIntegerv( GL_CONTEXT_FLAGS, &v );
+
+    if (v & GL_CONTEXT_FLAG_DEBUG_BIT)
+    {
+        glDebugMessageCallback( DebugCallbackARB, nullptr );
+        glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
+    }
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
@@ -222,6 +232,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     shader.Use();
     vertexBuffer.Bind();
     Statistics::IncDrawCalls();
+    Statistics::IncTriangleCount( endIndex - startIndex );
 
 #if DEBUG
     glValidateProgram( shader.GetHandle() );

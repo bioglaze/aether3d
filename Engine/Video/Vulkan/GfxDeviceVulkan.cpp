@@ -128,6 +128,7 @@ namespace ae3d
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "fence calls: " << ::Statistics::GetFenceCalls() << "\n";
                 stm << "mem alloc calls: " << ::Statistics::GetAllocCalls() << "\n";
+                stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
 
                 return stm.str();
             }
@@ -1588,6 +1589,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     vkCmdBindIndexBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
     vkCmdDrawIndexed( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
+    Statistics::IncTriangleCount( endIndex - startIndex );
     Statistics::IncDrawCalls();
 }
 

@@ -51,6 +51,7 @@ namespace ae3d
                 stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
+                stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
                 stm << "create constant buffer calls: " << ::Statistics::GetCreateConstantBufferCalls() << "\n";
 
                 return stm.str();
@@ -789,7 +790,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     if (GfxDeviceGlobal::sampleCount > 1)
     {
-        rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_R8G8B8A8_UNORM);
     }
 
     const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
@@ -915,6 +916,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( &indexBufferView );
     GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace * 3, 1, startFace * 3, 0, 0 );
 
+    Statistics::IncTriangleCount( endFace - startFace );
     Statistics::IncDrawCalls();
 }
 

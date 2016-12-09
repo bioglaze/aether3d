@@ -244,7 +244,7 @@ SceneWidget::SceneWidget( QWidget* parent ) : QOpenGLWidget( parent )
                         "Missing OpenGL support! Maybe you need to update your display driver.");
     }
 
-    QSurfaceFormat fmt;
+    QSurfaceFormat fmt( QSurfaceFormat::FormatOption::DebugContext );
     fmt.setVersion( 4, 1 );
     fmt.setProfile( QSurfaceFormat::CoreProfile );
     fmt.setDepthBufferSize( 24 );

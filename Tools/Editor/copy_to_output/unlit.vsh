@@ -2,6 +2,7 @@
 
 uniform mat4 _ModelViewProjectionMatrix;
 uniform mat4 _ModelViewMatrix;
+uniform mat4 _ModelMatrix;
 uniform mat4 _ShadowProjectionMatrix;
 uniform vec4 textureMap_ST;
 
@@ -9,6 +10,7 @@ layout (location = 0) in vec4 aPosition;
 layout (location = 1) in vec2 aTexCoord;
 
 out vec2 vTexCoord;
+out vec3 vPositionWorld;
 
 #define SHADOW_MAP
 #ifdef SHADOW_MAP
@@ -19,6 +21,7 @@ void main()
 {
     gl_Position = _ModelViewProjectionMatrix * aPosition;
     vTexCoord = aTexCoord * textureMap_ST.xy + textureMap_ST.zw;
+    vPositionWorld = (_ModelMatrix * aPosition).xyz;
 #ifdef SHADOW_MAP
     vProjCoord = _ShadowProjectionMatrix * aPosition;
 #endif

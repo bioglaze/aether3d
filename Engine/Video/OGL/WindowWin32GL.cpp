@@ -1,11 +1,7 @@
 #include "Window.hpp"
 #include <GL/glxw.h>
 #include <GL/wglext.h>
-
 #include "System.hpp"
-
-void APIENTRY DebugCallbackARB(GLenum source, GLenum type, GLuint id, GLenum severity,
-    GLsizei length, const GLchar *message, const GLvoid *userParam);
 
 namespace WindowGlobal
 {
@@ -232,15 +228,6 @@ namespace ae3d
         {
             OutputDebugStringA( "Failed to load OpenGL function pointers using GLXW!\n" );
             return;
-        }
-
-        GLint v;
-        glGetIntegerv( GL_CONTEXT_FLAGS, &v );
-
-        if (v & GL_CONTEXT_FLAG_DEBUG_BIT)
-        {
-            glDebugMessageCallback( DebugCallbackARB, nullptr );
-            glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
         }
 
         PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress( "wglSwapIntervalEXT" );

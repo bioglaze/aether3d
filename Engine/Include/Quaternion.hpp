@@ -55,9 +55,9 @@ namespace ae3d
         Quaternion operator*( const Quaternion& aQ ) const
         {
             return Quaternion( Vec3( w * aQ.x + x * aQ.w + y * aQ.z - z * aQ.y,
-                                    w * aQ.y + y * aQ.w + z * aQ.x - x * aQ.z,
-                                    w * aQ.z + z * aQ.w + x * aQ.y - y * aQ.x ),
-                              w * aQ.w - x * aQ.x - y * aQ.y - z * aQ.z );
+                                     w * aQ.y + y * aQ.w + z * aQ.x - x * aQ.z,
+                                     w * aQ.z + z * aQ.w + x * aQ.y - y * aQ.x ),
+                                     w * aQ.w - x * aQ.x - y * aQ.y - z * aQ.z );
         }
         
         /**
@@ -185,56 +185,45 @@ namespace ae3d
             return q;
         }
         
-        /** \param mat Matrix. */
+        // Converts a matrix into a Quaternion.
         void FromMatrix( const Matrix44& mat )
         {
-            const float trace = 1.0f + mat.m[0] + mat.m[5] + mat.m[10];
-            
-            if (trace > 0.0f)
-            {
-                assert( trace > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
-                
-                const float S = sqrtf( trace ) * 2.0f;
-                x = ( mat.m[9] - mat.m[6] ) / S;
-                y = ( mat.m[2] - mat.m[8] ) / S;
-                z = ( mat.m[4] - mat.m[1] ) / S;
-                w = 0.25f * S;
-            }
-            else if (mat.m[0] > mat.m[5] && mat.m[0] > mat.m[10])
-            {
-                const float val = 1.0f + mat.m[0] - mat.m[5] - mat.m[10];
-                assert( val > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
+            float t;
 
-                const float S = std::sqrt( val ) * 2.0f;
-                x = 0.25f * S;
-                y = (mat.m[4] + mat.m[1] ) / S;
-                z = (mat.m[2] + mat.m[8] ) / S;
-                w = (mat.m[9] - mat.m[6] ) / S;
-            }
-            else if (mat.m[5] > mat.m[10])
+            if (mat.m[ 10 ] < 0)
             {
-                const float val =  1.0f + mat.m[5] - mat.m[0] - mat.m[10];
-                assert( val > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
-
-                const float S = std::sqrt(val ) * 2.0f;
-                x = (mat.m[4] + mat.m[1] ) / S;
-                y = 0.25f * S;
-                z = (mat.m[9] + mat.m[6] ) / S;
-                w = (mat.m[2] - mat.m[8] ) / S;
+                if (mat.m[ 0 ] > mat.m[ 5 ])
+                {
+                    t = 1 + mat.m[ 0 ] - mat.m[ 5 ] - mat.m[ 10 ];
+                    *this = Quaternion( Vec3( t, mat.m[ 1 ] + mat.m[ 4 ], mat.m[ 8 ] + mat.m[ 2 ] ), mat.m[ 6 ] - mat.m[ 9 ] );
+                }
+                else
+                {
+                    t = 1 - mat.m[ 0 ] + mat.m[ 5 ] - mat.m[ 10 ];
+                    *this = Quaternion( Vec3( mat.m[ 1 ] + mat.m[ 4 ], t, mat.m[ 6 ] + mat.m[ 9 ] ), mat.m[ 8 ] - mat.m[ 2 ] );
+                }
             }
             else
             {
-                const float val = 1.0f + mat.m[10] - mat.m[0] - mat.m[5];
-                assert( val > 0 && "Quaternion from matrix: trying to get an sqrt of a negative value" );
-
-                const float S = std::sqrt( val ) * 2.0f;
-                x = (mat.m[2] + mat.m[8] ) / S;
-                y = (mat.m[9] + mat.m[6] ) / S;
-                z = 0.25f * S;
-                w = (mat.m[4] - mat.m[1] ) / S;
+                if (mat.m[ 0 ] < -mat.m[ 5 ])
+                {
+                    t = 1 - mat.m[ 0 ] - mat.m[ 5 ] + mat.m[ 10 ];
+                    *this = Quaternion( Vec3( mat.m[ 8 ] + mat.m[ 2 ], mat.m[ 6 ] + mat.m[ 9 ], t ), mat.m[ 1 ] - mat.m[ 4 ] );
+                }
+                else
+                {
+                    t = 1 + mat.m[ 0 ] + mat.m[ 5 ] + mat.m[ 10 ];
+                    *this = Quaternion( Vec3( mat.m[ 6 ] - mat.m[ 9 ], mat.m[ 8 ] - mat.m[ 2 ], mat.m[ 1 ] - mat.m[ 4 ] ), t );
+                }
             }
+            
+            const float factor = 0.5f / std::sqrt( t );
+            x *= factor;
+            y *= factor;
+            z *= factor;
+            w *= factor;
         }
-        
+
         /**
          Gets matrix for unit-length quaternion.
          

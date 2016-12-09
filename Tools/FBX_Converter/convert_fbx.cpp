@@ -519,6 +519,7 @@ void LoadFBX( const std::string& path )
     FbxNode* rootNode = theScene->GetRootNode();
 
     ImportMeshNodes( rootNode );
+
     /*ProcessSkeletonHierarchy( rootNode );
     ProcessJointsAndAnimations( rootNode );
     std::cout << "skeleton: " << std::endl;
@@ -549,6 +550,12 @@ int main( int paramCount, char** params )
     std::cerr << "Converting... " << std::endl;
 
     LoadFBX( params[ 1 ] );
+
+    if (gMeshes.empty())
+    {
+        std::cout << std::string( params[ 1 ] ) << " didn't contain any meshes." << std::endl;
+        return 0;
+    }
 
     // Creates a new file name by replacing 'obj' with 'ae3d'.
     std::string outFile = std::string( params[ 1 ] );

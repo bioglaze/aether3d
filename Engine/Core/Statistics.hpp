@@ -16,6 +16,8 @@ namespace Statistics
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
 
+    void IncTriangleCount( int triangles );
+    int GetTriangleCount();
     void IncCreateConstantBufferCalls();
     int GetCreateConstantBufferCalls();
     void IncDrawCalls();
