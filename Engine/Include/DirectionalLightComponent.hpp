@@ -3,6 +3,7 @@
 
 #include <string>
 #include "RenderTexture.hpp"
+#include "Vec3.hpp"
 
 namespace ae3d
 {
@@ -12,6 +13,12 @@ namespace ae3d
     public:
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
+
+        /// \return Color
+        const Vec3& GetColor() const { return color; }
+
+        /// \param aColor Color in range 0-1.
+        void SetColor( const Vec3& aColor ) { color = aColor; }
 
         /// \return True, if the light casts a shadow.
         bool CastsShadow() const { return castsShadow; }
@@ -42,6 +49,7 @@ namespace ae3d
         RenderTexture shadowMap;
         GameObject* gameObject = nullptr;
         bool castsShadow = false;
+        Vec3 color{ 1, 1, 1 };
     };
 }
 #endif

@@ -40,6 +40,7 @@ std::string ae3d::DirectionalLightComponent::GetSerialized() const
     outStream.imbue( c_locale );
 
     outStream << "dirlight\n";
-    outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
+    outStream << "color " << color.x << " " << color.y << " " << color.z << "\n";
+    outStream << "shadow " << (castsShadow ? 1 : 0) << "\n\n";
     return outStream.str();
 }

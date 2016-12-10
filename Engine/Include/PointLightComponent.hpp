@@ -13,6 +13,12 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \return Color
+        const Vec3& GetColor() const { return color; }
+
+        /// \param aColor Color in range 0-1.
+        void SetColor( const Vec3& aColor ) { color = aColor; }
+
         /// \return True, if the light casts a shadow.
         bool CastsShadow() const { return castsShadow; }
         
@@ -46,6 +52,7 @@ namespace ae3d
         static PointLightComponent* Get( unsigned index );
         
         RenderTexture shadowMap;
+        Vec3 color{ 1, 1, 1 };
         float radius = 10;
         GameObject* gameObject = nullptr;
         bool castsShadow = false;

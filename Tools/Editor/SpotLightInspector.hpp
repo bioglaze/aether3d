@@ -27,7 +27,10 @@ private slots:
     QWidget* root = nullptr;
     class QCheckBox* shadowCheck = nullptr;
     class QPushButton* removeButton = nullptr;
+    class QPushButton* colorButton = nullptr;
     ae3d::GameObject* gameObject = nullptr;
+    class QLineEdit* coneAngleInput = nullptr;
+    class QColorDialog* colorDialog = nullptr;
 };
 
 #endif

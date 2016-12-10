@@ -964,8 +964,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> name;
             outGameObjects.back().SetName( name.c_str() );
         }
-
-        if (token == "name")
+        else if (token == "name")
         {
             if (outGameObjects.empty())
             {
@@ -975,11 +974,33 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             std::string name;
             std::getline( lineStream, name );
-            //lineStream >> name;
             outGameObjects.back().SetName( name.c_str() );
         }
+        else if (token == "layer")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found layer but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
 
-        if (token == "dirlight")
+            int layer;
+            lineStream >> layer;
+            outGameObjects.back().SetLayer( layer );
+        }
+        else if (token == "enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s: found layer but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+            outGameObjects.back().SetEnabled( enabled != 0 );
+        }
+        else if (token == "dirlight")
         {
             if (outGameObjects.empty())
             {
@@ -996,8 +1017,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> castsShadow;
             outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
         }
-
-        if (token == "spotlight")
+        else if (token == "spotlight")
         {
             if (outGameObjects.empty())
             {
@@ -1007,18 +1027,9 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             currentLightType = CurrentLightType::Spot;
             GameObject& go = outGameObjects.back();
-            go.AddComponent< SpotLightComponent >();
-            
-            int castsShadow = 0;
-            lineStream >> castsShadow;
-            go.GetComponent< SpotLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
-            
-            float coneAngleDegrees;
-            lineStream >> coneAngleDegrees;
-            go.GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
+            go.AddComponent< SpotLightComponent >();            
         }
-        
-        if (token == "pointlight")
+        else if (token == "pointlight")
         {
             if (outGameObjects.empty())
             {
@@ -1027,23 +1038,10 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             }
             
             currentLightType = CurrentLightType::Point;
-            auto lastGo = outGameObjects.back();
-            lastGo.AddComponent< PointLightComponent >();
-            
-            int castsShadow = 0;
-            std::string shadowStr;
-            lineStream >> shadowStr;
-            lineStream >> castsShadow;
-            lastGo.GetComponent< PointLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
-
-            float radius;
-            std::string radiusStr;
-            lineStream >> radiusStr;
-            lineStream >> radius;
-            lastGo.GetComponent< PointLightComponent >()->SetRadius( radius );
+            GameObject& go  = outGameObjects.back();
+            go.AddComponent< PointLightComponent >();            
         }
-        
-        if (token == "shadow")
+        else if (token == "shadow")
         {
             if (outGameObjects.empty())
             {
@@ -1056,19 +1054,18 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             if (currentLightType == CurrentLightType::Directional)
             {
-                outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled != 0, 512 );
+                outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( enabled != 0, 1024 );
             }
             else if (currentLightType == CurrentLightType::Spot)
             {
-                outGameObjects.back().GetComponent< SpotLightComponent >()->SetCastShadow( enabled != 0, 512 );
+                outGameObjects.back().GetComponent< SpotLightComponent >()->SetCastShadow( enabled != 0, 1024 );
             }
-            if (currentLightType == CurrentLightType::Point)
+            else if (currentLightType == CurrentLightType::Point)
             {
-                outGameObjects.back().GetComponent< PointLightComponent >()->SetCastShadow( enabled != 0, 512 );
+                outGameObjects.back().GetComponent< PointLightComponent >()->SetCastShadow( enabled != 0, 1024 );
             }
         }
-
-        if (token == "camera")
+        else if (token == "camera")
         {
             if (outGameObjects.empty())
             {
@@ -1078,8 +1075,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< CameraComponent >();
         }
-
-        if (token == "ortho")
+        else if (token == "ortho")
         {
             if (outGameObjects.empty())
             {
@@ -1091,8 +1087,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> x >> y >> width >> height >> nearp >> farp;
             outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( x, y, width, height, nearp, farp );
         }
-
-        if (token == "persp")
+        else if (token == "persp")
         {
             if (outGameObjects.empty())
             {
@@ -1104,8 +1099,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> fov >> aspect >> nearp >> farp;
             outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( fov, aspect, nearp, farp );
         }
-
-        if (token == "projection")
+        else if (token == "projection")
         {
             if (outGameObjects.empty())
             {
@@ -1130,8 +1124,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 return DeserializeResult::ParseError;
             }
         }
-
-        if (token == "clearcolor")
+        else if (token == "clearcolor")
         {
             if (outGameObjects.empty())
             {
@@ -1143,8 +1136,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> red >> green >> blue;
             outGameObjects.back().GetComponent< CameraComponent >()->SetClearColor( { red, green, blue } );
         }
-
-        if (token == "transform")
+        else if (token == "transform")
         {
             if (outGameObjects.empty())
             {
@@ -1154,8 +1146,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< TransformComponent >();
         }
-
-        if (token == "meshrenderer")
+        else if (token == "meshrenderer")
         {
             if (outGameObjects.empty())
             {
@@ -1167,8 +1158,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             outMeshes.push_back( new Mesh() );
         }
-
-        if (token == "spriterenderer")
+        else if (token == "spriterenderer")
         {
             if (outGameObjects.empty())
             {
@@ -1178,8 +1168,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< SpriteRendererComponent >();
         }
-
-        if (token == "sprite")
+        else if (token == "sprite")
         {
             if (outGameObjects.empty())
             {
@@ -1202,8 +1191,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().GetComponent< SpriteRendererComponent >()->SetTexture( outTexture2Ds[ spritePath ], Vec3( x, y, 0 ), Vec3( x, y, 1 ), Vec4( 1, 1, 1, 1 ) );
         }
-        
-        if (token == "meshpath")
+        else if (token == "meshpath")
         {
             if (outGameObjects.empty())
             {
@@ -1227,8 +1215,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             meshRenderer->SetMaterial( tempMaterial, 0 );
         }
-
-        if (token == "position")
+        else if (token == "position")
         {
             if (outGameObjects.empty())
             {
@@ -1246,8 +1233,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> x >> y >> z;
             outGameObjects.back().GetComponent< TransformComponent >()->SetLocalPosition( { x, y, z } );
         }
-
-        if (token == "rotation")
+        else if (token == "rotation")
         {
             if (outGameObjects.empty())
             {
@@ -1265,8 +1251,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> x >> y >> z >> s;
             outGameObjects.back().GetComponent< TransformComponent >()->SetLocalRotation( { { x, y, z }, s } );
         }
-
-        if (token == "scale")
+        else if (token == "scale")
         {
             if (outGameObjects.empty())
             {
@@ -1284,8 +1269,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> scale;
             outGameObjects.back().GetComponent< TransformComponent >()->SetLocalScale( scale );
         }
-
-        if (token == "texture2d")
+        else if (token == "texture2d")
         {
             std::string name;
             std::string path;
@@ -1295,8 +1279,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outTexture2Ds[ name ] = new Texture2D();
             outTexture2Ds[ name ]->Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, 1 );
         }
-
-        if (token == "material")
+        else if (token == "material")
         {
             std::string materialName;
             lineStream >> materialName;
@@ -1304,8 +1287,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             outMaterials[ materialName ] = new Material();
         }
-
-        if (token == "mesh_material")
+        else if (token == "mesh_material")
         {
             if (outGameObjects.empty())
             {
@@ -1341,8 +1323,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 }
             }
         }
-
-        if (token == "param_float")
+        else if (token == "param_float")
         {
             std::string uniformName;
             float floatValue;
@@ -1350,8 +1331,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> uniformName >> floatValue;
             outMaterials[ currentMaterialName ]->SetFloat( uniformName.c_str(), floatValue );
         }
-
-        if (token == "param_vec3")
+        else if (token == "param_vec3")
         {
             std::string uniformName;
             Vec3 vec3;
@@ -1359,8 +1339,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> uniformName >> vec3.x >> vec3.y >> vec3.z;
             outMaterials[ currentMaterialName ]->SetVector( uniformName.c_str(), vec3 );
         }
-
-        if (token == "param_vec4")
+        else if (token == "param_vec4")
         {
             std::string uniformName;
             Vec4 vec4;
@@ -1368,8 +1347,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> uniformName >> vec4.x >> vec4.y >> vec4.z >> vec4.w;
             outMaterials[ currentMaterialName ]->SetVector( uniformName.c_str(), vec4 );
         }
-
-        if (token == "param_texture")
+        else if (token == "param_texture")
         {
             std::string uniformName;
             std::string textureName;
@@ -1377,8 +1355,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> uniformName >> textureName;
             outMaterials[ currentMaterialName ]->SetTexture( uniformName.c_str(), outTexture2Ds[ textureName ]);
         }
-
-        if (token == "audiosource")
+        else if (token == "audiosource")
         {
             if (outGameObjects.empty())
             {
@@ -1388,8 +1365,19 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< AudioSourceComponent >();
         }
-
-        if (token == "color")
+        else if (token == "coneangle")
+        {
+            float coneAngleDegrees;
+            lineStream >> coneAngleDegrees;
+            outGameObjects.back().GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
+        }
+        else if (token == "radius")
+        {
+            float radius;
+            lineStream >> radius;
+            outGameObjects.back().GetComponent< PointLightComponent >()->SetRadius( radius );
+        }
+        else if (token == "color")
         {
             Vec3 color;
 
@@ -1399,6 +1387,18 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             {
                 outGameObjects.back().GetComponent< SpotLightComponent >()->SetColor( color );
             }
+            else if (currentLightType == CurrentLightType::Directional)
+            {
+                outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetColor( color );
+            }
+            else if (currentLightType == CurrentLightType::Point)
+            {
+                outGameObjects.back().GetComponent< PointLightComponent >()->SetColor( color );
+            }
+        }
+        else
+        {
+            System::Print( "Unhandled token %s\n", token.c_str() );
         }
     }
 
