@@ -12,6 +12,7 @@
 #include <sstream>
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
+#include "LightTiler.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
@@ -94,9 +95,10 @@ namespace GfxDeviceGlobal
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
     std::vector< ID3D12DescriptorHeap* > frameHeaps;
-    std::vector< ID3D12Resource* > frameConstantBuffers;
+    std::vector< ID3D12Resource* > constantBuffers;
     std::vector< ID3D12Resource* > mappedConstantBuffers;
     int currentConstantBufferIndex = 0;
+    ae3d::LightTiler lightTiler;
 
     ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
     ID3D12CommandQueue* commandQueue = nullptr;
@@ -582,11 +584,11 @@ void CreateDepthStencil()
 
 void CreateConstantBuffers()
 {
-    GfxDeviceGlobal::frameConstantBuffers.resize( 300 );
-    GfxDeviceGlobal::mappedConstantBuffers.resize( GfxDeviceGlobal::frameConstantBuffers.size() );
-    ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::frameConstantBuffers.size(), "There are more constant buffers than descriptors" );
+    GfxDeviceGlobal::constantBuffers.resize( 300 );
+    GfxDeviceGlobal::mappedConstantBuffers.resize( GfxDeviceGlobal::constantBuffers.size() );
+    ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::constantBuffers.size(), "There are more constant buffers than descriptors" );
 
-    for (std::size_t bufferIndex = 0; bufferIndex < GfxDeviceGlobal::frameConstantBuffers.size(); ++bufferIndex)
+    for (std::size_t bufferIndex = 0; bufferIndex < GfxDeviceGlobal::constantBuffers.size(); ++bufferIndex)
     {
         D3D12_HEAP_PROPERTIES prop = {};
         prop.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -627,7 +629,7 @@ void CreateConstantBuffers()
         auto handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );// DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart();
         //handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV ) * (bufferIndex);
 
-        GfxDeviceGlobal::frameConstantBuffers[ bufferIndex ] = constantBuffer;
+        GfxDeviceGlobal::constantBuffers[ bufferIndex ] = constantBuffer;
 
         hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &GfxDeviceGlobal::mappedConstantBuffers[ bufferIndex ] ) );
         if (FAILED( hr ))
@@ -739,6 +741,8 @@ void ae3d::CreateRenderer( int samples )
     CreateDepthStencil();
     CreateSampler();
     CreateConstantBuffers();
+
+    GfxDeviceGlobal::lightTiler.Init();
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )
@@ -819,7 +823,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = GfxDeviceGlobal::frameConstantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
+    cbvDesc.BufferLocation = GfxDeviceGlobal::constantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
     
@@ -976,13 +980,17 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
 
-/*
-    ID3D12DebugDevice* d3dDebug = nullptr;
+    GfxDeviceGlobal::lightTiler.DestroyBuffers();
+
+    for (std::size_t cbInd = 0; cbInd < GfxDeviceGlobal::constantBuffers.size(); ++cbInd)
+    {
+        AE3D_SAFE_RELEASE( GfxDeviceGlobal::constantBuffers[ cbInd ] );
+    }
+    /*ID3D12DebugDevice* d3dDebug = nullptr;
     GfxDeviceGlobal::device->QueryInterface(__uuidof(ID3D12DebugDevice), reinterpret_cast<void**>(&d3dDebug));
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
     d3dDebug->ReportLiveDeviceObjects( D3D12_RLDO_DETAIL );
-    AE3D_SAFE_RELEASE( d3dDebug );
-*/
+    AE3D_SAFE_RELEASE( d3dDebug );*/
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
 }

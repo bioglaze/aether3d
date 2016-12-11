@@ -141,6 +141,9 @@
     <ClCompile Include="..\Core\Statistics.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\D3D12\LightTilerD3D12.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -262,6 +265,9 @@
     </ClInclude>
     <ClInclude Include="..\Core\Statistics.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\LightTiler.hpp">
+      <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

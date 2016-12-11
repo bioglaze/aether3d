@@ -175,4 +175,6 @@ cbuffer Scene\
     )";
 
     momentsShader.Load( momentsSource, momentsSource );
+
+    lightCullShader.Load( "", FileSystem::FileContents( "LightCuller.hlsl" ), FileSystem::FileContents( "" ) );
 }

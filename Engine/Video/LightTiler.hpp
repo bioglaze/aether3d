@@ -7,6 +7,8 @@
 #endif
 #include "Vec3.hpp"
 
+struct ID3D12Resource;
+
 namespace ae3d
 {
     /// Implements Forward+ light culler
@@ -24,6 +26,8 @@ namespace ae3d
         id< MTLBuffer > GetPointLightCenterAndRadiusBuffer() { return pointLightCenterAndRadiusBuffer; }
         id< MTLBuffer > GetCullerUniforms() { return uniformBuffer; }
 #endif
+        /// Destroys graphics API objects.
+        void DestroyBuffers();
 
     private:
         unsigned GetNumTilesX() const;
@@ -34,6 +38,10 @@ namespace ae3d
         id< MTLBuffer > uniformBuffer;
         id< MTLBuffer > pointLightCenterAndRadiusBuffer;
         id< MTLBuffer > perTileLightIndexBuffer;
+#endif
+#if RENDERER_D3D12
+        ID3D12Resource* perTileLightIndexBuffer = nullptr;
+        ID3D12Resource* pointLightCenterAndRadiusBuffer = nullptr;
 #endif
         std::vector< Vec4 > pointLightCenterAndRadius;
         int activePointLights = 0;

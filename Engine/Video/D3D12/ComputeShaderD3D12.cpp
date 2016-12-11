@@ -52,3 +52,8 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     const std::string dataStr = std::string( std::begin( dataHLSL.data ), std::end( dataHLSL.data ) );
     Load( dataStr.c_str() );
 }
+
+void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsigned slot )
+{
+
+}

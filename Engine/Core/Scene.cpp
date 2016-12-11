@@ -27,7 +27,7 @@
 #include "Texture2D.hpp"
 #include "Renderer.hpp"
 #include "System.hpp"
-#if defined( RENDERER_METAL )
+#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 )
 #include "LightTiler.hpp"
 #endif
 
@@ -46,7 +46,7 @@ namespace Global
     extern Vec3 vrEyePosition;
 }
 
-#if defined( RENDERER_METAL )
+#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 )
 namespace GfxDeviceGlobal
 {
     extern ae3d::LightTiler lightTiler;
@@ -230,7 +230,7 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
             RenderDepthAndNormals( cameraComponent, view, gameObjectsWithMeshRenderer, 0, frustum );
 
-#if defined( RENDERER_METAL )
+#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 )
             int goWithPointLightIndex = 0;
 
             for (auto gameObject : gameObjects)
@@ -245,8 +245,7 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
                 if (transform && pointLight)
                 {
-                    // TODO: Transform into world pos
-                    auto worldPos = transform->GetLocalPosition();
+                    auto worldPos = transform->GetWorldPosition();
                     GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius( goWithPointLightIndex, worldPos, pointLight->GetRadius());
                     ++goWithPointLightIndex;
                 }
@@ -254,7 +253,7 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
             GfxDeviceGlobal::lightTiler.UpdateLightBuffers();
             GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, cameraComponent->GetProjection(),
-                                                   view, cameraComponent->GetDepthNormalsTexture() );
+                                                    view, cameraComponent->GetDepthNormalsTexture() );
 #endif
         }
     }
