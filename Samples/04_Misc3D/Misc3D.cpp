@@ -26,7 +26,7 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
-#define TEST_SHADOWS_SPOT
+//#define TEST_SHADOWS_SPOT
 
 using namespace ae3d;
                       
@@ -118,6 +118,9 @@ int main()
     Mesh cubeMesh;
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
+    Mesh cubeMeshPTN; // Position-texcoord-normal
+    cubeMeshPTN.Load( FileSystem::FileContents( "textured_cube_ptn.ae3d" ) );
+
     Mesh cubeMeshScaledUV;
     cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
 
@@ -126,6 +129,12 @@ int main()
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+
+    GameObject cubePTN;
+    cubePTN.AddComponent< MeshRendererComponent >();
+    cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
+    cubePTN.AddComponent< TransformComponent >();
+    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 2, -80 } );
 
     GameObject rotatingCube;
     rotatingCube.AddComponent< MeshRendererComponent >();
@@ -192,6 +201,7 @@ int main()
     material.SetBackFaceCulling( true );
     
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
 #ifdef TEST_VERTEX_LAYOUTS
     cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
@@ -210,7 +220,13 @@ int main()
                         "unlitVert", "unlitFrag",
                         FileSystem::FileContents( "unlit_cube.hlsl" ), FileSystem::FileContents( "unlit_cube.hlsl" ),
                         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
-    
+
+    GameObject lightParent;
+    lightParent.AddComponent< MeshRendererComponent >();
+    lightParent.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    lightParent.AddComponent< TransformComponent >();
+    lightParent.GetComponent< TransformComponent >()->SetLocalPosition( { 0, -2, -80 } );
+
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
@@ -228,8 +244,9 @@ int main()
     spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    //spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, -1, 0 }, { 0, 1, 0 } );
     //spotLight.GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
-    //spotLight.GetComponent<TransformComponent>()->SetParent( rotatingCube.GetComponent< TransformComponent >() );
+    //spotLight.GetComponent<TransformComponent>()->SetParent( lightParent.GetComponent< TransformComponent >() );
 
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
@@ -262,7 +279,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -325,14 +342,17 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
+    //scene.Add( &lightParent );
+
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
 #endif
+    scene.Add( &cubePTN );
     scene.Add( &childCube );
     scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
@@ -431,6 +451,7 @@ int main()
         rotation.FromAxisAngle( axis, angle );
         cubes[ 2 ].GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
+        //lightParent.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
         //spotLight.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
         axis = Vec3( 1, 1, 1 ).Normalized();
