@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QGLFormat>
 #include <QMessageBox>
+#include "AudioSourceComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "System.hpp"
 #include "FileSystem.hpp"
@@ -274,6 +275,9 @@ void SceneWidget::Init()
     cameraTex.Load( FileSystem::FileContents( AbsoluteFilePath( "camera.png" ).c_str() ), TextureWrap::Repeat,
                     TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
 
+    audioTex.Load( FileSystem::FileContents( AbsoluteFilePath( "audio_source.png" ).c_str() ), TextureWrap::Repeat,
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+
     spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath( "glider.png" ).c_str() ), TextureWrap::Repeat,
                     TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
 
@@ -361,9 +365,10 @@ void SceneWidget::DrawLightSprites()
             continue;
         }
 
-        if (go->GetComponent< DirectionalLightComponent >() ||
-            go->GetComponent< SpotLightComponent >() ||
-            go->GetComponent< PointLightComponent >())
+        DirectionalLightComponent* dirLight = go->GetComponent< DirectionalLightComponent >();
+        SpotLightComponent* spotLight = go->GetComponent< SpotLightComponent >();
+        PointLightComponent* pointLight = go->GetComponent< PointLightComponent >();
+        if (dirLight || spotLight || pointLight)
         {
             const float distance = (cameraPos - goTransform->GetLocalPosition()).Length();
             const float lerpDistance = 10;
@@ -384,10 +389,68 @@ void SceneWidget::DrawLightSprites()
                 screenPoint.x > -lightTex.GetWidth() && screenPoint.y > -lightTex.GetHeight() &&
                 screenPoint.x < width() && screenPoint.y < height())
             {
-                const Vec3 color( 1, 1, 1 );// = static_cast<Light*>( light )->GetColor();
+                Vec3 color( 1, 1, 1 );
+
+                if (dirLight)
+                {
+                    color = dirLight->GetColor();
+                }
+                else if (spotLight)
+                {
+                    color = spotLight->GetColor();
+                }
+                else if (pointLight)
+                {
+                    color = pointLight->GetColor();
+                }
+
                 const float size = height() / distance;
 
                 ae3d::System::Draw( &lightTex, screenPoint.x, screenPoint.y, size, size, width(), height() );
+            }
+        }
+    }
+}
+
+void SceneWidget::DrawAudioSprites()
+{
+    auto cameraTransform = camera.GetComponent< TransformComponent >();
+    const Vec3 cameraPos = cameraTransform->GetLocalPosition();
+
+    for (auto& go : gameObjects)
+    {
+        auto goTransform = go->GetComponent< TransformComponent >();
+
+        if (!goTransform)
+        {
+            continue;
+        }
+
+        if (go->GetComponent< AudioSourceComponent >())
+        {
+            const float distance = (cameraPos - goTransform->GetLocalPosition()).Length();
+            const float lerpDistance = 10;
+            float opacity = 1;
+
+            if (distance < lerpDistance)
+            {
+                opacity = distance / lerpDistance;
+            }
+
+            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width(), height() );
+
+            const Vec3 viewDir = cameraTransform->GetViewDirection();
+            const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraPos).Normalized();
+            const float viewDotLight = Vec3::Dot( viewDir, lightDir ) ;
+
+            if (viewDotLight <= 0 &&
+                screenPoint.x > -audioTex.GetWidth() && screenPoint.y > -audioTex.GetHeight() &&
+                screenPoint.x < width() && screenPoint.y < height())
+            {
+                const Vec3 color( 1, 1, 1 );
+                const float size = height() / distance;
+
+                ae3d::System::Draw( &audioTex, screenPoint.x, screenPoint.y, size, size, width(), height() );
             }
         }
     }
@@ -437,6 +500,7 @@ void SceneWidget::paintGL()
 {
     scene.Render();
     DrawLightSprites();
+    DrawAudioSprites();
 }
 
 void SceneWidget::resizeGL( int width, int height )

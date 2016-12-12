@@ -343,8 +343,27 @@ void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
 
     if (item->text( 0 ).length() > 0)
     {
-        //sceneWidget->GetGameObject( renamedIndex )->SetName( item->text( 0 ).toUtf8().constData() );
-        CommandRenameGameObject( sceneWidget->GetGameObject( renamedIndex ), item->text( 0 ).toStdString() );
+        std::string name = item->text( 0 ).toStdString();
+        bool nameContainsOnlyWhiteSpace = true;
+
+        for (std::size_t charInd = 0; charInd < name.length(); ++charInd)
+        {
+            if (name.at( charInd ) != ' ' && name.at( charInd ) != '\t')
+            {
+                nameContainsOnlyWhiteSpace = false;
+                break;
+            }
+        }
+
+        if (nameContainsOnlyWhiteSpace)
+        {
+            QString oldName( sceneWidget->GetGameObject( renamedIndex )->GetName().c_str() );
+            item->setText( 0, oldName );
+        }
+        else
+        {
+            CommandRenameGameObject( sceneWidget->GetGameObject( renamedIndex ), name );
+        }
     }
 
     UpdateHierarchy();

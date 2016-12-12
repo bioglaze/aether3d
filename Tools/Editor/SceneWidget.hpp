@@ -119,6 +119,7 @@ private:
 
     ae3d::Vec3 SelectionAveragePosition();
     void DrawLightSprites();
+    void DrawAudioSprites();
 
     TransformGizmo transformGizmo;
     ae3d::GameObject camera;
@@ -130,6 +131,7 @@ private:
     ae3d::Vec3 cameraMoveDir;
     ae3d::Texture2D lightTex;
     ae3d::Texture2D cameraTex;
+    ae3d::Texture2D audioTex;
 
     ae3d::Texture2D spriteTex;
     ae3d::Shader unlitShader;
