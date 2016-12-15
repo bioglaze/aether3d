@@ -4,6 +4,7 @@
 #include <d3dx12.h>
 #include "stb_image.c"
 #include "DescriptorHeapManager.hpp"
+#include "DDSLoader.hpp"
 #include "GfxDevice.hpp"
 #include "FileSystem.hpp"
 #include "Macros.hpp"
@@ -44,12 +45,44 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     mipmaps = aMipmaps;
     colorSpace = aColorSpace;
     path = negX.path;
+    dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+    int bytesPerPixel = 2;
 
     // Gets dimension
     {
-        int tempComp;
-        unsigned char* tempData = stbi_load_from_memory( &posX.data[ 0 ], static_cast<int>(posX.data.size()), &width, &height, &tempComp, 4 );
-        stbi_image_free( tempData );
+        const bool isDDS = posX.path.find( ".dds" ) != std::string::npos || posX.path.find( ".DDS" ) != std::string::npos;
+
+        if (isDDS)
+        {
+            DDSLoader::Output ddsOutput;
+            auto fileContents = FileSystem::FileContents( posX.path.c_str() );
+            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
+
+            if (loadResult != DDSLoader::LoadResult::Success)
+            {
+                ae3d::System::Print( "DDS Loader could not load %s", posX.path.c_str() );
+                return;
+            }
+
+            dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC1_UNORM : DXGI_FORMAT_BC1_UNORM_SRGB;
+
+            if (ddsOutput.format == DDSLoader::Format::BC2)
+            {
+                dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC2_UNORM : DXGI_FORMAT_BC2_UNORM_SRGB;
+                bytesPerPixel = 4;
+            }
+            if (ddsOutput.format == DDSLoader::Format::BC3)
+            {
+                dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC3_UNORM : DXGI_FORMAT_BC3_UNORM_SRGB;
+                bytesPerPixel = 4;
+            }
+        }
+        else
+        {
+            int tempComp;
+            unsigned char* tempData = stbi_load_from_memory( &posX.data[ 0 ], static_cast<int>(posX.data.size()), &width, &height, &tempComp, 4 );
+            stbi_image_free( tempData );
+        }
     }
 
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
@@ -61,7 +94,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     descTex.Height = (UINT)height;
     descTex.DepthOrArraySize = 6;
     descTex.MipLevels = 1;
-    descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descTex.Format = dxgiFormat;
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -86,12 +119,17 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     unsigned char* faceData[ 6 ] = {};
     D3D12_SUBRESOURCE_DATA texResources[ 6 ] = {};
 
+    bool isStbImage[ 6 ] = {};
+    DDSLoader::Output ddsOutput[ 6 ];
+
     for (int face = 0; face < 6; ++face)
     {
         const bool isDDS = paths[ face ].find( ".dds" ) != std::string::npos || paths[ face ].find( ".DDS" ) != std::string::npos;
         
         if (HasStbExtension( paths[ face ] ))
         {
+            isStbImage[ face ] = true;
+
             int components;
             faceData[ face ] = stbi_load_from_memory( datas[ face ]->data(), static_cast<int>(datas[ face ]->size()), &width, &height, &components, 4 );
             
@@ -111,7 +149,24 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
         else if (isDDS)
         {
-            //LoadDDS( fileContents.path.c_str() );
+            isStbImage[ face ] = false;
+
+            auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
+            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput[ face ] );
+
+            if (loadResult != DDSLoader::LoadResult::Success)
+            {
+                ae3d::System::Print( "DDS Loader could not load %s", paths[ face ].c_str() );
+                return;
+            }
+
+            opaque = true;
+
+            faceData[ face ] = &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ 0 ] ];
+
+            texResources[ face ].pData = faceData[ face ];
+            texResources[ face ].RowPitch = width * bytesPerPixel;
+            texResources[ face ].SlicePitch = texResources[ face ].RowPitch * height;
         }
         else
         {
@@ -122,7 +177,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     InitializeTexture( gpuResource, &texResources[ 0 ], 6 );
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.Format = dxgiFormat;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;
@@ -137,7 +192,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     for (int face = 0; face < 6; ++face)
     {
-        stbi_image_free( faceData[ face ] );
+        if (isStbImage[ face ])
+        {
+            stbi_image_free( faceData[ face ] );
+        }
     }
 }
 
