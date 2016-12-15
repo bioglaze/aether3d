@@ -26,7 +26,7 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
-//#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_SPOT
 
 using namespace ae3d;
                       
@@ -283,7 +283,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     

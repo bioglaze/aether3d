@@ -3,6 +3,31 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
+static void GetGLFormat( ae3d::RenderTexture::DataType dataType, GLenum& outInternalFormat, GLenum& outExternalFormat )
+{
+    if (dataType == ae3d::RenderTexture::DataType::UByte)
+    {
+        outInternalFormat = GL_RGBA;
+        outExternalFormat = GL_RGBA;
+    }
+    else if (dataType == ae3d::RenderTexture::DataType::Float)
+    {
+        outInternalFormat = GL_RGBA32F;
+        outExternalFormat = GL_RGBA;
+    }
+    else if (dataType == ae3d::RenderTexture::DataType::R32G32)
+    {
+        outInternalFormat = GL_RG32F;
+        outExternalFormat = GL_RGBA;
+    }
+    else
+    {
+        ae3d::System::Print( "Unhandled texture format\n" );
+        outInternalFormat = GL_RGBA;
+        outExternalFormat = GL_RGBA;
+    }
+}
+
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
 {
     if (aWidth <= 0 || aHeight <= 0)
@@ -34,7 +59,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap == TextureWrap::Repeat ? GL_REPEAT : GL_CLAMP_TO_BORDER );
     glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor );
 
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, dataType == DataType::Float ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr );
+    GLenum internalFormat, externalFormat;
+    GetGLFormat( dataType, internalFormat, externalFormat );
+    const GLenum fmt = (dataType == DataType::Float || dataType == DataType::R32G32) ? GL_FLOAT : GL_UNSIGNED_BYTE;
+
+    glTexImage2D( GL_TEXTURE_2D, 0, internalFormat, width, height, 0, externalFormat, fmt, nullptr );
     GfxDevice::ErrorCheck( "Load Texture2D" );
     
     glBindTexture( GL_TEXTURE_2D, 0 );

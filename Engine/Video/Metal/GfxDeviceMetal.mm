@@ -328,7 +328,18 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 #if !TARGET_OS_IPHONE
         pipelineStateDescriptor.inputPrimitiveTopology = MTLPrimitiveTopologyClassTriangle;
 #endif
-        pipelineStateDescriptor.colorAttachments[0].pixelFormat = (pixelFormat == ae3d::RenderTexture::DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float);
+        MTLPixelFormat format = MTLPixelFormatBGRA8Unorm;
+
+        if (pixelFormat == ae3d::RenderTexture::DataType::R32G32)
+        {
+            format = MTLPixelFormatRG32Float;
+        }
+        else if (pixelFormat == ae3d::RenderTexture::DataType::Float)
+        {
+            format = MTLPixelFormatRGBA32Float;
+        }
+
+        pipelineStateDescriptor.colorAttachments[0].pixelFormat = format;
         pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;
         pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;

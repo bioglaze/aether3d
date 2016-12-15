@@ -57,6 +57,8 @@ namespace ae3d
 #if RENDERER_OPENGL
         /// \return True if the shader has been succesfully compiled and linked.
         bool IsValid() const { return handle != 0; }
+        // Checks that the rendering state is valid.
+        void Validate();
         unsigned GetHandle() const { return handle; }
 #endif
         

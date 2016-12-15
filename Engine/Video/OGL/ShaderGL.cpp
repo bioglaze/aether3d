@@ -139,6 +139,12 @@ void ShaderReload( const std::string& path )
     }
 }
 
+void ae3d::Shader::Validate()
+{
+    glValidateProgram( handle );
+    PrintInfoLog( handle, InfoLogType::Program );
+}
+
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
     GLuint vertexShader = CompileShader( vertexSource, GL_VERTEX_SHADER );

@@ -235,7 +235,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     Statistics::IncTriangleCount( endIndex - startIndex );
 
 #if DEBUG
-    glValidateProgram( shader.GetHandle() );
+    shader.Validate();
 #endif
 
     glDrawRangeElements( GL_TRIANGLES, startIndex, endIndex, (endIndex - startIndex) * 3, GL_UNSIGNED_SHORT, (const GLvoid*)(startIndex * sizeof( VertexBuffer::Face )) );

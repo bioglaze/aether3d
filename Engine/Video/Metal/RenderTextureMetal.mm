@@ -17,9 +17,20 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     handle = 1;
     isRenderTexture = true;
     dataType = aDataType;
-    
+
+    MTLPixelFormat format = MTLPixelFormatBGRA8Unorm;
+
+    if (dataType == DataType::R32G32)
+    {
+        format = MTLPixelFormatRG32Float;
+    }
+    else if (dataType == DataType::Float)
+    {
+        format = MTLPixelFormatRGBA32Float;
+    }
+
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:format
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
@@ -57,9 +68,20 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     handle = 1;
     isRenderTexture = true;
     dataType = aDataType;
-    
+
+    MTLPixelFormat format = MTLPixelFormatBGRA8Unorm;
+
+    if (dataType == DataType::R32G32)
+    {
+        format = MTLPixelFormatRG32Float;
+    }
+    else if (dataType == DataType::Float)
+    {
+        format = MTLPixelFormatRGBA32Float;
+    }
+
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:(dataType == DataType::UByte ? MTLPixelFormatBGRA8Unorm : MTLPixelFormatRGBA32Float)
+    [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:format
                                                        size:width
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;

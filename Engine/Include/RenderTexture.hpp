@@ -16,7 +16,8 @@ namespace ae3d
         enum class DataType
         {
             UByte,
-            Float
+            Float,
+            R32G32
         };
 
         /// Destroys graphics API objects.
