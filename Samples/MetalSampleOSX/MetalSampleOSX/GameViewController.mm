@@ -3,6 +3,8 @@
 #import <simd/simd.h>
 #import <MetalKit/MetalKit.h>
 #include <cmath>
+#include <vector>
+#include <map>
 
 #import "CameraComponent.hpp"
 #import "SpriteRendererComponent.hpp"
@@ -25,7 +27,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -84,6 +86,10 @@ using namespace ae3d;
     TextureCube skyTex;
     RenderTexture rtTex;
     RenderTexture cubeRT;
+    std::vector< GameObject > sponzaGameObjects;
+    std::map< std::string, Material* > sponzaMaterialNameToMaterial;
+    std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
+    std::vector< Mesh* > sponzaMeshes;
 }
 
 - (void)viewDidLoad
@@ -103,6 +109,27 @@ using namespace ae3d;
     ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
+
+    // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
+#if 0
+    auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
+                                 sponzaMaterialNameToMaterial, sponzaMeshes );
+
+    if (res != Scene::DeserializeResult::Success)
+    {
+        System::Print( "Could not parse Sponza\n" );
+    }
+
+    for (auto& mat : sponzaMaterialNameToMaterial)
+    {
+        mat.second->SetShader( &shader );
+    }
+
+    for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
+    {
+        scene.Add( &sponzaGameObjects[ i ] );
+    }
+#endif
 
     camera2d.SetName( "Camera2D" );
     camera2d.AddComponent<ae3d::CameraComponent>();
@@ -186,7 +213,7 @@ using namespace ae3d;
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
-    cubeMaterial.SetVector( "tintColor", { 1, 1, 1, 1 } );
+    cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
 
     rtCubeMaterial.SetShader( &skyboxShader );
     rtCubeMaterial.SetRenderTexture( "texture", &cubeRT );

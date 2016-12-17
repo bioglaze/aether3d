@@ -68,7 +68,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 return;
             }
             
-            const int bytesPerRow2 = width * components < 2048 ? 2048 : (width * components);
+            const int bytesPerRow2 = width * 4;
 
             opaque = (components == 3 || components == 1);
             

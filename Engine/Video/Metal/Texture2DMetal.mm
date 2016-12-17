@@ -230,7 +230,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
     }
     
-    const int bytesPerRow = width * components < 400 ? 400 : (width * components);
+    const int bytesPerRow = width * 4;
 
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];

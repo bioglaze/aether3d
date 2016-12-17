@@ -10,7 +10,7 @@ struct uniforms_t
 {
     matrix_float4x4 _ModelViewProjectionMatrix;
     matrix_float4x4 _ShadowProjectionMatrix;
-    float4 tintColor;
+    float4 tint;
 };
 
 struct ColorInOut
@@ -42,7 +42,7 @@ float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float d
     float pMax = linstep( 0.2, 1.0, variance / (variance + delta * delta) );
     
     //return clamp( max( p, pMax ), 0.0, 1.0 );
-    return (depth <= moments.x) ? 0.2 : 1.0;
+    return 1;//(depth <= moments.x) ? 0.2 : 1.0;
 }
 
 struct Vertex
@@ -62,7 +62,7 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
     
     out.color = half4( vert.color );
     out.texCoords = float2( vert.texcoord );
-    out.tintColor = uniforms.tintColor;
+    out.tintColor = uniforms.tint;
     out.projCoord = uniforms._ShadowProjectionMatrix * in_position;
     return out;
 }

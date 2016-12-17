@@ -8,9 +8,13 @@
 #if RENDERER_METAL
 const char* GetFullPath( const char* fileName )
 {
+    std::string nameWithSlash( "/" );
+    nameWithSlash += fileName;
+    std::replace( std::begin( nameWithSlash ), std::end( nameWithSlash ), '\\', '/' );
+
     NSBundle *b = [NSBundle mainBundle];
     NSString *dir = [b resourcePath];
-    NSString* fName = [NSString stringWithUTF8String: fileName];
+    NSString* fName = [NSString stringWithUTF8String: nameWithSlash.c_str()];
     dir = [dir stringByAppendingString:fName];
     return [dir fileSystemRepresentation];
 }
