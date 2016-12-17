@@ -78,7 +78,25 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     // Color
 
-    const VkFormat colorFormat = GfxDeviceGlobal::colorFormat;
+    VkFormat colorFormat;// = GfxDeviceGlobal::colorFormat;
+
+    if (dataType == DataType::UByte)
+    {
+        colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
+    }
+    else if (dataType == DataType::Float)
+    {
+        colorFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
+    }
+    else if (dataType == DataType::R32G32)
+    {
+        colorFormat = VK_FORMAT_R32G32_SFLOAT;
+    }
+    else
+    {
+        System::Print( "Unhandled format in cube render texture\n" );
+        colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
+    }
 
     VkImageCreateInfo colorImage = {};
     colorImage.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -246,6 +264,25 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     dataType = aDataType;
     handle = 1;
 
+    VkFormat colorFormat;// = GfxDeviceGlobal::colorFormat;
+
+    if (dataType == DataType::UByte)
+    {
+        colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
+    }
+    else if (dataType == DataType::Float)
+    {
+        colorFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
+    }
+    else if (dataType == DataType::R32G32)
+    {
+        colorFormat = VK_FORMAT_R32G32_SFLOAT;
+    }
+    else
+    {
+        System::Print( "Unhandled format in 2d render texture\n" );
+        colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
+    }
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.pNext = nullptr;

@@ -142,7 +142,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             
             opaque = (components == 3 || components == 1);
 
-            const int bytesPerPixel = 4;
+            bytesPerPixel = 4;
             texResources[ face ].pData = faceData[ face ];
             texResources[ face ].RowPitch = width * bytesPerPixel;
             texResources[ face ].SlicePitch = texResources[ face ].RowPitch * height;
