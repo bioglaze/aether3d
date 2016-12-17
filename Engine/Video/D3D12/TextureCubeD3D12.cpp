@@ -45,6 +45,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     mipmaps = aMipmaps;
     colorSpace = aColorSpace;
     path = negX.path;
+    isCube = true;
     dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
     int bytesPerPixel = 2;
 

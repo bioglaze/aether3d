@@ -199,13 +199,10 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int
         GfxDeviceGlobal::texture1 = texture;
     }
 
-    SetInt( name, textureUnit );
-    
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
-void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 namespace GfxDeviceGlobal
 {
     extern D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetRTV;
@@ -222,7 +219,6 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
         GfxDeviceGlobal::texture1 = texture;
     }
 
-    SetInt( name, textureUnit );
     //TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
