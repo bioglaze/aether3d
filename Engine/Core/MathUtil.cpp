@@ -114,6 +114,6 @@ namespace MathUtil
 
     int GetMipmapCount( int width, int height )
     {
-        return 1 + static_cast< int >(std::floor( std::log2( Min( width, height ) ) ));
+        return 1 + static_cast< int >(std::floor( std::log2( Max( width, height ) ) ));
     }
 }

@@ -25,7 +25,7 @@
 #include "VR.hpp"
 
 //#define TEST_RENDER_TEXTURE_2D
-//#define TEST_VERTEX_LAYOUTS
+#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_SPOT
 
 using namespace ae3d;
@@ -118,9 +118,6 @@ int main()
     Mesh cubeMesh;
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
-    Mesh cubeMeshPTN; // Position-texcoord-normal
-    cubeMeshPTN.Load( FileSystem::FileContents( "textured_cube_ptn.ae3d" ) );
-
     Mesh cubeMeshScaledUV;
     cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
 
@@ -129,12 +126,6 @@ int main()
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
-
-    GameObject cubePTN;
-    cubePTN.AddComponent< MeshRendererComponent >();
-    cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
-    cubePTN.AddComponent< TransformComponent >();
-    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 2, -80 } );
 
     GameObject rotatingCube;
     rotatingCube.AddComponent< MeshRendererComponent >();
@@ -160,7 +151,7 @@ int main()
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
 #ifdef TEST_VERTEX_LAYOUTS
-    Mesh cubeMeshPTN;
+    Mesh cubeMeshPTN; // Position-texcoord-normal
     cubeMeshPTN.Load( FileSystem::FileContents( "pnt_quads_2_meshes.ae3d" ) );
 
     GameObject cubePTN;

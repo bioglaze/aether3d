@@ -20,6 +20,7 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
 namespace MathUtil
 {
     int GetMipmapCount( int width, int height );
+    int Max( int a, int b );
 }
 
 namespace GfxDeviceGlobal
@@ -334,8 +335,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     }
 
     opaque = (components == 3 || components == 1);
-
-	mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast< int >(MathUtil::GetMipmapCount( width, height )) : 1;
+    mipLevelCount = mipmaps == Mipmaps::Generate ? MathUtil::GetMipmapCount( width, height ) : 1;
     dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
     D3D12_RESOURCE_DESC descTex = {};
@@ -387,15 +387,15 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         std::vector< std::vector< std::uint8_t > > mipLevels( mipLevelCount - 1 );
         for (std::size_t i = 1; i < mipLevelCount; ++i)
         {
-            const std::int32_t mipWidth = width >> i;
-            const std::int32_t mipHeight = height >> i;
+            const std::int32_t mipWidth = MathUtil::Max( width >> i, 1 );
+            const std::int32_t mipHeight = MathUtil::Max( height >> i, 1 );
             mipLevels[ i-1 ].resize( mipWidth * mipHeight * 4 );
         }
 
         for (std::size_t i = 1; i < mipLevelCount; ++i)
         {
-            const std::int32_t mipWidth = width >> i;
-            const std::int32_t mipHeight = height >> i;
+            const std::int32_t mipWidth = MathUtil::Max( width >> i, 1 );
+            const std::int32_t mipHeight = MathUtil::Max( height >> i, 1 );
 
             for (int mipY = 0; mipY < mipHeight; ++mipY)
             {

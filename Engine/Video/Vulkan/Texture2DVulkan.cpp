@@ -26,6 +26,7 @@ namespace ae3d
 namespace MathUtil
 {
     int GetMipmapCount( int width, int height );
+    int Max( int a, int b );
     bool IsPowerOfTwo( unsigned i );
 }
 
@@ -193,7 +194,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     std::vector<VkBufferImageCopy> bufferCopyRegions;
     std::uint32_t offset = 0;
 
-    mipLevelCount = mipmaps == Mipmaps::Generate ? static_cast<int>(MathUtil::GetMipmapCount( width, height )) : 1;
+    mipLevelCount = mipmaps == Mipmaps::Generate ? MathUtil::GetMipmapCount( width, height ) : 1;
 
     // We're generating mips at runtime, so no need to loop.
     for (int i = 0; i < 1/*mipLevels*/; ++i)
@@ -274,8 +275,8 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     for (int i = 1; i < mipLevelCount; ++i)
     {
-        const std::int32_t mipWidth = width >> i;
-        const std::int32_t mipHeight = height >> i;
+        const std::int32_t mipWidth = MathUtil::Max( width >> i, 1 );
+        const std::int32_t mipHeight = MathUtil::Max( height >> i, 1 );
 
         VkImageBlit imageBlit = {};
         imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

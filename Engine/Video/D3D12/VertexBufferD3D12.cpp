@@ -120,24 +120,48 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
 {
-    vertexFormat = VertexFormat::PTC;
+    vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
 
     const int ibSize = elementCount * 2;
-    ibOffset = sizeof( VertexPTC ) * vertexCount;
+    ibOffset = sizeof( VertexPTNTC ) * vertexCount;
 
-    UploadVB( (void*)faces, (void*)vertices, ibSize );
+    std::vector< VertexPTNTC > verticesPTNTC( vertexCount );
+
+    for (std::size_t vertexInd = 0; vertexInd < verticesPTNTC.size(); ++vertexInd)
+    {
+        verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
+        verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
+        verticesPTNTC[ vertexInd ].v = vertices[ vertexInd ].v;
+        verticesPTNTC[ vertexInd ].normal = Vec3( 0, 0, 1 );
+        verticesPTNTC[ vertexInd ].tangent = Vec4( 1, 0, 0, 0 );
+        verticesPTNTC[ vertexInd ].color = vertices[ vertexInd ].color;
+    }
+
+    UploadVB( (void*)faces, verticesPTNTC.data(), ibSize );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
 {
-    vertexFormat = VertexFormat::PTN;
+    vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
 
     const int ibSize = elementCount * 2;
-    ibOffset = sizeof( VertexPTN ) * vertexCount;
+    ibOffset = sizeof( VertexPTNTC ) * vertexCount;
 
-    UploadVB( (void*)faces, (void*)vertices, ibSize );
+    std::vector< VertexPTNTC > verticesPTNTC( vertexCount );
+
+    for (std::size_t vertexInd = 0; vertexInd < verticesPTNTC.size(); ++vertexInd)
+    {
+        verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
+        verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
+        verticesPTNTC[ vertexInd ].v = vertices[ vertexInd ].v;
+        verticesPTNTC[ vertexInd ].normal = vertices[ vertexInd ].normal;
+        verticesPTNTC[ vertexInd ].tangent = Vec4( 1, 0, 0, 0 );
+        verticesPTNTC[ vertexInd ].color = Vec4( 1, 1, 1, 1 );
+    }
+
+    UploadVB( (void*)faces, verticesPTNTC.data(), ibSize );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
