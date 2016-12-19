@@ -693,23 +693,27 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
     {
         const QPoint point = mapFromGlobal( QCursor::pos() );
         auto colliders = GetColliders( camera, gameObjects, point.x(), point.y(), width(), height(), 200 );
-        selectedGameObjects.clear();
-        std::list< ae3d::GameObject* > selectedObjects;
+
+        if (!(event->modifiers() & Qt::KeyboardModifier::ControlModifier))
+        {
+            selectedGameObjects.clear();
+            selectedObjectsClicked.clear();
+        }
 
         if (!colliders.empty())
         {
-            selectedObjects.push_back( colliders.front().go );
+            selectedObjectsClicked.push_back( colliders.front().go );
 
             for (std::size_t i = 0; i < gameObjects.size(); ++i)
             {
-                if (gameObjects[ i ].get() == selectedObjects.back())
+                if (gameObjects[ i ].get() == selectedObjectsClicked.back())
                 {
                     selectedGameObjects.push_back( int( i ) );
                 }
             }
         }
 
-        emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedObjects );
+        emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedObjectsClicked );
     }
 }
 

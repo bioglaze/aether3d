@@ -71,6 +71,7 @@ namespace GfxDeviceGlobal
     VkInstance instance = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkPhysicalDeviceProperties properties;
     VkClearColorValue clearColor;
     
     std::vector< VkCommandBuffer > drawCmdBuffers;
@@ -857,6 +858,8 @@ namespace ae3d
         result = vkEnumeratePhysicalDevices( GfxDeviceGlobal::instance, &gpuCount, &GfxDeviceGlobal::physicalDevice );
         AE3D_CHECK_VULKAN( result, "vkEnumeratePhysicalDevices" );
 
+        vkGetPhysicalDeviceProperties( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::properties );
+        
         // Finds graphics queue.
         std::uint32_t queueCount;
         vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, nullptr );

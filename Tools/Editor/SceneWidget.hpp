@@ -146,6 +146,7 @@ private:
     QWidget* mainWindow = nullptr;
     std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
     ae3d::Texture2D skyboxTextures[ 6 ];
+    std::list< ae3d::GameObject* > selectedObjectsClicked;
 };
 
 #endif

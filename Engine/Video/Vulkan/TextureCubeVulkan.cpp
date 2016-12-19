@@ -27,6 +27,7 @@ namespace GfxDeviceGlobal
     extern VkPhysicalDevice physicalDevice;
     extern VkQueue graphicsQueue;
     extern VkCommandPool cmdPool;
+    extern VkPhysicalDeviceProperties properties;
 }
 
 namespace TextureCubeGlobal
@@ -147,6 +148,15 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 return;
             }
 
+            if (static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimensionCube) < width ||
+                static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimensionCube) < height)
+            {
+                System::Print( "%s is too big (%dx%d), max supported size is %dx%d.\n", paths[ face ].c_str(), width, height,
+                    GfxDeviceGlobal::properties.limits.maxImageDimensionCube, GfxDeviceGlobal::properties.limits.maxImageDimensionCube );
+                width = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
+                height = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
+            }
+
             opaque = (components == 3 || components == 1);
             imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
 
@@ -220,6 +230,15 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             {
                 ae3d::System::Print( "DDS Loader could not load %s", paths[ face ].c_str() );
                 return;
+            }
+
+            if (static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimensionCube) < width ||
+                static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimensionCube) < height)
+            {
+                System::Print( "%s is too big (%dx%d), max supported size is %dx%d.\n", paths[ face ].c_str(), width, height,
+                    GfxDeviceGlobal::properties.limits.maxImageDimensionCube, GfxDeviceGlobal::properties.limits.maxImageDimensionCube );
+                width = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
+                height = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
             }
 
             mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );

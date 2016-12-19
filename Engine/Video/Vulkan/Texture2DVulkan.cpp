@@ -36,6 +36,7 @@ namespace GfxDeviceGlobal
     extern VkPhysicalDevice physicalDevice;
     extern VkQueue graphicsQueue;
     extern VkCommandPool cmdPool;
+    extern VkPhysicalDeviceProperties properties;
 }
 
 namespace Texture2DGlobal
@@ -98,6 +99,13 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     width = 256;
     height = 256;
     path = fileContents.path;
+
+    if (static_cast<int>(GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy) < anisotropy)
+    {
+        System::Print( "%s is using too big anisotropy (%d), max supported is %dx.\n", fileContents.path.c_str(), anisotropy,
+            GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy );
+        anisotropy = GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy;
+    }
 
     if (!fileContents.isLoaded)
     {
@@ -376,7 +384,16 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         return;
     }
 
-    mipLevelCount = static_cast< int >(ddsOutput.dataOffsets.size());
+    if (static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimension2D ) < width ||
+        static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimension2D ) < height)
+    {
+        System::Print( "%s is too big (%dx%d), max supported size is %dx%d.\n", fileContents.path.c_str(), width, height,
+            GfxDeviceGlobal::properties.limits.maxImageDimension2D, GfxDeviceGlobal::properties.limits.maxImageDimension2D );
+        width = GfxDeviceGlobal::properties.limits.maxImageDimension2D;
+        height = GfxDeviceGlobal::properties.limits.maxImageDimension2D;
+    }
+
+    mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );
     int bytesPerPixel = 1;
 
     VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
@@ -416,6 +433,15 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         const std::string reason( stbi_failure_reason() );
         System::Print( "%s failed to load. stb_image's reason: %s\n", fileContents.path.c_str(), reason.c_str() );
         return;
+    }
+
+    if (static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimension2D ) < width ||
+        static_cast< int >( GfxDeviceGlobal::properties.limits.maxImageDimension2D ) < height)
+    {
+        System::Print( "%s is too big (%dx%d), max supported size is %dx%d.\n", fileContents.path.c_str(), width, height, 
+            GfxDeviceGlobal::properties.limits.maxImageDimension2D, GfxDeviceGlobal::properties.limits.maxImageDimension2D );
+        width = GfxDeviceGlobal::properties.limits.maxImageDimension2D;
+        height = GfxDeviceGlobal::properties.limits.maxImageDimension2D;
     }
 
     opaque = (components == 3 || components == 1);
