@@ -125,21 +125,21 @@
     //scene.Add( &cubeFloor );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
-    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 512 );
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( false, 1024 );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
     dirLight.SetName( "dirLight" );
     //scene.Add( &dirLight );
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
-    pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 512 );
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 1024 );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
     pointLight.SetName( "pointLight" );
     //scene.Add( &pointLight );
 
     spotLight.AddComponent<ae3d::SpotLightComponent>();
-    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( false, 512 );
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetConeAngle( 45 );
     spotLight.AddComponent<ae3d::TransformComponent>();
     spotLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );

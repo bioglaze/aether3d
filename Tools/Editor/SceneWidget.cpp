@@ -571,31 +571,7 @@ void SceneWidget::keyReleaseEvent( QKeyEvent* aEvent )
     }
     else if (aEvent->key() == Qt::Key_Delete || aEvent->key() == macDelete)
     {
-        std::vector< GameObject* > pendingRemove;
-
-        for (auto i : selectedGameObjects)
-        {
-            scene.Remove( gameObjects[ i ].get() );
-            pendingRemove.push_back( gameObjects[ i ].get() );
-        }
-
-        for (std::size_t i = 0; i < selectedGameObjects.size(); ++i)
-        {
-            for (std::size_t p = 0; p < pendingRemove.size(); ++p)
-            {
-                if (!gameObjects.empty() && !pendingRemove.empty() && gameObjects[ i ].get() == pendingRemove[ p ])
-                {
-                    gameObjects.erase( gameObjects.begin() + i );
-                    i = 0;
-                    p = 0;
-                }
-            }
-        }
-
-        selectedGameObjects.clear();
-        emit GameObjectsAddedOrDeleted();
-        std::list< ae3d::GameObject* > emptySelection;
-        emit static_cast< MainWindow* >(mainWindow)->GameObjectSelected( emptySelection );
+        static_cast< MainWindow* >(mainWindow)->DeleteSelectedGameObjects();
     }
     else if (aEvent->key() == Qt::Key_F)
     {
@@ -923,31 +899,6 @@ ae3d::GameObject* SceneWidget::CreateGameObject()
     selectedGameObjects.clear();
     selectedGameObjects.push_back( (int)gameObjects.size() - 1 );
     return gameObjects.back().get();
-}
-
-void SceneWidget::RemoveGameObject( int index )
-{
-    if (index < (int)gameObjects.size())
-    {
-        scene.Remove( gameObjects[ index ].get() );
-        gameObjects.erase( gameObjects.begin() + index );
-    }
-}
-
-void SceneWidget::RemoveGameObject( GameObject* gameObject )
-{
-    int index = 0;
-
-    for (std::size_t i = 0; i < gameObjects.size(); ++i)
-    {
-        if (gameObjects[ i ].get() == gameObject)
-        {
-            index = (int)i;
-        }
-    }
-
-    scene.Remove( gameObject );
-    gameObjects.erase( gameObjects.begin() + index );
 }
 
 void SceneWidget::LoadSceneFromFile( const char* path )

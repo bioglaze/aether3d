@@ -39,6 +39,10 @@ public:
 
     explicit SceneWidget( QWidget* parent = 0 );
 
+    void SetGameObjects( std::vector< std::shared_ptr< ae3d::GameObject > > aGameObjects ) { gameObjects = aGameObjects; }
+
+    std::vector< std::shared_ptr< ae3d::GameObject > > GetGameObjects() { return gameObjects; }
+
     void CenterSelected();
 
     void HideHUD();
@@ -50,14 +54,6 @@ public:
     /// \return Index of created game object.
     /// Should only be called by CreateGoCommand!
     ae3d::GameObject* CreateGameObject();
-
-    /// \param index Index.
-    /// TODO: Implement as a command.
-    void RemoveGameObject( int index );
-
-    /// \param gameObject GameObject.
-    /// TODO: Implement as a command.
-    void RemoveGameObject( ae3d::GameObject* gameObject );
 
     /// \return Game object count.
     int GetGameObjectCount() const { return (int)gameObjects.size(); }

@@ -19,6 +19,7 @@
 #include "CreateLightCommand.hpp"
 #include "CreateMeshRendererCommand.hpp"
 #include "CreateSpriteRendererCommand.hpp"
+#include "DeleteGameObjectCommand.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "MainWindow.hpp"
 #include "MeshRendererComponent.hpp"
@@ -47,6 +48,15 @@ void TestCommands( MainWindow* mainWindow, SceneWidget* sceneWidget )
 
     mainWindow->CommandCreateAudioSourceComponent();
     System::Assert( sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< AudioSourceComponent >(), "audio source component was not added" );
+
+    mainWindow->CommandCreateSpriteRendererComponent();
+    System::Assert( sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< SpriteRendererComponent >(), "sprite renderer component was not added" );
+
+    mainWindow->CommandCreateMeshRendererComponent();
+    System::Assert( sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< MeshRendererComponent >(), "mesh renderer component was not added" );
+
+    mainWindow->CommandCreatePointLightComponent();
+    System::Assert( sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< PointLightComponent >(), "point light component was not added" );
 
     System::Print( "ran unit tests\n" );
     exit( 0 );
@@ -172,7 +182,6 @@ void MainWindow::ShowContextMenu( const QPoint& pos )
         else if (selectedItem->text() == "Duplicate")
         {
             auto selected = sceneWidget->selectedGameObjects.back();
-            std::cout << "Duplicate" << std::endl;
             commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
             *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
             UpdateHierarchy();
@@ -320,7 +329,7 @@ void MainWindow::OpenLightingInspector()
 void MainWindow::ShowAbout()
 {
     QMessageBox::about( this, "About", "Aether3D Editor by Timo Wiren 2016\n\nControls:\n\
-Right mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan\nCtrl-D: duplicate\nF: Focus on selected");
+Right mouse and W,S,A,D,Q,E: camera movement\nMiddle mouse: pan\nCtrl-D: duplicate\nF: Focus on selected\n ctrl-click: multi-select");
 }
 
 void MainWindow::HandleGameObjectsAddedOrDeleted()
@@ -404,27 +413,10 @@ void MainWindow::HierarchySelectionChanged()
 
 void MainWindow::DeleteSelectedGameObjects()
 {
-    std::vector< ae3d::GameObject* > selectedGameObjects;
-
-    for (auto i : sceneWidget->selectedGameObjects)
-    {
-        selectedGameObjects.push_back( sceneWidget->GetGameObject( i ) );
-    }
-
-    for (auto g : selectedGameObjects)
-    {
-        sceneWidget->RemoveGameObject( g );
-    }
-
-    /*for (int i = 0; i < sceneTree->topLevelItemCount(); ++i)
-    {
-        if (sceneTree->topLevelItem( i )->isSelected())
-        {
-            sceneWidget->RemoveGameObject( i );
-        }
-    }*/
+    emit CommandDeleteSelectedGameObjects();
 
     sceneWidget->selectedGameObjects.clear();
+
     std::list< ae3d::GameObject* > emptyList;
     emit GameObjectSelected( emptyList );
     sceneTree->clearSelection();
@@ -461,9 +453,18 @@ void MainWindow::keyPressEvent( QKeyEvent* event )
 void MainWindow::DuplicateSelected()
 {
     auto selected = sceneWidget->selectedGameObjects.back();
-    std::cout << "Duplicate" << std::endl;
     commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
     *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
+    UpdateHierarchy();
+}
+
+void MainWindow::CommandDeleteSelectedGameObjects()
+{
+    if (!sceneWidget->selectedGameObjects.empty())
+    {
+        commandManager.Execute( std::make_shared< DeleteGameObjectCommand >( sceneWidget ) );
+    }
+
     UpdateHierarchy();
 }
 

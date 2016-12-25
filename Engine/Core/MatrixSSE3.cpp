@@ -233,7 +233,7 @@ void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
-    const float top = std::tan( fovDegrees * ((float)M_PI / 360.0f) ) * nearDepth;
+    const float top = std::tan( fovDegrees * (static_cast< float >( M_PI ) / 360.0f) ) * nearDepth;
     const float bottom = -top;
     const float left = aspect * bottom;
     const float right = aspect * top;
@@ -243,10 +243,8 @@ void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, 
     const float a = (right + left)  / (right - left);
     const float b = (top + bottom)  / (top - bottom);
 
-    const float nudge = 0.999f;
-
-    const float c = farDepth < -nudge ? -nudge : -(farDepth + nearDepth) / (farDepth - nearDepth);
-    const float d = farDepth < -nudge ? -2 * nearDepth * nudge : -(2 * farDepth * nearDepth) / (farDepth - nearDepth);
+    const float c = -(farDepth + nearDepth) / (farDepth - nearDepth);
+    const float d = -(2 * farDepth * nearDepth) / (farDepth - nearDepth);
 
     const float proj[] =
     {
@@ -256,7 +254,7 @@ void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, 
         0, 0, d,  0
     };
 
-    InitFrom( proj );
+    InitFrom( &proj[ 0 ] );
 }
 
 void Matrix44::MakeProjection( float left, float right, float bottom, float top, float nearDepth, float farDepth )

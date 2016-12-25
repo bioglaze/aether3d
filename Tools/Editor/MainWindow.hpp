@@ -38,6 +38,7 @@ public:
     MainWindow();
     class SceneWidget* GetSceneWidget() const { return sceneWidget; }
     void DuplicateSelected();
+    void DeleteSelectedGameObjects();
 
 public slots:
     void LoadScene();
@@ -60,6 +61,7 @@ public slots:
     void CommandRemoveSpotLightComponent();
     void CommandRemovePointLightComponent();
 
+    void CommandDeleteSelectedGameObjects();
     void CommandRenameGameObject( ae3d::GameObject* gameObject, const std::string& newName );
     void CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale );
     void CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag, ae3d::CameraComponent::ProjectionType projectionType,
@@ -79,7 +81,6 @@ signals:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
 
 private:
-    void DeleteSelectedGameObjects();
     void UpdateHierarchy();
     void UpdateHierarchySelection();
     void keyPressEvent( QKeyEvent* event );
