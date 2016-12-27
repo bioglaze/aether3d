@@ -351,6 +351,58 @@ void SceneWidget::Init()
     emit GameObjectsAddedOrDeleted();
 }
 
+void SceneWidget::SelectSpriteUnderCursor()
+{
+    for (auto& go : gameObjects)
+    {
+        auto goTransform = go->GetComponent< TransformComponent >();
+
+        if (!goTransform)
+        {
+            continue;
+        }
+
+        DirectionalLightComponent* dirLight = go->GetComponent< DirectionalLightComponent >();
+        SpotLightComponent* spotLight = go->GetComponent< SpotLightComponent >();
+        PointLightComponent* pointLight = go->GetComponent< PointLightComponent >();
+        CameraComponent* cameraComp = go->GetComponent< CameraComponent >();
+        AudioSourceComponent* audioSource = go->GetComponent< AudioSourceComponent >();
+
+        if (dirLight || spotLight || pointLight || cameraComp || audioSource)
+        {
+            const Vec3 goPosOnScreen = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width(), height() );
+
+            auto cameraTransform = camera.GetComponent< TransformComponent >();
+            const Vec3 viewDir = cameraTransform->GetViewDirection();
+            const Vec3 goDir = (goTransform->GetLocalPosition() - cameraTransform->GetWorldPosition()).Normalized();
+            const float viewDotGo = Vec3::Dot( viewDir, goDir );
+            const QPoint cursorPosition = mapFromGlobal( QCursor::pos() );
+
+            if (viewDotGo <= 0 &&
+                cursorPosition.x() > goPosOnScreen.x - lightTex.GetWidth() &&
+                cursorPosition.x() < goPosOnScreen.x + lightTex.GetWidth() &&
+
+                cursorPosition.y() > goPosOnScreen.y - lightTex.GetWidth() &&
+                cursorPosition.y() < goPosOnScreen.y + lightTex.GetWidth() )
+            {
+                selectedGameObjects.clear();
+                std::list< ae3d::GameObject* > selectedGameObj;
+                selectedGameObj.push_back( go.get() );
+
+                for (std::size_t goIndex = 0; goIndex < gameObjects.size(); ++goIndex)
+                {
+                    if (gameObjects[ goIndex ].get() == go.get())
+                    {
+                        selectedGameObjects.push_back( int( goIndex ) );
+                    }
+                }
+
+                emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedGameObj );
+            }
+        }
+    }
+}
+
 void SceneWidget::DrawLightSprites()
 {
     auto cameraTransform = camera.GetComponent< TransformComponent >();
@@ -368,6 +420,7 @@ void SceneWidget::DrawLightSprites()
         DirectionalLightComponent* dirLight = go->GetComponent< DirectionalLightComponent >();
         SpotLightComponent* spotLight = go->GetComponent< SpotLightComponent >();
         PointLightComponent* pointLight = go->GetComponent< PointLightComponent >();
+
         if (dirLight || spotLight || pointLight)
         {
             const float distance = (cameraPos - goTransform->GetLocalPosition()).Length();
@@ -600,18 +653,15 @@ void SceneWidget::mousePressEvent( QMouseEvent* event )
     {
         mouseMode = MouseMode::Grab;
         setCursor( Qt::BlankCursor );
-        lastMousePosition[ 0 ] = QCursor::pos().x();//event->pos().x();
-        lastMousePosition[ 1 ] = QCursor::pos().y();//event->pos().y();
+        lastMousePosition[ 0 ] = QCursor::pos().x();
+        lastMousePosition[ 1 ] = QCursor::pos().y();
         QApplication::setOverrideCursor( Qt::CrossCursor );
-        //std::cout << "button down pos: " << lastMousePosition[ 0 ] << ", " << lastMousePosition[ 1 ] << std::endl;
     }
     else if (event->button() == Qt::MiddleButton)
     {
         mouseMode = MouseMode::Pan;
         lastMousePosition[ 0 ] = QCursor::pos().x();
         lastMousePosition[ 1 ] = QCursor::pos().y();
-        //cursor().setShape( Qt::ClosedHandCursor );
-        //QApplication::setOverrideCursor( Qt::ClosedHandCursor );
     }
     else if (event->button() == Qt::LeftButton)
     {
@@ -690,6 +740,8 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
         }
 
         emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedObjectsClicked );
+
+        SelectSpriteUnderCursor();
     }
 }
 
@@ -890,6 +942,7 @@ ae3d::Vec3 SceneWidget::SelectionAveragePosition()
 
     return avgPosition;
 }
+
 ae3d::GameObject* SceneWidget::CreateGameObject()
 {
     gameObjects.push_back( std::make_shared<ae3d::GameObject>() );

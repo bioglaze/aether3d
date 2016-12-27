@@ -114,6 +114,7 @@ private:
     };
 
     ae3d::Vec3 SelectionAveragePosition();
+    void SelectSpriteUnderCursor();
     void DrawLightSprites();
     void DrawAudioSprites();
 
