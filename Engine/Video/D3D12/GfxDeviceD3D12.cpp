@@ -904,9 +904,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     indexBufferView.SizeInBytes = vertexBuffer.GetIBSize();
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 
-    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
-
-    samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
+    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
         GfxDeviceGlobal::texture0->GetFilter() );
 
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };

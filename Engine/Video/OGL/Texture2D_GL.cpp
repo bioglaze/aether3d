@@ -135,7 +135,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 
         if (GfxDevice::HasExtension( "GL_KHR_debug" ))
         {
-            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.handle, (GLsizei)std::string( "default texture 2d" ).size(), "default texture 2d" );
+            glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.handle, -1, "default texture 2d" );
         }
 
         int data[ 32 * 32 * 4 ] = { 0xFFC0CB };
@@ -199,7 +199,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, (GLsizei)fileContents.path.size(), fileContents.path.c_str() );
+        glObjectLabel( GL_TEXTURE, handle, -1, fileContents.path.c_str() );
     }
 
     if (GfxDevice::HasExtension( "GL_EXT_texture_filter_anisotropic" ) && anisotropy > 1)

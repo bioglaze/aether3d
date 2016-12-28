@@ -41,13 +41,13 @@ namespace
         Shader
     };
 
-    void PrintInfoLog( GLuint shader, InfoLogType logType )
+    void PrintInfoLog( GLuint shader, InfoLogType logType, GLenum programParam )
     {
         GLint logLength = 0;
         
         if (logType == InfoLogType::Program)
         {
-            glGetProgramiv( shader, GL_INFO_LOG_LENGTH, &logLength );
+            glGetProgramiv( shader, programParam, &logLength );
         }
         else
         {
@@ -90,7 +90,7 @@ namespace
         if (!wasCompiled)
         {
             ae3d::System::Print( "Shader compile error.\n" );
-            PrintInfoLog( shader, InfoLogType::Shader );
+            PrintInfoLog( shader, InfoLogType::Shader, GL_INFO_LOG_LENGTH );
             return 0;
         }
         
@@ -142,7 +142,7 @@ void ShaderReload( const std::string& path )
 void ae3d::Shader::Validate()
 {
     glValidateProgram( handle );
-    PrintInfoLog( handle, InfoLogType::Program );
+    PrintInfoLog( handle, InfoLogType::Program, GL_VALIDATE_STATUS );
 }
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -154,7 +154,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_PROGRAM, program, (GLsizei)std::string( "shader" ).size(), "shader" );
+        glObjectLabel( GL_PROGRAM, program, -1, "shader" );
     }
 
     glAttachShader( program, vertexShader );
@@ -171,7 +171,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     if (!wasLinked)
     {
         ae3d::System::Print("Shader linking failed.\n");
-        PrintInfoLog( program, InfoLogType::Program );
+        PrintInfoLog( program, InfoLogType::Program, GL_INFO_LOG_LENGTH );
         return;
     }
 

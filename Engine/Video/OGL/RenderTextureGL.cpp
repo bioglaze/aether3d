@@ -49,7 +49,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, 17, "render_texture_2d" );
+        glObjectLabel( GL_TEXTURE, handle, -1, "render_texture_2d" );
     }
 
     const float borderColor[] = { 0, 0, 0, 1 };
@@ -109,7 +109,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, 19, "render_texture_cube" );
+        glObjectLabel( GL_TEXTURE, handle, -1, "render_texture_cube" );
     }
     
     glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : (mipmaps == Mipmaps::Generate ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR ) );

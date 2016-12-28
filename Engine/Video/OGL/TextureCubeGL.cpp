@@ -102,7 +102,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, (GLsizei)negX.path.size(), negX.path.c_str() );
+        glObjectLabel( GL_TEXTURE, handle, -1, negX.path.c_str() );
     }
 
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };

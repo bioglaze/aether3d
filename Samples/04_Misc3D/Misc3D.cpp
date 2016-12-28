@@ -25,7 +25,7 @@
 #include "VR.hpp"
 
 //#define TEST_RENDER_TEXTURE_2D
-#define TEST_VERTEX_LAYOUTS
+//#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_SPOT
 
 using namespace ae3d;
@@ -149,8 +149,7 @@ int main()
 
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
-
-#ifdef TEST_VERTEX_LAYOUTS
+    
     Mesh cubeMeshPTN; // Position-texcoord-normal
     cubeMeshPTN.Load( FileSystem::FileContents( "pnt_quads_2_meshes.ae3d" ) );
 
@@ -159,7 +158,6 @@ int main()
     cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
     cubePTN.AddComponent< TransformComponent >();
     cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
-#endif
 
     GameObject rtCube;
     rtCube.AddComponent< MeshRendererComponent >();
@@ -277,7 +275,6 @@ int main()
 #if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
-    
     if (res != Scene::DeserializeResult::Success)
     {
         System::Print( "Could not parse Sponza\n" );

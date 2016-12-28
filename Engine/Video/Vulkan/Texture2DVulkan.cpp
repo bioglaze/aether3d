@@ -150,7 +150,7 @@ bool isBC3( VkFormat format )
 
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
 {
-    if ((!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height )))
+    if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ))
     {
         if (mipmaps == Mipmaps::Generate)
         {

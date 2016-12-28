@@ -145,7 +145,8 @@ void ae3d::LightTiler::UpdateLightBuffers()
         return;
     }
 
-    memcpy_s( pointLightPtr, 0, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    std::size_t byteSize = pointLightCenterAndRadius.size() * 4 * sizeof( float );
+    memcpy_s( pointLightPtr, byteSize, pointLightCenterAndRadius.data(), byteSize );
     pointLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
 }
 
