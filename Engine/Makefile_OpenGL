@@ -46,7 +46,7 @@ ifeq ($(UNAME), Darwin)
 endif
 ifeq ($(UNAME), Linux)
 	mkdir -p $(OUTPUT_DIR)
-	rm -f $(OUTPUT_DIR)/libaether3d_linux.a
+	rm -f $(OUTPUT_DIR)/libaether3d_gl_linux.a
 endif
 	$(CCOMPILER) $(INCLUDES) -c ThirdParty/GL/glxw.c -o $(OUTPUT_DIR)/glxw.o
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o

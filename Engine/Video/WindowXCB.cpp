@@ -375,6 +375,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
             GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
             GLX_CONTEXT_MINOR_VERSION_ARB, 1,
             GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+            GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
             0,
         };
 
@@ -526,9 +527,9 @@ void ae3d::Window::PumpEvents()
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollUp;  
                 }
                 else if (be->detail == 5)
-		{
+                {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollDown;
-		}
+                }
                 else
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b1Type;
@@ -601,7 +602,6 @@ void ae3d::Window::PumpEvents()
     js_event j;
 
     while (read( WindowGlobal::gamePad.fd, &j, sizeof(js_event) ) == sizeof(js_event))
-        //read(WindowGlobal::gamePad.fd, &j, sizeof(js_event));
     {
         // Don't care if init or afterwards
         j.type &= ~JS_EVENT_INIT;
