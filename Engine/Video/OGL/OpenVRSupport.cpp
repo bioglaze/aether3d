@@ -449,9 +449,9 @@ void ae3d::VR::SubmitFrame()
 
     RenderDistortion();
 
-    vr::Texture_t leftEyeTexture = { (void*)Global::leftEyeDesc.resolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
+    vr::Texture_t leftEyeTexture = { (void*)Global::leftEyeDesc.resolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
     vr::VRCompositor()->Submit( vr::Eye_Left, &leftEyeTexture );
-    vr::Texture_t rightEyeTexture = { (void*)Global::rightEyeDesc.resolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
+    vr::Texture_t rightEyeTexture = { (void*)Global::rightEyeDesc.resolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
     vr::VRCompositor()->Submit( vr::Eye_Right, &rightEyeTexture );
     vr::VRCompositor()->PostPresentHandoff();
 }
@@ -477,7 +477,6 @@ void ae3d::VR::SetEye( int eye )
     const FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
     glBindFramebuffer( GL_FRAMEBUFFER, fbDesc.renderFramebufferId );
     glViewport( 0, 0, Global::width, Global::height );
-    glClear( GL_COLOR_BUFFER_BIT ); // glazen testi
 }
 
 void ae3d::VR::UnsetEye( int eye )
@@ -520,7 +519,6 @@ void ae3d::VR::CalcEyePose()
         {
             ++Global::validPoseCount;
             ConvertSteamVRMatrixToMatrix4( Global::trackedDevicePose[ nDevice ].mDeviceToAbsoluteTracking, Global::devicePose[ nDevice ] );
-            Global::vrEyePosition = Vec3( 0, 0, -80 );// Vec3( Global::devicePose[ nDevice ].m[ 12 ], Global::devicePose[ nDevice ].m[ 13 ], Global::devicePose[ nDevice ].m[ 14 ] );
             Global::vrEyePosition = Vec3( Global::devicePose[ nDevice ].m[ 12 ], Global::devicePose[ nDevice ].m[ 13 ], Global::devicePose[ nDevice ].m[ 14 ] );
             
             if (Global::devClassChar[ nDevice ] == 0)
@@ -530,7 +528,7 @@ void ae3d::VR::CalcEyePose()
                 case vr::TrackedDeviceClass_Controller:        Global::devClassChar[ nDevice ] = 'C'; break;
                 case vr::TrackedDeviceClass_HMD:               Global::devClassChar[ nDevice ] = 'H'; break;
                 case vr::TrackedDeviceClass_Invalid:           Global::devClassChar[ nDevice ] = 'I'; break;
-                case vr::TrackedDeviceClass_Other:             Global::devClassChar[ nDevice ] = 'O'; break;
+                case vr::TrackedDeviceClass_GenericTracker:    Global::devClassChar[ nDevice ] = 'O'; break;
                 case vr::TrackedDeviceClass_TrackingReference: Global::devClassChar[ nDevice ] = 'T'; break;
                 default:                                       Global::devClassChar[ nDevice ] = '?'; break;
                 }
@@ -556,7 +554,7 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float /*yawDegrees*/, int e
     const float nearPlane = camera.GetComponent< CameraComponent >()->GetNear();
     const float farPlane = camera.GetComponent< CameraComponent >()->GetFar();
 
-    vr::HmdMatrix44_t mat = Global::hmd->GetProjectionMatrix( eye == 0 ? vr::Hmd_Eye::Eye_Left : vr::Hmd_Eye::Eye_Right, nearPlane, farPlane, vr::API_OpenGL );
+    vr::HmdMatrix44_t mat = Global::hmd->GetProjectionMatrix( eye == 0 ? vr::Hmd_Eye::Eye_Left : vr::Hmd_Eye::Eye_Right, nearPlane, farPlane );
     Matrix44 projMat;
     std::memcpy( &projMat.m[ 0 ], &mat.m[ 0 ][ 0 ], sizeof( Matrix44 ) );
     projMat.Transpose( projMat );
