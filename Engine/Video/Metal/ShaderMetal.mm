@@ -11,7 +11,7 @@ extern id<MTLTexture> texture1;
 
 namespace GfxDeviceGlobal
 {
-    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap );
+    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, int anisotropy );
 }
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -134,7 +134,7 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
             System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
         }
 
-        GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap() );
+        GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap(), static_cast< int >( texture->GetAnisotropy() ) );
     }
     else
     {
@@ -159,7 +159,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* rend
             System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
         }
 
-        GfxDeviceGlobal::SetSampler( textureUnit, renderTexture->GetFilter(), renderTexture->GetWrap() );
+        GfxDeviceGlobal::SetSampler( textureUnit, renderTexture->GetFilter(), renderTexture->GetWrap(), static_cast< int >( renderTexture->GetAnisotropy() ) );
     }
     else
     {
@@ -184,7 +184,7 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
             System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
         }
         
-        GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap() );
+        GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap(), static_cast< int >( texture->GetAnisotropy() ) );
     }
     else
     {

@@ -25,7 +25,7 @@ namespace ae3d
         /// \param filter Filter mode.
         /// \param mipmaps Mipmaps
         /// \param colorSpace Color space.
-        /// \param anisotropy Anisotropy. Value range is 1-16 depending on support.
+        /// \param anisotropy Anisotropy. Value range is 1-16 depending on support. On Metal the value is bucketed into 1, 2, 4, 8 and 16.
         void Load( const FileSystem::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps, ColorSpace colorSpace, float anisotropy );
         
         /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
@@ -34,7 +34,7 @@ namespace ae3d
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
         /// \param colorSpace Color space.
-        /// \param anisotropy Anisotropy. Value range is 1-16 depending on support.
+        /// \param anisotropy Anisotropy. Value range is 1-16 depending on support. On Metal the value is bucketed into 1, 2, 4, 8 and 16.
         void LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter, ColorSpace colorSpace, float anisotropy );
 
 #if RENDERER_VULKAN

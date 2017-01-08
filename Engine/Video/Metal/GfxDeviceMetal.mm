@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
+#include <cmath>
 #include <unordered_map>
 #include <sstream>
 #include <list>
@@ -38,6 +39,41 @@ void PlatformInitGamePad()
 {
 }
 
+enum SamplerIndexByAnisotropy : int
+{
+    One = 0,
+    Two,
+    Four,
+    Eight,
+    Sixteen
+};
+
+int GetSamplerIndexByAnisotropy( int anisotropy )
+{
+    if (anisotropy == 1)
+    {
+        return SamplerIndexByAnisotropy::One;
+    }
+    if (anisotropy == 2)
+    {
+        return SamplerIndexByAnisotropy::Two;
+    }
+    if (anisotropy > 2 && anisotropy <= 4)
+    {
+        return SamplerIndexByAnisotropy::Four;
+    }
+    if (anisotropy > 4 && anisotropy <= 8)
+    {
+        return SamplerIndexByAnisotropy::Eight;
+    }
+    if (anisotropy > 8 && anisotropy <= 16)
+    {
+        return SamplerIndexByAnisotropy::Sixteen;
+    }
+
+    return SamplerIndexByAnisotropy::One;
+}
+
 namespace GfxDeviceGlobal
 {
     int backBufferWidth = 0;
@@ -57,49 +93,56 @@ namespace GfxDeviceGlobal
         id<MTLSamplerState> linearClamp;
         id<MTLSamplerState> pointRepeat;
         id<MTLSamplerState> pointClamp;
-    } samplers;
+    } samplers[ 5 ];
     
     void CreateSamplers()
     {
-        MTLSamplerDescriptor *samplerDescriptor = [MTLSamplerDescriptor new];
+        for (int samplerIndex = 0; samplerIndex < 5; ++samplerIndex)
+        {
+            MTLSamplerDescriptor *samplerDescriptor = [MTLSamplerDescriptor new];
 
-        samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
-        samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
-        samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
-        samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
-        samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
-        samplerDescriptor.label = @"linear repeat";
-        samplers.linearRepeat = [device newSamplerStateWithDescriptor:samplerDescriptor];
+            samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
+            samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
+            samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
+            samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
+            samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
+            samplerDescriptor.maxAnisotropy = (NSUInteger)std::pow( 2, samplerIndex );
+            samplerDescriptor.label = @"linear repeat";
+            samplers[ samplerIndex ].linearRepeat = [device newSamplerStateWithDescriptor:samplerDescriptor];
 
-        samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
-        samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
-        samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
-        samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
-        samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
-        samplerDescriptor.label = @"linear clamp";
-        samplers.linearClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
+            samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
+            samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
+            samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
+            samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
+            samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
+            samplerDescriptor.maxAnisotropy = (NSUInteger)std::pow( 2, samplerIndex );
+            samplerDescriptor.label = @"linear clamp";
+            samplers[ samplerIndex ].linearClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
 
-        samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
-        samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
-        samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
-        samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
-        samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
-        samplerDescriptor.label = @"point repeat";
-        samplers.pointRepeat = [device newSamplerStateWithDescriptor:samplerDescriptor];
+            samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
+            samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
+            samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
+            samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
+            samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
+            samplerDescriptor.maxAnisotropy = (NSUInteger)std::pow( 2, samplerIndex );
+            samplerDescriptor.label = @"point repeat";
+            samplers[ samplerIndex ].pointRepeat = [device newSamplerStateWithDescriptor:samplerDescriptor];
 
-        samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
-        samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
-        samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
-        samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
-        samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
-        samplerDescriptor.label = @"point clamp";
-        samplers.pointClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
-        
-        samplerStates[ 0 ] = samplers.pointClamp;
-        samplerStates[ 1 ] = samplers.pointClamp;
+            samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
+            samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
+            samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
+            samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
+            samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
+            samplerDescriptor.maxAnisotropy = (NSUInteger)std::pow( 2, samplerIndex );
+            samplerDescriptor.label = @"point clamp";
+            samplers[ samplerIndex ].pointClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
+        }
+
+        samplerStates[ 0 ] = samplers[ SamplerIndexByAnisotropy::One ].pointClamp;
+        samplerStates[ 1 ] = samplers[ SamplerIndexByAnisotropy::One ].pointClamp;
     }
     
-    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap )
+    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, int anisotropy )
     {
         if (textureUnit > 1)
         {
@@ -109,19 +152,19 @@ namespace GfxDeviceGlobal
         
         if (filter == ae3d::TextureFilter::Nearest && wrap == ae3d::TextureWrap::Clamp)
         {
-            samplerStates[ textureUnit ] = samplers.pointClamp;
+            samplerStates[ textureUnit ] = samplers[ GetSamplerIndexByAnisotropy( anisotropy ) ].pointClamp;
         }
         else if (filter == ae3d::TextureFilter::Nearest && wrap == ae3d::TextureWrap::Repeat)
         {
-            samplerStates[ textureUnit ] = samplers.pointRepeat;
+            samplerStates[ textureUnit ] = samplers[ GetSamplerIndexByAnisotropy( anisotropy ) ].pointRepeat;
         }
         else if (filter == ae3d::TextureFilter::Linear && wrap == ae3d::TextureWrap::Clamp)
         {
-            samplerStates[ textureUnit ] = samplers.linearClamp;
+            samplerStates[ textureUnit ] = samplers[ GetSamplerIndexByAnisotropy( anisotropy ) ].linearClamp;
         }
         else if (filter == ae3d::TextureFilter::Linear && wrap == ae3d::TextureWrap::Repeat)
         {
-            samplerStates[ textureUnit ] = samplers.linearRepeat;
+            samplerStates[ textureUnit ] = samplers[ GetSamplerIndexByAnisotropy( anisotropy ) ].linearRepeat;
         }
         else
         {
