@@ -469,7 +469,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
     return GfxDeviceGlobal::psoCache[ psoHash ];
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode )
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode )
 {
     if (!GfxDeviceGlobal::lightTiler.CullerUniformsCreated() && shader.GetMetalVertexShaderName() == "standard_vertex")
     {
@@ -538,6 +538,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
     [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
+    [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
     [renderEncoder setFragmentTexture:texture1 atIndex:1];
     

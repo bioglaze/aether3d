@@ -645,6 +645,19 @@ void SceneWidget::CenterSelected()
     camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 20 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
 }
 
+void SceneWidget::SetSelectedObjectHighlight( bool enable )
+{
+    for (auto& go : selectedGameObjects)
+    {
+        MeshRendererComponent* meshRenderer = gameObjects[ go ]->GetComponent< MeshRendererComponent >();
+
+        if (meshRenderer != nullptr)
+        {
+            meshRenderer->EnableWireframe( enable );
+        }
+    }
+}
+
 void SceneWidget::mousePressEvent( QMouseEvent* event )
 {
     setFocus();
@@ -717,6 +730,8 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
 
     if (event->button() == Qt::LeftButton)
     {
+        SetSelectedObjectHighlight( false );
+
         const QPoint point = mapFromGlobal( QCursor::pos() );
         auto colliders = GetColliders( camera, gameObjects, point.x(), point.y(), width(), height(), 200 );
 
@@ -738,6 +753,8 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
                 }
             }
         }
+
+        SetSelectedObjectHighlight( true );
 
         emit static_cast<MainWindow*>(mainWindow)->GameObjectSelected( selectedObjectsClicked );
 
@@ -949,6 +966,17 @@ ae3d::GameObject* SceneWidget::CreateGameObject()
     gameObjects.back()->SetName( "Game Object" );
     gameObjects.back()->AddComponent< ae3d::TransformComponent >();
     scene.Add( gameObjects.back().get() );
+
+    for (auto& go : selectedGameObjects)
+    {
+        MeshRendererComponent* meshRenderer = gameObjects[ go ]->GetComponent< MeshRendererComponent >();
+
+        if (meshRenderer != nullptr)
+        {
+            meshRenderer->EnableWireframe( true );
+        }
+    }
+
     selectedGameObjects.clear();
     selectedGameObjects.push_back( (int)gameObjects.size() - 1 );
     return gameObjects.back().get();

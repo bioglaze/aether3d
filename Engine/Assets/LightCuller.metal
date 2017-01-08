@@ -163,6 +163,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
             // test if sphere is intersecting or inside frustum
             if (-center.z - minZ < radius && center.z - maxZ < radius)
+            // should be like this:
+            //if (-center.z + minZ < radius && center.z - maxZ < radius)
             {
                 if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&

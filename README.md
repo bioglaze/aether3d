@@ -21,6 +21,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes.
   - XBox controller support.
   - Cross-Platform WYSIWYG scene editor.
   - Statically linked into your application.
+  - Wireframe rendering mode.
 
 # Planned Features
 

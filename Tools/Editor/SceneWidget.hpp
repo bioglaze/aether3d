@@ -117,6 +117,7 @@ private:
     void SelectSpriteUnderCursor();
     void DrawLightSprites();
     void DrawAudioSprites();
+    void SetSelectedObjectHighlight( bool enable );
 
     TransformGizmo transformGizmo;
     ae3d::GameObject camera;
