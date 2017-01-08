@@ -333,7 +333,7 @@ void CreateRootSignature()
 }
 
 unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat, int sampleCount )
+                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount )
 {
     std::string hashString;
     hashString += std::to_string( (unsigned)vertexFormat );
@@ -342,6 +342,7 @@ unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader
     hashString += std::to_string( (unsigned)blendMode );
     hashString += std::to_string( ((unsigned)depthFunc) );
     hashString += std::to_string( ((unsigned)cullMode) );
+    hashString += std::to_string( ((unsigned)fillMode) );
     hashString += std::to_string( ((unsigned)rtvFormat) );
     hashString += std::to_string( ((unsigned)sampleCount) );
 
@@ -349,7 +350,7 @@ unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader
 }
 
 void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                ae3d::GfxDevice::CullMode cullMode, DXGI_FORMAT rtvFormat, int sampleCount )
+                ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount )
 {
     D3D12_RASTERIZER_DESC descRaster = {};
 
@@ -373,7 +374,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     descRaster.DepthBias = 0;
     descRaster.DepthBiasClamp = 0;
     descRaster.DepthClipEnable = TRUE;
-    descRaster.FillMode = D3D12_FILL_MODE_SOLID;
+    descRaster.FillMode = fillMode == ae3d::GfxDevice::FillMode::Solid ? D3D12_FILL_MODE_SOLID : D3D12_FILL_MODE_WIREFRAME;
     descRaster.FrontCounterClockwise = TRUE;
     descRaster.MultisampleEnable = sampleCount > 1;
     descRaster.SlopeScaledDepthBias = 0;
@@ -521,7 +522,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO" );
 
-    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, rtvFormat, sampleCount );
+    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -782,7 +783,7 @@ void ae3d::GfxDevice::PopGroupMarker()
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
-                            CullMode cullMode )
+                            CullMode cullMode, FillMode fillMode )
 {
     // Prevents feedback. Currently disabled because it also prevents drawing a sprite that uses render texture.
     /*if (GfxDeviceGlobal::renderTexture0 && GfxDeviceGlobal::currentRenderTargetRTV.ptr == GfxDeviceGlobal::renderTexture0->GetRTV().ptr)
@@ -797,11 +798,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_R8G8B8A8_UNORM);
     }
 
-    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
+    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
+        CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
     }
     
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};

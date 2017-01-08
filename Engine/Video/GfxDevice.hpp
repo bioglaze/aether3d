@@ -45,6 +45,12 @@ namespace ae3d
             Off
         };
 
+        enum class FillMode
+        {
+            Solid,
+            Wireframe
+        };
+
         void Init( int width, int height );
 #if RENDERER_D3D12
         void ResetCommandList();
@@ -73,7 +79,7 @@ namespace ae3d
         void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );
-        void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode );
+        void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode );
         void ErrorCheck( const char* info );
 
         void SetClearColor( float red, float green, float blue );

@@ -141,6 +141,12 @@ void SetCullMode( ae3d::GfxDevice::CullMode cullMode )
         glDisable( GL_CULL_FACE );
     }
 }
+
+void SetFillMode( ae3d::GfxDevice::FillMode fillMode )
+{
+    glPolygonMode( GL_FRONT_AND_BACK, fillMode == ae3d::GfxDevice::FillMode::Solid ? GL_FILL : GL_LINE );
+}
+
 void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
 {
     if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
@@ -220,7 +226,7 @@ void ae3d::GfxDevice::PopGroupMarker()
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
-                            CullMode cullMode )
+                            CullMode cullMode, GfxDevice::FillMode fillMode )
 {
     ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     ae3d::System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
@@ -228,6 +234,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     SetBlendMode( blendMode );
     SetDepthFunc( depthFunc );
     SetCullMode( cullMode );
+    SetFillMode( fillMode );
 
     shader.Use();
     vertexBuffer.Bind();

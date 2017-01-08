@@ -157,7 +157,8 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &mvp.m[ 0 ] );
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
     
-    GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend, GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off );
+    GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend,
+                     GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid );
 }
 
 void ae3d::System::ReloadChangedAssets()

@@ -126,7 +126,7 @@ namespace MathUtil
 namespace ae3d
 {
     unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-        ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode )
+        ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode )
     {
         std::string hashString;
         hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
@@ -135,6 +135,7 @@ namespace ae3d
         hashString += std::to_string( (unsigned)blendMode );
         hashString += std::to_string( ((unsigned)depthFunc) + 4 );
         hashString += std::to_string( ((unsigned)cullMode) + 8 );
+        hashString += std::to_string( ((unsigned)fillMode) + 8 );
 
         return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
     }

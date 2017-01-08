@@ -120,7 +120,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         Shader* shader = overrideShader ? overrideShader : materials[ subMeshIndex ]->GetShader();
         GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
         GfxDevice::BlendMode blendMode = GfxDevice::BlendMode::Off;
-        
+
         if (overrideShader)
         {
             shader->Use();
@@ -180,7 +180,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         }
         
         GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount() / 3,
-                         *shader, blendMode, depthFunc, cullMode );
+                         *shader, blendMode, depthFunc, cullMode, isWireframe ? GfxDevice::FillMode::Wireframe : GfxDevice::FillMode::Solid );
     }
 }
 

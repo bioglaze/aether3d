@@ -23,6 +23,12 @@ namespace ae3d
         /// \param aMesh Mesh.
         void SetMesh( Mesh* aMesh );
 
+        /// \returen True, if the mesh will be rendered as a wireframe.
+        bool IsWireframe() const { return isWireframe; }
+
+        /// \param enable True, if the mesh will be rendered as a wireframe.
+        void EnableWireframe( bool enable ) { isWireframe = enable; }
+
         /// \return Textual representation of component.
         std::string GetSerialized() const;
         
@@ -56,6 +62,7 @@ namespace ae3d
         std::vector< bool > isSubMeshCulled;
         GameObject* gameObject = nullptr;
         bool isCulled = false;
+        bool isWireframe = false;
     };
 }
 

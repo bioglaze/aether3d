@@ -174,7 +174,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
         }
         
         ae3d::GfxDevice::Draw( vertexBuffer, drawable.bufferStart, drawable.bufferEnd, renderer.builtinShaders.spriteRendererShader, blendMode,
-                               ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Off );
+                               ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Off, ae3d::GfxDevice::FillMode::Solid );
     }
 }
 
