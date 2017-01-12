@@ -39,27 +39,27 @@ int main()
     camera.AddComponent<TransformComponent>();
 
     Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, 1 );
+    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
 
     // This texture has 7 mipmaps.
     Texture2D bc1Tex;
-    bc1Tex.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    bc1Tex.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     // This texture has 1 mipmap.
     Texture2D bc2Tex;
-    bc2Tex.Load( FileSystem::FileContents( "test_dxt3.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, 1 );
+    bc2Tex.Load( FileSystem::FileContents( "test_dxt3.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
 
     // This texture has 1 mipmap.
     Texture2D bc3Tex;
-    bc3Tex.Load( FileSystem::FileContents( "test_dxt5.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    bc3Tex.Load( FileSystem::FileContents( "test_dxt5.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     Texture2D nonSquareTex;
-    nonSquareTex.Load( FileSystem::FileContents( "textures/chain_texture.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, 1 );
+    nonSquareTex.Load( FileSystem::FileContents( "textures/chain_texture.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
 
     Texture2D notLoadedTex;
 
     Texture2D spriteTexFromAtlas;
-    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "marble", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, 1 );
+    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "marble", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, Anisotropy::k1 );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
@@ -84,14 +84,14 @@ int main()
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents("font_txt.fnt"));
 
     Texture2D fontTexSDF;
     //fontTexSDF.Load( FileSystem::FileContents( "font_sdf.tga" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
-    fontTexSDF.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+    fontTexSDF.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     Font sdfFont;
     sdfFont.LoadBMFont( &fontTexSDF, FileSystem::FileContents( "font_txt.fnt" ) );

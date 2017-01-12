@@ -91,7 +91,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     if (!fileContents.isLoaded)
     {

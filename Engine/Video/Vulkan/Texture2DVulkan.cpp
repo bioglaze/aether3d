@@ -14,6 +14,7 @@
 #include "VulkanUtils.hpp"
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
+float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 void Tokenize( const std::string& str,
 std::vector< std::string >& tokens,
 const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
@@ -72,7 +73,7 @@ void ae3d::Texture2D::DestroyTextures()
     }
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     // TODO: Move somewhere else.
     if (Texture2DGlobal::texCmdBuffer == VK_NULL_HANDLE)
@@ -93,18 +94,18 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
-    anisotropy = (aAnisotropy > 0 && aAnisotropy < 17) ? aAnisotropy : 1;
+    anisotropy = aAnisotropy;
     colorSpace = aColorSpace;
     handle = 1;
     width = 256;
     height = 256;
     path = fileContents.path;
 
-    if (static_cast<int>(GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy) < anisotropy)
+    if (static_cast<int>(GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy) < GetFloatAnisotropy( anisotropy ))
     {
         System::Print( "%s is using too big anisotropy (%f), max supported is %fx.\n", fileContents.path.c_str(), anisotropy,
             GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy );
-        anisotropy = GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy;
+        anisotropy = Anisotropy::k4;
     }
 
     if (!fileContents.isLoaded)
@@ -362,8 +363,8 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
     samplerInfo.minLod = 0;
     samplerInfo.maxLod = static_cast< float >(mipLevelCount);
-    samplerInfo.maxAnisotropy = anisotropy;
-    samplerInfo.anisotropyEnable = (anisotropy > 1) ? VK_TRUE : VK_FALSE;
+    samplerInfo.maxAnisotropy = GetFloatAnisotropy( anisotropy );
+    samplerInfo.anisotropyEnable = (anisotropy != Anisotropy::k1) ? VK_TRUE : VK_FALSE;
     samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );

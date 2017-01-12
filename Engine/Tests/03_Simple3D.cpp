@@ -74,7 +74,7 @@ int main()
     atlasContents.data.assign( std::begin( str ), std::end( str ) );
     
     Texture2D tex;
-    tex.LoadFromAtlas( FileSystem::FileContents("atlas_cegui.png"), atlasContents, "granite", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, 1 );
+    tex.LoadFromAtlas( FileSystem::FileContents("atlas_cegui.png"), atlasContents, "granite", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, Anisotropy:::k1 );
 
     Scene scene;
     scene.Add( &camera );

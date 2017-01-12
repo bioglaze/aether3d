@@ -15,6 +15,7 @@
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
+float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
 namespace MathUtil
@@ -180,7 +181,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, float aAnisotropy )
+void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     filter = aFilter;
     wrap = aWrap;

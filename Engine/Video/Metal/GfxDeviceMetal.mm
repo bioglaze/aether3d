@@ -44,31 +44,26 @@ enum SamplerIndexByAnisotropy : int
     One = 0,
     Two,
     Four,
-    Eight,
-    Sixteen
+    Eight
 };
 
-int GetSamplerIndexByAnisotropy( int anisotropy )
+int GetSamplerIndexByAnisotropy( ae3d::Anisotropy anisotropy )
 {
-    if (anisotropy == 1)
+    if (anisotropy == ae3d::Anisotropy::k1)
     {
         return SamplerIndexByAnisotropy::One;
     }
-    if (anisotropy == 2)
+    if (anisotropy == ae3d::Anisotropy::k2)
     {
         return SamplerIndexByAnisotropy::Two;
     }
-    if (anisotropy > 2 && anisotropy <= 4)
+    if (anisotropy == ae3d::Anisotropy::k4)
     {
         return SamplerIndexByAnisotropy::Four;
     }
-    if (anisotropy > 4 && anisotropy <= 8)
+    if (anisotropy == ae3d::Anisotropy::k8)
     {
         return SamplerIndexByAnisotropy::Eight;
-    }
-    if (anisotropy > 8 && anisotropy <= 16)
-    {
-        return SamplerIndexByAnisotropy::Sixteen;
     }
 
     return SamplerIndexByAnisotropy::One;
@@ -97,7 +92,7 @@ namespace GfxDeviceGlobal
     
     void CreateSamplers()
     {
-        for (int samplerIndex = 0; samplerIndex < 5; ++samplerIndex)
+        for (int samplerIndex = 0; samplerIndex < 4; ++samplerIndex)
         {
             MTLSamplerDescriptor *samplerDescriptor = [MTLSamplerDescriptor new];
 

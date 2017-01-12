@@ -1186,7 +1186,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> spritePath >> x >> y >> width >> height;
 
             outTexture2Ds[ spritePath ] = new Texture2D();
-            outTexture2Ds[ spritePath ]->Load( FileSystem::FileContents( spritePath.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, 1 );
+            outTexture2Ds[ spritePath ]->Load( FileSystem::FileContents( spritePath.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
             outGameObjects.back().GetComponent< SpriteRendererComponent >()->SetTexture( outTexture2Ds[ spritePath ], Vec3( x, y, 0 ), Vec3( x, y, 1 ), Vec4( 1, 1, 1, 1 ) );
         }
@@ -1276,7 +1276,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> name >> path;
             
             outTexture2Ds[ name ] = new Texture2D();
-            outTexture2Ds[ name ]->Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, 1 );
+            outTexture2Ds[ name ]->Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
         }
         else if (token == "material")
         {

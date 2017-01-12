@@ -9,7 +9,7 @@
 
 void ae3d::Renderer::GenerateTextures()
 {
-    whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, 1 );
+    whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 }
 
 void ae3d::Renderer::GenerateSkybox()

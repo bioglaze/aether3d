@@ -101,7 +101,7 @@ int main()
     camera2d.AddComponent<TransformComponent>();
     
     Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, 1 );
+    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
     
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
@@ -172,10 +172,10 @@ int main()
                  FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Texture2D gliderTex;
-    gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, 1 );
+    gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D gliderClampTex;
-    gliderClampTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, 1 );
+    gliderClampTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Material materialClamp;
     materialClamp.SetShader( &shader );
@@ -315,7 +315,7 @@ int main()
     rtCamera.AddComponent<TransformComponent>();
 
     Texture2D transTex;
-    transTex.Load( FileSystem::FileContents( "trans50.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, 1 );
+    transTex.Load( FileSystem::FileContents( "trans50.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
     Material transMaterial;
     transMaterial.SetShader( &shader );

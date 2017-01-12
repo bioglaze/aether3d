@@ -41,16 +41,39 @@ void Tokenize( const std::string& str,
     }
 }
 
+float GetFloatAnisotropy( ae3d::Anisotropy anisotropy )
+{
+    if (anisotropy == ae3d::Anisotropy::k1)
+    {
+        return 1;
+    }
+    if (anisotropy == ae3d::Anisotropy::k2)
+    {
+        return 2;
+    }
+    if (anisotropy == ae3d::Anisotropy::k4)
+    {
+        return 4;
+    }
+    if (anisotropy == ae3d::Anisotropy::k8)
+    {
+        return 1;
+    }
+
+    ae3d::System::Assert( false, "unhandled anisotropy" );
+    return 1;
+}
+
 namespace ae3d
 {
-    std::string GetCacheHash( const std::string& path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, float anisotropy )
+    std::string GetCacheHash( const std::string& path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, ae3d::Anisotropy anisotropy )
     {
         return path + std::to_string( static_cast<int>(wrap) ) + std::to_string( static_cast<int>(filter) ) +
-            std::to_string( static_cast<int>(mipmaps) ) + std::to_string( static_cast<int>(colorSpace) ) + std::to_string( anisotropy );
+            std::to_string( static_cast<int>(mipmaps) ) + std::to_string( static_cast<int>(colorSpace) ) + std::to_string( static_cast< int >(anisotropy) );
     }
 }
 
-void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, ColorSpace aColorSpace, float aAnisotropy )
+void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     Load( atlasTextureData, aWrap, aFilter, mipmaps, aColorSpace, aAnisotropy );
 
