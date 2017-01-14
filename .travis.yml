@@ -1,10 +1,11 @@
-# Enable C++ support
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+
 language: cpp
-# Compiler selection
 compiler:
   - clang
   - gcc
-# Build steps
 script:
   - cd Engine
   - make
