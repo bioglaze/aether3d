@@ -15,4 +15,4 @@ compiler:
   - gcc
 script:
   - cd Engine
-  - make
+  - make -f Makefile_OpenGL

@@ -186,7 +186,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     
     if (!meshData.isLoaded)
     {
-        const float s = 5;
+        const float s = 1;
         
         const std::vector< VertexBuffer::VertexPTC > vertices =
         {
@@ -221,7 +221,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         firstSubMesh.vertexBuffer.Generate( indices.data(), static_cast< int >(indices.size()), vertices.data(), static_cast< int >(vertices.size()) );
         firstSubMesh.vertexBuffer.SetDebugName( "default mesh" );
         firstSubMesh.aabbMin = {-s, -s, -s};
-        firstSubMesh.aabbMax = {s, s, s};
+        firstSubMesh.aabbMax = { s,  s, s };
         return LoadResult::FileNotFound;
     }
     

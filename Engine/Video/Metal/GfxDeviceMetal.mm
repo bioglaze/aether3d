@@ -15,6 +15,8 @@
 #include "RenderTexture.hpp"
 #include "Texture2D.hpp"
 
+float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
+
 extern ae3d::Renderer renderer;
 
 id <MTLDevice> device;
@@ -47,21 +49,23 @@ enum SamplerIndexByAnisotropy : int
     Eight
 };
 
-int GetSamplerIndexByAnisotropy( int anisotropy )
+int GetSamplerIndexByAnisotropy( ae3d::Anisotropy anisotropy )
 {
-    if (anisotropy == 1)
+    const float floatAnisotropy = GetFloatAnisotropy( anisotropy );
+    
+    if (floatAnisotropy == 1)
     {
         return SamplerIndexByAnisotropy::One;
     }
-    if (anisotropy == 2)
+    if (floatAnisotropy == 2)
     {
         return SamplerIndexByAnisotropy::Two;
     }
-    if (anisotropy == 4)
+    if (floatAnisotropy == 4)
     {
         return SamplerIndexByAnisotropy::Four;
     }
-    if (anisotropy == 8)
+    if (floatAnisotropy == 8)
     {
         return SamplerIndexByAnisotropy::Eight;
     }
@@ -137,7 +141,7 @@ namespace GfxDeviceGlobal
         samplerStates[ 1 ] = samplers[ SamplerIndexByAnisotropy::One ].pointClamp;
     }
     
-    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, int anisotropy )
+    void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, ae3d::Anisotropy anisotropy )
     {
         if (textureUnit > 1)
         {
