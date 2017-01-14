@@ -1,3 +1,10 @@
+os:
+  - linux
+#  - osx
+
+sudo: required
+dist: trusty
+
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
