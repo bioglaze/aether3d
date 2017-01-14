@@ -196,7 +196,7 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
 void SceneWidget::TransformGizmo::Init( Shader* shader )
 {
     translateTex.Load( FileSystem::FileContents( AbsoluteFilePath("glider.png").c_str() ), TextureWrap::Repeat,
-                       TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+                       TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
     translateMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "cursor_translate.ae3d" ).c_str() ) );
 
     xAxisMaterial.SetShader( shader );
@@ -270,16 +270,16 @@ void SceneWidget::Init()
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
     lightTex.Load( FileSystem::FileContents( AbsoluteFilePath( "light.png" ).c_str() ), TextureWrap::Repeat,
-                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     cameraTex.Load( FileSystem::FileContents( AbsoluteFilePath( "camera.png" ).c_str() ), TextureWrap::Repeat,
-                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     audioTex.Load( FileSystem::FileContents( AbsoluteFilePath( "audio_source.png" ).c_str() ), TextureWrap::Repeat,
-                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     spriteTex.Load( FileSystem::FileContents( AbsoluteFilePath( "glider.png" ).c_str() ), TextureWrap::Repeat,
-                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, 1 );
+                    TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     cubeMesh.Load( FileSystem::FileContents( AbsoluteFilePath( "textured_cube.ae3d" ).c_str() ) );
 

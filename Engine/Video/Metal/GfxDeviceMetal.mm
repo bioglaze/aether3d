@@ -47,21 +47,21 @@ enum SamplerIndexByAnisotropy : int
     Eight
 };
 
-int GetSamplerIndexByAnisotropy( ae3d::Anisotropy anisotropy )
+int GetSamplerIndexByAnisotropy( int anisotropy )
 {
-    if (anisotropy == ae3d::Anisotropy::k1)
+    if (anisotropy == 1)
     {
         return SamplerIndexByAnisotropy::One;
     }
-    if (anisotropy == ae3d::Anisotropy::k2)
+    if (anisotropy == 2)
     {
         return SamplerIndexByAnisotropy::Two;
     }
-    if (anisotropy == ae3d::Anisotropy::k4)
+    if (anisotropy == 4)
     {
         return SamplerIndexByAnisotropy::Four;
     }
-    if (anisotropy == ae3d::Anisotropy::k8)
+    if (anisotropy == 8)
     {
         return SamplerIndexByAnisotropy::Eight;
     }
