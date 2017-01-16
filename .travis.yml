@@ -16,3 +16,9 @@ compiler:
 script:
   - cd Engine
   - make -f Makefile_OpenGL
+  - cd ../Tools/OBJ_Converter
+  - make
+  - make -f Makefile_mtl
+  - cd ../CombineFiles
+  - make
+

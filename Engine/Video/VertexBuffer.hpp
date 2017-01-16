@@ -115,7 +115,7 @@ namespace ae3d
         /// \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount );
 
-        /// Sets a graphics API debug name for the buffer, visible in debugging tools
+        /// Sets a graphics API debug name for the buffer, visible in debugging tools. Must be called after Generate().
         /// \param name Name
         void SetDebugName( const char* name );
 

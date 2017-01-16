@@ -2,6 +2,7 @@
 #define SYSTEM_H
 
 #include <string>
+#include <vector>
 
 #if RENDERER_METAL
 #import <QuartzCore/CAMetalLayer.h>
@@ -37,6 +38,7 @@
    <li>Scene serialization.</li>
    <li>Scene editor built using Qt and WYSIWYG rendering.</li>
    <li>XBox controller support.</li>
+   <li>Wireframe rendering.</li>
    </ul>
 
    \section Requirements
@@ -82,7 +84,6 @@
 
    <ul>
    <li>Metal: Shadow maps don't show.</li>
-   <li>Metal: Small textures don't load.</li>
    <li>Oculus: Mirror texture is broken if SDK initialization fails.</li>
    </ul>
  
@@ -126,6 +127,11 @@ namespace ae3d
         /// \param yScreenSize Y viewport size in pixels
         void Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize );
         
+        /// Draws lines. Currently only implemented in OpenGL. Should be called after Scene::Render().
+        /// \param lines Lines.
+        /// \param color Color in range 0-1.
+        void DrawLines( const std::vector< Vec3 >& lines, const Vec3& color );
+        
         /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();
 
@@ -165,6 +171,7 @@ namespace ae3d
         /// Reloads assets that have been changed on disk. Relatively slow operation, so avoid calling too often.
         void ReloadChangedAssets();
 
+        /// Tests internal functionality.
         void RunUnitTests();
 
         namespace Statistics

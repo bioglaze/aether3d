@@ -511,6 +511,23 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
     return GfxDeviceGlobal::psoCache[ psoHash ];
 }
 
+void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+    std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
+    
+    std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
+    
+    for (std::size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
+    {
+        vertices[ lineIndex ].position = lines[ lineIndex ];
+        vertices[ lineIndex ].color = Vec4( color, 1 );
+    }
+    
+    VertexBuffer lineBuffer;
+    lineBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    lineBuffer.SetDebugName( "line buffer" );
+}
+
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode )
 {
     if (!GfxDeviceGlobal::lightTiler.CullerUniformsCreated() && shader.GetMetalVertexShaderName() == "standard_vertex")

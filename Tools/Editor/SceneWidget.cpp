@@ -26,7 +26,8 @@ ae3d::Material* gCubeMaterial = nullptr;
 
 std::string AbsoluteFilePath( const std::string& relativePath )
 {
-    QDir dir = QDir::currentPath();
+    //QDir dir = QDir::currentPath();
+    QDir dir = qApp->applicationDirPath();
 #if __APPLE__
     // On OS X the executable is inside .app, so this gets a path outside it.
     dir.cdUp();

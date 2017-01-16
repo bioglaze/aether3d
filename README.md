@@ -1,4 +1,7 @@
 # Aether3D Game Engine
+
+[![Build Status](https://travis-ci.org/bioglaze/aether3d.svg?branch=master)](https://travis-ci.org/bioglaze/aether3d)
+
 This codebase will evolve into the next generation [Aether3D](http://twiren.kapsi.fi/aether3d.html). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
 Not expected to be a valuable tool before 1.0 unless for learning purposes.
@@ -52,11 +55,19 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes.
   - Open OpenGL renderer's Visual Studio solution and select target ***Oculus Release***
   - Build and run Samples/04_Misc3D target ***Oculus Release*** in VS2015.
 
-## macOS / GNU/Linux
+## macOS
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile (`make` builds GL version, `make vulkan` builds Vulkan version).
   - FBX converter tries to find FBX SDK 2017.0.1 in its default install location.
+
+## Linux
+
+  - Install dependencies:
+
+`sudo apt install libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev`
+
+  - Either run `make -f Makefile_OpenGL` or `make -f Makefile_Vulkan` in Engine.
 
 ## iOS
   - Build Aether3D_iOS in Engine. It creates a framework.

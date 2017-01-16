@@ -161,6 +161,14 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
                      GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid );
 }
 
+void ae3d::System::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+    renderer.builtinShaders.spriteRendererShader.Use();
+    //renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+
+    GfxDevice::DrawLines( lines, color );
+}
+
 void ae3d::System::ReloadChangedAssets()
 {
     fileWatcher.Poll();

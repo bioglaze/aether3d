@@ -248,6 +248,37 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     glDrawRangeElements( GL_TRIANGLES, startIndex, endIndex, (endIndex - startIndex) * 3, GL_UNSIGNED_SHORT, (const GLvoid*)(startIndex * sizeof( VertexBuffer::Face )) );
 }
 
+void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+    SetBlendMode( BlendMode::Off );
+    SetDepthFunc( DepthFunc::NoneWriteOff );
+    SetCullMode( CullMode::Off );
+    SetFillMode( FillMode::Solid );
+
+    std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
+    
+    std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
+    
+    for (std::size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
+    {
+        vertices[ lineIndex ].position = lines[ lineIndex ];
+        vertices[ lineIndex ].color = Vec4( color, 1 );
+    }
+
+    for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
+    {
+        faces[ faceIndex * 2 + 0 ].a = faceIndex;
+        faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
+    }
+    
+    VertexBuffer lineBuffer;
+    lineBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    lineBuffer.SetDebugName( "line buffer" );
+
+    int endIndex = int( lines.size() ) * 2;
+    glDrawRangeElements( GL_LINE_LOOP, 0, endIndex, endIndex, GL_UNSIGNED_SHORT, (const GLvoid*)(sizeof( VertexBuffer::Face ) ) );
+}
+
 void ae3d::GfxDevice::SetMultiSampling( bool enable )
 {
     if (enable)

@@ -2,11 +2,13 @@
 #define GFX_DEVICE_H
 
 #include <cstdint>
+#include <vector>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #import <QuartzCore/CAMetalLayer.h>
 #endif
+#include "Vec3.hpp"
 
 namespace ae3d
 {
@@ -80,6 +82,7 @@ namespace ae3d
 #endif
         void ClearScreen( unsigned clearFlags );
         void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode );
+        void DrawLines( const std::vector< Vec3 >& lines, const Vec3& color );
         void ErrorCheck( const char* info );
 
         void SetClearColor( float red, float green, float blue );

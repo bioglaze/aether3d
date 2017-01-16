@@ -26,7 +26,7 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
-//#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_SPOT
 
 using namespace ae3d;
                       
