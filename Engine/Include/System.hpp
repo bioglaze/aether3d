@@ -39,6 +39,7 @@
    <li>Scene editor built using Qt and WYSIWYG rendering.</li>
    <li>XBox controller support.</li>
    <li>Wireframe rendering.</li>
+   <li>Line rendering.</li>
    </ul>
 
    \section Requirements
@@ -106,6 +107,7 @@
 */
 namespace ae3d
 {
+    struct Matrix44;
     class Texture2D;
 
     /// High-level functions
@@ -117,6 +119,12 @@ namespace ae3d
         /// Inits the gamepad.
         void InitGamePad();
 
+        /// Creates a buffer for line drawing.
+        /// \param lines Lines.
+        /// \param color Color.
+        /// \return handle to the buffer. Used with DrawLines.
+        int CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color );
+        
         /// Draws a texture into the screen. Should be called after Scene::Render().
         /// \param texture Texture
         /// \param x X screen coordinate in pixels
@@ -128,9 +136,10 @@ namespace ae3d
         void Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize );
         
         /// Draws lines. Currently only implemented in OpenGL. Should be called after Scene::Render().
-        /// \param lines Lines.
-        /// \param color Color in range 0-1.
-        void DrawLines( const std::vector< Vec3 >& lines, const Vec3& color );
+        /// \param handle Handle, created with CreateLineBuffer.
+        /// \param view Camera's view matrix.
+        /// \param projection Camera's projection matrix.
+        void DrawLines( int handle, const Matrix44& view, const Matrix44& projection );
         
         /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();

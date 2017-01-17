@@ -511,7 +511,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
     return GfxDeviceGlobal::psoCache[ psoHash ];
 }
 
-void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
 {
     std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
     
@@ -523,9 +523,23 @@ void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& c
         vertices[ lineIndex ].color = Vec4( color, 1 );
     }
     
+    for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
+    {
+        faces[ faceIndex * 2 + 0 ].a = faceIndex;
+        faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
+    }
+    
     VertexBuffer lineBuffer;
     lineBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
     lineBuffer.SetDebugName( "line buffer" );
+    
+    return 0;
+}
+
+void ae3d::GfxDevice::DrawLines( int handle )
+{
+    //int endIndex = int( lines.size() ) * 2;
+    //glDrawRangeElements( GL_LINE_LOOP, 0, endIndex, endIndex, GL_UNSIGNED_SHORT, (const GLvoid*)(sizeof( VertexBuffer::Face ) ) );
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode )

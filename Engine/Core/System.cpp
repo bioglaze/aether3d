@@ -161,12 +161,17 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
                      GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid );
 }
 
-void ae3d::System::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+int ae3d::System::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+    return GfxDevice::CreateLineBuffer( lines, color );
+}
+
+void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& projection )
 {
     renderer.builtinShaders.spriteRendererShader.Use();
-    //renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &projection.m[ 0 ] );
 
-    GfxDevice::DrawLines( lines, color );
+    GfxDevice::DrawLines( handle );
 }
 
 void ae3d::System::ReloadChangedAssets()

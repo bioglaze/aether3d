@@ -154,6 +154,16 @@ int main()
     //scene.Add( &rtCamera );
     //System::Print( "%s\n", scene.GetSerialized().c_str() );
 
+    Matrix44 lineView;
+    Matrix44 lineProjection;
+    lineProjection.MakeProjection( 0, width, height, 0, 0, 1 );
+    std::vector< Vec3 > lines( 4 );
+    lines[ 0 ] = Vec3( 10, 10, -0.5f );
+    lines[ 1 ] = Vec3( 50, 10, -0.5f );
+    lines[ 2 ] = Vec3( 50, 50, -0.5f );
+    lines[ 3 ] = Vec3( 10, 10, -0.5f );
+    const int lineHandle = System::CreateLineBuffer( lines, Vec3( 1, 0, 0 ) );
+    
     bool quit = false;
 
     while (Window::IsOpen() && !quit)
@@ -210,6 +220,8 @@ int main()
 
         scene.Render();
 
+        System::DrawLines( lineHandle, lineView, lineProjection );
+        
         Window::SwapBuffers();
     }
 

@@ -159,7 +159,7 @@ void TestMissingFiles()
     mesh.Load( FileSystem::FileContents( "notfound.ae3d" ) );
 
     Texture2D tex2d;
-    tex2d.Load( FileSystem::FileContents("notfound.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, 1 );
+    tex2d.Load( FileSystem::FileContents("notfound.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
     TextureCube texCube;
     texCube.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),

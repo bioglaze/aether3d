@@ -54,6 +54,7 @@ namespace ae3d
         };
 
         void Init( int width, int height );
+        int CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color );
 #if RENDERER_D3D12
         void ResetCommandList();
         void  CreateNewUniformBuffer();
@@ -82,7 +83,7 @@ namespace ae3d
 #endif
         void ClearScreen( unsigned clearFlags );
         void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode );
-        void DrawLines( const std::vector< Vec3 >& lines, const Vec3& color );
+        void DrawLines( int handle );
         void ErrorCheck( const char* info );
 
         void SetClearColor( float red, float green, float blue );

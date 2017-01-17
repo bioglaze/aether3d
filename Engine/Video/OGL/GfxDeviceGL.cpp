@@ -72,7 +72,8 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > programIds;
     std::vector< GLuint > rboIds;
     std::vector< GLuint > fboIds;
-
+    std::vector< ae3d::VertexBuffer > lineBuffers;
+    
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     GLuint systemFBO = 0;
@@ -188,6 +189,13 @@ void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
 
 void ae3d::GfxDevice::Init( int width, int height )
 {
+    if (width < 0 || height < 0)
+    {
+        System::Print( "Window's dimension is invalid." );
+        width = 640;
+        height = 480;
+    }
+    
     if (glxwInit() != 0)
     {
         System::Print( "Unable to initialize GLXW!" );
@@ -248,13 +256,13 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     glDrawRangeElements( GL_TRIANGLES, startIndex, endIndex, (endIndex - startIndex) * 3, GL_UNSIGNED_SHORT, (const GLvoid*)(startIndex * sizeof( VertexBuffer::Face )) );
 }
 
-void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
 {
-    SetBlendMode( BlendMode::Off );
-    SetDepthFunc( DepthFunc::NoneWriteOff );
-    SetCullMode( CullMode::Off );
-    SetFillMode( FillMode::Solid );
-
+    if (lines.empty())
+    {
+        return -1;
+    }
+    
     std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
     
     std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
@@ -264,18 +272,34 @@ void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& c
         vertices[ lineIndex ].position = lines[ lineIndex ];
         vertices[ lineIndex ].color = Vec4( color, 1 );
     }
-
+    
     for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
     {
         faces[ faceIndex * 2 + 0 ].a = faceIndex;
         faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
     }
     
-    VertexBuffer lineBuffer;
-    lineBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
-    lineBuffer.SetDebugName( "line buffer" );
+    GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
+    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
+    
+    return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
+}
 
-    int endIndex = int( lines.size() ) * 2;
+void ae3d::GfxDevice::DrawLines( int handle )
+{
+    if (handle < 0)
+    {
+        return;
+    }
+
+    SetBlendMode( BlendMode::Off );
+    SetDepthFunc( DepthFunc::NoneWriteOff );
+    SetCullMode( CullMode::Off );
+    SetFillMode( FillMode::Solid );
+
+    GfxDeviceGlobal::lineBuffers[ handle ].Bind();
+    int endIndex = GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount();
     glDrawRangeElements( GL_LINE_LOOP, 0, endIndex, endIndex, GL_UNSIGNED_SHORT, (const GLvoid*)(sizeof( VertexBuffer::Face ) ) );
 }
 
