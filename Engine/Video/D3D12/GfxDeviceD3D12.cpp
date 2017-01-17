@@ -782,6 +782,11 @@ void ae3d::GfxDevice::PopGroupMarker()
     GfxDeviceGlobal::graphicsCommandList->EndEvent();
 }
 
+void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+
+}
+
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode, FillMode fillMode )
 {

@@ -21,4 +21,11 @@ script:
   - make -f Makefile_mtl
   - cd ../CombineFiles
   - make
-
+  - cd../../Engine/Tests
+  - make
+  - cd ../../Samples/01_OpenWindow
+  - make
+  - cd ../03_Misc2D
+  - make
+  - cd ../04_Misc3D
+  - make

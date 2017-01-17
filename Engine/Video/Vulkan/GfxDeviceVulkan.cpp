@@ -1555,6 +1555,11 @@ void ae3d::GfxDevice::ClearScreen( unsigned /*clearFlags*/ )
 {
 }
 
+void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+
+}
+
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode, FillMode fillMode )
 {
