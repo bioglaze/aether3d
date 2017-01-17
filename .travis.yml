@@ -25,7 +25,6 @@ script:
   - make
   - ./01_Math
   - ./01_MathSSE
-  - ./02_Components
   - cd ../../Samples/01_OpenWindow
   - make
   - cd ../03_Misc2D
