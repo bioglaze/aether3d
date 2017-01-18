@@ -782,7 +782,12 @@ void ae3d::GfxDevice::PopGroupMarker()
     GfxDeviceGlobal::graphicsCommandList->EndEvent();
 }
 
-void ae3d::GfxDevice::DrawLines( const std::vector< Vec3 >& lines, const Vec3& color )
+int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+    return 0;
+}
+
+void ae3d::GfxDevice::DrawLines( int handle )
 {
 
 }

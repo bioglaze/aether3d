@@ -26,13 +26,14 @@ ae3d::Material* gCubeMaterial = nullptr;
 
 std::string AbsoluteFilePath( const std::string& relativePath )
 {
-    //QDir dir = QDir::currentPath();
-    QDir dir = qApp->applicationDirPath();
 #if __APPLE__
+    QDir dir = qApp->applicationDirPath();
     // On OS X the executable is inside .app, so this gets a path outside it.
     dir.cdUp();
     dir.cdUp();
     dir.cdUp();
+#else
+    QDir dir = QDir::currentPath();
 #endif
     return dir.absoluteFilePath( relativePath.c_str() ).toStdString();
 }
@@ -648,9 +649,20 @@ void SceneWidget::CenterSelected()
 
 void SceneWidget::SetSelectedObjectHighlight( bool enable )
 {
-    for (auto& go : selectedGameObjects)
+    for (std::size_t goIndex = 0; goIndex < gameObjects.size(); ++goIndex)
     {
-        MeshRendererComponent* meshRenderer = gameObjects[ go ]->GetComponent< MeshRendererComponent >();
+        MeshRendererComponent* meshRenderer = gameObjects[ goIndex ]->GetComponent< MeshRendererComponent >();
+
+        if (meshRenderer != nullptr)
+        {
+            meshRenderer->EnableWireframe( false );
+        }
+
+    }
+
+    for (auto& goIndex : selectedGameObjects)
+    {
+        MeshRendererComponent* meshRenderer = gameObjects[ goIndex ]->GetComponent< MeshRendererComponent >();
 
         if (meshRenderer != nullptr)
         {
