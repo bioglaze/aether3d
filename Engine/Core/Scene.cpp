@@ -354,6 +354,9 @@ void ae3d::Scene::Render()
     }
 
     //unsigned debugShadowFBO = 0;
+#if RENDERER_VULKAN
+    GfxDevice::BeginRenderPassAndCommandBuffer();
+#endif
 
     for (auto camera : cameras)
     {
@@ -521,7 +524,10 @@ void ae3d::Scene::Render()
         RenderWithCamera( camera, 0, "Primary Pass" );
 #endif
     }
-    
+#if RENDERER_VULKAN
+    GfxDevice::EndRenderPassAndCommandBuffer();
+#endif
+
     //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
 
     RenderDepthAndNormalsForAllCameras( cameras );
@@ -548,9 +554,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     GfxDevice::SetClearColor( color.x, color.y, color.z );
 #ifndef RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
-#endif
-#if RENDERER_VULKAN
-    GfxDevice::BeginRenderPassAndCommandBuffer();
 #endif
 #ifndef RENDERER_METAL
     GfxDevice::PushGroupMarker( debugGroupName );
@@ -709,9 +712,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 
 #if RENDERER_METAL
     GfxDevice::UnsetRenderTarget();
-#endif
-#if RENDERER_VULKAN
-    GfxDevice::EndRenderPassAndCommandBuffer();
 #endif
     GfxDevice::ErrorCheck( "Scene render after rendering" );
 }
