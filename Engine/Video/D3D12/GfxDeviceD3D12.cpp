@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include <cmath>
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
 #include "LightTiler.hpp"
@@ -25,6 +26,7 @@
 
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
+float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 
 namespace WindowGlobal
 {
@@ -61,15 +63,53 @@ namespace ae3d
     }
 }
 
+enum SamplerIndexByAnisotropy : int
+{
+    One = 0,
+    Two,
+    Four,
+    Eight
+};
+
+int GetSamplerIndexByAnisotropy( ae3d::Anisotropy anisotropy )
+{
+    const float floatAnisotropy = GetFloatAnisotropy( anisotropy );
+
+    if (floatAnisotropy == 1)
+    {
+        return SamplerIndexByAnisotropy::One;
+    }
+    if (floatAnisotropy == 2)
+    {
+        return SamplerIndexByAnisotropy::Two;
+    }
+    if (floatAnisotropy == 4)
+    {
+        return SamplerIndexByAnisotropy::Four;
+    }
+    if (floatAnisotropy == 8)
+    {
+        return SamplerIndexByAnisotropy::Eight;
+    }
+
+    return SamplerIndexByAnisotropy::One;
+}
+
 namespace GfxDeviceGlobal
 {
+    // Indexed by SamplerIndexByAnisotropy
     struct Samplers
     {
-        D3D12_CPU_DESCRIPTOR_HANDLE linearRepeat = {};
-        D3D12_CPU_DESCRIPTOR_HANDLE linearClamp = {};
-        D3D12_CPU_DESCRIPTOR_HANDLE pointRepeat = {};
-        D3D12_CPU_DESCRIPTOR_HANDLE pointClamp = {};
-    } samplers;
+        D3D12_CPU_DESCRIPTOR_HANDLE linearRepeatCPU = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE linearClampCPU = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE pointRepeatCPU = {};
+        D3D12_CPU_DESCRIPTOR_HANDLE pointClampCPU = {};
+
+        D3D12_GPU_DESCRIPTOR_HANDLE linearRepeatGPU = {};
+        D3D12_GPU_DESCRIPTOR_HANDLE linearClampGPU = {};
+        D3D12_GPU_DESCRIPTOR_HANDLE pointRepeatGPU = {};
+        D3D12_GPU_DESCRIPTOR_HANDLE pointClampGPU = {};
+    } samplers[ 4 ];
  
     const unsigned BufferCount = 2;
     int backBufferWidth = 640;
@@ -255,48 +295,59 @@ void CreateMSAA()
     GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::msaaDepth, nullptr, GfxDeviceGlobal::msaaDepthHandle );
 }
 
-void CreateSampler()
+void CreateSamplers()
 {
-    D3D12_SAMPLER_DESC descSampler = {};
-    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    descSampler.MinLOD = 0;
-    descSampler.MaxLOD = FLT_MAX;
-    descSampler.MipLODBias = 0;
-    descSampler.MaxAnisotropy = 0;
-    descSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-    //GfxDeviceGlobal::device->CreateSampler( &descSampler, DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart() );
-    D3D12_CPU_DESCRIPTOR_HANDLE handle = DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart();
-    
-    GfxDeviceGlobal::samplers.linearRepeat = handle;
-    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.linearRepeat );
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+    for (int samplerIndex = 0; samplerIndex < 4; ++samplerIndex)
+    {
+        D3D12_SAMPLER_DESC descSampler = {};
+        descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        descSampler.MinLOD = 0;
+        descSampler.MaxLOD = FLT_MAX;
+        descSampler.MipLODBias = 0;
+        descSampler.MaxAnisotropy = UINT( std::pow( 2, samplerIndex ) );
+        descSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+        
+        D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = DescriptorHeapManager::GetSamplerHeap()->GetCPUDescriptorHandleForHeapStart();
+        D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
 
-    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        GfxDeviceGlobal::samplers[ samplerIndex ].linearRepeatCPU = handleCPU;
+        GfxDeviceGlobal::samplers[ samplerIndex ].linearRepeatGPU = handleGPU;
+        GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers[ samplerIndex ].linearRepeatCPU );
+        handleCPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+        handleGPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
 
-    GfxDeviceGlobal::samplers.linearClamp = handle;
-    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.linearClamp );
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+        descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 
-    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-    GfxDeviceGlobal::samplers.pointRepeat = handle;
-    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.pointRepeat );
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+        GfxDeviceGlobal::samplers[ samplerIndex ].linearClampCPU = handleCPU;
+        GfxDeviceGlobal::samplers[ samplerIndex ].linearClampGPU = handleGPU;
+        GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers[ samplerIndex ].linearClampCPU );
+        handleCPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+        handleGPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
 
-    descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-    descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    GfxDeviceGlobal::samplers.pointClamp = handle;
-    GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers.pointClamp );
+        descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        GfxDeviceGlobal::samplers[ samplerIndex ].pointRepeatCPU = handleCPU;
+        GfxDeviceGlobal::samplers[ samplerIndex ].pointRepeatGPU = handleGPU;
+        GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers[ samplerIndex ].pointRepeatCPU );
+        handleCPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+        handleGPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+
+        descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        GfxDeviceGlobal::samplers[ samplerIndex ].pointClampCPU = handleCPU;
+        GfxDeviceGlobal::samplers[ samplerIndex ].pointClampGPU = handleGPU;
+        GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers[ samplerIndex ].pointClampCPU );
+    }
 }
 
 void CreateRootSignature()
@@ -526,30 +577,28 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter )
+D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Anisotropy anisotropy )
 {
-    D3D12_GPU_DESCRIPTOR_HANDLE outHandle = DescriptorHeapManager::GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
-
-    // NOTE: Pointer indexing must match creation order in CreateSampler()
+    int samplerIndex = GetSamplerIndexByAnisotropy( anisotropy );
 
     if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Linear)
     {
-        outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+        return GfxDeviceGlobal::samplers[ samplerIndex ].linearClampGPU;
     }
     if (wrap == ae3d::TextureWrap::Clamp && filter == ae3d::TextureFilter::Nearest)
     {
-        outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER ) * 3;
+        return GfxDeviceGlobal::samplers[ samplerIndex ].pointClampGPU;
     }
     if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Linear)
     {
-        //outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+        return GfxDeviceGlobal::samplers[ samplerIndex ].linearRepeatGPU;
     }
     if (wrap == ae3d::TextureWrap::Repeat && filter == ae3d::TextureFilter::Nearest)
     {
-        outHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER ) * 2;
+        return GfxDeviceGlobal::samplers[ samplerIndex ].pointRepeatGPU;
     }
 
-    return outHandle;
+    return GfxDeviceGlobal::samplers[ samplerIndex ].linearClampGPU;
 }
 
 void CreateDepthStencil()
@@ -740,7 +789,7 @@ void ae3d::CreateRenderer( int samples )
     CreateMSAA();
     CreateRootSignature();
     CreateDepthStencil();
-    CreateSampler();
+    CreateSamplers();
     CreateConstantBuffers();
 
     GfxDeviceGlobal::lightTiler.Init();
@@ -916,7 +965,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
-        GfxDeviceGlobal::texture0->GetFilter() );
+        GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
 
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
