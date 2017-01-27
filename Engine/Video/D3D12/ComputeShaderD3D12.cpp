@@ -9,6 +9,7 @@ namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
+    extern ID3D12RootSignature* rootSignatureTileCuller;
 }
 
 namespace Global
@@ -28,6 +29,10 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 {
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
 
+    GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
+    //GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
+    //GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
+    //GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::tileCullerPSO );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 }
 

@@ -26,7 +26,8 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
-#define TEST_SHADOWS_SPOT
+//#define TEST_SHADOWS_SPOT
+//#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
                       
@@ -70,6 +71,9 @@ int main()
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 0.1f, 200 );
 #else
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
+#endif
+#ifdef TEST_FORWARD_PLUS
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
 #endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
@@ -272,7 +276,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -332,6 +336,25 @@ int main()
     transCube1.AddComponent< TransformComponent >();
     transCube1.GetComponent< TransformComponent >()->SetLocalPosition( { 2, 0, -70 } );
     
+    Shader standardShader;
+    standardShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+        "standard_vertex", "standard_fragment",
+        ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+        ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+
+    Material standardMaterial;
+    standardMaterial.SetShader( &standardShader );
+    standardMaterial.SetTexture( "textureMap", &gliderTex );
+
+    GameObject standardCubeTopCenter;
+    standardCubeTopCenter.SetName( "standardCubeTopCenter" );
+    standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
+    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
+    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -14 ) );
+    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
+
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     //scene.Add( &camera2d );
@@ -343,6 +366,9 @@ int main()
 
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
+#endif
+#ifdef TEST_FORWARD_PLUS
+    scene.Add( &standardCubeTopCenter );
 #endif
     scene.Add( &cubePTN );
     scene.Add( &childCube );

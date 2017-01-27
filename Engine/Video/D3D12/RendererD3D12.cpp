@@ -1,8 +1,10 @@
 #include "Renderer.hpp"
 #include <string>
 #include "FileSystem.hpp"
+#include "ComputeShader.hpp"
 
 ae3d::Renderer renderer;
+void CreateComputePSO( ae3d::ComputeShader& shader );
 
 void ae3d::BuiltinShaders::Load()
 {
@@ -177,4 +179,5 @@ cbuffer Scene\
     momentsShader.Load( momentsSource, momentsSource );
 
     lightCullShader.Load( "", FileSystem::FileContents( "LightCuller.hlsl" ), FileSystem::FileContents( "" ) );
+    //CreateComputePSO( lightCullShader );
 }

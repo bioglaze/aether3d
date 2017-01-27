@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include "ComputeShader.hpp"
 #include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
 #include "LightTiler.hpp"
@@ -73,21 +74,21 @@ enum SamplerIndexByAnisotropy : int
 
 int GetSamplerIndexByAnisotropy( ae3d::Anisotropy anisotropy )
 {
-    const float floatAnisotropy = GetFloatAnisotropy( anisotropy );
+    const int intAnisotropy = static_cast< int >( GetFloatAnisotropy( anisotropy ) );
 
-    if (floatAnisotropy == 1)
+    if (intAnisotropy == 1)
     {
         return SamplerIndexByAnisotropy::One;
     }
-    if (floatAnisotropy == 2)
+    if (intAnisotropy == 2)
     {
         return SamplerIndexByAnisotropy::Two;
     }
-    if (floatAnisotropy == 4)
+    if (intAnisotropy == 4)
     {
         return SamplerIndexByAnisotropy::Four;
     }
-    if (floatAnisotropy == 8)
+    if (intAnisotropy == 8)
     {
         return SamplerIndexByAnisotropy::Eight;
     }
@@ -128,7 +129,8 @@ namespace GfxDeviceGlobal
 
     ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
-    ID3D12RootSignature* rootSignature = nullptr;
+    ID3D12RootSignature* rootSignatureGraphics = nullptr;
+    ID3D12RootSignature* rootSignatureTileCuller = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
@@ -377,9 +379,36 @@ void CreateRootSignature()
         HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
         AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
 
-        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignature ) );
+        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignatureGraphics ) );
         AE3D_CHECK_D3D( hr, "Failed to create root signature" );
-        GfxDeviceGlobal::rootSignature->SetName( L"Root Signature" );
+        GfxDeviceGlobal::rootSignatureGraphics->SetName( L"Graphics Root Signature" );
+    }
+
+    // Tile Culler
+    {
+        CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
+        descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
+        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0 );
+
+        CD3DX12_ROOT_PARAMETER rootParam[ 1 ];
+        rootParam[ 0 ].InitAsDescriptorTable( 3, descRange1 );
+
+        ID3DBlob* pOutBlob = nullptr;
+        ID3DBlob* pErrorBlob = nullptr;
+        D3D12_ROOT_SIGNATURE_DESC descRootSignature;
+        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        descRootSignature.NumParameters = 1;
+        descRootSignature.NumStaticSamplers = 0;
+        descRootSignature.pParameters = rootParam;
+        descRootSignature.pStaticSamplers = nullptr;
+
+        HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
+        AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
+
+        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignatureTileCuller ) );
+        AE3D_CHECK_D3D( hr, "Failed to create root signature" );
+        GfxDeviceGlobal::rootSignatureTileCuller->SetName( L"Tile Culler Root Signature" );
     }
 }
 
@@ -398,6 +427,18 @@ unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader
     hashString += std::to_string( ((unsigned)sampleCount) );
 
     return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
+}
+
+void CreateComputePSO( ae3d::ComputeShader& shader )
+{
+    D3D12_COMPUTE_PIPELINE_STATE_DESC descPso = {};
+    descPso.CS = { reinterpret_cast<BYTE*>( shader.blobShader->GetBufferPointer() ), shader.blobShader->GetBufferSize() };
+    descPso.pRootSignature = GfxDeviceGlobal::rootSignatureTileCuller;
+
+    ID3D12PipelineState* pso;
+    HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &pso ) );
+    AE3D_CHECK_D3D( hr, "Failed to create compute PSO" );
+    pso->SetName( L"PSO Tile Culler" );
 }
 
 void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
@@ -532,7 +573,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     D3D12_GRAPHICS_PIPELINE_STATE_DESC descPso = {};
     descPso.InputLayout = { layout, numElements };
     descPso.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
-    descPso.pRootSignature = GfxDeviceGlobal::rootSignature;
+    descPso.pRootSignature = GfxDeviceGlobal::rootSignatureGraphics;
     descPso.VS = { reinterpret_cast<BYTE*>(shader.blobShaderVertex->GetBufferPointer()), shader.blobShaderVertex->GetBufferSize() };
     descPso.PS = { reinterpret_cast<BYTE*>(shader.blobShaderPixel->GetBufferPointer()), shader.blobShaderPixel->GetBufferSize() };
     descPso.RasterizerState = descRaster;
@@ -571,7 +612,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     ID3D12PipelineState* pso;
     HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &pso ) );
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
-    pso->SetName( L"PSO" );
+    pso->SetName( L"PSO Graphics" );
 
     const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
@@ -969,7 +1010,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignature );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignatureGraphics );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
@@ -1032,7 +1073,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::renderTargets[ 1 ] );
     GfxDeviceGlobal::swapChain->SetFullscreenState( FALSE, nullptr );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignature );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignatureGraphics );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignatureTileCuller );
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
