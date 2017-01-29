@@ -113,10 +113,12 @@ private:
         ae3d::Texture2D translateTex;
     };
 
+    void CreateSphereLines();
     ae3d::Vec3 SelectionAveragePosition();
     void SelectSpriteUnderCursor();
     void DrawLightSprites();
     void DrawAudioSprites();
+    void DrawVisualizationLines();
     void SetSelectedObjectHighlight( bool enable );
 
     TransformGizmo transformGizmo;
@@ -145,6 +147,7 @@ private:
     std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
     ae3d::Texture2D skyboxTextures[ 6 ];
     std::list< ae3d::GameObject* > selectedObjectsClicked;
+    int sphereLineHandle = -1;
 };
 
 #endif

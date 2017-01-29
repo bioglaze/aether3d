@@ -168,8 +168,11 @@ int ae3d::System::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3
 
 void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& projection )
 {
+    Matrix44 viewProjection;
+    Matrix44::Multiply( view, projection, viewProjection );
     renderer.builtinShaders.spriteRendererShader.Use();
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &projection.m[ 0 ] );
+    renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", Texture2D::GetDefaultTexture(), 0 );
+    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &viewProjection.m[ 0 ] );
 
     GfxDevice::DrawLines( handle );
 }

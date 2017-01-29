@@ -135,7 +135,7 @@ namespace ae3d
         /// \param yScreenSize Y viewport size in pixels
         void Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize );
         
-        /// Draws lines. Currently only implemented in OpenGL. Should be called after Scene::Render().
+        /// Draws lines using a line loop. Currently only implemented in OpenGL. Should be called after Scene::Render().
         /// \param handle Handle, created with CreateLineBuffer.
         /// \param view Camera's view matrix.
         /// \param projection Camera's projection matrix.

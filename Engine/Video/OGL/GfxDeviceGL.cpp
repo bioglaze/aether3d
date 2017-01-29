@@ -273,6 +273,7 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
         vertices[ lineIndex ].color = Vec4( color, 1 );
     }
     
+    // Not used, but needs to be set to something.
     for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
     {
         faces[ faceIndex * 2 + 0 ].a = faceIndex;
@@ -299,8 +300,8 @@ void ae3d::GfxDevice::DrawLines( int handle )
     SetFillMode( FillMode::Solid );
 
     GfxDeviceGlobal::lineBuffers[ handle ].Bind();
-    int endIndex = GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount();
-    glDrawRangeElements( GL_LINE_LOOP, 0, endIndex, endIndex, GL_UNSIGNED_SHORT, (const GLvoid*)(sizeof( VertexBuffer::Face ) ) );
+    const int endIndex = GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount();
+    glDrawArrays( GL_LINE_LOOP, 0, endIndex );
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool enable )

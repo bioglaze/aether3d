@@ -28,7 +28,7 @@ std::string AbsoluteFilePath( const std::string& relativePath )
 {
 #if __APPLE__
     QDir dir = qApp->applicationDirPath();
-    // On OS X the executable is inside .app, so this gets a path outside it.
+    // On macOS the executable is inside .app, so this gets a path outside it.
     dir.cdUp();
     dir.cdUp();
     dir.cdUp();
@@ -350,7 +350,39 @@ void SceneWidget::Init()
     //new QShortcut(QKeySequence("Home"), this, SLOT(resetView()));
     //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
 
+    CreateSphereLines();
     emit GameObjectsAddedOrDeleted();
+}
+
+void SceneWidget::CreateSphereLines()
+{
+    std::vector< Vec3 > lines;
+
+    const int angleStep = 30;
+
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f );
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f );
+
+        lines.push_back( Vec3( x, y, 0 ) );
+    }
+
+    /*for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float z = std::cos( angleDeg * 3.14159f / 180.0f );
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f );
+
+        lines.push_back( Vec3( y, 0, z ) );
+    }*/
+
+    // Closes the loop.
+    const float x = std::cos( 0 * 3.14159f / 180.0f );
+    const float y = std::sin( 0 * 3.14159f / 180.0f );
+
+    lines.push_back( Vec3( x, y, 0 ) );
+
+    sphereLineHandle = System::CreateLineBuffer( lines, Vec3( 1, 1, 1 ) );
 }
 
 void SceneWidget::SelectSpriteUnderCursor()
@@ -403,6 +435,28 @@ void SceneWidget::SelectSpriteUnderCursor()
             }
         }
     }
+}
+
+void SceneWidget::DrawVisualizationLines()
+{
+    if (selectedGameObjects.empty())
+    {
+        return;
+    }
+
+    PointLightComponent* pointLight = gameObjects[ selectedGameObjects.front() ]->GetComponent< PointLightComponent >();
+
+    if (!pointLight)
+    {
+        return;
+    }
+
+    Matrix44 view = camera.GetComponent< CameraComponent >()->GetView();
+    Matrix44 scale;
+    scale.Scale( pointLight->GetRadius(), pointLight->GetRadius(), pointLight->GetRadius() );
+    Matrix44::Multiply( view, scale, view );
+    System::DrawLines( sphereLineHandle, view,
+                       camera.GetComponent< CameraComponent >()->GetProjection() );
 }
 
 void SceneWidget::DrawLightSprites()
@@ -556,6 +610,7 @@ void SceneWidget::paintGL()
     scene.Render();
     DrawLightSprites();
     DrawAudioSprites();
+    DrawVisualizationLines();
 }
 
 void SceneWidget::resizeGL( int width, int height )
@@ -571,6 +626,7 @@ void SceneWidget::keyPressEvent( QKeyEvent* aEvent )
 
     if (aEvent->key() == Qt::Key_Escape)
     {
+        SetSelectedObjectHighlight( false );
         selectedGameObjects.clear();
         emit GameObjectsAddedOrDeleted();
     }
@@ -990,6 +1046,7 @@ ae3d::GameObject* SceneWidget::CreateGameObject()
         }
     }
 
+    SetSelectedObjectHighlight( false );
     selectedGameObjects.clear();
     selectedGameObjects.push_back( (int)gameObjects.size() - 1 );
     return gameObjects.back().get();
