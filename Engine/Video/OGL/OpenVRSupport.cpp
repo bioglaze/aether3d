@@ -72,6 +72,10 @@ namespace Global
     Matrix44 devicePose[ vr::k_unMaxTrackedDeviceCount ];
     Shader lensDistort;
     Vec3 vrEyePosition; // Used in Scene.cpp for frustum culling
+    Vec3 leftControllerPosition;
+    Vec3 rightControllerPosition;
+    int leftHandIndex = -1;
+    int rightHandIndex = -1;
 }
 
 float GetVRFov()
@@ -366,6 +370,16 @@ void CompileShaders()
     Global::lensDistort.Load( lensVertexSource, lensFragmentSource );
 }
 
+Vec3 ae3d::VR::GetRightHandPosition()
+{
+    return Global::rightControllerPosition;
+}
+
+Vec3 ae3d::VR::GetLeftHandPosition()
+{
+    return Global::leftControllerPosition;
+}
+
 void ae3d::VR::Init()
 {
     vr::EVRInitError eError = vr::VRInitError_None;
@@ -447,12 +461,37 @@ void ae3d::VR::SubmitFrame()
         return;
     }
 
+    for (vr::TrackedDeviceIndex_t controllerIndex = 0; controllerIndex < vr::k_unMaxTrackedDeviceCount; ++controllerIndex)
+    {
+        vr::VRControllerState_t state;
+
+        // button 2 is the one above the "trackpad"
+        if (Global::hmd->GetControllerState( controllerIndex, &state, sizeof( state ) ))
+        {
+            //System::Print( "button state for controller %d: %ld\n", controllerIndex, state.ulButtonPressed );
+            //m_rbShowTrackedDevice[ unDevice ] = state.ulButtonPressed == 0;
+        }
+    }
+
     RenderDistortion();
 
     vr::Texture_t leftEyeTexture = { (void*)Global::leftEyeDesc.resolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-    vr::VRCompositor()->Submit( vr::Eye_Left, &leftEyeTexture );
+    vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &leftEyeTexture );
+
+    if (submitResult != vr::VRCompositorError_None)
+    {
+        System::Print( "VR submit for left eye returned error %d\n", submitResult );
+    }
+
     vr::Texture_t rightEyeTexture = { (void*)Global::rightEyeDesc.resolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-    vr::VRCompositor()->Submit( vr::Eye_Right, &rightEyeTexture );
+    
+    submitResult = vr::VRCompositor()->Submit( vr::Eye_Right, &rightEyeTexture );
+    
+    if (submitResult != vr::VRCompositorError_None)
+    {
+        System::Print( "VR submit for right eye returned error %d\n", submitResult );
+    }
+
     vr::VRCompositor()->PostPresentHandoff();
 }
 
@@ -513,33 +552,62 @@ void ae3d::VR::CalcEyePose()
     Global::validPoseCount = 0;
     Global::poseClasses = "";
 
-    for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
+    for (int deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
     {
-        if (Global::trackedDevicePose[ nDevice ].bPoseIsValid)
+        if (Global::trackedDevicePose[ deviceIndex ].bPoseIsValid)
         {
             ++Global::validPoseCount;
-            ConvertSteamVRMatrixToMatrix4( Global::trackedDevicePose[ nDevice ].mDeviceToAbsoluteTracking, Global::devicePose[ nDevice ] );
-            Global::vrEyePosition = Vec3( Global::devicePose[ nDevice ].m[ 12 ], Global::devicePose[ nDevice ].m[ 13 ], Global::devicePose[ nDevice ].m[ 14 ] );
+            ConvertSteamVRMatrixToMatrix4( Global::trackedDevicePose[ deviceIndex ].mDeviceToAbsoluteTracking, Global::devicePose[ deviceIndex ] );
             
-            if (Global::devClassChar[ nDevice ] == 0)
+            if (Global::devClassChar[ deviceIndex ] == 0)
             {
-                switch (Global::hmd->GetTrackedDeviceClass( nDevice ))
+                switch (Global::hmd->GetTrackedDeviceClass( deviceIndex ))
                 {
-                case vr::TrackedDeviceClass_Controller:        Global::devClassChar[ nDevice ] = 'C'; break;
-                case vr::TrackedDeviceClass_HMD:               Global::devClassChar[ nDevice ] = 'H'; break;
-                case vr::TrackedDeviceClass_Invalid:           Global::devClassChar[ nDevice ] = 'I'; break;
-                case vr::TrackedDeviceClass_GenericTracker:    Global::devClassChar[ nDevice ] = 'O'; break;
-                case vr::TrackedDeviceClass_TrackingReference: Global::devClassChar[ nDevice ] = 'T'; break;
-                default:                                       Global::devClassChar[ nDevice ] = '?'; break;
+                case vr::TrackedDeviceClass_Controller:        Global::devClassChar[ deviceIndex ] = 'C'; break;
+                case vr::TrackedDeviceClass_HMD:               Global::devClassChar[ deviceIndex ] = 'H'; break;
+                case vr::TrackedDeviceClass_Invalid:           Global::devClassChar[ deviceIndex ] = 'I'; break;
+                case vr::TrackedDeviceClass_GenericTracker:    Global::devClassChar[ deviceIndex ] = 'O'; break;
+                case vr::TrackedDeviceClass_TrackingReference: Global::devClassChar[ deviceIndex ] = 'T'; break;
+                default:                                       Global::devClassChar[ deviceIndex ] = '?'; break;
                 }
             }
 
-            Global::poseClasses += Global::devClassChar[ nDevice ];
+            Global::poseClasses += Global::devClassChar[ deviceIndex ];
         }
+    }
+
+    for (int deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
+    {
+        if (Global::devClassChar[ deviceIndex ] == 'C' && Global::leftHandIndex == -1)
+        {
+            Global::leftHandIndex = deviceIndex;
+        }
+        else if (Global::devClassChar[ deviceIndex ] == 'C' && Global::rightHandIndex == -1)
+        {
+            Global::rightHandIndex = deviceIndex;
+        }
+    }
+
+    if (Global::rightHandIndex != -1 && Global::trackedDevicePose[ Global::rightHandIndex ].bPoseIsValid)
+    {
+        Global::rightControllerPosition = Vec3( Global::devicePose[ Global::rightHandIndex ].m[ 12 ],
+                                                Global::devicePose[ Global::rightHandIndex ].m[ 13 ],
+                                                Global::devicePose[ Global::rightHandIndex ].m[ 14 ] );
+        //System::Print( "right hand position: %f %f %f\n", Global::rightControllerPosition.x, Global::rightControllerPosition.y, Global::rightControllerPosition.z );
+    }
+
+    if (Global::leftHandIndex != -1 && Global::trackedDevicePose[ Global::leftHandIndex ].bPoseIsValid)
+    {
+        Global::leftControllerPosition = Vec3( Global::devicePose[ Global::leftHandIndex ].m[ 12 ],
+                                               Global::devicePose[ Global::leftHandIndex ].m[ 13 ],
+                                               Global::devicePose[ Global::leftHandIndex ].m[ 14 ] );
     }
 
     if (Global::trackedDevicePose[ vr::k_unTrackedDeviceIndex_Hmd ].bPoseIsValid)
     {
+        Global::vrEyePosition = Vec3( Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 12 ],
+                                      Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 13 ],
+                                      Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 14 ] );
         Matrix44::Invert( Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ], Global::mat4HMDPose );
     }
 }

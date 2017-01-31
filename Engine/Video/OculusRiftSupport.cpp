@@ -185,6 +185,16 @@ float GetVRFov()
     return fovDegrees;
 }
 
+Vec3 ae3d::VR::GetRightHandPosition()
+{
+    return Vec3( 0, 0, 0 );
+}
+
+Vec3 ae3d::VR::GetLeftHandPosition()
+{
+    return Vec3( 0, 0, 0 );
+}
+
 void ae3d::VR::Init()
 {
     OVR::System::Init();

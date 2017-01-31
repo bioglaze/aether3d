@@ -67,17 +67,12 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 0.1f, 200 );
-#else
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 200 );
-#endif
 #ifdef TEST_FORWARD_PLUS
     camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
 #endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
-    //camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
     
@@ -244,9 +239,9 @@ int main()
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
 #ifdef TEST_SHADOWS_POINT
-    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( false, 1024 );
-#else
     pointLight.GetComponent<PointLightComponent>()->SetCastShadow( true, 1024 );
+#else
+    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( false, 1024 );
 #endif
     pointLight.GetComponent<PointLightComponent>()->SetRadius( 100 );
     pointLight.AddComponent<TransformComponent>();
@@ -336,8 +331,9 @@ int main()
     transCube1.AddComponent< TransformComponent >();
     transCube1.GetComponent< TransformComponent >()->SetLocalPosition( { 2, 0, -70 } );
     
+#ifdef TEST_FORWARD_PLUS
     Shader standardShader;
-    standardShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+    standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
         "standard_vertex", "standard_fragment",
         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
@@ -354,6 +350,7 @@ int main()
     standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -14 ) );
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
+#endif
 
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
@@ -375,11 +372,11 @@ int main()
     scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
     
+    //scene.Add( &pointLight );
     //scene.Add( &dirLight );
 #ifdef TEST_SHADOWS_SPOT
     scene.Add( &spotLight );
 #endif
-    //scene.Add( &pointLight );
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
@@ -454,7 +451,7 @@ int main()
             VR::CalcCameraForEye( camera, yaw, eye );
             scene.Render();
             VR::UnsetEye( eye );
-        }   
+        }
 #else
         scene.Render();
         //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
@@ -622,8 +619,8 @@ int main()
         stats += std::string( "\nRT binds:" ) + std::to_string( System::Statistics::GetRenderTargetBindCount() );
         stats += std::string( "\nTexture binds:" ) + std::to_string( System::Statistics::GetTextureBindCount() );
         stats += std::string( "\nShader binds:" ) + std::to_string( System::Statistics::GetShaderBindCount() );
-		statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
-		statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
+        statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
 
 #if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
         VR::SubmitFrame();

@@ -1,6 +1,8 @@
 #ifndef VR_H
 #define VR_H
 
+#include "Vec3.hpp"
+
 namespace ae3d
 {
     class GameObject;
@@ -10,8 +12,14 @@ namespace ae3d
         /// Inits the device. Must be called as early as possible.
         void Init();
 
-		/// Releases resources.
-		void Deinit();
+        /// Releases resources.
+        void Deinit();
+
+        /// \return Left hand position
+        Vec3 GetLeftHandPosition();
+
+        /// \return Right hand position
+        Vec3 GetRightHandPosition();
 
         /// \param outWidth Returns optimal width for window.
         /// \param outHeight Returns optimal height for window.
