@@ -20,6 +20,15 @@
 
 #define MULTISAMPLE_COUNT 1
 
+struct MyTouch
+{
+    UITouch* uiTouch;
+    int x, y;
+};
+
+struct MyTouch gTouches[ 8 ];
+int gTouchCount;
+
 @implementation GameViewController
 {
     MTKView* _view;
@@ -41,12 +50,17 @@
     ae3d::Shader shader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
+    int touchBeginX;
+    int touchBeginY;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
+    touchBeginX = 0;
+    touchBeginY = 0;
+
     device = MTLCreateSystemDefaultDevice();
     assert( device );
     
@@ -79,7 +93,6 @@
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.SetName( "camera3d" );
-    camera3d.SetLayer( 1 );
     scene.Add( &camera3d );
     
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
@@ -103,7 +116,7 @@
     
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
-    cubeMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
+    cubeMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
     
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );
     
@@ -197,6 +210,79 @@
     @autoreleasepool {
         [self _render];
     }
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    for (UITouch* touch in touches)
+    {
+        const CGPoint touchLocation = [touch locationInView:touch.view];
+        
+        gTouches[ gTouchCount ].uiTouch = touch;
+        gTouches[ gTouchCount ].x = touchLocation.x;
+        gTouches[ gTouchCount ].y = touchLocation.y;
+        
+        touchBeginX = touchLocation.x;
+        touchBeginY = touchLocation.y;
+        
+        ++gTouchCount;
+    }
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    // Updates input object's touch locations.
+    for (UITouch* touch in touches)
+    {
+        // Just testing camera movement
+        {
+            const CGPoint touchLocation = [touch locationInView:touch.view];
+
+            float deltaX = touchLocation.x - touchBeginX;
+            float deltaY = touchLocation.y - touchBeginY;
+            
+            camera3d.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 0, 1, 0 ), deltaX / 40 );
+            camera3d.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 1, 0, 0 ), deltaY / 40 );
+        }
+        
+        // Finds the correct touch and updates its location.
+        for (int t = 0; t < gTouchCount; ++t)
+        {
+            if (gTouches[ t ].uiTouch == touch)
+            {
+                const CGPoint touchLocation = [touch locationInView:touch.view];
+                
+                gTouches[ t ].x = touchLocation.x;
+                gTouches[ t ].y = touchLocation.y;
+            }
+        }
+    }
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    for (UITouch* touch in touches)
+    {
+        for (int t = 0; t < gTouchCount; ++t)
+        {
+            if (touch == gTouches[ t ].uiTouch)
+            {
+                for (int j = t; j < gTouchCount - 1; ++j)
+                {
+                    gTouches[ j ].x = gTouches[ j + 1 ].x;
+                    gTouches[ j ].y = gTouches[ j + 1 ].y;
+                    gTouches[ j ].uiTouch = gTouches [ j + 1 ].uiTouch;
+                }
+                
+                --gTouchCount;
+            }
+        }
+    }
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event 
+{
+    gTouchCount = 0;
 }
 
 @end

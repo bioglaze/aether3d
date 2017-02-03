@@ -344,8 +344,8 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
                                                                                              height:height
                                                                                           mipmapped:(mipmaps == Mipmaps::Generate ? YES : NO)];
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-        metalTexture.label = @"Texture 2D PVR2";
-
+        metalTexture.label = [NSString stringWithFormat:@"%s", path];
+        
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         
         NSData* data = [imageData objectAtIndex:0];
@@ -465,8 +465,8 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
                                                                                          height:height
                                                                                       mipmapped:(mipmaps == Mipmaps::Generate ? YES : NO)];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-    metalTexture.label = @"Texture 2D PVR3";
-
+    metalTexture.label = [NSString stringWithFormat:@"%s", path];
+    
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     
     NSData* data = [levelDatas objectAtIndex:0];

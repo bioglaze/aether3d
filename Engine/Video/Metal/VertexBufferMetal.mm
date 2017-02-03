@@ -20,7 +20,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                                                  length:sizeof( VertexPTC ) * vertexCount
                                                 options:MTLResourceOptionCPUCacheModeDefault];
-        vertexBuffer.label = @"Vertex buffer";
+        vertexBuffer.label = @"Vertex buffer PTC";
 
         std::vector< float > positions( vertexCount * 3 );
         
@@ -105,7 +105,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                            length:sizeof( VertexPTN ) * vertexCount
                           options:MTLResourceOptionCPUCacheModeDefault];
-        vertexBuffer.label = @"Vertex buffer";
+        vertexBuffer.label = @"Vertex buffer PTN";
 
         std::vector< float > positions( vertexCount * 3 );
         
@@ -189,7 +189,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                            length:sizeof( VertexPTNTC ) * vertexCount
                           options:MTLResourceOptionCPUCacheModeDefault];
-        vertexBuffer.label = @"Vertex buffer";
+        vertexBuffer.label = @"Vertex buffer PTNTC";
 
         std::vector< float > positions( vertexCount * 3 );
         

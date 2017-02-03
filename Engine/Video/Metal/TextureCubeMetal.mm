@@ -44,7 +44,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                                                                                           size:width
                                                                                         mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-    metalTexture.label = @"Cube Map";
+    metalTexture.label = [NSString stringWithFormat:@"%s", posX.path.c_str()];
     
     const NSUInteger bytesPerPixel = 4;
     NSUInteger bytesPerRow = bytesPerPixel * width;

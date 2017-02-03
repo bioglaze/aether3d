@@ -77,5 +77,6 @@ fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
     float depth = in.projCoord.z / in.projCoord.w;
     float shadow = max( 0.2, VSM( _ShadowMap, in.projCoord, depth ) );
     
+    //return float4(1, 0, 0, 1);
     return sampledColor * float4( shadow, shadow, shadow, 1 );
 }
