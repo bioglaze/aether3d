@@ -114,6 +114,7 @@ private:
     };
 
     void CreateSphereLines();
+    void CreateConeLines();
     ae3d::Vec3 SelectionAveragePosition();
     void SelectSpriteUnderCursor();
     void DrawLightSprites();
@@ -148,6 +149,7 @@ private:
     ae3d::Texture2D skyboxTextures[ 6 ];
     std::list< ae3d::GameObject* > selectedObjectsClicked;
     int sphereLineHandle = -1;
+    int coneLineHandle = -1;
 };
 
 #endif

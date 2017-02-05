@@ -351,6 +351,7 @@ void SceneWidget::Init()
     //new QShortcut(QKeySequence("Ctrl+Tab"), this, SLOT(togglePreview()));
 
     CreateSphereLines();
+    CreateConeLines();
     emit GameObjectsAddedOrDeleted();
 }
 
@@ -358,31 +359,90 @@ void SceneWidget::CreateSphereLines()
 {
     std::vector< Vec3 > lines;
 
-    const int angleStep = 30;
+    const int angleStep = 10;
 
     for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
         const float x = std::cos( angleDeg * 3.14159f / 180.0f );
         const float y = std::sin( angleDeg * 3.14159f / 180.0f );
 
+        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f );
+
         lines.push_back( Vec3( x, y, 0 ) );
+        lines.push_back( Vec3( x2, y2, 0 ) );
     }
 
-    /*for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
-        const float z = std::cos( angleDeg * 3.14159f / 180.0f );
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f );
         const float y = std::sin( angleDeg * 3.14159f / 180.0f );
 
-        lines.push_back( Vec3( y, 0, z ) );
-    }*/
+        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f );
 
-    // Closes the loop.
-    const float x = std::cos( 0 * 3.14159f / 180.0f );
-    const float y = std::sin( 0 * 3.14159f / 180.0f );
+        lines.push_back( Vec3( x, 0, y ) );
+        lines.push_back( Vec3( x2, 0, y2 ) );
+    }
 
-    lines.push_back( Vec3( x, y, 0 ) );
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f );
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f );
+
+        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f );
+
+        lines.push_back( Vec3( 0, y, x ) );
+        lines.push_back( Vec3( 0, y2, x2 ) );
+    }
 
     sphereLineHandle = System::CreateLineBuffer( lines, Vec3( 1, 1, 1 ) );
+}
+
+void SceneWidget::CreateConeLines()
+{
+    std::vector< Vec3 > lines;
+
+    const int angleStep = 10;
+
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f );
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f );
+
+        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f );
+
+        lines.push_back( Vec3( x, y, 0 ) );
+        lines.push_back( Vec3( x2, y2, 0 ) );
+    }
+
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f ) * 2;
+
+        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+
+        lines.push_back( Vec3( x, y, 1 ) );
+        lines.push_back( Vec3( x2, y2, 1 ) );
+    }
+
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f ) * 2;
+
+        const float x2 = std::cos( (angleDeg) * 3.14159f / 180.0f );
+        const float y2 = std::sin( (angleDeg) * 3.14159f / 180.0f );
+
+        lines.push_back( Vec3( x, y, 1 ) );
+        lines.push_back( Vec3( x2, y2, 0 ) );
+    }
+
+    coneLineHandle = System::CreateLineBuffer( lines, Vec3( 1, 1, 1 ) );
 }
 
 void SceneWidget::SelectSpriteUnderCursor()
@@ -446,17 +506,41 @@ void SceneWidget::DrawVisualizationLines()
 
     PointLightComponent* pointLight = gameObjects[ selectedGameObjects.front() ]->GetComponent< PointLightComponent >();
 
-    if (!pointLight)
+    if (pointLight)
     {
-        return;
+        TransformComponent* pointLightTransform = gameObjects[ selectedGameObjects.front() ]->GetComponent< TransformComponent >();
+
+        Matrix44 view = camera.GetComponent< CameraComponent >()->GetView();
+        Matrix44 scale;
+        scale.MakeIdentity();
+
+        scale.Scale( pointLight->GetRadius(), pointLight->GetRadius(), pointLight->GetRadius() );
+        scale.Translate( pointLightTransform->GetLocalPosition() );
+
+        Matrix44::Multiply( scale, view, view );
+        System::DrawLines( sphereLineHandle, view,
+                           camera.GetComponent< CameraComponent >()->GetProjection() );
     }
 
-    Matrix44 view = camera.GetComponent< CameraComponent >()->GetView();
-    Matrix44 scale;
-    scale.Scale( pointLight->GetRadius(), pointLight->GetRadius(), pointLight->GetRadius() );
-    Matrix44::Multiply( view, scale, view );
-    System::DrawLines( sphereLineHandle, view,
-                       camera.GetComponent< CameraComponent >()->GetProjection() );
+    SpotLightComponent* spotLight = gameObjects[ selectedGameObjects.front() ]->GetComponent< SpotLightComponent >();
+
+    if (spotLight)
+    {
+        TransformComponent* spotLightTransform = gameObjects[ selectedGameObjects.front() ]->GetComponent< TransformComponent >();
+
+        Matrix44 view = camera.GetComponent< CameraComponent >()->GetView();
+        Matrix44 scale;
+        scale.MakeIdentity();
+
+        //scale.Scale( spotLight->GetConeAngle(), spotLight->GetConeAngle(), spotLight->GetConeAngle() );
+        scale.Scale( 2, 2, 2 );
+        scale.Translate( spotLightTransform->GetLocalPosition() );
+
+        Matrix44::Multiply( scale, view, view );
+        System::DrawLines( coneLineHandle, view,
+                           camera.GetComponent< CameraComponent >()->GetProjection() );
+    }
+
 }
 
 void SceneWidget::DrawLightSprites()

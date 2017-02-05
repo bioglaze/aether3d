@@ -301,7 +301,7 @@ void ae3d::GfxDevice::DrawLines( int handle )
 
     GfxDeviceGlobal::lineBuffers[ handle ].Bind();
     const int endIndex = GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount();
-    glDrawArrays( GL_LINE_LOOP, 0, endIndex );
+    glDrawArrays( GL_LINES, 0, endIndex );
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool enable )
