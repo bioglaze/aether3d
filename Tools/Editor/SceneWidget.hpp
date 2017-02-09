@@ -119,6 +119,7 @@ private:
     void SelectSpriteUnderCursor();
     void DrawLightSprites();
     void DrawAudioSprites();
+    void DrawCameraSprites();
     void DrawVisualizationLines();
     void SetSelectedObjectHighlight( bool enable );
 

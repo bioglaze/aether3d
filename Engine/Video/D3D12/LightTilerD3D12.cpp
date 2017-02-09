@@ -75,11 +75,11 @@ void ae3d::LightTiler::Init()
             IID_PPV_ARGS( &perTileLightIndexBuffer ) );
         if (FAILED( hr ))
         {
-            ae3d::System::Assert( false, "Unable to create vertex buffer!\n" );
+            ae3d::System::Assert( false, "Unable to create light index buffer!" );
             return;
         }
 
-        perTileLightIndexBuffer->SetName( L"Light index buffer" );
+        perTileLightIndexBuffer->SetName( L"LightTiler light index buffer" );
         // TODO: Add to be destroyed on exit
     }
 
@@ -118,7 +118,46 @@ void ae3d::LightTiler::Init()
             return;
         }
 
-        pointLightCenterAndRadiusBuffer->SetName( L"Point light buffer" );
+        pointLightCenterAndRadiusBuffer->SetName( L"LightTiler point light buffer" );
+        // TODO: Add to be destroyed on exit
+    }
+
+    // Uniform buffer
+    {
+        D3D12_HEAP_PROPERTIES uploadProp = {};
+        uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+        uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        uploadProp.CreationNodeMask = 1;
+        uploadProp.VisibleNodeMask = 1;
+
+        D3D12_RESOURCE_DESC bufferProp = {};
+        bufferProp.Alignment = 0;
+        bufferProp.DepthOrArraySize = 1;
+        bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
+        bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+        bufferProp.Height = 1;
+        bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        bufferProp.MipLevels = 1;
+        bufferProp.SampleDesc.Count = 1;
+        bufferProp.SampleDesc.Quality = 0;
+        bufferProp.Width = sizeof( CullerUniforms );
+
+        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+            &uploadProp,
+            D3D12_HEAP_FLAG_NONE,
+            &bufferProp,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS( &uniformBuffer ) );
+        if (FAILED( hr ))
+        {
+            ae3d::System::Assert( false, "Unable to create uniform buffer!" );
+            return;
+        }
+
+        uniformBuffer->SetName( L"LightTiler uniform buffer" );
         // TODO: Add to be destroyed on exit
     }
 }
@@ -152,7 +191,6 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& view, RenderTexture& depthNormalTarget )
 {
-    shader.SetRenderTexture( &depthNormalTarget, 0 );
     CullerUniforms uniforms;
 
     Matrix44::Invert( projection, uniforms.invProjection );
@@ -166,12 +204,12 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     cullerUniformsCreated = true;
 
-    //uint8_t* bufferPointer = (uint8_t *)[ uniformBuffer contents ];
-    //memcpy( bufferPointer, &uniforms, sizeof( CullerUniforms ) );
+    memcpy_s( uniformBuffer, sizeof( CullerUniforms ), &uniforms, sizeof( CullerUniforms ) );
 
-    //shader.SetUniformBuffer( 0, uniformBuffer );
-    //shader.SetUniformBuffer( 1, pointLightCenterAndRadiusBuffer );
-    //shader.SetUniformBuffer( 2, perTileLightIndexBuffer );
+    shader.SetUniformBuffer( 0, uniformBuffer );
+    shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );
+    shader.SetTextureBuffer( 1, depthNormalTarget.GetGpuResource()->resource );
+    shader.SetUAVBuffer( 0, perTileLightIndexBuffer );
 
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 }

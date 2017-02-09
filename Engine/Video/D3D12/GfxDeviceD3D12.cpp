@@ -131,6 +131,7 @@ namespace GfxDeviceGlobal
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignatureGraphics = nullptr;
     ID3D12RootSignature* rootSignatureTileCuller = nullptr;
+    ID3D12PipelineState* lightTilerPSO = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
@@ -388,8 +389,8 @@ void CreateRootSignature()
     {
         CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0 );
-        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0 );
+        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0 );
 
         CD3DX12_ROOT_PARAMETER rootParam[ 1 ];
         rootParam[ 0 ].InitAsDescriptorTable( 3, descRange1 );
@@ -435,10 +436,9 @@ void CreateComputePSO( ae3d::ComputeShader& shader )
     descPso.CS = { reinterpret_cast<BYTE*>( shader.blobShader->GetBufferPointer() ), shader.blobShader->GetBufferSize() };
     descPso.pRootSignature = GfxDeviceGlobal::rootSignatureTileCuller;
 
-    ID3D12PipelineState* pso;
-    HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &pso ) );
+    HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &GfxDeviceGlobal::lightTilerPSO ) );
     AE3D_CHECK_D3D( hr, "Failed to create compute PSO" );
-    pso->SetName( L"PSO Tile Culler" );
+    GfxDeviceGlobal::lightTilerPSO->SetName( L"PSO Tile Culler" );
 }
 
 void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
@@ -1079,6 +1079,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::lightTilerPSO );
 
     GfxDeviceGlobal::lightTiler.DestroyBuffers();
 

@@ -7,6 +7,7 @@
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_D3D12
+#include <d3d12.h>
 #include <d3dcompiler.h>
 #endif
 #if RENDERER_VULKAN
@@ -69,6 +70,12 @@ namespace ae3d
         /// \param slot slot index.
         void SetRenderTexture( class RenderTexture* renderTexture, unsigned slot );
         
+#if RENDERER_D3D12
+        void SetUniformBuffer( unsigned slot, ID3D12Resource* buffer );
+        void SetTextureBuffer( unsigned slot, ID3D12Resource* buffer );
+        void SetUAVBuffer( unsigned slot, ID3D12Resource* buffer );
+#endif
+
     private:
         std::string path;
 

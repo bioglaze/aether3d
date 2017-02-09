@@ -335,7 +335,7 @@ int main()
     Shader standardShader;
     standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
         "standard_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+        ae3d::FileSystem::FileContents( "Standard.hlsl" ), ae3d::FileSystem::FileContents( "Standard.hlsl" ),
         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
 
     Material standardMaterial;

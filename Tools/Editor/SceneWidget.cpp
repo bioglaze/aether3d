@@ -649,6 +649,50 @@ void SceneWidget::DrawAudioSprites()
     }
 }
 
+void SceneWidget::DrawCameraSprites()
+{
+    auto cameraTransform = camera.GetComponent< TransformComponent >();
+    const Vec3 cameraPos = cameraTransform->GetLocalPosition();
+
+    for (auto& go : gameObjects)
+    {
+        auto goTransform = go->GetComponent< TransformComponent >();
+
+        if (!goTransform)
+        {
+            continue;
+        }
+
+        if (go->GetComponent< CameraComponent >())
+        {
+            const float distance = (cameraPos - goTransform->GetLocalPosition()).Length();
+            const float lerpDistance = 10;
+            float opacity = 1;
+
+            if (distance < lerpDistance)
+            {
+                opacity = distance / lerpDistance;
+            }
+
+            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width(), height() );
+
+            const Vec3 viewDir = cameraTransform->GetViewDirection();
+            const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraPos).Normalized();
+            const float viewDotLight = Vec3::Dot( viewDir, lightDir ) ;
+
+            if (viewDotLight <= 0 &&
+                screenPoint.x > -cameraTex.GetWidth() && screenPoint.y > -cameraTex.GetHeight() &&
+                screenPoint.x < width() && screenPoint.y < height())
+            {
+                const Vec3 color( 1, 1, 1 );
+                const float size = height() / distance;
+
+                ae3d::System::Draw( &cameraTex, screenPoint.x, screenPoint.y, size, size, width(), height() );
+            }
+        }
+    }
+}
+
 void SceneWidget::RemoveEditorObjects()
 {
     scene.Remove( &camera );
@@ -694,6 +738,7 @@ void SceneWidget::paintGL()
     scene.Render();
     DrawLightSprites();
     DrawAudioSprites();
+    DrawCameraSprites();
     DrawVisualizationLines();
 }
 

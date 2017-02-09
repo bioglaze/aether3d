@@ -10,6 +10,7 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern ID3D12RootSignature* rootSignatureTileCuller;
+    extern ID3D12PipelineState* lightTilerPSO;
 }
 
 namespace Global
@@ -29,10 +30,10 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 {
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
 
+    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
     //GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
     //GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
-    //GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::tileCullerPSO );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 }
 
@@ -59,6 +60,21 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
 }
 
 void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsigned slot )
+{
+
+}
+
+void ae3d::ComputeShader::SetUniformBuffer( unsigned slot, ID3D12Resource* buffer )
+{
+
+}
+
+void ae3d::ComputeShader::SetTextureBuffer( unsigned slot, ID3D12Resource* buffer )
+{
+
+}
+
+void ae3d::ComputeShader::SetUAVBuffer( unsigned slot, ID3D12Resource* buffer )
 {
 
 }

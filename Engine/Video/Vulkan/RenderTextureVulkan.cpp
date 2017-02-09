@@ -78,11 +78,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     // Color
 
-    VkFormat colorFormat;// = GfxDeviceGlobal::colorFormat;
+    VkFormat colorFormat;
 
     if (dataType == DataType::UByte)
     {
-        colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
+        colorFormat = GfxDeviceGlobal::colorFormat;
     }
     else if (dataType == DataType::Float)
     {
@@ -94,7 +94,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     }
     else
     {
-        System::Print( "Unhandled format in cube render texture\n" );
+        System::Print( "Unhandled format in 2d render texture\n" );
         colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
     }
 
