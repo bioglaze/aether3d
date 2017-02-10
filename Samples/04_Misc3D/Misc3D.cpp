@@ -26,7 +26,7 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
-//#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_SPOT
 //#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
@@ -210,8 +210,8 @@ int main()
                         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     GameObject lightParent;
-    lightParent.AddComponent< MeshRendererComponent >();
-    lightParent.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    //lightParent.AddComponent< MeshRendererComponent >();
+    //lightParent.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     lightParent.AddComponent< TransformComponent >();
     lightParent.GetComponent< TransformComponent >()->SetLocalPosition( { 0, -2, -80 } );
 
@@ -365,7 +365,7 @@ int main()
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
-    //scene.Add( &lightParent );
+    scene.Add( &lightParent );
 
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
@@ -472,7 +472,7 @@ int main()
         rotation.FromAxisAngle( axis, angle );
         cubes[ 2 ].GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
-        //lightParent.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
+        lightParent.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
         //spotLight.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
         axis = Vec3( 1, 1, 1 ).Normalized();

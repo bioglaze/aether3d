@@ -366,7 +366,7 @@ void ae3d::Scene::Render()
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
 
-            auto cameraPos = cameraTransform->GetLocalPosition();
+            auto cameraPos = cameraTransform->GetWorldPosition();
             auto cameraDir = cameraTransform->GetViewDirection();
 
             if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
@@ -409,13 +409,13 @@ void ae3d::Scene::Render()
                     }
                     
                     Matrix44 eyeView;
-                    cameraTransform->GetLocalRotation().GetMatrix( eyeView );
+                    cameraTransform->GetWorldRotation().GetMatrix( eyeView );
                     Matrix44 translation;
-                    translation.Translate( -cameraTransform->GetLocalPosition() );
+                    translation.Translate( -cameraTransform->GetWorldPosition() );
                     Matrix44::Multiply( translation, eyeView, eyeView );
                     
                     const Vec3 eyeViewDir = Vec3( eyeView.m[2], eyeView.m[6], eyeView.m[10] ).Normalized();
-                    eyeFrustum.Update( cameraTransform->GetLocalPosition(), eyeViewDir );
+                    eyeFrustum.Update( cameraTransform->GetWorldPosition(), eyeViewDir );
                     
                     if (!SceneGlobal::isShadowCameraCreated)
                     {
@@ -435,7 +435,7 @@ void ae3d::Scene::Render()
                     else if (spotLight)
                     {
                         SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
-                        SetupCameraForSpotShadowCasting( lightTransform->GetLocalPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                        SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                     }
                     else if (pointLight)
                     {
@@ -782,9 +782,9 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 
     Matrix44 view;
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
-    cameraTransform->GetLocalRotation().GetMatrix( view );
+    cameraTransform->GetWorldRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -cameraTransform->GetLocalPosition() );
+    translation.Translate( -cameraTransform->GetWorldPosition() );
     Matrix44::Multiply( translation, view, view );
     
     SceneGlobal::shadowCameraViewMatrix = view;
@@ -802,7 +802,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     }
     
     const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
-    frustum.Update( cameraTransform->GetLocalPosition(), viewDir );
+    frustum.Update( cameraTransform->GetWorldPosition(), viewDir );
     
     std::vector< unsigned > gameObjectsWithMeshRenderer;
     gameObjectsWithMeshRenderer.reserve( gameObjects.size() );
