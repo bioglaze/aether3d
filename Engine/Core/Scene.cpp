@@ -609,11 +609,14 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     fovDegrees = GetVRFov();
 #else
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
-    position = cameraTransform->GetLocalPosition();
+    //position = cameraTransform->GetLocalPosition();
+    position = cameraTransform->GetWorldPosition();
     fovDegrees = camera->GetFovDegrees();
-    cameraTransform->GetLocalRotation().GetMatrix( view );
+    //cameraTransform->GetLocalRotation().GetMatrix( view );
+    cameraTransform->GetWorldRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -cameraTransform->GetLocalPosition() );
+    //translation.Translate( -cameraTransform->GetLocalPosition() );
+    translation.Translate( -cameraTransform->GetWorldPosition() );
     Matrix44::Multiply( translation, view, view );
     camera->SetView( view );
 #endif

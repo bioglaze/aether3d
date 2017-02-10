@@ -108,15 +108,18 @@ void ae3d::TransformComponent::UpdateLocalMatrices()
 
         Matrix44 transform = transformComponents[ componentIndex ].localMatrix;
 
+        Quaternion worldRotation = transformComponents[ componentIndex ].localRotation;
+        
         while (parent != -1)
         {
             Matrix44::Multiply( transform, transformComponents[ parent ].GetLocalMatrix(), transform );
+            worldRotation = worldRotation * transformComponents[ parent ].localRotation;
             parent = transformComponents[ parent ].parent;
         }
 
         transformComponents[ componentIndex ].localToWorldMatrix = transform;
-        Matrix44::TransformPoint( transformComponents[ componentIndex ].localPosition, transform, &transformComponents[ componentIndex ].globalPosition );
-        transformComponents[ componentIndex ].globalRotation.FromMatrix( transform );
+        Matrix44::TransformPoint( Vec3( 0, 0, 0 ), transform, &transformComponents[ componentIndex ].globalPosition );
+        transformComponents[ componentIndex ].globalRotation = worldRotation;
     }
 }
 

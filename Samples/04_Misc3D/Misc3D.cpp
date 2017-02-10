@@ -271,7 +271,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -312,7 +312,13 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.5f, 0.5f, 0.5f ) );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<TransformComponent>();
-
+    //rtCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, -70 ) );
+    
+    GameObject rtCameraParent;
+    rtCameraParent.AddComponent<TransformComponent>();
+    rtCameraParent.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, -70 ) );
+    rtCamera.GetComponent<TransformComponent>()->SetParent( rtCameraParent.GetComponent<TransformComponent>() );
+    
     Texture2D transTex;
     transTex.Load( FileSystem::FileContents( "trans50.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
@@ -354,7 +360,7 @@ int main()
 
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
     //scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
@@ -472,6 +478,10 @@ int main()
         axis = Vec3( 1, 1, 1 ).Normalized();
         rotation.FromAxisAngle( axis, angle );
         rotatingCube.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
+
+        axis = Vec3( 0, 1, 0 ).Normalized();
+        rotation.FromAxisAngle( axis, angle );
+        rtCamera.GetComponent<TransformComponent>()->SetLocalRotation( rotation );
 
         while (Window::PollEvent( event ))
         {
