@@ -310,8 +310,8 @@ void SceneWidget::Init()
     AddEditorObjects();
     scene.Add( gameObjects[ 0 ].get() );
 
-    connect( &myTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
-    myTimer.start();
+    connect( &cameraMoveTimer, SIGNAL( timeout() ), this, SLOT( UpdateCamera() ) );
+    cameraMoveTimer.start();
     connect(mainWindow, SIGNAL(GameObjectSelected(std::list< ae3d::GameObject* >)),
             this, SLOT(GameObjectSelected(std::list< ae3d::GameObject* >)));
 
@@ -529,18 +529,20 @@ void SceneWidget::DrawVisualizationLines()
         TransformComponent* spotLightTransform = gameObjects[ selectedGameObjects.front() ]->GetComponent< TransformComponent >();
 
         Matrix44 view = camera.GetComponent< CameraComponent >()->GetView();
-        Matrix44 scale;
-        scale.MakeIdentity();
+        Matrix44 lineTransform;
+        lineTransform.MakeIdentity();
 
-        //scale.Scale( spotLight->GetConeAngle(), spotLight->GetConeAngle(), spotLight->GetConeAngle() );
-        scale.Scale( 2, 2, 2 );
-        scale.Translate( spotLightTransform->GetLocalPosition() );
+        Matrix44 spotRot;
+        spotLightTransform->GetLocalRotation().GetMatrix( spotRot );
 
-        Matrix44::Multiply( scale, view, view );
+        //lineTransform.Scale( spotLight->GetConeAngle(), spotLight->GetConeAngle(), spotLight->GetConeAngle() );
+        lineTransform.Scale( 2, 2, 2 );
+        Matrix44::Multiply( lineTransform, spotRot, lineTransform );
+        lineTransform.Translate( spotLightTransform->GetLocalPosition() );
+        Matrix44::Multiply( lineTransform, view, view );
         System::DrawLines( coneLineHandle, view,
                            camera.GetComponent< CameraComponent >()->GetProjection() );
     }
-
 }
 
 void SceneWidget::DrawLightSprites()

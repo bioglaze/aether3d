@@ -381,6 +381,7 @@ void MainWindow::HierarchyItemRenamed( QTreeWidgetItem* item )
 void MainWindow::HierarchySelectionChanged()
 {
     std::list< ae3d::GameObject* > selectedObjects;
+    sceneWidget->SetSelectedObjectHighlight( false );
     sceneWidget->selectedGameObjects.clear();
 
     if (sceneTree->selectedItems().empty())
@@ -402,10 +403,7 @@ void MainWindow::HierarchySelectionChanged()
         }
     }
 
-    /*for (auto index : sceneWidget->selectedGameObjects)
-    {
-        std::cout << "selection: " << index << std::endl;
-    }*/
+    sceneWidget->SetSelectedObjectHighlight( true );
 
     UpdateInspector();
     emit GameObjectSelected( selectedObjects );

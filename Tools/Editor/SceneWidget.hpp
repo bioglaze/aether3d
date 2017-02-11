@@ -39,34 +39,6 @@ public:
 
     explicit SceneWidget( QWidget* parent = 0 );
 
-    void SetGameObjects( std::vector< std::shared_ptr< ae3d::GameObject > > aGameObjects ) { gameObjects = aGameObjects; }
-
-    std::vector< std::shared_ptr< ae3d::GameObject > > GetGameObjects() { return gameObjects; }
-
-    void CenterSelected();
-
-    void HideHUD();
-
-    void Init();
-
-    void UpdateTransformGizmoPosition();
-
-    /// \return Index of created game object.
-    /// Should only be called by CreateGoCommand!
-    ae3d::GameObject* CreateGameObject();
-
-    /// \return Game object count.
-    int GetGameObjectCount() const { return (int)gameObjects.size(); }
-
-    /// \param path Path to .scene file.
-    void LoadSceneFromFile( const char* path );
-
-    void RemoveEditorObjects();
-
-    void AddEditorObjects();
-
-    void SetSelectedCameraTargetToPreview();
-
     /// \return scene.
     ae3d::Scene* GetScene() { return &scene; }
 
@@ -75,7 +47,37 @@ public:
         return index < (int)gameObjects.size() ? gameObjects.at( index ).get() : nullptr;
     }
 
+    /// \return Game object count.
+    int GetGameObjectCount() const { return (int)gameObjects.size(); }
+
+    std::vector< std::shared_ptr< ae3d::GameObject > > GetGameObjects() { return gameObjects; }
+
+    void AddEditorObjects();
+
+    void CenterSelected();
+
+    /// \return Index of created game object.
+    /// Should only be called by CreateGoCommand!
+    ae3d::GameObject* CreateGameObject();
+
+    void HideHUD();
+
+    void Init();
+
+    /// \param path Path to .scene file.
+    void LoadSceneFromFile( const char* path );
+
+    void RemoveEditorObjects();
+
+    void SetSelectedCameraTargetToPreview();
+
+    void SetGameObjects( std::vector< std::shared_ptr< ae3d::GameObject > > aGameObjects ) { gameObjects = aGameObjects; }
+
+    void UpdateTransformGizmoPosition();
+
     void SetMainWindow( QWidget* aMainWindow ) { mainWindow = aMainWindow; }
+
+    void SetSelectedObjectHighlight( bool enable );
 
     std::list< int > selectedGameObjects;
 
@@ -121,29 +123,27 @@ private:
     void DrawAudioSprites();
     void DrawCameraSprites();
     void DrawVisualizationLines();
-    void SetSelectedObjectHighlight( bool enable );
 
     TransformGizmo transformGizmo;
     ae3d::GameObject camera;
-    ae3d::GameObject previewCamera;
     ae3d::GameObject hudCamera;
     ae3d::GameObject hud;
+    ae3d::GameObject previewCamera;
     ae3d::RenderTexture previewCameraTex;
     ae3d::Scene scene;
     ae3d::Vec3 cameraMoveDir;
-    ae3d::Texture2D lightTex;
-    ae3d::Texture2D cameraTex;
     ae3d::Texture2D audioTex;
-
+    ae3d::Texture2D cameraTex;
+    ae3d::Texture2D lightTex;
     ae3d::Texture2D spriteTex;
-    ae3d::Shader unlitShader;
     ae3d::Material cubeMaterial;
     ae3d::Mesh cubeMesh;
+    ae3d::Shader unlitShader;
 
     MouseMode mouseMode = MouseMode::Normal;
     GizmoAxis dragAxis = GizmoAxis::None;
     int lastMousePosition[ 2 ];
-    QTimer myTimer;
+    QTimer cameraMoveTimer;
     QDesktopWidget desktop;
     QWidget* mainWindow = nullptr;
     std::vector< std::shared_ptr< ae3d::GameObject > > gameObjects;
