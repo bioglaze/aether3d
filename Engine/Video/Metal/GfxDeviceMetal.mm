@@ -670,8 +670,11 @@ void ae3d::GfxDevice::BeginFrame()
 
 void ae3d::GfxDevice::PresentDrawable()
 {
-    [commandBuffer presentDrawable:currentDrawable];
-    [commandBuffer commit];
+    if (currentDrawable != nil)
+    {
+        [commandBuffer presentDrawable:currentDrawable];
+        [commandBuffer commit];
+    }
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
