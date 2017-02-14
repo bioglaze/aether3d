@@ -1,6 +1,7 @@
 #include "LightTiler.hpp"
 #include <d3d12.h>
 #include "ComputeShader.hpp"
+#include "DescriptorHeapManager.hpp"
 #include "Macros.hpp"
 #include "Matrix.hpp"
 #include "RenderTexture.hpp"
@@ -25,6 +26,7 @@ void ae3d::LightTiler::DestroyBuffers()
 {
     AE3D_SAFE_RELEASE( pointLightCenterAndRadiusBuffer );
     AE3D_SAFE_RELEASE( perTileLightIndexBuffer );
+    AE3D_SAFE_RELEASE( uniformBuffer );
 }
 
 struct CullerUniforms
@@ -158,6 +160,16 @@ void ae3d::LightTiler::Init()
         }
 
         uniformBuffer->SetName( L"LightTiler uniform buffer" );
+
+        auto handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+        hr = uniformBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&mappedUniformBuffer) );
+        if (FAILED( hr ))
+        {
+            ae3d::System::Print( "Unable to map light tiler constant buffer!" );
+        }
+
+
         // TODO: Add to be destroyed on exit
     }
 }
@@ -204,7 +216,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     cullerUniformsCreated = true;
 
-    memcpy_s( uniformBuffer, sizeof( CullerUniforms ), &uniforms, sizeof( CullerUniforms ) );
+    memcpy_s( mappedUniformBuffer, sizeof( CullerUniforms ), &uniforms, sizeof( CullerUniforms ) );
 
     shader.SetUniformBuffer( 0, uniformBuffer );
     shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );

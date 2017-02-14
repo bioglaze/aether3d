@@ -88,6 +88,11 @@ namespace ae3d
         id<MTLBuffer> uniforms[ 3 ];
 #endif
         std::vector< RenderTexture* > renderTextures;
+#if RENDERER_D3D12
+        ID3D12Resource* uniformBuffers[ 3 ];
+        ID3D12Resource* textureBuffers[ 3 ];
+        ID3D12Resource* uavBuffers[ 3 ];
+#endif
     };
 }
 #endif
