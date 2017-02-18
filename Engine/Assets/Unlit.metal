@@ -79,4 +79,6 @@ fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
     
     //return float4(1, 0, 0, 1);
     return sampledColor * float4( shadow, shadow, shadow, 1 );
+    
+    //return _ShadowMap.sample( sampler0, in.texCoords ) * in.tintColor;
 }

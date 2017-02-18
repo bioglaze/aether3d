@@ -2,7 +2,7 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -42,7 +42,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         System::Print( "Failed to create a render texture 2D!\n" );
     }
     
-    metalTexture.label = @"Render Texture 2D";
+    NSString* debugNameStr = [NSString stringWithUTF8String:debugName ];
+    metalTexture.label = debugNameStr;
 
     MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
                                                                                          width:width
@@ -58,7 +59,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     metalDepthTexture.label = @"Render Texture depth";
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     isCube = true;
     width = aDimension;
@@ -92,7 +93,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         System::Print( "Failed to create a render texture Cube!\n" );
     }
     
-    metalTexture.label = @"Render Texture Cube";
+    NSString* debugNameStr = [NSString stringWithUTF8String:debugName ];
+    metalTexture.label = debugNameStr;
 
     MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
                                                                                          width:width

@@ -29,7 +29,7 @@ void ae3d::PointLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     // TODO: create only if not already created with current size.
     if (castsShadow)
     {
-        shadowMap.CreateCube( mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear );
+        shadowMap.CreateCube( mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "pointlight shadow" );
     }
 }
 

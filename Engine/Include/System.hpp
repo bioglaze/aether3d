@@ -62,12 +62,6 @@
    Run mingw32-make in Engine/.
    Then run mingw32-make in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
 
-   \subsection win_oculus Windows/Oculus Rift
-
-   Compile LibOVR, Logging and LibOVRKernel x64 release versions using VS2015. Copy those folders from Oculus SDK into Engine \ ThirdParty and 
-   Open Engine/VisualStudio_GL45 and build target Oculus Release.
-   Open Samples/04_Misc3D and build target Oculus Release.
- 
    \subsection osx macOS/Xcode
 
    OpenGL: Build Engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making

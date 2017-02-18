@@ -29,7 +29,7 @@ void ae3d::SpotLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     // TODO: create only if not already created with current size.
     if (castsShadow)
     {
-        shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear );
+        shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "spotlight shadow" );
     }
 }
 

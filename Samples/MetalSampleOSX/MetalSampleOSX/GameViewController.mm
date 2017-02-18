@@ -32,8 +32,8 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
-//#define TEST_SHADOWS_DIR
+//#define TEST_FORWARD_PLUS
+#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 
@@ -113,7 +113,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -154,7 +154,7 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
 #ifdef TEST_FORWARD_PLUS
-    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest );
+    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
 #endif
     camera3d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera3d );
@@ -324,9 +324,10 @@ using namespace ae3d;
     bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     bigCube2.AddComponent<ae3d::TransformComponent>();
-    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
+    //bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
+    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, -8, -10 ) );
     bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
-    //scene.Add( &bigCube2 );
+    scene.Add( &bigCube2 );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
 #ifdef TEST_SHADOWS_DIR
@@ -353,7 +354,7 @@ using namespace ae3d;
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -7 ) );
     scene.Add( &pointLight );
 
-    rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
@@ -372,7 +373,7 @@ using namespace ae3d;
     rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 20 ) );
     //scene.Add( &rtCamera );
 
-    cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear );
+    cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cube RT" );
 
     cameraCubeRT.AddComponent<CameraComponent>();
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 1 ) );
@@ -401,7 +402,7 @@ using namespace ae3d;
     _view = (MTKView *)self.view;
     _view.delegate = self;
     _view.device = device;
-    //_view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
+    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     _view.sampleCount = MULTISAMPLE_COUNT;
 }
 
@@ -412,7 +413,11 @@ using namespace ae3d;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    NSLog(@"mouseDown Detected");
+    camera3d.GetComponent<ae3d::TransformComponent>()->MoveForward( -1 );
+}
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
 }
 
 - (BOOL)acceptsFirstResponder

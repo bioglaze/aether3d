@@ -31,14 +31,14 @@ namespace ae3d
         /// \param dataType Data type.
         /// \param wrap Wrapping mode.
         /// \param filter Filtering mode.
-        void Create2D( int width, int height, DataType dataType, TextureWrap wrap, TextureFilter filter );
+        void Create2D( int width, int height, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
 
         /// \param dimension Dimension.
         /// \param dataType Data type.
         /// \param wrap Wrapping mode.
         /// \param filter Filtering mode.
-        void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter );
-        
+        void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
+
 #if RENDERER_OPENGL
         /// \return FBO.
         unsigned GetFBO() const { return fboId; }

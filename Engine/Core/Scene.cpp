@@ -585,7 +585,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     {
         auto cameraTrans = cameraGo->GetComponent< TransformComponent >();
         cameraTrans->GetLocalRotation().GetMatrix( view );
-#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+#if defined( AE3D_OPENVR )
         Matrix44 vrView = cameraTrans->GetVrView();
         // Cancels translation.
         vrView.m[ 14 ] = 0;
@@ -603,7 +603,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     Vec3 position;
 
     // TODO: Maybe add a VR flag into camera to select between HMD and normal pose.
-#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+#if defined( AE3D_OPENVR )
     view = cameraGo->GetComponent< TransformComponent >()->GetVrView();
     position = Global::vrEyePosition;
     fovDegrees = GetVRFov();

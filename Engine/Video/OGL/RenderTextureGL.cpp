@@ -28,7 +28,7 @@ static void GetGLFormat( ae3d::RenderTexture::DataType dataType, GLenum& outInte
     }
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -49,7 +49,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, -1, "render_texture_2d" );
+        glObjectLabel( GL_TEXTURE, handle, -1, debugName );
     }
 
     const float borderColor[] = { 0, 0, 0, 1 };
@@ -89,7 +89,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     GfxDevice::ErrorCheck( "CreateRenderTexture2D end" );
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aDimension <= 0)
     {
@@ -109,7 +109,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, -1, "render_texture_cube" );
+        glObjectLabel( GL_TEXTURE, handle, -1, debugName );
     }
     
     glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, filter == TextureFilter::Nearest ? GL_NEAREST : (mipmaps == Mipmaps::Generate ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR ) );

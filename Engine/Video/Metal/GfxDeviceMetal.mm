@@ -563,7 +563,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
 
     const int sampleCount = GfxDeviceGlobal::isRenderingToTexture ? 1 : GfxDeviceGlobal::sampleCount;
-    MTLPixelFormat depthFormat = MTLPixelFormatInvalid;
+    MTLPixelFormat depthFormat = MTLPixelFormatDepth32Float;
 
 #if TARGET_OS_IPHONE
     if (GfxDeviceGlobal::sampleCount == 1)
@@ -589,10 +589,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         depthFormat = MTLPixelFormatDepth32Float;
     }
     if (GfxDeviceGlobal::sampleCount > 1 && GfxDeviceGlobal::isRenderingToTexture)
-    {
-        depthFormat = MTLPixelFormatInvalid;
-    }
-    if (GfxDeviceGlobal::sampleCount > 1 && !GfxDeviceGlobal::isRenderingToTexture)
     {
         depthFormat = MTLPixelFormatInvalid;
     }

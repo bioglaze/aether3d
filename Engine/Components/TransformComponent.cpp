@@ -154,7 +154,7 @@ void ae3d::TransformComponent::SetVrView( const Matrix44& view )
 {
     (void)view;
     
-#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+#if defined( AE3D_OPENVR )
     hmdView = view;
 #endif
 }
