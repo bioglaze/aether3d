@@ -36,19 +36,19 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes.
 
 # API documentation
 
-[link](http://twiren.kapsi.fi/doc_v0.6/html/)
+[link](http://twiren.kapsi.fi/doc_v0.6.5/html/)
 
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
-  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.6.zip) and extract it into aether3d_build/Samples after building.
+  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.6.5.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 
   - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile.
   - Build and run Samples\01_OpenWindow.
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
-  - FBX converter tries to find FBX SDK 2017.0.1 in its default install location (English language localization)
+  - FBX converter tries to find FBX SDK 2017.1 in its default install location (English language localization)
   
 ### Oculus Rift
   - Build Oculus SDK's `LibOVR` and `LibOVRKernel`'s `Release x64` target in VS2015 and copy these folders into `Engine/ThirdParty`: LibOVR, LibOVRKernel, Logging
@@ -59,7 +59,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes.
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile (`make` builds GL version, `make vulkan` builds Vulkan version).
-  - FBX converter tries to find FBX SDK 2017.0.1 in its default install location.
+  - FBX converter tries to find FBX SDK 2017.1 in its default install location.
 
 ## Linux
 

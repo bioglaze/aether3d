@@ -42,18 +42,28 @@ void TestManyInstances()
     }
 }
 
-void TestCamera()
+bool TestCamera()
 {
     gGo.AddComponent< CameraComponent >();
     gGo.GetComponent< CameraComponent >()->SetTargetTexture( &gRenderTexture );
-    System::Assert( gGo.GetComponent< CameraComponent >()->GetTargetTexture() == &gRenderTexture, "camera render texture failed" );
+    if (gGo.GetComponent< CameraComponent >()->GetTargetTexture() != &gRenderTexture)
+    {
+        System::Print( "camera render texture failed\n" );
+        return false;
+    }
 
     GameObject go2;
     go2.AddComponent< CameraComponent >();
-    System::Assert( gGo.GetComponent< CameraComponent >() != go2.GetComponent< CameraComponent >(), "AddComponent produced identical references!" );
+    if (gGo.GetComponent< CameraComponent >() == go2.GetComponent< CameraComponent >())
+    {
+        System::Print( "AddComponent produced identical references!\n" );
+        return false;
+    }
+
+    return true;
 }
 
-void TestAddition()
+bool TestAddition()
 {
     GameObject go1;
     go1.AddComponent< CameraComponent >();
@@ -65,35 +75,69 @@ void TestAddition()
     go2.AddComponent< TransformComponent >();
     go2.AddComponent< MeshRendererComponent >();
 
-    System::Assert( go1.GetComponent< CameraComponent >() != go2.GetComponent< CameraComponent >(), "AddComponent produced identical references!" );
-    System::Assert( go1.GetComponent< TransformComponent >() != go2.GetComponent< TransformComponent >(), "AddComponent produced identical references!" );
-    System::Assert( go1.GetComponent< MeshRendererComponent >() != go2.GetComponent< MeshRendererComponent >(), "AddComponent produced identical references!" );
+    if (go1.GetComponent< CameraComponent >() == go2.GetComponent< CameraComponent >())
+    {
+        System::Print( "AddComponent produced identical references!\n" );
+        return false;
+    }
+
+    if (go1.GetComponent< TransformComponent >() == go2.GetComponent< TransformComponent >())
+    {
+        System::Print( "AddComponent produced identical references!\n" );
+        return false;
+    }
+
+    if (go1.GetComponent< MeshRendererComponent >() == go2.GetComponent< MeshRendererComponent >())
+    {
+        System::Print( "AddComponent produced identical references!\n" );
+        return false;
+    }
+
+    return true;
 }
 
-void TestTransform()
+bool TestTransform()
 {
     const Vec3 pos{ 1, 2, 3 };
     gGo.AddComponent< TransformComponent >();
     gGo.GetComponent< TransformComponent >()->SetLocalPosition( pos );
-    System::Assert( gGo.GetComponent< TransformComponent >()->GetLocalPosition().IsAlmost( pos ), "transform position failed" );
+    if (!gGo.GetComponent< TransformComponent >()->GetLocalPosition().IsAlmost( pos ))
+    {
+        System::Print( "transform position failed\n" );
+        return false;
+    }
     
     TransformComponent copy = *gGo.GetComponent< TransformComponent >();
-    System::Assert( copy.GetLocalPosition().x == gGo.GetComponent< TransformComponent >()->GetLocalPosition().x &&
-                    copy.GetLocalPosition().y == gGo.GetComponent< TransformComponent >()->GetLocalPosition().y &&
-                    copy.GetLocalPosition().z == gGo.GetComponent< TransformComponent >()->GetLocalPosition().z,
-                    "Transform copy failed (position)!" );
+    bool success = copy.GetLocalPosition().x == gGo.GetComponent< TransformComponent >()->GetLocalPosition().x &&
+        copy.GetLocalPosition().y == gGo.GetComponent< TransformComponent >()->GetLocalPosition().y &&
+        copy.GetLocalPosition().z == gGo.GetComponent< TransformComponent >()->GetLocalPosition().z;
+    if (!success)
+    {
+        System::Print( "transform copy position failed\n" );
+        return false;
+    }
 
-    System::Assert( copy.GetLocalRotation().x == gGo.GetComponent< TransformComponent >()->GetLocalRotation().x &&
-                    copy.GetLocalRotation().y == gGo.GetComponent< TransformComponent >()->GetLocalRotation().y &&
-                    copy.GetLocalRotation().z == gGo.GetComponent< TransformComponent >()->GetLocalRotation().z &&
-                    copy.GetLocalRotation().w == gGo.GetComponent< TransformComponent >()->GetLocalRotation().w,
-                    "Transform copy failed (rotation)!" );
-    
-    System::Assert( copy.GetLocalScale() == gGo.GetComponent< TransformComponent >()->GetLocalScale(),
-                   "transform copy failed (scale)!" );
+    success = copy.GetLocalRotation().x == gGo.GetComponent< TransformComponent >()->GetLocalRotation().x &&
+        copy.GetLocalRotation().y == gGo.GetComponent< TransformComponent >()->GetLocalRotation().y &&
+        copy.GetLocalRotation().z == gGo.GetComponent< TransformComponent >()->GetLocalRotation().z &&
+        copy.GetLocalRotation().w == gGo.GetComponent< TransformComponent >()->GetLocalRotation().w;
+    if (!success)
+    {
+        System::Print( "Transform copy failed (rotation)!\n" );
+        return false;
+    }
+
+    success = copy.GetLocalScale() == gGo.GetComponent< TransformComponent >()->GetLocalScale();
+    if (!success)
+    {
+        System::Print( "Transform copy failed (scale)!\n" );
+        return false;
+    }
+
+    return true;
 }
 
-void TestGameObjectCopying()
+bool TestGameObjectCopying()
 {
     const Vec3 pos{ 1, 2, 3 };
 
@@ -104,11 +148,15 @@ void TestGameObjectCopying()
     GameObject copy = go;
     copy.GetComponent< TransformComponent >()->SetLocalPosition( pos );    
 
-    System::Assert( copy.GetComponent< TransformComponent >()->GetLocalPosition().x == go.GetComponent< TransformComponent >()->GetLocalPosition().x &&
-                    copy.GetComponent< TransformComponent >()->GetLocalPosition().y == go.GetComponent< TransformComponent >()->GetLocalPosition().y &&
-                    copy.GetComponent< TransformComponent >()->GetLocalPosition().z == go.GetComponent< TransformComponent >()->GetLocalPosition().z,
-                    "GameObject copy failed (position)!" );
+    bool success = copy.GetComponent< TransformComponent >()->GetLocalPosition().x == go.GetComponent< TransformComponent >()->GetLocalPosition().x &&
+        copy.GetComponent< TransformComponent >()->GetLocalPosition().y == go.GetComponent< TransformComponent >()->GetLocalPosition().y &&
+        copy.GetComponent< TransformComponent >()->GetLocalPosition().z == go.GetComponent< TransformComponent >()->GetLocalPosition().z;
+    if (!success)
+    {
+        System::Print( "GameObject copy failed (scale)!\n" );
+    }
 
+    return success;
 }
 
 void TestText()
@@ -130,7 +178,7 @@ void TestSprite()
     SpriteRendererComponent copy = *gGo.GetComponent< SpriteRendererComponent >();
 }
 
-void TestMesh()
+bool TestMesh()
 {
     Mesh mesh;
     
@@ -144,10 +192,16 @@ void TestMesh()
     gGo.GetComponent< MeshRendererComponent >()->SetMesh( nullptr );
     
     Mesh copy = mesh;
-    System::Assert( copy.GetAABBMin().x == mesh.GetAABBMin().x &&
-                    copy.GetAABBMin().y == mesh.GetAABBMin().y &&
-                    copy.GetAABBMin().z == mesh.GetAABBMin().z,
-                    "Mesh copy failed!" );
+    bool success = copy.GetAABBMin().x == mesh.GetAABBMin().x &&
+        copy.GetAABBMin().y == mesh.GetAABBMin().y &&
+        copy.GetAABBMin().z == mesh.GetAABBMin().z;
+
+    if (!success)
+    {
+        System::Print( "Mesh copy failed!\n" );
+    }
+
+    return success;
 }
 
 void TestMissingFiles()
@@ -171,22 +225,39 @@ void TestMissingFiles()
     font.LoadBMFont( &tex2d, FileSystem::FileContents("not_found.fnt") );
 }
 
-void TestGameObjectEnabling()
+bool TestGameObjectEnabling()
 {
     GameObject go;
     go.AddComponent< TransformComponent >();
-    System::Assert( go.GetComponent< TransformComponent >()->GetGameObject() == &go, "invalid owner" );
-    
+    bool success = go.GetComponent< TransformComponent >()->GetGameObject() == &go;
+    if (!success)
+    {
+        System::Print( "invalid owner\n" );
+        return false;
+    }
+
     go.SetEnabled( false );
     
     GameObject child;
     child.AddComponent< TransformComponent >();
     child.GetComponent< TransformComponent >()->SetParent( go.GetComponent< TransformComponent >() );
     
-    System::Assert( !child.IsEnabled(), "child should be disabled if parent is disabled" );
-    
+    success = !child.IsEnabled();
+    if (!success)
+    {
+        System::Print( "child should be disabled if parent is disabled\n" );
+        return false;
+    }
+
     GameObject go2 = go;
-    System::Assert( !go.IsEnabled(), "copied game object should be disabled if original is disabled" );
+    success = !go.IsEnabled();
+    if (!success)
+    {
+        System::Print( "copied game object should be disabled if original is disabled\n" );
+        return false;
+    }
+
+    return true;
 }
 
 int main()
@@ -194,16 +265,20 @@ int main()
     Window::Create( 512, 512, WindowCreateFlags::Empty );
     System::LoadBuiltinAssets();
     
-    TestCamera();
-    TestTransform();
+    bool success = true;
+
+    success &= TestCamera();
+    success &= TestTransform();
     TestText();
     TestSprite();
     TestManyInstances();
-    TestMesh();
-    TestAddition();
-    TestGameObjectCopying();
-    TestGameObjectEnabling();
+    success &= TestMesh();
+    success &= TestAddition();
+    success &= TestGameObjectCopying();
+    success &= TestGameObjectEnabling();
     TestMissingFiles();
+
+    return success ? 0 : 1;
 }
 
     

@@ -30,7 +30,13 @@ int main()
     auto res = scene.Deserialize( FileSystem::FileContents( "scene.scene" ), gameObjects, textureNameToTexture,
                                  materialNameToMaterial, meshes );
 
-    System::Assert( res == Scene::DeserializeResult::Success, "Scene deserializing failed!" );
+    if (res != Scene::DeserializeResult::Success)
+    {
+        System::Print( "Scene serialization failed!\n" );
+        return 1;
+    }
+
+    return 0;
 }
 
 

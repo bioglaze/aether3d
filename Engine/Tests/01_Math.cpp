@@ -11,11 +11,12 @@ bool IsAlmost( float f1, float f2 )
     return std::abs( f1 - f2 ) < tolerance;
 }
 
-void TestVec4()
+bool TestVec4()
 {
     if (!Vec4( 1, 2, 3, 4 ).IsAlmost( Vec4( 1, 2, 3, 4 ) ))
     {
         std::cerr << "Vec4 IsAlmost or constructor failed!" << std::endl;
+        return false;
     }
 
     Vec4 vec1;
@@ -23,6 +24,7 @@ void TestVec4()
     if (!vec1.IsAlmost( Vec4( 0, 0, 0, 0 ) ))
     {
         std::cerr << "Vec4 constructor failed!" << std::endl;
+        return false;
     }
 
     Vec4 vec2( { 1, 2, 3 } );
@@ -30,17 +32,20 @@ void TestVec4()
     if (!vec2.IsAlmost( Vec4( 1, 2, 3, 1 ) ))
     {
         std::cerr << "Vec4 constructor failed!" << std::endl;
+        return false;
     }
 
+    return true;
 }
 
-void TestVec3()
+bool TestVec3()
 {
     Vec3 vec1;
 
     if (!vec1.IsAlmost( Vec3( 0, 0, 0 ) ))
     {
         std::cerr << "Vec3 constructor failed!" << std::endl;
+        return false;
     }
 
     vec1 = Vec3( 2, 3, 2 );
@@ -49,16 +54,19 @@ void TestVec3()
     if (!(vec1 + vec2).IsAlmost( Vec3( 5, 5, 5 ) ))
     {
         std::cerr << "Vec3 addition failed!" << std::endl;
+        return false;
     }
 
     if (!(vec1 - vec2).IsAlmost( Vec3( -1, 1, -1 ) ))
     {
         std::cerr << "Vec3 subtract failed!" << std::endl;
+        return false;
     }
 
     if (!(vec1 * vec2).IsAlmost( Vec3( 6, 6, 6 ) ))
     {
         std::cerr << "Vec3 multiply failed!" << std::endl;
+        return false;
     }
 
     vec2 = vec2.Normalized();
@@ -66,21 +74,25 @@ void TestVec3()
     if (std::abs( vec2.Length() - 1 ) > 0.0001f)
     {
         std::cerr << "Vec3::Normalize failed!" << std::endl;
+        return false;
     }
     
     if (!(Vec3( 1, 2, 3 ) / 2.0f).IsAlmost( Vec3( 0.5f, 1.0f, 1.5f ) ))
     {
         std::cerr << "Vec3 division failed!" << std::endl;
+        return false;
     }
 
     if (!(Vec3( 1, 1, 1 ) / Vec3( 2, 2, 2 )).IsAlmost( Vec3( 0.5f, 0.5f, 0.5f ) ))
     {
         std::cerr << "Vec3 division failed!" << std::endl;
+        return false;
     }
 
     if (!(Vec3( 1, 2, 3 ) * 2.0f).IsAlmost( Vec3( 2.0f, 4.0f, 6.0f ) ))
     {
         std::cerr << "Vec3 multiply by value failed!" << std::endl;
+        return false;
     }
 
     Vec3 a( 1, 2, 3 );
@@ -89,11 +101,13 @@ void TestVec3()
     if (!a.IsAlmost( b ))
     {
         std::cerr << "Vec3 assignment failed!" << std::endl;
+        return false;
     }
 
     if (!Vec3{ 3, 3, 3 }.IsAlmost( { 3, 3, 3 } ))
     {
         std::cerr << "Vec3 IsAlmost failed!" << std::endl;
+        return false;
     }
     
     b = Vec3( 1, 1, 1 );
@@ -102,6 +116,7 @@ void TestVec3()
     if (!r.IsAlmost( a ))
     {
         std::cerr << "Vec3 identity failed!" << std::endl;
+        return false;
     }
 
     b = Vec3( 2, 2, 2 );
@@ -110,43 +125,53 @@ void TestVec3()
     if (!(r * b).IsAlmost( a ))
     {
         std::cerr << "Vec3 identity failed!" << std::endl;
+        return false;
     }
 
     if (!Vec3::Min2( { 1, 2, 3 }, { 3, 1, 2 } ).IsAlmost( { 1, 1, 2 } ))
     {
         std::cerr << "Vec3 Min2 failed!" << std::endl;
+        return false;
     }
     if (!Vec3::Max2( { 1, 2, 3 }, { 3, 1, 2 } ).IsAlmost( { 3, 2, 3 } ))
     {
         std::cerr << "Vec3 Max2 failed!" << std::endl;
+        return false;
     }
 
     if (std::abs( Vec3::Dot( { 2, 2, 2 }, { 2, 2, 2 } ) - 12 ) > 0.0001f)
     {
         std::cerr << "Vec3 Dot failed! " << std::endl;
+        return false;
     }
 
     if (!Vec3::Cross( { 1, 0, 0 }, { 0, 1, 0 } ).IsAlmost( { 0, 0, 1 } ))
     {
         std::cerr << "Vec3 Cross failed!" << std::endl;
+        return false;
     }
 
     if (std::abs( Vec3::Distance( { 2, 2, 2 }, { 4, 2, 2 } ) - 2 ) > 0.0001f)
     {
         std::cerr << "Vec3 Distance failed! " << std::endl;
+        return false;
     }
     if (std::abs( Vec3::DistanceSquared( { 2, 2, 2 }, { 4, 2, 2 } ) - 4 ) > 0.0001f)
     {
         std::cerr << "Vec3 DistanceSquared failed! " << std::endl;
+        return false;
     }
 
     if (!Vec3::Reflect( { 1, 1, 0 }, { 1, 0, 0 } ).IsAlmost( { -1, 1, 0 } ))
     {
         std::cerr << "Vec3 reflect failed! " << std::endl;
+        return false;
     }
+
+    return true;
 }
 
-void TestMatrixTranspose()
+bool TestMatrixTranspose()
 {
     Matrix44 matrix;
     const float exceptedResult = 42;
@@ -156,10 +181,13 @@ void TestMatrixTranspose()
     if (matrix.m[ 3 * 4 ] != exceptedResult)
     {
         std::cerr << "Matrix transpose failed!" << std::endl;
+        return false;
     }
+
+    return true;
 }
 
-void TestMatrixMultiply()
+bool TestMatrixMultiply()
 {
     Matrix44 matrix1;
     const float m1data[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
@@ -187,11 +215,14 @@ void TestMatrixMultiply()
         if (std::abs( result.m[ i ] - expectedResult.m[ i ] ) > 0.0001f)
         {
             std::cerr << "Matrix multiply failed!" << std::endl;
+            return false;
         }
     }
+
+    return true;
 }
 
-void TestMatrixInverse()
+bool TestMatrixInverse()
 {
     Matrix44 mat;
     mat.MakeProjection( 45, 4.0f / 3.0f, 1, 200 );
@@ -214,8 +245,11 @@ void TestMatrixInverse()
         if (std::abs( result.m[ i ] - expectedResult.m[ i ] ) > 0.0001f)
         {
             std::cerr << "Matrix inverse failed!" << std::endl;
+            return false;
         }
     }
+
+    return true;
 }
 
 static bool TestQuatConstructor()
@@ -299,23 +333,30 @@ bool TestQuatEuler()
     return result;
 }
 
-void TestQuaternion()
+bool TestQuaternion()
 {
     if (!(TestQuatEuler() && TestQuatConstructor() && TestQuatGetConjugate() &&
           TestQuatMultiplyQ1Q2() && TestQuatNormalize()))
     {
         std::cerr << "Quaternion failed!" << std::endl;
+        return false;
     }
+
+    return true;
 }
 
 int main()
 {
-    TestVec3();
-    TestVec4();
-    TestMatrixTranspose();
-    TestMatrixMultiply();
-    TestMatrixInverse();
-    TestQuaternion();
+    bool result = true;
+
+    result &= TestVec3();
+    result &= TestVec4();
+    result &= TestMatrixTranspose();
+    result &= TestMatrixMultiply();
+    result &= TestMatrixInverse();
+    result &= TestQuaternion();
+
+    return result ? 0 : 1;
 }
 
     

@@ -114,9 +114,6 @@
     <ClCompile Include="..\Video\D3D12\ShaderD3D12.cpp">
       <Filter>Video</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\OculusRiftSupport.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\Components\DirectionalLightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>

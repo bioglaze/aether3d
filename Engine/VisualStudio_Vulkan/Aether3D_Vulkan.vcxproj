@@ -68,12 +68,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>SIMD_SSE3;VK_PROTOTYPES;VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -108,7 +110,6 @@
     <ClCompile Include="..\ThirdParty\stb_vorbis.c" />
     <ClCompile Include="..\Video\DDSLoader.cpp" />
     <ClCompile Include="..\Video\Material.cpp" />
-    <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />
     <ClCompile Include="..\Video\TextureCommon.cpp" />
     <ClCompile Include="..\Video\Vulkan\ComputeShaderVulkan.cpp" />

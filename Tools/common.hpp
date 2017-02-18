@@ -959,7 +959,7 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         }
 
         gMeshes[ m ].Interleave();
-        gMeshes[ m ].OptimizeFaces();
+        //gMeshes[ m ].OptimizeFaces();
 
         gMeshes[ m ].SolveFaceNormals();
         gMeshes[ m ].SolveFaceTangents();

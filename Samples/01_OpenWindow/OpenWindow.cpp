@@ -15,7 +15,7 @@
 
 using namespace ae3d;
 
-// Sample assets can be downloaded from here: http://twiren.kapsi.fi/files/aether3d_sample_v0.6.zip
+// Sample assets can be downloaded from here: http://twiren.kapsi.fi/files/aether3d_sample_v0.6.5.zip
 // Extract them into aether3d_build that is generated next to aether3d folder.
 
 int main()

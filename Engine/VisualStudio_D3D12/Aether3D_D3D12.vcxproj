@@ -75,12 +75,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>SIMD_SSE3;_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;RENDERER_D3D12</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -126,7 +129,6 @@
     <ClCompile Include="..\Video\D3D12\VertexBufferD3D12.cpp" />
     <ClCompile Include="..\Video\DDSLoader.cpp" />
     <ClCompile Include="..\Video\Material.cpp" />
-    <ClCompile Include="..\Video\OculusRiftSupport.cpp" />
     <ClCompile Include="..\Video\RendererCommon.cpp" />
     <ClCompile Include="..\Video\TextureCommon.cpp" />
     <ClCompile Include="..\Video\WindowWin32.cpp" />

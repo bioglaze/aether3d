@@ -325,12 +325,20 @@ void ImportMeshNodes( FbxNode* node )
     }
 }
 
+struct Keyframe
+{
+    FbxLongLong frameNum;
+    FbxAMatrix globalTransform;
+    Keyframe* next = nullptr;
+};
+
 struct Joint
 {
     FbxNode* node = nullptr;
     FbxAMatrix globalBindposeInverse;
     int parentIndex = 0;
     std::string name;
+    Keyframe* animation = nullptr;
 };
 
 struct Skeleton
@@ -351,7 +359,8 @@ struct CtrlPoint
 };
 
 Skeleton skeleton;
-std::vector< CtrlPoint* > mControlPoints;
+std::vector< CtrlPoint* > controlPoints;
+FbxLongLong animationLength;
 
 FbxAMatrix GetGeometryTransformation( FbxNode* inNode )
 {
@@ -367,49 +376,57 @@ FbxAMatrix GetGeometryTransformation( FbxNode* inNode )
 void ProcessControlPoints( FbxNode* inNode )
 {
     FbxMesh* currMesh = inNode->GetMesh();
-    unsigned int ctrlPointCount = currMesh->GetControlPointsCount();
-    for (unsigned int i = 0; i < ctrlPointCount; ++i)
+    const unsigned ctrlPointCount = currMesh->GetControlPointsCount();
+    controlPoints.resize( ctrlPointCount );
+
+    for (unsigned ctrlPointIndex = 0; ctrlPointIndex < ctrlPointCount; ++ctrlPointIndex)
     {
         CtrlPoint* currCtrlPoint = new CtrlPoint();
         Vec3 currPosition;
-        currPosition.x = static_cast<float>(currMesh->GetControlPointAt( i ).mData[ 0 ]);
-        currPosition.y = static_cast<float>(currMesh->GetControlPointAt( i ).mData[ 1 ]);
-        currPosition.z = static_cast<float>(currMesh->GetControlPointAt( i ).mData[ 2 ]);
+        currPosition.x = static_cast<float>(currMesh->GetControlPointAt( ctrlPointIndex ).mData[ 0 ]);
+        currPosition.y = static_cast<float>(currMesh->GetControlPointAt( ctrlPointIndex ).mData[ 1 ]);
+        currPosition.z = static_cast<float>(currMesh->GetControlPointAt( ctrlPointIndex ).mData[ 2 ]);
         currCtrlPoint->mPosition = currPosition;
-        mControlPoints[ i ] = currCtrlPoint;
+        controlPoints[ ctrlPointIndex ] = currCtrlPoint;
     }
+}
+
+unsigned FindJointIndexUsingName( const std::string& inJointName )
+{
+    for (unsigned int i = 0; i < skeleton.joints.size(); ++i)
+    {
+        if (skeleton.joints[ i ].name == inJointName)
+        {
+            return i;
+        }
+    }
+
+    std::cerr << "Corrupted skeleton information" << std::endl;
+    return 0;
 }
 
 void ProcessJointsAndAnimations( FbxNode* inNode )
 {
     FbxMesh* currMesh = inNode->GetMesh();
     unsigned int numOfDeformers = currMesh->GetDeformerCount();
-    // This geometry transform is something I cannot understand
-    // I think it is from MotionBuilder
-    // If you are using Maya for your models, 99% this is just an
-    // identity matrix
-    // But I am taking it into account anyways......
     FbxAMatrix geometryTransform = GetGeometryTransformation( inNode );
 
-    // A deformer is a FBX thing, which contains some clusters
-    // A cluster contains a link, which is basically a joint
-    // Normally, there is only one deformer in a mesh
     for (unsigned int deformerIndex = 0; deformerIndex < numOfDeformers; ++deformerIndex)
     {
-        // There are many types of deformers in Maya,
-        // We are using only skins, so we see if this is a skin
         FbxSkin* currSkin = reinterpret_cast<FbxSkin*>(currMesh->GetDeformer( deformerIndex, FbxDeformer::eSkin ));
         if (!currSkin)
         {
             continue;
         }
 
-        unsigned int numOfClusters = currSkin->GetClusterCount();
-        for (unsigned int clusterIndex = 0; clusterIndex < numOfClusters; ++clusterIndex)
+        const unsigned numOfClusters = currSkin->GetClusterCount();
+
+        for (unsigned clusterIndex = 0; clusterIndex < numOfClusters; ++clusterIndex)
         {
             FbxCluster* currCluster = currSkin->GetCluster( clusterIndex );
-            std::string currJointName = currCluster->GetLink()->GetName();
-            unsigned int currJointIndex = 0;// FindJointIndexUsingName( currJointName );
+            const std::string currJointName = currCluster->GetLink()->GetName();
+            const unsigned currJointIndex = FindJointIndexUsingName( currJointName );
+            std::cout << "cluster index " << clusterIndex << ", currJointIndex " << currJointIndex << ", currJointName " << currJointName << std::endl;
             FbxAMatrix transformMatrix;
             FbxAMatrix transformLinkMatrix;
             FbxAMatrix globalBindposeInverseMatrix;
@@ -418,49 +435,42 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
             currCluster->GetTransformLinkMatrix( transformLinkMatrix );	// The transformation of the cluster(joint) at binding time from joint space to world space
             globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix * geometryTransform;
 
-            // Update the information in mSkeleton 
             skeleton.joints[ currJointIndex ].globalBindposeInverse = globalBindposeInverseMatrix;
             skeleton.joints[ currJointIndex ].node = currCluster->GetLink();
 
-            // Associate each joint with the control points it affects
-            unsigned int numOfIndices = currCluster->GetControlPointIndicesCount();
-            for (unsigned int i = 0; i < numOfIndices; ++i)
+            const unsigned numOfIndices = currCluster->GetControlPointIndicesCount();
+
+            for (unsigned i = 0; i < numOfIndices; ++i)
             {
                 BlendingIndexWeightPair currBlendingIndexWeightPair;
                 currBlendingIndexWeightPair.blendingIndex = currJointIndex;
                 currBlendingIndexWeightPair.blendingWeight = static_cast< float >( currCluster->GetControlPointWeights()[ i ] );
-                mControlPoints[ currCluster->GetControlPointIndices()[ i ] ]->mBlendingInfo.push_back( currBlendingIndexWeightPair );
+                controlPoints[ currCluster->GetControlPointIndices()[ i ] ]->mBlendingInfo.push_back( currBlendingIndexWeightPair );
             }
 
-            // Get animation information
-            // Now only supports one take
-            FbxAnimStack* currAnimStack = 0;//B = scene->GetSrcObject<FbxAnimStack>( 0 );
-            FbxString animStackName = currAnimStack->GetName();
-            std::string mAnimationName = animStackName.Buffer();
+            const FbxAnimStack* currAnimStack = scene->GetSrcObject< FbxAnimStack >( 0 );
+            const FbxString animStackName = currAnimStack->GetName();
+            const std::string mAnimationName = animStackName.Buffer();
             std::cout << "animation name: " << mAnimationName << std::endl;
-            FbxTakeInfo* takeInfo = scene->GetTakeInfo( animStackName );
-            FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
-            FbxTime end = takeInfo->mLocalTimeSpan.GetStop();
-            /*mAnimationLength = end.GetFrameCount( FbxTime::eFrames24 ) - start.GetFrameCount( FbxTime::eFrames24 ) + 1;
-            Keyframe** currAnim = &skeleton.joints[ currJointIndex ].mAnimation;
+            const FbxTakeInfo* takeInfo = scene->GetTakeInfo( animStackName );
+            const FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
+            const FbxTime end = takeInfo->mLocalTimeSpan.GetStop();
+            animationLength = end.GetFrameCount( FbxTime::eFrames24 ) - start.GetFrameCount( FbxTime::eFrames24 ) + 1;
+            Keyframe** currAnim = &skeleton.joints[ currJointIndex ].animation;
 
             for (FbxLongLong i = start.GetFrameCount( FbxTime::eFrames24 ); i <= end.GetFrameCount( FbxTime::eFrames24 ); ++i)
             {
                 FbxTime currTime;
                 currTime.SetFrame( i, FbxTime::eFrames24 );
                 *currAnim = new Keyframe();
-                (*currAnim)->mFrameNum = i;
+                (*currAnim)->frameNum = i;
                 FbxAMatrix currentTransformOffset = inNode->EvaluateGlobalTransform( currTime ) * geometryTransform;
-                (*currAnim)->mGlobalTransform = currentTransformOffset.Inverse() * currCluster->GetLink()->EvaluateGlobalTransform( currTime );
-                currAnim = &((*currAnim)->mNext);
-            }*/
+                (*currAnim)->globalTransform = currentTransformOffset.Inverse() * currCluster->GetLink()->EvaluateGlobalTransform( currTime );
+                currAnim = &((*currAnim)->next);
+            }
         }
     }
 
-    // Some of the control points only have less than 4 joints
-    // affecting them.
-    // For a normal renderer, there are usually 4 joints
-    // I am adding more dummy joints if there isn't enough
     /*BlendingIndexWeightPair currBlendingIndexWeightPair;
     currBlendingIndexWeightPair.blendingIndex = 0;
     currBlendingIndexWeightPair.blendingWeight = 0;
@@ -471,6 +481,8 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
             itr->second->mBlendingInfo.push_back( currBlendingIndexWeightPair );
         }
     }*/
+
+    std::cout << "done" << std::endl;
 }
 
 void ProcessSkeletonHierarchyRecursively( const FbxNode* inNode, int myIndex, int inParentIndex )
@@ -498,6 +510,20 @@ void ProcessSkeletonHierarchy( const FbxNode* rootNode )
     }
 }
 
+void ProcessJointsAndAnimationsRecursively( FbxNode* node )
+{
+    if (node->GetNodeAttribute() && node->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eMesh)
+    {
+        ProcessControlPoints( node );
+        ProcessJointsAndAnimations( node );
+    }
+
+    for (int i = 0; i < node->GetChildCount(); ++i)
+    {
+        ProcessJointsAndAnimationsRecursively( node->GetChild( i ) );
+    }
+}
+
 void LoadFBX( const std::string& path )
 {
     std::ifstream ifs( path.c_str() );
@@ -520,15 +546,15 @@ void LoadFBX( const std::string& path )
 
     ImportMeshNodes( rootNode );
 
-    /*ProcessSkeletonHierarchy( rootNode );
-    ProcessJointsAndAnimations( rootNode );
+    ProcessSkeletonHierarchy( rootNode );
+    ProcessJointsAndAnimationsRecursively( rootNode );
     std::cout << "skeleton: " << std::endl;
     for (std::size_t i = 0; i < skeleton.joints.size(); ++i)
     {
         std::cout << "joint " << skeleton.joints[ i ].name << ", parent index "  << skeleton.joints[ i ].parentIndex << std::endl;
     }
 
-    std::cout << "end" << std::endl;*/
+    std::cout << "end" << std::endl;
 }
 
 int main( int paramCount, char** params )

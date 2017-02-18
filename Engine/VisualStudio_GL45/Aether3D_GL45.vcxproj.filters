@@ -76,9 +76,6 @@
     <ClCompile Include="..\Core\Frustum.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\Video\OculusRiftSupport.cpp">
-      <Filter>Video</Filter>
-    </ClCompile>
     <ClCompile Include="..\Components\DirectionalLightComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
