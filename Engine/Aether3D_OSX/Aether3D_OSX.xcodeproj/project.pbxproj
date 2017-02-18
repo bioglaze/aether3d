@@ -69,7 +69,6 @@
 		ABCF19C01AE28EA600822E80 /* TextRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19BF1AE28EA600822E80 /* TextRendererComponent.cpp */; };
 		ABCF19C31AE2D08800822E80 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABCF19C21AE2D08800822E80 /* Font.cpp */; };
 		ABD910F41B78F930005EBB74 /* VR.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABD910F31B78F930005EBB74 /* VR.hpp */; };
-		ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */; };
 		ABE40D4F1DA54ABA0000951B /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABE40D4E1DA54ABA0000951B /* MathUtil.cpp */; };
 		ABF549B11DF3364600EFF25D /* Statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABF549AF1DF3364600EFF25D /* Statistics.cpp */; };
 		ABF549B21DF3364600EFF25D /* Statistics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF549B01DF3364600EFF25D /* Statistics.hpp */; };
@@ -153,7 +152,6 @@
 		ABCF19C11AE2CF7200822E80 /* Font.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Font.hpp; path = ../Include/Font.hpp; sourceTree = "<group>"; };
 		ABCF19C21AE2D08800822E80 /* Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Font.cpp; path = ../Core/Font.cpp; sourceTree = "<group>"; };
 		ABD910F31B78F930005EBB74 /* VR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VR.hpp; path = ../Include/VR.hpp; sourceTree = "<group>"; };
-		ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
 		ABE40D4E1DA54ABA0000951B /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../Core/MathUtil.cpp; sourceTree = "<group>"; };
 		ABF549AF1DF3364600EFF25D /* Statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Statistics.cpp; path = ../Core/Statistics.cpp; sourceTree = "<group>"; };
 		ABF549B01DF3364600EFF25D /* Statistics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Statistics.hpp; path = ../Core/Statistics.hpp; sourceTree = "<group>"; };
@@ -204,7 +202,6 @@
 				AB4CD69A1C80C5A900C21006 /* GfxDeviceGL.cpp */,
 				AB889AE81ABB4C3B005BA86D /* GfxDevice.hpp */,
 				AB190E2D1B57DB0B005ECE49 /* Material.cpp */,
-				ABD910F51B78F946005EBB74 /* OculusRiftSupport.cpp */,
 				AB4CD69C1C80C5A900C21006 /* RenderTextureGL.cpp */,
 				AB4CD69B1C80C5A900C21006 /* RendererGL.cpp */,
 				ABCE0CA71AC08B0400F9EC53 /* Renderer.hpp */,
@@ -434,7 +431,6 @@
 				ABF549B11DF3364600EFF25D /* Statistics.cpp in Sources */,
 				AB889B091ABB4FDE005BA86D /* GameObject.cpp in Sources */,
 				AB4CD6A51C80C5A900C21006 /* RenderTextureGL.cpp in Sources */,
-				ABD910F61B78F946005EBB74 /* OculusRiftSupport.cpp in Sources */,
 				AB7C8AC31D74C9520066EC28 /* DDSLoader.cpp in Sources */,
 				AB4CD6AA1C80C5A900C21006 /* WindowOSX_GL.mm in Sources */,
 			);

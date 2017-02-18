@@ -73,7 +73,6 @@
 		AB6E134B1C11D8BC0020A929 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E13491C11D8BC0020A929 /* stb_image.c */; };
 		AB6E134C1C11D8BD0020A929 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */; };
 		AB6E134E1C11D93E0020A929 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6E134D1C11D93E0020A929 /* Metal.framework */; };
-		AB6E85851CB571A10041C8CB /* OculusRiftSupport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */; };
 		AB7C8AC01D74C8CB0066EC28 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7C8ABE1D74C8CB0066EC28 /* DDSLoader.cpp */; };
 		AB7C8AC11D74C8CB0066EC28 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB7C8ABF1D74C8CB0066EC28 /* DDSLoader.hpp */; };
 		AB8E83F71CEBAE7600A8E9E8 /* PointLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */; };
@@ -154,7 +153,6 @@
 		AB6E13491C11D8BC0020A929 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_image.c; path = ../ThirdParty/stb_image.c; sourceTree = "<group>"; };
 		AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB6E134D1C11D93E0020A929 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
-		AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OculusRiftSupport.cpp; path = ../Video/OculusRiftSupport.cpp; sourceTree = "<group>"; };
 		AB7C8ABE1D74C8CB0066EC28 /* DDSLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DDSLoader.cpp; path = ../Video/DDSLoader.cpp; sourceTree = "<group>"; };
 		AB7C8ABF1D74C8CB0066EC28 /* DDSLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DDSLoader.hpp; path = ../Video/DDSLoader.hpp; sourceTree = "<group>"; };
 		AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../Include/PointLightComponent.hpp; sourceTree = "<group>"; };
@@ -256,7 +254,6 @@
 				AB6E133D1C11D8A00020A929 /* Material.cpp */,
 				AB6E133E1C11D8A00020A929 /* Renderer.hpp */,
 				AB6E133F1C11D8A00020A929 /* RendererCommon.cpp */,
-				AB6E85841CB571A10041C8CB /* OculusRiftSupport.cpp */,
 				AB6E12FC1C11D7C50020A929 /* RendererMetal.mm */,
 				AB6E12FD1C11D7C50020A929 /* RenderTextureMetal.mm */,
 				AB6E12FE1C11D7C50020A929 /* ShaderMetal.mm */,
@@ -442,7 +439,6 @@
 				AB6E13011C11D7C50020A929 /* GfxDeviceMetal.mm in Sources */,
 				AB6E12F61C11D7B00020A929 /* Mesh.cpp in Sources */,
 				AB6E12F71C11D7B00020A929 /* Scene.cpp in Sources */,
-				AB6E85851CB571A10041C8CB /* OculusRiftSupport.cpp in Sources */,
 				AB6E12EC1C11D7B00020A929 /* AudioSystemOpenAL.cpp in Sources */,
 				AB6E13461C11D8A00020A929 /* TextureCommon.cpp in Sources */,
 				AB6E13021C11D7C50020A929 /* RendererMetal.mm in Sources */,

@@ -16,6 +16,7 @@
 #include "Shader.hpp"
 #include "Statistics.hpp"
 #include "Vec3.hpp"
+#include "VR.hpp"
 
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
@@ -251,3 +252,22 @@ void ae3d::System::RunUnitTests()
     const int max2 = MathUtil::Max( -1, 2 );
     Assert( max2 == 2, "Max failed" );
 }
+
+#if !AE3D_OPENVR
+void ae3d::VR::Deinit()
+{
+}
+
+void ae3d::VR::Init()
+{
+}
+
+void ae3d::VR::StartTracking( int /*windowWidth*/, int /*windowHeight*/ )
+{
+}
+
+void ae3d::VR::RecenterTracking()
+{
+}
+
+#endif
