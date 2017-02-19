@@ -328,7 +328,7 @@ void SceneWidget::Init()
 
     scene.Add( &hudCamera );
 
-    previewCameraTex.Create2D( rtDim.x, rtDim.y, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear );
+    previewCameraTex.Create2D( rtDim.x, rtDim.y, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "previewCamera" );
 
     previewCamera.AddComponent<CameraComponent>();
     previewCamera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
@@ -831,7 +831,7 @@ void SceneWidget::CenterSelected()
         return;
     }
 
-    camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 20 ), SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
+    camera.GetComponent<TransformComponent>()->LookAt( SelectionAveragePosition() + Vec3( 0, 0, 20 ), -SelectionAveragePosition(), Vec3( 0, 1, 0 ) );
 }
 
 void SceneWidget::SetSelectedObjectHighlight( bool enable )
@@ -1039,7 +1039,7 @@ bool SceneWidget::eventFilter( QObject* /*obj*/, QEvent* event )
                 GameObject* go = gameObjects[ goIndex ].get();
                 const Vec3 oldPosition = go->GetComponent< TransformComponent >()->GetLocalPosition();
 
-                float xOffset = -deltaX;
+                float xOffset = -deltaX * 0.1f;
 
                 if (xOffset > 1)
                 {
@@ -1052,7 +1052,7 @@ bool SceneWidget::eventFilter( QObject* /*obj*/, QEvent* event )
 
                 float zOffset = -xOffset;
 
-                float yOffset = deltaY;
+                float yOffset = deltaY * 0.1f;
 
                 if (yOffset > 1)
                 {

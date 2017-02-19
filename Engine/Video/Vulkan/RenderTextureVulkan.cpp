@@ -59,7 +59,7 @@ void ae3d::RenderTexture::DestroyTextures()
     }
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -127,7 +127,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     VkResult err = vkCreateImage( GfxDeviceGlobal::device, &colorImage, nullptr, &color.image );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image" );
     RenderTextureGlobal::imagesToReleaseAtExit.push_back( color.image );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, "render texture 2d color" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
 
     VkMemoryRequirements memReqs;
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, color.image, &memReqs );
@@ -248,7 +248,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aDimension <= 0)
     {
@@ -264,7 +264,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     dataType = aDataType;
     handle = 1;
 
-    VkFormat colorFormat;// = GfxDeviceGlobal::colorFormat;
+    VkFormat colorFormat;
 
     if (dataType == DataType::UByte)
     {
@@ -283,6 +283,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         System::Print( "Unhandled format in 2d render texture\n" );
         colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
     }
+
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.pNext = nullptr;

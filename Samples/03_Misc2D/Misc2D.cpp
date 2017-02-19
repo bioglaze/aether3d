@@ -129,7 +129,7 @@ int main()
     statsContainer.GetComponent<TransformComponent>()->SetParent( statsParent.GetComponent<TransformComponent>() );
 
     RenderTexture rtTex;
-    rtTex.Create2D( 512, 512, RenderTexture::DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear );
+    rtTex.Create2D( 512, 512, RenderTexture::DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear, "render texture" );
     
     GameObject renderTextureContainer;
     renderTextureContainer.AddComponent<SpriteRendererComponent>();

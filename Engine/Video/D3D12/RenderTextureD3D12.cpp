@@ -23,7 +23,7 @@ void ae3d::RenderTexture::DestroyTextures()
     }
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -81,7 +81,10 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
-    gpuResource.resource->SetName( L"Render Texture 2D" );
+    wchar_t wstr[ 128 ];
+    std::mbstowcs( wstr, debugName, 128 );
+
+    gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     RenderTextureGlobal::renderTextures.push_back( gpuResource.resource );
 
@@ -128,7 +131,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     }
 }
 
-void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter )
+void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aDimension <= 0)
     {
@@ -185,7 +188,10 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
             D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
         AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
-        gpuResource.resource->SetName( L"Cube map RT base" );
+
+        wchar_t wstr[ 128 ];
+        std::mbstowcs( wstr, debugName, 128 );
+        gpuResource.resource->SetName( wstr );
         gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
         RenderTextureGlobal::renderTextures.push_back( gpuResource.resource );
 
