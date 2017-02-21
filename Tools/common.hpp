@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <algorithm>
@@ -103,9 +104,29 @@ struct VertexPTNTCWithData
     VertexData data;
 };
 
+struct Keyframe
+{
+    std::uint64_t frameNum;
+    ae3d::Matrix44 globalTransform;
+    Keyframe* next = nullptr;
+};
+
+struct Joint
+{
+    class FbxNode* node = nullptr;
+    ae3d::Matrix44 globalBindposeInverse;
+    int parentIndex = -1;
+    std::string name;
+    Keyframe* animation = nullptr;
+};
+
+struct Skeleton
+{
+    std::vector< Joint > joints;
+};
+
 struct Mesh
 {
-    void BuildVertexInfluences();
     void Interleave();
     void SolveAABB();
     void SolveFaceNormals();
@@ -143,6 +164,8 @@ struct Mesh
 
     ae3d::Vec3 aabbMax;
     ae3d::Vec3 aabbMin;
+
+    Skeleton skeleton;
 };
 
 std::vector< Mesh > gMeshes;
@@ -924,6 +947,8 @@ bool Mesh::AlmostEquals( const TexCoord& t1, const TexCoord& t2 ) const
  (*)        Vertex data array of type Vertex.
  (2)        # of faces
  (*)        faces
+ (2)        # of joints if magic number is >= a8
+ (*)        joints
  (1)    terminator byte: 100
  */
 
@@ -1036,6 +1061,16 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
 
         // Writes indices.
         ofs.write( (char*)&gMeshes[m].indices[ 0 ], gMeshes[m].indices.size() * sizeof( VertexInd ) );
+
+        // Writes # of joints.
+        /*const unsigned short nJoints = (unsigned short)gMeshes[ m ].skeleton.joints.size();
+        ofs.write( reinterpret_cast< char* >((char*)&nJoints), 2 );
+
+        // Writes joints.
+        if (!gMeshes[ m ].skeleton.joints.empty())
+        {
+            ofs.write( (char*)&gMeshes[ m ].skeleton.joints[ 0 ], gMeshes[ m ].skeleton.joints.size() * sizeof( Joint ) );
+        }*/
     }
 
     // Terminator.

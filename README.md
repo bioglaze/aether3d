@@ -50,10 +50,10 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes.
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
   - FBX converter tries to find FBX SDK 2017.1 in its default install location (English language localization)
   
-### Oculus Rift
-  - Build Oculus SDK's `LibOVR` and `LibOVRKernel`'s `Release x64` target in VS2015 and copy these folders into `Engine/ThirdParty`: LibOVR, LibOVRKernel, Logging
-  - Open OpenGL renderer's Visual Studio solution and select target ***Oculus Release***
-  - Build and run Samples/04_Misc3D target ***Oculus Release*** in VS2015.
+### OpenVR
+  - Copy OpenVR headers into Engine\ThirdParty\headers
+  - Open OpenGL renderer's Visual Studio solution and select target ***OpenVR Release***
+  - Build and run Samples/04_Misc3D target ***OpenVR Release*** in VS2015.
 
 ## macOS
 

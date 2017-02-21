@@ -325,27 +325,6 @@ void ImportMeshNodes( FbxNode* node )
     }
 }
 
-struct Keyframe
-{
-    FbxLongLong frameNum;
-    FbxAMatrix globalTransform;
-    Keyframe* next = nullptr;
-};
-
-struct Joint
-{
-    FbxNode* node = nullptr;
-    FbxAMatrix globalBindposeInverse;
-    int parentIndex = 0;
-    std::string name;
-    Keyframe* animation = nullptr;
-};
-
-struct Skeleton
-{
-    std::vector< Joint > joints;
-};
-
 struct BlendingIndexWeightPair
 {
     int blendingIndex = 0;
@@ -355,10 +334,9 @@ struct BlendingIndexWeightPair
 struct CtrlPoint
 {
     Vec3 mPosition;
-    std::vector<BlendingIndexWeightPair> mBlendingInfo;
+    std::vector< BlendingIndexWeightPair > blendingInfo;
 };
 
-Skeleton skeleton;
 std::vector< CtrlPoint* > controlPoints;
 FbxLongLong animationLength;
 
@@ -391,7 +369,7 @@ void ProcessControlPoints( FbxNode* inNode )
     }
 }
 
-unsigned FindJointIndexUsingName( const std::string& inJointName )
+unsigned FindJointIndexUsingName( const Skeleton& skeleton, const std::string& inJointName )
 {
     for (unsigned int i = 0; i < skeleton.joints.size(); ++i)
     {
@@ -407,6 +385,8 @@ unsigned FindJointIndexUsingName( const std::string& inJointName )
 
 void ProcessJointsAndAnimations( FbxNode* inNode )
 {
+    assert( !gMeshes.empty() );
+
     FbxMesh* currMesh = inNode->GetMesh();
     unsigned int numOfDeformers = currMesh->GetDeformerCount();
     FbxAMatrix geometryTransform = GetGeometryTransformation( inNode );
@@ -425,7 +405,7 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
         {
             FbxCluster* currCluster = currSkin->GetCluster( clusterIndex );
             const std::string currJointName = currCluster->GetLink()->GetName();
-            const unsigned currJointIndex = FindJointIndexUsingName( currJointName );
+            const unsigned currJointIndex = FindJointIndexUsingName( gMeshes.back().skeleton, currJointName );
             std::cout << "cluster index " << clusterIndex << ", currJointIndex " << currJointIndex << ", currJointName " << currJointName << std::endl;
             FbxAMatrix transformMatrix;
             FbxAMatrix transformLinkMatrix;
@@ -435,8 +415,15 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
             currCluster->GetTransformLinkMatrix( transformLinkMatrix );	// The transformation of the cluster(joint) at binding time from joint space to world space
             globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix * geometryTransform;
 
-            skeleton.joints[ currJointIndex ].globalBindposeInverse = globalBindposeInverseMatrix;
-            skeleton.joints[ currJointIndex ].node = currCluster->GetLink();
+            for (int j = 0; j < 4; ++j)
+            {
+                for (int i = 0; i < 4; ++i)
+                {
+                    gMeshes.back().skeleton.joints[ currJointIndex ].globalBindposeInverse.m[ j * 4 + i ] = float( globalBindposeInverseMatrix.Get( j, i ) );
+                }
+            }
+
+            gMeshes.back().skeleton.joints[ currJointIndex ].node = currCluster->GetLink();
 
             const unsigned numOfIndices = currCluster->GetControlPointIndicesCount();
 
@@ -445,42 +432,52 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
                 BlendingIndexWeightPair currBlendingIndexWeightPair;
                 currBlendingIndexWeightPair.blendingIndex = currJointIndex;
                 currBlendingIndexWeightPair.blendingWeight = static_cast< float >( currCluster->GetControlPointWeights()[ i ] );
-                controlPoints[ currCluster->GetControlPointIndices()[ i ] ]->mBlendingInfo.push_back( currBlendingIndexWeightPair );
+                controlPoints[ currCluster->GetControlPointIndices()[ i ] ]->blendingInfo.push_back( currBlendingIndexWeightPair );
             }
 
             const FbxAnimStack* currAnimStack = scene->GetSrcObject< FbxAnimStack >( 0 );
             const FbxString animStackName = currAnimStack->GetName();
-            const std::string mAnimationName = animStackName.Buffer();
-            std::cout << "animation name: " << mAnimationName << std::endl;
+            const std::string animationName = animStackName.Buffer();
+            std::cout << "animation name: " << animationName << std::endl;
             const FbxTakeInfo* takeInfo = scene->GetTakeInfo( animStackName );
             const FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
             const FbxTime end = takeInfo->mLocalTimeSpan.GetStop();
             animationLength = end.GetFrameCount( FbxTime::eFrames24 ) - start.GetFrameCount( FbxTime::eFrames24 ) + 1;
-            Keyframe** currAnim = &skeleton.joints[ currJointIndex ].animation;
+            Keyframe** currAnim = &gMeshes.back().skeleton.joints[ currJointIndex ].animation;
 
-            for (FbxLongLong i = start.GetFrameCount( FbxTime::eFrames24 ); i <= end.GetFrameCount( FbxTime::eFrames24 ); ++i)
+            for (FbxLongLong f = start.GetFrameCount( FbxTime::eFrames24 ); f <= end.GetFrameCount( FbxTime::eFrames24 ); ++f)
             {
                 FbxTime currTime;
-                currTime.SetFrame( i, FbxTime::eFrames24 );
+                currTime.SetFrame( f, FbxTime::eFrames24 );
                 *currAnim = new Keyframe();
-                (*currAnim)->frameNum = i;
+                (*currAnim)->frameNum = f;
                 FbxAMatrix currentTransformOffset = inNode->EvaluateGlobalTransform( currTime ) * geometryTransform;
-                (*currAnim)->globalTransform = currentTransformOffset.Inverse() * currCluster->GetLink()->EvaluateGlobalTransform( currTime );
+
+                for (int j = 0; j < 4; ++j)
+                {
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        (*currAnim)->globalTransform.m[ j * 4 + i ] = float( (currentTransformOffset.Inverse() * currCluster->GetLink()->EvaluateGlobalTransform( currTime )).Get( j, i ) );
+                    }
+                }
+
                 currAnim = &((*currAnim)->next);
             }
         }
     }
 
-    /*BlendingIndexWeightPair currBlendingIndexWeightPair;
+    BlendingIndexWeightPair currBlendingIndexWeightPair;
     currBlendingIndexWeightPair.blendingIndex = 0;
     currBlendingIndexWeightPair.blendingWeight = 0;
-    for (auto itr = mControlPoints.begin(); itr != mControlPoints.end(); ++itr)
+
+    // Adds dummy joints if there are < 4
+    for (auto itr = controlPoints.begin(); itr != controlPoints.end(); ++itr)
     {
-        for (unsigned int i = itr->second->mBlendingInfo.size(); i <= 4; ++i)
+        for (std::size_t i = (*itr)->blendingInfo.size(); i <= 4; ++i)
         {
-            itr->second->mBlendingInfo.push_back( currBlendingIndexWeightPair );
+            (*itr)->blendingInfo.push_back( currBlendingIndexWeightPair );
         }
-    }*/
+    }
 
     std::cout << "done" << std::endl;
 }
@@ -492,12 +489,12 @@ void ProcessSkeletonHierarchyRecursively( const FbxNode* inNode, int myIndex, in
         Joint currJoint;
         currJoint.parentIndex = inParentIndex;
         currJoint.name = inNode->GetName();
-        skeleton.joints.push_back( currJoint );
+        gMeshes.back().skeleton.joints.push_back( currJoint );
     }
 
     for (std::size_t childIndex = 0; childIndex < inNode->GetChildCount(); ++childIndex)
     {
-        ProcessSkeletonHierarchyRecursively( inNode->GetChild( static_cast< int >( childIndex ) ), static_cast< int >( skeleton.joints.size() ), myIndex );
+        ProcessSkeletonHierarchyRecursively( inNode->GetChild( static_cast< int >( childIndex ) ), static_cast< int >( gMeshes.back().skeleton.joints.size() ), myIndex );
     }
 }
 
@@ -549,9 +546,9 @@ void LoadFBX( const std::string& path )
     ProcessSkeletonHierarchy( rootNode );
     ProcessJointsAndAnimationsRecursively( rootNode );
     std::cout << "skeleton: " << std::endl;
-    for (std::size_t i = 0; i < skeleton.joints.size(); ++i)
+    for (std::size_t i = 0; i < gMeshes.back().skeleton.joints.size(); ++i)
     {
-        std::cout << "joint " << skeleton.joints[ i ].name << ", parent index "  << skeleton.joints[ i ].parentIndex << std::endl;
+        std::cout << "joint " << gMeshes.back().skeleton.joints[ i ].name << ", parent index "  << gMeshes.back().skeleton.joints[ i ].parentIndex << std::endl;
     }
 
     std::cout << "end" << std::endl;

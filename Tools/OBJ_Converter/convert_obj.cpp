@@ -94,17 +94,18 @@ void LoadObj( const std::string& path )
         stm.clear();
         stm.str( line );
         stm >> preamble;
-		if (preamble == "s")
-		{
-			std::string smoothName;
-			stm >> smoothName;
-			
-			if (smoothName != "off")
-			{
-				std::cout << "Warning: The file contains smoothing groups. They are not supported by the converter." << std::endl;
-			}
-		}
-		else if (preamble == "v")
+
+        if (preamble == "s")
+        {
+            std::string smoothName;
+            stm >> smoothName;
+	
+            if (smoothName != "off")
+            {
+                std::cout << "Warning: The file contains smoothing groups. They are not supported by the converter." << std::endl;
+            }
+        }
+        else if (preamble == "v")
         {
             float x, y, z;
             stm >> x >> y >> z;
