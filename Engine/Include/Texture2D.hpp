@@ -40,6 +40,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkImageView& GetView() { return view; }
 #endif
+        /// Destroys all textures. Called internally at exit.
         static void DestroyTextures();
 
     private:

@@ -17,7 +17,6 @@ struct Vertex
 struct ColorInOut
 {
     float4 position [[position]];
-    float z;
 };
 
 vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
@@ -27,14 +26,13 @@ vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
     
     float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
-    out.z = out.position.z * 0.5 + 0.5; // OpenGL->D3D11 unit cube fixup.
+    out.position.z = out.position.z * 0.5 + 0.5; // -1..1 to 0..1 conversion
     return out;
 }
 
 fragment float4 moments_fragment( ColorInOut in [[stage_in]] )
 {
-    //float linearDepth = in.position.z;
-    float linearDepth = in.z;
+    float linearDepth = in.position.z;
 
     float dx = dfdx( linearDepth );
     float dy = dfdy( linearDepth );

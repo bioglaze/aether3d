@@ -33,16 +33,18 @@ float linstep( float low, float high, float v )
 
 float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth )
 {
-    float2 moments = shadowMap.sample( shadowSampler, projCoord.xy / projCoord.w ).rg;
-
+    float2 uv = (projCoord.xy / projCoord.w) * 0.5 + 0.5;
+    uv.y = 1 - uv.y;
+    
+    float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
+    
     float variance = max( moments.y - moments.x * moments.x, -0.001 );
 
     float delta = depth - moments.x;
     float p = smoothstep( depth - 0.02, depth, moments.x );
     float pMax = linstep( 0.2, 1.0, variance / (variance + delta * delta) );
     
-    //return clamp( max( p, pMax ), 0.0, 1.0 );
-    return 1;//(depth <= moments.x) ? 0.2 : 1.0;
+    return clamp( max( p, pMax ), 0.0, 1.0 );
 }
 
 struct Vertex
@@ -61,7 +63,7 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     
     out.color = half4( vert.color );
-    out.texCoords = float2( vert.texcoord );
+    out.texCoords = vert.texcoord;
     out.tintColor = uniforms.tint;
     out.projCoord = uniforms._ShadowProjectionMatrix * in_position;
     return out;
@@ -75,10 +77,8 @@ fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
     float4 sampledColor = textureMap.sample( sampler0, in.texCoords ) * in.tintColor;
 
     float depth = in.projCoord.z / in.projCoord.w;
+    depth = depth * 0.5 + 0.5;
     float shadow = max( 0.2, VSM( _ShadowMap, in.projCoord, depth ) );
     
-    //return float4(1, 0, 0, 1);
     return sampledColor * float4( shadow, shadow, shadow, 1 );
-    
-    //return _ShadowMap.sample( sampler0, in.texCoords ) * in.tintColor;
 }

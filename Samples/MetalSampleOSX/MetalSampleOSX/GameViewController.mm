@@ -51,6 +51,7 @@ using namespace ae3d;
     GameObject rotatingCube;
     GameObject bigCube;
     GameObject bigCube2;
+    GameObject bigCube3;
     GameObject text;
     GameObject textSDF;
     GameObject dirLight;
@@ -113,7 +114,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -142,7 +143,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -238,7 +239,7 @@ using namespace ae3d;
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     rotatingCube.AddComponent<ae3d::TransformComponent>();
-    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 4, 0, -10 ) );
+    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -8 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
     scene.Add( &rotatingCube );
 
@@ -316,7 +317,7 @@ using namespace ae3d;
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     bigCube.AddComponent<ae3d::TransformComponent>();
-    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -8, -10 ) );
+    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, -8, -10 ) );
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
     scene.Add( &bigCube );
 
@@ -324,10 +325,17 @@ using namespace ae3d;
     bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     bigCube2.AddComponent<ae3d::TransformComponent>();
-    //bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 2, -20 ) );
-    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, -8, -10 ) );
+    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, 4, -16 ) );
     bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
     scene.Add( &bigCube2 );
+
+    bigCube3.AddComponent<ae3d::MeshRendererComponent>();
+    bigCube3.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    bigCube3.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    bigCube3.AddComponent<ae3d::TransformComponent>();
+    bigCube3.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 4, -16 ) );
+    bigCube3.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
+    //scene.Add( &bigCube3 );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
 #ifdef TEST_SHADOWS_DIR

@@ -143,7 +143,9 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             
             Matrix44::Multiply( shadowTexProjMatrix, shadowView, shadowTexProjMatrix );
             Matrix44::Multiply( shadowTexProjMatrix, shadowProjection, shadowTexProjMatrix );
+#ifndef RENDERER_METAL
             Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
+#endif
 #ifndef RENDERER_VULKAN
             // Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );

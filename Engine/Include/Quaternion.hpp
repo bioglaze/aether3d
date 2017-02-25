@@ -185,7 +185,7 @@ namespace ae3d
             return q;
         }
         
-        // Converts a matrix into a Quaternion.
+        /// Converts a matrix into a Quaternion.
         void FromMatrix( const Matrix44& mat )
         {
             float t;

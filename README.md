@@ -4,7 +4,7 @@
 
 This codebase will evolve into the next generation [Aether3D](http://twiren.kapsi.fi/aether3d.html). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
-Not expected to be a valuable tool before 1.0 unless for learning purposes.
+Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.6.5.
 
 ![Screenshot](/Engine/Assets/sample.jpg)
 
@@ -28,8 +28,9 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes.
 
 # Planned Features
 
-  - Physically-based shading
-  - Clustered Forward lighting
+  - Physically-based rendering
+  - Clustered Forward shading
+  - ACES tone mapping
   - Post-processing effects
   - Animation
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)

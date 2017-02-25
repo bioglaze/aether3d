@@ -19,7 +19,7 @@ script:
   - cd ../Tools/OBJ_Converter
   - make
   - make -f Makefile_mtl
-  - cd ../Tools/SDF_Generator
+  - cd ../SDF_Generator
   - make
   - cd ../CombineFiles
   - make

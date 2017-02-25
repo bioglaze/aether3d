@@ -53,7 +53,7 @@
 
    \subsection win1 Windows/Visual Studio
    
-   You'll need Visual Studio 2015 or newer. Build Engine/VisualStudio_GL45 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
+   You'll need Visual Studio 2015 or newer. Build Engine/VisualStudio_GL45, Engine/VisualStudio_D3D12 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    You'll need OpenAL32.dll from OpenAL Soft either in your system directory or in the directory used to run samples/editor.
  
@@ -72,7 +72,7 @@
 
    \subsection osx_cmd macOS and GNU/Linux Command Line
 
-   Run the Makefile in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
+   Run Makefile_OpenGL or Makefile_Vulkan (on Linux) in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    On GNU/Linux you need at least the following packages: <pre>libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev</pre>
 
    \subsection Bugs

@@ -136,6 +136,7 @@ namespace ae3d
         VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
         VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
 #endif
+        /// Destroys all shaders. Called internally at exit.
         static void DestroyShaders();
 
         /// Wraps an int that is defaulted to -1. Needed for uniform handling.
