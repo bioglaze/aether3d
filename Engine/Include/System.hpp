@@ -75,13 +75,6 @@
    Run Makefile_OpenGL or Makefile_Vulkan (on Linux) in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    On GNU/Linux you need at least the following packages: <pre>libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev</pre>
 
-   \subsection Bugs
-
-   <ul>
-   <li>Metal: Shadow maps don't show.</li>
-   <li>Oculus: Mirror texture is broken if SDK initialization fails.</li>
-   </ul>
- 
    \section Tools
  
    \subsection Editor

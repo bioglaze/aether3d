@@ -558,34 +558,6 @@ void Mesh::OptimizeFaces()
         entriesInCache0 = Min( entriesInCache1, lruCacheSize );
     }
 
-    /*for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
-    {
-        std::cout << "non-optimized vertex " << i << ": " <<
-        interleavedVertices[i].position.x  << ", " <<
-        interleavedVertices[i].position.y << ", " <<
-        interleavedVertices[i].position.z << std::endl;
-    }
-
-    for (std::size_t i = 0; i < verticesWithCachedata.size(); ++i)
-    {
-        std::cout << "optimized vertex " << i << ": " <<
-        verticesWithCachedata[i].position.x  << ", " <<
-        verticesWithCachedata[i].position.y << ", " <<
-        verticesWithCachedata[i].position.z << std::endl;
-    }
-    
-    for (std::size_t i = 0; i < indices.size(); ++i)
-    {
-        std::cout << "non-optimized face " << i <<
-        ": " << indices[ i ].a << ", " << indices[ i ].b << ", " << indices[ i ].c << std::endl;
-    }
-
-    for (std::size_t i = 0; i < newIndexList.size(); ++i)
-    {
-        std::cout << "optimized face " << i <<
-            ": " << newIndexList[ i ].a << ", " << newIndexList[ i ].b << ", " << newIndexList[ i ].c << std::endl;
-    }*/
-
     indices = newIndexList;
 }
 
@@ -984,7 +956,7 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         }
 
         gMeshes[ m ].Interleave();
-        //gMeshes[ m ].OptimizeFaces();
+        gMeshes[ m ].OptimizeFaces();
 
         gMeshes[ m ].SolveFaceNormals();
         gMeshes[ m ].SolveFaceTangents();

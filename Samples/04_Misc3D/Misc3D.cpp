@@ -49,14 +49,13 @@ int main()
     }
     
     System::EnableWindowsMemleakDetection();
-    //VR::Init(); oculus
-#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+#if defined( AE3D_OPENVR )
     VR::GetIdealWindowSize( width, height );
 #endif
 
     Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
     Window::GetSize( width, height );
-    VR::Init(); // Vive
+    VR::Init();
     VR::StartTracking( width, height );
     Window::SetTitle( "Misc3D" );
     System::LoadBuiltinAssets();
@@ -448,7 +447,7 @@ int main()
 
     while (Window::IsOpen() && !quit)
     {
-#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+#if defined( AE3D_OPENVR )
         VR::CalcEyePose();
         
         for (int eye = 0; eye < 2; ++eye)
@@ -632,7 +631,7 @@ int main()
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
         statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
 
-#if defined( OCULUS_RIFT ) || defined( AE3D_OPENVR )
+#if defined( AE3D_OPENVR )
         VR::SubmitFrame();
 #endif
         Window::SwapBuffers();
