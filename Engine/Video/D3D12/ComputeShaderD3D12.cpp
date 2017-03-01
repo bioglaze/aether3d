@@ -32,7 +32,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = 350;
+    desc.NumDescriptors = 10;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     desc.NodeMask = 1;
 
@@ -46,26 +46,46 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = uniformBuffers[ 0 ]->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 2;
+    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
-    srvDesc.Texture2D.MostDetailedMip = 0;
-    srvDesc.Texture2D.PlaneSlice = 0;
-    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
+    srvDesc0.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    srvDesc0.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+    srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc0.Buffer.FirstElement = 0;
+    srvDesc0.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+    srvDesc0.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
+    srvDesc0.Buffer.StructureByteStride = 0;
 
-    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 1 ], &srvDesc, handle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 0 ], &srvDesc0, handle );
+
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
+    srvDesc1.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    srvDesc1.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc1.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc1.Texture2D.MipLevels = 1;
+    srvDesc1.Texture2D.MostDetailedMip = 0;
+    srvDesc1.Texture2D.PlaneSlice = 0;
+    srvDesc1.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 1 ], &srvDesc1, handle );
+
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+    D3D12_CONSTANT_BUFFER_VIEW_DESC uavDesc = {};
+    uavDesc.BufferLocation = uavBuffers[ 0 ]->GetGPUVirtualAddress();
+    uavDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+    GfxDeviceGlobal::device->CreateConstantBufferView( &uavDesc, handle );
 
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
-    //GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
-    //GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
+    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &tempHeap );
+    GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 }
 
