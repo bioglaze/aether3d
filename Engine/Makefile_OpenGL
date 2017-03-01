@@ -27,7 +27,7 @@ WARNINGS := -Wall -ansi -pedantic
 ENGINE_LIB := libaether3d_gl_osx.a
 endif
 
-DEFINES := -msse3 -DSIMD_SSE3 -DRENDERER_OPENGL
+DEFINES := -msse3 -DSIMD_SSE3 -DRENDERER_OPENGL -DDEBUG
 
 ifeq ($(OS),Windows_NT)
 ENGINE_LIB := libaether3d_gl_win.a
