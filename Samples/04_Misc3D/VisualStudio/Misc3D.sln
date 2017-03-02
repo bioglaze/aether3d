@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Misc3D", "Misc3D.vcxproj", "{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}"
 EndProject
@@ -10,7 +10,6 @@ Global
 		Debug D3D12|x64 = Debug D3D12|x64
 		Debug OpenGL|x64 = Debug OpenGL|x64
 		Debug Vulkan|x64 = Debug Vulkan|x64
-		Oculus Release|x64 = Oculus Release|x64
 		Release D3D12|x64 = Release D3D12|x64
 		Release OpenGL|x64 = Release OpenGL|x64
 		Release OpenVR|x64 = Release OpenVR|x64
@@ -23,8 +22,6 @@ Global
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug OpenGL|x64.Build.0 = Debug|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug Vulkan|x64.ActiveCfg = Debug Vulkan|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug Vulkan|x64.Build.0 = Debug Vulkan|x64
-		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Oculus Release|x64.ActiveCfg = Oculus Release|x64
-		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Oculus Release|x64.Build.0 = Oculus Release|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release D3D12|x64.ActiveCfg = D3D12 Release|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release D3D12|x64.Build.0 = D3D12 Release|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release OpenGL|x64.ActiveCfg = Release|x64
