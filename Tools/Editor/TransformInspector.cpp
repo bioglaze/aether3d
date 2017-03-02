@@ -91,6 +91,8 @@ void TransformInspector::FieldsChanged( QTableWidgetItem* item )
     if (transform)
     {
         scale = transform->GetLocalScale();
+        rotation = transform->GetLocalRotation();
+        rotationEuler = rotation.GetEuler();
     }
 
     const std::string newValue = item->text().toStdString();
