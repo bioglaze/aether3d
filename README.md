@@ -25,6 +25,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
   - Cross-Platform WYSIWYG scene editor.
   - Statically linked into your application.
   - Wireframe rendering mode.
+  - Line rendering
 
 # Planned Features
 
@@ -46,7 +47,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 
 ## Windows
 
-  - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile.
+  - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile_OpenGL or Makefile_Vulkan.
   - Build and run Samples\01_OpenWindow.
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
   - FBX converter tries to find FBX SDK 2017.1 in its default install location (English language localization)
@@ -59,7 +60,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 ## macOS
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
-  - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile (`make` builds GL version, `make vulkan` builds Vulkan version).
+  - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile. 
   - FBX converter tries to find FBX SDK 2017.1 in its default install location.
 
 ## Linux
@@ -72,7 +73,8 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 
 ## iOS
   - Build Aether3D_iOS in Engine. It creates a framework.
-  - Open Samples/MetalSampleiOS and add the framework into the project.
+  - Copy the framework into your desktop.
+  - Open Samples/MetalSampleiOS and build and run it.
 
 # Running Tests
 

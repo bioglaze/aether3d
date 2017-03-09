@@ -24,6 +24,17 @@
 using namespace ae3d;
 ae3d::Material* gCubeMaterial = nullptr;
 
+enum class CollisionTest
+{
+    AABB,
+    Triangles
+};
+
+struct FaceInd
+{
+    int a, b, c;
+};
+
 std::string AbsoluteFilePath( const std::string& relativePath )
 {
 #if __APPLE__
@@ -66,6 +77,13 @@ void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screen
     Matrix44::TransformPoint( outRayTarget, invView, &outRayTarget );
 }
 
+struct CollisionInfo
+{
+    GameObject* go = nullptr;
+    std::vector< int > subMeshIndices;
+    float meshDistance = 0;
+};
+
 template< typename T >
 T Min2( T t1, T t2 )
 {
@@ -76,6 +94,11 @@ template< typename T >
 T Max2( T t1, T t2 )
 {
     return t1 > t2 ? t1 : t2;
+}
+
+bool AlmostEquals( float f1, float f2 )
+{
+    return std::fabs( f1 - f2 ) < 0.0001f;
 }
 
 float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min, const Vec3& max )
@@ -112,12 +135,54 @@ float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min,
     return tmin;
 }
 
-struct CollisionInfo
+float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const std::vector< Vec3 >& vertices )
 {
-    GameObject* go = nullptr;
-    std::vector< int > subMeshIndices;
-    float meshDistance = 0;
-};
+    for (std::size_t ve = 0; ve < vertices.size() / 3; ve += 3)
+    {
+        const Vec3& v0 = vertices[ ve * 3 + 0 ];
+        const Vec3& v1 = vertices[ ve * 3 + 1 ];
+        const Vec3& v2 = vertices[ ve * 3 + 2 ];
+
+        const Vec3 e1 = v1 - v0;
+        const Vec3 e2 = v2 - v0;
+
+        const Vec3 d = (target - origin).Normalized();
+
+        const Vec3 h = Vec3::Cross( d, e2 );
+        const float a = Vec3::Dot( e1, h );
+
+        if (AlmostEquals( a, 0 ))
+        {
+            continue;
+        }
+
+        const float f = 1.0f / a;
+        const Vec3 s = origin - v0;
+        const float u = f * Vec3::Dot( s, h );
+
+        if (u < 0 || u > 1)
+        {
+            continue;
+        }
+
+        const Vec3 q = Vec3::Cross( s, e1 );
+        const float v = f * Vec3::Dot( d, q );
+
+        if (v < 0 || u + v > 1)
+        {
+            continue;
+        }
+
+        const float t = f * Vec3::Dot( e2, q );
+
+        if (t > 0.0001f)
+        {
+            return t;
+        }
+    }
+
+    return -1;
+}
 
 SceneWidget::GizmoAxis CollidesWithGizmo( GameObject& camera, GameObject& gizmo, int screenX, int screenY, int width, int height, float maxDistance )
 {
@@ -157,7 +222,7 @@ SceneWidget::GizmoAxis CollidesWithGizmo( GameObject& camera, GameObject& gizmo,
 }
 
 std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector< std::shared_ptr< ae3d::GameObject > >& gameObjects,
-                                           int screenX, int screenY, int width, int height, float maxDistance )
+                                           int screenX, int screenY, int width, int height, float maxDistance, CollisionTest collisionTest )
 {
     Vec3 rayOrigin, rayTarget;
     ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
@@ -185,7 +250,19 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
             CollisionInfo collisionInfo;
             collisionInfo.go = go.get();
             collisionInfo.meshDistance = meshDistance;
-            // TODO: submeshindices
+
+            for (unsigned subMeshIndex = 0; subMeshIndex < meshRenderer->GetMesh()->GetSubMeshCount(); ++subMeshIndex)
+            {
+                Vec3 subMeshMin, subMeshMax;
+                Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( subMeshIndex ), meshLocalToWorld, &subMeshMin );
+                Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( subMeshIndex ), meshLocalToWorld, &subMeshMax );
+
+                std::vector< Vec3 > triangles = meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex );
+                const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
+                                                                                   : IntersectRayTriangles( rayOrigin, rayTarget, triangles );
+                System::Print("subMeshDistance: %f\n", subMeshDistance );
+            }
+
             outInfo.emplace_back( collisionInfo );
         }
     }
@@ -933,7 +1010,7 @@ void SceneWidget::mouseReleaseEvent( QMouseEvent* event )
         SetSelectedObjectHighlight( false );
 
         const QPoint point = mapFromGlobal( QCursor::pos() );
-        auto colliders = GetColliders( camera, gameObjects, point.x(), point.y(), width(), height(), 200 );
+        auto colliders = GetColliders( camera, gameObjects, point.x(), point.y(), width(), height(), 200, CollisionTest::Triangles );
 
         if (!(event->modifiers() & Qt::KeyboardModifier::ControlModifier))
         {

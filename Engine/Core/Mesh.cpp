@@ -162,6 +162,45 @@ std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
     return m().subMeshes;
 }
 
+std::vector< Vec3 > ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIndex ) const
+{
+    if (subMeshIndex >= m().subMeshes.size())
+    {
+        System::Print( "Invalid submesh index in GetSubMeshFlattenedTriangles\n" );
+        std::vector< Vec3 > outTriangles;
+        return outTriangles;
+    }
+    
+    auto& subMesh = m().subMeshes[ subMeshIndex ];
+    const std::size_t faceCount = subMesh.vertexBuffer.GetFaceCount();
+    std::vector< Vec3 > outTriangles( faceCount * 3 );
+    
+    if (!subMesh.verticesPTNTC.empty())
+    {
+        for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3)
+        {
+            outTriangles[ faceIndex + 0 ] = subMesh.verticesPTNTC[ subMesh.indices[ faceIndex / 3 ].a ].position;
+            outTriangles[ faceIndex + 1 ] = subMesh.verticesPTNTC[ subMesh.indices[ faceIndex / 3 ].b ].position;
+            outTriangles[ faceIndex + 2 ] = subMesh.verticesPTNTC[ subMesh.indices[ faceIndex / 3 ].c ].position;
+        }
+    }
+    else if (!subMesh.verticesPTN.empty())
+    {
+        for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3)
+        {
+            outTriangles[ faceIndex + 0 ] = subMesh.verticesPTN[ subMesh.indices[ faceIndex / 3 ].a ].position;
+            outTriangles[ faceIndex + 1 ] = subMesh.verticesPTN[ subMesh.indices[ faceIndex / 3 ].b ].position;
+            outTriangles[ faceIndex + 2 ] = subMesh.verticesPTN[ subMesh.indices[ faceIndex / 3 ].c ].position;
+        }
+    }
+    else
+    {
+        System::Print("Empty vertex data in subMesh!\n");
+    }
+    
+    return outTriangles;
+}
+
 unsigned ae3d::Mesh::GetSubMeshCount() const
 {
     return (unsigned)m().subMeshes.size();
@@ -268,31 +307,28 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         uint16_t vertexCount;
         is.read( (char*)&vertexCount, sizeof( vertexCount ) );
 
-        std::vector< VertexBuffer::VertexPTNTC > verticesPTNTC;
-        std::vector< VertexBuffer::VertexPTN > verticesPTN;
-
         uint8_t vertexFormat;
         is.read( (char*)&vertexFormat, sizeof( vertexFormat ) );
         
         if (vertexFormat == 0) // PTNTC
         {
-            try { verticesPTNTC.resize( vertexCount ); }
+            try { subMesh.verticesPTNTC.resize( vertexCount ); }
             catch (std::bad_alloc&)
             {
                 return LoadResult::OutOfMemory;
             }
         
-            is.read( (char*)&verticesPTNTC[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTNTC ) );
+            is.read( (char*)&subMesh.verticesPTNTC[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTNTC ) );
         }
         else if (vertexFormat == 1) // PTN
         {
-            try { verticesPTN.resize( vertexCount ); }
+            try { subMesh.verticesPTN.resize( vertexCount ); }
             catch (std::bad_alloc&)
             {
                 return LoadResult::OutOfMemory;
             }
             
-            is.read( (char*)&verticesPTN[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTN ) );
+            is.read( (char*)&subMesh.verticesPTN[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTN ) );
         }
         else
         {
@@ -303,23 +339,21 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         uint16_t faceCount;
         is.read( (char*)&faceCount, sizeof( faceCount ) );
 
-        std::vector< VertexBuffer::Face > indices;
-
-        try { indices.resize( faceCount ); }
+        try { subMesh.indices.resize( faceCount ); }
         catch (std::bad_alloc&)
         {
             return LoadResult::OutOfMemory;
         }
 
-        is.read( (char*)&indices[ 0 ], faceCount * sizeof( VertexBuffer::Face ) );
+        is.read( (char*)&subMesh.indices[ 0 ], faceCount * sizeof( VertexBuffer::Face ) );
 
         if (vertexFormat == 0)
         {
-            subMesh.vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), verticesPTNTC.data(), static_cast< int >( verticesPTNTC.size() ) );
+            subMesh.vertexBuffer.Generate( subMesh.indices.data(), static_cast< int >( subMesh.indices.size() ), subMesh.verticesPTNTC.data(), static_cast< int >( subMesh.verticesPTNTC.size() ) );
         }
         else if (vertexFormat == 1)
         {
-            subMesh.vertexBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), verticesPTN.data(), static_cast< int >( verticesPTN.size() ) );
+            subMesh.vertexBuffer.Generate( subMesh.indices.data(), static_cast< int >( subMesh.indices.size() ), subMesh.verticesPTN.data(), static_cast< int >( subMesh.verticesPTN.size() ) );
         }
         else
         {

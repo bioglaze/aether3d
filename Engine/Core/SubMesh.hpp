@@ -2,6 +2,8 @@
 #define SUBMESH_H
 
 #include <string>
+#include <vector>
+#include "VertexBuffer.hpp"
 #include "Vec3.hpp"
 
 namespace ae3d
@@ -12,6 +14,9 @@ namespace ae3d
         ae3d::Vec3 aabbMax;
         ae3d::VertexBuffer vertexBuffer;
         std::string name;
+        std::vector< VertexBuffer::VertexPTNTC > verticesPTNTC;
+        std::vector< VertexBuffer::VertexPTN > verticesPTN;
+        std::vector< VertexBuffer::Face > indices;
     };
 }
 

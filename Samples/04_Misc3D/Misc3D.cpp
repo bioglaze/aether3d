@@ -117,7 +117,7 @@ int main()
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
     Mesh cubeMeshScaledUV;
-    cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
+    //cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
 
     GameObject cube;
     cube.AddComponent< MeshRendererComponent >();
