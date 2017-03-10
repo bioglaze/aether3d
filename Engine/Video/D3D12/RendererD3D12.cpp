@@ -66,7 +66,7 @@ cbuffer Scene\
     float4 PSMain( VSOutput vsOut ) : SV_Target\
     {\
         const float edgeDistance = 0.5;\
-        float distance = tex.SampleLevel( sLinear, vsOut.uv, 0 );\
+        float distance = tex.SampleLevel( sLinear, vsOut.uv, 0 ).r;\
         float edgeWidth = 0.7 * length( float2( ddx( distance ), ddy( distance ) ) );\
         float opacity = smoothstep( edgeDistance - edgeWidth, edgeDistance + edgeWidth, distance );\
         return float4( vsOut.color.rgb, opacity );\
@@ -92,7 +92,7 @@ cbuffer Scene\
             VSOutput vsOut;
             vsOut.pos = mul( _ModelViewProjectionMatrix, float4( pos, 1.0 ) );
             vsOut.color = color;
-            vsOut.uv = pos;
+            vsOut.uv = pos.xyz;
             return vsOut;
         }
 
@@ -145,8 +145,6 @@ cbuffer Scene\
         struct VSOutput
         {
             float4 pos : SV_POSITION;
-            float3 mvPosition : POSITION;
-            float3 normal : NORMAL;
         };
 
         cbuffer Scene

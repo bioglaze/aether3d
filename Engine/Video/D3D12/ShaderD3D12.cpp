@@ -72,19 +72,30 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
     const std::size_t vertexSourceLength = std::string( vertexSource ).size();
     ID3DBlob* blobError = nullptr;
-    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &blobShaderVertex, &blobError );
+#if DEBUG
+    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderVertex, &blobError );
+#else
+    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3  | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderVertex, &blobError );
+#endif
     if (FAILED( hr ))
     {
         ae3d::System::Print( "Unable to compile vertex shader %s: %s!\n", vertexPath.c_str(), blobError->GetBufferPointer() );
+        ae3d::System::Assert( false, "");
         return;
     }
 
     const std::size_t pixelSourceLength = std::string( fragmentSource ).size();
 
-    hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &blobShaderPixel, &blobError );
+#if DEBUG
+    hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderPixel, &blobError );
+#else
+    hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderPixel, &blobError );
+#endif
+
     if (FAILED( hr ))
     {
         ae3d::System::Print( "Unable to compile pixel shader %s: %s!\n", fragmentPath.c_str(), blobError->GetBufferPointer() );
+        ae3d::System::Assert( false, "" );
         return;
     }
 
@@ -207,6 +218,8 @@ namespace GfxDeviceGlobal
 {
     extern D3D12_CPU_DESCRIPTOR_HANDLE currentRenderTargetRTV;
 }
+
+//void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
 void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* texture, int textureUnit )
 {

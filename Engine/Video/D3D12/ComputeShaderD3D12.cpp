@@ -2,8 +2,11 @@
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include "FileSystem.hpp"
-#include "System.hpp"
 #include "Macros.hpp"
+#include "System.hpp"
+#include "TextureBase.hpp"
+
+void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
 namespace GfxDeviceGlobal
 {
@@ -82,11 +85,18 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     uavDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
     GfxDeviceGlobal::device->CreateConstantBufferView( &uavDesc, handle );
 
+    GpuResource depthNormals = {};
+    depthNormals.resource = textureBuffers[ 1 ];
+    depthNormals.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
+
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &tempHeap );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
+
+    TransitionResource( depthNormals, D3D12_RESOURCE_STATE_RENDER_TARGET );
 }
 
 void ae3d::ComputeShader::Load( const char* source )
@@ -98,7 +108,11 @@ void ae3d::ComputeShader::Load( const char* source )
     const std::size_t sourceLength = std::string( source ).size();
     ID3DBlob* blobError = nullptr;
     HRESULT hr = D3DCompile( source, sourceLength, "CSMain", nullptr /*defines*/, nullptr, "CSMain", "cs_5_0",
-                             D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShader, &blobError );
+#if DEBUG
+        D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShader, &blobError );
+#else
+        D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShader, &blobError );
+#endif
     if (FAILED( hr ))
     {
         ae3d::System::Print( "Unable to compile compute shader: %s!\n", blobError->GetBufferPointer() );
