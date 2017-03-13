@@ -27,6 +27,20 @@ void DescriptorHeapManager::Deinit()
     AE3D_SAFE_RELEASE( dsvHeap );
 }
 
+D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeapManager::GetCbvSrvUavGpuHandle( unsigned index )
+{
+    D3D12_GPU_DESCRIPTOR_HANDLE handle = cbvSrvUavHeap->GetGPUDescriptorHandleForHeapStart();
+    handle.ptr += index * GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    return handle;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::GetCbvSrvUavCpuHandle( unsigned index )
+{
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = cbvSrvUavHeap->GetCPUDescriptorHandleForHeapStart();
+    handle.ptr += index * GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    return handle;
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE type )
 {
     D3D12_CPU_DESCRIPTOR_HANDLE outHandle = {};

@@ -42,7 +42,6 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     ID3D12DescriptorHeap* tempHeap = nullptr;
     HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &tempHeap ) );
     AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
-    //GfxDeviceGlobal::frameHeaps.push_back( tempHeap );
     tempHeap->SetName( L"LightTiler heap" );
 
     D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();

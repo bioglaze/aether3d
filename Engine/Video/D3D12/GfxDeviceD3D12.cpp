@@ -137,7 +137,6 @@ namespace GfxDeviceGlobal
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
-    std::vector< ID3D12DescriptorHeap* > frameHeaps;
     std::vector< ID3D12Resource* > constantBuffers;
     std::vector< ID3D12Resource* > mappedConstantBuffers;
     int currentConstantBufferIndex = 0;
@@ -365,7 +364,7 @@ void CreateRootSignature()
         descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 2, 0 );
 
         CD3DX12_ROOT_PARAMETER rootParam[ 2 ];
-        rootParam[ 0 ].InitAsDescriptorTable( 2, descRange1 );
+        rootParam[ 0 ].InitAsDescriptorTable( 2, descRange1, D3D12_SHADER_VISIBILITY_ALL );
         rootParam[ 1 ].InitAsDescriptorTable( 1, descRange2, D3D12_SHADER_VISIBILITY_PIXEL );
 
         ID3DBlob* pOutBlob = nullptr;
@@ -484,8 +483,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
         D3D12_COLOR_WRITE_ENABLE_ALL,
     };
 
-    D3D12_RENDER_TARGET_BLEND_DESC blendAlpha;
-    ZeroMemory( &blendAlpha, sizeof( D3D12_RENDER_TARGET_BLEND_DESC ) );
+    D3D12_RENDER_TARGET_BLEND_DESC blendAlpha = {};
     blendAlpha.BlendEnable = TRUE;
     blendAlpha.SrcBlend = D3D12_BLEND_SRC_ALPHA;
     blendAlpha.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
@@ -495,8 +493,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     blendAlpha.BlendOp = D3D12_BLEND_OP_ADD;
     blendAlpha.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
-    D3D12_RENDER_TARGET_BLEND_DESC blendAdd;
-    ZeroMemory( &blendAdd, sizeof( D3D12_RENDER_TARGET_BLEND_DESC ) );
+    D3D12_RENDER_TARGET_BLEND_DESC blendAdd = {};
     blendAdd.BlendEnable = TRUE;
     blendAdd.SrcBlend = D3D12_BLEND_ONE;
     blendAdd.DestBlend = D3D12_BLEND_ONE;
@@ -717,8 +714,7 @@ void CreateConstantBuffers()
 
         constantBuffer->SetName( L"ConstantBuffer" );
 
-        auto handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );// DescriptorHeapManager::GetCbvSrvUavHeap()->GetCPUDescriptorHandleForHeapStart();
-        //handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV ) * (bufferIndex);
+        auto handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
         GfxDeviceGlobal::constantBuffers[ bufferIndex ] = constantBuffer;
 
@@ -759,19 +755,16 @@ void ae3d::CreateRenderer( int samples )
         OutputDebugStringA( "Failed to create debug layer!\n" );
     }
 #endif
-    IDXGIFactory4* factory = nullptr;
-    HRESULT hr = CreateDXGIFactory1( IID_PPV_ARGS( &factory ) );
-    AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP factory" );
 
-    factory->EnumAdapters( 0, reinterpret_cast< IDXGIAdapter** >( &GfxDeviceGlobal::adapter ) );
+    IDXGIFactory2* factory = nullptr;
 
-    bool useWarp = false;
-
-    if (useWarp)
-    {
-        hr = factory->EnumWarpAdapter( IID_PPV_ARGS( &GfxDeviceGlobal::adapter ) );
-        AE3D_CHECK_D3D( hr, "Failed to create D3D12 WARP adapter" );
-    }
+#if DEBUG
+    UINT factoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+#else
+    UINT factoryFlags = 0;
+#endif
+    HRESULT hr = CreateDXGIFactory2( factoryFlags, IID_PPV_ARGS( &factory ) );
+    AE3D_CHECK_D3D( hr, "Failed to create D3D12 factory" );
 
     hr = D3D12CreateDevice( GfxDeviceGlobal::adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
@@ -905,30 +898,18 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
     }
     
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = DescriptorHeapManager::numDescriptors;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    desc.NodeMask = 1;
+    ID3D12DescriptorHeap* tempHeap = DescriptorHeapManager::GetCbvSrvUavHeap();
+    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 3) % GfxDeviceGlobal::constantBuffers.size(); // FIXME: * 3 because the descriptor contains 3 entries, is this right?
 
-    ID3D12DescriptorHeap* tempHeap = nullptr;
-    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &tempHeap ) );
-    AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
-    GfxDeviceGlobal::frameHeaps.push_back( tempHeap );
-    wchar_t wname[ 128 ];
-    std::string heapName( "tempHeap_faces_" );
-    heapName += std::to_string( vertexBuffer.GetFaceCount() );
-    std::mbstowcs( wname, heapName.c_str(), 128 );
-    tempHeap->SetName( wname );
-
-    D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
+    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = DescriptorHeapManager::GetCbvSrvUavGpuHandle( index );
+    D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = GfxDeviceGlobal::constantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
-    GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
+    GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
     
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     
     const DXGI_FORMAT format0 = GfxDeviceGlobal::texture0->GetDXGIFormat();
     const int mipLevelCount0 = GfxDeviceGlobal::texture0->GetMipLevelCount();
@@ -987,13 +968,13 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     ID3D12Resource* texResource0 = GfxDeviceGlobal::texture0->GetGpuResource()->resource;
 
-    GfxDeviceGlobal::device->CreateShaderResourceView( texResource0, &srvDesc0, handle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( texResource0, &srvDesc0, cpuHandle );
 
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     ID3D12Resource* texResource1 = GfxDeviceGlobal::texture1->GetGpuResource()->resource;
 
-    GfxDeviceGlobal::device->CreateShaderResourceView( texResource1, &srvDesc1, handle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( texResource1, &srvDesc1, cpuHandle );
 
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
@@ -1010,7 +991,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, gpuHandle );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
     GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
@@ -1223,13 +1204,6 @@ void ae3d::GfxDevice::Present()
 
     hr = GfxDeviceGlobal::commandListAllocator->Reset();
     AE3D_CHECK_D3D( hr, "commandListAllocator Reset" );
-
-    for (std::size_t i = 0; i < GfxDeviceGlobal::frameHeaps.size(); ++i)
-    {
-        AE3D_SAFE_RELEASE( GfxDeviceGlobal::frameHeaps[ i ] );
-    }
-    
-    GfxDeviceGlobal::frameHeaps.clear();
 
     for (std::size_t i = 0; i < Global::frameVBUploads.size(); ++i)
     {

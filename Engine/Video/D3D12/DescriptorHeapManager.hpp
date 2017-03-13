@@ -11,6 +11,9 @@ public:
     static ID3D12DescriptorHeap* GetRTVHeap() { return rtvHeap; }
     static ID3D12DescriptorHeap* GetDSVHeap() { return dsvHeap; }
     static D3D12_CPU_DESCRIPTOR_HANDLE AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE type );
+    static D3D12_GPU_DESCRIPTOR_HANDLE GetCbvSrvUavGpuHandle( unsigned index );
+    static D3D12_CPU_DESCRIPTOR_HANDLE GetCbvSrvUavCpuHandle( unsigned index );
+
     static void Deinit();
     static const UINT numDescriptors = 350;
 
