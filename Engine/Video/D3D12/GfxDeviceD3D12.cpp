@@ -898,7 +898,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
     }
     
-    ID3D12DescriptorHeap* tempHeap = DescriptorHeapManager::GetCbvSrvUavHeap();
     const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 3) % GfxDeviceGlobal::constantBuffers.size(); // FIXME: * 3 because the descriptor contains 3 entries, is this right?
 
     D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = DescriptorHeapManager::GetCbvSrvUavGpuHandle( index );
@@ -910,71 +909,10 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
     
     cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-    
-    const DXGI_FORMAT format0 = GfxDeviceGlobal::texture0->GetDXGIFormat();
-    const int mipLevelCount0 = GfxDeviceGlobal::texture0->GetMipLevelCount();
-    const D3D12_SRV_DIMENSION viewDimension0 = GfxDeviceGlobal::texture0->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
-
-    // TODO: Get from texture object
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
-    srvDesc0.Format = format0;
-    srvDesc0.ViewDimension = viewDimension0;
-    srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-    if (srvDesc0.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
-    {
-        srvDesc0.Texture2D.MipLevels = mipLevelCount0;
-        srvDesc0.Texture2D.MostDetailedMip = 0;
-        srvDesc0.Texture2D.PlaneSlice = 0;
-        srvDesc0.Texture2D.ResourceMinLODClamp = 0.0f;
-    }
-    else if (srvDesc0.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
-    {
-        srvDesc0.TextureCube.MipLevels = mipLevelCount0;
-        srvDesc0.TextureCube.MostDetailedMip = 0;
-        srvDesc0.TextureCube.ResourceMinLODClamp = 0.0f;
-    }
-    else
-    {
-        System::Assert( false, "unhandled texture dimension" );
-    }
-
-    const DXGI_FORMAT format1 = GfxDeviceGlobal::texture1->GetDXGIFormat();
-    const int mipLevelCount1 = GfxDeviceGlobal::texture1->GetMipLevelCount();
-    const D3D12_SRV_DIMENSION viewDimension1 = GfxDeviceGlobal::texture1->IsCube() ? D3D12_SRV_DIMENSION_TEXTURECUBE : D3D12_SRV_DIMENSION_TEXTURE2D;
-
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
-    srvDesc1.Format = format1;
-    srvDesc1.ViewDimension = viewDimension1;
-    srvDesc1.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-    if (srvDesc1.ViewDimension == D3D12_SRV_DIMENSION_TEXTURE2D)
-    {
-        srvDesc1.Texture2D.MipLevels = mipLevelCount1;
-        srvDesc1.Texture2D.MostDetailedMip = 0;
-        srvDesc1.Texture2D.PlaneSlice = 0;
-        srvDesc1.Texture2D.ResourceMinLODClamp = 0.0f;
-    }
-    else if (srvDesc1.ViewDimension == D3D12_SRV_DIMENSION_TEXTURECUBE)
-    {
-        srvDesc1.TextureCube.MipLevels = mipLevelCount1;
-        srvDesc1.TextureCube.MostDetailedMip = 0;
-        srvDesc1.TextureCube.ResourceMinLODClamp = 0.0f;
-    }
-    else
-    {
-        //System::Assert( false, "unhandled texture dimension" );
-    }
-
-    ID3D12Resource* texResource0 = GfxDeviceGlobal::texture0->GetGpuResource()->resource;
-
-    GfxDeviceGlobal::device->CreateShaderResourceView( texResource0, &srvDesc0, cpuHandle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
 
     cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-
-    ID3D12Resource* texResource1 = GfxDeviceGlobal::texture1->GetGpuResource()->resource;
-
-    GfxDeviceGlobal::device->CreateShaderResourceView( texResource1, &srvDesc1, cpuHandle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
 
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
@@ -989,7 +927,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
         GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
 
-    ID3D12DescriptorHeap* descHeaps[] = { tempHeap, DescriptorHeapManager::GetSamplerHeap() };
+    ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, gpuHandle );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );

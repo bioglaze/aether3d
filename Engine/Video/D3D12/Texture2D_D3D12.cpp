@@ -163,19 +163,18 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         texResource.SlicePitch = texResource.RowPitch * Texture2DGlobal::defaultTexture.height;
         InitializeTexture( Texture2DGlobal::defaultTexture.gpuResource, &texResource, 1 );
 
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Texture2D.MipLevels = 1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.PlaneSlice = 0;
-        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+        Texture2DGlobal::defaultTexture.srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        Texture2DGlobal::defaultTexture.srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        Texture2DGlobal::defaultTexture.srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        Texture2DGlobal::defaultTexture.srvDesc.Texture2D.MipLevels = 1;
+        Texture2DGlobal::defaultTexture.srvDesc.Texture2D.MostDetailedMip = 0;
+        Texture2DGlobal::defaultTexture.srvDesc.Texture2D.PlaneSlice = 0;
+        Texture2DGlobal::defaultTexture.srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
         Texture2DGlobal::defaultTexture.srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
         Texture2DGlobal::defaultTexture.handle = static_cast< unsigned >(Texture2DGlobal::defaultTexture.srv.ptr);
 
-        GfxDeviceGlobal::device->CreateShaderResourceView( Texture2DGlobal::defaultTexture.gpuResource.resource, &srvDesc, Texture2DGlobal::defaultTexture.srv );
+        GfxDeviceGlobal::device->CreateShaderResourceView( Texture2DGlobal::defaultTexture.gpuResource.resource, &Texture2DGlobal::defaultTexture.srvDesc, Texture2DGlobal::defaultTexture.srv );
     }
     
     return &Texture2DGlobal::defaultTexture;
@@ -223,7 +222,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         ae3d::System::Print("Unknown texture file extension: %s\n", fileContents.path.c_str() );
     }
     
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = dxgiFormat;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -234,7 +232,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     
     srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     handle = static_cast< unsigned >( srv.ptr );
-
+    
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 
     Texture2DGlobal::pathToCachedTexture[ cacheHash ] = *this;

@@ -177,7 +177,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     InitializeTexture( gpuResource, &texResources[ 0 ], 6 );
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = dxgiFormat;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;

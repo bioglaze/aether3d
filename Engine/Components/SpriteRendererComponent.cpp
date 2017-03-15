@@ -130,7 +130,7 @@ struct RenderQueue
 {
     void Clear();
     void Build();
-    void Render( ae3d::GfxDevice::BlendMode blendMode);
+    void Render( ae3d::GfxDevice::BlendMode blendMode, const float* projectionModelMatrix );
     
     bool isDirty = true;
     std::vector< Sprite > sprites;
@@ -155,7 +155,7 @@ void RenderQueue::Build()
     isDirty = false;
 }
 
-void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
+void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* projectionModelMatrix )
 {
     if (isDirty)
     {
@@ -164,6 +164,9 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode )
     
     for (auto& drawable : drawables)
     {
+        renderer.builtinShaders.spriteRendererShader.Use();
+        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+
         if (drawable.texture->IsRenderTexture())
         {
             renderer.builtinShaders.spriteRendererShader.SetRenderTexture("textureMap", static_cast< ae3d::RenderTexture* >(drawable.texture), 0);
@@ -306,10 +309,7 @@ void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
     {
         return;
     }
-    
-    renderer.builtinShaders.spriteRendererShader.Use();
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
-    
-    m().opaqueRenderQueue.Render( ae3d::GfxDevice::BlendMode::Off );
-    m().transparentRenderQueue.Render( ae3d::GfxDevice::BlendMode::AlphaBlend );
+        
+    m().opaqueRenderQueue.Render( ae3d::GfxDevice::BlendMode::Off, projectionModelMatrix );
+    m().transparentRenderQueue.Render( ae3d::GfxDevice::BlendMode::AlphaBlend, projectionModelMatrix );
 }

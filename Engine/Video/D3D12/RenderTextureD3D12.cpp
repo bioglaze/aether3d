@@ -195,7 +195,6 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
         RenderTextureGlobal::renderTextures.push_back( gpuResource.resource );
 
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Format = dxgiFormat;
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
