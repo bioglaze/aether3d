@@ -57,7 +57,7 @@ float GetFloatAnisotropy( ae3d::Anisotropy anisotropy )
     }
     if (anisotropy == ae3d::Anisotropy::k8)
     {
-        return 1;
+        return 8;
     }
 
     ae3d::System::Assert( false, "unhandled anisotropy" );

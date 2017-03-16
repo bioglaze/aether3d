@@ -18,7 +18,6 @@ namespace GfxDeviceGlobal
 namespace Global
 {
     std::vector< ID3D12Resource* > vbs;
-    std::vector< ID3D12Resource* > frameVBUploads;
 }
 
 void ae3d::VertexBuffer::DestroyBuffers()
@@ -116,6 +115,14 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
     memcpy_s( vbUploadPtr, ibOffset, vertices, ibOffset );
     memcpy_s( vbUploadPtr + ibOffset, ibSize, faces, ibSize );
     vb->Unmap( 0, nullptr );
+
+    vertexBufferView.BufferLocation = vb->GetGPUVirtualAddress();
+    vertexBufferView.StrideInBytes = GetStride();
+    vertexBufferView.SizeInBytes = GetIBOffset();
+
+    indexBufferView.BufferLocation = vb->GetGPUVirtualAddress() + GetIBOffset();
+    indexBufferView.SizeInBytes = GetIBSize();
+    indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )

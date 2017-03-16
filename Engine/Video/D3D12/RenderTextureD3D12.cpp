@@ -128,6 +128,20 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         descDsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateDepthStencilView( gpuResourceDepth.resource, &descDsv, dsv );
         RenderTextureGlobal::renderTextures.push_back( gpuResourceDepth.resource );
+
+        srvDesc.Format = dxgiFormat;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.PlaneSlice = 0;
+        srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+        srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        handle = static_cast< unsigned >(srv.ptr);
+
+        GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
+
     }
 }
 

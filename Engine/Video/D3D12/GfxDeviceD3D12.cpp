@@ -154,11 +154,6 @@ namespace GfxDeviceGlobal
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
 }
 
-namespace Global
-{
-    extern std::vector< ID3D12Resource* > frameVBUploads; // Defined in VertexBufferD3D12.cpp
-}
-
 namespace ae3d
 {
     void CreateRenderer( int samples );
@@ -672,7 +667,7 @@ void CreateDepthStencil()
 
 void CreateConstantBuffers()
 {
-    GfxDeviceGlobal::constantBuffers.resize( 300 );
+    GfxDeviceGlobal::constantBuffers.resize( 800 );
     GfxDeviceGlobal::mappedConstantBuffers.resize( GfxDeviceGlobal::constantBuffers.size() );
     ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::constantBuffers.size(), "There are more constant buffers than descriptors" );
 
@@ -739,7 +734,7 @@ void ae3d::CreateRenderer( int samples )
     if (dhr == S_OK)
     {
         debugController->EnableDebugLayer();
-#if 0
+#if 1
         ID3D12Debug1* debugController1;
         dhr = debugController->QueryInterface( IID_PPV_ARGS( &debugController1 ) );
 
@@ -839,12 +834,7 @@ void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )
 
 void ae3d::GfxDevice::CreateNewUniformBuffer()
 {
-    ++GfxDeviceGlobal::currentConstantBufferIndex;
-
-    if (GfxDeviceGlobal::currentConstantBufferIndex == GfxDeviceGlobal::mappedConstantBuffers.size())
-    {
-        GfxDeviceGlobal::currentConstantBufferIndex = 0;
-    }
+    GfxDeviceGlobal::currentConstantBufferIndex = (GfxDeviceGlobal::currentConstantBufferIndex + 1) % GfxDeviceGlobal::mappedConstantBuffers.size();
 }
 
 void* ae3d::GfxDevice::GetCurrentUniformBuffer()
@@ -914,16 +904,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
 
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-    vertexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress();
-    vertexBufferView.StrideInBytes = vertexBuffer.GetStride();
-    vertexBufferView.SizeInBytes = vertexBuffer.GetIBOffset();
-
-    D3D12_INDEX_BUFFER_VIEW indexBufferView;
-    indexBufferView.BufferLocation = vertexBuffer.GetVBResource()->GetGPUVirtualAddress() + vertexBuffer.GetIBOffset();
-    indexBufferView.SizeInBytes = vertexBuffer.GetIBSize();
-    indexBufferView.Format = DXGI_FORMAT_R16_UINT;
-
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
         GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
 
@@ -932,8 +912,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, gpuHandle );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
-    GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, &vertexBufferView );
-    GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( &indexBufferView );
+    GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, vertexBuffer.GetView() );
+    GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( vertexBuffer.GetIndexView() );
     GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace * 3, 1, startFace * 3, 0, 0 );
 
     Statistics::IncTriangleCount( endFace - startFace );
@@ -1041,8 +1021,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     scissor.bottom = static_cast< LONG >( vpHeight );
     GfxDeviceGlobal::graphicsCommandList->RSSetScissorRects( 1, &scissor );
 
-    auto descHandleRtvStep = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
-
     D3D12_CPU_DESCRIPTOR_HANDLE descHandleRtv;
 
     if (GfxDeviceGlobal::currentRenderTarget)
@@ -1056,7 +1034,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     else
     {
         descHandleRtv = DescriptorHeapManager::GetRTVHeap()->GetCPUDescriptorHandleForHeapStart();
-        descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * descHandleRtvStep;
+        descHandleRtv.ptr += GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() * GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
     }
 
     if ((clearFlags & ClearFlags::Color) != 0)
@@ -1143,13 +1121,6 @@ void ae3d::GfxDevice::Present()
     hr = GfxDeviceGlobal::commandListAllocator->Reset();
     AE3D_CHECK_D3D( hr, "commandListAllocator Reset" );
 
-    for (std::size_t i = 0; i < Global::frameVBUploads.size(); ++i)
-    {
-       AE3D_SAFE_RELEASE( Global::frameVBUploads[ i ] );
-    }
-    
-    Global::frameVBUploads.clear();
-    
     GfxDeviceGlobal::currentRenderTarget = nullptr;
 
     Statistics::EndFrameTimeProfiling();

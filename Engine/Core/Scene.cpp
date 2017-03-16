@@ -353,7 +353,6 @@ void ae3d::Scene::Render()
         }
     }
 
-    //unsigned debugShadowFBO = 0;
 #if RENDERER_VULKAN
     GfxDevice::BeginRenderPassAndCommandBuffer();
 #endif
@@ -431,33 +430,32 @@ void ae3d::Scene::Render()
                     {
                         SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                         SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                        RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     }
                     else if (spotLight)
                     {
                         SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
                         SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                        RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     }
                     else if (pointLight)
                     {
                         SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<PointLightComponent>()->shadowMap );
-                    }
 
-                    if (pointLight)
-                    {
                         for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
                         {
                             const float scale = 2000;
-                            
+
                             static const Vec3 directions[ 6 ] =
                             {
-                                Vec3(  1,  0,  0 ) * scale, // posX
+                                Vec3( 1,  0,  0 ) * scale, // posX
                                 Vec3( -1,  0,  0 ) * scale, // negX
-                                Vec3(  0,  1,  0 ) * scale, // posY
-                                Vec3(  0, -1,  0 ) * scale, // negY
-                                Vec3(  0,  0,  1 ) * scale, // posZ
-                                Vec3(  0,  0, -1 ) * scale  // negZ
+                                Vec3( 0,  1,  0 ) * scale, // posY
+                                Vec3( 0, -1,  0 ) * scale, // negY
+                                Vec3( 0,  0,  1 ) * scale, // posZ
+                                Vec3( 0,  0, -1 ) * scale  // negZ
                             };
-                            
+
                             static const Vec3 ups[ 6 ] =
                             {
                                 Vec3( 0,  -1,  0 ),
@@ -467,21 +465,16 @@ void ae3d::Scene::Render()
                                 Vec3( 0, -1,  0 ),
                                 Vec3( 0, -1,  0 )
                             };
-                            
+
                             lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
                             RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
                         }
-                    }
-                    else
-                    {
-                        RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     }
 
                     if (dirLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                         Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
-                        //debugShadowFBO = go->GetComponent<DirectionalLightComponent>()->shadowMap.GetFBO();
                         hasShadow = true;
                     }
                     else if (spotLight)
@@ -495,14 +488,12 @@ void ae3d::Scene::Render()
                         Material::SetGlobalVector( "_LightColor", spotLight->GetColor() );
                         Material::SetGlobalInt( "_LightType", 1 );
 #endif
-                        //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
                         hasShadow = true;
                     }
                     else if (pointLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
                         Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
-                        //debugShadowFBO = go->GetComponent<SpotLightComponent>()->shadowMap.GetFBO();
                         hasShadow = true;
                     }
 
@@ -527,8 +518,6 @@ void ae3d::Scene::Render()
 #if RENDERER_VULKAN
     GfxDevice::EndRenderPassAndCommandBuffer();
 #endif
-
-    //GfxDevice::DebugBlitFBO( debugShadowFBO, 256, 256 );
 
     RenderDepthAndNormalsForAllCameras( cameras );
 
@@ -609,13 +598,10 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     fovDegrees = GetVRFov();
 #else
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
-    //position = cameraTransform->GetLocalPosition();
     position = cameraTransform->GetWorldPosition();
     fovDegrees = camera->GetFovDegrees();
-    //cameraTransform->GetLocalRotation().GetMatrix( view );
     cameraTransform->GetWorldRotation().GetMatrix( view );
     Matrix44 translation;
-    //translation.Translate( -cameraTransform->GetLocalPosition() );
     translation.Translate( -cameraTransform->GetWorldPosition() );
     Matrix44::Multiply( translation, view, view );
     camera->SetView( view );

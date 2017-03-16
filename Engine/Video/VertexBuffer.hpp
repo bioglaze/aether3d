@@ -1,6 +1,9 @@
 #ifndef VERTEX_BUFFER_H
 #define VERTEX_BUFFER_H
 
+#if RENDERER_D3D12
+#include <d3d12.h>
+#endif
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
@@ -10,8 +13,6 @@
 #include <vulkan/vulkan.h>
 #endif
 #include "Vec3.hpp"
-
-struct ID3D12Resource;
 
 namespace ae3d
 {
@@ -81,6 +82,12 @@ namespace ae3d
 
         /// \return Index buffer offset from the beginning of the vb.
         long GetIBOffset() const { return ibOffset; }
+
+        /// \return VB view
+        const D3D12_VERTEX_BUFFER_VIEW* GetView() const { return &vertexBufferView; }
+
+        /// \return IB view
+        const D3D12_INDEX_BUFFER_VIEW* GetIndexView() const { return &indexBufferView; }
 #endif
 
         /// Binds the buffer. Must be called before GfxDevice::Draw.
@@ -154,6 +161,8 @@ namespace ae3d
         void UploadVB( void* faces, void* vertices, unsigned ibSize );
         // Index buffer is stored in the vertex buffer after vertex data.
         ID3D12Resource* vb = nullptr;
+        D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+        D3D12_INDEX_BUFFER_VIEW indexBufferView;
         long ibOffset = 0;
         int sizeBytes = 0;
 #endif
