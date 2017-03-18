@@ -53,6 +53,12 @@ namespace ae3d
             Wireframe
         };
 
+        enum class PrimitiveTopology
+        {
+            Triangles,
+            Lines
+        };
+
         void Init( int width, int height );
         int CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color );
 #if RENDERER_D3D12
@@ -82,8 +88,8 @@ namespace ae3d
         void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );
-        void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode );
-        void DrawLines( int handle );
+        void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode, PrimitiveTopology topology );
+        void DrawLines( int handle, Shader& shader );
         void ErrorCheck( const char* info );
 
         void SetClearColor( float red, float green, float blue );

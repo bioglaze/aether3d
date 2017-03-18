@@ -1560,13 +1560,13 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
     return 0;
 }
 
-void ae3d::GfxDevice::DrawLines( int handle )
+void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 {
 
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
-                            CullMode cullMode, FillMode fillMode )
+                            CullMode cullMode, FillMode fillMode, PrimitiveTopology /*topology*/ )
 {
     System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );

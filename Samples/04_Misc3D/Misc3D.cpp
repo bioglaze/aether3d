@@ -26,7 +26,7 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
-#define TEST_SHADOWS_SPOT
+//#define TEST_SHADOWS_SPOT
 //#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
@@ -355,6 +355,7 @@ int main()
     standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -14 ) );
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
+    scene.Add( &standardCubeTopCenter );
 #endif
 
     scene.SetSkybox( &skybox );
@@ -368,9 +369,6 @@ int main()
 
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
-#endif
-#ifdef TEST_FORWARD_PLUS
-    scene.Add( &standardCubeTopCenter );
 #endif
     scene.Add( &cubePTN );
     scene.Add( &childCube );

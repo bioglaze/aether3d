@@ -14,6 +14,7 @@ namespace GfxDeviceGlobal
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern ID3D12RootSignature* rootSignatureTileCuller;
     extern ID3D12PipelineState* lightTilerPSO;
+    extern ID3D12DescriptorHeap* computeCbvSrvUavHeap;
 }
 
 namespace Global
@@ -32,19 +33,9 @@ void DestroyComputeShaders()
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
 {
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
+    System::Assert( GfxDeviceGlobal::computeCbvSrvUavHeap != nullptr, "heap not initialized" );
 
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = 10;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    desc.NodeMask = 1;
-
-    ID3D12DescriptorHeap* tempHeap = nullptr;
-    HRESULT hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &tempHeap ) );
-    AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
-    tempHeap->SetName( L"LightTiler heap" );
-
-    D3D12_CPU_DESCRIPTOR_HANDLE handle = tempHeap->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = GfxDeviceGlobal::computeCbvSrvUavHeap->GetCPUDescriptorHandleForHeapStart();
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = uniformBuffers[ 0 ]->GetGPUVirtualAddress();
@@ -90,9 +81,9 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
 
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
+    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeap );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
-    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &tempHeap );
-    GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, tempHeap->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 
     TransitionResource( depthNormals, D3D12_RESOURCE_STATE_RENDER_TARGET );

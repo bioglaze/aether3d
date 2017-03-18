@@ -56,7 +56,6 @@ namespace ae3d
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
-                stm << "create constant buffer calls: " << ::Statistics::GetCreateConstantBufferCalls() << "\n";
 
                 return stm.str();
 	    }
@@ -137,6 +136,7 @@ namespace GfxDeviceGlobal
     std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
+    std::vector< ae3d::VertexBuffer > lineBuffers;
     std::vector< ID3D12Resource* > constantBuffers;
     std::vector< ID3D12Resource* > mappedConstantBuffers;
     int currentConstantBufferIndex = 0;
@@ -152,6 +152,7 @@ namespace GfxDeviceGlobal
     ID3D12Resource* msaaDepth = nullptr;
     D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
+    ID3D12DescriptorHeap* computeCbvSrvUavHeap = nullptr;
 }
 
 namespace ae3d
@@ -408,7 +409,7 @@ void CreateRootSignature()
 }
 
 unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount )
+                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
     std::string hashString;
     hashString += std::to_string( (unsigned)vertexFormat );
@@ -420,6 +421,7 @@ unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader
     hashString += std::to_string( ((unsigned)fillMode) );
     hashString += std::to_string( ((unsigned)rtvFormat) );
     hashString += std::to_string( ((unsigned)sampleCount) );
+    hashString += std::to_string( ((unsigned)topology) );
 
     return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
 }
@@ -436,7 +438,7 @@ void CreateComputePSO( ae3d::ComputeShader& shader )
 }
 
 void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount )
+                ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
     D3D12_RASTERIZER_DESC descRaster = {};
 
@@ -594,7 +596,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     }
 
     descPso.SampleMask = UINT_MAX;
-    descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    descPso.PrimitiveTopologyType = topology == ae3d::GfxDevice::PrimitiveTopology::Lines ? D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE : D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     descPso.NumRenderTargets = 1;
     descPso.RTVFormats[ 0 ] = rtvFormat;
     descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
@@ -606,7 +608,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO Graphics" );
 
-    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount );
+    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount, topology );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -734,7 +736,7 @@ void ae3d::CreateRenderer( int samples )
     if (dhr == S_OK)
     {
         debugController->EnableDebugLayer();
-#if 1
+#if 0
         ID3D12Debug1* debugController1;
         dhr = debugController->QueryInterface( IID_PPV_ARGS( &debugController1 ) );
 
@@ -821,6 +823,19 @@ void ae3d::CreateRenderer( int samples )
     CreateSamplers();
     CreateConstantBuffers();
 
+    // Compute heap
+    {
+        D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+        desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+        desc.NumDescriptors = 10;
+        desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+        desc.NodeMask = 1;
+
+        hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::computeCbvSrvUavHeap ) );
+        AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
+        GfxDeviceGlobal::computeCbvSrvUavHeap->SetName( L"Compute CBV SRV UAV heap" );
+    }
+
     GfxDeviceGlobal::lightTiler.Init();
 }
 
@@ -857,16 +872,47 @@ void ae3d::GfxDevice::PopGroupMarker()
 
 int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
 {
-    return 0;
+    if (lines.empty())
+    {
+        return -1;
+    }
+
+    std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
+
+    std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
+
+    for (std::size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
+    {
+        vertices[ lineIndex ].position = lines[ lineIndex ];
+        vertices[ lineIndex ].color = Vec4( color, 1 );
+    }
+
+    // Not used, but needs to be set to something.
+    for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
+    {
+        faces[ faceIndex * 2 + 0 ].a = faceIndex;
+        faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
+    }
+
+    GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
+    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
+
+    return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
 }
 
-void ae3d::GfxDevice::DrawLines( int handle )
+void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 {
+    if (handle < 0)
+    {
+        return;
+    }
 
+    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount(), shader, BlendMode::Off, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
-                            CullMode cullMode, FillMode fillMode )
+                            CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )
 {
     // Prevents feedback. Currently disabled because it also prevents drawing a sprite that uses render texture.
     /*if (GfxDeviceGlobal::renderTexture0 && GfxDeviceGlobal::currentRenderTargetRTV.ptr == GfxDeviceGlobal::renderTexture0->GetRTV().ptr)
@@ -881,16 +927,15 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_R8G8B8A8_UNORM);
     }
 
-    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
+    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount );
+        CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
     }
     
     const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 3) % GfxDeviceGlobal::constantBuffers.size(); // FIXME: * 3 because the descriptor contains 3 entries, is this right?
 
-    D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = DescriptorHeapManager::GetCbvSrvUavGpuHandle( index );
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
@@ -909,12 +954,21 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, gpuHandle );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavGpuHandle( index ) );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
     GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, vertexBuffer.GetView() );
-    GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( vertexBuffer.GetIndexView() );
-    GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace * 3, 1, startFace * 3, 0, 0 );
+    GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( topology == PrimitiveTopology::Lines ? nullptr : vertexBuffer.GetIndexView() );
+    GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( topology == PrimitiveTopology::Lines ? D3D_PRIMITIVE_TOPOLOGY_LINELIST : D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+    if (topology == PrimitiveTopology::Triangles)
+    {
+        GfxDeviceGlobal::graphicsCommandList->DrawIndexedInstanced( endFace * 3 - startFace * 3, 1, startFace * 3, 0, 0 );
+    }
+    else
+    {
+        GfxDeviceGlobal::graphicsCommandList->DrawInstanced( endFace / 6 - startFace / 6, 1, startFace / 6, 0 );
+    }
 
     Statistics::IncTriangleCount( endFace - startFace );
     Statistics::IncDrawCalls();
@@ -933,7 +987,6 @@ void ae3d::GfxDevice::ResetCommandList()
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
     AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignatureGraphics );
-    GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
     GfxDeviceGlobal::texture0 = Texture2D::GetDefaultTexture();
     GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
@@ -979,6 +1032,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::lightTilerPSO );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeap );
 
     GfxDeviceGlobal::lightTiler.DestroyBuffers();
 

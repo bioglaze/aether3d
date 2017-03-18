@@ -182,7 +182,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         }
         
         GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount() / 3,
-                         *shader, blendMode, depthFunc, cullMode, isWireframe ? GfxDevice::FillMode::Wireframe : GfxDevice::FillMode::Solid );
+                         *shader, blendMode, depthFunc, cullMode, isWireframe ? GfxDevice::FillMode::Wireframe : GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
     }
 }
 

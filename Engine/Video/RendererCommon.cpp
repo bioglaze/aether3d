@@ -77,6 +77,6 @@ void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponen
 
     GfxDevice::PushGroupMarker( "Skybox" );
     GfxDevice::Draw( skyboxBuffer, 0, skyboxBuffer.GetFaceCount() / 3, builtinShaders.skyboxShader, GfxDevice::BlendMode::Off,
-                     GfxDevice::DepthFunc::LessOrEqualWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid );
+                     GfxDevice::DepthFunc::LessOrEqualWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
     GfxDevice::PopGroupMarker();
 }

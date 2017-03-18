@@ -158,7 +158,7 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
     
     GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend,
-                     GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid );
+                     GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 int ae3d::System::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
@@ -174,7 +174,7 @@ void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& 
     renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", Texture2D::GetDefaultTexture(), 0 );
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &viewProjection.m[ 0 ] );
 
-    GfxDevice::DrawLines( handle );
+    GfxDevice::DrawLines( handle, renderer.builtinShaders.spriteRendererShader );
 }
 
 void ae3d::System::ReloadChangedAssets()

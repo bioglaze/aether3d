@@ -234,7 +234,7 @@ void ae3d::GfxDevice::PopGroupMarker()
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
-                            CullMode cullMode, GfxDevice::FillMode fillMode )
+                            CullMode cullMode, GfxDevice::FillMode fillMode, GfxDevice::PrimitiveTopology /*topology*/ )
 {
     ae3d::System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     ae3d::System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
@@ -287,7 +287,7 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
     return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
 }
 
-void ae3d::GfxDevice::DrawLines( int handle )
+void ae3d::GfxDevice::DrawLines( int handle, ae3d::Shader& /*shader*/ )
 {
     if (handle < 0)
     {
