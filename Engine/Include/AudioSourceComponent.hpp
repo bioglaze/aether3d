@@ -21,6 +21,9 @@ namespace ae3d
         /// \param enable True, if clips played through this source will be affected by this GameObject's and camera's position.
         void Set3D( bool enable ) { is3D = enable; }
         
+        /// \param enable True, if the clip will be looped when playing.
+        void SetLooping( bool enable ) { isLooping = enable; }
+        
         /// Plays the clip.
         void Play() const;
 
@@ -42,6 +45,7 @@ namespace ae3d
         GameObject* gameObject = nullptr;
         unsigned clipId = 0;
         bool is3D = false;
+        bool isLooping = false;
     };
 }
 

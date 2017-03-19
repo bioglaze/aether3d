@@ -28,7 +28,7 @@ void ae3d::AudioSourceComponent::SetClipId( unsigned audioClipId )
 
 void ae3d::AudioSourceComponent::Play() const
 {
-    AudioSystem::Play( clipId );
+    AudioSystem::Play( clipId, isLooping );
 }
 
 std::string ae3d::AudioSourceComponent::GetSerialized() const

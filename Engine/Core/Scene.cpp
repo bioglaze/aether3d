@@ -798,7 +798,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     {
         ++i;
         
-        if (gameObject == nullptr)
+        if (gameObject == nullptr || !gameObject->IsEnabled())
         {
             continue;
         }

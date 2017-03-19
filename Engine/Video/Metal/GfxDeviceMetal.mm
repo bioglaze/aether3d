@@ -536,13 +536,13 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
     return 0;
 }
 
-void ae3d::GfxDevice::DrawLines( int handle )
+void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 {
     //int endIndex = int( lines.size() ) * 2;
     //glDrawRangeElements( GL_LINE_LOOP, 0, endIndex, endIndex, GL_UNSIGNED_SHORT, (const GLvoid*)(sizeof( VertexBuffer::Face ) ) );
 }
 
-void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode )
+void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )
 {
     if (!GfxDeviceGlobal::lightTiler.CullerUniformsCreated() && shader.GetMetalVertexShaderName() == "standard_vertex")
     {
@@ -649,7 +649,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         System::Assert( false, "Unhandled vertex format" );
     }
     
-    [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+    [renderEncoder drawIndexedPrimitives:(topology == PrimitiveTopology::Triangles ? MTLPrimitiveTypeTriangle : MTLPrimitiveTypeLine)
                               indexCount:(endIndex - startIndex) * 3
                                indexType:MTLIndexTypeUInt16
                              indexBuffer:vertexBuffer.GetIndexBuffer()

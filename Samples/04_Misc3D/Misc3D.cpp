@@ -427,6 +427,7 @@ int main()
     cubes[ 4 ].AddComponent<AudioSourceComponent>();
     cubes[ 4 ].GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     cubes[ 4 ].GetComponent<AudioSourceComponent>()->Set3D( true );
+    cubes[ 4 ].GetComponent<AudioSourceComponent>()->SetLooping( true );
     cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
 
     bool quit = false;

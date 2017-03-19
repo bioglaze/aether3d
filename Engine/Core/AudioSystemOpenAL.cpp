@@ -349,19 +349,22 @@ float ae3d::AudioSystem::GetClipLengthForId( unsigned handle )
     return handle < AudioGlobal::clips.size() ? AudioGlobal::clips[ handle ].lengthInSeconds : 1;
 }
 
-void ae3d::AudioSystem::Play( unsigned clipId )
+void ae3d::AudioSystem::Play( unsigned clipId, bool isLooping )
 {
     if (clipId >= AudioGlobal::clips.size())
     {
         return;
     }
     
+    const auto srcID = AudioGlobal::clips[ clipId ].srcID;
+    
     ALint state;
-    alGetSourcei( AudioGlobal::clips[ clipId ].srcID, AL_SOURCE_STATE, &state );
+    alGetSourcei( srcID, AL_SOURCE_STATE, &state );
+    alSourcei( srcID, AL_LOOPING, isLooping ? AL_TRUE : AL_FALSE );
     
     if (state != AL_PLAYING)
     {
-        alSourcePlay( AudioGlobal::clips[ clipId ].srcID );
+        alSourcePlay( srcID );
     }
 }
 

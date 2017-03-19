@@ -28,7 +28,8 @@ namespace ae3d
         float GetClipLengthForId( unsigned handle );
         
         /// \param clipId Clip handle from GetClipIdForData.
-        void Play( unsigned clipId );
+        /// \param isLooping True, if the clip should loop
+        void Play( unsigned clipId, bool isLooping );
         
         /// \param x X coordinate.
         /// \param y Y coordinate.
