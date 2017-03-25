@@ -177,20 +177,20 @@ std::vector< Vec3 > ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIn
     
     if (!subMesh.verticesPTNTC.empty())
     {
-        for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3)
+        for (std::size_t faceIndex = 0; faceIndex < faceCount / 3; ++faceIndex)
         {
-            outTriangles[ faceIndex + 0 ] = subMesh.verticesPTNTC[ subMesh.indices[ faceIndex / 3 ].a ].position;
-            outTriangles[ faceIndex + 1 ] = subMesh.verticesPTNTC[ subMesh.indices[ faceIndex / 3 ].b ].position;
-            outTriangles[ faceIndex + 2 ] = subMesh.verticesPTNTC[ subMesh.indices[ faceIndex / 3 ].c ].position;
+            outTriangles[ faceIndex * 3 + 0 ] = subMesh.verticesPTNTC.at( subMesh.indices[ faceIndex ].a ).position;
+            outTriangles[ faceIndex * 3 + 1 ] = subMesh.verticesPTNTC.at( subMesh.indices[ faceIndex ].b ).position;
+            outTriangles[ faceIndex * 3 + 2 ] = subMesh.verticesPTNTC.at( subMesh.indices[ faceIndex ].c ).position;
         }
     }
     else if (!subMesh.verticesPTN.empty())
     {
-        for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3)
+        for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex)
         {
-            outTriangles[ faceIndex + 0 ] = subMesh.verticesPTN[ subMesh.indices[ faceIndex / 3 ].a ].position;
-            outTriangles[ faceIndex + 1 ] = subMesh.verticesPTN[ subMesh.indices[ faceIndex / 3 ].b ].position;
-            outTriangles[ faceIndex + 2 ] = subMesh.verticesPTN[ subMesh.indices[ faceIndex / 3 ].c ].position;
+            outTriangles[ faceIndex * 3 + 0 ] = subMesh.verticesPTN.at( subMesh.indices[ faceIndex ].a ).position;
+            outTriangles[ faceIndex * 3 + 1 ] = subMesh.verticesPTN.at( subMesh.indices[ faceIndex ].b ).position;
+            outTriangles[ faceIndex * 3 + 2 ] = subMesh.verticesPTN.at( subMesh.indices[ faceIndex ].c ).position;
         }
     }
     else

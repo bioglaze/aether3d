@@ -228,8 +228,8 @@ void CameraInspector::ApplyFieldsIntoSelectedCamera()
     }
     catch (std::invalid_argument&)
     {
-        perspFar = 1;
-        persp->item( 0, 3 )->setText( "1" );
+        perspFar = 200;
+        persp->item( 0, 3 )->setText( "200" );
     }
 
     try
