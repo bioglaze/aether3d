@@ -166,7 +166,7 @@ int main()
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
                  "unlitVert", "unlitFrag",
-                 FileSystem::FileContents( "unlit.hlsl" ), FileSystem::FileContents( "unlit.hlsl" ),
+                 FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
                  FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Texture2D gliderTex;
@@ -205,7 +205,7 @@ int main()
     Shader shaderCubeMap;
     shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ),
                         "unlitVert", "unlitFrag",
-                        FileSystem::FileContents( "unlit_cube.hlsl" ), FileSystem::FileContents( "unlit_cube.hlsl" ),
+                        FileSystem::FileContents( "unlit_cube_vert.hlsl" ), FileSystem::FileContents( "unlit_cube_frag.hlsl" ),
                         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     GameObject lightParent;
@@ -448,7 +448,11 @@ int main()
     {
 #if defined( AE3D_OPENVR )
         VR::CalcEyePose();
-        
+       
+        cube.GetComponent< TransformComponent >()->SetLocalPosition( camera.GetComponent< TransformComponent >()->GetWorldPosition() + VR::GetLeftHandPosition() );
+        Vec3 pos = VR::GetLeftHandPosition();
+        System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
+
         for (int eye = 0; eye < 2; ++eye)
         {
             VR::SetEye( eye );

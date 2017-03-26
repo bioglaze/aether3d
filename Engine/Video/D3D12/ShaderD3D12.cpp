@@ -73,10 +73,12 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     const std::size_t vertexSourceLength = std::string( vertexSource ).size();
     ID3DBlob* blobError = nullptr;
 #if DEBUG
-    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderVertex, &blobError );
+    const UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS;
 #else
-    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "VSMain", nullptr /*defines*/, nullptr, "VSMain", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3  | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderVertex, &blobError );
+    const UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS;
 #endif
+    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "main", nullptr /*defines*/, nullptr, "main", "vs_5_0", flags, 0, &blobShaderVertex, &blobError );
+
     if (FAILED( hr ))
     {
         ae3d::System::Print( "Unable to compile vertex shader %s: %s!\n", vertexPath.c_str(), blobError->GetBufferPointer() );
@@ -86,11 +88,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     const std::size_t pixelSourceLength = std::string( fragmentSource ).size();
 
-#if DEBUG
-    hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderPixel, &blobError );
-#else
-    hr = D3DCompile( fragmentSource, pixelSourceLength, "PSMain", nullptr /*defines*/, nullptr, "PSMain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS, 0, &blobShaderPixel, &blobError );
-#endif
+    hr = D3DCompile( fragmentSource, pixelSourceLength, "main", nullptr /*defines*/, nullptr, "main", "ps_5_0", flags, 0, &blobShaderPixel, &blobError );
 
     if (FAILED( hr ))
     {

@@ -13,6 +13,7 @@ namespace Statistics
     int createConstantBufferCalls = 0;
     int allocCalls = 0;
     int triangleCount = 0;
+    int psoBindCount = 0;
     float depthNormalsTimeMS = 0;
     float shadowMapTimeMS = 0;
     float frameTimeMS = 0;
@@ -65,6 +66,16 @@ void Statistics::EndFrameTimeProfiling()
     auto tEnd = std::chrono::high_resolution_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startFrameTimePoint ).count();
     Statistics::frameTimeMS = static_cast< float >(tDiff);
+}
+
+void Statistics::IncPSOBindCalls()
+{
+    ++Statistics::psoBindCount;
+}
+
+int Statistics::GetPSOBindCalls()
+{
+    return Statistics::psoBindCount;
 }
 
 void Statistics::IncFenceCalls()
@@ -184,6 +195,7 @@ void Statistics::ResetFrameStatistics()
     createConstantBufferCalls = 0;
     allocCalls = 0;
     triangleCount = 0;
+    psoBindCount = 0;
 
     startFrameTimePoint = std::chrono::high_resolution_clock::now();
 }

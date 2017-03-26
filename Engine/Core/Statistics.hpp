@@ -37,6 +37,8 @@ namespace Statistics
     int GetFenceCalls();
     void IncAllocCalls();
     int GetAllocCalls();
+    void IncPSOBindCalls();
+    int GetPSOBindCalls();
 }
 
 #endif

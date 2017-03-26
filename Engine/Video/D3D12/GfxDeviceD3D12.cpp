@@ -56,6 +56,7 @@ namespace ae3d
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
+                stm << "PSO binds: " << ::Statistics::GetPSOBindCalls() << "\n";
 
                 return stm.str();
 	    }
@@ -972,6 +973,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     Statistics::IncTriangleCount( endFace - startFace );
     Statistics::IncDrawCalls();
+    Statistics::IncPSOBindCalls();
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
