@@ -96,6 +96,10 @@ using namespace ae3d;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
+    
+    Matrix44 lineView;
+    Matrix44 lineProjection;
+    int lineHandle;
 }
 
 - (void)viewDidLoad
@@ -403,6 +407,14 @@ using namespace ae3d;
     transMaterial.SetBackFaceCulling( true );
     //transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );
     //rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &transMaterial, 0 );
+    
+    lineProjection.MakeProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
+    std::vector< Vec3 > lines( 4 );
+    lines[ 0 ] = Vec3( 10, 10, -0.5f );
+    lines[ 1 ] = Vec3( 50, 10, -0.5f );
+    lines[ 2 ] = Vec3( 50, 50, -0.5f );
+    lines[ 3 ] = Vec3( 10, 10, -0.5f );
+    lineHandle = System::CreateLineBuffer( lines, Vec3( 1, 0, 0 ) );
 }
 
 - (void)_setupView
@@ -440,6 +452,8 @@ using namespace ae3d;
     ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
     ae3d::System::BeginFrame();
     scene.Render();
+    System::DrawLines( lineHandle, lineView, lineProjection );
+    scene.EndRenderMetal();
     ae3d::System::EndFrame();
 }
 

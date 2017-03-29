@@ -23,6 +23,9 @@ namespace ae3d
         /// Adds a game object into the scene if it does not exist there already.
         void Add( class GameObject* gameObject );
         
+        /// Ends the rendering on Metal API. Enables line drawing after Render() and before EndRenderMetal().
+        void EndRenderMetal();
+        
         /// \param gameObject Game object to remove. Does nothing if it is null or doesn't exist in the scene.
         void Remove( GameObject* gameObject );
         

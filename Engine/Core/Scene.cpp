@@ -528,7 +528,12 @@ void ae3d::Scene::Render()
     {
         RenderWithCamera( camera, 0, "Primary Pass" );
     }
+#endif
+}
 
+void ae3d::Scene::EndRenderMetal()
+{
+#if RENDERER_METAL
     GfxDevice::EndBackBufferEncoding();
     Statistics::EndFrameTimeProfiling();
 #endif

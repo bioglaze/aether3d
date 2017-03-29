@@ -85,7 +85,8 @@ namespace GfxDeviceGlobal
     std::list< id<MTLBuffer> > uniformBuffers;
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
     ae3d::LightTiler lightTiler;
-
+    std::vector< ae3d::VertexBuffer > lineBuffers;
+    
     struct Samplers
     {
         id<MTLSamplerState> linearRepeat;
@@ -341,7 +342,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
                        ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
-                       MTLPixelFormat depthFormat, int sampleCount )
+                       MTLPixelFormat depthFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
     std::string hashString;
     hashString += std::to_string( (ptrdiff_t)&shader.vertexProgram );
@@ -352,14 +353,15 @@ std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMo
     hashString += std::to_string( ((unsigned)pixelFormat) );
     hashString += std::to_string( ((unsigned)depthFormat) );
     hashString += std::to_string( sampleCount );
+    hashString += std::to_string( ((unsigned)topology) );
     return hashString;
 }
 
 id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
                                     ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
-                                    MTLPixelFormat depthFormat, int sampleCount )
+                                   MTLPixelFormat depthFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
-    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, depthFormat, sampleCount );
+    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, depthFormat, sampleCount, topology );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
@@ -368,7 +370,8 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.vertexFunction = shader.vertexProgram;
         pipelineStateDescriptor.fragmentFunction = shader.fragmentProgram;
 #if !TARGET_OS_IPHONE
-        pipelineStateDescriptor.inputPrimitiveTopology = MTLPrimitiveTopologyClassTriangle;
+        pipelineStateDescriptor.inputPrimitiveTopology = (topology == ae3d::GfxDevice::PrimitiveTopology::Triangles) ?
+        MTLPrimitiveTopologyClassTriangle : MTLPrimitiveTopologyClassLine;
 #endif
         MTLPixelFormat format = MTLPixelFormatBGRA8Unorm;
 
@@ -529,17 +532,21 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
         faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
     }
     
-    VertexBuffer lineBuffer;
-    lineBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
-    lineBuffer.SetDebugName( "line buffer" );
+    GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
+    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
     
-    return 0;
+    return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
 }
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 {
-    //int endIndex = int( lines.size() ) * 2;
-    //glDrawRangeElements( GL_LINE_LOOP, 0, endIndex, endIndex, GL_UNSIGNED_SHORT, (const GLvoid*)(sizeof( VertexBuffer::Face ) ) );
+    if (handle < 0 || handle >= int( GfxDeviceGlobal::lineBuffers.size() ))
+    {
+        return;
+    }
+    
+    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount(), shader, BlendMode::Off, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )
@@ -595,7 +602,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 #endif
 
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat,
-                                                  depthFormat, sampleCount )];
+                                                  depthFormat, sampleCount, topology )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
 
@@ -649,11 +656,18 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         System::Assert( false, "Unhandled vertex format" );
     }
     
-    [renderEncoder drawIndexedPrimitives:(topology == PrimitiveTopology::Triangles ? MTLPrimitiveTypeTriangle : MTLPrimitiveTypeLine)
-                              indexCount:(endIndex - startIndex) * 3
+    if (topology == PrimitiveTopology::Triangles)
+    {
+        [renderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+                                  indexCount:(endIndex - startIndex) * 3
                                indexType:MTLIndexTypeUInt16
                              indexBuffer:vertexBuffer.GetIndexBuffer()
-                       indexBufferOffset:startIndex * 2 * 3];    
+                       indexBufferOffset:startIndex * 2 * 3];
+    }
+    else // MTLPrimitiveTypeLine
+    {
+        [renderEncoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:vertexBuffer.GetFaceCount()];
+    }
 }
 
 void ae3d::GfxDevice::BeginFrame()

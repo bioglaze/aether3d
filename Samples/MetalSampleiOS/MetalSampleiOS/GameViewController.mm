@@ -198,6 +198,7 @@ int gTouchCount;
     ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
     ae3d::System::BeginFrame();
     scene.Render();
+    scene.EndRenderMetal();
     ae3d::System::EndFrame();
 }
 
