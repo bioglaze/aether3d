@@ -111,6 +111,8 @@ namespace GfxDeviceGlobal
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > frameUbos;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
+    int backBufferWidth;
+    int backBufferHeight;
 }
 
 namespace ae3d
@@ -1444,8 +1446,10 @@ namespace ae3d
     }
 }
 
-void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
+void ae3d::GfxDevice::Init( int width, int height )
 {
+    GfxDeviceGlobal::backBufferWidth = width;
+    GfxDeviceGlobal::backBufferHeight = height;
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )
@@ -1562,6 +1566,19 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 {
+
+}
+
+void ae3d::GfxDevice::SetViewport( int aViewport[ 4 ] )
+{
+    VkViewport viewport = {};
+    viewport.x = (float)aViewport[ 0 ];
+    viewport.y = (float)aViewport[ 1 ];
+    viewport.width = (float)aViewport[ 2 ];
+    viewport.height = (float)aViewport[ 3 ];
+    viewport.minDepth = (float) 0.0f;
+    viewport.maxDepth = (float) 1.0f;
+    vkCmdSetViewport( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0, 1, &viewport );
 
 }
 

@@ -980,6 +980,12 @@ void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )
 {
 }
 
+void ae3d::GfxDevice::SetViewport( int viewport[ 4 ] )
+{
+    D3D12_VIEWPORT viewPort{ (FLOAT)viewport[ 0 ], (FLOAT)viewport[ 1 ], (FLOAT)viewport[ 2 ], (FLOAT)viewport[ 3 ], 0, 1 };
+    GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &viewPort );
+}
+
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
 {
 }
@@ -1068,9 +1074,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
         vpWidth = static_cast< FLOAT >( GfxDeviceGlobal::currentRenderTarget->GetWidth() );
         vpHeight = static_cast< FLOAT >( GfxDeviceGlobal::currentRenderTarget->GetHeight() );
     }
-
-    D3D12_VIEWPORT viewPort{ 0, 0, vpWidth, vpHeight, 0, 1 };
-    GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &viewPort );
 
     D3D12_RECT scissor = {};
     scissor.right = static_cast< LONG >( vpWidth );
