@@ -86,6 +86,7 @@ namespace GfxDeviceGlobal
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
     ae3d::LightTiler lightTiler;
     std::vector< ae3d::VertexBuffer > lineBuffers;
+    int viewport[ 4 ];
     
     struct Samplers
     {
@@ -220,6 +221,14 @@ id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
 {
+}
+
+void ae3d::GfxDevice::SetViewport( int viewport[ 4 ] )
+{
+    GfxDeviceGlobal::viewport[ 0 ] = viewport[ 0 ];
+    GfxDeviceGlobal::viewport[ 1 ] = viewport[ 1 ];
+    GfxDeviceGlobal::viewport[ 2 ] = viewport[ 2 ];
+    GfxDeviceGlobal::viewport[ 3 ] = viewport[ 3 ];
 }
 
 void ae3d::GfxDevice::ResetUniformBuffers()
@@ -605,7 +614,16 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
                                                   depthFormat, sampleCount, topology )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
-
+    
+    MTLViewport viewport;
+    viewport.originX = GfxDeviceGlobal::viewport[ 0 ];
+    viewport.originY = GfxDeviceGlobal::viewport[ 1 ];
+    viewport.width = GfxDeviceGlobal::viewport[ 2 ];
+    viewport.height = GfxDeviceGlobal::viewport[ 3 ];
+    viewport.znear = 0;
+    viewport.zfar = 1;
+    [renderEncoder setViewport:viewport];
+    
     if (shader.GetMetalVertexShaderName() == "standard_vertex")
     {
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPerTileLightIndexBuffer() offset:0 atIndex:6];

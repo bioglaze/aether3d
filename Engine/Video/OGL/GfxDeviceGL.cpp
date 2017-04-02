@@ -287,6 +287,11 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
     return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
 }
 
+void ae3d::GfxDevice::SetViewport( int viewport[ 4 ] )
+{
+    glViewport( viewport[ 0 ], viewport[ 1 ], viewport[ 2 ], viewport[ 3 ] );
+}
+
 void ae3d::GfxDevice::DrawLines( int handle, ae3d::Shader& /*shader*/ )
 {
     if (handle < 0)

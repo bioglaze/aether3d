@@ -546,6 +546,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
+    GfxDevice::SetViewport( camera->GetViewport() );
 #ifndef RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
@@ -713,6 +714,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
                                          int cubeMapFace, const Frustum& frustum )
 {
+    GfxDevice::SetViewport( camera->GetViewport() );
 #if RENDERER_METAL
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
@@ -755,7 +757,8 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #if !RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
-
+    GfxDevice::SetViewport( camera->GetViewport() );
+    
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     

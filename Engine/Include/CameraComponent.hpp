@@ -128,6 +128,15 @@ namespace ae3d
         /// \param view View matrix.
         void SetView( const Matrix44& view ) { viewMatrix = view; }
 
+        /// \param x Starting x coordinate
+        /// \param y Starting y coordinate
+        /// \param width Width
+        /// \param height Height
+        void SetViewport( int x, int y, int width, int height );
+        
+        /// \return Viewport
+        int* GetViewport() { return viewport; }
+        
     private:
         friend class GameObject;
         friend class Scene;
@@ -164,6 +173,7 @@ namespace ae3d
         ProjectionType projectionType = ProjectionType::Orthographic;
         ClearFlag clearFlag = ClearFlag::DepthAndColor;
         GameObject* gameObject = nullptr;
+        int viewport[ 4 ];
     };
 }
 #endif

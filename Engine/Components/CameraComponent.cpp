@@ -7,6 +7,12 @@
 std::vector< ae3d::CameraComponent > cameraComponents;
 unsigned nextFreeCameraComponent = 0;
 
+namespace GfxDeviceGlobal
+{
+    extern int backBufferWidth;
+    extern int backBufferHeight;
+}
+
 unsigned ae3d::CameraComponent::New()
 {
     if (nextFreeCameraComponent == cameraComponents.size())
@@ -14,6 +20,15 @@ unsigned ae3d::CameraComponent::New()
         cameraComponents.resize( cameraComponents.size() + 10 );
     }
 
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 0 ] = 0;
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 1 ] = 0;
+#if AETHER3D_METAL
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 2 ] = GfxDeviceGlobal::backBufferWidth * 2;
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 3 ] = GfxDeviceGlobal::backBufferHeight * 2;
+#else
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 2 ] = GfxDeviceGlobal::backBufferWidth;
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 3 ] = GfxDeviceGlobal::backBufferHeight;
+#endif
     return nextFreeCameraComponent++;
 }
 
@@ -72,6 +87,14 @@ void ae3d::CameraComponent::SetTargetTexture( ae3d::RenderTexture* renderTexture
     targetTexture = renderTexture;
 }
 
+void ae3d::CameraComponent::SetViewport( int x, int y, int width, int height )
+{
+    viewport[ 0 ] = x;
+    viewport[ 1 ] = y;
+    viewport[ 2 ] = width;
+    viewport[ 3 ] = height;
+}
+
 std::string ae3d::CameraComponent::GetSerialized() const
 {
     std::stringstream outStream;
@@ -97,6 +120,7 @@ std::string ae3d::CameraComponent::GetSerialized() const
     outStream << "persp " << fovDegrees << " " << aspect << " " << nearp << " " << farp << "\n";
     outStream << "layermask " << layerMask << "\n";
     outStream << "order " << renderOrder << "\n";
+    outStream << "viewport " << viewport[ 0 ] << " " << viewport[ 1 ] << " " << viewport[ 2 ] << " " << viewport[ 3 ] << "\n";
     outStream << "clearcolor " << clearColor.x << " " << clearColor.y << " " << clearColor.z << "\n\n";
 
     return outStream.str();
