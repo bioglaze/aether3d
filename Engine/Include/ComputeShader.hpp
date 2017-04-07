@@ -2,13 +2,11 @@
 #define COMPUTE_SHADER_H
 
 #include <string>
-#include <vector>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_D3D12
 #include <d3d12.h>
-#include <d3dcompiler.h>
 #endif
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
@@ -87,7 +85,7 @@ namespace ae3d
         id<MTLComputePipelineState> pipeline;
         id<MTLBuffer> uniforms[ 3 ];
 #endif
-        std::vector< RenderTexture* > renderTextures;
+        RenderTexture* renderTextures[ 3 ];
 #if RENDERER_D3D12
         ID3D12Resource* uniformBuffers[ 3 ];
         ID3D12Resource* textureBuffers[ 3 ];

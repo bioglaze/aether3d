@@ -913,6 +913,7 @@ namespace ae3d
         enabledFeatures.shaderTessellationAndGeometryPointSize = true;
         enabledFeatures.shaderClipDistance = true;
         enabledFeatures.shaderCullDistance = true;
+        enabledFeatures.textureCompressionBC = true;
 
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

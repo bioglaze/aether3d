@@ -119,7 +119,7 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     Load( dataStr.c_str() );
 }
 
-void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsigned slot )
+void ae3d::ComputeShader::SetRenderTexture( RenderTexture* /*renderTexture*/, unsigned /*slot*/ )
 {
 
 }

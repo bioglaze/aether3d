@@ -6,7 +6,6 @@
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_D3D12
-#include <vector>
 #include <d3d12.h>
 #endif
 #include "Vec3.hpp"
