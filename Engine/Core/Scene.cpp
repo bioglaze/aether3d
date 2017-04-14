@@ -546,9 +546,14 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
+#ifndef RENDERER_VULKAN
     GfxDevice::SetViewport( camera->GetViewport() );
+#endif
 #ifndef RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
+#endif
+#ifdef RENDERER_VULKAN
+    GfxDevice::SetViewport( camera->GetViewport() );
 #endif
 #ifndef RENDERER_METAL
     GfxDevice::PushGroupMarker( debugGroupName );
@@ -707,6 +712,9 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 
 #if RENDERER_METAL
     GfxDevice::UnsetRenderTarget();
+#endif
+#if RENDERER_VULKAN
+    GfxDevice::SetRenderTarget( nullptr, 0 );
 #endif
     GfxDevice::ErrorCheck( "Scene render after rendering" );
 }

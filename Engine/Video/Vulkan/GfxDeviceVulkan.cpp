@@ -79,6 +79,8 @@ namespace GfxDeviceGlobal
     VkCommandBuffer prePresentCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer postPresentCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer computeCmdBuffer = VK_NULL_HANDLE;
+    VkCommandBuffer offscreenCmdBuffer = VK_NULL_HANDLE;
+    VkCommandBuffer currentCmdBuffer = VK_NULL_HANDLE;
 
     VkSwapchainKHR swapChain = VK_NULL_HANDLE;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
@@ -95,6 +97,7 @@ namespace GfxDeviceGlobal
     std::vector< VkFramebuffer > frameBuffers;
     VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE;
     VkSemaphore renderCompleteSemaphore = VK_NULL_HANDLE;
+    VkSemaphore offscreenSemaphore = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
@@ -436,6 +439,10 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &computeBufAllocateInfo, &GfxDeviceGlobal::computeCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+
+        // Render texture
+        err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::offscreenCmdBuffer );
+        AE3D_CHECK_VULKAN( err, "Offscreen command buffer" );
     }
 
     void SubmitPrePresentBarrier()
@@ -1429,18 +1436,17 @@ namespace ae3d
         CreateDescriptorSetLayout();
         CreateDescriptorPool();
 
-        VkSemaphoreCreateInfo presentCompleteSemaphoreCreateInfo = {};
-        presentCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        presentCompleteSemaphoreCreateInfo.pNext = nullptr;
+        VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+        semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        semaphoreCreateInfo.pNext = nullptr;
 
-        err = vkCreateSemaphore( GfxDeviceGlobal::device, &presentCompleteSemaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
+        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
         AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
 
-        VkSemaphoreCreateInfo renderCompleteSemaphoreCreateInfo = {};
-        renderCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        renderCompleteSemaphoreCreateInfo.pNext = nullptr;
+        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::renderCompleteSemaphore );
+        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
 
-        err = vkCreateSemaphore( GfxDeviceGlobal::device, &renderCompleteSemaphoreCreateInfo, nullptr, &GfxDeviceGlobal::renderCompleteSemaphore );
+        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::offscreenSemaphore );
         AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
 
         GfxDevice::SetClearColor( 0, 0, 0 );
@@ -1459,12 +1465,12 @@ void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
-    debug::BeginRegion( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], name, 0, 1, 0 );
+    debug::BeginRegion( GfxDeviceGlobal::currentCmdBuffer, name, 0, 1, 0 );
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
-    debug::EndRegion( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
+    debug::EndRegion( GfxDeviceGlobal::currentCmdBuffer );
 }
 
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
@@ -1507,31 +1513,31 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0 != VK_NULL_HANDLE ? GfxDeviceGlobal::frameBuffer0 : 
                                       GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
 
-    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], &cmdBufInfo );
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
-    vkCmdBeginRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+    vkCmdBeginRenderPass( GfxDeviceGlobal::currentCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
 
     VkViewport viewport = {};
     viewport.height = (float)height;
     viewport.width = (float)width;
     viewport.minDepth = (float) 0.0f;
     viewport.maxDepth = (float) 1.0f;
-    vkCmdSetViewport( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0, 1, &viewport );
+    vkCmdSetViewport( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &viewport );
 
     VkRect2D scissor = {};
     scissor.extent.width = width;
     scissor.extent.height = height;
     scissor.offset.x = 0;
     scissor.offset.y = 0;
-    vkCmdSetScissor( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0, 1, &scissor );
+    vkCmdSetScissor( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &scissor );
 }
 
 void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
 {
     vkCmdEndRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
 
-    VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
+    VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
 
     VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
@@ -1579,8 +1585,15 @@ void ae3d::GfxDevice::SetViewport( int aViewport[ 4 ] )
     viewport.height = (float)aViewport[ 3 ];
     viewport.minDepth = (float) 0.0f;
     viewport.maxDepth = (float) 1.0f;
-    vkCmdSetViewport( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], 0, 1, &viewport );
 
+    vkCmdSetViewport( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &viewport );
+    
+    VkRect2D scissor = {};
+    scissor.extent.width = (float)aViewport[ 2 ];
+    scissor.extent.height = (float)aViewport[ 3 ];
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+    vkCmdSetScissor( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &scissor );
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
@@ -1610,16 +1623,16 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
 
-    vkCmdBindDescriptorSets( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS,
+    vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
 
-    vkCmdBindPipeline( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::psoCache[ psoHash ] );
+    vkCmdBindPipeline( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::psoCache[ psoHash ] );
 
     VkDeviceSize offsets[ 1 ] = { 0 };
-    vkCmdBindVertexBuffers( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], VertexBuffer::VERTEX_BUFFER_BIND_ID, 1, vertexBuffer.GetVertexBuffer(), offsets );
+    vkCmdBindVertexBuffers( GfxDeviceGlobal::currentCmdBuffer, VertexBuffer::VERTEX_BUFFER_BIND_ID, 1, vertexBuffer.GetVertexBuffer(), offsets );
 
-    vkCmdBindIndexBuffer( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
-    vkCmdDrawIndexed( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ], (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
+    vkCmdBindIndexBuffer( GfxDeviceGlobal::currentCmdBuffer, *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
+    vkCmdDrawIndexed( GfxDeviceGlobal::currentCmdBuffer, (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
     Statistics::IncTriangleCount( endIndex - startIndex );
     Statistics::IncDrawCalls();
 }
@@ -1680,6 +1693,8 @@ void ae3d::GfxDevice::BeginFrame()
     
     VkResult err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, GfxDeviceGlobal::presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
     AE3D_CHECK_VULKAN( err, "acquireNextImage" );
+
+    GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
 
     SubmitPostPresentBarrier();
 }
@@ -1791,8 +1806,36 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMapFace*/ )
 {
+    GfxDeviceGlobal::currentCmdBuffer = target ? GfxDeviceGlobal::offscreenCmdBuffer : GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
     GfxDeviceGlobal::renderTexture0 = target;
     GfxDeviceGlobal::frameBuffer0 = target ? target->GetFrameBuffer() : VK_NULL_HANDLE;
+
+    if (target)
+    {
+        VkCommandBufferBeginInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
+        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+
+        VkClearValue clearValues[ 2 ];
+        clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
+        clearValues[ 1 ].depthStencil = { 1.0f, 0 };
+
+        VkRenderPassBeginInfo renderPassBeginInfo = {};
+        renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassBeginInfo.pNext = nullptr;
+        renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderPass;
+        renderPassBeginInfo.renderArea.offset.x = 0;
+        renderPassBeginInfo.renderArea.offset.y = 0;
+        renderPassBeginInfo.renderArea.extent.width = target->GetWidth();
+        renderPassBeginInfo.renderArea.extent.height = target->GetHeight();
+        renderPassBeginInfo.clearValueCount = 2;
+        renderPassBeginInfo.pClearValues = clearValues;
+        renderPassBeginInfo.framebuffer = target->GetFrameBuffer();
+
+        vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+    }
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )

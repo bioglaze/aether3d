@@ -124,8 +124,9 @@ void ae3d::System::Print( const char* format, ... )
     std::fflush( stdout );
 }
 
-void ae3d::System::Assert(bool condition, const char* message)
+void ae3d::System::Assert( bool condition, const char* message )
 {
+#if DEBUG
     if (!condition)
     {
         Print("Assertion failed: %s\n", message);
@@ -133,9 +134,10 @@ void ae3d::System::Assert(bool condition, const char* message)
 #ifdef _MSC_VER
         __debugbreak();
 #else
-        assert(false);
+        assert( false );
 #endif
     }
+#endif
 }
 
 void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize )
@@ -271,6 +273,16 @@ namespace ae3d
         
         void RecenterTracking()
         {
+        }
+
+        Vec3 GetLeftHandPosition()
+        {
+            return Vec3( 0, 0, 0 );
+        }
+
+        Vec3 GetRightHandPosition()
+        {
+            return Vec3( 0, 0, 0 );
         }
     }
 }

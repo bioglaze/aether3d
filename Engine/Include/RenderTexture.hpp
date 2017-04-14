@@ -46,7 +46,10 @@ namespace ae3d
         unsigned GetFBO() const { return fboId; }
 #endif
 #if RENDERER_VULKAN
+        /// \return frame buffer.
         VkFramebuffer GetFrameBuffer() { return frameBuffer; }
+
+        /// \return color view.
         VkImageView GetColorView() { return color.view; }
 #endif
 
@@ -57,6 +60,8 @@ namespace ae3d
         unsigned fboId = 0;
 #endif
 #if RENDERER_VULKAN
+        void CreateRenderPass();
+
         VkFramebuffer frameBuffer;
 
         struct FrameBufferAttachment
@@ -72,6 +77,7 @@ namespace ae3d
         VkImageLayout imageLayout;
         VkDeviceMemory deviceMemory;
         VkImageView view;
+        VkRenderPass renderPass;
 #endif
         DataType dataType = DataType::UByte;
     };
