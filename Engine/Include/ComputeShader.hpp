@@ -75,21 +75,22 @@ namespace ae3d
 #endif
 
     private:
+        static const int SLOT_COUNT = 3;
         std::string path;
-
+        
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;
 #endif
 #if RENDERER_METAL
         id <MTLFunction> function;
         id<MTLComputePipelineState> pipeline;
-        id<MTLBuffer> uniforms[ 3 ];
+        id<MTLBuffer> uniforms[ SLOT_COUNT ];
 #endif
-        RenderTexture* renderTextures[ 3 ];
+        RenderTexture* renderTextures[ SLOT_COUNT ];
 #if RENDERER_D3D12
-        ID3D12Resource* uniformBuffers[ 3 ];
-        ID3D12Resource* textureBuffers[ 3 ];
-        ID3D12Resource* uavBuffers[ 3 ];
+        ID3D12Resource* uniformBuffers[ SLOT_COUNT ];
+        ID3D12Resource* textureBuffers[ SLOT_COUNT ];
+        ID3D12Resource* uavBuffers[ SLOT_COUNT ];
 #endif
     };
 }

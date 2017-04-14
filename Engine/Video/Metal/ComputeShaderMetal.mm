@@ -31,16 +31,12 @@ void ae3d::ComputeShader::Load( const char* metalShaderName, const FileSystem::F
     {
         NSLog( @"Error occurred when building compute pipeline for function %s: %@", metalShaderName, [error localizedDescription] );
     }
-    
-    renderTextures.resize( 5 );
 }
 
 void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsigned slot )
 {
-    if (slot < renderTextures.size())
-    {
-        renderTextures[ slot ] = renderTexture;
-    }
+    System::Assert( slot < SLOT_COUNT, "Too high slot" );
+    renderTextures[ slot ] = renderTexture;
 }
 
 void ae3d::ComputeShader::SetUniformBuffer( int slotIndex, id< MTLBuffer > buffer )
@@ -58,12 +54,10 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     
     id<MTLComputeCommandEncoder> commandEncoder = [commandBuffer computeCommandEncoder];
     [commandEncoder setComputePipelineState:pipeline];
-    [commandEncoder setBuffer:uniforms[ 0 ] offset:0 atIndex:0];
-    [commandEncoder setBuffer:uniforms[ 1 ] offset:0 atIndex:1];
-    [commandEncoder setBuffer:uniforms[ 2 ] offset:0 atIndex:2];
 
-    for (std::size_t i = 0; i < renderTextures.size(); ++i)
+    for (std::size_t i = 0; i < SLOT_COUNT; ++i)
     {
+        [commandEncoder setBuffer:uniforms[ i ] offset:0 atIndex:i];
         [commandEncoder setTexture:(renderTextures[ i ] ? renderTextures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
     }
     
