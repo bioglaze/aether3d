@@ -4,10 +4,6 @@
 #include <list>
 #include <QObject>
 
-class QMenu;
-class QMenuBar;
-class QWidget;
-
 namespace ae3d
 {
     class GameObject;
@@ -18,17 +14,19 @@ class WindowMenu : QObject
     Q_OBJECT
 
 public:
-    void Init( QWidget* mainWindow );
-    QMenuBar* menuBar = nullptr;
+    void Init( class QWidget* mainWindow );
+    void SetUndoText( const char* text );
+    class QMenuBar* menuBar = nullptr;
 
 private slots:
     void GameObjectSelected( std::list< ae3d::GameObject* > gameObjects );
 
 private:
-    QMenu* fileMenu = nullptr;
+    class QMenu* fileMenu = nullptr;
     QMenu* sceneMenu = nullptr;
     QMenu* editMenu = nullptr;
     QMenu* componentMenu = nullptr;
+    class QAction* undo = nullptr;
 };
 
 #endif

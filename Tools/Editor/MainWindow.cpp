@@ -183,6 +183,7 @@ void MainWindow::ShowContextMenu( const QPoint& pos )
         {
             auto selected = sceneWidget->selectedGameObjects.back();
             commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
+            windowMenu.SetUndoText( "Undo Duplicate" );
             *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
             UpdateHierarchy();
         }
@@ -452,6 +453,7 @@ void MainWindow::DuplicateSelected()
 {
     auto selected = sceneWidget->selectedGameObjects.back();
     commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
+    windowMenu.SetUndoText( "Undo Duplicate" );
     *sceneWidget->GetGameObject( sceneWidget->GetGameObjectCount() - 1 ) = *sceneWidget->GetGameObject( selected );
     UpdateHierarchy();
 }
@@ -461,6 +463,7 @@ void MainWindow::CommandDeleteSelectedGameObjects()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< DeleteGameObjectCommand >( sceneWidget ) );
+        windowMenu.SetUndoText( "Undo Delete gameobject" );
     }
 
     UpdateHierarchy();
@@ -471,6 +474,7 @@ void MainWindow::CommandRenameGameObject( ae3d::GameObject* gameObject, const st
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< RenameGameObjectCommand >( gameObject, newName ) );
+        windowMenu.SetUndoText( "Undo Rename" );
     }
 }
 
@@ -479,6 +483,7 @@ void MainWindow::CommandCreateAudioSourceComponent()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< CreateAudioSourceCommand >( sceneWidget ) );
+        windowMenu.SetUndoText( "Undo Create AudioSource" );
         UpdateInspector();
     }
 }
@@ -487,6 +492,7 @@ void MainWindow::CommandRemoveAudioSourceComponent()
 {
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::AudioSourceComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    windowMenu.SetUndoText( "Undo Remove Component" );
     UpdateInspector();
 }
 
@@ -495,6 +501,7 @@ void MainWindow::CommandCreateCameraComponent()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< CreateCameraCommand >( sceneWidget ) );
+        windowMenu.SetUndoText( "Undo Create Camera" );
         sceneWidget->SetSelectedCameraTargetToPreview();
         UpdateInspector();
     }
@@ -504,6 +511,7 @@ void MainWindow::CommandRemoveCameraComponent()
 {
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::CameraComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    windowMenu.SetUndoText( "Undo Remove Camera" );
     UpdateInspector();
     sceneWidget->HideHUD();
 }
@@ -513,6 +521,7 @@ void MainWindow::CommandCreateMeshRendererComponent()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
+        windowMenu.SetUndoText( "Undo Create Mesh Renderer" );
         UpdateInspector();
     }
 }
@@ -521,6 +530,7 @@ void MainWindow::CommandRemoveMeshRendererComponent()
 {
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::MeshRendererComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    windowMenu.SetUndoText( "Undo Remove MeshRenderer" );
     UpdateInspector();
 }
 
@@ -529,6 +539,7 @@ void MainWindow::CommandCreateSpriteRendererComponent()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< CreateSpriteRendererCommand >( sceneWidget ) );
+        windowMenu.SetUndoText( "Undo Create Sprite Renderer" );
         UpdateInspector();
     }
 }
@@ -537,6 +548,7 @@ void MainWindow::CommandRemoveSpriteRendererComponent()
 {
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::SpriteRendererComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    windowMenu.SetUndoText( "Undo Remove Sprite Renderer" );
     UpdateInspector();
 }
 
@@ -545,6 +557,7 @@ void MainWindow::CommandCreateDirectionalLightComponent()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Directional ) );
+        windowMenu.SetUndoText( "Undo Create Directional Light" );
         UpdateInspector();
     }
 }
@@ -553,6 +566,7 @@ void MainWindow::CommandRemoveDirectionalLightComponent()
 {
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::DirectionalLightComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    windowMenu.SetUndoText( "Undo Remove Directional Light" );
     UpdateInspector();
 }
 
@@ -561,6 +575,7 @@ void MainWindow::CommandCreateSpotLightComponent()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Spot ) );
+        windowMenu.SetUndoText( "Undo Create Spot Light" );
         UpdateInspector();
     }
 }
@@ -569,6 +584,7 @@ void MainWindow::CommandRemoveSpotLightComponent()
 {
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::SpotLightComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    windowMenu.SetUndoText( "Undo Remove Spot Light" );
     UpdateInspector();
 }
 
@@ -577,6 +593,7 @@ void MainWindow::CommandCreatePointLightComponent()
     if (!sceneWidget->selectedGameObjects.empty())
     {
         commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Point ) );
+        windowMenu.SetUndoText( "Undo Create Point Light" );
         UpdateInspector();
     }
 }
@@ -585,18 +602,21 @@ void MainWindow::CommandRemovePointLightComponent()
 {
     auto component = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.back() )->GetComponent< ae3d::PointLightComponent >();
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
+    windowMenu.SetUndoText( "Undo Remove Point Light" );
     UpdateInspector();
 }
 
 void MainWindow::CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )
 {
     commandManager.Execute( std::make_shared< ModifyTransformCommand >( gameObjectIndex, sceneWidget, newPosition, newRotation, newScale ) );
+    windowMenu.SetUndoText( "Undo Modify Transform" );
     sceneWidget->UpdateTransformGizmoPosition();
 }
 
 void MainWindow::CommandCreateGameObject()
 {
     commandManager.Execute( std::make_shared< CreateGoCommand >( sceneWidget ) );
+    windowMenu.SetUndoText( "Undo Create Gameobject" );
     UpdateHierarchy();
 }
 
@@ -610,6 +630,7 @@ void MainWindow::CommandModifyCamera( ae3d::CameraComponent::ClearFlag clearFlag
     ae3d::System::Assert( camera, "First selected object doesn't contain a camera component" );
     commandManager.Execute( std::make_shared< ModifyCameraCommand >( camera, clearFlag, projectionType, orthoParams, perspParams,
                                                                      clearColor, renderOrder ) );
+    windowMenu.SetUndoText( "Undo Modify Camera" );
 }
 
 void MainWindow::CommandModifySpriteRenderer( std::string path, float x, float y, float width, float height )
@@ -619,6 +640,7 @@ void MainWindow::CommandModifySpriteRenderer( std::string path, float x, float y
     auto spriteRenderer = sceneWidget->GetGameObject( sceneWidget->selectedGameObjects.front() )->GetComponent< ae3d::SpriteRendererComponent >();
     ae3d::System::Assert( spriteRenderer, "First selected object doesn't contain a sprite renderer component" );
     commandManager.Execute( std::make_shared< ModifySpriteRendererCommand >( spriteRenderer, path, x, y, width, height ) );
+    windowMenu.SetUndoText( "Undo Modify Sprite Renderer" );
 }
 
 void MainWindow::LoadScene()

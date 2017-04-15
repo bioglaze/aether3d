@@ -102,6 +102,9 @@ using namespace ae3d;
     Matrix44 lineView;
     Matrix44 lineProjection;
     int lineHandle;
+    
+    Scene scene2;
+    GameObject bigCubeInScene2;
 }
 
 - (void)viewDidLoad
@@ -120,7 +123,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -166,7 +169,8 @@ using namespace ae3d;
 #endif
     camera3d.AddComponent<ae3d::TransformComponent>();
     scene.Add( &camera3d );
-
+    scene2.Add( &camera3d );
+    
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     // TODO: SDF texture
     fontTexSDF.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
@@ -320,6 +324,14 @@ using namespace ae3d;
     cubePTN2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, 5, -10 ) );
     //scene.Add( &cubePTN2 );
 
+    bigCubeInScene2.AddComponent<ae3d::MeshRendererComponent>();
+    bigCubeInScene2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    bigCubeInScene2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    bigCubeInScene2.AddComponent<ae3d::TransformComponent>();
+    bigCubeInScene2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, -8, -10 ) );
+    bigCubeInScene2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
+    scene2.Add( &bigCubeInScene2 );
+
     bigCube.AddComponent<ae3d::MeshRendererComponent>();
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
@@ -443,6 +455,10 @@ using namespace ae3d;
 {
 }
 
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+}
+
 - (BOOL)acceptsFirstResponder
 {
     return YES;
@@ -455,6 +471,7 @@ using namespace ae3d;
     ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
     ae3d::System::BeginFrame();
     scene.Render();
+    //scene2.Render();
     System::DrawLines( lineHandle, lineView, lineProjection );
     scene.EndRenderMetal();
     ae3d::System::EndFrame();

@@ -17,7 +17,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     //fileMenu->addSeparator();
 
     editMenu = menuBar->addMenu( "&Edit" );
-    editMenu->addAction( "Undo", mainWindow, SLOT(Undo()), QKeySequence("Ctrl+Z"));
+    undo = editMenu->addAction( "Undo", mainWindow, SLOT(Undo()), QKeySequence("Ctrl+Z"));
 
     sceneMenu = menuBar->addMenu( "&Scene" );
     sceneMenu->addAction( "Lighting", mainWindow, SLOT(OpenLightingInspector()), QKeySequence("Ctrl+L"));
@@ -36,4 +36,9 @@ void WindowMenu::Init( QWidget* mainWindow )
 void WindowMenu::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
 {
     componentMenu->setEnabled( !gameObjects.empty() );
+}
+
+void WindowMenu::SetUndoText( const char* text )
+{
+    undo->setText( text );
 }
