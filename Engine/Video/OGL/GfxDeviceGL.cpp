@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <cstring>
 #include <GL/glxw.h>
 #include "System.hpp"
 #include "Statistics.hpp"
@@ -78,6 +79,9 @@ namespace GfxDeviceGlobal
     int backBufferHeight = 400;
     GLuint systemFBO = 0;
     GLuint cachedFBO = 0;
+    GLuint perObjectUbo = 0;
+    
+    PerObjectUboStruct perObjectUboStruct;
 }
 
 namespace ae3d
@@ -173,6 +177,15 @@ void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
     }
 }
 
+void ae3d::GfxDevice::UploadPerObjectUbo()
+{
+    glBindBufferBase( GL_UNIFORM_BUFFER, 0, GfxDeviceGlobal::perObjectUbo );
+    GLvoid* mappedMem = glMapBuffer( GL_UNIFORM_BUFFER, GL_WRITE_ONLY );
+    std::memcpy( mappedMem, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUbo ) );
+    glUnmapBuffer( GL_UNIFORM_BUFFER );
+    ErrorCheck( "After UploadPerObjectUbo" );
+}
+
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
 {
     if (enable)
@@ -214,6 +227,11 @@ void ae3d::GfxDevice::Init( int width, int height )
         glDebugMessageCallback( DebugCallbackARB, nullptr );
         glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
     }
+    
+    glGenBuffers( 1, &GfxDeviceGlobal::perObjectUbo );
+    glBindBuffer( GL_UNIFORM_BUFFER, GfxDeviceGlobal::perObjectUbo );
+    glBufferData( GL_UNIFORM_BUFFER, sizeof( PerObjectUboStruct ), &GfxDeviceGlobal::perObjectUboStruct, GL_DYNAMIC_DRAW );
+    GfxDevice::ErrorCheck( "Init end" );
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
@@ -474,7 +492,7 @@ const char* GetGLErrorString(GLenum code)
     }
 }
 
-void ae3d::GfxDevice::ErrorCheck(const char* info)
+void ae3d::GfxDevice::ErrorCheck( const char* info )
 {
         (void)info;
 #if defined _DEBUG || defined DEBUG

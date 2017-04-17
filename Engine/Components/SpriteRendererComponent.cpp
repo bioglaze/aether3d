@@ -16,6 +16,11 @@ extern ae3d::Renderer renderer;
 std::vector<ae3d::SpriteRendererComponent> spriteRendererComponents;
 unsigned nextFreeSpriteComponent = 0;
 
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+
 struct Drawable
 {
     ae3d::TextureBase* texture = ae3d::Texture2D::GetDefaultTexture();
@@ -165,8 +170,13 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* pro
     for (auto& drawable : drawables)
     {
         renderer.builtinShaders.spriteRendererShader.Use();
+/*#if RENDERER_OPENGL
+        GfxDeviceGlobal::perObjectUboStruct.projectionModelMatrix.InitFrom( projectionModelMatrix );
+        ae3d::GfxDevice::UploadPerObjectUbo();
+#else*/
         renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
-
+//#endif
+        
         if (drawable.texture->IsRenderTexture())
         {
             renderer.builtinShaders.spriteRendererShader.SetRenderTexture("textureMap", static_cast< ae3d::RenderTexture* >(drawable.texture), 0);

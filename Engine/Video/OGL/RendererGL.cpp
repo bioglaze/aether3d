@@ -11,6 +11,10 @@ void ae3d::BuiltinShaders::Load()
     layout (location = 1) in vec2 aTexCoord;
     layout (location = 2) in vec4 aColor;
 
+    /*layout(std140) uniform PerObject
+    {
+        mat4 _ProjectionModelMatrix;
+    };*/
     uniform mat4 _ProjectionModelMatrix;
 
     out vec2 vTexCoord;

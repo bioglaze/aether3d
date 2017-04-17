@@ -177,6 +177,17 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     handle = program;
     uniformLocations = GetUniformLocations( program );
+    
+    glUseProgram( program );
+    GfxDevice::ErrorCheck( "UBO begin" );
+    uboLoc = glGetUniformBlockIndex( program, "PerObject" );
+
+    if (uboLoc != 4294967295)
+    {
+        glUniformBlockBinding( program, uboLoc, 0 );
+    }
+    
+    GfxDevice::ErrorCheck( "UBO end" );
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexGLSL, const FileSystem::FileContentsData& fragmentGLSL,

@@ -8,7 +8,13 @@
 #import <MetalKit/MetalKit.h>
 #import <QuartzCore/CAMetalLayer.h>
 #endif
+#include "Matrix.hpp"
 #include "Vec3.hpp"
+
+struct PerObjectUboStruct
+{
+    ae3d::Matrix44 projectionModelMatrix;
+};
 
 namespace ae3d
 {
@@ -121,6 +127,7 @@ namespace ae3d
         unsigned GetSystemFBO();
         void SetSystemFBO( unsigned fbo );
 
+        void UploadPerObjectUbo();
         void SetBackBufferDimensionAndFBO( int width, int height );
         void ErrorCheckFBO();
         bool HasExtension( const char* glExtension );

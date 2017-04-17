@@ -60,6 +60,7 @@ namespace ae3d
         // Checks that the rendering state is valid.
         void Validate();
         unsigned GetHandle() const { return handle; }
+        unsigned GetUboLoc() const { return uboLoc; }
 #endif
         
         /// Activates the shader to be used in a draw call.
@@ -162,6 +163,7 @@ namespace ae3d
 #endif
 #if RENDERER_OPENGL
         unsigned handle = 0;
+        unsigned uboLoc = 0;
         std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
 #endif
 #if RENDERER_METAL
