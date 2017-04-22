@@ -2,6 +2,7 @@
 #include <simd/simd.h>
 
 #define TILE_RES 16
+#define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
 
 using namespace metal;
@@ -10,14 +11,20 @@ struct StandardUniforms
 {
     matrix_float4x4 _ModelViewProjectionMatrix;
     matrix_float4x4 _ShadowProjectionMatrix;
+    matrix_float4x4 _ModelViewMatrix;
     float4 tintColor;
 };
+static_assert( sizeof( StandardUniforms ) < 512, "" );
 
 struct StandardColorInOut
 {
     float4 position [[position]];
     float4 projCoord;
     float2 texCoords;
+    float3 positionVS;
+    float3 tangentVS;
+    float3 bitangentVS;
+    float3 normalVS;
     half4  color;
 };
 
@@ -89,50 +96,87 @@ static uint GetNumTilesY( int windowHeight )
     return uint(((windowHeight + TILE_RES - 1) / float(TILE_RES)));
 }
 
-vertex StandardColorInOut standard_vertex(StandardVertex vert [[stage_in]],
+float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, float3 v )
+{
+    return normalize( v.x * normalize( tangent ) + v.y * normalize( bitangent ) + v.z * normalize( normal ) );
+}
+
+vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
                                constant StandardUniforms& uniforms [[ buffer(5) ]],
-                               unsigned int vid [[ vertex_id ]])
+                               unsigned int vid [[ vertex_id ]] )
 {
     StandardColorInOut out;
     
-    float4 in_position = float4( float3( vert.position ), 1.0 );
+    float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
+    out.positionVS = (uniforms._ModelViewMatrix * in_position).xyz;
     
     out.color = half4( vert.color );
-    out.texCoords = float2( vert.texcoord );
+    out.texCoords = vert.texcoord;
     out.projCoord = uniforms._ShadowProjectionMatrix * in_position;
+    
+    out.tangentVS = (uniforms._ModelViewMatrix * float4( vert.tangent.xyz, 0 )).xyz;
+    float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
+    out.bitangentVS = normalize( uniforms._ModelViewMatrix * float4( ct, 0 ) ).xyz;
+    out.normalVS = vert.normal.xyz;//(uniforms._ModelViewMatrix * float4( vert.normal.xyz, 0 )).xyz;
+    
     return out;
 }
 
-fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
-                               texture2d<float, access::sample> textureMap [[texture(0)]],
+fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
+                               texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
+                               texture2d<float, access::sample> normalMap [[texture(2)]],
+                               texture2d<float, access::sample> specularMap [[texture(3)]],
+                               constant StandardUniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
-                               //constant float* pointLightBufferCenterAndRadius [[ buffer(7) ]],
+                               constant float* pointLightBufferCenterAndRadius [[ buffer(7) ]],
                                constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
-    half4 sampledColor = half4( textureMap.sample( sampler0, in.texCoords ) );
-
+    const float4 albedoColor = float4( albedoSmoothnessMap.sample( sampler0, in.texCoords ) );
+    const float smoothness = albedoColor.a;
+    const float4 normalTS = float4( normalMap.sample( sampler0, in.texCoords ) );
+    const float4 specular = float4( specularMap.sample( sampler0, in.texCoords ) );
+    
+    const float3 normalVS = tangentSpaceTransform( in.tangentVS, in.bitangentVS, in.normalVS, normalTS.xyz );
+    
     const uint tileIndex = GetTileIndex( in.position.xy, cullerUniforms.windowWidth );
     const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 
+    float4 outColor = float4( 0, 0, 0, 1 );
+    
+    uint numPointLights = cullerUniforms.numLights & 0xFFFFu;
+    
+    for (uint i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
+    {
+        float4 center = pointLightBufferCenterAndRadius[ i ];
+        float radius = center.w;
+        
+        float3 vecToLightVS = (uniforms._ModelViewMatrix * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
+        float3 lightDirVS = normalize( vecToLightVS );
+        
+        float lightDistance = length( vecToLightVS );
+        //outColor.rgb = dot( lightDirVS, in.normalVS );
+        outColor.rgb = in.normalVS;//lightDistance < radius ? 1 : 0.25;
+    }
+    
     if (numLights == 0)
     {
-        sampledColor = half4( 0, 0, 0, 1 );
+        outColor = float4( 0.5, 0.5, 0.5, 1 );
     }
     else if (numLights == 1)
     {
-        sampledColor = half4( 0, 1, 0, 1 );
+        //outColor = float4( 0, 1, 0, 1 );
     }
     else if (numLights == 2)
     {
-        sampledColor = half4( 1, 1, 0, 1 );
+        outColor = float4( 1, 1, 0, 1 );
     }
     else
     {
-        sampledColor = half4( 1, 0, 0, 1 );
+        outColor = float4( 1, 0, 0, 1 );
     }
 
-    return sampledColor;
+    return albedoColor * outColor;
 }

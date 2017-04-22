@@ -32,7 +32,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -168,6 +168,8 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
 #endif
     camera3d.AddComponent<ae3d::TransformComponent>();
+    camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
+    
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
@@ -284,7 +286,7 @@ using namespace ae3d;
     standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
     standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -14 ) );
+    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
 
     standardCubeTR.AddComponent<ae3d::MeshRendererComponent>();
@@ -298,7 +300,6 @@ using namespace ae3d;
     standardCubeBR.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
     standardCubeBR.AddComponent<ae3d::TransformComponent>();
     standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, -4, -10 ) );
-    standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -10 ) );
 
 #ifdef TEST_FORWARD_PLUS
     //scene.Add( &standardCubeBR );
@@ -336,7 +337,7 @@ using namespace ae3d;
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     bigCube.AddComponent<ae3d::TransformComponent>();
-    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, -8, -10 ) );
+    bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 0, -85 ) );
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
     scene.Add( &bigCube );
 
@@ -346,7 +347,7 @@ using namespace ae3d;
     bigCube2.AddComponent<ae3d::TransformComponent>();
     bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, 4, -16 ) );
     bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
-    scene.Add( &bigCube2 );
+    //scene.Add( &bigCube2 );
 
     bigCube3.AddComponent<ae3d::MeshRendererComponent>();
     bigCube3.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -378,7 +379,7 @@ using namespace ae3d;
 #endif
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 0.5f );
     pointLight.AddComponent<ae3d::TransformComponent>();
-    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -7 ) );
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -80, 0, -85 ) );
     scene.Add( &pointLight );
 
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
@@ -457,6 +458,8 @@ using namespace ae3d;
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
+    camera3d.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( theEvent.deltaX ) / 20 );
+    camera3d.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( theEvent.deltaY ) / 20 );
 }
 
 - (BOOL)acceptsFirstResponder
@@ -500,7 +503,7 @@ using namespace ae3d;
         text.GetComponent<ae3d::TextRendererComponent>()->SetText( "this is a long string. this is a long string" );
     }
 
-    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( std::sin( angle / 2 ) * 2, 0, -7 ) );
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -8, 0, -85 + std::sin( angle / 2 ) * 2 ) );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

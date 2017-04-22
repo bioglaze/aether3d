@@ -720,8 +720,6 @@ void Mesh::SolveVertexTangents()
 
     vbitangents.resize( interleavedVertices.size() );
 
-    // http://www.terathon.com/code/tangent.html
-    // "To find the tangent vectors for a single vertex, we average the tangents for all triangles sharing that vertex"
     for (std::size_t vertInd = 0; vertInd < interleavedVertices.size(); ++vertInd)
     {
         ae3d::Vec4 tangent( 0.0f, 0.0f, 0.0f, 0.0f );

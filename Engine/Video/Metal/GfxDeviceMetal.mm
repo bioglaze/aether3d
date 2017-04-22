@@ -201,7 +201,7 @@ namespace
 
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 {
-    id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:256 options:MTLResourceCPUCacheModeDefaultCache];
+    id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:UNIFORM_BUFFER_SIZE options:MTLResourceCPUCacheModeDefaultCache];
     uniformBuffer.label = @"uniform buffer";
 
     Statistics::IncCreateConstantBufferCalls();
@@ -627,7 +627,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     if (shader.GetMetalVertexShaderName() == "standard_vertex")
     {
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPerTileLightIndexBuffer() offset:0 atIndex:6];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer() offset:0 atIndex:7];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetCullerUniforms() offset:0 atIndex:8];
+        [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
     }
 
     [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
@@ -635,6 +637,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
     [renderEncoder setFragmentTexture:texture0 atIndex:0];
     [renderEncoder setFragmentTexture:texture1 atIndex:1];
+    [renderEncoder setFragmentTexture:texture0 atIndex:2];
+    [renderEncoder setFragmentTexture:texture0 atIndex:3];
     
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {
@@ -660,6 +664,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
     {
         // No need to set extra buffers as vertexBuffer contains all attributes.
+        [renderEncoder setVertexBuffer:nil offset:0 atIndex:1];
     }
     else if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTN)
     {
