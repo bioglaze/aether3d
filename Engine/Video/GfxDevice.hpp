@@ -88,7 +88,8 @@ namespace ae3d
         void EndBackBufferEncoding();
 #endif
 #if RENDERER_VULKAN
-        void CreateNewUniformBuffer();
+        void GetNewUniformBuffer();
+        void CreateUniformBuffers();
         std::uint8_t* GetCurrentUbo();
         void BeginRenderPassAndCommandBuffer();
         void EndRenderPassAndCommandBuffer();

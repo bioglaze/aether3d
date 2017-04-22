@@ -112,7 +112,8 @@ namespace GfxDeviceGlobal
     VkImageView view0 = VK_NULL_HANDLE;
     VkSampler sampler0 = VK_NULL_HANDLE;
     std::vector< VkBuffer > pendingFreeVBs;
-    std::vector< Ubo > frameUbos;
+    std::vector< Ubo > ubos;
+    int currentUbo = 0;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int backBufferWidth;
     int backBufferHeight;
@@ -1450,6 +1451,8 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
 
         GfxDevice::SetClearColor( 0, 0, 0 );
+
+        GfxDevice::CreateUniformBuffers();
     }
 }
 
@@ -1589,8 +1592,8 @@ void ae3d::GfxDevice::SetViewport( int aViewport[ 4 ] )
     vkCmdSetViewport( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &viewport );
     
     VkRect2D scissor = {};
-    scissor.extent.width = (float)aViewport[ 2 ];
-    scissor.extent.height = (float)aViewport[ 3 ];
+    scissor.extent.width = (std::uint32_t)aViewport[ 2 ];
+    scissor.extent.height = (std::uint32_t)aViewport[ 3 ];
     scissor.offset.x = 0;
     scissor.offset.y = 0;
     vkCmdSetScissor( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &scissor );
@@ -1621,7 +1624,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, psoHash );
     }
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::frameUbos.back().uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1637,49 +1640,57 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     Statistics::IncDrawCalls();
 }
 
-void ae3d::GfxDevice::CreateNewUniformBuffer()
+void ae3d::GfxDevice::GetNewUniformBuffer()
 {
-    const VkDeviceSize uboSize = 16 * 4;
+    GfxDeviceGlobal::currentUbo = (GfxDeviceGlobal::currentUbo + 1) % GfxDeviceGlobal::ubos.size();
+}
 
-    VkBufferCreateInfo bufferInfo = {};
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = uboSize;
-    bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+void ae3d::GfxDevice::CreateUniformBuffers()
+{
+    GfxDeviceGlobal::ubos.resize( 1800 );
 
-    Ubo ubo;
+    for (std::size_t uboIndex = 0; uboIndex < GfxDeviceGlobal::ubos.size(); ++uboIndex)
+    {
+        auto& ubo = GfxDeviceGlobal::ubos[ uboIndex ];
 
-    VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &ubo.ubo );
-    AE3D_CHECK_VULKAN( err, "vkCreateBuffer UBO" );
+        const VkDeviceSize uboSize = 16 * 4;
 
-    VkMemoryRequirements memReqs;
-    vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, ubo.ubo, &memReqs );
+        VkBufferCreateInfo bufferInfo = {};
+        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferInfo.size = uboSize;
+        bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 
-    VkMemoryAllocateInfo allocInfo = {};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.pNext = nullptr;
-    allocInfo.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
-    err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &ubo.uboMemory );
-    AE3D_CHECK_VULKAN( err, "vkAllocateMemory UBO" );
-    Statistics::IncAllocCalls();
+        VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &ubo.ubo );
+        AE3D_CHECK_VULKAN( err, "vkCreateBuffer UBO" );
 
-    err = vkBindBufferMemory( GfxDeviceGlobal::device, ubo.ubo, ubo.uboMemory, 0 );
-    AE3D_CHECK_VULKAN( err, "vkBindBufferMemory UBO" );
+        VkMemoryRequirements memReqs;
+        vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, ubo.ubo, &memReqs );
 
-    ubo.uboDesc.buffer = ubo.ubo;
-    ubo.uboDesc.offset = 0;
-    ubo.uboDesc.range = uboSize;
+        VkMemoryAllocateInfo allocInfo = {};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.pNext = nullptr;
+        allocInfo.allocationSize = memReqs.size;
+        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
+        err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &ubo.uboMemory );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory UBO" );
+        Statistics::IncAllocCalls();
 
-    err = vkMapMemory( GfxDeviceGlobal::device, ubo.uboMemory, 0, uboSize, 0, (void **)&ubo.uboData );
-    AE3D_CHECK_VULKAN( err, "vkMapMemory UBO" );
+        err = vkBindBufferMemory( GfxDeviceGlobal::device, ubo.ubo, ubo.uboMemory, 0 );
+        AE3D_CHECK_VULKAN( err, "vkBindBufferMemory UBO" );
 
-    GfxDeviceGlobal::frameUbos.push_back( ubo );
+        ubo.uboDesc.buffer = ubo.ubo;
+        ubo.uboDesc.offset = 0;
+        ubo.uboDesc.range = uboSize;
+
+        err = vkMapMemory( GfxDeviceGlobal::device, ubo.uboMemory, 0, uboSize, 0, (void **)&ubo.uboData );
+        AE3D_CHECK_VULKAN( err, "vkMapMemory UBO" );
+    }
+    //GfxDeviceGlobal::frameUbos.push_back( ubo );
 }
 
 std::uint8_t* ae3d::GfxDevice::GetCurrentUbo()
 {
-    ae3d::System::Assert( !GfxDeviceGlobal::frameUbos.empty() && GfxDeviceGlobal::frameUbos.back().uboData != nullptr, "no Ubo" );
-    return GfxDeviceGlobal::frameUbos.back().uboData;
+    return GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboData;
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
@@ -1737,14 +1748,7 @@ void ae3d::GfxDevice::Present()
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeVBs[ i ], nullptr );
     }
 
-    for (std::size_t i = 0; i < GfxDeviceGlobal::frameUbos.size(); ++i)
-    {
-        vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::frameUbos[ i ].uboMemory, nullptr );
-        vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::frameUbos[ i ].ubo, nullptr );
-    }
-
     GfxDeviceGlobal::pendingFreeVBs.clear();
-    GfxDeviceGlobal::frameUbos.clear();
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
@@ -1780,6 +1784,12 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthView, nullptr );
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthMem, nullptr );
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorMem, nullptr );
+    }
+
+    for (std::size_t i = 0; i < GfxDeviceGlobal::ubos.size(); ++i)
+    {
+        vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::ubos[ i ].uboMemory, nullptr );
+        vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::ubos[ i ].ubo, nullptr );
     }
 
     Shader::DestroyShaders();

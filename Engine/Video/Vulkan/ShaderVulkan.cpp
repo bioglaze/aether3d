@@ -112,7 +112,7 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, con
 void ae3d::Shader::Use()
 {
     System::Assert( IsValid(), "no valid shader" );
-    GfxDevice::CreateNewUniformBuffer();
+    GfxDevice::GetNewUniformBuffer();
 }
 
 void ae3d::Shader::SetMatrix( const char* /*name*/, const float* matrix4x4 )
