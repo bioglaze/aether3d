@@ -82,7 +82,8 @@ namespace GfxDeviceGlobal
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
     id<MTLSamplerState> samplerStates[ 2 ];
-    std::list< id<MTLBuffer> > uniformBuffers;
+    std::vector< id<MTLBuffer> > uniformBuffers;
+    int currentUboIndex;
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
     ae3d::LightTiler lightTiler;
     std::vector< ae3d::VertexBuffer > lineBuffers;
@@ -201,22 +202,13 @@ namespace
 
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 {
-    id<MTLBuffer> uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:UNIFORM_BUFFER_SIZE options:MTLResourceCPUCacheModeDefaultCache];
-    uniformBuffer.label = @"uniform buffer";
-
-    Statistics::IncCreateConstantBufferCalls();
-    GfxDeviceGlobal::uniformBuffers.push_back( uniformBuffer );
-    return uniformBuffer;
+    GfxDeviceGlobal::currentUboIndex = (GfxDeviceGlobal::currentUboIndex + 1) % GfxDeviceGlobal::uniformBuffers.size();
+    return GfxDeviceGlobal::uniformBuffers[ GfxDeviceGlobal::currentUboIndex ];
 }
 
 id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
 {
-    if (GfxDeviceGlobal::uniformBuffers.empty())
-    {
-        return GetNewUniformBuffer();
-    }
-    
-    return GfxDeviceGlobal::uniformBuffers.back();
+    return GfxDeviceGlobal::uniformBuffers[ GfxDeviceGlobal::currentUboIndex ];
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
@@ -229,11 +221,6 @@ void ae3d::GfxDevice::SetViewport( int viewport[ 4 ] )
     GfxDeviceGlobal::viewport[ 1 ] = viewport[ 1 ];
     GfxDeviceGlobal::viewport[ 2 ] = viewport[ 2 ];
     GfxDeviceGlobal::viewport[ 3 ] = viewport[ 3 ];
-}
-
-void ae3d::GfxDevice::ResetUniformBuffers()
-{
-    GfxDeviceGlobal::uniformBuffers.clear();
 }
 
 void ae3d::GfxDevice::Init( int width, int height )
@@ -276,6 +263,13 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     GfxDeviceGlobal::backBufferWidth = view.bounds.size.width;
     GfxDeviceGlobal::backBufferHeight = view.bounds.size.height;
     GfxDeviceGlobal::sampleCount = sampleCount;
+    GfxDeviceGlobal::uniformBuffers.resize( 1400 );
+    
+    for (std::size_t uboIndex = 0; uboIndex < GfxDeviceGlobal::uniformBuffers.size(); ++uboIndex)
+    {
+        GfxDeviceGlobal::uniformBuffers[ uboIndex ] = [GfxDevice::GetMetalDevice() newBufferWithLength:UNIFORM_BUFFER_SIZE options:MTLResourceCPUCacheModeDefaultCache];
+        GfxDeviceGlobal::uniformBuffers[ uboIndex ].label = @"uniform buffer";
+    }
     
     MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
     depthStateDesc.depthCompareFunction = MTLCompareFunctionLessEqual;
@@ -695,8 +689,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
 void ae3d::GfxDevice::BeginFrame()
 {
-    ResetUniformBuffers();
-    
     commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
     

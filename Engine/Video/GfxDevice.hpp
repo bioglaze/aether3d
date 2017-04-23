@@ -81,7 +81,6 @@ namespace ae3d
         id <MTLLibrary> GetDefaultMetalShaderLibrary();
         id <MTLBuffer> GetNewUniformBuffer();
         id <MTLBuffer> GetCurrentUniformBuffer();
-        void ResetUniformBuffers();
         void PresentDrawable();
         void BeginFrame();
         void BeginBackBufferEncoding();
