@@ -107,83 +107,86 @@ namespace ae3d
     }
 }
 
-void SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
+namespace
 {
-    if (blendMode == ae3d::GfxDevice::BlendMode::Off)
-    {
-        glDisable( GL_BLEND );
-    }
-    else if (blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend)
-    {
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-        glEnable( GL_BLEND );
-    }
-    else if (blendMode == ae3d::GfxDevice::BlendMode::Additive)
-    {
-        glBlendFunc( GL_ONE, GL_ONE );
-        glEnable( GL_BLEND );
-    }
-    else
-    {
-        ae3d::System::Assert( false, "Unhandled blend mode." );
-    }
-}
 
-void SetCullMode( ae3d::GfxDevice::CullMode cullMode )
-{
-    if (cullMode == ae3d::GfxDevice::CullMode::Back)
+    void SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
     {
-        glEnable( GL_CULL_FACE );
-        glCullFace( GL_BACK );
+        if (blendMode == ae3d::GfxDevice::BlendMode::Off)
+        {
+            glDisable( GL_BLEND );
+        }
+        else if (blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend)
+        {
+            glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            glEnable( GL_BLEND );
+        }
+        else if (blendMode == ae3d::GfxDevice::BlendMode::Additive)
+        {
+            glBlendFunc( GL_ONE, GL_ONE );
+            glEnable( GL_BLEND );
+        }
+        else
+        {
+            ae3d::System::Assert( false, "Unhandled blend mode." );
+        }
     }
-    else if (cullMode == ae3d::GfxDevice::CullMode::Front)
-    {
-        glEnable( GL_CULL_FACE );
-        glCullFace( GL_FRONT );
-    }
-    else
-    {
-        glDisable( GL_CULL_FACE );
-    }
-}
 
-void SetFillMode( ae3d::GfxDevice::FillMode fillMode )
-{
-    glPolygonMode( GL_FRONT_AND_BACK, fillMode == ae3d::GfxDevice::FillMode::Solid ? GL_FILL : GL_LINE );
-}
+    void SetCullMode( ae3d::GfxDevice::CullMode cullMode )
+    {
+        if (cullMode == ae3d::GfxDevice::CullMode::Back)
+        {
+            glEnable( GL_CULL_FACE );
+            glCullFace( GL_BACK );
+        }
+        else if (cullMode == ae3d::GfxDevice::CullMode::Front)
+        {
+            glEnable( GL_CULL_FACE );
+            glCullFace( GL_FRONT );
+        }
+        else
+        {
+            glDisable( GL_CULL_FACE );
+        }
+    }
 
-void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
-{
-    if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
+    void SetFillMode( ae3d::GfxDevice::FillMode fillMode )
     {
-        glDepthMask( GL_TRUE );
-        glEnable( GL_DEPTH_TEST );
-        glDepthFunc( GL_LEQUAL );
+        glPolygonMode( GL_FRONT_AND_BACK, fillMode == ae3d::GfxDevice::FillMode::Solid ? GL_FILL : GL_LINE );
     }
-    else if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff)
-    {
-        glDepthMask( GL_FALSE );
-        glEnable( GL_DEPTH_TEST );
-        glDepthFunc( GL_LEQUAL );
-    }
-    else if (depthFunc == ae3d::GfxDevice::DepthFunc::NoneWriteOff)
-    {
-        glDepthMask( GL_FALSE );
-        glDisable( GL_DEPTH_TEST );
-    }
-    else
-    {
-        ae3d::System::Assert( false, "Unhandled depth function." );   
-    }
-}
 
-void ae3d::GfxDevice::UploadPerObjectUbo()
-{
-    glBindBufferBase( GL_UNIFORM_BUFFER, 0, GfxDeviceGlobal::perObjectUbo );
-    GLvoid* mappedMem = glMapBuffer( GL_UNIFORM_BUFFER, GL_WRITE_ONLY );
-    std::memcpy( mappedMem, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUbo ) );
-    glUnmapBuffer( GL_UNIFORM_BUFFER );
-    ErrorCheck( "After UploadPerObjectUbo" );
+    void SetDepthFunc( ae3d::GfxDevice::DepthFunc depthFunc )
+    {
+        if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn)
+        {
+            glDepthMask( GL_TRUE );
+            glEnable( GL_DEPTH_TEST );
+            glDepthFunc( GL_LEQUAL );
+        }
+        else if (depthFunc == ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff)
+        {
+            glDepthMask( GL_FALSE );
+            glEnable( GL_DEPTH_TEST );
+            glDepthFunc( GL_LEQUAL );
+        }
+        else if (depthFunc == ae3d::GfxDevice::DepthFunc::NoneWriteOff)
+        {
+            glDepthMask( GL_FALSE );
+            glDisable( GL_DEPTH_TEST );
+        }
+        else
+        {
+            ae3d::System::Assert( false, "Unhandled depth function." );
+        }
+    }
+
+    void UploadPerObjectUbo()
+    {
+        glBindBufferBase( GL_UNIFORM_BUFFER, 0, GfxDeviceGlobal::perObjectUbo );
+        GLvoid* mappedMem = glMapBuffer( GL_UNIFORM_BUFFER, GL_WRITE_ONLY );
+        std::memcpy( mappedMem, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
+        glUnmapBuffer( GL_UNIFORM_BUFFER );
+    }
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
@@ -266,6 +269,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     vertexBuffer.Bind();
     Statistics::IncDrawCalls();
     Statistics::IncTriangleCount( endIndex - startIndex );
+    UploadPerObjectUbo();
 
 #if DEBUG
     shader.Validate();

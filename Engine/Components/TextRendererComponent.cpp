@@ -14,6 +14,11 @@ extern ae3d::Renderer renderer;
 std::vector< ae3d::TextRendererComponent > textComponents;
 unsigned nextFreeTextComponent = 0;
 
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+
 unsigned ae3d::TextRendererComponent::New()
 {
     if (nextFreeTextComponent == textComponents.size())
@@ -114,7 +119,11 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
     {
         auto shader = m().shader;
         shader->Use();
-        shader->SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+#if RENDERER_OPENGL
+        GfxDeviceGlobal::perObjectUboStruct.projectionModelMatrix.InitFrom( projectionModelMatrix );
+#else
+        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+#endif
         shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
 
         GfxDevice::Draw( m().vertexBuffer, 0, m().vertexBuffer.GetFaceCount() / 3, *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend,

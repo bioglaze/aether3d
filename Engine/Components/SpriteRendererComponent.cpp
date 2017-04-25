@@ -170,12 +170,11 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* pro
     for (auto& drawable : drawables)
     {
         renderer.builtinShaders.spriteRendererShader.Use();
-/*#if RENDERER_OPENGL
+#if RENDERER_OPENGL
         GfxDeviceGlobal::perObjectUboStruct.projectionModelMatrix.InitFrom( projectionModelMatrix );
-        ae3d::GfxDevice::UploadPerObjectUbo();
-#else*/
+#else
         renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
-//#endif
+#endif
         
         if (drawable.texture->IsRenderTexture())
         {

@@ -7,6 +7,11 @@
 #include "Vec3.hpp"
 #include "VertexBuffer.hpp"
 
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+
 void ae3d::Renderer::GenerateTextures()
 {
     whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
@@ -72,7 +77,11 @@ void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponen
     Matrix44::Multiply( camera.GetView(), camera.GetProjection(), modelViewProjection );
     
     builtinShaders.skyboxShader.Use();
+#if RENDERER_OPENGL
+    GfxDeviceGlobal::perObjectUboStruct.modelViewProjectionMatrix = modelViewProjection;
+#else
     builtinShaders.skyboxShader.SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection.m );
+#endif
     builtinShaders.skyboxShader.SetTexture( "skyMap", skyTexture, 0 );
 
     GfxDevice::PushGroupMarker( "Skybox" );

@@ -14,6 +14,7 @@
 struct PerObjectUboStruct
 {
     ae3d::Matrix44 projectionModelMatrix;
+    ae3d::Matrix44 modelViewProjectionMatrix;
 };
 
 namespace ae3d
@@ -128,7 +129,6 @@ namespace ae3d
         unsigned GetSystemFBO();
         void SetSystemFBO( unsigned fbo );
 
-        void UploadPerObjectUbo();
         void SetBackBufferDimensionAndFBO( int width, int height );
         void ErrorCheckFBO();
         bool HasExtension( const char* glExtension );
