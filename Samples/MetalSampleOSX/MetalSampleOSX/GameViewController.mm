@@ -287,7 +287,7 @@ using namespace ae3d;
     standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
     standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
+    //standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
 
     standardCubeTR.AddComponent<ae3d::MeshRendererComponent>();
     standardCubeTR.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -377,7 +377,7 @@ using namespace ae3d;
 #ifdef TEST_SHADOWS_POINT
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( true, 1024 );
 #endif
-    pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 0.5f );
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 1 );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -80, 0, -85 ) );
     scene.Add( &pointLight );
@@ -503,7 +503,12 @@ using namespace ae3d;
         text.GetComponent<ae3d::TextRendererComponent>()->SetText( "this is a long string. this is a long string" );
     }
 
-    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -8, 0, -85 + std::sin( angle / 2 ) * 2 ) );
+    // radius 1
+    //pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -8, 0, -85 + std::sin( angle / 2 ) * 2 ) );
+    //pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 11, 0, -85 ) );
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9, 0, -85 ) );
+    
+    //standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

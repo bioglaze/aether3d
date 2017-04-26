@@ -12,6 +12,7 @@ struct StandardUniforms
     matrix_float4x4 _ModelViewProjectionMatrix;
     matrix_float4x4 _ShadowProjectionMatrix;
     matrix_float4x4 _ModelViewMatrix;
+    matrix_float4x4 _ModelMatrix;
     float4 tintColor;
 };
 static_assert( sizeof( StandardUniforms ) < 512, "" );
@@ -22,6 +23,7 @@ struct StandardColorInOut
     float4 projCoord;
     float2 texCoords;
     float3 positionVS;
+    float3 positionWS;
     float3 tangentVS;
     float3 bitangentVS;
     float3 normalVS;
@@ -32,9 +34,9 @@ struct StandardVertex
 {
     float3 position [[attribute(0)]];
     float2 texcoord [[attribute(1)]];
-    float3 normal [[attribute(2)]];
-    float4 tangent [[attribute(3)]];
-    float4 color [[attribute(4)]];
+    float3 normal [[attribute(3)]];
+    float4 tangent [[attribute(4)]];
+    float4 color [[attribute(2)]];
 };
 
 struct CullerUniforms
@@ -110,6 +112,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     out.positionVS = (uniforms._ModelViewMatrix * in_position).xyz;
+    out.positionWS = (uniforms._ModelMatrix * in_position).xyz;
     
     out.color = half4( vert.color );
     out.texCoords = vert.texcoord;
@@ -118,7 +121,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     out.tangentVS = (uniforms._ModelViewMatrix * float4( vert.tangent.xyz, 0 )).xyz;
     float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
     out.bitangentVS = normalize( uniforms._ModelViewMatrix * float4( ct, 0 ) ).xyz;
-    out.normalVS = vert.normal.xyz;//(uniforms._ModelViewMatrix * float4( vert.normal.xyz, 0 )).xyz;
+    out.normalVS = (uniforms._ModelViewMatrix * float4( vert.normal.xyz, 0 )).xyz;
     
     return out;
 }
@@ -154,16 +157,18 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         float radius = center.w;
         
         float3 vecToLightVS = (uniforms._ModelViewMatrix * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
+        float3 vecToLightWS = center.xyz - in.positionWS.xyz;
         float3 lightDirVS = normalize( vecToLightVS );
         
-        float lightDistance = length( vecToLightVS );
-        //outColor.rgb = dot( lightDirVS, in.normalVS );
-        outColor.rgb = in.normalVS;//lightDistance < radius ? 1 : 0.25;
+        float lightDistance = length( vecToLightWS );
+        //outColor.rgb = lightDistance < radius ? -dot( lightDirVS, normalize( in.normalVS ) ) : 0.25;
+        //outColor.rgb = -dot( lightDirVS, normalize( in.normalVS ) );
+        outColor.rgb = lightDistance < radius ? 1 : 0.25;
     }
     
     if (numLights == 0)
     {
-        outColor = float4( 0.5, 0.5, 0.5, 1 );
+        outColor = float4( 0, 0, 1, 1 );
     }
     else if (numLights == 1)
     {
