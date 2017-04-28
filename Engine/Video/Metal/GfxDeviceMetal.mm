@@ -80,7 +80,7 @@ namespace GfxDeviceGlobal
     int sampleCount = 1;
     bool isRenderingToTexture = false;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
-    std::unordered_map< std::string, id <MTLRenderPipelineState> > psoCache;
+    std::unordered_map< std::uint64_t, id <MTLRenderPipelineState> > psoCache;
     id<MTLSamplerState> samplerStates[ 2 ];
     std::vector< id<MTLBuffer> > uniformBuffers;
     int currentUboIndex;
@@ -343,28 +343,28 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
     GfxDeviceGlobal::clearFlags = (ae3d::GfxDevice::ClearFlags)clearFlags;
 }
 
-std::string GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
+std::uint64_t GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
                        ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
                        MTLPixelFormat depthFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
-    std::string hashString;
-    hashString += std::to_string( (ptrdiff_t)&shader.vertexProgram );
-    hashString += std::to_string( (ptrdiff_t)&shader.fragmentProgram );
-    hashString += std::to_string( (unsigned)blendMode );
-    hashString += std::to_string( ((unsigned)depthFunc) );
-    hashString += std::to_string( ((unsigned)vertexFormat) );
-    hashString += std::to_string( ((unsigned)pixelFormat) );
-    hashString += std::to_string( ((unsigned)depthFormat) );
-    hashString += std::to_string( sampleCount );
-    hashString += std::to_string( ((unsigned)topology) );
-    return hashString;
+    std::uint64_t outResult = (ptrdiff_t)&shader.vertexProgram;
+    outResult += (ptrdiff_t)&shader.fragmentProgram;
+    outResult += (unsigned)blendMode;
+    outResult += ((unsigned)depthFunc) * 2;
+    outResult += ((unsigned)vertexFormat) * 4;
+    outResult += ((unsigned)pixelFormat) * 8;
+    outResult += ((unsigned)depthFormat) * 16;
+    outResult += sampleCount * 32;
+    outResult += ((unsigned)topology) * 64;
+    
+    return outResult;
 }
 
 id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
                                     ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
                                    MTLPixelFormat depthFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
-    const std::string psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, depthFormat, sampleCount, topology );
+    const std::uint64_t psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, depthFormat, sampleCount, topology );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {

@@ -145,15 +145,18 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 normalVS = tangentSpaceTransform( in.tangentVS, in.bitangentVS, in.normalVS, normalTS.xyz );
     
     const uint tileIndex = GetTileIndex( in.position.xy, cullerUniforms.windowWidth );
-    const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
+    uint index = cullerUniforms.maxNumLightsPerTile * tileIndex;
+    uint nextLightIndex = perTileLightIndexBuffer[ index ];
 
-    float4 outColor = float4( 0, 0, 0, 1 );
-    
-    uint numPointLights = cullerUniforms.numLights & 0xFFFFu;
-    
-    for (uint i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
+    float4 outColor = float4( 0.25, 0.25, 0.25, 1 );
+
+    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
-        float4 center = pointLightBufferCenterAndRadius[ i ];
+        uint lightIndex = nextLightIndex;
+        index++;
+        nextLightIndex = perTileLightIndexBuffer[ index ];
+
+        float4 center = pointLightBufferCenterAndRadius[ lightIndex ];
         float radius = center.w;
         
         float3 vecToLightVS = (uniforms._ModelViewMatrix * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
@@ -162,10 +165,14 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         
         float lightDistance = length( vecToLightWS );
         //outColor.rgb = lightDistance < radius ? -dot( lightDirVS, normalize( in.normalVS ) ) : 0.25;
-        //outColor.rgb = -dot( lightDirVS, normalize( in.normalVS ) );
-        outColor.rgb = lightDistance < radius ? 1 : 0.25;
+        outColor.rgb += dot( lightDirVS, normalize( in.normalVS ) );
+        //outColor.rgb = lightDistance < radius ? 1 : 0.25;
+        //outColor.rgb = float3(1, 0, 0 );
     }
     
+    /*
+     const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
+
     if (numLights == 0)
     {
         outColor = float4( 0, 0, 1, 1 );
@@ -181,7 +188,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     else
     {
         outColor = float4( 1, 0, 0, 1 );
-    }
+    }*/
 
     return albedoColor * outColor;
 }

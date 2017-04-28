@@ -1400,6 +1400,27 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 outGameObjects.back().GetComponent< PointLightComponent >()->SetColor( color );
             }
         }
+#if RENDERER_METAL
+        else if (token == "metal_shaders")
+        {
+            if (currentMaterialName == "")
+            {
+                System::Print( "Failed to parse %s: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+            
+            std::string vertexShaderName, fragmentShaderName;
+            lineStream >> vertexShaderName >> fragmentShaderName;
+
+            Shader* shader = new Shader();
+            shader->Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
+                            vertexShaderName.c_str(), fragmentShaderName.c_str(),
+                            FileSystem::FileContents( "unlit.hlsl" ), FileSystem::FileContents( "unlit.hlsl" ),
+                            FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+
+            outMaterials[ currentMaterialName ]->SetShader( shader );
+        }
+#endif
         else
         {
             System::Print( "Unhandled token %s\n", token.c_str() );
