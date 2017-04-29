@@ -101,7 +101,7 @@ namespace GfxDeviceGlobal
     VkCommandPool cmdPool = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
-    std::map< unsigned, VkPipeline > psoCache;
+    std::map< std::uint64_t, VkPipeline > psoCache;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
     std::vector< VkDescriptorSet > descriptorSets;
     int descriptorSetIndex = 0;
@@ -277,7 +277,7 @@ namespace ae3d
     }
 
     void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                    ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, unsigned hash )
+                    ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, std::uint64_t hash )
     {
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
         inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -1617,7 +1617,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
 
-    const unsigned psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode );
+    const std::uint64_t psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {

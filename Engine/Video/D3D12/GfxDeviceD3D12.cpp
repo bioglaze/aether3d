@@ -134,7 +134,7 @@ namespace GfxDeviceGlobal
     ID3D12PipelineState* lightTilerPSO = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
     float clearColor[ 4 ] = { 0, 0, 0, 1 };
-    std::unordered_map< unsigned, ID3D12PipelineState* > psoCache;
+    std::unordered_map< std::uint64_t, ID3D12PipelineState* > psoCache;
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
     std::vector< ae3d::VertexBuffer > lineBuffers;
@@ -409,22 +409,20 @@ void CreateRootSignature()
     }
 }
 
-unsigned GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
+std::uint64_t GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
                      ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
-    std::string hashString;
-    hashString += std::to_string( (unsigned)vertexFormat );
-    hashString += std::to_string( (ptrdiff_t)&shader.blobShaderVertex );
-    hashString += std::to_string( (ptrdiff_t)&shader.blobShaderPixel );
-    hashString += std::to_string( (unsigned)blendMode );
-    hashString += std::to_string( ((unsigned)depthFunc) );
-    hashString += std::to_string( ((unsigned)cullMode) );
-    hashString += std::to_string( ((unsigned)fillMode) );
-    hashString += std::to_string( ((unsigned)rtvFormat) );
-    hashString += std::to_string( ((unsigned)sampleCount) );
-    hashString += std::to_string( ((unsigned)topology) );
+    std::uint64_t outResult = (unsigned)vertexFormat;
+    outResult += (ptrdiff_t)&shader;
+    outResult += (unsigned)blendMode;
+    outResult += ((unsigned)depthFunc) * 2;
+    outResult += ((unsigned)cullMode) * 4;
+    outResult += ((unsigned)fillMode) * 8;
+    outResult += ((unsigned)rtvFormat) * 16;
+    outResult += sampleCount * 32;
+    outResult += ((unsigned)rtvFormat) * 64;
 
-    return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >( hashString.length() ) );
+    return outResult;
 }
 
 void CreateComputePSO( ae3d::ComputeShader& shader )
@@ -609,7 +607,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO Graphics" );
 
-    const unsigned hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount, topology );
+    const std::uint64_t hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount, topology );
     GfxDeviceGlobal::psoCache[ hash ] = pso;
 }
 
@@ -928,7 +926,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_R8G8B8A8_UNORM);
     }
 
-    const unsigned psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
+    const std::uint64_t psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {

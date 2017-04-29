@@ -1,5 +1,6 @@
 #include <vulkan/vulkan.h>
 #include <cstring>
+#include <cstdint>
 #include "Macros.hpp"
 #include "System.hpp"
 #include "VertexBuffer.hpp"
@@ -125,19 +126,17 @@ namespace MathUtil
 
 namespace ae3d
 {
-    unsigned GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
+    std::uint64_t GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
         ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode )
     {
-        std::string hashString;
-        hashString += std::to_string( (ptrdiff_t)&vertexBuffer );
-        hashString += std::to_string( (ptrdiff_t)&shader.GetVertexInfo().module );
-        hashString += std::to_string( (ptrdiff_t)&shader.GetFragmentInfo().module );
-        hashString += std::to_string( (unsigned)blendMode );
-        hashString += std::to_string( ((unsigned)depthFunc) + 4 );
-        hashString += std::to_string( ((unsigned)cullMode) + 8 );
-        hashString += std::to_string( ((unsigned)fillMode) + 8 );
+        std::uint64_t outResult = (ptrdiff_t)&vertexBuffer;
+        outResult += (ptrdiff_t)&shader;
+        outResult += (unsigned)blendMode;
+        outResult += ((unsigned)depthFunc) * 2;
+        outResult += ((unsigned)cullMode) * 4;
+        outResult += ((unsigned)fillMode) * 8;
 
-        return MathUtil::GetHash( hashString.c_str(), static_cast< unsigned >(hashString.length()) );
+        return outResult;
     }
 
     void CreateInstance( VkInstance* outInstance )
