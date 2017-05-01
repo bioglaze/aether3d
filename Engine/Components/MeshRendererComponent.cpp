@@ -15,8 +15,8 @@ using namespace ae3d;
 
 namespace MathUtil
 {
-    void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax );
-    void GetCorners( const Vec3& min, const Vec3& max, std::vector< Vec3 >& outCorners );
+    void GetMinMax( const Vec3* aPoints, int count, Vec3& outMin, Vec3& outMax );
+    void GetCorners( const Vec3& min, const Vec3& max, Vec3 outCorners[ 8 ] );
 }
 
 std::vector< ae3d::MeshRendererComponent > meshRendererComponents;
@@ -51,16 +51,16 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
 
     isCulled = false;
     
-    std::vector< Vec3 > aabbWorld;
+    Vec3 aabbWorld[ 8 ];
     MathUtil::GetCorners( mesh->GetAABBMin(), mesh->GetAABBMax(), aabbWorld );
     
-    for (std::size_t v = 0; v < aabbWorld.size(); ++v)
+    for (std::size_t v = 0; v < 8; ++v)
     {
         Matrix44::TransformPoint( aabbWorld[ v ], localToWorld, &aabbWorld[ v ] );
     }
     
     Vec3 aabbMinWorld, aabbMaxWorld;
-    MathUtil::GetMinMax( aabbWorld, aabbMinWorld, aabbMaxWorld );
+    MathUtil::GetMinMax( aabbWorld, 8, aabbMinWorld, aabbMaxWorld );
     
     if (!cameraFrustum.BoxInFrustum( aabbMinWorld, aabbMaxWorld ))
     {
@@ -83,15 +83,15 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
         Vec3 meshAabbMinWorld = subMeshes[ subMeshIndex ].aabbMin;
         Vec3 meshAabbMaxWorld = subMeshes[ subMeshIndex ].aabbMax;
         
-        std::vector< Vec3 > meshAabbWorld;
+        Vec3 meshAabbWorld[ 8 ];
         MathUtil::GetCorners( meshAabbMinWorld, meshAabbMaxWorld, meshAabbWorld );
         
-        for (std::size_t v = 0; v < meshAabbWorld.size(); ++v)
+        for (std::size_t v = 0; v < 8; ++v)
         {
             Matrix44::TransformPoint( meshAabbWorld[ v ], localToWorld, &meshAabbWorld[ v ] );
         }
         
-        MathUtil::GetMinMax( meshAabbWorld, meshAabbMinWorld, meshAabbMaxWorld );
+        MathUtil::GetMinMax( meshAabbWorld, 8, meshAabbMinWorld, meshAabbMaxWorld );
         
         if (!cameraFrustum.BoxInFrustum( meshAabbMinWorld, meshAabbMaxWorld ))
         {

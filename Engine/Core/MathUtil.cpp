@@ -5,15 +5,12 @@ using namespace ae3d;
 
 namespace MathUtil
 {
-    void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax )
+    void GetMinMax( const Vec3* aPoints, int count, Vec3& outMin, Vec3& outMax )
     {
-        if (!aPoints.empty())
-        {
-            outMin = aPoints[ 0 ];
-            outMax = aPoints[ 0 ];
-        }
+        outMin = aPoints[ 0 ];
+        outMax = aPoints[ 0 ];
 
-        for (std::size_t i = 1, s = aPoints.size(); i < s; ++i)
+        for (int i = 1, s = count; i < s; ++i)
         {
             const Vec3& point = aPoints[ i ];
 
@@ -49,19 +46,16 @@ namespace MathUtil
         }
     }
 
-    void GetCorners( const Vec3& min, const Vec3& max, std::vector< Vec3 >& outCorners )
+    void GetCorners( const Vec3& min, const Vec3& max, Vec3 outCorners[ 8 ] )
     {
-        outCorners =
-        {
-            Vec3( min.x, min.y, min.z ),
-            Vec3( max.x, min.y, min.z ),
-            Vec3( min.x, max.y, min.z ),
-            Vec3( min.x, min.y, max.z ),
-            Vec3( max.x, max.y, min.z ),
-            Vec3( min.x, max.y, max.z ),
-            Vec3( max.x, max.y, max.z ),
-            Vec3( max.x, min.y, max.z )
-        };
+        outCorners[ 0 ] = Vec3( min.x, min.y, min.z );
+        outCorners[ 1 ] = Vec3( max.x, min.y, min.z );
+        outCorners[ 2 ] = Vec3( min.x, max.y, min.z );
+        outCorners[ 3 ] = Vec3( min.x, min.y, max.z );
+        outCorners[ 4 ] = Vec3( max.x, max.y, min.z );
+        outCorners[ 5 ] = Vec3( min.x, max.y, max.z );
+        outCorners[ 6 ] = Vec3( max.x, max.y, max.z );
+        outCorners[ 7 ] = Vec3( max.x, min.y, max.z );
     }
 
     float Floor( float f )
@@ -82,24 +76,6 @@ namespace MathUtil
     bool IsPowerOfTwo( unsigned i )
     {
         return ((i & (i - 1)) == 0);
-    }
-
-    unsigned GetHash( const char* s, unsigned length )
-    {
-        const unsigned A = 54059;
-        const unsigned B = 76963;
-
-        unsigned h = 31;
-        unsigned i = 0;
-
-        while (i < length)
-        {
-            h = (h * A) ^ (s[ 0 ] * B);
-            ++s;
-            ++i;
-        }
-
-        return h;
     }
 
     int Min( int x, int y )

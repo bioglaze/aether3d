@@ -25,13 +25,9 @@ using namespace ae3d;
 
 namespace MathUtil
 {
-    void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax );
-    void GetCorners( const Vec3& min, const Vec3& max, std::vector< Vec3 >& outCorners );
     bool IsPowerOfTwo( unsigned i );
-    unsigned GetHash( const char* s, unsigned length );
     int Min( int x, int y );
     int Max( int x, int y );
-    int GetMipmapCount( int width, int height );
 }
 
 #if _MSC_VER

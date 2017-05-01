@@ -19,6 +19,8 @@ namespace MathUtil
     bool IsFinite( float f );
 }
 
+unsigned boundTextures[ 16 ];
+
 namespace
 {
     struct ShaderCacheEntry
@@ -242,9 +244,16 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 
 void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
 {
-    glActiveTexture( GL_TEXTURE0 + textureUnit );
-    glBindTexture( GL_TEXTURE_2D, texture->GetID() );
-    Statistics::IncTextureBinds();
+    const unsigned texId = texture->GetID();
+    
+    if (boundTextures[ textureUnit ] != texId)
+    {
+        boundTextures[ textureUnit ] = texId;
+        glActiveTexture( GL_TEXTURE0 + textureUnit );
+        glBindTexture( GL_TEXTURE_2D, texId );
+        Statistics::IncTextureBinds();
+    }
+    
     SetInt( name, textureUnit );
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
@@ -253,9 +262,16 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int t
 
 void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int textureUnit )
 {
-    glActiveTexture( GL_TEXTURE0 + textureUnit );
-    glBindTexture( GL_TEXTURE_CUBE_MAP, texture->GetID() );
-    Statistics::IncTextureBinds();
+    const unsigned texId = texture->GetID();
+    
+    if (boundTextures[ textureUnit ] != texId)
+    {
+        boundTextures[ textureUnit ] = texId;
+        glActiveTexture( GL_TEXTURE0 + textureUnit );
+        glBindTexture( GL_TEXTURE_CUBE_MAP, texId );
+        Statistics::IncTextureBinds();
+    }
+    
     SetInt( name, textureUnit );
     
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
@@ -264,9 +280,16 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int
 
 void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* texture, int textureUnit )
 {
-    glActiveTexture( GL_TEXTURE0 + textureUnit );
-    glBindTexture( texture->IsCube() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, texture->GetID() );
-    Statistics::IncTextureBinds();
+    const unsigned texId = texture->GetID();
+    
+    if (boundTextures[ textureUnit ] != texId)
+    {
+        boundTextures[ textureUnit ] = texId;
+        glActiveTexture( GL_TEXTURE0 + textureUnit );
+        glBindTexture( texture->IsCube() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, texId );
+        Statistics::IncTextureBinds();
+    }
+    
     SetInt( name, textureUnit );
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );

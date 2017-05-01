@@ -37,7 +37,7 @@ float GetVRFov();
 
 namespace MathUtil
 {
-    void GetMinMax( const std::vector< Vec3 >& aPoints, Vec3& outMin, Vec3& outMax );
+    void GetMinMax( const Vec3* aPoints, int count, Vec3& outMin, Vec3& outMax );
     bool IsNaN( float f );
 }
 
@@ -99,7 +99,7 @@ void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const F
     const Matrix44& shadowCameraView = outCamera.GetView();
     
     // Transforms view camera frustum points to shadow camera space.
-    std::vector< Vec3 > viewFrustumLS( 8 );
+    Vec3 viewFrustumLS[ 8 ];
     
     Matrix44::TransformPoint( eyeFrustum.NearTopLeft(), shadowCameraView, &viewFrustumLS[ 0 ] );
     Matrix44::TransformPoint( eyeFrustum.NearTopRight(), shadowCameraView, &viewFrustumLS[ 1 ] );
@@ -113,7 +113,7 @@ void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const F
     
     // Gets light-space view frustum extremes.
     Vec3 viewMinLS, viewMaxLS;
-    MathUtil::GetMinMax( viewFrustumLS, viewMinLS, viewMaxLS );
+    MathUtil::GetMinMax( viewFrustumLS, 8, viewMinLS, viewMaxLS );
     
     // Transforms scene's AABB to light-space.
     Vec3 sceneAABBminLS, sceneAABBmaxLS;
@@ -132,14 +132,14 @@ void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const F
         Vec3( max.x, min.y, max.z )
     };
     
-    std::vector< Vec3 > sceneAABBLS( 8 );
+    Vec3 sceneAABBLS[ 8 ];
     
     for (int i = 0; i < 8; ++i)
     {
         Matrix44::TransformPoint( sceneCorners[ i ], shadowCameraView, &sceneAABBLS[ i ] );
     }
     
-    MathUtil::GetMinMax( sceneAABBLS, sceneAABBminLS, sceneAABBmaxLS );
+    MathUtil::GetMinMax( sceneAABBLS, 8, sceneAABBminLS, sceneAABBmaxLS );
     
     // Use world volume for near plane.
     viewMaxLS.z = sceneAABBmaxLS.z > viewMaxLS.z ? sceneAABBmaxLS.z : viewMaxLS.z;
