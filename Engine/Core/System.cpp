@@ -273,12 +273,12 @@ namespace ae3d
 
         Vec3 GetLeftHandPosition()
         {
-            return Vec3( 0, 0, 0 );
+            return Vec3( -1, 0, 0 );
         }
 
         Vec3 GetRightHandPosition()
         {
-            return Vec3( 0, 0, 0 );
+            return Vec3( 1, 0, 0 );
         }
     }
 }

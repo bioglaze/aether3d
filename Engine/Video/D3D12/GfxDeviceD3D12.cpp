@@ -36,11 +36,6 @@ namespace WindowGlobal
     extern int windowHeight;
 }
 
-namespace MathUtil
-{
-    unsigned GetHash( const char* s, unsigned length );
-}
-
 namespace ae3d
 {
     namespace System
@@ -415,12 +410,12 @@ std::uint64_t GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::S
     std::uint64_t outResult = (unsigned)vertexFormat;
     outResult += (ptrdiff_t)&shader;
     outResult += (unsigned)blendMode;
-    outResult += ((unsigned)depthFunc) * 2;
-    outResult += ((unsigned)cullMode) * 4;
-    outResult += ((unsigned)fillMode) * 8;
-    outResult += ((unsigned)rtvFormat) * 16;
-    outResult += sampleCount * 32;
+    outResult += ((unsigned)depthFunc) * 4;
+    outResult += ((unsigned)cullMode) * 16;
+    outResult += ((unsigned)fillMode) * 32;
     outResult += ((unsigned)rtvFormat) * 64;
+    outResult += sampleCount * 128;
+    outResult += ((unsigned)topology) * 256;
 
     return outResult;
 }

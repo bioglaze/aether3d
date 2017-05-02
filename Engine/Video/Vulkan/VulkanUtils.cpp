@@ -119,11 +119,6 @@ namespace debug
     }
 }
 
-namespace MathUtil
-{
-    unsigned GetHash( const char* s, unsigned length );
-}
-
 namespace ae3d
 {
     std::uint64_t GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,

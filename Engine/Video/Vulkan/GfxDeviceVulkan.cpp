@@ -37,8 +37,8 @@ PFN_vkQueuePresentKHR queuePresentKHR = nullptr;
 struct Ubo
 {
     VkBuffer ubo = VK_NULL_HANDLE;
-    VkDeviceMemory uboMemory;
-    VkDescriptorBufferInfo uboDesc;
+    VkDeviceMemory uboMemory = VK_NULL_HANDLE;
+    VkDescriptorBufferInfo uboDesc = {};
     std::uint8_t* uboData = nullptr;
 };
 
