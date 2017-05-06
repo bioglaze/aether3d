@@ -100,7 +100,7 @@ void ae3d::TextRendererComponent::SetFont( Font* aFont )
 
 void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
 {
-    if (m().font == nullptr)
+    if (!isEnabled || m().font == nullptr)
     {
         return;
     }
@@ -145,6 +145,7 @@ std::string ae3d::TextRendererComponent::GetSerialized() const
     outStream << "textrenderer\n";
     const auto& color = m().color;
     outStream << "color " << color.x << " " << color.y << " " << color.z << " " << color.w << "\n";
+    outStream << "enabled" << isEnabled << "\n";
     outStream << "text " << m().text << "\n\n";
     return outStream.str();
 }

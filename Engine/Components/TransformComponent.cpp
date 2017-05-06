@@ -191,8 +191,8 @@ std::string ae3d::TransformComponent::GetSerialized() const
     outStream.imbue( c_locale );
 
     outStream << "transform\nposition " << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\nrotation ";
-    outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\nscale " <<
-        localScale << "\n\n";
+    outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\nscale " << localScale << "\n";
+    outStream << "enabled" << isEnabled << "\n\n";
     
     return outStream.str();
 }

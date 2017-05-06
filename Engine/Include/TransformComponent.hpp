@@ -30,6 +30,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
         
+        /// \param enabled True if the component should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
         /// \param localPosition Local position.
         /// \param center Point we're looking at.
         /// \param up Up vector.
@@ -114,6 +117,7 @@ namespace ae3d
         Matrix44 hmdView; // For VR
 #endif
         GameObject* gameObject = nullptr;
+        bool isEnabled = true;
     };
 }
 

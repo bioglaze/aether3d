@@ -28,6 +28,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \param enabled True if the component should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
         /// \param color Color in range 0-1.
         void SetColor( const struct Vec4& color );
 
@@ -69,6 +72,7 @@ namespace ae3d
         std::aligned_storage<StorageSize, StorageAlign>::type _storage = {};
         
         GameObject* gameObject = nullptr;
+        bool isEnabled = true;
     };
 }
 

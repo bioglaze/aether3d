@@ -121,7 +121,9 @@ std::string ae3d::CameraComponent::GetSerialized() const
     outStream << "layermask " << layerMask << "\n";
     outStream << "order " << renderOrder << "\n";
     outStream << "viewport " << viewport[ 0 ] << " " << viewport[ 1 ] << " " << viewport[ 2 ] << " " << viewport[ 3 ] << "\n";
-    outStream << "clearcolor " << clearColor.x << " " << clearColor.y << " " << clearColor.z << "\n\n";
+    outStream << "clearcolor " << clearColor.x << " " << clearColor.y << " " << clearColor.z;
+    outStream << "enabled" << isEnabled << "\n";
+    outStream << "\n\n";
 
     return outStream.str();
 }

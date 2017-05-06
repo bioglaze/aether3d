@@ -13,6 +13,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \param enabled True if the component should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
         /// \return Color
         const Vec3& GetColor() const { return color; }
 
@@ -56,6 +59,7 @@ namespace ae3d
         float radius = 10;
         GameObject* gameObject = nullptr;
         bool castsShadow = false;
+        bool isEnabled = true;
     };
 }
 #endif

@@ -41,6 +41,7 @@ std::string ae3d::DirectionalLightComponent::GetSerialized() const
 
     outStream << "dirlight\n";
     outStream << "color " << color.x << " " << color.y << " " << color.z << "\n";
+    outStream << "enabled" << isEnabled << "\n";
     outStream << "shadow " << (castsShadow ? 1 : 0) << "\n\n";
     return outStream.str();
 }

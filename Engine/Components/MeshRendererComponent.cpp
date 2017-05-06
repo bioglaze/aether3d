@@ -103,7 +103,7 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
 void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matrix44& modelViewProjection, const Matrix44& localToWorld,
                                           const Matrix44& shadowView, const Matrix44& shadowProjection, Shader* overrideShader, RenderType renderType )
 {
-    if (isCulled || !mesh)
+    if (isCulled || !mesh || !isEnabled)
     {
         return;
     }

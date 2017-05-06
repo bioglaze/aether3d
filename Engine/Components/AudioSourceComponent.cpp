@@ -28,13 +28,20 @@ void ae3d::AudioSourceComponent::SetClipId( unsigned audioClipId )
 
 void ae3d::AudioSourceComponent::Play() const
 {
-    AudioSystem::Play( clipId, isLooping );
+    if (isEnabled)
+    {
+        AudioSystem::Play( clipId, isLooping );
+    }
 }
 
 std::string ae3d::AudioSourceComponent::GetSerialized() const
 {
     std::stringstream outStream;
-    outStream << "audiosource\n" << clipId << "\n\n";
+    outStream << "audiosource\n";
+    outStream << clipId << "\n";
+    outStream << "enabled" << isEnabled << "\n";
+    outStream << "\n\n";
+    
     return outStream.str();
 }
 

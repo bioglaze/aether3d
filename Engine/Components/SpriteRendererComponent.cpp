@@ -268,7 +268,8 @@ std::string ae3d::SpriteRendererComponent::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "spriterenderer\n";
-
+    outStream << "enabled" << isEnabled << "\n";
+    
     for (std::size_t spriteIndex = 0; spriteIndex < m().spriteInfos.size(); ++spriteIndex)
     {
         const auto& info = m().spriteInfos[ spriteIndex ];
@@ -314,7 +315,7 @@ void ae3d::SpriteRendererComponent::SetTexture( TextureBase* aTexture, const Vec
 
 void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
 {
-    if (m().transparentRenderQueue.sprites.empty() && m().opaqueRenderQueue.sprites.empty())
+    if (!isEnabled || (m().transparentRenderQueue.sprites.empty() && m().opaqueRenderQueue.sprites.empty()))
     {
         return;
     }

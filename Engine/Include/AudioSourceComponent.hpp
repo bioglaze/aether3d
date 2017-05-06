@@ -12,6 +12,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \param enabled True if the component should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
         /// \return True, if clips played through this source will be affected by this game object's and camera's position.
         bool Is3D() const { return is3D; }
         
@@ -46,6 +49,7 @@ namespace ae3d
         unsigned clipId = 0;
         bool is3D = false;
         bool isLooping = false;
+        bool isEnabled = true;
     };
 }
 

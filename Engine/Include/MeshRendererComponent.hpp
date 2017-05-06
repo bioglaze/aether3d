@@ -13,6 +13,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \param enabled True if the component should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
         /// \return Mesh.
         class Mesh* GetMesh() { return mesh; }
         
@@ -63,6 +66,7 @@ namespace ae3d
         GameObject* gameObject = nullptr;
         bool isCulled = false;
         bool isWireframe = false;
+        bool isEnabled = true;
     };
 }
 

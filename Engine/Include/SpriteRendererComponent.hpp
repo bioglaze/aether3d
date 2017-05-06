@@ -42,6 +42,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \param enabled True if the component should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
         /// \return Textual representation of component.
         std::string GetSerialized() const;
 
@@ -90,6 +93,7 @@ namespace ae3d
         std::aligned_storage<StorageSize, StorageAlign>::type _storage = {};
         
         GameObject* gameObject = nullptr;
+        bool isEnabled = true;
     };
 }
 #endif

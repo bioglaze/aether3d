@@ -12,15 +12,18 @@ namespace ae3d
     class CameraComponent
     {
     public:
-        /// \return GameObject that owns this component.
-        class GameObject* GetGameObject() const { return gameObject; }
-
         /// Projection type
         enum class ProjectionType { Orthographic, Perspective };
         
         /// Clear flag.
         enum class ClearFlag { DepthAndColor, Depth, DontClear };
         
+        /// \return GameObject that owns this component.
+        class GameObject* GetGameObject() const { return gameObject; }
+        
+        /// \param enabled True if the component should be rendered, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
         /// \return Projection matrix.
         const Matrix44& GetProjection() const { return projectionMatrix; }
 
@@ -174,6 +177,7 @@ namespace ae3d
         ClearFlag clearFlag = ClearFlag::DepthAndColor;
         GameObject* gameObject = nullptr;
         int viewport[ 4 ];
+        bool isEnabled = true;
     };
 }
 #endif
