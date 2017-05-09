@@ -38,7 +38,7 @@ namespace Texture2DGlobal
     std::vector< ID3D12Resource* > uploadBuffers;
     ae3d::Texture2D defaultTexture;
     
-    std::map< std::string, ae3d::Texture2D > pathToCachedTexture;
+    std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
 #if DEBUG
     std::map< std::string, std::size_t > pathToCachedTextureSizeInBytes;
     
@@ -106,11 +106,80 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subRes
     }
 }
 
+// FIXME: This is duplicated with GL renderer, unify!
 void TexReload( const std::string& path )
 {
-    auto& tex = Texture2DGlobal::pathToCachedTexture[ path ];
+    std::string cacheHash = GetCacheHash( path, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
 
-    tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
+
+    cacheHash = GetCacheHash( path, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
+    if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
+    {
+        auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
+    }
 }
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
@@ -196,17 +265,22 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
     
     const std::string cacheHash = GetCacheHash( fileContents.path, aWrap, aFilter, aMipmaps, aColorSpace, aAnisotropy );
-    const bool isCached = Texture2DGlobal::pathToCachedTexture.find( cacheHash ) != Texture2DGlobal::pathToCachedTexture.end();
+    const bool isCached = Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != Texture2DGlobal::hashToCachedTexture.end();
 
     if (isCached && handle == 0)
     {
-        *this = Texture2DGlobal::pathToCachedTexture[ cacheHash ];
+        System::Print("loading from cache\n");
+        *this = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
         return;
     }
     
     // First load
-    //    fileWatcher.AddFile( fileContents.path, TexReload );
+    if (handle == 0)
+    {
+        fileWatcher.AddFile( fileContents.path, TexReload );
+    }
 
+    System::Print( "loading %s\n", fileContents.path.c_str() );
     const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
     
     if (HasStbExtension( fileContents.path ))
@@ -235,7 +309,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 
-    Texture2DGlobal::pathToCachedTexture[ cacheHash ] = *this;
+    Texture2DGlobal::hashToCachedTexture[ cacheHash ] = *this;
 #if DEBUG
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
     //Texture2DGlobal::PrintMemoryUsage();

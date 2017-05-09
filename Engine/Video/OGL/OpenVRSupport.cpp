@@ -16,6 +16,7 @@
 #include "Vec3.hpp"
 
 using namespace ae3d;
+extern unsigned boundTextures[ 16 ];
 
 struct FramebufferDesc
 {
@@ -302,11 +303,13 @@ void RenderDistortion()
     Global::activeVao = Global::lensVAO;
     Global::lensDistort.Use();
 
-    glActiveTexture( GL_TEXTURE0 );
     glProgramUniform1i( Global::lensDistort.GetHandle(), glGetUniformLocation( Global::lensDistort.GetHandle(), "mytexture" ), 0 );
 
     //render left lens (first half of index array )
+    glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_2D, Global::leftEyeDesc.resolveTextureId );
+    boundTextures[ 0 ] = Global::leftEyeDesc.resolveTextureId;
+
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -314,7 +317,9 @@ void RenderDistortion()
     glDrawElements( GL_TRIANGLES, Global::indexSize / 2, GL_UNSIGNED_SHORT, 0 );
 
     //render right lens (second half of index array )
+    boundTextures[ 0 ] = Global::rightEyeDesc.resolveTextureId;
     glBindTexture( GL_TEXTURE_2D, Global::rightEyeDesc.resolveTextureId );
+
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );

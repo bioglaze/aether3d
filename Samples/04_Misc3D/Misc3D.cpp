@@ -173,7 +173,7 @@ int main()
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D gliderClampTex;
-    gliderClampTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    gliderClampTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Material materialClamp;
     materialClamp.SetShader( &shader );
@@ -340,7 +340,7 @@ int main()
     Shader standardShader;
     standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
         "standard_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "Standard.hlsl" ), ae3d::FileSystem::FileContents( "Standard.hlsl" ),
+        ae3d::FileSystem::FileContents( "Standard_vert.hlsl" ), ae3d::FileSystem::FileContents( "Standard_frag.hlsl" ),
         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
 
     Material standardMaterial;
@@ -353,7 +353,7 @@ int main()
     standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
     standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -14 ) );
+    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -100 ) );
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
     scene.Add( &standardCubeTopCenter );
 #endif
@@ -384,7 +384,7 @@ int main()
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
 #endif
-    //scene.Add( &transCube1 );
+    scene.Add( &transCube1 );
 
     const int cubeCount = 10;
     GameObject cubes[ cubeCount ];
@@ -443,6 +443,8 @@ int main()
     float angle = 0;
     Vec3 moveDir;
 
+    bool reload = false;
+
     while (Window::IsOpen() && !quit)
     {
 #if defined( AE3D_OPENVR )
@@ -460,6 +462,12 @@ int main()
             VR::UnsetEye( eye );
         }
 #else
+        if (reload)
+        {
+            System::Print("reloading\n");
+            System::ReloadChangedAssets();
+            reload = false;
+        }
         scene.Render();
         //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
 #endif
@@ -505,10 +513,6 @@ int main()
                     VR::RecenterTracking();
                     cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
                     cubes[ 3 ].SetEnabled( false );
-                }
-                else if (keyCode == KeyCode::R)
-                {
-                    System::ReloadChangedAssets();
                 }
                 else if (keyCode == KeyCode::W)
                 {
@@ -583,7 +587,8 @@ int main()
                 }
                 else if (keyCode == KeyCode::R)
                 {
-                    System::ReloadChangedAssets();
+                    reload = true;
+                    //System::ReloadChangedAssets();
                 }
             }
 
