@@ -106,15 +106,15 @@ struct VertexPTNTCWithData
 
 struct Keyframe
 {
-    std::uint64_t frameNum;
     ae3d::Matrix44 globalTransform;
+    std::uint64_t frameNum;
     Keyframe* next = nullptr;
 };
 
 struct Joint
 {
-    class FbxNode* node = nullptr;
     ae3d::Matrix44 globalBindposeInverse;
+    class FbxNode* node = nullptr;
     int parentIndex = -1;
     std::string name;
     Keyframe* animation = nullptr;
