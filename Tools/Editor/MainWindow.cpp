@@ -485,6 +485,7 @@ void MainWindow::CommandCreateAudioSourceComponent()
         commandManager.Execute( std::make_shared< CreateAudioSourceCommand >( sceneWidget ) );
         windowMenu.SetUndoText( "Undo Create AudioSource" );
         UpdateInspector();
+        windowMenu.Update();
     }
 }
 
@@ -494,6 +495,7 @@ void MainWindow::CommandRemoveAudioSourceComponent()
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     windowMenu.SetUndoText( "Undo Remove Component" );
     UpdateInspector();
+    windowMenu.Update();
 }
 
 void MainWindow::CommandCreateCameraComponent()
@@ -504,6 +506,7 @@ void MainWindow::CommandCreateCameraComponent()
         windowMenu.SetUndoText( "Undo Create Camera" );
         sceneWidget->SetSelectedCameraTargetToPreview();
         UpdateInspector();
+        windowMenu.Update();
     }
 }
 
@@ -513,6 +516,7 @@ void MainWindow::CommandRemoveCameraComponent()
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     windowMenu.SetUndoText( "Undo Remove Camera" );
     UpdateInspector();
+    windowMenu.Update();
     sceneWidget->HideHUD();
 }
 
@@ -523,6 +527,7 @@ void MainWindow::CommandCreateMeshRendererComponent()
         commandManager.Execute( std::make_shared< CreateMeshRendererCommand >( sceneWidget ) );
         windowMenu.SetUndoText( "Undo Create Mesh Renderer" );
         UpdateInspector();
+        windowMenu.Update();
     }
 }
 
@@ -532,6 +537,7 @@ void MainWindow::CommandRemoveMeshRendererComponent()
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     windowMenu.SetUndoText( "Undo Remove MeshRenderer" );
     UpdateInspector();
+    windowMenu.Update();
 }
 
 void MainWindow::CommandCreateSpriteRendererComponent()
@@ -541,6 +547,7 @@ void MainWindow::CommandCreateSpriteRendererComponent()
         commandManager.Execute( std::make_shared< CreateSpriteRendererCommand >( sceneWidget ) );
         windowMenu.SetUndoText( "Undo Create Sprite Renderer" );
         UpdateInspector();
+        windowMenu.Update();
     }
 }
 
@@ -550,6 +557,7 @@ void MainWindow::CommandRemoveSpriteRendererComponent()
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     windowMenu.SetUndoText( "Undo Remove Sprite Renderer" );
     UpdateInspector();
+    windowMenu.Update();
 }
 
 void MainWindow::CommandCreateDirectionalLightComponent()
@@ -559,6 +567,7 @@ void MainWindow::CommandCreateDirectionalLightComponent()
         commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Directional ) );
         windowMenu.SetUndoText( "Undo Create Directional Light" );
         UpdateInspector();
+        windowMenu.Update();
     }
 }
 
@@ -568,6 +577,7 @@ void MainWindow::CommandRemoveDirectionalLightComponent()
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     windowMenu.SetUndoText( "Undo Remove Directional Light" );
     UpdateInspector();
+    windowMenu.Update();
 }
 
 void MainWindow::CommandCreateSpotLightComponent()
@@ -577,6 +587,7 @@ void MainWindow::CommandCreateSpotLightComponent()
         commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Spot ) );
         windowMenu.SetUndoText( "Undo Create Spot Light" );
         UpdateInspector();
+        windowMenu.Update();
     }
 }
 
@@ -586,6 +597,7 @@ void MainWindow::CommandRemoveSpotLightComponent()
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     windowMenu.SetUndoText( "Undo Remove Spot Light" );
     UpdateInspector();
+    windowMenu.Update();
 }
 
 void MainWindow::CommandCreatePointLightComponent()
@@ -595,6 +607,7 @@ void MainWindow::CommandCreatePointLightComponent()
         commandManager.Execute( std::make_shared< CreateLightCommand >( sceneWidget, CreateLightCommand::Type::Point ) );
         windowMenu.SetUndoText( "Undo Create Point Light" );
         UpdateInspector();
+        windowMenu.Update();
     }
 }
 
@@ -604,6 +617,7 @@ void MainWindow::CommandRemovePointLightComponent()
     commandManager.Execute( std::make_shared< RemoveComponentCommand >( component ) );
     windowMenu.SetUndoText( "Undo Remove Point Light" );
     UpdateInspector();
+    windowMenu.Update();
 }
 
 void MainWindow::CommandModifyTransform( int gameObjectIndex, const ae3d::Vec3& newPosition, const ae3d::Quaternion& newRotation, float newScale )

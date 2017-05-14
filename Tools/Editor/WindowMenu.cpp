@@ -1,6 +1,14 @@
 #include <QMenu>
 #include <QMenuBar>
 #include "WindowMenu.hpp"
+#include "GameObject.hpp"
+#include "AudioSourceComponent.hpp"
+#include "CameraComponent.hpp"
+#include "DirectionalLightComponent.hpp"
+#include "MeshRendererComponent.hpp"
+#include "SpotLightComponent.hpp"
+#include "PointLightComponent.hpp"
+#include "SpriteRendererComponent.hpp"
 
 void WindowMenu::Init( QWidget* mainWindow )
 {
@@ -24,18 +32,35 @@ void WindowMenu::Init( QWidget* mainWindow )
     sceneMenu->addAction( "Create Game Object", mainWindow, SLOT(CommandCreateGameObject()), QKeySequence("Ctrl+N"));
 
     componentMenu = menuBar->addMenu( "&Component" );
-    componentMenu->addAction( "Add Audio Source", mainWindow, SLOT(CommandCreateAudioSourceComponent()));
-    componentMenu->addAction( "Add Camera", mainWindow, SLOT(CommandCreateCameraComponent()));
-    componentMenu->addAction( "Add Directional Light", mainWindow, SLOT(CommandCreateDirectionalLightComponent()));
-    componentMenu->addAction( "Add Mesh Renderer", mainWindow, SLOT(CommandCreateMeshRendererComponent()));
-    componentMenu->addAction( "Add Sprite Renderer", mainWindow, SLOT(CommandCreateSpriteRendererComponent()));
-    componentMenu->addAction( "Add Spot Light", mainWindow, SLOT(CommandCreateSpotLightComponent()));
-    componentMenu->addAction( "Add Point Light", mainWindow, SLOT(CommandCreatePointLightComponent()));
+    actionAddAudioSource = componentMenu->addAction( "Add Audio Source", mainWindow, SLOT(CommandCreateAudioSourceComponent()));
+    actionAddCamera = componentMenu->addAction( "Add Camera", mainWindow, SLOT(CommandCreateCameraComponent()));
+    actionAddDirLight = componentMenu->addAction( "Add Directional Light", mainWindow, SLOT(CommandCreateDirectionalLightComponent()));
+    actionAddMesh = componentMenu->addAction( "Add Mesh Renderer", mainWindow, SLOT(CommandCreateMeshRendererComponent()));
+    actionAddSpriteRenderer = componentMenu->addAction( "Add Sprite Renderer", mainWindow, SLOT(CommandCreateSpriteRendererComponent()));
+    actionAddSpotLight = componentMenu->addAction( "Add Spot Light", mainWindow, SLOT(CommandCreateSpotLightComponent()));
+    actionAddPointLight = componentMenu->addAction( "Add Point Light", mainWindow, SLOT(CommandCreatePointLightComponent()));
 }
 
-void WindowMenu::GameObjectSelected( std::list< ae3d::GameObject* > gameObjects )
+void WindowMenu::Update()
 {
     componentMenu->setEnabled( !gameObjects.empty() );
+
+    if (!gameObjects.empty())
+    {
+        actionAddAudioSource->setEnabled( !gameObjects.front()->GetComponent< ae3d::AudioSourceComponent >() );
+        actionAddCamera->setEnabled( !gameObjects.front()->GetComponent< ae3d::CameraComponent >() );
+        actionAddDirLight->setEnabled( !gameObjects.front()->GetComponent< ae3d::DirectionalLightComponent >() );
+        actionAddSpotLight->setEnabled( !gameObjects.front()->GetComponent< ae3d::SpotLightComponent >() );
+        actionAddPointLight->setEnabled( !gameObjects.front()->GetComponent< ae3d::PointLightComponent >() );
+        actionAddMesh->setEnabled( !gameObjects.front()->GetComponent< ae3d::MeshRendererComponent >() );
+        actionAddSpriteRenderer->setEnabled( !gameObjects.front()->GetComponent< ae3d::SpriteRendererComponent >() );
+    }
+}
+
+void WindowMenu::GameObjectSelected( std::list< ae3d::GameObject* > selectedGameObjects )
+{
+    gameObjects = selectedGameObjects;
+    Update();
 }
 
 void WindowMenu::SetUndoText( const char* text )
