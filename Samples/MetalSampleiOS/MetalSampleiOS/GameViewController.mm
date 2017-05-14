@@ -1,3 +1,5 @@
+#include <vector>
+#include <map>
 #import <simd/simd.h>
 #import "GameViewController.h"
 
@@ -52,6 +54,10 @@ int gTouchCount;
     ae3d::Shader shader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
+    std::vector< ae3d::GameObject > sponzaGameObjects;
+    std::map< std::string, ae3d::Material* > sponzaMaterialNameToMaterial;
+    std::map< std::string, ae3d::Texture2D* > sponzaTextureNameToTexture;
+    std::vector< ae3d::Mesh* > sponzaMeshes;
     int touchBeginX;
     int touchBeginY;
 }
@@ -95,6 +101,7 @@ int gTouchCount;
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthNormals" );
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.SetName( "camera3d" );
+    camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
     scene.Add( &camera3d );
     
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
@@ -177,6 +184,27 @@ int gTouchCount;
     spotLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
     spotLight.SetName( "spotLight" );
     //scene.Add( &pointLight );
+    
+    // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
+#if 1
+    auto res = scene.Deserialize( ae3d::FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
+                                 sponzaMaterialNameToMaterial, sponzaMeshes );
+    
+    if (res != ae3d::Scene::DeserializeResult::Success)
+    {
+        ae3d::System::Print( "Could not parse Sponza\n" );
+    }
+    
+    /*for (auto& mat : sponzaMaterialNameToMaterial)
+     {
+     mat.second->SetShader( &shader );
+     }*/
+    
+    for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
+    {
+        scene.Add( &sponzaGameObjects[ i ] );
+    }
+#endif
 }
 
 - (void)_setupView

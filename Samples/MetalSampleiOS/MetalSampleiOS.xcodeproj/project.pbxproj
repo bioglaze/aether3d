@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB6DECD61EC82B350019358C /* textures in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD11EC82B350019358C /* textures */; };
+		AB6DECD71EC82B350019358C /* default_white.png in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD21EC82B350019358C /* default_white.png */; };
+		AB6DECD81EC82B350019358C /* gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD31EC82B350019358C /* gradient.png */; };
+		AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD41EC82B350019358C /* new_sponza.ae3d */; };
+		AB6DECDA1EC82B350019358C /* sponza.scene in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD51EC82B350019358C /* sponza.scene */; };
 		AB811CCF1C23433500911AB6 /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; };
 		AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD01C2344BA00911AB6 /* OpenAL.framework */; };
 		AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD21C2346F400911AB6 /* MetalKit.framework */; };
@@ -57,6 +62,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AB6DECD11EC82B350019358C /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
+		AB6DECD21EC82B350019358C /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
+		AB6DECD31EC82B350019358C /* gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gradient.png; path = ../../../../aether3d_build/Samples/gradient.png; sourceTree = "<group>"; };
+		AB6DECD41EC82B350019358C /* new_sponza.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = new_sponza.ae3d; path = ../../../../aether3d_build/Samples/new_sponza.ae3d; sourceTree = "<group>"; };
+		AB6DECD51EC82B350019358C /* sponza.scene */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sponza.scene; path = ../../../../aether3d_build/Samples/sponza.scene; sourceTree = "<group>"; };
 		AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aether3D_iOS.framework; path = ../../../../../Desktop/Aether3D_iOS.framework; sourceTree = "<group>"; };
 		AB811CD01C2344BA00911AB6 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		AB811CD21C2346F400911AB6 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
@@ -149,6 +159,11 @@
 		ABA29F431C19E1F90098E21D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB6DECD11EC82B350019358C /* textures */,
+				AB6DECD21EC82B350019358C /* default_white.png */,
+				AB6DECD31EC82B350019358C /* gradient.png */,
+				AB6DECD41EC82B350019358C /* new_sponza.ae3d */,
+				AB6DECD51EC82B350019358C /* sponza.scene */,
 				ABD3AB2F1C29D7F700E78933 /* font_txt.fnt */,
 				ABD3AB301C29D7F700E78933 /* font.png */,
 				ABD3AB311C29D7F700E78933 /* glider.png */,
@@ -268,10 +283,15 @@
 				ABD3AB331C29D7F700E78933 /* font_txt.fnt in Resources */,
 				ABD3AB341C29D7F700E78933 /* font.png in Resources */,
 				ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */,
+				AB6DECD81EC82B350019358C /* gradient.png in Resources */,
 				ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */,
+				AB6DECD71EC82B350019358C /* default_white.png in Resources */,
+				AB6DECD61EC82B350019358C /* textures in Resources */,
 				ABD3AB351C29D7F700E78933 /* glider.png in Resources */,
 				ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */,
+				AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */,
 				ABA29F511C19E1F90098E21D /* Main.storyboard in Resources */,
+				AB6DECDA1EC82B350019358C /* sponza.scene in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
