@@ -1805,6 +1805,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::renderCompleteSemaphore, nullptr );
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );
+    vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::offscreenSemaphore, nullptr );
     vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
     vkDestroyPipelineCache( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, nullptr );
     vkDestroySwapchainKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, nullptr );

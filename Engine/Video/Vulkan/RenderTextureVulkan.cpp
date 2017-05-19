@@ -29,6 +29,7 @@ namespace RenderTextureGlobal
     std::vector< VkImageView > imageViewsToReleaseAtExit;
     std::vector< VkDeviceMemory > memoryToReleaseAtExit;
     std::vector< VkFramebuffer > fbsToReleaseAtExit;
+    std::vector< VkRenderPass > renderPassesToReleaseAtExit;
 }
 
 void ae3d::RenderTexture::DestroyTextures()
@@ -56,6 +57,11 @@ void ae3d::RenderTexture::DestroyTextures()
     for (std::size_t fbIndex = 0; fbIndex < RenderTextureGlobal::fbsToReleaseAtExit.size(); ++fbIndex)
     {
         vkDestroyFramebuffer( GfxDeviceGlobal::device, RenderTextureGlobal::fbsToReleaseAtExit[ fbIndex ], nullptr );
+    }
+
+    for (std::size_t rpIndex = 0; rpIndex < RenderTextureGlobal::renderPassesToReleaseAtExit.size(); ++rpIndex)
+    {
+        vkDestroyRenderPass( GfxDeviceGlobal::device, RenderTextureGlobal::renderPassesToReleaseAtExit[ rpIndex ], nullptr );
     }
 }
 
@@ -362,4 +368,6 @@ void ae3d::RenderTexture::CreateRenderPass()
 
     VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &renderPass );
     AE3D_CHECK_VULKAN( err, "RenderTexture vkCreateRenderPass" );
+
+    RenderTextureGlobal::renderPassesToReleaseAtExit.push_back( renderPass );
 }
