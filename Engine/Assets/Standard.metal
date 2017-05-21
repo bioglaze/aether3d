@@ -133,7 +133,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> specularMap [[texture(3)]],
                                constant StandardUniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
-                               constant float* pointLightBufferCenterAndRadius [[ buffer(7) ]],
+                               constant float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
                                constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
@@ -158,20 +158,18 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
 
         float4 center = pointLightBufferCenterAndRadius[ lightIndex ];
         float radius = center.w;
-        
+
         float3 vecToLightVS = (uniforms._ModelViewMatrix * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
         float3 vecToLightWS = center.xyz - in.positionWS.xyz;
         float3 lightDirVS = normalize( vecToLightVS );
         
         float lightDistance = length( vecToLightWS );
-        //outColor.rgb = lightDistance < radius ? -dot( lightDirVS, normalize( in.normalVS ) ) : 0.25;
-        outColor.rgb += dot( lightDirVS, normalize( in.normalVS ) );
-        //outColor.rgb = lightDistance < radius ? 1 : 0.25;
-        //outColor.rgb = float3(1, 0, 0 );
+        outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
+        //outColor.rgb += -dot( lightDirVS, normalize( in.normalVS ) );
+        //outColor.rgb += lightDistance < radius ? 1 : 0.25;
     }
     
-    /*
-     const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
+     /*const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 
     if (numLights == 0)
     {
@@ -179,7 +177,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     }
     else if (numLights == 1)
     {
-        //outColor = float4( 0, 1, 0, 1 );
+        outColor = float4( 0, 1, 0, 1 );
     }
     else if (numLights == 2)
     {

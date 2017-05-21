@@ -89,8 +89,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     Matrix44::Invert( projection, uniforms.invProjection );
 
     uniforms.viewMatrix = view;
-    uniforms.windowWidth = depthNormalTarget.GetWidth() * 2; // * 2 because of retina resolution
-    uniforms.windowHeight = depthNormalTarget.GetHeight() * 2;
+    uniforms.windowWidth = depthNormalTarget.GetWidth();
+    uniforms.windowHeight = depthNormalTarget.GetHeight();
     unsigned activeSpotLights = 0;
     uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
