@@ -243,7 +243,7 @@ int gTouchCount;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
     cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
-    std::string stats = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
+    std::string stats = ae3d::System::Statistics::GetStatistics();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
 }
 
@@ -280,17 +280,28 @@ int gTouchCount;
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     // Updates input object's touch locations.
+    const bool moveForwardOrBackward = gTouchCount > 1;
+    
     for (UITouch* touch in touches)
     {
         // Just testing camera movement
+        if (moveForwardOrBackward)
+        {
+            const CGPoint touchLocation = [touch locationInView:touch.view];
+            
+            float deltaY = touchLocation.y - touchBeginY;
+            
+            camera3d.GetComponent<ae3d::TransformComponent>()->MoveForward( deltaY / 40 );
+        }
+        else
         {
             const CGPoint touchLocation = [touch locationInView:touch.view];
 
             float deltaX = touchLocation.x - touchBeginX;
             float deltaY = touchLocation.y - touchBeginY;
             
-            camera3d.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 0, 1, 0 ), deltaX / 40 );
-            camera3d.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 1, 0, 0 ), deltaY / 40 );
+            camera3d.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 0, 1, 0 ), -deltaX / 40 );
+            camera3d.GetComponent<ae3d::TransformComponent>()->OffsetRotate( ae3d::Vec3( 1, 0, 0 ), -deltaY / 40 );
         }
         
         // Finds the correct touch and updates its location.

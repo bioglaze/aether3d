@@ -23,5 +23,26 @@ void CreateGoCommand::Undo()
     ae3d::System::Assert( sceneWidget->GetScene() != nullptr, "Create game object undo needs scene" );
     ae3d::System::Assert( createdGo != nullptr, "Create game object undo need game object." );
 
-    //sceneWidget->RemoveGameObject( createdGoIndex );
+    sceneWidget->GetScene()->Remove( createdGo );
+
+    std::vector< std::shared_ptr< ae3d::GameObject > > gameObjectsAfterDelete;
+
+    auto sceneGos = sceneWidget->GetGameObjects();
+
+    for (std::size_t go = 0; go < sceneGos.size(); ++go)
+    {
+        bool wasDeleted = false;
+
+        if (createdGo == sceneGos[ go ].get())
+        {
+            wasDeleted = true;
+        }
+
+        if (!wasDeleted)
+        {
+            gameObjectsAfterDelete.push_back( sceneGos[ go ] );
+        }
+    }
+
+    sceneWidget->SetGameObjects( gameObjectsAfterDelete );
 }

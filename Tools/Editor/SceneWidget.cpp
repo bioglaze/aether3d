@@ -260,7 +260,6 @@ std::vector< CollisionInfo > GetColliders( GameObject& camera, const std::vector
                 std::vector< Vec3 > triangles = meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex );
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
                                                                                    : IntersectRayTriangles( rayOrigin, rayTarget, triangles );
-                System::Print("subMeshDistance: %f\n", subMeshDistance );
             }
 
             outInfo.emplace_back( collisionInfo );
