@@ -44,7 +44,7 @@ void ae3d::LightTiler::Init()
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
 
     uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )
-                                 options:MTLResourceCPUCacheModeDefaultCache];
+                                 options:MTLStorageModeManaged];
     uniformBuffer.label = @"CullerUniforms";
 }
 

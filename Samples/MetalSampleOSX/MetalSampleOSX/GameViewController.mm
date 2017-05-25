@@ -154,7 +154,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -492,13 +492,16 @@ using namespace ae3d;
 {
     [self _update];
     
-    ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
-    ae3d::System::BeginFrame();
-    scene.Render();
-    //scene2.Render();
-    System::DrawLines( lineHandle, lineView, lineProjection );
-    scene.EndRenderMetal();
-    ae3d::System::EndFrame();
+    if (_view.currentRenderPassDescriptor != nil)
+    {
+        ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
+        ae3d::System::BeginFrame();
+        scene.Render();
+        //scene2.Render();
+        //System::DrawLines( lineHandle, lineView, lineProjection );
+        scene.EndRenderMetal();
+        ae3d::System::EndFrame();
+    }
 }
 
 - (void)_reshape
@@ -515,8 +518,8 @@ using namespace ae3d;
     rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
     //std::string drawCalls = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
-    std::string stats = ae3d::System::Statistics::GetStatistics();
-    text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
+    //std::string stats = ae3d::System::Statistics::GetStatistics();
+    //text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
     
     // Testing vertex buffer growing
     if (angle == 5)

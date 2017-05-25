@@ -19,7 +19,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexFormat = VertexFormat::PTC;
         vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                                                  length:sizeof( VertexPTC ) * vertexCount
-                                                options:MTLResourceOptionCPUCacheModeDefault];
+                                                options:MTLResourceCPUCacheModeDefaultCache];
         vertexBuffer.label = @"Vertex buffer PTC";
 
         std::vector< float > positions( vertexCount * 3 );
@@ -33,7 +33,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         positionBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                            length:3 * 4 * vertexCount
-                          options:MTLResourceOptionCPUCacheModeDefault];
+                          options:MTLResourceCPUCacheModeDefaultCache];
         positionBuffer.label = @"Position buffer";
 
         std::vector< float > texcoords( vertexCount * 2 );
@@ -46,7 +46,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:texcoords.data()
                              length:2 * 4 * vertexCount
-                            options:MTLResourceOptionCPUCacheModeDefault];
+                            options:MTLResourceCPUCacheModeDefaultCache];
         texcoordBuffer.label = @"Texcoord buffer";
 
         std::vector< float > colors( vertexCount * 4 );
@@ -61,7 +61,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
                              length:4 * 4 * vertexCount
-                            options:MTLResourceOptionCPUCacheModeDefault];
+                            options:MTLResourceCPUCacheModeDefaultCache];
         colorBuffer.label = @"Color buffer";
 
         std::vector< float > normals( vertexCount * 3 );
@@ -73,7 +73,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
                           length:3 * 4 * vertexCount
-                         options:MTLResourceOptionCPUCacheModeDefault];
+                         options:MTLResourceCPUCacheModeDefaultCache];
         normalBuffer.label = @"Normal buffer";
         
         std::vector< float > tangents( vertexCount * 4 );
@@ -85,12 +85,12 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
                             length:4 * 4 * vertexCount
-                           options:MTLResourceOptionCPUCacheModeDefault];
+                           options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
 
         indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                            length:sizeof( Face ) * faceCount
-                          options:MTLResourceOptionCPUCacheModeDefault];
+                          options:MTLResourceCPUCacheModeDefaultCache];
         indexBuffer.label = @"Index buffer";
 
         elementCount = faceCount * 3;
@@ -104,7 +104,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexFormat = VertexFormat::PTN;
         vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                            length:sizeof( VertexPTN ) * vertexCount
-                          options:MTLResourceOptionCPUCacheModeDefault];
+                          options:MTLResourceCPUCacheModeDefaultCache];
         vertexBuffer.label = @"Vertex buffer PTN";
 
         std::vector< float > positions( vertexCount * 3 );
@@ -118,7 +118,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         positionBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                              length:3 * 4 * vertexCount
-                            options:MTLResourceOptionCPUCacheModeDefault];
+                            options:MTLResourceCPUCacheModeDefaultCache];
         positionBuffer.label = @"Position buffer";
         
         std::vector< float > texcoords( vertexCount * 2 );
@@ -131,7 +131,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:texcoords.data()
                              length:2 * 4 * vertexCount
-                            options:MTLResourceOptionCPUCacheModeDefault];
+                            options:MTLResourceCPUCacheModeDefaultCache];
         texcoordBuffer.label = @"Texcoord buffer";
         
         std::vector< float > normals( vertexCount * 3 );
@@ -145,7 +145,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:normals.data()
                           length:3 * 4 * vertexCount
-                         options:MTLResourceOptionCPUCacheModeDefault];
+                         options:MTLResourceCPUCacheModeDefaultCache];
         normalBuffer.label = @"Normal buffer";
 
         std::vector< float > colors( vertexCount * 4 );
@@ -157,7 +157,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
                           length:4 * 4 * vertexCount
-                         options:MTLResourceOptionCPUCacheModeDefault];
+                         options:MTLResourceCPUCacheModeDefaultCache];
         colorBuffer.label = @"Color buffer";
         
         std::vector< float > tangents( vertexCount * 4 );
@@ -169,12 +169,12 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
                             length:4 * 4 * vertexCount
-                           options:MTLResourceOptionCPUCacheModeDefault];
+                           options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
 
         indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                           length:sizeof( Face ) * faceCount
-                         options:MTLResourceOptionCPUCacheModeDefault];
+                         options:MTLResourceCPUCacheModeDefaultCache];
         indexBuffer.label = @"Index buffer";
         
         elementCount = faceCount * 3;
@@ -188,7 +188,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         vertexFormat = VertexFormat::PTNTC;
         vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                            length:sizeof( VertexPTNTC ) * vertexCount
-                          options:MTLResourceOptionCPUCacheModeDefault];
+                          options:MTLResourceCPUCacheModeDefaultCache];
         vertexBuffer.label = @"Vertex buffer PTNTC";
 
         std::vector< float > positions( vertexCount * 3 );
@@ -202,7 +202,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         positionBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                              length:3 * 4 * vertexCount
-                            options:MTLResourceOptionCPUCacheModeDefault];
+                            options:MTLResourceCPUCacheModeDefaultCache];
         positionBuffer.label = @"Position buffer";
         
         std::vector< float > texcoords( vertexCount * 2 );
@@ -215,7 +215,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:texcoords.data()
                              length:2 * 4 * vertexCount
-                            options:MTLResourceOptionCPUCacheModeDefault];
+                            options:MTLResourceCPUCacheModeDefaultCache];
         texcoordBuffer.label = @"Texcoord buffer";
         
         std::vector< float > normals( vertexCount * 3 );
@@ -229,7 +229,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:normals.data()
                            length:3 * 4 * vertexCount
-                          options:MTLResourceOptionCPUCacheModeDefault];
+                          options:MTLResourceCPUCacheModeDefaultCache];
         normalBuffer.label = @"Normal buffer";
 
         std::vector< float > colors( vertexCount * 4 );
@@ -244,7 +244,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
                           length:4 * 4 * vertexCount
-                         options:MTLResourceOptionCPUCacheModeDefault];
+                         options:MTLResourceCPUCacheModeDefaultCache];
         colorBuffer.label = @"Color buffer";
 
         std::vector< float > tangents( vertexCount * 4 );
@@ -259,12 +259,12 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         
         tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
                           length:4 * 4 * vertexCount
-                         options:MTLResourceOptionCPUCacheModeDefault];
+                         options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
 
         indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                           length:sizeof( Face ) * faceCount
-                         options:MTLResourceOptionCPUCacheModeDefault];
+                         options:MTLResourceCPUCacheModeDefaultCache];
         indexBuffer.label = @"Index buffer";
         
         elementCount = faceCount * 3;

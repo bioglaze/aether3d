@@ -163,10 +163,20 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         float3 vecToLightWS = center.xyz - in.positionWS.xyz;
         float3 lightDirVS = normalize( vecToLightVS );
         
+        float dotNL = clamp( dot( normalize( in.normalVS ), lightDirVS ), 0.0, 1.0 );
         float lightDistance = length( vecToLightWS );
-        outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
+        float falloff = 1;
+        
+        if (lightDistance < radius)
+        {
+            float x = lightDistance / radius;
+            falloff = -0.05 + 1.05 / (1.0 + 20.0 * x * x);
+            outColor.rgb += max( 0.0, dotNL );// * falloff;
+        }
+        
+        //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
         //outColor.rgb += -dot( lightDirVS, normalize( in.normalVS ) );
-        //outColor.rgb += lightDistance < radius ? 1 : 0.25;
+        outColor.rgb += lightDistance < radius ? 1 : 0.25;
     }
     
      /*const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
