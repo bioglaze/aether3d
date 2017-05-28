@@ -27,6 +27,7 @@
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
@@ -244,6 +245,45 @@ int main()
 #endif
     pointLight.GetComponent<PointLightComponent>()->SetRadius( 100 );
     pointLight.AddComponent<TransformComponent>();
+    pointLight.GetComponent< TransformComponent >()->SetLocalPosition( { -20, 10, -80 } );
+    
+#ifdef TEST_SHADOWS_POINT
+    GameObject cube1;
+    cube1.AddComponent< MeshRendererComponent >();
+    cube1.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    cube1.AddComponent< TransformComponent >();
+    cube1.GetComponent< TransformComponent >()->SetLocalPosition( { -20, 7, -80 } );
+    cube1.GetComponent< TransformComponent >()->SetLocalScale( 5 );
+    
+    GameObject cube2;
+    cube2.AddComponent< MeshRendererComponent >();
+    cube2.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    cube2.AddComponent< TransformComponent >();
+    cube2.GetComponent< TransformComponent >()->SetLocalPosition( { -30, 17, -80 } );
+    cube2.GetComponent< TransformComponent >()->SetLocalScale( 5 );
+
+    GameObject cube3;
+    cube3.AddComponent< MeshRendererComponent >();
+    cube3.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    cube3.AddComponent< TransformComponent >();
+    cube3.GetComponent< TransformComponent >()->SetLocalPosition( { -30, 7, -70 } );
+    cube3.GetComponent< TransformComponent >()->SetLocalScale( 5 );
+
+    GameObject cube4;
+    cube4.AddComponent< MeshRendererComponent >();
+    cube4.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    cube4.AddComponent< TransformComponent >();
+    cube4.GetComponent< TransformComponent >()->SetLocalPosition( { -30, 7, -70 } );
+    cube4.GetComponent< TransformComponent >()->SetLocalScale( 5 );
+
+    GameObject smallCube1;
+    smallCube1.AddComponent< MeshRendererComponent >();
+    smallCube1.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    smallCube1.AddComponent< TransformComponent >();
+    smallCube1.GetComponent< TransformComponent >()->SetLocalPosition( { -25, 2, -80 } );
+    smallCube1.GetComponent< TransformComponent >()->SetLocalScale( 1 );
+
+#endif
 
     Scene scene;
     
@@ -366,7 +406,18 @@ int main()
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
     scene.Add( &lightParent );
-
+#ifdef TEST_SHADOWS_POINT
+    cube1.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    cube3.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    cube4.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    smallCube1.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    scene.Add( &cube1 );
+    scene.Add( &cube2 );
+    scene.Add( &cube3 );
+    scene.Add( &cube4 );
+    scene.Add( &smallCube1 );
+#endif
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
 #endif

@@ -19,7 +19,7 @@ void WindowMenu::Init( QWidget* mainWindow )
     fileMenu = menuBar->addMenu( "&File" );
     fileMenu->addAction( "Save Scene", mainWindow, SLOT(SaveScene()), QKeySequence("Ctrl+S"));
     fileMenu->addAction( "Open Scene", mainWindow, SLOT(LoadScene()), QKeySequence("Ctrl+O"));
-    fileMenu->addAction( "About", mainWindow, SLOT(ShowAbout()), QKeySequence("Ctrl+A"));
+    fileMenu->addAction( "About", mainWindow, SLOT(ShowAbout()) );
     //fileMenu->addAction( "Exit", mainWindow, SLOT(ShowAbout()), QKeySequence("Ctrl+Q"));
 
     //fileMenu->addSeparator();

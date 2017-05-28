@@ -135,7 +135,7 @@ void MainWindow::closeEvent( QCloseEvent *event )
 {
     if (commandManager.HasUnsavedChanges())
     {
-        switch( QMessageBox::information( this, "Qt Application Example",
+        switch( QMessageBox::information( this, "Aether3D Editor",
                                               "The document has been changed since "
                                               "the last save.",
                                               "Save Now", "Cancel", "Leave Anyway",
