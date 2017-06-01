@@ -6,8 +6,6 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
-#include <iostream>
-#include <vector>
 #include "System.hpp"
 
 unsigned MyMax( unsigned a, unsigned b )
@@ -96,6 +94,12 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         return LoadResult::FileNotFound;
     }
 
+    if (fileContents.data.size() < sizeof( header ) )
+    {
+        ae3d::System::Print( "DDS loader error: Texture %s file length is less than DDS header length.\n", fileContents.path.c_str() );
+        return LoadResult::FileNotFound;
+    }
+    
     std::memcpy( &header, fileContents.data.data(), sizeof( header ) );
 
     assert( header.sHeader.dwMagic == DDS_MAGIC );
@@ -104,7 +108,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     if (!(header.sHeader.dwFlags & DDSD_PIXELFORMAT) ||
         !(header.sHeader.dwFlags & DDSD_CAPS) )
     {
-        std::cerr << "Error! Texture " << fileContents.path << " doesn't have pixelformat or caps." << std::endl;
+        ae3d::System::Print( "DDS loader error: Texture %s doesn't contain pixelformat or caps.\n", fileContents.path.c_str() );
         outWidth    = 32;
         outHeight   = 32;
         outOpaque = true;
@@ -170,7 +174,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else
     {
-        std::cerr << "Error! Texture " << fileContents.path << " has unknown pixel format." << std::endl;
+        ae3d::System::Print("DDS loader error: Texture %s has unknown pixelformat.\n", fileContents.path.c_str() );
         outWidth    = 32;
         outHeight   = 32;
         outOpaque = true;
@@ -201,7 +205,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
         if (data.empty())
         {
-            std::cerr << "Error loading texture " << fileContents.path << std::endl;
+            ae3d::System::Print("DDS loader error: Texture %s contents are empty.\n", fileContents.path.c_str() );
             outWidth    = 32;
             outHeight   = 32;
             outOpaque = true;

@@ -69,6 +69,7 @@ using namespace ae3d;
     GameObject standardCubeTL;
     GameObject standardCubeTL2;
     GameObject standardCubeTopCenter;
+    GameObject standardCubeSpotReceiver;
     GameObject standardCubeBR;
     GameObject standardCubeTR;
     GameObject spriteContainer;
@@ -292,6 +293,12 @@ using namespace ae3d;
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     //standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
 
+    standardCubeSpotReceiver.AddComponent<ae3d::MeshRendererComponent>();
+    standardCubeSpotReceiver.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCubeSpotReceiver.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCubeSpotReceiver.AddComponent<ae3d::TransformComponent>();
+    standardCubeSpotReceiver.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
+
     standardCubeTR.AddComponent<ae3d::MeshRendererComponent>();
     standardCubeTR.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     standardCubeTR.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
@@ -310,6 +317,7 @@ using namespace ae3d;
     //scene.Add( &standardCubeTR );
     //scene.Add( &standardCubeTL2 );
     scene.Add( &standardCubeTopCenter );
+    scene.Add( &standardCubeSpotReceiver );
     //scene.Add( &standardCubeTL );
 #endif
 
@@ -532,6 +540,9 @@ using namespace ae3d;
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9.8f, 0, -85 ) );
     
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
+    standardCubeSpotReceiver.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -90 ) );
+    
+    spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { -8, 2, -90 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
