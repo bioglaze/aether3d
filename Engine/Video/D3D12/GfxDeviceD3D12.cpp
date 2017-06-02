@@ -25,6 +25,9 @@
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
 
+// Keep in sync with ShaderD3D12
+#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 2)
+
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
@@ -687,7 +690,7 @@ void CreateConstantBuffers()
         buf.MipLevels = 1;
         buf.SampleDesc.Count = 1;
         buf.SampleDesc.Quality = 0;
-        buf.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+        buf.Width = AE3D_CB_SIZE;
 
         ID3D12Resource* constantBuffer;
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
@@ -934,7 +937,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = GfxDeviceGlobal::constantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT; // must be a multiple of 256
+    cbvDesc.SizeInBytes = AE3D_CB_SIZE;
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
 
     cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );

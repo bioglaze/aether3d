@@ -144,7 +144,7 @@ void ae3d::LightTiler::Init()
         bufferProp.MipLevels = 1;
         bufferProp.SampleDesc.Count = 1;
         bufferProp.SampleDesc.Quality = 0;
-        bufferProp.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;// sizeof( CullerUniforms );
+        bufferProp.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 2;
 
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
             &uploadProp,

@@ -12,6 +12,8 @@
 #include "RenderTexture.hpp"
 #include "Macros.hpp"
 
+#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 2)
+
 extern ae3d::FileWatcher fileWatcher;
 
 namespace GfxDeviceGlobal
@@ -159,7 +161,7 @@ void ae3d::Shader::ReflectVariables()
             AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
             uniformLocations[ std::string( descVar.Name ) ].i = descVar.StartOffset;
-            ae3d::System::Assert( descVar.StartOffset + descVar.Size < D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, "too big constant buffer" );
+            ae3d::System::Assert( descVar.StartOffset + descVar.Size < AE3D_CB_SIZE, "too big constant buffer" );
         }
     }
 }
@@ -178,7 +180,7 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, matrix4x4, 64 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, matrix4x4, 64 );
     }
 }
 
@@ -244,7 +246,7 @@ void ae3d::Shader::SetInt( const char* name, int value )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, &value, 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, &value, 4 );
     }
 }
 
@@ -256,7 +258,7 @@ void ae3d::Shader::SetFloat( const char* name, float value )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, &value, 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, &value, 4 );
     }
 }
 
@@ -268,7 +270,7 @@ void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, vec3, 3 * 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, vec3, 3 * 4 );
     }
 }
 
@@ -280,6 +282,6 @@ void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT, vec4, 4 * 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, vec4, 4 * 4 );
     }
 }
