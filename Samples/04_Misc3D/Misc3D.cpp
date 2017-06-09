@@ -398,10 +398,10 @@ int main()
     scene.Add( &standardCubeTopCenter );
 #endif
 
-    //scene.SetSkybox( &skybox );
+    scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
-    //scene.Add( &statsContainer );
+    scene.Add( &camera2d );
+    scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
@@ -426,7 +426,7 @@ int main()
     //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
     
-    //scene.Add( &pointLight );
+    scene.Add( &pointLight );
     //scene.Add( &dirLight );
 #ifdef TEST_SHADOWS_SPOT
     scene.Add( &spotLight );

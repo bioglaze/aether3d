@@ -32,10 +32,13 @@ namespace ae3d
 #if RENDERER_D3D12
         ID3D12Resource* GetPointLightCenterAndRadiusBuffer() const { return pointLightCenterAndRadiusBuffer; }
 #endif
+        int GetPointLightCount() const { return activePointLights; }
+        int GetSpotLightCount() const { return 0; }
+        unsigned GetMaxNumLightsPerTile() const;
+
     private:
         unsigned GetNumTilesX() const;
         unsigned GetNumTilesY() const;
-        unsigned GetMaxNumLightsPerTile() const;
 
 #if RENDERER_METAL
         id< MTLBuffer > uniformBuffer;

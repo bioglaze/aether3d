@@ -31,7 +31,7 @@ void ae3d::LightTiler::DestroyBuffers()
     AE3D_SAFE_RELEASE( uniformBuffer );
 }
 
-struct CullerUniforms
+/*struct CullerUniforms
 {
     Matrix44 invProjection;
     Matrix44 viewMatrix;
@@ -39,6 +39,20 @@ struct CullerUniforms
     unsigned windowHeight;
     unsigned numLights;
     int maxNumLightsPerTile;
+};*/
+
+struct CullerUniforms
+{
+    Matrix44 projection;
+    Matrix44 invProjection;
+    Vec3 cameraPos;
+    float alphaTest;
+    unsigned numLights;
+    unsigned windowWidth;
+    unsigned windowHeight;
+    unsigned maxNumLightsPerTile;
+    Vec4 linearDepthConstant;
+    Matrix44 viewMatrix;
 };
 
 void ae3d::LightTiler::Init()
@@ -126,7 +140,6 @@ void ae3d::LightTiler::Init()
         }
 
         pointLightCenterAndRadiusBuffer->SetName( L"LightTiler point light buffer" );
-        // TODO: Add to be destroyed on exit
     }
 
     // Uniform buffer
@@ -166,16 +179,11 @@ void ae3d::LightTiler::Init()
 
         uniformBuffer->SetName( L"LightTiler uniform buffer" );
 
-        auto handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-
         hr = uniformBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&mappedUniformBuffer) );
         if (FAILED( hr ))
         {
             ae3d::System::Print( "Unable to map light tiler constant buffer!" );
         }
-
-
-        // TODO: Add to be destroyed on exit
     }
 }
 
@@ -185,7 +193,7 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& po
 
     if (bufferIndex < MaxLights)
     {
-        activePointLights = MathUtil::Max( bufferIndex, activePointLights ) + 1;
+        activePointLights = MathUtil::Max( bufferIndex + 1, activePointLights );
         pointLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
     }
 }

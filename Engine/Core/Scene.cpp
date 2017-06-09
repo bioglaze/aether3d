@@ -356,6 +356,9 @@ void ae3d::Scene::Render()
 #if RENDERER_VULKAN
     GfxDevice::BeginRenderPassAndCommandBuffer();
 #endif
+#if RENDERER_D3D12
+    RenderDepthAndNormalsForAllCameras( cameras );
+#endif
 
     for (auto camera : cameras)
     {
@@ -519,7 +522,9 @@ void ae3d::Scene::Render()
     GfxDevice::EndRenderPassAndCommandBuffer();
 #endif
 
+#if !RENDERER_D3D12
     RenderDepthAndNormalsForAllCameras( cameras );
+#endif
 
 #if RENDERER_METAL
     GfxDevice::BeginBackBufferEncoding();

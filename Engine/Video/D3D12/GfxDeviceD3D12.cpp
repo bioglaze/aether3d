@@ -959,6 +959,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         srvDesc.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
         srvDesc.Buffer.StructureByteStride = 0;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
+
+        unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
+        unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
+        unsigned numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
+        shader.SetInt( "windowWidth", GfxDeviceGlobal::backBufferWidth );
+        shader.SetInt( "windowHeight", GfxDeviceGlobal::backBufferHeight );
+        shader.SetInt( "numLights", numLights );
+        shader.SetInt( "maxNumLightsPerTile", GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile() );
     }
     else
     {
