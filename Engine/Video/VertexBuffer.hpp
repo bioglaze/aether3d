@@ -161,8 +161,8 @@ namespace ae3d
         void UploadVB( void* faces, void* vertices, unsigned ibSize );
         // Index buffer is stored in the vertex buffer after vertex data.
         ID3D12Resource* vb = nullptr;
-        D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-        D3D12_INDEX_BUFFER_VIEW indexBufferView;
+        D3D12_VERTEX_BUFFER_VIEW vertexBufferView = {};
+        D3D12_INDEX_BUFFER_VIEW indexBufferView = {};
         long ibOffset = 0;
         int sizeBytes = 0;
 #endif

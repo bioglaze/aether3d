@@ -27,8 +27,8 @@
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_SPOT
-#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+//#define TEST_SHADOWS_POINT
+#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
                       
@@ -398,10 +398,10 @@ int main()
     scene.Add( &standardCubeTopCenter );
 #endif
 
-    scene.SetSkybox( &skybox );
+    //scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
-    scene.Add( &statsContainer );
+    //scene.Add( &camera2d );
+    //scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
@@ -422,8 +422,8 @@ int main()
     scene.Add( &cubePTN );
 #endif
     scene.Add( &cubePTN );
-    scene.Add( &childCube );
-    scene.Add( &copiedCube );
+    //scene.Add( &childCube );
+    //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
     
     //scene.Add( &pointLight );
@@ -435,7 +435,7 @@ int main()
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
 #endif
-    scene.Add( &transCube1 );
+    //scene.Add( &transCube1 );
 
     const int cubeCount = 10;
     GameObject cubes[ cubeCount ];

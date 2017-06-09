@@ -101,9 +101,9 @@ namespace ae3d
         /// \param vec4 Vec4 contents.
         void SetVector4( const char* name, const float* vec4 );
 
-#if RENDERER_NULL
-        bool IsValid() const { return true; }
-#endif
+        /// \return Vertex shader path.
+        const std::string& GetVertexShaderPath() const { return vertexPath; }
+
 #if RENDERER_D3D12
         bool IsValid() const { return blobShaderVertex != nullptr; }
         ID3DBlob* blobShaderVertex = nullptr;

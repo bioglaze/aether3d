@@ -15,6 +15,8 @@ namespace GfxDeviceGlobal
     extern int backBufferWidth;
     extern int backBufferHeight;
     extern ID3D12Device* device;
+    extern ID3D12Resource* uav1;
+    extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
 }
 
 namespace MathUtil
@@ -48,18 +50,16 @@ void ae3d::LightTiler::Init()
         const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
         const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
-        D3D12_HEAP_PROPERTIES uploadProp = {};
-        uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
-        uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        uploadProp.CreationNodeMask = 1;
-        uploadProp.VisibleNodeMask = 1;
+        D3D12_HEAP_PROPERTIES heapProp = {};
+        heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+        heapProp.CreationNodeMask = 1;
+        heapProp.VisibleNodeMask = 1;
 
         D3D12_RESOURCE_DESC bufferProp = {};
         bufferProp.Alignment = 0;
         bufferProp.DepthOrArraySize = 1;
         bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-        bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
+        bufferProp.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
         bufferProp.Format = DXGI_FORMAT_UNKNOWN;
         bufferProp.Height = 1;
         bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
@@ -69,10 +69,10 @@ void ae3d::LightTiler::Init()
         bufferProp.Width = maxNumLightsPerTile * numTiles * sizeof( unsigned );
 
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-            &uploadProp,
+            &heapProp,
             D3D12_HEAP_FLAG_NONE,
             &bufferProp,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
+            D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
             nullptr,
             IID_PPV_ARGS( &perTileLightIndexBuffer ) );
         if (FAILED( hr ))
@@ -82,7 +82,12 @@ void ae3d::LightTiler::Init()
         }
 
         perTileLightIndexBuffer->SetName( L"LightTiler light index buffer" );
-        // TODO: Add to be destroyed on exit
+        GfxDeviceGlobal::uav1 = perTileLightIndexBuffer;
+        GfxDeviceGlobal::uav1Desc.Format = DXGI_FORMAT_UNKNOWN;
+        GfxDeviceGlobal::uav1Desc.Buffer.NumElements = maxNumLightsPerTile * numTiles;
+        GfxDeviceGlobal::uav1Desc.Buffer.StructureByteStride = 4;
+        GfxDeviceGlobal::uav1Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+        GfxDeviceGlobal::uav1Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
     }
 
     // Point light buffer

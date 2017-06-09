@@ -15,6 +15,7 @@ namespace GfxDeviceGlobal
     extern ID3D12RootSignature* rootSignatureTileCuller;
     extern ID3D12PipelineState* lightTilerPSO;
     extern ID3D12DescriptorHeap* computeCbvSrvUavHeap;
+    extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
 }
 
 namespace Global
@@ -73,7 +74,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     D3D12_CONSTANT_BUFFER_VIEW_DESC uavDesc = {};
     uavDesc.BufferLocation = uavBuffers[ 0 ]->GetGPUVirtualAddress();
     uavDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
-    GfxDeviceGlobal::device->CreateConstantBufferView( &uavDesc, handle );
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 0 ], nullptr, &GfxDeviceGlobal::uav1Desc, handle );
 
     GpuResource depthNormals = {};
     depthNormals.resource = textureBuffers[ 1 ];

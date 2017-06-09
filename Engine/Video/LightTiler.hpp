@@ -29,6 +29,9 @@ namespace ae3d
         /// Destroys graphics API objects.
         void DestroyBuffers();
 
+#if RENDERER_D3D12
+        ID3D12Resource* GetPointLightCenterAndRadiusBuffer() const { return pointLightCenterAndRadiusBuffer; }
+#endif
     private:
         unsigned GetNumTilesX() const;
         unsigned GetNumTilesY() const;

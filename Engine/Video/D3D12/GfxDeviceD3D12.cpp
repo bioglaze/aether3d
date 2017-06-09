@@ -135,6 +135,8 @@ namespace GfxDeviceGlobal
     std::unordered_map< std::uint64_t, ID3D12PipelineState* > psoCache;
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
+    ID3D12Resource* uav1 = nullptr;
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc = {};
     std::vector< ae3d::VertexBuffer > lineBuffers;
     std::vector< ID3D12Resource* > constantBuffers;
     std::vector< ID3D12Resource* > mappedConstantBuffers;
@@ -351,15 +353,16 @@ void CreateRootSignature()
 {
     // Graphics
     {
-        CD3DX12_DESCRIPTOR_RANGE descRange1[ 2 ];
+        CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
         descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0 );
+        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1 );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
         descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 2, 0 );
 
         CD3DX12_ROOT_PARAMETER rootParam[ 2 ];
-        rootParam[ 0 ].InitAsDescriptorTable( 2, descRange1, D3D12_SHADER_VISIBILITY_ALL );
+        rootParam[ 0 ].InitAsDescriptorTable( 3, descRange1, D3D12_SHADER_VISIBILITY_ALL );
         rootParam[ 1 ].InitAsDescriptorTable( 1, descRange2, D3D12_SHADER_VISIBILITY_PIXEL );
 
         ID3DBlob* pOutBlob = nullptr;
@@ -931,7 +934,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
     }
     
-    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 3) % GfxDeviceGlobal::constantBuffers.size(); // FIXME: * 3 because the descriptor contains 3 entries, is this right?
+    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 4) % GfxDeviceGlobal::constantBuffers.size(); // FIXME: * 4 because the descriptor contains 4 entries, is this right?
 
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
 
@@ -944,7 +947,26 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
 
     cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+
+    if (shader.GetVertexShaderPath().find( "Standard" ) != std::string::npos)
+    {
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srvDesc.Buffer.FirstElement = 0;
+        srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+        srvDesc.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
+        srvDesc.Buffer.StructureByteStride = 0;
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
+    }
+    else
+    {
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+    }
+
+    cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav1, nullptr, &GfxDeviceGlobal::uav1Desc, cpuHandle );
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
         GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
