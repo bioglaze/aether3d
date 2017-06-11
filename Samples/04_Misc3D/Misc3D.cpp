@@ -28,7 +28,7 @@
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
                       
@@ -243,9 +243,9 @@ int main()
 #else
     pointLight.GetComponent<PointLightComponent>()->SetCastShadow( false, 1024 );
 #endif
-    pointLight.GetComponent<PointLightComponent>()->SetRadius( 100 );
+    pointLight.GetComponent<PointLightComponent>()->SetRadius( 1 );
     pointLight.AddComponent<TransformComponent>();
-    pointLight.GetComponent< TransformComponent >()->SetLocalPosition( { -20, 10, -80 } );
+    pointLight.GetComponent<TransformComponent>()->SetLocalPosition( { 2, 0, -98 } );
     
 #ifdef TEST_SHADOWS_POINT
     GameObject cube1;

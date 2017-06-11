@@ -15,8 +15,6 @@ layout (location = 0) out vec3 vTexCoord;
 void main()
 {
     gl_Position = ubo._ModelViewProjectionMatrix * vec4( aPosition.xyz, 1.0 );
-    gl_Position.y = -gl_Position.y;
-    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
     vTexCoord = aPosition;
 }

@@ -231,6 +231,41 @@ void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
     m[ 12 ] = 0; m[ 13 ] = 0; m[ 14 ] = 0; m[ 15 ] = 1;
 }
 
+#if RENDERER_VULKAN
+void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
+{
+    const float f = 1.0f / std::tan( (0.5f * fovDegrees) * M_PI / 180.0f );
+
+    const float proj[] =
+    {
+        f / aspect, 0, 0,  0,
+        0, -f, 0,  0,
+        0, 0, farDepth / (nearDepth - farDepth), -1,
+        0, 0, (nearDepth * farDepth) / (nearDepth - farDepth),  0
+    };
+
+    InitFrom( &proj[ 0 ] );
+}
+
+void Matrix44::MakeProjection( float left, float right, float bottom, float top, float nearDepth, float farDepth )
+{
+    const float tx = -((right + left) / (right - left));
+    const float ty = -((bottom + top) / (bottom - top));
+    const float tz = nearDepth / (nearDepth - farDepth);
+
+    const float proj[] =
+    {
+            2.0f / (right - left), 0.0f, 0.0f, 0.0f,
+            0.0f, 2.0f / (bottom - top), 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f / (nearDepth - farDepth), 0.0f,
+            tx, ty, tz, 1.0f
+    };
+
+    InitFrom( &proj[ 0 ] );
+}
+
+#else
+
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
     const float top = std::tan( fovDegrees * (static_cast< float >( M_PI ) / 360.0f) ) * nearDepth;
@@ -273,6 +308,7 @@ void Matrix44::MakeProjection( float left, float right, float bottom, float top,
 
     InitFrom( ortho );
 }
+#endif
 
 void Matrix44::MakeRotationXYZ( float xDeg, float yDeg, float zDeg )
 {
