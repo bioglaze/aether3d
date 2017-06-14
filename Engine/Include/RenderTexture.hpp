@@ -73,6 +73,7 @@ namespace ae3d
 
         FrameBufferAttachment color;
         FrameBufferAttachment depth;
+        VkFormat colorFormat;
         VkImage image;
         VkImageLayout imageLayout;
         VkDeviceMemory deviceMemory;

@@ -310,7 +310,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -381,7 +381,7 @@ int main()
     standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
         "standard_vertex", "standard_fragment",
         ae3d::FileSystem::FileContents( "Standard_vert.hlsl" ), ae3d::FileSystem::FileContents( "Standard_frag.hlsl" ),
-        ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+        ae3d::FileSystem::FileContents( "unlit_vert.spv" ), ae3d::FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
@@ -398,10 +398,10 @@ int main()
     scene.Add( &standardCubeTopCenter );
 #endif
 
-    scene.SetSkybox( &skybox );
+    //scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
-    scene.Add( &statsContainer );
+    //scene.Add( &camera2d );
+    //scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );

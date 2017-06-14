@@ -84,8 +84,6 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     // Color
 
-    VkFormat colorFormat;
-
     if (dataType == DataType::UByte)
     {
         colorFormat = GfxDeviceGlobal::colorFormat;
@@ -271,8 +269,6 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     dataType = aDataType;
     handle = 1;
 
-    VkFormat colorFormat;
-
     if (dataType == DataType::UByte)
     {
         colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
@@ -316,7 +312,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 void ae3d::RenderTexture::CreateRenderPass()
 {
     VkAttachmentDescription attachments[ 2 ];
-    attachments[ 0 ].format = GfxDeviceGlobal::colorFormat;
+    attachments[ 0 ].format = colorFormat;
     attachments[ 0 ].samples = VK_SAMPLE_COUNT_1_BIT;
     attachments[ 0 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
