@@ -51,6 +51,9 @@ namespace ae3d
 
         /// \return color view.
         VkImageView GetColorView() { return color.view; }
+
+        /// \return render pass.
+        VkRenderPass GetRenderPass() { return renderPass; }
 #endif
 
   private:
@@ -62,7 +65,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         void CreateRenderPass();
 
-        VkFramebuffer frameBuffer;
+        VkFramebuffer frameBuffer = VK_NULL_HANDLE;
 
         struct FrameBufferAttachment
         {

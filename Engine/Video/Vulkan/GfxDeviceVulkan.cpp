@@ -277,7 +277,7 @@ namespace ae3d
     }
 
     void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                    ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, std::uint64_t hash )
+                    ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass, std::uint64_t hash )
     {
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
         inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -386,7 +386,7 @@ namespace ae3d
 
         pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineCreateInfo.layout = GfxDeviceGlobal::pipelineLayout;
-        pipelineCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
+        pipelineCreateInfo.renderPass = renderPass != VK_NULL_HANDLE ? renderPass : GfxDeviceGlobal::renderPass;
         pipelineCreateInfo.pVertexInputState = vertexBuffer.GetInputState();
         pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
         pipelineCreateInfo.pRasterizationState = &rasterizationState;
@@ -1495,8 +1495,7 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     renderPassBeginInfo.renderArea.extent.height = height;
     renderPassBeginInfo.clearValueCount = (std::uint32_t)clearValues.size();
     renderPassBeginInfo.pClearValues = clearValues.data();
-    renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0 != VK_NULL_HANDLE ? GfxDeviceGlobal::frameBuffer0 : 
-                                      GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
+    renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
@@ -1599,11 +1598,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
 
-    const std::uint64_t psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode );
+    const std::uint64_t psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, psoHash );
+        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE, psoHash );
     }
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
@@ -1701,8 +1700,19 @@ void ae3d::GfxDevice::Present()
     submitInfo.pWaitDstStageMask = &pipelineStages;
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
+    
+    if (!GfxDeviceGlobal::renderTexture0 || GfxDeviceGlobal::renderTexture0->GetFrameBuffer() == VK_NULL_HANDLE)
+    {
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
+    }
+    else
+    {
+        VkCommandBuffer buffers[] = { GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] };
+        submitInfo.commandBufferCount = 2;
+        submitInfo.pCommandBuffers = buffers;
+    }
+
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
 
@@ -1802,33 +1812,41 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMap
     GfxDeviceGlobal::currentCmdBuffer = target ? GfxDeviceGlobal::offscreenCmdBuffer : GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
     GfxDeviceGlobal::renderTexture0 = target;
     GfxDeviceGlobal::frameBuffer0 = target ? target->GetFrameBuffer() : VK_NULL_HANDLE;
+}
 
-    if (target)
-    {
-        VkCommandBufferBeginInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+void BeginOffscreen()
+{
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
-        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
-        VkClearValue clearValues[ 2 ];
-        clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
-        clearValues[ 1 ].depthStencil = { 1.0f, 0 };
+    VkClearValue clearValues[ 2 ];
+    clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
+    clearValues[ 1 ].depthStencil = { 1.0f, 0 };
 
-        VkRenderPassBeginInfo renderPassBeginInfo = {};
-        renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassBeginInfo.pNext = nullptr;
-        renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderPass;
-        renderPassBeginInfo.renderArea.offset.x = 0;
-        renderPassBeginInfo.renderArea.offset.y = 0;
-        renderPassBeginInfo.renderArea.extent.width = target->GetWidth();
-        renderPassBeginInfo.renderArea.extent.height = target->GetHeight();
-        renderPassBeginInfo.clearValueCount = 2;
-        renderPassBeginInfo.pClearValues = clearValues;
-        renderPassBeginInfo.framebuffer = target->GetFrameBuffer();
+    VkRenderPassBeginInfo renderPassBeginInfo = {};
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.pNext = nullptr;
+    renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : GfxDeviceGlobal::renderPass;
+    renderPassBeginInfo.renderArea.offset.x = 0;
+    renderPassBeginInfo.renderArea.offset.y = 0;
+    renderPassBeginInfo.renderArea.extent.width = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetWidth() : GfxDeviceGlobal::backBufferWidth;
+    renderPassBeginInfo.renderArea.extent.height = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetHeight() : GfxDeviceGlobal::backBufferHeight;
+    renderPassBeginInfo.clearValueCount = 2;
+    renderPassBeginInfo.pClearValues = clearValues;
+    renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0;
 
-        vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
-    }
+    vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+}
+
+void EndOffscreen()
+{
+    vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
+
+    VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
+    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )

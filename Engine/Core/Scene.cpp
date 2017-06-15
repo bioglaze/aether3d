@@ -34,6 +34,8 @@
 using namespace ae3d;
 extern Renderer renderer;
 float GetVRFov();
+void BeginOffscreen();
+void EndOffscreen();
 
 namespace MathUtil
 {
@@ -353,11 +355,10 @@ void ae3d::Scene::Render()
         }
     }
 
+    RenderDepthAndNormalsForAllCameras( cameras );
+
 #if RENDERER_VULKAN
     GfxDevice::BeginRenderPassAndCommandBuffer();
-#endif
-#if RENDERER_D3D12
-    RenderDepthAndNormalsForAllCameras( cameras );
 #endif
 
     for (auto camera : cameras)
@@ -520,10 +521,6 @@ void ae3d::Scene::Render()
     }
 #if RENDERER_VULKAN
     GfxDevice::EndRenderPassAndCommandBuffer();
-#endif
-
-#if !RENDERER_D3D12
-    RenderDepthAndNormalsForAllCameras( cameras );
 #endif
 
 #if RENDERER_METAL
@@ -727,12 +724,16 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
                                          int cubeMapFace, const Frustum& frustum )
 {
-    GfxDevice::SetViewport( camera->GetViewport() );
 #if RENDERER_METAL
+    GfxDevice::SetViewport( camera->GetViewport() );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
 #else
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
+#if RENDERER_VULKAN
+    BeginOffscreen();
+#endif
+    GfxDevice::SetViewport( camera->GetViewport() );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
 #endif
     GfxDevice::PushGroupMarker( "DepthNormal" );
@@ -760,6 +761,9 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
     GfxDevice::UnsetRenderTarget();
 #else
     GfxDevice::SetRenderTarget( nullptr, 0 );
+#endif
+#if RENDERER_VULKAN
+    EndOffscreen();
 #endif
     GfxDevice::ErrorCheck( "depthnormals render end" );
 }

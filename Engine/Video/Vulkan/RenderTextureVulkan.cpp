@@ -17,7 +17,6 @@ namespace GfxDeviceGlobal
 {
     extern VkDevice device;
     extern VkCommandBuffer setupCmdBuffer;
-    extern VkRenderPass renderPass;
     extern VkFormat colorFormat;
     extern VkFormat depthFormat;
 }
@@ -131,7 +130,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     VkResult err = vkCreateImage( GfxDeviceGlobal::device, &colorImage, nullptr, &color.image );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image" );
     RenderTextureGlobal::imagesToReleaseAtExit.push_back( color.image );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
 
     VkMemoryRequirements memReqs;
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, color.image, &memReqs );
@@ -161,7 +160,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageView, nullptr, &color.view );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image view" );
     RenderTextureGlobal::imageViewsToReleaseAtExit.push_back( color.view );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture 2d color view" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture 2d color view" );
 
     // Depth/Stencil
 
@@ -318,8 +317,8 @@ void ae3d::RenderTexture::CreateRenderPass()
     attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[ 0 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[ 0 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[ 0 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    attachments[ 0 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    attachments[ 0 ].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[ 0 ].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     attachments[ 0 ].flags = 0;
 
     attachments[ 1 ].format = GfxDeviceGlobal::depthFormat;
@@ -328,7 +327,7 @@ void ae3d::RenderTexture::CreateRenderPass()
     attachments[ 1 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[ 1 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[ 1 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[ 1 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    attachments[ 1 ].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     attachments[ 1 ].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     attachments[ 1 ].flags = 0;
 

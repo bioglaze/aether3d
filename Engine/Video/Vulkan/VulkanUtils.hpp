@@ -10,7 +10,7 @@ namespace ae3d
         VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount );
 
     std::uint64_t GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-        ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode );
+        ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass );
 
     void CreateInstance( VkInstance* outInstance );
 }
