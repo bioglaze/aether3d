@@ -43,8 +43,13 @@ void ae3d::LightTiler::Init()
                   options:MTLResourceStorageModePrivate];
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
 
+#if !TARGET_OS_IPHONE
     uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )
                                  options:MTLStorageModeManaged];
+#else
+    uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )
+                       options:MTLStorageModeShared];    
+#endif
     uniformBuffer.label = @"CullerUniforms";
 }
 

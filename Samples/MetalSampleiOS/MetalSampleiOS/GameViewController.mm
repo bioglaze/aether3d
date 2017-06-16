@@ -41,6 +41,7 @@ int gTouchCount;
     ae3d::GameObject rtCamera;
     ae3d::GameObject cube;
     ae3d::GameObject cubeFloor;
+    ae3d::GameObject standardCube;
     ae3d::GameObject text;
     ae3d::GameObject dirLight;
     ae3d::GameObject pointLight;
@@ -51,7 +52,9 @@ int gTouchCount;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
     ae3d::Material cubeMaterial;
+    ae3d::Material standardMaterial;
     ae3d::Shader shader;
+    ae3d::Shader standardShader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
     std::vector< ae3d::GameObject > sponzaGameObjects;
@@ -98,7 +101,7 @@ int gTouchCount;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
-    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width, self.view.bounds.size.height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthNormals" );
+    camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthNormals" );
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.SetName( "camera3d" );
     camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
@@ -123,6 +126,13 @@ int gTouchCount;
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     
+    standardShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+                        "standard_vertex", "standard_fragment",
+                        ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+                        ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ));
+    standardMaterial.SetShader( &standardShader );
+    standardMaterial.SetTexture( "textureMap", &gliderTex );
+
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
     cubeMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
@@ -137,6 +147,13 @@ int gTouchCount;
     cube.SetName( "cube" );
     scene.Add( &cube );
 
+    standardCube.AddComponent<ae3d::MeshRendererComponent>();
+    standardCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCube.AddComponent<ae3d::TransformComponent>();
+    standardCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 3, 0, -85 ) );
+    scene.Add( &standardCube );
+    
     cubeFloor.AddComponent<ae3d::MeshRendererComponent>();
     cubeFloor.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     cubeFloor.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
@@ -172,10 +189,11 @@ int gTouchCount;
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( false, 1024 );
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 1.2f );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
     pointLight.SetName( "pointLight" );
-    //scene.Add( &pointLight );
+    scene.Add( &pointLight );
 
     spotLight.AddComponent<ae3d::SpotLightComponent>();
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
@@ -183,10 +201,13 @@ int gTouchCount;
     spotLight.AddComponent<ae3d::TransformComponent>();
     spotLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
     spotLight.SetName( "spotLight" );
-    //scene.Add( &pointLight );
+    //scene.Add( &spotLight );
+    
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9.8f, 0, -85 ) );
+    standardCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( ae3d::FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     

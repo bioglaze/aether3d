@@ -42,13 +42,17 @@
 
 void cocoaProcessEvents();
 
+static const NSUInteger kMaxBuffersInFlight = 3;
+
 using namespace ae3d;
 
 @implementation GameViewController
 {
     MTKView* _view;
     id <MTLDevice> device;
-
+    id <MTLCommandQueue> commandQueue;
+    dispatch_semaphore_t inFlightSemaphore;
+    
     GameObject camera2d;
     GameObject camera3d;
     GameObject rotatingCube;
@@ -460,6 +464,9 @@ using namespace ae3d;
     lines[ 2 ] = Vec3( 50, 50, -0.5f );
     lines[ 3 ] = Vec3( 10, 10, -0.5f );
     lineHandle = System::CreateLineBuffer( lines, Vec3( 1, 0, 0 ) );
+    
+    commandQueue = [device newCommandQueue];
+    inFlightSemaphore = dispatch_semaphore_create( kMaxBuffersInFlight );
 }
 
 - (void)_setupView
@@ -495,6 +502,30 @@ using namespace ae3d;
 {
     return YES;
 }
+
+#if 0
+- (void)_render
+{
+    //dispatch_semaphore_wait( inFlightSemaphore, DISPATCH_TIME_FOREVER );
+
+    //id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+
+    //__block dispatch_semaphore_t block_sema = inFlightSemaphore;
+    /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+     {
+         dispatch_semaphore_signal(block_sema);
+     }];*/
+
+    if (_view.currentRenderPassDescriptor != nil)
+    {
+        //id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:_view.currentRenderPassDescriptor];
+        //[renderEncoder endEncoding];
+        //[commandBuffer presentDrawable:_view.currentDrawable];
+        //[commandBuffer commit];
+
+    }
+}
+#endif
 
 - (void)_render
 {
