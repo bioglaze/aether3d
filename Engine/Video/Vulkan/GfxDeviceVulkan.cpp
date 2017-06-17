@@ -117,6 +117,7 @@ namespace GfxDeviceGlobal
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int backBufferWidth;
     int backBufferHeight;
+    bool didUseOffscreenPassOnThisFrame = false;
 }
 
 namespace ae3d
@@ -1701,7 +1702,7 @@ void ae3d::GfxDevice::Present()
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
     
-    if (!GfxDeviceGlobal::renderTexture0 || GfxDeviceGlobal::renderTexture0->GetFrameBuffer() == VK_NULL_HANDLE)
+    if (!GfxDeviceGlobal::didUseOffscreenPassOnThisFrame)
     {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
@@ -1711,6 +1712,7 @@ void ae3d::GfxDevice::Present()
         VkCommandBuffer buffers[] = { GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] };
         submitInfo.commandBufferCount = 2;
         submitInfo.pCommandBuffers = buffers;
+        GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = false;
     }
 
     submitInfo.signalSemaphoreCount = 1;
@@ -1839,6 +1841,8 @@ void BeginOffscreen()
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0;
 
     vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+
+    GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = GfxDeviceGlobal::renderTexture0 != nullptr;
 }
 
 void EndOffscreen()

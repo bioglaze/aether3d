@@ -16,7 +16,6 @@ namespace GfxDeviceGlobal
 {
     extern VkDevice device;
     extern VkImageView view0;
-    extern ae3d::RenderTexture* renderTexture0;
     extern VkSampler sampler0;
 }
 

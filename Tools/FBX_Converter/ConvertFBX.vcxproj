@@ -58,7 +58,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2017.1\include";..\..\Engine\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_NULL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_OPENGL</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -74,7 +74,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2017.1\include";..\..\Engine\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_NULL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_OPENGL</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>

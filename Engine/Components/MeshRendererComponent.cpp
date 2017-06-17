@@ -121,6 +121,16 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
         GfxDevice::BlendMode blendMode = GfxDevice::BlendMode::Off;
 
+        if (materials[ subMeshIndex ]->GetBlendingMode() != Material::BlendingMode::Off && renderType == RenderType::Opaque)
+        {
+            continue;
+        }
+
+        if (materials[ subMeshIndex ]->GetBlendingMode() == Material::BlendingMode::Off && renderType == RenderType::Transparent)
+        {
+            continue;
+        }
+
         if (overrideShader)
         {
             shader->Use();
@@ -129,16 +139,6 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         }
         else
         {
-            if (materials[ subMeshIndex ]->GetBlendingMode() != Material::BlendingMode::Off && renderType == RenderType::Opaque)
-            {
-                continue;
-            }
-
-            if (materials[ subMeshIndex ]->GetBlendingMode() == Material::BlendingMode::Off && renderType == RenderType::Transparent)
-            {
-                continue;
-            }
-
             Matrix44 shadowTexProjMatrix = localToWorld;
             
             Matrix44::Multiply( shadowTexProjMatrix, shadowView, shadowTexProjMatrix );
