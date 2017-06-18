@@ -1461,8 +1461,8 @@ void ae3d::GfxDevice::PopGroupMarker()
 
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
 {
-    VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
-    AE3D_CHECK_VULKAN( res, "vkDeviceWaitIdle" );
+    //VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
+    //AE3D_CHECK_VULKAN( res, "vkDeviceWaitIdle" );
 
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1525,8 +1525,8 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
 
-    VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
-    AE3D_CHECK_VULKAN( res, "vkDeviceWaitIdle" );
+    //VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
+    //AE3D_CHECK_VULKAN( res, "vkDeviceWaitIdle" );
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
@@ -1587,7 +1587,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
     System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::drawCmdBuffers.size(), "invalid draw buffer index" );
-    System::Assert( GfxDeviceGlobal::pipelineLayout != VK_NULL_HANDLE, "invalid pipelineLayout" );
 
     if (GfxDeviceGlobal::view0 == VK_NULL_HANDLE || GfxDeviceGlobal::sampler0 == VK_NULL_HANDLE)
     {
@@ -1596,6 +1595,12 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     if (shader.GetVertexInfo().module == VK_NULL_HANDLE || shader.GetFragmentInfo().module == VK_NULL_HANDLE)
     {
+        return;
+    }
+
+    if (Statistics::GetDrawCalls() >= GfxDeviceGlobal::descriptorSets.size())
+    {
+        System::Print( "Skipping draw because draw call count %d exceeds descriptor set count %ld \n", Statistics::GetDrawCalls(), GfxDeviceGlobal::descriptorSets.size() );
         return;
     }
 

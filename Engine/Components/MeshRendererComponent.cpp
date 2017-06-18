@@ -135,7 +135,10 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         {
             shader->Use();
             shader->SetMatrix( "_ModelViewProjectionMatrix", &modelViewProjection.m[ 0 ] );
+#ifndef RENDERER_VULKAN
+            // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
             shader->SetMatrix( "_ModelViewMatrix", &modelView.m[ 0 ] );
+#endif
         }
         else
         {
@@ -147,7 +150,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
 #endif
 #ifndef RENDERER_VULKAN
-            // Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
+            // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
             materials[ subMeshIndex ]->SetMatrix( "_ModelMatrix", localToWorld );
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewMatrix", modelView );
