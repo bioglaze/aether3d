@@ -1,5 +1,4 @@
 #include "VertexBuffer.hpp"
-#include <string>
 #include <vector>
 #include <GL/glxw.h>
 #include "GfxDevice.hpp"

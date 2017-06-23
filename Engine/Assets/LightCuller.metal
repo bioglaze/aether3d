@@ -130,7 +130,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     float minZ = FLT_MAX;
     float maxZ = 0.0f;
 
-    float depth = -depthNormalsTexture.read( globalIdx.xy ).x;
+    float depth = depthNormalsTexture.read( globalIdx.xy ).x;
 
     uint z = as_type< uint >( depth );
 
@@ -145,8 +145,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     uint zMin = atomic_load_explicit( &ldsZMin, memory_order::memory_order_relaxed );
     uint zMax = atomic_load_explicit( &ldsZMax, memory_order::memory_order_relaxed );
-    minZ = as_type< float >( zMin );
-    maxZ = as_type< float >( zMax );
+    minZ = as_type< float >( zMax );
+    maxZ = as_type< float >( zMin );
 
     // loop over the point lights and do a sphere vs. frustum intersection test
     uint numPointLights = uniforms.numLights & 0xFFFFu;
@@ -162,9 +162,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             center.xyz = (uniforms.viewMatrix * float4( center.xyz, 1.0f ) ).xyz;
 
             // test if sphere is intersecting or inside frustum
-            if (-center.z - minZ < radius && center.z - maxZ < radius)
-            // should be like this:
-            //if (-center.z + minZ < radius && center.z - maxZ < radius)
+            if (-center.z + minZ < radius && center.z - maxZ < radius)
             {
                 if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&

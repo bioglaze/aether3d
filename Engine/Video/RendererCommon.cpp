@@ -1,9 +1,9 @@
 #include "Renderer.hpp"
+#include <vector>
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
 #include "GfxDevice.hpp"
 #include "Matrix.hpp"
-#include <vector>
 #include "Vec3.hpp"
 #include "VertexBuffer.hpp"
 

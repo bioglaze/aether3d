@@ -1,10 +1,10 @@
-#include <GL/glxw.h>
+#include "TextureCube.hpp"
 #include <vector>
+#include <GL/glxw.h>
 #define STBI_NO_PSD
 #define STBI_NO_PIC
 #define STBI_NO_HDR
 #include "stb_image.c"
-#include "TextureCube.hpp"
 #include "DDSLoader.hpp"
 #include "GfxDevice.hpp"
 #include "FileSystem.hpp"

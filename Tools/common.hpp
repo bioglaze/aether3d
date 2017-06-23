@@ -160,7 +160,6 @@ struct Mesh
 
     // Used to calculate tangent-space handedness.
     std::vector< ae3d::Vec3 > bitangents;  // For faces.
-    std::vector< ae3d::Vec3 > vbitangents; // For vertices.
 
     ae3d::Vec3 aabbMax;
     ae3d::Vec3 aabbMin;
@@ -718,7 +717,7 @@ void Mesh::SolveVertexTangents()
         interleavedVertices[ v ].tangent = ae3d::Vec4( 0, 0, 0, 0 );
     }
 
-    vbitangents.resize( interleavedVertices.size() );
+    std::vector< ae3d::Vec3 > vbitangents( interleavedVertices.size() );
 
     for (std::size_t vertInd = 0; vertInd < interleavedVertices.size(); ++vertInd)
     {

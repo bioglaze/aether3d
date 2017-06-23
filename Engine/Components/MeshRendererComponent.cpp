@@ -117,10 +117,6 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             continue;
         }
         
-        Shader* shader = overrideShader ? overrideShader : materials[ subMeshIndex ]->GetShader();
-        GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
-        GfxDevice::BlendMode blendMode = GfxDevice::BlendMode::Off;
-
         if (materials[ subMeshIndex ]->GetBlendingMode() != Material::BlendingMode::Off && renderType == RenderType::Opaque)
         {
             continue;
@@ -130,6 +126,10 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         {
             continue;
         }
+
+        Shader* shader = overrideShader ? overrideShader : materials[ subMeshIndex ]->GetShader();
+        GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
+        GfxDevice::BlendMode blendMode = GfxDevice::BlendMode::Off;
 
         if (overrideShader)
         {

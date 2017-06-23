@@ -1,8 +1,5 @@
 #include "ComputeShader.hpp"
 #include "FileSystem.hpp"
-#include "GfxDevice.hpp"
-#include "System.hpp"
-#include "Macros.hpp"
 
 // Unimplemented because OpenGL renderer is 4.1. If Apple updates their GL driver to support 4.3 these will get implemented.
 

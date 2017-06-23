@@ -2,7 +2,6 @@
 #include <locale>
 #include <vector>
 #include <sstream>
-#include <cmath>
 #include "Matrix.hpp"
 #include "System.hpp"
 

@@ -130,7 +130,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -159,7 +159,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -557,8 +557,8 @@ using namespace ae3d;
     rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
     //std::string drawCalls = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
-    //std::string stats = ae3d::System::Statistics::GetStatistics();
-    //text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
+    std::string stats = ae3d::System::Statistics::GetStatistics();
+    text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
     
     // Testing vertex buffer growing
     if (angle == 5)

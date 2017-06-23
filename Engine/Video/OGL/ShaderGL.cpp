@@ -1,6 +1,6 @@
 #include "Shader.hpp"
-#include <GL/glxw.h>
 #include <vector>
+#include <GL/glxw.h>
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
 #include "GfxDevice.hpp"

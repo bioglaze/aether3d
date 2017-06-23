@@ -2,7 +2,6 @@
 #define QUATERNION_H
 
 #include <cmath>
-#include <cassert>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 
