@@ -56,7 +56,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         moduleCreateInfo.pNext = nullptr;
         moduleCreateInfo.codeSize = vertexData.data.size();
-        moduleCreateInfo.pCode = (std::uint32_t*)vertexData.data.data();
+        moduleCreateInfo.pCode = (const std::uint32_t*)vertexData.data.data();
         moduleCreateInfo.flags = 0;
 
         VkShaderModule shaderModule;
@@ -82,7 +82,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         moduleCreateInfo.pNext = nullptr;
         moduleCreateInfo.codeSize = fragmentData.data.size();
-        moduleCreateInfo.pCode = (std::uint32_t*)fragmentData.data.data();
+        moduleCreateInfo.pCode = (const std::uint32_t*)fragmentData.data.data();
         moduleCreateInfo.flags = 0;
 
         VkShaderModule shaderModule;

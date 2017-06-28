@@ -267,9 +267,4 @@
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Video\OGL\WindowOSX_GL.mm">
-      <Filter>Video</Filter>
-    </None>
-  </ItemGroup>
 </Project>

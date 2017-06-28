@@ -131,12 +131,13 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             else if (wParam == SC_RESTORE)
             {
             }
+            break;
         case WM_LBUTTONDOWN:
         case WM_LBUTTONUP:
         {
             WindowGlobal::IncEventIndex();
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = message == WM_LBUTTONDOWN ? ae3d::WindowEventType::Mouse1Down : ae3d::WindowEventType::Mouse1Up;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = message == WM_LBUTTONDOWN ? ae3d::WindowEventType::Mouse1Down : ae3d::WindowEventType::Mouse1Up;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
         }
             break;
@@ -144,8 +145,8 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_RBUTTONUP:
         {
             WindowGlobal::IncEventIndex();
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = message == WM_RBUTTONDOWN ? ae3d::WindowEventType::Mouse2Down : ae3d::WindowEventType::Mouse2Up;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].mouseX = LOWORD(lParam);
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = message == WM_RBUTTONDOWN ? ae3d::WindowEventType::Mouse2Down : ae3d::WindowEventType::Mouse2Up;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
         }
             break;

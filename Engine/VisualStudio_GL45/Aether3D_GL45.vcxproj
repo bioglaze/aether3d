@@ -221,9 +221,6 @@
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Video\OGL\WindowOSX_GL.mm" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

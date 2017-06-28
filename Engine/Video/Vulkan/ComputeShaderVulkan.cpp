@@ -20,7 +20,7 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     moduleCreateInfo.pNext = nullptr;
     moduleCreateInfo.codeSize = dataSPIRV.data.size();
-    moduleCreateInfo.pCode = (std::uint32_t*)dataSPIRV.data.data();
+    moduleCreateInfo.pCode = (const std::uint32_t*)dataSPIRV.data.data();
     moduleCreateInfo.flags = 0;
 
     VkShaderModule shaderModule;

@@ -1598,7 +1598,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
 
-    if (Statistics::GetDrawCalls() >= GfxDeviceGlobal::descriptorSets.size())
+    if (Statistics::GetDrawCalls() >= (int)GfxDeviceGlobal::descriptorSets.size())
     {
         System::Print( "Skipping draw because draw call count %d exceeds descriptor set count %ld \n", Statistics::GetDrawCalls(), GfxDeviceGlobal::descriptorSets.size() );
         return;
@@ -1707,6 +1707,8 @@ void ae3d::GfxDevice::Present()
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
     
+    VkCommandBuffer buffers[] = { GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] };
+
     if (!GfxDeviceGlobal::didUseOffscreenPassOnThisFrame)
     {
         submitInfo.commandBufferCount = 1;
@@ -1714,7 +1716,6 @@ void ae3d::GfxDevice::Present()
     }
     else
     {
-        VkCommandBuffer buffers[] = { GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] };
         submitInfo.commandBufferCount = 2;
         submitInfo.pCommandBuffers = buffers;
         GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = false;
