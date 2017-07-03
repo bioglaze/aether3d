@@ -440,7 +440,7 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
 
             const FbxAnimStack* currAnimStack = scene->GetSrcObject< FbxAnimStack >( 0 );
             const FbxString animStackName = currAnimStack->GetName();
-            const std::string animationName = animStackName.Buffer();
+            //const std::string animationName = animStackName.Buffer();
             //std::cout << "animation name: " << animationName << std::endl;
             const FbxTakeInfo* takeInfo = scene->GetTakeInfo( animStackName );
             const FbxTime start = takeInfo->mLocalTimeSpan.GetStart();

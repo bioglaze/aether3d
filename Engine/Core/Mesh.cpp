@@ -397,6 +397,11 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
                 is.read( (char*)&animLength, sizeof( int ) );
                 subMesh.joints[ j ].animTransforms.resize( animLength );
                 is.read( (char*)subMesh.joints[ j ].animTransforms.data(), subMesh.joints[ j ].animTransforms.size() * sizeof( ae3d::Matrix44 ) );
+                for (int i = 0; i < animLength; ++i)
+                {
+                    auto& m = subMesh.joints[ j ].animTransforms[ i ].m;
+                    System::Print( "joint %d frame %d, matrix %f %f %f %f\n", j, i, m[0], m[ 1 ], m[ 2 ], m[ 3 ] );
+                }
             }
         }
         

@@ -184,6 +184,18 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     }
 }
 
+void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, int count )
+{
+    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
+
+    const int offset = uniformLocations[ name ].i;
+
+    if (offset != -1)
+    {
+        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, matrix4x4s, 64 * count );
+    }
+}
+
 void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
 {
     if (textureUnit == 0)

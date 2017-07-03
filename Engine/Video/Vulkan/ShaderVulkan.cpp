@@ -123,6 +123,12 @@ void ae3d::Shader::SetMatrix( const char* /*name*/, const float* matrix4x4 )
     std::memcpy( &GfxDevice::GetCurrentUbo()[ 0 ], &matrix4x4[0], sizeof( Matrix44 ) );
 }
 
+void ae3d::Shader::SetMatrixArray( const char* /*name*/, const float* matrix4x4s, int count )
+{
+    System::Assert( GfxDevice::GetCurrentUbo() != nullptr, "null ubo" );
+    std::memcpy( &GfxDevice::GetCurrentUbo()[ 0 ], &matrix4x4s[ 0 ], sizeof( Matrix44 ) * count );
+}
+
 void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int /*textureUnit*/ )
 {
     if (texture)

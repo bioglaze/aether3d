@@ -47,6 +47,10 @@ unsigned ae3d::VertexBuffer::GetStride() const
     {
         return sizeof( VertexPTNTC );
     }
+    else if (vertexFormat == VertexFormat::PTNTC_Skinned)
+    {
+        return sizeof( VertexPTNTC_Skinned );
+    }
     else
     {
         System::Assert( false, "unhandled vertex format!" );
@@ -178,6 +182,17 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
     const int ibSize = elementCount * 2;
     ibOffset = sizeof( VertexPTNTC ) * vertexCount;
+
+    UploadVB( (void*)faces, (void*)vertices, ibSize );
+}
+
+void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC_Skinned* vertices, int vertexCount )
+{
+    vertexFormat = VertexFormat::PTNTC;
+    elementCount = faceCount * 3;
+
+    const int ibSize = elementCount * 2;
+    ibOffset = sizeof( VertexPTNTC_Skinned ) * vertexCount;
 
     UploadVB( (void*)faces, (void*)vertices, ibSize );
 }

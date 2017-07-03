@@ -161,7 +161,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             if (!subMeshes[ subMeshIndex ].joints.empty())
             {
                 std::vector< Matrix44 > bones( subMeshes[ subMeshIndex ].joints.size() );
-                
+
                 // FIXME: testing animation, remove this code
                 static size_t a = 0;
                 ++a;
@@ -179,8 +179,8 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
                                            bones[ j ] );
                     }
                 }
-                
-                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
+
+                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices[0]", &bones[ 0 ].m[ 0 ], (int)bones.size() );
             }
 
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())

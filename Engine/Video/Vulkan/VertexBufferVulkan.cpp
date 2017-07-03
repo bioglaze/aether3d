@@ -296,6 +296,52 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
         attributeDescriptions[ 4 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
         attributeDescriptions[ 4 ].offset = sizeof( float ) * 12;
     }
+    else if (vertexFormat == VertexFormat::PTNTC_Skinned)
+    {
+        attributeDescriptions.resize( 5 );
+
+        // Location 0 : Position
+        attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 0 ].location = posChannel;
+        attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[ 0 ].offset = 0;
+
+        // Location 1 : TexCoord
+        attributeDescriptions[ 1 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 1 ].location = uvChannel;
+        attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[ 1 ].offset = sizeof( float ) * 3;
+
+        // Location 2 : Normal
+        attributeDescriptions[ 2 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 2 ].location = normalChannel;
+        attributeDescriptions[ 2 ].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[ 2 ].offset = sizeof( float ) * 5;
+
+        // Location 3 : Tangent
+        attributeDescriptions[ 3 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 3 ].location = tangentChannel;
+        attributeDescriptions[ 3 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[ 3 ].offset = sizeof( float ) * 8;
+
+        // Location 4 : Color
+        attributeDescriptions[ 4 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 4 ].location = colorChannel;
+        attributeDescriptions[ 4 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[ 4 ].offset = sizeof( float ) * 12;
+
+        // Location 5 : Bones
+        attributeDescriptions[ 5 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 5 ].location = boneChannel;
+        attributeDescriptions[ 5 ].format = VK_FORMAT_R32G32B32A32_UINT;
+        attributeDescriptions[ 5 ].offset = sizeof( float ) * 16;
+
+        // Location 5 : Weights
+        attributeDescriptions[ 6 ].binding = VERTEX_BUFFER_BIND_ID;
+        attributeDescriptions[ 6 ].location = weightChannel;
+        attributeDescriptions[ 6 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[ 6 ].offset = sizeof( float ) * 20;
+    }
     else
     {
         System::Assert( false, "unhandled vertex format" );
@@ -354,4 +400,11 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
     GenerateVertexBuffer( static_cast< const void*>( vertices ), vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), static_cast< const void*>( faces ), elementCount * 2 );
+}
+
+void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC_Skinned* vertices, int vertexCount )
+{
+    vertexFormat = VertexFormat::PTNTC;
+    elementCount = faceCount * 3;
+    GenerateVertexBuffer( static_cast< const void*>( vertices ), vertexCount * sizeof( VertexPTNTC_Skinned ), sizeof( VertexPTNTC_Skinned ), static_cast< const void*>( faces ), elementCount * 2 );
 }

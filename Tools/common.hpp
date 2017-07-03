@@ -1106,13 +1106,13 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         {
             ofs.write( (char*)&gMeshes[ m ].joints[ j ].globalBindposeInverse, sizeof( ae3d::Matrix44 ) );
             ofs.write( (char*)&gMeshes[ m ].joints[ j ].parentIndex, 4 );
-            int nameLength = gMeshes[ m ].joints[ j ].name.length();
-            ofs.write( (char*)&nameLength, sizeof( int ) );
-            ofs.write(reinterpret_cast<char*>((char*)gMeshes[m].joints[ j ].name.data()),
-                      nameLength);
-            int animLength = gMeshes[ m ].joints[ j ].animTransforms.size();
+            const int jointNameLength = (int)gMeshes[ m ].joints[ j ].name.length();
+            ofs.write( (char*)&jointNameLength, sizeof( int ) );
+            ofs.write( reinterpret_cast<char*>((char*)gMeshes[m].joints[ j ].name.data()),
+                jointNameLength );
+            const int animLength = (int)gMeshes[ m ].joints[ j ].animTransforms.size();
             ofs.write( (char*)&animLength, sizeof( int ) );
-            ofs.write( (char*)&gMeshes[ m ].joints[ j ].animTransforms, gMeshes[ m ].joints[ j ].animTransforms.size() * sizeof( ae3d::Matrix44 ) );
+            ofs.write( (char*)&gMeshes[ m ].joints[ j ].animTransforms[ 0 ].m[ 0 ], gMeshes[ m ].joints[ j ].animTransforms.size() * sizeof( ae3d::Matrix44 ) );
         }
     }
 
