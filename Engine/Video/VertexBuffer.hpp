@@ -20,7 +20,7 @@ namespace ae3d
     class VertexBuffer
     {
     public:
-        enum class VertexFormat { PTC, PTN, PTNTC };
+        enum class VertexFormat { PTC, PTN, PTNTC, PTNTC_Skinned };
 
         /// Triangle of 3 vertices.
         struct Face
@@ -62,6 +62,17 @@ namespace ae3d
             Vec4 color;
         };
 
+        struct VertexPTNTC_Skinned
+        {
+            Vec3 position;
+            float u, v;
+            Vec3 normal;
+            Vec4 tangent;
+            Vec4 color;
+            ae3d::Vec4 weights;
+            int bones[ 4 ];
+        };
+        
         /// Vertex with position, texcoord and normal.
         struct VertexPTN
         {
@@ -122,6 +133,13 @@ namespace ae3d
         /// \param vertexCount Vertex count.
         void Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount );
 
+        /// Generates the buffer from supplied geometry.
+        /// \param faces Faces.
+        /// \param faceCount Face count.
+        /// \param vertices Vertices.
+        /// \param vertexCount Vertex count.
+        void Generate( const Face* faces, int faceCount, const VertexPTNTC_Skinned* vertices, int vertexCount );
+
         /// Sets a graphics API debug name for the buffer, visible in debugging tools. Must be called after Generate().
         /// \param name Name
         void SetDebugName( const char* name );
@@ -135,6 +153,8 @@ namespace ae3d
         id<MTLBuffer> colorBuffer;
         id<MTLBuffer> normalBuffer;
         id<MTLBuffer> tangentBuffer;
+        id<MTLBuffer> boneBuffer;
+        id<MTLBuffer> weightBuffer;
 #endif
         
 #endif
@@ -154,7 +174,9 @@ namespace ae3d
         static const int colorChannel = 2;
         static const int normalChannel = 3;
         static const int tangentChannel = 4;
-        
+        static const int boneChannel = 5;
+        static const int weightChannel = 6;
+
     private:
 
 #if RENDERER_D3D12

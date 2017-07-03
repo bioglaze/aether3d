@@ -6,6 +6,7 @@
 #include <string>
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
+#include "Matrix.hpp"
 #include "VertexBuffer.hpp"
 #include "SubMesh.hpp"
 #include "System.hpp"
@@ -332,6 +333,16 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             
             is.read( (char*)&subMesh.verticesPTN[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTN ) );
         }
+        else if (vertexFormat == 2) // PTNTC_Skinned
+        {
+            try { subMesh.verticesPTNTC_Skinned.resize( vertexCount ); }
+            catch (std::bad_alloc&)
+            {
+                return LoadResult::OutOfMemory;
+            }
+            
+            is.read( (char*)&subMesh.verticesPTNTC_Skinned[ 0 ].position.x, vertexCount * sizeof( VertexBuffer::VertexPTNTC_Skinned ) );
+        }
         else
         {
             System::Print( "Mesh %s submesh %s has invalid vertex format %d. Only 0 and 1 are valid!\n", meshData.path.c_str(), subMesh.name.c_str(), vertexFormat );
@@ -357,11 +368,38 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         {
             subMesh.vertexBuffer.Generate( subMesh.indices.data(), static_cast< int >( subMesh.indices.size() ), subMesh.verticesPTN.data(), static_cast< int >( subMesh.verticesPTN.size() ) );
         }
+        else if (vertexFormat == 2)
+        {
+            subMesh.vertexBuffer.Generate( subMesh.indices.data(), static_cast< int >( subMesh.indices.size() ), subMesh.verticesPTNTC_Skinned.data(), static_cast< int >( subMesh.verticesPTNTC_Skinned.size() ) );
+        }
         else
         {
             ae3d::System::Assert( false, "unhandled vertex format" );
         }
 
+        if (vertexFormat == 2)
+        {
+            uint16_t jointCount;
+            is.read( (char*)&jointCount, sizeof( jointCount ) );
+
+            subMesh.joints.resize( jointCount );
+            
+            for (size_t j = 0; j < subMesh.joints.size(); ++j)
+            {
+                is.read( (char*)&subMesh.joints[ j ].globalBindposeInverse, sizeof( ae3d::Matrix44 ) );
+                is.read( (char*)&subMesh.joints[ j ].parentIndex, 4 );
+                int jointNameLength;
+                is.read( (char*)&jointNameLength, sizeof( int ) );
+                std::vector< char > jointName( jointNameLength + 1 );
+                is.read( (char*)&jointName[ 0 ], jointNameLength );
+                subMesh.joints[ j ].name = std::string( jointName.data(), jointName.size() - 1 );
+                int animLength;
+                is.read( (char*)&animLength, sizeof( int ) );
+                subMesh.joints[ j ].animTransforms.resize( animLength );
+                is.read( (char*)subMesh.joints[ j ].animTransforms.data(), subMesh.joints[ j ].animTransforms.size() * sizeof( ae3d::Matrix44 ) );
+            }
+        }
+        
         std::string subMeshDebugName = meshData.path + std::string( ":" ) + subMesh.name;
         subMesh.vertexBuffer.SetDebugName( subMeshDebugName.c_str() );
     }

@@ -431,6 +431,48 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
             vertexDesc.layouts[0].stride = sizeof( ae3d::VertexBuffer::VertexPTNTC );
             vertexDesc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
         }
+        else if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTNTC_Skinned)
+        {
+            pipelineStateDescriptor.label = @"pipeline PTNTC_Skinned";
+            
+            // Position
+            vertexDesc.attributes[0].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[0].bufferIndex = 0;
+            vertexDesc.attributes[0].offset = 0;
+            
+            // Texcoord
+            vertexDesc.attributes[1].format = MTLVertexFormatFloat2;
+            vertexDesc.attributes[1].bufferIndex = 0;
+            vertexDesc.attributes[1].offset = 4 * 3;
+            
+            // Normal
+            vertexDesc.attributes[3].format = MTLVertexFormatFloat3;
+            vertexDesc.attributes[3].bufferIndex = 0;
+            vertexDesc.attributes[3].offset = 4 * 5;
+            
+            // Tangent
+            vertexDesc.attributes[4].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[4].bufferIndex = 0;
+            vertexDesc.attributes[4].offset = 4 * 8;
+            
+            // Color
+            vertexDesc.attributes[2].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[2].bufferIndex = 0;
+            vertexDesc.attributes[2].offset = 4 * 12;
+            
+            // Weights
+            vertexDesc.attributes[ ae3d::VertexBuffer::weightChannel ].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[ ae3d::VertexBuffer::weightChannel ].bufferIndex = 0;
+            vertexDesc.attributes[ ae3d::VertexBuffer::weightChannel ].offset = 4 * 16;
+
+            // Bones
+            vertexDesc.attributes[ ae3d::VertexBuffer::boneChannel ].format = MTLVertexFormatInt4;
+            vertexDesc.attributes[ ae3d::VertexBuffer::boneChannel ].bufferIndex = 0;
+            vertexDesc.attributes[ ae3d::VertexBuffer::boneChannel ].offset = 4 * 20;
+
+            vertexDesc.layouts[0].stride = sizeof( ae3d::VertexBuffer::VertexPTNTC_Skinned );
+            vertexDesc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
+        }
         else if (vertexFormat == ae3d::VertexBuffer::VertexFormat::PTN)
         {
             pipelineStateDescriptor.label = @"pipeline PTN";
@@ -656,6 +698,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 1 ] atIndex:1];
     
     if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
+    {
+        // No need to set extra buffers as vertexBuffer contains all attributes.
+        [renderEncoder setVertexBuffer:nil offset:0 atIndex:1];
+    }
+    else if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC_Skinned)
     {
         // No need to set extra buffers as vertexBuffer contains all attributes.
         [renderEncoder setVertexBuffer:nil offset:0 atIndex:1];

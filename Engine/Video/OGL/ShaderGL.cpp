@@ -242,6 +242,14 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     glProgramUniformMatrix4fv( handle, uniformLocations[ name ].i, 1, GL_FALSE, matrix4x4 );
 }
 
+void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, int count )
+{
+#ifdef WARN_ON_MISSING_BINDINGS
+    if (uniformLocations[ name ].i == -1) { System::Print( "Missing uniform matrix binding %s in vertex or fragment shader %s\n", name, fragmentPath.c_str() ); }
+#endif
+    glProgramUniformMatrix4fv( handle, uniformLocations[ name ].i, count, GL_FALSE, matrix4x4s );
+}
+
 void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
 {
     const unsigned texId = texture->GetID();

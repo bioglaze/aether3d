@@ -158,6 +158,31 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
             materials[ subMeshIndex ]->Apply();
 
+            if (!subMeshes[ subMeshIndex ].joints.empty())
+            {
+                std::vector< Matrix44 > bones( subMeshes[ subMeshIndex ].joints.size() );
+                
+                // FIXME: testing animation, remove this code
+                static size_t a = 0;
+                ++a;
+                if (a >= 60)
+                {
+                    a = 0;
+                }
+                
+                for (size_t j = 0; j < bones.size(); ++j)
+                {
+                    if (!subMeshes[ subMeshIndex ].joints[ j ].animTransforms.empty())
+                    {
+                        Matrix44::Multiply( subMeshes[ subMeshIndex ].joints[ j ].globalBindposeInverse,
+                                           subMeshes[ subMeshIndex ].joints[ j ].animTransforms[ a ],
+                                           bones[ j ] );
+                    }
+                }
+                
+                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
+            }
+
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())
             {
                 cullMode = GfxDevice::CullMode::Off;

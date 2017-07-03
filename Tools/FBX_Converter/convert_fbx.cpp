@@ -200,6 +200,11 @@ void ProcessNormal( FbxMesh* mesh, int vertexIndex, int vertexCounter, Vec3& out
 
 void ProcessUV( FbxMesh* mesh, int vertexIndex, int uvChannel, int uvLayer, TexCoord& outUV )
 {
+    if (mesh->GetElementUVCount() == 0)
+    {
+        return;
+    }
+    
     if (uvLayer > 1 || mesh->GetElementUVCount() <= uvLayer)
     {
         assert( !"Invalid reference." );
@@ -369,11 +374,11 @@ void ProcessControlPoints( FbxNode* inNode )
     }
 }
 
-unsigned FindJointIndexUsingName( const Skeleton& skeleton, const std::string& inJointName )
+unsigned FindJointIndexUsingName( const std::vector< Joint >& joints, const std::string& inJointName )
 {
-    for (unsigned int i = 0; i < skeleton.joints.size(); ++i)
+    for (unsigned int i = 0; i < joints.size(); ++i)
     {
-        if (skeleton.joints[ i ].name == inJointName)
+        if (joints[ i ].name == inJointName)
         {
             return i;
         }
@@ -405,8 +410,8 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
         {
             FbxCluster* currCluster = currSkin->GetCluster( clusterIndex );
             const std::string currJointName = currCluster->GetLink()->GetName();
-            const unsigned currJointIndex = FindJointIndexUsingName( gMeshes.back().skeleton, currJointName );
-            std::cout << "cluster index " << clusterIndex << ", currJointIndex " << currJointIndex << ", currJointName " << currJointName << std::endl;
+            const unsigned currJointIndex = FindJointIndexUsingName( gMeshes.back().joints, currJointName );
+            //std::cout << "cluster index " << clusterIndex << ", currJointIndex " << currJointIndex << ", currJointName " << currJointName << std::endl;
             FbxAMatrix transformMatrix;
             FbxAMatrix transformLinkMatrix;
             FbxAMatrix globalBindposeInverseMatrix;
@@ -419,11 +424,9 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
             {
                 for (int i = 0; i < 4; ++i)
                 {
-                    gMeshes.back().skeleton.joints[ currJointIndex ].globalBindposeInverse.m[ j * 4 + i ] = float( globalBindposeInverseMatrix.Get( j, i ) );
+                    gMeshes.back().joints[ currJointIndex ].globalBindposeInverse.m[ j * 4 + i ] = float( globalBindposeInverseMatrix.Get( j, i ) );
                 }
             }
-
-            gMeshes.back().skeleton.joints[ currJointIndex ].node = currCluster->GetLink();
 
             const unsigned numOfIndices = currCluster->GetControlPointIndicesCount();
 
@@ -438,30 +441,30 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
             const FbxAnimStack* currAnimStack = scene->GetSrcObject< FbxAnimStack >( 0 );
             const FbxString animStackName = currAnimStack->GetName();
             const std::string animationName = animStackName.Buffer();
-            std::cout << "animation name: " << animationName << std::endl;
+            //std::cout << "animation name: " << animationName << std::endl;
             const FbxTakeInfo* takeInfo = scene->GetTakeInfo( animStackName );
             const FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
             const FbxTime end = takeInfo->mLocalTimeSpan.GetStop();
             animationLength = end.GetFrameCount( FbxTime::eFrames24 ) - start.GetFrameCount( FbxTime::eFrames24 ) + 1;
-            Keyframe** currAnim = &gMeshes.back().skeleton.joints[ currJointIndex ].animation;
 
+            gMeshes.back().joints[ currJointIndex ].animTransforms.resize( animationLength );
+            
+            int a = 0;
             for (FbxLongLong f = start.GetFrameCount( FbxTime::eFrames24 ); f <= end.GetFrameCount( FbxTime::eFrames24 ); ++f)
             {
                 FbxTime currTime;
                 currTime.SetFrame( f, FbxTime::eFrames24 );
-                *currAnim = new Keyframe();
-                (*currAnim)->frameNum = f;
                 FbxAMatrix currentTransformOffset = inNode->EvaluateGlobalTransform( currTime ) * geometryTransform;
-
+                
                 for (int j = 0; j < 4; ++j)
                 {
                     for (int i = 0; i < 4; ++i)
                     {
-                        (*currAnim)->globalTransform.m[ j * 4 + i ] = float( (currentTransformOffset.Inverse() * currCluster->GetLink()->EvaluateGlobalTransform( currTime )).Get( j, i ) );
+                        gMeshes.back().joints[ currJointIndex ].animTransforms[ a ].m[ j * 4 + i ] = float( (currentTransformOffset.Inverse() * currCluster->GetLink()->EvaluateGlobalTransform( currTime )).Get( j, i ) );
                     }
                 }
-
-                currAnim = &((*currAnim)->next);
+                
+                ++a;
             }
         }
     }
@@ -479,7 +482,21 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
         }
     }
 
-    std::cout << "done" << std::endl;
+    gMeshes.back().weights.resize( controlPoints.size() );
+    gMeshes.back().bones.resize( controlPoints.size() );
+    
+    for (size_t i = 0; i < controlPoints.size(); ++i)
+    {
+        gMeshes.back().weights[ i ].x = controlPoints[ i ]->blendingInfo[ 0 ].blendingWeight;
+        gMeshes.back().weights[ i ].y = controlPoints[ i ]->blendingInfo[ 1 ].blendingWeight;
+        gMeshes.back().weights[ i ].z = controlPoints[ i ]->blendingInfo[ 2 ].blendingWeight;
+        gMeshes.back().weights[ i ].w = controlPoints[ i ]->blendingInfo[ 3 ].blendingWeight;
+        
+        gMeshes.back().bones[ i ].a = controlPoints[ i ]->blendingInfo[ 0 ].blendingIndex;
+        gMeshes.back().bones[ i ].b = controlPoints[ i ]->blendingInfo[ 1 ].blendingIndex;
+        gMeshes.back().bones[ i ].c = controlPoints[ i ]->blendingInfo[ 2 ].blendingIndex;
+        gMeshes.back().bones[ i ].d = controlPoints[ i ]->blendingInfo[ 3 ].blendingIndex;
+    }
 }
 
 void ProcessSkeletonHierarchyRecursively( const FbxNode* inNode, int myIndex, int inParentIndex )
@@ -489,12 +506,12 @@ void ProcessSkeletonHierarchyRecursively( const FbxNode* inNode, int myIndex, in
         Joint currJoint;
         currJoint.parentIndex = inParentIndex;
         currJoint.name = inNode->GetName();
-        gMeshes.back().skeleton.joints.push_back( currJoint );
+        gMeshes.back().joints.push_back( currJoint );
     }
 
-    for (std::size_t childIndex = 0; childIndex < inNode->GetChildCount(); ++childIndex)
+    for (size_t childIndex = 0; childIndex < inNode->GetChildCount(); ++childIndex)
     {
-        ProcessSkeletonHierarchyRecursively( inNode->GetChild( static_cast< int >( childIndex ) ), static_cast< int >( gMeshes.back().skeleton.joints.size() ), myIndex );
+        ProcessSkeletonHierarchyRecursively( inNode->GetChild( static_cast< int >( childIndex ) ), static_cast< int >( gMeshes.back().joints.size() ), myIndex );
     }
 }
 
@@ -545,13 +562,6 @@ void LoadFBX( const std::string& path )
 
     ProcessSkeletonHierarchy( rootNode );
     ProcessJointsAndAnimationsRecursively( rootNode );
-    std::cout << "skeleton: " << std::endl;
-    for (std::size_t i = 0; i < gMeshes.back().skeleton.joints.size(); ++i)
-    {
-        std::cout << "joint " << gMeshes.back().skeleton.joints[ i ].name << ", parent index "  << gMeshes.back().skeleton.joints[ i ].parentIndex << std::endl;
-    }
-
-    std::cout << "end" << std::endl;
 }
 
 int main( int paramCount, char** params )

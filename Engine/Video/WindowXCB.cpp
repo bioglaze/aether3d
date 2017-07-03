@@ -541,8 +541,8 @@ void ae3d::Window::PumpEvents()
                 
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = be->event_x;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - be->event_y;
+                break;
             }
-            break;
             case XCB_KEY_PRESS:
             case XCB_KEY_RELEASE:
             {
@@ -554,6 +554,7 @@ void ae3d::Window::PumpEvents()
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
                 const xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = (WindowGlobal::keyMap.find( keysym ) == WindowGlobal::keyMap.end() ) ? ae3d::KeyCode::N : WindowGlobal::keyMap[ keysym ];
+                break;
             }
             case XCB_MOTION_NOTIFY:
             {

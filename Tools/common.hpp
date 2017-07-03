@@ -67,7 +67,18 @@ struct VertexInd
     unsigned short a, b, c;
 };
 
-enum class VertexFormat { PTNTC, PTN };
+enum class VertexFormat { PTNTC_Skinned, PTNTC, PTN };
+
+struct VertexPTNTC_Skinned
+{
+    ae3d::Vec3 position;
+    TexCoord texCoord;
+    ae3d::Vec3 normal;
+    ae3d::Vec4 tangent;
+    ae3d::Vec4 color;
+    ae3d::Vec4 weights;
+    int bones[ 4 ];
+};
 
 struct VertexPTNTC
 {
@@ -104,25 +115,17 @@ struct VertexPTNTCWithData
     VertexData data;
 };
 
-struct Keyframe
-{
-    ae3d::Matrix44 globalTransform;
-    std::uint64_t frameNum;
-    Keyframe* next = nullptr;
-};
-
 struct Joint
 {
     ae3d::Matrix44 globalBindposeInverse;
-    class FbxNode* node = nullptr;
     int parentIndex = -1;
     std::string name;
-    Keyframe* animation = nullptr;
+    std::vector< ae3d::Matrix44 > animTransforms;
 };
 
-struct Skeleton
+struct BoneIndices
 {
-    std::vector< Joint > joints;
+    int a, b, c, d;
 };
 
 struct Mesh
@@ -134,6 +137,7 @@ struct Mesh
     void SolveVertexNormals();
     void SolveVertexTangents();
     void CopyInterleavedVerticesToPTN();
+    void CopyInterleavedVerticesToPTNTC();
     
     void OptimizeFaces(); // Implements https://tomforsyth1000.github.io/papers/fast_vert_cache_opt.html
     bool ComputeVertexScores();
@@ -154,7 +158,8 @@ struct Mesh
     
     // Separate element arrays combined to one.
     // These are written to the .ae3d file.
-    std::vector< VertexPTNTC > interleavedVertices;
+    std::vector< VertexPTNTC_Skinned > interleavedVertices;
+    std::vector< VertexPTNTC > interleavedVerticesPTNTC;
     std::vector< VertexPTN > interleavedVerticesPTN;
     std::vector< VertexInd > indices;
 
@@ -164,7 +169,9 @@ struct Mesh
     ae3d::Vec3 aabbMax;
     ae3d::Vec3 aabbMin;
 
-    Skeleton skeleton;
+    std::vector< Joint > joints;
+    std::vector< ae3d::Vec4 > weights;
+    std::vector< BoneIndices > bones;
 };
 
 std::vector< Mesh > gMeshes;
@@ -182,11 +189,25 @@ void Mesh::CopyInterleavedVerticesToPTN()
 {
     interleavedVerticesPTN.resize( interleavedVertices.size() );
     
-    for (std::size_t i = 0; i < interleavedVertices.size(); ++i)
+    for (size_t i = 0; i < interleavedVertices.size(); ++i)
     {
         interleavedVerticesPTN[ i ].position = interleavedVertices[ i ].position;
         interleavedVerticesPTN[ i ].texCoord = interleavedVertices[ i ].texCoord;
         interleavedVerticesPTN[ i ].normal = interleavedVertices[ i ].normal;
+    }
+}
+
+void Mesh::CopyInterleavedVerticesToPTNTC()
+{
+    interleavedVerticesPTNTC.resize( interleavedVertices.size() );
+    
+    for (size_t i = 0; i < interleavedVerticesPTNTC.size(); ++i)
+    {
+        interleavedVerticesPTNTC[ i ].position = interleavedVertices[ i ].position;
+        interleavedVerticesPTNTC[ i ].texCoord = interleavedVertices[ i ].texCoord;
+        interleavedVerticesPTNTC[ i ].normal = interleavedVertices[ i ].normal;
+        interleavedVerticesPTNTC[ i ].tangent = interleavedVertices[ i ].tangent;
+        interleavedVerticesPTNTC[ i ].color = interleavedVertices[ i ].color;
     }
 }
 
@@ -788,12 +809,24 @@ void Mesh::Interleave()
 
         if (!found)
         {
-            VertexPTNTC newVertex;
+            VertexPTNTC_Skinned newVertex;
             newVertex.position = tvertex;
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
             newVertex.color    = tcolor;
-
+            
+            if (!weights.empty())
+            {
+                newVertex.weights  = weights[ face[ f ].vInd[ 0 ] ];
+            }
+            if (!bones.empty())
+            {
+                newVertex.bones[ 0 ] = bones[ face[ f ].vInd[ 0 ] ].a;
+                newVertex.bones[ 1 ] = bones[ face[ f ].vInd[ 0 ] ].b;
+                newVertex.bones[ 2 ] = bones[ face[ f ].vInd[ 0 ] ].c;
+                newVertex.bones[ 3 ] = bones[ face[ f ].vInd[ 0 ] ].d;
+            }
+            
             interleavedVertices.push_back( newVertex );
 
             newFace.a = (unsigned short)(interleavedVertices.size() - 1);
@@ -824,12 +857,24 @@ void Mesh::Interleave()
 
         if (!found)
         {
-            VertexPTNTC newVertex;
+            VertexPTNTC_Skinned newVertex;
             newVertex.position = tvertex;
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
             newVertex.color    = tcolor;
-
+            
+            if (!weights.empty())
+            {
+                newVertex.weights  = weights[ face[ f ].vInd[ 1 ] ];
+            }
+            if (!bones.empty())
+            {
+                newVertex.bones[ 0 ] = bones[ face[ f ].vInd[ 1 ] ].a;
+                newVertex.bones[ 1 ] = bones[ face[ f ].vInd[ 1 ] ].b;
+                newVertex.bones[ 2 ] = bones[ face[ f ].vInd[ 1 ] ].c;
+                newVertex.bones[ 3 ] = bones[ face[ f ].vInd[ 1 ] ].d;
+            }
+            
             interleavedVertices.push_back( newVertex );
 
             newFace.b = (unsigned short)(interleavedVertices.size() - 1);
@@ -859,12 +904,24 @@ void Mesh::Interleave()
 
         if (!found)
         {
-            VertexPTNTC newVertex;
+            VertexPTNTC_Skinned newVertex;
             newVertex.position = tvertex;
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
             newVertex.color    = tcolor;
 
+            if (!weights.empty())
+            {
+                newVertex.weights  = weights[ face[ f ].vInd[ 2 ] ];
+            }
+            if (!bones.empty())
+            {
+                newVertex.bones[ 0 ] = bones[ face[ f ].vInd[ 2 ] ].a;
+                newVertex.bones[ 1 ] = bones[ face[ f ].vInd[ 2 ] ].b;
+                newVertex.bones[ 2 ] = bones[ face[ f ].vInd[ 2 ] ].c;
+                newVertex.bones[ 3 ] = bones[ face[ f ].vInd[ 2 ] ].d;
+            }
+            
             interleavedVertices.push_back( newVertex );
 
             newFace.c = (unsigned short)(interleavedVertices.size() - 1);
@@ -1002,12 +1059,21 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         ofs.write( reinterpret_cast< char* >((char*)&nVertices), 2 );
 
         // Writes vertex data.
-        if (vertexFormat == VertexFormat::PTNTC)
+        if (vertexFormat == VertexFormat::PTNTC_Skinned || !gMeshes[ m ].joints.empty())
         {
-            const unsigned char format = 0;
+            const unsigned char format = 2;
             ofs.write( (char*)&format, 1 );
 
-            ofs.write( (char*)&gMeshes[m].interleavedVertices[ 0 ], gMeshes[m].interleavedVertices.size() * sizeof( VertexPTNTC ) );
+            ofs.write( (char*)&gMeshes[ m ].interleavedVertices[ 0 ], gMeshes[ m ].interleavedVertices.size() * sizeof( VertexPTNTC_Skinned ) );
+        }
+        else if (vertexFormat == VertexFormat::PTNTC)
+        {
+            gMeshes[ m ].CopyInterleavedVerticesToPTNTC();
+            
+            const unsigned char format = 0;
+            ofs.write( (char*)&format, 1 );
+            
+            ofs.write( (char*)&gMeshes[ m ].interleavedVerticesPTNTC[ 0 ], gMeshes[ m ].interleavedVerticesPTNTC.size() * sizeof( VertexPTNTC ) );
         }
         else if (vertexFormat == VertexFormat::PTN)
         {
@@ -1016,7 +1082,7 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
             const unsigned char format = 1;
             ofs.write( (char*)&format, 1 );
         
-            ofs.write( (char*)&gMeshes[m].interleavedVerticesPTN[ 0 ], gMeshes[m].interleavedVerticesPTN.size() * sizeof( VertexPTN ) );
+            ofs.write( (char*)&gMeshes[m].interleavedVerticesPTN[ 0 ], gMeshes[ m ].interleavedVerticesPTN.size() * sizeof( VertexPTN ) );
         }
         else
         {
@@ -1025,21 +1091,29 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         }
         
         // Writes # of indices.
-        const unsigned short nIndices = (unsigned short)gMeshes[m].indices.size();
-        ofs.write( reinterpret_cast< char* >((char*)&nIndices), 2 );
+        const unsigned short indexCount = (unsigned short)gMeshes[m].indices.size();
+        ofs.write( reinterpret_cast< char* >((char*)&indexCount), 2 );
 
         // Writes indices.
         ofs.write( (char*)&gMeshes[m].indices[ 0 ], gMeshes[m].indices.size() * sizeof( VertexInd ) );
 
         // Writes # of joints.
-        /*const unsigned short nJoints = (unsigned short)gMeshes[ m ].skeleton.joints.size();
-        ofs.write( reinterpret_cast< char* >((char*)&nJoints), 2 );
+        const unsigned short jointCount = (unsigned short)gMeshes[ m ].joints.size();
+        ofs.write( reinterpret_cast< char* >((char*)&jointCount), 2 );
 
         // Writes joints.
-        if (!gMeshes[ m ].skeleton.joints.empty())
+        for (size_t j = 0; j < gMeshes[ m ].joints.size(); ++j)
         {
-            ofs.write( (char*)&gMeshes[ m ].skeleton.joints[ 0 ], gMeshes[ m ].skeleton.joints.size() * sizeof( Joint ) );
-        }*/
+            ofs.write( (char*)&gMeshes[ m ].joints[ j ].globalBindposeInverse, sizeof( ae3d::Matrix44 ) );
+            ofs.write( (char*)&gMeshes[ m ].joints[ j ].parentIndex, 4 );
+            int nameLength = gMeshes[ m ].joints[ j ].name.length();
+            ofs.write( (char*)&nameLength, sizeof( int ) );
+            ofs.write(reinterpret_cast<char*>((char*)gMeshes[m].joints[ j ].name.data()),
+                      nameLength);
+            int animLength = gMeshes[ m ].joints[ j ].animTransforms.size();
+            ofs.write( (char*)&animLength, sizeof( int ) );
+            ofs.write( (char*)&gMeshes[ m ].joints[ j ].animTransforms, gMeshes[ m ].joints[ j ].animTransforms.size() * sizeof( ae3d::Matrix44 ) );
+        }
     }
 
     // Terminator.
@@ -1048,5 +1122,4 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
 
     std::cout << "Wrote " << aOutFile << std::endl;
 }
-
 #endif

@@ -88,6 +88,30 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
                            options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
 
+        std::vector< int > bones( vertexCount * 4 );
+        
+        for (std::size_t v = 0; v < bones.size(); ++v)
+        {
+            bones[ v ] = 0;
+        }
+
+        boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
+                         length:4 * 4 * vertexCount
+                        options:MTLResourceCPUCacheModeDefaultCache];
+        boneBuffer.label = @"Bone buffer";
+        
+        std::vector< float > weights( vertexCount * 4 );
+        
+        for (std::size_t v = 0; v < weights.size(); ++v)
+        {
+            weights[ v ] = 1;
+        }
+        
+        weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
+                           length:4 * 4 * vertexCount
+                          options:MTLResourceCPUCacheModeDefaultCache];
+        weightBuffer.label = @"Weight buffer";
+
         indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                            length:sizeof( Face ) * faceCount
                           options:MTLResourceCPUCacheModeDefaultCache];
@@ -171,6 +195,30 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
                             length:4 * 4 * vertexCount
                            options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
+
+        std::vector< int > bones( vertexCount * 4 );
+        
+        for (std::size_t v = 0; v < bones.size(); ++v)
+        {
+            bones[ v ] = 0;
+        }
+        
+        boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
+                          length:4 * 4 * vertexCount
+                         options:MTLResourceCPUCacheModeDefaultCache];
+        boneBuffer.label = @"Bone buffer";
+
+        std::vector< float > weights( vertexCount * 4 );
+        
+        for (std::size_t v = 0; v < weights.size(); ++v)
+        {
+            weights[ v ] = 1;
+        }
+        
+        weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
+                          length:4 * 4 * vertexCount
+                         options:MTLResourceCPUCacheModeDefaultCache];
+        weightBuffer.label = @"Weight buffer";
 
         indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                           length:sizeof( Face ) * faceCount
@@ -262,6 +310,126 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
                          options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
 
+        indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
+                          length:sizeof( Face ) * faceCount
+                         options:MTLResourceCPUCacheModeDefaultCache];
+        indexBuffer.label = @"Index buffer";
+        
+        elementCount = faceCount * 3;
+    }
+}
+
+void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC_Skinned* vertices, int vertexCount )
+{
+    if (faceCount > 0)
+    {
+        vertexFormat = VertexFormat::PTNTC_Skinned;
+        vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
+                           length:sizeof( VertexPTNTC_Skinned ) * vertexCount
+                          options:MTLResourceCPUCacheModeDefaultCache];
+        vertexBuffer.label = @"Vertex buffer VertexPTNTC_Skinned";
+        
+        std::vector< float > positions( vertexCount * 3 );
+        
+        for (int v = 0; v < vertexCount; ++v)
+        {
+            positions[ v * 3 + 0 ] = vertices[ v ].position.x;
+            positions[ v * 3 + 1 ] = vertices[ v ].position.y;
+            positions[ v * 3 + 2 ] = vertices[ v ].position.z;
+        }
+        
+        positionBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
+                             length:3 * 4 * vertexCount
+                            options:MTLResourceCPUCacheModeDefaultCache];
+        positionBuffer.label = @"Position buffer";
+        
+        std::vector< float > texcoords( vertexCount * 2 );
+        
+        for (int v = 0; v < vertexCount; ++v)
+        {
+            texcoords[ v * 2 + 0 ] = vertices[ v ].u;
+            texcoords[ v * 2 + 1 ] = vertices[ v ].v;
+        }
+        
+        texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:texcoords.data()
+                             length:2 * 4 * vertexCount
+                            options:MTLResourceCPUCacheModeDefaultCache];
+        texcoordBuffer.label = @"Texcoord buffer";
+        
+        std::vector< float > normals( vertexCount * 3 );
+        
+        for (int v = 0; v < vertexCount; ++v)
+        {
+            normals[ v * 3 + 0 ] = vertices[ v ].normal.x;
+            normals[ v * 3 + 1 ] = vertices[ v ].normal.y;
+            normals[ v * 3 + 2 ] = vertices[ v ].normal.z;
+        }
+        
+        normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:normals.data()
+                           length:3 * 4 * vertexCount
+                          options:MTLResourceCPUCacheModeDefaultCache];
+        normalBuffer.label = @"Normal buffer";
+        
+        std::vector< float > colors( vertexCount * 4 );
+        
+        for (int v = 0; v < vertexCount; ++v)
+        {
+            colors[ v * 4 + 0 ] = vertices[ v ].color.x;
+            colors[ v * 4 + 1 ] = vertices[ v ].color.y;
+            colors[ v * 4 + 2 ] = vertices[ v ].color.z;
+            colors[ v * 4 + 3 ] = vertices[ v ].color.w;
+        }
+        
+        colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
+                          length:4 * 4 * vertexCount
+                         options:MTLResourceCPUCacheModeDefaultCache];
+        colorBuffer.label = @"Color buffer";
+        
+        std::vector< float > tangents( vertexCount * 4 );
+        
+        for (int v = 0; v < vertexCount; ++v)
+        {
+            tangents[ v * 4 + 0 ] = vertices[ v ].tangent.x;
+            tangents[ v * 4 + 1 ] = vertices[ v ].tangent.y;
+            tangents[ v * 4 + 2 ] = vertices[ v ].tangent.z;
+            tangents[ v * 4 + 3 ] = vertices[ v ].tangent.w;
+        }
+        
+        tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
+                            length:4 * 4 * vertexCount
+                           options:MTLResourceCPUCacheModeDefaultCache];
+        tangentBuffer.label = @"Tangent buffer";
+        
+        std::vector< float > weights( vertexCount * 4 );
+        
+        for (int v = 0; v < vertexCount; ++v)
+        {
+            weights[ v * 4 + 0 ] = vertices[ v ].weights.x;
+            weights[ v * 4 + 1 ] = vertices[ v ].weights.y;
+            weights[ v * 4 + 2 ] = vertices[ v ].weights.z;
+            weights[ v * 4 + 3 ] = vertices[ v ].weights.w;
+        }
+        
+        weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
+                          length:4 * 4 * vertexCount
+                         options:MTLResourceCPUCacheModeDefaultCache];
+        weightBuffer.label = @"Weight buffer";
+
+        std::vector< int > bones( vertexCount * 4 );
+        
+        for (int v = 0; v < vertexCount; ++v)
+        {
+            bones[ v * 4 + 0 ] = vertices[ v ].bones[ 0 ];
+            bones[ v * 4 + 1 ] = vertices[ v ].bones[ 1 ];
+            bones[ v * 4 + 2 ] = vertices[ v ].bones[ 2 ];
+            bones[ v * 4 + 3 ] = vertices[ v ].bones[ 3 ];
+        }
+        
+        boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
+                           length:4 * 4 * vertexCount
+                          options:MTLResourceCPUCacheModeDefaultCache];
+        boneBuffer.label = @"Bone buffer";
+        
         indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                           length:sizeof( Face ) * faceCount
                          options:MTLResourceCPUCacheModeDefaultCache];

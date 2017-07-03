@@ -6,11 +6,12 @@ using namespace metal;
 float linstep( float low, float high, float v );
 float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth );
 
-struct uniforms_t
+struct Uniforms
 {
     matrix_float4x4 _ModelViewProjectionMatrix;
     matrix_float4x4 _ShadowProjectionMatrix;
     float4 tint;
+    //matrix_float4x4 boneMatrices[ 80 ];
 };
 
 struct ColorInOut
@@ -52,14 +53,23 @@ struct Vertex
     float3 position [[attribute(0)]];
     float2 texcoord [[attribute(1)]];
     float4 color [[attribute(2)]];
+    
+    //int4 boneIndex [[attribute(5)]];
+    //float4 boneWeights [[attribute(6)]];
 };
 
 vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
-                               constant uniforms_t& uniforms [[ buffer(5) ]])
+                               constant Uniforms& uniforms [[ buffer(5) ]])
 {
     ColorInOut out;
-    
+
     float4 in_position = float4( vert.position, 1.0 );
+    
+    /*float4 position2 = uniforms.boneMatrices[ vert.boneIndex.x ] * in_position * vert.boneWeights.x;
+    position2 += uniforms.boneMatrices[ vert.boneIndex.y ] * in_position * vert.boneWeights.y;
+    position2 += uniforms.boneMatrices[ vert.boneIndex.z ] * in_position * vert.boneWeights.z;
+    position2 += uniforms.boneMatrices[ vert.boneIndex.w ] * in_position * vert.boneWeights.w;
+*/
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
     
     out.color = half4( vert.color );

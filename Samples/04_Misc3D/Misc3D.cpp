@@ -28,18 +28,18 @@
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
-                      
+
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.6.5.zip
 
 int main()
 {
     bool fullScreen = false;
 
-    int width = 1920;
-    int height = 1080;
+    int width = 1920 / 2;
+    int height = 1080 / 2;
     //int width = 640;
     //int height = 480;
 
@@ -152,6 +152,9 @@ int main()
     Mesh cubeMeshPTN; // Position-texcoord-normal
     cubeMeshPTN.Load( FileSystem::FileContents( "pnt_quads_2_meshes.ae3d" ) );
 
+    Mesh animatedMesh;
+    animatedMesh.Load( FileSystem::FileContents( "human_anim_test2.ae3d" ) );
+
     GameObject cubePTN;
     cubePTN.AddComponent< MeshRendererComponent >();
     cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
@@ -164,6 +167,13 @@ int main()
     rtCube.AddComponent< TransformComponent >();
     rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { 5, 0, -70 } );
 
+    GameObject animatedGo;
+    animatedGo.AddComponent< MeshRendererComponent >();
+    animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
+    animatedGo.AddComponent< TransformComponent >();
+    animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { 3, 0, -100 } );
+    animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
+    
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
                  "unlitVert", "unlitFrag",
@@ -203,6 +213,8 @@ int main()
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
     copiedCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
+    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    
     Shader shaderCubeMap;
     shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ),
                         "unlitVert", "unlitFrag",
@@ -398,10 +410,10 @@ int main()
     scene.Add( &standardCubeTopCenter );
 #endif
 
-    //scene.SetSkybox( &skybox );
+    scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
-    //scene.Add( &statsContainer );
+    scene.Add( &camera2d );
+    scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
@@ -421,6 +433,7 @@ int main()
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
 #endif
+    scene.Add( &animatedGo );
     scene.Add( &cubePTN );
     //scene.Add( &childCube );
     //scene.Add( &copiedCube );

@@ -70,6 +70,10 @@ namespace ae3d
         /// \param matrix4x4 Contents of Matrix44.
         void SetMatrix( const char* name, const float* matrix4x4 );
 
+        /// \param name Matrix array uniform name.
+        /// \param matrix4x4 Contents of Matrix44 array.
+        void SetMatrixArray( const char* name, const float* matrix4x4s, int count );
+
         /// \param name Texture uniform name.
         /// \param texture Texture.
         /// \param textureUnit Texture unit.

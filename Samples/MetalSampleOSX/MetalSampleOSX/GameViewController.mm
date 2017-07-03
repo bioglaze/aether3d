@@ -32,7 +32,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -78,11 +78,13 @@ using namespace ae3d;
     GameObject standardCubeTR;
     GameObject spriteContainer;
     GameObject cameraCubeRT;
+    GameObject animatedGo;
     Scene scene;
     Font font;
     Font fontSDF;
     Mesh cubeMesh;
     Mesh cubeMeshPTN;
+    Mesh animatedMesh;
     Material cubeMaterial;
     Material rtCubeMaterial;
     Material transMaterial;
@@ -130,7 +132,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -159,7 +161,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -356,21 +358,31 @@ using namespace ae3d;
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
     scene.Add( &bigCube );
 
-    bigCube2.AddComponent<ae3d::MeshRendererComponent>();
-    bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
-    bigCube2.AddComponent<ae3d::TransformComponent>();
-    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, 4, -16 ) );
-    bigCube2.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
+    bigCube2.AddComponent<MeshRendererComponent>();
+    bigCube2.GetComponent<MeshRendererComponent>()->SetMesh( &cubeMesh );
+    bigCube2.GetComponent<MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    bigCube2.AddComponent<TransformComponent>();
+    bigCube2.GetComponent<TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, 4, -16 ) );
+    bigCube2.GetComponent<TransformComponent>()->SetLocalScale( 5 );
     //scene.Add( &bigCube2 );
 
-    bigCube3.AddComponent<ae3d::MeshRendererComponent>();
-    bigCube3.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    bigCube3.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
-    bigCube3.AddComponent<ae3d::TransformComponent>();
-    bigCube3.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 4, -16 ) );
-    bigCube3.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
+    bigCube3.AddComponent<MeshRendererComponent>();
+    bigCube3.GetComponent<MeshRendererComponent>()->SetMesh( &cubeMesh );
+    bigCube3.GetComponent<MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    bigCube3.AddComponent<TransformComponent>();
+    bigCube3.GetComponent<TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 4, -16 ) );
+    bigCube3.GetComponent<TransformComponent>()->SetLocalScale( 5 );
     //scene.Add( &bigCube3 );
+
+    animatedMesh.Load( FileSystem::FileContents( "human_anim_test2.ae3d" ) );
+
+    animatedGo.AddComponent< MeshRendererComponent >();
+    animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
+    animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    animatedGo.AddComponent< TransformComponent >();
+    animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, 0, -85 } );
+    animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
+    scene.Add( &animatedGo );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
 #ifdef TEST_SHADOWS_DIR
