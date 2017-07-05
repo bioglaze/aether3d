@@ -236,6 +236,8 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         return -1;
     }
 
+    XFree( fb_configs );
+    
     int samples = 0;
 
     if (flags & ae3d::WindowCreateFlags::MSAA4)
@@ -287,7 +289,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     /* Select first framebuffer config and query visualID */
     int visualID = 0;
     glXGetFBConfigAttrib( display, fb_config, GLX_VISUAL_ID, &visualID );
-    
+
     GLXContext context = glXCreateNewContext( display, fb_config, GLX_RGBA_TYPE, nullptr, True );
     
     if (!context)
@@ -295,6 +297,9 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         std::cerr << "glXCreateNewContext failed." << std::endl;
         return -1;
     }
+
+    XFree( fbConfigs );
+
 #endif
 #if RENDERER_VULKAN
     (void)default_screen;
