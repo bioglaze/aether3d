@@ -342,7 +342,7 @@ struct CtrlPoint
     std::vector< BlendingIndexWeightPair > blendingInfo;
 };
 
-std::vector< CtrlPoint* > controlPoints;
+std::vector< CtrlPoint > controlPoints;
 FbxLongLong animationLength;
 
 FbxAMatrix GetGeometryTransformation( FbxNode* inNode )
@@ -364,12 +364,12 @@ void ProcessControlPoints( FbxNode* inNode )
 
     for (unsigned ctrlPointIndex = 0; ctrlPointIndex < ctrlPointCount; ++ctrlPointIndex)
     {
-        CtrlPoint* currCtrlPoint = new CtrlPoint();
+        CtrlPoint currCtrlPoint;
         Vec3 currPosition;
         currPosition.x = static_cast<float>(currMesh->GetControlPointAt( ctrlPointIndex ).mData[ 0 ]);
         currPosition.y = static_cast<float>(currMesh->GetControlPointAt( ctrlPointIndex ).mData[ 1 ]);
         currPosition.z = static_cast<float>(currMesh->GetControlPointAt( ctrlPointIndex ).mData[ 2 ]);
-        currCtrlPoint->mPosition = currPosition;
+        currCtrlPoint.mPosition = currPosition;
         controlPoints[ ctrlPointIndex ] = currCtrlPoint;
     }
 }
@@ -435,7 +435,7 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
                 BlendingIndexWeightPair currBlendingIndexWeightPair;
                 currBlendingIndexWeightPair.blendingIndex = currJointIndex;
                 currBlendingIndexWeightPair.blendingWeight = static_cast< float >( currCluster->GetControlPointWeights()[ i ] );
-                controlPoints[ currCluster->GetControlPointIndices()[ i ] ]->blendingInfo.push_back( currBlendingIndexWeightPair );
+                controlPoints[ currCluster->GetControlPointIndices()[ i ] ].blendingInfo.push_back( currBlendingIndexWeightPair );
             }
 
             const FbxAnimStack* currAnimStack = scene->GetSrcObject< FbxAnimStack >( 0 );
@@ -476,9 +476,9 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
     // Adds dummy joints if there are < 4
     for (auto itr = controlPoints.begin(); itr != controlPoints.end(); ++itr)
     {
-        for (std::size_t i = (*itr)->blendingInfo.size(); i <= 4; ++i)
+        for (std::size_t i = (*itr).blendingInfo.size(); i <= 4; ++i)
         {
-            (*itr)->blendingInfo.push_back( currBlendingIndexWeightPair );
+            (*itr).blendingInfo.push_back( currBlendingIndexWeightPair );
         }
     }
 
@@ -487,15 +487,15 @@ void ProcessJointsAndAnimations( FbxNode* inNode )
     
     for (size_t i = 0; i < controlPoints.size(); ++i)
     {
-        gMeshes.back().weights[ i ].x = controlPoints[ i ]->blendingInfo[ 0 ].blendingWeight;
-        gMeshes.back().weights[ i ].y = controlPoints[ i ]->blendingInfo[ 1 ].blendingWeight;
-        gMeshes.back().weights[ i ].z = controlPoints[ i ]->blendingInfo[ 2 ].blendingWeight;
-        gMeshes.back().weights[ i ].w = controlPoints[ i ]->blendingInfo[ 3 ].blendingWeight;
+        gMeshes.back().weights[ i ].x = controlPoints[ i ].blendingInfo[ 0 ].blendingWeight;
+        gMeshes.back().weights[ i ].y = controlPoints[ i ].blendingInfo[ 1 ].blendingWeight;
+        gMeshes.back().weights[ i ].z = controlPoints[ i ].blendingInfo[ 2 ].blendingWeight;
+        gMeshes.back().weights[ i ].w = controlPoints[ i ].blendingInfo[ 3 ].blendingWeight;
         
-        gMeshes.back().bones[ i ].a = controlPoints[ i ]->blendingInfo[ 0 ].blendingIndex;
-        gMeshes.back().bones[ i ].b = controlPoints[ i ]->blendingInfo[ 1 ].blendingIndex;
-        gMeshes.back().bones[ i ].c = controlPoints[ i ]->blendingInfo[ 2 ].blendingIndex;
-        gMeshes.back().bones[ i ].d = controlPoints[ i ]->blendingInfo[ 3 ].blendingIndex;
+        gMeshes.back().bones[ i ].a = controlPoints[ i ].blendingInfo[ 0 ].blendingIndex;
+        gMeshes.back().bones[ i ].b = controlPoints[ i ].blendingInfo[ 1 ].blendingIndex;
+        gMeshes.back().bones[ i ].c = controlPoints[ i ].blendingInfo[ 2 ].blendingIndex;
+        gMeshes.back().bones[ i ].d = controlPoints[ i ].blendingInfo[ 3 ].blendingIndex;
     }
 }
 
