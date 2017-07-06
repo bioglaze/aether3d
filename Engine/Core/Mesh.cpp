@@ -300,17 +300,17 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         is.read( (char*)&subMesh.aabbMin, sizeof( subMesh.aabbMin ) );
         is.read( (char*)&subMesh.aabbMax, sizeof( subMesh.aabbMax ) );
 
-        uint16_t nameLength;
+        uint16_t nameLength = 0;
         is.read( (char*)&nameLength, sizeof( nameLength ) );
 
         std::vector< char > meshName( nameLength + 1 );
         is.read( (char*)&meshName[ 0 ], nameLength );
         subMesh.name = std::string( meshName.data(), meshName.size() - 1 );
 
-        uint16_t vertexCount;
+        uint16_t vertexCount = 0;
         is.read( (char*)&vertexCount, sizeof( vertexCount ) );
 
-        uint8_t vertexFormat;
+        uint8_t vertexFormat = 0;
         is.read( (char*)&vertexFormat, sizeof( vertexFormat ) );
         
         if (vertexFormat == 0) // PTNTC
@@ -349,7 +349,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             return LoadResult::Corrupted;
         }
 
-        uint16_t faceCount;
+        uint16_t faceCount = 0;
         is.read( (char*)&faceCount, sizeof( faceCount ) );
 
         try { subMesh.indices.resize( faceCount ); }
@@ -379,7 +379,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
 
         if (vertexFormat == 2)
         {
-            uint16_t jointCount;
+            uint16_t jointCount = 0;
             is.read( (char*)&jointCount, sizeof( jointCount ) );
 
             subMesh.joints.resize( jointCount );
@@ -397,11 +397,6 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
                 is.read( (char*)&animLength, sizeof( int ) );
                 subMesh.joints[ j ].animTransforms.resize( animLength );
                 is.read( (char*)subMesh.joints[ j ].animTransforms.data(), subMesh.joints[ j ].animTransforms.size() * sizeof( ae3d::Matrix44 ) );
-                for (int i = 0; i < animLength; ++i)
-                {
-                    auto& m = subMesh.joints[ j ].animTransforms[ i ].m;
-                    System::Print( "joint %d frame %d, matrix %f %f %f %f\n", j, i, m[0], m[ 1 ], m[ 2 ], m[ 3 ] );
-                }
             }
         }
         
@@ -409,7 +404,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         subMesh.vertexBuffer.SetDebugName( subMeshDebugName.c_str() );
     }
     
-    uint8_t terminator;
+    uint8_t terminator = 0;
     is.read( (char*)&terminator, sizeof( terminator ) );
 
     if (terminator != 100)

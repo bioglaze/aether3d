@@ -310,6 +310,30 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
                          options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
 
+        std::vector< int > bones( vertexCount * 4 );
+        
+        for (std::size_t v = 0; v < bones.size(); ++v)
+        {
+            bones[ v ] = 0;
+        }
+        
+        boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
+                         length:4 * 4 * vertexCount
+                        options:MTLResourceCPUCacheModeDefaultCache];
+        boneBuffer.label = @"Bone buffer";
+        
+        std::vector< float > weights( vertexCount * 4 );
+        
+        for (std::size_t v = 0; v < weights.size(); ++v)
+        {
+            weights[ v ] = 1;
+        }
+        
+        weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
+                           length:4 * 4 * vertexCount
+                          options:MTLResourceCPUCacheModeDefaultCache];
+        weightBuffer.label = @"Weight buffer";
+
         indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                           length:sizeof( Face ) * faceCount
                          options:MTLResourceCPUCacheModeDefaultCache];

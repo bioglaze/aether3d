@@ -180,6 +180,12 @@ int main()
                  FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
                  FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
+    Shader shaderSkin;
+    shaderSkin.Load( FileSystem::FileContents( "unlit_skin.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
+                "unlitVert", "unlitFrag",
+                FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
+                FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
@@ -197,7 +203,12 @@ int main()
     material.SetTexture( "textureMap", &gliderTex );
     material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
-    
+
+    Material materialSkin;
+    materialSkin.SetShader( &shaderSkin );
+    materialSkin.SetTexture( "textureMap", &gliderTex );
+    materialSkin.SetVector( "tint", { 1, 1, 1, 1 } );
+
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
@@ -213,7 +224,7 @@ int main()
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
     copiedCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
-    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &materialSkin, 0 );
     
     Shader shaderCubeMap;
     shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ),
@@ -702,6 +713,10 @@ int main()
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
         statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
 
+        static int animationFrame = 0;
+        ++animationFrame;
+        animatedGo.GetComponent< MeshRendererComponent >()->SetAnimationFrame( animationFrame );
+        
 #if defined( AE3D_OPENVR )
         VR::SubmitFrame();
 #endif

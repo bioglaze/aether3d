@@ -26,6 +26,9 @@ namespace ae3d
         /// \param aMesh Mesh.
         void SetMesh( Mesh* aMesh );
 
+        /// \param frame Animation frame. If too high or low, repeats from the beginning using modulo.
+        void SetAnimationFrame( int frame ) { animFrame = frame; }
+        
         /// \return True, if the mesh will be rendered as a wireframe.
         bool IsWireframe() const { return isWireframe; }
 
@@ -64,6 +67,7 @@ namespace ae3d
         std::vector< Material* > materials;
         std::vector< bool > isSubMeshCulled;
         GameObject* gameObject = nullptr;
+        int animFrame = 0;
         bool isCulled = false;
         bool isWireframe = false;
         bool isEnabled = true;

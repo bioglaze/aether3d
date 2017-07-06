@@ -162,25 +162,20 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             {
                 std::vector< Matrix44 > bones( subMeshes[ subMeshIndex ].joints.size() );
 
-                // FIXME: testing animation, remove this code
-                static size_t a = 0;
-                ++a;
-                if (a >= 60)
-                {
-                    a = 0;
-                }
-                
                 for (size_t j = 0; j < bones.size(); ++j)
                 {
                     if (!subMeshes[ subMeshIndex ].joints[ j ].animTransforms.empty())
                     {
+                        const std::size_t frames = subMeshes[ subMeshIndex ].joints[ j ].animTransforms.size();
                         Matrix44::Multiply( subMeshes[ subMeshIndex ].joints[ j ].globalBindposeInverse,
-                                           subMeshes[ subMeshIndex ].joints[ j ].animTransforms[ a ],
+                                           subMeshes[ subMeshIndex ].joints[ j ].animTransforms[ animFrame % frames ],
                                            bones[ j ] );
                     }
                 }
-
+#ifndef RENDERER_VULKAN
+                // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
                 materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices[0]", &bones[ 0 ].m[ 0 ], (int)bones.size() );
+#endif
             }
 
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())

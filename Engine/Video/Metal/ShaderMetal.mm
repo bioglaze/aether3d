@@ -117,6 +117,19 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
     memcpy( bufferPointer, matrix4x4, 16 * 4 );
 }
 
+void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, int count )
+{
+    if (uniforms.find( name ) == std::end( uniforms ))
+    {
+        //System::Print( "SetMatrix: could not find %s\n", name );
+        return;
+    }
+    
+    id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniforms[ name ].offsetFromBufferStart;
+    memcpy( bufferPointer, matrix4x4s, 16 * 4 * count );
+}
+
 void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int textureUnit )
 {
     if (texture != nullptr)
