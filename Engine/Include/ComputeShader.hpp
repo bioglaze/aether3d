@@ -10,7 +10,6 @@
 #endif
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
-#include <cstdint>
 #endif
 
 namespace ae3d

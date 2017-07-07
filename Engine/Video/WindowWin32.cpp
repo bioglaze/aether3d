@@ -350,12 +350,15 @@ namespace ae3d
             System::Assert( false, "failed to register window class" );
         }
 
+        const int xPos = (GetSystemMetrics( SM_CXSCREEN ) - WindowGlobal::windowWidth) / 2;
+        const int yPos = (GetSystemMetrics( SM_CYSCREEN ) - WindowGlobal::windowHeight) / 2;
+
         WindowGlobal::hwnd = CreateWindowExA( fullscreen ? WS_EX_TOOLWINDOW | WS_EX_TOPMOST : 0,
             "WindowClass1",    // name of the window class
             "Window",   // title of the window
             fullscreen ? WS_POPUP : (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU),    // window style
-            CW_USEDEFAULT,    // x-position of the window
-            CW_USEDEFAULT,    // y-position of the window
+            xPos,    // x-position of the window
+            yPos,    // y-position of the window
             WindowGlobal::windowWidth,    // width of the window
             WindowGlobal::windowHeight,    // height of the window
             nullptr,    // we have no parent window
