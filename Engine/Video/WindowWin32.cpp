@@ -52,6 +52,11 @@ namespace WindowGlobal
     ae3d::KeyCode keyMap[ 256 ];
 }
 
+namespace GfxDeviceGlobal
+{
+    extern unsigned frameIndex;
+}
+
 static void InitKeyMap()
 {
     for (int keyIndex = 0; keyIndex < 256; ++keyIndex)
@@ -183,7 +188,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             break;
     }
 
-    return DefWindowProc(hWnd, message, wParam, lParam);
+    return DefWindowProc( hWnd, message, wParam, lParam );
 }
 
 void PlatformInitGamePad()
@@ -422,7 +427,7 @@ namespace ae3d
     {
         MSG msg;
 
-        if (PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ))
+        while (PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ))
         {
             TranslateMessage( &msg );
             DispatchMessage( &msg );
@@ -445,5 +450,6 @@ namespace ae3d
 #if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
         GfxDevice::Present();
 #endif
+        ++GfxDeviceGlobal::frameIndex;
     }
 }

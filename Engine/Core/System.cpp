@@ -106,7 +106,7 @@ void ae3d::System::Print( const char* format, ... )
     va_list ap;
     va_start(ap, format);
 
-    static char msg[ 1024 ];
+    static char msg[ 2048 ];
 #if _MSC_VER
     vsnprintf_s( msg, sizeof(msg), format, ap );
 #else

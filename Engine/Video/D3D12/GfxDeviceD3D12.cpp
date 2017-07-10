@@ -141,6 +141,7 @@ namespace GfxDeviceGlobal
     std::vector< ID3D12Resource* > constantBuffers;
     std::vector< ID3D12Resource* > mappedConstantBuffers;
     int currentConstantBufferIndex = 0;
+    unsigned frameIndex = 0;
     ae3d::LightTiler lightTiler;
 
     ID3D12GraphicsCommandList* graphicsCommandList = nullptr;
@@ -853,6 +854,26 @@ void ae3d::CreateRenderer( int samples )
     }
 
     GfxDeviceGlobal::lightTiler.Init();
+}
+
+void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::BeginShadowMapGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::EndShadowMapGpuQuery()
+{
+    // TODO: Implement
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )

@@ -80,7 +80,12 @@ namespace GfxDeviceGlobal
     GLuint systemFBO = 0;
     GLuint cachedFBO = 0;
     GLuint perObjectUbo = 0;
-    
+    GLuint depthNormalsQueryBegins[ 4 ];
+    GLuint depthNormalsQueryEnds[ 4 ];
+    GLuint shadowMapQueryBegins[ 4 ];
+    GLuint shadowMapQueryEnds[ 4 ];
+    unsigned frameIndex = 0;
+
     PerObjectUboStruct perObjectUboStruct;
 }
 
@@ -93,9 +98,11 @@ namespace ae3d
             std::string GetStatistics()
             {
                 std::stringstream stm;
-                stm << "frame time: " << ::Statistics::GetFrameTimeMS() << " ms\n";
-                stm << "shadow map time: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
-                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
+                stm << "frame time CPU: " << ::Statistics::GetFrameTimeMS() << " ms\n";
+                stm << "shadow map time CPU: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
+                stm << "shadow map time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << " ms\n";
+                stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
+                stm << "depth pass time GPU: " << ::Statistics::GetDepthNormalsTimeGpuMS() << " ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "texture binds: " << ::Statistics::GetTextureBinds() << "\n";
                 stm << "render target binds: " << ::Statistics::GetRenderTargetBinds() << "\n";
@@ -109,7 +116,6 @@ namespace ae3d
 
 namespace
 {
-
     void SetBlendMode( ae3d::GfxDevice::BlendMode blendMode )
     {
         if (blendMode == ae3d::GfxDevice::BlendMode::Off)
@@ -189,6 +195,46 @@ namespace
     }
 }
 
+void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
+{
+    glQueryCounter( GfxDeviceGlobal::depthNormalsQueryBegins[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+}
+
+void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
+{
+    glQueryCounter( GfxDeviceGlobal::depthNormalsQueryEnds[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+    
+    if (GfxDeviceGlobal::frameIndex > 3)
+    {
+        GLuint64 beginTime, endTime;
+        const int index = (GfxDeviceGlobal::frameIndex - 3) & 3;
+        glGetQueryObjectui64v( GfxDeviceGlobal::depthNormalsQueryBegins[ index ], GL_QUERY_RESULT, &beginTime );
+        glGetQueryObjectui64v( GfxDeviceGlobal::depthNormalsQueryEnds[ index ], GL_QUERY_RESULT, &endTime );
+        const float theTime = (endTime - beginTime) / 1000000.0f;
+        Statistics::SetDepthNormalsGpuTime( theTime );
+    }
+}
+
+void ae3d::GfxDevice::BeginShadowMapGpuQuery()
+{
+    glQueryCounter( GfxDeviceGlobal::shadowMapQueryBegins[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+}
+
+void ae3d::GfxDevice::EndShadowMapGpuQuery()
+{
+    glQueryCounter( GfxDeviceGlobal::shadowMapQueryEnds[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+
+    if (GfxDeviceGlobal::frameIndex > 3)
+    {
+        GLuint64 beginTime, endTime;
+        const int index = (GfxDeviceGlobal::frameIndex - 3) & 3;
+        glGetQueryObjectui64v( GfxDeviceGlobal::shadowMapQueryBegins[ index ], GL_QUERY_RESULT, &beginTime );
+        glGetQueryObjectui64v( GfxDeviceGlobal::shadowMapQueryEnds[ index ], GL_QUERY_RESULT, &endTime );
+        const float theTime = (endTime - beginTime) / 1000000.0f;
+        Statistics::SetShadowMapGpuTime( theTime );
+    }
+}
+
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )
 {
     if (enable)
@@ -234,7 +280,12 @@ void ae3d::GfxDevice::Init( int width, int height )
     glGenBuffers( 1, &GfxDeviceGlobal::perObjectUbo );
     glBindBuffer( GL_UNIFORM_BUFFER, GfxDeviceGlobal::perObjectUbo );
     glBufferData( GL_UNIFORM_BUFFER, sizeof( PerObjectUboStruct ), &GfxDeviceGlobal::perObjectUboStruct, GL_DYNAMIC_DRAW );
-    GfxDevice::ErrorCheck( "Init end" );
+
+    glGenQueries( 4, GfxDeviceGlobal::depthNormalsQueryBegins );
+    glGenQueries( 4, GfxDeviceGlobal::depthNormalsQueryEnds );
+
+    glGenQueries( 4, GfxDeviceGlobal::shadowMapQueryBegins );
+    glGenQueries( 4, GfxDeviceGlobal::shadowMapQueryEnds );
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )

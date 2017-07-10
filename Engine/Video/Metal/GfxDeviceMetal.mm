@@ -88,6 +88,7 @@ namespace GfxDeviceGlobal
     ae3d::LightTiler lightTiler;
     std::vector< ae3d::VertexBuffer > lineBuffers;
     int viewport[ 4 ];
+    unsigned frameIndex = 0;
     
     struct Samplers
     {
@@ -209,6 +210,26 @@ id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
 {
     return GfxDeviceGlobal::uniformBuffers[ GfxDeviceGlobal::currentUboIndex ];
+}
+
+void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::BeginShadowMapGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::EndShadowMapGpuQuery()
+{
+    // TODO: Implement
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float factor, float units )

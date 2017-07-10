@@ -11,7 +11,9 @@ namespace Statistics
 
     float GetFrameTimeMS();
     float GetShadowMapTimeMS();
+    float GetShadowMapTimeGpuMS();
     float GetDepthNormalsTimeMS();
+    float GetDepthNormalsTimeGpuMS();
 
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
@@ -39,6 +41,8 @@ namespace Statistics
     int GetAllocCalls();
     void IncPSOBindCalls();
     int GetPSOBindCalls();
+    void SetDepthNormalsGpuTime( float theTime );
+    void SetShadowMapGpuTime( float theTime );
 }
 
 #endif

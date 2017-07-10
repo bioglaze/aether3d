@@ -1,4 +1,5 @@
 #include "Statistics.hpp"
+#include "GfxDevice.hpp"
 #include <chrono>
 
 namespace Statistics
@@ -15,7 +16,9 @@ namespace Statistics
     int triangleCount = 0;
     int psoBindCount = 0;
     float depthNormalsTimeMS = 0;
+    float depthNormalsTimeGpuMS = 0;
     float shadowMapTimeMS = 0;
+    float shadowMapTimeGpuMS = 0;
     float frameTimeMS = 0;
     std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
@@ -32,9 +35,20 @@ int Statistics::GetTriangleCount()
     return triangleCount;
 }
 
+void Statistics::SetDepthNormalsGpuTime( float theTime )
+{
+    depthNormalsTimeGpuMS = theTime;
+}
+
+void Statistics::SetShadowMapGpuTime( float theTime )
+{
+    shadowMapTimeGpuMS = theTime;
+}
+
 void Statistics::BeginShadowMapProfiling()
 {
     Statistics::startShadowMapTimePoint = std::chrono::high_resolution_clock::now();
+    ae3d::GfxDevice::BeginShadowMapGpuQuery();
 }
 
 void Statistics::EndShadowMapProfiling()
@@ -42,11 +56,13 @@ void Statistics::EndShadowMapProfiling()
     auto tEnd = std::chrono::high_resolution_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startShadowMapTimePoint ).count();
     Statistics::shadowMapTimeMS = static_cast< float >(tDiff);
+    ae3d::GfxDevice::EndShadowMapGpuQuery();
 }
 
 void Statistics::BeginDepthNormalsProfiling()
 {
     Statistics::startDepthNormalsTimePoint = std::chrono::high_resolution_clock::now();
+    ae3d::GfxDevice::BeginDepthNormalsGpuQuery();
 }
 
 void Statistics::EndDepthNormalsProfiling()
@@ -54,6 +70,7 @@ void Statistics::EndDepthNormalsProfiling()
     auto tEnd = std::chrono::high_resolution_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startDepthNormalsTimePoint ).count();
     Statistics::depthNormalsTimeMS = static_cast< float >(tDiff);
+    ae3d::GfxDevice::EndDepthNormalsGpuQuery();
 }
 
 void Statistics::BeginFrameTimeProfiling()
@@ -151,6 +168,16 @@ float Statistics::GetShadowMapTimeMS()
 float Statistics::GetDepthNormalsTimeMS()
 {
     return Statistics::depthNormalsTimeMS;
+}
+
+float Statistics::GetDepthNormalsTimeGpuMS()
+{
+    return Statistics::depthNormalsTimeGpuMS;
+}
+
+float Statistics::GetShadowMapTimeGpuMS()
+{
+    return Statistics::shadowMapTimeGpuMS;
 }
 
 int Statistics::GetDrawCalls()

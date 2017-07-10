@@ -100,6 +100,11 @@ namespace ae3d
         void DrawLines( int handle, Shader& shader );
         void ErrorCheck( const char* info );
 
+        void BeginDepthNormalsGpuQuery();
+        void EndDepthNormalsGpuQuery();
+        void BeginShadowMapGpuQuery();
+        void EndShadowMapGpuQuery();
+
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture* target, unsigned cubeMapFace );
         void UnsetRenderTarget();

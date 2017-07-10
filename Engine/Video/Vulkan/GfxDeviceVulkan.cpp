@@ -118,6 +118,7 @@ namespace GfxDeviceGlobal
     int backBufferWidth;
     int backBufferHeight;
     bool didUseOffscreenPassOnThisFrame = false;
+    unsigned frameIndex = 0;
 }
 
 namespace ae3d
@@ -1443,6 +1444,26 @@ void ae3d::GfxDevice::Init( int width, int height )
 {
     GfxDeviceGlobal::backBufferWidth = width;
     GfxDeviceGlobal::backBufferHeight = height;
+}
+
+void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::BeginShadowMapGpuQuery()
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::EndShadowMapGpuQuery()
+{
+    // TODO: Implement
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )

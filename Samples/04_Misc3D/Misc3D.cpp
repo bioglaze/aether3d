@@ -38,8 +38,8 @@ int main()
 {
     bool fullScreen = false;
 
-    int width = 1920 / 2;
-    int height = 1080 / 2;
+    int width = 1920 / 1;
+    int height = 1080 / 1;
     //int width = 640;
     //int height = 480;
 
@@ -171,9 +171,9 @@ int main()
     animatedGo.AddComponent< MeshRendererComponent >();
     animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
     animatedGo.AddComponent< TransformComponent >();
-    animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { 3, 0, -100 } );
-    animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
-    animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 0, 0 } ) );
+    animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { 13, -14, -80 } );
+    animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.0075f );
+    animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 90, 0 } ) );
     
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
@@ -193,6 +193,9 @@ int main()
     Texture2D gliderClampTex;
     gliderClampTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
+    Texture2D playerTex;
+    playerTex.Load( FileSystem::FileContents( "player.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+
     Material materialClamp;
     materialClamp.SetShader( &shader );
     materialClamp.SetTexture( "textureMap", &gliderClampTex );
@@ -207,7 +210,7 @@ int main()
 
     Material materialSkin;
     materialSkin.SetShader( &shaderSkin );
-    materialSkin.SetTexture( "textureMap", &gliderTex );
+    materialSkin.SetTexture( "textureMap", &playerTex );
     materialSkin.SetVector( "tint", { 1, 1, 1, 1 } );
 
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
@@ -334,7 +337,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -445,7 +448,7 @@ int main()
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
 #endif
-    scene.Add( &animatedGo );
+    //scene.Add( &animatedGo );
     scene.Add( &cubePTN );
     //scene.Add( &childCube );
     //scene.Add( &copiedCube );
@@ -503,7 +506,7 @@ int main()
     cubes[ 4 ].AddComponent<AudioSourceComponent>();
     cubes[ 4 ].GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     cubes[ 4 ].GetComponent<AudioSourceComponent>()->Set3D( true );
-    cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
+    //cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
 
     bool quit = false;
     
@@ -667,8 +670,7 @@ int main()
                     //System::ReloadChangedAssets();
                 }
             }
-
-            if (event.type == WindowEventType::MouseMove)
+            else if (event.type == WindowEventType::MouseMove)
             {
                 const int mouseDeltaX = event.mouseX - lastMouseX;
                 const int mouseDeltaY = event.mouseY - lastMouseY;
@@ -677,21 +679,21 @@ int main()
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }
-            if (event.type == WindowEventType::GamePadLeftThumbState)
+            else if (event.type == WindowEventType::GamePadLeftThumbState)
             {           
                 gamePadLeftThumbX = event.gamePadThumbX;
                 gamePadLeftThumbY = event.gamePadThumbY;
             }
-            if (event.type == WindowEventType::GamePadRightThumbState)
+            else if (event.type == WindowEventType::GamePadRightThumbState)
             {
                 gamePadRightThumbX = event.gamePadThumbX;
                 gamePadRightThumbY = event.gamePadThumbY;
             }
-            if (event.type == WindowEventType::GamePadButtonY)
+            else if (event.type == WindowEventType::GamePadButtonY)
             {
                 camera.GetComponent<TransformComponent>()->MoveUp( 0.1f );
             }
-            if (event.type == WindowEventType::GamePadButtonA)
+            else if (event.type == WindowEventType::GamePadButtonA)
             {
                 camera.GetComponent<TransformComponent>()->MoveUp( -0.1f );
             }
