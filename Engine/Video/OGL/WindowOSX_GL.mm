@@ -10,6 +10,11 @@
 
 void UpdateFrameTiming();
 
+namespace GfxDeviceGlobal
+{
+    extern unsigned frameIndex;
+}
+
 struct GamePad
 {
     bool isConnected = false;
@@ -722,5 +727,6 @@ void ae3d::Window::SwapBuffers()
 {
     [WindowGlobal::glContext flushBuffer];
     UpdateFrameTiming();
+    ++GfxDeviceGlobal::frameIndex;
 }
 

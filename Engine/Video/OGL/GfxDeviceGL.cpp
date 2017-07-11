@@ -80,10 +80,8 @@ namespace GfxDeviceGlobal
     GLuint systemFBO = 0;
     GLuint cachedFBO = 0;
     GLuint perObjectUbo = 0;
-    GLuint depthNormalsQueryBegins[ 4 ];
-    GLuint depthNormalsQueryEnds[ 4 ];
-    GLuint shadowMapQueryBegins[ 4 ];
-    GLuint shadowMapQueryEnds[ 4 ];
+    GLuint depthNormalsQueries[ 4 ];
+    GLuint shadowMapQueries[ 4 ];
     unsigned frameIndex = 0;
 
     PerObjectUboStruct perObjectUboStruct;
@@ -197,40 +195,38 @@ namespace
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
 {
-    glQueryCounter( GfxDeviceGlobal::depthNormalsQueryBegins[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+    glBeginQuery( GL_TIME_ELAPSED, GfxDeviceGlobal::depthNormalsQueries[ GfxDeviceGlobal::frameIndex & 3 ] );
 }
 
 void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
 {
-    glQueryCounter( GfxDeviceGlobal::depthNormalsQueryEnds[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+    glEndQuery( GL_TIME_ELAPSED );
     
     if (GfxDeviceGlobal::frameIndex > 3)
     {
-        GLuint64 beginTime, endTime;
-        const int index = (GfxDeviceGlobal::frameIndex - 3) & 3;
-        glGetQueryObjectui64v( GfxDeviceGlobal::depthNormalsQueryBegins[ index ], GL_QUERY_RESULT, &beginTime );
-        glGetQueryObjectui64v( GfxDeviceGlobal::depthNormalsQueryEnds[ index ], GL_QUERY_RESULT, &endTime );
-        const float theTime = (endTime - beginTime) / 1000000.0f;
+        GLuint64 timeStamp;
+        const unsigned index = ((GfxDeviceGlobal::frameIndex & 3) - 3) & 3;
+        glGetQueryObjectui64v( GfxDeviceGlobal::depthNormalsQueries[ index ], GL_QUERY_RESULT, &timeStamp );
+        const float theTime = timeStamp / 1000000.0f;
         Statistics::SetDepthNormalsGpuTime( theTime );
     }
 }
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()
 {
-    glQueryCounter( GfxDeviceGlobal::shadowMapQueryBegins[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+    glBeginQuery( GL_TIME_ELAPSED, GfxDeviceGlobal::shadowMapQueries[ GfxDeviceGlobal::frameIndex & 3 ] );
 }
 
 void ae3d::GfxDevice::EndShadowMapGpuQuery()
 {
-    glQueryCounter( GfxDeviceGlobal::shadowMapQueryEnds[ GfxDeviceGlobal::frameIndex & 3 ], GL_TIMESTAMP );
+    glEndQuery( GL_TIME_ELAPSED );
 
     if (GfxDeviceGlobal::frameIndex > 3)
     {
-        GLuint64 beginTime, endTime;
-        const int index = (GfxDeviceGlobal::frameIndex - 3) & 3;
-        glGetQueryObjectui64v( GfxDeviceGlobal::shadowMapQueryBegins[ index ], GL_QUERY_RESULT, &beginTime );
-        glGetQueryObjectui64v( GfxDeviceGlobal::shadowMapQueryEnds[ index ], GL_QUERY_RESULT, &endTime );
-        const float theTime = (endTime - beginTime) / 1000000.0f;
+        GLuint64 timeStamp;
+        const unsigned index = ((GfxDeviceGlobal::frameIndex & 3) - 3) & 3;
+        glGetQueryObjectui64v( GfxDeviceGlobal::shadowMapQueries[ index ], GL_QUERY_RESULT, &timeStamp );
+        const float theTime = timeStamp / 1000000.0f;
         Statistics::SetShadowMapGpuTime( theTime );
     }
 }
@@ -281,11 +277,8 @@ void ae3d::GfxDevice::Init( int width, int height )
     glBindBuffer( GL_UNIFORM_BUFFER, GfxDeviceGlobal::perObjectUbo );
     glBufferData( GL_UNIFORM_BUFFER, sizeof( PerObjectUboStruct ), &GfxDeviceGlobal::perObjectUboStruct, GL_DYNAMIC_DRAW );
 
-    glGenQueries( 4, GfxDeviceGlobal::depthNormalsQueryBegins );
-    glGenQueries( 4, GfxDeviceGlobal::depthNormalsQueryEnds );
-
-    glGenQueries( 4, GfxDeviceGlobal::shadowMapQueryBegins );
-    glGenQueries( 4, GfxDeviceGlobal::shadowMapQueryEnds );
+    glGenQueries( 4, GfxDeviceGlobal::depthNormalsQueries );
+    glGenQueries( 4, GfxDeviceGlobal::shadowMapQueries );
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )

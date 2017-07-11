@@ -53,6 +53,11 @@ namespace ae3d
     void CreateRenderer( int samples );
 }
 
+namespace GfxDeviceGlobal
+{
+    extern unsigned frameIndex;
+}
+
 namespace
 {
     // TODO: DRY. Duplicated in WindowWin32.cpp
@@ -729,6 +734,7 @@ void ae3d::Window::SwapBuffers()
 #if RENDERER_VULKAN
     GfxDevice::Present();
 #endif
+    ++GfxDeviceGlobal::frameIndex;
 }
 
 bool ae3d::Window::PollEvent( WindowEvent& outEvent )
