@@ -5,7 +5,7 @@ ae3d::Renderer renderer;
 void ae3d::BuiltinShaders::Load()
 {
     const char* spriteVertexSource = R"(
-    #version 410 core
+    #version 330 core
     
     layout (location = 0) in vec3 aPosition;
     layout (location = 1) in vec2 aTexCoord;
@@ -28,7 +28,7 @@ void ae3d::BuiltinShaders::Load()
     })";
     
     const char* spriteFragmentSource = R"(
-    #version 410 core
+    #version 330 core
     
     in vec2 vTexCoord;
     in vec4 vColor;
@@ -44,7 +44,7 @@ void ae3d::BuiltinShaders::Load()
     spriteRendererShader.Load( spriteVertexSource, spriteFragmentSource );
 
     const char* sdfVertexSource = R"(
-    #version 410 core
+    #version 330 core
     
     layout (location = 0) in vec3 aPosition;
     layout (location = 1) in vec2 aTexCoord;
@@ -67,7 +67,7 @@ void ae3d::BuiltinShaders::Load()
     })";
     
     const char* sdfFragmentSource = R"(
-    #version 410 core
+    #version 330 core
     
     in vec2 vTexCoord;
     in vec4 vColor;
@@ -87,7 +87,7 @@ void ae3d::BuiltinShaders::Load()
     sdfShader.Load( sdfVertexSource, sdfFragmentSource );
 
     const char* skyboxVertexSource = R"(
-    #version 410 core
+    #version 330 core
 
     layout (location = 0) in vec3 aPosition;
     
@@ -106,7 +106,7 @@ void ae3d::BuiltinShaders::Load()
     })";
 
     const char* skyboxFragmentSource = R"(
-    #version 410 core
+    #version 330 core
 
     in vec3 vTexCoord;
     out vec4 fragColor;
@@ -121,7 +121,7 @@ void ae3d::BuiltinShaders::Load()
     skyboxShader.Load( skyboxVertexSource, skyboxFragmentSource );
     
     const char* momentsVertexSource = R"(
-    #version 410 core
+    #version 330 core
     
     layout (location = 0) in vec3 aPosition;
     
@@ -133,7 +133,7 @@ void ae3d::BuiltinShaders::Load()
     })";
     
     const char* momentsFragmentSource = R"(
-    #version 410 core
+    #version 330 core
     
     out vec4 fragColor;
     
@@ -154,7 +154,7 @@ void ae3d::BuiltinShaders::Load()
     momentsShader.Load( momentsVertexSource, momentsFragmentSource );
   
     const char* depthNormalsVertexSource = R"(
-    #version 410 core
+    #version 330 core
     layout (location = 0) in vec4 aPosition;
     layout (location = 3) in vec3 aNormal;
     
@@ -173,7 +173,7 @@ void ae3d::BuiltinShaders::Load()
     )";
     
     const char* depthNormalsFragmentSource = R"(
-    #version 410 core
+    #version 330 core
     in vec3 vPosition;
     in vec3 vNormal;
     

@@ -123,11 +123,11 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& framebufferDesc 
 
 void SetupDistortion()
 {
-    GLushort m_iLensGridSegmentCountH = 43;
-    GLushort m_iLensGridSegmentCountV = 43;
+    const GLushort lensGridSegmentCountH = 43;
+    const GLushort lensGridSegmentCountV = 43;
 
-    float w = (float)(1.0 / float( m_iLensGridSegmentCountH - 1 ));
-    float h = (float)(1.0 / float( m_iLensGridSegmentCountV - 1 ));
+    const float w = (float)(1.0 / float( lensGridSegmentCountH - 1 ));
+    const float h = (float)(1.0 / float( lensGridSegmentCountV - 1 ));
 
     float u, v = 0;
 
@@ -136,9 +136,9 @@ void SetupDistortion()
 
     // Left eye distortion verts
     float Xoffset = -1;
-    for (int y = 0; y < m_iLensGridSegmentCountV; ++y)
+    for (int y = 0; y < lensGridSegmentCountV; ++y)
     {
-        for (int x = 0; x < m_iLensGridSegmentCountH; ++x)
+        for (int x = 0; x < lensGridSegmentCountH; ++x)
         {
             u = x * w; v = 1 - y * h;
             vert.position = Vector2( Xoffset + u, -1 + 2 * y*h );
@@ -156,9 +156,9 @@ void SetupDistortion()
 
     // Right eye distortion verts
     Xoffset = 0;
-    for (int y = 0; y < m_iLensGridSegmentCountV; ++y)
+    for (int y = 0; y < lensGridSegmentCountV; ++y)
     {
-        for (int x = 0; x < m_iLensGridSegmentCountH; ++x)
+        for (int x = 0; x < lensGridSegmentCountH; ++x)
         {
             u = x * w; v = 1 - y * h;
             vert.position = Vector2( Xoffset + u, -1 + 2 * y * h );
@@ -178,14 +178,14 @@ void SetupDistortion()
     GLushort a, b, c, d;
 
     GLushort offset = 0;
-    for (GLushort y = 0; y<m_iLensGridSegmentCountV - 1; y++)
+    for (GLushort y = 0; y < lensGridSegmentCountV - 1; ++y)
     {
-        for (GLushort x = 0; x<m_iLensGridSegmentCountH - 1; x++)
+        for (GLushort x = 0; x < lensGridSegmentCountH - 1; ++x)
         {
-            a = m_iLensGridSegmentCountH*y + x + offset;
-            b = m_iLensGridSegmentCountH*y + x + 1 + offset;
-            c = (y + 1)*m_iLensGridSegmentCountH + x + 1 + offset;
-            d = (y + 1)*m_iLensGridSegmentCountH + x + offset;
+            a = lensGridSegmentCountH * y + x + offset;
+            b = lensGridSegmentCountH * y + x + 1 + offset;
+            c = (y + 1) * lensGridSegmentCountH + x + 1 + offset;
+            d = (y + 1) * lensGridSegmentCountH + x + offset;
             vIndices.push_back( a );
             vIndices.push_back( b );
             vIndices.push_back( c );
@@ -196,15 +196,15 @@ void SetupDistortion()
         }
     }
 
-    offset = (m_iLensGridSegmentCountH)*(m_iLensGridSegmentCountV);
-    for (GLushort y = 0; y<m_iLensGridSegmentCountV - 1; y++)
+    offset = lensGridSegmentCountH * lensGridSegmentCountV;
+    for (GLushort y = 0; y < lensGridSegmentCountV - 1; ++y)
     {
-        for (GLushort x = 0; x<m_iLensGridSegmentCountH - 1; x++)
+        for (GLushort x = 0; x < lensGridSegmentCountH - 1; ++x)
         {
-            a = m_iLensGridSegmentCountH*y + x + offset;
-            b = m_iLensGridSegmentCountH*y + x + 1 + offset;
-            c = (y + 1)*m_iLensGridSegmentCountH + x + 1 + offset;
-            d = (y + 1)*m_iLensGridSegmentCountH + x + offset;
+            a = lensGridSegmentCountH * y + x + offset;
+            b = lensGridSegmentCountH * y + x + 1 + offset;
+            c = (y + 1) * lensGridSegmentCountH + x + 1 + offset;
+            d = (y + 1) * lensGridSegmentCountH + x + offset;
             vIndices.push_back( a );
             vIndices.push_back( b );
             vIndices.push_back( c );
@@ -333,7 +333,7 @@ void RenderDistortion()
 void CompileShaders()
 {
     const char* lensVertexSource =
-        "#version 410 core\n"
+        "#version 330 core\n"
         "layout(location = 0) in vec4 position;\n"
         "layout(location = 1) in vec2 v2UVredIn;\n"
         "layout(location = 2) in vec2 v2UVGreenIn;\n"
@@ -350,7 +350,7 @@ void CompileShaders()
         "}\n";
 
     const char* lensFragmentSource =
-        "#version 410 core\n"
+        "#version 330 core\n"
         "uniform sampler2D mytexture;\n"
 
         "noperspective in vec2 v2UVred;\n"

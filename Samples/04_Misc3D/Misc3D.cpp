@@ -425,10 +425,10 @@ int main()
     scene.Add( &standardCubeTopCenter );
 #endif
 
-    scene.SetSkybox( &skybox );
+    //scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
-    scene.Add( &statsContainer );
+    //scene.Add( &camera2d );
+    //scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
