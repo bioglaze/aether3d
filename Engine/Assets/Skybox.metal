@@ -11,7 +11,7 @@ typedef struct
 typedef struct
 {
     float4 position [[position]];
-    half4  color;
+    //half4  color;
     float3 texCoords;
 } ColorInOut;
 
@@ -19,7 +19,6 @@ struct Vertex
 {
     float3 position [[attribute(0)]];
     float2 texcoord [[attribute(1)]];
-    float4 color [[attribute(2)]];
 };
 
 constexpr sampler s(coord::normalized,
@@ -34,14 +33,13 @@ vertex ColorInOut skybox_vertex( Vertex vert [[stage_in]],
     float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms._ModelViewProjectionMatrix * in_position;
 
-    out.color = half4( vert.color );
     out.texCoords = vert.position;
     return out;
 }
 
-fragment half4 skybox_fragment(ColorInOut in [[stage_in]],
-                               texturecube<float, access::sample> texture [[texture(0)]])
+fragment half4 skybox_fragment( ColorInOut in [[stage_in]],
+                                texturecube<float, access::sample> texture [[texture(0)]] )
 {
-    half4 sampledColor = half4(texture.sample(s, in.texCoords)) * in.color;
+    half4 sampledColor = half4( texture.sample( s, in.texCoords ) );
     return half4(sampledColor);
 }
