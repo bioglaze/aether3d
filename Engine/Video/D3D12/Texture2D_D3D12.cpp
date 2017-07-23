@@ -269,7 +269,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (isCached && handle == 0)
     {
-        System::Print("loading from cache\n");
         *this = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
         return;
     }
@@ -280,7 +279,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         fileWatcher.AddFile( fileContents.path, TexReload );
     }
 
-    System::Print( "loading %s\n", fileContents.path.c_str() );
     const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
     
     if (HasStbExtension( fileContents.path ))

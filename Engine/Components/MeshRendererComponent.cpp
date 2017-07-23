@@ -39,7 +39,7 @@ ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
 
 std::string ae3d::MeshRendererComponent::GetSerialized() const
 {
-    return "meshrenderer\n";
+    return "meshrenderer\n\n";
 }
 
 void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld )

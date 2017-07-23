@@ -39,7 +39,7 @@ std::string ae3d::AudioSourceComponent::GetSerialized() const
     std::stringstream outStream;
     outStream << "audiosource\n";
     outStream << clipId << "\n";
-    outStream << "enabled" << isEnabled << "\n";
+    outStream << "enabled " << isEnabled << "\n";
     outStream << "\n\n";
     
     return outStream.str();
