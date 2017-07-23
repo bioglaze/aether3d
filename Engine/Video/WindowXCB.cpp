@@ -19,6 +19,7 @@
 #include <dirent.h>
 #include <cstring>
 #include "GfxDevice.hpp"
+#include "Statistics.hpp"
 
 // Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
 // Event tutorial: http://xcb.freedesktop.org/tutorial/events/
@@ -730,6 +731,7 @@ void ae3d::Window::SwapBuffers()
 {
 #if RENDERER_OPENGL
     glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
+    Statistics::EndFrameTimeProfiling();
 #endif
 #if RENDERER_VULKAN
     GfxDevice::Present();
