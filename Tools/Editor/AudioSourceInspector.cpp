@@ -19,8 +19,6 @@ void AudioSourceInspector::Init( QWidget* mainWindow )
     audioClipTable->setHorizontalHeaderLabels( QString("").split(";") );
     audioClipTable->setVerticalHeaderLabels( QString("Filename").split(";") );
 
-    audioClipTable->setItem( 0, 0, new QTableWidgetItem() );
-
     QLabel* componentName = new QLabel("Audio Source");
     removeButton = new QPushButton("remove");
     QBoxLayout* headerLayout = new QBoxLayout( QBoxLayout::LeftToRight );
@@ -53,13 +51,12 @@ void AudioSourceInspector::GameObjectSelected( std::list< ae3d::GameObject* > ga
 
 void AudioSourceInspector::AudioCellClicked( int, int )
 {
-    // TOOD: Asset library, this is only an ugly placeholder.
-
     const std::string path = QFileDialog::getOpenFileName( root, "Open Audio Clip", "", "Audio clips (*.wav)" ).toStdString();
 
     if (!path.empty())
     {
         ae3d::AudioClip* audioClip = new ae3d::AudioClip();
         audioClip->Load( ae3d::FileSystem::FileContents( path.c_str() ) );
+        audioClipTable->setItem( 0, 0, new QTableWidgetItem( path.c_str() ) );
     }
 }

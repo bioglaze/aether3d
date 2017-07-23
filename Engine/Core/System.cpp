@@ -19,6 +19,12 @@
 
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
+#if RENDERER_OPENGL
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+#endif
 void PlatformInitGamePad();
 
 using namespace ae3d;
@@ -152,7 +158,11 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     Matrix44::Multiply( scale, proj, mvp );
     
     renderer.builtinShaders.spriteRendererShader.Use();
+#if RENDERER_OPENGL
+    GfxDeviceGlobal::perObjectUboStruct.projectionModelMatrix.InitFrom( &mvp.m[ 0 ] );
+#else
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &mvp.m[ 0 ] );
+#endif
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
     
     GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend,

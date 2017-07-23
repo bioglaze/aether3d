@@ -37,14 +37,43 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     const std::vector< const FileSystem::FileContentsData* > fileContents = { &posX, &negX, &negY, &posY, &negZ, &posZ };
 
     int firstImageComponents;
-    unsigned char* firstImageData = stbi_load_from_memory( datas[ 0 ]->data(), static_cast<int>(datas[ 0 ]->size()), &width, &height, &firstImageComponents, 4 );
-    stbi_image_free( firstImageData );
-
+    const bool isFirstImageDDS = paths[ 0 ].find( ".dds" ) != std::string::npos || paths[ 0 ].find( ".DDS" ) != std::string::npos;
+    
+    if (isFirstImageDDS)
+    {
+#if !TARGET_OS_IPHONE
+        DDSLoader::Output output;
+        DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( *fileContents[ 0 ], 0, width, height, opaque, output );
+        
+        if (ddsLoadResult != DDSLoader::LoadResult::Success)
+        {
+            ae3d::System::Print( "Could not load %s\n", fileContents[ 0 ]->path.c_str() );
+            return;
+        }
+#endif
+    }
+    else
+    {
+        unsigned char* firstImageData = stbi_load_from_memory( datas[ 0 ]->data(), static_cast<int>(datas[ 0 ]->size()), &width, &height, &firstImageComponents, 4 );
+        stbi_image_free( firstImageData );
+    }
+    
     MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                                                           size:width
                                                                                         mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-    metalTexture.label = [NSString stringWithFormat:@"%s", posX.path.c_str()];
+
+    const std::size_t pos = fileContents[ 0 ]->path.find_last_of( "/" );
+    
+    if (pos != std::string::npos)
+    {
+        std::string fileName = fileContents[ 0 ]->path.substr( pos );
+        metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+    }
+    else
+    {
+        metalTexture.label = [NSString stringWithUTF8String:fileContents[ 0 ]->path.c_str()];
+    }
     
     const NSUInteger bytesPerPixel = 4;
     NSUInteger bytesPerRow = bytesPerPixel * width;
@@ -54,7 +83,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     for (int face = 0; face < 6; ++face)
     {
-        const bool isDDS = paths[ face ].find( ".dds" ) != std::string::npos || paths[ face ].find( ".dds" ) != std::string::npos;
+        const bool isDDS = paths[ face ].find( ".dds" ) != std::string::npos || paths[ face ].find( ".DDS" ) != std::string::npos;
 
         if (HasStbExtension( paths[ face ] ))
         {
@@ -94,7 +123,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             }
 
             bytesPerRow = width * 2;
-
+            const int bytesPerRow2 = width * 4;
+            
             MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm;
 
             if (output.format == DDSLoader::Format::BC1)
@@ -112,27 +142,14 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 bytesPerRow = width * 4;
             }
 
-            MTLTextureDescriptor* textureDescriptor =
-            [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
-                                                               width:width
-                                                              height:height
-                                                           mipmapped:NO];//(mipmaps == Mipmaps::None ? NO : YES)];
-            metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
-
-            std::size_t pos = fileContents[ face ]->path.find_last_of( "/" );
-            if (pos != std::string::npos)
-            {
-                std::string fileName = fileContents[ face ]->path.substr( pos );
-                metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
-            }
-            else
-            {
-                metalTexture.label = [NSString stringWithUTF8String:fileContents[ face ]->path.c_str()];
-            }
-
-
             region = MTLRegionMake2D( 0, 0, width, height );
-            [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&output.imageData[ output.dataOffsets[ 0 ] ] bytesPerRow:bytesPerRow];
+            [metalTexture replaceRegion:region
+                            mipmapLevel:0
+                                  slice:face
+                              withBytes:&output.imageData[ output.dataOffsets[ 0 ] ]
+                            bytesPerRow:bytesPerRow2
+                          bytesPerImage:bytesPerImage];
+
 #endif
         }
         else

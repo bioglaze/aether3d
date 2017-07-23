@@ -38,8 +38,8 @@ int main()
 {
     bool fullScreen = false;
 
-    int width = 1920 / 1;
-    int height = 1080 / 1;
+    int width = 1920 / 2;
+    int height = 1080 / 2;
     //int width = 640;
     //int height = 480;
 
@@ -337,7 +337,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -425,10 +425,10 @@ int main()
     scene.Add( &standardCubeTopCenter );
 #endif
 
-    //scene.SetSkybox( &skybox );
+    scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
-    //scene.Add( &statsContainer );
+    scene.Add( &camera2d );
+    scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
@@ -448,7 +448,7 @@ int main()
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
 #endif
-    //scene.Add( &animatedGo );
+    scene.Add( &animatedGo );
     scene.Add( &cubePTN );
     //scene.Add( &childCube );
     //scene.Add( &copiedCube );

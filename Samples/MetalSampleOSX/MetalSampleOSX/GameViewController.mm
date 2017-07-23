@@ -141,10 +141,10 @@ using namespace ae3d;
         System::Print( "Could not parse Sponza\n" );
     }
 
-    /*for (auto& mat : sponzaMaterialNameToMaterial)
+    for (auto& mat : sponzaMaterialNameToMaterial)
     {
         mat.second->SetShader( &shader );
-    }*/
+    }
 
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
     {
@@ -161,7 +161,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -190,10 +190,15 @@ using namespace ae3d;
     bc1Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc2Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt3.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc3Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt5.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
-    skyTex.Load( ae3d::FileSystem::FileContents( "/left.jpg" ), ae3d::FileSystem::FileContents( "/right.jpg" ),
+    /*skyTex.Load( ae3d::FileSystem::FileContents( "/left.jpg" ), ae3d::FileSystem::FileContents( "/right.jpg" ),
                 ae3d::FileSystem::FileContents( "/bottom.jpg" ), ae3d::FileSystem::FileContents( "/top.jpg" ),
                 ae3d::FileSystem::FileContents( "/front.jpg" ), ae3d::FileSystem::FileContents( "/back.jpg" ),
-                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB );
+                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB );*/
+    
+    skyTex.Load( FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
+                FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
+                FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
+                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );
     scene.SetSkybox( &skyTex );
     
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
