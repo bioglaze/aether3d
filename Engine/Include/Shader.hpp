@@ -71,7 +71,8 @@ namespace ae3d
         void SetMatrix( const char* name, const float* matrix4x4 );
 
         /// \param name Matrix array uniform name.
-        /// \param matrix4x4 Contents of Matrix44 array.
+        /// \param matrix4x4s Contents of Matrix44 array.
+        /// \param count Matrix count in the array.
         void SetMatrixArray( const char* name, const float* matrix4x4s, int count );
 
         /// \param name Texture uniform name.

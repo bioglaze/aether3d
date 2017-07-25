@@ -47,7 +47,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 
 ## Windows
 
-  - Open the project in Engine\VisualStudio_* in VS2015 and build it. For MinGW you can use Engine/Makefile_OpenGL or Makefile_Vulkan.
+  - Open the project in Engine\VisualStudio_* in VS2017 and build it. For MinGW you can use Engine/Makefile_OpenGL or Makefile_Vulkan.
   - Build and run Samples\01_OpenWindow.
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
   - FBX converter tries to find FBX SDK 2017.1 in its default install location (English language localization)
@@ -55,7 +55,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 ### OpenVR
   - Copy OpenVR headers into Engine\ThirdParty\headers
   - Open OpenGL renderer's Visual Studio solution and select target ***OpenVR Release***
-  - Build and run Samples/04_Misc3D target ***OpenVR Release*** in VS2015.
+  - Build and run Samples/04_Misc3D target ***OpenVR Release*** in VS2017.
 
 ## macOS
 

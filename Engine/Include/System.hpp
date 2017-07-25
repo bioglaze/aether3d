@@ -15,7 +15,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.6.5 Documentation
+   \mainpage Aether3D Game Engine v0.7 Documentation
 
    \section Introduction
 
@@ -26,7 +26,7 @@
 
    <ul>
    <li>Windows, macOS, iOS and GNU/Linux.</li>
-   <li>OpenGL 4.1, Vulkan (WIP) Metal and D3D12 (WIP) renderers.</li>
+   <li>OpenGL 4.1, Vulkan (WIP) Metal and D3D12 renderers.</li>
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
@@ -35,6 +35,7 @@
    <li>Shadow mapping from a directional or spot light (no lighting yet)</li>
    <li>VR support. Tested on HTC Vive and Oculus Rift.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
+   <li>Skinned animation.</li>
    <li>Scene serialization.</li>
    <li>Scene editor built using Qt and WYSIWYG rendering.</li>
    <li>XBox controller support.</li>
@@ -49,11 +50,11 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.6.5.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.7.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    
-   You'll need Visual Studio 2015 or newer. Build Engine/VisualStudio_GL45, Engine/VisualStudio_D3D12 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
+   You'll need Visual Studio 2017 or newer. Build Engine/VisualStudio_GL45, Engine/VisualStudio_D3D12 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    You'll need OpenAL32.dll from OpenAL Soft either in your system directory or in the directory used to run samples/editor.
  
