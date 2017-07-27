@@ -50,9 +50,6 @@ int main()
     }
     
     System::EnableWindowsMemleakDetection();
-#if defined( AE3D_OPENVR )
-    VR::GetIdealWindowSize( width, height );
-#endif
 
     Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
     Window::GetSize( width, height );
@@ -62,6 +59,11 @@ int main()
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
+
+#if defined( AE3D_OPENVR )
+    VR::GetIdealWindowSize( width, height );
+#endif
+    System::Print( "backbuffer dimension: %dx%d\n", width, height );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -427,8 +429,8 @@ int main()
 
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
-    scene.Add( &statsContainer );
+    //scene.Add( &camera2d );
+    //scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
@@ -531,7 +533,8 @@ int main()
        
         cube.GetComponent< TransformComponent >()->SetLocalPosition( camera.GetComponent< TransformComponent >()->GetWorldPosition() + VR::GetLeftHandPosition() );
         Vec3 pos = VR::GetLeftHandPosition();
-        System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
+        //System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
+        camera.GetComponent< CameraComponent >()->SetViewport( 0, 0, width, height );
 
         for (int eye = 0; eye < 2; ++eye)
         {

@@ -164,7 +164,13 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &mvp.m[ 0 ] );
 #endif
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
-    
+    int viewport[ 4 ];
+    viewport[ 0 ] = 0;
+    viewport[ 1 ] = 0;
+    viewport[ 2 ] = xScreenSize;
+    viewport[ 3 ] = yScreenSize;
+    GfxDevice::SetViewport( viewport );
+
     GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend,
                      GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
