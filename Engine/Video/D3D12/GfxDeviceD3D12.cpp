@@ -31,6 +31,7 @@
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
+const int MaxNumTimers = 4;
 
 namespace WindowGlobal
 {
@@ -49,8 +50,10 @@ namespace ae3d
             {
                 std::stringstream stm;
                 stm << "frame time: " << ::Statistics::GetFrameTimeMS() << "ms\n";
-                stm << "shadow pass time: " << ::Statistics::GetShadowMapTimeMS() << "ms\n";
-                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
+                stm << "shadow pass time CPU: " << ::Statistics::GetShadowMapTimeMS() << "ms\n";
+                stm << "shadow pass time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << "ms\n";
+                stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
+                stm << "depth pass time GPU: " << ::Statistics::GetDepthNormalsTimeGpuMS() << "ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
@@ -93,6 +96,14 @@ int GetSamplerIndexByAnisotropy( ae3d::Anisotropy anisotropy )
 
     return SamplerIndexByAnisotropy::One;
 }
+
+struct TimerQuery
+{
+    ID3D12QueryHeap* queryHeap = nullptr;
+    ID3D12Resource* queryBuffer = nullptr;
+    uint64_t* result = nullptr;
+    uint64_t frequency = 0;
+};
 
 namespace GfxDeviceGlobal
 {
@@ -155,6 +166,7 @@ namespace GfxDeviceGlobal
     D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
     ID3D12DescriptorHeap* computeCbvSrvUavHeap = nullptr;
+    TimerQuery timerQuery;
 }
 
 namespace ae3d
@@ -833,6 +845,47 @@ void ae3d::CreateRenderer( int samples )
     D3D12_CPU_DESCRIPTOR_HANDLE initDsvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
     D3D12_CPU_DESCRIPTOR_HANDLE initCbvSrvUavHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
+    // Query heap
+    D3D12_HEAP_PROPERTIES HeapProps;
+    HeapProps.Type = D3D12_HEAP_TYPE_READBACK;
+    HeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    HeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    HeapProps.CreationNodeMask = 1;
+    HeapProps.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC BufferDesc;
+    BufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    BufferDesc.Alignment = 0;
+    BufferDesc.Width = sizeof( uint64_t ) * MaxNumTimers * 2;
+    BufferDesc.Height = 1;
+    BufferDesc.DepthOrArraySize = 1;
+    BufferDesc.MipLevels = 1;
+    BufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+    BufferDesc.SampleDesc.Count = 1;
+    BufferDesc.SampleDesc.Quality = 0;
+    BufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    BufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    hr = GfxDeviceGlobal::device->CreateCommittedResource( &HeapProps, D3D12_HEAP_FLAG_NONE, &BufferDesc,
+        D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &GfxDeviceGlobal::timerQuery.queryBuffer ) );
+    AE3D_CHECK_D3D( hr, "Failed to create query buffer" );
+
+    GfxDeviceGlobal::timerQuery.queryBuffer->SetName( L"Query Buffer" );
+
+    D3D12_QUERY_HEAP_DESC QueryHeapDesc;
+    QueryHeapDesc.Count = MaxNumTimers * 2;
+    QueryHeapDesc.NodeMask = 1;
+    QueryHeapDesc.Type = D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
+    hr = GfxDeviceGlobal::device->CreateQueryHeap( &QueryHeapDesc, IID_PPV_ARGS( &GfxDeviceGlobal::timerQuery.queryHeap ) );
+    AE3D_CHECK_D3D( hr, "Failed to create query heap" );
+    GfxDeviceGlobal::timerQuery.queryHeap->SetName( L"Query heap" );
+
+    hr = GfxDeviceGlobal::commandQueue->GetTimestampFrequency( &GfxDeviceGlobal::timerQuery.frequency );
+    AE3D_CHECK_D3D( hr, "Failed to get timer query frequency" );
+
+    D3D12_RANGE range = { 0, MaxNumTimers };
+    GfxDeviceGlobal::timerQuery.queryBuffer->Map( 0, &range, (void**)&GfxDeviceGlobal::timerQuery.result );
+
     CreateBackBuffer();
     CreateMSAA();
     CreateRootSignature();
@@ -868,12 +921,23 @@ void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()
 {
-    // TODO: Implement
+    //uint32_t offset = m_control.m_current * 2 + 0;
+    uint32_t offset = GfxDeviceGlobal::frameIndex & 3;
+    GfxDeviceGlobal::graphicsCommandList->EndQuery( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, offset );
 }
 
 void ae3d::GfxDevice::EndShadowMapGpuQuery()
 {
-    // TODO: Implement
+    //uint32_t offset = 0;
+    uint32_t offset = ((GfxDeviceGlobal::frameIndex & 3) - 3) & 3;
+
+    GfxDeviceGlobal::graphicsCommandList->EndQuery( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, offset + 1 );
+    GfxDeviceGlobal::graphicsCommandList->ResolveQueryData( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, offset, 2, GfxDeviceGlobal::timerQuery.queryBuffer, offset * sizeof( uint64_t ) );
+    
+    const uint64_t beginTime = GfxDeviceGlobal::timerQuery.result[ offset + 0 ];
+    const uint64_t endTime = GfxDeviceGlobal::timerQuery.result[ offset + 1 ];
+    const float theTime = (endTime - beginTime) / 1000000.0f;
+    Statistics::SetShadowMapGpuTime( theTime );
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )
@@ -1104,6 +1168,11 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::lightTilerPSO );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeap );
+
+    D3D12_RANGE range = { 0, 0 };
+    GfxDeviceGlobal::timerQuery.queryBuffer->Unmap( 0, &range );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryBuffer );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryHeap );
 
     GfxDeviceGlobal::lightTiler.DestroyBuffers();
 

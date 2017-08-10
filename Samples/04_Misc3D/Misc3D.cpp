@@ -26,7 +26,7 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_VERTEX_LAYOUTS
-//#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
 
@@ -63,7 +63,6 @@ int main()
 #if defined( AE3D_OPENVR )
     VR::GetIdealWindowSize( width, height );
 #endif
-    System::Print( "backbuffer dimension: %dx%d\n", width, height );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -429,8 +428,8 @@ int main()
 
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
-    //scene.Add( &statsContainer );
+    scene.Add( &camera2d );
+    scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );
