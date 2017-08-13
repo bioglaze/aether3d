@@ -99,6 +99,7 @@ namespace GfxDeviceGlobal
     VkSemaphore renderCompleteSemaphore = VK_NULL_HANDLE;
     VkSemaphore offscreenSemaphore = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
+    VkQueryPool queryPool = VK_NULL_HANDLE;
     VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     std::map< std::uint64_t, VkPipeline > psoCache;
@@ -513,7 +514,7 @@ namespace ae3d
         vkCmdPipelineBarrier(
             GfxDeviceGlobal::postPresentCmdBuffer,
             VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
             0,
             0, nullptr,
             0, nullptr,
@@ -1438,6 +1439,14 @@ namespace ae3d
         GfxDevice::SetClearColor( 0, 0, 0 );
 
         GfxDevice::CreateUniformBuffers();
+
+        VkQueryPoolCreateInfo queryPoolInfo = {};
+        queryPoolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
+        queryPoolInfo.queryType = VK_QUERY_TYPE_OCCLUSION;
+        queryPoolInfo.queryCount = 2;
+
+        err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, NULL, &GfxDeviceGlobal::queryPool );
+        AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
     }
 }
 
@@ -1797,6 +1806,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     vkDestroyDescriptorSetLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorSetLayout, nullptr );
     vkDestroyDescriptorPool( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorPool, nullptr );
     vkDestroyRenderPass( GfxDeviceGlobal::device, GfxDeviceGlobal::renderPass, nullptr );
+    vkDestroyQueryPool( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, nullptr );
 
     if (GfxDeviceGlobal::msaaTarget.colorImage != VK_NULL_HANDLE)
     {

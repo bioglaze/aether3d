@@ -258,8 +258,33 @@ namespace ae3d
             imageMemoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         }
 
-        const VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-        const VkPipelineStageFlags destStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        VkPipelineStageFlags destStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+
+        if (imageMemoryBarrier.dstAccessMask == VK_ACCESS_TRANSFER_WRITE_BIT)
+        {
+            destStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        }
+        
+        if (imageMemoryBarrier.dstAccessMask == VK_ACCESS_SHADER_READ_BIT)
+        {
+            destStageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        }
+
+        if (imageMemoryBarrier.dstAccessMask == VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT)
+        {
+            destStageFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        }
+
+        if (imageMemoryBarrier.dstAccessMask == VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT)
+        {
+            destStageFlags = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        }
+
+        if (imageMemoryBarrier.dstAccessMask == VK_ACCESS_TRANSFER_READ_BIT)
+        {
+            destStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        }
 
         vkCmdPipelineBarrier(
             cmdbuffer,
