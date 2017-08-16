@@ -101,6 +101,24 @@ namespace ae3d
     /// High-level functions
     namespace System
     {
+        /// \param vpX Viewport x.
+        /// \param vpY Viewport y.
+        /// \param vpWidth Viewport width.
+        /// \param vpHeight Viewport height.
+        /// \param elemCount Element count.
+        /// \param textureId Texture id.
+        /// \param offset Offset into vertex buffer.
+        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset );
+        
+        /// \param vertexSize Vertex size.
+        /// \param indexSize Index size.
+        /// \param outMappedVertices Mapped vertices.
+        /// \param outMappedIndices Mapped indices.
+        void MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices );
+
+        /// Unmaps UI vertex buffer. Must be called before DrawUI if it was mapped.
+        void UnmapUIVertexBuffer();
+        
         /// Inits audio system.
         void InitAudio();
 

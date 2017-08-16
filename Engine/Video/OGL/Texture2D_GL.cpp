@@ -151,6 +151,29 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
+{
+    width = aWidth;
+    height = aHeight;
+    wrap = TextureWrap::Repeat;
+    filter = TextureFilter::Nearest;
+    
+    handle = GfxDevice::CreateTextureId();
+
+    glBindTexture( GL_TEXTURE_2D, handle );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+    if (GfxDevice::HasExtension( "GL_KHR_debug" ))
+    {
+        glObjectLabel( GL_TEXTURE, handle, -1, debugName );
+    }
+
+    glTexImage2D( GL_TEXTURE_2D, 0, channels == 4 ? GL_RGBA8 : GL_RGB8, width, height, 0, channels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData );
+}
+
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     filter = aFilter;

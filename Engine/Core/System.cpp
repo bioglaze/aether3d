@@ -78,6 +78,25 @@ void ae3d::System::Deinit()
     AudioSystem::Deinit();
 }
 
+void ae3d::System::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
+{
+    GfxDevice::MapUIVertexBuffer( vertexSize, indexSize, outMappedVertices, outMappedIndices );
+}
+
+void ae3d::System::UnmapUIVertexBuffer()
+{
+    GfxDevice::UnmapUIVertexBuffer();
+}
+
+void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
+{
+    Matrix44 proj;
+    renderer.builtinShaders.uiShader.Use();
+    renderer.builtinShaders.uiShader.SetMatrix( "projection", &proj.m[ 0 ] );
+
+    GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, textureId, offset );
+}
+
 void ae3d::System::EnableWindowsMemleakDetection()
 {
 #if _MSC_VER

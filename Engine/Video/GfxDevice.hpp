@@ -66,6 +66,9 @@ namespace ae3d
             Lines
         };
 
+        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset );
+        void MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices );
+        void UnmapUIVertexBuffer();
         void Init( int width, int height );
         int CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color );
 #if RENDERER_D3D12

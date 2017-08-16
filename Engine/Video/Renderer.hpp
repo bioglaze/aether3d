@@ -20,6 +20,7 @@ namespace ae3d
         Shader skyboxShader;
         Shader momentsShader;
         Shader depthNormalsShader;
+        Shader uiShader;
         ComputeShader lightCullShader;
     };
 

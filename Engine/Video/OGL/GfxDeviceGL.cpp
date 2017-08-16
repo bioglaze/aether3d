@@ -64,6 +64,20 @@ void APIENTRY DebugCallbackARB( GLenum source, GLenum type, GLuint id, GLenum se
     }
 }
 
+struct UIVertexBuffer
+{
+    GLuint vao = 0;
+    GLuint vbo = 0;
+    GLuint ibo = 0;
+};
+
+struct nk_glfw_vertex
+{
+    float position[ 2 ];
+    float uv[ 2 ];
+    std::uint8_t col[ 4 ];
+};
+
 namespace GfxDeviceGlobal
 {
     std::vector< GLuint > vaoIds;
@@ -85,6 +99,33 @@ namespace GfxDeviceGlobal
     unsigned frameIndex = 0;
 
     PerObjectUboStruct perObjectUboStruct;
+    UIVertexBuffer uiVertexBuffer;
+}
+
+void InitUIVertexBuffer()
+{
+    GLsizei vs = sizeof(struct nk_glfw_vertex);
+    size_t vp = offsetof(struct nk_glfw_vertex, position);
+    size_t vt = offsetof(struct nk_glfw_vertex, uv);
+    size_t vc = offsetof(struct nk_glfw_vertex, col);
+
+    glGenBuffers( 1, &GfxDeviceGlobal::uiVertexBuffer.vbo );
+    glGenBuffers( 1, &GfxDeviceGlobal::uiVertexBuffer.ibo );
+    glGenVertexArrays( 1, &GfxDeviceGlobal::uiVertexBuffer.vao );
+
+    glBindVertexArray( GfxDeviceGlobal::uiVertexBuffer.vao );
+    glBindBuffer( GL_ARRAY_BUFFER, GfxDeviceGlobal::uiVertexBuffer.vbo );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, GfxDeviceGlobal::uiVertexBuffer.ibo );
+
+    glEnableVertexAttribArray( 0 ); // pos
+    glEnableVertexAttribArray( 1 );  // uv
+    glEnableVertexAttribArray( 2 ); // color
+
+    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, vs, (void*)vp );
+    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, vs, (void*)vt );
+    glVertexAttribPointer( 2, 4, GL_UNSIGNED_BYTE, GL_TRUE, vs, (void*)vc );
+
+    glBindVertexArray( 0 );
 }
 
 namespace ae3d
@@ -193,6 +234,32 @@ namespace
     }
 }
 
+void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
+{
+    glBindVertexArray( GfxDeviceGlobal::uiVertexBuffer.vao );
+    glBindBuffer( GL_ARRAY_BUFFER, GfxDeviceGlobal::uiVertexBuffer.vbo );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, GfxDeviceGlobal::uiVertexBuffer.ibo );
+
+    glBufferData( GL_ARRAY_BUFFER, vertexSize, nullptr, GL_STREAM_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexSize, nullptr, GL_STREAM_DRAW );
+
+    *outMappedVertices = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+    *outMappedIndices = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY );
+}
+
+void ae3d::GfxDevice::UnmapUIVertexBuffer()
+{
+    glUnmapBuffer( GL_ARRAY_BUFFER );
+    glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+}
+
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
+{
+    glBindVertexArray( GfxDeviceGlobal::uiVertexBuffer.vao );
+    glScissor( vpX, vpY, vpWidth, vpHeight );
+    glDrawElements( GL_TRIANGLES, elemCount, GL_UNSIGNED_SHORT, offset );
+}
+
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
 {
     glBeginQuery( GL_TIME_ELAPSED, GfxDeviceGlobal::depthNormalsQueries[ GfxDeviceGlobal::frameIndex & 3 ] );
@@ -279,6 +346,8 @@ void ae3d::GfxDevice::Init( int width, int height )
 
     glGenQueries( 4, GfxDeviceGlobal::depthNormalsQueries );
     glGenQueries( 4, GfxDeviceGlobal::shadowMapQueries );
+
+    InitUIVertexBuffer();
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )

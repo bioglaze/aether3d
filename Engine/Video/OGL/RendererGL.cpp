@@ -188,4 +188,42 @@ void ae3d::BuiltinShaders::Load()
     )";
 
     depthNormalsShader.Load( depthNormalsVertexSource, depthNormalsFragmentSource );
+
+    const char* uiVertexSource = R"(
+    #version 330 core
+
+    uniform mat4 projection;
+
+    layout (location=0) in vec2 Position;
+    layout (location=1) in vec2 TexCoord;
+    layout (location=2) in vec4 Color;
+
+    out vec2 Frag_UV;
+    out vec4 Frag_Color;
+
+    void main()
+    {
+        Frag_UV = TexCoord;
+        Frag_Color = Color;
+        gl_Position = projection * vec4( Position.xy, 0.0, 1.0 );
+    }
+    )";
+    
+    const char* uiFragmentSource = R"(
+    #version 330 core
+
+    uniform sampler2D Texture;
+
+    in vec2 Frag_UV;
+    in vec4 Frag_Color;
+
+    out vec4 Out_Color;
+
+    void main()
+    {
+        Out_Color = Frag_Color * texture( Texture, Frag_UV.st );
+    }
+    )";
+
+    uiShader.Load( uiVertexSource, uiFragmentSource );
 }
