@@ -90,9 +90,17 @@ void ae3d::System::UnmapUIVertexBuffer()
 
 void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
 {
-    Matrix44 proj;
+    float ortho[ 4 ][ 4 ] = {
+        { 2, 0, 0, 0 },
+        { 0,-2, 0, 0 },
+        { 0, 0,-1, 0 },
+        { -1,1, 0, 1 },
+    };
+    ortho[ 0 ][ 0 ] /= (float)vpWidth;
+    ortho[ 1 ][ 1 ] /= (float)vpHeight;
+
     renderer.builtinShaders.uiShader.Use();
-    renderer.builtinShaders.uiShader.SetMatrix( "projection", &proj.m[ 0 ] );
+    renderer.builtinShaders.uiShader.SetMatrix( "projection", &ortho[ 0 ][ 0 ] );
 
     GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, textureId, offset );
 }
@@ -186,8 +194,8 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     int viewport[ 4 ];
     viewport[ 0 ] = 0;
     viewport[ 1 ] = 0;
-    viewport[ 2 ] = xScreenSize;
-    viewport[ 3 ] = yScreenSize;
+    viewport[ 2 ] = (int)xScreenSize;
+    viewport[ 3 ] = (int)yScreenSize;
     GfxDevice::SetViewport( viewport );
 
     GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend,

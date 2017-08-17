@@ -909,6 +909,21 @@ void ae3d::CreateRenderer( int samples )
     GfxDeviceGlobal::lightTiler.Init();
 }
 
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
+{
+    // TODO: Implement
+}
+
+void ae3d::GfxDevice::UnmapUIVertexBuffer()
+{
+    // TODO: Implement
+}
+
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
 {
     // TODO: Implement

@@ -103,7 +103,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (static_cast<int>(GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy) < GetFloatAnisotropy( anisotropy ))
     {
-        System::Print( "%s is using too big anisotropy (%f), max supported is %fx.\n", fileContents.path.c_str(), anisotropy,
+        System::Print( "%s is using too big anisotropy (%f), max supported is %fx.\n", fileContents.path.c_str(), GetFloatAnisotropy( anisotropy ),
             GfxDeviceGlobal::properties.limits.maxSamplerAnisotropy );
         anisotropy = Anisotropy::k4;
     }
