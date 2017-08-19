@@ -100,7 +100,7 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
     }
 }
 
-void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matrix44& modelViewProjection, const Matrix44& localToWorld,
+void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Matrix44& localToClip, const Matrix44& localToWorld,
                                           const Matrix44& shadowView, const Matrix44& shadowProjection, Shader* overrideShader, RenderType renderType )
 {
     if (isCulled || !mesh || !isEnabled)
@@ -134,10 +134,10 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
         if (overrideShader)
         {
             shader->Use();
-            shader->SetMatrix( "_ModelViewProjectionMatrix", &modelViewProjection.m[ 0 ] );
+            shader->SetMatrix( "_ModelViewProjectionMatrix", &localToClip.m[ 0 ] );
 #ifndef RENDERER_VULKAN
             // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
-            shader->SetMatrix( "_ModelViewMatrix", &modelView.m[ 0 ] );
+            shader->SetMatrix( "_ModelViewMatrix", &localToView.m[ 0 ] );
 #endif
         }
         else
@@ -153,9 +153,9 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& modelView, const Matri
             // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
             materials[ subMeshIndex ]->SetMatrix( "_ModelMatrix", localToWorld );
-            materials[ subMeshIndex ]->SetMatrix( "_ModelViewMatrix", modelView );
+            materials[ subMeshIndex ]->SetMatrix( "_ModelViewMatrix", localToView );
 #endif
-            materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection );
+            materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", localToClip );
             materials[ subMeshIndex ]->Apply();
 
             if (!subMeshes[ subMeshIndex ].joints.empty())

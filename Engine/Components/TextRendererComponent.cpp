@@ -120,7 +120,7 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
         auto shader = m().shader;
         shader->Use();
 #if RENDERER_OPENGL
-        GfxDeviceGlobal::perObjectUboStruct.projectionModelMatrix.InitFrom( projectionModelMatrix );
+        GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( projectionModelMatrix );
 #else
         renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
 #endif

@@ -13,7 +13,6 @@ void ae3d::BuiltinShaders::Load()
 
     layout(std140) uniform PerObject
     {
-        mat4 _ProjectionModelMatrix;
         mat4 _ModelViewProjectionMatrix;
     };
 
@@ -22,7 +21,7 @@ void ae3d::BuiltinShaders::Load()
     
     void main()
     {
-        gl_Position = _ProjectionModelMatrix * vec4( aPosition.xyz, 1.0 );
+        gl_Position = _ModelViewProjectionMatrix * vec4( aPosition.xyz, 1.0 );
         vTexCoord = aTexCoord;
         vColor = aColor;
     })";
@@ -52,7 +51,6 @@ void ae3d::BuiltinShaders::Load()
     
     layout(std140) uniform PerObject
     {
-        mat4 _ProjectionModelMatrix;
         mat4 _ModelViewProjectionMatrix;
     };
     
@@ -61,7 +59,7 @@ void ae3d::BuiltinShaders::Load()
     
     void main()
     {
-        gl_Position = _ProjectionModelMatrix * vec4( aPosition.xyz, 1.0 );
+        gl_Position = _ModelViewProjectionMatrix * vec4( aPosition.xyz, 1.0 );
         vTexCoord = aTexCoord;
         vColor = aColor;
     })";
@@ -93,7 +91,6 @@ void ae3d::BuiltinShaders::Load()
     
     layout(std140) uniform PerObject
     {
-        mat4 _ProjectionModelMatrix;
         mat4 _ModelViewProjectionMatrix;
     };
 

@@ -160,7 +160,7 @@ void RenderQueue::Build()
     isDirty = false;
 }
 
-void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* projectionModelMatrix )
+void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* localToClip )
 {
     if (isDirty)
     {
@@ -171,9 +171,9 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* pro
     {
         renderer.builtinShaders.spriteRendererShader.Use();
 #if RENDERER_OPENGL
-        GfxDeviceGlobal::perObjectUboStruct.projectionModelMatrix.InitFrom( projectionModelMatrix );
+        GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
 #else
-        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", localToClip );
 #endif
         
         if (drawable.texture->IsRenderTexture())

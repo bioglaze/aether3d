@@ -186,7 +186,7 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     
     renderer.builtinShaders.spriteRendererShader.Use();
 #if RENDERER_OPENGL
-    GfxDeviceGlobal::perObjectUboStruct.projectionModelMatrix.InitFrom( &mvp.m[ 0 ] );
+    GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &mvp.m[ 0 ] );
 #else
     renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &mvp.m[ 0 ] );
 #endif

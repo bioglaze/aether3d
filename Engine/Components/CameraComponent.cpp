@@ -39,10 +39,10 @@ ae3d::CameraComponent* ae3d::CameraComponent::Get( unsigned index )
 
 ae3d::Vec3 ae3d::CameraComponent::GetScreenPoint( const ae3d::Vec3 &worldPoint, float viewWidth, float viewHeight ) const
 {
-    Matrix44 viewProjection;
-    Matrix44::Multiply( viewMatrix, projectionMatrix, viewProjection );
+    Matrix44 worldToClip;
+    Matrix44::Multiply( viewMatrix, projectionMatrix, worldToClip );
     ALIGNAS( 16 ) Vec4 pos( worldPoint );
-    Matrix44::TransformPoint( pos, viewProjection, &pos );
+    Matrix44::TransformPoint( pos, worldToClip, &pos );
     pos.x /= pos.w;
     pos.y /= pos.w;
     

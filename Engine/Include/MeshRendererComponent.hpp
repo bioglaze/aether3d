@@ -57,10 +57,10 @@ namespace ae3d
         /// \param localToWorld Local-to-World matrix
         void Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld );
         
-        /// \param modelView Model-view matrix.
-        /// \param modelViewProjectionMatrix Model-view-projection matrix.
+        /// \param localToView Model-view matrix.
+        /// \param localToClip Model-view-projection matrix.
         /// \param localToWorld Transforms mesh AABB from mesh-local space into world-space.
-        void Render( const struct Matrix44& modelView, const Matrix44& modelViewProjectionMatrix, const Matrix44& localToWorld,
+        void Render( const struct Matrix44& localToView, const Matrix44& localToClip, const Matrix44& localToWorld,
                      const Matrix44& shadowView, const Matrix44& shadowProjection, class Shader* overrideShader, RenderType renderType );
 
         Mesh* mesh = nullptr;

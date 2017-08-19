@@ -73,14 +73,14 @@ void ae3d::Renderer::GenerateQuadBuffer()
 
 void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera )
 {
-    Matrix44 modelViewProjection;
-    Matrix44::Multiply( camera.GetView(), camera.GetProjection(), modelViewProjection );
+    Matrix44 localToClip;
+    Matrix44::Multiply( camera.GetView(), camera.GetProjection(), localToClip );
     
     builtinShaders.skyboxShader.Use();
 #if RENDERER_OPENGL
-    GfxDeviceGlobal::perObjectUboStruct.modelViewProjectionMatrix = modelViewProjection;
+    GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
 #else
-    builtinShaders.skyboxShader.SetMatrix( "_ModelViewProjectionMatrix", modelViewProjection.m );
+    builtinShaders.skyboxShader.SetMatrix( "_ModelViewProjectionMatrix", localToClip.m );
 #endif
     builtinShaders.skyboxShader.SetTexture( "skyMap", skyTexture, 0 );
 

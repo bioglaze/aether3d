@@ -13,8 +13,7 @@
 
 struct PerObjectUboStruct
 {
-    ae3d::Matrix44 projectionModelMatrix;
-    ae3d::Matrix44 modelViewProjectionMatrix;
+    ae3d::Matrix44 localToClip;
 };
 
 namespace ae3d
