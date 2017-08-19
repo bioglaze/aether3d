@@ -225,6 +225,13 @@ void Matrix44::InitFrom( const float* data )
     std::memcpy( m, data, sizeof( m ) );
 }
 
+void Matrix44::SetTranslation( const Vec3& translation )
+{
+    m[ 12 ] = translation.x;
+    m[ 13 ] = translation.y;
+    m[ 14 ] = translation.z;
+}
+
 void Matrix44::MakeIdentity()
 {
     std::memset( &m[ 0 ], 0, sizeof( m ) );

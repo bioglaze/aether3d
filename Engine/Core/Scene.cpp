@@ -94,7 +94,7 @@ void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const F
     Matrix44 view;
     outCameraTransform.GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -outCameraTransform.GetLocalPosition() );
+    translation.SetTranslation( -outCameraTransform.GetLocalPosition() );
     Matrix44::Multiply( translation, view, view );
     outCamera.SetView( view );
 
@@ -414,7 +414,7 @@ void ae3d::Scene::Render()
                     Matrix44 eyeView;
                     cameraTransform->GetWorldRotation().GetMatrix( eyeView );
                     Matrix44 translation;
-                    translation.Translate( -cameraTransform->GetWorldPosition() );
+                    translation.SetTranslation( -cameraTransform->GetWorldPosition() );
                     Matrix44::Multiply( translation, eyeView, eyeView );
                     
                     const Vec3 eyeViewDir = Vec3( eyeView.m[2], eyeView.m[6], eyeView.m[10] ).Normalized();
@@ -615,7 +615,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     fovDegrees = camera->GetFovDegrees();
     cameraTransform->GetWorldRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -cameraTransform->GetWorldPosition() );
+    translation.SetTranslation( -cameraTransform->GetWorldPosition() );
     Matrix44::Multiply( translation, view, view );
     camera->SetView( view );
 #endif
@@ -795,7 +795,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     auto cameraTransform = cameraGo->GetComponent< TransformComponent >();
     cameraTransform->GetWorldRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -cameraTransform->GetWorldPosition() );
+    translation.SetTranslation( -cameraTransform->GetWorldPosition() );
     Matrix44::Multiply( translation, view, view );
     
     SceneGlobal::shadowCameraViewMatrix = view;

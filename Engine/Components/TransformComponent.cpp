@@ -146,7 +146,7 @@ void ae3d::TransformComponent::SolveLocalMatrix()
 {
     localRotation.GetMatrix( localMatrix );
     localMatrix.Scale( localScale, localScale, localScale );
-    localMatrix.Translate( localPosition );
+    localMatrix.SetTranslation( localPosition );
 }
 
 void ae3d::TransformComponent::SetVrView( const Matrix44& view )
@@ -201,7 +201,7 @@ ae3d::Vec3 ae3d::TransformComponent::GetViewDirection() const
     ae3d::Matrix44 view;
     GetWorldRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -globalPosition );
+    translation.SetTranslation( -globalPosition );
     Matrix44::Multiply( translation, view, view );
 
     return Vec3( view.m[ 2 ], view.m[ 6 ], view.m[ 10 ] ).Normalized();

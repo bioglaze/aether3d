@@ -117,6 +117,9 @@ namespace ae3d
         
         /* Resets this matrix. */
         void MakeIdentity();
+
+        /// \param translation Translation
+        void SetTranslation( const Vec3& translation );
         
         /**
          Makes a lookat matrix (left-handed).

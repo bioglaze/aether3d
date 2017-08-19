@@ -175,7 +175,7 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
     
     Matrix44 translate;
-    translate.Translate( Vec3( x, y, 0 ) );
+    translate.SetTranslation( Vec3( x, y, 0 ) );
     
     Matrix44 scale;
     scale.Scale( xSize, ySize, 1 );
