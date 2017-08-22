@@ -48,16 +48,18 @@ struct Face
 {
     Face()
     {
-        vInd[0] = vInd[1] = vInd[2] = 0;
-        uvInd[0] = uvInd[1] = uvInd[2] = 0;
-        vnInd[0] = vnInd[1] = vnInd[2] = 0;
-        colInd[0] = colInd[1] = colInd[2] = 0;
+        vInd[ 0 ] = vInd[ 1 ] = vInd[ 2 ] = 0;
+        uvInd[ 0 ] = uvInd[ 1 ] = uvInd[ 2 ] = 0;
+        vnInd[ 0 ] = vnInd[ 1 ] = vnInd[ 2 ] = 0;
+        colInd[ 0 ] = colInd[ 1 ] = colInd[ 2 ] = 0;
+        tInd[ 0 ] = tInd[ 1 ] = tInd[ 2 ] = 0;
     }
 
-    unsigned short vInd[3];
-    unsigned short uvInd[3];
-    unsigned short vnInd[3];
-    unsigned short colInd[3];
+    unsigned short vInd[ 3 ];
+    unsigned short uvInd[ 3 ];
+    unsigned short vnInd[ 3 ];
+    unsigned short colInd[ 3 ];
+    unsigned short tInd[ 3 ];
 };
 
 // Defines a face used in a vertex array.
@@ -149,6 +151,7 @@ struct Mesh
     std::string name = { "unnamed" };
     std::vector< ae3d::Vec3 > vertex;
     std::vector< ae3d::Vec4 > tangents;
+    std::vector< ae3d::Vec4 > nonInterleavedTangents;
     std::vector< ae3d::Vec3 > vnormal;
     std::vector< ae3d::Vec4 > colors;
     std::vector< ae3d::Vec3 > fnormal;
@@ -789,6 +792,7 @@ void Mesh::Interleave()
         ae3d::Vec3 tnormal = vnormal[ face[ f ].vnInd[ 0 ] ];
         TexCoord ttcoord = tcoord.empty() ? TexCoord() : tcoord[ face[ f ].uvInd[ 0 ] ];
         ae3d::Vec4 tcolor = colors.empty() ? ae3d::Vec4( 0, 0, 0, 1 ) : colors[ face[ f ].colInd[ 0 ] ];
+        ae3d::Vec4 ttangent = nonInterleavedTangents.empty() ? ae3d::Vec4( 0, 0, 0, 1 ) : nonInterleavedTangents[ face[ f ].tInd[ 0 ] ];
 
         // Searches face f's vertex a from the vertex list.
         // If it's not found, it's added.
@@ -799,6 +803,7 @@ void Mesh::Interleave()
             if (AlmostEquals( interleavedVertices[ indices[ i ].a ].position, tvertex ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].a ].normal,   tnormal ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].a ].texCoord, ttcoord ) &&
+                AlmostEquals( interleavedVertices[ indices[ i ].a ].tangent, ttangent ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].a ].color, tcolor ))
             {
                 found = true;
@@ -814,6 +819,7 @@ void Mesh::Interleave()
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
             newVertex.color    = tcolor;
+            newVertex.tangent  = ttangent;
             
             if (!weights.empty())
             {
@@ -837,6 +843,7 @@ void Mesh::Interleave()
         tnormal = vnormal[ face[ f ].vnInd[ 1 ] ];
         ttcoord = tcoord.empty() ? TexCoord() : tcoord [ face[ f ].uvInd[ 1 ] ];
         tcolor = colors.empty() ? ae3d::Vec4( 0, 0, 0, 1 ) : colors[ face[ f ].colInd[ 1 ] ];
+        ttangent = nonInterleavedTangents.empty() ? ae3d::Vec4( 0, 0, 0, 1 ) : nonInterleavedTangents[ face[ f ].tInd[ 1 ] ];
         
         found = false;
 
@@ -845,6 +852,7 @@ void Mesh::Interleave()
             if (AlmostEquals( interleavedVertices[ indices[ i ].b ].position, tvertex ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].b ].normal,   tnormal ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].b ].texCoord, ttcoord ) &&
+                AlmostEquals( interleavedVertices[ indices[ i ].b ].tangent, ttangent ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].b ].color, tcolor ))
                 
             {
@@ -862,6 +870,7 @@ void Mesh::Interleave()
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
             newVertex.color    = tcolor;
+            newVertex.tangent  = ttangent;
             
             if (!weights.empty())
             {
@@ -885,6 +894,7 @@ void Mesh::Interleave()
         tnormal = vnormal[ face[ f ].vnInd[ 2 ] ];
         ttcoord = tcoord.empty() ? TexCoord() :  tcoord [ face[ f ].uvInd[ 2 ] ];
         tcolor = colors.empty() ? ae3d::Vec4( 0, 0, 0, 1 ) : colors[ face[ f ].colInd[ 2 ] ];
+        ttangent = nonInterleavedTangents.empty() ? ae3d::Vec4( 0, 0, 0, 1 ) : nonInterleavedTangents[ face[ f ].tInd[ 2 ] ];
 
         found = false;
 
@@ -893,6 +903,7 @@ void Mesh::Interleave()
             if (AlmostEquals( interleavedVertices[ indices[ i ].c ].position, tvertex ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].c ].normal,   tnormal ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].c ].texCoord, ttcoord ) &&
+                AlmostEquals( interleavedVertices[ indices[ i ].c ].tangent, ttangent ) &&
                 AlmostEquals( interleavedVertices[ indices[ i ].c ].color, tcolor ))
             {
                 found = true;
@@ -909,6 +920,7 @@ void Mesh::Interleave()
             newVertex.normal   = tnormal;
             newVertex.texCoord = ttcoord;
             newVertex.color    = tcolor;
+            newVertex.tangent  = ttangent;
 
             if (!weights.empty())
             {
@@ -1013,8 +1025,12 @@ void WriteAe3d( const std::string& aOutFile, VertexFormat vertexFormat )
         gMeshes[ m ].OptimizeFaces();
 
         gMeshes[ m ].SolveFaceNormals();
-        gMeshes[ m ].SolveFaceTangents();
-        gMeshes[ m ].SolveVertexTangents();
+
+        if (gMeshes[ m ].nonInterleavedTangents.empty())
+        {
+            gMeshes[ m ].SolveFaceTangents();
+            gMeshes[ m ].SolveVertexTangents();
+        }
     }
 
     // Calculates model's AABB by finding extreme values from meshes' AABBs.

@@ -170,8 +170,8 @@ int main()
     nk_font* nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
-    nk_font_atlas_end( &atlas, nk_handle_id( atlasId ), &nullTexture );
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
+    nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
@@ -241,10 +241,9 @@ int main()
             nk_end( &ctx );
         }
 
+        scene.Render();
         DrawNuklear( &ctx, &cmds, 512, 512 );
         
-        scene.Render();
-
         Window::SwapBuffers();
 
         ++frame;

@@ -198,6 +198,87 @@ void ProcessNormal( FbxMesh* mesh, int vertexIndex, int vertexCounter, Vec3& out
     }
 }
 
+void ProcessTangent( FbxMesh* mesh, int vertexIndex, int vertexCounter, Vec4& outTangent )
+{
+    if (mesh->GetElementTangentCount() == 0)
+    {
+        return;
+    }
+
+    FbxGeometryElementTangent* tangent = mesh->GetElementTangent( 0 );
+
+    outTangent.w = 1;
+    
+    switch (tangent->GetMappingMode())
+    {
+        case FbxGeometryElement::eByControlPoint:
+        switch (tangent->GetReferenceMode())
+        {
+        case FbxGeometryElement::eDirect:
+        {
+            const auto vt = tangent->GetDirectArray().GetAt( vertexIndex );
+            outTangent.x = static_cast<float>( vt.mData[ 0 ] );
+            outTangent.y = static_cast<float>( vt.mData[ 1 ] );
+            outTangent.z = static_cast<float>( vt.mData[ 2 ] );
+            // FIXME: returns 0, but must be -1 or 1: outTangent.w = static_cast<float>( vt.mData[ 3 ] );
+        }
+        break;
+
+        case FbxGeometryElement::eIndexToDirect:
+        {
+            const int index = tangent->GetIndexArray().GetAt( vertexIndex );
+            const auto vt = tangent->GetDirectArray().GetAt( index );
+            outTangent.x = static_cast<float>( vt.mData[ 0 ] );
+            outTangent.y = static_cast<float>( vt.mData[ 1 ] );
+            outTangent.z = static_cast<float>( vt.mData[ 2 ] );
+            // FIXME: returns 0, but must be -1 or 1: outTangent.w = static_cast<float>( vt.mData[ 3 ] );
+        }
+        break;
+
+        default:
+            assert( !"invalid reference." );
+            exit( 1 );
+        }
+        break;
+
+    case FbxGeometryElement::eByPolygonVertex:
+        switch (tangent->GetReferenceMode())
+        {
+        case FbxGeometryElement::eDirect:
+        {
+            outTangent.x = static_cast<float>(tangent->GetDirectArray().GetAt( vertexCounter ).mData[ 0 ]);
+            outTangent.y = static_cast<float>(tangent->GetDirectArray().GetAt( vertexCounter ).mData[ 1 ]);
+            outTangent.z = static_cast<float>(tangent->GetDirectArray().GetAt( vertexCounter ).mData[ 2 ]);
+            // FIXME: returns 0, but must be -1 or 1: outTangent.w = static_cast<float>(tangent->GetDirectArray().GetAt( vertexCounter ).mData[ 3 ]);
+        }
+            break;
+
+        case FbxGeometryElement::eIndexToDirect:
+        {
+            int index = tangent->GetIndexArray().GetAt( vertexCounter );
+            outTangent.x = static_cast<float>(tangent->GetDirectArray().GetAt( index ).mData[ 0 ]);
+            outTangent.y = static_cast<float>(tangent->GetDirectArray().GetAt( index ).mData[ 1 ]);
+            outTangent.z = static_cast<float>(tangent->GetDirectArray().GetAt( index ).mData[ 2 ]);
+            // FIXME: returns 0, but must be -1 or 1: outTangent.w = static_cast<float>(tangent->GetDirectArray().GetAt( index ).mData[ 3 ]);
+        }
+            break;
+
+        default:
+            assert( !"Invalid reference for tangent." );
+            exit( 1 );
+        }
+        break;
+            
+        case FbxGeometryElement::eNone:
+        case FbxGeometryElement::eByPolygon:
+        case FbxGeometryElement::eByEdge:
+        case FbxGeometryElement::eAllSame:
+            std::cerr << "Unhandled mapping mode for tangent.";
+            exit( 1 );
+            break;
+    }
+}
+
 void ProcessUV( FbxMesh* mesh, int vertexIndex, int uvChannel, int uvLayer, TexCoord& outUV )
 {
     if (mesh->GetElementUVCount() == 0)
@@ -294,6 +375,7 @@ void ImportMeshNodes( FbxNode* node )
         {
             Vec3 normal[ 3 ];
             TexCoord uv[ 3 ];
+            Vec4 tangent[ 3 ];
             Face face;
 
             for (int j = 0; j < 3; ++j)
@@ -303,13 +385,16 @@ void ImportMeshNodes( FbxNode* node )
 
                 ProcessNormal( mesh, vertexIndex, vertexCounter, normal[ j ] );
                 ProcessUV( mesh, vertexIndex, mesh->GetTextureUVIndex( i, j ), uvChannel, uv[ j ] );
-
+                ProcessTangent( mesh, vertexIndex, vertexCounter, tangent[ j ] );
+                
                 gMeshes.back().vnormal.push_back( normal[ j ] );
                 gMeshes.back().tcoord.push_back( uv[ j ] );
+                gMeshes.back().nonInterleavedTangents.push_back( tangent[ j ] );
 
                 face.vInd[ j ] = (unsigned short)vertexIndex;
                 face.vnInd[ j ] = (unsigned short)vertexCounter;
                 face.uvInd[ j ] = (unsigned short)vertexCounter;
+                face.tInd[ j ] = (unsigned short)vertexCounter;
                 ++vertexCounter;
             }
             

@@ -255,9 +255,20 @@ void ae3d::GfxDevice::UnmapUIVertexBuffer()
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
 {
+    glEnable( GL_BLEND );
+    glBlendEquation( GL_FUNC_ADD );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glDisable( GL_CULL_FACE );
+    glDisable( GL_DEPTH_TEST );
+    glEnable( GL_SCISSOR_TEST );
+    
     glBindVertexArray( GfxDeviceGlobal::uiVertexBuffer.vao );
     glScissor( vpX, vpY, vpWidth, vpHeight );
     glDrawElements( GL_TRIANGLES, elemCount, GL_UNSIGNED_SHORT, offset );
+
+    glDisable( GL_BLEND );
+    glDisable( GL_SCISSOR_TEST );
+    glEnable( GL_CULL_FACE );
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
