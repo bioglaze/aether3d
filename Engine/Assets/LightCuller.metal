@@ -12,7 +12,7 @@ using namespace metal;
 struct Uniforms
 {
     matrix_float4x4 invProjection;
-    matrix_float4x4 viewMatrix;
+    matrix_float4x4 worldToView;
     uint windowWidth;
     uint windowHeight;
     uint numLights;
@@ -159,7 +159,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         {
             float4 center = pointLightBufferCenterAndRadius[ il ];
             float radius = center.w;
-            center.xyz = (uniforms.viewMatrix * float4( center.xyz, 1.0f ) ).xyz;
+            center.xyz = (uniforms.worldToView * float4( center.xyz, 1.0f ) ).xyz;
 
             // test if sphere is intersecting or inside frustum
             if (-center.z + minZ < radius && center.z - maxZ < radius)
@@ -193,7 +193,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         {
             float4 center = float4( 0, 0, 0, 1 );//spotLightBufferCenterAndRadius[ il ];
             float radius = center.w * 5.0f; // FIXME: Multiply was added, but more clever culling should be done instead.
-            center.xyz = (uniforms.viewMatrix * float4( center.xyz, 1.0f )).xyz;
+            center.xyz = (uniforms.worldToView * float4( center.xyz, 1.0f )).xyz;
 
             // test if sphere is intersecting or inside frustum
             if (-center.z - minZ < radius && center.z - maxZ < radius)

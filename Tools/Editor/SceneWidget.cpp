@@ -650,7 +650,7 @@ void SceneWidget::DrawLightSprites()
                 opacity = distance / lerpDistance;
             }
 
-            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width(), height() );
+            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width() * devicePixelRatio(), height() * devicePixelRatio() );
 
             const Vec3 viewDir = cameraTransform->GetViewDirection();
             const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraPos).Normalized();
@@ -658,7 +658,7 @@ void SceneWidget::DrawLightSprites()
 
             if (viewDotLight <= 0 &&
                 screenPoint.x > -lightTex.GetWidth() && screenPoint.y > -lightTex.GetHeight() &&
-                screenPoint.x < width() && screenPoint.y < height())
+                screenPoint.x < width() * devicePixelRatio() && screenPoint.y < height() * devicePixelRatio())
             {
                 Vec3 color( 1, 1, 1 );
 
@@ -675,9 +675,9 @@ void SceneWidget::DrawLightSprites()
                     color = pointLight->GetColor();
                 }
 
-                const float size = height() / distance;
+                const float size = (height() * devicePixelRatio()) / distance;
 
-                ae3d::System::Draw( &lightTex, screenPoint.x, screenPoint.y, size, size, width(), height() );
+                ae3d::System::Draw( &lightTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height() * devicePixelRatio() );
             }
         }
     }
@@ -708,7 +708,7 @@ void SceneWidget::DrawAudioSprites()
                 opacity = distance / lerpDistance;
             }
 
-            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width(), height() );
+            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width() * devicePixelRatio(), height() * devicePixelRatio());
 
             const Vec3 viewDir = cameraTransform->GetViewDirection();
             const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraPos).Normalized();
@@ -716,12 +716,12 @@ void SceneWidget::DrawAudioSprites()
 
             if (viewDotLight <= 0 &&
                 screenPoint.x > -audioTex.GetWidth() && screenPoint.y > -audioTex.GetHeight() &&
-                screenPoint.x < width() && screenPoint.y < height())
+                screenPoint.x < width() * devicePixelRatio() && screenPoint.y < height() * devicePixelRatio())
             {
                 const Vec3 color( 1, 1, 1 );
-                const float size = height() / distance;
+                const float size = (height() * devicePixelRatio()) / distance;
 
-                ae3d::System::Draw( &audioTex, screenPoint.x, screenPoint.y, size, size, width(), height() );
+                ae3d::System::Draw( &audioTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height()  * devicePixelRatio());
             }
         }
     }
@@ -752,7 +752,7 @@ void SceneWidget::DrawCameraSprites()
                 opacity = distance / lerpDistance;
             }
 
-            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width(), height() );
+            const Vec3 screenPoint = camera.GetComponent< CameraComponent >()->GetScreenPoint( goTransform->GetLocalPosition(), width() * devicePixelRatio(), height() * devicePixelRatio() );
 
             const Vec3 viewDir = cameraTransform->GetViewDirection();
             const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraPos).Normalized();
@@ -760,12 +760,12 @@ void SceneWidget::DrawCameraSprites()
 
             if (viewDotLight <= 0 &&
                 screenPoint.x > -cameraTex.GetWidth() && screenPoint.y > -cameraTex.GetHeight() &&
-                screenPoint.x < width() && screenPoint.y < height())
+                screenPoint.x < width() * devicePixelRatio() && screenPoint.y < height() * devicePixelRatio())
             {
                 const Vec3 color( 1, 1, 1 );
                 const float size = height() / distance;
 
-                ae3d::System::Draw( &cameraTex, screenPoint.x, screenPoint.y, size, size, width(), height() );
+                ae3d::System::Draw( &cameraTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height() * devicePixelRatio() );
             }
         }
     }
@@ -824,6 +824,7 @@ void SceneWidget::resizeGL( int width, int height )
 {
     System::InitGfxDeviceForEditor( width * devicePixelRatio(), height * devicePixelRatio() );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, float( width * devicePixelRatio() ) / (height * devicePixelRatio()), 1, 400 );
+    camera.GetComponent<CameraComponent>()->SetViewport( 0, 0, width * devicePixelRatio(), height * devicePixelRatio() );
 }
 
 void SceneWidget::keyPressEvent( QKeyEvent* aEvent )

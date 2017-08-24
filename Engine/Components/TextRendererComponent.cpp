@@ -98,7 +98,7 @@ void ae3d::TextRendererComponent::SetFont( Font* aFont )
     m().isDirty = true;
 }
 
-void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
+void ae3d::TextRendererComponent::Render( const float* localToClip )
 {
     if (!isEnabled || m().font == nullptr)
     {
@@ -120,9 +120,9 @@ void ae3d::TextRendererComponent::Render( const float* projectionModelMatrix )
         auto shader = m().shader;
         shader->Use();
 #if RENDERER_OPENGL
-        GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( projectionModelMatrix );
+        GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
 #else
-        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", projectionModelMatrix );
+        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", localToClip );
 #endif
         shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
 

@@ -255,6 +255,9 @@ void ae3d::GfxDevice::UnmapUIVertexBuffer()
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
 {
+    glActiveTexture( GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_2D, textureId );
+    
     glEnable( GL_BLEND );
     glBlendEquation( GL_FUNC_ADD );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );

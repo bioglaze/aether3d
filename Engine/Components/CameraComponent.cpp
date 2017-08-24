@@ -40,7 +40,7 @@ ae3d::CameraComponent* ae3d::CameraComponent::Get( unsigned index )
 ae3d::Vec3 ae3d::CameraComponent::GetScreenPoint( const ae3d::Vec3 &worldPoint, float viewWidth, float viewHeight ) const
 {
     Matrix44 worldToClip;
-    Matrix44::Multiply( viewMatrix, projectionMatrix, worldToClip );
+    Matrix44::Multiply( worldToView, viewToClip, worldToClip );
     ALIGNAS( 16 ) Vec4 pos( worldPoint );
     Matrix44::TransformPoint( pos, worldToClip, &pos );
     pos.x /= pos.w;
@@ -60,7 +60,7 @@ void ae3d::CameraComponent::SetProjection( float left, float right, float bottom
     orthoParams.down = bottom;
     nearp = aNear;
     farp = aFar;
-    projectionMatrix.MakeProjection( orthoParams.left, orthoParams.right, orthoParams.down, orthoParams.top, nearp, farp );
+    viewToClip.MakeProjection( orthoParams.left, orthoParams.right, orthoParams.down, orthoParams.top, nearp, farp );
 }
 
 void ae3d::CameraComponent::SetProjection( float aFovDegrees, float aAspect, float aNear, float aFar )
@@ -69,12 +69,12 @@ void ae3d::CameraComponent::SetProjection( float aFovDegrees, float aAspect, flo
     farp = aFar;
     fovDegrees = aFovDegrees;
     aspect = aAspect;
-    projectionMatrix.MakeProjection( fovDegrees, aspect, aNear, aFar );
+    viewToClip.MakeProjection( fovDegrees, aspect, aNear, aFar );
 }
 
 void ae3d::CameraComponent::SetProjection( const Matrix44& proj )
 {
-    projectionMatrix = proj;
+    viewToClip = proj;
 }
 
 void ae3d::CameraComponent::SetClearColor( const Vec3& color )

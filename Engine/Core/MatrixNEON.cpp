@@ -341,6 +341,13 @@ void Matrix44::Scale( float x, float y, float z )
     Multiply( *this, scale, *this );
 }
 
+void Matrix44::SetTranslation( const Vec3& translation )
+{
+    m[ 12 ] = translation.x;
+    m[ 13 ] = translation.y;
+    m[ 14 ] = translation.z;
+}
+
 void Matrix44::Transpose( Matrix44& out ) const
 {
     float tmp[ 16 ];

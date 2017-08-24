@@ -18,7 +18,7 @@ using namespace ae3d;
 struct CullerUniforms
 {
     Matrix44 invProjection;
-    Matrix44 viewMatrix;
+    Matrix44 worldToView;
     unsigned windowWidth;
     unsigned windowHeight;
     unsigned numLights;
@@ -86,14 +86,14 @@ unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
     return (MaxLightsPerTile - (adjustmentMultipier * (height / 120)));
 }
 
-void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& view, RenderTexture& depthNormalTarget )
+void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewToClip, const Matrix44& worldToView, RenderTexture& depthNormalTarget )
 {
     shader.SetRenderTexture( &depthNormalTarget, 0 );
     CullerUniforms uniforms;
 
-    Matrix44::Invert( projection, uniforms.invProjection );
+    Matrix44::Invert( viewToClip, uniforms.invProjection );
 
-    uniforms.viewMatrix = view;
+    uniforms.worldToView = worldToView;
     uniforms.windowWidth = depthNormalTarget.GetWidth();
     uniforms.windowHeight = depthNormalTarget.GetHeight();
     unsigned activeSpotLights = 0;

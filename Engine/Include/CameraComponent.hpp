@@ -25,10 +25,10 @@ namespace ae3d
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
         /// \return Projection matrix.
-        const Matrix44& GetProjection() const { return projectionMatrix; }
+        const Matrix44& GetProjection() const { return viewToClip; }
 
         /// \return View matrix.
-        const Matrix44& GetView() const { return viewMatrix; }
+        const Matrix44& GetView() const { return worldToView; }
 
         /// \param worldPoint Point in the world.
         /// \param viewWidth Camera's viewport width.
@@ -129,7 +129,7 @@ namespace ae3d
 
         /// TODO: Convert to private
         /// \param view View matrix.
-        void SetView( const Matrix44& view ) { viewMatrix = view; }
+        void SetView( const Matrix44& view ) { worldToView = view; }
 
         /// \param x Starting x coordinate
         /// \param y Starting y coordinate
@@ -153,8 +153,8 @@ namespace ae3d
         /// \return Component at index or null if index is invalid.
         static CameraComponent* Get( unsigned index );
 
-        Matrix44 projectionMatrix;
-        Matrix44 viewMatrix;
+        Matrix44 viewToClip;
+        Matrix44 worldToView;
         Vec3 clearColor;
         RenderTexture* targetTexture = nullptr;
         RenderTexture depthNormalsTexture;

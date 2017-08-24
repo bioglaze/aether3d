@@ -652,18 +652,18 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 
         if (spriteRenderer)
         {
-            Matrix44 projectionModel;
-            Matrix44::Multiply( transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
-            spriteRenderer->Render( projectionModel.m );
+            Matrix44 localToClip;
+            Matrix44::Multiply( transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity, camera->GetProjection(), localToClip );
+            spriteRenderer->Render( localToClip.m );
         }
         
         auto textRenderer = gameObject->GetComponent< TextRendererComponent >();
         
         if (textRenderer)
         {
-            Matrix44 projectionModel;
-            Matrix44::Multiply( transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity, camera->GetProjection(), projectionModel );
-            textRenderer->Render( projectionModel.m );
+            Matrix44 localToClip;
+            Matrix44::Multiply( transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity, camera->GetProjection(), localToClip );
+            textRenderer->Render( localToClip.m );
         }
         
         auto meshRenderer = gameObject->GetComponent< MeshRendererComponent >();

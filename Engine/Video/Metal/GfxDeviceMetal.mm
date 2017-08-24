@@ -89,6 +89,7 @@ namespace GfxDeviceGlobal
     std::vector< ae3d::VertexBuffer > lineBuffers;
     int viewport[ 4 ];
     unsigned frameIndex = 0;
+    id< MTLBuffer > uiBuffer;
     
     struct Samplers
     {
@@ -214,7 +215,9 @@ id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
 {
-    // TODO: Implement
+    int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
+    SetViewport( viewport );
+    Draw( GfxDeviceGlobal::lineBuffers[ 0 ], 0, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
