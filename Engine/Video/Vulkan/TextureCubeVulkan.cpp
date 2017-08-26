@@ -174,6 +174,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
             TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemories[ face ] );
             Statistics::IncAllocCalls();
+            Statistics::IncTotalAllocCalls();
 
             err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
             AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
@@ -280,6 +281,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
             TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemories[ face ] );
             Statistics::IncAllocCalls();
+            Statistics::IncTotalAllocCalls();
 
             err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
             AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
@@ -345,6 +347,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
     TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
     Statistics::IncAllocCalls();
+    Statistics::IncTotalAllocCalls();
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );

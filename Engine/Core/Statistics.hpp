@@ -39,6 +39,8 @@ namespace Statistics
     int GetFenceCalls();
     void IncAllocCalls();
     int GetAllocCalls();
+    void IncTotalAllocCalls();
+    int GetTotalAllocCalls();
     void IncPSOBindCalls();
     int GetPSOBindCalls();
     void SetDepthNormalsGpuTime( float theTime );

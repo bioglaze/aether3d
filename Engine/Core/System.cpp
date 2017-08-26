@@ -188,7 +188,7 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
 #if RENDERER_OPENGL
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &mvp.m[ 0 ] );
 #else
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &mvp.m[ 0 ] );
+    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_LocalToClip", &mvp.m[ 0 ] );
 #endif
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
     int viewport[ 4 ];
@@ -213,7 +213,7 @@ void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& 
     Matrix44::Multiply( view, projection, viewProjection );
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", Texture2D::GetDefaultTexture(), 0 );
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", &viewProjection.m[ 0 ] );
+    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_LocalToClip", &viewProjection.m[ 0 ] );
 
     GfxDevice::DrawLines( handle, renderer.builtinShaders.spriteRendererShader );
 }

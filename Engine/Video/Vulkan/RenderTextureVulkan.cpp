@@ -144,6 +144,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     AE3D_CHECK_VULKAN( err, "render texture 2d color image memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( color.mem );
     Statistics::IncAllocCalls();
+    Statistics::IncTotalAllocCalls();
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, color.image, color.mem, 0 );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image bind memory" );
@@ -193,6 +194,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     AE3D_CHECK_VULKAN( err, "render texture 2d depth memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( depth.mem );
     Statistics::IncAllocCalls();
+    Statistics::IncTotalAllocCalls();
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, depth.image, depth.mem, 0 );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth bind" );

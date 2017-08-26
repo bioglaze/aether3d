@@ -13,7 +13,7 @@ void ae3d::BuiltinShaders::Load()
 
     layout(std140) uniform PerObject
     {
-        mat4 _ModelViewProjectionMatrix;
+        mat4 _LocalToClip;
     };
 
     out vec2 vTexCoord;
@@ -21,7 +21,7 @@ void ae3d::BuiltinShaders::Load()
     
     void main()
     {
-        gl_Position = _ModelViewProjectionMatrix * vec4( aPosition.xyz, 1.0 );
+        gl_Position = _LocalToClip * vec4( aPosition.xyz, 1.0 );
         vTexCoord = aTexCoord;
         vColor = aColor;
     })";

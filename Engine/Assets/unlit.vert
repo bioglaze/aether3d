@@ -7,7 +7,7 @@ layout (location = 2) in vec4 aColor;
 // Prevents generating code that needs ClipDistance which is not available.
 out gl_PerVertex { vec4 gl_Position; };
 
-layout (binding = 0) uniform UBO 
+layout (set=0, binding = 0) uniform UBO 
 {
     uniform mat4 _ModelViewProjectionMatrix;
 } ubo;

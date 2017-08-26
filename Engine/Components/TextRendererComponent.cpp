@@ -122,7 +122,7 @@ void ae3d::TextRendererComponent::Render( const float* localToClip )
 #if RENDERER_OPENGL
         GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
 #else
-        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", localToClip );
+        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_LocalToClip", localToClip );
 #endif
         shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
 

@@ -135,7 +135,7 @@ struct RenderQueue
 {
     void Clear();
     void Build();
-    void Render( ae3d::GfxDevice::BlendMode blendMode, const float* projectionModelMatrix );
+    void Render( ae3d::GfxDevice::BlendMode blendMode, const float* localToClip );
     
     bool isDirty = true;
     std::vector< Sprite > sprites;
@@ -173,7 +173,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* loc
 #if RENDERER_OPENGL
         GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
 #else
-        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_ProjectionModelMatrix", localToClip );
+        renderer.builtinShaders.spriteRendererShader.SetMatrix( "_LocalToClip", localToClip );
 #endif
         
         if (drawable.texture->IsRenderTexture())
@@ -313,13 +313,13 @@ void ae3d::SpriteRendererComponent::SetTexture( TextureBase* aTexture, const Vec
     }
 }
 
-void ae3d::SpriteRendererComponent::Render( const float* projectionModelMatrix )
+void ae3d::SpriteRendererComponent::Render( const float* localToClip )
 {
     if (!isEnabled || (m().transparentRenderQueue.sprites.empty() && m().opaqueRenderQueue.sprites.empty()))
     {
         return;
     }
         
-    m().opaqueRenderQueue.Render( ae3d::GfxDevice::BlendMode::Off, projectionModelMatrix );
-    m().transparentRenderQueue.Render( ae3d::GfxDevice::BlendMode::AlphaBlend, projectionModelMatrix );
+    m().opaqueRenderQueue.Render( ae3d::GfxDevice::BlendMode::Off, localToClip );
+    m().transparentRenderQueue.Render( ae3d::GfxDevice::BlendMode::AlphaBlend, localToClip );
 }

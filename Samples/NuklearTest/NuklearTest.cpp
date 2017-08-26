@@ -41,15 +41,6 @@ nk_draw_null_texture nullTexture;
 
 void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
-    float ortho[ 4 ][ 4 ] = {
-        { 2.0f, 0.0f, 0.0f, 0.0f },
-        { 0.0f,-2.0f, 0.0f, 0.0f },
-        { 0.0f, 0.0f,-1.0f, 0.0f },
-        { -1.0f,1.0f, 0.0f, 1.0f }
-    };
-    ortho[ 0 ][ 0 ] /= (float)width;
-    ortho[ 1 ][ 1 ] /= (float)height;
-
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
         {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_glfw_vertex, position)},
@@ -83,8 +74,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     const struct nk_draw_command* cmd = nullptr;
     nk_draw_index* offset = nullptr;
 
-    const float scaleX = 1;
-    const float scaleY = 1;
+    const float scaleX = 2;
+    const float scaleY = 2;
     
     nk_draw_foreach( cmd, ctx, uiCommands )
     {
@@ -117,7 +108,7 @@ int main()
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1.0f, 0.5f, 0.5f ) );
+    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
     camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DontClear );
     camera.AddComponent<TransformComponent>();
    
@@ -148,8 +139,8 @@ int main()
     sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
 
     scene.Add( &camera );
-    scene.Add( &spriteContainer );
-    scene.Add( &textContainer );
+    //scene.Add( &spriteContainer );
+    //scene.Add( &textContainer );
     sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
     camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
 
@@ -161,7 +152,6 @@ int main()
     int atlasWidth = 0;
     int atlasHeight = 0;
     Texture2D nkFontTexture;
-    int atlasId = 1;
     nk_buffer cmds;
     
     nk_font_atlas_init_default( &atlas );
@@ -176,10 +166,14 @@ int main()
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
    
+    double x = 0, y = 0;
+
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
         WindowEvent event;
+
+        nk_input_begin( &ctx );
 
         while (Window::PollEvent( event ))
         {
@@ -202,14 +196,25 @@ int main()
                     System::ReloadChangedAssets();
                 }
             }
+
+            if (event.type == WindowEventType::MouseMove)
+            {
+                x = event.mouseX;
+                y = height - event.mouseY;
+                nk_input_motion( &ctx, (int)x, (int)y );
+            }
+
+            nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, (event.type == WindowEventType::Mouse1Down) ? 1 : 1 );
+            nk_input_button( &ctx, NK_BUTTON_RIGHT, (int)x, (int)y, (event.type == WindowEventType::Mouse2Down) ? 1 : 0 );
         }
 
-        //enum {EASY, HARD};
-        //static int op = EASY;
-        //static float value = 0.6f;
+        nk_input_end( &ctx );
+
+        enum {EASY, HARD};
+        static int op = EASY;
+        static float value = 0.6f;
         
-        if (nk_begin( &ctx, "Demo", nk_rect( 50, 50, 300, 400 ),
-                      NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE ))
+        if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE ))
         {
             nk_layout_row_static( &ctx, 30, 120, 1 );
             
@@ -217,10 +222,11 @@ int main()
             {
                 ae3d::System::Print( "Pressed a button\n" );
             }
-#if 0
-            nk_layout_row_static(&ctx, 30, 80, 1);
-            if (nk_button_label(&ctx, "button")) {
+#if 1
+            nk_layout_row_static( &ctx, 30, 80, 1 );
+            if (nk_button_label( &ctx, "button" )) {
                 /* event handling */
+                System::Print("Pressed a button\n");
             }
 
             /* fixed widget window ratio width */
@@ -242,7 +248,7 @@ int main()
         }
 
         scene.Render();
-        DrawNuklear( &ctx, &cmds, 512, 512 );
+        DrawNuklear( &ctx, &cmds, width, height );
         
         Window::SwapBuffers();
 

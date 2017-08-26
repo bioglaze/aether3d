@@ -137,7 +137,7 @@ namespace ae3d
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "fence calls: " << ::Statistics::GetFenceCalls() << "\n";
-                stm << "mem alloc calls: " << ::Statistics::GetAllocCalls() << "\n";
+                stm << "mem alloc calls: " << ::Statistics::GetAllocCalls() << " (frame), " << ::Statistics::GetTotalAllocCalls() << " (total)\n";
                 stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
 
                 return stm.str();
@@ -209,6 +209,7 @@ namespace ae3d
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
         
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.colorMem );
+        Statistics::IncTotalAllocCalls();
         AE3D_CHECK_VULKAN( err, "Create MSAA color" );
 
         vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorImage, GfxDeviceGlobal::msaaTarget.colorMem, 0 );
@@ -258,6 +259,7 @@ namespace ae3d
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
 
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.depthMem );
+        Statistics::IncTotalAllocCalls();
         AE3D_CHECK_VULKAN( err, "MSAA depth memory" );
         vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, GfxDeviceGlobal::msaaTarget.depthMem, 0 );
 
@@ -873,6 +875,8 @@ namespace ae3d
 
         vkGetPhysicalDeviceProperties( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::properties );
         
+        //System::Print("max allocs: %d\n", GfxDeviceGlobal::properties.limits.maxMemoryAllocationCount );
+
         // Finds graphics queue.
         std::uint32_t queueCount;
         vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, nullptr );
@@ -1219,6 +1223,7 @@ namespace ae3d
         mem_alloc.allocationSize = memReqs.size;
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mem_alloc.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &mem_alloc, nullptr, &GfxDeviceGlobal::depthStencil.mem );
+        Statistics::IncTotalAllocCalls();
         AE3D_CHECK_VULKAN( err, "depth stencil memory" );
 
         err = vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, GfxDeviceGlobal::depthStencil.mem, 0 );
@@ -1310,7 +1315,7 @@ namespace ae3d
         VkDescriptorImageInfo samplerDesc = {};
         samplerDesc.sampler = sampler;
         samplerDesc.imageView = view;
-        samplerDesc.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        samplerDesc.imageLayout = VK_IMAGE_LAYOUT_GENERAL; // TODO: try VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 
         VkWriteDescriptorSet samplerSet = {};
         samplerSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1333,7 +1338,7 @@ namespace ae3d
         layoutBindingUBO.binding = 0;
         layoutBindingUBO.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         layoutBindingUBO.descriptorCount = 1;
-        layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         layoutBindingUBO.pImmutableSamplers = nullptr;
 
         // Binding 1 : Sampler (Fragment shader)
@@ -1706,6 +1711,7 @@ void ae3d::GfxDevice::CreateUniformBuffers()
         GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &ubo.uboMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory UBO" );
+        Statistics::IncTotalAllocCalls();
         Statistics::IncAllocCalls();
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, ubo.ubo, ubo.uboMemory, 0 );

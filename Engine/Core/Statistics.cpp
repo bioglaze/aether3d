@@ -13,6 +13,7 @@ namespace Statistics
     int vertexBufferBinds = 0;
     int createConstantBufferCalls = 0;
     int allocCalls = 0;
+    int totalAllocCalls = 0;
     int triangleCount = 0;
     int psoBindCount = 0;
     float depthNormalsTimeMS = 0;
@@ -108,6 +109,16 @@ void Statistics::IncAllocCalls()
 int Statistics::GetAllocCalls()
 {
     return Statistics::allocCalls;
+}
+
+void Statistics::IncTotalAllocCalls()
+{
+    ++Statistics::totalAllocCalls;
+}
+
+int Statistics::GetTotalAllocCalls()
+{
+    return Statistics::totalAllocCalls;
 }
 
 void Statistics::IncCreateConstantBufferCalls()

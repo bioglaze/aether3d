@@ -80,8 +80,8 @@ namespace ae3d
         /* \return Component at index or null if index is invalid. */
         static SpriteRendererComponent* Get( unsigned index );
 
-        /* \param projectionModelMatrix Projection and model matrix combined. */
-        void Render( const float* projectionModelMatrix );
+        /* \param localToClip Transforms coordinates to clip space. */
+        void Render( const float* localToClip );
         
         struct Impl;
         Impl& m() { return reinterpret_cast<Impl&>(_storage); }

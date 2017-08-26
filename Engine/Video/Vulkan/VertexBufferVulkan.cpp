@@ -105,6 +105,7 @@ void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkB
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &memory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
     Statistics::IncAllocCalls();
+    Statistics::IncTotalAllocCalls();
 
     err = vkBindBufferMemory( GfxDeviceGlobal::device, buffer, memory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindBufferMemory" );

@@ -3,7 +3,7 @@
 layout (location = 0) in vec3 vTexCoord;
 layout (location = 0) out vec4 fragColor;
 
-layout (binding = 1) uniform samplerCube skyMap;
+layout (set = 0, binding = 1) uniform samplerCube skyMap;
 
 void main()
 {

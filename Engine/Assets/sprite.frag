@@ -3,7 +3,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout (binding = 1) uniform sampler2D textureMap;
+layout (set = 0, binding = 1) uniform sampler2D textureMap;
 
 layout (location = 0) in vec2 vTexCoord;
 layout (location = 1) in vec4 vColor;
