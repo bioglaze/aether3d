@@ -5,7 +5,7 @@ using namespace metal;
 
 struct Uniforms
 {
-    matrix_float4x4 _LocalToClip;
+    matrix_float4x4 localToClip;
 };
 
 struct Vertex
@@ -32,7 +32,7 @@ vertex ColorInOut sprite_vertex(Vertex vert [[stage_in]],
     ColorInOut out;
     
     float4 in_position = float4( float3( vert.position ), 1.0 );
-    out.position = uniforms._LocalToClip * in_position;
+    out.position = uniforms.localToClip * in_position;
     
     out.color = half4( vert.color );
     out.texCoords = vert.texcoord;

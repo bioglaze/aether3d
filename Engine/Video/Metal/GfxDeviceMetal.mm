@@ -90,6 +90,7 @@ namespace GfxDeviceGlobal
     int viewport[ 4 ];
     unsigned frameIndex = 0;
     id< MTLBuffer > uiBuffer;
+    PerObjectUboStruct perObjectUboStruct;
     
     struct Samplers
     {
@@ -177,6 +178,14 @@ namespace GfxDeviceGlobal
     }
 }
 
+void UploadPerObjectUbo()
+{
+    id<MTLBuffer> uniformBuffer = ae3d::GfxDevice::GetCurrentUniformBuffer();
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents];
+
+    std::memcpy( bufferPointer, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
+}
+
 namespace ae3d
 {
     namespace System
@@ -190,7 +199,6 @@ namespace ae3d
                 stm << "shadow map time: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
                 stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
-                stm << "create uniform buffer calls: " << ::Statistics::GetCreateConstantBufferCalls() << "\n";
                 return stm.str();
             }
         }
@@ -758,6 +766,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         System::Assert( false, "Unhandled vertex format" );
     }
+    
+    UploadPerObjectUbo();
     
     if (topology == PrimitiveTopology::Triangles)
     {

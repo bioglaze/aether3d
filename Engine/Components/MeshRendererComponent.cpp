@@ -144,23 +144,20 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
         }
         else
         {
-            Matrix44 shadowTexProjMatrix = localToWorld;
+            Matrix44 localToShadowClip;
             
-            Matrix44::Multiply( shadowTexProjMatrix, shadowView, shadowTexProjMatrix );
-            Matrix44::Multiply( shadowTexProjMatrix, shadowProjection, shadowTexProjMatrix );
+            Matrix44::Multiply( localToWorld, shadowView, localToShadowClip );
+            Matrix44::Multiply( localToShadowClip, shadowProjection, localToShadowClip );
 #ifndef RENDERER_METAL
-            Matrix44::Multiply( shadowTexProjMatrix, Matrix44::bias, shadowTexProjMatrix );
-#endif
-#ifndef RENDERER_VULKAN
-            // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
-            materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
-            materials[ subMeshIndex ]->SetMatrix( "_ModelMatrix", localToWorld );
+            Matrix44::Multiply( localToShadowClip, Matrix44::bias, localToShadowClip );
 #endif
             materials[ subMeshIndex ]->Apply();
             
             GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
             GfxDeviceGlobal::perObjectUboStruct.localToView = localToView;
-
+            GfxDeviceGlobal::perObjectUboStruct.localToWorld = localToWorld;
+            GfxDeviceGlobal::perObjectUboStruct.localToShadowClip = localToShadowClip;
+            
             if (!subMeshes[ subMeshIndex ].joints.empty())
             {
                 std::vector< Matrix44 > bones( subMeshes[ subMeshIndex ].joints.size() );

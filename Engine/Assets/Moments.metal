@@ -5,8 +5,8 @@ using namespace metal;
 
 struct uniforms_t
 {
-    matrix_float4x4 _ModelViewProjectionMatrix;
-    matrix_float4x4 _ModelViewMatrix;
+    matrix_float4x4 localToClip;
+    matrix_float4x4 localToView;
 };
 
 struct Vertex
@@ -25,7 +25,7 @@ vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
     ColorInOut out;
     
     float4 in_position = float4( vert.position, 1.0 );
-    out.position = uniforms._ModelViewProjectionMatrix * in_position;
+    out.position = uniforms.localToClip * in_position;
     out.position.z = out.position.z * 0.5 + 0.5; // -1..1 to 0..1 conversion
     return out;
 }

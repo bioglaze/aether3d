@@ -5,7 +5,7 @@ using namespace metal;
 
 typedef struct
 {
-    matrix_float4x4 _ModelViewProjectionMatrix;
+    matrix_float4x4 localToClip;
 } uniforms_t;
 
 typedef struct
@@ -31,7 +31,7 @@ vertex ColorInOut skybox_vertex( Vertex vert [[stage_in]],
     ColorInOut out;
 
     float4 in_position = float4( vert.position, 1.0 );
-    out.position = uniforms._ModelViewProjectionMatrix * in_position;
+    out.position = uniforms.localToClip * in_position;
 
     out.texCoords = vert.position;
     return out;

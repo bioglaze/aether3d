@@ -8,8 +8,8 @@ float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float d
 
 struct Uniforms
 {
-    matrix_float4x4 _ModelViewProjectionMatrix;
-    matrix_float4x4 _ShadowProjectionMatrix;
+    matrix_float4x4 localToClip;
+    matrix_float4x4 localToShadowClip;
     float4 tint;
     //matrix_float4x4 boneMatrices[ 80 ];
 };
@@ -70,12 +70,12 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
     position2 += uniforms.boneMatrices[ vert.boneIndex.z ] * in_position * vert.boneWeights.z;
     position2 += uniforms.boneMatrices[ vert.boneIndex.w ] * in_position * vert.boneWeights.w;
 */
-    out.position = uniforms._ModelViewProjectionMatrix * in_position;
+    out.position = uniforms.localToClip * in_position;
     
     out.color = half4( vert.color );
     out.texCoords = vert.texcoord;
     out.tintColor = uniforms.tint;
-    out.projCoord = uniforms._ShadowProjectionMatrix * in_position;
+    out.projCoord = uniforms.localToShadowClip * in_position;
     return out;
 }
 

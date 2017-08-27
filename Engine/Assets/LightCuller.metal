@@ -11,7 +11,7 @@ using namespace metal;
 
 struct Uniforms
 {
-    matrix_float4x4 invProjection;
+    matrix_float4x4 clipToView;
     matrix_float4x4 worldToView;
     uint windowWidth;
     uint windowHeight;
@@ -19,9 +19,9 @@ struct Uniforms
     int maxNumLightsPerTile;
 };
 
-static float4 ConvertProjToView( float4 p, matrix_float4x4 invProjection )
+static float4 ConvertClipToView( float4 p, matrix_float4x4 clipToView )
 {
-    p = invProjection * p;
+    p = clipToView * p;
     p /= p.w;
     // FIXME: Added the following line, not needed in D3D11 or ForwardPlus11 example. [2014-07-07]
     //p.y = -p.y;
@@ -107,10 +107,10 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
         // four corners of the tile, clockwise from top-left
         float4 frustum[ 4 ];
-        frustum[ 0 ] = ConvertProjToView( v0, uniforms.invProjection );
-        frustum[ 1 ] = ConvertProjToView( v1, uniforms.invProjection );
-        frustum[ 2 ] = ConvertProjToView( v2, uniforms.invProjection );
-        frustum[ 3 ] = ConvertProjToView( v3, uniforms.invProjection );
+        frustum[ 0 ] = ConvertClipToView( v0, uniforms.clipToView );
+        frustum[ 1 ] = ConvertClipToView( v1, uniforms.clipToView );
+        frustum[ 2 ] = ConvertClipToView( v2, uniforms.clipToView );
+        frustum[ 3 ] = ConvertClipToView( v3, uniforms.clipToView );
 
         // create plane equations for the four sides of the frustum,
         // with the positive half-space outside the frustum (and remember,

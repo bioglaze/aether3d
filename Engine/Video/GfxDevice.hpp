@@ -15,6 +15,8 @@ struct PerObjectUboStruct
 {
     ae3d::Matrix44 localToClip;
     ae3d::Matrix44 localToView;
+    ae3d::Matrix44 localToWorld;
+    ae3d::Matrix44 localToShadowClip;
 };
 
 namespace ae3d

@@ -9,10 +9,10 @@ using namespace metal;
 
 struct StandardUniforms
 {
-    matrix_float4x4 _ModelViewProjectionMatrix;
+    matrix_float4x4 localToClip;
+    matrix_float4x4 localToView;
+    matrix_float4x4 localToWorld;
     matrix_float4x4 _ShadowProjectionMatrix;
-    matrix_float4x4 _ModelViewMatrix;
-    matrix_float4x4 _ModelMatrix;
     float4 tintColor;
 };
 static_assert( sizeof( StandardUniforms ) < 512, "" );
@@ -110,18 +110,18 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     StandardColorInOut out;
     
     float4 in_position = float4( vert.position, 1.0 );
-    out.position = uniforms._ModelViewProjectionMatrix * in_position;
-    out.positionVS = (uniforms._ModelViewMatrix * in_position).xyz;
-    out.positionWS = (uniforms._ModelMatrix * in_position).xyz;
+    out.position = uniforms.localToClip * in_position;
+    out.positionVS = (uniforms.localToView * in_position).xyz;
+    out.positionWS = (uniforms.localToWorld * in_position).xyz;
     
     out.color = half4( vert.color );
     out.texCoords = vert.texcoord;
     out.projCoord = uniforms._ShadowProjectionMatrix * in_position;
     
-    out.tangentVS = (uniforms._ModelViewMatrix * float4( vert.tangent.xyz, 0 )).xyz;
+    out.tangentVS = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
     float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
-    out.bitangentVS = normalize( uniforms._ModelViewMatrix * float4( ct, 0 ) ).xyz;
-    out.normalVS = (uniforms._ModelViewMatrix * float4( vert.normal.xyz, 0 )).xyz;
+    out.bitangentVS = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
+    out.normalVS = (uniforms.localToView * float4( vert.normal.xyz, 0 )).xyz;
     
     return out;
 }
@@ -159,7 +159,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         float4 center = pointLightBufferCenterAndRadius[ lightIndex ];
         float radius = center.w;
 
-        float3 vecToLightVS = (uniforms._ModelViewMatrix * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
+        float3 vecToLightVS = (uniforms.localToView * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
         float3 vecToLightWS = center.xyz - in.positionWS.xyz;
         float3 lightDirVS = normalize( vecToLightVS );
         

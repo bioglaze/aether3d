@@ -5,8 +5,8 @@ using namespace metal;
 
 struct Uniforms
 {
-    matrix_float4x4 _ModelViewProjectionMatrix;
-    matrix_float4x4 _ModelViewMatrix;
+    matrix_float4x4 localToClip;
+    matrix_float4x4 localToView;
 };
 
 struct Vertex
@@ -30,9 +30,9 @@ vertex ColorInOut depthnormals_vertex( Vertex vert [[stage_in]],
     
     float4 in_position = float4( vert.position.xyz, 1.0 );
     float4 in_normal = float4( vert.normal.xyz, 0.0 );
-    out.position = uniforms._ModelViewProjectionMatrix * in_position;
-    out.mvPosition = uniforms._ModelViewMatrix * in_position;
-    out.normal = uniforms._ModelViewMatrix * in_normal;
+    out.position = uniforms.localToClip * in_position;
+    out.mvPosition = uniforms.localToView * in_position;
+    out.normal = uniforms.localToView * in_normal;
     return out;
 }
 

@@ -51,9 +51,6 @@ namespace ae3d
                    const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL,
                    const FileSystem::FileContentsData& vertexDataSPIRV, const FileSystem::FileContentsData& fragmentDataSPIRV );
         
-#if RENDERER_METAL
-        void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
-#endif
 #if RENDERER_OPENGL
         /// \return True if the shader has been succesfully compiled and linked.
         bool IsValid() const { return handle != 0; }
@@ -116,6 +113,8 @@ namespace ae3d
 #endif
 
 #if RENDERER_METAL
+        void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
+
         bool IsValid() const { return vertexProgram != nullptr; }
 
         const std::string& GetMetalVertexShaderName() const { return metalVertexShaderName; }
