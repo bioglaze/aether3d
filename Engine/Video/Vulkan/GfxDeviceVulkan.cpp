@@ -120,6 +120,7 @@ namespace GfxDeviceGlobal
     int backBufferHeight;
     bool didUseOffscreenPassOnThisFrame = false;
     unsigned frameIndex = 0;
+    PerObjectUboStruct perObjectUboStruct;
 }
 
 namespace ae3d
@@ -1455,6 +1456,11 @@ namespace ae3d
     }
 }
 
+void UploadPerObjectUbo()
+{
+    std::memcpy( &ae3d::GfxDevice::GetCurrentUbo()[ 0 ], &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
+}
+
 void ae3d::GfxDevice::Init( int width, int height )
 {
     GfxDeviceGlobal::backBufferWidth = width;
@@ -1661,6 +1667,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE, psoHash );
     }
+
+    UploadPerObjectUbo();
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
 

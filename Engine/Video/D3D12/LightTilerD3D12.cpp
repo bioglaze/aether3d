@@ -31,16 +31,6 @@ void ae3d::LightTiler::DestroyBuffers()
     AE3D_SAFE_RELEASE( uniformBuffer );
 }
 
-/*struct CullerUniforms
-{
-    Matrix44 invProjection;
-    Matrix44 viewMatrix;
-    unsigned windowWidth;
-    unsigned windowHeight;
-    unsigned numLights;
-    int maxNumLightsPerTile;
-};*/
-
 struct CullerUniforms
 {
     Matrix44 projection;

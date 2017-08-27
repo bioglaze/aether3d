@@ -452,6 +452,8 @@ void ae3d::GfxDevice::DrawLines( int handle, ae3d::Shader& /*shader*/ )
     SetDepthFunc( DepthFunc::NoneWriteOff );
     SetCullMode( CullMode::Off );
     SetFillMode( FillMode::Solid );
+    
+    UploadPerObjectUbo();
 
     GfxDeviceGlobal::lineBuffers[ handle ].Bind();
     const int endIndex = GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount();

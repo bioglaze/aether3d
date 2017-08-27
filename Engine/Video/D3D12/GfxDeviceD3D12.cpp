@@ -167,11 +167,17 @@ namespace GfxDeviceGlobal
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
     ID3D12DescriptorHeap* computeCbvSrvUavHeap = nullptr;
     TimerQuery timerQuery;
+    PerObjectUboStruct perObjectUboStruct;
 }
 
 namespace ae3d
 {
     void CreateRenderer( int samples );
+}
+
+void UploadPerObjectUbo()
+{
+    memcpy_s( (char*)ae3d::GfxDevice::GetCurrentUniformBuffer(), AE3D_CB_SIZE, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
 }
 
 void WaitForPreviousFrame()
@@ -1103,6 +1109,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, vertexBuffer.GetView() );
     GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( topology == PrimitiveTopology::Lines ? nullptr : vertexBuffer.GetIndexView() );
     GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( topology == PrimitiveTopology::Lines ? D3D_PRIMITIVE_TOPOLOGY_LINELIST : D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+    UploadPerObjectUbo();
 
     if (topology == PrimitiveTopology::Triangles)
     {

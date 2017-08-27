@@ -77,11 +77,11 @@ void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponen
     Matrix44::Multiply( camera.GetView(), camera.GetProjection(), localToClip );
     
     builtinShaders.skyboxShader.Use();
-#if RENDERER_OPENGL
+//#if RENDERER_OPENGL
     GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
-#else
-    builtinShaders.skyboxShader.SetMatrix( "_ModelViewProjectionMatrix", localToClip.m );
-#endif
+//#else
+    //builtinShaders.skyboxShader.SetMatrix( "_ModelViewProjectionMatrix", localToClip.m );
+//#endif
     builtinShaders.skyboxShader.SetTexture( "skyMap", skyTexture, 0 );
 
     GfxDevice::PushGroupMarker( "Skybox" );

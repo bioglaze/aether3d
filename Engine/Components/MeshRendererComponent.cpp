@@ -13,6 +13,11 @@
 
 using namespace ae3d;
 
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+
 namespace MathUtil
 {
     void GetMinMax( const Vec3* aPoints, int count, Vec3& outMin, Vec3& outMax );
@@ -134,11 +139,8 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
         if (overrideShader)
         {
             shader->Use();
-            shader->SetMatrix( "_ModelViewProjectionMatrix", &localToClip.m[ 0 ] );
-#ifndef RENDERER_VULKAN
-            // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
-            shader->SetMatrix( "_ModelViewMatrix", &localToView.m[ 0 ] );
-#endif
+            GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
+            GfxDeviceGlobal::perObjectUboStruct.localToView = localToView;
         }
         else
         {
@@ -153,10 +155,11 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
             // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
             materials[ subMeshIndex ]->SetMatrix( "_ShadowProjectionMatrix", shadowTexProjMatrix );
             materials[ subMeshIndex ]->SetMatrix( "_ModelMatrix", localToWorld );
-            materials[ subMeshIndex ]->SetMatrix( "_ModelViewMatrix", localToView );
 #endif
-            materials[ subMeshIndex ]->SetMatrix( "_ModelViewProjectionMatrix", localToClip );
             materials[ subMeshIndex ]->Apply();
+            
+            GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
+            GfxDeviceGlobal::perObjectUboStruct.localToView = localToView;
 
             if (!subMeshes[ subMeshIndex ].joints.empty())
             {

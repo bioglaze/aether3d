@@ -19,12 +19,10 @@
 
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
-#if RENDERER_OPENGL
 namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
 }
-#endif
 void PlatformInitGamePad();
 
 using namespace ae3d;
@@ -185,12 +183,9 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     Matrix44::Multiply( scale, proj, mvp );
     
     renderer.builtinShaders.spriteRendererShader.Use();
-#if RENDERER_OPENGL
-    GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &mvp.m[ 0 ] );
-#else
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_LocalToClip", &mvp.m[ 0 ] );
-#endif
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
+    GfxDeviceGlobal::perObjectUboStruct.localToClip = mvp;
+
     int viewport[ 4 ];
     viewport[ 0 ] = 0;
     viewport[ 1 ] = 0;
@@ -213,7 +208,7 @@ void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& 
     Matrix44::Multiply( view, projection, viewProjection );
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", Texture2D::GetDefaultTexture(), 0 );
-    renderer.builtinShaders.spriteRendererShader.SetMatrix( "_LocalToClip", &viewProjection.m[ 0 ] );
+    GfxDeviceGlobal::perObjectUboStruct.localToClip = viewProjection;
 
     GfxDevice::DrawLines( handle, renderer.builtinShaders.spriteRendererShader );
 }

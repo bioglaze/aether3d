@@ -13,7 +13,7 @@ void ae3d::BuiltinShaders::Load()
 
     layout(std140) uniform PerObject
     {
-        mat4 _LocalToClip;
+        mat4 localToClip;
     };
 
     out vec2 vTexCoord;
@@ -21,7 +21,7 @@ void ae3d::BuiltinShaders::Load()
     
     void main()
     {
-        gl_Position = _LocalToClip * vec4( aPosition.xyz, 1.0 );
+        gl_Position = localToClip * vec4( aPosition.xyz, 1.0 );
         vTexCoord = aTexCoord;
         vColor = aColor;
     })";
@@ -51,7 +51,7 @@ void ae3d::BuiltinShaders::Load()
     
     layout(std140) uniform PerObject
     {
-        mat4 _ModelViewProjectionMatrix;
+        mat4 localToClip;
     };
     
     out vec2 vTexCoord;
@@ -59,7 +59,7 @@ void ae3d::BuiltinShaders::Load()
     
     void main()
     {
-        gl_Position = _ModelViewProjectionMatrix * vec4( aPosition.xyz, 1.0 );
+        gl_Position = localToClip * vec4( aPosition.xyz, 1.0 );
         vTexCoord = aTexCoord;
         vColor = aColor;
     })";
@@ -91,14 +91,14 @@ void ae3d::BuiltinShaders::Load()
     
     layout(std140) uniform PerObject
     {
-        mat4 _ModelViewProjectionMatrix;
+        mat4 localToClip;
     };
 
     out vec3 vTexCoord;
 
     void main()
     {
-        gl_Position = _ModelViewProjectionMatrix * vec4( aPosition.xyz, 1.0 );
+        gl_Position = localToClip * vec4( aPosition.xyz, 1.0 );
         vTexCoord = aPosition;
     })";
 
@@ -122,11 +122,14 @@ void ae3d::BuiltinShaders::Load()
     
     layout (location = 0) in vec3 aPosition;
     
-    uniform mat4 _ModelViewProjectionMatrix;
-    
+    layout(std140) uniform PerObject
+    {
+        mat4 localToClip;
+    };
+
     void main()
     {
-        gl_Position = _ModelViewProjectionMatrix * vec4( aPosition, 1.0 );
+        gl_Position = localToClip * vec4( aPosition, 1.0 );
     })";
     
     const char* momentsFragmentSource = R"(
@@ -155,17 +158,20 @@ void ae3d::BuiltinShaders::Load()
     layout (location = 0) in vec4 aPosition;
     layout (location = 3) in vec3 aNormal;
     
-    uniform mat4 _ModelViewProjectionMatrix;
-    uniform mat4 _ModelViewMatrix;
+    layout(std140) uniform PerObject
+    {
+        mat4 localToClip;
+        mat4 localToView;
+    };
     
     out vec3 vPosition;
     out vec3 vNormal;
     
     void main()
     {
-        gl_Position = _ModelViewProjectionMatrix * aPosition;
-        vPosition = (_ModelViewMatrix * aPosition).xyz;
-        vNormal = mat3( _ModelViewMatrix ) * aNormal;
+        gl_Position = localToClip * aPosition;
+        vPosition = (localToView * aPosition).xyz;
+        vNormal = mat3( localToView ) * aNormal;
     }
     )";
     
