@@ -91,6 +91,42 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &defaultTexture;
 }
 
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
+{
+    width = aWidth;
+    height = aHeight;
+    wrap = TextureWrap::Repeat;
+    filter = TextureFilter::Linear;
+
+    opaque = (channels == 3 || channels == 1);
+    
+    MTLTextureDescriptor* textureDescriptor =
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+                                                       width:width
+                                                      height:height
+                                                   mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+    metalTexture.label = @"texture loaded from data";
+    
+    const int bytesPerRow = width * 4;
+    
+    MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
+    [metalTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];
+    
+    if (mipmaps == Mipmaps::Generate)
+    {
+        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
+        [commandEncoder generateMipmapsForTexture:metalTexture];
+        [commandEncoder endEncoding];
+        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
+         completionBlock(metalTexture);
+         }];*/
+        [commandBuffer commit];
+    }
+}
+
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     if (!fileContents.isLoaded)

@@ -36,9 +36,90 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
+//#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
+
+#ifdef TEST_NUKLEAR_UI
+#define NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_DEFAULT_FONT
+#define NK_IMPLEMENTATION
+#include "nuklear.h"
+
+#define MAX_VERTEX_MEMORY 512 * 1024
+#define MAX_ELEMENT_MEMORY 128 * 1024
+
+struct nk_glfw_vertex
+{
+    float position[ 3 ];
+    float uv[ 2 ];
+    float col[ 4 ];
+};
+
+nk_draw_null_texture nullTexture;
+
+void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
+{
+    struct nk_convert_config config;
+    static const struct nk_draw_vertex_layout_element vertex_layout[] = {
+        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_glfw_vertex, position)},
+        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_glfw_vertex, uv)},
+        {NK_VERTEX_COLOR, NK_FORMAT_R8G8B8A8, NK_OFFSETOF(struct nk_glfw_vertex, col)},
+        {NK_VERTEX_LAYOUT_END}
+    };
+    NK_MEMSET( &config, 0, sizeof( config ) );
+    config.vertex_layout = vertex_layout;
+    config.vertex_size = sizeof( struct nk_glfw_vertex );
+    config.vertex_alignment = NK_ALIGNOF( struct nk_glfw_vertex );
+    config.null = nullTexture;
+    config.circle_segment_count = 22;
+    config.curve_segment_count = 22;
+    config.arc_segment_count = 22;
+    config.global_alpha = 1.0f;
+    config.shape_AA = NK_ANTI_ALIASING_ON;
+    config.line_AA = NK_ANTI_ALIASING_ON;
+    
+    void* vertices;
+    void* elements;
+    ae3d::System::MapUIVertexBuffer( MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY, &vertices, &elements );
+    
+    nk_buffer vbuf, ebuf;
+    nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY );
+    nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
+    nk_convert( ctx, uiCommands, &vbuf, &ebuf, &config );
+    
+    ae3d::System::UnmapUIVertexBuffer();
+    
+    const struct nk_draw_command* cmd = nullptr;
+    nk_draw_index* offset = nullptr;
+    
+    const float scaleX = 2;
+    const float scaleY = 2;
+    
+    nk_draw_foreach( cmd, ctx, uiCommands )
+    {
+        if (cmd->elem_count == 0)
+        {
+            continue;
+        }
+        
+        ae3d::System::DrawUI( (int)(cmd->clip_rect.x * scaleX),
+                       (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
+                       (int)(cmd->clip_rect.w * scaleX),
+                       (int)(cmd->clip_rect.h * scaleY),
+                       cmd->elem_count, cmd->texture.id, offset );
+        offset += cmd->elem_count;
+    }
+    
+    nk_clear( ctx );
+}
+
+#endif
 
 void cocoaProcessEvents();
 
@@ -114,6 +195,15 @@ using namespace ae3d;
     Scene scene2;
     GameObject bigCubeInScene2;
     GameObject pointLights[ POINT_LIGHT_COUNT ];
+    
+#ifdef TEST_NUKLEAR_UI
+    nk_context ctx;
+    nk_font_atlas atlas;
+    int atlasWidth;
+    int atlasHeight;
+    Texture2D nkFontTexture;
+    nk_buffer cmds;
+#endif
 }
 
 - (void)viewDidLoad
@@ -484,6 +574,20 @@ using namespace ae3d;
     
     commandQueue = [device newCommandQueue];
     inFlightSemaphore = dispatch_semaphore_create( kMaxBuffersInFlight );
+    
+#ifdef TEST_NUKLEAR_UI
+    nk_font_atlas_init_default( &atlas );
+    nk_font_atlas_begin( &atlas );
+    
+    nk_font* nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
+    const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
+    
+    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
+    nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
+    
+    nk_init_default( &ctx, &nkFont->handle );
+    nk_buffer_init_default( &cmds );
+#endif
 }
 
 - (void)_setupView
@@ -555,6 +659,44 @@ using namespace ae3d;
         scene.Render();
         //scene2.Render();
         //System::DrawLines( lineHandle, lineView, lineProjection );
+        
+#ifdef TEST_NUKLEAR_UI
+        enum {EASY, HARD};
+        static int op = EASY;
+        static float value = 0.6f;
+        
+        if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE ))
+        {
+            nk_layout_row_static( &ctx, 30, 120, 1 );
+            
+            if (nk_button_label( &ctx, "button" ))
+            {
+                ae3d::System::Print( "Pressed a button\n" );
+            }
+            nk_layout_row_static( &ctx, 30, 80, 1 );
+            if (nk_button_label( &ctx, "button" )) {
+                /* event handling */
+                System::Print("Pressed a button\n");
+            }
+            
+            /* fixed widget window ratio width */
+            nk_layout_row_dynamic(&ctx, 30, 2);
+            if (nk_option_label(&ctx, "easy", op == EASY)) op = EASY;
+            if (nk_option_label(&ctx, "hard", op == HARD)) op = HARD;
+            
+            /* custom widget pixel width */
+            nk_layout_row_begin(&ctx, NK_STATIC, 30, 2);
+            {
+                nk_layout_row_push(&ctx, 50);
+                nk_label(&ctx, "Volume:", NK_TEXT_LEFT);
+                nk_layout_row_push(&ctx, 110);
+                nk_slider_float(&ctx, 0, &value, 1.0f, 0.1f);
+            }
+            nk_layout_row_end( &ctx );
+            nk_end( &ctx );
+        }
+        DrawNuklear( &ctx, &cmds, self.view.bounds.size.width, self.view.bounds.size.height );
+#endif
         scene.EndRenderMetal();
         ae3d::System::EndFrame();
     }

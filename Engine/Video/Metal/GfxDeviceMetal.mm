@@ -89,7 +89,7 @@ namespace GfxDeviceGlobal
     std::vector< ae3d::VertexBuffer > lineBuffers;
     int viewport[ 4 ];
     unsigned frameIndex = 0;
-    id< MTLBuffer > uiBuffer;
+    ae3d::VertexBuffer uiBuffer;
     PerObjectUboStruct perObjectUboStruct;
     
     struct Samplers
@@ -225,17 +225,20 @@ void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int e
 {
     int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
     SetViewport( viewport );
-    Draw( GfxDeviceGlobal::lineBuffers[ 0 ], 0, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+    Draw( GfxDeviceGlobal::uiBuffer, (size_t)offset, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
 {
-    // TODO: Implement
+    System::Assert( [GfxDeviceGlobal::uiBuffer.GetVertexBuffer() contents] != nullptr, "vertices are null" );
+    System::Assert( [GfxDeviceGlobal::uiBuffer.GetIndexBuffer() contents] != nullptr, "indices are null" );
+    
+    *outMappedVertices = (void*)[GfxDeviceGlobal::uiBuffer.GetVertexBuffer() contents];
+    *outMappedIndices = (void*)[GfxDeviceGlobal::uiBuffer.GetIndexBuffer() contents];
 }
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
 {
-    // TODO: Implement
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
@@ -336,6 +339,10 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
 
     GfxDeviceGlobal::CreateSamplers();
     GfxDeviceGlobal::lightTiler.Init();
+
+    std::vector< VertexBuffer::VertexPTC > vertices( 512 * 1024 );
+    std::vector< VertexBuffer::Face > faces( 512 * 1024 );
+    GfxDeviceGlobal::uiBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
 
     if (sampleCount == 1)
     {

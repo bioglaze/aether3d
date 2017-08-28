@@ -16,6 +16,7 @@
 		AB4ADC2A1D8EB2800032CBDD /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB4ADC291D8EB2800032CBDD /* Standard.metal */; };
 		AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */; };
 		AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7839E31C70CA950065EF51 /* DepthNormals.metal */; };
+		AB80CD021F548FC6003D9537 /* UI.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB80CD011F548FC6003D9537 /* UI.metal */; };
 		AB9D9A291C96E993009DF897 /* back.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A221C96E993009DF897 /* back.jpg */; };
 		AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A231C96E993009DF897 /* bottom.jpg */; };
 		AB9D9A2B1C96E993009DF897 /* front.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A241C96E993009DF897 /* front.jpg */; };
@@ -67,6 +68,7 @@
 		AB4ADC291D8EB2800032CBDD /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
+		AB80CD011F548FC6003D9537 /* UI.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = UI.metal; path = ../../../Engine/Assets/UI.metal; sourceTree = "<group>"; };
 		AB9D9A221C96E993009DF897 /* back.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = back.jpg; path = ../../../../aether3d_build/Samples/skybox/back.jpg; sourceTree = "<group>"; };
 		AB9D9A231C96E993009DF897 /* bottom.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bottom.jpg; path = ../../../../aether3d_build/Samples/skybox/bottom.jpg; sourceTree = "<group>"; };
 		AB9D9A241C96E993009DF897 /* front.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = front.jpg; path = ../../../../aether3d_build/Samples/skybox/front.jpg; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 				ABE04FC11C1217F00025C436 /* Skybox.metal */,
 				ABE04FC21C1217F00025C436 /* SpriteShader.metal */,
 				AB4ADC291D8EB2800032CBDD /* Standard.metal */,
+				AB80CD011F548FC6003D9537 /* UI.metal */,
 				ABE04FC31C1217F00025C436 /* Unlit.metal */,
 				ABE04F821C1216A80025C436 /* main.m */,
 			);
@@ -388,6 +391,7 @@
 				ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */,
 				ABE04F831C1216A80025C436 /* main.m in Sources */,
 				ABE04FC41C1217F00025C436 /* Moments.metal in Sources */,
+				AB80CD021F548FC6003D9537 /* UI.metal in Sources */,
 				AB4ADC2A1D8EB2800032CBDD /* Standard.metal in Sources */,
 				ABE04F861C1216A80025C436 /* GameViewController.mm in Sources */,
 				ABE04FC71C1217F00025C436 /* SpriteShader.metal in Sources */,
