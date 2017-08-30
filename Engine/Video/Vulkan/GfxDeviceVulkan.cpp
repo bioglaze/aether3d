@@ -1448,10 +1448,10 @@ namespace ae3d
 
         VkQueryPoolCreateInfo queryPoolInfo = {};
         queryPoolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
-        queryPoolInfo.queryType = VK_QUERY_TYPE_OCCLUSION;
+        queryPoolInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
         queryPoolInfo.queryCount = 2;
 
-        err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, NULL, &GfxDeviceGlobal::queryPool );
+        err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, nullptr, &GfxDeviceGlobal::queryPool );
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
     }
 }
@@ -1484,12 +1484,10 @@ void ae3d::GfxDevice::UnmapUIVertexBuffer()
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
 {
-    // TODO: Implement
 }
 
 void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
 {
-    // TODO: Implement
 }
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()
@@ -1803,6 +1801,11 @@ void ae3d::GfxDevice::Present()
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 
+    uint64_t resultData[ 2 ] = { 0, 0 };
+    err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint64_t ), resultData, sizeof( uint64_t ), VK_QUERY_RESULT_WITH_AVAILABILITY_BIT | VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
+    uint64_t diff = resultData[ 1 ] - resultData[ 0 ];
+    Statistics::SetDepthNormalsGpuTime( diff / 1000000.0f );
+
     for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeVBs.size(); ++i)
     {
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeVBs[ i ], nullptr );
@@ -1890,6 +1893,9 @@ void BeginOffscreen()
 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+    
+    vkCmdResetQueryPool( GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::queryPool, 0, 2 );
+    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 0 );
 
     VkClearValue clearValues[ 2 ];
     clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
@@ -1915,6 +1921,8 @@ void BeginOffscreen()
 void EndOffscreen()
 {
     vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
+
+    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 1 );
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
