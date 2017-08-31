@@ -249,6 +249,61 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
+{
+    width = aWidth;
+    height = aHeight;
+    wrap = TextureWrap::Repeat;
+    filter = TextureFilter::Linear;
+
+    D3D12_RESOURCE_DESC descTex = {};
+    descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    descTex.Width = width;
+    descTex.Height = static_cast< UINT >(height);
+    descTex.DepthOrArraySize = 1;
+    descTex.MipLevels = 1;
+    descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descTex.SampleDesc.Count = 1;
+    descTex.SampleDesc.Quality = 0;
+    descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    D3D12_HEAP_PROPERTIES heapProps = {};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+    heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    heapProps.CreationNodeMask = 1;
+    heapProps.VisibleNodeMask = 1;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
+        D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
+    AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+
+    wchar_t wstr[ 128 ];
+    std::mbstowcs( wstr, debugName, 128 );
+    gpuResource.resource->SetName( wstr );
+    gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
+
+    D3D12_SUBRESOURCE_DATA texResource = {};
+    texResource.pData = imageData;
+    texResource.RowPitch = Texture2DGlobal::defaultTexture.width * channels * 4;
+    texResource.SlicePitch = texResource.RowPitch * height;
+    InitializeTexture( gpuResource, &texResource, 1 );
+
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.PlaneSlice = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    handle = static_cast< unsigned >(Texture2DGlobal::defaultTexture.srv.ptr);
+
+    GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
+}
+
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     filter = aFilter;

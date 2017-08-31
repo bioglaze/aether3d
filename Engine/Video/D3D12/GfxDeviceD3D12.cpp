@@ -889,9 +889,6 @@ void ae3d::CreateRenderer( int samples )
     hr = GfxDeviceGlobal::commandQueue->GetTimestampFrequency( &GfxDeviceGlobal::timerQuery.frequency );
     AE3D_CHECK_D3D( hr, "Failed to get timer query frequency" );
 
-    D3D12_RANGE range = { 0, MaxNumTimers };
-    GfxDeviceGlobal::timerQuery.queryBuffer->Map( 0, &range, (void**)&GfxDeviceGlobal::timerQuery.result );
-
     CreateBackBuffer();
     CreateMSAA();
     CreateRootSignature();
@@ -942,21 +939,23 @@ void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()
 {
-    //uint32_t offset = m_control.m_current * 2 + 0;
     uint32_t offset = GfxDeviceGlobal::frameIndex & 3;
     GfxDeviceGlobal::graphicsCommandList->EndQuery( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, offset );
 }
 
 void ae3d::GfxDevice::EndShadowMapGpuQuery()
 {
-    //uint32_t offset = 0;
-    uint32_t offset = ((GfxDeviceGlobal::frameIndex & 3) - 3) & 3;
+    uint32_t offset = GfxDeviceGlobal::frameIndex & 3;
 
     GfxDeviceGlobal::graphicsCommandList->EndQuery( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, offset + 1 );
-    GfxDeviceGlobal::graphicsCommandList->ResolveQueryData( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, offset, 2, GfxDeviceGlobal::timerQuery.queryBuffer, offset * sizeof( uint64_t ) );
+    GfxDeviceGlobal::graphicsCommandList->ResolveQueryData( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, offset, 2, GfxDeviceGlobal::timerQuery.queryBuffer, 0 );
     
+    D3D12_RANGE range = { 0, MaxNumTimers };
+    GfxDeviceGlobal::timerQuery.queryBuffer->Map( 0, &range, (void**)&GfxDeviceGlobal::timerQuery.result );
     const uint64_t beginTime = GfxDeviceGlobal::timerQuery.result[ offset + 0 ];
     const uint64_t endTime = GfxDeviceGlobal::timerQuery.result[ offset + 1 ];
+    GfxDeviceGlobal::timerQuery.queryBuffer->Unmap( 0, nullptr );
+
     const float theTime = (endTime - beginTime) / 1000000.0f;
     Statistics::SetShadowMapGpuTime( theTime );
 }
@@ -1192,8 +1191,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::lightTilerPSO );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeap );
 
-    D3D12_RANGE range = { 0, 0 };
-    GfxDeviceGlobal::timerQuery.queryBuffer->Unmap( 0, &range );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryBuffer );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryHeap );
 
