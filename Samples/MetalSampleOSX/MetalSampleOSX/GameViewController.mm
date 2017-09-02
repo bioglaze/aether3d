@@ -2,7 +2,6 @@
 // Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.7.zip
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
-
 #import "GameViewController.h"
 #import <Metal/Metal.h>
 #import <simd/simd.h>
@@ -36,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_NUKLEAR_UI
+#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -54,7 +53,7 @@
 #define MAX_VERTEX_MEMORY 512 * 1024
 #define MAX_ELEMENT_MEMORY 128 * 1024
 
-struct nk_glfw_vertex
+struct VertexPTC
 {
     float position[ 3 ];
     float uv[ 2 ];
@@ -62,20 +61,22 @@ struct nk_glfw_vertex
 };
 
 nk_draw_null_texture nullTexture;
+nk_font* nkFont = nullptr;
 
 void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
-        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_glfw_vertex, position)},
-        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_glfw_vertex, uv)},
-        {NK_VERTEX_COLOR, NK_FORMAT_R8G8B8A8, NK_OFFSETOF(struct nk_glfw_vertex, col)},
+        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, position)},
+        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, uv)},
+        {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF(struct VertexPTC, col)},
         {NK_VERTEX_LAYOUT_END}
     };
+    
     NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
-    config.vertex_size = sizeof( struct nk_glfw_vertex );
-    config.vertex_alignment = NK_ALIGNOF( struct nk_glfw_vertex );
+    config.vertex_size = sizeof( struct VertexPTC );
+    config.vertex_alignment = NK_ALIGNOF( struct VertexPTC );
     config.null = nullTexture;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;
@@ -96,8 +97,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     ae3d::System::UnmapUIVertexBuffer();
     
     const struct nk_draw_command* cmd = nullptr;
-    nk_draw_index* offset = nullptr;
-    
+    //nk_draw_index* offset = nullptr;
+    int offset = 0;
     const float scaleX = 2;
     const float scaleY = 2;
     
@@ -112,7 +113,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
                        (int)(cmd->clip_rect.w * scaleX),
                        (int)(cmd->clip_rect.h * scaleY),
-                       cmd->elem_count, cmd->texture.id, offset );
+                       cmd->elem_count, cmd->texture.id, &offset );
         offset += cmd->elem_count;
     }
     
@@ -251,7 +252,7 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -289,7 +290,7 @@ using namespace ae3d;
                 FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
                 FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );*/
-    scene.SetSkybox( &skyTex );
+    //scene.SetSkybox( &skyTex );
     
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
     fontSDF.LoadBMFont( &fontTexSDF, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
@@ -579,7 +580,7 @@ using namespace ae3d;
     nk_font_atlas_init_default( &atlas );
     nk_font_atlas_begin( &atlas );
     
-    nk_font* nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
+    nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
     
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
@@ -587,6 +588,9 @@ using namespace ae3d;
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
+    
+    standardMaterial.SetTexture( "textureMap", &nkFontTexture );
+    cubeMaterial.SetTexture( "textureMap", &nkFontTexture );
 #endif
 }
 
@@ -673,24 +677,27 @@ using namespace ae3d;
             {
                 ae3d::System::Print( "Pressed a button\n" );
             }
+            
             nk_layout_row_static( &ctx, 30, 80, 1 );
-            if (nk_button_label( &ctx, "button" )) {
+            
+            if (nk_button_label( &ctx, "button" ))
+            {
                 /* event handling */
                 System::Print("Pressed a button\n");
             }
             
             /* fixed widget window ratio width */
-            nk_layout_row_dynamic(&ctx, 30, 2);
-            if (nk_option_label(&ctx, "easy", op == EASY)) op = EASY;
-            if (nk_option_label(&ctx, "hard", op == HARD)) op = HARD;
+            nk_layout_row_dynamic( &ctx, 30, 2 );
+            if (nk_option_label( &ctx, "easy", op == EASY)) op = EASY;
+            if (nk_option_label( &ctx, "hard", op == HARD)) op = HARD;
             
             /* custom widget pixel width */
-            nk_layout_row_begin(&ctx, NK_STATIC, 30, 2);
+            nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {
-                nk_layout_row_push(&ctx, 50);
-                nk_label(&ctx, "Volume:", NK_TEXT_LEFT);
-                nk_layout_row_push(&ctx, 110);
-                nk_slider_float(&ctx, 0, &value, 1.0f, 0.1f);
+                nk_layout_row_push( &ctx, 50 );
+                nk_label( &ctx, "Volume:", NK_TEXT_LEFT );
+                nk_layout_row_push( &ctx, 110 );
+                nk_slider_float( &ctx, 0, &value, 1.0f, 0.1f );
             }
             nk_layout_row_end( &ctx );
             nk_end( &ctx );

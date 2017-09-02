@@ -101,15 +101,6 @@ namespace ae3d
     /// High-level functions
     namespace System
     {
-        /// \param vpX Viewport x.
-        /// \param vpY Viewport y.
-        /// \param vpWidth Viewport width.
-        /// \param vpHeight Viewport height.
-        /// \param elemCount Element count.
-        /// \param textureId Texture id.
-        /// \param offset Offset into vertex buffer.
-        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset );
-        
         /// \param vertexSize Vertex size.
         /// \param indexSize Index size.
         /// \param outMappedVertices Mapped vertices.
@@ -147,6 +138,15 @@ namespace ae3d
         /// \param projection Camera's projection matrix.
         void DrawLines( int handle, const Matrix44& view, const Matrix44& projection );
         
+        /// \param vpX Viewport x.
+        /// \param vpY Viewport y.
+        /// \param vpWidth Viewport width.
+        /// \param vpHeight Viewport height.
+        /// \param elemCount Element count.
+        /// \param textureId Texture id.
+        /// \param offset Offset into vertex buffer.
+        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset );
+
         /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();
 

@@ -19,10 +19,12 @@
 
 extern ae3d::Renderer renderer;
 extern ae3d::FileWatcher fileWatcher;
+
 namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
 }
+
 void PlatformInitGamePad();
 
 using namespace ae3d;
@@ -98,8 +100,8 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     ortho[ 1 ][ 1 ] /= (float)vpHeight;
 
     renderer.builtinShaders.uiShader.Use();
-    renderer.builtinShaders.uiShader.SetMatrix( "projection", &ortho[ 0 ][ 0 ] );
-
+    GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
+    
     GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, textureId, offset );
 }
 

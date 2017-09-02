@@ -97,7 +97,6 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     height = aHeight;
     wrap = TextureWrap::Repeat;
     filter = TextureFilter::Linear;
-
     opaque = (channels == 3 || channels == 1);
     
     MTLTextureDescriptor* textureDescriptor =
@@ -108,7 +107,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     metalTexture.label = @"texture loaded from data";
     
-    const int bytesPerRow = width * 4;
+    const int bytesPerRow = width * channels;
     
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];

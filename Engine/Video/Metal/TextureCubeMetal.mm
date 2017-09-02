@@ -122,7 +122,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 return;
             }
 
-            bytesPerRow = width * 2;
             const int bytesPerRow2 = width * 4;
             
             MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm;
@@ -134,12 +133,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             else if (output.format == DDSLoader::Format::BC2)
             {
                 pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
-                bytesPerRow = width * 4;
             }
             else if (output.format == DDSLoader::Format::BC3)
             {
                 pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
-                bytesPerRow = width * 4;
             }
 
             region = MTLRegionMake2D( 0, 0, width, height );

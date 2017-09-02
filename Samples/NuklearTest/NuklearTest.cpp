@@ -27,11 +27,11 @@
 
 using namespace ae3d;
 
-struct nk_glfw_vertex
+struct VertexPTC
 {
-    float position[ 2 ];
+    float position[ 3 ];
     float uv[ 2 ];
-    nk_byte col[ 4 ];
+    float col[ 4 ];
 };
 
 nk_draw_null_texture nullTexture;
@@ -43,15 +43,16 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
 {
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
-        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_glfw_vertex, position)},
-        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct nk_glfw_vertex, uv)},
-        {NK_VERTEX_COLOR, NK_FORMAT_R8G8B8A8, NK_OFFSETOF(struct nk_glfw_vertex, col)},
+        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, position)},
+        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, uv)},
+        {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF(struct VertexPTC, col)},
         {NK_VERTEX_LAYOUT_END}
     };
+
     NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
-    config.vertex_size = sizeof( struct nk_glfw_vertex );
-    config.vertex_alignment = NK_ALIGNOF( struct nk_glfw_vertex );
+    config.vertex_size = sizeof( struct VertexPTC );
+    config.vertex_alignment = NK_ALIGNOF( struct VertexPTC );
     config.null = nullTexture;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;

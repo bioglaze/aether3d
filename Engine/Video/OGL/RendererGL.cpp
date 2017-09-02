@@ -195,9 +195,12 @@ void ae3d::BuiltinShaders::Load()
     const char* uiVertexSource = R"(
     #version 330 core
 
-    uniform mat4 projection;
-
-    layout (location=0) in vec2 Position;
+    layout(std140) uniform PerObject
+    {
+        mat4 localToClip;
+    };
+    
+    layout (location=0) in vec3 Position;
     layout (location=1) in vec2 TexCoord;
     layout (location=2) in vec4 Color;
 
@@ -208,7 +211,7 @@ void ae3d::BuiltinShaders::Load()
     {
         Frag_UV = TexCoord;
         Frag_Color = Color;
-        gl_Position = projection * vec4( Position.xy, 0.0, 1.0 );
+        gl_Position = localToClip * vec4( Position.xy, 0.0, 1.0 );
     }
     )";
     

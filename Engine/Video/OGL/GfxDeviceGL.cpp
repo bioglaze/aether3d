@@ -71,13 +71,6 @@ struct UIVertexBuffer
     GLuint ibo = 0;
 };
 
-struct nk_glfw_vertex
-{
-    float position[ 2 ];
-    float uv[ 2 ];
-    std::uint8_t col[ 4 ];
-};
-
 namespace GfxDeviceGlobal
 {
     std::vector< GLuint > vaoIds;
@@ -104,10 +97,10 @@ namespace GfxDeviceGlobal
 
 void InitUIVertexBuffer()
 {
-    GLsizei vs = sizeof(struct nk_glfw_vertex);
-    size_t vp = offsetof(struct nk_glfw_vertex, position);
-    size_t vt = offsetof(struct nk_glfw_vertex, uv);
-    size_t vc = offsetof(struct nk_glfw_vertex, col);
+    GLsizei vs = sizeof( ae3d::VertexBuffer::VertexPTC );
+    size_t vp = offsetof( ae3d::VertexBuffer::VertexPTC, position );
+    size_t vt = offsetof( ae3d::VertexBuffer::VertexPTC, u );
+    size_t vc = offsetof( ae3d::VertexBuffer::VertexPTC, color );
 
     glGenBuffers( 1, &GfxDeviceGlobal::uiVertexBuffer.vbo );
     glGenBuffers( 1, &GfxDeviceGlobal::uiVertexBuffer.ibo );
@@ -121,9 +114,9 @@ void InitUIVertexBuffer()
     glEnableVertexAttribArray( 1 );  // uv
     glEnableVertexAttribArray( 2 ); // color
 
-    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, vs, (void*)vp );
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, vs, (void*)vp );
     glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, vs, (void*)vt );
-    glVertexAttribPointer( 2, 4, GL_UNSIGNED_BYTE, GL_TRUE, vs, (void*)vc );
+    glVertexAttribPointer( 2, 4, GL_FLOAT, GL_FALSE, vs, (void*)vc );
 
     glBindVertexArray( 0 );
 }
@@ -264,6 +257,8 @@ void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int e
     glDisable( GL_CULL_FACE );
     glDisable( GL_DEPTH_TEST );
     glEnable( GL_SCISSOR_TEST );
+    
+    UploadPerObjectUbo();
     
     glBindVertexArray( GfxDeviceGlobal::uiVertexBuffer.vao );
     glScissor( vpX, vpY, vpWidth, vpHeight );
