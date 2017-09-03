@@ -552,7 +552,7 @@ using namespace ae3d;
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
-    scene.Add( &cameraCubeRT );
+    //scene.Add( &cameraCubeRT );
 
     transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None,
                   ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
@@ -611,10 +611,21 @@ using namespace ae3d;
 - (void)mouseDown:(NSEvent *)theEvent
 {
     camera3d.GetComponent<ae3d::TransformComponent>()->MoveForward( -1 );
+    
+#ifdef TEST_NUKLEAR_UI
+    nk_input_begin( &ctx );
+    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.absoluteX, (int)theEvent.absoluteY, 1 );
+    nk_input_end( &ctx );
+#endif
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
+#ifdef TEST_NUKLEAR_UI
+    nk_input_begin( &ctx );
+    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.absoluteX, (int)theEvent.absoluteY, 0 );
+    nk_input_end( &ctx );
+#endif
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
@@ -647,7 +658,6 @@ using namespace ae3d;
         //[renderEncoder endEncoding];
         //[commandBuffer presentDrawable:_view.currentDrawable];
         //[commandBuffer commit];
-
     }
 }
 #endif
@@ -682,7 +692,6 @@ using namespace ae3d;
             
             if (nk_button_label( &ctx, "button" ))
             {
-                /* event handling */
                 System::Print("Pressed a button\n");
             }
             

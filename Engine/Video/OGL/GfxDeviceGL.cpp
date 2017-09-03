@@ -339,7 +339,8 @@ void ae3d::GfxDevice::Init( int width, int height )
     SetBackBufferDimensionAndFBO( width, height );
     Set_sRGB_Writes( true );
     glEnable( GL_DEPTH_TEST );
-
+    glEnable( GL_TEXTURE_CUBE_MAP_SEAMLESS );
+    
     GLint v;
     glGetIntegerv( GL_CONTEXT_FLAGS, &v );
 

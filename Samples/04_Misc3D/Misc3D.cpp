@@ -527,32 +527,6 @@ int main()
 
     while (Window::IsOpen() && !quit)
     {
-#if defined( AE3D_OPENVR )
-        VR::CalcEyePose();
-       
-        cube.GetComponent< TransformComponent >()->SetLocalPosition( camera.GetComponent< TransformComponent >()->GetWorldPosition() + VR::GetLeftHandPosition() );
-        Vec3 pos = VR::GetLeftHandPosition();
-        //System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
-        camera.GetComponent< CameraComponent >()->SetViewport( 0, 0, width, height );
-
-        for (int eye = 0; eye < 2; ++eye)
-        {
-            VR::SetEye( eye );
-            VR::CalcCameraForEye( camera, yaw, eye );
-            scene.Render();
-            VR::UnsetEye( eye );
-        }
-#else
-        if (reload)
-        {
-            System::Print("reloading\n");
-            System::ReloadChangedAssets();
-            reload = false;
-        }
-        scene.Render();
-        //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
-#endif
-
         Window::PumpEvents();
         WindowEvent event;
         
@@ -722,6 +696,32 @@ int main()
         ++animationFrame;
         animatedGo.GetComponent< MeshRendererComponent >()->SetAnimationFrame( animationFrame );
         
+#if defined( AE3D_OPENVR )
+        VR::CalcEyePose();
+        
+        cube.GetComponent< TransformComponent >()->SetLocalPosition( camera.GetComponent< TransformComponent >()->GetWorldPosition() + VR::GetLeftHandPosition() );
+        Vec3 pos = VR::GetLeftHandPosition();
+        //System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
+        camera.GetComponent< CameraComponent >()->SetViewport( 0, 0, width, height );
+        
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            VR::SetEye( eye );
+            VR::CalcCameraForEye( camera, yaw, eye );
+            scene.Render();
+            VR::UnsetEye( eye );
+        }
+#else
+        if (reload)
+        {
+            System::Print("reloading\n");
+            System::ReloadChangedAssets();
+            reload = false;
+        }
+        scene.Render();
+        //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
+#endif
+
 #if defined( AE3D_OPENVR )
         VR::SubmitFrame();
 #endif
