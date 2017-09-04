@@ -7,6 +7,7 @@
 #include <vulkan/vulkan.h>
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
+#include "Renderer.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
 #include "Statistics.hpp"
@@ -24,6 +25,8 @@
 #endif
 
 #define AE3D_DESCRIPTOR_SETS_COUNT 250
+
+extern ae3d::Renderer renderer;
 
 PFN_vkCreateSwapchainKHR createSwapchainKHR = nullptr;
 PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR getPhysicalDeviceSurfaceCapabilitiesKHR = nullptr;
@@ -121,6 +124,9 @@ namespace GfxDeviceGlobal
     bool didUseOffscreenPassOnThisFrame = false;
     unsigned frameIndex = 0;
     PerObjectUboStruct perObjectUboStruct;
+    ae3d::VertexBuffer uiVertexBuffer;
+    std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
+    std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
 }
 
 namespace ae3d
@@ -133,8 +139,10 @@ namespace ae3d
             {
                 std::stringstream stm;
                 stm << "frame time: " << ::Statistics::GetFrameTimeMS() << " ms\n";
-                stm << "shadow pass time: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
-                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
+                stm << "shadow pass time CPU: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
+                stm << "shadow pass time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << " ms\n";
+                stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
+                stm << "depth pass time GPU: " << ::Statistics::GetDepthNormalsTimeGpuMS() << " ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "fence calls: " << ::Statistics::GetFenceCalls() << "\n";
@@ -1453,6 +1461,8 @@ namespace ae3d
 
         err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, nullptr, &GfxDeviceGlobal::queryPool );
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
+
+        GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
     }
 }
 
@@ -1469,17 +1479,19 @@ void ae3d::GfxDevice::Init( int width, int height )
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
 {
-    // TODO: Implement
-}
+    int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
+    SetViewport( viewport );
+    Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );}
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
 {
-    // TODO: Implement
+    *outMappedVertices = GfxDeviceGlobal::uiVertices.data();
+    *outMappedIndices = GfxDeviceGlobal::uiFaces.data();
 }
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
 {
-    // TODO: Implement
+    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
@@ -1767,6 +1779,8 @@ void ae3d::GfxDevice::Present()
     
     VkCommandBuffer buffers[] = { GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] };
 
+    const bool shouldGetQueryResults = GfxDeviceGlobal::didUseOffscreenPassOnThisFrame;
+
     if (!GfxDeviceGlobal::didUseOffscreenPassOnThisFrame)
     {
         submitInfo.commandBufferCount = 1;
@@ -1801,10 +1815,13 @@ void ae3d::GfxDevice::Present()
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 
-    uint64_t resultData[ 2 ] = { 0, 0 };
-    err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint64_t ), resultData, sizeof( uint64_t ), VK_QUERY_RESULT_WITH_AVAILABILITY_BIT | VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
-    uint64_t diff = resultData[ 1 ] - resultData[ 0 ];
-    Statistics::SetDepthNormalsGpuTime( diff / 1000000.0f );
+    if (shouldGetQueryResults)
+    {
+        uint64_t resultData[ 2 ] = { 0, 0 };
+        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint64_t ) * 2, resultData, sizeof( uint64_t ), VK_QUERY_RESULT_WITH_AVAILABILITY_BIT | VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
+        uint64_t diff = resultData[ 1 ] - resultData[ 0 ];
+        Statistics::SetDepthNormalsGpuTime( diff / 1000000.0f );
+    }
 
     for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeVBs.size(); ++i)
     {

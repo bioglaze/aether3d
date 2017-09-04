@@ -105,13 +105,13 @@ namespace ae3d
 
         void SolveLocalMatrix();
 
-        Vec3 localPosition;
-        Quaternion localRotation;
-        float localScale = 1;
-        Vec3 globalPosition;
-        Quaternion globalRotation;
         Matrix44 localMatrix;
         Matrix44 localToWorldMatrix;
+        Vec3 localPosition;
+        Quaternion localRotation;
+        Quaternion globalRotation;
+        float localScale = 1;
+        Vec3 globalPosition;
         int parent = -1;
 #if defined( AE3D_OPENVR )
         Matrix44 hmdView; // For VR

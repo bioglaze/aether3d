@@ -1,4 +1,5 @@
 #include "Texture2D.hpp"
+#include <map>
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -42,6 +43,7 @@ namespace GfxDeviceGlobal
 
 namespace Texture2DGlobal
 {
+    std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
     ae3d::Texture2D defaultTexture;
     VkCommandBuffer texCmdBuffer = VK_NULL_HANDLE;
     std::vector< VkSampler > samplersToReleaseAtExit;
@@ -71,6 +73,36 @@ void ae3d::Texture2D::DestroyTextures()
     {
         vkFreeMemory( GfxDeviceGlobal::device, Texture2DGlobal::memoryToReleaseAtExit[ memoryIndex ], nullptr );
     }
+}
+
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
+{
+    width = aWidth;
+    height = aHeight;
+    wrap = TextureWrap::Repeat;
+    filter = TextureFilter::Linear;
+    opaque = channels == 3;
+
+    // TODO: Move somewhere else.
+    if (Texture2DGlobal::texCmdBuffer == VK_NULL_HANDLE)
+    {
+        System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
+        System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "cmdPool not initialized" );
+
+        VkCommandBufferAllocateInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        cmdBufInfo.commandPool = GfxDeviceGlobal::cmdPool;
+        cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        cmdBufInfo.commandBufferCount = 1;
+
+        VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &Texture2DGlobal::texCmdBuffer );
+        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers Texture2D" );
+    }
+
+    CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB );
+
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, debugName );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
 }
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )

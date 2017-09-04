@@ -16,6 +16,7 @@
 #include "Macros.hpp"
 #include "LightTiler.hpp"
 #include "RenderTexture.hpp"
+#include "Renderer.hpp"
 #include "System.hpp"
 #include "Shader.hpp"
 #include "Statistics.hpp"
@@ -32,6 +33,7 @@ void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 const int MaxNumTimers = 4;
+extern ae3d::Renderer renderer;
 
 namespace WindowGlobal
 {
@@ -168,6 +170,9 @@ namespace GfxDeviceGlobal
     ID3D12DescriptorHeap* computeCbvSrvUavHeap = nullptr;
     TimerQuery timerQuery;
     PerObjectUboStruct perObjectUboStruct;
+    ae3d::VertexBuffer uiVertexBuffer;
+    std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
+    std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
 }
 
 namespace ae3d
@@ -914,17 +919,20 @@ void ae3d::CreateRenderer( int samples )
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
 {
-    // TODO: Implement
+    int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
+    SetViewport( viewport );
+    Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
 {
-    // TODO: Implement
+    *outMappedVertices = GfxDeviceGlobal::uiVertices.data();
+    *outMappedIndices = GfxDeviceGlobal::uiFaces.data();
 }
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
 {
-    // TODO: Implement
+    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
