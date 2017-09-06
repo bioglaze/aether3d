@@ -37,6 +37,11 @@ float GetVRFov();
 void BeginOffscreen();
 void EndOffscreen();
 
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+
 namespace MathUtil
 {
     void GetMinMax( const Vec3* aPoints, int count, Vec3& outMin, Vec3& outMax );
@@ -478,26 +483,24 @@ void ae3d::Scene::Render()
                     if (dirLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                        Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
+                        GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
                         hasShadow = true;
                     }
                     else if (spotLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
-                        Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
-#if RENDERER_OPENGL
-                        Material::SetGlobalFloat( "_LightConeAngleCos", std::cos( spotLight->GetConeAngle() * 3.14159265f / 180.0f ) );
-                        Material::SetGlobalVector( "_LightPosition", lightTransform->GetLocalPosition() );
-                        Material::SetGlobalVector( "_LightDirection", lightTransform->GetViewDirection() );
-                        Material::SetGlobalVector( "_LightColor", spotLight->GetColor() );
-                        Material::SetGlobalInt( "_LightType", 1 );
-#endif
+                        GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
+                        GfxDeviceGlobal::perObjectUboStruct.lightConeAngleCos = std::cos( spotLight->GetConeAngle() * 3.14159265f / 180.0f );
+                        GfxDeviceGlobal::perObjectUboStruct.lightPosition = lightTransform->GetLocalPosition();
+                        GfxDeviceGlobal::perObjectUboStruct.lightDirection = lightTransform->GetViewDirection();
+                        GfxDeviceGlobal::perObjectUboStruct.lightColor = spotLight->GetColor();
+                        GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
                         hasShadow = true;
                     }
                     else if (pointLight)
                     {
                         Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
-                        Material::SetGlobalFloat( "_ShadowMinAmbient", 0.2f );
+                        GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
                         hasShadow = true;
                     }
 
@@ -512,7 +515,7 @@ void ae3d::Scene::Render()
         {
             Texture2D& whiteTexture = renderer.GetWhiteTexture();
             Material::SetGlobalTexture2D( "_ShadowMap", &whiteTexture );
-            Material::SetGlobalFloat( "_ShadowMinAmbient", 1 );
+            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 1;
         }
 #endif
 #if !RENDERER_METAL

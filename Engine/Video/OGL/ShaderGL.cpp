@@ -91,7 +91,7 @@ namespace
         
         if (!wasCompiled)
         {
-            ae3d::System::Print( "Shader compile error.\n" );
+            ae3d::System::Print( "Shader compile error\n" );
             PrintInfoLog( shader, InfoLogType::Shader, GL_INFO_LOG_LENGTH );
             return 0;
         }
@@ -172,7 +172,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     
     if (!wasLinked)
     {
-        ae3d::System::Print("Shader linking failed.\n");
+        ae3d::System::Print("Shader linking failed for %s or %s.\n", vertexPath.c_str(), fragmentPath.c_str() );
         PrintInfoLog( program, InfoLogType::Program, GL_INFO_LOG_LENGTH );
         return;
     }
@@ -199,6 +199,9 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& vertexGLSL, const F
 {
     const std::string vertexStr = std::string( std::begin( vertexGLSL.data ), std::end( vertexGLSL.data ) );
     const std::string fragmentStr = std::string( std::begin( fragmentGLSL.data ), std::end( fragmentGLSL.data ) );
+
+    vertexPath = vertexGLSL.path;
+    fragmentPath = fragmentGLSL.path;
 
     Load( vertexStr.c_str(), fragmentStr.c_str() );
     

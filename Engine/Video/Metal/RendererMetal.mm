@@ -11,5 +11,5 @@ void ae3d::BuiltinShaders::Load()
     momentsShader.LoadFromLibrary( "moments_vertex", "moments_fragment" );
     depthNormalsShader.LoadFromLibrary( "depthnormals_vertex", "depthnormals_fragment" );
     lightCullShader.Load( "light_culler", FileSystem::FileContents(""), FileSystem::FileContents("") );
-    uiShader.LoadFromLibrary( "ui_vertex", "ui_fragment" );
+    uiShader.LoadFromLibrary( "sprite_vertex", "sprite_fragment" );
 }

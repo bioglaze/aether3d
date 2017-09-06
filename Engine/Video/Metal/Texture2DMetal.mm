@@ -1,4 +1,5 @@
 #include "Texture2D.hpp"
+#include <map>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -16,6 +17,11 @@
 #define MYMAX(x, y) ((x) > (y) ? (x) : (y))
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
+
+namespace Texture2DGlobal
+{
+    std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
+}
 
 namespace PVRType
 {
