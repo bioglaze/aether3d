@@ -3,15 +3,26 @@
 
 using namespace metal;
 
+//#define SKIN
+
 float linstep( float low, float high, float v );
 float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth );
 
 struct Uniforms
 {
     matrix_float4x4 localToClip;
+    matrix_float4x4 localToView;
+    matrix_float4x4 localToWorld;
     matrix_float4x4 localToShadowClip;
-    float4 tint;
-    //matrix_float4x4 boneMatrices[ 80 ];
+    float3 lightPosition;
+    float3 lightDirection;
+    float3 lightColor;
+    float lightConeAngleCos;
+    int lightType;
+    float minAmbient;
+#ifdef SKIN
+    matrix_float4x4 boneMatrices[ 80 ];
+#endif
 };
 
 struct ColorInOut
@@ -54,8 +65,8 @@ struct Vertex
     float2 texcoord [[attribute(1)]];
     float4 color [[attribute(2)]];
     
-    //int4 boneIndex [[attribute(5)]];
-    //float4 boneWeights [[attribute(6)]];
+    int4 boneIndex [[attribute(5)]];
+    float4 boneWeights [[attribute(6)]];
 };
 
 vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
@@ -65,16 +76,18 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
 
     float4 in_position = float4( vert.position, 1.0 );
     
-    /*float4 position2 = uniforms.boneMatrices[ vert.boneIndex.x ] * in_position * vert.boneWeights.x;
+#ifdef SKIN
+    float4 position2 = uniforms.boneMatrices[ vert.boneIndex.x ] * in_position * vert.boneWeights.x;
     position2 += uniforms.boneMatrices[ vert.boneIndex.y ] * in_position * vert.boneWeights.y;
     position2 += uniforms.boneMatrices[ vert.boneIndex.z ] * in_position * vert.boneWeights.z;
     position2 += uniforms.boneMatrices[ vert.boneIndex.w ] * in_position * vert.boneWeights.w;
-*/
+    out.position = uniforms.localToClip * position2;
+#else
     out.position = uniforms.localToClip * in_position;
-    
+#endif
     out.color = half4( vert.color );
     out.texCoords = vert.texcoord;
-    out.tintColor = uniforms.tint;
+    out.tintColor = float4( 1, 1, 1, 1 );
     out.projCoord = uniforms.localToShadowClip * in_position;
     return out;
 }

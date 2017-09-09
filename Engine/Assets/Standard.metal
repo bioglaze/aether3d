@@ -13,7 +13,6 @@ struct StandardUniforms
     matrix_float4x4 localToView;
     matrix_float4x4 localToWorld;
     matrix_float4x4 _ShadowProjectionMatrix;
-    float4 tintColor;
 };
 static_assert( sizeof( StandardUniforms ) < 512, "" );
 

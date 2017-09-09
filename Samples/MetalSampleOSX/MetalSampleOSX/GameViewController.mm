@@ -35,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_NUKLEAR_UI
+//#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -290,7 +290,7 @@ using namespace ae3d;
                 FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
                 FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );*/
-    //scene.SetSkybox( &skyTex );
+    scene.SetSkybox( &skyTex );
     
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
     fontSDF.LoadBMFont( &fontTexSDF, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
@@ -559,7 +559,6 @@ using namespace ae3d;
     
     transMaterial.SetShader( &shader );
     transMaterial.SetTexture( "textureMap", &transTex );
-    transMaterial.SetVector( "tintColor", { 1, 0, 0, 1 } );
 
     transMaterial.SetBackFaceCulling( true );
     //transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );
@@ -735,6 +734,10 @@ using namespace ae3d;
     std::string stats = ae3d::System::Statistics::GetStatistics();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
     
+    static int animationFrame = 0;
+    ++animationFrame;
+    animatedGo.GetComponent< MeshRendererComponent >()->SetAnimationFrame( animationFrame );
+
     // Testing vertex buffer growing
     if (angle == 5)
     {

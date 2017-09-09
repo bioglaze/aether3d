@@ -91,7 +91,7 @@ void ae3d::Shader::LoadUniforms( MTLRenderPipelineReflection* reflection )
                     }
                     else
                     {
-                        System::Print( "Shader has unhandled uniform type %d. Uniform name: %d\n", reflectedUniform.dataType, reflectedUniform.name.UTF8String );
+                        System::Print( "Shader has unhandled uniform type %d. Uniform name: %s\n", reflectedUniform.dataType, reflectedUniform.name.UTF8String );
                     }
                     
                     uniform.offsetFromBufferStart = reflectedUniform.offset;
@@ -121,7 +121,7 @@ void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, in
 {
     if (uniforms.find( name ) == std::end( uniforms ))
     {
-        //System::Print( "SetMatrix: could not find %s\n", name );
+        System::Print( "SetMatrix: could not find %s\n", name );
         return;
     }
     
