@@ -14,9 +14,9 @@ struct Uniforms
     matrix_float4x4 localToView;
     matrix_float4x4 localToWorld;
     matrix_float4x4 localToShadowClip;
-    float3 lightPosition;
-    float3 lightDirection;
-    float3 lightColor;
+    float4 lightPosition;
+    float4 lightDirection;
+    float4 lightColor;
     float lightConeAngleCos;
     int lightType;
     float minAmbient;

@@ -12,7 +12,7 @@ struct StandardUniforms
     matrix_float4x4 localToClip;
     matrix_float4x4 localToView;
     matrix_float4x4 localToWorld;
-    matrix_float4x4 _ShadowProjectionMatrix;
+    matrix_float4x4 localToShadowClip;
 };
 static_assert( sizeof( StandardUniforms ) < 512, "" );
 
@@ -115,7 +115,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     
     out.color = half4( vert.color );
     out.texCoords = vert.texcoord;
-    out.projCoord = uniforms._ShadowProjectionMatrix * in_position;
+    out.projCoord = uniforms.localToShadowClip * in_position;
     
     out.tangentVS = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
     float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;

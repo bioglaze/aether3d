@@ -25,7 +25,9 @@
 #include "VR.hpp"
 
 //#define TEST_RENDER_TEXTURE_2D
+// TODO: TEST_RENDER_TEXTURE_3D
 //#define TEST_VERTEX_LAYOUTS
+#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
@@ -245,7 +247,11 @@ int main()
 
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
+#ifdef TEST_SHADOWS_DIR
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
+#else
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
+#endif
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
@@ -455,8 +461,12 @@ int main()
     //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
     
+#ifdef TEST_SHADOWS_POINT
     scene.Add( &pointLight );
-    //scene.Add( &dirLight );
+#endif
+#ifdef TEST_SHADOWS_DIR
+    scene.Add( &dirLight );
+#endif
 #ifdef TEST_SHADOWS_SPOT
     scene.Add( &spotLight );
 #endif

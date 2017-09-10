@@ -17,9 +17,9 @@ struct PerObjectUboStruct
     ae3d::Matrix44 localToView;
     ae3d::Matrix44 localToWorld;
     ae3d::Matrix44 localToShadowClip;
-    ae3d::Vec3 lightPosition;
-    ae3d::Vec3 lightDirection;
-    ae3d::Vec3 lightColor;
+    ae3d::Vec4 lightPosition;
+    ae3d::Vec4 lightDirection;
+    ae3d::Vec4 lightColor;
     float lightConeAngleCos;
     int lightType;
     float minAmbient;

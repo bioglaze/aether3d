@@ -452,9 +452,9 @@ void ae3d::Scene::Render()
                         Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
                         GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
                         GfxDeviceGlobal::perObjectUboStruct.lightConeAngleCos = std::cos( spotLight->GetConeAngle() * 3.14159265f / 180.0f );
-                        GfxDeviceGlobal::perObjectUboStruct.lightPosition = lightTransform->GetLocalPosition();
-                        GfxDeviceGlobal::perObjectUboStruct.lightDirection = lightTransform->GetViewDirection();
-                        GfxDeviceGlobal::perObjectUboStruct.lightColor = spotLight->GetColor();
+                        GfxDeviceGlobal::perObjectUboStruct.lightPosition = Vec4( lightTransform->GetLocalPosition(), 1 );
+                        GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightTransform->GetViewDirection(), 0 );
+                        GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( spotLight->GetColor(), 1 );
                         GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
                         hasShadow = true;
                     }
