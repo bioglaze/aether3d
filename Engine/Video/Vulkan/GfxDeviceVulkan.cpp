@@ -1413,25 +1413,18 @@ namespace ae3d
                 VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
             SetImageLayout( GfxDeviceGlobal::setupCmdBuffer, GfxDeviceGlobal::msaaTarget.depthImage, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
                 VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
+            CreateFramebufferMSAA();
         }
         else
         {
             CreateRenderPassNonMSAA();
+            CreateFramebufferNonMSAA();
         }
 
         VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
         pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
         VkResult err = vkCreatePipelineCache( GfxDeviceGlobal::device, &pipelineCacheCreateInfo, nullptr, &GfxDeviceGlobal::pipelineCache );
         AE3D_CHECK_VULKAN( err, "vkCreatePipelineCache" );
-
-        if (samples > 1)
-        {
-            CreateFramebufferMSAA();
-        }
-        else
-        {
-            CreateFramebufferNonMSAA();
-        }
 
         FlushSetupCommandBuffer();
         CreateDescriptorSetLayout();
@@ -1776,7 +1769,9 @@ void ae3d::GfxDevice::Present()
     submitInfo.pWaitDstStageMask = &pipelineStages;
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
-    
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
+
     VkCommandBuffer buffers[] = { GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] };
 
     const bool shouldGetQueryResults = GfxDeviceGlobal::didUseOffscreenPassOnThisFrame;
@@ -1792,9 +1787,6 @@ void ae3d::GfxDevice::Present()
         submitInfo.pCommandBuffers = buffers;
         GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = false;
     }
-
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
 
     VkResult err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );

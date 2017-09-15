@@ -188,7 +188,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC_Skinned* vertices, int vertexCount )
 {
-    vertexFormat = VertexFormat::PTNTC;
+    vertexFormat = VertexFormat::PTNTC_Skinned;
     elementCount = faceCount * 3;
 
     const int ibSize = elementCount * 2;

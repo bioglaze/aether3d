@@ -50,7 +50,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
   - Open the project in Engine\VisualStudio_* in VS2017 and build it. For MinGW you can use Engine/Makefile_OpenGL or Makefile_Vulkan.
   - Build and run Samples\01_OpenWindow.
   - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
-  - FBX converter tries to find FBX SDK 2017.1 in its default install location (English language localization)
+  - FBX converter tries to find FBX SDK 2018.1.1 in its default install location (English language localization)
   
 ### OpenVR
   - Copy OpenVR headers into Engine\ThirdParty\headers
@@ -61,7 +61,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 
   - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
   - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile. 
-  - FBX converter tries to find FBX SDK 2017.1 in its default install location.
+  - FBX converter tries to find FBX SDK 2018.1.1 in its default install location.
 
 ## Linux
 

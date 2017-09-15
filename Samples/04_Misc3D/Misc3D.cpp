@@ -27,7 +27,7 @@
 //#define TEST_RENDER_TEXTURE_2D
 // TODO: TEST_RENDER_TEXTURE_3D
 //#define TEST_VERTEX_LAYOUTS
-#define TEST_SHADOWS_DIR
+//#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
@@ -187,7 +187,7 @@ int main()
     Shader shaderSkin;
     shaderSkin.Load( FileSystem::FileContents( "unlit_skin.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
                 "unlitVert", "unlitFrag",
-                FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
+                FileSystem::FileContents( "unlit_vert_skin.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Texture2D gliderTex;
@@ -344,7 +344,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -434,8 +434,8 @@ int main()
 
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    scene.Add( &camera2d );
-    scene.Add( &statsContainer );
+    //scene.Add( &camera2d );
+    //scene.Add( &statsContainer );
     //scene.Add( &cameraCubeRT );
     //scene.Add( &rtCube );
     //scene.Add( &cubeScaledUV );

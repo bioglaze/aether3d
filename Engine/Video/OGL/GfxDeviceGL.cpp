@@ -364,8 +364,7 @@ void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        const std::string nameStr( name );
-        glPushDebugGroup( GL_DEBUG_SOURCE_APPLICATION, 0, (GLsizei)nameStr.length(), name );
+        glPushDebugGroup( GL_DEBUG_SOURCE_APPLICATION, 0, -1, name );
     }
 }
 

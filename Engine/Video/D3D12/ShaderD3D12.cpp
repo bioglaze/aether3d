@@ -12,7 +12,7 @@
 #include "RenderTexture.hpp"
 #include "Macros.hpp"
 
-#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3)
+#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64)
 
 extern ae3d::FileWatcher fileWatcher;
 
