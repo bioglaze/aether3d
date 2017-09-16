@@ -30,7 +30,8 @@ namespace ae3d
     class RenderTexture;
     class VertexBuffer;
     class Shader;
-
+    class Texture2D;
+    
     /// Low-level graphics state abstraction.
     namespace GfxDevice
     {
@@ -74,7 +75,7 @@ namespace ae3d
             Lines
         };
 
-        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset );
+        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset );
         void MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices );
         void UnmapUIVertexBuffer();
         void Init( int width, int height );

@@ -143,9 +143,9 @@ namespace ae3d
         /// \param vpWidth Viewport width.
         /// \param vpHeight Viewport height.
         /// \param elemCount Element count.
-        /// \param textureId Texture id.
+        /// \param texture Texture
         /// \param offset Offset into vertex buffer.
-        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset );
+        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset );
 
         /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();

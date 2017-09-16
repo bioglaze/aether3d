@@ -88,7 +88,7 @@ void ae3d::System::UnmapUIVertexBuffer()
     GfxDevice::UnmapUIVertexBuffer();
 }
 
-void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
+void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
 {
     float ortho[ 4 ][ 4 ] = {
         { 2, 0, 0, 0 },
@@ -102,7 +102,7 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     renderer.builtinShaders.uiShader.Use();
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
     
-    GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, textureId, offset );
+    GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, texture, offset );
 }
 
 void ae3d::System::EnableWindowsMemleakDetection()

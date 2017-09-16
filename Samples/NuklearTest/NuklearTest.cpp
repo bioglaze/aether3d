@@ -1,3 +1,4 @@
+#include <map>
 #include <string>
 #include "Font.hpp"
 #include "CameraComponent.hpp"
@@ -35,6 +36,7 @@ struct VertexPTC
 };
 
 nk_draw_null_texture nullTexture;
+std::map< int, Texture2D* > uiTextures;
 
 // Sample assets can be downloaded from here: http://twiren.kapsi.fi/files/aether3d_sample_v0.7.zip
 // Extract them into aether3d_build that is generated next to aether3d folder.
@@ -89,7 +91,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                         (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
                         (int)(cmd->clip_rect.w * scaleX),
                         (int)(cmd->clip_rect.h * scaleY),
-                        cmd->elem_count, cmd->texture.id, offset );
+                        cmd->elem_count, uiTextures[ cmd->texture.id ], offset );
         offset += cmd->elem_count;
     }
 
@@ -163,6 +165,8 @@ int main()
 
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
+    
+    uiTextures[ nk_handle_id( nkFontTexture.GetID() ).id ] = &nkFontTexture;
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );

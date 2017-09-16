@@ -5,10 +5,11 @@
 #include <sstream>
 #include <cstring>
 #include <GL/glxw.h>
+#include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Statistics.hpp"
-#include "RenderTexture.hpp"
 #include "Shader.hpp"
+#include "Texture2D.hpp"
 #include "VertexBuffer.hpp"
 
 void PrintOpenGLDebugOutput( GLenum source, GLenum type, GLuint id, GLenum severity, const char *msg)
@@ -246,10 +247,10 @@ void ae3d::GfxDevice::UnmapUIVertexBuffer()
     glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
 {
     glActiveTexture( GL_TEXTURE0 );
-    glBindTexture( GL_TEXTURE_2D, textureId );
+    glBindTexture( GL_TEXTURE_2D, texture->GetID() );
     
     glEnable( GL_BLEND );
     glBlendEquation( GL_FUNC_ADD );

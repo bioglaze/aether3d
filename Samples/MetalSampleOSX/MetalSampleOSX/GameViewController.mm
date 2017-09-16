@@ -35,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_NUKLEAR_UI
+#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -62,6 +62,7 @@ struct VertexPTC
 
 nk_draw_null_texture nullTexture;
 nk_font* nkFont = nullptr;
+std::map< int, ae3d::Texture2D* > uiTextures;
 
 void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
@@ -113,7 +114,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
                        (int)(cmd->clip_rect.w * scaleX),
                        (int)(cmd->clip_rect.h * scaleY),
-                       cmd->elem_count, cmd->texture.id, &offset );
+                       cmd->elem_count, uiTextures[ cmd->texture.id ], &offset );
         offset += cmd->elem_count;
     }
     
@@ -584,6 +585,8 @@ using namespace ae3d;
     
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
+    
+    uiTextures[ nk_handle_id( nkFontTexture.GetID() ).id ] = &nkFontTexture;
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );

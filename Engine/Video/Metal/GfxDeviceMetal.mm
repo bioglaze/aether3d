@@ -221,7 +221,7 @@ id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
     return GfxDeviceGlobal::uniformBuffers[ GfxDeviceGlobal::currentUboIndex ];
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, int textureId, void* offset )
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
 {
     int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
     SetViewport( viewport );
