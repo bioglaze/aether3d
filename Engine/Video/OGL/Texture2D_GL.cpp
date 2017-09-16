@@ -89,7 +89,8 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
+    glPixelStorei( GL_UNPACK_ALIGNMENT, channels == 4 ? 4 : 1 );
+    
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
         glObjectLabel( GL_TEXTURE, handle, -1, debugName );

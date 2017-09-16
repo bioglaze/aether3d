@@ -1,9 +1,7 @@
 #include <map>
+#include <iostream>
 #include <string>
-#include "Font.hpp"
 #include "CameraComponent.hpp"
-#include "SpriteRendererComponent.hpp"
-#include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "GameObject.hpp"
 #include "Scene.hpp"
@@ -12,7 +10,6 @@
 #include "Vec3.hpp"
 #include "Window.hpp"
 #include "Texture2D.hpp"
-#include "Shader.hpp"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -38,10 +35,7 @@ struct VertexPTC
 nk_draw_null_texture nullTexture;
 std::map< int, Texture2D* > uiTextures;
 
-// Sample assets can be downloaded from here: http://twiren.kapsi.fi/files/aether3d_sample_v0.7.zip
-// Extract them into aether3d_build that is generated next to aether3d folder.
-
-void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
+void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int /*width*/, int height )
 {
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
@@ -112,40 +106,14 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
-    camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DontClear );
+    camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera.AddComponent<TransformComponent>();
    
-    Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
-
-    GameObject spriteContainer;
-    spriteContainer.AddComponent<SpriteRendererComponent>();
-    spriteContainer.AddComponent<TransformComponent>();
-    auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
-    sprite->SetTexture( &spriteTex, Vec3( 320, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-    
-    Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
-    
-    Font font;
-    font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
-
-    GameObject textContainer;
-    textContainer.AddComponent<TextRendererComponent>();
-    textContainer.GetComponent<TextRendererComponent>()->SetText( "Aether3D \nGame Engine" );
-    textContainer.GetComponent<TextRendererComponent>()->SetFont( &font );
-                                                                       
     Scene scene;
-    //scene.Add( &camera );
-    //scene.Add( &spriteContainer );
-    //scene.Add( &textContainer );
-    sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-
     scene.Add( &camera );
-    //scene.Add( &spriteContainer );
-    //scene.Add( &textContainer );
-    sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-    camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+
+    Texture2D gliderTexture;
+    gliderTexture.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
 
     bool quit = false;
     int frame = 0;
@@ -172,7 +140,7 @@ int main()
     nk_buffer_init_default( &cmds );
    
     double x = 0, y = 0;
-
+    
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -205,50 +173,57 @@ int main()
             if (event.type == WindowEventType::MouseMove)
             {
                 x = event.mouseX;
-                y = height - event.mouseY;
+                y = height - event.mouseY + 20;
+                std::cout << "mouse position: " << x << ", y: " << y << std::endl;
                 nk_input_motion( &ctx, (int)x, (int)y );
             }
 
-            nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, (event.type == WindowEventType::Mouse1Down) ? 1 : 1 );
-            nk_input_button( &ctx, NK_BUTTON_RIGHT, (int)x, (int)y, (event.type == WindowEventType::Mouse2Down) ? 1 : 0 );
+            if (event.type == WindowEventType::Mouse1Down)
+            {
+                x = event.mouseX;
+                y = height - event.mouseY + 20;
+                nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 1 );
+            }
+
+            if (event.type == WindowEventType::Mouse1Up)
+            {
+                x = event.mouseX;
+                y = height - event.mouseY + 20;
+                nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 0 );
+            }
+            
+            //nk_input_button( &ctx, NK_BUTTON_RIGHT, (int)x, (int)y, (event.type == WindowEventType::Mouse2Down) ? 1 : 0 );
         }
 
         nk_input_end( &ctx );
 
-        enum {EASY, HARD};
+        enum { EASY, HARD };
         static int op = EASY;
         static float value = 0.6f;
         
         if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE ))
         {
-            nk_layout_row_static( &ctx, 30, 120, 1 );
+            nk_layout_row_static( &ctx, 30, 80, 1 );
             
             if (nk_button_label( &ctx, "button" ))
             {
-                ae3d::System::Print( "Pressed a button\n" );
-            }
-#if 1
-            nk_layout_row_static( &ctx, 30, 80, 1 );
-            if (nk_button_label( &ctx, "button" )) {
-                /* event handling */
                 System::Print("Pressed a button\n");
             }
 
             /* fixed widget window ratio width */
-            nk_layout_row_dynamic(&ctx, 30, 2);
-            if (nk_option_label(&ctx, "easy", op == EASY)) op = EASY;
-            if (nk_option_label(&ctx, "hard", op == HARD)) op = HARD;
+            nk_layout_row_dynamic( &ctx, 30, 2 );
+            if (nk_option_label( &ctx, "easy", op == EASY )) op = EASY;
+            if (nk_option_label( &ctx, "hard", op == HARD )) op = HARD;
 
             /* custom widget pixel width */
-            nk_layout_row_begin(&ctx, NK_STATIC, 30, 2);
+            nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {
-                nk_layout_row_push(&ctx, 50);
-                nk_label(&ctx, "Volume:", NK_TEXT_LEFT);
-                nk_layout_row_push(&ctx, 110);
-                nk_slider_float(&ctx, 0, &value, 1.0f, 0.1f);
+                nk_layout_row_push( &ctx, 50 );
+                nk_label( &ctx, "Volume:", NK_TEXT_LEFT );
+                nk_layout_row_push( &ctx, 110 );
+                nk_slider_float( &ctx, 0, &value, 1.0f, 0.1f );
             }
             nk_layout_row_end( &ctx );
-#endif
             nk_end( &ctx );
         }
 
@@ -258,8 +233,6 @@ int main()
         Window::SwapBuffers();
 
         ++frame;
-        textContainer.GetComponent<TextRendererComponent>()->SetText( (frame % 5 == 0) ? "Aether3D \nGame Engine" : "Aether3D" );
-        textContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
     }
 
     System::Deinit();
