@@ -2,13 +2,21 @@
 
 uniform sampler2D textureMap;
 uniform sampler2D _ShadowMap;
-uniform float _ShadowMinAmbient;
-uniform int _LightType; // 0: None, 1: Spot, 2: Dir, 3: Point
-uniform vec3 _LightColor;
-uniform vec3 _LightPosition;
-uniform vec3 _LightDirection;
-uniform float _LightConeAngleCos;
 uniform vec4 tint;
+
+layout(std140) uniform PerObject
+{
+    mat4 localToClip;
+    mat4 localToView;
+    mat4 localToWorld;
+    mat4 localToShadowClip;
+    vec4 lightPosition;
+    vec4 lightDirection;
+    vec4 lightColor;
+    float lightConeAngleCos;
+    int lightType; // 0: None, 1: Spot, 2: Dir, 3: Point
+    float minAmbient;
+};
 
 in vec3 vPositionWorld;
 in vec2 vTexCoord;
@@ -34,41 +42,44 @@ float VSM( in float depth )
 
 out vec4 fragColor;
 
+#if 0
 vec4 GetSpotLightAttenuation()
 {
-    vec3 vecToLight = normalize( _LightPosition - vPositionWorld );
-    float spotAngle = dot( _LightDirection, vecToLight );
+    vec3 vecToLight = normalize( lightPosition - vPositionWorld );
+    float spotAngle = dot( lightDirection, vecToLight );
 
     // Falloff
-    float dist = distance( vPositionWorld, _LightPosition );
+    float dist = distance( vPositionWorld, lightPosition );
     float a = dist / 15.0f /*_LightRadius*/ + 1.0;
     float att = 1.0f / (a * a);
-    vec3 color = _LightColor * att;
+    vec3 color = lightColor * att;
 
     // Edge smoothing begins.
-    float dif = 1.0f - _LightConeAngleCos;
-    float factor = clamp( (spotAngle - _LightConeAngleCos) / dif, 0.0f, 1.0f );
+    float dif = 1.0f - lightConeAngleCos;
+    float factor = clamp( (spotAngle - lightConeAngleCos) / dif, 0.0f, 1.0f );
     float linearFalloff = 0.04f;
-    vec3 edgeColor = _LightColor * factor / (dist * linearFalloff);
+    vec3 edgeColor = lightColor * factor / (dist * linearFalloff);
     color = min( edgeColor, color );
     // Edge smoothing ends.
 
-    return spotAngle > _LightConeAngleCos ? vec4( color, 1.0 ) : vec4( 0.0, 0.0, 0.0, 1.0 );
+    return spotAngle > lightConeAngleCos ? vec4( color, 1.0 ) : vec4( 0.2, 0.2, 0.2, 1.0 );
 }
+#endif
 
 void main()
 {
     float shadow = 1.0;
     float depth = vProjCoord.z / vProjCoord.w;
-    shadow = max( _ShadowMinAmbient, VSM( depth ) );
+    shadow = max( minAmbient, VSM( depth ) );
 
-    vec4 attenuatedLightColor = vec4( 1.0f, 1.0f, 1.0f, 1.0f );
+    /*vec4 attenuatedLightColor = vec4( 1.0f, 1.0f, 1.0f, 1.0f );
 
     if (_LightType == 1)
     {
         attenuatedLightColor = GetSpotLightAttenuation();
-    }
+    }*/
 
-    fragColor = tint * texture( textureMap, vTexCoord ) * attenuatedLightColor * shadow;
+    //fragColor = tint * texture( textureMap, vTexCoord ) * shadow;// * attenuatedLightColor;
+    fragColor = texture( textureMap, vTexCoord ) * shadow;
 }
 
