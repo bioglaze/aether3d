@@ -31,11 +31,11 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_NUKLEAR_UI
+//#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -253,7 +253,6 @@ using namespace ae3d;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
-    //scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -271,7 +270,8 @@ using namespace ae3d;
 #endif
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
-    
+
+    //scene.Add( &camera2d );
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
@@ -303,7 +303,6 @@ using namespace ae3d;
     text.AddComponent<ae3d::TransformComponent>();
     text.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
     text.SetLayer( 2 );
-    scene.Add( &text );
 
     textSDF.AddComponent<ae3d::TextRendererComponent>();
     textSDF.GetComponent<ae3d::TextRendererComponent>()->SetText( "This is SDF text" );
@@ -313,7 +312,6 @@ using namespace ae3d;
     textSDF.AddComponent<ae3d::TransformComponent>();
     textSDF.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 450, 5, 0 ) );
     textSDF.SetLayer( 2 );
-    scene.Add( &textSDF );
 
     spriteContainer.AddComponent<ae3d::SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
@@ -326,7 +324,6 @@ using namespace ae3d;
     //spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
     spriteContainer.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
     spriteContainer.SetLayer( 2 );
-    scene.Add( &spriteContainer );
 
     shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                 "unlit_vertex", "unlit_fragment",
@@ -361,7 +358,6 @@ using namespace ae3d;
     rotatingCube.AddComponent<ae3d::TransformComponent>();
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -8 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
-    scene.Add( &rotatingCube );
 
     rtCube.AddComponent<ae3d::MeshRendererComponent>();
     rtCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -369,7 +365,6 @@ using namespace ae3d;
     rtCube.AddComponent<ae3d::TransformComponent>();
     rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { -5, 0, -85 } );
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
-    scene.Add( &rtCube );
 
     standardCubeBL.AddComponent<ae3d::MeshRendererComponent>();
     standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -414,30 +409,18 @@ using namespace ae3d;
     standardCubeBR.AddComponent<ae3d::TransformComponent>();
     standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, -4, -10 ) );
 
-#ifdef TEST_FORWARD_PLUS
-    //scene.Add( &standardCubeBR );
-    //scene.Add( &standardCubeBL );
-    //scene.Add( &standardCubeTR );
-    //scene.Add( &standardCubeTL2 );
-    scene.Add( &standardCubeTopCenter );
-    scene.Add( &standardCubeSpotReceiver );
-    //scene.Add( &standardCubeTL );
-#endif
-
     cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "/textured_cube_ptn.ae3d" ) );
     cubePTN.AddComponent<ae3d::MeshRendererComponent>();
     cubePTN.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMeshPTN );
     cubePTN.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     cubePTN.AddComponent<ae3d::TransformComponent>();
     cubePTN.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 3, 0, -10 ) );
-    //scene.Add( &cubePTN );
 
     cubePTN2.AddComponent<ae3d::MeshRendererComponent>();
     cubePTN2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh/*PTN*/ );
     cubePTN2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     cubePTN2.AddComponent<ae3d::TransformComponent>();
     cubePTN2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, 5, -10 ) );
-    //scene.Add( &cubePTN2 );
 
     bigCubeInScene2.AddComponent<ae3d::MeshRendererComponent>();
     bigCubeInScene2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -453,7 +436,6 @@ using namespace ae3d;
     bigCube.AddComponent<ae3d::TransformComponent>();
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 40, 0, -85 ) );
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
-    scene.Add( &bigCube );
 
     bigCube2.AddComponent<MeshRendererComponent>();
     bigCube2.GetComponent<MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -461,7 +443,6 @@ using namespace ae3d;
     bigCube2.AddComponent<TransformComponent>();
     bigCube2.GetComponent<TransformComponent>()->SetLocalPosition( ae3d::Vec3( -1, 4, -16 ) );
     bigCube2.GetComponent<TransformComponent>()->SetLocalScale( 5 );
-    //scene.Add( &bigCube2 );
 
     bigCube3.AddComponent<MeshRendererComponent>();
     bigCube3.GetComponent<MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -469,7 +450,6 @@ using namespace ae3d;
     bigCube3.AddComponent<TransformComponent>();
     bigCube3.GetComponent<TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 4, -16 ) );
     bigCube3.GetComponent<TransformComponent>()->SetLocalScale( 5 );
-    //scene.Add( &bigCube3 );
 
     animatedMesh.Load( FileSystem::FileContents( "human_anim_test2.ae3d" ) );
 
@@ -479,7 +459,6 @@ using namespace ae3d;
     animatedGo.AddComponent< TransformComponent >();
     animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, 0, -85 } );
     animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
-    scene.Add( &animatedGo );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
 #ifdef TEST_SHADOWS_DIR
@@ -487,7 +466,6 @@ using namespace ae3d;
 #endif
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
-    scene.Add( &dirLight );
 
     spotLight.AddComponent<ae3d::SpotLightComponent>();
 #ifdef TEST_SHADOWS_SPOT
@@ -495,7 +473,6 @@ using namespace ae3d;
 #endif
     spotLight.AddComponent<ae3d::TransformComponent>();
     spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 8, -10 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
-    scene.Add( &spotLight );
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
 #ifdef TEST_SHADOWS_POINT
@@ -504,7 +481,6 @@ using namespace ae3d;
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 1.2f );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -80, 0, -85 ) );
-    scene.Add( &pointLight );
 
     // Inits point lights for Forward+
     {
@@ -531,7 +507,6 @@ using namespace ae3d;
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 100, -0.6f ), ae3d::Vec3( 768*2, 512*2, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( dirLight.GetComponent<ae3d::DirectionalLightComponent>()->GetShadowMap(), ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 512, 512, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
-    //scene.Add( &renderTextureContainer );
     
     rtCamera.AddComponent<ae3d::CameraComponent>();
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
@@ -541,7 +516,6 @@ using namespace ae3d;
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.AddComponent<ae3d::TransformComponent>();
     rtCamera.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 20 ) );
-    //scene.Add( &rtCamera );
 
     cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cube RT" );
 
@@ -553,6 +527,32 @@ using namespace ae3d;
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
+
+#ifdef TEST_FORWARD_PLUS
+    //scene.Add( &standardCubeBR );
+    //scene.Add( &standardCubeBL );
+    //scene.Add( &standardCubeTR );
+    //scene.Add( &standardCubeTL2 );
+    scene.Add( &standardCubeTopCenter );
+    scene.Add( &standardCubeSpotReceiver );
+    //scene.Add( &standardCubeTL );
+#endif
+    scene.Add( &bigCube );
+    //scene.Add( &cubePTN2 );
+    //scene.Add( &cubePTN );
+    scene.Add( &rtCube );
+    scene.Add( &rotatingCube );
+    scene.Add( &spriteContainer );
+    scene.Add( &textSDF );
+    scene.Add( &text );
+    //scene.Add( &bigCube2 );
+    //scene.Add( &bigCube3 );
+    scene.Add( &animatedGo );
+    scene.Add( &pointLight );
+    scene.Add( &spotLight );
+    scene.Add( &dirLight );
+    //scene.Add( &renderTextureContainer );
+    //scene.Add( &rtCamera );
     //scene.Add( &cameraCubeRT );
 
     transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None,
@@ -590,9 +590,6 @@ using namespace ae3d;
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
-    
-    standardMaterial.SetTexture( "textureMap", &nkFontTexture );
-    cubeMaterial.SetTexture( "textureMap", &nkFontTexture );
 #endif
 }
 
@@ -683,13 +680,6 @@ using namespace ae3d;
         
         if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE ))
         {
-            nk_layout_row_static( &ctx, 30, 120, 1 );
-            
-            if (nk_button_label( &ctx, "button" ))
-            {
-                ae3d::System::Print( "Pressed a button\n" );
-            }
-            
             nk_layout_row_static( &ctx, 30, 80, 1 );
             
             if (nk_button_label( &ctx, "button" ))

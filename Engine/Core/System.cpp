@@ -100,6 +100,7 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     ortho[ 1 ][ 1 ] /= (float)vpHeight;
 
     renderer.builtinShaders.uiShader.Use();
+    renderer.builtinShaders.uiShader.SetTexture( "textureMap", texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
     
     GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, texture, offset );

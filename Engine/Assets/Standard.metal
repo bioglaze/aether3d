@@ -5,6 +5,8 @@
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
 
+//#define DEBUG_LIGHT_COUNT
+
 using namespace metal;
 
 struct StandardUniforms
@@ -14,7 +16,6 @@ struct StandardUniforms
     matrix_float4x4 localToWorld;
     matrix_float4x4 localToShadowClip;
 };
-static_assert( sizeof( StandardUniforms ) < 512, "" );
 
 struct StandardColorInOut
 {
@@ -178,24 +179,26 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         outColor.rgb += lightDistance < radius ? 1 : 0.25;
     }
     
-     /*const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
+#ifdef DEBUG_LIGHT_COUNT
+     const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 
     if (numLights == 0)
     {
-        outColor = float4( 0, 0, 1, 1 );
+        outColor = float4( 1, 1, 1, 1 );
     }
-    else if (numLights == 1)
+    else if (numLights < 10)
     {
         outColor = float4( 0, 1, 0, 1 );
     }
-    else if (numLights == 2)
+    else if (numLights < 20)
     {
         outColor = float4( 1, 1, 0, 1 );
     }
     else
     {
         outColor = float4( 1, 0, 0, 1 );
-    }*/
-
+    }
+#endif
+    
     return albedoColor * outColor;
 }
