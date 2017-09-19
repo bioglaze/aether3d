@@ -174,7 +174,7 @@ int main()
             {
                 x = event.mouseX;
                 y = height - event.mouseY + 20;
-                std::cout << "mouse position: " << x << ", y: " << y << std::endl;
+                //std::cout << "mouse position: " << x << ", y: " << y << std::endl;
                 nk_input_motion( &ctx, (int)x, (int)y );
             }
 

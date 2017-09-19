@@ -423,10 +423,19 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     }
 
     static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC) glXGetProcAddressARB((const GLubyte*)"glXSwapIntervalEXT");
+    static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC) glXGetProcAddressARB((const GLubyte*)"glXSwapIntervalMESA");
 
     if (glXSwapIntervalEXT)
     {
         glXSwapIntervalEXT( display, WindowGlobal::drawable, 1 );
+    }
+    else if (glXSwapIntervalMESA)
+    {
+        glXSwapIntervalMESA( 1 );
+    }
+    else    
+    {
+        std::cerr << "glXSwapIntervalEXT not found! VSync disabled." << std::endl;
     }
 #endif
 
@@ -505,37 +514,31 @@ void ae3d::Window::PumpEvents()
     
     while ((event = xcb_poll_for_event( WindowGlobal::connection )))
     {
-        //const bool synthetic_event = (event->response_type & 0x80) != 0;
         const uint8_t response_type = event->response_type & ~0x80;
-
+        
         switch (response_type)
         {
-            case XCB_EVENT_MASK_BUTTON_PRESS:
-            case XCB_EVENT_MASK_BUTTON_RELEASE:
+            case 5: // XCB_EVENT_MASK_BUTTON_RELEASE doesn't work for some reason
             {
                 const xcb_query_pointer_reply_t* pointer = xcb_query_pointer_reply( WindowGlobal::connection, xcb_query_pointer(WindowGlobal::connection, XDefaultRootWindow(WindowGlobal::display)), nullptr );
                 const bool newb1 = (pointer->mask & XCB_BUTTON_MASK_1) != 0;
                 const bool newb2 = (pointer->mask & XCB_BUTTON_MASK_2) != 0;
                 const bool newb3 = (pointer->mask & XCB_BUTTON_MASK_3) != 0;
-                const xcb_button_press_event_t* be = (xcb_button_press_event_t*)event;
-
-                const auto b1Type = response_type == XCB_EVENT_MASK_BUTTON_PRESS ? ae3d::WindowEventType::Mouse1Down : ae3d::WindowEventType::Mouse1Up;
-                const auto b2Type = response_type == XCB_EVENT_MASK_BUTTON_PRESS ? ae3d::WindowEventType::Mouse2Down : ae3d::WindowEventType::Mouse2Up;
-                const auto b3Type = response_type == XCB_EVENT_MASK_BUTTON_PRESS ? ae3d::WindowEventType::MouseMiddleDown : ae3d::WindowEventType::MouseMiddleUp;
+                const xcb_button_release_event_t* be = (xcb_button_release_event_t*)event;
 
                 WindowGlobal::IncEventIndex();
                 
                 if (newb1)
                 {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b1Type;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
                 }
                 else if (newb3)
                 {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b2Type;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse2Up;
                 }
                 else if (newb2)
                 {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b3Type;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMiddleUp;
                 }
                 else if (be->detail == 4)
                 {
@@ -547,7 +550,47 @@ void ae3d::Window::PumpEvents()
                 }
                 else
                 {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = b1Type;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
+                }
+                
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = be->event_x;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - be->event_y;
+
+                break;
+            }
+            case XCB_EVENT_MASK_BUTTON_PRESS:
+            {
+                const xcb_query_pointer_reply_t* pointer = xcb_query_pointer_reply( WindowGlobal::connection, xcb_query_pointer(WindowGlobal::connection, XDefaultRootWindow(WindowGlobal::display)), nullptr );
+                const bool newb1 = (pointer->mask & XCB_BUTTON_MASK_1) != 0;
+                const bool newb2 = (pointer->mask & XCB_BUTTON_MASK_2) != 0;
+                const bool newb3 = (pointer->mask & XCB_BUTTON_MASK_3) != 0;
+                const xcb_button_press_event_t* be = (xcb_button_press_event_t*)event;
+
+                WindowGlobal::IncEventIndex();
+                
+                if (newb1)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
+                }
+                else if (newb3)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse2Down;
+                }
+                else if (newb2)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMiddleDown;
+                }
+                else if (be->detail == 4)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollUp;  
+                }
+                else if (be->detail == 5)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollDown;
+                }
+                else
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Down;
                 }
                 
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = be->event_x;
