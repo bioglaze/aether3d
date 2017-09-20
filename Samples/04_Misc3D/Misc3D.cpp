@@ -25,7 +25,7 @@
 #include "VR.hpp"
 
 //#define TEST_RENDER_TEXTURE_2D
-// TODO: TEST_RENDER_TEXTURE_3D
+//#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
@@ -79,6 +79,7 @@ int main()
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
     
+#ifdef TEST_RENDER_TEXTURE_CUBE
     RenderTexture cubeRT;
     cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
     
@@ -91,7 +92,8 @@ int main()
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
-
+#endif
+    
     GameObject camera2d;
     camera2d.AddComponent<CameraComponent>();
     camera2d.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
@@ -164,12 +166,14 @@ int main()
     cubePTN.AddComponent< TransformComponent >();
     cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
 
+#ifdef TEST_RENDER_TEXTURE_CUBE
     GameObject rtCube;
     rtCube.AddComponent< MeshRendererComponent >();
     rtCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
     rtCube.AddComponent< TransformComponent >();
     rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { 5, 0, -70 } );
-
+#endif
+    
     GameObject animatedGo;
     animatedGo.AddComponent< MeshRendererComponent >();
     animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
@@ -330,7 +334,7 @@ int main()
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );*/
-
+#ifdef TEST_RENDER_TEXTURE_CUBE
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
     materialCubeRT.SetRenderTexture( "skyMap", &cubeRT );
@@ -338,7 +342,7 @@ int main()
     materialCubeRT.SetBackFaceCulling( true );
 
     rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
-
+#endif
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
@@ -436,8 +440,10 @@ int main()
     scene.Add( &camera );
     //scene.Add( &camera2d );
     //scene.Add( &statsContainer );
-    //scene.Add( &cameraCubeRT );
-    //scene.Add( &rtCube );
+#ifdef TEST_RENDER_TEXTURE_CUBE
+    scene.Add( &rtCube );
+    scene.Add( &cameraCubeRT );
+#endif
     //scene.Add( &cubeScaledUV );
     scene.Add( &lightParent );
 #ifdef TEST_SHADOWS_POINT
