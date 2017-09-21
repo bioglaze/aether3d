@@ -21,9 +21,11 @@ namespace Statistics
     float shadowMapTimeMS = 0;
     float shadowMapTimeGpuMS = 0;
     float frameTimeMS = 0;
+    float presentTimeMS = 0;
     std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
+    std::chrono::time_point< std::chrono::high_resolution_clock > startPresentTimePoint;
 }
 
 void Statistics::IncTriangleCount( int triangles )
@@ -36,6 +38,11 @@ int Statistics::GetTriangleCount()
     return triangleCount;
 }
 
+float Statistics::GetPresentTimeMS()
+{
+    return presentTimeMS;
+}
+
 void Statistics::SetDepthNormalsGpuTime( float theTime )
 {
     depthNormalsTimeGpuMS = theTime;
@@ -44,6 +51,18 @@ void Statistics::SetDepthNormalsGpuTime( float theTime )
 void Statistics::SetShadowMapGpuTime( float theTime )
 {
     shadowMapTimeGpuMS = theTime;
+}
+
+void Statistics::BeginPresentTimeProfiling()
+{
+    Statistics::startPresentTimePoint = std::chrono::high_resolution_clock::now();
+}
+
+void Statistics::EndPresentTimeProfiling()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startPresentTimePoint ).count();
+    Statistics::presentTimeMS = static_cast< float >(tDiff);
 }
 
 void Statistics::BeginShadowMapProfiling()

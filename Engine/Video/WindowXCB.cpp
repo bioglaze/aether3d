@@ -435,7 +435,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     }
     else    
     {
-        std::cerr << "glXSwapIntervalEXT not found! VSync disabled." << std::endl;
+        std::cerr << "glXSwapIntervalEXT and glXSwapIntervalMESA not found! VSync disabled." << std::endl;
     }
 #endif
 
@@ -773,7 +773,9 @@ void ae3d::Window::PumpEvents()
 void ae3d::Window::SwapBuffers()
 {
 #if RENDERER_OPENGL
+    Statistics::BeginPresentTimeProfiling();
     glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
+    Statistics::EndPresentTimeProfiling();
     Statistics::EndFrameTimeProfiling();
 #endif
 #if RENDERER_VULKAN

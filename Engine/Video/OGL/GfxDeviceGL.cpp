@@ -136,6 +136,7 @@ namespace ae3d
                 stm << "shadow map time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << " ms\n";
                 stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
                 stm << "depth pass time GPU: " << ::Statistics::GetDepthNormalsTimeGpuMS() << " ms\n";
+                stm << "present time CPU: " << ::Statistics::GetPresentTimeMS() << " ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "texture binds: " << ::Statistics::GetTextureBinds() << "\n";
                 stm << "render target binds: " << ::Statistics::GetRenderTargetBinds() << "\n";

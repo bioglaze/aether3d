@@ -18,6 +18,10 @@ namespace Statistics
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
 
+    void BeginPresentTimeProfiling();
+    void EndPresentTimeProfiling();
+    float GetPresentTimeMS();
+    
     void IncTriangleCount( int triangles );
     int GetTriangleCount();
     void IncCreateConstantBufferCalls();
