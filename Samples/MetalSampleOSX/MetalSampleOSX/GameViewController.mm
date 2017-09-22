@@ -31,11 +31,11 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_NUKLEAR_UI
+#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -86,8 +86,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     config.shape_AA = NK_ANTI_ALIASING_ON;
     config.line_AA = NK_ANTI_ALIASING_ON;
     
-    void* vertices;
-    void* elements;
+    void* vertices = nullptr;
+    void* elements = nullptr;
     ae3d::System::MapUIVertexBuffer( MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY, &vertices, &elements );
     
     nk_buffer vbuf, ebuf;
@@ -98,8 +98,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     ae3d::System::UnmapUIVertexBuffer();
     
     const struct nk_draw_command* cmd = nullptr;
-    //nk_draw_index* offset = nullptr;
-    int offset = 0;
+    nk_draw_index* offset = nullptr;
     const float scaleX = 2;
     const float scaleY = 2;
     
@@ -114,13 +113,12 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
                        (int)(cmd->clip_rect.w * scaleX),
                        (int)(cmd->clip_rect.h * scaleY),
-                       cmd->elem_count, uiTextures[ cmd->texture.id ], &offset );
+                       cmd->elem_count, uiTextures[ cmd->texture.id ], offset );
         offset += cmd->elem_count;
     }
     
     nk_clear( ctx );
 }
-
 #endif
 
 void cocoaProcessEvents();
@@ -169,10 +167,12 @@ using namespace ae3d;
     Mesh cubeMeshPTN;
     Mesh animatedMesh;
     Material cubeMaterial;
+    Material skinMaterial;
     Material rtCubeMaterial;
     Material transMaterial;
     Material standardMaterial;
     Shader shader;
+    Shader skinShader;
     Shader skyboxShader;
     Shader standardShader;
     Texture2D fontTex;
@@ -329,11 +329,19 @@ using namespace ae3d;
                 "unlit_vertex", "unlit_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
-    
+
+    skinShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
+                "unlit_skin_vertex", "unlit_skin_fragment",
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
+
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
     cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
+
+    skinMaterial.SetShader( &skinShader );
+    skinMaterial.SetTexture( "textureMap", &gliderTex );
 
     rtCubeMaterial.SetShader( &skyboxShader );
     rtCubeMaterial.SetRenderTexture( "skyMap", &cubeRT );
@@ -455,7 +463,7 @@ using namespace ae3d;
 
     animatedGo.AddComponent< MeshRendererComponent >();
     animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
-    animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &skinMaterial, 0 );
     animatedGo.AddComponent< TransformComponent >();
     animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, 0, -85 } );
     animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
@@ -613,16 +621,17 @@ using namespace ae3d;
     
 #ifdef TEST_NUKLEAR_UI
     nk_input_begin( &ctx );
-    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.absoluteX, (int)theEvent.absoluteY, 1 );
+    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 1 );
     nk_input_end( &ctx );
 #endif
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
+    //ae3d::System::Print( "x: %f, y: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y );
 #ifdef TEST_NUKLEAR_UI
     nk_input_begin( &ctx );
-    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.absoluteX, (int)theEvent.absoluteY, 0 );
+    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 0 );
     nk_input_end( &ctx );
 #endif
 }
@@ -758,5 +767,4 @@ using namespace ae3d;
         [self _render];
     }
 }
-
 @end
