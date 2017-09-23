@@ -9,7 +9,10 @@ INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 GCCWARNINGS := -g -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
- -Wunsafe-loop-optimizations -Wvector-operation-performance
+ -Wunsafe-loop-optimizations -Wvector-operation-performance -Wuseless-cast -Wformat=2
+
+NEW_GCC_WARNINGS := -Wduplicated-cond -Wduplicated-branches -Wrestrict
+
 CLANGWARNINGS := -Wall -Wextra -ansi -pedantic
 
 ifeq ($(COMPILER), clang)

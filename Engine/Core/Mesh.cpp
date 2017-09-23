@@ -304,7 +304,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         is.read( (char*)&nameLength, sizeof( nameLength ) );
 
         std::vector< char > meshName( nameLength + 1 );
-        is.read( (char*)&meshName[ 0 ], nameLength );
+        is.read( &meshName[ 0 ], nameLength );
         subMesh.name = std::string( meshName.data(), meshName.size() - 1 );
 
         uint16_t vertexCount = 0;
@@ -391,7 +391,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
                 int jointNameLength;
                 is.read( (char*)&jointNameLength, sizeof( int ) );
                 std::vector< char > jointName( jointNameLength + 1 );
-                is.read( (char*)&jointName[ 0 ], jointNameLength );
+                is.read( &jointName[ 0 ], jointNameLength );
                 subMesh.joints[ j ].name = std::string( jointName.data(), jointName.size() - 1 );
                 int animLength;
                 is.read( (char*)&animLength, sizeof( int ) );

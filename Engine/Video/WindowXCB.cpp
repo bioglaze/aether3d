@@ -68,11 +68,11 @@ namespace
         
         if (value < -deadZoneThreshold)
         {
-            result = (float)((value + deadZoneThreshold) / (32768.0f - deadZoneThreshold));
+            result = (value + deadZoneThreshold) / (32768.0f - deadZoneThreshold);
         }
         else if (value > deadZoneThreshold)
         {
-            result = (float)((value - deadZoneThreshold) / (32767.0f - deadZoneThreshold));
+            result = (value - deadZoneThreshold) / (32767.0f - deadZoneThreshold);
         }
 
         return result;

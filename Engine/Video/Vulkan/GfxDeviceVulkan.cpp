@@ -1,5 +1,6 @@
 #include "GfxDevice.hpp"
 #include <cstdint>
+#include <cstring>
 #include <map>
 #include <vector> 
 #include <string>

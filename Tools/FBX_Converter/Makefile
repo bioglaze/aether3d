@@ -13,6 +13,10 @@ ifeq ($(UNAME), Linux)
 COMPILER := g++
 FBX_INCLUDE := -I/home/glaze/Downloads/fbx_sdk/include
 FBX_LIB := /home/glaze/Downloads/fbx_sdk/lib/gcc4/x64/release/libfbxsdk.a
+GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
+ -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
+ -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
+ -Wunsafe-loop-optimizations -Wvector-operation-performance -Wuseless-cast -Wformat=2
 all:
 	$(COMPILER) -DRENDERER_OPENGL -g -std=c++11 convert_fbx.cpp $(FBX_LIB) -lpthread -ldl ../../Engine/Core/Matrix.cpp $(FBX_INCLUDE) -I../../Engine/Include -o convert_fbx
 endif

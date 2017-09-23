@@ -81,7 +81,7 @@ namespace
 
     GLuint CompileShader( const char* source, GLenum shaderType )
     {
-        const GLuint shader = ae3d::GfxDevice::CreateShaderId( static_cast<unsigned>(shaderType) );
+        const GLuint shader = ae3d::GfxDevice::CreateShaderId( shaderType );
         glShaderSource( shader, 1, &source, nullptr );
         glCompileShader( shader );
         

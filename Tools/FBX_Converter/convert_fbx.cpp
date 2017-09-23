@@ -594,7 +594,7 @@ void ProcessSkeletonHierarchyRecursively( const FbxNode* inNode, int myIndex, in
         gMeshes.back().joints.push_back( currJoint );
     }
 
-    for (size_t childIndex = 0; childIndex < inNode->GetChildCount(); ++childIndex)
+    for (std::size_t childIndex = 0; childIndex < (std::size_t)inNode->GetChildCount(); ++childIndex)
     {
         ProcessSkeletonHierarchyRecursively( inNode->GetChild( static_cast< int >( childIndex ) ), static_cast< int >( gMeshes.back().joints.size() ), myIndex );
     }
