@@ -103,6 +103,11 @@ namespace ae3d
         /// \param vec4 Vec4 contents.
         void SetVector4( const char* name, const float* vec4 );
 
+        /// \param offset Offset into the currently bound uniform buffer.
+        /// \param data Data to be copied into the uniform buffer.
+        /// \param dataBytes Copied data's size in bytes.
+        void SetUniform( int offset, void* data, int dataBytes );
+
         /// \return Vertex shader path.
         const std::string& GetVertexShaderPath() const { return vertexPath; }
 

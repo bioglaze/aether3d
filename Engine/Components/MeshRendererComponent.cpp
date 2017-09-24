@@ -172,13 +172,14 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
                                            bones[ j ] );
                     }
                 }
-#ifndef RENDERER_VULKAN
-                // FIXME: Disabled on Vulkan backend because uniform code is not complete and this would overwrite MVP.
 #ifdef RENDERER_OPENGL
                 materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices[0]", &bones[ 0 ].m[ 0 ], (int)bones.size() );
-#else
-                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
 #endif
+#if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
+                materials[ subMeshIndex ]->GetShader()->SetUniform( 576, &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
+#endif
+#ifdef RENDERER_METAL
+                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
 #endif
             }
 

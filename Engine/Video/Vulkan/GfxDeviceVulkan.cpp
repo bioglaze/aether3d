@@ -1703,7 +1703,7 @@ void ae3d::GfxDevice::CreateUniformBuffers()
     {
         auto& ubo = GfxDeviceGlobal::ubos[ uboIndex ];
 
-        const VkDeviceSize uboSize = 16 * 4;
+        const VkDeviceSize uboSize = 256 * 3 + 80 * 64;// 16 * 4;
 
         VkBufferCreateInfo bufferInfo = {};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

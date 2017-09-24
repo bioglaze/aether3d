@@ -10,6 +10,17 @@ out gl_PerVertex { vec4 gl_Position; };
 layout (set = 0, binding = 0) uniform UBO 
 {
     mat4 localToClip;
+    mat4 localToView;
+    mat4 localToWorld;
+    mat4 localToShadowClip;
+    vec4 lightPosition;
+    vec4 lightDirection;
+    vec4 lightColor;
+    float lightConeAngleCos;
+    int lightType;
+    float minAmbient;
+    // offset is not final for this matrix array yet
+    mat4 boneMatrices[ 80 ];
 } ubo;
 
 layout (location = 0) out vec2 vTexCoord;

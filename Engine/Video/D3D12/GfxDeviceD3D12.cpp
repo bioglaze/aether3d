@@ -679,7 +679,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::Texture
 void CreateDepthStencil()
 {
     auto descResource = CD3DX12_RESOURCE_DESC::Tex2D(
-        DXGI_FORMAT_R32_TYPELESS, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+        DXGI_FORMAT_R32_TYPELESS, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE,
         D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
 
     auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT );
@@ -1112,7 +1112,17 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavGpuHandle( index ) );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
-    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
+
+    ID3D12PipelineState* pso = GfxDeviceGlobal::psoCache[ psoHash ];
+    static ID3D12PipelineState* cachedPSO = nullptr;
+
+    if (cachedPSO != pso)
+    {
+        GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
+        cachedPSO = pso;
+        Statistics::IncPSOBindCalls();
+    }
+
     GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 1, vertexBuffer.GetView() );
     GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( topology == PrimitiveTopology::Lines ? nullptr : vertexBuffer.GetIndexView() );
     GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( topology == PrimitiveTopology::Lines ? D3D_PRIMITIVE_TOPOLOGY_LINELIST : D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
@@ -1130,7 +1140,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     Statistics::IncTriangleCount( endFace - startFace );
     Statistics::IncDrawCalls();
-    Statistics::IncPSOBindCalls();
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )

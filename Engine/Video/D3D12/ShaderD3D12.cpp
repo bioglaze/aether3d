@@ -196,6 +196,11 @@ void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, in
     }
 }
 
+void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
+{
+    memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, data, dataBytes );
+}
+
 void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
 {
     if (textureUnit == 0)
