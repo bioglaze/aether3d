@@ -176,7 +176,9 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
                 materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices[0]", &bones[ 0 ].m[ 0 ], (int)bones.size() );
 #endif
 #if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
-                materials[ subMeshIndex ]->GetShader()->SetUniform( 576, &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
+                // materials[ subMeshIndex ]->GetShader()->SetUniform( 576, &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
+                //materials[ subMeshIndex ]->GetShader()->SetUniform( offsetof( PerObjectUboStruct, boneMatrices ), &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
+                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
 #endif
 #ifdef RENDERER_METAL
                 materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );

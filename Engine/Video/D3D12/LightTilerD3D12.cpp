@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include "ComputeShader.hpp"
 #include "DescriptorHeapManager.hpp"
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "Matrix.hpp"
 #include "RenderTexture.hpp"
@@ -30,20 +31,6 @@ void ae3d::LightTiler::DestroyBuffers()
     AE3D_SAFE_RELEASE( perTileLightIndexBuffer );
     AE3D_SAFE_RELEASE( uniformBuffer );
 }
-
-struct CullerUniforms
-{
-    Matrix44 projection;
-    Matrix44 invProjection;
-    Vec3 cameraPos;
-    float alphaTest;
-    unsigned numLights;
-    unsigned windowWidth;
-    unsigned windowHeight;
-    unsigned maxNumLightsPerTile;
-    Vec4 linearDepthConstant;
-    Matrix44 viewMatrix;
-};
 
 void ae3d::LightTiler::Init()
 {
@@ -152,7 +139,7 @@ void ae3d::LightTiler::Init()
         bufferProp.MipLevels = 1;
         bufferProp.SampleDesc.Count = 1;
         bufferProp.SampleDesc.Quality = 0;
-        bufferProp.Width = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 2;
+        bufferProp.Width = sizeof( PerObjectUboStruct );
 
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
             &uploadProp,
@@ -204,13 +191,13 @@ void ae3d::LightTiler::UpdateLightBuffers()
     pointLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
 }
 
-void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& view, RenderTexture& depthNormalTarget )
+void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )
 {
-    CullerUniforms uniforms;
+    PerObjectUboStruct uniforms;
 
-    Matrix44::Invert( projection, uniforms.invProjection );
+    Matrix44::Invert( projection, uniforms.clipToView );
 
-    uniforms.viewMatrix = view;
+    uniforms.localToView = localToView;
     uniforms.windowWidth = depthNormalTarget.GetWidth();
     uniforms.windowHeight = depthNormalTarget.GetHeight();
     unsigned activeSpotLights = 0;
@@ -219,7 +206,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     cullerUniformsCreated = true;
 
-    memcpy_s( mappedUniformBuffer, sizeof( CullerUniforms ), &uniforms, sizeof( CullerUniforms ) );
+    memcpy_s( mappedUniformBuffer, sizeof( PerObjectUboStruct ), &uniforms, sizeof( PerObjectUboStruct ) );
 
     shader.SetUniformBuffer( 0, uniformBuffer );
     shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );

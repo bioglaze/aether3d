@@ -24,7 +24,7 @@
 #include "Window.hpp"
 #include "VR.hpp"
 
-//#define TEST_RENDER_TEXTURE_2D
+#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
@@ -191,7 +191,7 @@ int main()
     Shader shaderSkin;
     shaderSkin.Load( FileSystem::FileContents( "unlit_skin.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
                 "unlitVert", "unlitFrag",
-                FileSystem::FileContents( "unlit_vert_skin.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
+                FileSystem::FileContents( "unlit_skin_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Texture2D gliderTex;
@@ -438,8 +438,8 @@ int main()
 
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-    //scene.Add( &camera2d );
-    //scene.Add( &statsContainer );
+    scene.Add( &camera2d );
+    scene.Add( &statsContainer );
 #ifdef TEST_RENDER_TEXTURE_CUBE
     scene.Add( &rtCube );
     scene.Add( &cameraCubeRT );

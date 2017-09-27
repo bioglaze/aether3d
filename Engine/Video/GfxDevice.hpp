@@ -17,12 +17,19 @@ struct PerObjectUboStruct
     ae3d::Matrix44 localToView;
     ae3d::Matrix44 localToWorld;
     ae3d::Matrix44 localToShadowClip;
+    ae3d::Matrix44 clipToView;
     ae3d::Vec4 lightPosition;
     ae3d::Vec4 lightDirection;
     ae3d::Vec4 lightColor;
     float lightConeAngleCos;
     int lightType;
     float minAmbient;
+    unsigned maxNumLightsPerTile;
+    unsigned windowWidth;
+    unsigned windowHeight;
+    unsigned numLights; // 16 bits for point light count, 16 for spot light count
+    unsigned padding;
+    ae3d::Matrix44 boneMatrices[ 80 ];
 };
 
 namespace ae3d
