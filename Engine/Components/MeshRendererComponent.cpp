@@ -1,5 +1,6 @@
 #include "MeshRendererComponent.hpp"
 #include <vector>
+#include <cstring>
 #include "Frustum.hpp"
 #include "Matrix.hpp"
 #include "Mesh.hpp"
@@ -172,14 +173,8 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
                                            bones[ j ] );
                     }
                 }
-#ifdef RENDERER_OPENGL
-                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices[0]", &bones[ 0 ].m[ 0 ], (int)bones.size() );
-#endif
-#if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
-                // materials[ subMeshIndex ]->GetShader()->SetUniform( 576, &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
-                //materials[ subMeshIndex ]->GetShader()->SetUniform( offsetof( PerObjectUboStruct, boneMatrices ), &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
-                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
-#endif
+
+                std::memcpy( &GfxDeviceGlobal::perObjectUboStruct.boneMatrices[ 0 ], &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
 #ifdef RENDERER_METAL
                 materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
 #endif

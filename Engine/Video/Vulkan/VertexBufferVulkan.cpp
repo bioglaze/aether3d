@@ -299,7 +299,7 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
     }
     else if (vertexFormat == VertexFormat::PTNTC_Skinned)
     {
-        attributeDescriptions.resize( 5 );
+        attributeDescriptions.resize( 7 );
 
         // Location 0 : Position
         attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
@@ -334,14 +334,14 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
         // Location 5 : Bones
         attributeDescriptions[ 5 ].binding = VERTEX_BUFFER_BIND_ID;
         attributeDescriptions[ 5 ].location = boneChannel;
-        attributeDescriptions[ 5 ].format = VK_FORMAT_R32G32B32A32_UINT;
-        attributeDescriptions[ 5 ].offset = sizeof( float ) * 16;
+        attributeDescriptions[ 5 ].format = VK_FORMAT_R32G32B32A32_SINT;
+        attributeDescriptions[ 5 ].offset = sizeof( float ) * 20;
 
-        // Location 5 : Weights
+        // Location 6 : Weights
         attributeDescriptions[ 6 ].binding = VERTEX_BUFFER_BIND_ID;
         attributeDescriptions[ 6 ].location = weightChannel;
         attributeDescriptions[ 6 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[ 6 ].offset = sizeof( float ) * 20;
+        attributeDescriptions[ 6 ].offset = sizeof( float ) * 16;
     }
     else
     {
@@ -405,7 +405,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC_Skinned* vertices, int vertexCount )
 {
-    vertexFormat = VertexFormat::PTNTC;
+    vertexFormat = VertexFormat::PTNTC_Skinned;
     elementCount = faceCount * 3;
     GenerateVertexBuffer( static_cast< const void*>( vertices ), vertexCount * sizeof( VertexPTNTC_Skinned ), sizeof( VertexPTNTC_Skinned ), static_cast< const void*>( faces ), elementCount * 2 );
 }

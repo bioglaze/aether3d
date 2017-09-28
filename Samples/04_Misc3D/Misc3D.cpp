@@ -24,7 +24,7 @@
 #include "Window.hpp"
 #include "VR.hpp"
 
-#define TEST_RENDER_TEXTURE_2D
+//#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
