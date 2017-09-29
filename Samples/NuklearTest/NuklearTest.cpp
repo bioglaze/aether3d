@@ -229,7 +229,8 @@ int main()
 
         scene.Render();
         DrawNuklear( &ctx, &cmds, width, height );
-        
+        scene.EndFrame();
+
         Window::SwapBuffers();
 
         ++frame;

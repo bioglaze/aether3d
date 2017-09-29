@@ -117,6 +117,7 @@ int main()
         }
 
         scene.Render();
+        scene.EndFrame();
 
         Window::SwapBuffers();
 

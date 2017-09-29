@@ -220,6 +220,7 @@ int main()
         //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         scene.Render();
+        scene.EndFrame();
 
         System::DrawLines( lineHandle, lineView, lineProjection );
         

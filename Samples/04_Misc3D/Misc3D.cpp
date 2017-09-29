@@ -735,6 +735,7 @@ int main()
             reload = false;
         }
         scene.Render();
+        scene.EndFrame();
         //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
 #endif
 

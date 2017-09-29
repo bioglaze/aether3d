@@ -514,7 +514,8 @@ void ae3d::Scene::Render()
 #endif
     }
 #if RENDERER_VULKAN
-    GfxDevice::EndRenderPassAndCommandBuffer();
+//    Now handled by Scene::EndFrame()
+//    GfxDevice::EndRenderPassAndCommandBuffer();
 #endif
 
 #if RENDERER_METAL
@@ -524,6 +525,17 @@ void ae3d::Scene::Render()
     {
         RenderWithCamera( camera, 0, "Primary Pass" );
     }
+#endif
+}
+
+void ae3d::Scene::EndFrame()
+{
+#if RENDERER_VULKAN
+    GfxDevice::EndRenderPassAndCommandBuffer();
+#endif
+#if RENDERER_METAL
+    GfxDevice::EndBackBufferEncoding();
+    Statistics::EndFrameTimeProfiling();
 #endif
 }
 

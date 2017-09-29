@@ -74,7 +74,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
-    <TargetName>NuklearTest_GL_d</TargetName>
+    <TargetName>NuklearTest_Vulkan_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug D3D12|x64'">
     <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>

@@ -1473,9 +1473,10 @@ void ae3d::GfxDevice::Init( int width, int height )
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
 {
-    int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
+    int viewport[ 4 ] = { vpX < 8192 ? std::abs( vpX )  : 8192, vpY < 8192 ? std::abs( vpY ) : 8192, vpWidth < 8192 ? vpWidth : 8192, vpHeight < 8192 ? vpHeight : 8192 };
     SetViewport( viewport );
-    Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );}
+    Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+}
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
 {
