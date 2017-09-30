@@ -147,8 +147,8 @@ int main()
     Scene scene;
     scene.Add( &camera );
     scene.Add( &spriteContainer );
-    //scene.Add( &textContainer );
-    scene.Add( &textContainerSDF );
+    scene.Add( &textContainer );
+    //scene.Add( &textContainerSDF );
     scene.Add( &statsContainer );
     scene.Add( &statsParent );
     //scene.Add( &renderTextureContainer );
@@ -220,9 +220,8 @@ int main()
         //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         scene.Render();
-        scene.EndFrame();
-
         System::DrawLines( lineHandle, lineView, lineProjection );
+        scene.EndFrame();
         
         Window::SwapBuffers();
     }

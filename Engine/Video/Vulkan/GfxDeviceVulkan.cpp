@@ -128,6 +128,7 @@ namespace GfxDeviceGlobal
     ae3d::VertexBuffer uiVertexBuffer;
     std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
     std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
+    std::vector< ae3d::VertexBuffer > lineBuffers;
 }
 
 namespace ae3d
@@ -292,11 +293,11 @@ namespace ae3d
     }
 
     void CreatePSO( VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                    ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass, std::uint64_t hash )
+                    ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass, ae3d::GfxDevice::PrimitiveTopology topology, std::uint64_t hash )
     {
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
         inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-        inputAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        inputAssemblyState.topology = topology == ae3d::GfxDevice::PrimitiveTopology::Triangles ? VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST : VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
         VkPipelineRasterizationStateCreateInfo rasterizationState = {};
         rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -1615,12 +1616,43 @@ void ae3d::GfxDevice::ClearScreen( unsigned /*clearFlags*/ )
 
 int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
 {
-    return 0;
+    if (lines.empty())
+    {
+        return -1;
+    }
+
+    std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
+
+    std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
+
+    for (std::size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
+    {
+        vertices[ lineIndex ].position = lines[ lineIndex ];
+        vertices[ lineIndex ].color = Vec4( color, 1 );
+    }
+
+    // Not used, but needs to be set to something.
+    for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
+    {
+        faces[ faceIndex * 2 + 0 ].a = faceIndex;
+        faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
+    }
+
+    GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
+    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
+
+    return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
 }
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 {
+    if (handle < 0)
+    {
+        return;
+    }
 
+    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount() / 3, shader, BlendMode::Off, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
 }
 
 void ae3d::GfxDevice::SetViewport( int aViewport[ 4 ] )
@@ -1644,7 +1676,7 @@ void ae3d::GfxDevice::SetViewport( int aViewport[ 4 ] )
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
-                            CullMode cullMode, FillMode fillMode, PrimitiveTopology /*topology*/ )
+                            CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )
 {
     System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
@@ -1666,11 +1698,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
 
-    const std::uint64_t psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE );
+    const std::uint64_t psoHash = GetPSOHash( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE, topology );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
-        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE, psoHash );
+        CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE, topology, psoHash );
     }
 
     UploadPerObjectUbo();

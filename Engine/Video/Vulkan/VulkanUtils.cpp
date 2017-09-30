@@ -122,7 +122,7 @@ namespace debug
 namespace ae3d
 {
     std::uint64_t GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-        ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass )
+        ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass, ae3d::GfxDevice::PrimitiveTopology topology )
     {
         std::uint64_t outResult = (ptrdiff_t)&vertexBuffer;
         outResult += (ptrdiff_t)&shader;
@@ -131,6 +131,7 @@ namespace ae3d
         outResult += ((unsigned)cullMode) * 4;
         outResult += ((unsigned)fillMode) * 8;
         outResult += ((ptrdiff_t)&renderPass) * 16;
+        outResult += ((unsigned)topology) * 32;
 
         return outResult;
     }

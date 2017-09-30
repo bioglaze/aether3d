@@ -183,11 +183,11 @@ bool isBC3( VkFormat format )
 
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
 {
-    if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ))
+    if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ) || isBC1( format ) || isBC2( format ) || isBC3( format ))
     {
         if (mipmaps == Mipmaps::Generate)
         {
-            System::Print( "Mipmaps not generated for %s because the dimension (%dx%d) is not power-of-two.\n", path.c_str(), width, height );
+            System::Print( "Mipmaps not generated for %s because the dimension (%dx%d) is not power-of-two or the texture is a .dds.\n", path.c_str(), width, height );
         }
 
         mipLevelCount = 1;
@@ -488,8 +488,17 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
-    Texture2DGlobal::defaultTexture.handle = 1;
-    Texture2DGlobal::defaultTexture.width = 256;
-    Texture2DGlobal::defaultTexture.height = 256;
+    if (Texture2DGlobal::defaultTexture.view == VK_NULL_HANDLE)
+    {
+        std::vector< std::uint8_t > imageData( 32 * 32 * 4 );
+        
+        for (int i = 0; i < 32 * 32 * 4; ++i)
+        {
+            imageData[ i ] = 0xFF;
+        }
+
+        Texture2DGlobal::defaultTexture.LoadFromData( imageData.data(), 32, 32, 4, "default texture 2d" );
+    }
+
     return &Texture2DGlobal::defaultTexture;
 }
