@@ -34,6 +34,7 @@ namespace WindowGlobal
 {
     int windowWidth = 640;
     int windowHeight = 480;
+    int windowHeightWithoutTitleBar = 640;
     const int eventStackSize = 10;
     ae3d::WindowEvent eventStack[ eventStackSize ];
     int eventIndex = -1;
@@ -143,7 +144,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = message == WM_LBUTTONDOWN ? ae3d::WindowEventType::Mouse1Down : ae3d::WindowEventType::Mouse1Up;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeightWithoutTitleBar - HIWORD( lParam );
         }
             break;
         case WM_RBUTTONDOWN:
@@ -152,7 +153,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = message == WM_RBUTTONDOWN ? ae3d::WindowEventType::Mouse2Down : ae3d::WindowEventType::Mouse2Up;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeightWithoutTitleBar - HIWORD( lParam );
         }
             break;
         case WM_MBUTTONDOWN:
@@ -160,7 +161,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = message == WM_MBUTTONDOWN ? ae3d::WindowEventType::MouseMiddleDown : ae3d::WindowEventType::MouseMiddleUp;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeightWithoutTitleBar - HIWORD( lParam );
             break;
         case WM_MOUSEWHEEL:
         {
@@ -168,7 +169,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = delta < 0 ? ae3d::WindowEventType::MouseWheelScrollDown : ae3d::WindowEventType::MouseWheelScrollUp;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeightWithoutTitleBar - HIWORD( lParam );
         }
             break;
         case WM_MOUSEMOVE:
@@ -180,7 +181,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD( lParam );
-            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeight - HIWORD( lParam );
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeightWithoutTitleBar - HIWORD( lParam );
             break;
         case WM_CLOSE:
             WindowGlobal::IncEventIndex();
@@ -392,8 +393,11 @@ namespace ae3d
 
         CreateRenderer( samples );
         WindowGlobal::isOpen = true;
-        GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
-        
+        RECT rect = {};
+        GetClientRect( WindowGlobal::hwnd, &rect );
+        GfxDevice::Init( rect.right, rect.bottom );
+        WindowGlobal::windowHeightWithoutTitleBar = rect.bottom;
+
         if (samples > 0)
         {
             GfxDevice::SetMultiSampling( true );

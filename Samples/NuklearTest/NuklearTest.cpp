@@ -173,7 +173,7 @@ int main()
             if (event.type == WindowEventType::MouseMove)
             {
                 x = event.mouseX;
-                y = height - event.mouseY + 20;
+                y = height - event.mouseY;
                 //std::cout << "mouse position: " << x << ", y: " << y << std::endl;
                 nk_input_motion( &ctx, (int)x, (int)y );
             }
@@ -181,14 +181,14 @@ int main()
             if (event.type == WindowEventType::Mouse1Down)
             {
                 x = event.mouseX;
-                y = height - event.mouseY + 20;
+                y = height - event.mouseY;
                 nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 1 );
             }
 
             if (event.type == WindowEventType::Mouse1Up)
             {
                 x = event.mouseX;
-                y = height - event.mouseY + 20;
+                y = height - event.mouseY;
                 nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 0 );
             }
             

@@ -173,6 +173,7 @@ namespace GfxDeviceGlobal
     ae3d::VertexBuffer uiVertexBuffer;
     std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
     std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
+    ID3D12PipelineState* cachedPSO = nullptr;
 }
 
 namespace ae3d
@@ -915,6 +916,8 @@ void ae3d::CreateRenderer( int samples )
     }
 
     GfxDeviceGlobal::lightTiler.Init();
+    GfxDeviceGlobal::texture0 = Texture2D::GetDefaultTexture();
+    GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
 }
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
@@ -1092,10 +1095,10 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
         unsigned numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
-        shader.SetInt( "windowWidth", GfxDeviceGlobal::backBufferWidth );
-        shader.SetInt( "windowHeight", GfxDeviceGlobal::backBufferHeight );
-        shader.SetInt( "numLights", numLights );
-        shader.SetInt( "maxNumLightsPerTile", GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile() );
+        GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
+        GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+        GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
+        GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
     }
     else
     {
@@ -1114,12 +1117,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
 
     ID3D12PipelineState* pso = GfxDeviceGlobal::psoCache[ psoHash ];
-    static ID3D12PipelineState* cachedPSO = nullptr;
 
-    if (cachedPSO != pso)
+    if (GfxDeviceGlobal::cachedPSO != pso)
     {
-        GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::psoCache[ psoHash ] );
-        cachedPSO = pso;
+        GfxDeviceGlobal::graphicsCommandList->SetPipelineState( pso );
+        GfxDeviceGlobal::cachedPSO = pso;
         Statistics::IncPSOBindCalls();
     }
 
@@ -1161,7 +1163,8 @@ void ae3d::GfxDevice::ResetCommandList()
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
     AE3D_CHECK_D3D( hr, "graphicsCommandList Reset" );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootSignature( GfxDeviceGlobal::rootSignatureGraphics );
-
+    
+    GfxDeviceGlobal::cachedPSO = nullptr;
     GfxDeviceGlobal::texture0 = Texture2D::GetDefaultTexture();
     GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
 }
