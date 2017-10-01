@@ -3,17 +3,17 @@
 
 using namespace metal;
 
-typedef struct
+struct Uniforms
 {
     matrix_float4x4 localToClip;
-} uniforms_t;
+};
 
-typedef struct
+struct ColorInOut
 {
     float4 position [[position]];
     //half4  color;
     float3 texCoords;
-} ColorInOut;
+};
 
 struct Vertex
 {
@@ -26,7 +26,7 @@ constexpr sampler s(coord::normalized,
                     filter::linear);
 
 vertex ColorInOut skybox_vertex( Vertex vert [[stage_in]],
-                                constant uniforms_t& uniforms [[ buffer(5) ]])
+                                constant Uniforms& uniforms [[ buffer(5) ]])
 {
     ColorInOut out;
 

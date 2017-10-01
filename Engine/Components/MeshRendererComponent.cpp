@@ -175,9 +175,6 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
                 }
 
                 std::memcpy( &GfxDeviceGlobal::perObjectUboStruct.boneMatrices[ 0 ], &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
-#ifdef RENDERER_METAL
-                materials[ subMeshIndex ]->GetShader()->SetMatrixArray( "boneMatrices", &bones[ 0 ].m[ 0 ], (int)bones.size() );
-#endif
             }
 
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())

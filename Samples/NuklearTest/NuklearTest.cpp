@@ -54,8 +54,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int /*width*/, int hei
     config.curve_segment_count = 22;
     config.arc_segment_count = 22;
     config.global_alpha = 1.0f;
-    config.shape_AA = NK_ANTI_ALIASING_ON;
-    config.line_AA = NK_ANTI_ALIASING_ON;
+    config.shape_AA = NK_ANTI_ALIASING_OFF;
+    config.line_AA = NK_ANTI_ALIASING_OFF;
 
     void* vertices;
     void* elements;

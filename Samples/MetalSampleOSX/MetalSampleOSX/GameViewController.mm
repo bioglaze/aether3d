@@ -32,10 +32,10 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-//#define TEST_SHADOWS_DIR
+#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_NUKLEAR_UI
+//#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -83,8 +83,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     config.curve_segment_count = 22;
     config.arc_segment_count = 22;
     config.global_alpha = 1.0f;
-    config.shape_AA = NK_ANTI_ALIASING_ON;
-    config.line_AA = NK_ANTI_ALIASING_ON;
+    config.shape_AA = NK_ANTI_ALIASING_OFF;
+    config.line_AA = NK_ANTI_ALIASING_OFF;
     
     void* vertices = nullptr;
     void* elements = nullptr;
@@ -224,7 +224,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 

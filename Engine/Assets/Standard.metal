@@ -9,12 +9,25 @@
 
 using namespace metal;
 
-struct StandardUniforms
+struct Uniforms
 {
     matrix_float4x4 localToClip;
     matrix_float4x4 localToView;
     matrix_float4x4 localToWorld;
     matrix_float4x4 localToShadowClip;
+    matrix_float4x4 clipToView;
+    float4 lightPosition;
+    float4 lightDirection;
+    float4 lightColor;
+    float lightConeAngle;
+    int lightType; // 0: None, 1: Spot, 2: Dir, 3: Point
+    float minAmbient;
+    uint maxNumLightsPerTile;
+    uint windowWidth;
+    uint windowHeight;
+    uint numLights; // 16 bits for point light count, 16 for spot light count
+    uint padding;
+    matrix_float4x4 boneMatrices[ 80 ];
 };
 
 struct StandardColorInOut
@@ -104,7 +117,7 @@ float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, f
 }
 
 vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
-                               constant StandardUniforms& uniforms [[ buffer(5) ]],
+                               constant Uniforms& uniforms [[ buffer(5) ]],
                                unsigned int vid [[ vertex_id ]] )
 {
     StandardColorInOut out;
@@ -131,7 +144,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
                                texture2d<float, access::sample> normalMap [[texture(2)]],
                                texture2d<float, access::sample> specularMap [[texture(3)]],
-                               constant StandardUniforms& uniforms [[ buffer(5) ]],
+                               constant Uniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
                                constant float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
                                constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
