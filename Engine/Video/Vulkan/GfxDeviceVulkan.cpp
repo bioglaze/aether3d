@@ -1326,7 +1326,8 @@ namespace ae3d
         VkDescriptorImageInfo samplerDesc = {};
         samplerDesc.sampler = sampler;
         samplerDesc.imageView = view;
-        samplerDesc.imageLayout = VK_IMAGE_LAYOUT_GENERAL; // TODO: try VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        //samplerDesc.imageLayout = VK_IMAGE_LAYOUT_GENERAL; // TODO: try VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        samplerDesc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         VkWriteDescriptorSet samplerSet = {};
         samplerSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

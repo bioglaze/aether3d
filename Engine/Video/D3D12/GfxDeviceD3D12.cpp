@@ -255,7 +255,7 @@ void CreateBackBuffer()
         D3D12_CPU_DESCRIPTOR_HANDLE handle = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_RTV );
 
         D3D12_RENDER_TARGET_VIEW_DESC descRtv = {};
-        descRtv.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;// DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        descRtv.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
         descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], &descRtv, handle );
     }
@@ -271,7 +271,7 @@ void CreateMSAA()
     // MSAA color
 
     D3D12_CLEAR_VALUE clearValue = {};
-    clearValue.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    clearValue.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 
     D3D12_HEAP_PROPERTIES heapProp = {};
     heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -282,7 +282,7 @@ void CreateMSAA()
     rtDesc.Height = GfxDeviceGlobal::backBufferHeight;
     rtDesc.DepthOrArraySize = 1;
     rtDesc.MipLevels = 1;
-    rtDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    rtDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
     rtDesc.SampleDesc.Count = GfxDeviceGlobal::sampleCount;
     rtDesc.SampleDesc.Quality = DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN;
     rtDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
@@ -842,7 +842,7 @@ void ae3d::CreateRenderer( int samples )
     swapChainDesc1.BufferCount = 2;
     swapChainDesc1.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc1.Flags = 0;
-    swapChainDesc1.Format = DXGI_FORMAT_B8G8R8A8_UNORM;// DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapChainDesc1.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     swapChainDesc1.Width = WindowGlobal::windowWidth;
     swapChainDesc1.Height = WindowGlobal::windowHeight;
     swapChainDesc1.SampleDesc.Count = 1;
@@ -1052,11 +1052,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         return;
     }*/
 
-    DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;// DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
     
     if (GfxDeviceGlobal::sampleCount > 1)
     {
-        rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_B8G8R8A8_UNORM);
+        rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_B8G8R8A8_UNORM_SRGB);
     }
 
     const std::uint64_t psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
@@ -1314,7 +1314,7 @@ void ae3d::GfxDevice::Present()
 
         TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RESOLVE_SOURCE );
         TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_RESOLVE_DEST );
-        GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( backBufferRT.resource, 0, GfxDeviceGlobal::msaaColor, 0, DXGI_FORMAT_B8G8R8A8_UNORM );
+        GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( backBufferRT.resource, 0, GfxDeviceGlobal::msaaColor, 0, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB );
         TransitionResource( backBufferRT, D3D12_RESOURCE_STATE_PRESENT );
         TransitionResource( msaaColorGpuResource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     }
