@@ -88,7 +88,7 @@ void ae3d::System::UnmapUIVertexBuffer()
     GfxDevice::UnmapUIVertexBuffer();
 }
 
-void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
+void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset, int windowWidth, int windowHeight )
 {
     float ortho[ 4 ][ 4 ] = {
         { 2, 0, 0, 0 },
@@ -96,8 +96,8 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
         { 0, 0,-1, 0 },
         { -1,1, 0, 1 },
     };
-    ortho[ 0 ][ 0 ] /= (float)vpWidth;
-    ortho[ 1 ][ 1 ] /= (float)vpHeight;
+    ortho[ 0 ][ 0 ] /= (float)windowWidth;
+    ortho[ 1 ][ 1 ] /= (float)windowHeight;
 
     renderer.builtinShaders.uiShader.Use();
     renderer.builtinShaders.uiShader.SetTexture( "textureMap", texture, 0 );

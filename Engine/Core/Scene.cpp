@@ -239,7 +239,8 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
 #if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 )
             int goWithPointLightIndex = 0;
-
+            int goWithSpotLightIndex = 0;
+            
             for (auto gameObject : gameObjects)
             {
                 if (gameObject == nullptr || (gameObject->GetLayer() & cameraComponent->GetLayerMask()) == 0 || !gameObject->IsEnabled())
@@ -249,12 +250,20 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
                 auto transform = gameObject->GetComponent< TransformComponent >();
                 auto pointLight = gameObject->GetComponent< PointLightComponent >();
+                auto spotLight = gameObject->GetComponent< SpotLightComponent >();
 
                 if (transform && pointLight)
                 {
                     auto worldPos = transform->GetWorldPosition();
                     GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius( goWithPointLightIndex, worldPos, pointLight->GetRadius());
                     ++goWithPointLightIndex;
+                }
+
+                if (transform && spotLight)
+                {
+                    auto worldPos = transform->GetWorldPosition();
+                    //GfxDeviceGlobal::lightTiler.SetSpotLightPositionAndRadius( goWithSpotLightIndex, worldPos, spotLight->GetRadius());
+                    ++goWithSpotLightIndex;
                 }
             }
 

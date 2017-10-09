@@ -32,7 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-#define TEST_SHADOWS_DIR
+//#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
@@ -99,8 +99,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     
     const struct nk_draw_command* cmd = nullptr;
     nk_draw_index* offset = nullptr;
-    const float scaleX = 2;
-    const float scaleY = 2;
+    const float scaleX = 6;
+    const float scaleY = 3;
     
     nk_draw_foreach( cmd, ctx, uiCommands )
     {
@@ -113,15 +113,13 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
                        (int)(cmd->clip_rect.w * scaleX),
                        (int)(cmd->clip_rect.h * scaleY),
-                       cmd->elem_count, uiTextures[ cmd->texture.id ], offset );
+                       cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
         offset += cmd->elem_count;
     }
     
     nk_clear( ctx );
 }
 #endif
-
-void cocoaProcessEvents();
 
 static const NSUInteger kMaxBuffersInFlight = 3;
 
@@ -224,7 +222,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -555,7 +553,7 @@ using namespace ae3d;
     scene.Add( &text );
     //scene.Add( &bigCube2 );
     //scene.Add( &bigCube3 );
-    scene.Add( &animatedGo );
+    //scene.Add( &animatedGo );
     scene.Add( &pointLight );
     scene.Add( &spotLight );
     scene.Add( &dirLight );
@@ -617,20 +615,26 @@ using namespace ae3d;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+    ae3d::System::Print( "mouseDown x: %f, y: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y );
+    
     camera3d.GetComponent<ae3d::TransformComponent>()->MoveForward( -1 );
     
 #ifdef TEST_NUKLEAR_UI
     nk_input_begin( &ctx );
+    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 1 );
     nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 1 );
     nk_input_end( &ctx );
 #endif
 }
 
+// nk_input_motion( &ctx, (int)x, (int)y );
+
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    //ae3d::System::Print( "x: %f, y: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y );
+    ae3d::System::Print( "mouseUp x: %f, y: %f, height: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y, self.view.bounds.size.height );
 #ifdef TEST_NUKLEAR_UI
     nk_input_begin( &ctx );
+    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 0 );
     nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 0 );
     nk_input_end( &ctx );
 #endif
@@ -687,7 +691,7 @@ using namespace ae3d;
         static int op = EASY;
         static float value = 0.6f;
         
-        if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE ))
+        if (nk_begin( &ctx, "Demo", nk_rect( 0, 0, 300, 400 ), NK_WINDOW_BORDER ))
         {
             nk_layout_row_static( &ctx, 30, 80, 1 );
             

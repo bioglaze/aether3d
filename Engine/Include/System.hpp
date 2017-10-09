@@ -145,7 +145,7 @@ namespace ae3d
         /// \param elemCount Element count.
         /// \param texture Texture
         /// \param offset Offset into vertex buffer.
-        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset );
+        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset, int windowWidth, int windowHeight );
 
         /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();

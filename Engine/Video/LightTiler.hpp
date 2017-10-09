@@ -17,6 +17,7 @@ namespace ae3d
     public:
         void Init();
         void SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius );
+        void SetSpotLightPositionAndRadius( int bufferIndex, Vec3& position, float radius );
         void UpdateLightBuffers();
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
         bool CullerUniformsCreated() const { return cullerUniformsCreated; }
@@ -24,6 +25,7 @@ namespace ae3d
 #if RENDERER_METAL
         id< MTLBuffer > GetPerTileLightIndexBuffer() { return perTileLightIndexBuffer; }
         id< MTLBuffer > GetPointLightCenterAndRadiusBuffer() { return pointLightCenterAndRadiusBuffer; }
+        id< MTLBuffer > GetSpotLightCenterAndRadiusBuffer() { return spotLightCenterAndRadiusBuffer; }
         id< MTLBuffer > GetCullerUniforms() { return uniformBuffer; }
 #endif
         /// Destroys graphics API objects.
@@ -43,6 +45,7 @@ namespace ae3d
 #if RENDERER_METAL
         id< MTLBuffer > uniformBuffer;
         id< MTLBuffer > pointLightCenterAndRadiusBuffer;
+        id< MTLBuffer > spotLightCenterAndRadiusBuffer;
         id< MTLBuffer > perTileLightIndexBuffer;
 #endif
 #if RENDERER_D3D12
@@ -50,9 +53,12 @@ namespace ae3d
         ID3D12Resource* mappedUniformBuffer = nullptr;
         ID3D12Resource* perTileLightIndexBuffer = nullptr;
         ID3D12Resource* pointLightCenterAndRadiusBuffer = nullptr;
+        ID3D12Resource* spotLightCenterAndRadiusBuffer = nullptr;
 #endif
         std::vector< Vec4 > pointLightCenterAndRadius;
+        std::vector< Vec4 > spotLightCenterAndRadius;
         int activePointLights = 0;
+        int activeSpotLights = 0;
         bool cullerUniformsCreated = false;
         static const int TileRes = 16;
         static const int MaxLights = 2048;

@@ -65,6 +65,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                          constant Uniforms& uniforms [[ buffer(0) ]],
                          constant float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
                          device uint* perTileLightIndexBufferOut [[ buffer(2) ]],
+                         constant float4* spotLightBufferCenterAndRadius [[ buffer(3) ]],
                          uint2 gid [[thread_position_in_grid]],
                          uint2 tid [[thread_position_in_threadgroup]],
                          uint2 dtid [[threadgroup_position_in_grid]])
@@ -191,7 +192,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
         if (il < numSpotLights)
         {
-            float4 center = float4( 0, 0, 0, 1 );//spotLightBufferCenterAndRadius[ il ];
+            float4 center = spotLightBufferCenterAndRadius[ il ];
             float radius = center.w * 5.0f; // FIXME: Multiply was added, but more clever culling should be done instead.
             center.xyz = (uniforms.worldToView * float4( center.xyz, 1.0f )).xyz;
 

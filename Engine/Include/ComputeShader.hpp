@@ -74,7 +74,7 @@ namespace ae3d
 #endif
 
     private:
-        static const int SLOT_COUNT = 3;
+        static const int SLOT_COUNT = 4;
         std::string path;
         
 #if RENDERER_VULKAN

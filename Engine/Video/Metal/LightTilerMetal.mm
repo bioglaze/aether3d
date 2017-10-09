@@ -36,6 +36,15 @@ void ae3d::LightTiler::Init()
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
     memcpy( bufferPointer, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
 
+    spotLightCenterAndRadius.resize( MaxLights );
+    
+    spotLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
+                                         options:MTLResourceCPUCacheModeDefaultCache];
+    spotLightCenterAndRadiusBuffer.label = @"spotLightCenterAndRadiusBuffer";
+    
+    bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
+    memcpy( bufferPointer, spotLightCenterAndRadius.data(), spotLightCenterAndRadius.size() * 4 * sizeof( float ) );
+
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
@@ -74,6 +83,17 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& positio
     }
 }
 
+void ae3d::LightTiler::SetSpotLightPositionAndRadius( int handle, Vec3& position, float radius )
+{
+    System::Assert( handle < MaxLights, "tried to set a too high light index" );
+    
+    if (handle < MaxLights)
+    {
+        activeSpotLights = std::max( handle, activeSpotLights ) + 1;
+        spotLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
+    }
+}
+
 unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
 {
     // FIXME: Should this be the same as the tile size?
@@ -96,7 +116,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
     uniforms.worldToView = worldToView;
     uniforms.windowWidth = depthNormalTarget.GetWidth();
     uniforms.windowHeight = depthNormalTarget.GetHeight();
-    unsigned activeSpotLights = 0;
     uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
@@ -108,7 +127,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
     shader.SetUniformBuffer( 0, uniformBuffer );
     shader.SetUniformBuffer( 1, pointLightCenterAndRadiusBuffer );
     shader.SetUniformBuffer( 2, perTileLightIndexBuffer);
-
+    shader.SetUniformBuffer( 3, spotLightCenterAndRadiusBuffer );
+    
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 }
 
@@ -116,5 +136,8 @@ void ae3d::LightTiler::UpdateLightBuffers()
 {
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
     memcpy( bufferPointer, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+
+    bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
+    memcpy( bufferPointer, spotLightCenterAndRadius.data(), spotLightCenterAndRadius.size() * 4 * sizeof( float ) );
 }
 
