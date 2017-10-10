@@ -1276,16 +1276,18 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
-        VkDescriptorPoolSize typeCounts[ 2 ];
+        VkDescriptorPoolSize typeCounts[ 3 ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
         typeCounts[ 1 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 2 ].type = VK_DESCRIPTOR_TYPE_SAMPLER;
+        typeCounts[ 2 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.pNext = nullptr;
-        descriptorPoolInfo.poolSizeCount = 2;
+        descriptorPoolInfo.poolSizeCount = 3;
         descriptorPoolInfo.pPoolSizes = typeCounts;
         descriptorPoolInfo.maxSets = AE3D_DESCRIPTOR_SETS_COUNT;
         descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
@@ -1322,22 +1324,31 @@ namespace ae3d
         uboSet.pBufferInfo = &uboDesc;
         uboSet.dstBinding = 0;
 
-        // Binding 1 : Sampler
         VkDescriptorImageInfo samplerDesc = {};
         samplerDesc.sampler = sampler;
         samplerDesc.imageView = view;
         samplerDesc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
+        // Binding 1 : Image
+        VkWriteDescriptorSet imageSet = {};
+        imageSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        imageSet.dstSet = outDescriptorSet;
+        imageSet.descriptorCount = 1;
+        imageSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        imageSet.pImageInfo = &samplerDesc;
+        imageSet.dstBinding = 1;
+
+        // Binding 2 : Sampler
         VkWriteDescriptorSet samplerSet = {};
         samplerSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         samplerSet.dstSet = outDescriptorSet;
         samplerSet.descriptorCount = 1;
-        samplerSet.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
         samplerSet.pImageInfo = &samplerDesc;
-        samplerSet.dstBinding = 1;
+        samplerSet.dstBinding = 2;
 
-        VkWriteDescriptorSet sets[ 2 ] = { uboSet, samplerSet };
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 2, sets, 0, nullptr );
+        VkWriteDescriptorSet sets[ 3 ] = { uboSet, samplerSet, imageSet };
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 3, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
@@ -1352,20 +1363,28 @@ namespace ae3d
         layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         layoutBindingUBO.pImmutableSamplers = nullptr;
 
-        // Binding 1 : Sampler (Fragment shader)
+        // Binding 1 : Image (Fragment shader)
+        VkDescriptorSetLayoutBinding layoutBindingImage = {};
+        layoutBindingImage.binding = 1;
+        layoutBindingImage.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindingImage.descriptorCount = 1;
+        layoutBindingImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindingImage.pImmutableSamplers = nullptr;
+
+        // Binding 2 : Sampler (Fragment shader)
         VkDescriptorSetLayoutBinding layoutBindingSampler = {};
-        layoutBindingSampler.binding = 1;
-        layoutBindingSampler.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        layoutBindingSampler.binding = 2;
+        layoutBindingSampler.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
         layoutBindingSampler.descriptorCount = 1;
         layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         layoutBindingSampler.pImmutableSamplers = nullptr;
 
-        const VkDescriptorSetLayoutBinding bindings[2] = { layoutBindingUBO, layoutBindingSampler };
+        const VkDescriptorSetLayoutBinding bindings[ 3 ] = { layoutBindingUBO, layoutBindingSampler, layoutBindingImage };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         descriptorLayout.pNext = nullptr;
-        descriptorLayout.bindingCount = 2;
+        descriptorLayout.bindingCount = 3;
         descriptorLayout.pBindings = bindings;
 
         VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorLayout, nullptr, &GfxDeviceGlobal::descriptorSetLayout );

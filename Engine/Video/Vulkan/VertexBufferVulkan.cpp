@@ -331,17 +331,17 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
         attributeDescriptions[ 4 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
         attributeDescriptions[ 4 ].offset = sizeof( float ) * 12;
 
-        // Location 5 : Bones
+        // Location 5 : Weights
         attributeDescriptions[ 5 ].binding = VERTEX_BUFFER_BIND_ID;
-        attributeDescriptions[ 5 ].location = boneChannel;
-        attributeDescriptions[ 5 ].format = VK_FORMAT_R32G32B32A32_SINT;
-        attributeDescriptions[ 5 ].offset = sizeof( float ) * 20;
+        attributeDescriptions[ 5 ].location = 5;
+        attributeDescriptions[ 5 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attributeDescriptions[ 5 ].offset = sizeof( float ) * 16;
 
-        // Location 6 : Weights
+        // Location 6 : Bones
         attributeDescriptions[ 6 ].binding = VERTEX_BUFFER_BIND_ID;
-        attributeDescriptions[ 6 ].location = weightChannel;
-        attributeDescriptions[ 6 ].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[ 6 ].offset = sizeof( float ) * 16;
+        attributeDescriptions[ 6 ].location = 6;
+        attributeDescriptions[ 6 ].format = VK_FORMAT_R32G32B32A32_UINT;
+        attributeDescriptions[ 6 ].offset = sizeof( float ) * 20;
     }
     else
     {
