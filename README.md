@@ -6,6 +6,8 @@ This codebase will evolve into the next generation [Aether3D](http://twiren.kaps
 
 Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.7.
 
+Author: [Timo Wirén](http://twiren.kapsi.fi)
+
 ![Screenshot](/Engine/Assets/sample.jpg)
 
 # Features

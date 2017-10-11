@@ -35,7 +35,7 @@ struct VertexPTC
 nk_draw_null_texture nullTexture;
 std::map< int, Texture2D* > uiTextures;
 
-void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int /*width*/, int height )
+void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
@@ -85,7 +85,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int /*width*/, int hei
                         (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
                         (int)(cmd->clip_rect.w * scaleX),
                         (int)(cmd->clip_rect.h * scaleY),
-                        cmd->elem_count, uiTextures[ cmd->texture.id ], offset );
+                        cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
         offset += cmd->elem_count;
     }
 
@@ -141,6 +141,10 @@ int main()
    
     double x = 0, y = 0;
     
+    int winWidth, winHeight;
+    Window::GetSize( winWidth, winHeight );
+    System::Print( "window size: %dx%d\n", winWidth, winHeight );
+
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();

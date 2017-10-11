@@ -25,12 +25,12 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
 
     VkShaderModule shaderModule;
     VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
-    AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
+    AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
 
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
     info.module = shaderModule;
-    info.pName = "main";
+    info.pName = "CSMain";
     info.pNext = nullptr;
     info.flags = 0;
     info.pSpecializationInfo = nullptr;
@@ -38,9 +38,28 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     System::Assert( info.module != VK_NULL_HANDLE, "compute shader module not created" );
 }
 
-void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& /*contents*/ )
+void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& contents )
 {
-	System::Print("LoadSPIRV unimplemented\n");
+    VkShaderModuleCreateInfo moduleCreateInfo;
+    moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    moduleCreateInfo.pNext = nullptr;
+    moduleCreateInfo.codeSize = contents.data.size();
+    moduleCreateInfo.pCode = (const std::uint32_t*)contents.data.data();
+    moduleCreateInfo.flags = 0;
+
+    VkShaderModule shaderModule;
+    VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
+    AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
+
+    info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+    info.module = shaderModule;
+    info.pName = "CSMain";
+    info.pNext = nullptr;
+    info.flags = 0;
+    info.pSpecializationInfo = nullptr;
+
+    System::Assert( info.module != VK_NULL_HANDLE, "compute shader module not created" );
 }
 
 void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* /*renderTexture*/, unsigned /*slot*/ )

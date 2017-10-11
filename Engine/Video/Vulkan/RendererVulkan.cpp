@@ -11,4 +11,5 @@ void ae3d::BuiltinShaders::Load()
     momentsShader.LoadSPIRV( FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
     depthNormalsShader.LoadSPIRV( FileSystem::FileContents( "depthnormals_vert.spv" ), FileSystem::FileContents( "depthnormals_frag.spv" ) );
     uiShader.LoadSPIRV( FileSystem::FileContents( "sprite_vert.spv" ), FileSystem::FileContents( "sprite_frag.spv" ) );
+    lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
 }

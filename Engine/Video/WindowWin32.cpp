@@ -412,7 +412,7 @@ namespace ae3d
     void Window::GetSize( int& outWidth, int& outHeight )
     {
         outWidth = WindowGlobal::windowWidth;
-        outHeight = WindowGlobal::windowHeight;
+        outHeight = WindowGlobal::windowHeightWithoutTitleBar;
     }
 
     bool Window::PollEvent(WindowEvent& outEvent)

@@ -35,7 +35,7 @@ namespace ae3d
         ID3D12Resource* GetPointLightCenterAndRadiusBuffer() const { return pointLightCenterAndRadiusBuffer; }
 #endif
         int GetPointLightCount() const { return activePointLights; }
-        int GetSpotLightCount() const { return 0; }
+        int GetSpotLightCount() const { return activeSpotLights; }
         unsigned GetMaxNumLightsPerTile() const;
 
     private:

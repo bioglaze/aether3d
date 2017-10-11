@@ -61,7 +61,7 @@
    \subsection win Windows/MinGW
 
    Run mingw32-make in Engine/.
-   Then run mingw32-make in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
+   Then run mingw32-make -f Makefile_Vulkan in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
 
    \subsection osx macOS/Xcode
 
