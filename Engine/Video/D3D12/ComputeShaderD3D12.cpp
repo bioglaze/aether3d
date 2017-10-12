@@ -81,6 +81,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     depthNormals.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
     TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
 
+    // TODO: Add spotlight SRV somewhere in this method and update compute root signature!
+
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeap );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
@@ -92,10 +94,12 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
 void ae3d::ComputeShader::Load( const char* source )
 {
-    uniformBuffers[ 0 ] = uniformBuffers[ 1 ] = uniformBuffers[ 2 ] = nullptr;
-    textureBuffers[ 0 ] = textureBuffers[ 1 ] = textureBuffers[ 2 ] = nullptr;
-    uavBuffers[ 0 ] = uavBuffers[ 1 ] = uavBuffers[ 2 ] = nullptr;
-
+    for (int slotIndex = 0; slotIndex < SLOT_COUNT; ++slotIndex)
+    {
+        uniformBuffers[ slotIndex ] = nullptr;
+        textureBuffers[ slotIndex ] = nullptr;
+        uavBuffers[ slotIndex ] = nullptr;
+    }
     const std::size_t sourceLength = std::string( source ).size();
     ID3DBlob* blobError = nullptr;
     HRESULT hr = D3DCompile( source, sourceLength, "CSMain", nullptr /*defines*/, nullptr, "CSMain", "cs_5_0",
@@ -127,7 +131,7 @@ void ae3d::ComputeShader::SetRenderTexture( RenderTexture* /*renderTexture*/, un
 
 void ae3d::ComputeShader::SetUniformBuffer( unsigned slot, ID3D12Resource* buffer )
 {
-    if (slot < 3)
+    if (slot < SLOT_COUNT)
     {
         uniformBuffers[ slot ] = buffer;
     }
@@ -139,7 +143,7 @@ void ae3d::ComputeShader::SetUniformBuffer( unsigned slot, ID3D12Resource* buffe
 
 void ae3d::ComputeShader::SetTextureBuffer( unsigned slot, ID3D12Resource* buffer )
 {
-    if (slot < 3)
+    if (slot < SLOT_COUNT)
     {
         textureBuffers[ slot ] = buffer;
     }
@@ -151,7 +155,7 @@ void ae3d::ComputeShader::SetTextureBuffer( unsigned slot, ID3D12Resource* buffe
 
 void ae3d::ComputeShader::SetUAVBuffer( unsigned slot, ID3D12Resource* buffer )
 {
-    if (slot < 3)
+    if (slot < SLOT_COUNT)
     {
         uavBuffers[ slot ] = buffer;
     }

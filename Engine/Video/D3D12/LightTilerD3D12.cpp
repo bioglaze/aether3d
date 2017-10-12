@@ -215,6 +215,17 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& po
     }
 }
 
+void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
+{
+    System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
+
+    if (bufferIndex < MaxLights)
+    {
+        activeSpotLights = MathUtil::Max( bufferIndex + 1, activeSpotLights );
+        spotLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
+    }
+}
+
 void ae3d::LightTiler::UpdateLightBuffers()
 {
     char* pointLightPtr = nullptr;
