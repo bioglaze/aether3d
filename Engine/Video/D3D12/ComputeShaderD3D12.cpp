@@ -6,6 +6,8 @@
 #include "System.hpp"
 #include "TextureBase.hpp"
 
+#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64)
+
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
 namespace GfxDeviceGlobal
@@ -40,7 +42,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = uniformBuffers[ 0 ]->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+    cbvDesc.SizeInBytes = AE3D_CB_SIZE;
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
@@ -71,9 +73,6 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    D3D12_CONSTANT_BUFFER_VIEW_DESC uavDesc = {};
-    uavDesc.BufferLocation = uavBuffers[ 0 ]->GetGPUVirtualAddress();
-    uavDesc.SizeInBytes = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 0 ], nullptr, &GfxDeviceGlobal::uav1Desc, handle );
 
     GpuResource depthNormals = {};

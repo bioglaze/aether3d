@@ -9,6 +9,8 @@
 #include "System.hpp"
 #include "Vec3.hpp"
 
+#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64)
+
 using namespace ae3d;
 
 namespace GfxDeviceGlobal
@@ -179,7 +181,7 @@ void ae3d::LightTiler::Init()
         bufferProp.MipLevels = 1;
         bufferProp.SampleDesc.Count = 1;
         bufferProp.SampleDesc.Quality = 0;
-        bufferProp.Width = sizeof( PerObjectUboStruct );
+        bufferProp.Width = AE3D_CB_SIZE;
 
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
             &uploadProp,
