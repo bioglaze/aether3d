@@ -141,6 +141,9 @@
     <ClCompile Include="..\Core\Statistics.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Video\Vulkan\LightTilerVulkan.cpp">
+      <Filter>Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\AudioClip.hpp">
@@ -259,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="..\Core\Statistics.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Video\LightTiler.hpp">
+      <Filter>Video</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

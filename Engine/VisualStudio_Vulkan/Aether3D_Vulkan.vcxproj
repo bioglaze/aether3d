@@ -115,6 +115,7 @@
     <ClCompile Include="..\Video\TextureCommon.cpp" />
     <ClCompile Include="..\Video\Vulkan\ComputeShaderVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\GfxDeviceVulkan.cpp" />
+    <ClCompile Include="..\Video\Vulkan\LightTilerVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\RendererVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\RenderTextureVulkan.cpp" />
     <ClCompile Include="..\Video\Vulkan\ShaderVulkan.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="..\Include\Window.hpp" />
     <ClInclude Include="..\Video\DDSLoader.hpp" />
     <ClInclude Include="..\Video\GfxDevice.hpp" />
+    <ClInclude Include="..\Video\LightTiler.hpp" />
     <ClInclude Include="..\Video\Renderer.hpp" />
     <ClInclude Include="..\Video\VertexBuffer.hpp" />
     <ClInclude Include="..\Video\Vulkan\VulkanUtils.hpp" />

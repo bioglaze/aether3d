@@ -9,6 +9,19 @@ namespace GfxDeviceGlobal
     extern VkCommandBuffer computeCmdBuffer;
 }
 
+namespace ComputeShaderGlobal
+{
+    std::vector< VkShaderModule > modulesToReleaseAtExit;
+}
+
+void ae3d::ComputeShader::DestroyShaders()
+{
+    for (std::size_t moduleIndex = 0; moduleIndex < ComputeShaderGlobal::modulesToReleaseAtExit.size(); ++moduleIndex)
+    {
+        vkDestroyShaderModule( GfxDeviceGlobal::device, ComputeShaderGlobal::modulesToReleaseAtExit[ moduleIndex ], nullptr );
+    }
+}
+
 void ae3d::ComputeShader::Load( const char* /*source*/ )
 {
 
@@ -26,6 +39,7 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     VkShaderModule shaderModule;
     VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
     AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
+    ComputeShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
 
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
@@ -50,6 +64,7 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     VkShaderModule shaderModule;
     VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
     AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
+    ComputeShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
 
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     info.stage = VK_SHADER_STAGE_COMPUTE_BIT;

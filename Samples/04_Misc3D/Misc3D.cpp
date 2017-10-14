@@ -30,7 +30,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
 
@@ -419,7 +419,7 @@ int main()
     standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
         "standard_vertex", "standard_fragment",
         ae3d::FileSystem::FileContents( "Standard_vert.hlsl" ), ae3d::FileSystem::FileContents( "Standard_frag.hlsl" ),
-        ae3d::FileSystem::FileContents( "unlit_vert.spv" ), ae3d::FileSystem::FileContents( "unlit_frag.spv" ) );
+        ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
 
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );

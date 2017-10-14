@@ -5,6 +5,9 @@
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
+#if RENDERER_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 #include "Vec3.hpp"
 
 struct ID3D12Resource;
@@ -38,6 +41,9 @@ namespace ae3d
         int GetSpotLightCount() const { return activeSpotLights; }
         unsigned GetMaxNumLightsPerTile() const;
 
+#if RENDERER_VULKAN
+        VkDescriptorBufferInfo GetPointLightDesc() const { return pointLightDesc; }
+#endif
     private:
         unsigned GetNumTilesX() const;
         unsigned GetNumTilesY() const;
@@ -54,6 +60,11 @@ namespace ae3d
         ID3D12Resource* perTileLightIndexBuffer = nullptr;
         ID3D12Resource* pointLightCenterAndRadiusBuffer = nullptr;
         ID3D12Resource* spotLightCenterAndRadiusBuffer = nullptr;
+#endif
+#if RENDERER_VULKAN
+        VkBuffer pointLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory pointLightCenterAndRadiusMemory = VK_NULL_HANDLE;
+        VkDescriptorBufferInfo pointLightDesc;
 #endif
         std::vector< Vec4 > pointLightCenterAndRadius;
         std::vector< Vec4 > spotLightCenterAndRadius;

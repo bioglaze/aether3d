@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <vulkan/vulkan.h>
+#include "LightTiler.hpp"
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "Renderer.hpp"
@@ -124,6 +125,7 @@ namespace GfxDeviceGlobal
     int backBufferHeight;
     bool didUseOffscreenPassOnThisFrame = false;
     unsigned frameIndex = 0;
+    ae3d::LightTiler lightTiler;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
     std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
@@ -886,8 +888,6 @@ namespace ae3d
 
         vkGetPhysicalDeviceProperties( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::properties );
         
-        //System::Print("max allocs: %d\n", GfxDeviceGlobal::properties.limits.maxMemoryAllocationCount );
-
         // Finds graphics queue.
         std::uint32_t queueCount;
         vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, nullptr );
@@ -1276,18 +1276,20 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
-        VkDescriptorPoolSize typeCounts[ 3 ];
+        VkDescriptorPoolSize typeCounts[ 4 ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
         typeCounts[ 1 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 2 ].type = VK_DESCRIPTOR_TYPE_SAMPLER;
         typeCounts[ 2 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 3 ].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        typeCounts[ 3 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.pNext = nullptr;
-        descriptorPoolInfo.poolSizeCount = 3;
+        descriptorPoolInfo.poolSizeCount = 4;
         descriptorPoolInfo.pPoolSizes = typeCounts;
         descriptorPoolInfo.maxSets = AE3D_DESCRIPTOR_SETS_COUNT;
         descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
@@ -1310,7 +1312,7 @@ namespace ae3d
         }
     }
 
-    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler )
+    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler, const VkDescriptorBufferInfo& bufferDesc )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
@@ -1347,8 +1349,17 @@ namespace ae3d
         samplerSet.pImageInfo = &samplerDesc;
         samplerSet.dstBinding = 2;
 
-        VkWriteDescriptorSet sets[ 3 ] = { uboSet, samplerSet, imageSet };
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 3, sets, 0, nullptr );
+        // Binding 3 : Buffer
+        VkWriteDescriptorSet bufferSet = {};
+        bufferSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        bufferSet.dstSet = outDescriptorSet;
+        bufferSet.descriptorCount = 1;
+        bufferSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        bufferSet.pBufferInfo = &bufferDesc;
+        bufferSet.dstBinding = 3;
+
+        VkWriteDescriptorSet sets[ 4 ] = { uboSet, samplerSet, imageSet, bufferSet };
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 4, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
@@ -1379,12 +1390,20 @@ namespace ae3d
         layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         layoutBindingSampler.pImmutableSamplers = nullptr;
 
-        const VkDescriptorSetLayoutBinding bindings[ 3 ] = { layoutBindingUBO, layoutBindingSampler, layoutBindingImage };
+        // Binding 3 : Buffer (Fragment shader)
+        VkDescriptorSetLayoutBinding layoutBindingBuffer = {};
+        layoutBindingBuffer.binding = 3;
+        layoutBindingBuffer.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindingBuffer.descriptorCount = 1;
+        layoutBindingBuffer.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindingBuffer.pImmutableSamplers = nullptr;
+
+        const VkDescriptorSetLayoutBinding bindings[ 4 ] = { layoutBindingUBO, layoutBindingSampler, layoutBindingImage, layoutBindingBuffer };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         descriptorLayout.pNext = nullptr;
-        descriptorLayout.bindingCount = 3;
+        descriptorLayout.bindingCount = 4;
         descriptorLayout.pBindings = bindings;
 
         VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorLayout, nullptr, &GfxDeviceGlobal::descriptorSetLayout );
@@ -1477,6 +1496,8 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
 
         GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
+
+        GfxDeviceGlobal::lightTiler.Init();
     }
 }
 
@@ -1724,9 +1745,21 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE, topology, psoHash );
     }
 
+    if (shader.GetVertexShaderPath().find( "Standard" ) != std::string::npos)
+    {
+        unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
+        unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
+        unsigned numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
+
+        GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
+        GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+        GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
+        GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
+    }
+
     UploadPerObjectUbo();
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::lightTiler.GetPointLightDesc() );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1755,7 +1788,8 @@ void ae3d::GfxDevice::CreateUniformBuffers()
     {
         auto& ubo = GfxDeviceGlobal::ubos[ uboIndex ];
 
-        const VkDeviceSize uboSize = 256 * 3 + 80 * 64;// 16 * 4;
+        const VkDeviceSize uboSize = 256 * 3 + 80 * 64;
+        static_assert( uboSize >= sizeof( PerObjectUboStruct ), "UBO size must be larger than UBO struct" );
 
         VkBufferCreateInfo bufferInfo = {};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -1788,7 +1822,6 @@ void ae3d::GfxDevice::CreateUniformBuffers()
         err = vkMapMemory( GfxDeviceGlobal::device, ubo.uboMemory, 0, uboSize, 0, (void **)&ubo.uboData );
         AE3D_CHECK_VULKAN( err, "vkMapMemory UBO" );
     }
-    //GfxDeviceGlobal::frameUbos.push_back( ubo );
 }
 
 std::uint8_t* ae3d::GfxDevice::GetCurrentUbo()
@@ -1919,6 +1952,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     }
 
     Shader::DestroyShaders();
+    ComputeShader::DestroyShaders();
     Texture2D::DestroyTextures();
     TextureCube::DestroyTextures();
     RenderTexture::DestroyTextures();

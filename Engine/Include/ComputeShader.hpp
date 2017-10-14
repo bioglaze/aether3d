@@ -36,6 +36,9 @@ namespace ae3d
         void Load( const char* source );
 
 #if RENDERER_VULKAN
+        /// Destroys shaders.
+        static void DestroyShaders();
+
         /// Loads SPIR-V shader.
         /// \param contents SPIR-V file contents.
         void LoadSPIRV( const FileSystem::FileContentsData& contents );

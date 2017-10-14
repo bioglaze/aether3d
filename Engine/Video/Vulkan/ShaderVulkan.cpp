@@ -52,6 +52,8 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 
     // Vertex shader
     {
+        vertexPath = vertexData.path;
+
         VkShaderModuleCreateInfo moduleCreateInfo;
         moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         moduleCreateInfo.pNext = nullptr;
@@ -78,6 +80,8 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 
     // Fragment shader
     {
+        fragmentPath = fragmentData.path;
+
         VkShaderModuleCreateInfo moduleCreateInfo;
         moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         moduleCreateInfo.pNext = nullptr;
