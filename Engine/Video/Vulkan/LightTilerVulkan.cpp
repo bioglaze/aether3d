@@ -42,7 +42,7 @@ void ae3d::LightTiler::Init()
         VkBufferCreateInfo bufferInfo = {};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferInfo.size = pointLightCenterAndRadius.size() * 4 * sizeof( float );
-        bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+        bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &pointLightCenterAndRadiusBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightCenterAndRadiusBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "pointLightCenterAndRadiusBuffer" );
@@ -61,9 +61,14 @@ void ae3d::LightTiler::Init()
         err = vkBindBufferMemory( GfxDeviceGlobal::device, pointLightCenterAndRadiusBuffer, pointLightCenterAndRadiusMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory pointLightCenterAndRadiusBuffer" );
 
-        pointLightDesc.buffer = pointLightCenterAndRadiusBuffer;
-        pointLightDesc.offset = 0;
-        pointLightDesc.range = bufferInfo.size;
+        VkBufferViewCreateInfo bufferViewInfo = {};
+        bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+        bufferViewInfo.flags = 0;
+        bufferViewInfo.buffer = pointLightCenterAndRadiusBuffer;
+        bufferViewInfo.range = VK_WHOLE_SIZE;
+
+        err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightBufferView );
+        AE3D_CHECK_VULKAN( err, "point light buffer view" );
     }
 }
 

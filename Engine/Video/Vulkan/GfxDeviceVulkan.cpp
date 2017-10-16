@@ -1283,7 +1283,7 @@ namespace ae3d
         typeCounts[ 1 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 2 ].type = VK_DESCRIPTOR_TYPE_SAMPLER;
         typeCounts[ 2 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 3 ].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        typeCounts[ 3 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         typeCounts[ 3 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
@@ -1312,7 +1312,7 @@ namespace ae3d
         }
     }
 
-    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler, const VkDescriptorBufferInfo& bufferDesc )
+    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
@@ -1354,8 +1354,8 @@ namespace ae3d
         bufferSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         bufferSet.dstSet = outDescriptorSet;
         bufferSet.descriptorCount = 1;
-        bufferSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        bufferSet.pBufferInfo = &bufferDesc;
+        bufferSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        bufferSet.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightBufferView();
         bufferSet.dstBinding = 3;
 
         VkWriteDescriptorSet sets[ 4 ] = { uboSet, samplerSet, imageSet, bufferSet };
@@ -1393,7 +1393,7 @@ namespace ae3d
         // Binding 3 : Buffer (Fragment shader)
         VkDescriptorSetLayoutBinding layoutBindingBuffer = {};
         layoutBindingBuffer.binding = 3;
-        layoutBindingBuffer.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindingBuffer.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         layoutBindingBuffer.descriptorCount = 1;
         layoutBindingBuffer.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingBuffer.pImmutableSamplers = nullptr;
@@ -1759,7 +1759,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     UploadPerObjectUbo();
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::lightTiler.GetPointLightDesc() );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );

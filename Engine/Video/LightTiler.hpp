@@ -42,7 +42,8 @@ namespace ae3d
         unsigned GetMaxNumLightsPerTile() const;
 
 #if RENDERER_VULKAN
-        VkDescriptorBufferInfo GetPointLightDesc() const { return pointLightDesc; }
+        VkBuffer GetPointLightBuffer() const { return pointLightCenterAndRadiusBuffer; }
+        VkBufferView* GetPointLightBufferView() { return &pointLightBufferView; }
 #endif
     private:
         unsigned GetNumTilesX() const;
@@ -64,7 +65,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkBuffer pointLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory pointLightCenterAndRadiusMemory = VK_NULL_HANDLE;
-        VkDescriptorBufferInfo pointLightDesc;
+        VkBufferView pointLightBufferView;
 #endif
         std::vector< Vec4 > pointLightCenterAndRadius;
         std::vector< Vec4 > spotLightCenterAndRadius;
