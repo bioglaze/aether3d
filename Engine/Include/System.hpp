@@ -160,7 +160,7 @@ namespace ae3d
         void InitGfxDeviceForEditor( int width, int height );
         
 #if RENDERER_METAL
-        void InitMetal( id< MTLDevice > metalDevice, MTKView* view, int sampleCount );
+        void InitMetal( id< MTLDevice > metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize );
         void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
         void BeginFrame();
         void EndFrame();

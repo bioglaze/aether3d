@@ -904,7 +904,6 @@ std::string ae3d::Scene::GetSerialized() const
 
         outSerialized += gameObject->GetSerialized();
         
-        // TODO: Try to DRY.
         if (gameObject->GetComponent<MeshRendererComponent>())
         {
             outSerialized += gameObject->GetComponent<MeshRendererComponent>()->GetSerialized();

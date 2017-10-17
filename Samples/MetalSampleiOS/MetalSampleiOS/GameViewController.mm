@@ -21,6 +21,8 @@
 #import "Aether3D_iOS/Material.hpp"
 
 #define MULTISAMPLE_COUNT 1
+#define MAX_UI_VERTEX_MEMORY (512 * 1024)
+#define MAX_UI_ELEMENT_MEMORY (128 * 1024)
 
 struct MyTouch
 {
@@ -78,7 +80,7 @@ int gTouchCount;
     [self _setupView];
     [self _reshape];
 
-    ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT );
+    ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT, MAX_UI_VERTEX_MEMORY, MAX_UI_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
     

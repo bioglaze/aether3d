@@ -96,7 +96,6 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int handle, Vec3& position
 
 unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
 {
-    // FIXME: Should this be the same as the tile size?
     const unsigned adjustmentMultipier = 32;
     
     // I haven't tested at greater than 1080p, so cap it

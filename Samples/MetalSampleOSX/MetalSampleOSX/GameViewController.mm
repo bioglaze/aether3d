@@ -35,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_NUKLEAR_UI
+#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -50,8 +50,8 @@
 #define NK_IMPLEMENTATION
 #include "nuklear.h"
 
-#define MAX_VERTEX_MEMORY 512 * 1024
-#define MAX_ELEMENT_MEMORY 128 * 1024
+#define MAX_VERTEX_MEMORY (512 * 1024)
+#define MAX_ELEMENT_MEMORY (128 * 1024)
 
 struct VertexPTC
 {
@@ -217,7 +217,7 @@ using namespace ae3d;
     [self _reshape];
     //self.nextResponder = super.nextResponder;
 
-    ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT );
+    ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
 
@@ -621,8 +621,8 @@ using namespace ae3d;
     
 #ifdef TEST_NUKLEAR_UI
     nk_input_begin( &ctx );
-    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 1 );
-    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 1 );
+    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 1 );
+    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 1 );
     nk_input_end( &ctx );
 #endif
 }
@@ -634,8 +634,8 @@ using namespace ae3d;
     ae3d::System::Print( "mouseUp x: %f, y: %f, height: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y, self.view.bounds.size.height );
 #ifdef TEST_NUKLEAR_UI
     nk_input_begin( &ctx );
-    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 0 );
-    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 0 );
+    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 0 );
+    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 0 );
     nk_input_end( &ctx );
 #endif
 }

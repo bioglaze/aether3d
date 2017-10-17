@@ -296,7 +296,7 @@ void ae3d::GfxDevice::PopGroupMarker()
     [renderEncoder popDebugGroup];
 }
 
-void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount )
+void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize )
 {
     if (sampleCount < 1 || sampleCount > 8)
     {
@@ -340,8 +340,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     GfxDeviceGlobal::CreateSamplers();
     GfxDeviceGlobal::lightTiler.Init();
 
-    std::vector< VertexBuffer::VertexPTC > vertices( 512 * 1024 );
-    std::vector< VertexBuffer::Face > faces( 512 * 1024 );
+    std::vector< VertexBuffer::VertexPTC > vertices( uiVBSize );
+    std::vector< VertexBuffer::Face > faces( uiIBSize );
     GfxDeviceGlobal::uiBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
 
     if (sampleCount == 1)
@@ -606,7 +606,6 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 
         GfxDeviceGlobal::psoCache[ psoHash ] = pso;
         
-        // FIXME: If two PSOs use the same set of shaders, are their uniform locations equal? This code assumes so. [TimoW, 2015-10-05]
         shader.LoadUniforms( reflectionObj );        
     }
 
