@@ -754,6 +754,9 @@ namespace ae3d
             WindowGlobal::windowHeight = surfCaps.currentExtent.height;
         }
 
+        GfxDeviceGlobal::backBufferWidth = WindowGlobal::windowWidth;
+        GfxDeviceGlobal::backBufferHeight = WindowGlobal::windowHeight;
+
         std::uint32_t desiredNumberOfSwapchainImages = surfCaps.minImageCount + 1;
 
         if ((surfCaps.maxImageCount > 0) && (desiredNumberOfSwapchainImages > surfCaps.maxImageCount))
@@ -1957,6 +1960,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     TextureCube::DestroyTextures();
     RenderTexture::DestroyTextures();
     VertexBuffer::DestroyBuffers();
+    LightTiler::DestroyObjects();
 
     for (auto pso : GfxDeviceGlobal::psoCache)
     {

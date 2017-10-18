@@ -570,6 +570,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
 #ifdef RENDERER_VULKAN
+    if (camera->GetTargetTexture())
+    {
+        BeginOffscreen();
+    }
+
     GfxDevice::SetViewport( camera->GetViewport() );
 #endif
 #ifndef RENDERER_METAL
@@ -732,6 +737,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 #endif
 #if RENDERER_VULKAN
     GfxDevice::SetRenderTarget( nullptr, 0 );
+    
+    if (camera->GetTargetTexture())
+    {
+        EndOffscreen();
+    }
 #endif
     GfxDevice::ErrorCheck( "Scene render after rendering" );
 }

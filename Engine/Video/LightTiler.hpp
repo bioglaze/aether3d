@@ -44,6 +44,9 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkBuffer GetPointLightBuffer() const { return pointLightCenterAndRadiusBuffer; }
         VkBufferView* GetPointLightBufferView() { return &pointLightBufferView; }
+        VkBuffer GetSpotLightBuffer() const { return spotLightCenterAndRadiusBuffer; }
+        VkBufferView* GetSpotLightBufferView() { return &spotLightBufferView; }
+        static void DestroyObjects();
 #endif
     private:
         unsigned GetNumTilesX() const;
@@ -66,6 +69,14 @@ namespace ae3d
         VkBuffer pointLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory pointLightCenterAndRadiusMemory = VK_NULL_HANDLE;
         VkBufferView pointLightBufferView;
+
+        VkBuffer spotLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory spotLightCenterAndRadiusMemory = VK_NULL_HANDLE;
+        VkBufferView spotLightBufferView;
+
+        VkBuffer perTileLightIndexBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory perTileLightIndexBufferMemory = VK_NULL_HANDLE;
+        VkBufferView perTileLightIndexBufferView;
 #endif
         std::vector< Vec4 > pointLightCenterAndRadius;
         std::vector< Vec4 > spotLightCenterAndRadius;
