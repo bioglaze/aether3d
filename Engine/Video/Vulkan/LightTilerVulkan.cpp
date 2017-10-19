@@ -101,7 +101,8 @@ void ae3d::LightTiler::Init()
         bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
         bufferViewInfo.flags = 0;
         bufferViewInfo.buffer = perTileLightIndexBuffer;
-        bufferViewInfo.range = VK_WHOLE_SIZE;
+		bufferViewInfo.range = VK_WHOLE_SIZE;
+		bufferViewInfo.format = VK_FORMAT_R32_UINT;
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &perTileLightIndexBufferView );
         AE3D_CHECK_VULKAN( err, "light index buffer view" );
@@ -139,6 +140,7 @@ void ae3d::LightTiler::Init()
         bufferViewInfo.flags = 0;
         bufferViewInfo.buffer = pointLightCenterAndRadiusBuffer;
         bufferViewInfo.range = VK_WHOLE_SIZE;
+		bufferViewInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightBufferView );
         AE3D_CHECK_VULKAN( err, "point light buffer view" );
@@ -176,6 +178,7 @@ void ae3d::LightTiler::Init()
         bufferViewInfo.flags = 0;
         bufferViewInfo.buffer = spotLightCenterAndRadiusBuffer;
         bufferViewInfo.range = VK_WHOLE_SIZE;
+		bufferViewInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &spotLightBufferView );
         AE3D_CHECK_VULKAN( err, "spot light buffer view" );
