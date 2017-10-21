@@ -27,6 +27,12 @@ namespace ae3d
         /// \param shadowMapSize Shadow map size in pixels. If it's invalid, it falls back to 512.
         void SetCastShadow( bool enable, int shadowMapSize );
 
+        /// \param Radius for light culler. Defaults to 2.
+        void SetRadius( float aRadius ) { radius = aRadius; }
+        
+        /// \return Radius for light culler.
+        float GetRadius() const { return radius; }
+        
         /// \return Shadow map
         RenderTexture* GetShadowMap() { return &shadowMap; }
 
@@ -59,6 +65,7 @@ namespace ae3d
         GameObject* gameObject = nullptr;
         Vec3 color{ 1, 1, 1 };
         float coneAngle = 45;
+        float radius = 2;
         bool castsShadow = false;
         bool isEnabled = true;
     };

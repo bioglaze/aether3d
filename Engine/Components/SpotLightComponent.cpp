@@ -43,6 +43,7 @@ std::string ae3d::SpotLightComponent::GetSerialized() const
     outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
     outStream << "coneangle " << coneAngle << "\n";
     outStream << "enabled" << isEnabled << "\n";
+    outStream << "radius " << radius << "\n";
     outStream << "color " << color.x << " " << color.y << " " << color.z << "\n\n";
 
     return outStream.str();

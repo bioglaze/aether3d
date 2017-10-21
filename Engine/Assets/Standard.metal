@@ -147,6 +147,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
                                constant float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
+                               constant float4* spotLightBufferCenterAndRadius [[ buffer(9) ]],
                                constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
@@ -190,6 +191,21 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
         //outColor.rgb += -dot( lightDirVS, normalize( in.normalVS ) );
         outColor.rgb += lightDistance < radius ? 1 : 0.25;
+    }
+    
+    // Moves past the first sentinel to get to the spot lights.
+    ++index;
+    nextLightIndex = perTileLightIndexBuffer[ index ];
+    
+    while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
+    {
+        uint lightIndex = nextLightIndex;
+        index++;
+        nextLightIndex = perTileLightIndexBuffer[ index ];
+        
+        float4 center = spotLightBufferCenterAndRadius[ lightIndex ];
+        float radius = center.w;
+        outColor.r += radius;
     }
     
 #ifdef DEBUG_LIGHT_COUNT

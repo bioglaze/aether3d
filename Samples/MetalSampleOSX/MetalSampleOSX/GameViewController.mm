@@ -35,10 +35,12 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_NUKLEAR_UI
+//#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
+#define MAX_VERTEX_MEMORY (512 * 1024)
+#define MAX_ELEMENT_MEMORY (128 * 1024)
 
 #ifdef TEST_NUKLEAR_UI
 #define NK_INCLUDE_FIXED_TYPES
@@ -49,9 +51,6 @@
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_IMPLEMENTATION
 #include "nuklear.h"
-
-#define MAX_VERTEX_MEMORY (512 * 1024)
-#define MAX_ELEMENT_MEMORY (128 * 1024)
 
 struct VertexPTC
 {

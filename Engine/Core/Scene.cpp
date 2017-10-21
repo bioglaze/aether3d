@@ -262,7 +262,7 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
                 if (transform && spotLight)
                 {
                     auto worldPos = transform->GetWorldPosition();
-                    //GfxDeviceGlobal::lightTiler.SetSpotLightPositionAndRadius( goWithSpotLightIndex, worldPos, spotLight->GetRadius());
+                    GfxDeviceGlobal::lightTiler.SetSpotLightPositionAndRadius( goWithSpotLightIndex, worldPos, spotLight->GetRadius() );
                     ++goWithSpotLightIndex;
                 }
             }
@@ -1412,7 +1412,19 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             float radius;
             lineStream >> radius;
-            outGameObjects.back().GetComponent< PointLightComponent >()->SetRadius( radius );
+            
+            if (currentLightType == CurrentLightType::Point)
+            {
+                outGameObjects.back().GetComponent< PointLightComponent >()->SetRadius( radius );
+            }
+            else if (currentLightType == CurrentLightType::Spot)
+            {
+                outGameObjects.back().GetComponent< SpotLightComponent >()->SetRadius( radius );
+            }
+            else
+            {
+                System::Print( "Found 'radius' but no spotlight or point light is defined before this line.\n" );
+            }
         }
         else if (token == "color")
         {
