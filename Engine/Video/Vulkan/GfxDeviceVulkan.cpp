@@ -1361,7 +1361,16 @@ namespace ae3d
         bufferSet.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightBufferView();
         bufferSet.dstBinding = 3;
 
-        VkWriteDescriptorSet sets[ 4 ] = { uboSet, samplerSet, imageSet, bufferSet };
+        // Binding 4 : Buffer (UAV)
+        VkWriteDescriptorSet bufferSetUAV = {};
+        bufferSetUAV.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        bufferSetUAV.dstSet = outDescriptorSet;
+        bufferSetUAV.descriptorCount = 1;
+        bufferSetUAV.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        bufferSetUAV.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetLightIndexBufferView();
+        bufferSetUAV.dstBinding = 4;
+
+        VkWriteDescriptorSet sets[ 5 ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, 4, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1374,7 +1383,7 @@ namespace ae3d
         layoutBindingUBO.binding = 0;
         layoutBindingUBO.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         layoutBindingUBO.descriptorCount = 1;
-        layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingUBO.pImmutableSamplers = nullptr;
 
         // Binding 1 : Image (Fragment shader)
@@ -1382,7 +1391,7 @@ namespace ae3d
         layoutBindingImage.binding = 1;
         layoutBindingImage.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
         layoutBindingImage.descriptorCount = 1;
-        layoutBindingImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindingImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingImage.pImmutableSamplers = nullptr;
 
         // Binding 2 : Sampler (Fragment shader)
@@ -1393,7 +1402,7 @@ namespace ae3d
         layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         layoutBindingSampler.pImmutableSamplers = nullptr;
 
-        // Binding 3 : Buffer (Fragment shader)
+        // Binding 3 : Buffer
         VkDescriptorSetLayoutBinding layoutBindingBuffer = {};
         layoutBindingBuffer.binding = 3;
         layoutBindingBuffer.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
@@ -1401,7 +1410,15 @@ namespace ae3d
         layoutBindingBuffer.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingBuffer.pImmutableSamplers = nullptr;
 
-        const VkDescriptorSetLayoutBinding bindings[ 4 ] = { layoutBindingUBO, layoutBindingSampler, layoutBindingImage, layoutBindingBuffer };
+        // Binding 4 : Buffer (UAV)
+        VkDescriptorSetLayoutBinding layoutBindingBufferUAV = {};
+        layoutBindingBufferUAV.binding = 4;
+        layoutBindingBufferUAV.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindingBufferUAV.descriptorCount = 1;
+        layoutBindingBufferUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindingBufferUAV.pImmutableSamplers = nullptr;
+
+        const VkDescriptorSetLayoutBinding bindings[ 5 ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer, layoutBindingBufferUAV };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -1515,14 +1532,14 @@ void ae3d::GfxDevice::Init( int width, int height )
     GfxDeviceGlobal::backBufferHeight = height;
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* /*texture*/, void* offset )
 {
     int viewport[ 4 ] = { vpX < 8192 ? std::abs( vpX )  : 8192, vpY < 8192 ? std::abs( vpY ) : 8192, vpWidth < 8192 ? vpWidth : 8192, vpHeight < 8192 ? vpHeight : 8192 };
     SetViewport( viewport );
     Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
-void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
+void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, void** outMappedVertices, void** outMappedIndices )
 {
     *outMappedVertices = GfxDeviceGlobal::uiVertices.data();
     *outMappedIndices = GfxDeviceGlobal::uiFaces.data();
@@ -1758,6 +1775,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
         GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
         GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
+        //shader.set
     }
 
     UploadPerObjectUbo();

@@ -18,6 +18,8 @@ namespace GfxDeviceGlobal
     extern int backBufferHeight;
     extern VkDevice device;
     extern PerObjectUboStruct perObjectUboStruct;
+    extern VkCommandBuffer computeCmdBuffer;
+    extern VkPipelineCache pipelineCache;
 }
 
 namespace LightTilerGlobal
@@ -101,8 +103,8 @@ void ae3d::LightTiler::Init()
         bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
         bufferViewInfo.flags = 0;
         bufferViewInfo.buffer = perTileLightIndexBuffer;
-		bufferViewInfo.range = VK_WHOLE_SIZE;
-		bufferViewInfo.format = VK_FORMAT_R32_UINT;
+        bufferViewInfo.range = VK_WHOLE_SIZE;
+        bufferViewInfo.format = VK_FORMAT_R32_UINT;
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &perTileLightIndexBufferView );
         AE3D_CHECK_VULKAN( err, "light index buffer view" );
@@ -140,7 +142,7 @@ void ae3d::LightTiler::Init()
         bufferViewInfo.flags = 0;
         bufferViewInfo.buffer = pointLightCenterAndRadiusBuffer;
         bufferViewInfo.range = VK_WHOLE_SIZE;
-		bufferViewInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        bufferViewInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightBufferView );
         AE3D_CHECK_VULKAN( err, "point light buffer view" );
@@ -184,6 +186,17 @@ void ae3d::LightTiler::Init()
         AE3D_CHECK_VULKAN( err, "spot light buffer view" );
         LightTilerGlobal::bufferViewsToReleaseAtExit.push_back( spotLightBufferView );
     }
+
+    /*VkPipelineLayoutCreateInfo psoLayoutInfo = {};
+    psoLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+    VkResult err = vkCreatePipelineLayout( GfxDeviceGlobal::device, &psoLayoutInfo, nullptr, &psoLayout );
+
+    VkComputePipelineCreateInfo psoInfo = {};
+    psoInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+    psoInfo.layout = psoLayout;
+    err = vkCreateComputePipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &psoInfo, nullptr, &pso );
+    AE3D_CHECK_VULKAN( err, "Light tiler PSO" );*/
 }
 
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
@@ -237,11 +250,15 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     cullerUniformsCreated = true;
 
-    /*shader.SetUniformBuffer( 0, uniformBuffer );
-    shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );
-    shader.SetTextureBuffer( 1, depthNormalTarget.GetGpuResource()->resource );
-    shader.SetTextureBuffer( 2, spotLightCenterAndRadiusBuffer );
-    shader.SetUAVBuffer( 0, perTileLightIndexBuffer );*/
+    /*VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    //shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::computeCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+
+    vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pso );
+
+    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
+
+    vkEndCommandBuffer( GfxDeviceGlobal::computeCmdBuffer );*/
 }

@@ -46,6 +46,7 @@ namespace ae3d
         VkBufferView* GetPointLightBufferView() { return &pointLightBufferView; }
         VkBuffer GetSpotLightBuffer() const { return spotLightCenterAndRadiusBuffer; }
         VkBufferView* GetSpotLightBufferView() { return &spotLightBufferView; }
+        VkBufferView* GetLightIndexBufferView() { return &perTileLightIndexBufferView; }
         static void DestroyObjects();
 #endif
     private:
@@ -77,6 +78,8 @@ namespace ae3d
         VkBuffer perTileLightIndexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory perTileLightIndexBufferMemory = VK_NULL_HANDLE;
         VkBufferView perTileLightIndexBufferView;
+        VkPipeline pso;
+        VkPipelineLayout psoLayout;
 #endif
         std::vector< Vec4 > pointLightCenterAndRadius;
         std::vector< Vec4 > spotLightCenterAndRadius;

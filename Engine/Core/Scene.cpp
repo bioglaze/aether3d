@@ -27,7 +27,7 @@
 #include "Texture2D.hpp"
 #include "Renderer.hpp"
 #include "System.hpp"
-#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 )
+#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
 #include "LightTiler.hpp"
 #endif
 
@@ -53,7 +53,7 @@ namespace Global
     extern Vec3 vrEyePosition;
 }
 
-#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 )
+#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
 namespace GfxDeviceGlobal
 {
     extern ae3d::LightTiler lightTiler;
@@ -237,7 +237,7 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
             RenderDepthAndNormals( cameraComponent, view, gameObjectsWithMeshRenderer, 0, frustum );
 
-#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 )
+#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
             int goWithPointLightIndex = 0;
             int goWithSpotLightIndex = 0;
             
