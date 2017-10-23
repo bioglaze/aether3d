@@ -944,7 +944,8 @@ namespace ae3d
         enabledFeatures.shaderCullDistance = true;
         enabledFeatures.textureCompressionBC = true;
         enabledFeatures.fillModeNonSolid = true;
-
+        enabledFeatures.samplerAnisotropy = true;
+        
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         deviceCreateInfo.pNext = nullptr;
@@ -1629,8 +1630,8 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     VkViewport viewport = {};
     viewport.height = (float)height;
     viewport.width = (float)width;
-    viewport.minDepth = (float) 0.0f;
-    viewport.maxDepth = (float) 1.0f;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
     vkCmdSetViewport( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &viewport );
 
     VkRect2D scissor = {};
