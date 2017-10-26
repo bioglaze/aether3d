@@ -31,7 +31,7 @@ ENGINE_LIB := libaether3d_osx_vulkan.a
 endif
 
 ifeq ($(UNAME), Linux)
-DEFINES := -DDEBUG -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
+DEFINES := -msse3 -DSIMD_SSE3 -DDEBUG -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
 endif
 ifeq ($(UNAME), Darwin)
 DEFINES := -DRENDERER_VULKAN
@@ -91,7 +91,7 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Statistics.cpp -o $(OUTPUT_DIR)/Statistics.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioSystemOpenAL.cpp -o $(OUTPUT_DIR)/AudioSystemOpenAL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileSystem.cpp -o $(OUTPUT_DIR)/FileSystem.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Matrix.cpp -o $(OUTPUT_DIR)/Matrix.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/MatrixSSE3.cpp -o $(OUTPUT_DIR)/Matrix.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Frustum.cpp -o $(OUTPUT_DIR)/Frustum.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o

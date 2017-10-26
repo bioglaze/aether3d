@@ -234,7 +234,7 @@ void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 #if RENDERER_VULKAN
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
-    const float f = 1.0f / std::tan( (0.5f * fovDegrees) * M_PI / 180.0f );
+    const float f = 1.0f / std::tan( (0.5f * fovDegrees) * (float)M_PI / 180.0f );
 
     const float proj[] =
     {

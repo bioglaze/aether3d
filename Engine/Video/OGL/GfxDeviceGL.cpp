@@ -61,7 +61,11 @@ void APIENTRY DebugCallbackARB( GLenum source, GLenum type, GLuint id, GLenum se
         (void)length;
         (void)userParam;
         PrintOpenGLDebugOutput( source, type, id, severity, message);
-        ae3d::System::Assert( false, "OpenGL error" );
+
+        if (type != GL_DEBUG_TYPE_PERFORMANCE_ARB)
+        {
+            ae3d::System::Assert( false, "OpenGL error" );
+        }
     }
 }
 

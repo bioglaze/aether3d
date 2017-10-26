@@ -242,21 +242,40 @@ void Matrix44::MakeIdentity()
     m[ 15 ] = 1;
 }
 
-void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
+#if RENDERER_VULKAN
+void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
-    const Vec3 zAxis = (center - eye).Normalized();
-    //const Vec3 xAxis = Vec3::Cross( zAxis, up ).Normalized();
-    //const Vec3 yAxis = Vec3::Cross( xAxis, zAxis );
+    const float f = 1.0f / std::tan( (0.5f * fovDegrees) * (float)M_PI / 180.0f );
 
-    // Mirrored (fixes cube map RT camera face orientation):
-    const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
-    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
-    
-    m[  0 ] = xAxis.x; m[  1 ] = xAxis.y; m[  2 ] = xAxis.z; m[  3 ] = -Vec3::Dot( xAxis, eye );
-    m[  4 ] = yAxis.x; m[  5 ] = yAxis.y; m[  6 ] = yAxis.z; m[  7 ] = -Vec3::Dot( yAxis, eye );
-    m[  8 ] = zAxis.x; m[  9 ] = zAxis.y; m[ 10 ] = zAxis.z; m[ 11 ] = -Vec3::Dot( zAxis, eye );
-    m[ 12 ] =       0; m[ 13 ] =       0; m[ 14 ] =       0; m[ 15 ] = 1;
+    const float proj[] =
+    {
+        f / aspect, 0, 0,  0,
+        0, -f, 0,  0,
+        0, 0, farDepth / (nearDepth - farDepth), -1,
+        0, 0, (nearDepth * farDepth) / (nearDepth - farDepth),  0
+    };
+
+    InitFrom( &proj[ 0 ] );
 }
+
+void Matrix44::MakeProjection( float left, float right, float bottom, float top, float nearDepth, float farDepth )
+{
+    const float tx = -((right + left) / (right - left));
+    const float ty = -((bottom + top) / (bottom - top));
+    const float tz = nearDepth / (nearDepth - farDepth);
+
+    const float proj[] =
+    {
+            2.0f / (right - left), 0.0f, 0.0f, 0.0f,
+            0.0f, 2.0f / (bottom - top), 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f / (nearDepth - farDepth), 0.0f,
+            tx, ty, tz, 1.0f
+    };
+
+    InitFrom( &proj[ 0 ] );
+}
+
+#else
 
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
@@ -281,10 +300,7 @@ void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, 
         0, 0, d,  0
     };
 
-    InitFrom( &proj[ 0 ] );  
-#if AE3D_CHECK_FOR_NAN
-    ae3d::CheckNaN( *this );
-#endif
+    InitFrom( &proj[ 0 ] );
 }
 
 void Matrix44::MakeProjection( float left, float right, float bottom, float top, float nearDepth, float farDepth )
@@ -301,11 +317,24 @@ void Matrix44::MakeProjection( float left, float right, float bottom, float top,
         tx, ty, tz, 1.0f
     };
 
-    InitFrom( &ortho[ 0 ] );
-    
-#if AE3D_CHECK_FOR_NAN
-    ae3d::CheckNaN( *this );
+    InitFrom( ortho );
+}
 #endif
+
+void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
+{
+    const Vec3 zAxis = (center - eye).Normalized();
+    //const Vec3 xAxis = Vec3::Cross( zAxis, up ).Normalized();
+    //const Vec3 yAxis = Vec3::Cross( xAxis, zAxis );
+
+    // Mirrored (fixes cube map RT camera face orientation):
+    const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
+    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
+    
+    m[  0 ] = xAxis.x; m[  1 ] = xAxis.y; m[  2 ] = xAxis.z; m[  3 ] = -Vec3::Dot( xAxis, eye );
+    m[  4 ] = yAxis.x; m[  5 ] = yAxis.y; m[  6 ] = yAxis.z; m[  7 ] = -Vec3::Dot( yAxis, eye );
+    m[  8 ] = zAxis.x; m[  9 ] = zAxis.y; m[ 10 ] = zAxis.z; m[ 11 ] = -Vec3::Dot( zAxis, eye );
+    m[ 12 ] =       0; m[ 13 ] =       0; m[ 14 ] =       0; m[ 15 ] = 1;
 }
 
 void Matrix44::MakeRotationXYZ( float xDeg, float yDeg, float zDeg )
