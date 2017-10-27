@@ -28,12 +28,12 @@ namespace GfxDeviceGlobal
     extern VkQueue graphicsQueue;
     extern VkCommandPool cmdPool;
     extern VkPhysicalDeviceProperties properties;
+    extern VkCommandBuffer texCmdBuffer;
 }
 
 namespace TextureCubeGlobal
 {
     ae3d::TextureCube defaultTexture;
-    VkCommandBuffer texCmdBuffer = VK_NULL_HANDLE;
     std::vector< VkSampler > samplersToReleaseAtExit;
     std::vector< VkImage > imagesToReleaseAtExit;
     std::vector< VkImageView > imageViewsToReleaseAtExit;
@@ -68,21 +68,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                               const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
                               TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace )
 {
-    if (TextureCubeGlobal::texCmdBuffer == VK_NULL_HANDLE)
-    {
-        System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-        System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "cmdPool not initialized" );
-
-        VkCommandBufferAllocateInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        cmdBufInfo.commandPool = GfxDeviceGlobal::cmdPool;
-        cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        cmdBufInfo.commandBufferCount = 1;
-
-        VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &TextureCubeGlobal::texCmdBuffer );
-        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers TextureCube" );
-    }
-
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
@@ -129,7 +114,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     cmdBufInfo.pInheritanceInfo = nullptr;
     cmdBufInfo.flags = 0;
 
-    VkResult err = vkBeginCommandBuffer( TextureCubeGlobal::texCmdBuffer, &cmdBufInfo );
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
 
     for (int face = 0; face < 6; ++face)
@@ -215,7 +200,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             stbi_image_free( data );
 
-            SetImageLayout( TextureCubeGlobal::texCmdBuffer,
+            SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
                 images[ face ],
                 VK_IMAGE_ASPECT_COLOR_BIT,
                 VK_IMAGE_LAYOUT_UNDEFINED,
@@ -320,7 +305,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
 
-            SetImageLayout( TextureCubeGlobal::texCmdBuffer,
+            SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
                 images[ face ],
                 VK_IMAGE_ASPECT_COLOR_BIT,
                 VK_IMAGE_LAYOUT_UNDEFINED,
@@ -352,7 +337,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
 
-    SetImageLayout( TextureCubeGlobal::texCmdBuffer,
+    SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
         image,
         VK_IMAGE_ASPECT_COLOR_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED,
@@ -378,19 +363,19 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         copyRegion.extent.height = height;
         copyRegion.extent.depth = 1;
 
-        vkCmdCopyImage( TextureCubeGlobal::texCmdBuffer,
+        vkCmdCopyImage( GfxDeviceGlobal::texCmdBuffer,
             images[ face ], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1, &copyRegion );
     }
 
-    SetImageLayout( TextureCubeGlobal::texCmdBuffer,
+    SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
         image,
         VK_IMAGE_ASPECT_COLOR_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6, 0, 1 );
 
-    err = vkEndCommandBuffer( TextureCubeGlobal::texCmdBuffer );
+    err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
 
     VkFence nullFence = { VK_NULL_HANDLE };
@@ -400,7 +385,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     submitInfo.pNext = nullptr;
     submitInfo.waitSemaphoreCount = 0;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &TextureCubeGlobal::texCmdBuffer;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, nullFence );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in TextureCube" );

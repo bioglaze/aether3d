@@ -17,8 +17,8 @@
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 void Tokenize( const std::string& str,
-std::vector< std::string >& tokens,
-const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
+               std::vector< std::string >& tokens,
+               const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
 
 namespace ae3d
 {
@@ -39,13 +39,13 @@ namespace GfxDeviceGlobal
     extern VkQueue graphicsQueue;
     extern VkCommandPool cmdPool;
     extern VkPhysicalDeviceProperties properties;
+    extern VkCommandBuffer texCmdBuffer;
 }
 
 namespace Texture2DGlobal
 {
     std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
     ae3d::Texture2D defaultTexture;
-    VkCommandBuffer texCmdBuffer = VK_NULL_HANDLE;
     std::vector< VkSampler > samplersToReleaseAtExit;
     std::vector< VkImage > imagesToReleaseAtExit;
     std::vector< VkImageView > imageViewsToReleaseAtExit;
@@ -83,22 +83,6 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     filter = TextureFilter::Linear;
     opaque = channels == 3;
 
-    // TODO: Move somewhere else.
-    if (Texture2DGlobal::texCmdBuffer == VK_NULL_HANDLE)
-    {
-        System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-        System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "cmdPool not initialized" );
-
-        VkCommandBufferAllocateInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        cmdBufInfo.commandPool = GfxDeviceGlobal::cmdPool;
-        cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        cmdBufInfo.commandBufferCount = 1;
-
-        VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &Texture2DGlobal::texCmdBuffer );
-        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers Texture2D" );
-    }
-
     CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB );
 
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, debugName );
@@ -107,22 +91,6 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
-    // TODO: Move somewhere else.
-    if (Texture2DGlobal::texCmdBuffer == VK_NULL_HANDLE)
-    {
-        System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-        System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "cmdPool not initialized" );
-
-        VkCommandBufferAllocateInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        cmdBufInfo.commandPool = GfxDeviceGlobal::cmdPool;
-        cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        cmdBufInfo.commandBufferCount = 1;
-
-        VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &Texture2DGlobal::texCmdBuffer );
-        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers Texture2D" );
-    }
-
     filter = aFilter;
     wrap = aWrap;
     mipmaps = aMipmaps;
@@ -293,7 +261,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     cmdBufInfo.pInheritanceInfo = nullptr;
     cmdBufInfo.flags = 0;
 
-    err = vkBeginCommandBuffer( Texture2DGlobal::texCmdBuffer, &cmdBufInfo );
+    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
 
     VkImageSubresourceRange range = {};
@@ -316,7 +284,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     imageMemoryBarrier.subresourceRange = range;
 
     vkCmdPipelineBarrier(
-            Texture2DGlobal::texCmdBuffer,
+            GfxDeviceGlobal::texCmdBuffer,
             VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
             VK_PIPELINE_STAGE_TRANSFER_BIT,
             0,
@@ -334,10 +302,9 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     bufferCopyRegion.imageExtent.depth = 1;
     bufferCopyRegion.bufferOffset = 0;
 
-    vkCmdCopyBufferToImage( Texture2DGlobal::texCmdBuffer, stagingBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
+    vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
 
     std::vector<VkBufferImageCopy> bufferCopyRegions;
-    std::uint32_t offset = 0;
 
     for (int i = 1; i < mipLevelCount; ++i)
     {
@@ -359,7 +326,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
         imageBlit.dstOffsets[ 0 ] = { 0, 0, 0 };
         imageBlit.dstOffsets[ 1 ] = { mipWidth, mipHeight, 1 };
 
-        vkCmdBlitImage( Texture2DGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image,
+        vkCmdBlitImage( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlit, VK_FILTER_LINEAR );
     }
 
@@ -377,7 +344,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     imageMemoryBarrier.subresourceRange.levelCount = mipLevelCount;
 
     vkCmdPipelineBarrier(
-            Texture2DGlobal::texCmdBuffer,
+            GfxDeviceGlobal::texCmdBuffer,
             VK_PIPELINE_STAGE_TRANSFER_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
@@ -385,12 +352,12 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
             0, nullptr,
             1, &imageMemoryBarrier );
 
-    vkEndCommandBuffer( Texture2DGlobal::texCmdBuffer );
+    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &Texture2DGlobal::texCmdBuffer;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
@@ -473,7 +440,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 {
     System::Assert( GfxDeviceGlobal::graphicsQueue != VK_NULL_HANDLE, "queue not initialized" );
     System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-    System::Assert( Texture2DGlobal::texCmdBuffer != VK_NULL_HANDLE, "texCmdBuffer not initialized" );
 
     int components;
     unsigned char* data = stbi_load_from_memory( fileContents.data.data(), static_cast<int>(fileContents.data.size()), &width, &height, &components, 4 );

@@ -86,7 +86,8 @@ namespace GfxDeviceGlobal
     VkCommandBuffer computeCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer offscreenCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer currentCmdBuffer = VK_NULL_HANDLE;
-
+    VkCommandBuffer texCmdBuffer = VK_NULL_HANDLE;
+    
     VkSwapchainKHR swapChain = VK_NULL_HANDLE;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     VkRenderPass renderPass = VK_NULL_HANDLE;
@@ -1519,6 +1520,15 @@ namespace ae3d
         GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
 
         GfxDeviceGlobal::lightTiler.Init();
+
+        VkCommandBufferAllocateInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        cmdBufInfo.commandPool = GfxDeviceGlobal::cmdPool;
+        cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        cmdBufInfo.commandBufferCount = 1;
+
+        err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &GfxDeviceGlobal::texCmdBuffer );
+        AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
     }
 }
 

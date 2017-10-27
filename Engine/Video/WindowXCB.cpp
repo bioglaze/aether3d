@@ -162,7 +162,7 @@ void PlatformInitGamePad()
         
         if ((entry.d_name[0] == 'j') && (entry.d_name[1] == 's'))
         {
-            char full_device_path[ 260 ];
+            char full_device_path[ 267 ];
             snprintf( full_device_path, sizeof( full_device_path ), "%s/%s", "/dev/input", entry.d_name );
             int fd = open( full_device_path, O_RDONLY );
 
