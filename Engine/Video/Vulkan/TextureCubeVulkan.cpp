@@ -94,7 +94,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     imageCreateInfo.arrayLayers = 1;
     imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
-    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
     imageCreateInfo.flags = 0;
@@ -196,15 +196,46 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 }
             }
 
+            VkMappedMemoryRange flushRange = {};
+            flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+            flushRange.pNext = nullptr;
+            flushRange.memory = deviceMemories[ face ];
+            flushRange.offset = 0;
+            flushRange.size = width * height * bytesPerPixel;
+            vkFlushMappedMemoryRanges( GfxDeviceGlobal::device, 1, &flushRange );
+
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
 
             stbi_image_free( data );
 
-            SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
-                images[ face ],
-                VK_IMAGE_ASPECT_COLOR_BIT,
-                VK_IMAGE_LAYOUT_UNDEFINED,
-                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 0, 1 );
+            VkImageSubresourceRange range = {};
+            range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            range.baseMipLevel = 0;
+            range.levelCount = 1;
+            range.baseArrayLayer = 0;
+            range.layerCount = 1;
+
+            VkImageMemoryBarrier imageMemoryBarrier = {};
+            imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            imageMemoryBarrier.pNext = nullptr;
+            imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            imageMemoryBarrier.srcAccessMask = 0;
+            imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+            imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+            imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            imageMemoryBarrier.image = images[ face ];
+            imageMemoryBarrier.subresourceRange = range;
+
+            vkCmdPipelineBarrier(
+                                 GfxDeviceGlobal::texCmdBuffer,
+                                 VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                 VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                 0,
+                                 0, nullptr,
+                                 0, nullptr,
+                                 1, &imageMemoryBarrier );
+            
         }
         else if (isDDS)
         {
@@ -303,6 +334,14 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 }
             }
 
+            VkMappedMemoryRange flushRange = {};
+            flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+            flushRange.pNext = nullptr;
+            flushRange.memory = deviceMemories[ face ];
+            flushRange.offset = 0;
+            flushRange.size = width * height * bytesPerPixel;
+            vkFlushMappedMemoryRanges( GfxDeviceGlobal::device, 1, &flushRange );
+
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
 
             SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
@@ -317,6 +356,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     imageCreateInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     imageCreateInfo.arrayLayers = 6;
+    imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage in TextureCube" );
@@ -369,16 +409,36 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             1, &copyRegion );
     }
 
-    SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
-        image,
-        VK_IMAGE_ASPECT_COLOR_BIT,
-        VK_IMAGE_LAYOUT_UNDEFINED,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6, 0, 1 );
+    VkImageSubresourceRange range = {};
+    range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    range.baseMipLevel = 0;
+    range.levelCount = 1;
+    range.baseArrayLayer = 0;
+    range.layerCount = 6;
+
+    VkImageMemoryBarrier imageMemoryBarrier = {};
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    imageMemoryBarrier.pNext = nullptr;
+    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.srcAccessMask = 0;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageMemoryBarrier.image = image;
+    imageMemoryBarrier.subresourceRange = range;
+
+    vkCmdPipelineBarrier(
+                         GfxDeviceGlobal::texCmdBuffer,
+                         VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                         0,
+                         0, nullptr,
+                         0, nullptr,
+                         1, &imageMemoryBarrier );
 
     err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
-
-    VkFence nullFence = { VK_NULL_HANDLE };
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -387,18 +447,17 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
 
-    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, nullFence );
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in TextureCube" );
 
-    err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
-    AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle in TextureCube" );
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.pNext = nullptr;
     viewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
     viewInfo.format = format;
-    viewInfo.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
+    viewInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
     viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.baseArrayLayer = 0;
