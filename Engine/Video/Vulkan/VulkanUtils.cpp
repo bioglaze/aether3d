@@ -45,6 +45,7 @@ namespace debug
 #if _MSC_VER && DEBUG
             __debugbreak();
 #endif
+            //ae3d::System::Assert( false, "Vulkan warning" );
         }
 
         return VK_FALSE;

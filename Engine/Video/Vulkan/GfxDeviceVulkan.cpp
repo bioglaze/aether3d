@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <vulkan/vulkan.h>
+#include "FileSystem.hpp"
 #include "LightTiler.hpp"
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
@@ -1401,7 +1402,7 @@ namespace ae3d
         layoutBindingSampler.binding = 2;
         layoutBindingSampler.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
         layoutBindingSampler.descriptorCount = 1;
-        layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingSampler.pImmutableSamplers = nullptr;
 
         // Binding 3 : Buffer
@@ -1518,6 +1519,8 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
 
         GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
+
+        renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
 
         GfxDeviceGlobal::lightTiler.Init();
 

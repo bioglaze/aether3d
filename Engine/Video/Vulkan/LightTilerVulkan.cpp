@@ -2,10 +2,13 @@
 #include <vector>
 #include "ComputeShader.hpp"
 #include "RenderTexture.hpp"
+#include "Renderer.hpp"
 #include "System.hpp"
 #include "GfxDevice.hpp"
 #include "VulkanUtils.hpp"
 // TODO: Some of these methods can be shared with D3D12 and possibly Metal.
+
+extern ae3d::Renderer renderer;
 
 namespace MathUtil
 {
@@ -20,6 +23,8 @@ namespace GfxDeviceGlobal
     extern PerObjectUboStruct perObjectUboStruct;
     extern VkCommandBuffer computeCmdBuffer;
     extern VkPipelineCache pipelineCache;
+    extern VkDescriptorSetLayout descriptorSetLayout;
+    extern VkPipelineLayout pipelineLayout;
 }
 
 namespace LightTilerGlobal
@@ -187,16 +192,46 @@ void ae3d::LightTiler::Init()
         LightTilerGlobal::bufferViewsToReleaseAtExit.push_back( spotLightBufferView );
     }
 
-    /*VkPipelineLayoutCreateInfo psoLayoutInfo = {};
+    // Binding 0 : CBV
+    /*VkDescriptorSetLayoutBinding cbvLayout = {};
+    cbvLayout.binding = 0;
+    cbvLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    cbvLayout.descriptorCount = 1;
+    cbvLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+    cbvLayout.pImmutableSamplers = nullptr;
+
+    const VkDescriptorSetLayoutBinding bindings[ 3 ] = { cbvLayout, imageLayout, bufferLayout, uavLayout };
+    
+    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
+    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorLayout.pNext = nullptr;
+    descriptorLayout.bindingCount = 4;
+    descriptorLayout.pBindings = bindings;
+
+    VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorLayout, nullptr, &GfxDeviceGlobal::descriptorSetLayout );
+    AE3D_CHECK_VULKAN( err, "vkCreateDescriptorSetLayout" );
+
+    VkPipelineLayoutCreateInfo psoLayoutInfo = {};
     psoLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    psoLayoutInfo.setLayoutCount = 1;
+    psoLayoutInfo.pSetLayouts = &computeLayout;
+    VkResult err = vkCreatePipelineLayout( GfxDeviceGlobal::device, &psoLayoutInfo, nullptr, &GfxDeviceGlobal::descriptorSetLayout );
+*/
 
-    VkResult err = vkCreatePipelineLayout( GfxDeviceGlobal::device, &psoLayoutInfo, nullptr, &psoLayout );
+    VkPipelineLayoutCreateInfo psoLayoutInfo = {};
+    psoLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    psoLayoutInfo.pNext = nullptr;
+    psoLayoutInfo.setLayoutCount = 1;
+    psoLayoutInfo.pSetLayouts = &GfxDeviceGlobal::descriptorSetLayout;
 
+    //    renderer.builtinShaders.lightCullShader.GetInfo()
     VkComputePipelineCreateInfo psoInfo = {};
     psoInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-    psoInfo.layout = psoLayout;
-    err = vkCreateComputePipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &psoInfo, nullptr, &pso );
-    AE3D_CHECK_VULKAN( err, "Light tiler PSO" );*/
+    psoInfo.layout = GfxDeviceGlobal::pipelineLayout;
+    psoInfo.stage = renderer.builtinShaders.lightCullShader.GetInfo();
+    
+    VkResult err = vkCreateComputePipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &psoInfo, nullptr, &pso );
+    AE3D_CHECK_VULKAN( err, "Light tiler PSO" );
 }
 
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )

@@ -62,7 +62,7 @@ namespace ae3d
         ID3DBlob* blobShader = nullptr;
 #endif
 #if RENDERER_VULKAN
-        VkPipelineShaderStageCreateInfo& GetVertexInfo() { return info; }
+        VkPipelineShaderStageCreateInfo& GetInfo() { return info; }
 #endif
 
         /// Sets a render texture into a slot.
