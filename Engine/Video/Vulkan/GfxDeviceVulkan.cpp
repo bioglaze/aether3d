@@ -196,8 +196,6 @@ namespace ae3d
 
     void CreateMsaaColor()
     {
-        //assert( (deviceProperties.limits.framebufferColorSampleCounts >= SampleCount) && (deviceProperties.limits.framebufferDepthSampleCounts >= SAMPLE_COUNT) );
-
         VkImageCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         info.imageType = VK_IMAGE_TYPE_2D;
@@ -1282,7 +1280,7 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
-        VkDescriptorPoolSize typeCounts[ 4 ];
+        VkDescriptorPoolSize typeCounts[ 5 ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
@@ -1291,11 +1289,13 @@ namespace ae3d
         typeCounts[ 2 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 3 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         typeCounts[ 3 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 4 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        typeCounts[ 4 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.pNext = nullptr;
-        descriptorPoolInfo.poolSizeCount = 4;
+        descriptorPoolInfo.poolSizeCount = 5;
         descriptorPoolInfo.pPoolSizes = typeCounts;
         descriptorPoolInfo.maxSets = AE3D_DESCRIPTOR_SETS_COUNT;
         descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
@@ -1373,8 +1373,9 @@ namespace ae3d
         bufferSetUAV.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetLightIndexBufferView();
         bufferSetUAV.dstBinding = 4;
 
-        VkWriteDescriptorSet sets[ 5 ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV };
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 4, sets, 0, nullptr );
+        const int setCount = 5;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV };
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
@@ -1421,12 +1422,13 @@ namespace ae3d
         layoutBindingBufferUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingBufferUAV.pImmutableSamplers = nullptr;
 
-        const VkDescriptorSetLayoutBinding bindings[ 5 ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer, layoutBindingBufferUAV };
+        const int bindingCount = 5;
+        const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer, layoutBindingBufferUAV };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         descriptorLayout.pNext = nullptr;
-        descriptorLayout.bindingCount = 4;
+        descriptorLayout.bindingCount = bindingCount;
         descriptorLayout.pBindings = bindings;
 
         VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorLayout, nullptr, &GfxDeviceGlobal::descriptorSetLayout );
@@ -1789,7 +1791,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
         GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
         GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
-        //shader.set
     }
 
     UploadPerObjectUbo();

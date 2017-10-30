@@ -799,8 +799,9 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #if !RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
+#ifndef RENDERER_VULKAN
     GfxDevice::SetViewport( camera->GetViewport() );
-    
+#endif    
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
     
@@ -813,7 +814,10 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #endif
 #if RENDERER_VULKAN
 	GfxDevice::BeginRenderPassAndCommandBuffer();
+    BeginOffscreen();
+    GfxDevice::SetViewport( camera->GetViewport() );
 #endif
+
     GfxDevice::PushGroupMarker( "Shadow maps" );
 
     Matrix44 view;
@@ -891,6 +895,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #endif
 #if RENDERER_VULKAN
 	GfxDevice::EndRenderPassAndCommandBuffer();
+    EndOffscreen();
 #endif
 
     GfxDevice::ErrorCheck( "Scene render shadows end" );
