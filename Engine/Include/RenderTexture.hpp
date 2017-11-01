@@ -77,10 +77,6 @@ namespace ae3d
         FrameBufferAttachment color;
         FrameBufferAttachment depth;
         VkFormat colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
-        VkImage image = VK_NULL_HANDLE;
-        VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
-        VkImageView view = VK_NULL_HANDLE;
         VkRenderPass renderPass = VK_NULL_HANDLE;
 #endif
         DataType dataType = DataType::UByte;

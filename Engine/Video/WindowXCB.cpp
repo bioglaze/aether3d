@@ -338,7 +338,14 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                       valuemask,
                       valuelist
                       );
-    
+
+    xcb_size_hints_t hints;
+
+    xcb_icccm_size_hints_set_min_size( &hints, WindowGlobal::windowWidth, WindowGlobal::windowHeight );
+    xcb_icccm_size_hints_set_max_size( &hints, WindowGlobal::windowWidth, WindowGlobal::windowHeight );
+
+    xcb_icccm_set_wm_size_hints( WindowGlobal::connection, WindowGlobal::window, XCB_ATOM_WM_NORMAL_HINTS, &hints );
+
     xcb_map_window( connection, WindowGlobal::window );
 
     xcb_atom_t protocols[] =

@@ -742,7 +742,7 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfacePresentModesKHR" );
 
         VkExtent2D swapchainExtent = {};
-        if (surfCaps.currentExtent.width == 0)
+        if (surfCaps.currentExtent.width == (std::uint32_t)-1)
         {
             swapchainExtent.width = WindowGlobal::windowWidth;
             swapchainExtent.height = WindowGlobal::windowHeight;
