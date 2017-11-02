@@ -390,10 +390,7 @@ namespace ae3d
         multisampleState.pSampleMask = nullptr;
         multisampleState.rasterizationSamples = GfxDeviceGlobal::msaaSampleBits;
 
-        VkPipelineShaderStageCreateInfo shaderStages[ 2 ] = { {},{} };
-
-        shaderStages[ 0 ] = shader.GetVertexInfo();
-        shaderStages[ 1 ] = shader.GetFragmentInfo();
+        VkPipelineShaderStageCreateInfo shaderStages[ 2 ] = { shader.GetVertexInfo(), shader.GetFragmentInfo() };
 
         VkPipelineViewportStateCreateInfo viewportState = {};
         viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -450,6 +447,9 @@ namespace ae3d
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::prePresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
 
+        err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::offscreenCmdBuffer );
+        AE3D_CHECK_VULKAN( err, "Offscreen command buffer" );
+
         VkCommandBufferAllocateInfo computeBufAllocateInfo = {};
         computeBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         computeBufAllocateInfo.commandPool = GfxDeviceGlobal::cmdPool;
@@ -458,10 +458,6 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &computeBufAllocateInfo, &GfxDeviceGlobal::computeCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
-
-        // Render texture
-        err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::offscreenCmdBuffer );
-        AE3D_CHECK_VULKAN( err, "Offscreen command buffer" );
     }
 
     void SubmitPrePresentBarrier()
@@ -1289,7 +1285,7 @@ namespace ae3d
         typeCounts[ 2 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 3 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         typeCounts[ 3 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 4 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        typeCounts[ 4 ].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
         typeCounts[ 4 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
@@ -1369,7 +1365,7 @@ namespace ae3d
         bufferSetUAV.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         bufferSetUAV.dstSet = outDescriptorSet;
         bufferSetUAV.descriptorCount = 1;
-        bufferSetUAV.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        bufferSetUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
         bufferSetUAV.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetLightIndexBufferView();
         bufferSetUAV.dstBinding = 4;
 
@@ -1417,7 +1413,7 @@ namespace ae3d
         // Binding 4 : Buffer (UAV)
         VkDescriptorSetLayoutBinding layoutBindingBufferUAV = {};
         layoutBindingBufferUAV.binding = 4;
-        layoutBindingBufferUAV.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindingBufferUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
         layoutBindingBufferUAV.descriptorCount = 1;
         layoutBindingBufferUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingBufferUAV.pImmutableSamplers = nullptr;
@@ -1993,7 +1989,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     TextureCube::DestroyTextures();
     RenderTexture::DestroyTextures();
     VertexBuffer::DestroyBuffers();
-    LightTiler::DestroyObjects();
+    GfxDeviceGlobal::lightTiler.DestroyBuffers();
 
     for (auto pso : GfxDeviceGlobal::psoCache)
     {

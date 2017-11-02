@@ -47,7 +47,6 @@ namespace ae3d
         VkBuffer GetSpotLightBuffer() const { return spotLightCenterAndRadiusBuffer; }
         VkBufferView* GetSpotLightBufferView() { return &spotLightBufferView; }
         VkBufferView* GetLightIndexBufferView() { return &perTileLightIndexBufferView; }
-        static void DestroyObjects();
 #endif
     private:
         unsigned GetNumTilesX() const;
