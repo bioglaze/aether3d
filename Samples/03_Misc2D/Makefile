@@ -3,7 +3,7 @@ COMPILER ?= g++
 ENGINE_LIB := libaether3d_gl_linux.a
 LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
 VULKAN_LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lvulkan -lopenal
-LIB_PATH := -L. -L/home/glaze/Downloads/VulkanSDK/1.0.61.0/x86_64/lib/
+LIB_PATH := -L. -L/home/glaze/Downloads/VulkanSDK/1.0.65.0/x86_64/lib/
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++ --stdlib=libc++ -DAETHER3D_UNIX
