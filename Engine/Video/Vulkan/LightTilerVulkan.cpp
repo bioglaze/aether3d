@@ -172,12 +172,6 @@ void ae3d::LightTiler::Init()
         AE3D_CHECK_VULKAN( err, "spot light buffer view" );
     }
 
-    VkPipelineLayoutCreateInfo psoLayoutInfo = {};
-    psoLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    psoLayoutInfo.pNext = nullptr;
-    psoLayoutInfo.setLayoutCount = 1;
-    psoLayoutInfo.pSetLayouts = &GfxDeviceGlobal::descriptorSetLayout;
-
     VkComputePipelineCreateInfo psoInfo = {};
     psoInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
     psoInfo.layout = GfxDeviceGlobal::pipelineLayout;
