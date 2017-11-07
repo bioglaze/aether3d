@@ -59,8 +59,6 @@ namespace ae3d
         id< MTLBuffer > perTileLightIndexBuffer;
 #endif
 #if RENDERER_D3D12
-        ID3D12Resource* uniformBuffer = nullptr;
-        ID3D12Resource* mappedUniformBuffer = nullptr;
         ID3D12Resource* perTileLightIndexBuffer = nullptr;
         ID3D12Resource* pointLightCenterAndRadiusBuffer = nullptr;
         ID3D12Resource* spotLightCenterAndRadiusBuffer = nullptr;

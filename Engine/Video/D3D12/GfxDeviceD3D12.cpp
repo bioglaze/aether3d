@@ -183,7 +183,7 @@ namespace ae3d
 
 void UploadPerObjectUbo()
 {
-    memcpy_s( (char*)ae3d::GfxDevice::GetCurrentUniformBuffer(), AE3D_CB_SIZE, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
+    memcpy_s( (char*)ae3d::GfxDevice::GetCurrentMappedConstantBuffer(), AE3D_CB_SIZE, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
 }
 
 void WaitForPreviousFrame()
@@ -984,9 +984,14 @@ void ae3d::GfxDevice::CreateNewUniformBuffer()
     GfxDeviceGlobal::currentConstantBufferIndex = (GfxDeviceGlobal::currentConstantBufferIndex + 1) % GfxDeviceGlobal::mappedConstantBuffers.size();
 }
 
-void* ae3d::GfxDevice::GetCurrentUniformBuffer()
+void* ae3d::GfxDevice::GetCurrentMappedConstantBuffer()
 {
     return GfxDeviceGlobal::mappedConstantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ];
+}
+
+void* ae3d::GfxDevice::GetCurrentConstantBuffer()
+{
+    return GfxDeviceGlobal::constantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ];
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )

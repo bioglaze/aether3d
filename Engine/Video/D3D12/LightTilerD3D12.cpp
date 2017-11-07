@@ -32,7 +32,6 @@ void ae3d::LightTiler::DestroyBuffers()
     AE3D_SAFE_RELEASE( pointLightCenterAndRadiusBuffer );
     AE3D_SAFE_RELEASE( spotLightCenterAndRadiusBuffer );
     AE3D_SAFE_RELEASE( perTileLightIndexBuffer );
-    AE3D_SAFE_RELEASE( uniformBuffer );
 }
 
 void ae3d::LightTiler::Init()
@@ -160,50 +159,6 @@ void ae3d::LightTiler::Init()
 
         spotLightCenterAndRadiusBuffer->SetName( L"LightTiler spot light buffer" );
     }
-
-    // Uniform buffer
-    {
-        D3D12_HEAP_PROPERTIES uploadProp = {};
-        uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
-        uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-        uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-        uploadProp.CreationNodeMask = 1;
-        uploadProp.VisibleNodeMask = 1;
-
-        D3D12_RESOURCE_DESC bufferProp = {};
-        bufferProp.Alignment = 0;
-        bufferProp.DepthOrArraySize = 1;
-        bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-        bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
-        bufferProp.Format = DXGI_FORMAT_UNKNOWN;
-        bufferProp.Height = 1;
-        bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-        bufferProp.MipLevels = 1;
-        bufferProp.SampleDesc.Count = 1;
-        bufferProp.SampleDesc.Quality = 0;
-        bufferProp.Width = AE3D_CB_SIZE;
-
-        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-            &uploadProp,
-            D3D12_HEAP_FLAG_NONE,
-            &bufferProp,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS( &uniformBuffer ) );
-        if (FAILED( hr ))
-        {
-            ae3d::System::Assert( false, "Unable to create uniform buffer!" );
-            return;
-        }
-
-        uniformBuffer->SetName( L"LightTiler uniform buffer" );
-
-        hr = uniformBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&mappedUniformBuffer) );
-        if (FAILED( hr ))
-        {
-            ae3d::System::Print( "Unable to map light tiler constant buffer!" );
-        }
-    }
 }
 
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
@@ -259,6 +214,8 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )
 {
+    GfxDevice::CreateNewUniformBuffer();
+
     PerObjectUboStruct uniforms;
 
     Matrix44::Invert( projection, uniforms.clipToView );
@@ -271,9 +228,9 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     cullerUniformsCreated = true;
 
-    memcpy_s( mappedUniformBuffer, sizeof( PerObjectUboStruct ), &uniforms, sizeof( PerObjectUboStruct ) );
+    memcpy_s( ae3d::GfxDevice::GetCurrentMappedConstantBuffer(), AE3D_CB_SIZE, &uniforms, sizeof( PerObjectUboStruct ) );
 
-    shader.SetUniformBuffer( 0, uniformBuffer );
+    shader.SetUniformBuffer( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
     shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );
     shader.SetTextureBuffer( 1, depthNormalTarget.GetGpuResource()->resource );
     shader.SetTextureBuffer( 2, spotLightCenterAndRadiusBuffer );

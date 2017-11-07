@@ -174,31 +174,31 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
+    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
     
     const int offset = uniformLocations[ name ].i;
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, matrix4x4, 64 );
+        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, matrix4x4, 64 );
     }
 }
 
 void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, int count )
 {
-    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
+    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
     const int offset = uniformLocations[ name ].i;
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, matrix4x4s, 64 * count );
+        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, matrix4x4s, 64 * count );
     }
 }
 
 void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
 {
-    memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, data, dataBytes );
+    memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, data, dataBytes );
 }
 
 void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
@@ -252,48 +252,48 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
-    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
+    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
     const int offset = uniformLocations[ name ].i;
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, &value, 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, &value, 4 );
     }
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )
 {
-    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
+    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
     const int offset = uniformLocations[ name ].i;
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, &value, 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, &value, 4 );
     }
 }
 
 void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
-    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
+    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
     const int offset = uniformLocations[ name ].i;
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, vec3, 3 * 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, vec3, 3 * 4 );
     }
 }
 
 void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
-    System::Assert( GfxDevice::GetCurrentUniformBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
+    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
     const int offset = uniformLocations[ name ].i;
 
     if (offset != -1)
     {
-        memcpy_s( (char*)GfxDevice::GetCurrentUniformBuffer() + offset, AE3D_CB_SIZE, vec4, 4 * 4 );
+        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, vec4, 4 * 4 );
     }
 }

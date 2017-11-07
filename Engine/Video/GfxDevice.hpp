@@ -90,7 +90,8 @@ namespace ae3d
 #if RENDERER_D3D12
         void ResetCommandList();
         void  CreateNewUniformBuffer();
-        void* GetCurrentUniformBuffer();
+        void* GetCurrentMappedConstantBuffer();
+        void* GetCurrentConstantBuffer();
 #endif
 #if RENDERER_METAL
         static const int UNIFORM_BUFFER_SIZE = sizeof( PerObjectUboStruct ) + 64 * 81;

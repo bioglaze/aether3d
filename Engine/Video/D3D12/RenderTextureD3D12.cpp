@@ -58,6 +58,9 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         System::Print( "unhandled data type for render texture 2d\n" );
     }
 
+    D3D12_CLEAR_VALUE clearValue = {};
+    clearValue.Format = dxgiFormat;
+
     D3D12_RESOURCE_DESC descTex = {};
     descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     descTex.Width = width;
@@ -78,7 +81,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     heapProps.VisibleNodeMask = 1;
 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
-        D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
+        D3D12_RESOURCE_STATE_COPY_DEST, &clearValue, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
     wchar_t wstr[ 128 ];
