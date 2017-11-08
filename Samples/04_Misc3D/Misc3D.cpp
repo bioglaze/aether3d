@@ -40,8 +40,8 @@ int main()
 {
     bool fullScreen = false;
 
-    int width = 1920 / 2;
-    int height = 1080 / 2;
+    int width = 1920 / 1;
+    int height = 1080 / 1;
     //int width = 640;
     //int height = 480;
 
@@ -348,7 +348,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -695,10 +695,10 @@ int main()
         camera.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
         camera.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
 
-        camera.GetComponent<TransformComponent>()->MoveForward( gamePadLeftThumbY );
+        camera.GetComponent<TransformComponent>()->MoveForward( -gamePadLeftThumbY );
         camera.GetComponent<TransformComponent>()->MoveRight( gamePadLeftThumbX );
         camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( gamePadRightThumbX ) / 1 );
-        camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( gamePadRightThumbY ) / 1 );
+        camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( gamePadRightThumbY ) / 1 );
 
         /*std::string stats = std::string( "draw calls:" ) + std::to_string( System::Statistics::GetDrawCallCount() );
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );

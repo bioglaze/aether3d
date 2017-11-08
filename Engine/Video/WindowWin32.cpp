@@ -48,6 +48,7 @@ namespace WindowGlobal
     }
 
     bool isOpen = false;
+    bool isGamePadConnected = false;
     HWND hwnd;
     HDC hdc;
     ae3d::KeyCode keyMap[ 256 ];
@@ -210,6 +211,10 @@ void PlatformInitGamePad()
     {
         XInputGetState_ = (x_input_get_state*)GetProcAddress( XInputLibrary, "XInputGetState" );
         XInputSetState_ = (x_input_set_state*)GetProcAddress( XInputLibrary, "XInputSetState" );
+
+        XINPUT_STATE controllerState;
+
+        WindowGlobal::isGamePadConnected = XInputGetState_( 0, &controllerState ) == ERROR_SUCCESS;
     }
     else
     {
@@ -237,88 +242,88 @@ namespace ae3d
 
     void PumpGamePadEvents()
     {
-        XINPUT_STATE ControllerState;
+        XINPUT_STATE controllerState;
 
-        if (XInputGetState_( 0, &ControllerState ) == ERROR_SUCCESS)
+        if (XInputGetState_( 0, &controllerState ) == ERROR_SUCCESS)
         {
-            XINPUT_GAMEPAD* Pad = &ControllerState.Gamepad;
+            XINPUT_GAMEPAD* pad = &controllerState.Gamepad;
 
-            float avgX = ProcessGamePadStickValue( Pad->sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE );
-            float avgY = ProcessGamePadStickValue( Pad->sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE );
+            float avgX = ProcessGamePadStickValue( pad->sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE );
+            float avgY = ProcessGamePadStickValue( pad->sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE );
             
             WindowGlobal::IncEventIndex();
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadLeftThumbState;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = avgX;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = avgY;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadLeftThumbState;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = avgX;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = avgY;
 
-            avgX = ProcessGamePadStickValue( Pad->sThumbRX, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE );
-            avgY = ProcessGamePadStickValue( Pad->sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE );
+            avgX = ProcessGamePadStickValue( pad->sThumbRX, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE );
+            avgY = ProcessGamePadStickValue( pad->sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE );
 
             WindowGlobal::IncEventIndex();
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadRightThumbState;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbX = avgX;
-            WindowGlobal::eventStack[WindowGlobal::eventIndex].gamePadThumbY = avgY;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadRightThumbState;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = avgX;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = avgY;
 
-            if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadUp;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonDPadUp;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadDown;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonDPadDown;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_LEFT) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_DPAD_LEFT) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadLeft;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonDPadLeft;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonDPadRight;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonDPadRight;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_A) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_A) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonA;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonA;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_B) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_B) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonB;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonB;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_X) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_X) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonX;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonX;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_Y) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_Y) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonY;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonY;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonLeftShoulder;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonLeftShoulder;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)!= 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)!= 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonRightShoulder;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonRightShoulder;
 
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_START) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_START) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonStart;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonStart;
             }
-            if ((Pad->wButtons & XINPUT_GAMEPAD_BACK) != 0)
+            if ((pad->wButtons & XINPUT_GAMEPAD_BACK) != 0)
             {
                 WindowGlobal::IncEventIndex();
-                WindowGlobal::eventStack[WindowGlobal::eventIndex].type = ae3d::WindowEventType::GamePadButtonBack;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::GamePadButtonBack;
             }
         }
     }
@@ -437,7 +442,10 @@ namespace ae3d
             DispatchMessage( &msg );
         }
 
-        PumpGamePadEvents();
+        if (WindowGlobal::isGamePadConnected)
+        {
+            PumpGamePadEvents();
+        }
     }
 
     bool Window::IsOpen()
