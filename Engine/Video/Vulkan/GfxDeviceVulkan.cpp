@@ -27,7 +27,7 @@
 #include <X11/Xlib-xcb.h>
 #endif
 
-#define AE3D_DESCRIPTOR_SETS_COUNT 250
+#define AE3D_DESCRIPTOR_SETS_COUNT 350
 
 extern ae3d::Renderer renderer;
 

@@ -700,17 +700,20 @@ int main()
         camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( gamePadRightThumbX ) / 1 );
         camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( gamePadRightThumbY ) / 1 );
 
+        static int animationFrame = 0;
+        ++animationFrame;
+        animatedGo.GetComponent< MeshRendererComponent >()->SetAnimationFrame( animationFrame );
+
         /*std::string stats = std::string( "draw calls:" ) + std::to_string( System::Statistics::GetDrawCallCount() );
         stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
         stats += std::string( "\nRT binds:" ) + std::to_string( System::Statistics::GetRenderTargetBindCount() );
         stats += std::string( "\nTexture binds:" ) + std::to_string( System::Statistics::GetTextureBindCount() );
         stats += std::string( "\nShader binds:" ) + std::to_string( System::Statistics::GetShaderBindCount() );
         statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
-        statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
-
-        static int animationFrame = 0;
-        ++animationFrame;
-        animatedGo.GetComponent< MeshRendererComponent >()->SetAnimationFrame( animationFrame );
+        if (animationFrame % 60 == 0)
+        {
+            statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
+        }
         
 #if defined( AE3D_OPENVR )
         VR::CalcEyePose();

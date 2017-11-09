@@ -112,6 +112,8 @@ namespace WindowGlobal
     GamePad gamePad;
     float lastLeftThumbX = 0;
     float lastLeftThumbY = 0;
+    float lastRightThumbX = 0;
+    float lastRightThumbY = 0;
     std::map< xcb_keysym_t, ae3d::KeyCode > keyMap =
     {
         { XK_a, ae3d::KeyCode::A },
@@ -339,14 +341,15 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                       valuelist
                       );
 
+
+    xcb_map_window( connection, WindowGlobal::window );
+
     xcb_size_hints_t hints;
 
     xcb_icccm_size_hints_set_min_size( &hints, WindowGlobal::windowWidth, WindowGlobal::windowHeight );
     xcb_icccm_size_hints_set_max_size( &hints, WindowGlobal::windowWidth, WindowGlobal::windowHeight );
 
     xcb_icccm_set_wm_size_hints( WindowGlobal::connection, WindowGlobal::window, XCB_ATOM_WM_NORMAL_HINTS, &hints );
-
-    xcb_map_window( connection, WindowGlobal::window );
 
     xcb_atom_t protocols[] =
     {
@@ -731,7 +734,7 @@ void ae3d::Window::PumpEvents()
         {
             if (j.number == WindowGlobal::gamePad.leftThumbX)
             {
-                float x = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
+                const float x = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadLeftThumbState;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = x;
@@ -740,12 +743,30 @@ void ae3d::Window::PumpEvents()
             }
             else if (j.number == WindowGlobal::gamePad.leftThumbY)
             {
-                float y = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
+                const float y = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadLeftThumbState;
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = WindowGlobal::lastLeftThumbX;
-                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = y;
-                WindowGlobal::lastLeftThumbY = y;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = -y;
+                WindowGlobal::lastLeftThumbY = -y;
+            }
+            else if (j.number == WindowGlobal::gamePad.rightThumbX)
+            {
+                const float x = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
+                WindowGlobal::IncEventIndex();
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadRightThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = x;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = WindowGlobal::lastRightThumbY;
+                WindowGlobal::lastRightThumbX = x;
+            }
+            else if (j.number == WindowGlobal::gamePad.rightThumbY)
+            {
+                const float y = ProcessGamePadStickValue( j.value, WindowGlobal::gamePad.deadZone );
+                WindowGlobal::IncEventIndex();
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = WindowEventType::GamePadRightThumbState;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbX = WindowGlobal::lastRightThumbX;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].gamePadThumbY = -y;
+                WindowGlobal::lastRightThumbY = -y;
             }
             else if (j.number == WindowGlobal::gamePad.dpadXaxis)
             {
