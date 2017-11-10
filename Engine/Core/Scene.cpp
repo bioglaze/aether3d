@@ -1450,6 +1450,32 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 outGameObjects.back().GetComponent< PointLightComponent >()->SetColor( color );
             }
         }
+        else if (token == "shaders")
+        {
+            if (currentMaterialName == "")
+            {
+                System::Print( "Failed to parse %s: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str() );
+                return DeserializeResult::ParseError;
+            }
+            
+            std::string vertexShaderName, fragmentShaderName;
+            lineStream >> vertexShaderName >> fragmentShaderName;
+
+            std::string glslVert = vertexShaderName + std::string( ".vsh" );
+            std::string glslFrag = fragmentShaderName + std::string( ".fsh" );
+            std::string hlslVert = vertexShaderName + std::string( ".hlsl" );
+            std::string hlslFrag = fragmentShaderName + std::string( ".hlsl" );
+            std::string spvVert = vertexShaderName + std::string( "_vert.spv" );
+            std::string spvFrag = fragmentShaderName + std::string( "_frag.fsh" );
+            
+            Shader* shader = new Shader();
+            shader->Load( FileSystem::FileContents( glslVert.c_str() ), FileSystem::FileContents( glslFrag.c_str() ),
+                          vertexShaderName.c_str(), fragmentShaderName.c_str(),
+                          FileSystem::FileContents( hlslVert.c_str() ), FileSystem::FileContents( hlslFrag.c_str() ),
+                          FileSystem::FileContents( spvVert.c_str() ), FileSystem::FileContents( spvFrag.c_str() ) );
+
+            outMaterials[ currentMaterialName ]->SetShader( shader );
+        }
         else if (token == "metal_shaders")
         {
 #if RENDERER_METAL
@@ -1473,10 +1499,28 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         }
         else
         {
-            System::Print( "Unhandled token %s\n", token.c_str() );
+            System::Print( "Scene parser: Unhandled token %s\n", token.c_str() );
         }
     }
 
+    for (const auto& go : outGameObjects)
+    {
+        const auto mr = go.GetComponent< MeshRendererComponent >();
+
+        if (mr)
+        {
+            const unsigned subMeshCount = mr->GetMesh()->GetSubMeshCount();
+            
+            for (unsigned i = 0; i < subMeshCount; ++i)
+            {
+                if (!mr->GetMaterial( i ))
+                {
+                    System::Print( "Scene parser: missing material for mesh renderer in game object %s in subMesh %s\n", go.GetName().c_str(), mr->GetMesh()->GetSubMeshName( i ).c_str() );
+                }
+            }
+        }
+    }
+    
     return DeserializeResult::Success;
 }
 

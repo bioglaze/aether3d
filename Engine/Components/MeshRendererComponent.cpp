@@ -38,6 +38,11 @@ unsigned ae3d::MeshRendererComponent::New()
     return nextFreeMeshRendererComponent++;
 }
 
+Material* ae3d::MeshRendererComponent::GetMaterial( int subMeshIndex )
+{
+    return (std::size_t)subMeshIndex < materials.size() ? materials[ subMeshIndex ] : nullptr;
+}
+
 ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
 {
     return &meshRendererComponents[ index ];

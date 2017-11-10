@@ -358,7 +358,11 @@ int main()
 
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
+#ifdef TEST_FORWARD_PLUS
+        mat.second->SetShader( &standardShader );
+#else
         mat.second->SetShader( &shader );
+#endif
     }
     
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)

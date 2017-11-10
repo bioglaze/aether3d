@@ -240,9 +240,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pso );
 
-    System::Print("before dispatch. tiles x: %d, tiles y: %d\n", GetNumTilesX(), GetNumTilesY() );
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
-    System::Print("after dispatch\n");
 
     vkEndCommandBuffer( GfxDeviceGlobal::computeCmdBuffer );
 }

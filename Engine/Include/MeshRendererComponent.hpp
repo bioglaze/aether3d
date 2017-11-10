@@ -19,9 +19,13 @@ namespace ae3d
         /// \return Mesh.
         class Mesh* GetMesh() { return mesh; }
         
+        /// \param subMeshIndex Sub mesh index.
+        /// \return Submesh's material or null if the index is invalid.
+        class Material* GetMaterial( int subMeshIndex );
+
         /// \param material Material.
         /// \param subMeshIndex Sub mesh index.
-        void SetMaterial( class Material* material, int subMeshIndex );
+        void SetMaterial( Material* material, int subMeshIndex );
 
         /// \param aMesh Mesh.
         void SetMesh( Mesh* aMesh );
