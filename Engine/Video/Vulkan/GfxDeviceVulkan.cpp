@@ -1378,7 +1378,7 @@ namespace ae3d
 
     void CreateDescriptorSetLayout()
     {
-        // Binding 0 : Uniform buffer (Vertex shader)
+        // Binding 0 : Uniform buffer
         VkDescriptorSetLayoutBinding layoutBindingUBO = {};
         layoutBindingUBO.binding = 0;
         layoutBindingUBO.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -1386,7 +1386,7 @@ namespace ae3d
         layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingUBO.pImmutableSamplers = nullptr;
 
-        // Binding 1 : Image (Fragment shader)
+        // Binding 1 : Image
         VkDescriptorSetLayoutBinding layoutBindingImage = {};
         layoutBindingImage.binding = 1;
         layoutBindingImage.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
@@ -1394,7 +1394,7 @@ namespace ae3d
         layoutBindingImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingImage.pImmutableSamplers = nullptr;
 
-        // Binding 2 : Sampler (Fragment shader)
+        // Binding 2 : Sampler
         VkDescriptorSetLayoutBinding layoutBindingSampler = {};
         layoutBindingSampler.binding = 2;
         layoutBindingSampler.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
@@ -1779,6 +1779,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     if (shader.GetVertexShaderPath().find( "Standard" ) != std::string::npos)
     {
+        System::Assert( GfxDeviceGlobal::lightTiler.CullerUniformsCreated(), "Tried to use standard shader without first filling the light index buffer!" );
+
         unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
         unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);

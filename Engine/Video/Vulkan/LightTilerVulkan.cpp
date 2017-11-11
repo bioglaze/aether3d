@@ -84,7 +84,7 @@ void ae3d::LightTiler::Init()
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
+        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &allocInfo.memoryTypeIndex );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &perTileLightIndexBufferMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory perTileLightIndexBuffer" );
 

@@ -343,6 +343,51 @@ int main()
 
     rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
 #endif
+
+#ifdef TEST_FORWARD_PLUS
+    Shader standardShader;
+    standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
+        "standard_vertex", "standard_fragment",
+        ae3d::FileSystem::FileContents( "Standard_vert.hlsl" ), ae3d::FileSystem::FileContents( "Standard_frag.hlsl" ),
+        ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
+
+    Material standardMaterial;
+    standardMaterial.SetShader( &standardShader );
+    standardMaterial.SetTexture( "textureMap", &gliderTex );
+
+    GameObject standardCubeTopCenter;
+    standardCubeTopCenter.SetName( "standardCubeTopCenter" );
+    standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
+    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+    standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
+    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -100 ) );
+    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
+    scene.Add( &standardCubeTopCenter );
+
+    const int POINT_LIGHT_COUNT = 100;
+    
+    GameObject pointLights[ POINT_LIGHT_COUNT ];
+    
+    // Inits point lights for Forward+
+    {
+        int pointLightIndex = 0;
+        
+        for (int row = 0; row < 10; ++row)
+        {
+            for (int col = 0; col < 10; ++col)
+            {
+                pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
+                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
+                pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9 + row * 2, -4, -85 + col * 2 ) );
+                scene.Add( &pointLights[ pointLightIndex ] );
+                ++pointLightIndex;
+            }
+        }
+    }
+#endif
+
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
@@ -418,28 +463,6 @@ int main()
     transCube1.AddComponent< TransformComponent >();
     transCube1.GetComponent< TransformComponent >()->SetLocalPosition( { 2, 0, -70 } );
     
-#ifdef TEST_FORWARD_PLUS
-    Shader standardShader;
-    standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
-        "standard_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "Standard_vert.hlsl" ), ae3d::FileSystem::FileContents( "Standard_frag.hlsl" ),
-        ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
-
-    Material standardMaterial;
-    standardMaterial.SetShader( &standardShader );
-    standardMaterial.SetTexture( "textureMap", &gliderTex );
-
-    GameObject standardCubeTopCenter;
-    standardCubeTopCenter.SetName( "standardCubeTopCenter" );
-    standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -100 ) );
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
-    scene.Add( &standardCubeTopCenter );
-#endif
-
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );
