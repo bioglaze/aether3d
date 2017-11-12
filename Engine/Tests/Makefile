@@ -21,7 +21,13 @@ all:
 ifeq ($(OS),Windows_NT)
 	g++ -Wall -march=native -std=c++11 -DRENDERER_OPENGL -DSIMD_SSE3 01_Math.cpp ../Core/MatrixSSE3.cpp -I../Include -o 01_MathSSE
 	g++ -Wall -DRENDERER_OPENGL -std=c++11 01_Math.cpp ../Core/Matrix.cpp -I../Include -o 01_Math
-else
+endif
+ifeq ($(UNAME), Darwin)
 	clang++ -DRENDERER_OPENGL -std=c++11 -march=native -fsanitize=address -DSIMD_SSE3 01_Math.cpp ../Core/MatrixSSE3.cpp -I../Include -o 01_MathSSE
 	clang++ -DRENDERER_OPENGL -std=c++11 -fsanitize=address 01_Math.cpp ../Core/Matrix.cpp -I../Include -o 01_Math
 endif
+ifeq ($(UNAME), Linux)
+	g++ -DRENDERER_OPENGL -std=c++11 -march=native -fsanitize=address -DSIMD_SSE3 01_Math.cpp ../Core/MatrixSSE3.cpp -I../Include -o 01_MathSSE
+	g++ -DRENDERER_OPENGL -std=c++11 -fsanitize=address 01_Math.cpp ../Core/Matrix.cpp -I../Include -o 01_Math
+endif
+

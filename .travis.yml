@@ -33,3 +33,6 @@ script:
   - make
   - cd ../04_Misc3D
   - make
+  - cd ../NuklearTest
+  - make
+

@@ -98,10 +98,14 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     };
     ortho[ 0 ][ 0 ] /= (float)windowWidth;
     ortho[ 1 ][ 1 ] /= (float)windowHeight;
-
+    
     renderer.builtinShaders.uiShader.Use();
     renderer.builtinShaders.uiShader.SetTexture( "textureMap", texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
+
+    //Matrix44 proj;
+    //proj.MakeProjection( 0, windowWidth, 0, windowHeight, -1, 1);
+    //GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &proj.m[ 0 ] );
     
     GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, texture, offset );
 }

@@ -27,7 +27,7 @@ namespace ae3d
         /// \param shadowMapSize Shadow map size in pixels. If it's invalid, it falls back to 512.
         void SetCastShadow( bool enable, int shadowMapSize );
 
-        /// \param Radius for light culler. Defaults to 2.
+        /// \param aRadius for light culler. Defaults to 2.
         void SetRadius( float aRadius ) { radius = aRadius; }
         
         /// \return Radius for light culler.
