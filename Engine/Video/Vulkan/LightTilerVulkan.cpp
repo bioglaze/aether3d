@@ -25,6 +25,7 @@ namespace GfxDeviceGlobal
     extern VkPipelineCache pipelineCache;
     extern VkDescriptorSetLayout descriptorSetLayout;
     extern VkPipelineLayout pipelineLayout;
+    extern VkQueue computeQueue;
 }
 
 namespace ae3d
@@ -32,6 +33,7 @@ namespace ae3d
     void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex );
 }
 
+void BindComputeDescriptorSet();
 void UploadPerObjectUbo();
 
 void ae3d::LightTiler::DestroyBuffers()
@@ -238,9 +240,59 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::computeCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
+    BindComputeDescriptorSet();
+
+    const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
+    const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
+
+    VkBufferMemoryBarrier lightIndexToCompute = {};
+    lightIndexToCompute.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    lightIndexToCompute.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+    lightIndexToCompute.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+    lightIndexToCompute.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    lightIndexToCompute.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    lightIndexToCompute.buffer = perTileLightIndexBuffer;
+    lightIndexToCompute.size = maxNumLightsPerTile * numTiles * sizeof( unsigned );
+
+    vkCmdPipelineBarrier( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_STAGE_HOST_BIT,
+                                    VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0, 0,
+                                     nullptr, 1, &lightIndexToCompute, 0, nullptr );
+    
     vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pso );
 
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 
+    VkBufferMemoryBarrier lightIndexToFrag = {};
+    lightIndexToFrag.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    lightIndexToFrag.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+    lightIndexToFrag.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    lightIndexToFrag.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    lightIndexToFrag.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    lightIndexToFrag.buffer = perTileLightIndexBuffer;
+    lightIndexToFrag.size = maxNumLightsPerTile * numTiles * sizeof( unsigned );
+
+    vkCmdPipelineBarrier( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                                    VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
+                                     nullptr, 1, &lightIndexToFrag, 0, nullptr );
+    
     vkEndCommandBuffer( GfxDeviceGlobal::computeCmdBuffer );
+
+    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pWaitDstStageMask = &pipelineStages;
+    submitInfo.waitSemaphoreCount = 0;
+    submitInfo.pWaitSemaphores = nullptr;//&GfxDeviceGlobal::presentCompleteSemaphore;
+    submitInfo.signalSemaphoreCount = 0;
+    submitInfo.pSignalSemaphores = nullptr;//&GfxDeviceGlobal::renderCompleteSemaphore;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::computeCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::computeQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit compute" );
+
+    err = vkQueueWaitIdle( GfxDeviceGlobal::computeQueue );
+    AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
+
 }

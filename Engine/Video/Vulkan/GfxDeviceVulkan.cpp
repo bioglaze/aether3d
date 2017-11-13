@@ -1533,6 +1533,14 @@ namespace ae3d
     }
 }
 
+void BindComputeDescriptorSet()
+{
+    VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
+
+    vkCmdBindDescriptorSets( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
+                             GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
+}
+
 void UploadPerObjectUbo()
 {
     std::memcpy( &ae3d::GfxDevice::GetCurrentUbo()[ 0 ], &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
@@ -1878,6 +1886,9 @@ void ae3d::GfxDevice::BeginFrame()
     GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
 
     SubmitPostPresentBarrier();
+
+    GfxDeviceGlobal::view0 = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::sampler0 = Texture2D::GetDefaultTexture()->GetSampler();
 }
 
 void ae3d::GfxDevice::Present()
