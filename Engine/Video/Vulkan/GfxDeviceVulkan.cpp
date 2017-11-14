@@ -176,7 +176,7 @@ namespace WindowGlobal
 
 namespace ae3d
 {
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex )
+    std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties )
     {
         for (std::uint32_t i = 0; i < 32; i++)
         {
@@ -184,14 +184,14 @@ namespace ae3d
             {
                 if ((GfxDeviceGlobal::deviceMemoryProperties.memoryTypes[ i ].propertyFlags & properties) == properties)
                 {
-                    *typeIndex = i;
-                    return;
+                    return i;
                 }
             }
             typeBits >>= 1;
         }
 
         ae3d::System::Assert( false, "could not get memory type" );
+        return 0;
     }
 
     void CreateMsaaColor()
@@ -219,7 +219,7 @@ namespace ae3d
         VkMemoryAllocateInfo memAlloc = {};
         memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memAlloc.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
+        memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
         
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.colorMem );
         Statistics::IncTotalAllocCalls();
@@ -269,7 +269,7 @@ namespace ae3d
         VkMemoryAllocateInfo memAlloc = {};
         memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memAlloc.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
+        memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.depthMem );
         Statistics::IncTotalAllocCalls();
@@ -439,16 +439,24 @@ namespace ae3d
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, GfxDeviceGlobal::drawCmdBuffers.data() );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
 
+        for (std::size_t i = 0; i < GfxDeviceGlobal::drawCmdBuffers.size(); ++i)
+        {
+            debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::offscreenCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "drawCmdBuffer" );
+        }
+        
         commandBufferAllocateInfo.commandBufferCount = 1;
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::postPresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::computeCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "postPresentCmdBuffer" );
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::prePresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::computeCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "prePresentCmdBuffer" );
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::offscreenCmdBuffer );
         AE3D_CHECK_VULKAN( err, "Offscreen command buffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::offscreenCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "offscreenCmdBuffer" );
 
         VkCommandBufferAllocateInfo computeBufAllocateInfo = {};
         computeBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -458,6 +466,7 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &computeBufAllocateInfo, &GfxDeviceGlobal::computeCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::computeCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "computeCmdBuffer" );
     }
 
     void SubmitPrePresentBarrier()
@@ -1232,7 +1241,7 @@ namespace ae3d
         VkMemoryRequirements memReqs;
         vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, &memReqs );
         mem_alloc.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mem_alloc.memoryTypeIndex );
+        mem_alloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &mem_alloc, nullptr, &GfxDeviceGlobal::depthStencil.mem );
         Statistics::IncTotalAllocCalls();
         AE3D_CHECK_VULKAN( err, "depth stencil memory" );
@@ -1848,7 +1857,7 @@ void ae3d::GfxDevice::CreateUniformBuffers()
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
+        allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &ubo.uboMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory UBO" );
         Statistics::IncTotalAllocCalls();

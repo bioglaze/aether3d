@@ -28,11 +28,6 @@ namespace GfxDeviceGlobal
     extern VkQueue computeQueue;
 }
 
-namespace ae3d
-{
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex );
-}
-
 void BindComputeDescriptorSet();
 void UploadPerObjectUbo();
 
@@ -86,7 +81,7 @@ void ae3d::LightTiler::Init()
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &allocInfo.memoryTypeIndex );
+        allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &perTileLightIndexBufferMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory perTileLightIndexBuffer" );
 
@@ -102,6 +97,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &perTileLightIndexBufferView );
         AE3D_CHECK_VULKAN( err, "light index buffer view" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)perTileLightIndexBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "perTileLightIndexBufferView" );
     }
 
     // Point light buffer
@@ -121,7 +117,7 @@ void ae3d::LightTiler::Init()
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
+        allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &pointLightCenterAndRadiusMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory pointLightCenterAndRadiusMemory" );
 
@@ -137,6 +133,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightBufferView );
         AE3D_CHECK_VULKAN( err, "point light buffer view" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "pointLightBufferView" );
     }
 
     // Spot light buffer
@@ -156,7 +153,7 @@ void ae3d::LightTiler::Init()
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
-        GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &allocInfo.memoryTypeIndex );
+        allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightCenterAndRadiusMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory spotLightCenterAndRadiusMemory" );
 
@@ -172,6 +169,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &spotLightBufferView );
         AE3D_CHECK_VULKAN( err, "spot light buffer view" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "spotLightBufferView" );
     }
 
     VkComputePipelineCreateInfo psoInfo = {};
@@ -181,6 +179,7 @@ void ae3d::LightTiler::Init()
     
     VkResult err = vkCreateComputePipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &psoInfo, nullptr, &pso );
     AE3D_CHECK_VULKAN( err, "Light tiler PSO" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "light tiler PSO" );
 }
 
 void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )

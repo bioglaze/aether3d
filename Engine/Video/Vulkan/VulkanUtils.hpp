@@ -13,6 +13,7 @@ namespace ae3d
         ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass, ae3d::GfxDevice::PrimitiveTopology topology );
 
     void CreateInstance( VkInstance* outInstance );
+    std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties );
 }
 
 namespace debug

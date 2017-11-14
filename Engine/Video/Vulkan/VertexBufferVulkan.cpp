@@ -15,11 +15,6 @@ namespace GfxDeviceGlobal
     extern VkQueue graphicsQueue;
 }
 
-namespace ae3d
-{
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-}
-
 namespace VertexBufferGlobal
 {
     std::vector< VkBuffer > buffersToReleaseAtExit;
@@ -101,7 +96,7 @@ void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkB
 
     vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, buffer, &memReqs );
     memAlloc.allocationSize = memReqs.size;
-    ae3d::GetMemoryType( memReqs.memoryTypeBits, memoryFlags, &memAlloc.memoryTypeIndex );
+    memAlloc.memoryTypeIndex = ae3d::GetMemoryType( memReqs.memoryTypeBits, memoryFlags );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &memory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
     Statistics::IncAllocCalls();

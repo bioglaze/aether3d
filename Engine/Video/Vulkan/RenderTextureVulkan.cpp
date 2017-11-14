@@ -8,7 +8,6 @@
 
 namespace ae3d
 {
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
     void AllocateSetupCommandBuffer();
     void FlushSetupCommandBuffer();
 }
@@ -139,7 +138,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAlloc.allocationSize = memReqs.size;
 
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
+    memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &color.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( color.mem );
@@ -189,7 +188,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, depth.image, &memReqs );
     memAlloc.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
+    memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &depth.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( depth.mem );
@@ -319,7 +318,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, color.image, &memReqs );
     memAllocInfo.allocationSize = memReqs.size;
 
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
+    memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &color.mem );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( color.mem );
@@ -383,7 +382,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAlloc.allocationSize = memReqs.size;
     
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAlloc.memoryTypeIndex );
+    memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &depth.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( depth.mem );

@@ -20,11 +20,6 @@ void Tokenize( const std::string& str,
                std::vector< std::string >& tokens,
                const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
 
-namespace ae3d
-{
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-}
-
 namespace MathUtil
 {
     int GetMipmapCount( int width, int height );
@@ -189,7 +184,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     memAllocInfo.pNext = nullptr;
     memAllocInfo.memoryTypeIndex = 0;
     memAllocInfo.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
+    memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
@@ -218,7 +213,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffer, &memReqs );
 
     memAllocInfo.allocationSize = memReqs.size;
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
+    memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
 

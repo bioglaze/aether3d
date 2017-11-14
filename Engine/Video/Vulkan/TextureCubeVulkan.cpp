@@ -13,7 +13,7 @@ bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
 namespace ae3d
 {
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
+    std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties ); // Defined in GfxDeviceVulkan.cpp 
 }
 
 namespace MathUtil
@@ -153,7 +153,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
             memAllocInfo.allocationSize = memReqs.size;
 
-            GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
+            memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
             AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
@@ -291,7 +291,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
             memAllocInfo.allocationSize = memReqs.size;
 
-            GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memAllocInfo.memoryTypeIndex );
+            memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
             AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
@@ -367,7 +367,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
     memAllocInfo.allocationSize = memReqs.size;
 
-    GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memAllocInfo.memoryTypeIndex );
+    memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
     TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
