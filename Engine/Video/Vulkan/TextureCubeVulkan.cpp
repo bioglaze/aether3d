@@ -11,11 +11,6 @@
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
-namespace ae3d
-{
-    std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties ); // Defined in GfxDeviceVulkan.cpp 
-}
-
 namespace MathUtil
 {
     bool IsPowerOfTwo( unsigned i );

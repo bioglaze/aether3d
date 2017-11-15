@@ -26,6 +26,8 @@ namespace GfxDeviceGlobal
     extern VkDescriptorSetLayout descriptorSetLayout;
     extern VkPipelineLayout pipelineLayout;
     extern VkQueue computeQueue;
+    extern VkImageView view0;
+    extern VkSampler sampler0;
 }
 
 void BindComputeDescriptorSet();
@@ -206,7 +208,11 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& pos
 
 void ae3d::LightTiler::UpdateLightBuffers()
 {
+    /*err = vkMapMemory( GfxDeviceGlobal::device, pointLightStagingMmemory, 0, pointLightCenterAndRadius.size() * 4 * sizeof( float ), 0, &pointLightBufferData );
+    AE3D_CHECK_VULKAN( err, "map staging point light memory" );
 
+    std::memcpy( pointLightBufferData, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    vkUnmapMemory( GfxDeviceGlobal::device, pointLightStagingMmemory );*/
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
@@ -228,6 +234,9 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = depthNormalTarget.GetHeight();
     GfxDeviceGlobal::perObjectUboStruct.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GetMaxNumLightsPerTile();
+
+    GfxDeviceGlobal::view0 = depthNormalTarget.GetColorView();
+    GfxDeviceGlobal::sampler0 = depthNormalTarget.GetSampler();
     
     UploadPerObjectUbo();
 

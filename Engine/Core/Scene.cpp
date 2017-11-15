@@ -522,11 +522,6 @@ void ae3d::Scene::Render()
         RenderWithCamera( camera, 0, "Primary Pass" );
 #endif
     }
-#if RENDERER_VULKAN
-//    Now handled by Scene::EndFrame()
-//    GfxDevice::EndRenderPassAndCommandBuffer();
-#endif
-
 #if RENDERER_METAL
     GfxDevice::BeginBackBufferEncoding();
 

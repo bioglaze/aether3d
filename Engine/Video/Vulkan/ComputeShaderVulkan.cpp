@@ -2,6 +2,7 @@
 #include "FileSystem.hpp"
 #include "System.hpp"
 #include "Macros.hpp"
+#include "VulkanUtils.hpp"
 
 namespace GfxDeviceGlobal
 {
@@ -39,6 +40,7 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     VkShaderModule shaderModule;
     VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
     AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "compute shader" );
     ComputeShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
 
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -64,6 +66,7 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     VkShaderModule shaderModule;
     VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
     AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, contents.path.c_str() );
     ComputeShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
 
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

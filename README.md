@@ -4,9 +4,9 @@
 
 This codebase will evolve into the next generation [Aether3D](http://twiren.kapsi.fi/aether3d.html). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
-Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.7.
+Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.7.5.
 
-Author: [Timo Wirén](http://twiren.kapsi.fi)
+Author: [Timo WirÃ©n](http://twiren.kapsi.fi)
 
 ![Screenshot](/Engine/Assets/sample.jpg)
 
@@ -14,6 +14,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
   - Windows, macOS, iOS and Linux support.
   - OpenGL 4.1, Vulkan (WIP), D3D12 and Metal renderers.
+  - Forward+ light culling
   - Component-based game object system.
   - VR support. Tested on HTC Vive and Oculus Rift.
   - Sprite rendering, texture atlasing and batching.
@@ -40,12 +41,12 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # API documentation
 
-[link](http://twiren.kapsi.fi/doc_v0.7/html/)
+[link](http://twiren.kapsi.fi/doc_v0.7.5/html/)
 
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
-  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.7.zip) and extract it into aether3d_build/Samples after building.
+  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.7.5.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 
