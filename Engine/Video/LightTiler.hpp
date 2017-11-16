@@ -66,6 +66,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkBuffer pointLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory pointLightCenterAndRadiusMemory = VK_NULL_HANDLE;
+        void* mappedPointLightCenterAndRadiusMemory = nullptr;
         VkBufferView pointLightBufferView;
 
         VkBuffer spotLightCenterAndRadiusBuffer = VK_NULL_HANDLE;

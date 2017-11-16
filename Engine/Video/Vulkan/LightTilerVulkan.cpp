@@ -1,5 +1,6 @@
 #include "LightTiler.hpp"
 #include <vector>
+#include <cstring>
 #include "ComputeShader.hpp"
 #include "RenderTexture.hpp"
 #include "Renderer.hpp"
@@ -126,6 +127,9 @@ void ae3d::LightTiler::Init()
         err = vkBindBufferMemory( GfxDeviceGlobal::device, pointLightCenterAndRadiusBuffer, pointLightCenterAndRadiusMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory pointLightCenterAndRadiusBuffer" );
 
+        err = vkMapMemory( GfxDeviceGlobal::device, pointLightCenterAndRadiusMemory, 0, bufferInfo.size, 0, &mappedPointLightCenterAndRadiusMemory );
+        AE3D_CHECK_VULKAN( err, "vkMapMemory point lights" );
+
         VkBufferViewCreateInfo bufferViewInfo = {};
         bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
         bufferViewInfo.flags = 0;
@@ -208,11 +212,7 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& pos
 
 void ae3d::LightTiler::UpdateLightBuffers()
 {
-    /*err = vkMapMemory( GfxDeviceGlobal::device, pointLightStagingMmemory, 0, pointLightCenterAndRadius.size() * 4 * sizeof( float ), 0, &pointLightBufferData );
-    AE3D_CHECK_VULKAN( err, "map staging point light memory" );
-
-    std::memcpy( pointLightBufferData, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
-    vkUnmapMemory( GfxDeviceGlobal::device, pointLightStagingMmemory );*/
+    std::memcpy( mappedPointLightCenterAndRadiusMemory, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
@@ -302,5 +302,4 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     err = vkQueueWaitIdle( GfxDeviceGlobal::computeQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
-
 }
