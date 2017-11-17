@@ -166,6 +166,9 @@ void ae3d::LightTiler::Init()
         err = vkBindBufferMemory( GfxDeviceGlobal::device, spotLightCenterAndRadiusBuffer, spotLightCenterAndRadiusMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory spotLightCenterAndRadiusBuffer" );
 
+        err = vkMapMemory( GfxDeviceGlobal::device, spotLightCenterAndRadiusMemory, 0, bufferInfo.size, 0, &mappedSpotLightCenterAndRadiusMemory );
+        AE3D_CHECK_VULKAN( err, "vkMapMemory spot lights" );
+
         VkBufferViewCreateInfo bufferViewInfo = {};
         bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
         bufferViewInfo.flags = 0;
@@ -213,6 +216,7 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& pos
 void ae3d::LightTiler::UpdateLightBuffers()
 {
     std::memcpy( mappedPointLightCenterAndRadiusMemory, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    std::memcpy( mappedSpotLightCenterAndRadiusMemory, spotLightCenterAndRadius.data(), spotLightCenterAndRadius.size() * 4 * sizeof( float ) );
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const

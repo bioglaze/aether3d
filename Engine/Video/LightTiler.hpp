@@ -71,6 +71,7 @@ namespace ae3d
 
         VkBuffer spotLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory spotLightCenterAndRadiusMemory = VK_NULL_HANDLE;
+        void* mappedSpotLightCenterAndRadiusMemory = nullptr;
         VkBufferView spotLightBufferView;
 
         VkBuffer perTileLightIndexBuffer = VK_NULL_HANDLE;
