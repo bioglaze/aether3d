@@ -40,6 +40,9 @@ void EndOffscreen();
 namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
+#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
+    extern ae3d::LightTiler lightTiler;
+#endif
 }
 
 namespace MathUtil
@@ -52,13 +55,6 @@ namespace Global
 {
     extern Vec3 vrEyePosition;
 }
-
-#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
-namespace GfxDeviceGlobal
-{
-    extern ae3d::LightTiler lightTiler;
-}
-#endif
 
 namespace SceneGlobal
 {
@@ -985,6 +981,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     tempMaterial->SetBackFaceCulling( true );
     outMaterials[ "temp material" ] = tempMaterial;
 
+    int lineNo = 0;
     while (!stream.eof())
     {
         std::getline( stream, line );
@@ -993,6 +990,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         lineStream.imbue( c_locale );
         std::string token;
         lineStream >> token;
+        
+        ++lineNo;
         
         if (token == "gameobject")
         {
@@ -1005,7 +1004,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found name but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found name but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1017,7 +1016,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found layer but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found layer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1029,7 +1028,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found layer but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found layer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1041,7 +1040,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found dirlight but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found dirlight but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
@@ -1058,7 +1057,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found spotlight but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found spotlight but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
@@ -1070,7 +1069,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found pointlight but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found pointlight but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
@@ -1082,7 +1081,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found shadow but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found shadow but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1106,7 +1105,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found camera but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found camera but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1116,7 +1115,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found ortho but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found ortho but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1128,7 +1127,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found persp but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found persp but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1140,7 +1139,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found projection but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found projection but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1165,7 +1164,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found clearcolor but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found clearcolor but there are no game objects defined before this line.\n", serialized.path.c_str() , lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1177,7 +1176,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found transform but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found transform but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1187,7 +1186,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found meshrenderer but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found meshrenderer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1199,7 +1198,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found spriterenderer but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found spriterenderer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1209,13 +1208,13 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found sprite but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found sprite but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
             if (!outGameObjects.back().GetComponent< SpriteRendererComponent >())
             {
-                System::Print( "Failed to parse %s: found sprite but the game object doesn't have a sprite renderer component.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found sprite but the game object doesn't have a sprite renderer component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1232,7 +1231,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found meshFile but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found meshFile but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1240,7 +1239,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             if (!meshRenderer)
             {
-                System::Print( "Failed to parse %s: found meshpath but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found meshpath but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1256,13 +1255,13 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found position but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found position but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
             if (!outGameObjects.back().GetComponent< TransformComponent >())
             {
-                System::Print( "Failed to parse %s: found position but the game object doesn't have a transform component.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found position but the game object doesn't have a transform component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1274,13 +1273,13 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found rotation but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found rotation but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
             if (!outGameObjects.back().GetComponent< TransformComponent >())
             {
-                System::Print( "Failed to parse %s: found rotation but the game object doesn't have a transform component.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found rotation but the game object doesn't have a transform component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1292,13 +1291,13 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found scale but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found scale but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
             if (!outGameObjects.back().GetComponent< TransformComponent >())
             {
-                System::Print( "Failed to parse %s: found scale but the game object doesn't have a transform component.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found scale but the game object doesn't have a transform component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1328,7 +1327,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found mesh_material but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found mesh_material but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
@@ -1336,13 +1335,13 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             if (!mr)
             {
-                System::Print( "Failed to parse %s: found mesh_material but the last defined game object doesn't have a mesh renderer component.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found mesh_material but the last defined game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
             if (!mr->GetMesh())
             {
-                System::Print( "Failed to parse %s: found mesh_material but the last defined game object's mesh renderer doesn't have a mesh.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found mesh_material but the last defined game object's mesh renderer doesn't have a mesh.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
@@ -1396,7 +1395,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s: found audiosource but there are no game objects defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found audiosource but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1449,7 +1448,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (currentMaterialName == "")
             {
-                System::Print( "Failed to parse %s: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
@@ -1476,7 +1475,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 #if RENDERER_METAL
             if (currentMaterialName == "")
             {
-                System::Print( "Failed to parse %s: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str() );
+                System::Print( "Failed to parse %s at line %d: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
@@ -1494,7 +1493,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         }
         else
         {
-            System::Print( "Scene parser: Unhandled token %s\n", token.c_str() );
+            System::Print( "Scene parser: Unhandled token '%s' at line %d\n", token.c_str(), lineNo );
         }
     }
 

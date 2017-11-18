@@ -188,9 +188,9 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
             outColor.rgb += max( 0.0, dotNL );// * falloff;
         }
         
-        //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
+        outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
         //outColor.rgb += -dot( lightDirVS, normalize( in.normalVS ) );
-        outColor.rgb += lightDistance < radius ? 1 : 0.25;
+        //outColor.rgb += lightDistance < radius ? 1 : 0.25;
     }
     
     // Moves past the first sentinel to get to the spot lights.

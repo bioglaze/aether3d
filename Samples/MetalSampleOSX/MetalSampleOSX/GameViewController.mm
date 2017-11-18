@@ -35,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_NUKLEAR_UI
+#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -221,7 +221,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -232,7 +232,11 @@ using namespace ae3d;
 
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
+#ifdef TEST_FORWARD_PLUS
+        mat.second->SetShader( &standardShader );
+#else
         mat.second->SetShader( &shader );
+#endif
     }
 
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
@@ -483,10 +487,11 @@ using namespace ae3d;
 #ifdef TEST_SHADOWS_POINT
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( true, 1024 );
 #endif
-    pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 1.2f );
+    pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 10.2f );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -80, 0, -85 ) );
 
+#ifdef TEST_FORWARD_PLUS
     // Inits point lights for Forward+
     {
         int pointLightIndex = 0;
@@ -498,13 +503,14 @@ using namespace ae3d;
                 pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
-                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9 + row * 2, -4, -85 + col * 2 ) );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9 + row * 4, -4, -85 + col * 4 ) );
                 scene.Add( &pointLights[ pointLightIndex ] );
                 ++pointLightIndex;
             }
         }
     }
-    
+#endif
+
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
@@ -554,8 +560,8 @@ using namespace ae3d;
     //scene.Add( &bigCube3 );
     //scene.Add( &animatedGo );
     scene.Add( &pointLight );
-    scene.Add( &spotLight );
-    scene.Add( &dirLight );
+    //scene.Add( &spotLight );
+    //scene.Add( &dirLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
     //scene.Add( &cameraCubeRT );
