@@ -1911,22 +1911,8 @@ void ae3d::GfxDevice::Present()
     submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
-
-    VkCommandBuffer buffers[] = { GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] };
-
-    const bool shouldGetQueryResults = GfxDeviceGlobal::didUseOffscreenPassOnThisFrame;
-
-    if (!GfxDeviceGlobal::didUseOffscreenPassOnThisFrame)
-    {
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
-    }
-    else
-    {
-        submitInfo.commandBufferCount = 2;
-        submitInfo.pCommandBuffers = buffers;
-        GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = false;
-    }
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
 
     VkResult err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
@@ -1947,7 +1933,7 @@ void ae3d::GfxDevice::Present()
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 
-    if (shouldGetQueryResults)
+    if (GfxDeviceGlobal::didUseOffscreenPassOnThisFrame)
     {
         uint64_t resultData[ 2 ] = { 0, 0 };
         err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint64_t ) * 2, resultData, sizeof( uint64_t ), VK_QUERY_RESULT_WITH_AVAILABILITY_BIT | VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
@@ -1961,6 +1947,7 @@ void ae3d::GfxDevice::Present()
     }
 
     GfxDeviceGlobal::pendingFreeVBs.clear();
+    GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = false;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
@@ -2077,6 +2064,21 @@ void EndOffscreen()
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
+
+    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pWaitDstStageMask = &pipelineStages;
+    submitInfo.waitSemaphoreCount = 0;
+    submitInfo.pWaitSemaphores = nullptr;//&GfxDeviceGlobal::offscreenSemaphore;
+    submitInfo.signalSemaphoreCount = 0;
+    submitInfo.pSignalSemaphores = nullptr;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::offscreenCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
