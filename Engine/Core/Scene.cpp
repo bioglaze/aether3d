@@ -804,7 +804,6 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
 #if RENDERER_VULKAN
-	GfxDevice::BeginRenderPassAndCommandBuffer();
     BeginOffscreen();
     GfxDevice::SetViewport( camera->GetViewport() );
 #endif
@@ -885,7 +884,6 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     GfxDevice::UnsetRenderTarget();
 #endif
 #if RENDERER_VULKAN
-	GfxDevice::EndRenderPassAndCommandBuffer();
     EndOffscreen();
 #endif
 

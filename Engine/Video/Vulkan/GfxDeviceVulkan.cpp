@@ -2026,6 +2026,9 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMap
 
 void BeginOffscreen()
 {
+    // FIXME: Use fence instead of queue wait.
+    vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
