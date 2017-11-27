@@ -950,6 +950,11 @@ namespace ae3d
         enabledFeatures.textureCompressionBC = true;
         enabledFeatures.fillModeNonSolid = true;
         enabledFeatures.samplerAnisotropy = true;
+
+        if (debug::enabled)
+        {
+            enabledFeatures.robustBufferAccess = true;
+        }
         
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

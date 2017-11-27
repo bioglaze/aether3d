@@ -40,10 +40,10 @@ int main()
 {
     bool fullScreen = false;
 
-    int width = 1920 / 1;
-    int height = 1080 / 1;
-    //int width = 640;
-    //int height = 480;
+    const int originalWidth = 1920 / 1;
+    const int originalHeight = 1080 / 1;
+    int width = originalWidth;
+    int height = originalHeight;
 
     if (fullScreen)
     {
@@ -70,9 +70,9 @@ int main()
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 0.1f, 200 );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
 #ifdef TEST_FORWARD_PLUS
-    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
 #endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );

@@ -79,6 +79,13 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Copy the framework into your desktop.
   - Open Samples/MetalSampleiOS and build and run it.
 
+# Tested GPUs
+  - AMD Radeon R9 Nano on Ubuntu 17.10 and Windows 10
+  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS Sierra
+  - NVIDIA GTX 980 on Windows 10
+  - NVIDIA GTX 660 on Windows 7
+  - Intel Skylake HD530 on Ubuntu 17.10
+
 # Running Tests
 
 ## Visual Studio
