@@ -1,5 +1,5 @@
 // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.7.zip
+// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.7.5.zip
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"
@@ -35,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_NUKLEAR_UI
+//#define TEST_NUKLEAR_UI
 
 #define POINT_LIGHT_COUNT 100
 #define MULTISAMPLE_COUNT 1
@@ -120,6 +120,51 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
 }
 #endif
 
+int CreateConeLines()
+{
+    std::vector< ae3d::Vec3 > lines;
+    
+    const int angleStep = 10;
+    
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f );
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f );
+        
+        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        
+        lines.push_back( ae3d::Vec3( x, y, 0 ) );
+        lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
+    }
+    
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f ) * 2;
+        
+        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+        
+        lines.push_back( ae3d::Vec3( x, y, 1 ) );
+        lines.push_back( ae3d::Vec3( x2, y2, 1 ) );
+    }
+    
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = std::cos( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = std::sin( angleDeg * 3.14159f / 180.0f ) * 2;
+        
+        const float x2 = std::cos( (angleDeg) * 3.14159f / 180.0f );
+        const float y2 = std::sin( (angleDeg) * 3.14159f / 180.0f );
+        
+        lines.push_back( ae3d::Vec3( x, y, 1 ) );
+        lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
+    }
+    
+    return ae3d::System::CreateLineBuffer( lines, ae3d::Vec3( 1, 1, 1 ) );
+}
+
 static const NSUInteger kMaxBuffersInFlight = 3;
 
 using namespace ae3d;
@@ -190,6 +235,7 @@ using namespace ae3d;
     Matrix44 lineView;
     Matrix44 lineProjection;
     int lineHandle;
+    int coneLineHandle;
     
     Scene scene2;
     GameObject bigCubeInScene2;
@@ -560,7 +606,7 @@ using namespace ae3d;
     //scene.Add( &bigCube3 );
     //scene.Add( &animatedGo );
     scene.Add( &pointLight );
-    //scene.Add( &spotLight );
+    scene.Add( &spotLight );
     //scene.Add( &dirLight );
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
@@ -583,6 +629,8 @@ using namespace ae3d;
     lines[ 2 ] = Vec3( 50, 50, -0.5f );
     lines[ 3 ] = Vec3( 10, 10, -0.5f );
     lineHandle = System::CreateLineBuffer( lines, Vec3( 1, 0, 0 ) );
+    
+    coneLineHandle = CreateConeLines();
     
     commandQueue = [device newCommandQueue];
     inFlightSemaphore = dispatch_semaphore_create( kMaxBuffersInFlight );
@@ -690,6 +738,21 @@ using namespace ae3d;
         scene.Render();
         //scene2.Render();
         //System::DrawLines( lineHandle, lineView, lineProjection );
+        Matrix44 view = camera3d.GetComponent< CameraComponent >()->GetView();
+        Matrix44 lineTransform;
+        lineTransform.MakeIdentity();
+        
+        Matrix44 spotRot;
+        spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalRotation().GetMatrix( spotRot );
+        
+        //lineTransform.Scale( spotLight->GetConeAngle(), spotLight->GetConeAngle(), spotLight->GetConeAngle() );
+        lineTransform.Scale( 2, 2, 2 );
+        Matrix44::Multiply( lineTransform, spotRot, lineTransform );
+        lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
+        Matrix44::Multiply( lineTransform, view, view );
+        System::DrawLines( coneLineHandle, view,
+                          camera3d.GetComponent< CameraComponent >()->GetProjection() );
+        rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
         
 #ifdef TEST_NUKLEAR_UI
         enum {EASY, HARD};
