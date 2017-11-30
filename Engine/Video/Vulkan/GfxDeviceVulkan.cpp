@@ -27,7 +27,7 @@
 #include <X11/Xlib-xcb.h>
 #endif
 
-#define AE3D_DESCRIPTOR_SETS_COUNT 350
+#define AE3D_DESCRIPTOR_SETS_COUNT 550
 
 extern ae3d::Renderer renderer;
 
@@ -1935,6 +1935,7 @@ void ae3d::GfxDevice::Present()
     err = queuePresentKHR( GfxDeviceGlobal::graphicsQueue, &presentInfo );
     AE3D_CHECK_VULKAN( err, "queuePresent" );
 
+    // FIXME: This slows down rendering
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 

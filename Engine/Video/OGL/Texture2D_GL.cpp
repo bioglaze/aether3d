@@ -152,7 +152,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_TEXTURE, handle, -1, fileContents.path.c_str() );
+        glObjectLabel( GL_TEXTURE, handle, -1, fileContents.path.length() < 256 ? fileContents.path.c_str() : "long texture2d name" );
     }
 
     if (GfxDevice::HasExtension( "GL_EXT_texture_filter_anisotropic" ) && anisotropy != Anisotropy::k1)

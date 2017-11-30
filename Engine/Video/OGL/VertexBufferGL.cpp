@@ -1,5 +1,6 @@
 #include "VertexBuffer.hpp"
 #include <vector>
+#include <cstring>
 #include <GL/glxw.h>
 #include "GfxDevice.hpp"
 #include "Statistics.hpp"
@@ -55,7 +56,7 @@ void ae3d::VertexBuffer::SetDebugName( const char* name )
 {
     if (GfxDevice::HasExtension( "GL_KHR_debug" ))
     {
-        glObjectLabel( GL_BUFFER, vboId, -1, name );
+        glObjectLabel( GL_BUFFER, vboId, -1, std::strlen( name ) < 256 ? name : "long vb name" );
     }
 }
 
