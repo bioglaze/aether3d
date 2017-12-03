@@ -33,7 +33,7 @@
 
 //#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
-//#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
 
@@ -527,8 +527,9 @@ using namespace ae3d;
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
 #endif
     spotLight.AddComponent<ae3d::TransformComponent>();
-    spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 8, -10 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
-
+    //spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 8, -10 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    
     pointLight.AddComponent<ae3d::PointLightComponent>();
 #ifdef TEST_SHADOWS_POINT
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( true, 1024 );
@@ -752,7 +753,7 @@ using namespace ae3d;
         Matrix44::Multiply( lineTransform, view, view );
         System::DrawLines( coneLineHandle, view,
                           camera3d.GetComponent< CameraComponent >()->GetProjection() );
-        rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
+        rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );
         
 #ifdef TEST_NUKLEAR_UI
         enum {EASY, HARD};
@@ -824,8 +825,6 @@ using namespace ae3d;
     
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     standardCubeSpotReceiver.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -90 ) );
-    
-    spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { -8, 2, -90 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

@@ -182,12 +182,9 @@ void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTe
 
         for (std::size_t t = 0; t < tokens.size(); ++t)
         {
-            if (tokens[ t ].find( "Name" ) != std::string::npos)
+            if (tokens[ t ].find( "Name" ) != std::string::npos && tokens[ t + 1 ] == textureName)
             {
-                if (tokens[ t + 1 ] == textureName)
-                {
-                    found = true;
-                }
+                found = true;
             }
 
             if (!found)

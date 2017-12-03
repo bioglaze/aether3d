@@ -16,6 +16,7 @@ namespace GfxDeviceGlobal
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
+    NSLog( @"Shader: Unimplemented method Load()\n" );
 }
 
 void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, const FileSystem::FileContentsData& /*fragmentGLSL*/,
