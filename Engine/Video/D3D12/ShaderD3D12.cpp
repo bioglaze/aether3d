@@ -130,8 +130,8 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/,
     
     if (!isInCache && !vertexDataHLSL.path.empty() && !fragmentDataHLSL.path.empty() && IsValid())
     {
-        fileWatcher.AddFile( vertexDataHLSL.path.c_str(), ShaderReload );
-        fileWatcher.AddFile( fragmentDataHLSL.path.c_str(), ShaderReload );
+        fileWatcher.AddFile( vertexDataHLSL.path, ShaderReload );
+        fileWatcher.AddFile( fragmentDataHLSL.path, ShaderReload );
         cacheEntries.push_back( { vertexDataHLSL.path, fragmentDataHLSL.path, this } );
     }
 }

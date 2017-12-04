@@ -496,45 +496,45 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     descBlend.AlphaToCoverageEnable = FALSE;
     descBlend.IndependentBlendEnable = FALSE;
 
-    const D3D12_RENDER_TARGET_BLEND_DESC blendOff =
-    {
-        FALSE, FALSE,
-        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-        D3D12_LOGIC_OP_NOOP,
-        D3D12_COLOR_WRITE_ENABLE_ALL,
-    };
-
-    D3D12_RENDER_TARGET_BLEND_DESC blendAlpha = {};
-    blendAlpha.BlendEnable = TRUE;
-    blendAlpha.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    blendAlpha.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-    blendAlpha.SrcBlendAlpha = D3D12_BLEND_ONE;
-    blendAlpha.DestBlendAlpha = D3D12_BLEND_ZERO;
-    blendAlpha.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    blendAlpha.BlendOp = D3D12_BLEND_OP_ADD;
-    blendAlpha.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-    D3D12_RENDER_TARGET_BLEND_DESC blendAdd = {};
-    blendAdd.BlendEnable = TRUE;
-    blendAdd.SrcBlend = D3D12_BLEND_ONE;
-    blendAdd.DestBlend = D3D12_BLEND_ONE;
-    blendAdd.SrcBlendAlpha = D3D12_BLEND_ONE;
-    blendAdd.DestBlendAlpha = D3D12_BLEND_ONE;
-    blendAdd.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    blendAdd.BlendOp = D3D12_BLEND_OP_ADD;
-    blendAdd.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
     if (blendMode == ae3d::GfxDevice::BlendMode::Off)
     {
+        const D3D12_RENDER_TARGET_BLEND_DESC blendOff =
+        {
+            FALSE, FALSE,
+            D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+            D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+            D3D12_LOGIC_OP_NOOP,
+            D3D12_COLOR_WRITE_ENABLE_ALL,
+        };
+
         descBlend.RenderTarget[ 0 ] = blendOff;
     }
     else if (blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend)
     {
+        D3D12_RENDER_TARGET_BLEND_DESC blendAlpha = {};
+        blendAlpha.BlendEnable = TRUE;
+        blendAlpha.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+        blendAlpha.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+        blendAlpha.SrcBlendAlpha = D3D12_BLEND_ONE;
+        blendAlpha.DestBlendAlpha = D3D12_BLEND_ZERO;
+        blendAlpha.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        blendAlpha.BlendOp = D3D12_BLEND_OP_ADD;
+        blendAlpha.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
         descBlend.RenderTarget[ 0 ] = blendAlpha;
     }
     else if (blendMode == ae3d::GfxDevice::BlendMode::Additive)
     {
+        D3D12_RENDER_TARGET_BLEND_DESC blendAdd = {};
+        blendAdd.BlendEnable = TRUE;
+        blendAdd.SrcBlend = D3D12_BLEND_ONE;
+        blendAdd.DestBlend = D3D12_BLEND_ONE;
+        blendAdd.SrcBlendAlpha = D3D12_BLEND_ONE;
+        blendAdd.DestBlendAlpha = D3D12_BLEND_ONE;
+        blendAdd.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        blendAdd.BlendOp = D3D12_BLEND_OP_ADD;
+        blendAdd.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
         descBlend.RenderTarget[ 0 ] = blendAdd;
     }
     else

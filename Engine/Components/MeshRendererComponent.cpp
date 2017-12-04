@@ -170,12 +170,14 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
 
                 for (size_t j = 0; j < bones.size(); ++j)
                 {
-                    if (!subMeshes[ subMeshIndex ].joints[ j ].animTransforms.empty())
+                    const auto& joint = subMeshes[ subMeshIndex ].joints[ j ];
+
+                    if (!joint.animTransforms.empty())
                     {
-                        const std::size_t frames = subMeshes[ subMeshIndex ].joints[ j ].animTransforms.size();
-                        Matrix44::Multiply( subMeshes[ subMeshIndex ].joints[ j ].globalBindposeInverse,
-                                           subMeshes[ subMeshIndex ].joints[ j ].animTransforms[ animFrame % frames ],
-                                           bones[ j ] );
+                        const std::size_t frames = joint.animTransforms.size();
+                        Matrix44::Multiply( joint.globalBindposeInverse,
+                                            joint.animTransforms[ animFrame % frames ],
+                                            bones[ j ] );
                     }
                 }
 

@@ -299,8 +299,6 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
 
-    std::vector<VkBufferImageCopy> bufferCopyRegions;
-
     for (int i = 1; i < mipLevelCount; ++i)
     {
         const std::int32_t mipWidth = MathUtil::Max( width >> i, 1 );

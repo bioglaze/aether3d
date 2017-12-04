@@ -301,7 +301,6 @@ namespace ae3d
         void FindOrthonormals( const Vec3& normal, Vec3& orthonormal1, Vec3& orthonormal2 ) const
         {
             Matrix44 orthoX( 90,  0, 0 );
-            Matrix44 orthoY(  0, 90, 0 );
             
             Vec3 ww;
             Matrix44::TransformDirection( normal, orthoX, &ww );
@@ -309,6 +308,7 @@ namespace ae3d
             
             if (std::fabs( dot ) > 0.6f)
             {
+                Matrix44 orthoY( 0, 90, 0 );
                 Matrix44::TransformDirection( normal, orthoY, &ww );
             }
             

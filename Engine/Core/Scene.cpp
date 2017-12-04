@@ -383,11 +383,11 @@ void ae3d::Scene::Render()
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
 
-            auto cameraPos = cameraTransform->GetWorldPosition();
-            auto cameraDir = cameraTransform->GetViewDirection();
-
             if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
             {
+                auto cameraPos = cameraTransform->GetWorldPosition();
+                auto cameraDir = cameraTransform->GetViewDirection();
+
                 AudioSystem::SetListenerPosition( cameraPos.x, cameraPos.y, cameraPos.z );
                 AudioSystem::SetListenerOrientation( cameraDir.x, cameraDir.y, cameraDir.z );
             }
@@ -1448,7 +1448,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         }
         else if (token == "shaders")
         {
-            if (currentMaterialName == "")
+            if (currentMaterialName.empty())
             {
                 System::Print( "Failed to parse %s at line %d: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
