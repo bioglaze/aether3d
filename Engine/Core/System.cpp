@@ -107,7 +107,7 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     //proj.MakeProjection( 0, windowWidth, 0, windowHeight, -1, 1);
     //GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &proj.m[ 0 ] );
     
-    GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, texture, offset );
+    GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, offset );
 }
 
 void ae3d::System::EnableWindowsMemleakDetection()

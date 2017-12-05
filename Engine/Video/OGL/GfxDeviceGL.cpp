@@ -252,7 +252,7 @@ void ae3d::GfxDevice::UnmapUIVertexBuffer()
     glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* offset )
 {
     glEnable( GL_BLEND );
     glBlendEquation( GL_FUNC_ADD );

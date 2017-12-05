@@ -65,11 +65,6 @@ void ae3d::Material::Apply()
         ++texUnit;
     }
 
-    for (const auto& mat4 : mat4s)
-    {
-        shader->SetMatrix( mat4.first.c_str(), &mat4.second.m[ 0 ] );
-    }
-
     for (const auto& globalTexRT : sTexRTs)
     {
         shader->SetRenderTexture( globalTexRT.first.c_str(), globalTexRT.second, texUnit );
@@ -105,11 +100,6 @@ void ae3d::Material::Apply()
     {
         GfxDevice::SetPolygonOffset( false, 0, 0 );
     }
-}
-
-void ae3d::Material::SetMatrix( const char* name, const Matrix44& matrix )
-{
-    mat4s[ name ] = matrix;
 }
 
 void ae3d::Material::SetShader( Shader* aShader )

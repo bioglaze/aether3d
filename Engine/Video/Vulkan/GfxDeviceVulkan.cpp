@@ -1566,7 +1566,7 @@ void ae3d::GfxDevice::Init( int width, int height )
     GfxDeviceGlobal::backBufferHeight = height;
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* /*texture*/, void* offset )
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* /*offset*/ )
 {
     int viewport[ 4 ] = { vpX < 8192 ? std::abs( vpX )  : 8192, vpY < 8192 ? std::abs( vpY ) : 8192, vpWidth < 8192 ? vpWidth : 8192, vpHeight < 8192 ? vpHeight : 8192 };
     SetViewport( viewport );

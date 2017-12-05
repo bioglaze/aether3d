@@ -920,14 +920,14 @@ void ae3d::CreateRenderer( int samples )
     GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset )
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* /*offset*/ )
 {
     int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
     SetViewport( viewport );
     Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
-void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
+void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, void** outMappedVertices, void** outMappedIndices )
 {
     *outMappedVertices = GfxDeviceGlobal::uiVertices.data();
     *outMappedIndices = GfxDeviceGlobal::uiFaces.data();

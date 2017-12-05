@@ -76,10 +76,6 @@ namespace ae3d
         /// \param blending Blending mode. Defaults to off.
         void SetBlendingMode( BlendingMode blending ) { blendingMode = blending; }
         
-        /// \param name Name. This is a uniform in the shader.
-        /// \param matrix 4x4 matrix.
-        void SetMatrix( const char* name, const Matrix44& matrix );
-        
         /// \param shader Shader.
         void SetShader( Shader* shader );
 
@@ -125,7 +121,6 @@ namespace ae3d
         std::unordered_map< std::string, Texture2D* > tex2ds;
         std::unordered_map< std::string, TextureCube* > texCubes;
         std::unordered_map< std::string, RenderTexture* > texRTs;
-        std::unordered_map< std::string, Matrix44 > mat4s;
         Shader* shader = nullptr;
         DepthFunction depthFunction = DepthFunction::LessOrEqualWriteOn;
         BlendingMode blendingMode = BlendingMode::Off;
