@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{06752E2C-BE3A-4B85-86C7-2460F26ADDAF}</ProjectGuid>
     <RootNamespace>NuklearTest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -69,19 +69,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>NuklearTest_GL_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>NuklearTest_Vulkan_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug D3D12|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>NuklearTest_D3D12_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>NuklearTest_GL_r</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

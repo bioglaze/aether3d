@@ -112,7 +112,7 @@ int main()
         }
         else if (frame == 5)
         {
-            Vec3 screenPoint = camera.GetComponent<CameraComponent>()->GetScreenPoint( Vec3( 320, 200, 0 ), width, height );
+            Vec3 screenPoint = camera.GetComponent<CameraComponent>()->GetScreenPoint( Vec3( 320, 200, 0 ), (float)width, (float)height );
             System::Print( "screen point: %f, %f, %f\n", screenPoint.x, screenPoint.y, screenPoint.z );
         }
 

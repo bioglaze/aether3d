@@ -1290,7 +1290,8 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
-        VkDescriptorPoolSize typeCounts[ 5 ];
+        const std::uint32_t typeCount = 6;
+        VkDescriptorPoolSize typeCounts[ typeCount ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
@@ -1301,11 +1302,13 @@ namespace ae3d
         typeCounts[ 3 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 4 ].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
         typeCounts[ 4 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 5 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        typeCounts[ 5 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.pNext = nullptr;
-        descriptorPoolInfo.poolSizeCount = 5;
+        descriptorPoolInfo.poolSizeCount = typeCount;
         descriptorPoolInfo.pPoolSizes = typeCounts;
         descriptorPoolInfo.maxSets = AE3D_DESCRIPTOR_SETS_COUNT;
         descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
@@ -1383,8 +1386,17 @@ namespace ae3d
         bufferSetUAV.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetLightIndexBufferView();
         bufferSetUAV.dstBinding = 4;
 
-        const int setCount = 5;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV };
+        // Binding 5 : Image
+        VkWriteDescriptorSet imageSet2 = {};
+        imageSet2.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        imageSet2.dstSet = outDescriptorSet;
+        imageSet2.descriptorCount = 1;
+        imageSet2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        imageSet2.pImageInfo = &samplerDesc; // FIXME: Get from a function parameter
+        imageSet2.dstBinding = 5;
+
+        const int setCount = 6;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2 };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1432,8 +1444,16 @@ namespace ae3d
         layoutBindingBufferUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingBufferUAV.pImmutableSamplers = nullptr;
 
-        const int bindingCount = 5;
-        const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer, layoutBindingBufferUAV };
+        // Binding 5 : Image
+        VkDescriptorSetLayoutBinding layoutBindingImage2 = {};
+        layoutBindingImage2.binding = 5;
+        layoutBindingImage2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindingImage2.descriptorCount = 1;
+        layoutBindingImage2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindingImage2.pImmutableSamplers = nullptr;
+
+        const int bindingCount = 6;
+        const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer, layoutBindingBufferUAV, layoutBindingImage2 };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

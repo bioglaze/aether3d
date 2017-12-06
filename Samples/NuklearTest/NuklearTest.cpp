@@ -205,7 +205,7 @@ int main()
         static int op = EASY;
         static float value = 0.6f;
         
-        if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE ))
+        if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
         {
             nk_layout_row_static( &ctx, 30, 80, 1 );
             

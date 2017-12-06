@@ -93,29 +93,35 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>OpenWindow_GL_d</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>OpenWindow_Vulkan_d</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Vulkan|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>OpenWindow_Vulkan_r</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug D3D12|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>OpenWindow_D3D12_d</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>OpenWindow_GL_r</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release D3D12|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>OpenWindow_D3D12_r</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -136,10 +142,12 @@
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy builtin assets</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -164,10 +172,12 @@
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy builtin assets</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -197,10 +207,12 @@
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy builtin assets</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -225,10 +237,12 @@
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy builtin assets</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -257,10 +271,12 @@
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy builtin assets</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
@@ -289,10 +305,12 @@
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\Engine\Assets ..\..\..\..\aether3d_build\Samples</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy builtin assets</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>

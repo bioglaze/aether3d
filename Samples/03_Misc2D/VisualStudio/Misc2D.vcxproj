@@ -79,24 +79,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>Misc2D_GL_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>Misc2D_Vulkan_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug D3D12|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>Misc2D_D3D12_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release D3D12|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>Misc2D_D3D12_r</TargetName>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\..\..\aether3d_build\Samples\</OutDir>
+    <OutDir>..\..\..\..\aether3d_build\</OutDir>
     <TargetName>Misc2D_GL_r</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

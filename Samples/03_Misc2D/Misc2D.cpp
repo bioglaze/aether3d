@@ -157,7 +157,7 @@ int main()
 
     Matrix44 lineView;
     Matrix44 lineProjection;
-    lineProjection.MakeProjection( 0, width, height, 0, 0, 1 );
+    lineProjection.MakeProjection( 0, (float)width, (float)height, 0, 0, 1 );
     std::vector< Vec3 > lines( 4 );
     lines[ 0 ] = Vec3( 10, 10, -0.5f );
     lines[ 1 ] = Vec3( 50, 10, -0.5f );
