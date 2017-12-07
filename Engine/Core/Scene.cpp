@@ -571,6 +571,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     }
 
     GfxDevice::SetViewport( camera->GetViewport() );
+    GfxDevice::SetScissor( camera->GetViewport() );
 #endif
 #ifndef RENDERER_METAL
     GfxDevice::PushGroupMarker( debugGroupName );
@@ -752,6 +753,7 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
     GfxDevice::SetRenderTarget( &camera->GetDepthNormalsTexture(), cubeMapFace );
 #if RENDERER_VULKAN
     BeginOffscreen();
+    GfxDevice::SetScissor( camera->GetViewport() );
 #endif
     GfxDevice::SetViewport( camera->GetViewport() );
     GfxDevice::ClearScreen( GfxDevice::ClearFlags::Color | GfxDevice::ClearFlags::Depth );
@@ -809,6 +811,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #endif
 #if RENDERER_VULKAN
     BeginOffscreen();
+    GfxDevice::SetScissor( camera->GetViewport() );
     GfxDevice::SetViewport( camera->GetViewport() );
 #endif
 
@@ -1001,6 +1004,9 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             std::string name;
             lineStream >> name;
             outGameObjects.back().SetName( name.c_str() );
+        }
+        else if (token == "")
+        {
         }
         else if (token == "name")
         {

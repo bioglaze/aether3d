@@ -131,7 +131,8 @@ namespace ae3d
         void SetMultiSampling( bool enable );
         void Set_sRGB_Writes( bool enable );
         void SetViewport( int viewport[ 4 ] );
-        
+        void SetScissor( int scissor[ 4 ] );
+
         void PushGroupMarker( const char* name );
         void PopGroupMarker();
 

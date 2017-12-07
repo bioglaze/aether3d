@@ -199,6 +199,7 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     viewport[ 2 ] = (int)xScreenSize;
     viewport[ 3 ] = (int)yScreenSize;
     GfxDevice::SetViewport( viewport );
+    //GfxDevice::SetScissor( viewport );
 
     GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend,
                      GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );

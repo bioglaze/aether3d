@@ -922,8 +922,8 @@ void ae3d::CreateRenderer( int samples )
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* /*offset*/ )
 {
-    int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
-    SetViewport( viewport );
+    int scissor[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
+    SetScissor( scissor );
     Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
@@ -1158,6 +1158,16 @@ void ae3d::GfxDevice::SetViewport( int viewport[ 4 ] )
 {
     D3D12_VIEWPORT viewPort{ (FLOAT)viewport[ 0 ], (FLOAT)viewport[ 1 ], (FLOAT)viewport[ 2 ], (FLOAT)viewport[ 3 ], 0, 1 };
     GfxDeviceGlobal::graphicsCommandList->RSSetViewports( 1, &viewPort );
+}
+
+void ae3d::GfxDevice::SetScissor( int scissor[ 4 ] )
+{
+    D3D12_RECT rect = {};
+    rect.left = scissor[ 0 ];
+    rect.right = scissor[ 2 ];
+    rect.top = scissor[ 1 ];
+    rect.bottom = scissor[ 3 ];
+    GfxDeviceGlobal::graphicsCommandList->RSSetScissorRects( 1, &rect );
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )

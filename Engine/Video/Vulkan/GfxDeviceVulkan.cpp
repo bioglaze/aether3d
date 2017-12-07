@@ -1588,8 +1588,8 @@ void ae3d::GfxDevice::Init( int width, int height )
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* /*offset*/ )
 {
-    int viewport[ 4 ] = { vpX < 8192 ? std::abs( vpX )  : 8192, vpY < 8192 ? std::abs( vpY ) : 8192, vpWidth < 8192 ? vpWidth : 8192, vpHeight < 8192 ? vpHeight : 8192 };
-    SetViewport( viewport );
+    int scissor[ 4 ] = { vpX < 8192 ? std::abs( vpX )  : 8192, vpY < 8192 ? std::abs( vpY ) : 8192, vpWidth < 8192 ? vpWidth : 8192, vpHeight < 8192 ? vpHeight : 8192 };
+    SetScissor( scissor );
     Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
@@ -1779,13 +1779,16 @@ void ae3d::GfxDevice::SetViewport( int aViewport[ 4 ] )
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
-    vkCmdSetViewport( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &viewport );
-    
+    vkCmdSetViewport( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &viewport );    
+}
+
+void ae3d::GfxDevice::SetScissor( int aScissor[ 4 ] )
+{
     VkRect2D scissor = {};
-    scissor.extent.width = (std::uint32_t)aViewport[ 2 ];
-    scissor.extent.height = (std::uint32_t)aViewport[ 3 ];
-    scissor.offset.x = 0;
-    scissor.offset.y = 0;
+    scissor.extent.width = (std::uint32_t)aScissor[ 2 ];
+    scissor.extent.height = (std::uint32_t)aScissor[ 3 ];
+    scissor.offset.x = (std::uint32_t)aScissor[ 0 ];
+    scissor.offset.y = (std::uint32_t)aScissor[ 1 ];
     vkCmdSetScissor( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &scissor );
 }
 

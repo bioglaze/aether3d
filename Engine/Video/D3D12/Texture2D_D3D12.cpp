@@ -212,7 +212,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
 
     D3D12_SUBRESOURCE_DATA texResource = {};
     texResource.pData = imageData;
-    texResource.RowPitch = Texture2DGlobal::defaultTexture.width * channels * 4;
+    texResource.RowPitch = width * channels;
     texResource.SlicePitch = texResource.RowPitch * height;
     InitializeTexture( gpuResource, &texResource, 1 );
 
@@ -225,7 +225,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
     srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-    handle = static_cast< unsigned >(Texture2DGlobal::defaultTexture.srv.ptr);
+    handle = static_cast< unsigned >(srv.ptr);
 
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 }
