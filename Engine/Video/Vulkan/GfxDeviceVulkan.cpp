@@ -118,7 +118,9 @@ namespace GfxDeviceGlobal
     ae3d::RenderTexture* renderTexture0 = nullptr;
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
     VkImageView view0 = VK_NULL_HANDLE;
+    VkImageView view1 = VK_NULL_HANDLE;
     VkSampler sampler0 = VK_NULL_HANDLE;
+    VkSampler sampler1 = VK_NULL_HANDLE;
     std::vector< VkBuffer > pendingFreeVBs;
     std::vector< Ubo > ubos;
     int currentUbo = 0;
@@ -1331,7 +1333,7 @@ namespace ae3d
         }
     }
 
-    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view, VkSampler sampler )
+    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1 )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
@@ -1345,10 +1347,10 @@ namespace ae3d
         uboSet.pBufferInfo = &uboDesc;
         uboSet.dstBinding = 0;
 
-        VkDescriptorImageInfo samplerDesc = {};
-        samplerDesc.sampler = sampler;
-        samplerDesc.imageView = view;
-        samplerDesc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        VkDescriptorImageInfo sampler0Desc = {};
+        sampler0Desc.sampler = sampler0;
+        sampler0Desc.imageView = view0;
+        sampler0Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         // Binding 1 : Image
         VkWriteDescriptorSet imageSet = {};
@@ -1356,8 +1358,13 @@ namespace ae3d
         imageSet.dstSet = outDescriptorSet;
         imageSet.descriptorCount = 1;
         imageSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        imageSet.pImageInfo = &samplerDesc;
+        imageSet.pImageInfo = &sampler0Desc;
         imageSet.dstBinding = 1;
+
+        VkDescriptorImageInfo sampler1Desc = {};
+        sampler1Desc.sampler = sampler1;
+        sampler1Desc.imageView = view1;
+        sampler1Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         // Binding 2 : Sampler
         VkWriteDescriptorSet samplerSet = {};
@@ -1365,7 +1372,7 @@ namespace ae3d
         samplerSet.dstSet = outDescriptorSet;
         samplerSet.descriptorCount = 1;
         samplerSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-        samplerSet.pImageInfo = &samplerDesc;
+        samplerSet.pImageInfo = &sampler0Desc;
         samplerSet.dstBinding = 2;
 
         // Binding 3 : Buffer
@@ -1392,7 +1399,7 @@ namespace ae3d
         imageSet2.dstSet = outDescriptorSet;
         imageSet2.descriptorCount = 1;
         imageSet2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        imageSet2.pImageInfo = &samplerDesc; // FIXME: Get from a function parameter
+        imageSet2.pImageInfo = &sampler1Desc;
         imageSet2.dstBinding = 5;
 
         const int setCount = 6;
@@ -1569,7 +1576,7 @@ namespace ae3d
 
 void BindComputeDescriptorSet()
 {
-    VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
+    VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::view1, GfxDeviceGlobal::sampler1 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1838,7 +1845,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     UploadPerObjectUbo();
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0 );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::view1, GfxDeviceGlobal::sampler1 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1926,6 +1933,8 @@ void ae3d::GfxDevice::BeginFrame()
 
     GfxDeviceGlobal::view0 = Texture2D::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::sampler0 = Texture2D::GetDefaultTexture()->GetSampler();
+    GfxDeviceGlobal::view1 = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::sampler1 = Texture2D::GetDefaultTexture()->GetSampler();
 }
 
 void ae3d::GfxDevice::Present()

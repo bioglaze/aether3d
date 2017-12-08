@@ -103,10 +103,12 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     renderer.builtinShaders.uiShader.SetTexture( "textureMap", texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
 
-    //Matrix44 proj;
-    //proj.MakeProjection( 0, windowWidth, 0, windowHeight, -1, 1);
-    //GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &proj.m[ 0 ] );
-    
+#if RENDERER_VULKAN
+    Matrix44 proj;
+    proj.MakeProjection( 0, (float)windowWidth, (float)windowHeight, 0, -1, 1 );
+    GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &proj.m[ 0 ] );
+#endif
+
     GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, offset );
 }
 
@@ -190,7 +192,7 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     Matrix44::Multiply( scale, proj, mvp );
     
     renderer.builtinShaders.spriteRendererShader.Use();
-    renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 1 );
+    renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip = mvp;
 
     int viewport[ 4 ];
