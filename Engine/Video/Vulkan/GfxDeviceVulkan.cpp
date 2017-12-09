@@ -102,6 +102,7 @@ namespace GfxDeviceGlobal
     std::vector< VkImage > swapchainImages;
     std::vector< SwapchainBuffer > swapchainBuffers;
     std::vector< VkFramebuffer > frameBuffers;
+    VkPhysicalDeviceFeatures deviceFeatures;
     VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE;
     VkSemaphore renderCompleteSemaphore = VK_NULL_HANDLE;
     VkSemaphore offscreenSemaphore = VK_NULL_HANDLE;
@@ -944,14 +945,16 @@ namespace ae3d
             }
         }
 
+        vkGetPhysicalDeviceFeatures( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::deviceFeatures );
+
         VkPhysicalDeviceFeatures enabledFeatures = {};
-        enabledFeatures.tessellationShader = true;
-        enabledFeatures.shaderTessellationAndGeometryPointSize = true;
-        enabledFeatures.shaderClipDistance = true;
-        enabledFeatures.shaderCullDistance = true;
-        enabledFeatures.textureCompressionBC = true;
-        enabledFeatures.fillModeNonSolid = true;
-        enabledFeatures.samplerAnisotropy = true;
+        enabledFeatures.tessellationShader = GfxDeviceGlobal::deviceFeatures.tessellationShader;
+        enabledFeatures.shaderTessellationAndGeometryPointSize = GfxDeviceGlobal::deviceFeatures.shaderTessellationAndGeometryPointSize;
+        enabledFeatures.shaderClipDistance = GfxDeviceGlobal::deviceFeatures.shaderClipDistance;
+        enabledFeatures.shaderCullDistance = GfxDeviceGlobal::deviceFeatures.shaderCullDistance;
+        enabledFeatures.textureCompressionBC = GfxDeviceGlobal::deviceFeatures.textureCompressionBC;
+        enabledFeatures.fillModeNonSolid = GfxDeviceGlobal::deviceFeatures.fillModeNonSolid;
+        enabledFeatures.samplerAnisotropy = GfxDeviceGlobal::deviceFeatures.samplerAnisotropy;
 
         if (debug::enabled)
         {

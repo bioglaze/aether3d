@@ -35,6 +35,7 @@ namespace GfxDeviceGlobal
     extern VkCommandPool cmdPool;
     extern VkPhysicalDeviceProperties properties;
     extern VkCommandBuffer texCmdBuffer;
+    extern VkPhysicalDeviceFeatures deviceFeatures;
 }
 
 namespace Texture2DGlobal
@@ -115,13 +116,13 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
         LoadSTB( fileContents );
     }
-    else if (isDDS)
+    else if (isDDS && GfxDeviceGlobal::deviceFeatures.textureCompressionBC)
     {
         LoadDDS( fileContents.path.c_str() );
     }
     else
     {
-        ae3d::System::Print( "Unknown texture file extension: %s\n", fileContents.path.c_str() );
+        System::Print( "Unknown/unsupported texture file extension: %s\n", fileContents.path.c_str() );
     }
 
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, fileContents.path.c_str() );
