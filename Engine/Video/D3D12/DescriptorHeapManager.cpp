@@ -49,7 +49,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::AllocateDescriptor( D3D12_DES
     desc.Type = type;
     desc.NumDescriptors = DescriptorHeapManager::numDescriptors;
     desc.Flags = (type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV || type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV) ? (D3D12_DESCRIPTOR_HEAP_FLAGS)0 : D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    desc.NodeMask = 1;
+    desc.NodeMask = 0;
 
     if (type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
     {

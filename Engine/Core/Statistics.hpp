@@ -47,8 +47,8 @@ namespace Statistics
     int GetTotalAllocCalls();
     void IncPSOBindCalls();
     int GetPSOBindCalls();
-    void SetDepthNormalsGpuTime( float theTime );
-    void SetShadowMapGpuTime( float theTime );
+    void SetDepthNormalsGpuTime( float timeMS );
+    void SetShadowMapGpuTime( float timeMS );
 }
 
 #endif

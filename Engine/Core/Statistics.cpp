@@ -43,14 +43,14 @@ float Statistics::GetPresentTimeMS()
     return presentTimeMS;
 }
 
-void Statistics::SetDepthNormalsGpuTime( float theTime )
+void Statistics::SetDepthNormalsGpuTime( float timeMS )
 {
-    depthNormalsTimeGpuMS = theTime;
+    depthNormalsTimeGpuMS = timeMS;
 }
 
-void Statistics::SetShadowMapGpuTime( float theTime )
+void Statistics::SetShadowMapGpuTime( float timeMS )
 {
-    shadowMapTimeGpuMS = theTime;
+    shadowMapTimeGpuMS = timeMS;
 }
 
 void Statistics::BeginPresentTimeProfiling()

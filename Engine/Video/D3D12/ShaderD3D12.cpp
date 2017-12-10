@@ -211,6 +211,10 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int t
     {
         GfxDeviceGlobal::texture1 = texture;
     }
+    else
+    {
+        System::Print( "SetTexture: too high texture unit %d\n", textureUnit );
+    }
 
     const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
     SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
