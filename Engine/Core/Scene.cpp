@@ -1005,7 +1005,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> name;
             outGameObjects.back().SetName( name.c_str() );
         }
-        else if (token == "")
+        else if (token.empty())
         {
         }
         else if (token == "name")

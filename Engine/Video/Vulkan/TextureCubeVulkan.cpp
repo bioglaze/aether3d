@@ -24,6 +24,7 @@ namespace GfxDeviceGlobal
     extern VkCommandPool cmdPool;
     extern VkPhysicalDeviceProperties properties;
     extern VkCommandBuffer texCmdBuffer;
+    extern VkPhysicalDeviceFeatures deviceFeatures;
 }
 
 namespace TextureCubeGlobal
@@ -78,7 +79,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
 
-    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
     VkImageCreateInfo imageCreateInfo = {};
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -229,10 +230,9 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                                  0,
                                  0, nullptr,
                                  0, nullptr,
-                                 1, &imageMemoryBarrier );
-            
+                                 1, &imageMemoryBarrier );            
         }
-        else if (isDDS)
+        else if (isDDS && GfxDeviceGlobal::deviceFeatures.textureCompressionBC)
         {
             DDSLoader::Output ddsOutput;
             auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
@@ -311,30 +311,14 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             bytesPerPixel = 4;
 
-            if (MathUtil::IsPowerOfTwo( width ) && MathUtil::IsPowerOfTwo( height ))
-            {
-                std::memcpy( mapped, &fileContents.data[ ddsOutput.dataOffsets[ face ] ], width * height * bytesPerPixel );
-            }
-            else
-            {
-                const std::size_t rowSize = bytesPerPixel * width;
-                char* mappedPos = (char*)mapped;
-                char* dataPos = (char*)&fileContents.data[ ddsOutput.dataOffsets[ face ] ];
-
-                for (int i = 0; i < height; ++i)
-                {
-                    std::memcpy( mappedPos, dataPos, rowSize );
-                    mappedPos += subResLayout.rowPitch;
-                    dataPos += rowSize;
-                }
-            }
+            std::memcpy( mapped, &ddsOutput.imageData[ ddsOutput.dataOffsets[ 0 ] ], width * height * bytesPerPixel );
 
             VkMappedMemoryRange flushRange = {};
             flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
             flushRange.pNext = nullptr;
             flushRange.memory = deviceMemories[ face ];
             flushRange.offset = 0;
-            flushRange.size = width * height * bytesPerPixel;
+            flushRange.size = memReqs.size;
             vkFlushMappedMemoryRanges( GfxDeviceGlobal::device, 1, &flushRange );
 
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
@@ -344,6 +328,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 VK_IMAGE_ASPECT_COLOR_BIT,
                 VK_IMAGE_LAYOUT_UNDEFINED,
                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 0, 1 );
+        }
+        else
+        {
+            System::Print( "Unknown/unsupported texture file extension: %s\n", paths[ face ].c_str() );
         }
     }
  
@@ -451,7 +439,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.pNext = nullptr;
     viewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
-    viewInfo.format = format;
+    viewInfo.format = imageCreateInfo.format;
     viewInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
     viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     viewInfo.subresourceRange.baseMipLevel = 0;
