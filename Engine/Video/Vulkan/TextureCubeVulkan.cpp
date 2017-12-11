@@ -466,7 +466,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     samplerInfo.maxLod = static_cast< float >( mipLevelCount );
     samplerInfo.maxAnisotropy = 1;
     samplerInfo.anisotropyEnable = VK_FALSE;
-    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     TextureCubeGlobal::samplersToReleaseAtExit.push_back( sampler );

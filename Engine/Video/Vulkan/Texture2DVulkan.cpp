@@ -373,9 +373,9 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
     samplerInfo.minLod = 0;
     samplerInfo.maxLod = static_cast< float >(mipLevelCount);
-    samplerInfo.maxAnisotropy = GetFloatAnisotropy( anisotropy );
-    samplerInfo.anisotropyEnable = (anisotropy != Anisotropy::k1) ? VK_TRUE : VK_FALSE;
-    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    samplerInfo.maxAnisotropy = GfxDeviceGlobal::deviceFeatures.samplerAnisotropy ? GetFloatAnisotropy( anisotropy ) : 1;
+    samplerInfo.anisotropyEnable = (anisotropy != Anisotropy::k1 && GfxDeviceGlobal::deviceFeatures.samplerAnisotropy) ? VK_TRUE : VK_FALSE;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     Texture2DGlobal::samplersToReleaseAtExit.push_back( sampler );

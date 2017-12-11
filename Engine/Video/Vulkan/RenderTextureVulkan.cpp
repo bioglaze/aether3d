@@ -246,7 +246,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     samplerInfo.maxLod = 1;
     samplerInfo.maxAnisotropy = 1;
     samplerInfo.anisotropyEnable = VK_FALSE;
-    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     RenderTextureGlobal::samplersToReleaseAtExit.push_back( sampler );
@@ -283,7 +283,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     }
     else
     {
-        System::Print( "Unhandled format in 2d render texture\n" );
+        System::Print( "Unhandled format in cube render texture\n" );
         colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
     }
 
@@ -320,11 +320,11 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 
     memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &color.mem );
-    AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory in RenderTextureCube" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( color.mem );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, color.image, color.mem, 0 );
-    AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
+    AE3D_CHECK_VULKAN( err, "vkBindImageMemory in RenderTextureCube" );
 
     AllocateSetupCommandBuffer();
 
@@ -348,9 +348,9 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 
     colorImageView.image = color.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageView, nullptr, &color.view );
-    AE3D_CHECK_VULKAN( err, "render texture 2d color image view" );
+    AE3D_CHECK_VULKAN( err, "render texture cube color image view" );
     RenderTextureGlobal::imageViewsToReleaseAtExit.push_back( color.view );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture 2d color view" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture cube color view" );
 
     // Depth/Stencil
 
@@ -372,9 +372,9 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     depthStencilView.subresourceRange.layerCount = 6;
 
     err = vkCreateImage( GfxDeviceGlobal::device, &depthImage, nullptr, &depth.image );
-    AE3D_CHECK_VULKAN( err, "render texture 2d depth image" );
+    AE3D_CHECK_VULKAN( err, "render texture cube depth image" );
     RenderTextureGlobal::imagesToReleaseAtExit.push_back( depth.image );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)depth.image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, "render texture 2d depth" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)depth.image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, "render texture cube depth" );
 
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, depth.image, &memReqs );
 
@@ -384,13 +384,13 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     
     memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &depth.mem );
-    AE3D_CHECK_VULKAN( err, "render texture 2d depth memory" );
+    AE3D_CHECK_VULKAN( err, "render texture cube depth memory" );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( depth.mem );
     Statistics::IncAllocCalls();
     Statistics::IncTotalAllocCalls();
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, depth.image, depth.mem, 0 );
-    AE3D_CHECK_VULKAN( err, "render texture 2d depth bind" );
+    AE3D_CHECK_VULKAN( err, "render texture cube depth bind" );
 
     SetImageLayout( GfxDeviceGlobal::setupCmdBuffer,
         depth.image,
@@ -400,9 +400,9 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 
     depthStencilView.image = depth.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &depth.view );
-    AE3D_CHECK_VULKAN( err, "render texture 2d depth view" );
+    AE3D_CHECK_VULKAN( err, "render texture cube depth view" );
     RenderTextureGlobal::imageViewsToReleaseAtExit.push_back( depth.view );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)depth.view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture 2d depth view" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)depth.view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, "render texture cube depth view" );
 
     FlushSetupCommandBuffer();
     CreateRenderPass();
@@ -423,7 +423,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     err = vkCreateFramebuffer( GfxDeviceGlobal::device, &fbufCreateInfo, nullptr, &frameBuffer );
     AE3D_CHECK_VULKAN( err, "rendertexture framebuffer" );
     RenderTextureGlobal::fbsToReleaseAtExit.push_back( frameBuffer );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)frameBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, "render texture 2d framebuffer" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)frameBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, "render texture cube framebuffer" );
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
