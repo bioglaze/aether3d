@@ -54,6 +54,9 @@ namespace ae3d
 
         /// \return render pass.
         VkRenderPass GetRenderPass() { return renderPass; }
+
+        /// \return Color image.
+        VkImage GetColorImage() { return color.image; }
 #endif
 
   private:

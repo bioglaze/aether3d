@@ -108,6 +108,7 @@ namespace GfxDeviceGlobal
     VkSemaphore offscreenSemaphore = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
     VkQueryPool queryPool = VK_NULL_HANDLE;
+    std::vector< float > timings;
     VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     std::map< std::uint64_t, VkPipeline > psoCache;
@@ -1549,13 +1550,13 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
 
         GfxDevice::SetClearColor( 0, 0, 0 );
-
         GfxDevice::CreateUniformBuffers();
 
+        GfxDeviceGlobal::timings.resize( 2 );
         VkQueryPoolCreateInfo queryPoolInfo = {};
         queryPoolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
         queryPoolInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
-        queryPoolInfo.queryCount = 2;
+        queryPoolInfo.queryCount = (std::uint32_t)GfxDeviceGlobal::timings.size() - 1;
 
         err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, nullptr, &GfxDeviceGlobal::queryPool );
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
@@ -1648,9 +1649,6 @@ void ae3d::GfxDevice::PopGroupMarker()
 
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
 {
-    //VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
-    //AE3D_CHECK_VULKAN( res, "vkDeviceWaitIdle" );
-
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     cmdBufInfo.pNext = nullptr;
@@ -1711,9 +1709,6 @@ void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
-
-    //VkResult res = vkDeviceWaitIdle( GfxDeviceGlobal::device );
-    //AE3D_CHECK_VULKAN( res, "vkDeviceWaitIdle" );
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
@@ -1976,10 +1971,17 @@ void ae3d::GfxDevice::Present()
 
     if (GfxDeviceGlobal::didUseOffscreenPassOnThisFrame)
     {
-        uint64_t resultData[ 2 ] = { 0, 0 };
-        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint64_t ) * 2, resultData, sizeof( uint64_t ), VK_QUERY_RESULT_WITH_AVAILABILITY_BIT | VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
-        uint64_t diff = resultData[ 1 ] - resultData[ 0 ];
-        Statistics::SetDepthNormalsGpuTime( diff / 1000000.0f );
+        GfxDeviceGlobal::timings.resize( 1 );
+        std::uint32_t start = 0;
+        std::uint32_t end = 0;
+        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint32_t ), &start, 0, VK_QUERY_RESULT_WAIT_BIT );
+
+        const float factor = 1e6f * GfxDeviceGlobal::properties.limits.timestampPeriod;
+        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 1, 1, sizeof( uint32_t ), &end, 0, VK_QUERY_RESULT_WAIT_BIT );
+
+        GfxDeviceGlobal::timings[ 0 ] = (float)(end - start) / factor;
+
+        Statistics::SetDepthNormalsGpuTime( GfxDeviceGlobal::timings[ 0 ] * 1000.0f );
     }
 
     for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeVBs.size(); ++i)
@@ -2067,17 +2069,25 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMap
 
 void BeginOffscreen()
 {
+    ae3d::System::Assert( GfxDeviceGlobal::renderTexture0, "Render texture must be set when beginning offscreen rendering" );
+    
     // FIXME: Use fence instead of queue wait.
     vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
-    
+
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
-    
+
+    /*ae3d::SetImageLayout( GfxDeviceGlobal::offscreenCmdBuffer,
+                          GfxDeviceGlobal::renderTexture0->GetColorImage(),
+                          VK_IMAGE_ASPECT_COLOR_BIT,
+                          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );*/
+
     vkCmdResetQueryPool( GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::queryPool, 0, 2 );
-    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 0 );
+    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 0 );
 
     VkClearValue clearValues[ 2 ];
     clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
@@ -2086,25 +2096,30 @@ void BeginOffscreen()
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBeginInfo.pNext = nullptr;
-    renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : GfxDeviceGlobal::renderPass;
+    renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderTexture0->GetRenderPass();
     renderPassBeginInfo.renderArea.offset.x = 0;
     renderPassBeginInfo.renderArea.offset.y = 0;
-    renderPassBeginInfo.renderArea.extent.width = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetWidth() : GfxDeviceGlobal::backBufferWidth;
-    renderPassBeginInfo.renderArea.extent.height = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetHeight() : GfxDeviceGlobal::backBufferHeight;
+    renderPassBeginInfo.renderArea.extent.width = GfxDeviceGlobal::renderTexture0->GetWidth();
+    renderPassBeginInfo.renderArea.extent.height = GfxDeviceGlobal::renderTexture0->GetHeight();
     renderPassBeginInfo.clearValueCount = 2;
     renderPassBeginInfo.pClearValues = clearValues;
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0;
 
     vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
 
-    GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = GfxDeviceGlobal::renderTexture0 != nullptr;
+    GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = true;
 }
 
 void EndOffscreen()
 {
+    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, GfxDeviceGlobal::queryPool, 1 );
     vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
 
-    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 1 );
+    /*ae3d::SetImageLayout( GfxDeviceGlobal::offscreenCmdBuffer,
+                          GfxDeviceGlobal::renderTexture0->GetColorImage(),
+                          VK_IMAGE_ASPECT_COLOR_BIT,
+                          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 0, 1 );*/
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
