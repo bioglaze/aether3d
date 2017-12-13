@@ -129,7 +129,6 @@ namespace GfxDeviceGlobal
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int backBufferWidth;
     int backBufferHeight;
-    bool didUseOffscreenPassOnThisFrame = false;
     unsigned frameIndex = 0;
     ae3d::LightTiler lightTiler;
     PerObjectUboStruct perObjectUboStruct;
@@ -1552,7 +1551,7 @@ namespace ae3d
         GfxDevice::SetClearColor( 0, 0, 0 );
         GfxDevice::CreateUniformBuffers();
 
-        GfxDeviceGlobal::timings.resize( 2 );
+        GfxDeviceGlobal::timings.resize( 3 );
         VkQueryPoolCreateInfo queryPoolInfo = {};
         queryPoolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
         queryPoolInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
@@ -1969,28 +1968,12 @@ void ae3d::GfxDevice::Present()
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 
-    if (GfxDeviceGlobal::didUseOffscreenPassOnThisFrame)
-    {
-        GfxDeviceGlobal::timings.resize( 1 );
-        std::uint32_t start = 0;
-        std::uint32_t end = 0;
-        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint32_t ), &start, 0, VK_QUERY_RESULT_WAIT_BIT );
-
-        const float factor = 1e6f * GfxDeviceGlobal::properties.limits.timestampPeriod;
-        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 1, 1, sizeof( uint32_t ), &end, 0, VK_QUERY_RESULT_WAIT_BIT );
-
-        GfxDeviceGlobal::timings[ 0 ] = (float)(end - start) / factor;
-
-        Statistics::SetDepthNormalsGpuTime( GfxDeviceGlobal::timings[ 0 ] * 1000.0f );
-    }
-
     for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeVBs.size(); ++i)
     {
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeVBs[ i ], nullptr );
     }
 
     GfxDeviceGlobal::pendingFreeVBs.clear();
-    GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = false;
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
@@ -2069,7 +2052,7 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMap
 
 void BeginOffscreen()
 {
-    ae3d::System::Assert( GfxDeviceGlobal::renderTexture0, "Render texture must be set when beginning offscreen rendering" );
+    ae3d::System::Assert( GfxDeviceGlobal::renderTexture0 != nullptr, "Render texture must be set when beginning offscreen rendering" );
     
     // FIXME: Use fence instead of queue wait.
     vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
@@ -2106,8 +2089,6 @@ void BeginOffscreen()
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0;
 
     vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
-
-    GfxDeviceGlobal::didUseOffscreenPassOnThisFrame = true;
 }
 
 void EndOffscreen()
@@ -2138,6 +2119,17 @@ void EndOffscreen()
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+
+	GfxDeviceGlobal::timings.resize( 1 );
+	std::uint32_t start = 0;
+	std::uint32_t end = 0;
+	err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint32_t ), &start, 0, VK_QUERY_RESULT_WAIT_BIT );
+	err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 1, 1, sizeof( uint32_t ), &end, 0, VK_QUERY_RESULT_WAIT_BIT );
+
+	const float factor = 1e6f * GfxDeviceGlobal::properties.limits.timestampPeriod;
+	GfxDeviceGlobal::timings[ 0 ] = ( float )( end - start ) / factor;
+
+	Statistics::SetDepthNormalsGpuTime( GfxDeviceGlobal::timings[ 0 ] );
 }
 
 void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
