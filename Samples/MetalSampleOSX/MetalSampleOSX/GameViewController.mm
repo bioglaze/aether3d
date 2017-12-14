@@ -33,7 +33,7 @@
 
 //#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
-#define TEST_SHADOWS_SPOT
+//#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
 
@@ -753,6 +753,7 @@ using namespace ae3d;
         Matrix44::Multiply( lineTransform, view, view );
         System::DrawLines( coneLineHandle, view,
                           camera3d.GetComponent< CameraComponent >()->GetProjection() );
+        System::Draw( &gliderTex, 40, 240, 100, 100, self.view.bounds.size.width, self.view.bounds.size.height );
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );
         
 #ifdef TEST_NUKLEAR_UI

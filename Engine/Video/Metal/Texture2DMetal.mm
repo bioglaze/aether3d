@@ -126,9 +126,6 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
-        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
-         completionBlock(metalTexture);
-         }];*/
         [commandBuffer commit];
     }
 }
@@ -146,14 +143,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     colorSpace = aColorSpace;
     anisotropy = aAnisotropy;
     path = fileContents.path;
-
-    /*const bool isCached = Texture2DGlobal::pathToCachedTexture.find( fileContents.path ) != Texture2DGlobal::pathToCachedTexture.end();
-    
-    if (isCached && handle == 0)
-    {
-        *this = Texture2DGlobal::pathToCachedTexture[ fileContents.path ];
-        return;
-    }*/
     
     const bool isPVR = fileContents.path.find( ".pvr" ) != std::string::npos || fileContents.path.find( ".PVR" ) != std::string::npos;
     const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".dds" ) != std::string::npos;
@@ -284,9 +273,6 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
-        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
-         completionBlock(metalTexture);
-         }];*/
         [commandBuffer commit];
     }
 
@@ -400,9 +386,6 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
             id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
             [commandEncoder generateMipmapsForTexture:metalTexture];
             [commandEncoder endEncoding];
-            /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
-             completionBlock(metalTexture);
-             }];*/
             [commandBuffer commit];
         }
 
@@ -521,9 +504,6 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
-        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
-         completionBlock(metalTexture);
-         }];*/
         [commandBuffer commit];
     }
 

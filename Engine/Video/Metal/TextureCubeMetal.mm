@@ -146,9 +146,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
-        /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer) {
-         completionBlock(metalTexture);
-         }];*/
         [commandBuffer commit];
     }
 }

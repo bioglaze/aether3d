@@ -873,7 +873,6 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
         renderPassDescriptorFBO.depthAttachment.slice = cubeMapFace;
         renderPassDescriptorFBO.depthAttachment.texture = depthTexture;
         renderPassDescriptorFBO.depthAttachment.loadAction = depthLoadAction;
-        //renderPassDescriptorFBO.depthAttachment.storeAction = MTLStoreActionStore;
         renderPassDescriptorFBO.depthAttachment.clearDepth = 1.0;
     }
 

@@ -65,5 +65,4 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     [commandEncoder endEncoding];
     
     [commandBuffer commit];
-    //[commandBuffer waitUntilCompleted];
 }
