@@ -27,8 +27,6 @@
 #include <X11/Xlib-xcb.h>
 #endif
 
-#define AE3D_DESCRIPTOR_SETS_COUNT 550
-
 extern ae3d::Renderer renderer;
 
 PFN_vkCreateSwapchainKHR createSwapchainKHR = nullptr;
@@ -1295,6 +1293,8 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
+        const int AE3D_DESCRIPTOR_SETS_COUNT = 550;
+
         const std::uint32_t typeCount = 6;
         VkDescriptorPoolSize typeCounts[ typeCount ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -1484,6 +1484,22 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreatePipelineLayout" );
     }
 
+    void CreateSemaphores()
+    {
+        VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+        semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        semaphoreCreateInfo.pNext = nullptr;
+
+        VkResult err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
+        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
+
+        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::renderCompleteSemaphore );
+        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
+
+        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::offscreenSemaphore );
+        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
+    }
+    
     void CreateRenderer( int samples )
     {
         GfxDeviceGlobal::msaaSampleBits = GetSampleBits( samples );
@@ -1534,19 +1550,7 @@ namespace ae3d
         FlushSetupCommandBuffer();
         CreateDescriptorSetLayout();
         CreateDescriptorPool();
-
-        VkSemaphoreCreateInfo semaphoreCreateInfo = {};
-        semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        semaphoreCreateInfo.pNext = nullptr;
-
-        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
-        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
-
-        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::renderCompleteSemaphore );
-        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
-
-        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::offscreenSemaphore );
-        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
+        CreateSemaphores();        
 
         GfxDevice::SetClearColor( 0, 0, 0 );
         GfxDevice::CreateUniformBuffers();

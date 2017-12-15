@@ -20,9 +20,6 @@
 #define NK_IMPLEMENTATION
 #include "nuklear.h"
 
-#define MAX_VERTEX_MEMORY (512 * 1024)
-#define MAX_ELEMENT_MEMORY (128 * 1024)
-
 using namespace ae3d;
 
 struct VertexPTC
@@ -56,6 +53,9 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     config.global_alpha = 1.0f;
     config.shape_AA = NK_ANTI_ALIASING_OFF;
     config.line_AA = NK_ANTI_ALIASING_OFF;
+
+    const int MAX_VERTEX_MEMORY = 512 * 1024;
+    const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
     void* vertices;
     void* elements;
