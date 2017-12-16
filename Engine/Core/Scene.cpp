@@ -277,6 +277,51 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
     Statistics::EndDepthNormalsProfiling();
 }
 
+void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
+{
+    for (auto rtCamera : rtCameras)
+    {
+        auto transform = rtCamera->GetComponent< TransformComponent >();
+
+        if (transform && !rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
+        {
+            RenderWithCamera( rtCamera, 0, "2D RT" );
+        }
+        else if (transform && rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
+        {
+            const Vec3 cameraPos = transform->GetLocalPosition();
+
+            for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
+            {
+                const float scale = 2000;
+
+                static const Vec3 directions[ 6 ] =
+                {
+                    Vec3(  1,  0,  0 ) * scale, // posX
+                    Vec3( -1,  0,  0 ) * scale, // negX
+                    Vec3(  0,  1,  0 ) * scale, // posY
+                    Vec3(  0, -1,  0 ) * scale, // negY
+                    Vec3(  0,  0,  1 ) * scale, // posZ
+                    Vec3(  0,  0, -1 ) * scale  // negZ
+                };
+                
+                static const Vec3 ups[ 6 ] =
+                {
+                    Vec3( 0,  -1,  0 ),
+                    Vec3( 0,  -1,  0 ),
+                    Vec3( 0,  0,  1 ),
+                    Vec3( 0,  0, -1 ),
+                    Vec3( 0, -1,  0 ),
+                    Vec3( 0, -1,  0 )
+                };
+                
+                transform->LookAt( cameraPos, cameraPos + directions[ cubeMapFace ], ups[ cubeMapFace ] );
+                RenderWithCamera( rtCamera, cubeMapFace, "Cube Map RT" );
+            }
+        }
+    }
+}
+
 void ae3d::Scene::Render()
 {
 #if RENDERER_OPENGL
@@ -326,49 +371,8 @@ void ae3d::Scene::Render()
     auto cameraSortFunction = [](GameObject* g1, GameObject* g2) { return g1->GetComponent< CameraComponent >()->GetRenderOrder() <
         g2->GetComponent< CameraComponent >()->GetRenderOrder(); };
     std::sort( std::begin( cameras ), std::end( cameras ), cameraSortFunction );
-    
-    for (auto rtCamera : rtCameras)
-    {
-        auto transform = rtCamera->GetComponent< TransformComponent >();
 
-        if (transform && !rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
-        {
-            RenderWithCamera( rtCamera, 0, "2D RT" );
-        }
-        else if (transform && rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
-        {
-            const Vec3 cameraPos = transform->GetLocalPosition();
-
-            for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
-            {
-                const float scale = 2000;
-
-                static const Vec3 directions[ 6 ] =
-                {
-                    Vec3(  1,  0,  0 ) * scale, // posX
-                    Vec3( -1,  0,  0 ) * scale, // negX
-                    Vec3(  0,  1,  0 ) * scale, // posY
-                    Vec3(  0, -1,  0 ) * scale, // negY
-                    Vec3(  0,  0,  1 ) * scale, // posZ
-                    Vec3(  0,  0, -1 ) * scale  // negZ
-                };
-                
-                static const Vec3 ups[ 6 ] =
-                {
-                    Vec3( 0,  -1,  0 ),
-                    Vec3( 0,  -1,  0 ),
-                    Vec3( 0,  0,  1 ),
-                    Vec3( 0,  0, -1 ),
-                    Vec3( 0, -1,  0 ),
-                    Vec3( 0, -1,  0 )
-                };
-                
-                transform->LookAt( cameraPos, cameraPos + directions[ cubeMapFace ], ups[ cubeMapFace ] );
-                RenderWithCamera( rtCamera, cubeMapFace, "Cube Map RT" );
-            }
-        }
-    }
-
+    RenderRTCameras( rtCameras );
     RenderDepthAndNormalsForAllCameras( cameras );
 
 #if RENDERER_VULKAN
@@ -392,126 +396,130 @@ void ae3d::Scene::Render()
                 AudioSystem::SetListenerOrientation( cameraDir.x, cameraDir.y, cameraDir.z );
             }
 
-            // Shadow pass
             GfxDeviceGlobal::perObjectUboStruct.lightType = 0;
 
-            for (auto go : gameObjects)
+            // Shadow pass
+
+            if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
             {
-                if (!go || !go->IsEnabled())
+                for (auto go : gameObjects)
                 {
-                    continue;
-                }
+                    if (!go || !go->IsEnabled())
+                    {
+                        continue;
+                    }
                 
-                auto lightTransform = go->GetComponent<TransformComponent>();
-                auto dirLight = go->GetComponent<DirectionalLightComponent>();
-                auto spotLight = go->GetComponent<SpotLightComponent>();
-                auto pointLight = go->GetComponent<PointLightComponent>();
+                    auto lightTransform = go->GetComponent<TransformComponent>();
+                    auto dirLight = go->GetComponent<DirectionalLightComponent>();
+                    auto spotLight = go->GetComponent<SpotLightComponent>();
+                    auto pointLight = go->GetComponent<PointLightComponent>();
 
-                if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
-                                       (pointLight && pointLight->CastsShadow())))
-                {
-                    Statistics::BeginShadowMapProfiling();
+                    if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
+                                           (pointLight && pointLight->CastsShadow())))
+                    {
+                        Statistics::BeginShadowMapProfiling();
 
-                    Frustum eyeFrustum;
+                        Frustum eyeFrustum;
                     
-                    auto cameraComponent = camera->GetComponent< CameraComponent >();
+                        auto cameraComponent = camera->GetComponent< CameraComponent >();
                     
-                    if (cameraComponent->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
-                    {
-                        eyeFrustum.SetProjection( cameraComponent->GetFovDegrees(), cameraComponent->GetAspect(), cameraComponent->GetNear(), cameraComponent->GetFar() );
-                    }
-                    else
-                    {
-                        eyeFrustum.SetProjection( cameraComponent->GetLeft(), cameraComponent->GetRight(), cameraComponent->GetBottom(), cameraComponent->GetTop(), cameraComponent->GetNear(), cameraComponent->GetFar() );
-                    }
-                    
-                    Matrix44 eyeView;
-                    cameraTransform->GetWorldRotation().GetMatrix( eyeView );
-                    Matrix44 translation;
-                    translation.SetTranslation( -cameraTransform->GetWorldPosition() );
-                    Matrix44::Multiply( translation, eyeView, eyeView );
-                    
-                    const Vec3 eyeViewDir = Vec3( eyeView.m[2], eyeView.m[6], eyeView.m[10] ).Normalized();
-                    eyeFrustum.Update( cameraTransform->GetWorldPosition(), eyeViewDir );
-                    
-                    if (!SceneGlobal::isShadowCameraCreated)
-                    {
-                        SceneGlobal::shadowCamera.AddComponent< CameraComponent >();
-                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
-                        SceneGlobal::shadowCamera.AddComponent< TransformComponent >();
-                        SceneGlobal::isShadowCameraCreated = true;
-                        // Component adding can invalidate lightTransform pointer.
-                        lightTransform = go->GetComponent<TransformComponent>();
-                    }
-                    
-                    if (dirLight)
-                    {
-                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                        SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
-                        RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
-                        Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                        GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
-                        hasShadow = true;
-                    }
-                    else if (spotLight)
-                    {
-                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
-                        SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
-                        RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
-                        Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
-                        GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
-                        GfxDeviceGlobal::perObjectUboStruct.lightConeAngleCos = std::cos( spotLight->GetConeAngle() * 3.14159265f / 180.0f );
-                        GfxDeviceGlobal::perObjectUboStruct.lightPosition = Vec4( lightTransform->GetLocalPosition(), 1 );
-                        GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightTransform->GetViewDirection(), 0 );
-                        GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( spotLight->GetColor(), 1 );
-                        GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
-                        hasShadow = true;
-                    }
-                    else if (pointLight)
-                    {
-                        SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<PointLightComponent>()->shadowMap );
-
-                        for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
+                        if (cameraComponent->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
                         {
-                            const float scale = 2000;
+                            eyeFrustum.SetProjection( cameraComponent->GetFovDegrees(), cameraComponent->GetAspect(), cameraComponent->GetNear(), cameraComponent->GetFar() );
+                        }
+                        else
+                        {
+                            eyeFrustum.SetProjection( cameraComponent->GetLeft(), cameraComponent->GetRight(), cameraComponent->GetBottom(), cameraComponent->GetTop(), cameraComponent->GetNear(), cameraComponent->GetFar() );
+                        }
+                    
+                        Matrix44 eyeView;
+                        cameraTransform->GetWorldRotation().GetMatrix( eyeView );
+                        Matrix44 translation;
+                        translation.SetTranslation( -cameraTransform->GetWorldPosition() );
+                        Matrix44::Multiply( translation, eyeView, eyeView );
+                    
+                        const Vec3 eyeViewDir = Vec3( eyeView.m[2], eyeView.m[6], eyeView.m[10] ).Normalized();
+                        eyeFrustum.Update( cameraTransform->GetWorldPosition(), eyeViewDir );
+                    
+                        if (!SceneGlobal::isShadowCameraCreated)
+                        {
+                            SceneGlobal::shadowCamera.AddComponent< CameraComponent >();
+                            SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+                            SceneGlobal::shadowCamera.AddComponent< TransformComponent >();
+                            SceneGlobal::isShadowCameraCreated = true;
+                            // Component adding can invalidate lightTransform pointer.
+                            lightTransform = go->GetComponent<TransformComponent>();
+                        }
+                    
+                        if (dirLight)
+                        {
+                            SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                            SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                            RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
+                            Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
+                            hasShadow = true;
+                        }
+                        else if (spotLight)
+                        {
+                            SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
+                            SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                            RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
+                            Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
+                            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
+                            GfxDeviceGlobal::perObjectUboStruct.lightConeAngleCos = std::cos( spotLight->GetConeAngle() * 3.14159265f / 180.0f );
+                            GfxDeviceGlobal::perObjectUboStruct.lightPosition = Vec4( lightTransform->GetLocalPosition(), 1 );
+                            GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightTransform->GetViewDirection(), 0 );
+                            GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( spotLight->GetColor(), 1 );
+                            GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
+                            hasShadow = true;
+                        }
+                        else if (pointLight)
+                        {
+                            SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<PointLightComponent>()->shadowMap );
 
-                            static const Vec3 directions[ 6 ] =
+                            for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
                             {
-                                Vec3( 1,  0,  0 ) * scale, // posX
-                                Vec3( -1,  0,  0 ) * scale, // negX
-                                Vec3( 0,  1,  0 ) * scale, // posY
-                                Vec3( 0, -1,  0 ) * scale, // negY
-                                Vec3( 0,  0,  1 ) * scale, // posZ
-                                Vec3( 0,  0, -1 ) * scale  // negZ
-                            };
+                                const float scale = 2000;
 
-                            static const Vec3 ups[ 6 ] =
-                            {
-                                Vec3( 0,  -1,  0 ),
-                                Vec3( 0,  -1,  0 ),
-                                Vec3( 0,  0,  1 ),
-                                Vec3( 0,  0, -1 ),
-                                Vec3( 0, -1,  0 ),
-                                Vec3( 0, -1,  0 )
-                            };
+                                static const Vec3 directions[ 6 ] =
+                                {
+                                    Vec3( 1,  0,  0 ) * scale, // posX
+                                    Vec3( -1,  0,  0 ) * scale, // negX
+                                    Vec3( 0,  1,  0 ) * scale, // posY
+                                    Vec3( 0, -1,  0 ) * scale, // negY
+                                    Vec3( 0,  0,  1 ) * scale, // posZ
+                                    Vec3( 0,  0, -1 ) * scale  // negZ
+                                };
 
-                            lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
-                            RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
+                                static const Vec3 ups[ 6 ] =
+                                {
+                                    Vec3( 0,  -1,  0 ),
+                                    Vec3( 0,  -1,  0 ),
+                                    Vec3( 0,  0,  1 ),
+                                    Vec3( 0,  0, -1 ),
+                                    Vec3( 0, -1,  0 ),
+                                    Vec3( 0, -1,  0 )
+                                };
+
+                                lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
+                                RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
+                            }
+
+                            Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
+                            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
+                            hasShadow = true;
                         }
 
-                        Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
-                        GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
-                        hasShadow = true;
+                        Statistics::EndShadowMapProfiling();
                     }
-
-                    Statistics::EndShadowMapProfiling();
                 }
             }
         }
 
         // Defaults for a case where there are no shadow casting lights.
 #if !RENDERER_VULKAN
-        if (!hasShadow)
+        if (!hasShadow && camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
         {
             Texture2D& whiteTexture = renderer.GetWhiteTexture();
             Material::SetGlobalTexture2D( "_ShadowMap", &whiteTexture );
