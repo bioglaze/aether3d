@@ -87,7 +87,6 @@ void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const F
     System::Assert( !MathUtil::IsNaN( viewFrustumCentroid.x ) && !MathUtil::IsNaN( viewFrustumCentroid.y ) && !MathUtil::IsNaN( viewFrustumCentroid.z ), "Invalid eye frustum" );
     System::Assert( outCamera.GetTargetTexture() != nullptr, "Shadow camera needs target texture" );
     System::Assert( lightDirection.Length() > 0.9f && lightDirection.Length() < 1.1f, "Light dir must be normalized" );
-    
 
     // Start at the centroid, and move back in the opposite direction of the light
     // by an amount equal to the camera's farClip. This is the temporary working position for the light.
@@ -801,11 +800,15 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
 void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace )
 {
     CameraComponent* camera = cameraGo->GetComponent< CameraComponent >();
+
+    System::Assert( camera->GetTargetTexture() != nullptr, "cannot render shadows if target texture is missing!" );
+    int viewport[ 4 ] = { 0, 0, camera->GetTargetTexture()->GetWidth(), camera->GetTargetTexture()->GetHeight() };
+
 #if !RENDERER_METAL
     GfxDevice::SetRenderTarget( camera->GetTargetTexture(), cubeMapFace );
 #endif
 #ifndef RENDERER_VULKAN
-    GfxDevice::SetViewport( camera->GetViewport() );
+    GfxDevice::SetViewport( viewport );
 #endif    
     const Vec3 color = camera->GetClearColor();
     GfxDevice::SetClearColor( color.x, color.y, color.z );
@@ -819,8 +822,8 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #endif
 #if RENDERER_VULKAN
     BeginOffscreen();
-    GfxDevice::SetScissor( camera->GetViewport() );
-    GfxDevice::SetViewport( camera->GetViewport() );
+    GfxDevice::SetScissor( viewport );
+    GfxDevice::SetViewport( viewport );
 #endif
 
     GfxDevice::PushGroupMarker( "Shadow maps" );
