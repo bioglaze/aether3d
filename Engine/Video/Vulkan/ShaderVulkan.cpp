@@ -17,6 +17,8 @@ namespace GfxDeviceGlobal
     extern VkDevice device;
     extern VkImageView view0;
     extern VkSampler sampler0;
+    extern VkImageView view1;
+    extern VkSampler sampler1;
 }
 
 namespace ae3d
@@ -139,31 +141,74 @@ void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
     std::memcpy( &GfxDevice::GetCurrentUbo()[ offset ], data, dataBytes );
 }
 
-void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int /*textureUnit*/ )
+void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int textureUnit )
 {
-    if (texture)
+    if (texture == nullptr)
+    {
+        return;
+    }
+    
+    if (textureUnit == 0)
     {
         GfxDeviceGlobal::view0 = texture->GetView();
         GfxDeviceGlobal::sampler0 = texture->GetSampler();
     }
+    else if (textureUnit == 1)
+    {
+        GfxDeviceGlobal::view1 = texture->GetView();
+        GfxDeviceGlobal::sampler1 = texture->GetSampler();
+    }
+    else
+    {
+        System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
+    }
 }
 
-void ae3d::Shader::SetTexture( const char* /*name*/, TextureCube* texture, int /*textureUnit*/ )
+void ae3d::Shader::SetTexture( const char* /*name*/, TextureCube* texture, int textureUnit )
 {
-    if (texture)
+    if (texture == nullptr)
+    {
+        return;
+    }
+    
+    if (textureUnit == 0)
     {
         GfxDeviceGlobal::view0 = texture->GetView();
         GfxDeviceGlobal::sampler0 = texture->GetSampler();
     }
+    else if (textureUnit == 1)
+    {
+        GfxDeviceGlobal::view1 = texture->GetView();
+        GfxDeviceGlobal::sampler1 = texture->GetSampler();
+    }
+    else
+    {
+        System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
+    }
 }
 
-void ae3d::Shader::SetRenderTexture( const char* /*name*/, RenderTexture* texture, int /*textureUnit*/ )
+void ae3d::Shader::SetRenderTexture( const char* /*name*/, RenderTexture* texture, int textureUnit )
 {
-    if (texture)
+    if (texture == nullptr)
+    {
+        return;
+    }
+    
+    if (textureUnit == 0)
     {
         GfxDeviceGlobal::view0 = texture->GetColorView();
         GfxDeviceGlobal::sampler0 = texture->GetSampler();
     }
+    else if (textureUnit == 1)
+    {
+        GfxDeviceGlobal::view1 = texture->GetColorView();
+        GfxDeviceGlobal::sampler1 = texture->GetSampler();
+    }
+    else
+    {
+        System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
+    }
+
 }
 
 void ae3d::Shader::SetInt( const char* /*name*/, int /*value*/ )
