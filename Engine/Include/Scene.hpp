@@ -25,9 +25,6 @@ namespace ae3d
         
         /// Ends the rendering. Called after scene.Render() and UI/line rendering etc.
         void EndFrame();
-
-        /// Ends the rendering on Metal API. Enables line drawing after Render() and before EndRenderMetal().
-        void EndRenderMetal();
         
         /// \param gameObject Game object to remove. Does nothing if it is null or doesn't exist in the scene.
         void Remove( GameObject* gameObject );

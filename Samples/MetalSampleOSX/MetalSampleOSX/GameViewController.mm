@@ -37,10 +37,10 @@
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
 
-#define POINT_LIGHT_COUNT 100
-#define MULTISAMPLE_COUNT 1
-#define MAX_VERTEX_MEMORY (512 * 1024)
-#define MAX_ELEMENT_MEMORY (128 * 1024)
+const int POINT_LIGHT_COUNT = 100;
+const int MULTISAMPLE_COUNT = 1;
+const int MAX_VERTEX_MEMORY = 512 * 1024;
+const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 #ifdef TEST_NUKLEAR_UI
 #define NK_INCLUDE_FIXED_TYPES
@@ -202,6 +202,7 @@ using namespace ae3d;
     GameObject spriteContainer;
     GameObject cameraCubeRT;
     GameObject animatedGo;
+    GameObject wireframeGo;
     Scene scene;
     Font font;
     Font fontSDF;
@@ -414,6 +415,14 @@ using namespace ae3d;
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -8 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
 
+    wireframeGo.AddComponent<ae3d::MeshRendererComponent>();
+    wireframeGo.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    wireframeGo.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
+    wireframeGo.GetComponent<ae3d::MeshRendererComponent>()->EnableWireframe( true );
+    wireframeGo.AddComponent<ae3d::TransformComponent>();
+    wireframeGo.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -2, 0, -8 ) );
+    wireframeGo.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
+
     rtCube.AddComponent<ae3d::MeshRendererComponent>();
     rtCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     rtCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &rtCubeMaterial, 0 );
@@ -600,6 +609,7 @@ using namespace ae3d;
     //scene.Add( &cubePTN );
     scene.Add( &rtCube );
     scene.Add( &rotatingCube );
+    scene.Add( &wireframeGo );
     scene.Add( &spriteContainer );
     scene.Add( &textSDF );
     scene.Add( &text );
@@ -607,8 +617,12 @@ using namespace ae3d;
     //scene.Add( &bigCube3 );
     //scene.Add( &animatedGo );
     scene.Add( &pointLight );
+#ifdef TEST_SHADOWS_SPOT
     scene.Add( &spotLight );
-    //scene.Add( &dirLight );
+#endif
+#ifdef TEST_SHADOWS_DIR
+    scene.Add( &dirLight );
+#endif
     //scene.Add( &renderTextureContainer );
     //scene.Add( &rtCamera );
     //scene.Add( &cameraCubeRT );
@@ -788,7 +802,7 @@ using namespace ae3d;
         }
         DrawNuklear( &ctx, &cmds, self.view.bounds.size.width, self.view.bounds.size.height );
 #endif
-        scene.EndRenderMetal();
+        scene.EndFrame();
         ae3d::System::EndFrame();
     }
 }

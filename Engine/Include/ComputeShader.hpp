@@ -42,6 +42,7 @@ namespace ae3d
         /// Loads SPIR-V shader.
         /// \param contents SPIR-V file contents.
         void LoadSPIRV( const FileSystem::FileContentsData& contents );
+        VkPipelineShaderStageCreateInfo& GetInfo() { return info; }
 #endif
         /// \param metalShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param dataHLSL HLSL shader file contents.
@@ -58,13 +59,6 @@ namespace ae3d
         /// \param buffer Uniform buffer
         void SetUniformBuffer( int slotIndex, id< MTLBuffer > buffer );
 #endif
-#if RENDERER_D3D12
-        ID3DBlob* blobShader = nullptr;
-#endif
-#if RENDERER_VULKAN
-        VkPipelineShaderStageCreateInfo& GetInfo() { return info; }
-#endif
-
         /// Sets a render texture into a slot.
         /// \param renderTexture render texture.
         /// \param slot slot index.
@@ -74,6 +68,7 @@ namespace ae3d
         void SetUniformBuffer( unsigned slot, ID3D12Resource* buffer );
         void SetTextureBuffer( unsigned slot, ID3D12Resource* buffer );
         void SetUAVBuffer( unsigned slot, ID3D12Resource* buffer );
+        ID3DBlob* blobShader = nullptr;
 #endif
 
     private:

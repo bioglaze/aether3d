@@ -1,7 +1,6 @@
 #include "ComputeShader.hpp"
 #include "FileSystem.hpp"
 #include "GfxDevice.hpp"
-//#include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"

@@ -1,15 +1,13 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "Macros.hpp"
-
 namespace ae3d
 {
     struct Vec3;
     struct Vec4;
 
     /* 4x4 Matrix. */
-    struct ALIGNAS( 16 ) Matrix44
+    struct alignas( 16 ) Matrix44
     {
         /* Identity matrix. */
         static const Matrix44 identity;

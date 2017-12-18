@@ -550,14 +550,6 @@ void ae3d::Scene::EndFrame()
 #endif
 }
 
-void ae3d::Scene::EndRenderMetal()
-{
-#if RENDERER_METAL
-    GfxDevice::EndBackBufferEncoding();
-    Statistics::EndFrameTimeProfiling();
-#endif
-}
-
 void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const char* debugGroupName )
 {
     ae3d::System::Assert( 0 <= cubeMapFace && cubeMapFace < 6, "invalid cube map face" );

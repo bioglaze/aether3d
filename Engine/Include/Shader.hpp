@@ -37,6 +37,8 @@ namespace ae3d
         /// Loads SPIR-V shader.
         /// \param spirvData SPIR-V file contents.
         void LoadSPIRV( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData );
+        VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
+        VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
 #endif
         /// \param vertexDataGLSL GLSL Vertex shader file contents.
         /// \param fragmentDataGLSL GLSL Fragment shader file contents.
@@ -141,10 +143,6 @@ namespace ae3d
 
         id <MTLFunction> vertexProgram;
         id <MTLFunction> fragmentProgram;
-#endif
-#if RENDERER_VULKAN
-        VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
-        VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
 #endif
         /// Destroys all shaders. Called internally at exit.
         static void DestroyShaders();

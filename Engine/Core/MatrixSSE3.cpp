@@ -157,7 +157,7 @@ void Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4* out )
 {
     Matrix44 transpose;
     mat.Transpose( transpose );
-    ALIGNAS( 16 ) Vec4 v4 = vec;
+    alignas( 16 ) Vec4 v4 = vec;
 
     __m128 vec4 = _mm_load_ps( &v4.x );
     __m128 row1 = _mm_load_ps( &transpose.m[  0 ] );
@@ -178,14 +178,14 @@ void Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4* out )
 
 void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 {
-    ALIGNAS( 16 ) Vec4 tmp( vec );
+    alignas( 16 ) Vec4 tmp( vec );
     TransformPoint( tmp, mat, &tmp );
     *out = Vec3( tmp.x, tmp.y, tmp.z );
 }
 
 void Matrix44::TransformDirection( const Vec3& dir, const Matrix44& mat, Vec3* out )
 {
-    ALIGNAS( 16 ) Vec4 tmp( dir.x, dir.y, dir.z, 0 );
+    alignas( 16 ) Vec4 tmp( dir.x, dir.y, dir.z, 0 );
     TransformPoint( tmp, mat, &tmp );
     *out = Vec3( tmp.x, tmp.y, tmp.z );
 }
