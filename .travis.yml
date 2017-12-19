@@ -35,4 +35,6 @@ script:
   - make
   - cd ../NuklearTest
   - make
+  - cd ../../Engine
+  - make -f Makefile_Vulkan
 

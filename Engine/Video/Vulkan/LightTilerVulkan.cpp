@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstring>
 #include "ComputeShader.hpp"
+#include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "Renderer.hpp"
 #include "System.hpp"
