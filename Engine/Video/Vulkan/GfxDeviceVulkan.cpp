@@ -1295,7 +1295,7 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 550;
 
-        const std::uint32_t typeCount = 6;
+        const std::uint32_t typeCount = 7;
         VkDescriptorPoolSize typeCounts[ typeCount ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
@@ -1309,6 +1309,8 @@ namespace ae3d
         typeCounts[ 4 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 5 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
         typeCounts[ 5 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 6 ].type = VK_DESCRIPTOR_TYPE_SAMPLER;
+        typeCounts[ 6 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1405,8 +1407,17 @@ namespace ae3d
         imageSet2.pImageInfo = &sampler1Desc;
         imageSet2.dstBinding = 5;
 
-        const int setCount = 6;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2 };
+        // Binding 6 : Sampler
+        VkWriteDescriptorSet samplerSet2 = {};
+        samplerSet2.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        samplerSet2.dstSet = outDescriptorSet;
+        samplerSet2.descriptorCount = 1;
+        samplerSet2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+        samplerSet2.pImageInfo = &sampler1Desc;
+        samplerSet2.dstBinding = 6;
+
+        const int setCount = 7;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2 };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1462,8 +1473,17 @@ namespace ae3d
         layoutBindingImage2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingImage2.pImmutableSamplers = nullptr;
 
-        const int bindingCount = 6;
-        const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer, layoutBindingBufferUAV, layoutBindingImage2 };
+        // Binding 6 : Sampler
+        VkDescriptorSetLayoutBinding layoutBindingSampler2 = {};
+        layoutBindingSampler2.binding = 6;
+        layoutBindingSampler2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+        layoutBindingSampler2.descriptorCount = 1;
+        layoutBindingSampler2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindingSampler2.pImmutableSamplers = nullptr;
+
+        const int bindingCount = 7;
+        const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
+                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2 };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -2067,12 +2087,6 @@ void BeginOffscreen()
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
-    /*ae3d::SetImageLayout( GfxDeviceGlobal::offscreenCmdBuffer,
-                          GfxDeviceGlobal::renderTexture0->GetColorImage(),
-                          VK_IMAGE_ASPECT_COLOR_BIT,
-                          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );*/
-
     vkCmdResetQueryPool( GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::queryPool, 0, 2 );
     vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 0 );
 
@@ -2099,12 +2113,6 @@ void EndOffscreen()
 {
     vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, GfxDeviceGlobal::queryPool, 1 );
     vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
-
-    /*ae3d::SetImageLayout( GfxDeviceGlobal::offscreenCmdBuffer,
-                          GfxDeviceGlobal::renderTexture0->GetColorImage(),
-                          VK_IMAGE_ASPECT_COLOR_BIT,
-                          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 0, 1 );*/
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
