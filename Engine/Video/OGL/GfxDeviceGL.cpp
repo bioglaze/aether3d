@@ -693,16 +693,6 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
         System::Assert( glCubeMapFace >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && glCubeMapFace <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "Invalid cube map face." );
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glCubeMapFace, target->GetID(), 0 );
     }
-    
-    if (target != nullptr)
-    {
-        glViewport( 0, 0, target->GetWidth(), target->GetHeight() );
-    }
-    else
-    {
-        ae3d::System::Assert( GfxDeviceGlobal::backBufferWidth > 0, "invalid backbuffer dimension" );
-        glViewport( 0, 0, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
-    }
 
     ErrorCheckFBO();
     ErrorCheck( "SetRenderTarget end" );
