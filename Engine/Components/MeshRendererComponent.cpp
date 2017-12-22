@@ -166,9 +166,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
             
             if (!subMeshes[ subMeshIndex ].joints.empty())
             {
-                std::vector< Matrix44 > bones( subMeshes[ subMeshIndex ].joints.size() );
-
-                for (size_t j = 0; j < bones.size(); ++j)
+                for (std::size_t j = 0; j < subMeshes[ subMeshIndex ].joints.size(); ++j)
                 {
                     const auto& joint = subMeshes[ subMeshIndex ].joints[ j ];
 
@@ -177,11 +175,9 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
                         const std::size_t frames = joint.animTransforms.size();
                         Matrix44::Multiply( joint.globalBindposeInverse,
                                             joint.animTransforms[ animFrame % frames ],
-                                            bones[ j ] );
+                                            GfxDeviceGlobal::perObjectUboStruct.boneMatrices[ j ] );
                     }
                 }
-
-                std::memcpy( &GfxDeviceGlobal::perObjectUboStruct.boneMatrices[ 0 ], &bones[ 0 ].m[ 0 ], (int)bones.size() * sizeof( Matrix44 ) );
             }
 
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())

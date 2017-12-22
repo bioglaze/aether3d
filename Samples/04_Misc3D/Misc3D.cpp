@@ -28,7 +28,7 @@
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
-//#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
 
@@ -79,17 +79,6 @@ int main()
     //camera.GetComponent<CameraComponent>()->SetViewport( 0, 0, originalWidth / 2, originalHeight );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
-
-    GameObject cameraHalf;
-    cameraHalf.AddComponent<CameraComponent>();
-    cameraHalf.GetComponent<CameraComponent>()->SetClearColor( Vec3( 1, 0, 0 ) );
-    cameraHalf.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    cameraHalf.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
-    cameraHalf.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
-    cameraHalf.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
-    cameraHalf.GetComponent<CameraComponent>()->SetViewport( 0, 0, originalWidth / 2, originalHeight );
-    cameraHalf.AddComponent<TransformComponent>();
-    cameraHalf.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
 #ifdef TEST_RENDER_TEXTURE_CUBE
     RenderTexture cubeRT;
