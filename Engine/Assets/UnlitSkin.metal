@@ -40,27 +40,6 @@ constexpr sampler shadowSampler(coord::normalized,
                                 address::clamp_to_zero,
                                 filter::linear);
 
-/*float linstep( float low, float high, float v )
-{
-    return clamp( (v - low) / (high - low), 0.0, 1.0 );
-}
-
-float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth )
-{
-    float2 uv = (projCoord.xy / projCoord.w) * 0.5 + 0.5;
-    uv.y = 1 - uv.y;
-    
-    float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
-    
-    float variance = max( moments.y - moments.x * moments.x, -0.001 );
-
-    float delta = depth - moments.x;
-    float p = smoothstep( depth - 0.02, depth, moments.x );
-    float pMax = linstep( 0.2, 1.0, variance / (variance + delta * delta) );
-    
-    return clamp( max( p, pMax ), 0.0, 1.0 );
-}*/
-
 struct Vertex
 {
     float3 position [[attribute(0)]];

@@ -36,6 +36,8 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
+//#define TEST_RENDER_TEXTURE_2D
+//#define TEST_RENDER_TEXTURE_CUBE
 
 const int POINT_LIGHT_COUNT = 100;
 const int MULTISAMPLE_COUNT = 1;
@@ -165,8 +167,6 @@ int CreateConeLines()
     return ae3d::System::CreateLineBuffer( lines, ae3d::Vec3( 1, 1, 1 ) );
 }
 
-static const NSUInteger kMaxBuffersInFlight = 3;
-
 using namespace ae3d;
 
 @implementation GameViewController
@@ -174,7 +174,6 @@ using namespace ae3d;
     MTKView* _view;
     id <MTLDevice> device;
     id <MTLCommandQueue> commandQueue;
-    dispatch_semaphore_t inFlightSemaphore;
     
     GameObject camera2d;
     GameObject camera3d;
@@ -261,7 +260,6 @@ using namespace ae3d;
 
     [self _setupView];
     [self _reshape];
-    //self.nextResponder = super.nextResponder;
 
     ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
@@ -319,7 +317,7 @@ using namespace ae3d;
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
@@ -570,7 +568,9 @@ using namespace ae3d;
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
-    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+#ifdef TEST_RENDER_TEXTURE_2D
+    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+#endif
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 100, -0.6f ), ae3d::Vec3( 768*2, 512*2, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( dirLight.GetComponent<ae3d::DirectionalLightComponent>()->GetShadowMap(), ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 512, 512, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
@@ -615,7 +615,7 @@ using namespace ae3d;
     scene.Add( &text );
     //scene.Add( &bigCube2 );
     //scene.Add( &bigCube3 );
-    //scene.Add( &animatedGo );
+    scene.Add( &animatedGo );
     scene.Add( &pointLight );
 #ifdef TEST_SHADOWS_SPOT
     scene.Add( &spotLight );
@@ -623,10 +623,14 @@ using namespace ae3d;
 #ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
 #endif
-    //scene.Add( &renderTextureContainer );
-    //scene.Add( &rtCamera );
-    //scene.Add( &cameraCubeRT );
-
+#ifdef TEST_RENDER_TEXTURE_2D
+    scene.Add( &renderTextureContainer );
+    scene.Add( &rtCamera );
+#endif
+#ifdef TEST_RENDER_TEXTURE_CUBE
+    scene.Add( &renderTextureContainer );
+    scene.Add( &cameraCubeRT );
+#endif
     transTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None,
                   ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
     
@@ -648,7 +652,6 @@ using namespace ae3d;
     coneLineHandle = CreateConeLines();
     
     commandQueue = [device newCommandQueue];
-    inFlightSemaphore = dispatch_semaphore_create( kMaxBuffersInFlight );
     
 #ifdef TEST_NUKLEAR_UI
     nk_font_atlas_init_default( &atlas );
@@ -718,29 +721,6 @@ using namespace ae3d;
 {
     return YES;
 }
-
-#if 0
-- (void)_render
-{
-    //dispatch_semaphore_wait( inFlightSemaphore, DISPATCH_TIME_FOREVER );
-
-    //id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
-
-    //__block dispatch_semaphore_t block_sema = inFlightSemaphore;
-    /*[commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
-     {
-         dispatch_semaphore_signal(block_sema);
-     }];*/
-
-    if (_view.currentRenderPassDescriptor != nil)
-    {
-        //id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:_view.currentRenderPassDescriptor];
-        //[renderEncoder endEncoding];
-        //[commandBuffer presentDrawable:_view.currentDrawable];
-        //[commandBuffer commit];
-    }
-}
-#endif
 
 - (void)_render
 {
