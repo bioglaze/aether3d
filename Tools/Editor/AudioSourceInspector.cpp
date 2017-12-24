@@ -51,7 +51,7 @@ void AudioSourceInspector::GameObjectSelected( std::list< ae3d::GameObject* > ga
 
 void AudioSourceInspector::AudioCellClicked( int, int )
 {
-    const std::string path = QFileDialog::getOpenFileName( root, "Open Audio Clip", "", "Audio clips (*.wav)" ).toStdString();
+    const std::string path = QFileDialog::getOpenFileName( root, "Open Audio Clip", "", "Audio clips (*.wav *.ogg)" ).toStdString();
 
     if (!path.empty())
     {
