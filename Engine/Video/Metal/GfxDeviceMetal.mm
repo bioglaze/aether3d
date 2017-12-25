@@ -349,7 +349,7 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
         return;
     }
     
-    MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+    MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:view.colorPixelFormat
                                                                                         width:GfxDeviceGlobal::backBufferWidth * 2
                                                                                        height:GfxDeviceGlobal::backBufferHeight * 2
                                                                                     mipmapped:NO];
@@ -430,7 +430,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         pipelineStateDescriptor.inputPrimitiveTopology = (topology == ae3d::GfxDevice::PrimitiveTopology::Triangles) ?
         MTLPrimitiveTopologyClassTriangle : MTLPrimitiveTopologyClassLine;
 #endif
-        MTLPixelFormat format = MTLPixelFormatBGRA8Unorm;
+        MTLPixelFormat format = MTLPixelFormatBGRA8Unorm_sRGB;
 
         if (pixelFormat == ae3d::RenderTexture::DataType::R32G32)
         {

@@ -172,8 +172,6 @@ using namespace ae3d;
 @implementation GameViewController
 {
     MTKView* _view;
-    id <MTLDevice> device;
-    id <MTLCommandQueue> commandQueue;
     
     GameObject camera2d;
     GameObject camera3d;
@@ -255,18 +253,21 @@ using namespace ae3d;
 {
     [super viewDidLoad];
 
-    device = MTLCreateSystemDefaultDevice();
-    assert( device );
-
-    [self _setupView];
+    _view = (MTKView *)self.view;
+    _view.delegate = self;
+    _view.device = MTLCreateSystemDefaultDevice();
+    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
+    _view.sampleCount = MULTISAMPLE_COUNT;
+    _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+    
     [self _reshape];
 
-    ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
+    ae3d::System::InitMetal( _view.device, _view, MULTISAMPLE_COUNT, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -651,8 +652,6 @@ using namespace ae3d;
     
     coneLineHandle = CreateConeLines();
     
-    commandQueue = [device newCommandQueue];
-    
 #ifdef TEST_NUKLEAR_UI
     nk_font_atlas_init_default( &atlas );
     nk_font_atlas_begin( &atlas );
@@ -668,15 +667,6 @@ using namespace ae3d;
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
 #endif
-}
-
-- (void)_setupView
-{
-    _view = (MTKView *)self.view;
-    _view.delegate = self;
-    _view.device = device;
-    _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
-    _view.sampleCount = MULTISAMPLE_COUNT;
 }
 
 - (void)keyDown:(NSEvent *)theEvent

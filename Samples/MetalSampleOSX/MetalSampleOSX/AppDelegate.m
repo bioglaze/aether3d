@@ -19,19 +19,4 @@
     return YES;
 }
 
-- (void)keyDown:(NSEvent *)theEvent
-{
-    NSLog( @"Key down\n" );
-}
-
-- (void)keyUp:(NSEvent *)theEvent
-{
-    NSLog( @"Key up\n" );
-}
-
-- (BOOL)acceptsFirstResponder
-{
-    return YES;
-}
-
 @end
