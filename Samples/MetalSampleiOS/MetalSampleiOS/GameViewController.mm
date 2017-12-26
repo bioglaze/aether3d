@@ -240,6 +240,7 @@ int gTouchCount;
     //_view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     _view.sampleCount = MULTISAMPLE_COUNT;
+    _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
 }
 
 - (void)_render
@@ -249,7 +250,7 @@ int gTouchCount;
     ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
     ae3d::System::BeginFrame();
     scene.Render();
-    scene.EndRenderMetal();
+    scene.EndFrame();
     ae3d::System::EndFrame();
 }
 

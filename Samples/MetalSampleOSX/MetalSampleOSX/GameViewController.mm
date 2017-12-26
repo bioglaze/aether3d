@@ -3,8 +3,8 @@
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"
-#import <Metal/Metal.h>
 #import <simd/simd.h>
+#import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #include <cmath>
 #include <vector>
@@ -43,6 +43,8 @@ const int POINT_LIGHT_COUNT = 100;
 const int MULTISAMPLE_COUNT = 1;
 const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
+
+NSViewController* myViewController;
 
 #ifdef TEST_NUKLEAR_UI
 #define NK_INCLUDE_FIXED_TYPES
@@ -229,6 +231,7 @@ using namespace ae3d;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
+    Vec3 moveDir;
     
     Matrix44 lineView;
     Matrix44 lineProjection;
@@ -260,6 +263,8 @@ using namespace ae3d;
     _view.sampleCount = MULTISAMPLE_COUNT;
     _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
     
+    myViewController = self;
+    
     [self _reshape];
 
     ae3d::System::InitMetal( _view.device, _view, MULTISAMPLE_COUNT, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
@@ -267,7 +272,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -671,7 +676,61 @@ using namespace ae3d;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-    NSLog(@"onKeyDown Detected");
+    const float velocity = 0.3f;
+    
+    // Keycodes from: https://forums.macrumors.com/threads/nsevent-keycode-list.780577/
+    if ([theEvent keyCode] == 0x00) // A
+    {
+        moveDir.x = -velocity;
+    }
+    else if ([theEvent keyCode] == 0x02) // D
+    {
+        moveDir.x = velocity;
+    }
+    else if ([theEvent keyCode] == 0x0D) // W
+    {
+        moveDir.z = -velocity;
+    }
+    else if ([theEvent keyCode] == 0x01) // S
+    {
+        moveDir.z = velocity;
+    }
+    else if ([theEvent keyCode] == 0x0C) // Q
+    {
+        moveDir.y = -velocity;
+    }
+    else if ([theEvent keyCode] == 0x0E) // E
+    {
+        moveDir.y = velocity;
+    }
+}
+
+- (void)keyUp:(NSEvent *)theEvent
+{
+    if ([theEvent keyCode] == 0x00) // A
+    {
+        moveDir.x = 0;
+    }
+    else if ([theEvent keyCode] == 0x02) // D
+    {
+        moveDir.x = 0;
+    }
+    else if ([theEvent keyCode] == 0x0D) // W
+    {
+        moveDir.z = 0;
+    }
+    else if ([theEvent keyCode] == 0x01) // S
+    {
+        moveDir.z = 0;
+    }
+    else if ([theEvent keyCode] == 0x0C) // Q
+    {
+        moveDir.y = 0;
+    }
+    else if ([theEvent keyCode] == 0x0E) // E
+    {
+        moveDir.y = 0;
+    }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -810,6 +869,10 @@ using namespace ae3d;
     
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     standardCubeSpotReceiver.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -90 ) );
+    
+    camera3d.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
+    camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
+    camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
