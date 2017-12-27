@@ -972,7 +972,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     
     std::string currentMaterialName;
     
-    enum CurrentLightType { Directional, Spot, Point, None };
+    enum class CurrentLightType { Directional, Spot, Point, None };
     CurrentLightType currentLightType = CurrentLightType::None;
     
     // FIXME: These ensure that the mesh is rendered. A proper fix would be to serialize materials.

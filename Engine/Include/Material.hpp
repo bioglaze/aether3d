@@ -15,10 +15,10 @@ namespace ae3d
     {
   public:
         /// Blending mode
-        enum BlendingMode { Alpha, Off };
+        enum class BlendingMode { Alpha, Off };
         
         /// Depth function used when rendering a mesh using material.
-        enum DepthFunction { NoneWriteOff, LessOrEqualWriteOn };
+        enum class DepthFunction { NoneWriteOff, LessOrEqualWriteOn };
 
         /// Sets a texture into every material, overriding textures set by SetTexture.
         /// \param name Texture uniform name.

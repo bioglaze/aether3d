@@ -121,24 +121,8 @@ namespace ae3d
 
 #if RENDERER_METAL
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
-
         bool IsValid() const { return vertexProgram != nullptr; }
-
         const std::string& GetMetalVertexShaderName() const { return metalVertexShaderName; }
-        
-        enum class UniformType { Float, Float2, Float3, Float4, Matrix4x4 };
-        
-        struct Uniform
-        {
-            UniformType type = UniformType::Float;
-            unsigned long offsetFromBufferStart = 0;
-            float floatValue[ 4 ];
-            float matrix4x4[ 16 ];
-        };
-
-        // TODO: make private
-        std::map< std::string, Uniform > uniforms;
-        
         void LoadUniforms( MTLRenderPipelineReflection* reflection );
 
         id <MTLFunction> vertexProgram;
@@ -155,6 +139,7 @@ namespace ae3d
         };
 
     private:
+        std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
         std::string vertexPath;
         std::string fragmentPath;
 
@@ -162,7 +147,6 @@ namespace ae3d
         void ReflectVariables();
 
         ID3D12ShaderReflection* reflector = nullptr;
-        std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
 #endif
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo vertexInfo;
@@ -171,7 +155,6 @@ namespace ae3d
 #if RENDERER_OPENGL
         unsigned handle = 0;
         unsigned uboLoc = 0;
-        std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
 #endif
 #if RENDERER_METAL
         std::string metalVertexShaderName;
