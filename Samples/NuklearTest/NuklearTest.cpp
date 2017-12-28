@@ -214,12 +214,10 @@ int main()
                 System::Print("Pressed a button\n");
             }
 
-            /* fixed widget window ratio width */
             nk_layout_row_dynamic( &ctx, 30, 2 );
             if (nk_option_label( &ctx, "easy", op == EASY )) op = EASY;
             if (nk_option_label( &ctx, "hard", op == HARD )) op = HARD;
 
-            /* custom widget pixel width */
             nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {
                 nk_layout_row_push( &ctx, 50 );
@@ -228,6 +226,43 @@ int main()
                 nk_slider_float( &ctx, 0, &value, 1.0f, 0.1f );
             }
             nk_layout_row_end( &ctx );
+            
+            nk_layout_row_dynamic( &ctx, 250, 1 );
+            if (nk_group_begin( &ctx, "Standard", NK_WINDOW_BORDER ))
+            {
+                if (nk_tree_push(&ctx, NK_TREE_NODE, "Window", NK_MAXIMIZED))
+                {
+                    static int selected[ 8 ];
+                    
+                    if (nk_tree_push( &ctx, NK_TREE_NODE, "Next", NK_MAXIMIZED ))
+                    {
+                        nk_layout_row_dynamic( &ctx, 20, 1 );
+                        
+                        for (int i = 0; i < 4; ++i)
+                        {
+                            nk_selectable_label( &ctx, (selected[ i ]) ? "Selected": "Unselected", NK_TEXT_LEFT, &selected[ i ] );
+                        }
+                        
+                        nk_tree_pop( &ctx );
+                    }
+                    if (nk_tree_push( &ctx, NK_TREE_NODE, "Previous", NK_MAXIMIZED ))
+                    {
+                        nk_layout_row_dynamic( &ctx, 20, 1 );
+                        
+                        for (int i = 4; i < 8; ++i)
+                        {
+                            nk_selectable_label( &ctx, (selected[i]) ? "Selected": "Unselected", NK_TEXT_LEFT, &selected[i] );
+                        }
+                        
+                        nk_tree_pop( &ctx );
+                    }
+                    
+                    nk_tree_pop( &ctx );
+                }
+                
+                nk_group_end( &ctx );
+            }
+        
             nk_end( &ctx );
         }
 
