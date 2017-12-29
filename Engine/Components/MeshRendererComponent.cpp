@@ -1,6 +1,5 @@
 #include "MeshRendererComponent.hpp"
 #include <vector>
-#include <cstring>
 #include "Frustum.hpp"
 #include "Matrix.hpp"
 #include "Mesh.hpp"

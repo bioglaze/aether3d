@@ -30,28 +30,7 @@ void ae3d::ComputeShader::Load( const char* /*source*/ )
 
 void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSystem::FileContentsData& /*dataHLSL*/, const FileSystem::FileContentsData& dataSPIRV )
 {
-    VkShaderModuleCreateInfo moduleCreateInfo;
-    moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    moduleCreateInfo.pNext = nullptr;
-    moduleCreateInfo.codeSize = dataSPIRV.data.size();
-    moduleCreateInfo.pCode = (const std::uint32_t*)dataSPIRV.data.data();
-    moduleCreateInfo.flags = 0;
-
-    VkShaderModule shaderModule;
-    VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
-    AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "compute shader" );
-    ComputeShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
-
-    info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-    info.module = shaderModule;
-    info.pName = "CSMain";
-    info.pNext = nullptr;
-    info.flags = 0;
-    info.pSpecializationInfo = nullptr;
-
-    System::Assert( info.module != VK_NULL_HANDLE, "compute shader module not created" );
+    LoadSPIRV( dataSPIRV );
 }
 
 void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& contents )
@@ -82,7 +61,7 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
 
 void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* /*renderTexture*/, unsigned /*slot*/ )
 {
-	System::Print("SetRenderTexture unimplemented\n");
+	System::Print( "ComputeShader:SetRenderTexture unimplemented\n" );
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
