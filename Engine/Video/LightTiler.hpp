@@ -1,7 +1,6 @@
 #ifndef LIGHT_TILER_HPP
 #define LIGHT_TILER_HPP
 
-#include <vector>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
@@ -80,14 +79,14 @@ namespace ae3d
         VkPipeline pso;
         VkPipelineLayout psoLayout;
 #endif
-        std::vector< Vec4 > pointLightCenterAndRadius;
-        std::vector< Vec4 > spotLightCenterAndRadius;
-        int activePointLights = 0;
-        int activeSpotLights = 0;
-        bool cullerUniformsCreated = false;
         static const int TileRes = 16;
         static const int MaxLights = 2048;
         static const unsigned MaxLightsPerTile = 544;
+        Vec4 pointLightCenterAndRadius[ MaxLights ];
+        Vec4 spotLightCenterAndRadius[ MaxLights ];
+        int activePointLights = 0;
+        int activeSpotLights = 0;
+        bool cullerUniformsCreated = false;
     };
 }
 

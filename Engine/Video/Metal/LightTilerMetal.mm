@@ -27,14 +27,12 @@ struct CullerUniforms
 
 void ae3d::LightTiler::Init()
 {
-    pointLightCenterAndRadius.resize( MaxLights );
-
     pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                  options:MTLResourceCPUCacheModeDefaultCache];
     pointLightCenterAndRadiusBuffer.label = @"pointLightCenterAndRadiusBuffer";
 
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
 
     spotLightCenterAndRadius.resize( MaxLights );
     
@@ -43,7 +41,7 @@ void ae3d::LightTiler::Init()
     spotLightCenterAndRadiusBuffer.label = @"spotLightCenterAndRadiusBuffer";
     
     bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, spotLightCenterAndRadius.data(), spotLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
 
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
@@ -134,9 +132,9 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
 void ae3d::LightTiler::UpdateLightBuffers()
 {
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
 
     bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, spotLightCenterAndRadius.data(), spotLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
 }
 

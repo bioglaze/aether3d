@@ -166,13 +166,15 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
         LoadSTB( fileContents );
     }
-    else if (isDDS)
+    else if (isDDS && GfxDevice::HasExtension( "GL_EXT_texture_compression_s3tc" ))
     {
         LoadDDS( fileContents.path.c_str() );
     }
     else
     {
         System::Print( "Unhandled texture extension in file %s\n", fileContents.path.c_str() );
+        *this = Texture2DGlobal::defaultTexture;
+        return;
     }
 
     if (mipmaps == Mipmaps::Generate)

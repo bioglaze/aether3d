@@ -36,9 +36,6 @@ void ae3d::LightTiler::DestroyBuffers()
 
 void ae3d::LightTiler::Init()
 {
-    pointLightCenterAndRadius.resize( MaxLights );
-    spotLightCenterAndRadius.resize( MaxLights );
-
     // Light index buffer
     {
         const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
@@ -104,7 +101,7 @@ void ae3d::LightTiler::Init()
         bufferProp.MipLevels = 1;
         bufferProp.SampleDesc.Count = 1;
         bufferProp.SampleDesc.Quality = 0;
-        bufferProp.Width = pointLightCenterAndRadius.size() * 4 * sizeof( float );
+        bufferProp.Width = MaxLights * 4 * sizeof( float );
 
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
             &uploadProp,
@@ -142,7 +139,7 @@ void ae3d::LightTiler::Init()
         bufferProp.MipLevels = 1;
         bufferProp.SampleDesc.Count = 1;
         bufferProp.SampleDesc.Quality = 0;
-        bufferProp.Width = spotLightCenterAndRadius.size() * 4 * sizeof( float );
+        bufferProp.Width = MaxLights * 4 * sizeof( float );
 
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
 	        &uploadProp,
@@ -194,8 +191,8 @@ void ae3d::LightTiler::UpdateLightBuffers()
         return;
     }
 
-    std::size_t byteSize = pointLightCenterAndRadius.size() * 4 * sizeof( float );
-    memcpy_s( pointLightPtr, byteSize, pointLightCenterAndRadius.data(), byteSize );
+    const std::size_t byteSize = MaxLights * 4 * sizeof( float );
+    memcpy_s( pointLightPtr, byteSize, &pointLightCenterAndRadius[ 0 ], byteSize );
     pointLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
 
     char* spotLightPtr = nullptr;
@@ -207,8 +204,7 @@ void ae3d::LightTiler::UpdateLightBuffers()
         return;
     }
 
-    byteSize = spotLightCenterAndRadius.size() * 4 * sizeof( float );
-    memcpy_s( spotLightPtr, byteSize, spotLightCenterAndRadius.data(), byteSize );
+    memcpy_s( spotLightPtr, byteSize, &spotLightCenterAndRadius[ 0 ], byteSize );
     spotLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
 }
 

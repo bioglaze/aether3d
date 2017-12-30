@@ -1,5 +1,4 @@
 #include "LightTiler.hpp"
-#include <vector>
 #include <cstring>
 #include "ComputeShader.hpp"
 #include "Macros.hpp"
@@ -62,9 +61,6 @@ unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
 
 void ae3d::LightTiler::Init()
 {
-    pointLightCenterAndRadius.resize( MaxLights );
-    spotLightCenterAndRadius.resize( MaxLights );
-
     // Light index buffer
     {
         const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
@@ -108,7 +104,7 @@ void ae3d::LightTiler::Init()
     {
         VkBufferCreateInfo bufferInfo = {};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferInfo.size = pointLightCenterAndRadius.size() * 4 * sizeof( float );
+        bufferInfo.size = MaxLights * 4 * sizeof( float );
         bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &pointLightCenterAndRadiusBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
@@ -147,7 +143,7 @@ void ae3d::LightTiler::Init()
     {
         VkBufferCreateInfo bufferInfo = {};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferInfo.size = spotLightCenterAndRadius.size() * 4 * sizeof( float );
+        bufferInfo.size = MaxLights * 4 * sizeof( float );
         bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &spotLightCenterAndRadiusBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
@@ -216,8 +212,8 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& pos
 
 void ae3d::LightTiler::UpdateLightBuffers()
 {
-    std::memcpy( mappedPointLightCenterAndRadiusMemory, pointLightCenterAndRadius.data(), pointLightCenterAndRadius.size() * 4 * sizeof( float ) );
-    std::memcpy( mappedSpotLightCenterAndRadiusMemory, spotLightCenterAndRadius.data(), spotLightCenterAndRadius.size() * 4 * sizeof( float ) );
+    std::memcpy( mappedPointLightCenterAndRadiusMemory, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+    std::memcpy( mappedSpotLightCenterAndRadiusMemory, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const

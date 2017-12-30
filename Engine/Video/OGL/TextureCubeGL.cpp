@@ -134,7 +134,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             GfxDevice::ErrorCheck( "Cube map creation" );
             stbi_image_free( data );
         }
-        else if (isDDS)
+        else if (isDDS && GfxDevice::HasExtension( "GL_EXT_texture_compression_s3tc" ))
         {
             DDSLoader::Output unusedOutput;
             const DDSLoader::LoadResult result = DDSLoader::Load( FileSystem::FileContents( paths[ face ].c_str() ), face + 1, width, height, opaque, unusedOutput );
