@@ -28,7 +28,7 @@
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
-#define TEST_SHADOWS_SPOT
+//#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
 
@@ -395,7 +395,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)

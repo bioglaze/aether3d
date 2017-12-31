@@ -15,7 +15,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.7 Documentation
+   \mainpage Aether3D Game Engine v0.7.5 Documentation
 
    \section Introduction
 

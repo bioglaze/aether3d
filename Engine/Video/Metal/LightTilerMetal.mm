@@ -34,8 +34,6 @@ void ae3d::LightTiler::Init()
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
     memcpy( bufferPointer, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
 
-    spotLightCenterAndRadius.resize( MaxLights );
-    
     spotLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                          options:MTLResourceCPUCacheModeDefaultCache];
     spotLightCenterAndRadiusBuffer.label = @"spotLightCenterAndRadiusBuffer";
