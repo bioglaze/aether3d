@@ -10,6 +10,7 @@
 namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
+    extern std::vector< ae3d::VertexBuffer > lineBuffers;
 }
 
 void ae3d::Renderer::GenerateTextures()
@@ -84,4 +85,35 @@ void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponen
     GfxDevice::Draw( skyboxBuffer, 0, skyboxBuffer.GetFaceCount() / 3, builtinShaders.skyboxShader, GfxDevice::BlendMode::Off,
                      GfxDevice::DepthFunc::LessOrEqualWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
     GfxDevice::PopGroupMarker();
+}
+
+int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
+{
+    if (lines.empty())
+    {
+        return -1;
+    }
+
+    std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
+
+    std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
+
+    for (std::size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
+    {
+        vertices[ lineIndex ].position = lines[ lineIndex ];
+        vertices[ lineIndex ].color = Vec4( color, 1 );
+    }
+
+    // Not used, but needs to be set to something.
+    for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
+    {
+        faces[ faceIndex * 2 + 0 ].a = faceIndex;
+        faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
+    }
+
+    GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
+    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
+
+    return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
 }

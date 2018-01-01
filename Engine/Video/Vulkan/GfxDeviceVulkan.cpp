@@ -956,7 +956,7 @@ namespace ae3d
 
         if (debug::enabled)
         {
-            enabledFeatures.robustBufferAccess = true;
+            enabledFeatures.robustBufferAccess = GfxDeviceGlobal::deviceFeatures.robustBufferAccess;
         }
         
         VkDeviceCreateInfo deviceCreateInfo = {};
@@ -1754,37 +1754,6 @@ void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outB
 
 void ae3d::GfxDevice::ClearScreen( unsigned /*clearFlags*/ )
 {
-}
-
-int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
-{
-    if (lines.empty())
-    {
-        return -1;
-    }
-
-    std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
-
-    std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
-
-    for (std::size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
-    {
-        vertices[ lineIndex ].position = lines[ lineIndex ];
-        vertices[ lineIndex ].color = Vec4( color, 1 );
-    }
-
-    // Not used, but needs to be set to something.
-    for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.size() / 2); ++faceIndex)
-    {
-        faces[ faceIndex * 2 + 0 ].a = faceIndex;
-        faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
-    }
-
-    GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
-    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
-    GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
-
-    return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
 }
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
