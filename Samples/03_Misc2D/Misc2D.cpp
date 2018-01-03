@@ -220,7 +220,7 @@ int main()
         //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
 
         scene.Render();
-        System::Draw( &spriteTex, 40, 240, 100, 100, (float)width, (float)height );
+        System::Draw( &spriteTex, 40, 240, 100, 100, (float)width, (float)height, Vec4( 1, 0.2f, 0.2f, 1.0f ) );
         System::DrawLines( lineHandle, lineView, lineProjection );
         scene.EndFrame();
         

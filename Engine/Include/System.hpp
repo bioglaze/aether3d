@@ -15,7 +15,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.7.5 Documentation
+   \mainpage Aether3D Game Engine v0.7.8 Documentation
 
    \section Introduction
 
@@ -50,7 +50,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.7.5.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.7.8.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    
@@ -130,7 +130,8 @@ namespace ae3d
         /// \param ySize Y size in pixels
         /// \param xScreenSize X viewport size in pixels
         /// \param yScreenSize Y viewport size in pixels
-        void Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize );
+        /// \param tintColor Tint color
+        void Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor );
         
         /// Draws lines using a line loop. Currently only implemented in OpenGL. Should be called after Scene::Render().
         /// \param handle Handle, created with CreateLineBuffer.

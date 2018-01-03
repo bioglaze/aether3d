@@ -171,7 +171,8 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* loc
     {
         renderer.builtinShaders.spriteRendererShader.Use();
         GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
- 
+        GfxDeviceGlobal::perObjectUboStruct.lightColor = ae3d::Vec4( 1, 1, 1, 1 );
+
         if (drawable.texture->IsRenderTexture())
         {
             renderer.builtinShaders.spriteRendererShader.SetRenderTexture( "textureMap", static_cast< ae3d::RenderTexture* >(drawable.texture), 0 );

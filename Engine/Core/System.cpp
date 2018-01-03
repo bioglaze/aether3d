@@ -102,7 +102,8 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     renderer.builtinShaders.uiShader.Use();
     renderer.builtinShaders.uiShader.SetTexture( "textureMap", texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
-
+    GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
+    
 #if RENDERER_VULKAN
     Matrix44 proj;
     proj.MakeProjection( 0, (float)windowWidth, (float)windowHeight, 0, -1, 1 );
@@ -176,7 +177,7 @@ void ae3d::System::Assert( bool condition, const char* message )
 #endif
 }
 
-void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize )
+void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor )
 {
     Matrix44 proj;
     proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
@@ -194,14 +195,14 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip = mvp;
-
+    GfxDeviceGlobal::perObjectUboStruct.lightColor = tintColor;
+    
     int viewport[ 4 ];
     viewport[ 0 ] = 0;
     viewport[ 1 ] = 0;
     viewport[ 2 ] = (int)xScreenSize;
     viewport[ 3 ] = (int)yScreenSize;
     GfxDevice::SetViewport( viewport );
-    //GfxDevice::SetScissor( viewport );
 
     GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, GfxDevice::BlendMode::AlphaBlend,
                      GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
@@ -218,6 +219,7 @@ void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& 
     Matrix44::Multiply( view, projection, viewProjection );
     renderer.builtinShaders.spriteRendererShader.Use();
     renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", Texture2D::GetDefaultTexture(), 0 );
+    GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip = viewProjection;
 
     GfxDevice::DrawLines( handle, renderer.builtinShaders.spriteRendererShader );

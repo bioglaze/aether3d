@@ -121,7 +121,8 @@ void ae3d::TextRendererComponent::Render( const float* localToClip )
         shader->Use();
         shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
         GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
-
+        GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
+        
         GfxDevice::Draw( m().vertexBuffer, 0, m().vertexBuffer.GetFaceCount() / 3, *m().shader, ae3d::GfxDevice::BlendMode::AlphaBlend,
                          ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOff, ae3d::GfxDevice::CullMode::Off, ae3d::GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
     }

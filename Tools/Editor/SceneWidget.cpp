@@ -677,7 +677,7 @@ void SceneWidget::DrawLightSprites()
 
                 const float size = (height() * devicePixelRatio()) / distance;
 
-                ae3d::System::Draw( &lightTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height() * devicePixelRatio() );
+                ae3d::System::Draw( &lightTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height() * devicePixelRatio(), Vec4( color.x, color.y, color.z, 1 ) );
             }
         }
     }
@@ -718,10 +718,9 @@ void SceneWidget::DrawAudioSprites()
                 screenPoint.x > -audioTex.GetWidth() && screenPoint.y > -audioTex.GetHeight() &&
                 screenPoint.x < width() * devicePixelRatio() && screenPoint.y < height() * devicePixelRatio())
             {
-                const Vec3 color( 1, 1, 1 );
                 const float size = (height() * devicePixelRatio()) / distance;
 
-                ae3d::System::Draw( &audioTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height()  * devicePixelRatio());
+                ae3d::System::Draw( &audioTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height() * devicePixelRatio(), Vec4( 1, 1, 1, 1 ) );
             }
         }
     }
@@ -762,10 +761,9 @@ void SceneWidget::DrawCameraSprites()
                 screenPoint.x > -cameraTex.GetWidth() && screenPoint.y > -cameraTex.GetHeight() &&
                 screenPoint.x < width() * devicePixelRatio() && screenPoint.y < height() * devicePixelRatio())
             {
-                const Vec3 color( 1, 1, 1 );
                 const float size = height() / distance;
 
-                ae3d::System::Draw( &cameraTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height() * devicePixelRatio() );
+                ae3d::System::Draw( &cameraTex, screenPoint.x, screenPoint.y, size, size, width() * devicePixelRatio(), height() * devicePixelRatio(), Vec4( 1, 1, 1, 1 ) );
             }
         }
     }

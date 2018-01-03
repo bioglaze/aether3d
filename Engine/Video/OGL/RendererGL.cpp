@@ -14,6 +14,22 @@ void ae3d::BuiltinShaders::Load()
     layout(std140) uniform PerObject
     {
         mat4 localToClip;
+        mat4 localToView;
+        mat4 localToWorld;
+        mat4 localToShadowClip;
+        mat4 clipToView;
+        vec4 lightPosition;
+        vec4 lightDirection;
+        vec4 lightColor;
+        float lightConeAngleCos;
+        int lightType;
+        float minAmbient;
+        uint maxNumLightsPerTile;
+        uint windowWidth;
+        uint windowHeight;
+        uint numLights; // 16 bits for point light count, 16 for spot light count
+        uint padding;
+        mat4 boneMatrices[ 80 ];
     };
 
     out vec2 vTexCoord;
@@ -23,7 +39,7 @@ void ae3d::BuiltinShaders::Load()
     {
         gl_Position = localToClip * vec4( aPosition.xyz, 1.0 );
         vTexCoord = aTexCoord;
-        vColor = aColor;
+        vColor = aColor * lightColor;
     })";
     
     const char* spriteFragmentSource = R"(
