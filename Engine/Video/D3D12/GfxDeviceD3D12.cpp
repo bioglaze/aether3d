@@ -334,6 +334,43 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
 }
 
+void CreateTimerQuery()
+{
+    D3D12_HEAP_PROPERTIES heapProps;
+    heapProps.Type = D3D12_HEAP_TYPE_READBACK;
+    heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    heapProps.CreationNodeMask = 1;
+    heapProps.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC bufferDesc;
+    bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    bufferDesc.Alignment = 0;
+    bufferDesc.Width = sizeof( std::uint64_t ) * GfxDeviceGlobal::timerQuery.MaxNumTimers * 2 * GfxDeviceGlobal::timerQuery.RenderLatency;
+    bufferDesc.Height = 1;
+    bufferDesc.DepthOrArraySize = 1;
+    bufferDesc.MipLevels = 1;
+    bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+    bufferDesc.SampleDesc.Count = 1;
+    bufferDesc.SampleDesc.Quality = 0;
+    bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &bufferDesc,
+                                       D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &GfxDeviceGlobal::timerQuery.queryBuffer ) );
+    AE3D_CHECK_D3D( hr, "Failed to create query buffer" );
+
+    GfxDeviceGlobal::timerQuery.queryBuffer->SetName( L"Query Buffer" );
+
+    D3D12_QUERY_HEAP_DESC QueryHeapDesc;
+    QueryHeapDesc.Count = GfxDeviceGlobal::timerQuery.MaxNumTimers * 2;
+    QueryHeapDesc.NodeMask = 0;
+    QueryHeapDesc.Type = D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
+    hr = GfxDeviceGlobal::device->CreateQueryHeap( &QueryHeapDesc, IID_PPV_ARGS( &GfxDeviceGlobal::timerQuery.queryHeap ) );
+    AE3D_CHECK_D3D( hr, "Failed to create query heap" );
+    GfxDeviceGlobal::timerQuery.queryHeap->SetName( L"Query heap" );
+}
+
 void CreateBackBuffer()
 {
     for (int i = 0; i < GfxDeviceGlobal::BufferCount; ++i)
@@ -949,47 +986,15 @@ void ae3d::CreateRenderer( int samples )
 
     hr = factory->CreateSwapChainForHwnd( GfxDeviceGlobal::commandQueue, WindowGlobal::hwnd, &swapChainDesc1, nullptr, nullptr, (IDXGISwapChain1**)&GfxDeviceGlobal::swapChain );
     AE3D_CHECK_D3D( hr, "Failed to create swap chain" );
+
+    factory->MakeWindowAssociation( WindowGlobal::hwnd, DXGI_MWA_NO_ALT_ENTER );
     factory->Release();
 
     D3D12_CPU_DESCRIPTOR_HANDLE initSamplerHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
     D3D12_CPU_DESCRIPTOR_HANDLE initDsvHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
     D3D12_CPU_DESCRIPTOR_HANDLE initCbvSrvUavHeapTemp = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    // Query heap
-    D3D12_HEAP_PROPERTIES HeapProps;
-    HeapProps.Type = D3D12_HEAP_TYPE_READBACK;
-    HeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-    HeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-    HeapProps.CreationNodeMask = 1;
-    HeapProps.VisibleNodeMask = 1;
-
-    D3D12_RESOURCE_DESC BufferDesc;
-    BufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    BufferDesc.Alignment = 0;
-    BufferDesc.Width = sizeof( std::uint64_t ) * GfxDeviceGlobal::timerQuery.MaxNumTimers * 2 * GfxDeviceGlobal::timerQuery.RenderLatency;
-    BufferDesc.Height = 1;
-    BufferDesc.DepthOrArraySize = 1;
-    BufferDesc.MipLevels = 1;
-    BufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-    BufferDesc.SampleDesc.Count = 1;
-    BufferDesc.SampleDesc.Quality = 0;
-    BufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    BufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-    hr = GfxDeviceGlobal::device->CreateCommittedResource( &HeapProps, D3D12_HEAP_FLAG_NONE, &BufferDesc,
-        D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &GfxDeviceGlobal::timerQuery.queryBuffer ) );
-    AE3D_CHECK_D3D( hr, "Failed to create query buffer" );
-
-    GfxDeviceGlobal::timerQuery.queryBuffer->SetName( L"Query Buffer" );
-
-    D3D12_QUERY_HEAP_DESC QueryHeapDesc;
-    QueryHeapDesc.Count = GfxDeviceGlobal::timerQuery.MaxNumTimers * 2;
-    QueryHeapDesc.NodeMask = 0;
-    QueryHeapDesc.Type = D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
-    hr = GfxDeviceGlobal::device->CreateQueryHeap( &QueryHeapDesc, IID_PPV_ARGS( &GfxDeviceGlobal::timerQuery.queryHeap ) );
-    AE3D_CHECK_D3D( hr, "Failed to create query heap" );
-    GfxDeviceGlobal::timerQuery.queryHeap->SetName( L"Query heap" );
-
+    CreateTimerQuery();
     CreateBackBuffer();
     CreateMSAA();
     CreateRootSignature();
