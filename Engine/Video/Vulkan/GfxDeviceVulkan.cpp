@@ -173,6 +173,7 @@ namespace WindowGlobal
 #endif
     extern int windowWidth;
     extern int windowHeight;
+    extern int presentInterval;
 }
 
 namespace ae3d
@@ -795,7 +796,7 @@ namespace ae3d
         swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         swapchainInfo.queueFamilyIndexCount = 0;
         swapchainInfo.pQueueFamilyIndices = nullptr;
-        swapchainInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+        swapchainInfo.presentMode = WindowGlobal::presentInterval == 0 ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
         swapchainInfo.clipped = VK_TRUE;
         swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 

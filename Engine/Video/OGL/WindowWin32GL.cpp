@@ -7,6 +7,7 @@ namespace WindowGlobal
 {
     extern HWND hwnd;
     extern HDC hdc;
+    extern int presentInterval;
 }
 
 namespace Dummy
@@ -231,6 +232,6 @@ namespace ae3d
         }
 
         PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress( "wglSwapIntervalEXT" );
-        wglSwapIntervalEXT( 1 );
+        wglSwapIntervalEXT( WindowGlobal::presentInterval );
     }
 }

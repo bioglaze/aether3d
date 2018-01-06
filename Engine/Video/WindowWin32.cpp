@@ -35,6 +35,7 @@ namespace WindowGlobal
     int windowWidth = 640;
     int windowHeight = 480;
     int windowHeightWithoutTitleBar = 640;
+    int presentInterval = 1;
     const int eventStackSize = 10;
     ae3d::WindowEvent eventStack[ eventStackSize ];
     int eventIndex = -1;
@@ -333,6 +334,7 @@ namespace ae3d
         InitKeyMap();
         WindowGlobal::windowWidth = width == 0 ? GetSystemMetrics( SM_CXSCREEN ) : width;
         WindowGlobal::windowHeight = height == 0 ? GetSystemMetrics( SM_CYSCREEN ) : height;
+        WindowGlobal::presentInterval = (flags & WindowCreateFlags::No_vsync) != 0 ? 0 : 1;
 
         const HINSTANCE hInstance = GetModuleHandle( nullptr );
         const bool fullscreen = (flags & WindowCreateFlags::Fullscreen) != 0;

@@ -49,7 +49,8 @@ namespace ae3d
         Fullscreen = 1 << 1,
         MSAA4 = 1 << 2,
         MSAA8 = 1 << 3,
-        MSAA16 = 1 << 4
+        MSAA16 = 1 << 4,
+        No_vsync = 1 << 5
     };
 
     /// Window event is a key press, close event, mouse click etc.

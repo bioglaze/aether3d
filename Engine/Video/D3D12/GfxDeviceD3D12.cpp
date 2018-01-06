@@ -39,6 +39,7 @@ namespace WindowGlobal
     extern HWND hwnd;
     extern int windowWidth;
     extern int windowHeight;
+    extern int presentInterval;
 }
 
 namespace ae3d
@@ -1404,7 +1405,7 @@ void ae3d::GfxDevice::Present()
     ID3D12CommandList* ppCommandLists[] = { GfxDeviceGlobal::graphicsCommandList };
     GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, &ppCommandLists[ 0 ] );
 
-    hr = GfxDeviceGlobal::swapChain->Present( 1, 0 );
+    hr = GfxDeviceGlobal::swapChain->Present( WindowGlobal::presentInterval, 0 );
 
     if (FAILED( hr ))
     {

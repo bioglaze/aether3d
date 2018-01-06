@@ -85,7 +85,8 @@ namespace WindowGlobal
     const int eventStackSize = 15;
     ae3d::WindowEvent eventStack[eventStackSize];
     int eventIndex = -1;
-    
+    int presentInterval = 1;
+
     void IncEventIndex()
     {
         if (eventIndex < eventStackSize - 1)
@@ -234,6 +235,8 @@ void LoadAtoms()
 
 static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
+    WindowGlobal::presentInterval = (flags & ae3d::WindowCreateFlags::No_vsync) ? 0 : 1;
+
 #if RENDERER_OPENGL
     int num_fb_configs = 0;
     GLXFBConfig* fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
@@ -437,11 +440,11 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
 
     if (glXSwapIntervalEXT)
     {
-        glXSwapIntervalEXT( display, WindowGlobal::drawable, 1 );
+        glXSwapIntervalEXT( display, WindowGlobal::drawable, WindowGlobal::presentInterval );
     }
     else if (glXSwapIntervalMESA)
     {
-        glXSwapIntervalMESA( 1 );
+        glXSwapIntervalMESA( WindowGlobal::presentInterval );
     }
     else    
     {
