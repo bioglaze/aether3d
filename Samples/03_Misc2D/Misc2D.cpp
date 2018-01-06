@@ -205,20 +205,6 @@ int main()
             }
         }
 
-        //std::string stats = text + std::to_string( System::Statistics::GetDrawCallCount() );
-        
-        //std::string stats = System::Statistics::GetStatistics();
-        //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
-
-        //stats += std::string( "\nbarriers: " ) + std::to_string( System::Statistics::GetBarrierCallCount() );
-
-        /*unsigned gpuUsage, gpuBudget;
-        System::Statistics::GetGpuMemoryUsage( gpuUsage, gpuBudget );
-        stats += std::string( "\nused VRAM: " ) + std::to_string( gpuUsage ) + std::string( " MB, budget: " ) +
-            std::to_string( gpuBudget ) + std::string( " MB" );
-          */  
-        //statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );
-
         scene.Render();
         System::Draw( &spriteTex, 40, 240, 100, 100, (float)width, (float)height, Vec4( 1, 0.2f, 0.2f, 1.0f ) );
         System::DrawLines( lineHandle, lineView, lineProjection );

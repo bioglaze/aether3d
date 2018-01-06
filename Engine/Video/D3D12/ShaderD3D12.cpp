@@ -53,6 +53,8 @@ namespace
     std::vector< ShaderCacheEntry > cacheEntries;
 }
 
+void ClearPSOCache();
+
 void ShaderReload( const std::string& path )
 {
     for (const auto& entry : cacheEntries)
@@ -66,6 +68,7 @@ void ShaderReload( const std::string& path )
             const std::string fragmentStr = std::string( std::begin( fragmentData.data ), std::end( fragmentData.data ) );
 
             entry.shader->Load( vertexStr.c_str(), fragmentStr.c_str() );
+            ClearPSOCache();
         }
     }
 }

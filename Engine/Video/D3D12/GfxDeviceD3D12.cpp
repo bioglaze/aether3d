@@ -199,6 +199,11 @@ namespace GfxDeviceGlobal
     ID3D12PipelineState* cachedPSO = nullptr;
 }
 
+void ClearPSOCache()
+{
+    GfxDeviceGlobal::psoCache.clear();
+}
+
 std::uint64_t TimerQuery::Start( const char* name )
 {
     std::uint64_t index = (std::uint64_t)-1;
