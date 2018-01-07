@@ -1,4 +1,3 @@
-#ifndef SIMD_SSE3
 #include "Matrix.hpp"
 #include <cstring>
 #include <cmath>
@@ -137,6 +136,8 @@ void Matrix44::Invert( const Matrix44& matrix, Matrix44& out )
 #endif
 }
 
+#ifndef SIMD_SSE3
+#if !(RENDERER_METAL && !(__i386__))
 void Matrix44::Multiply( const Matrix44& a, const Matrix44& b, Matrix44& out )
 {
     float tmp[ 16 ];
@@ -165,13 +166,16 @@ void ae3d::Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4*
     tmp.y = mat.m[1] * vec.x + mat.m[ 5 ] * vec.y + mat.m[ 9] * vec.z + mat.m[13] * vec.w;
     tmp.z = mat.m[2] * vec.x + mat.m[ 6 ] * vec.y + mat.m[10] * vec.z + mat.m[14] * vec.w;
     tmp.w = mat.m[3] * vec.x + mat.m[ 7 ] * vec.y + mat.m[11] * vec.z + mat.m[15] * vec.w;
-
+    
     *out = tmp;
-
+    
 #if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
 #endif
 }
+
+#endif
+#endif
 
 void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 {
@@ -427,4 +431,4 @@ void Matrix44::Translate( const Vec3& v )
     ae3d::CheckNaN( *this );
 #endif
 }
-#endif
+
