@@ -50,7 +50,7 @@ vertex ColorInOut sprite_vertex(Vertex vert [[stage_in]],
     float4 in_position = float4( float3( vert.position ), 1.0 );
     out.position = uniforms.localToClip * in_position;
     
-    out.color = half4( vert.color * vert.lightColor );
+    out.color = half4( vert.color * uniforms.lightColor );
     out.texCoords = vert.texcoord;
     return out;
 }
