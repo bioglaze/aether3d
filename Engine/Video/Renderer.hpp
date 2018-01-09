@@ -21,6 +21,7 @@ namespace ae3d
         Shader momentsShader;
         Shader depthNormalsShader;
         Shader uiShader;
+        Shader fullscreenTriangleShader;
         ComputeShader lightCullShader;
     };
 

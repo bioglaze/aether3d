@@ -158,6 +158,8 @@ namespace GfxDeviceGlobal
     ae3d::RenderTexture* currentRenderTarget = nullptr;
     unsigned currentRenderTargetCubeMapFace = 0;
 
+    ae3d::RenderTexture hdrTarget;
+    ID3D12PipelineState* fullscreenTrianglePSO;
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
     GpuResource rtvResources[ 2 ];
 
@@ -322,22 +324,63 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
     BarrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
     BarrierDesc.Transition.StateBefore = oldState;
     BarrierDesc.Transition.StateAfter = newState;
+    BarrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 
     // Check to see if we already started the transition
     if (newState == gpuResource.transitioningState)
     {
-        BarrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_END_ONLY;
         gpuResource.transitioningState = (D3D12_RESOURCE_STATES)-1;
-    }
-    else
-    {
-        BarrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
     }
 
     gpuResource.usageState = newState;
 
     Statistics::IncBarrierCalls();
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
+}
+
+void CreateFullscreenTrianglePSO( ID3DBlob* vertexBlob, ID3DBlob* pixelBlob )
+{
+    D3D12_RASTERIZER_DESC descRaster = {};
+    descRaster.CullMode = D3D12_CULL_MODE_FRONT;
+    descRaster.FrontCounterClockwise = FALSE;
+    descRaster.FillMode = D3D12_FILL_MODE_SOLID;
+
+    const D3D12_RENDER_TARGET_BLEND_DESC blendOff =
+    {
+        FALSE, FALSE,
+        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+        D3D12_LOGIC_OP_NOOP,
+        D3D12_COLOR_WRITE_ENABLE_ALL,
+    };
+
+    D3D12_BLEND_DESC descBlend = {};
+    descBlend.AlphaToCoverageEnable = FALSE;
+    descBlend.IndependentBlendEnable = FALSE;
+    descBlend.RenderTarget[ 0 ] = blendOff;
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC descPso = {};
+    descPso.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
+    descPso.pRootSignature = GfxDeviceGlobal::rootSignatureGraphics;
+    descPso.VS = { reinterpret_cast<BYTE*>( vertexBlob->GetBufferPointer()), vertexBlob->GetBufferSize() };
+    descPso.PS = { reinterpret_cast<BYTE*>( pixelBlob->GetBufferPointer()), pixelBlob->GetBufferSize() };
+    descPso.RasterizerState = descRaster;
+    descPso.BlendState = descBlend;
+    descPso.DepthStencilState.StencilEnable = FALSE;
+    descPso.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+    descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    descPso.DepthStencilState.DepthEnable = FALSE;
+    descPso.SampleMask = UINT_MAX;
+    descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    descPso.NumRenderTargets = 1;
+    descPso.RTVFormats[ 0 ] = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    descPso.SampleDesc.Count = GfxDeviceGlobal::sampleCount;
+    descPso.SampleDesc.Quality = GfxDeviceGlobal::sampleCount > 1 ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &GfxDeviceGlobal::fullscreenTrianglePSO ) );
+    AE3D_CHECK_D3D( hr, "Failed to create PSO" );
+    GfxDeviceGlobal::fullscreenTrianglePSO->SetName( L"PSO Fullscreen Triangle" );
 }
 
 void CreateTimerQuery()
@@ -400,6 +443,8 @@ void CreateBackBuffer()
         descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], &descRtv, handle );
     }
+
+    GfxDeviceGlobal::hdrTarget.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "hdrTarget" );
 }
 
 void CreateMSAA()
@@ -412,7 +457,7 @@ void CreateMSAA()
     // MSAA color
 
     D3D12_CLEAR_VALUE clearValue = {};
-    clearValue.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    clearValue.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 
     D3D12_HEAP_PROPERTIES heapProp = {};
     heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -818,6 +863,43 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::Texture
     return GfxDeviceGlobal::samplers[ samplerIndex ].linearClampGPU;
 }
 
+void DrawHDRToBackBuffer()
+{
+    GfxDeviceGlobal::currentConstantBufferIndex = (GfxDeviceGlobal::currentConstantBufferIndex + 1) % GfxDeviceGlobal::mappedConstantBuffers.size();
+    GfxDeviceGlobal::currentRenderTarget = nullptr;
+    ae3d::GfxDevice::ClearScreen( 0 );
+    TransitionResource( *GfxDeviceGlobal::hdrTarget.GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
+
+    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 4) % GfxDeviceGlobal::constantBuffers.size();
+
+    D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
+
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+    cbvDesc.BufferLocation = GfxDeviceGlobal::constantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
+    cbvDesc.SizeInBytes = AE3D_CB_SIZE;
+    GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
+
+    cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::hdrTarget.GetGpuResource()->resource, GfxDeviceGlobal::hdrTarget.GetSRVDesc(), cpuHandle );
+
+    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( ae3d::Mipmaps::None, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, ae3d::Anisotropy::k1 );
+
+    ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
+    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavGpuHandle( index ) );
+    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
+
+    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::fullscreenTrianglePSO );
+    GfxDeviceGlobal::cachedPSO = GfxDeviceGlobal::fullscreenTrianglePSO;
+    Statistics::IncPSOBindCalls();
+
+    GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 0, nullptr );
+    GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( nullptr );
+    GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+    GfxDeviceGlobal::graphicsCommandList->DrawInstanced( 3, 1, 0, 0 );
+}
+
 void CreateDepthStencil()
 {
     auto descResource = CD3DX12_RESOURCE_DESC::Tex2D(
@@ -1055,7 +1137,6 @@ void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
     const float timeMS = (float)GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.depthNormalsProfilerIndex ].timeSamples[ GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.depthNormalsProfilerIndex ].currSample ];
 
     Statistics::SetDepthNormalsGpuTime( timeMS );
-
 }
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()
@@ -1120,12 +1201,6 @@ void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFace, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
                             CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )
 {
-    // Prevents feedback. Currently disabled because it also prevents drawing a sprite that uses render texture.
-    /*if (GfxDeviceGlobal::renderTexture0 && GfxDeviceGlobal::currentRenderTargetRTV.ptr == GfxDeviceGlobal::renderTexture0->GetRTV().ptr)
-    {
-        return;
-    }*/
-
     DXGI_FORMAT rtvFormat = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
     
     if (GfxDeviceGlobal::sampleCount > 1)
@@ -1277,6 +1352,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     DescriptorHeapManager::Deinit();
 
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::fullscreenTrianglePSO );
+
     for (auto& pso : GfxDeviceGlobal::psoCache)
     {
         AE3D_SAFE_RELEASE( pso.second );
@@ -1387,6 +1464,8 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 void ae3d::GfxDevice::Present()
 {
+    DrawHDRToBackBuffer();
+
     TransitionResource( GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ], D3D12_RESOURCE_STATE_PRESENT );
 
     if (GfxDeviceGlobal::sampleCount > 1)
@@ -1473,16 +1552,13 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     System::Assert( !target || target->IsRenderTexture(), "target must be render texture" );
     System::Assert( cubeMapFace < 6, "invalid cube map face" );
 
+    if (target == nullptr)
+    {
+        target = &GfxDeviceGlobal::hdrTarget;
+    }
+
     GfxDeviceGlobal::currentRenderTarget = target;
     GfxDeviceGlobal::currentRenderTargetCubeMapFace = cubeMapFace;
 
-    if (target && target->IsCube())
-    {
-        TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
-    }
-    else if (target)
-    {
-        System::Assert( target->GetGpuResource()->resource != nullptr, "no GPU resource's resource in render target!" );
-        TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
-    }
+    TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
 }
