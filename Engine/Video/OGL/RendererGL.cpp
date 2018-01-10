@@ -209,4 +209,33 @@ void ae3d::BuiltinShaders::Load()
     depthNormalsShader.Load( depthNormalsVertexSource, depthNormalsFragmentSource );
 
     uiShader.Load( spriteVertexSource, spriteFragmentSource );
+
+    const char* fullscreenTriangleVertexSource = R"(
+    #version 330 core
+        
+    out vec2 vTexCoord;
+    
+    void main()
+    {
+        vTexCoord = vec2( (gl_VertexID << 1) & 2, gl_VertexID & 2 );
+        gl_Position = vec4( vTexCoord * 2.0f + -1.0f, 0.0f, 1.0f );
+    }
+    )";
+
+    const char* fullscreenTriangleFragmentSource = R"(
+    #version 330 core
+    in vec3 vPosition;
+    in vec2 vTexCoord;
+    
+    out vec4 fragColor;
+    
+    uniform sampler2D textureMap;
+
+    void main()
+    {
+        fragColor = texture( textureMap, vTexCoord );
+    }
+    )";
+
+    fullscreenTriangleShader.Load( fullscreenTriangleVertexSource, fullscreenTriangleFragmentSource );
 }

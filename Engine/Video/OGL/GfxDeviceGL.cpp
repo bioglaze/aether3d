@@ -7,6 +7,7 @@
 #include <GL/glxw.h>
 #include "RenderTexture.hpp"
 #include "System.hpp"
+#include "Shader.hpp"
 #include "Statistics.hpp"
 #include "Shader.hpp"
 #include "Texture2D.hpp"
@@ -87,6 +88,7 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > fboIds;
     std::vector< ae3d::VertexBuffer > lineBuffers;
     
+    ae3d::RenderTexture hdrTarget;
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     GLuint systemFBO = 0;
@@ -94,6 +96,7 @@ namespace GfxDeviceGlobal
     GLuint perObjectUbo = 0;
     GLuint depthNormalsQueries[ 4 ];
     GLuint shadowMapQueries[ 4 ];
+    GLuint emptyVAO;
     unsigned frameIndex = 0;
 
     PerObjectUboStruct perObjectUboStruct;
@@ -361,6 +364,13 @@ void ae3d::GfxDevice::Init( int width, int height )
     glGenQueries( 4, GfxDeviceGlobal::shadowMapQueries );
 
     InitUIVertexBuffer();
+    GfxDeviceGlobal::hdrTarget.Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "hdrTarget" );
+
+    glGenVertexArrays( 1, &GfxDeviceGlobal::emptyVAO );
+    glBindVertexArray( GfxDeviceGlobal::emptyVAO );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindVertexArray( 0 );
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
@@ -667,13 +677,21 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     ErrorCheck( "SetRenderTarget end" );
 }
 
+void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
+{
+    /*fullscreenTriangleShader.Use();
+    fullscreenTriangleShader.SetRenderTexture( "textureMap", &GfxDeviceGlobal::hdrTarget, 0 );
+    glBindVertexArray( GfxDeviceGlobal::emptyVAO );
+    glDrawArrays( GL_TRIANGLES, 0, 3 );*/
+}
+
 void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )
 {
     GfxDeviceGlobal::backBufferWidth = width;
     GfxDeviceGlobal::backBufferHeight = height;
     int fboId = 0;
     glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fboId );
-    GfxDeviceGlobal::systemFBO = static_cast< unsigned >(fboId);
+    GfxDeviceGlobal::systemFBO = static_cast< unsigned >( fboId );
 }
 
 void ae3d::GfxDevice::Set_sRGB_Writes( bool enable )

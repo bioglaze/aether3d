@@ -36,6 +36,7 @@ extern Renderer renderer;
 float GetVRFov();
 void BeginOffscreen();
 void EndOffscreen();
+void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader );
 
 namespace GfxDeviceGlobal
 {
@@ -547,6 +548,9 @@ void ae3d::Scene::EndFrame()
 #if RENDERER_METAL
     GfxDevice::EndBackBufferEncoding();
     Statistics::EndFrameTimeProfiling();
+#endif
+#if RENDERER_OPENGL
+    DrawHDRToBackBuffer( renderer.builtinShaders.fullscreenTriangleShader );
 #endif
 }
 
