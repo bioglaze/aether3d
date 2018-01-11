@@ -18,7 +18,7 @@ namespace ae3d
     {
     public:
         void Init();
-        void SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius );
+        void SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color );
         void SetSpotLightPositionAndRadius( int bufferIndex, Vec3& position, float radius );
         void UpdateLightBuffers();
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
@@ -27,22 +27,26 @@ namespace ae3d
 #if RENDERER_METAL
         id< MTLBuffer > GetPerTileLightIndexBuffer() { return perTileLightIndexBuffer; }
         id< MTLBuffer > GetPointLightCenterAndRadiusBuffer() { return pointLightCenterAndRadiusBuffer; }
+        id< MTLBuffer > GetPointLightColorBuffer() { return pointLightColorBuffer; }
         id< MTLBuffer > GetSpotLightCenterAndRadiusBuffer() { return spotLightCenterAndRadiusBuffer; }
         id< MTLBuffer > GetCullerUniforms() { return uniformBuffer; }
 #endif
         /// Destroys graphics API objects.
         void DestroyBuffers();
-
+        
 #if RENDERER_D3D12
         ID3D12Resource* GetPointLightCenterAndRadiusBuffer() const { return pointLightCenterAndRadiusBuffer; }
+        ID3D12Resource* GetPointLightColorBuffer() const { return pointLightColorBuffer; }
 #endif
         int GetPointLightCount() const { return activePointLights; }
         int GetSpotLightCount() const { return activeSpotLights; }
         unsigned GetMaxNumLightsPerTile() const;
-
+        
 #if RENDERER_VULKAN
         VkBuffer GetPointLightBuffer() const { return pointLightCenterAndRadiusBuffer; }
         VkBufferView* GetPointLightBufferView() { return &pointLightBufferView; }
+        VkBuffer GetPointLightColorBuffer() const { return pointLightColorBuffer; }
+        VkBufferView* GetPointLightColorBufferView() { return &pointLightColorView; }
         VkBuffer GetSpotLightBuffer() const { return spotLightCenterAndRadiusBuffer; }
         VkBufferView* GetSpotLightBufferView() { return &spotLightBufferView; }
         VkBufferView* GetLightIndexBufferView() { return &perTileLightIndexBufferView; }
@@ -50,16 +54,18 @@ namespace ae3d
     private:
         unsigned GetNumTilesX() const;
         unsigned GetNumTilesY() const;
-
+        
 #if RENDERER_METAL
         id< MTLBuffer > uniformBuffer;
         id< MTLBuffer > pointLightCenterAndRadiusBuffer;
+        id< MTLBuffer > pointLightColorBuffer;
         id< MTLBuffer > spotLightCenterAndRadiusBuffer;
         id< MTLBuffer > perTileLightIndexBuffer;
 #endif
 #if RENDERER_D3D12
         ID3D12Resource* perTileLightIndexBuffer = nullptr;
         ID3D12Resource* pointLightCenterAndRadiusBuffer = nullptr;
+        ID3D12Resource* pointLightColorBuffer = nullptr;
         ID3D12Resource* spotLightCenterAndRadiusBuffer = nullptr;
 #endif
 #if RENDERER_VULKAN
@@ -67,12 +73,17 @@ namespace ae3d
         VkDeviceMemory pointLightCenterAndRadiusMemory = VK_NULL_HANDLE;
         void* mappedPointLightCenterAndRadiusMemory = nullptr;
         VkBufferView pointLightBufferView;
-
+        
+        VkBuffer pointLightColorBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory pointLightColorMemory = VK_NULL_HANDLE;
+        void* mappedPointLightColorMemory = nullptr;
+        VkBufferView pointLightColorView;
+        
         VkBuffer spotLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory spotLightCenterAndRadiusMemory = VK_NULL_HANDLE;
         void* mappedSpotLightCenterAndRadiusMemory = nullptr;
         VkBufferView spotLightBufferView;
-
+        
         VkBuffer perTileLightIndexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory perTileLightIndexBufferMemory = VK_NULL_HANDLE;
         VkBufferView perTileLightIndexBufferView;
@@ -83,6 +94,7 @@ namespace ae3d
         static const int MaxLights = 2048;
         static const unsigned MaxLightsPerTile = 544;
         Vec4 pointLightCenterAndRadius[ MaxLights ];
+        Vec4 pointLightColors[ MaxLights ];
         Vec4 spotLightCenterAndRadius[ MaxLights ];
         int activePointLights = 0;
         int activeSpotLights = 0;
@@ -91,3 +103,4 @@ namespace ae3d
 }
 
 #endif
+

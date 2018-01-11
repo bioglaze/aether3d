@@ -1296,7 +1296,7 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 550;
 
-        const std::uint32_t typeCount = 7;
+        const std::uint32_t typeCount = 8;
         VkDescriptorPoolSize typeCounts[ typeCount ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
@@ -1312,6 +1312,8 @@ namespace ae3d
         typeCounts[ 5 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 6 ].type = VK_DESCRIPTOR_TYPE_SAMPLER;
         typeCounts[ 6 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 7 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        typeCounts[ 7 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1417,8 +1419,17 @@ namespace ae3d
         samplerSet2.pImageInfo = &sampler1Desc;
         samplerSet2.dstBinding = 6;
 
-        const int setCount = 7;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2 };
+        // Binding 7 : Buffer
+        VkWriteDescriptorSet bufferSet2 = {};
+        bufferSet2.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        bufferSet2.dstSet = outDescriptorSet;
+        bufferSet2.descriptorCount = 1;
+        bufferSet2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        bufferSet2.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightColorBufferView();
+        bufferSet2.dstBinding = 7;
+
+        const int setCount = 8;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2 };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1482,9 +1493,17 @@ namespace ae3d
         layoutBindingSampler2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingSampler2.pImmutableSamplers = nullptr;
 
-        const int bindingCount = 7;
+        // Binding 7 : Buffer
+        VkDescriptorSetLayoutBinding layoutBindingBuffer2 = {};
+        layoutBindingBuffer2.binding = 7;
+        layoutBindingBuffer2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindingBuffer2.descriptorCount = 1;
+        layoutBindingBuffer2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindingBuffer2.pImmutableSamplers = nullptr;
+
+        const int bindingCount = 8;
         const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
-                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2 };
+                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2 };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

@@ -255,7 +255,7 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
                 if (transform && pointLight)
                 {
                     auto worldPos = transform->GetWorldPosition();
-                    GfxDeviceGlobal::lightTiler.SetPointLightPositionAndRadius( goWithPointLightIndex, worldPos, pointLight->GetRadius());
+                    GfxDeviceGlobal::lightTiler.SetPointLightParameters( goWithPointLightIndex, worldPos, pointLight->GetRadius(), Vec4( pointLight->GetColor() ) );
                     ++goWithPointLightIndex;
                 }
 

@@ -30,6 +30,7 @@ namespace MathUtil
 void ae3d::LightTiler::DestroyBuffers()
 {
     AE3D_SAFE_RELEASE( pointLightCenterAndRadiusBuffer );
+    AE3D_SAFE_RELEASE( pointLightColorBuffer );
     AE3D_SAFE_RELEASE( spotLightCenterAndRadiusBuffer );
     AE3D_SAFE_RELEASE( perTileLightIndexBuffer );
 }
@@ -81,7 +82,7 @@ void ae3d::LightTiler::Init()
         GfxDeviceGlobal::uav1Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
     }
 
-    // Point light buffer
+    // Point light center/radius buffer
     {
         D3D12_HEAP_PROPERTIES uploadProp = {};
         uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -116,7 +117,45 @@ void ae3d::LightTiler::Init()
             return;
         }
 
-        pointLightCenterAndRadiusBuffer->SetName( L"LightTiler point light buffer" );
+        pointLightCenterAndRadiusBuffer->SetName( L"LightTiler point light center/radius buffer" );
+    }
+
+    // Point light color buffer
+    {
+        D3D12_HEAP_PROPERTIES uploadProp = {};
+        uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+        uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        uploadProp.CreationNodeMask = 1;
+        uploadProp.VisibleNodeMask = 1;
+
+        D3D12_RESOURCE_DESC bufferProp = {};
+        bufferProp.Alignment = 0;
+        bufferProp.DepthOrArraySize = 1;
+        bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
+        bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+        bufferProp.Height = 1;
+        bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        bufferProp.MipLevels = 1;
+        bufferProp.SampleDesc.Count = 1;
+        bufferProp.SampleDesc.Quality = 0;
+        bufferProp.Width = MaxLights * 4 * sizeof( float );
+
+        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+            &uploadProp,
+            D3D12_HEAP_FLAG_NONE,
+            &bufferProp,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS( &pointLightColorBuffer ) );
+        if (FAILED( hr ))
+        {
+            ae3d::System::Assert( false, "Unable to create point light buffer!" );
+            return;
+        }
+
+        pointLightColorBuffer->SetName( L"LightTiler point light color buffer" );
     }
 
     // Spot light buffer
@@ -158,7 +197,7 @@ void ae3d::LightTiler::Init()
     }
 }
 
-void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
+void ae3d::LightTiler::SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color )
 {
     System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
 
@@ -166,6 +205,7 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& po
     {
         activePointLights = MathUtil::Max( bufferIndex + 1, activePointLights );
         pointLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
+        pointLightColors[ bufferIndex ] = color;
     }
 }
 
@@ -182,30 +222,49 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& pos
 
 void ae3d::LightTiler::UpdateLightBuffers()
 {
-    char* pointLightPtr = nullptr;
-    HRESULT hr = pointLightCenterAndRadiusBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &pointLightPtr) );
-
-    if (FAILED( hr ))
-    {
-        ae3d::System::Assert( false, "Unable to map point light buffer!\n" );
-        return;
-    }
-
     const std::size_t byteSize = MaxLights * 4 * sizeof( float );
-    memcpy_s( pointLightPtr, byteSize, &pointLightCenterAndRadius[ 0 ], byteSize );
-    pointLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
 
-    char* spotLightPtr = nullptr;
-    hr = spotLightCenterAndRadiusBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&spotLightPtr) );
-
-    if( FAILED( hr ) )
     {
-        ae3d::System::Assert( false, "Unable to map spot light buffer!\n" );
-        return;
+        char* pointLightPtr = nullptr;
+        HRESULT hr = pointLightCenterAndRadiusBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&pointLightPtr) );
+
+        if (FAILED( hr ))
+        {
+            ae3d::System::Assert( false, "Unable to map point light buffer!\n" );
+            return;
+        }
+
+        memcpy_s( pointLightPtr, byteSize, &pointLightCenterAndRadius[ 0 ], byteSize );
+        pointLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
     }
 
-    memcpy_s( spotLightPtr, byteSize, &spotLightCenterAndRadius[ 0 ], byteSize );
-    spotLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
+    {
+        char* pointLightPtr = nullptr;
+        HRESULT hr = pointLightColorBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&pointLightPtr) );
+
+        if (FAILED( hr ))
+        {
+            ae3d::System::Assert( false, "Unable to map point light buffer!\n" );
+            return;
+        }
+
+        memcpy_s( pointLightPtr, byteSize, &pointLightColors[ 0 ], byteSize );
+        pointLightColorBuffer->Unmap( 0, nullptr );
+    }
+
+    {
+        char* spotLightPtr = nullptr;
+        HRESULT hr = spotLightCenterAndRadiusBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&spotLightPtr) );
+
+        if (FAILED( hr ))
+        {
+            ae3d::System::Assert( false, "Unable to map spot light buffer!\n" );
+            return;
+        }
+
+        memcpy_s( spotLightPtr, byteSize, &spotLightCenterAndRadius[ 0 ], byteSize );
+        spotLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
+    }
 }
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )
@@ -230,6 +289,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );
     shader.SetTextureBuffer( 1, depthNormalTarget.GetGpuResource()->resource );
     shader.SetTextureBuffer( 2, spotLightCenterAndRadiusBuffer );
+
     shader.SetUAVBuffer( 0, perTileLightIndexBuffer );
 
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );

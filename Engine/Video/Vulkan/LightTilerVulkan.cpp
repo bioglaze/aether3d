@@ -38,12 +38,15 @@ void ae3d::LightTiler::DestroyBuffers()
 {
     vkDestroyBuffer( GfxDeviceGlobal::device, perTileLightIndexBuffer, nullptr );
     vkDestroyBuffer( GfxDeviceGlobal::device, pointLightCenterAndRadiusBuffer, nullptr );
+    vkDestroyBuffer( GfxDeviceGlobal::device, pointLightColorBuffer, nullptr );
     vkDestroyBuffer( GfxDeviceGlobal::device, spotLightCenterAndRadiusBuffer, nullptr );
     vkDestroyBufferView( GfxDeviceGlobal::device, perTileLightIndexBufferView, nullptr );
     vkDestroyBufferView( GfxDeviceGlobal::device, pointLightBufferView, nullptr );
+    vkDestroyBufferView( GfxDeviceGlobal::device, pointLightColorView, nullptr );
     vkDestroyBufferView( GfxDeviceGlobal::device, spotLightBufferView, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, perTileLightIndexBufferMemory, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, pointLightCenterAndRadiusMemory, nullptr );
+    vkFreeMemory( GfxDeviceGlobal::device, pointLightColorMemory, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, spotLightCenterAndRadiusMemory, nullptr );
     vkDestroyPipeline( GfxDeviceGlobal::device, pso, nullptr );
 }
@@ -100,7 +103,7 @@ void ae3d::LightTiler::Init()
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)perTileLightIndexBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "perTileLightIndexBufferView" );
     }
 
-    // Point light buffer
+    // Point light center/radius buffer
     {
         VkBufferCreateInfo bufferInfo = {};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -137,6 +140,45 @@ void ae3d::LightTiler::Init()
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightBufferView );
         AE3D_CHECK_VULKAN( err, "point light buffer view" );
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "pointLightBufferView" );
+    }
+
+    // Point light color buffer
+    {
+        VkBufferCreateInfo bufferInfo = {};
+        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferInfo.size = MaxLights * 4 * sizeof( float );
+        bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
+        VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &pointLightColorBuffer );
+        AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightColorBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "pointLightColorBuffer" );
+
+        VkMemoryRequirements memReqs;
+        vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, pointLightColorBuffer, &memReqs );
+
+        VkMemoryAllocateInfo allocInfo = {};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.pNext = nullptr;
+        allocInfo.allocationSize = memReqs.size;
+        allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
+        err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &pointLightColorMemory );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory pointLightColorMemory" );
+
+        err = vkBindBufferMemory( GfxDeviceGlobal::device, pointLightColorBuffer, pointLightColorMemory, 0 );
+        AE3D_CHECK_VULKAN( err, "vkBindBufferMemory pointLightColorBuffer" );
+
+        err = vkMapMemory( GfxDeviceGlobal::device, pointLightColorMemory, 0, bufferInfo.size, 0, &mappedPointLightColorMemory );
+        AE3D_CHECK_VULKAN( err, "vkMapMemory point lights" );
+
+        VkBufferViewCreateInfo bufferViewInfo = {};
+        bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+        bufferViewInfo.flags = 0;
+        bufferViewInfo.buffer = pointLightColorBuffer;
+        bufferViewInfo.range = VK_WHOLE_SIZE;
+        bufferViewInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+
+        err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightColorView );
+        AE3D_CHECK_VULKAN( err, "point light color view" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightColorView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "pointLightColorView" );
     }
 
     // Spot light buffer
@@ -188,7 +230,7 @@ void ae3d::LightTiler::Init()
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "light tiler PSO" );
 }
 
-void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
+void ae3d::LightTiler::SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color )
 {
     System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
 
@@ -196,6 +238,7 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int bufferIndex, Vec3& po
     {
         activePointLights = MathUtil::Max( bufferIndex + 1, activePointLights );
         pointLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
+        pointLightColors[ bufferIndex ] = color;
     }
 }
 

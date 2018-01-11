@@ -31,16 +31,14 @@ void ae3d::LightTiler::Init()
                                  options:MTLResourceCPUCacheModeDefaultCache];
     pointLightCenterAndRadiusBuffer.label = @"pointLightCenterAndRadiusBuffer";
 
-    uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+    pointLightColorBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
+                                         options:MTLResourceCPUCacheModeDefaultCache];
+    pointLightColorBuffer.label = @"pointLightColorBuffer";
 
     spotLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                          options:MTLResourceCPUCacheModeDefaultCache];
     spotLightCenterAndRadiusBuffer.label = @"spotLightCenterAndRadiusBuffer";
     
-    bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
-
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
@@ -68,7 +66,7 @@ unsigned ae3d::LightTiler::GetNumTilesY() const
     return (unsigned)((GfxDeviceGlobal::backBufferHeight * 2 + TileRes - 1) / (float)TileRes);
 }
 
-void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& position, float radius )
+void ae3d::LightTiler::SetPointLightParameters( int handle, const Vec3& position, float radius, const Vec4& color )
 {
     System::Assert( handle < MaxLights, "tried to set a too high light index" );
 
@@ -76,6 +74,7 @@ void ae3d::LightTiler::SetPointLightPositionAndRadius( int handle, Vec3& positio
     {
         activePointLights = std::max( handle, activePointLights ) + 1;
         pointLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
+        pointLightColors[ handle ] = color;
     }
 }
 
@@ -131,6 +130,9 @@ void ae3d::LightTiler::UpdateLightBuffers()
 {
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
     memcpy( bufferPointer, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+
+    bufferPointer = (uint8_t *)[pointLightColorBuffer contents];
+    memcpy( bufferPointer, &pointLightColors[ 0 ], MaxLights * 4 * sizeof( float ) );
 
     bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
     memcpy( bufferPointer, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );

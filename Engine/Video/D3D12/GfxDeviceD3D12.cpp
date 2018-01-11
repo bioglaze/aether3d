@@ -566,7 +566,7 @@ void CreateRootSignature()
     {
         CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0 );
         descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1 );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
@@ -870,7 +870,7 @@ void DrawHDRToBackBuffer()
     ae3d::GfxDevice::ClearScreen( 0 );
     TransitionResource( *GfxDeviceGlobal::hdrTarget.GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
 
-    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 4) % GfxDeviceGlobal::constantBuffers.size();
+    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 5) % GfxDeviceGlobal::constantBuffers.size();
 
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
 
@@ -1215,7 +1215,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
     }
     
-    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 4) % GfxDeviceGlobal::constantBuffers.size(); // FIXME: * 4 because the descriptor contains 4 entries, is this right?
+    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * 5) % GfxDeviceGlobal::constantBuffers.size();
 
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
 
@@ -1240,6 +1240,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         srvDesc.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
         srvDesc.Buffer.StructureByteStride = 0;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
+
+        cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer(), &srvDesc, cpuHandle );
 
         unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();

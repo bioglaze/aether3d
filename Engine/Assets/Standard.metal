@@ -149,6 +149,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                constant float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
                                constant float4* spotLightBufferCenterAndRadius [[ buffer(9) ]],
                                constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
+                               constant float4* pointLightBufferColors [[ buffer(10) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
     const float4 albedoColor = float4( albedoSmoothnessMap.sample( sampler0, in.texCoords ) );
@@ -185,10 +186,12 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         {
             float x = lightDistance / radius;
             falloff = -0.05 + 1.05 / (1.0 + 20.0 * x * x);
-            outColor.rgb += max( 0.0, dotNL );// * falloff;
+            //outColor.rgb += max( 0.0, dotNL );// * falloff;
+            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb;
         }
         
-        outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
+        //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
+        
         //outColor.rgb += -dot( lightDirVS, normalize( in.normalVS ) );
         //outColor.rgb += lightDistance < radius ? 1 : 0.25;
     }
