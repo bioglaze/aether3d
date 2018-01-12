@@ -652,21 +652,17 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
-    if (target != nullptr && target->GetFBO() == GfxDeviceGlobal::cachedFBO && cubeMapFace == 0)
+    if (target == nullptr)
     {
-        return;
+        target = &GfxDeviceGlobal::hdrTarget;
     }
-    if (target == nullptr && GfxDeviceGlobal::cachedFBO == GfxDeviceGlobal::systemFBO)
-    {
-        return;
-    }
-
-    const GLuint fbo = target != nullptr ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
+    
+    const GLuint fbo = target->GetFBO();
     Statistics::IncRenderTargetBinds();
     glBindFramebuffer( GL_FRAMEBUFFER, fbo );
     GfxDeviceGlobal::cachedFBO = fbo;
 
-    if (target && target->IsCube())
+    if (target->IsCube())
     {
         const unsigned glCubeMapFace = GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace;
         System::Assert( glCubeMapFace >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && glCubeMapFace <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "Invalid cube map face." );
@@ -679,10 +675,19 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
 
 void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
 {
-    /*fullscreenTriangleShader.Use();
+    fullscreenTriangleShader.Use();
     fullscreenTriangleShader.SetRenderTexture( "textureMap", &GfxDeviceGlobal::hdrTarget, 0 );
+
+    glDisable( GL_BLEND );
+    glFrontFace( GL_CW );
+    glDisable( GL_DEPTH_TEST );
+    glBindFramebuffer( GL_FRAMEBUFFER, GfxDeviceGlobal::systemFBO );
     glBindVertexArray( GfxDeviceGlobal::emptyVAO );
-    glDrawArrays( GL_TRIANGLES, 0, 3 );*/
+    glDrawArrays( GL_TRIANGLES, 0, 3 );
+    glFrontFace( GL_CCW );
+
+    Statistics::IncRenderTargetBinds();
+    Statistics::IncDrawCalls();
 }
 
 void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )
