@@ -32,8 +32,9 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
-        System::Print( "Render texture has invalid dimension!\n" );
-        return;
+        System::Print( "Render texture has invalid dimension! Defaulting to 512x512.\n" );
+        aWidth = 512;
+        aHeight = 512;
     }
     
     width = aWidth;
@@ -93,8 +94,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 {
     if (aDimension <= 0)
     {
-        System::Print( "Render texture has invalid dimension!\n" );
-        return;
+        System::Print( "Render texture has invalid dimension! Defaulting to 512.\n" );
+        aDimension = 512;
     }
     
     width = height = aDimension;

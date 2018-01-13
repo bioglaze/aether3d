@@ -238,17 +238,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     WindowGlobal::presentInterval = (flags & ae3d::WindowCreateFlags::No_vsync) ? 0 : 1;
 
 #if RENDERER_OPENGL
-    int num_fb_configs = 0;
-    GLXFBConfig* fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
-    
-    if (!fb_configs || num_fb_configs == 0)
-    {
-        std::cerr << "glXGetFBConfigs failed." << std::endl;
-        return -1;
-    }
-
-    XFree( fb_configs );
-    
     int samples = 0;
 
     if (flags & ae3d::WindowCreateFlags::MSAA4)
@@ -263,6 +252,17 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     {
         samples = 16;
     }
+
+    int num_fb_configs = 0;
+    GLXFBConfig* fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
+    
+    if (!fb_configs || num_fb_configs == 0)
+    {
+        std::cerr << "glXGetFBConfigs failed." << std::endl;
+        return -1;
+    }
+
+    XFree( fb_configs );
     
     const int Visual_attribs[] =
     {
@@ -282,7 +282,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         None
     };
 
-    int attribs[ 100 ];
+    int attribs[ sizeof( Visual_attribs ) ];
     memcpy( attribs, Visual_attribs, sizeof( Visual_attribs ) );
 
     int fbcount;
@@ -489,7 +489,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     xcb_screen_t* screen = screen_iter.data;
     
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
-    
+
     if (CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height, flags ) == -1)
     {
         return;
@@ -497,7 +497,22 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 
     GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
 #if RENDERER_VULKAN
-    ae3d::CreateRenderer( 1 );
+    int samples = 0;
+
+    if (flags & ae3d::WindowCreateFlags::MSAA4)
+    {
+        samples = 4;
+    }
+    else if (flags & ae3d::WindowCreateFlags::MSAA8)
+    {
+        samples = 8;
+    }
+    else if (flags & ae3d::WindowCreateFlags::MSAA16)
+    {
+        samples = 16;
+    }
+
+    ae3d::CreateRenderer( samples );
 #endif
     SetTitle( "Aether3D Game Engine" );
     WindowGlobal::isOpen = true;
