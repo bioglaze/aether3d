@@ -205,7 +205,7 @@ namespace ae3d
 
         VkBuffer vertexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory vertexMem = VK_NULL_HANDLE;
-        VkPipelineVertexInputStateCreateInfo inputStateCreateInfo;
+        VkPipelineVertexInputStateCreateInfo inputStateCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO, nullptr, 0, 0, nullptr, 0, nullptr };
         std::vector< VkVertexInputBindingDescription > bindingDescriptions;
         std::vector< VkVertexInputAttributeDescription > attributeDescriptions;
 

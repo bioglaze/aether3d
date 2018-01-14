@@ -1,8 +1,7 @@
 #include "System.hpp"
 #if _MSC_VER
-#define WIN32_LEAN_AND_MEAN
-#define VC_EXTRALEAN
-#include <Windows.h>
+#define _AMD64_
+#include <debugapi.h>
 #endif
 #include <vector>
 #include <cstdarg>

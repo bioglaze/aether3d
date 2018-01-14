@@ -18,11 +18,6 @@
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "VulkanUtils.hpp"
-#if VK_USE_PLATFORM_WIN32_KHR
-#define WIN32_LEAN_AND_MEAN
-#define VC_EXTRALEAN
-#include <Windows.h>
-#endif
 #if VK_USE_PLATFORM_XCB_KHR
 #include <X11/Xlib-xcb.h>
 #endif
@@ -134,6 +129,8 @@ namespace GfxDeviceGlobal
     std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
     std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
     std::vector< ae3d::VertexBuffer > lineBuffers;
+    ae3d::RenderTexture hdrTarget;
+    VkPipeline fullscreenTrianglePSO;
 }
 
 namespace ae3d
@@ -1607,6 +1604,13 @@ namespace ae3d
         GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
 
         renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
+        renderer.builtinShaders.fullscreenTriangleShader.LoadSPIRV( FileSystem::FileContents( "fullscreen_triangle_vert.spv" ), FileSystem::FileContents( "sprite_frag.spv" ) );
+
+        VertexBuffer emptyBuffer;
+        const std::uint64_t psoHash = GetPSOHash( emptyBuffer, renderer.builtinShaders.fullscreenTriangleShader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Front,
+            ae3d::GfxDevice::FillMode::Solid, GfxDeviceGlobal::hdrTarget.GetRenderPass(), ae3d::GfxDevice::PrimitiveTopology::Triangles );
+        CreatePSO( emptyBuffer, renderer.builtinShaders.fullscreenTriangleShader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Front,
+            ae3d::GfxDevice::FillMode::Solid, GfxDeviceGlobal::hdrTarget.GetRenderPass(), ae3d::GfxDevice::PrimitiveTopology::Triangles, psoHash );
 
         GfxDeviceGlobal::lightTiler.Init();
 
@@ -1618,7 +1622,14 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &GfxDeviceGlobal::texCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+
+        GfxDeviceGlobal::hdrTarget.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "hdrTarget" );
     }
+}
+
+void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
+{
+
 }
 
 void BindComputeDescriptorSet()
@@ -1935,6 +1946,12 @@ void ae3d::GfxDevice::BeginFrame()
     ae3d::System::Assert( GfxDeviceGlobal::swapChain != VK_NULL_HANDLE, "swap chain not initialized" );
     
     VkResult err = acquireNextImageKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, UINT64_MAX, GfxDeviceGlobal::presentCompleteSemaphore, (VkFence)nullptr, &GfxDeviceGlobal::currentBuffer );
+
+    if (err == VK_TIMEOUT)
+    {
+        System::Print( "acquireNextImageKHR returned VK_TIMEOUT\n" );
+    }
+
     AE3D_CHECK_VULKAN( err, "acquireNextImage" );
 
     GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];

@@ -1,4 +1,7 @@
 #include <string>
+#include <cmath>
+#include <ctime>
+#include <cstdlib>
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
@@ -34,7 +37,7 @@
 
 using namespace ae3d;
 
-// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.7.5.zip
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.7.8.zip
 
 int main()
 {
@@ -374,14 +377,18 @@ int main()
     {
         int pointLightIndex = 0;
         
+        std::srand( std::time( nullptr ) );
+
         for (int row = 0; row < 10; ++row)
         {
             for (int col = 0; col < 10; ++col)
             {
                 pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (rand() % 100 ) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
-                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 2, -4, -100 + (float)col * 2 ) );
+                //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 2, -4, -100 + (float)col * 2 ) );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 5, -12, -100 + (float)col * 4 ) );
 
                 scene.Add( &pointLights[ pointLightIndex ] );
                 ++pointLightIndex;
@@ -744,6 +751,23 @@ int main()
             statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
         }
         
+#ifdef TEST_FORWARD_PLUS
+        static float y = -14;
+        y += 0.1f;
+
+        if (y > 30)
+        {
+            y = -14;
+        }
+
+        for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
+        {
+            const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
+            const float xOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+            const float yOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+            pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+        }
+#endif
 #if defined( AE3D_OPENVR )
         VR::CalcEyePose();
         
