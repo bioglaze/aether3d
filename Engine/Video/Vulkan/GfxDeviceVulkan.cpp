@@ -1992,6 +1992,12 @@ void ae3d::GfxDevice::Present()
     presentInfo.pWaitSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
     presentInfo.waitSemaphoreCount = 1;
     err = queuePresentKHR( GfxDeviceGlobal::graphicsQueue, &presentInfo );
+
+    if (err == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        System::Print( "queuePresentKHR returned VK_ERROR_OUT_OF_DATE_KHR\n" );
+    }
+
     AE3D_CHECK_VULKAN( err, "queuePresent" );
 
     // FIXME: This slows down rendering

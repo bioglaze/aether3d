@@ -111,7 +111,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         descDepth.SampleDesc.Count = 1;
         descDepth.SampleDesc.Quality = 0;
         descDepth.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        descDepth.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+        descDepth.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 
         D3D12_CLEAR_VALUE dsClear = {};
         dsClear.Format = descDepth.Format;
@@ -256,7 +256,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         descDepth.SampleDesc.Count = 1;
         descDepth.SampleDesc.Quality = 0;
         descDepth.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        descDepth.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+        descDepth.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 
         D3D12_CLEAR_VALUE dsClear = {};
         dsClear.Format = descDepth.Format;

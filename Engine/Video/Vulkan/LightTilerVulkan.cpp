@@ -256,6 +256,7 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& pos
 void ae3d::LightTiler::UpdateLightBuffers()
 {
     std::memcpy( mappedPointLightCenterAndRadiusMemory, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+    std::memcpy( mappedPointLightColorMemory, &pointLightColors[ 0 ], MaxLights * 4 * sizeof( float ) );
     std::memcpy( mappedSpotLightCenterAndRadiusMemory, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
 }
 

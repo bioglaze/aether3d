@@ -169,7 +169,7 @@ namespace GfxDeviceGlobal
     ID3D12RootSignature* rootSignatureTileCuller = nullptr;
     ID3D12PipelineState* lightTilerPSO = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
-    float clearColor[ 4 ] = { 0, 0, 0, 1 };
+    float clearColor[ 4 ] = { 0, 0, 0, 0 };
     std::unordered_map< std::uint64_t, ID3D12PipelineState* > psoCache;
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
