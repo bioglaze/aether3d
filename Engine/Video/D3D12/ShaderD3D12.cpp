@@ -82,7 +82,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 #else
     const UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_ALL_RESOURCES_BOUND | D3DCOMPILE_WARNINGS_ARE_ERRORS;
 #endif
-    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "main", nullptr /*defines*/, nullptr, "main", "vs_5_0", flags, 0, &blobShaderVertex, &blobError );
+    HRESULT hr = D3DCompile( vertexSource, vertexSourceLength, "main", nullptr /*defines*/, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_5_0", flags, 0, &blobShaderVertex, &blobError );
 
     if (FAILED( hr ))
     {
@@ -93,7 +93,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 
     const std::size_t pixelSourceLength = std::string( fragmentSource ).size();
 
-    hr = D3DCompile( fragmentSource, pixelSourceLength, "main", nullptr /*defines*/, nullptr, "main", "ps_5_0", flags, 0, &blobShaderPixel, &blobError );
+    hr = D3DCompile( fragmentSource, pixelSourceLength, "main", nullptr /*defines*/, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_5_0", flags, 0, &blobShaderPixel, &blobError );
 
     if (FAILED( hr ))
     {
