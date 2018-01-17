@@ -308,16 +308,13 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     RenderTextureGlobal::imagesToReleaseAtExit.push_back( color.image );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
 
+    VkMemoryRequirements memReqs;
+    vkGetImageMemoryRequirements( GfxDeviceGlobal::device, color.image, &memReqs );
+
     VkMemoryAllocateInfo memAllocInfo = {};
     memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAllocInfo.pNext = nullptr;
-    memAllocInfo.memoryTypeIndex = 0;
-    memAllocInfo.allocationSize = 0;
-
-    VkMemoryRequirements memReqs;
-    vkGetImageMemoryRequirements( GfxDeviceGlobal::device, color.image, &memReqs );
     memAllocInfo.allocationSize = memReqs.size;
-
     memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &color.mem );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory in RenderTextureCube" );

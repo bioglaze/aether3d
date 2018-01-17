@@ -1611,6 +1611,7 @@ namespace ae3d
             ae3d::GfxDevice::FillMode::Solid, GfxDeviceGlobal::hdrTarget.GetRenderPass(), ae3d::GfxDevice::PrimitiveTopology::Triangles );
         CreatePSO( emptyBuffer, renderer.builtinShaders.fullscreenTriangleShader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Front,
             ae3d::GfxDevice::FillMode::Solid, GfxDeviceGlobal::hdrTarget.GetRenderPass(), ae3d::GfxDevice::PrimitiveTopology::Triangles, psoHash );
+        GfxDeviceGlobal::fullscreenTrianglePSO = GfxDeviceGlobal::psoCache[ psoHash ];
 
         GfxDeviceGlobal::lightTiler.Init();
 
@@ -1627,9 +1628,19 @@ namespace ae3d
     }
 }
 
-void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
+void DrawHDRToBackBuffer( ae3d::Shader& /*fullscreenTriangleShader*/ )
 {
+    // TODO: enable
+    /*GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
+    ae3d::GfxDevice::BeginRenderPassAndCommandBuffer();
 
+    GfxDeviceGlobal::view0 = GfxDeviceGlobal::hdrTarget.GetColorView();
+    GfxDeviceGlobal::sampler0 = GfxDeviceGlobal::hdrTarget.GetSampler();
+
+    vkCmdBindPipeline( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::fullscreenTrianglePSO );
+    vkCmdDraw( GfxDeviceGlobal::currentCmdBuffer, 3, 1, 0, 0 );
+
+    ae3d::GfxDevice::EndRenderPassAndCommandBuffer();*/
 }
 
 void BindComputeDescriptorSet()
@@ -1703,10 +1714,6 @@ void ae3d::GfxDevice::PopGroupMarker()
 
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
 {
-    VkCommandBufferBeginInfo cmdBufInfo = {};
-    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    cmdBufInfo.pNext = nullptr;
-
     std::vector< VkClearValue > clearValues;
     if (GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT)
     {
@@ -1736,6 +1743,10 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     renderPassBeginInfo.clearValueCount = (std::uint32_t)clearValues.size();
     renderPassBeginInfo.pClearValues = clearValues.data();
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
+
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufInfo.pNext = nullptr;
 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
@@ -2081,6 +2092,12 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMapFace*/ )
 {
+    if (!target)
+    {
+        // TODO: enable
+        //target = &GfxDeviceGlobal::hdrTarget;
+    }
+
     GfxDeviceGlobal::currentCmdBuffer = target ? GfxDeviceGlobal::offscreenCmdBuffer : GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
     GfxDeviceGlobal::renderTexture0 = target;
     GfxDeviceGlobal::frameBuffer0 = target ? target->GetFrameBuffer() : VK_NULL_HANDLE;

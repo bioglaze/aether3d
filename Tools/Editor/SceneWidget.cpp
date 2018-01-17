@@ -816,6 +816,7 @@ void SceneWidget::paintGL()
     DrawAudioSprites();
     DrawCameraSprites();
     DrawVisualizationLines();
+    scene.EndFrame();
 }
 
 void SceneWidget::resizeGL( int width, int height )
