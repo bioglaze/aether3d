@@ -1,5 +1,5 @@
 // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.7.5.zip
+// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.7.8.zip
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"
@@ -7,6 +7,8 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #include <cmath>
+#include <ctime>
+#include <cstdlib>
 #include <vector>
 #include <map>
 
@@ -555,6 +557,7 @@ using namespace ae3d;
     // Inits point lights for Forward+
     {
         int pointLightIndex = 0;
+        std::srand( std::time( nullptr ) );
         
         for (int row = 0; row < 10; ++row)
         {
@@ -562,8 +565,11 @@ using namespace ae3d;
             {
                 pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (rand() % 100 ) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
-                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9 + row * 4, -4, -85 + col * 4 ) );
+                //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9 + row * 4, -4, -85 + col * 4 ) );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 5, -12, -100 + (float)col * 4 ) );
+
                 scene.Add( &pointLights[ pointLightIndex ] );
                 ++pointLightIndex;
             }
@@ -873,6 +879,25 @@ using namespace ae3d;
     camera3d.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
     camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
     camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+    
+#ifdef TEST_FORWARD_PLUS
+    static float y = -14;
+    y += 0.1f;
+    
+    if (y > 30)
+    {
+        y = -14;
+    }
+    
+    for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
+    {
+        const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
+        const float xOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+        const float yOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+    }
+#endif
+
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

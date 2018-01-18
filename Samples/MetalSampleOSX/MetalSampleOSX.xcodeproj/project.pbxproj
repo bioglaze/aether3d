@@ -15,6 +15,7 @@
 		AB2CA8291C13664600D4D7C4 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8281C13664600D4D7C4 /* glider.png */; };
 		AB4ADC2A1D8EB2800032CBDD /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB4ADC291D8EB2800032CBDD /* Standard.metal */; };
 		AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */; };
+		AB657725200FD3BD0089CB54 /* MetalCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = AB657724200FD3BD0089CB54 /* MetalCommon.h */; };
 		AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7839E31C70CA950065EF51 /* DepthNormals.metal */; };
 		AB9330F11F744513004E4640 /* UnlitSkin.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9330F01F744513004E4640 /* UnlitSkin.metal */; };
 		AB9D9A291C96E993009DF897 /* back.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A221C96E993009DF897 /* back.jpg */; };
@@ -67,6 +68,7 @@
 		AB36166A1D945400001149E0 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../../Engine/Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 		AB4ADC291D8EB2800032CBDD /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
+		AB657724200FD3BD0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
 		AB9330F01F744513004E4640 /* UnlitSkin.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = UnlitSkin.metal; path = ../../../Engine/Assets/UnlitSkin.metal; sourceTree = "<group>"; };
 		AB9D9A221C96E993009DF897 /* back.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = back.jpg; path = ../../../../aether3d_build/Samples/skybox/back.jpg; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB657724200FD3BD0089CB54 /* MetalCommon.h */,
 				AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */,
 				ABCBC06B1E052CAA000F0B6D /* new_sponza.ae3d */,
 				ABCBC06C1E052CAA000F0B6D /* sponza.scene */,
@@ -389,6 +392,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */,
+				AB657725200FD3BD0089CB54 /* MetalCommon.h in Sources */,
 				ABE04F831C1216A80025C436 /* main.m in Sources */,
 				ABE04FC41C1217F00025C436 /* Moments.metal in Sources */,
 				AB4ADC2A1D8EB2800032CBDD /* Standard.metal in Sources */,

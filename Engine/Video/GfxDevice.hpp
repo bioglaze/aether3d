@@ -152,9 +152,6 @@ namespace ae3d
         unsigned CreateRboId();
         unsigned CreateFboId();
 
-        unsigned GetSystemFBO();
-        void SetSystemFBO( unsigned fbo );
-
         void SetBackBufferDimensionAndFBO( int width, int height );
         void ErrorCheckFBO();
         bool HasExtension( const char* glExtension );

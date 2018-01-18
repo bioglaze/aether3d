@@ -62,6 +62,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AB657726200FD4BA0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
 		AB6DECD11EC82B350019358C /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
 		AB6DECD21EC82B350019358C /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
 		AB6DECD31EC82B350019358C /* gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gradient.png; path = ../../../../aether3d_build/Samples/gradient.png; sourceTree = "<group>"; };
@@ -185,6 +186,7 @@
 		ABD3AB241C29D78900E78933 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				AB657726200FD4BA0089CB54 /* MetalCommon.h */,
 				ABFE40671D8D1DE000195AD2 /* LightCuller.metal */,
 				AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */,
 				ABD3AB251C29D79F00E78933 /* Moments.metal */,
