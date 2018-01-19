@@ -679,12 +679,16 @@ void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
     fullscreenTriangleShader.SetRenderTexture( "textureMap", &GfxDeviceGlobal::hdrTarget, 0 );
 
     glDisable( GL_BLEND );
+    glDisable( GL_CULL_FACE );
     glFrontFace( GL_CW );
     glDisable( GL_DEPTH_TEST );
+    glViewport( 0, 0, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
+    glScissor( 0, 0, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
     glBindFramebuffer( GL_FRAMEBUFFER, GfxDeviceGlobal::systemFBO );
     glBindVertexArray( GfxDeviceGlobal::emptyVAO );
     glDrawArrays( GL_TRIANGLES, 0, 3 );
     glFrontFace( GL_CCW );
+    glEnable( GL_CULL_FACE );
 
     Statistics::IncRenderTargetBinds();
     Statistics::IncDrawCalls();
