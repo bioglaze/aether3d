@@ -10,12 +10,19 @@ layout(std140) uniform PerObject
     mat4 localToView;
     mat4 localToWorld;
     mat4 localToShadowClip;
+    mat4 clipToView;
     vec4 lightPosition;
     vec4 lightDirection;
     vec4 lightColor;
-    float lightConeAngleCos;
+    float lightConeAngle;
     int lightType; // 0: None, 1: Spot, 2: Dir, 3: Point
     float minAmbient;
+    uint maxNumLightsPerTile;
+    uint windowWidth;
+    uint windowHeight;
+    uint numLights; // 16 bits for point light count, 16 for spot light count
+    uint padding;
+    mat4 boneMatrices[ 80 ];
 };
 
 in vec3 vPositionWorld;

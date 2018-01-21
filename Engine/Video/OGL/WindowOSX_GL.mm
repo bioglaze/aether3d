@@ -5,7 +5,6 @@
 #include "System.hpp"
 #include "GfxDevice.hpp"
 
-// Based on https://github.com/vbo/handmadehero_osx_platform_layer/blob/day_29/code/osx_handmade.m
 // XBox One controller driver: https://github.com/FranticRain/Xone-OSX
 
 void UpdateFrameTiming();
@@ -47,7 +46,7 @@ namespace WindowGlobal
 
         if (eventIndex >= eventStackSize)
         {
-            eventIndex = eventStackSize;
+            eventIndex = eventStackSize - 1;
             ae3d::System::Print( "Too many window/input events!\n" );
         }
     }
@@ -99,8 +98,6 @@ namespace WindowGlobal
 
 static void iokitControllerValueChangeCallbackImpl( void*/*context*/, IOReturn /*result*/, void*/*sender*/, IOHIDValueRef valueRef )
 {
-    //game_controller_input *controller = (game_controller_input *)context;
-    
     if (IOHIDValueGetLength(valueRef) > 2)
     {
         return;
@@ -117,13 +114,8 @@ static void iokitControllerValueChangeCallbackImpl( void*/*context*/, IOReturn /
     const int usage = IOHIDElementGetUsage( element );
     const CFIndex value = IOHIDValueGetIntegerValue( valueRef );
     
-    //ae3d::System::Print("usage: %d\n", usage);
-    
     if (usagePage == kHIDPage_Button)
     {
-        //const int isDown = value != 0;
-        //ae3d::System::Print("button: %d\n", value);
-        
         // Usage values obtained from XBox One controller.
         // TODO: table-driven logic.
         if (usage == 2)
@@ -390,7 +382,6 @@ NSObject <NSWindowDelegate> @end
 - (void)windowDidResignKey: (NSNotification *)notification
 {
     (void)notification;
-    //NSWindow *window = [notification object];
 }
 @end
 
@@ -430,6 +421,15 @@ NSWindow *window;
 }
 
 - (void) mouseMoved: (NSEvent*) event
+{
+    NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
+    WindowGlobal::IncEventIndex();
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMove;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = (int)point.x;
+    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = (int)point.y;
+}
+
+- (void)mouseDragged:(NSEvent *) event
 {
     NSPoint point = [self convertPoint:[event locationInWindow] fromView:nil];
     WindowGlobal::IncEventIndex();
@@ -513,15 +513,12 @@ static void CreateWindow( int width, int height, ae3d::WindowCreateFlags flags )
     [WindowGlobal::application setMainMenu: menubar];
     NSMenu *appMenu = [NSMenu alloc];
     id quitTitle = [@"Quit " stringByAppendingString: appName];
-    // Make menu respond to cmd+q
     id quitMenuItem =
     [[NSMenuItem alloc] initWithTitle: quitTitle
                                action: @selector(terminate:)
                         keyEquivalent: @"q"];
     [appMenu addItem: quitMenuItem];
     [appMenuItem setSubmenu: appMenu];
-    // When running from console we need to manually steal focus
-    // from the terminal window for some reason.
     [WindowGlobal::application activateIgnoringOtherApps:YES];
     
     [window makeKeyAndOrderFront: WindowGlobal::application];
@@ -679,7 +676,6 @@ void cocoaProcessEvents()
                 }
 
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ [event keyCode] ];
-                //NSLog(@"key: %d", [event keyCode]);
             } break;
             default:
             {
