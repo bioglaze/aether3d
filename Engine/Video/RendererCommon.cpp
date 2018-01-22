@@ -2,8 +2,10 @@
 #include <vector>
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
+#include "LightTiler.hpp"
 #include "GfxDevice.hpp"
 #include "Matrix.hpp"
+#include "System.hpp"
 #include "Vec3.hpp"
 #include "VertexBuffer.hpp"
 
@@ -11,6 +13,13 @@ namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
     extern std::vector< ae3d::VertexBuffer > lineBuffers;
+    extern int backBufferWidth;
+    extern int backBufferHeight;
+}
+
+namespace MathUtil
+{
+    int Max( int x, int y );
 }
 
 void ae3d::Renderer::GenerateTextures()
@@ -116,4 +125,38 @@ int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const V
     GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
 
     return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
+}
+
+void ae3d::LightTiler::SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color )
+{
+    System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
+
+    if (bufferIndex < MaxLights)
+    {
+        activePointLights = MathUtil::Max( bufferIndex + 1, activePointLights );
+        pointLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
+        pointLightColors[ bufferIndex ] = color;
+    }
+}
+
+void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
+{
+    System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
+
+    if (bufferIndex < MaxLights)
+    {
+        activeSpotLights = MathUtil::Max( bufferIndex + 1, activeSpotLights );
+        spotLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
+    }
+}
+
+unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
+{
+    const unsigned kAdjustmentMultipier = 32;
+
+    // I haven't tested at greater than 1080p, so cap it
+    const unsigned uHeight = (GfxDeviceGlobal::backBufferHeight > 1080) ? 1080 : GfxDeviceGlobal::backBufferHeight;
+
+    // adjust max lights per tile down as height increases
+    return (MaxLightsPerTile - (kAdjustmentMultipier * (uHeight / 120)));
 }

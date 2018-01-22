@@ -22,11 +22,6 @@ namespace GfxDeviceGlobal
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
 }
 
-namespace MathUtil
-{
-    int Max( int x, int y );
-}
-
 void ae3d::LightTiler::DestroyBuffers()
 {
     AE3D_SAFE_RELEASE( pointLightCenterAndRadiusBuffer );
@@ -197,29 +192,6 @@ void ae3d::LightTiler::Init()
     }
 }
 
-void ae3d::LightTiler::SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color )
-{
-    System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
-
-    if (bufferIndex < MaxLights)
-    {
-        activePointLights = MathUtil::Max( bufferIndex + 1, activePointLights );
-        pointLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
-        pointLightColors[ bufferIndex ] = color;
-    }
-}
-
-void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
-{
-    System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
-
-    if (bufferIndex < MaxLights)
-    {
-        activeSpotLights = MathUtil::Max( bufferIndex + 1, activeSpotLights );
-        spotLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
-    }
-}
-
 void ae3d::LightTiler::UpdateLightBuffers()
 {
     const std::size_t byteSize = MaxLights * 4 * sizeof( float );
@@ -303,15 +275,4 @@ unsigned ae3d::LightTiler::GetNumTilesX() const
 unsigned ae3d::LightTiler::GetNumTilesY() const
 {
     return (unsigned)((GfxDeviceGlobal::backBufferHeight + TileRes - 1) / (float)TileRes);
-}
-
-unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
-{
-    const unsigned kAdjustmentMultipier = 32;
-
-    // I haven't tested at greater than 1080p, so cap it
-    const unsigned uHeight = (GfxDeviceGlobal::backBufferHeight > 1080) ? 1080 : GfxDeviceGlobal::backBufferHeight;
-
-    // adjust max lights per tile down as height increases
-    return (MaxLightsPerTile - (kAdjustmentMultipier * (uHeight / 120)));
 }

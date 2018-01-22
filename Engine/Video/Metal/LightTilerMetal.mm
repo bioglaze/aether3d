@@ -66,40 +66,6 @@ unsigned ae3d::LightTiler::GetNumTilesY() const
     return (unsigned)((GfxDeviceGlobal::backBufferHeight * 2 + TileRes - 1) / (float)TileRes);
 }
 
-void ae3d::LightTiler::SetPointLightParameters( int handle, const Vec3& position, float radius, const Vec4& color )
-{
-    System::Assert( handle < MaxLights, "tried to set a too high light index" );
-
-    if (handle < MaxLights)
-    {
-        activePointLights = std::max( handle, activePointLights ) + 1;
-        pointLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
-        pointLightColors[ handle ] = color;
-    }
-}
-
-void ae3d::LightTiler::SetSpotLightPositionAndRadius( int handle, Vec3& position, float radius )
-{
-    System::Assert( handle < MaxLights, "tried to set a too high light index" );
-    
-    if (handle < MaxLights)
-    {
-        activeSpotLights = std::max( handle, activeSpotLights ) + 1;
-        spotLightCenterAndRadius[ handle ] = Vec4( position.x, position.y, position.z, radius );
-    }
-}
-
-unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
-{
-    const unsigned adjustmentMultipier = 32;
-    
-    // I haven't tested at greater than 1080p, so cap it
-    const unsigned height = (GfxDeviceGlobal::backBufferHeight > 1080) ? 1080 : GfxDeviceGlobal::backBufferHeight;
-    
-    // adjust max lights per tile down as height increases
-    return (MaxLightsPerTile - (adjustmentMultipier * (height / 120)));
-}
-
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewToClip, const Matrix44& worldToView, RenderTexture& depthNormalTarget )
 {
     shader.SetRenderTexture( &depthNormalTarget, 0 );
