@@ -20,7 +20,7 @@ namespace ae3d
     class VertexBuffer
     {
     public:
-        enum class VertexFormat { PTC, PTN, PTNTC, PTNTC_Skinned };
+        enum class VertexFormat { PTC, PTN, PTNTC, PTNTC_Skinned, Empty };
 
         /// Triangle of 3 vertices.
         struct Face

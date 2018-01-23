@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB05A58F201784B9009FB5BD /* FullscreenTriangle.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB05A58E201784B9009FB5BD /* FullscreenTriangle.metal */; };
 		AB6DECD61EC82B350019358C /* textures in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD11EC82B350019358C /* textures */; };
 		AB6DECD71EC82B350019358C /* default_white.png in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD21EC82B350019358C /* default_white.png */; };
 		AB6DECD81EC82B350019358C /* gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD31EC82B350019358C /* gradient.png */; };
@@ -62,6 +63,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AB05A58E201784B9009FB5BD /* FullscreenTriangle.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = FullscreenTriangle.metal; path = ../../../Engine/Assets/FullscreenTriangle.metal; sourceTree = "<group>"; };
 		AB657726200FD4BA0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
 		AB6DECD11EC82B350019358C /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
 		AB6DECD21EC82B350019358C /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
@@ -186,9 +188,10 @@
 		ABD3AB241C29D78900E78933 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				AB657726200FD4BA0089CB54 /* MetalCommon.h */,
-				ABFE40671D8D1DE000195AD2 /* LightCuller.metal */,
 				AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */,
+				AB05A58E201784B9009FB5BD /* FullscreenTriangle.metal */,
+				ABFE40671D8D1DE000195AD2 /* LightCuller.metal */,
+				AB657726200FD4BA0089CB54 /* MetalCommon.h */,
 				ABD3AB251C29D79F00E78933 /* Moments.metal */,
 				ABD3AB261C29D79F00E78933 /* SDF.metal */,
 				ABD3AB271C29D79F00E78933 /* Skybox.metal */,
@@ -313,6 +316,7 @@
 			files = (
 				ABD3AB2E1C29D79F00E78933 /* Unlit.metal in Sources */,
 				ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */,
+				AB05A58F201784B9009FB5BD /* FullscreenTriangle.metal in Sources */,
 				ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */,
 				AB9CA0011D8ECA760049A3AF /* Standard.metal in Sources */,
 				ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */,

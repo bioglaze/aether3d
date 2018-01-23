@@ -90,6 +90,7 @@ namespace GfxDeviceGlobal
     int viewport[ 4 ];
     unsigned frameIndex = 0;
     ae3d::VertexBuffer uiBuffer;
+    ae3d::RenderTexture hdrTarget;
     PerObjectUboStruct perObjectUboStruct;
     
     struct Samplers
@@ -344,6 +345,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     std::vector< VertexBuffer::Face > faces( uiIBSize );
     GfxDeviceGlobal::uiBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
 
+    GfxDeviceGlobal::hdrTarget.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "hdrTarget" );
+
     if (sampleCount == 1)
     {
         return;
@@ -589,7 +592,7 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         }
         else
         {
-            ae3d::System::Assert( false, "unimplemented vertex format" );
+            //ae3d::System::Assert( false, "unimplemented vertex format" );
         }
         
         pipelineStateDescriptor.vertexDescriptor = vertexDesc;
@@ -646,14 +649,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     MTLPixelFormat depthFormat = MTLPixelFormatDepth32Float;
 
 #if TARGET_OS_IPHONE
-    if (GfxDeviceGlobal::sampleCount == 1)
-    {
-        depthFormat = MTLPixelFormatDepth32Float;
-    }
-    if (GfxDeviceGlobal::sampleCount > 1)
-    {
-        depthFormat = MTLPixelFormatDepth32Float;
-    }
+    depthFormat = MTLPixelFormatDepth32Float;
+
     if (GfxDeviceGlobal::isRenderingToTexture)
     {
         depthFormat = MTLPixelFormatInvalid;
@@ -662,7 +659,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         depthFormat = MTLPixelFormatDepth32Float;
     }
-
 #else
     if (GfxDeviceGlobal::sampleCount == 1 && GfxDeviceGlobal::isRenderingToTexture)
     {
@@ -869,4 +865,37 @@ void ae3d::GfxDevice::UnsetRenderTarget()
 
 void ae3d::GfxDevice::ErrorCheck( const char* )
 {
+}
+
+void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
+{
+#if 0
+    [renderEncoder setRenderPipelineState:GetPSO( fullscreenTriangleShader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::NoneWriteOff,
+                                                  ae3d::VertexBuffer::VertexFormat::Empty, GfxDeviceGlobal::currentRenderTargetDataType,
+                                                  MTLPixelFormatDepth32Float, 1, ae3d::GfxDevice::PrimitiveTopology::Triangles )];
+    [renderEncoder setVertexBuffer:nil offset:0 atIndex:0];
+    [renderEncoder setVertexBuffer:nil offset:0 atIndex:1];
+    [renderEncoder setVertexBuffer:nil offset:0 atIndex:5];
+    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 0 ] atIndex:0];
+    
+    MTLViewport viewport;
+    viewport.originX = GfxDeviceGlobal::viewport[ 0 ];
+    viewport.originY = GfxDeviceGlobal::viewport[ 1 ];
+    viewport.width = GfxDeviceGlobal::viewport[ 2 ];
+    viewport.height = GfxDeviceGlobal::viewport[ 3 ];
+    viewport.znear = 0;
+    viewport.zfar = 1;
+    [renderEncoder setViewport:viewport];
+    
+    [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
+    [renderEncoder setCullMode:MTLCullModeBack];
+    [renderEncoder setTriangleFillMode:MTLTriangleFillMode::MTLTriangleFillModeFill];
+    [renderEncoder setFragmentTexture:GfxDeviceGlobal::hdrTarget.GetMetalTexture() atIndex:0];
+    [renderEncoder setFragmentTexture:texture1 atIndex:1];
+    [renderEncoder setFragmentTexture:texture0 atIndex:2];
+    [renderEncoder setFragmentTexture:texture0 atIndex:3];
+    [renderEncoder setDepthStencilState:depthStateLessEqualWriteOff];
+
+    [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
+#endif
 }

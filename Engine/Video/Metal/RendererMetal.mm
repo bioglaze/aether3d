@@ -12,4 +12,5 @@ void ae3d::BuiltinShaders::Load()
     depthNormalsShader.LoadFromLibrary( "depthnormals_vertex", "depthnormals_fragment" );
     lightCullShader.Load( "light_culler", FileSystem::FileContents(""), FileSystem::FileContents("") );
     uiShader.LoadFromLibrary( "sprite_vertex", "sprite_fragment" );
+    fullscreenTriangleShader.LoadFromLibrary( "fullscreen_triangle_vertex", "fullscreen_triangle_fragment" );
 }

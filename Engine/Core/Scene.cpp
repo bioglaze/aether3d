@@ -549,7 +549,7 @@ void ae3d::Scene::EndFrame()
     GfxDevice::EndBackBufferEncoding();
     Statistics::EndFrameTimeProfiling();
 #endif
-#if defined (RENDERER_OPENGL) || defined( RENDERER_VULKAN )
+#if defined (RENDERER_OPENGL) || defined( RENDERER_VULKAN ) || defined( RENDERER_METAL )
     DrawHDRToBackBuffer( renderer.builtinShaders.fullscreenTriangleShader );
 #endif
 }
