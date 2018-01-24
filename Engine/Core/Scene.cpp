@@ -732,7 +732,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     GfxDevice::PopGroupMarker();
 
 #if RENDERER_METAL
-    GfxDevice::UnsetRenderTarget();
+    GfxDevice::SetRenderTarget( nullptr, 0 );
 #endif
 #if RENDERER_VULKAN
     GfxDevice::SetRenderTarget( nullptr, 0 );
@@ -781,12 +781,8 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
     }
 
     GfxDevice::PopGroupMarker();
-
-#if RENDERER_METAL
-    GfxDevice::UnsetRenderTarget();
-#else
+    
     GfxDevice::SetRenderTarget( nullptr, 0 );
-#endif
 #if RENDERER_VULKAN
     EndOffscreen();
 #endif
@@ -895,7 +891,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     GfxDevice::PopGroupMarker();
 
 #if RENDERER_METAL
-    GfxDevice::UnsetRenderTarget();
+    GfxDevice::SetRenderTarget( nullptr, 0 );
 #endif
 #if RENDERER_VULKAN
     EndOffscreen();

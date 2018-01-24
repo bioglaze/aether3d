@@ -15,11 +15,10 @@ struct StandardColorInOut
 {
     float4 position [[position]];
     float4 projCoord;
-    float2 texCoords;
     float3 positionVS;
     float3 positionWS;
-    float3 tangentVS;
-    float3 bitangentVS;
+    float4 tangentVS_u;
+    float4 bitangentVS_v;
     float3 normalVS;
     half4  color;
 };
@@ -109,12 +108,13 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     out.positionWS = (uniforms.localToWorld * in_position).xyz;
     
     out.color = half4( vert.color );
-    out.texCoords = vert.texcoord;
     out.projCoord = uniforms.localToShadowClip * in_position;
     
-    out.tangentVS = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
+    out.tangentVS_u.xyz = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
+    out.tangentVS_u.w = vert.texcoord.x;
     float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
-    out.bitangentVS = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
+    out.bitangentVS_v.xyz = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
+    out.bitangentVS_v.w = vert.texcoord.y;
     out.normalVS = (uniforms.localToView * float4( vert.normal.xyz, 0 )).xyz;
     
     return out;
@@ -133,12 +133,13 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                constant float4* pointLightBufferColors [[ buffer(10) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
-    const float4 albedoColor = float4( albedoSmoothnessMap.sample( sampler0, in.texCoords ) );
+    const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
+    const float4 albedoColor = float4( albedoSmoothnessMap.sample( sampler0, uv ) );
     const float smoothness = albedoColor.a;
-    const float4 normalTS = float4( normalMap.sample( sampler0, in.texCoords ) );
-    const float4 specular = float4( specularMap.sample( sampler0, in.texCoords ) );
+    const float4 normalTS = float4( normalMap.sample( sampler0, uv ) );
+    const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
-    const float3 normalVS = tangentSpaceTransform( in.tangentVS, in.bitangentVS, in.normalVS, normalTS.xyz );
+    const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
     
     const uint tileIndex = GetTileIndex( in.position.xy, cullerUniforms.windowWidth );
     uint index = cullerUniforms.maxNumLightsPerTile * tileIndex;
@@ -166,9 +167,9 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         if (lightDistance < radius)
         {
             float x = lightDistance / radius;
-            falloff = -0.05 + 1.05 / (1.0 + 20.0 * x * x);
+            falloff = -0.05 + 1.05 / (1.0 + 5.0 * x * x);
             //outColor.rgb += max( 0.0, dotNL );// * falloff;
-            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb;
+            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * falloff;
         }
         
         //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;

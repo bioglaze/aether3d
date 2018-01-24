@@ -810,6 +810,11 @@ void ae3d::GfxDevice::EndBackBufferEncoding()
 
 void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsigned cubeMapFace )
 {
+    if (GfxDeviceGlobal::isRenderingToTexture)
+    {
+        [renderEncoder endEncoding];
+    }
+    
     GfxDeviceGlobal::isRenderingToTexture = renderTexture != nullptr;
 
     if (!renderTexture || renderTexture->GetMetalTexture() == nil)
@@ -852,15 +857,6 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
     renderEncoder.label = @"FboRenderEncoder";
 
     GfxDeviceGlobal::currentRenderTargetDataType = renderTexture->GetDataType();
-}
-
-void ae3d::GfxDevice::UnsetRenderTarget()
-{
-    if (GfxDeviceGlobal::isRenderingToTexture)
-    {
-        [renderEncoder endEncoding];
-    }
-    GfxDeviceGlobal::isRenderingToTexture = false;
 }
 
 void ae3d::GfxDevice::ErrorCheck( const char* )
