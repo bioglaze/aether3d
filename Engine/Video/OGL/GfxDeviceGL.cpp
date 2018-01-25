@@ -654,15 +654,23 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
 {
     if (target == nullptr)
     {
+#ifndef AE3D_OPENVR
         target = &GfxDeviceGlobal::hdrTarget;
+#else
+        return;
+#endif
     }
-    
+
+#ifndef AE3D_OPENVR
     const GLuint fbo = target->GetFBO();
+#else
+    const GLuint fbo = target ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
+#endif
     Statistics::IncRenderTargetBinds();
     glBindFramebuffer( GL_FRAMEBUFFER, fbo );
     GfxDeviceGlobal::cachedFBO = fbo;
 
-    if (target->IsCube())
+    if (target && target->IsCube())
     {
         const unsigned glCubeMapFace = GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeMapFace;
         System::Assert( glCubeMapFace >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && glCubeMapFace <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "Invalid cube map face." );

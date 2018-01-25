@@ -783,6 +783,8 @@ int main()
             scene.Render();
             VR::UnsetEye( eye );
         }
+        
+        VR::SubmitFrame();
 #else
         if (reload)
         {
@@ -793,10 +795,6 @@ int main()
         scene.Render();
         scene.EndFrame();
         //System::Draw( &gliderTex, 20, 0, 256, 256, width, height );
-#endif
-
-#if defined( AE3D_OPENVR )
-        VR::SubmitFrame();
 #endif
         Window::SwapBuffers();
     }
