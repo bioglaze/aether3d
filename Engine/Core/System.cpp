@@ -22,6 +22,9 @@ extern ae3d::FileWatcher fileWatcher;
 namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
+#if RENDERER_OPENGL
+    extern bool isEditor;
+#endif
 }
 
 void PlatformInitGamePad();
@@ -46,6 +49,9 @@ extern "C"
 void ae3d::System::InitGfxDeviceForEditor( int width, int height )
 {
     GfxDevice::Init( width, height );
+#if RENDERER_OPENGL
+    GfxDeviceGlobal::isEditor = true;
+#endif
 }
 
 #if RENDERER_METAL

@@ -98,6 +98,7 @@ namespace GfxDeviceGlobal
     GLuint shadowMapQueries[ 4 ];
     GLuint emptyVAO;
     unsigned frameIndex = 0;
+    bool isEditor = false;
 
     PerObjectUboStruct perObjectUboStruct;
     UIVertexBuffer uiVertexBuffer;
@@ -652,6 +653,14 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
+    if (GfxDeviceGlobal::isEditor && !target)
+    {
+        glBindFramebuffer( GL_FRAMEBUFFER, GfxDeviceGlobal::systemFBO );
+        GfxDeviceGlobal::cachedFBO = GfxDeviceGlobal::systemFBO;
+
+        return;
+    }
+
     if (target == nullptr)
     {
 #ifndef AE3D_OPENVR
@@ -683,6 +692,11 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
 
 void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
 {
+    if (GfxDeviceGlobal::isEditor)
+    {
+        return;
+    }
+    
     fullscreenTriangleShader.Use();
     fullscreenTriangleShader.SetRenderTexture( "textureMap", &GfxDeviceGlobal::hdrTarget, 0 );
 
