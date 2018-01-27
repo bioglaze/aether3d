@@ -657,6 +657,8 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     gameObjectsWithMeshRenderer.reserve( gameObjects.size() );
     int gameObjectIndex = -1;
     
+    GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
+    
     for (auto gameObject : gameObjects)
     {
         ++gameObjectIndex;
@@ -668,7 +670,13 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         
         auto transform = gameObject->GetComponent< TransformComponent >();
         auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
-
+        auto dirLight = gameObject->GetComponent< DirectionalLightComponent >();
+        
+        if (dirLight)
+        {
+            GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( dirLight->GetColor() );
+        }
+        
         if (spriteRenderer)
         {
             Matrix44 localToClip;

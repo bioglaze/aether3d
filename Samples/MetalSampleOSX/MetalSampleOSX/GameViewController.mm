@@ -37,7 +37,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_NUKLEAR_UI
+#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 
@@ -47,6 +47,14 @@ const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 NSViewController* myViewController;
+
+struct InputEvent
+{
+    bool isActive;
+    int x, y;
+    int button;
+};
+InputEvent inputEvent;
 
 #ifdef TEST_NUKLEAR_UI
 #define NK_INCLUDE_FIXED_TYPES
@@ -534,6 +542,7 @@ using namespace ae3d;
 #ifdef TEST_SHADOWS_DIR
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 1024 );
 #endif
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetColor( { 1, 0, 0 } );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
 
@@ -741,29 +750,23 @@ using namespace ae3d;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    ae3d::System::Print( "mouseDown x: %f, y: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y );
+    //ae3d::System::Print( "mouseDown x: %f, y: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y );
     
     camera3d.GetComponent<ae3d::TransformComponent>()->MoveForward( -1 );
     
-#ifdef TEST_NUKLEAR_UI
-    nk_input_begin( &ctx );
-    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 1 );
-    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 1 );
-    nk_input_end( &ctx );
-#endif
+    inputEvent.button = 1;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
 }
-
-// nk_input_motion( &ctx, (int)x, (int)y );
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    ae3d::System::Print( "mouseUp x: %f, y: %f, height: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y, self.view.bounds.size.height );
-#ifdef TEST_NUKLEAR_UI
-    nk_input_begin( &ctx );
-    nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, self.view.bounds.size.height - (int)theEvent.locationInWindow.y, 0 );
-    //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, 0 );
-    nk_input_end( &ctx );
-#endif
+    //ae3d::System::Print( "mouseUp x: %f, y: %f, height: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y, self.view.bounds.size.height );
+    inputEvent.button = 0;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
@@ -806,6 +809,24 @@ using namespace ae3d;
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );
         
 #ifdef TEST_NUKLEAR_UI
+        nk_input_begin( &ctx );
+        if (inputEvent.button == 1 && inputEvent.isActive)
+        {
+            nk_input_button( &ctx, NK_BUTTON_LEFT, inputEvent.x, inputEvent.y, 1 );
+            nk_input_motion( &ctx, inputEvent.x, inputEvent.y );
+        }
+        if (inputEvent.button == 0 && inputEvent.isActive)
+        {
+            nk_input_button( &ctx, NK_BUTTON_LEFT, inputEvent.x, inputEvent.y, 0 );
+            nk_input_motion( &ctx, inputEvent.x, inputEvent.y );
+        }
+        inputEvent.isActive = false;
+        inputEvent.x = 0;
+        inputEvent.y = 0;
+        inputEvent.button = -1;
+        
+        nk_input_end( &ctx );
+
         enum {EASY, HARD};
         static int op = EASY;
         static float value = 0.6f;
@@ -821,8 +842,8 @@ using namespace ae3d;
             
             /* fixed widget window ratio width */
             nk_layout_row_dynamic( &ctx, 30, 2 );
-            if (nk_option_label( &ctx, "easy", op == EASY)) op = EASY;
-            if (nk_option_label( &ctx, "hard", op == HARD)) op = HARD;
+            if (nk_option_label( &ctx, "easy", op == EASY )) op = EASY;
+            if (nk_option_label( &ctx, "hard", op == HARD )) op = HARD;
             
             /* custom widget pixel width */
             nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
