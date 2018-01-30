@@ -147,5 +147,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
         [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
     }
 }

@@ -59,6 +59,7 @@ int gTouchCount;
     ae3d::Shader standardShader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
+    ae3d::Texture2D astcTex;
     std::vector< ae3d::GameObject > sponzaGameObjects;
     std::map< std::string, ae3d::Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, ae3d::Texture2D* > sponzaTextureNameToTexture;
@@ -106,12 +107,13 @@ int gTouchCount;
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthNormals" );
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.SetName( "camera3d" );
-    camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
+    camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 3, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
     scene.Add( &camera3d );
     
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
-    
+    astcTex.Load( ae3d::FileSystem::FileContents( "/granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
     text.AddComponent<ae3d::TextRendererComponent>();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( "Aether3D Game Engine" );
@@ -133,8 +135,9 @@ int gTouchCount;
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
-    standardMaterial.SetTexture( "textureMap", &gliderTex );
-
+    //standardMaterial.SetTexture( "textureMap", &gliderTex );
+    standardMaterial.SetTexture( "textureMap", &astcTex );
+    
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( "textureMap", &gliderTex );
     cubeMaterial.SetVector( "tint", { 1, 0, 0, 1 } );

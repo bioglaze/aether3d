@@ -65,10 +65,102 @@ struct PVRv3Header
     uint32_t metadataLength;
 };
 
+struct ASTCHeader
+{
+    uint32_t magic;
+    uint8_t blockDimX;
+    uint8_t blockDimY;
+    uint8_t blockDimZ;
+    uint8_t xSize[ 3 ];
+    uint8_t ySize[ 3 ];
+    uint8_t zSize[ 3 ];
+};
+
 namespace
 {
     ae3d::Texture2D defaultTexture;
 }
+
+#if TARGET_OS_IPHONE
+MTLPixelFormat GetASTCPixelFormat( uint32_t blockWidth, uint32_t blockHeight )
+{
+    MTLPixelFormat pixelFormat = MTLPixelFormatInvalid;
+    
+    if (blockWidth == 4 && blockHeight == 4)
+    {
+        pixelFormat = MTLPixelFormatASTC_4x4_LDR;
+    }
+    else if (blockWidth == 5)
+    {
+        if( blockHeight == 4)
+        {
+            pixelFormat = MTLPixelFormatASTC_5x4_LDR;
+        }
+        else if (blockHeight == 5)
+        {
+            pixelFormat = MTLPixelFormatASTC_5x5_LDR;
+        }
+    }
+    else if (blockWidth == 6)
+    {
+        if( blockHeight == 5)
+        {
+            pixelFormat = MTLPixelFormatASTC_6x5_LDR;
+        }
+        else if (blockHeight == 6)
+        {
+            pixelFormat = MTLPixelFormatASTC_6x6_LDR;
+        }
+    }
+    else if (blockWidth == 8)
+    {
+        if( blockHeight == 5)
+        {
+            pixelFormat = MTLPixelFormatASTC_8x5_LDR;
+        }
+        else if (blockHeight == 6)
+        {
+            pixelFormat = MTLPixelFormatASTC_8x6_LDR;
+        }
+        else if (blockHeight == 8)
+        {
+            pixelFormat = MTLPixelFormatASTC_8x8_LDR;
+        }
+    }
+    else if (blockWidth == 10)
+    {
+        if( blockHeight == 5)
+        {
+            pixelFormat = MTLPixelFormatASTC_10x5_LDR;
+        }
+        else if (blockHeight == 6)
+        {
+            pixelFormat = MTLPixelFormatASTC_10x6_LDR;
+        }
+        else if (blockHeight == 8)
+        {
+            pixelFormat = MTLPixelFormatASTC_10x8_LDR;
+        }
+        else if (blockHeight == 10)
+        {
+            pixelFormat = MTLPixelFormatASTC_10x10_LDR;
+        }
+    }
+    else if (blockWidth == 12)
+    {
+        if (blockHeight == 10)
+        {
+            pixelFormat = MTLPixelFormatASTC_12x10_LDR;
+        }
+        else if (blockHeight == 12)
+        {
+            pixelFormat = MTLPixelFormatASTC_12x12_LDR;
+        }
+    }
+
+    return pixelFormat;
+}
+#endif
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
@@ -127,6 +219,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
         [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
     }
 }
 
@@ -145,8 +238,9 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     path = fileContents.path;
     
     const bool isPVR = fileContents.path.find( ".pvr" ) != std::string::npos || fileContents.path.find( ".PVR" ) != std::string::npos;
-    const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".dds" ) != std::string::npos;
-    
+    const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
+    const bool isASTC = fileContents.path.find( ".astc" ) != std::string::npos || fileContents.path.find( ".ASTC" ) != std::string::npos;
+
     if (HasStbExtension( fileContents.path ))
     {
         LoadSTB( fileContents );
@@ -156,7 +250,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         NSString* pvrtcNSString = [NSString stringWithUTF8String: fileContents.path.c_str()];
         NSData* fileData = [NSData dataWithContentsOfFile:pvrtcNSString];
         PVRv2Header* header = (PVRv2Header*) [fileData bytes];
-        uint32_t version = CFSwapInt32LittleToHost(header->headerLength);
+        uint32_t version = CFSwapInt32LittleToHost( header->headerLength );
 
         const uint32_t PvrV3Magic = 0x03525650;
         
@@ -217,10 +311,63 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         {
             metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
         }
-        
-        
+
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&output.imageData[ output.dataOffsets[ 0 ] ] bytesPerRow:bytesPerRow];
+#else
+        ae3d::System::Print( ".dds loading not supported on iOS. Tried to load %s\n", fileContents.path.c_str() );
+#endif
+    }
+    else if (isASTC)
+    {
+#if TARGET_OS_IPHONE
+        NSString* astcNSString = [NSString stringWithUTF8String: fileContents.path.c_str()];
+        NSData* fileData = [NSData dataWithContentsOfFile:astcNSString];
+        ASTCHeader* header = (ASTCHeader*) [fileData bytes];
+        const uint32_t astcMagic = 0x5CA1AB13;
+        
+        if (header->magic != astcMagic)
+        {
+            ae3d::System::Print( "Wrong magic in %s\n", fileContents.path.c_str() );
+            return;
+        }
+        
+        const uint32_t w  = (header->xSize[ 2 ] << 16) + (header->xSize[ 1 ] << 8) + header->xSize[ 0 ];
+        const uint32_t h = (header->ySize[ 2 ] << 16) + (header->ySize[ 1 ] << 8) + header->ySize[ 0 ];
+        const uint32_t depth  = (header->zSize[ 2 ] << 16) + (header->zSize[ 1 ] << 8) + header->zSize[ 0 ];
+        
+        const uint32_t widthInBlocks =  (w + header->blockDimX - 1) / header->blockDimX;
+        const uint32_t blockSize = 4 * 4;
+        uint8_t* bytes = (uint8_t*)([fileData bytes]) + sizeof( ASTCHeader );
+        const uint32_t bytesPerRow = widthInBlocks * blockSize;
+
+        width = w;
+        height = h;
+        mipLevelCount = 1;
+        const MTLPixelFormat pixelFormat = GetASTCPixelFormat( header->blockDimX, header->blockDimY );
+        
+        MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
+                                                                                              width:width
+                                                                                             height:height
+                                                                                          mipmapped:(mipmaps == Mipmaps::Generate ? YES : NO)];
+        metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
+        metalTexture.label = [NSString stringWithFormat:@"%s", path.c_str()];
+
+        MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
+        [metalTexture replaceRegion:region mipmapLevel:0 withBytes:bytes bytesPerRow:bytesPerRow];
+        
+        if (mipmaps == Mipmaps::Generate)
+        {
+            id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
+            id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+            id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
+            [commandEncoder generateMipmapsForTexture:metalTexture];
+            [commandEncoder endEncoding];
+            [commandBuffer commit];
+            [commandBuffer waitUntilCompleted];
+        }
+#else
+     ae3d::System::Print( ".astc loading not supported on macOS. Tried to load %s\n", fileContents.path.c_str() );
 #endif
     }
     else
@@ -274,6 +421,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
         [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
     }
 
     stbi_image_free( data );
@@ -387,6 +535,7 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
             [commandEncoder generateMipmapsForTexture:metalTexture];
             [commandEncoder endEncoding];
             [commandBuffer commit];
+            [commandBuffer waitUntilCompleted];
         }
 
         [imageData removeAllObjects];
@@ -505,6 +654,7 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
         [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
     }
 
     [levelDatas removeAllObjects];
