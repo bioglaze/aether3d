@@ -1,4 +1,4 @@
-// Ogg Vorbis audio decoder - v1.12 - public domain
+// Ogg Vorbis audio decoder - v1.13b - public domain
 // http://nothings.org/stb_vorbis/
 //
 // Original version written by Sean Barrett in 2007.
@@ -32,6 +32,7 @@
 //    manxorist@github   saga musix          github:infatum
 //
 // Partial history:
+//    1.13    - 2018/01/29 - fix truncation of last frame (hopefully)
 //    1.12    - 2017/11/21 - limit residue begin/end to blocksize/2 to avoid large temp allocs in bad/corrupt files
 //    1.11    - 2017/07/23 - fix MinGW compilation 
 //    1.10    - 2017/03/03 - more robust seeking; fix negative ilog(); clear error in open_memory
@@ -3397,7 +3398,7 @@ static int vorbis_decode_packet_rest(vorb *f, int *len, Mode *m, int left_start,
    if (f->last_seg_which == f->end_seg_with_known_loc) {
       // if we have a valid current loc, and this is final:
       if (f->current_loc_valid && (f->page_flag & PAGEFLAG_last_page)) {
-         uint32 current_end = f->known_loc_for_packet - (n-right_end);
+         uint32 current_end = f->known_loc_for_packet;
          // then let's infer the size of the (probably) short final frame
          if (current_end < f->current_loc + (right_end-left_start)) {
             if (current_end < f->current_loc) {
@@ -3406,7 +3407,7 @@ static int vorbis_decode_packet_rest(vorb *f, int *len, Mode *m, int left_start,
             } else {
                *len = current_end - f->current_loc;
             }
-            *len += left_start;
+            *len += left_start; // this doesn't seem right, but has no ill effect on my test files
             if (*len > right_end) *len = right_end; // this should never happen
             f->current_loc += *len;
             return TRUE;
@@ -5460,4 +5461,3 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ------------------------------------------------------------------------------
 */
-

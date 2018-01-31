@@ -1,4 +1,4 @@
-/* stb_image - v2.17 - public domain image loader - http://nothings.org/stb
+/* stb_image - v2.18 - public domain image loader - http://nothings.org/stb
                                   no warranty implied; use at your own risk
 
    Do this:
@@ -48,6 +48,7 @@ LICENSE
 
 RECENT REVISION HISTORY:
 
+      2.18  (2018-01-30) fix warnings
       2.17  (2018-01-29) bugfix, 1-bit BMP, 16-bitness query, fix warnings
       2.16  (2017-07-23) all functions have 16-bit variants; optimizations; bugfixes
       2.15  (2017-03-18) fix png-1,2,4; all Imagenet JPGs; no runtime SSE detection on GCC
@@ -510,8 +511,8 @@ STBIDEF int   stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const ch
 #include <string.h>
 #include <limits.h>
 
-#if !defined(STBI_NO_LINEAR) && !defined(STBI_NO_HDR)
-#include <math.h>  // ldexp
+#if !defined(STBI_NO_LINEAR) || !defined(STBI_NO_HDR)
+#include <math.h>  // ldexp, pow
 #endif
 
 #ifndef STBI_NO_STDIO
@@ -903,7 +904,7 @@ static int stbi__mad3sizes_valid(int a, int b, int c, int add)
 }
 
 // returns 1 if "a*b*c*d + add" has no negative terms/factors and doesn't overflow
-#if !defined(STBI_NO_LINEAR) && !defined(STBI_NO_HDR)
+#if !defined(STBI_NO_LINEAR) || !defined(STBI_NO_HDR)
 static int stbi__mad4sizes_valid(int a, int b, int c, int d, int add)
 {
    return stbi__mul2sizes_valid(a, b) && stbi__mul2sizes_valid(a*b, c) &&
@@ -924,7 +925,7 @@ static void *stbi__malloc_mad3(int a, int b, int c, int add)
    return stbi__malloc(a*b*c + add);
 }
 
-#if !defined(STBI_NO_LINEAR) && !defined(STBI_NO_HDR)
+#if !defined(STBI_NO_LINEAR) || !defined(STBI_NO_HDR)
 static void *stbi__malloc_mad4(int a, int b, int c, int d, int add)
 {
    if (!stbi__mad4sizes_valid(a, b, c, d, add)) return NULL;
@@ -1129,7 +1130,7 @@ static stbi__uint16 *stbi__load_and_postprocess_16bit(stbi__context *s, int *x, 
    return (stbi__uint16 *) result;
 }
 
-#if !defined(STBI_NO_HDR) && !defined(STBI_NO_LINEAR)
+#if !defined(STBI_NO_HDR) || !defined(STBI_NO_LINEAR)
 static void stbi__float_postprocess(float *result, int *x, int *y, int *comp, int req_comp)
 {
    if (stbi__vertically_flip_on_load && result != NULL) {
@@ -1330,10 +1331,11 @@ STBIDEF int      stbi_is_hdr          (char const *filename)
    return result;
 }
 
-STBIDEF int      stbi_is_hdr_from_file(FILE *f)
+STBIDEF int stbi_is_hdr_from_file(FILE *f)
 {
    #ifndef STBI_NO_HDR
-   long pos = ftell(f), res;
+   long pos = ftell(f);
+   int res;
    stbi__context s;
    stbi__start_file(&s,f);
    res = stbi__hdr_test(&s);
@@ -2213,7 +2215,7 @@ static void stbi__idct_block(stbi_uc *out, int out_stride, short data[64])
          //    (1|2|3|4|5|6|7)==0          0     seconds
          //    all separate               -0.047 seconds
          //    1 && 2|3 && 4|5 && 6|7:    -0.047 seconds
-         int dcterm = d[0] << 2;
+         int dcterm = d[0]*4;
          v[0] = v[8] = v[16] = v[24] = v[32] = v[40] = v[48] = v[56] = dcterm;
       } else {
          STBI__IDCT_1D(d[ 0],d[ 8],d[16],d[24],d[32],d[40],d[48],d[56])
@@ -5041,9 +5043,9 @@ static int stbi__shiftsigned(int v, int shift, int bits)
       v <<= -shift;
    else
       v >>= shift;
-   assert(v >= 0 && v < 256);
+   STBI_ASSERT(v >= 0 && v < 256);
    v >>= (8-bits);
-   assert(bits >= 0 && bits <= 8);
+   STBI_ASSERT(bits >= 0 && bits <= 8);
    return (int) ((unsigned) v * mul_table[bits]) >> shift_table[bits];
 }
 
@@ -7455,4 +7457,3 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ------------------------------------------------------------------------------
 */
-
