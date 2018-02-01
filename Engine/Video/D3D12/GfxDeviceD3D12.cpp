@@ -26,8 +26,7 @@
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
 
-// Keep in sync with ShaderD3D12
-#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64)
+int AE3D_CB_SIZE = (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64);
 
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
@@ -597,7 +596,7 @@ void CreateRootSignature()
     {
         CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0 );
         descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0 );
 
         CD3DX12_ROOT_PARAMETER rootParam[ 1 ];

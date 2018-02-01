@@ -9,7 +9,7 @@
 #include "System.hpp"
 #include "Vec3.hpp"
 
-#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64)
+extern int AE3D_CB_SIZE;
 
 using namespace ae3d;
 
@@ -27,6 +27,7 @@ void ae3d::LightTiler::DestroyBuffers()
     AE3D_SAFE_RELEASE( pointLightCenterAndRadiusBuffer );
     AE3D_SAFE_RELEASE( pointLightColorBuffer );
     AE3D_SAFE_RELEASE( spotLightCenterAndRadiusBuffer );
+    AE3D_SAFE_RELEASE( spotLightColorBuffer );
     AE3D_SAFE_RELEASE( perTileLightIndexBuffer );
 }
 
@@ -190,6 +191,45 @@ void ae3d::LightTiler::Init()
 
         spotLightCenterAndRadiusBuffer->SetName( L"LightTiler spot light buffer" );
     }
+
+    // Spot light color buffer
+    {
+        D3D12_HEAP_PROPERTIES uploadProp = {};
+        uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+        uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        uploadProp.CreationNodeMask = 1;
+        uploadProp.VisibleNodeMask = 1;
+
+        D3D12_RESOURCE_DESC bufferProp = {};
+        bufferProp.Alignment = 0;
+        bufferProp.DepthOrArraySize = 1;
+        bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
+        bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+        bufferProp.Height = 1;
+        bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        bufferProp.MipLevels = 1;
+        bufferProp.SampleDesc.Count = 1;
+        bufferProp.SampleDesc.Quality = 0;
+        bufferProp.Width = MaxLights * 4 * sizeof( float );
+
+        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+            &uploadProp,
+            D3D12_HEAP_FLAG_NONE,
+            &bufferProp,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS( &spotLightColorBuffer ) );
+        if (FAILED( hr ))
+        {
+            ae3d::System::Assert( false, "Unable to create spot light buffer!" );
+            return;
+        }
+
+        spotLightColorBuffer->SetName( L"LightTiler spot light color buffer" );
+    }
+
 }
 
 void ae3d::LightTiler::UpdateLightBuffers()

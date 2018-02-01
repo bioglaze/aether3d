@@ -23,6 +23,7 @@
 #endif
 
 extern ae3d::Renderer renderer;
+void EndOffscreen();
 
 PFN_vkCreateSwapchainKHR createSwapchainKHR = nullptr;
 PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR getPhysicalDeviceSurfaceCapabilitiesKHR = nullptr;
@@ -1293,7 +1294,7 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 550;
 
-        const std::uint32_t typeCount = 8;
+        const std::uint32_t typeCount = 9;
         VkDescriptorPoolSize typeCounts[ typeCount ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
@@ -1311,6 +1312,8 @@ namespace ae3d
         typeCounts[ 6 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 7 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         typeCounts[ 7 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 8 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        typeCounts[ 8 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1425,8 +1428,17 @@ namespace ae3d
         bufferSet2.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightColorBufferView();
         bufferSet2.dstBinding = 7;
 
-        const int setCount = 8;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2 };
+        // Binding 8 : Buffer
+        VkWriteDescriptorSet bufferSet3 = {};
+        bufferSet3.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        bufferSet3.dstSet = outDescriptorSet;
+        bufferSet3.descriptorCount = 1;
+        bufferSet3.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        bufferSet3.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightBufferView();
+        bufferSet3.dstBinding = 8;
+
+        const int setCount = 9;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3 };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1498,9 +1510,17 @@ namespace ae3d
         layoutBindingBuffer2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         layoutBindingBuffer2.pImmutableSamplers = nullptr;
 
-        const int bindingCount = 8;
+        // Binding 8 : Buffer
+        VkDescriptorSetLayoutBinding layoutBindingBuffer3 = {};
+        layoutBindingBuffer3.binding = 8;
+        layoutBindingBuffer3.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindingBuffer3.descriptorCount = 1;
+        layoutBindingBuffer3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindingBuffer3.pImmutableSamplers = nullptr;
+
+        const int bindingCount = 9;
         const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
-                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2 };
+                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2, layoutBindingBuffer3 };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -1630,8 +1650,14 @@ namespace ae3d
 
 void DrawHDRToBackBuffer( ae3d::Shader& /*fullscreenTriangleShader*/ )
 {
-    // TODO: enable
-    /*GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
+#if 0
+    vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+
+    //ae3d::GfxDevice::BeginRenderPassAndCommandBuffer();
+    //ae3d::GfxDevice::EndRenderPassAndCommandBuffer();
+    EndOffscreen();
+
+    GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
     ae3d::GfxDevice::BeginRenderPassAndCommandBuffer();
 
     GfxDeviceGlobal::view0 = GfxDeviceGlobal::hdrTarget.GetColorView();
@@ -1640,7 +1666,8 @@ void DrawHDRToBackBuffer( ae3d::Shader& /*fullscreenTriangleShader*/ )
     vkCmdBindPipeline( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::fullscreenTrianglePSO );
     vkCmdDraw( GfxDeviceGlobal::currentCmdBuffer, 3, 1, 0, 0 );
 
-    ae3d::GfxDevice::EndRenderPassAndCommandBuffer();*/
+    ae3d::GfxDevice::EndRenderPassAndCommandBuffer();
+#endif
 }
 
 void BindComputeDescriptorSet()
@@ -1732,6 +1759,13 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     const uint32_t width = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetWidth() : WindowGlobal::windowWidth;
     const uint32_t height = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetHeight() : WindowGlobal::windowHeight;
 
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufInfo.pNext = nullptr;
+
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBeginInfo.pNext = nullptr;
@@ -1743,13 +1777,6 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     renderPassBeginInfo.clearValueCount = (std::uint32_t)clearValues.size();
     renderPassBeginInfo.pClearValues = clearValues.data();
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
-
-    VkCommandBufferBeginInfo cmdBufInfo = {};
-    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    cmdBufInfo.pNext = nullptr;
-
-    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
-    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
     vkCmdBeginRenderPass( GfxDeviceGlobal::currentCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
 
@@ -2094,7 +2121,6 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMap
 {
     if (!target)
     {
-        // TODO: enable
         //target = &GfxDeviceGlobal::hdrTarget;
     }
 

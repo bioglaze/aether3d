@@ -6,7 +6,7 @@
 #include "System.hpp"
 #include "TextureBase.hpp"
 
-#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64)
+extern int AE3D_CB_SIZE;
 
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
@@ -73,14 +73,25 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
+    srvDesc2.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+    srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc2.Buffer.FirstElement = 0;
+    srvDesc2.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+    srvDesc2.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
+    srvDesc2.Buffer.StructureByteStride = 0;
+
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 2 ], &srvDesc2, handle );
+
+    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
     GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 0 ], nullptr, &GfxDeviceGlobal::uav1Desc, handle );
 
     GpuResource depthNormals = {};
     depthNormals.resource = textureBuffers[ 1 ];
     depthNormals.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
     TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
-
-    // TODO: Add spotlight SRV somewhere in this method and update compute root signature!
 
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeap );

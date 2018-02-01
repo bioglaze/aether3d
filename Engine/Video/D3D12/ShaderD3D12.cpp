@@ -12,7 +12,7 @@
 #include "RenderTexture.hpp"
 #include "Macros.hpp"
 
-#define AE3D_CB_SIZE (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64)
+extern int AE3D_CB_SIZE;
 
 extern ae3d::FileWatcher fileWatcher;
 
@@ -164,7 +164,7 @@ void ae3d::Shader::ReflectVariables()
             AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
             uniformLocations[ std::string( descVar.Name ) ].i = descVar.StartOffset;
-            ae3d::System::Assert( descVar.StartOffset + descVar.Size < AE3D_CB_SIZE, "too big constant buffer" );
+            ae3d::System::Assert( descVar.StartOffset + descVar.Size < (unsigned)AE3D_CB_SIZE, "too big constant buffer" );
         }
     }
 }

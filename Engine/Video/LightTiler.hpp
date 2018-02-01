@@ -35,6 +35,8 @@ namespace ae3d
         void DestroyBuffers();
         
 #if RENDERER_D3D12
+        ID3D12Resource* GetSpotLightCenterAndRadiusBuffer() const { return spotLightCenterAndRadiusBuffer; }
+        ID3D12Resource* GetSpotLightColorBuffer() const { return spotLightColorBuffer; }
         ID3D12Resource* GetPointLightCenterAndRadiusBuffer() const { return pointLightCenterAndRadiusBuffer; }
         ID3D12Resource* GetPointLightColorBuffer() const { return pointLightColorBuffer; }
 #endif
@@ -67,6 +69,7 @@ namespace ae3d
         ID3D12Resource* pointLightCenterAndRadiusBuffer = nullptr;
         ID3D12Resource* pointLightColorBuffer = nullptr;
         ID3D12Resource* spotLightCenterAndRadiusBuffer = nullptr;
+        ID3D12Resource* spotLightColorBuffer = nullptr;
 #endif
 #if RENDERER_VULKAN
         VkBuffer pointLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
