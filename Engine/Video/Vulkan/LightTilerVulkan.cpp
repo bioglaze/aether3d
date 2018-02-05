@@ -7,7 +7,6 @@
 #include "System.hpp"
 #include "GfxDevice.hpp"
 #include "VulkanUtils.hpp"
-// TODO: Some of these methods can be shared with D3D12 and possibly Metal.
 
 extern ae3d::Renderer renderer;
 
@@ -40,14 +39,17 @@ void ae3d::LightTiler::DestroyBuffers()
     vkDestroyBuffer( GfxDeviceGlobal::device, pointLightCenterAndRadiusBuffer, nullptr );
     vkDestroyBuffer( GfxDeviceGlobal::device, pointLightColorBuffer, nullptr );
     vkDestroyBuffer( GfxDeviceGlobal::device, spotLightCenterAndRadiusBuffer, nullptr );
+    vkDestroyBuffer( GfxDeviceGlobal::device, spotLightParamsBuffer, nullptr );
     vkDestroyBufferView( GfxDeviceGlobal::device, perTileLightIndexBufferView, nullptr );
     vkDestroyBufferView( GfxDeviceGlobal::device, pointLightBufferView, nullptr );
     vkDestroyBufferView( GfxDeviceGlobal::device, pointLightColorView, nullptr );
     vkDestroyBufferView( GfxDeviceGlobal::device, spotLightBufferView, nullptr );
+    vkDestroyBufferView( GfxDeviceGlobal::device, spotLightParamsView, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, perTileLightIndexBufferMemory, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, pointLightCenterAndRadiusMemory, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, pointLightColorMemory, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, spotLightCenterAndRadiusMemory, nullptr );
+    vkFreeMemory( GfxDeviceGlobal::device, spotLightParamsMemory, nullptr );
     vkDestroyPipeline( GfxDeviceGlobal::device, pso, nullptr );
 }
 
@@ -209,6 +211,45 @@ void ae3d::LightTiler::Init()
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "spotLightBufferView" );
     }
 
+    // Spot light params buffer
+    {
+        VkBufferCreateInfo bufferInfo = {};
+        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferInfo.size = MaxLights * 4 * sizeof( float );
+        bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
+        VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &spotLightParamsBuffer );
+        AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightParamsBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "spotLightParamsBuffer" );
+
+        VkMemoryRequirements memReqs;
+        vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, spotLightParamsBuffer, &memReqs );
+
+        VkMemoryAllocateInfo allocInfo = {};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.pNext = nullptr;
+        allocInfo.allocationSize = memReqs.size;
+        allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
+        err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightParamsMemory );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory spotLightParamsMemory" );
+
+        err = vkBindBufferMemory( GfxDeviceGlobal::device, spotLightParamsBuffer, spotLightParamsMemory, 0 );
+        AE3D_CHECK_VULKAN( err, "vkBindBufferMemory spotLightParamsBuffer" );
+
+        err = vkMapMemory( GfxDeviceGlobal::device, spotLightParamsMemory, 0, bufferInfo.size, 0, &mappedSpotLightParamsMemory );
+        AE3D_CHECK_VULKAN( err, "vkMapMemory spot lights" );
+
+        VkBufferViewCreateInfo bufferViewInfo = {};
+        bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+        bufferViewInfo.flags = 0;
+        bufferViewInfo.buffer = spotLightParamsBuffer;
+        bufferViewInfo.range = VK_WHOLE_SIZE;
+		bufferViewInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+
+        err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &spotLightParamsView );
+        AE3D_CHECK_VULKAN( err, "spot light params buffer view" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightParamsView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "spotLightParamsBufferView" );
+    }
+
     VkComputePipelineCreateInfo psoInfo = {};
     psoInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
     psoInfo.layout = GfxDeviceGlobal::pipelineLayout;
@@ -224,6 +265,7 @@ void ae3d::LightTiler::UpdateLightBuffers()
     std::memcpy( mappedPointLightCenterAndRadiusMemory, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
     std::memcpy( mappedPointLightColorMemory, &pointLightColors[ 0 ], MaxLights * 4 * sizeof( float ) );
     std::memcpy( mappedSpotLightCenterAndRadiusMemory, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+    std::memcpy( mappedSpotLightParamsMemory, &spotLightParams[ 0 ], MaxLights * 4 * sizeof( float ) );
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const

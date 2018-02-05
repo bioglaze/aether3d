@@ -1294,7 +1294,7 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 550;
 
-        const std::uint32_t typeCount = 9;
+        const std::uint32_t typeCount = 10;
         VkDescriptorPoolSize typeCounts[ typeCount ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
@@ -1314,6 +1314,8 @@ namespace ae3d
         typeCounts[ 7 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
         typeCounts[ 8 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         typeCounts[ 8 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[ 9 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        typeCounts[ 9 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1437,8 +1439,17 @@ namespace ae3d
         bufferSet3.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightBufferView();
         bufferSet3.dstBinding = 8;
 
-        const int setCount = 9;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3 };
+        // Binding 9 : Buffer
+        VkWriteDescriptorSet bufferSet4 = {};
+        bufferSet4.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        bufferSet4.dstSet = outDescriptorSet;
+        bufferSet4.descriptorCount = 1;
+        bufferSet4.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        bufferSet4.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightParamsView();
+        bufferSet4.dstBinding = 9;
+
+        const int setCount = 10;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4 };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1518,9 +1529,18 @@ namespace ae3d
         layoutBindingBuffer3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
         layoutBindingBuffer3.pImmutableSamplers = nullptr;
 
-        const int bindingCount = 9;
+        // Binding 9 : Buffer
+        VkDescriptorSetLayoutBinding layoutBindingBuffer4 = {};
+        layoutBindingBuffer4.binding = 9;
+        layoutBindingBuffer4.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindingBuffer4.descriptorCount = 1;
+        layoutBindingBuffer4.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindingBuffer4.pImmutableSamplers = nullptr;
+
+        const int bindingCount = 10;
         const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
-                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2, layoutBindingBuffer3 };
+                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2,
+                                                                        layoutBindingBuffer3, layoutBindingBuffer4 };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

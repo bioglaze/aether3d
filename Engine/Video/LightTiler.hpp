@@ -19,7 +19,7 @@ namespace ae3d
     public:
         void Init();
         void SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color );
-        void SetSpotLightPositionAndRadius( int bufferIndex, Vec3& position, float radius );
+        void SetSpotLightParameters( int bufferIndex, Vec3& position, float radius, const Vec3& direction, float coneAngle, float falloffRadius );
         void UpdateLightBuffers();
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
         bool CullerUniformsCreated() const { return cullerUniformsCreated; }
@@ -51,6 +51,7 @@ namespace ae3d
         VkBufferView* GetPointLightColorBufferView() { return &pointLightColorView; }
         VkBuffer GetSpotLightBuffer() const { return spotLightCenterAndRadiusBuffer; }
         VkBufferView* GetSpotLightBufferView() { return &spotLightBufferView; }
+        VkBufferView* GetSpotLightParamsView() { return &spotLightParamsView; }
         VkBufferView* GetLightIndexBufferView() { return &perTileLightIndexBufferView; }
 #endif
     private:
@@ -86,6 +87,11 @@ namespace ae3d
         VkDeviceMemory spotLightCenterAndRadiusMemory = VK_NULL_HANDLE;
         void* mappedSpotLightCenterAndRadiusMemory = nullptr;
         VkBufferView spotLightBufferView;
+
+        VkBuffer spotLightParamsBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory spotLightParamsMemory = VK_NULL_HANDLE;
+        void* mappedSpotLightParamsMemory = nullptr;
+        VkBufferView spotLightParamsView;
         
         VkBuffer perTileLightIndexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory perTileLightIndexBufferMemory = VK_NULL_HANDLE;
@@ -99,6 +105,7 @@ namespace ae3d
         Vec4 pointLightCenterAndRadius[ MaxLights ];
         Vec4 pointLightColors[ MaxLights ];
         Vec4 spotLightCenterAndRadius[ MaxLights ];
+        Vec4 spotLightParams[ MaxLights ];
         int activePointLights = 0;
         int activeSpotLights = 0;
         bool cullerUniformsCreated = false;

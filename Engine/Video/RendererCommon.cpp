@@ -139,7 +139,7 @@ void ae3d::LightTiler::SetPointLightParameters( int bufferIndex, const Vec3& pos
     }
 }
 
-void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& position, float radius )
+void ae3d::LightTiler::SetSpotLightParameters( int bufferIndex, Vec3& position, float radius, const Vec3& direction, float coneAngle, float falloffRadius )
 {
     System::Assert( bufferIndex < MaxLights, "tried to set a too high light index" );
 
@@ -147,6 +147,7 @@ void ae3d::LightTiler::SetSpotLightPositionAndRadius( int bufferIndex, Vec3& pos
     {
         activeSpotLights = MathUtil::Max( bufferIndex + 1, activeSpotLights );
         spotLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
+        spotLightParams[ bufferIndex ] = Vec4( direction.x, direction.y, coneAngle, falloffRadius ); // FIXME: incomplete, need to pack params
     }
 }
 

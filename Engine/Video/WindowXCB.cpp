@@ -252,19 +252,8 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     {
         samples = 16;
     }
-
-    int num_fb_configs = 0;
-    GLXFBConfig* fb_configs = glXGetFBConfigs( display, default_screen, &num_fb_configs );
     
-    if (!fb_configs || num_fb_configs == 0)
-    {
-        std::cerr << "glXGetFBConfigs failed." << std::endl;
-        return -1;
-    }
-
-    XFree( fb_configs );
-    
-    const int Visual_attribs[] =
+    const int visualAttribs[] =
     {
         GLX_X_RENDERABLE, True,
         GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
@@ -282,12 +271,8 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         None
     };
 
-    int attribs[ sizeof( Visual_attribs ) ];
-    memcpy( attribs, Visual_attribs, sizeof( Visual_attribs ) );
-
     int fbcount;
-    GLXFBConfig fb_config = nullptr;
-    GLXFBConfig* fbConfigs = glXChooseFBConfig( display, DefaultScreen( display ), attribs, &fbcount );
+    GLXFBConfig* fbConfigs = glXChooseFBConfig( display, DefaultScreen( display ), visualAttribs, &fbcount );
 
     if (!fbConfigs || fbcount == 0)
     {
@@ -295,7 +280,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         return -1;
     }
 
-    fb_config = fbConfigs[ 0 ];
+    GLXFBConfig fb_config = fbConfigs[ 0 ];
     
     /* Select first framebuffer config and query visualID */
     int visualID = 0;
