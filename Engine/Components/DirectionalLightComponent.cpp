@@ -2,6 +2,7 @@
 #include <locale>
 #include <vector>
 #include <sstream>
+#include <string>
 
 std::vector< ae3d::DirectionalLightComponent > directionalLightComponents;
 unsigned nextFreeDirectionalLightComponent = 0;

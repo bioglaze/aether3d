@@ -473,7 +473,7 @@ void SceneWidget::CreateSphereLines()
         lines.push_back( Vec3( 0, y2, x2 ) );
     }
 
-    sphereLineHandle = System::CreateLineBuffer( lines, Vec3( 1, 1, 1 ) );
+    sphereLineHandle = System::CreateLineBuffer( lines.data(), (int)lines.size(), Vec3( 1, 1, 1 ) );
 }
 
 void SceneWidget::CreateConeLines()
@@ -518,7 +518,7 @@ void SceneWidget::CreateConeLines()
         lines.push_back( Vec3( x2, y2, 0 ) );
     }
 
-    coneLineHandle = System::CreateLineBuffer( lines, Vec3( 1, 1, 1 ) );
+    coneLineHandle = System::CreateLineBuffer( lines.data(), (int)lines.size(), Vec3( 1, 1, 1 ) );
 }
 
 void SceneWidget::SelectSpriteUnderCursor()

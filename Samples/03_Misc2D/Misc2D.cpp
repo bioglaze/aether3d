@@ -163,7 +163,7 @@ int main()
     lines[ 1 ] = Vec3( 50, 10, -0.5f );
     lines[ 2 ] = Vec3( 50, 50, -0.5f );
     lines[ 3 ] = Vec3( 10, 10, -0.5f );
-    const int lineHandle = System::CreateLineBuffer( lines, Vec3( 1, 0, 0 ) );
+    const int lineHandle = System::CreateLineBuffer( lines.data(), (int)lines.size(), Vec3( 1, 0, 0 ) );
     
     bool quit = false;
 

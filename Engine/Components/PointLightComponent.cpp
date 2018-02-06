@@ -1,6 +1,7 @@
 #include "PointLightComponent.hpp"
 #include <locale>
 #include <vector>
+#include <string>
 #include <sstream>
 
 std::vector< ae3d::PointLightComponent > pointLightComponents;

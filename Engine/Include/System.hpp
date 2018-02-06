@@ -2,7 +2,6 @@
 #define SYSTEM_H
 
 #include <string>
-#include <vector>
 
 #if RENDERER_METAL
 #import <QuartzCore/CAMetalLayer.h>
@@ -33,7 +32,7 @@
    <li>Virtual file system aka .pak archive files for faster loading.</li>
    <li>Custom mesh format, converters included for .obj, .fbx and Blender.</li>
    <li>Shadow mapping from a directional or spot light (no lighting yet)</li>
-   <li>VR support. Tested on HTC Vive and Oculus Rift.</li>
+   <li>VR support. Tested on HTC Vive.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Skinned animation.</li>
    <li>Scene serialization.</li>
@@ -120,7 +119,7 @@ namespace ae3d
         /// \param lines Lines.
         /// \param color Color.
         /// \return handle to the buffer. Used with DrawLines.
-        int CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color );
+        int CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color );
         
         /// Draws a texture into the screen. Should be called after Scene::Render().
         /// \param texture Texture

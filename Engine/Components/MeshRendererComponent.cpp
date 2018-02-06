@@ -1,4 +1,5 @@
 #include "MeshRendererComponent.hpp"
+#include <string>
 #include <vector>
 #include "Frustum.hpp"
 #include "Matrix.hpp"

@@ -29,6 +29,7 @@ namespace ae3d
         id< MTLBuffer > GetPointLightCenterAndRadiusBuffer() { return pointLightCenterAndRadiusBuffer; }
         id< MTLBuffer > GetPointLightColorBuffer() { return pointLightColorBuffer; }
         id< MTLBuffer > GetSpotLightCenterAndRadiusBuffer() { return spotLightCenterAndRadiusBuffer; }
+        id< MTLBuffer > GetSpotLightParamsBuffer() { return spotLightParamsBuffer; }
         id< MTLBuffer > GetCullerUniforms() { return uniformBuffer; }
 #endif
         /// Destroys graphics API objects.
@@ -63,6 +64,7 @@ namespace ae3d
         id< MTLBuffer > pointLightCenterAndRadiusBuffer;
         id< MTLBuffer > pointLightColorBuffer;
         id< MTLBuffer > spotLightCenterAndRadiusBuffer;
+        id< MTLBuffer > spotLightParamsBuffer;
         id< MTLBuffer > perTileLightIndexBuffer;
 #endif
 #if RENDERER_D3D12

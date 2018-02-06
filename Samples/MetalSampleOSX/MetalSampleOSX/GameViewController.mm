@@ -33,7 +33,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -176,7 +176,7 @@ int CreateConeLines()
         lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
     }
     
-    return ae3d::System::CreateLineBuffer( lines, ae3d::Vec3( 1, 1, 1 ) );
+    return ae3d::System::CreateLineBuffer( lines.data(), (int)lines.size(), ae3d::Vec3( 1, 1, 1 ) );
 }
 
 using namespace ae3d;
@@ -282,7 +282,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -668,7 +668,7 @@ using namespace ae3d;
     lines[ 1 ] = Vec3( 50, 10, -0.5f );
     lines[ 2 ] = Vec3( 50, 50, -0.5f );
     lines[ 3 ] = Vec3( 10, 10, -0.5f );
-    lineHandle = System::CreateLineBuffer( lines, Vec3( 1, 0, 0 ) );
+    lineHandle = System::CreateLineBuffer( lines.data(), (int)lines.size(), Vec3( 1, 0, 0 ) );
     
     coneLineHandle = CreateConeLines();
     

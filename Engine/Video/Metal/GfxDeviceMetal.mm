@@ -690,6 +690,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer() offset:0 atIndex:7];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer() offset:0 atIndex:9];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer() offset:0 atIndex:10];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer() offset:0 atIndex:11];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetCullerUniforms() offset:0 atIndex:8];
         [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
     }

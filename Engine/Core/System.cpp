@@ -213,9 +213,16 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
                      GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
-int ae3d::System::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
+int ae3d::System::CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color )
 {
-    return GfxDevice::CreateLineBuffer( lines, color );
+    std::vector< Vec3 > lineVec( lineCount );
+    
+    for (std::size_t lineIndex = 0; lineIndex < lineVec.size(); ++lineIndex)
+    {
+        lineVec[ lineIndex ] = lines[ lineIndex ];
+    }
+    
+    return GfxDevice::CreateLineBuffer( lineVec, color );
 }
 
 void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& projection )

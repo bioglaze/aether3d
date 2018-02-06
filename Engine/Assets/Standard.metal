@@ -131,6 +131,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                constant float4* spotLightBufferCenterAndRadius [[ buffer(9) ]],
                                constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
                                constant float4* pointLightBufferColors [[ buffer(10) ]],
+                               constant float4* spotLightParams [[ buffer(11) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
@@ -188,6 +189,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         index++;
         nextLightIndex = perTileLightIndexBuffer[ index ];
         
+        float4 params = spotLightParams[ lightIndex ];
         float4 center = spotLightBufferCenterAndRadius[ lightIndex ];
         float radius = center.w;
         outColor.r += radius;

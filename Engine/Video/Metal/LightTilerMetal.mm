@@ -38,7 +38,11 @@ void ae3d::LightTiler::Init()
     spotLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                          options:MTLResourceCPUCacheModeDefaultCache];
     spotLightCenterAndRadiusBuffer.label = @"spotLightCenterAndRadiusBuffer";
-    
+
+    spotLightParamsBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
+                                        options:MTLResourceCPUCacheModeDefaultCache];
+    spotLightParamsBuffer.label = @"spotLightParamsBuffer";
+
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
@@ -102,5 +106,8 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
     bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
     memcpy( bufferPointer, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+
+    bufferPointer = (uint8_t *)[spotLightParamsBuffer contents];
+    memcpy( bufferPointer, &spotLightParams[ 0 ], MaxLights * 4 * sizeof( float ) );
 }
 

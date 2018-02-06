@@ -1,5 +1,6 @@
 #include "SpotLightComponent.hpp"
 #include <locale>
+#include <string>
 #include <vector>
 #include <sstream>
 

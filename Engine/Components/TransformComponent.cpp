@@ -1,6 +1,7 @@
 #include "TransformComponent.hpp"
 #include <locale>
 #include <vector>
+#include <string>
 #include <sstream>
 #include "Matrix.hpp"
 #include "System.hpp"
