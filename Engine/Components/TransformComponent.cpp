@@ -183,15 +183,18 @@ void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
     }
 }
 
-std::string ae3d::TransformComponent::GetSerialized() const
+std::string GetSerialized( ae3d::TransformComponent* component )
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );
     outStream.imbue( c_locale );
 
+    auto localPosition = component->GetLocalPosition();
+    auto localRotation = component->GetLocalRotation();
+    
     outStream << "transform\nposition " << localPosition.x << " " << localPosition.y << " " << localPosition.z << "\nrotation ";
-    outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\nscale " << localScale << "\n";
-    outStream << "enabled " << isEnabled << "\n\n";
+    outStream << localRotation.x << " " << localRotation.y << " " << localRotation.z << " " << localRotation.w << "\nscale " << component->GetLocalScale() << "\n";
+    outStream << "enabled " << component->IsEnabled() << "\n\n";
     
     return outStream.str();
 }

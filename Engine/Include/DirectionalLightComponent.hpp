@@ -1,7 +1,6 @@
 #ifndef DIRECTIONAL_LIGHT_HPP
 #define DIRECTIONAL_LIGHT_HPP
 
-#include <string>
 #include "RenderTexture.hpp"
 #include "Vec3.hpp"
 
@@ -26,15 +25,15 @@ namespace ae3d
         /// \return True, if the light casts a shadow.
         bool CastsShadow() const { return castsShadow; }
         
+        /// \return True, if enabled
+        bool IsEnabled() const { return isEnabled; }
+        
         /// \param enable If true, the light will cast a shadow.
         /// \param shadowMapSize Shadow map size in pixels. If it's invalid, it falls back to 512.
         void SetCastShadow( bool enable, int shadowMapSize );
 
         /// \return Shadow map
         RenderTexture* GetShadowMap() { return &shadowMap; }
-
-        /// \return Serialized data.
-        std::string GetSerialized() const;
         
     private:
         friend class GameObject;

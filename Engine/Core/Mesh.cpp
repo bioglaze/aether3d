@@ -128,9 +128,9 @@ ae3d::Mesh& ae3d::Mesh::operator=( const Mesh& other )
     return *this;
 }
 
-const std::string& ae3d::Mesh::GetPath() const
+const char* ae3d::Mesh::GetPath() const
 {
-    return m().path;
+    return m().path.c_str();
 }
 
 const Vec3& ae3d::Mesh::GetAABBMin() const
@@ -153,9 +153,9 @@ const Vec3& ae3d::Mesh::GetSubMeshAABBMax( unsigned subMeshIndex ) const
     return m().subMeshes[ subMeshIndex < m().subMeshes.size() ? subMeshIndex : 0 ].aabbMax;
 }
 
-const std::string& ae3d::Mesh::GetSubMeshName( unsigned index ) const
+const char* ae3d::Mesh::GetSubMeshName( unsigned index ) const
 {
-    return m().subMeshes[ index < m().subMeshes.size() ? index : 0 ].name;
+    return m().subMeshes[ index < m().subMeshes.size() ? index : 0 ].name.c_str();
 }
 
 std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()

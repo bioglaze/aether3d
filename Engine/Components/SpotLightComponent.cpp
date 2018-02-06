@@ -33,17 +33,19 @@ void ae3d::SpotLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     }
 }
 
-std::string ae3d::SpotLightComponent::GetSerialized() const
+std::string GetSerialized( ae3d::SpotLightComponent* component )
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );
     outStream.imbue( c_locale );
 
+    auto color = component->GetColor();
+    
     outStream << "spotlight\n";
-    outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
-    outStream << "coneangle " << coneAngle << "\n";
-    outStream << "enabled" << isEnabled << "\n";
-    outStream << "radius " << radius << "\n";
+    outStream << "shadow " << (component->CastsShadow() ? 1 : 0) << "\n";
+    outStream << "coneangle " << component->GetConeAngle() << "\n";
+    outStream << "enabled" << component->IsEnabled() << "\n";
+    outStream << "radius " << component->GetRadius() << "\n";
     outStream << "color " << color.x << " " << color.y << " " << color.z << "\n\n";
 
     return outStream.str();

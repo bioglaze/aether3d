@@ -3,7 +3,6 @@
 
 #include <type_traits>
 #include <vector>
-#include <string>
 
 namespace ae3d
 {
@@ -35,7 +34,7 @@ namespace ae3d
         Mesh& operator=( const Mesh& other );
 
         /// \return Path where this mesh was loaded from.
-        const std::string& GetPath() const;
+        const char* GetPath() const;
         
         /// \param meshData Data from .ae3d mesh file.
         /// \return Load result.
@@ -63,7 +62,7 @@ namespace ae3d
         
         /// \param index Submesh index.
         /// \return Submesh name. If index is invalid, returns first submesh's name.
-        const std::string& GetSubMeshName( unsigned index ) const;
+        const char* GetSubMeshName( unsigned index ) const;
         
       private:
         friend class MeshRendererComponent;

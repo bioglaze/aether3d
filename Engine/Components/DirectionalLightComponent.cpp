@@ -33,15 +33,17 @@ void ae3d::DirectionalLightComponent::SetCastShadow( bool enable, int shadowMapS
     }
 }
 
-std::string ae3d::DirectionalLightComponent::GetSerialized() const
+std::string GetSerialized( ae3d::DirectionalLightComponent* component )
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );
     outStream.imbue( c_locale );
 
+    auto color = component->GetColor();
+    
     outStream << "dirlight\n";
     outStream << "color " << color.x << " " << color.y << " " << color.z << "\n";
-    outStream << "enabled" << isEnabled << "\n";
-    outStream << "shadow " << (castsShadow ? 1 : 0) << "\n\n";
+    outStream << "enabled" << component->IsEnabled() << "\n";
+    outStream << "shadow " << (component->CastsShadow() ? 1 : 0) << "\n\n";
     return outStream.str();
 }

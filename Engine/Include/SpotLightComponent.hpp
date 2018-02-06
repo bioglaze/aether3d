@@ -1,7 +1,6 @@
 #ifndef SPOT_LIGHT_HPP
 #define SPOT_LIGHT_HPP
 
-#include <string>
 #include "RenderTexture.hpp"
 #include "Vec3.hpp"
 
@@ -14,6 +13,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \return True, if enabled
+        bool IsEnabled() const { return isEnabled; }
+        
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
@@ -44,9 +46,6 @@ namespace ae3d
 
         /// \param aColor Color in range 0-1.
         void SetColor( const Vec3& aColor ) { color = aColor; }
-
-        /// \return Serialized data.
-        std::string GetSerialized() const;
         
     private:
         friend class GameObject;

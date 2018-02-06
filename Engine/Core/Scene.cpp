@@ -37,6 +37,12 @@ float GetVRFov();
 void BeginOffscreen();
 void EndOffscreen();
 void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader );
+std::string GetSerialized( ae3d::AudioSourceComponent* component );
+std::string GetSerialized( ae3d::MeshRendererComponent* component );
+std::string GetSerialized( ae3d::DirectionalLightComponent* component );
+std::string GetSerialized( ae3d::PointLightComponent* component );
+std::string GetSerialized( ae3d::SpotLightComponent* component );
+std::string GetSerialized( ae3d::TransformComponent* component );
 
 namespace GfxDeviceGlobal
 {
@@ -929,11 +935,11 @@ std::string ae3d::Scene::GetSerialized() const
         
         if (gameObject->GetComponent<MeshRendererComponent>())
         {
-            outSerialized += gameObject->GetComponent<MeshRendererComponent>()->GetSerialized();
+            outSerialized += ::GetSerialized( gameObject->GetComponent<MeshRendererComponent>() );
         }
         if (gameObject->GetComponent<TransformComponent>())
         {
-            outSerialized += gameObject->GetComponent<TransformComponent>()->GetSerialized();
+            outSerialized += ::GetSerialized( gameObject->GetComponent<TransformComponent>() );
         }
         if (gameObject->GetComponent<CameraComponent>())
         {
@@ -949,19 +955,19 @@ std::string ae3d::Scene::GetSerialized() const
         }
         if (gameObject->GetComponent<AudioSourceComponent>())
         {
-            outSerialized += gameObject->GetComponent<AudioSourceComponent>()->GetSerialized();
+            outSerialized += ::GetSerialized( gameObject->GetComponent<AudioSourceComponent>() );
         }
         if (gameObject->GetComponent<DirectionalLightComponent>())
         {
-            outSerialized += gameObject->GetComponent<DirectionalLightComponent>()->GetSerialized();
+            outSerialized += ::GetSerialized( gameObject->GetComponent<DirectionalLightComponent>() );
         }
         if (gameObject->GetComponent<SpotLightComponent>())
         {
-            outSerialized += gameObject->GetComponent<SpotLightComponent>()->GetSerialized();
+            outSerialized += ::GetSerialized( gameObject->GetComponent<SpotLightComponent>() );
         }
         if (gameObject->GetComponent<PointLightComponent>())
         {
-            outSerialized += gameObject->GetComponent<PointLightComponent>()->GetSerialized();
+            outSerialized += ::GetSerialized( gameObject->GetComponent<PointLightComponent>() );
         }
     }
     return outSerialized;
@@ -1529,7 +1535,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             {
                 if (!mr->GetMaterial( i ))
                 {
-                    System::Print( "Scene parser: missing material for mesh renderer in game object %s in subMesh %s\n", go.GetName().c_str(), mr->GetMesh()->GetSubMeshName( i ).c_str() );
+                    System::Print( "Scene parser: missing material for mesh renderer in game object %s in subMesh %s\n", go.GetName().c_str(), mr->GetMesh()->GetSubMeshName( i ) );
                 }
             }
         }

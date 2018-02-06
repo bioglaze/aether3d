@@ -33,16 +33,18 @@ void ae3d::PointLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     }
 }
 
-std::string ae3d::PointLightComponent::GetSerialized() const
+std::string GetSerialized( ae3d::PointLightComponent* component )
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );
     outStream.imbue( c_locale );
 
+    auto color = component->GetColor();
+    
     outStream << "pointlight\n";
-    outStream << "shadow " << (castsShadow ? 1 : 0) << "\n";
-    outStream << "radius " << radius << "\n";
-    outStream << "enabled" << isEnabled << "\n";
+    outStream << "shadow " << (component->CastsShadow() ? 1 : 0) << "\n";
+    outStream << "radius " << component->GetRadius() << "\n";
+    outStream << "enabled" << component->IsEnabled() << "\n";
     outStream << "color " << color.x << " " << color.y << " " << color.z << "\n\n";
 
     return outStream.str();

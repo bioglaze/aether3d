@@ -1,7 +1,6 @@
 #ifndef TRANSFORM_COMPONENT_H
 #define TRANSFORM_COMPONENT_H
 
-#include <string>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
@@ -29,6 +28,9 @@ namespace ae3d
 
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
+        
+        /// \return True, if enabled.
+        bool IsEnabled() const { return isEnabled; }
         
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
@@ -77,9 +79,6 @@ namespace ae3d
 
         /// \return Local-to-world transform matrix.
         const Matrix44& GetLocalToWorldMatrix() { return localToWorldMatrix; }
-
-        /// \return Textual representation of component.
-        std::string GetSerialized() const;
 
         /// \return View direction (normalized)
         Vec3 GetViewDirection() const;

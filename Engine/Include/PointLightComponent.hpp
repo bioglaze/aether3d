@@ -1,7 +1,6 @@
 #ifndef POINT_LIGHT_HPP
 #define POINT_LIGHT_HPP
 
-#include <string>
 #include "RenderTexture.hpp"
 
 namespace ae3d
@@ -13,6 +12,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \return True, if enabled
+        bool IsEnabled() const { return isEnabled; }
+        
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
@@ -37,9 +39,6 @@ namespace ae3d
         
         /// \param aRadius radius
         void SetRadius( float aRadius ) { radius = aRadius; }
-        
-        /// \return Serialized data.
-        std::string GetSerialized() const;
         
     private:
         friend class GameObject;

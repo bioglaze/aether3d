@@ -1,7 +1,6 @@
 #ifndef MESH_RENDERER_COMPONENT
 #define MESH_RENDERER_COMPONENT
 
-#include <string>
 #include <vector>
 
 namespace ae3d
@@ -38,9 +37,6 @@ namespace ae3d
 
         /// \param enable True, if the mesh will be rendered as a wireframe.
         void EnableWireframe( bool enable ) { isWireframe = enable; }
-
-        /// \return Textual representation of component.
-        std::string GetSerialized() const;
         
     private:
         friend class GameObject;

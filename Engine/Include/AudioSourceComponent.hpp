@@ -1,8 +1,6 @@
 #ifndef AUDIO_SOURCE_COMPONENT
 #define AUDIO_SOURCE_COMPONENT
 
-#include <string>
-
 namespace ae3d
 {
     /// Contains an audio clip and methods to play it. \see AudioClip
@@ -17,6 +15,12 @@ namespace ae3d
 
         /// \return True, if clips played through this source will be affected by this game object's and camera's position.
         bool Is3D() const { return is3D; }
+
+        /// \return True, if enabled
+        bool IsEnabled() const { return isEnabled; }
+        
+        /// \return Clip's id
+        unsigned GetClipID() const { return clipId; }
         
         /// \param audioClipId Audio clip id.
         void SetClipId( unsigned audioClipId );
@@ -29,9 +33,6 @@ namespace ae3d
         
         /// Plays the clip.
         void Play() const;
-
-        /// \return Textual representation of component.
-        std::string GetSerialized() const;
 
     private:
         friend class GameObject;
