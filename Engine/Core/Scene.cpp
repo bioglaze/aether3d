@@ -269,7 +269,7 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
                 {
                     auto worldPos = transform->GetWorldPosition();
                     // FIXME: add falloff radius, check cone angle vs. cosine of cone angle
-                    GfxDeviceGlobal::lightTiler.SetSpotLightParameters( goWithSpotLightIndex, worldPos, spotLight->GetRadius(), transform->GetViewDirection(), spotLight->GetConeAngle(), 3 );
+                    GfxDeviceGlobal::lightTiler.SetSpotLightParameters( goWithSpotLightIndex, worldPos, spotLight->GetRadius(), Vec4( spotLight->GetColor() ), transform->GetViewDirection(), spotLight->GetConeAngle(), 3 );
                     ++goWithSpotLightIndex;
                 }
             }
