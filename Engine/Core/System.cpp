@@ -3,7 +3,6 @@
 #define _AMD64_
 #include <debugapi.h>
 #endif
-#include <vector>
 #include <cstdarg>
 #include <cassert>
 #include "AudioSystem.hpp"
@@ -214,15 +213,8 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
 }
 
 int ae3d::System::CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color )
-{
-    std::vector< Vec3 > lineVec( lineCount );
-    
-    for (std::size_t lineIndex = 0; lineIndex < lineVec.size(); ++lineIndex)
-    {
-        lineVec[ lineIndex ] = lines[ lineIndex ];
-    }
-    
-    return GfxDevice::CreateLineBuffer( lineVec, color );
+{    
+    return GfxDevice::CreateLineBuffer( lines, lineCount, color );
 }
 
 void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& projection )

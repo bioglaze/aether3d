@@ -2,7 +2,6 @@
 #define GFX_DEVICE_H
 
 #include <cstdint>
-#include <vector>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
@@ -86,7 +85,7 @@ namespace ae3d
         void MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices );
         void UnmapUIVertexBuffer();
         void Init( int width, int height );
-        int CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color );
+        int CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color );
 #if RENDERER_D3D12
         void ResetCommandList();
         void  CreateNewUniformBuffer();

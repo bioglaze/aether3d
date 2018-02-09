@@ -96,18 +96,17 @@ void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponen
     GfxDevice::PopGroupMarker();
 }
 
-int ae3d::GfxDevice::CreateLineBuffer( const std::vector< Vec3 >& lines, const Vec3& color )
+int ae3d::GfxDevice::CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color )
 {
-    if (lines.empty())
+    if (lineCount == 0)
     {
         return -1;
     }
 
-    std::vector< VertexBuffer::Face > faces( lines.size() * 2 );
+    std::vector< VertexBuffer::Face > faces( lineCount * 2 );
+    std::vector< VertexBuffer::VertexPTC > vertices( lineCount );
 
-    std::vector< VertexBuffer::VertexPTC > vertices( lines.size() );
-
-    for (std::size_t lineIndex = 0; lineIndex < lines.size(); ++lineIndex)
+    for (int lineIndex = 0; lineIndex < lineCount; ++lineIndex)
     {
         vertices[ lineIndex ].position = lines[ lineIndex ];
         vertices[ lineIndex ].color = Vec4( color, 1 );

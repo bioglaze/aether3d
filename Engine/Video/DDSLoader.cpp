@@ -2,10 +2,7 @@
 #if RENDERER_OPENGL
 #include <GL/glxw.h>
 #endif
-#include <cassert>
 #include <cstring>
-#include <cstdio>
-#include <cstdlib>
 #include "System.hpp"
 
 unsigned MyMax( unsigned a, unsigned b )
@@ -82,7 +79,7 @@ DDSInfo loadInfoIndex8 = { false, false, true, 1, 1 };
 
 DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& output )
 {
-    assert( cubeMapFace >= 0 && cubeMapFace < 7 );
+    ae3d::System::Assert( cubeMapFace >= 0 && cubeMapFace < 7, "DDSLoader: Wrong cubemap face" );
 
     DDSHeader header;
     int mipMapCount = 0;
@@ -102,8 +99,8 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     
     std::memcpy( &header, fileContents.data.data(), sizeof( header ) );
 
-    assert( header.sHeader.dwMagic == DDS_MAGIC );
-    assert( header.sHeader.dwSize == 124 );
+    ae3d::System::Assert( header.sHeader.dwMagic == DDS_MAGIC, "DDSLoader: Wrong magic" );
+    ae3d::System::Assert( header.sHeader.dwSize == 124, "DDSLoader: Wrong header size" );
   
     if (!(header.sHeader.dwFlags & DDSD_PIXELFORMAT) ||
         !(header.sHeader.dwFlags & DDSD_CAPS) )
@@ -117,8 +114,8 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
     const uint32_t xSize = header.sHeader.dwWidth;
     const uint32_t ySize = header.sHeader.dwHeight;
-    assert( !( xSize & (xSize - 1) ) );
-    assert( !( ySize & (ySize - 1) ) );
+    ae3d::System::Assert( !( xSize & (xSize - 1) ), "DDSLoader: Wrong image width" );
+    ae3d::System::Assert( !( ySize & (ySize - 1) ), "DDSLoader: Wrong image height" );
 
     outWidth  = xSize;
     outHeight = ySize;
@@ -198,8 +195,8 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     if (li->isCompressed)
     {
         size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
-        assert( size == header.sHeader.dwPitchOrLinearSize );
-        assert( header.sHeader.dwFlags & DDSD_LINEARSIZE );
+        ae3d::System::Assert( size == header.sHeader.dwPitchOrLinearSize, "DDSLoader: Wrong pitch or size" );
+        ae3d::System::Assert( header.sHeader.dwFlags & DDSD_LINEARSIZE, "DDSLoader, need flag DDSD_LINEARSIZE" );
 
         std::vector< unsigned char > data( size );
 
@@ -231,10 +228,10 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else if (li->hasPalette)
     {
-        assert( header.sHeader.dwFlags & DDSD_PITCH );
-        assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8 );
+        ae3d::System::Assert( header.sHeader.dwFlags & DDSD_PITCH, "DDSLoader: need flag DDSD_PITCH" );
+        ae3d::System::Assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8, "DDSLoader: Wrong bit count" );
         size = header.sHeader.dwPitchOrLinearSize * ySize;
-        assert( size == x * y * li->blockBytes );
+        ae3d::System::Assert( size == x * y * li->blockBytes, "DDSLoader: Invalid size" );
         std::vector< unsigned char > data( size );
         unsigned palette[ 256 ];
 #if RENDERER_OPENGL
