@@ -146,8 +146,8 @@ void ae3d::LightTiler::SetSpotLightParameters( int bufferIndex, Vec3& position, 
     {
         activeSpotLights = MathUtil::Max( bufferIndex + 1, activeSpotLights );
         spotLightCenterAndRadius[ bufferIndex ] = Vec4( position.x, position.y, position.z, radius );
-        spotLightParams[ bufferIndex ] = Vec4( direction.x, direction.y, coneAngle, falloffRadius ); // FIXME: incomplete, need to pack params
-		spotLightColors[ bufferIndex ] = color;
+        spotLightParams[ bufferIndex ] = Vec4( direction.x, direction.y, direction.z, coneAngle );
+		spotLightColors[ bufferIndex ] = Vec4( color.x, color.y, color.z, falloffRadius );
     }
 }
 

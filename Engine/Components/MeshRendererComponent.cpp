@@ -48,7 +48,7 @@ ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
     return &meshRendererComponents[ index ];
 }
 
-std::string GetSerialized( ae3d::MeshRendererComponent* component )
+std::string GetSerialized( ae3d::MeshRendererComponent* /*component*/ )
 {
     return "meshrenderer\n\n";
 }
