@@ -7,23 +7,16 @@
 #include "System.hpp"
 #include "Vec3.hpp"
 
+void UploadPerObjectUbo();
+
 namespace GfxDeviceGlobal
 {
     extern int backBufferWidth;
     extern int backBufferHeight;
+    extern PerObjectUboStruct perObjectUboStruct;
 }
 
 using namespace ae3d;
-
-struct CullerUniforms
-{
-    Matrix44 invProjection;
-    Matrix44 worldToView;
-    unsigned windowWidth;
-    unsigned windowHeight;
-    unsigned numLights;
-    int maxNumLightsPerTile;
-};
 
 void ae3d::LightTiler::Init()
 {
@@ -43,21 +36,16 @@ void ae3d::LightTiler::Init()
                                         options:MTLResourceCPUCacheModeDefaultCache];
     spotLightParamsBuffer.label = @"spotLightParamsBuffer";
 
+    spotLightColorBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
+                               options:MTLResourceCPUCacheModeDefaultCache];
+    spotLightColorBuffer.label = @"spotLightColorBuffer";
+
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
     perTileLightIndexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxNumLightsPerTile * numTiles * sizeof( unsigned )
                   options:MTLResourceStorageModePrivate];
     perTileLightIndexBuffer.label = @"perTileLightIndexBuffer";
-
-#if !TARGET_OS_IPHONE
-    uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )
-                                 options:MTLStorageModeManaged];
-#else
-    uniformBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( CullerUniforms )
-                       options:MTLStorageModeShared];    
-#endif
-    uniformBuffer.label = @"CullerUniforms";
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
@@ -73,22 +61,18 @@ unsigned ae3d::LightTiler::GetNumTilesY() const
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewToClip, const Matrix44& worldToView, RenderTexture& depthNormalTarget )
 {
     shader.SetRenderTexture( &depthNormalTarget, 0 );
-    CullerUniforms uniforms;
 
-    Matrix44::Invert( viewToClip, uniforms.invProjection );
+    Matrix44::Invert( viewToClip, GfxDeviceGlobal::perObjectUboStruct.clipToView );
 
-    uniforms.worldToView = worldToView;
-    uniforms.windowWidth = depthNormalTarget.GetWidth();
-    uniforms.windowHeight = depthNormalTarget.GetHeight();
-    uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
-    uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
-
-    cullerUniformsCreated = true;
+    GfxDeviceGlobal::perObjectUboStruct.localToView = worldToView;
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = depthNormalTarget.GetWidth();
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = depthNormalTarget.GetHeight();
+    GfxDeviceGlobal::perObjectUboStruct.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
+    GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GetMaxNumLightsPerTile();
     
-    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents];
-    memcpy( bufferPointer, &uniforms, sizeof( CullerUniforms ) );
+    UploadPerObjectUbo();
 
-    shader.SetUniformBuffer( 0, uniformBuffer );
+    shader.SetUniformBuffer( 0, GfxDevice::GetCurrentUniformBuffer() );
     shader.SetUniformBuffer( 1, pointLightCenterAndRadiusBuffer );
     shader.SetUniformBuffer( 2, perTileLightIndexBuffer);
     shader.SetUniformBuffer( 3, spotLightCenterAndRadiusBuffer );
@@ -109,5 +93,8 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
     bufferPointer = (uint8_t *)[spotLightParamsBuffer contents];
     memcpy( bufferPointer, &spotLightParams[ 0 ], MaxLights * 4 * sizeof( float ) );
+
+    bufferPointer = (uint8_t *)[spotLightColorBuffer contents];
+    memcpy( bufferPointer, &spotLightColors[ 0 ], MaxLights * 4 * sizeof( float ) );
 }
 

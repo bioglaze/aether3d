@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <list>
+#include <vector>
 #include "GfxDevice.hpp"
 #include "LightTiler.hpp"
 #include "VertexBuffer.hpp"
@@ -627,11 +628,6 @@ void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )
 {
-    if (!GfxDeviceGlobal::lightTiler.CullerUniformsCreated() && shader.GetMetalVertexShaderName() == "standard_vertex")
-    {
-        return;
-    }
-    
     Statistics::IncDrawCalls();
 
     if (!texture0)
@@ -686,13 +682,13 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     
     if (shader.GetMetalVertexShaderName() == "standard_vertex")
     {
+        [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPerTileLightIndexBuffer() offset:0 atIndex:6];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer() offset:0 atIndex:7];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer() offset:0 atIndex:9];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer() offset:0 atIndex:10];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer() offset:0 atIndex:11];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetCullerUniforms() offset:0 atIndex:8];
-        [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer() offset:0 atIndex:8];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer() offset:0 atIndex:9];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer() offset:0 atIndex:10];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer() offset:0 atIndex:11];
     }
 
     [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];

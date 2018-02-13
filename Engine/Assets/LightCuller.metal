@@ -4,20 +4,12 @@
 
 using namespace metal;
 
+#include "MetalCommon.h"
+
 #define TILE_RES 16
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define MAX_NUM_LIGHTS_PER_TILE 544
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
-
-struct Uniforms
-{
-    matrix_float4x4 clipToView;
-    matrix_float4x4 worldToView;
-    uint windowWidth;
-    uint windowHeight;
-    uint numLights;
-    int maxNumLightsPerTile;
-};
 
 static float4 ConvertClipToView( float4 p, matrix_float4x4 clipToView )
 {
@@ -149,7 +141,6 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     minZ = as_type< float >( zMax );
     maxZ = as_type< float >( zMin );
 
-    // loop over the point lights and do a sphere vs. frustum intersection test
     uint numPointLights = uniforms.numLights & 0xFFFFu;
 
     for (uint i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
@@ -160,9 +151,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         {
             float4 center = pointLightBufferCenterAndRadius[ il ];
             float radius = center.w;
-            center.xyz = (uniforms.worldToView * float4( center.xyz, 1.0f ) ).xyz;
+            center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f ) ).xyz;
 
-            // test if sphere is intersecting or inside frustum
             if (-center.z + minZ < radius && center.z - maxZ < radius)
             {
                 if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
@@ -194,18 +184,15 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         {
             float4 center = spotLightBufferCenterAndRadius[ il ];
             float radius = center.w * 5.0f; // FIXME: Multiply was added, but more clever culling should be done instead.
-            center.xyz = (uniforms.worldToView * float4( center.xyz, 1.0f )).xyz;
+            center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f )).xyz;
 
-            // test if sphere is intersecting or inside frustum
-            if (-center.z - minZ < radius && center.z - maxZ < radius)
+            if (-center.z + minZ < radius && center.z - maxZ < radius)
             {
                 if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < radius))
                 {
-                    // do a thread-safe increment of the list counter
-                    // and put the index of this light into the list
                     uint dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
                     ldsLightIdx[ dstIdx ] = il;
                 }

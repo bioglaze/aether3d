@@ -33,7 +33,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -282,7 +282,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -550,9 +550,11 @@ using namespace ae3d;
 #ifdef TEST_SHADOWS_SPOT
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
 #endif
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetColor( Vec3( 1, 0, 0 ) );
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetRadius( 5 );
     spotLight.AddComponent<ae3d::TransformComponent>();
-    //spotLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 8, -10 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    //spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -70 }, { 0, -1, 0 }, { 0, 1, 0 } );
     
     pointLight.AddComponent<ae3d::PointLightComponent>();
 #ifdef TEST_SHADOWS_POINT
@@ -566,7 +568,7 @@ using namespace ae3d;
     // Inits point lights for Forward+
     {
         int pointLightIndex = 0;
-        std::srand( std::time( nullptr ) );
+        std::srand( (unsigned)std::time( nullptr ) );
         
         for (int row = 0; row < 10; ++row)
         {
@@ -637,10 +639,8 @@ using namespace ae3d;
     //scene.Add( &bigCube2 );
     //scene.Add( &bigCube3 );
     scene.Add( &animatedGo );
-    scene.Add( &pointLight );
-#ifdef TEST_SHADOWS_SPOT
+    //scene.Add( &pointLight );
     scene.Add( &spotLight );
-#endif
 #ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
 #endif

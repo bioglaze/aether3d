@@ -22,7 +22,6 @@ namespace ae3d
         void SetSpotLightParameters( int bufferIndex, Vec3& position, float radius, const Vec4& color, const Vec3& direction, float coneAngle, float falloffRadius );
         void UpdateLightBuffers();
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
-        bool CullerUniformsCreated() const { return cullerUniformsCreated; }
         
 #if RENDERER_METAL
         id< MTLBuffer > GetPerTileLightIndexBuffer() { return perTileLightIndexBuffer; }
@@ -30,7 +29,7 @@ namespace ae3d
         id< MTLBuffer > GetPointLightColorBuffer() { return pointLightColorBuffer; }
         id< MTLBuffer > GetSpotLightCenterAndRadiusBuffer() { return spotLightCenterAndRadiusBuffer; }
         id< MTLBuffer > GetSpotLightParamsBuffer() { return spotLightParamsBuffer; }
-        id< MTLBuffer > GetCullerUniforms() { return uniformBuffer; }
+        id< MTLBuffer > GetSpotLightColorBuffer() { return spotLightColorBuffer; }
 #endif
         /// Destroys graphics API objects.
         void DestroyBuffers();
@@ -61,11 +60,11 @@ namespace ae3d
         unsigned GetNumTilesY() const;
         
 #if RENDERER_METAL
-        id< MTLBuffer > uniformBuffer;
         id< MTLBuffer > pointLightCenterAndRadiusBuffer;
         id< MTLBuffer > pointLightColorBuffer;
         id< MTLBuffer > spotLightCenterAndRadiusBuffer;
         id< MTLBuffer > spotLightParamsBuffer;
+        id< MTLBuffer > spotLightColorBuffer;
         id< MTLBuffer > perTileLightIndexBuffer;
 #endif
 #if RENDERER_D3D12
@@ -113,7 +112,6 @@ namespace ae3d
         Vec4 spotLightParams[ MaxLights ];
         int activePointLights = 0;
         int activeSpotLights = 0;
-        bool cullerUniformsCreated = false;
     };
 }
 

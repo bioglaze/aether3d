@@ -40,6 +40,7 @@ void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsign
 
 void ae3d::ComputeShader::SetUniformBuffer( int slotIndex, id< MTLBuffer > buffer )
 {
+    System::Assert( slotIndex < SLOT_COUNT, "Too high slot" );
     uniforms[ slotIndex ] = buffer;
 }
 

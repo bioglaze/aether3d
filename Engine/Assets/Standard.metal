@@ -32,16 +32,6 @@ struct StandardVertex
     float4 color [[attribute(2)]];
 };
 
-struct CullerUniforms
-{
-    matrix_float4x4 invProjection;
-    matrix_float4x4 viewMatrix;
-    uint windowWidth;
-    uint windowHeight;
-    uint numLights;
-    int maxNumLightsPerTile;
-};
-
 static uint GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, const device uint* perTileLightIndexBuffer )
 {
     uint numLightsInThisTile = 0;
@@ -51,7 +41,7 @@ static uint GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, co
     // count point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
-        ++numLightsInThisTile;
+        //++numLightsInThisTile;
         ++index;
         nextLightIndex = perTileLightIndexBuffer[ index ];
     }
@@ -128,10 +118,10 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
                                constant float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
-                               constant float4* spotLightBufferCenterAndRadius [[ buffer(9) ]],
-                               constant CullerUniforms& cullerUniforms  [[ buffer(8) ]],
-                               constant float4* pointLightBufferColors [[ buffer(10) ]],
-                               constant float4* spotLightParams [[ buffer(11) ]],
+                               constant float4* spotLightBufferCenterAndRadius [[ buffer(8) ]],
+                               constant float4* pointLightBufferColors [[ buffer(9) ]],
+                               constant float4* spotLightParams [[ buffer(10) ]],
+                               constant float4* spotLightBufferColors [[ buffer(11) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
@@ -142,8 +132,8 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
     
-    const uint tileIndex = GetTileIndex( in.position.xy, cullerUniforms.windowWidth );
-    uint index = cullerUniforms.maxNumLightsPerTile * tileIndex;
+    const uint tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
+    uint index = uniforms.maxNumLightsPerTile * tileIndex;
     uint nextLightIndex = perTileLightIndexBuffer[ index ];
 
     float4 outColor = float4( 0.25, 0.25, 0.25, 1 );
@@ -186,17 +176,30 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
         uint lightIndex = nextLightIndex;
-        index++;
+        ++index;
         nextLightIndex = perTileLightIndexBuffer[ index ];
         
-        float4 params = spotLightParams[ lightIndex ];
-        float4 center = spotLightBufferCenterAndRadius[ lightIndex ];
-        float radius = center.w;
-        outColor.r += radius;
+        const float4 params = spotLightParams[ lightIndex ];
+        const float4 center = spotLightBufferCenterAndRadius[ lightIndex ];
+        const float radius = center.w;
+        
+        float3 vecToLight = normalize( center.xyz - in.positionWS.xyz );
+        float spotAngle = dot( -params.xyz, vecToLight );
+
+        float cosineOfConeAngle = 0.5f;//(spotParams.z > 0.0f) ? spotParams.z : -spotParams.z;
+        
+        // Falloff
+        float dist = distance( in.positionWS.xyz, center.xyz );
+        float a = dist / radius + 1.0f;
+        float att = 1.0f / (a * a);
+        float3 color = spotLightBufferColors[ lightIndex ].rgb * att;// * specularTex;
+        
+        float3 accumDiffuseAndSpecular = spotAngle > cosineOfConeAngle ? color : float3( 0.0, 0.0, 0.0 );
+        outColor.rgb += accumDiffuseAndSpecular;
     }
     
 #ifdef DEBUG_LIGHT_COUNT
-     const uint numLights = GetNumLightsInThisTile( tileIndex, cullerUniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
+    const uint numLights = GetNumLightsInThisTile( tileIndex, uniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 
     if (numLights == 0)
     {
