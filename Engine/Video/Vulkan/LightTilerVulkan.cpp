@@ -293,8 +293,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     
     UploadPerObjectUbo();
 
-    cullerUniformsCreated = true;
-
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 

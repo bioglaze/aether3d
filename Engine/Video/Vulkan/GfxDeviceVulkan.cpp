@@ -1910,8 +1910,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     if (shader.GetVertexShaderPath().find( "Standard" ) != std::string::npos)
     {
-        System::Assert( GfxDeviceGlobal::lightTiler.CullerUniformsCreated(), "Tried to use standard shader without first filling the light index buffer!" );
-
         unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
         unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
@@ -1943,6 +1941,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 void ae3d::GfxDevice::GetNewUniformBuffer()
 {
     GfxDeviceGlobal::currentUbo = (GfxDeviceGlobal::currentUbo + 1) % GfxDeviceGlobal::ubos.size();
+
+	GfxDeviceGlobal::perObjectUboStruct.numLights = 0;
+	GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
+	GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+	GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
 }
 
 void ae3d::GfxDevice::CreateUniformBuffers()

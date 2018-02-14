@@ -358,8 +358,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
-    cullerUniformsCreated = true;
-
     memcpy_s( ae3d::GfxDevice::GetCurrentMappedConstantBuffer(), AE3D_CB_SIZE, &uniforms, sizeof( PerObjectUboStruct ) );
 
     shader.SetUniformBuffer( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );

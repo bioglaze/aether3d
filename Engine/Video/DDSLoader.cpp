@@ -196,7 +196,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     {
         size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
         ae3d::System::Assert( size == header.sHeader.dwPitchOrLinearSize, "DDSLoader: Wrong pitch or size" );
-        ae3d::System::Assert( header.sHeader.dwFlags & DDSD_LINEARSIZE, "DDSLoader, need flag DDSD_LINEARSIZE" );
+        ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_LINEARSIZE) != 0, "DDSLoader, need flag DDSD_LINEARSIZE" );
 
         std::vector< unsigned char > data( size );
 
@@ -228,7 +228,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else if (li->hasPalette)
     {
-        ae3d::System::Assert( header.sHeader.dwFlags & DDSD_PITCH, "DDSLoader: need flag DDSD_PITCH" );
+        ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_PITCH) != 0, "DDSLoader: need flag DDSD_PITCH" );
         ae3d::System::Assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8, "DDSLoader: Wrong bit count" );
         size = header.sHeader.dwPitchOrLinearSize * ySize;
         ae3d::System::Assert( size == x * y * li->blockBytes, "DDSLoader: Invalid size" );
