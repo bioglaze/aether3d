@@ -1,6 +1,7 @@
 #include "Mesh.hpp"
 #include <vector>
 #include <cstdint>
+#include <sstream>
 #include <string>
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
