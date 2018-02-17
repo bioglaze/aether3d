@@ -1,4 +1,3 @@
-#include <vector>
 #include "Vec3.hpp"
 
 using namespace ae3d;

@@ -97,7 +97,10 @@ namespace debug
             float color[ 4 ] = { r, g, b, 1 };
             VkDebugMarkerMarkerInfoEXT markerInfo = {};
             markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-            memcpy( markerInfo.color, &color[ 0 ], sizeof( float ) * 4 );
+            markerInfo.color[ 0 ], color[ 0 ];
+            markerInfo.color[ 1 ], color[ 1 ];
+            markerInfo.color[ 2 ], color[ 2 ];
+            markerInfo.color[ 3 ], color[ 3 ];
             markerInfo.pMarkerName = pMarkerName;
             CmdDebugMarkerBegin( cmdbuffer, &markerInfo );
         }

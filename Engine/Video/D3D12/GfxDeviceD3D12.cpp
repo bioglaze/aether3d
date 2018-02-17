@@ -1,7 +1,4 @@
 #include "GfxDevice.hpp"
-#define WIN32_LEAN_AND_MEAN
-#define VC_EXTRALEAN
-#include <Windows.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <d3dx12.h>

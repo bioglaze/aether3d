@@ -1,7 +1,6 @@
 #include "AudioSourceComponent.hpp"
 #include "AudioSystem.hpp"
 #include <vector>
-#include <sstream>
 #include <string>
 
 std::vector< ae3d::AudioSourceComponent > audioSourceComponents;
@@ -37,12 +36,10 @@ void ae3d::AudioSourceComponent::Play() const
 
 std::string GetSerialized( ae3d::AudioSourceComponent* component )
 {
-    std::stringstream outStream;
-    outStream << "audiosource\n";
-    outStream << component->GetClipID() << "\n";
-    outStream << "enabled " << component->IsEnabled() << "\n";
-    outStream << "\n\n";
+    std::string str( "audiosource\n" );
+    str += std::to_string( component->GetClipID() ) + "\n";
+    str += "enabled " + std::to_string( component->IsEnabled() ) + "\n\n\n";
     
-    return outStream.str();
+    return str;
 }
 

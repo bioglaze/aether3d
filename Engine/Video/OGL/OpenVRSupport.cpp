@@ -1,8 +1,6 @@
 #if AE3D_OPENVR
 #include "VR.hpp"
 #include <cstdint>
-#include <cmath>
-#include <memory>
 #include <string>
 #include <vector>
 #include <openvr.h>

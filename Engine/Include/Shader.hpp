@@ -8,7 +8,6 @@
 #endif
 #if RENDERER_D3D12
 #include <d3d12.h>
-#include <d3dcompiler.h>
 #endif
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
@@ -145,8 +144,6 @@ namespace ae3d
 
 #if RENDERER_D3D12
         void ReflectVariables();
-
-        ID3D12ShaderReflection* reflector = nullptr;
 #endif
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo vertexInfo;

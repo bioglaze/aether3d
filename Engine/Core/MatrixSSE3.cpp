@@ -1,7 +1,5 @@
 #ifdef SIMD_SSE3
 #include "Matrix.hpp"
-#include <cstring>
-#include <cmath>
 #include <pmmintrin.h>
 #include <xmmintrin.h>
 #include "Vec3.hpp"

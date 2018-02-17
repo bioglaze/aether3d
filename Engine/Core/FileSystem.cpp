@@ -2,7 +2,6 @@
 #include "System.hpp"
 #include <algorithm>
 #include <fstream>
-#include <sstream>
 #include <vector>
 
 #if RENDERER_METAL
@@ -54,7 +53,7 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* p
     {
         for (const auto& entry : pakFile.entries)
         {
-            if (entry.path == std::string(path))
+            if (entry.path == outData.path)
             {
                 outData.data = entry.contents;
                 outData.isLoaded = true;

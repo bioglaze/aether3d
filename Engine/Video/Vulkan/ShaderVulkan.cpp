@@ -10,7 +10,8 @@
 #include "VulkanUtils.hpp"
 #include "Vec3.hpp"
 #include <cstring>
-#include <vector>
+
+constexpr int MaxModuleCount = 200;
 
 namespace GfxDeviceGlobal
 {
@@ -21,19 +22,15 @@ namespace GfxDeviceGlobal
     extern VkSampler sampler1;
 }
 
-namespace ae3d
-{
-    void GetMemoryType( std::uint32_t typeBits, VkFlags properties, std::uint32_t* typeIndex ); // Defined in GfxDeviceVulkan.cpp 
-}
-
 namespace ShaderGlobal
 {
-    std::vector< VkShaderModule > modulesToReleaseAtExit;
+    int moduleIndex = 0;
+    VkShaderModule modulesToReleaseAtExit[ MaxModuleCount ];
 }
 
 void ae3d::Shader::DestroyShaders()
 {
-    for (std::size_t moduleIndex = 0; moduleIndex < ShaderGlobal::modulesToReleaseAtExit.size(); ++moduleIndex)
+    for (std::size_t moduleIndex = 0; moduleIndex < ShaderGlobal::moduleIndex; ++moduleIndex)
     {
         vkDestroyShaderModule( GfxDeviceGlobal::device, ShaderGlobal::modulesToReleaseAtExit[ moduleIndex ], nullptr );
     }
@@ -46,6 +43,7 @@ void ae3d::Shader::Load( const char* /*vertexSourceGLSL*/, const char* /*fragmen
 void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, const FileSystem::FileContentsData& fragmentData )
 {
     System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
+    System::Assert( ShaderGlobal::moduleIndex + 2 < MaxModuleCount, "too many shader modules" );
     
     if (!vertexData.isLoaded || !fragmentData.isLoaded)
     {
@@ -67,7 +65,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
         AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, vertexData.path.c_str() );
-        ShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
+        ShaderGlobal::modulesToReleaseAtExit[ ShaderGlobal::moduleIndex++ ] = shaderModule;
 
         vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         vertexInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -95,7 +93,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
         AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, fragmentData.path.c_str() );
-        ShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
+        ShaderGlobal::modulesToReleaseAtExit[ ShaderGlobal::moduleIndex++ ] = shaderModule;
 
         fragmentInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         fragmentInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;

@@ -1,5 +1,4 @@
 #include "Renderer.hpp"
-#include <string>
 #include "FileSystem.hpp"
 #include "ComputeShader.hpp"
 

@@ -1,7 +1,5 @@
 #include "Mesh.hpp"
 #include <vector>
-#include <sstream>
-#include <list>
 #include <cstdint>
 #include <string>
 #include "FileSystem.hpp"
@@ -41,7 +39,7 @@ namespace
 {
 
 std::vector< MeshCacheEntry > gMeshCache;
-std::list< Mesh* > gMeshInstances;
+std::vector< Mesh* > gMeshInstances;
 
 struct membuf : std::streambuf
 {

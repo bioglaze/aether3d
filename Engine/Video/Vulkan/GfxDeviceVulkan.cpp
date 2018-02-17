@@ -4,7 +4,6 @@
 #include <map>
 #include <vector> 
 #include <string>
-#include <sstream>
 #include <vulkan/vulkan.h>
 #include "FileSystem.hpp"
 #include "LightTiler.hpp"
@@ -143,7 +142,7 @@ namespace ae3d
         {
             std::string GetStatistics()
             {
-                std::stringstream stm;
+                /*std::stringstream stm;
                 stm << "frame time: " << ::Statistics::GetFrameTimeMS() << " ms\n";
                 stm << "shadow pass time CPU: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
                 stm << "shadow pass time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << " ms\n";
@@ -153,9 +152,21 @@ namespace ae3d
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "fence calls: " << ::Statistics::GetFenceCalls() << "\n";
                 stm << "mem alloc calls: " << ::Statistics::GetAllocCalls() << " (frame), " << ::Statistics::GetTotalAllocCalls() << " (total)\n";
-                stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
+                stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";*/
 
-                return stm.str();
+                std::string str;
+                str = "frame time: " + std::to_string( ::Statistics::GetFrameTimeMS() ) + " ms\n";
+                str += "shadow pass time CPU: " + std::to_string( ::Statistics::GetShadowMapTimeMS() ) + " ms\n";
+                str += "shadow pass time GPU: " + std::to_string( ::Statistics::GetShadowMapTimeGpuMS() ) + " ms\n";
+                str += "depth pass time CPU: " + std::to_string( ::Statistics::GetDepthNormalsTimeMS() ) + " ms\n";
+                str += "depth pass time GPU: " + std::to_string( ::Statistics::GetDepthNormalsTimeGpuMS() ) + " ms\n";
+                str += "draw calls: " + std::to_string( ::Statistics::GetDrawCalls() ) + "\n";
+                str += "barrier calls: " + std::to_string( ::Statistics::GetBarrierCalls() ) + "\n";
+                str += "fence calls: " + std::to_string( ::Statistics::GetFenceCalls() ) + "\n";
+                str += "mem alloc calls: " + std::to_string( ::Statistics::GetAllocCalls() ) + " (frame), " + std::to_string( ::Statistics::GetTotalAllocCalls() ) + " (total)\n";
+                str += "triangles: " + std::to_string( ::Statistics::GetTriangleCount() ) + "\n";
+
+                return str;
             }
         }
     }

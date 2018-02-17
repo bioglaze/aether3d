@@ -1,7 +1,6 @@
 #include "FileWatcher.hpp"
 #include <ctime>
 #include <sys/stat.h>
-#include <locale.h>
 
 ae3d::FileWatcher fileWatcher;
 

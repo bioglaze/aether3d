@@ -141,6 +141,8 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/,
 
 void ae3d::Shader::ReflectVariables()
 {
+    ID3D12ShaderReflection* reflector = nullptr;
+
     HRESULT hr = D3DReflect( blobShaderVertex->GetBufferPointer(), blobShaderVertex->GetBufferSize(), IID_PPV_ARGS( &reflector ) );
     AE3D_CHECK_D3D( hr, "Shader reflection failed" );
 

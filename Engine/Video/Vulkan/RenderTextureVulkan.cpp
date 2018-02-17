@@ -300,7 +300,6 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     colorImage.tiling = VK_IMAGE_TILING_OPTIMAL;
     colorImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     colorImage.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-    colorImage.arrayLayers = 6;
     colorImage.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     VkResult err = vkCreateImage( GfxDeviceGlobal::device, &colorImage, nullptr, &color.image );
