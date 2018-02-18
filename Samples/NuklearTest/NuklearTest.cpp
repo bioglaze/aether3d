@@ -172,6 +172,19 @@ int main()
                 {
                     System::ReloadChangedAssets();
                 }
+                if (keyCode == KeyCode::K)
+                {
+                    nk_input_char( &ctx, 'k' );
+                    ae3d::System::Print("input k\n");
+                }
+                if (keyCode == KeyCode::Left)
+                {
+                    nk_input_key( &ctx, NK_KEY_LEFT, event.type == WindowEventType::KeyDown );
+                }
+                if (keyCode == KeyCode::Right)
+                {
+                    nk_input_key( &ctx, NK_KEY_RIGHT, event.type == WindowEventType::KeyDown );
+                }
             }
 
             if (event.type == WindowEventType::MouseMove)
@@ -217,6 +230,20 @@ int main()
             nk_layout_row_dynamic( &ctx, 30, 2 );
             if (nk_option_label( &ctx, "easy", op == EASY )) op = EASY;
             if (nk_option_label( &ctx, "hard", op == HARD )) op = HARD;
+            nk_check_label( &ctx, "check1", 0 );
+            nk_check_label( &ctx, "check2", 1 );
+            size_t prog_value = 54;
+            nk_progress( &ctx, &prog_value, 100, NK_MODIFIABLE );
+
+            static char field_buffer[ 64 ];
+            static int field_len;
+            nk_edit_string( &ctx, NK_EDIT_FIELD, field_buffer, &field_len, 64, nk_filter_default );
+            static float pos;
+
+            nk_property_float( &ctx, "#X:", -1024.0f, &pos, 1024.0f, 1, 1 );
+
+            static const char *weapons[] = {"Fist","Pistol","Shotgun" };
+            int current_weapon = nk_combo( &ctx, weapons, 3, current_weapon, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
 
             nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {

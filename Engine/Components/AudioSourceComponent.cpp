@@ -38,7 +38,7 @@ std::string GetSerialized( ae3d::AudioSourceComponent* component )
 {
     std::string str( "audiosource\n" );
     str += std::to_string( component->GetClipID() ) + "\n";
-    str += "enabled " + std::to_string( component->IsEnabled() ) + "\n\n\n";
+    str += "enabled " + std::to_string( (int)component->IsEnabled() ) + "\n\n\n";
     
     return str;
 }
