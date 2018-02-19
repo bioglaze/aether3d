@@ -168,20 +168,19 @@ int main()
                 {
                     quit = true;
                 }
-                if (keyCode == KeyCode::A)
+                else if (keyCode == KeyCode::A)
                 {
-                    System::ReloadChangedAssets();
+                    nk_input_char( &ctx, 'a' );
                 }
-                if (keyCode == KeyCode::K)
+                else if (keyCode == KeyCode::K)
                 {
                     nk_input_char( &ctx, 'k' );
-                    ae3d::System::Print("input k\n");
                 }
-                if (keyCode == KeyCode::Left)
+                else if (keyCode == KeyCode::Left)
                 {
                     nk_input_key( &ctx, NK_KEY_LEFT, event.type == WindowEventType::KeyDown );
                 }
-                if (keyCode == KeyCode::Right)
+                else if (keyCode == KeyCode::Right)
                 {
                     nk_input_key( &ctx, NK_KEY_RIGHT, event.type == WindowEventType::KeyDown );
                 }

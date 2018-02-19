@@ -52,7 +52,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
   - Open the project in Engine\VisualStudio_* in VS2017 and build it. For MinGW you can use Engine/Makefile_OpenGL or Makefile_Vulkan.
   - Build and run Samples\01_OpenWindow.
-  - Vulkan users: built-in shader sources are located in Engine\assets. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd. 
+  - Vulkan users: built-in shader sources are located in aether3d_build/Samples that comes with sample asset archive. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd in Engine/assets. 
   - FBX converter tries to find FBX SDK 2018.1.1 in its default install location (English language localization)
   
 ### OpenVR
@@ -106,6 +106,7 @@ Third party library licenses are:
   - stb_vorbis.c is in public domain
   - glxw is under zlib license
   - OpenAL-soft is under LGPLv2 license
+  - Nuklear UI is in public domain
 
 # Roadmap/internal TODO
 
