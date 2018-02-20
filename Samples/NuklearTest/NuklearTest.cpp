@@ -116,7 +116,6 @@ int main()
     gliderTexture.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
 
     bool quit = false;
-    int frame = 0;
 
     nk_context ctx;
     nk_font_atlas atlas;
@@ -213,8 +212,6 @@ int main()
 
         nk_input_end( &ctx );
 
-        enum { EASY, HARD };
-        static int op = EASY;
         static float value = 0.6f;
         
         if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
@@ -227,6 +224,8 @@ int main()
             }
 
             nk_layout_row_dynamic( &ctx, 30, 2 );
+            enum { EASY, HARD };
+            static int op = EASY;
             if (nk_option_label( &ctx, "easy", op == EASY )) op = EASY;
             if (nk_option_label( &ctx, "hard", op == HARD )) op = HARD;
             nk_check_label( &ctx, "check1", 0 );
@@ -298,8 +297,6 @@ int main()
         scene.EndFrame();
 
         Window::SwapBuffers();
-
-        ++frame;
     }
 
     System::Deinit();

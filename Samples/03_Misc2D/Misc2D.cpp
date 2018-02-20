@@ -172,8 +172,6 @@ int main()
         Window::PumpEvents();
         WindowEvent event;
 
-        std::string text( "draw calls:" );
-        
         while (Window::PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
@@ -198,10 +196,6 @@ int main()
                 {
                     audioContainer.GetComponent<AudioSourceComponent>()->Play();
                 }
-            }
-            if (event.type == WindowEventType::GamePadButtonA)
-            {
-                text = "button a down";
             }
         }
 

@@ -36,8 +36,8 @@ namespace ae3d
         
 #if RENDERER_D3D12
         ID3D12Resource* GetSpotLightCenterAndRadiusBuffer() const { return spotLightCenterAndRadiusBuffer; }
-		ID3D12Resource* GetSpotLightColorBuffer() const { return spotLightColorBuffer; }
-		ID3D12Resource* GetSpotLightParamsBuffer() const { return spotLightParamsBuffer; }
+        ID3D12Resource* GetSpotLightColorBuffer() const { return spotLightColorBuffer; }
+        ID3D12Resource* GetSpotLightParamsBuffer() const { return spotLightParamsBuffer; }
         ID3D12Resource* GetPointLightCenterAndRadiusBuffer() const { return pointLightCenterAndRadiusBuffer; }
         ID3D12Resource* GetPointLightColorBuffer() const { return pointLightColorBuffer; }
 #endif
@@ -72,8 +72,8 @@ namespace ae3d
         ID3D12Resource* pointLightCenterAndRadiusBuffer = nullptr;
         ID3D12Resource* pointLightColorBuffer = nullptr;
         ID3D12Resource* spotLightCenterAndRadiusBuffer = nullptr;
-		ID3D12Resource* spotLightColorBuffer = nullptr;
-		ID3D12Resource* spotLightParamsBuffer = nullptr;
+        ID3D12Resource* spotLightColorBuffer = nullptr;
+        ID3D12Resource* spotLightParamsBuffer = nullptr;
 #endif
 #if RENDERER_VULKAN
         VkBuffer pointLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
@@ -106,8 +106,8 @@ namespace ae3d
         static const int MaxLights = 2048;
         static const unsigned MaxLightsPerTile = 544;
         Vec4 pointLightCenterAndRadius[ MaxLights ];
-		Vec4 pointLightColors[ MaxLights ];
-		Vec4 spotLightColors[ MaxLights ];
+        Vec4 pointLightColors[ MaxLights ];
+        Vec4 spotLightColors[ MaxLights ];
         Vec4 spotLightCenterAndRadius[ MaxLights ];
         Vec4 spotLightParams[ MaxLights ];
         int activePointLights = 0;

@@ -1,6 +1,4 @@
 #include "Window.hpp"
-#define WIN32_LEAN_AND_MEAN
-#define VC_EXTRALEAN
 #include <Windows.h>
 #include <xinput.h>
 #include "GfxDevice.hpp"

@@ -28,6 +28,7 @@ void ae3d::LightTiler::DestroyBuffers()
     AE3D_SAFE_RELEASE( pointLightColorBuffer );
     AE3D_SAFE_RELEASE( spotLightCenterAndRadiusBuffer );
     AE3D_SAFE_RELEASE( spotLightColorBuffer );
+    AE3D_SAFE_RELEASE( spotLightParamsBuffer );
     AE3D_SAFE_RELEASE( perTileLightIndexBuffer );
 }
 
@@ -230,43 +231,43 @@ void ae3d::LightTiler::Init()
         spotLightColorBuffer->SetName( L"LightTiler spot light color buffer" );
     }
 
-	// Spot light params buffer
-	{
-		D3D12_HEAP_PROPERTIES uploadProp = {};
-		uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
-		uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		uploadProp.CreationNodeMask = 1;
-		uploadProp.VisibleNodeMask = 1;
+    // Spot light params buffer
+    {
+        D3D12_HEAP_PROPERTIES uploadProp = {};
+        uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+        uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+        uploadProp.CreationNodeMask = 1;
+        uploadProp.VisibleNodeMask = 1;
 
-		D3D12_RESOURCE_DESC bufferProp = {};
-		bufferProp.Alignment = 0;
-		bufferProp.DepthOrArraySize = 1;
-		bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
-		bufferProp.Format = DXGI_FORMAT_UNKNOWN;
-		bufferProp.Height = 1;
-		bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		bufferProp.MipLevels = 1;
-		bufferProp.SampleDesc.Count = 1;
-		bufferProp.SampleDesc.Quality = 0;
-		bufferProp.Width = MaxLights * 4 * sizeof( float );
+        D3D12_RESOURCE_DESC bufferProp = {};
+        bufferProp.Alignment = 0;
+        bufferProp.DepthOrArraySize = 1;
+        bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
+        bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+        bufferProp.Height = 1;
+        bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        bufferProp.MipLevels = 1;
+        bufferProp.SampleDesc.Count = 1;
+        bufferProp.SampleDesc.Quality = 0;
+        bufferProp.Width = MaxLights * 4 * sizeof( float );
 
-		HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
-			&uploadProp,
-			D3D12_HEAP_FLAG_NONE,
-			&bufferProp,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS( &spotLightParamsBuffer ) );
-		if ( FAILED( hr ) )
-		{
-			ae3d::System::Assert( false, "Unable to create spot light params buffer!" );
-			return;
-		}
+        HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+	        &uploadProp,
+	        D3D12_HEAP_FLAG_NONE,
+	        &bufferProp,
+	        D3D12_RESOURCE_STATE_GENERIC_READ,
+	        nullptr,
+	        IID_PPV_ARGS( &spotLightParamsBuffer ) );
+        if ( FAILED( hr ) )
+        {
+	        ae3d::System::Assert( false, "Unable to create spot light params buffer!" );
+	        return;
+        }
 
-		spotLightParamsBuffer->SetName( L"LightTiler spot light params buffer" );
-	}
+        spotLightParamsBuffer->SetName( L"LightTiler spot light params buffer" );
+    }
 }
 
 void ae3d::LightTiler::UpdateLightBuffers()
@@ -315,33 +316,33 @@ void ae3d::LightTiler::UpdateLightBuffers()
         spotLightCenterAndRadiusBuffer->Unmap( 0, nullptr );
     }
 
-	{
-		char* spotLightPtr = nullptr;
-		HRESULT hr = spotLightColorBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &spotLightPtr ) );
+    {
+        char* spotLightPtr = nullptr;
+        HRESULT hr = spotLightColorBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &spotLightPtr ) );
 
-		if ( FAILED( hr ) )
-		{
-			ae3d::System::Assert( false, "Unable to map spot light buffer!\n" );
-			return;
-		}
+        if ( FAILED( hr ) )
+        {
+            ae3d::System::Assert( false, "Unable to map spot light buffer!\n" );
+            return;
+        }
 
-		memcpy_s( spotLightPtr, byteSize, &spotLightColors[ 0 ], byteSize );
-		spotLightColorBuffer->Unmap( 0, nullptr );
-	}
+        memcpy_s( spotLightPtr, byteSize, &spotLightColors[ 0 ], byteSize );
+        spotLightColorBuffer->Unmap( 0, nullptr );
+    }
 
-	{
-		char* spotLightPtr = nullptr;
-		HRESULT hr = spotLightParamsBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &spotLightPtr ) );
+    {
+        char* spotLightPtr = nullptr;
+        HRESULT hr = spotLightParamsBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &spotLightPtr ) );
 
-		if ( FAILED( hr ) )
-		{
-			ae3d::System::Assert( false, "Unable to map spot light buffer!\n" );
-			return;
-		}
+        if ( FAILED( hr ) )
+        {
+            ae3d::System::Assert( false, "Unable to map spot light buffer!\n" );
+            return;
+        }
 
-		memcpy_s( spotLightPtr, byteSize, &spotLightParams[ 0 ], byteSize );
-		spotLightParamsBuffer->Unmap( 0, nullptr );
-	}
+        memcpy_s( spotLightPtr, byteSize, &spotLightParams[ 0 ], byteSize );
+        spotLightParamsBuffer->Unmap( 0, nullptr );
+    }
 }
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )
