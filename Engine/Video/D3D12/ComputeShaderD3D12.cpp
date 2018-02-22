@@ -18,6 +18,7 @@ namespace GfxDeviceGlobal
     extern ID3D12PipelineState* lightTilerPSO;
     extern ID3D12DescriptorHeap* computeCbvSrvUavHeap;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
+    extern ID3D12PipelineState* cachedPSO;
 }
 
 namespace Global
@@ -93,6 +94,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     depthNormals.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
     TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
 
+    GfxDeviceGlobal::cachedPSO = GfxDeviceGlobal::lightTilerPSO;
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeap );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );

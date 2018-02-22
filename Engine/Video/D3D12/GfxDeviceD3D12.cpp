@@ -930,9 +930,9 @@ void CreateDepthStencil()
 
 void CreateConstantBuffers()
 {
-    GfxDeviceGlobal::constantBuffers.resize( 1200 );
+    GfxDeviceGlobal::constantBuffers.resize( 2000 );
     GfxDeviceGlobal::mappedConstantBuffers.resize( GfxDeviceGlobal::constantBuffers.size() );
-    ae3d::System::Assert( DescriptorHeapManager::numDescriptors > GfxDeviceGlobal::constantBuffers.size(), "There are more constant buffers than descriptors" );
+    ae3d::System::Assert( DescriptorHeapManager::numDescriptors >= GfxDeviceGlobal::constantBuffers.size(), "There are more constant buffers than descriptors" );
 
     for (std::size_t bufferIndex = 0; bufferIndex < GfxDeviceGlobal::constantBuffers.size(); ++bufferIndex)
     {
@@ -1241,11 +1241,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer(), &srvDesc, cpuHandle );
 
-		cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-		GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
+        cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
 
-		cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-		GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(), &srvDesc, cpuHandle );
+        cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(), &srvDesc, cpuHandle );
 
         unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
@@ -1259,15 +1259,21 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     else
     {
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-		cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-		GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+        cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+
+        cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+
+        cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
     }
 
     cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav1, nullptr, &GfxDeviceGlobal::uav1Desc, cpuHandle );
 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
-        GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
+    GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
 
     ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
@@ -1390,11 +1396,12 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     {
         AE3D_SAFE_RELEASE( GfxDeviceGlobal::constantBuffers[ cbInd ] );
     }
-    ID3D12DebugDevice* d3dDebug = nullptr;
+
+    /*ID3D12DebugDevice* d3dDebug = nullptr;
     GfxDeviceGlobal::device->QueryInterface(__uuidof(ID3D12DebugDevice), reinterpret_cast<void**>(&d3dDebug));
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
     d3dDebug->ReportLiveDeviceObjects( D3D12_RLDO_DETAIL );
-    AE3D_SAFE_RELEASE( d3dDebug );
+    AE3D_SAFE_RELEASE( d3dDebug );*/
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
 }

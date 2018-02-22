@@ -1725,7 +1725,7 @@ void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int e
 {
     int scissor[ 4 ] = { vpX < 8192 ? std::abs( vpX )  : 8192, vpY < 8192 ? std::abs( vpY ) : 8192, vpWidth < 8192 ? vpWidth : 8192, vpHeight < 8192 ? vpHeight : 8192 };
     SetScissor( scissor );
-    Draw( GfxDeviceGlobal::uiVertexBuffer, (size_t)offset, (size_t)offset + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+    Draw( GfxDeviceGlobal::uiVertexBuffer, (int)((size_t)offset), (int)((size_t)offset + elemCount), renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, void** outMappedVertices, void** outMappedIndices )

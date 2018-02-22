@@ -51,6 +51,8 @@ namespace ae3d
         VkBuffer GetPointLightColorBuffer() const { return pointLightColorBuffer; }
         VkBufferView* GetPointLightColorBufferView() { return &pointLightColorView; }
         VkBuffer GetSpotLightBuffer() const { return spotLightCenterAndRadiusBuffer; }
+        VkBuffer GetSpotLightColorBuffer() const { return spotLightColorBuffer; }
+        VkBufferView* GetSpotLightColorBufferView() { return &spotLightColorView; }
         VkBufferView* GetSpotLightBufferView() { return &spotLightBufferView; }
         VkBufferView* GetSpotLightParamsView() { return &spotLightParamsView; }
         VkBufferView* GetLightIndexBufferView() { return &perTileLightIndexBufferView; }
@@ -85,7 +87,12 @@ namespace ae3d
         VkDeviceMemory pointLightColorMemory = VK_NULL_HANDLE;
         void* mappedPointLightColorMemory = nullptr;
         VkBufferView pointLightColorView;
-        
+
+        VkBuffer spotLightColorBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory spotLightColorMemory = VK_NULL_HANDLE;
+        void* mappedSpotLightColorMemory = nullptr;
+        VkBufferView spotLightColorView;
+
         VkBuffer spotLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory spotLightCenterAndRadiusMemory = VK_NULL_HANDLE;
         void* mappedSpotLightCenterAndRadiusMemory = nullptr;
