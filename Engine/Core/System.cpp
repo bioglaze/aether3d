@@ -181,7 +181,7 @@ void ae3d::System::Assert( bool condition, const char* message )
 #endif
 }
 
-void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor )
+void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor )
 {
     Matrix44 proj;
     proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
@@ -197,7 +197,20 @@ void ae3d::System::Draw( Texture2D* texture, float x, float y, float xSize, floa
     Matrix44::Multiply( scale, proj, mvp );
     
     renderer.builtinShaders.spriteRendererShader.Use();
-    renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", texture, 0 );
+
+    if (texture->IsCube() && !texture->IsRenderTexture())
+    {
+        renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (TextureCube*)texture, 0 );
+    }
+    else if (!texture->IsCube() && !texture->IsRenderTexture())
+    {
+        renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (Texture2D*)texture, 0 );
+    }
+    else if (texture->IsRenderTexture())
+    {
+        renderer.builtinShaders.spriteRendererShader.SetRenderTexture( "textureMap", (RenderTexture*)texture, 0 );
+    }
+    
     GfxDeviceGlobal::perObjectUboStruct.localToClip = mvp;
     GfxDeviceGlobal::perObjectUboStruct.lightColor = tintColor;
     
