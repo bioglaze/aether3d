@@ -43,8 +43,8 @@ int main()
 {
     bool fullScreen = false;
 
-    const int originalWidth = 1920 / 2;
-    const int originalHeight = 1080 / 2;
+    const int originalWidth = 1920 / 1;
+    const int originalHeight = 1080 / 1;
     int width = originalWidth;
     int height = originalHeight;
 
@@ -82,7 +82,7 @@ int main()
 #endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
-    camera.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
+    //camera.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
     //camera.GetComponent<CameraComponent>()->SetViewport( 0, 0, originalWidth / 2, originalHeight );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
@@ -109,7 +109,7 @@ int main()
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
     camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::Depth );
     camera2d.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
-    camera2d.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
+    //camera2d.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
     camera2d.GetComponent<CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<TransformComponent>();
     

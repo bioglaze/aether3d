@@ -155,7 +155,6 @@ namespace GfxDeviceGlobal
     ae3d::RenderTexture* currentRenderTarget = nullptr;
     unsigned currentRenderTargetCubeMapFace = 0;
 
-    ae3d::RenderTexture hdrTarget;
     ID3D12PipelineState* fullscreenTrianglePSO;
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
     GpuResource rtvResources[ 2 ];
@@ -440,8 +439,6 @@ void CreateBackBuffer()
         descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateRenderTargetView( GfxDeviceGlobal::renderTargets[ i ], &descRtv, handle );
     }
-
-    GfxDeviceGlobal::hdrTarget.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "hdrTarget" );
 }
 
 void CreateMSAA()
@@ -858,43 +855,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::Texture
     }
 
     return GfxDeviceGlobal::samplers[ samplerIndex ].linearClampGPU;
-}
-
-void DrawHDRToBackBuffer()
-{
-    GfxDeviceGlobal::currentConstantBufferIndex = (GfxDeviceGlobal::currentConstantBufferIndex + 1) % GfxDeviceGlobal::mappedConstantBuffers.size();
-    GfxDeviceGlobal::currentRenderTarget = nullptr;
-    ae3d::GfxDevice::ClearScreen( 0 );
-    TransitionResource( *GfxDeviceGlobal::hdrTarget.GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
-
-    const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * RESOURCE_BINDING_COUNT) % GfxDeviceGlobal::constantBuffers.size();
-
-    D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
-
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = GfxDeviceGlobal::constantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = AE3D_CB_SIZE;
-    GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
-
-    cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::hdrTarget.GetGpuResource()->resource, GfxDeviceGlobal::hdrTarget.GetSRVDesc(), cpuHandle );
-
-    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( ae3d::Mipmaps::None, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, ae3d::Anisotropy::k1 );
-
-    ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
-    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavGpuHandle( index ) );
-    GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
-
-    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::fullscreenTrianglePSO );
-    GfxDeviceGlobal::cachedPSO = GfxDeviceGlobal::fullscreenTrianglePSO;
-    Statistics::IncPSOBindCalls();
-
-    GfxDeviceGlobal::graphicsCommandList->IASetVertexBuffers( 0, 0, nullptr );
-    GfxDeviceGlobal::graphicsCommandList->IASetIndexBuffer( nullptr );
-    GfxDeviceGlobal::graphicsCommandList->IASetPrimitiveTopology( D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-    GfxDeviceGlobal::graphicsCommandList->DrawInstanced( 3, 1, 0, 0 );
 }
 
 void CreateDepthStencil()
@@ -1479,8 +1439,6 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 void ae3d::GfxDevice::Present()
 {
-    DrawHDRToBackBuffer();
-
     TransitionResource( GfxDeviceGlobal::rtvResources[ GfxDeviceGlobal::swapChain->GetCurrentBackBufferIndex() ], D3D12_RESOURCE_STATE_PRESENT );
 
     if (GfxDeviceGlobal::sampleCount > 1)
@@ -1567,13 +1525,11 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
     System::Assert( !target || target->IsRenderTexture(), "target must be render texture" );
     System::Assert( cubeMapFace < 6, "invalid cube map face" );
 
-    if (target == nullptr)
-    {
-        target = &GfxDeviceGlobal::hdrTarget;
-    }
-
     GfxDeviceGlobal::currentRenderTarget = target;
     GfxDeviceGlobal::currentRenderTargetCubeMapFace = cubeMapFace;
 
-    TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
+    if (target != nullptr)
+    {
+        TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET );
+    }
 }
