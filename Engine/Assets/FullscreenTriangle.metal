@@ -22,5 +22,5 @@ fragment float4 fullscreen_triangle_fragment( ColorInOut in [[stage_in]],
                                texture2d<float, access::sample> textureMap [[texture(0)]],
                                sampler sampler0 [[sampler(0)]] )
 {
-    return textureMap.sample( sampler0, in.texCoords );
+    return textureMap.sample( sampler0, float2( in.texCoords.x, -in.texCoords.y ) );
 }

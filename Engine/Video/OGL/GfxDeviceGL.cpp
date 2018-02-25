@@ -88,7 +88,6 @@ namespace GfxDeviceGlobal
     std::vector< GLuint > fboIds;
     std::vector< ae3d::VertexBuffer > lineBuffers;
     
-    ae3d::RenderTexture hdrTarget;
     int backBufferWidth = 640;
     int backBufferHeight = 400;
     GLuint systemFBO = 0;
@@ -96,7 +95,6 @@ namespace GfxDeviceGlobal
     GLuint perObjectUbo = 0;
     GLuint depthNormalsQueries[ 4 ];
     GLuint shadowMapQueries[ 4 ];
-    GLuint emptyVAO;
     unsigned frameIndex = 0;
     bool isEditor = false;
 
@@ -365,13 +363,6 @@ void ae3d::GfxDevice::Init( int width, int height )
     glGenQueries( 4, GfxDeviceGlobal::shadowMapQueries );
 
     InitUIVertexBuffer();
-    GfxDeviceGlobal::hdrTarget.Create2D( width, height, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "hdrTarget" );
-
-    glGenVertexArrays( 1, &GfxDeviceGlobal::emptyVAO );
-    glBindVertexArray( GfxDeviceGlobal::emptyVAO );
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-    glBindVertexArray( 0 );
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
@@ -653,28 +644,18 @@ bool ae3d::GfxDevice::HasExtension( const char* glExtension )
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
-    if (GfxDeviceGlobal::isEditor && !target)
+    if (target != nullptr && target->GetFBO() == GfxDeviceGlobal::cachedFBO && cubeMapFace == 0)
     {
-        glBindFramebuffer( GL_FRAMEBUFFER, GfxDeviceGlobal::systemFBO );
-        GfxDeviceGlobal::cachedFBO = GfxDeviceGlobal::systemFBO;
-
         return;
     }
-
-    if (target == nullptr)
+    
+    if (target == nullptr && GfxDeviceGlobal::cachedFBO == GfxDeviceGlobal::systemFBO)
     {
-#ifndef AE3D_OPENVR
-        target = &GfxDeviceGlobal::hdrTarget;
-#else
         return;
-#endif
     }
-
-#ifndef AE3D_OPENVR
-    const GLuint fbo = target->GetFBO();
-#else
+    
     const GLuint fbo = target ? target->GetFBO() : GfxDeviceGlobal::systemFBO;
-#endif
+
     Statistics::IncRenderTargetBinds();
     glBindFramebuffer( GL_FRAMEBUFFER, fbo );
     GfxDeviceGlobal::cachedFBO = fbo;
@@ -688,32 +669,6 @@ void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFa
 
     ErrorCheckFBO();
     ErrorCheck( "SetRenderTarget end" );
-}
-
-void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader )
-{
-    if (GfxDeviceGlobal::isEditor)
-    {
-        return;
-    }
-    
-    fullscreenTriangleShader.Use();
-    fullscreenTriangleShader.SetRenderTexture( "textureMap", &GfxDeviceGlobal::hdrTarget, 0 );
-
-    glDisable( GL_BLEND );
-    glDisable( GL_CULL_FACE );
-    glFrontFace( GL_CW );
-    glDisable( GL_DEPTH_TEST );
-    glViewport( 0, 0, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
-    glScissor( 0, 0, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight );
-    glBindFramebuffer( GL_FRAMEBUFFER, GfxDeviceGlobal::systemFBO );
-    glBindVertexArray( GfxDeviceGlobal::emptyVAO );
-    glDrawArrays( GL_TRIANGLES, 0, 3 );
-    glFrontFace( GL_CCW );
-    glEnable( GL_CULL_FACE );
-
-    Statistics::IncRenderTargetBinds();
-    Statistics::IncDrawCalls();
 }
 
 void ae3d::GfxDevice::SetBackBufferDimensionAndFBO( int width, int height )

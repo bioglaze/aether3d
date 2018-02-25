@@ -36,7 +36,6 @@ extern Renderer renderer;
 float GetVRFov();
 void BeginOffscreen();
 void EndOffscreen();
-void DrawHDRToBackBuffer( ae3d::Shader& fullscreenTriangleShader );
 std::string GetSerialized( ae3d::AudioSourceComponent* component );
 std::string GetSerialized( ae3d::MeshRendererComponent* component );
 std::string GetSerialized( ae3d::DirectionalLightComponent* component );
@@ -538,8 +537,10 @@ void ae3d::Scene::Render()
 #endif
     }
 #if RENDERER_METAL
+    //GfxDevice::SetRenderTarget( nullptr, 0 );
+    //GfxDevice::EndBackBufferEncoding();
     GfxDevice::BeginBackBufferEncoding();
-
+    
     for (auto camera : cameras)
     {
         RenderWithCamera( camera, 0, "Primary Pass" );
@@ -557,7 +558,7 @@ void ae3d::Scene::EndFrame()
     Statistics::EndFrameTimeProfiling();
 #endif
 #if defined (RENDERER_OPENGL) || defined( RENDERER_VULKAN ) || defined( RENDERER_METAL )
-    DrawHDRToBackBuffer( renderer.builtinShaders.fullscreenTriangleShader );
+    GfxDevice::SetRenderTarget( nullptr, 0 );
 #endif
 }
 
