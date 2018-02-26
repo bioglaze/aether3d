@@ -184,7 +184,12 @@ void ae3d::System::Assert( bool condition, const char* message )
 void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor )
 {
     Matrix44 proj;
+
+#if RENDERER_OPENGL
+    proj.MakeProjection( 0, xScreenSize, 0, yScreenSize, -1, 1 );
+#else
     proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
+#endif
     
     Matrix44 translate;
     translate.SetTranslation( Vec3( x, y, 0 ) );

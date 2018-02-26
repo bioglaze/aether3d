@@ -537,8 +537,6 @@ void ae3d::Scene::Render()
 #endif
     }
 #if RENDERER_METAL
-    //GfxDevice::SetRenderTarget( nullptr, 0 );
-    //GfxDevice::EndBackBufferEncoding();
     GfxDevice::BeginBackBufferEncoding();
     
     for (auto camera : cameras)
@@ -546,6 +544,7 @@ void ae3d::Scene::Render()
         RenderWithCamera( camera, 0, "Primary Pass" );
     }
 #endif
+    GfxDevice::SetRenderTarget( nullptr, 0 );
 }
 
 void ae3d::Scene::EndFrame()
@@ -556,9 +555,6 @@ void ae3d::Scene::EndFrame()
 #if RENDERER_METAL
     GfxDevice::EndBackBufferEncoding();
     Statistics::EndFrameTimeProfiling();
-#endif
-#if defined (RENDERER_OPENGL) || defined( RENDERER_VULKAN ) || defined( RENDERER_METAL )
-    GfxDevice::SetRenderTarget( nullptr, 0 );
 #endif
 }
 
