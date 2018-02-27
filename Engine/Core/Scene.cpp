@@ -545,6 +545,9 @@ void ae3d::Scene::Render()
     }
 #endif
     GfxDevice::SetRenderTarget( nullptr, 0 );
+#if RENDERER_D3D12
+	GfxDevice::ClearScreen( GfxDevice::ClearFlags::Depth );
+#endif
 }
 
 void ae3d::Scene::EndFrame()
