@@ -186,7 +186,14 @@ void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, fl
     Matrix44 proj;
 
 #if RENDERER_OPENGL
-    proj.MakeProjection( 0, xScreenSize, 0, yScreenSize, -1, 1 );
+    if (texture->IsRenderTexture())
+    {
+        proj.MakeProjection( 0, xScreenSize, 0, yScreenSize, -1, 1 );
+    }
+    else
+    {
+        proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
+    }
 #else
     proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
 #endif
