@@ -223,8 +223,17 @@ std::uint64_t TimerQuery::Start( const char* name )
     }
 
     auto& profileData = profiles[ index ];
-    ae3d::System::Assert( !profileData.queryStarted, "Query must not be started" );
-    ae3d::System::Assert( !profileData.queryEnded, "Query must not be ended" );
+    //ae3d::System::Assert( !profileData.queryStarted, "Query must not be started" );
+    //ae3d::System::Assert( !profileData.queryEnded, "Query must not be ended" );
+	if( profileData.queryStarted )
+	{
+		return 0;
+	}
+	if( profileData.queryEnded )
+	{
+		return 0;
+	}
+
     profileData.isActive = true;
     const UINT startQueryIndex = UINT( index * 2 );
     GfxDeviceGlobal::graphicsCommandList->EndQuery( GfxDeviceGlobal::timerQuery.queryHeap, D3D12_QUERY_TYPE_TIMESTAMP, startQueryIndex );
@@ -238,8 +247,16 @@ void TimerQuery::End( std::uint64_t index )
     ae3d::System::Assert( index < MaxNumTimers, "Too high profiler index" );
     
     auto& profileData = profiles[ index ];
-    ae3d::System::Assert( profileData.queryStarted, "Query must be started" );
-    ae3d::System::Assert( !profileData.queryEnded, "Query must not be ended" );
+    //ae3d::System::Assert( profileData.queryStarted, "Query must be started" );
+    //ae3d::System::Assert( !profileData.queryEnded, "Query must not be ended" );
+	if( !profileData.queryStarted )
+	{
+		return;
+	}
+	if( profileData.queryEnded )
+	{
+		return;
+	}
 
     const UINT startQueryIdx = UINT( index * 2 );
     const UINT endQueryIdx = startQueryIdx + 1;

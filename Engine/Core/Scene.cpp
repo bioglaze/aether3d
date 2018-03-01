@@ -378,8 +378,9 @@ void ae3d::Scene::Render()
         g2->GetComponent< CameraComponent >()->GetRenderOrder(); };
     std::sort( std::begin( cameras ), std::end( cameras ), cameraSortFunction );
 
-    RenderRTCameras( rtCameras );
-    RenderDepthAndNormalsForAllCameras( cameras );
+	RenderDepthAndNormalsForAllCameras( rtCameras );
+	RenderRTCameras( rtCameras );
+	RenderDepthAndNormalsForAllCameras( cameras );
 
 #if RENDERER_VULKAN
     GfxDevice::BeginRenderPassAndCommandBuffer();
