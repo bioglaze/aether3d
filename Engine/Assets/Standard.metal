@@ -41,7 +41,7 @@ static uint GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, co
     // count point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
-        //++numLightsInThisTile;
+        ++numLightsInThisTile;
         ++index;
         nextLightIndex = perTileLightIndexBuffer[ index ];
     }
@@ -50,7 +50,8 @@ static uint GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, co
     
     // Moves past sentinel
     ++index;
-
+    nextLightIndex = perTileLightIndexBuffer[ index ];
+    
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
         ++numLightsInThisTile;
