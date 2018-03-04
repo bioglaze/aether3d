@@ -1699,28 +1699,6 @@ namespace ae3d
     }
 }
 
-void DrawHDRToBackBuffer( ae3d::Shader& /*fullscreenTriangleShader*/ )
-{
-#if 0
-    vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
-
-    //ae3d::GfxDevice::BeginRenderPassAndCommandBuffer();
-    //ae3d::GfxDevice::EndRenderPassAndCommandBuffer();
-    EndOffscreen();
-
-    GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
-    ae3d::GfxDevice::BeginRenderPassAndCommandBuffer();
-
-    GfxDeviceGlobal::view0 = GfxDeviceGlobal::hdrTarget.GetColorView();
-    GfxDeviceGlobal::sampler0 = GfxDeviceGlobal::hdrTarget.GetSampler();
-
-    vkCmdBindPipeline( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::fullscreenTrianglePSO );
-    vkCmdDraw( GfxDeviceGlobal::currentCmdBuffer, 3, 1, 0, 0 );
-
-    ae3d::GfxDevice::EndRenderPassAndCommandBuffer();
-#endif
-}
-
 void BindComputeDescriptorSet()
 {
     VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::view1, GfxDeviceGlobal::sampler1 );
@@ -1768,12 +1746,10 @@ void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()
 {
-    // TODO: Implement
 }
 
 void ae3d::GfxDevice::EndShadowMapGpuQuery()
 {
-    // TODO: Implement
 }
 
 void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )
@@ -1939,17 +1915,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         CreatePSO( vertexBuffer, shader, blendMode, depthFunc, cullMode, fillMode, GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetRenderPass() : VK_NULL_HANDLE, topology, psoHash );
     }
 
-    if (shader.GetVertexShaderPath().find( "Standard" ) != std::string::npos)
-    {
-        unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
-        unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
-        unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
+    const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
+    const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
+    const unsigned lightCount = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
 
-        GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
-        GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
-        GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
-        GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
-    }
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.numLights = lightCount;
+    GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
 
     UploadPerObjectUbo();
 
@@ -1972,11 +1945,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 void ae3d::GfxDevice::GetNewUniformBuffer()
 {
     GfxDeviceGlobal::currentUbo = (GfxDeviceGlobal::currentUbo + 1) % GfxDeviceGlobal::ubos.size();
-
-	GfxDeviceGlobal::perObjectUboStruct.numLights = 0;
-	GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
-	GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
-	GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
 }
 
 void ae3d::GfxDevice::CreateUniformBuffers()
