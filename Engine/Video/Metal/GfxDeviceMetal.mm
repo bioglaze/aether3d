@@ -208,7 +208,7 @@ namespace ae3d
 
 namespace
 {
-    float clearColor[] = { 0, 0, 0, 1 };
+    float clearColor[] = { 0, 0, 0, 0 };
 }
 
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()

@@ -212,21 +212,27 @@ using namespace ae3d;
     GameObject cameraCubeRT;
     GameObject animatedGo;
     GameObject wireframeGo;
+    
     Scene scene;
+    
     Font font;
     Font fontSDF;
+    
     Mesh cubeMesh;
     Mesh cubeMeshPTN;
     Mesh animatedMesh;
+    
     Material cubeMaterial;
     Material skinMaterial;
     Material rtCubeMaterial;
     Material transMaterial;
     Material standardMaterial;
+    
     Shader shader;
     Shader skinShader;
     Shader skyboxShader;
     Shader standardShader;
+    
     Texture2D fontTex;
     Texture2D fontTexSDF;
     Texture2D gliderTex;
@@ -234,9 +240,14 @@ using namespace ae3d;
     Texture2D bc1Tex;
     Texture2D bc2Tex;
     Texture2D bc3Tex;
+    
     TextureCube skyTex;
+
     RenderTexture rtTex;
     RenderTexture cubeRT;
+    RenderTexture cameraTex;
+    RenderTexture camera2dTex;
+    
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
@@ -306,14 +317,19 @@ using namespace ae3d;
     }
 #endif
 
+    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+
+    camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
+
     camera2d.SetName( "Camera2D" );
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
-    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::Depth );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetClearColor( ae3d::Vec3( 0.5f, 0.0f, 0.0f ) );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
+    camera2d.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &camera2dTex );
     camera2d.AddComponent<ae3d::TransformComponent>();
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
@@ -325,6 +341,7 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
+    camera3d.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &cameraTex );
     //camera3d.GetComponent<ae3d::CameraComponent>()->SetViewport( 0, 0, 640, 480 );
 #ifdef TEST_FORWARD_PLUS
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2,
@@ -784,6 +801,9 @@ using namespace ae3d;
 {
     [self _update];
     
+    const int width = self.view.bounds.size.width * 2;
+    const int height = self.view.bounds.size.height * 2;
+    
     if (_view.currentRenderPassDescriptor != nil)
     {
         ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
@@ -858,6 +878,8 @@ using namespace ae3d;
         }
         DrawNuklear( &ctx, &cmds, self.view.bounds.size.width, self.view.bounds.size.height );
 #endif
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
         scene.EndFrame();
         ae3d::System::EndFrame();
     }
