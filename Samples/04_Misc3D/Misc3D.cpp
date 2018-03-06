@@ -1,7 +1,5 @@
 #include <string>
 #include <cmath>
-#include <ctime>
-#include <cstdlib>
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
@@ -27,6 +25,8 @@
 #include "Window.hpp"
 #include "VR.hpp"
 
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.7.8.zip
+
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
@@ -37,7 +37,15 @@
 
 using namespace ae3d;
 
-// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.7.8.zip
+int Random100()
+{
+    constexpr int A = 5;
+    constexpr int C = 3;
+
+    static int prev = 1;
+    prev = (A * prev + C) % 101;
+    return prev;
+}
 
 int main()
 {
@@ -71,6 +79,9 @@ int main()
 
     RenderTexture cameraTex;
     cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+
+    RenderTexture camera2dTex;
+    camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -109,7 +120,7 @@ int main()
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
     camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::Depth );
     camera2d.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
-    camera2d.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
+    camera2d.GetComponent<CameraComponent>()->SetTargetTexture( &camera2dTex );
     camera2d.GetComponent<CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<TransformComponent>();
     
@@ -382,7 +393,6 @@ int main()
     {
         int pointLightIndex = 0;
         
-        std::srand( std::time( nullptr ) );
 
         for (int row = 0; row < 50; ++row)
         {
@@ -390,7 +400,7 @@ int main()
             {
                 pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
-                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (rand() % 100 ) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f } );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
                 //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 2, -4, -100 + (float)col * 2 ) );
                 pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -12, -150 + (float)col * 4 ) );
@@ -514,9 +524,7 @@ int main()
 #ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
 #endif
-#ifdef TEST_SHADOWS_SPOT
-    scene.Add( &spotLight );
-#endif
+    //scene.Add( &spotLight );
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
@@ -768,8 +776,11 @@ int main()
         for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
         {
             const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
-            const float xOffset = 0;// (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
-            const float yOffset = 0;// (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+            //const float xOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+            //const float yOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+            const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+            const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+            
             pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
         }
 #endif
@@ -802,6 +813,7 @@ int main()
         System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ) );
 #else
 		System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+		System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
 #endif
         scene.EndFrame();
 #endif

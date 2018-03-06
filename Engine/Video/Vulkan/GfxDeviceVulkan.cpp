@@ -1835,7 +1835,7 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     GfxDeviceGlobal::clearColor.float32[ 0 ] = red;
     GfxDeviceGlobal::clearColor.float32[ 1 ] = green;
     GfxDeviceGlobal::clearColor.float32[ 2 ] = blue;
-    GfxDeviceGlobal::clearColor.float32[ 3 ] = 1.0f;
+    GfxDeviceGlobal::clearColor.float32[ 3 ] = 0.0f;
 }
 
 void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
