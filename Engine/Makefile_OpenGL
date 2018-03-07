@@ -4,7 +4,7 @@ UNAME := $(shell uname)
 COMPILER ?= g++
 CCOMPILER ?= gcc
 ENGINE_LIB := libaether3d_gl_linux.a
-STD_LIB := -std=c++11
+STD_LIB := -std=c++11 -fsanitize=address
 INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
