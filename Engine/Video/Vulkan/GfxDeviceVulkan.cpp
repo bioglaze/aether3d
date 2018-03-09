@@ -2066,8 +2066,12 @@ void ae3d::GfxDevice::Present()
         GfxDeviceGlobal::timings.resize( 1 );
         std::uint32_t start = 0;
         std::uint32_t end = 0;
-        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint32_t ), &start, 0, VK_QUERY_RESULT_WAIT_BIT );
+        
+		err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( uint32_t ), &start, 0, VK_QUERY_RESULT_WAIT_BIT );
+		AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
+
         err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 1, 1, sizeof( uint32_t ), &end, 0, VK_QUERY_RESULT_WAIT_BIT );
+		AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
 
         const float factor = 1e6f * GfxDeviceGlobal::properties.limits.timestampPeriod;
         GfxDeviceGlobal::timings[ 0 ] = (float)(end - start) / factor;

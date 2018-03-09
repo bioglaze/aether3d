@@ -66,8 +66,13 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
             glObjectLabel( GL_TEXTURE, Texture2DGlobal::defaultTexture.handle, -1, "default texture 2d" );
         }
 
-        //int data[ 32 * 32 * 4 ] = { 0xFFC0CB };
-        int data[ 32 * 32 * 4 ] = { 0xFFFFFF };
+        int data[ 32 * 32 * 4 ];
+
+		for( unsigned i = 0; i < 32 * 32 * 4; ++i )
+		{
+			data[ i ] = 0xFFFFFF;
+		}
+
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, Texture2DGlobal::defaultTexture.width, Texture2DGlobal::defaultTexture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
         GfxDevice::ErrorCheck( "Load Texture2D" );
     }

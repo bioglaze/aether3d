@@ -127,4 +127,5 @@ int main()
     }
 
     System::Deinit();
+	return 0;
 }

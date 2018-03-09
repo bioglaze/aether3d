@@ -243,10 +243,6 @@ int main()
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
-#ifdef TEST_VERTEX_LAYOUTS
-    cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-#endif
-
     childCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
