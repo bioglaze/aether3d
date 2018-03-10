@@ -574,7 +574,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 {
-    glClearColor( red, green, blue, 1 );
+    glClearColor( red, green, blue, 0 );
 }
 
 const char* GetGLErrorString(GLenum code)

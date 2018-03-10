@@ -37,13 +37,23 @@
 
 using namespace ae3d;
 
-int Random100()
+int Random100( bool reset )
 {
     constexpr int A = 5;
     constexpr int C = 3;
 
     static int prev = 1;
-    prev = (A * prev + C) % 101;
+
+    // Hack to prevent lights wandering off
+    static int iterations = 0;
+    ++iterations;
+    
+    if (iterations == 600)
+    {
+        iterations = 0;
+    }
+    
+    prev = reset ? 1 : ((A * prev + C) % 101);
     return prev;
 }
 
@@ -118,7 +128,7 @@ int main()
     camera2d.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera2d.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Orthographic );
     camera2d.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::Depth );
+    camera2d.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera2d.GetComponent<CameraComponent>()->SetLayerMask( 0x2 );
     camera2d.GetComponent<CameraComponent>()->SetTargetTexture( &camera2dTex );
     camera2d.GetComponent<CameraComponent>()->SetRenderOrder( 2 );
@@ -772,8 +782,6 @@ int main()
         for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
         {
             const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
-            //const float xOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
-            //const float yOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
             const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
             const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
             
