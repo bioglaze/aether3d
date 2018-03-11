@@ -208,7 +208,59 @@ void ae3d::BuiltinShaders::Load()
 
     depthNormalsShader.Load( depthNormalsVertexSource, depthNormalsFragmentSource );
 
-    uiShader.Load( spriteVertexSource, spriteFragmentSource );
+    const char* uiVertexSource = R"(
+    #version 330 core
+    
+    layout (location = 0) in vec3 aPosition;
+    layout (location = 1) in vec2 aTexCoord;
+    layout (location = 2) in vec4 aColor;
+
+    layout(std140) uniform PerObject
+    {
+        mat4 localToClip;
+        mat4 localToView;
+        mat4 localToWorld;
+        mat4 localToShadowClip;
+        mat4 clipToView;
+        vec4 lightPosition;
+        vec4 lightDirection;
+        vec4 lightColor;
+        float lightConeAngleCos;
+        int lightType;
+        float minAmbient;
+        uint maxNumLightsPerTile;
+        uint windowWidth;
+        uint windowHeight;
+        uint numLights; // 16 bits for point light count, 16 for spot light count
+        uint padding;
+        mat4 boneMatrices[ 80 ];
+    };
+
+    out vec2 vTexCoord;
+    out vec4 vColor;
+    
+    void main()
+    {
+        gl_Position = localToClip * vec4( aPosition.xy, 0.0, 1.0 );
+        vTexCoord = aTexCoord;
+        vColor = aColor;
+    })";
+    
+    const char* uiFragmentSource = R"(
+    #version 330 core
+    
+    in vec2 vTexCoord;
+    in vec4 vColor;
+    out vec4 fragColor;
+    
+    uniform sampler2D textureMap;
+    
+    void main()
+    {
+        fragColor = texture( textureMap, vTexCoord ) * vColor;
+    })";
+
+    uiShader.Load( uiVertexSource, uiFragmentSource );
 
     const char* fullscreenTriangleVertexSource = R"(
     #version 330 core

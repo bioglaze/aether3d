@@ -71,8 +71,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     const struct nk_draw_command* cmd = nullptr;
     nk_draw_index* offset = nullptr;
 
-    const float scaleX = 2;
-    const float scaleY = 2;
+    const float scaleX = 1;
+    const float scaleY = 1;
     
     nk_draw_foreach( cmd, ctx, uiCommands )
     {
