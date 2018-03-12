@@ -7,8 +7,6 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #include <cmath>
-#include <ctime>
-#include <cstdlib>
 #include <vector>
 #include <map>
 
@@ -45,6 +43,27 @@ const int POINT_LIGHT_COUNT = 100;
 const int MULTISAMPLE_COUNT = 1;
 const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
+
+int Random100()
+{
+    constexpr int A = 5;
+    constexpr int C = 3;
+    
+    static int prev = 1;
+    
+    // Hack to prevent lights wandering off
+    static int iterations = 0;
+    ++iterations;
+    
+    if (iterations == 1200)
+    {
+        iterations = 0;
+        prev = 1;
+    }
+    
+    prev = (A * prev + C) % 101;
+    return prev;
+}
 
 NSViewController* myViewController;
 
@@ -394,9 +413,9 @@ using namespace ae3d;
 
     spriteContainer.AddComponent<ae3d::SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
-    sprite->SetTexture( &bc1Tex, Vec3( 120, 100, -0.6f ), Vec3( (float)bc1Tex.GetWidth(), (float)bc1Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
-    sprite->SetTexture( &bc2Tex, Vec3( 120, 200, -0.5f ), Vec3( (float)bc2Tex.GetWidth(), (float)bc2Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
-    sprite->SetTexture( &bc3Tex, Vec3( 120, 300, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
+    sprite->SetTexture( &bc1Tex, Vec3( 120, 100, -0.6f ), Vec3( (float)bc1Tex.GetWidth(), (float)bc1Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    sprite->SetTexture( &bc2Tex, Vec3( 120, 200, -0.5f ), Vec3( (float)bc2Tex.GetWidth(), (float)bc2Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    sprite->SetTexture( &bc3Tex, Vec3( 120, 300, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     sprite->SetTexture( &gliderTex, Vec3( 220, 120, -0.5f ), Vec3( (float)gliderTex.GetWidth(), (float)gliderTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     
     spriteContainer.AddComponent<TransformComponent>();
@@ -585,7 +604,6 @@ using namespace ae3d;
     // Inits point lights for Forward+
     {
         int pointLightIndex = 0;
-        std::srand( (unsigned)std::time( nullptr ) );
         
         for (int row = 0; row < 10; ++row)
         {
@@ -593,7 +611,7 @@ using namespace ae3d;
             {
                 pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
-                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (rand() % 100 ) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f } );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
                 //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9 + row * 4, -4, -85 + col * 4 ) );
                 pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 5, -12, -100 + (float)col * 4 ) );
@@ -827,7 +845,10 @@ using namespace ae3d;
                           camera3d.GetComponent< CameraComponent >()->GetProjection() );
         System::Draw( &gliderTex, 40, 240, 100, 100, self.view.bounds.size.width, self.view.bounds.size.height, Vec4( 1, 1, 1, 1 ) );
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );
-        
+
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+
 #ifdef TEST_NUKLEAR_UI
         nk_input_begin( &ctx );
         if (inputEvent.button == 1 && inputEvent.isActive)
@@ -847,7 +868,7 @@ using namespace ae3d;
         
         nk_input_end( &ctx );
 
-        enum {EASY, HARD};
+        enum { EASY, HARD };
         static int op = EASY;
         static float value = 0.6f;
         
@@ -878,8 +899,6 @@ using namespace ae3d;
         }
         DrawNuklear( &ctx, &cmds, self.view.bounds.size.width, self.view.bounds.size.height );
 #endif
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
         scene.EndFrame();
         ae3d::System::EndFrame();
     }
@@ -935,8 +954,8 @@ using namespace ae3d;
     for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
     {
         const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
-        const float xOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
-        const float yOffset = (rand() % 10) / 20.0f - (rand() % 10) / 20.0f;
+        const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
     }
 #endif

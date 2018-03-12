@@ -37,7 +37,7 @@
 
 using namespace ae3d;
 
-int Random100( bool reset )
+int Random100()
 {
     constexpr int A = 5;
     constexpr int C = 3;
@@ -51,9 +51,10 @@ int Random100( bool reset )
     if (iterations == 600)
     {
         iterations = 0;
+        prev = 1;
     }
     
-    prev = reset ? 1 : ((A * prev + C) % 101);
+    prev = (A * prev + C) % 101;
     return prev;
 }
 
