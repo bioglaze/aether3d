@@ -20,14 +20,14 @@ struct PerObjectUboStruct
     ae3d::Vec4 lightPosition;
     ae3d::Vec4 lightDirection;
     ae3d::Vec4 lightColor = ae3d::Vec4( 1, 1, 1, 1 );
-    float lightConeAngleCos;
-    int lightType;
-    float minAmbient;
-    unsigned maxNumLightsPerTile;
-    unsigned windowWidth;
-    unsigned windowHeight;
-    unsigned numLights; // 16 bits for point light count, 16 for spot light count
-    unsigned padding;
+    float lightConeAngleCos = 0;
+    int lightType = 0;
+    float minAmbient = 0.2f;
+    unsigned maxNumLightsPerTile = 0;
+    unsigned windowWidth = 1;
+    unsigned windowHeight = 1;
+    unsigned numLights = 0; // 16 bits for point light count, 16 for spot light count
+    unsigned padding = 0;
     ae3d::Matrix44 boneMatrices[ 80 ];
 };
 
