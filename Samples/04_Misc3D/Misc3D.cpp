@@ -816,9 +816,10 @@ int main()
         scene.Render();
 #if RENDERER_D3D12
         System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &camera2dTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ) );
 #else
-		System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
-		System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+	System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+	System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
 #endif
         scene.EndFrame();
 #endif
