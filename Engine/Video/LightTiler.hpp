@@ -24,12 +24,12 @@ namespace ae3d
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
         
 #if RENDERER_METAL
-        id< MTLBuffer > GetPerTileLightIndexBuffer() { return perTileLightIndexBuffer; }
-        id< MTLBuffer > GetPointLightCenterAndRadiusBuffer() { return pointLightCenterAndRadiusBuffer; }
-        id< MTLBuffer > GetPointLightColorBuffer() { return pointLightColorBuffer; }
-        id< MTLBuffer > GetSpotLightCenterAndRadiusBuffer() { return spotLightCenterAndRadiusBuffer; }
-        id< MTLBuffer > GetSpotLightParamsBuffer() { return spotLightParamsBuffer; }
-        id< MTLBuffer > GetSpotLightColorBuffer() { return spotLightColorBuffer; }
+        id< MTLBuffer > GetPerTileLightIndexBuffer() const { return perTileLightIndexBuffer; }
+        id< MTLBuffer > GetPointLightCenterAndRadiusBuffer() const { return pointLightCenterAndRadiusBuffer; }
+        id< MTLBuffer > GetPointLightColorBuffer() const { return pointLightColorBuffer; }
+        id< MTLBuffer > GetSpotLightCenterAndRadiusBuffer() const { return spotLightCenterAndRadiusBuffer; }
+        id< MTLBuffer > GetSpotLightParamsBuffer() const { return spotLightParamsBuffer; }
+        id< MTLBuffer > GetSpotLightColorBuffer() const { return spotLightColorBuffer; }
 #endif
         /// Destroys graphics API objects.
         void DestroyBuffers();

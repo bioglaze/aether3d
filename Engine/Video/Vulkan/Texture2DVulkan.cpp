@@ -222,6 +222,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     void* stagingData;
     err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory, 0, memReqs.size, 0, &stagingData );
+    AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
     std::memcpy( stagingData, data, imageSize );
 
     VkMappedMemoryRange flushRange = {};

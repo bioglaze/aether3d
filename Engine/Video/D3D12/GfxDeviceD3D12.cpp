@@ -269,17 +269,17 @@ void TimerQuery::End( std::uint64_t index )
     profileData.queryEnded = true;
 }
 
-void TimerQuery::UpdateProfile( std::uint64_t index, std::uint64_t* frameQueryData )
+void TimerQuery::UpdateProfile( std::uint64_t index, std::uint64_t* queryData )
 {
     ae3d::System::Assert( index < MaxNumTimers, "Too high query index" );
 
     profiles[ index ].queryEnded = false;
     double time = 0;
 
-    if (frameQueryData)
+    if ( queryData )
     {
-        std::uint64_t startTime = frameQueryData[ index * 2 + 0 ];
-        std::uint64_t endTime = frameQueryData[ index * 2 + 1 ];
+        std::uint64_t startTime = queryData[ index * 2 + 0 ];
+        std::uint64_t endTime = queryData[ index * 2 + 1 ];
 
         if (endTime > startTime)
         {
