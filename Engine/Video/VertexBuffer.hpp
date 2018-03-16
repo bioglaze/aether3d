@@ -8,8 +8,6 @@
 #import <Metal/Metal.h>
 #endif
 #if RENDERER_VULKAN
-#include <cstdint>
-#include <vector>
 #include <vulkan/vulkan.h>
 #endif
 #include "Vec3.hpp"
@@ -159,7 +157,7 @@ namespace ae3d
         
 #endif
 #if RENDERER_VULKAN
-        static const std::uint32_t VERTEX_BUFFER_BIND_ID = 0;
+        static const unsigned VERTEX_BUFFER_BIND_ID = 0;
 
         VkPipelineVertexInputStateCreateInfo* GetInputState() { return &inputStateCreateInfo; }
         VkBuffer* GetVertexBuffer() { return &vertexBuffer; }
@@ -206,8 +204,8 @@ namespace ae3d
         VkBuffer vertexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory vertexMem = VK_NULL_HANDLE;
         VkPipelineVertexInputStateCreateInfo inputStateCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO, nullptr, 0, 0, nullptr, 0, nullptr };
-        std::vector< VkVertexInputBindingDescription > bindingDescriptions;
-        std::vector< VkVertexInputAttributeDescription > attributeDescriptions;
+        VkVertexInputBindingDescription bindingDescriptions;
+        VkVertexInputAttributeDescription attributeDescriptions[ 7 ];
 
         VkBuffer indexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory indexMem = VK_NULL_HANDLE;

@@ -2,7 +2,6 @@
 #define DDSLOADER_H
 #include <stdint.h>
 #include <vector>
-#include "FileSystem.hpp"
 
 #define DDS_MAGIC 0x20534444 ///<  little-endian
 
@@ -125,6 +124,14 @@ struct DDSInfo
     int type;
 #endif
 };
+
+namespace ae3d
+{
+	namespace FileSystem
+	{
+		struct FileContentsData;
+	}
+}
 
 /// Loads a .dds (DirectDraw Surface)
 namespace DDSLoader

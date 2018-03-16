@@ -209,14 +209,15 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
 
 void ae3d::VertexBuffer::CreateInputState( int vertexStride )
 {
-    bindingDescriptions.resize( 1 );
-    bindingDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
-    bindingDescriptions[ 0 ].stride = vertexStride;
-    bindingDescriptions[ 0 ].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    bindingDescriptions.binding = VERTEX_BUFFER_BIND_ID;
+    bindingDescriptions.stride = vertexStride;
+    bindingDescriptions.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	std::uint32_t attributeCount = 0;
 
     if (vertexFormat == VertexFormat::PTC)
     {
-        attributeDescriptions.resize( 3 );
+		attributeCount = 3;
 
         // Location 0 : Position
         attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
@@ -238,7 +239,7 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
     }
     else if (vertexFormat == VertexFormat::PTN)
     {
-        attributeDescriptions.resize( 3 );
+		attributeCount = 3;
 
         // Location 0 : Position
         attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
@@ -260,7 +261,7 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
     }
     else if (vertexFormat == VertexFormat::PTNTC)
     {
-        attributeDescriptions.resize( 5 );
+		attributeCount = 5;
 
         // Location 0 : Position
         attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
@@ -294,7 +295,7 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
     }
     else if (vertexFormat == VertexFormat::PTNTC_Skinned)
     {
-        attributeDescriptions.resize( 7 );
+		attributeCount = 7;
 
         // Location 0 : Position
         attributeDescriptions[ 0 ].binding = VERTEX_BUFFER_BIND_ID;
@@ -345,10 +346,10 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
 
     inputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     inputStateCreateInfo.pNext = nullptr;
-    inputStateCreateInfo.vertexBindingDescriptionCount = (std::uint32_t)bindingDescriptions.size();
-    inputStateCreateInfo.pVertexBindingDescriptions = bindingDescriptions.data();
-    inputStateCreateInfo.vertexAttributeDescriptionCount = (std::uint32_t)attributeDescriptions.size();
-    inputStateCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    inputStateCreateInfo.vertexBindingDescriptionCount = 1;
+    inputStateCreateInfo.pVertexBindingDescriptions = &bindingDescriptions;
+    inputStateCreateInfo.vertexAttributeDescriptionCount = attributeCount;
+    inputStateCreateInfo.pVertexAttributeDescriptions = &attributeDescriptions[ 0 ];
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )

@@ -4,12 +4,9 @@
 #include <string>
 #include <unordered_map>
 #include "Vec3.hpp"
-#include "Matrix.hpp"
 
 namespace ae3d
 {
-    struct Matrix44;
-    
     /// Material is used to render a mesh.
     class Material
     {

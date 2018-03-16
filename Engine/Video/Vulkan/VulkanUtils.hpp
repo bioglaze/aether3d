@@ -2,10 +2,21 @@
 #define VULKAN_UTILS
 
 #include <vulkan/vulkan.h>
-#include "GfxDevice.hpp"
 
 namespace ae3d
 {
+	class VertexBuffer;
+	class Shader;
+
+	namespace GfxDevice
+	{
+		enum class DepthFunc;
+		enum class BlendMode;
+		enum class CullMode;
+		enum class FillMode;
+		enum class PrimitiveTopology;
+	}
+
     void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
         VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount );
 

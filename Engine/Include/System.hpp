@@ -7,7 +7,6 @@
 #import <QuartzCore/CAMetalLayer.h>
 #import <MetalKit/MetalKit.h>
 #endif
-#include "Vec3.hpp"
 
 #if !defined( RENDERER_D3D12 ) && !defined( RENDERER_VULKAN ) && !defined( RENDERER_METAL ) && !defined( RENDERER_OPENGL )
 #error No renderer defined
@@ -95,6 +94,8 @@
 namespace ae3d
 {
     struct Matrix44;
+	struct Vec3;
+	struct Vec4;
     class Texture2D;
     class TextureBase;
     

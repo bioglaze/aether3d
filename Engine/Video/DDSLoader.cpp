@@ -4,6 +4,7 @@
 #endif
 #include <cstring>
 #include "System.hpp"
+#include "FileSystem.hpp"
 
 unsigned MyMax( unsigned a, unsigned b )
 {

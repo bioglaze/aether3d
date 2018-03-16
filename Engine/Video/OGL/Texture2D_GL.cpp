@@ -19,9 +19,6 @@ extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 void TexReload( const std::string& path ); // Defined in TextureCommon.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
-void Tokenize( const std::string& str,
-              std::vector< std::string >& tokens,
-              const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
 
 namespace Texture2DGlobal
 {
