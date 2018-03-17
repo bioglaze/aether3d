@@ -31,7 +31,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -312,7 +312,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -587,10 +587,11 @@ using namespace ae3d;
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
 #endif
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetColor( Vec3( 1, 0, 0 ) );
-    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetRadius( 5 );
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetRadius( 2 );
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.AddComponent<ae3d::TransformComponent>();
     //spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -70 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -70 }, { 0, 0, 1 }, { 0, 1, 0 } );
     
     pointLight.AddComponent<ae3d::PointLightComponent>();
 #ifdef TEST_SHADOWS_POINT
@@ -954,12 +955,11 @@ using namespace ae3d;
     for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
     {
         const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
-        const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-        const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        const float xOffset = 0;//(Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        const float yOffset = 0;//(Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
     }
 #endif
-
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size

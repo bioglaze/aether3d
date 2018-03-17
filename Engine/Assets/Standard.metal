@@ -141,19 +141,19 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
 
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
-        uint lightIndex = nextLightIndex;
+        const uint lightIndex = nextLightIndex;
         index++;
         nextLightIndex = perTileLightIndexBuffer[ index ];
 
-        float4 center = pointLightBufferCenterAndRadius[ lightIndex ];
-        float radius = center.w;
+        const float4 center = pointLightBufferCenterAndRadius[ lightIndex ];
+        const float radius = center.w;
 
-        float3 vecToLightVS = (uniforms.localToView * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
-        float3 vecToLightWS = center.xyz - in.positionWS.xyz;
-        float3 lightDirVS = normalize( vecToLightVS );
+        const float3 vecToLightVS = (uniforms.localToView * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
+        const float3 vecToLightWS = center.xyz - in.positionWS.xyz;
+        const float3 lightDirVS = normalize( vecToLightVS );
         
-        float dotNL = clamp( dot( normalize( in.normalVS ), lightDirVS ), 0.0, 1.0 );
-        float lightDistance = length( vecToLightWS );
+        const float dotNL = clamp( dot( normalize( in.normalVS ), lightDirVS ), 0.0, 1.0 );
+        const float lightDistance = length( vecToLightWS );
         float falloff = 1;
         
         if (lightDistance < radius)
@@ -176,7 +176,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
-        uint lightIndex = nextLightIndex;
+        const uint lightIndex = nextLightIndex;
         ++index;
         nextLightIndex = perTileLightIndexBuffer[ index ];
         
@@ -184,18 +184,17 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float4 center = spotLightBufferCenterAndRadius[ lightIndex ];
         const float radius = center.w;
         
-        float3 vecToLight = normalize( center.xyz - in.positionWS.xyz );
-        float spotAngle = dot( -params.xyz, vecToLight );
-
-        float cosineOfConeAngle = 0.5f;//(spotParams.z > 0.0f) ? spotParams.z : -spotParams.z;
+        const float3 vecToLight = normalize( center.xyz - in.positionWS.xyz );
+        const float spotAngle = dot( -params.xyz, vecToLight );
+        const float cosineOfConeAngle = abs( params.w );
         
         // Falloff
-        float dist = distance( in.positionWS.xyz, center.xyz );
-        float a = dist / radius + 1.0f;
-        float att = 1.0f / (a * a);
-        float3 color = spotLightBufferColors[ lightIndex ].rgb * att;// * specularTex;
+        const float dist = distance( in.positionWS.xyz, center.xyz );
+        const float a = dist / radius + 1.0f;
+        const float att = 1.0f / (a * a);
+        const float3 color = spotLightBufferColors[ lightIndex ].rgb;// * att;// * specularTex;
         
-        float3 accumDiffuseAndSpecular = spotAngle > cosineOfConeAngle ? color : float3( 0.0, 0.0, 0.0 );
+        const float3 accumDiffuseAndSpecular = spotAngle > cosineOfConeAngle ? color : float3( 0.0, 0.0, 0.0 );
         outColor.rgb += accumDiffuseAndSpecular;
     }
     
