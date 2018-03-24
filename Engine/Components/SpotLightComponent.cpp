@@ -1,8 +1,6 @@
 #include "SpotLightComponent.hpp"
-#include <locale>
 #include <string>
 #include <vector>
-#include <sstream>
 
 std::vector< ae3d::SpotLightComponent > spotLightComponents;
 unsigned nextFreeSpotlLightComponent = 0;
@@ -34,20 +32,34 @@ void ae3d::SpotLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     }
 }
 
+void ae3d::SpotLightComponent::SetConeAngle( float degrees )
+{
+    coneAngle = degrees;
+
+    if (coneAngle < 0 || coneAngle > 180)
+    {
+        coneAngle = 35;
+    }
+}
+
 std::string GetSerialized( ae3d::SpotLightComponent* component )
 {
-    std::stringstream outStream;
-    std::locale c_locale( "C" );
-    outStream.imbue( c_locale );
-
+    std::string outStr = "spotlight\nshadow ";
+    outStr += std::to_string( (component->CastsShadow() ? 1 : 0) );
+    outStr += "\nconeAngle ";
+    outStr += std::to_string( component->GetConeAngle() );
+    outStr += "\nenabled ";
+    outStr += std::to_string( (component->IsEnabled() ? 1 : 0) );
+    outStr += "\nradius ";
+    outStr += std::to_string( component->GetRadius() );
+    outStr += "\ncolor ";
     auto color = component->GetColor();
-    
-    outStream << "spotlight\n";
-    outStream << "shadow " << (component->CastsShadow() ? 1 : 0) << "\n";
-    outStream << "coneangle " << component->GetConeAngle() << "\n";
-    outStream << "enabled" << component->IsEnabled() << "\n";
-    outStream << "radius " << component->GetRadius() << "\n";
-    outStream << "color " << color.x << " " << color.y << " " << color.z << "\n\n";
+    outStr += std::to_string( color.x );
+    outStr += " ";
+    outStr += std::to_string( color.y );
+    outStr += " ";
+    outStr += std::to_string( color.z );
+    outStr += "\n\n";
 
-    return outStream.str();
+    return outStr;
 }

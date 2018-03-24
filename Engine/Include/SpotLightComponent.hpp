@@ -42,7 +42,7 @@ namespace ae3d
         float GetConeAngle() const { return coneAngle; }
         
         /// \param degrees Angle in degrees.
-        void SetConeAngle( float degrees ) { coneAngle = degrees; }
+        void SetConeAngle( float degrees );
 
         /// \param aColor Color in range 0-1.
         void SetColor( const Vec3& aColor ) { color = aColor; }
