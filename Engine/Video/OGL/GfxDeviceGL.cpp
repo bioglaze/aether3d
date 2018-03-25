@@ -96,7 +96,6 @@ namespace GfxDeviceGlobal
     GLuint depthNormalsQueries[ 4 ];
     GLuint shadowMapQueries[ 4 ];
     unsigned frameIndex = 0;
-    bool isEditor = false;
 
     PerObjectUboStruct perObjectUboStruct;
     UIVertexBuffer uiVertexBuffer;

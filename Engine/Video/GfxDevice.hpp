@@ -28,6 +28,7 @@ struct PerObjectUboStruct
     unsigned windowHeight = 1;
     unsigned numLights = 0; // 16 bits for point light count, 16 for spot light count
     unsigned padding = 0;
+    ae3d::Vec4 tex0scaleOffset = ae3d::Vec4( 1, 1, 0, 0 );
     ae3d::Matrix44 boneMatrices[ 80 ];
 };
 

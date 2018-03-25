@@ -29,6 +29,7 @@ void ae3d::BuiltinShaders::Load()
         uint windowHeight;
         uint numLights; // 16 bits for point light count, 16 for spot light count
         uint padding;
+        vec4 tex0scaleOffset;
         mat4 boneMatrices[ 80 ];
     };
 
@@ -233,6 +234,7 @@ void ae3d::BuiltinShaders::Load()
         uint windowHeight;
         uint numLights; // 16 bits for point light count, 16 for spot light count
         uint padding;
+        vec4 tex0scaleOffset;
         mat4 boneMatrices[ 80 ];
     };
 

@@ -25,6 +25,8 @@
 		AB9D9A2C1C96E993009DF897 /* left.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A251C96E993009DF897 /* left.jpg */; };
 		AB9D9A2D1C96E993009DF897 /* right.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A261C96E993009DF897 /* right.jpg */; };
 		AB9D9A2E1C96E993009DF897 /* top.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A271C96E993009DF897 /* top.jpg */; };
+		ABC1CC7F2067CE6F003D0A2D /* atlas_cegui.xml in Resources */ = {isa = PBXBuildFile; fileRef = ABC1CC7D2067CE6E003D0A2D /* atlas_cegui.xml */; };
+		ABC1CC802067CE6F003D0A2D /* atlas_cegui.png in Resources */ = {isa = PBXBuildFile; fileRef = ABC1CC7E2067CE6E003D0A2D /* atlas_cegui.png */; };
 		ABCBC06A1E052C82000F0B6D /* textures in Resources */ = {isa = PBXBuildFile; fileRef = ABCBC0691E052C82000F0B6D /* textures */; };
 		ABCBC06D1E052CAA000F0B6D /* new_sponza.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABCBC06B1E052CAA000F0B6D /* new_sponza.ae3d */; };
 		ABCBC06E1E052CAA000F0B6D /* sponza.scene in Resources */ = {isa = PBXBuildFile; fileRef = ABCBC06C1E052CAA000F0B6D /* sponza.scene */; };
@@ -79,6 +81,8 @@
 		AB9D9A251C96E993009DF897 /* left.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = left.jpg; path = ../../../../aether3d_build/Samples/skybox/left.jpg; sourceTree = "<group>"; };
 		AB9D9A261C96E993009DF897 /* right.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = right.jpg; path = ../../../../aether3d_build/Samples/skybox/right.jpg; sourceTree = "<group>"; };
 		AB9D9A271C96E993009DF897 /* top.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = top.jpg; path = ../../../../aether3d_build/Samples/skybox/top.jpg; sourceTree = "<group>"; };
+		ABC1CC7D2067CE6E003D0A2D /* atlas_cegui.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = atlas_cegui.xml; path = ../../../../aether3d_build/Samples/atlas_cegui.xml; sourceTree = "<group>"; };
+		ABC1CC7E2067CE6E003D0A2D /* atlas_cegui.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = atlas_cegui.png; path = ../../../../aether3d_build/Samples/atlas_cegui.png; sourceTree = "<group>"; };
 		ABCBC0691E052C82000F0B6D /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
 		ABCBC06B1E052CAA000F0B6D /* new_sponza.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = new_sponza.ae3d; path = ../../../../aether3d_build/Samples/new_sponza.ae3d; sourceTree = "<group>"; };
 		ABCBC06C1E052CAA000F0B6D /* sponza.scene */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sponza.scene; path = ../../../../aether3d_build/Samples/sponza.scene; sourceTree = "<group>"; };
@@ -196,6 +200,8 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				ABC1CC7E2067CE6E003D0A2D /* atlas_cegui.png */,
+				ABC1CC7D2067CE6E003D0A2D /* atlas_cegui.xml */,
 				AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */,
 				ABCBC06B1E052CAA000F0B6D /* new_sponza.ae3d */,
 				ABCBC06C1E052CAA000F0B6D /* sponza.scene */,
@@ -366,9 +372,11 @@
 				AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */,
 				AB29D4481D772C7400E998FC /* test_dxt1.dds in Resources */,
 				ABCFF6B51D79C2D300BD7AF0 /* test_dxt3.dds in Resources */,
+				ABC1CC802067CE6F003D0A2D /* atlas_cegui.png in Resources */,
 				AB9D9A291C96E993009DF897 /* back.jpg in Resources */,
 				AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */,
 				AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */,
+				ABC1CC7F2067CE6F003D0A2D /* atlas_cegui.xml in Resources */,
 				AB2345001DEABFB8004C4DEE /* default_white.png in Resources */,
 				AB2CA8291C13664600D4D7C4 /* glider.png in Resources */,
 				ABCBC06D1E052CAA000F0B6D /* new_sponza.ae3d in Resources */,
