@@ -302,9 +302,6 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
     }
     
     SetInt( name, textureUnit );
-
-    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )
