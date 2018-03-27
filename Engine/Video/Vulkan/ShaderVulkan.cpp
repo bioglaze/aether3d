@@ -20,6 +20,7 @@ namespace GfxDeviceGlobal
     extern VkSampler sampler0;
     extern VkImageView view1;
     extern VkSampler sampler1;
+	extern PerObjectUboStruct perObjectUboStruct;
 }
 
 namespace ShaderGlobal
@@ -148,6 +149,7 @@ void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int tex
     
     if (textureUnit == 0)
     {
+		GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         GfxDeviceGlobal::view0 = texture->GetView();
         GfxDeviceGlobal::sampler0 = texture->GetSampler();
     }

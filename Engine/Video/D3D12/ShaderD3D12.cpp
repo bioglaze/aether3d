@@ -21,6 +21,7 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
     extern ae3d::TextureBase* texture0;
     extern ae3d::TextureBase* texture1;
+	extern PerObjectUboStruct perObjectUboStruct;
 }
 
 namespace Global
@@ -210,6 +211,11 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int t
 {
     if (textureUnit == 0)
     {
+		if( texture != nullptr )
+		{
+			GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+		}
+
         GfxDeviceGlobal::texture0 = texture;
     }
     else if (textureUnit == 1)
