@@ -207,7 +207,7 @@ void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
     memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, data, dataBytes );
 }
 
-void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::Texture2D* texture, int textureUnit )
 {
     if (textureUnit == 0)
     {
@@ -226,32 +226,36 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int t
     {
         System::Print( "SetTexture: too high texture unit %d\n", textureUnit );
     }
-
-    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
-void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::TextureCube* texture, int textureUnit )
 {
     if (textureUnit == 0)
     {
+		if( texture != nullptr )
+		{
+			GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+		}
+
         GfxDeviceGlobal::texture0 = texture;
     }
     else if (textureUnit == 1)
     {
         GfxDeviceGlobal::texture1 = texture;
     }
-
-    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
 //void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
-void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* /*name*/, ae3d::RenderTexture* texture, int textureUnit )
 {
     if (textureUnit == 0)
     {
+		if( texture != nullptr )
+		{
+			GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+		}
+
         GfxDeviceGlobal::texture0 = texture;
     }
     else if (textureUnit == 1)
@@ -260,9 +264,6 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
     }
 
     //TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
-
-    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )
