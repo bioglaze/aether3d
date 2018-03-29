@@ -58,7 +58,7 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
     
     out.position = uniforms.localToClip * in_position;
     out.color = half4( vert.color );
-    out.texCoords = vert.texcoord;
+    out.texCoords = vert.texcoord * uniforms.tex0scaleOffset.xy + uniforms.tex0scaleOffset.wz;
     out.tintColor = float4( 1, 1, 1, 1 );
     out.projCoord = uniforms.localToShadowClip * in_position;
     return out;

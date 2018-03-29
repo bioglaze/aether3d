@@ -19,6 +19,11 @@ namespace MathUtil
     bool IsFinite( float f );
 }
 
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+
 unsigned boundTextures[ 16 ];
 
 namespace
@@ -267,8 +272,10 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::Texture2D* texture, int t
     
     SetInt( name, textureUnit );
 
-    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
+    if (textureUnit == 0 && texture != nullptr)
+    {
+        GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+    }
 }
 
 void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int textureUnit )
@@ -285,8 +292,10 @@ void ae3d::Shader::SetTexture( const char* name, ae3d::TextureCube* texture, int
     
     SetInt( name, textureUnit );
     
-    const std::string scaleOffsetName = std::string( name ) + std::string( "_ST" );
-    SetVector4( scaleOffsetName.c_str(), &texture->GetScaleOffset().x );
+    if (textureUnit == 0 && texture != nullptr)
+    {
+        GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+    }
 }
 
 void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* texture, int textureUnit )
@@ -302,6 +311,11 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* text
     }
     
     SetInt( name, textureUnit );
+    
+    if (textureUnit == 0 && texture != nullptr)
+    {
+        GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+    }
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )

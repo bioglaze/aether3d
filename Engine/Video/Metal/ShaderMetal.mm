@@ -12,6 +12,7 @@ extern id<MTLTexture> texture1;
 namespace GfxDeviceGlobal
 {
     void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, ae3d::Anisotropy anisotropy );
+    extern PerObjectUboStruct perObjectUboStruct;
 }
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -107,6 +108,7 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
         if (textureUnit == 0)
         {
             texture0 = texture->GetMetalTexture();
+            GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         }
         else if (textureUnit == 1)
         {
@@ -132,6 +134,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* rend
         if (textureUnit == 0)
         {
             texture0 = renderTexture->GetMetalTexture();
+            GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = renderTexture->GetScaleOffset();
         }
         else if (textureUnit == 1)
         {
@@ -157,6 +160,7 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
         if (textureUnit == 0)
         {
             texture0 = texture->GetMetalTexture();
+            GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         }
         else if (textureUnit == 1)
         {
