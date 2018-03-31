@@ -8,6 +8,10 @@ dist: trusty
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
+  - wget -O vulkansdk-linux-x86_64-1.1.70.1.run https://vulkan.lunarg.com/sdk/download/1.1.70.1/linux/vulkansdk-linux-x86_64-1.1.70.1.run
+  - chmod ugo+x vulkansdk-linux-x86_64-1.1.70.1.run
+  - ./vulkansdk-linux-x86_64-1.1.70.1.run
+  - export VULKAN_SDK=$TRAVIS_BUILD_DIR/VulkanSDK/1.1.70.1/x86_64  
 
 language: cpp
 compiler:
