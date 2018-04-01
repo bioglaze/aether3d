@@ -830,7 +830,7 @@ using namespace ae3d;
         scene.Render();
         //scene2.Render();
         //System::DrawLines( lineHandle, lineView, lineProjection );
-        Matrix44 view = camera3d.GetComponent< CameraComponent >()->GetView();
+        Matrix44 viewMat = camera3d.GetComponent< CameraComponent >()->GetView();
         Matrix44 lineTransform;
         lineTransform.MakeIdentity();
         
@@ -841,8 +841,8 @@ using namespace ae3d;
         lineTransform.Scale( 2, 2, 2 );
         Matrix44::Multiply( lineTransform, spotRot, lineTransform );
         lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
-        Matrix44::Multiply( lineTransform, view, view );
-        System::DrawLines( coneLineHandle, view,
+        Matrix44::Multiply( lineTransform, viewMat, viewMat );
+        System::DrawLines( coneLineHandle, viewMat,
                           camera3d.GetComponent< CameraComponent >()->GetProjection() );
         System::Draw( &gliderTex, 40, 240, 100, 100, self.view.bounds.size.width, self.view.bounds.size.height, Vec4( 1, 1, 1, 1 ) );
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );

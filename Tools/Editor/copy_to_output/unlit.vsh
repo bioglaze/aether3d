@@ -1,7 +1,5 @@
 #version 330 core
 
-uniform vec4 textureMap_ST;
-
 layout(std140) uniform PerObject
 {
     mat4 localToClip;
@@ -20,6 +18,7 @@ layout(std140) uniform PerObject
     uint windowHeight;
     uint numLights; // 16 bits for point light count, 16 for spot light count
     uint padding;
+    vec4 tex0scaleOffset;
     mat4 boneMatrices[ 80 ];
 };
 
@@ -38,7 +37,7 @@ out vec4 vProjCoord;
 void main()
 {
     gl_Position = localToClip * aPosition;
-    vTexCoord = aTexCoord * textureMap_ST.xy + textureMap_ST.zw;
+    vTexCoord = aTexCoord * tex0scaleOffset.xy + tex0scaleOffset.zw;
 #ifdef SHADOW_MAP
     vProjCoord = localToShadowClip * aPosition;
 #endif
