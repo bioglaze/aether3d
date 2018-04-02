@@ -573,30 +573,44 @@ void CreateSamplers()
 
 void CreateRootSignature()
 {
+    D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
+    featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+
+    HRESULT hr = GfxDeviceGlobal::device->CheckFeatureSupport( D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof( featureData ) );
+
+    if (hr != 0)
+    {
+        ae3d::System::Print( "Root signature 1.1 not supported, falling back to 1.0.\n" );
+        featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1;
+    }
+
     // Graphics
     {
-        CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
+        CD3DX12_DESCRIPTOR_RANGE1 descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
         descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 0 );
         descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1 );
+        descRange1[ 0 ].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_VOLATILE;
+        descRange1[ 1 ].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_VOLATILE;
+        descRange1[ 2 ].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_VOLATILE;
 
-        CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
+        CD3DX12_DESCRIPTOR_RANGE1 descRange2[ 1 ];
         descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 2, 0 );
 
-        CD3DX12_ROOT_PARAMETER rootParam[ 2 ];
-        rootParam[ 0 ].InitAsDescriptorTable( 3, descRange1, D3D12_SHADER_VISIBILITY_ALL );
-        rootParam[ 1 ].InitAsDescriptorTable( 1, descRange2, D3D12_SHADER_VISIBILITY_PIXEL );
+        CD3DX12_ROOT_PARAMETER1 rootParameters[ 2 ];
+        rootParameters[ 0 ].InitAsDescriptorTable( 3, descRange1, D3D12_SHADER_VISIBILITY_ALL );
+        rootParameters[ 1 ].InitAsDescriptorTable( 1, descRange2, D3D12_SHADER_VISIBILITY_PIXEL );
+
+        const D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+                                                 D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+
+        CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
+        rootSignatureDescription.Init_1_1( 2, rootParameters, 0, nullptr, flags );
 
         ID3DBlob* pOutBlob = nullptr;
         ID3DBlob* pErrorBlob = nullptr;
-        D3D12_ROOT_SIGNATURE_DESC descRootSignature;
-        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-        descRootSignature.NumParameters = 2;
-        descRootSignature.NumStaticSamplers = 0;
-        descRootSignature.pParameters = rootParam;
-        descRootSignature.pStaticSamplers = nullptr;
 
-        HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
+        hr = D3DX12SerializeVersionedRootSignature( &rootSignatureDescription, featureData.HighestVersion, &pOutBlob, &pErrorBlob );
         AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
 
         hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignatureGraphics ) );
@@ -606,24 +620,23 @@ void CreateRootSignature()
 
     // Tile Culler
     {
-        CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
+        CD3DX12_DESCRIPTOR_RANGE1 descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
         descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0 );
         descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0 );
 
-        CD3DX12_ROOT_PARAMETER rootParam[ 1 ];
+        CD3DX12_ROOT_PARAMETER1 rootParam[ 1 ];
         rootParam[ 0 ].InitAsDescriptorTable( 3, descRange1 );
+
+        const D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS |
+              D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
         ID3DBlob* pOutBlob = nullptr;
         ID3DBlob* pErrorBlob = nullptr;
-        D3D12_ROOT_SIGNATURE_DESC descRootSignature;
-        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-        descRootSignature.NumParameters = 1;
-        descRootSignature.NumStaticSamplers = 0;
-        descRootSignature.pParameters = rootParam;
-        descRootSignature.pStaticSamplers = nullptr;
+        CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC descRootSignature;
+        descRootSignature.Init_1_1( 1, rootParam, 0, nullptr, flags );
 
-        HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
+        hr = D3DX12SerializeVersionedRootSignature( &descRootSignature, featureData.HighestVersion, &pOutBlob, &pErrorBlob );
         AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
 
         hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignatureTileCuller ) );
