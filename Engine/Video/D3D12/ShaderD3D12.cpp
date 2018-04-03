@@ -211,10 +211,10 @@ void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::Texture2D* texture, i
 {
     if (textureUnit == 0)
     {
-		if( texture != nullptr )
-		{
-			GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
-		}
+        if( texture != nullptr )
+        {
+            GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+        }
 
         GfxDeviceGlobal::texture0 = texture;
     }
@@ -232,10 +232,10 @@ void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::TextureCube* texture,
 {
     if (textureUnit == 0)
     {
-		if( texture != nullptr )
-		{
-			GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
-		}
+        if( texture != nullptr )
+        {
+            GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+        }
 
         GfxDeviceGlobal::texture0 = texture;
     }
@@ -251,10 +251,10 @@ void ae3d::Shader::SetRenderTexture( const char* /*name*/, ae3d::RenderTexture* 
 {
     if (textureUnit == 0)
     {
-		if( texture != nullptr )
-		{
-			GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
-		}
+        if( texture != nullptr )
+        {
+            GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
+        }
 
         GfxDeviceGlobal::texture0 = texture;
     }

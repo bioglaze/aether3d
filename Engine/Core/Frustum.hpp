@@ -44,23 +44,23 @@ public:
      The values should be the same as in gluPerspective()
      
      \param fieldOfView Vertical field of view in degrees
-     \param aaspect Aspect ratio (width / height)
-     \param anear Near clipping plane z-coordinate
-     \param afar Far clipping plane z-coordinate
+     \param aAspect Aspect ratio (width / height)
+     \param aNear Near clipping plane z-coordinate
+     \param aFar Far clipping plane z-coordinate
      */
-    void SetProjection( float fieldOfView, float aspect, float anear, float afar );
+    void SetProjection( float fieldOfView, float aAspect, float aNear, float aFar );
     
     /**
      Sets orthographic projection.
      
-     \param left Left.
-     \param right Right.
-     \param bottom Bottom.
-     \param top Top.
-     \param nearDepth Near plane distance.
-     \param farDepth Far plane distance.
+     \param aLeft Left.
+     \param aRight Right.
+     \param aBottom Bottom.
+     \param aTop Top.
+     \param aNear Near plane distance.
+     \param aFar Far plane distance.
      */
-    void SetProjection( float left, float right, float bottom, float top, float nearp, float farp );
+    void SetProjection( float aLeft, float aRight, float aBottom, float aTop, float aNear, float aFar );
     
     /**
      Calculates the frustum planes. Should be called when the camera's origin
@@ -118,10 +118,10 @@ private:
         /**
          Sets plane's normal and point.
          
-         \param normal Normal.
-         \param point Point.
+         \param aNormal Normal.
+         \param aPoint Point.
          */
-        void SetNormalAndPoint( const Vec3& normal, const Vec3& point );
+        void SetNormalAndPoint( const Vec3& aNormal, const Vec3& aPoint );
         
         /// Calculates plane's normal.
         void CalculateNormal();
