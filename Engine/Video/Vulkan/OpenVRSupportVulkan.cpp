@@ -73,6 +73,8 @@ namespace Global
     VkPipeline companionPSO;
     VkVertexInputAttributeDescription inputCompanion;
     VkDescriptorSetLayout descriptorSetLayout;
+    VkPipelineLayout pipelineLayout;
+    VkVertexInputAttributeDescription attributeDescriptions[ 3 ];
 }
 
 float GetVRFov()
@@ -245,8 +247,34 @@ void SetupDescriptors()
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
     descriptorSetLayoutCreateInfo.bindingCount = 3;
     descriptorSetLayoutCreateInfo.pBindings = &layoutBindings[ 0 ];
-    VkResult result = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorSetLayoutCreateInfo, nullptr, &Global::descriptorSetLayout );
+    VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorSetLayoutCreateInfo, nullptr, &Global::descriptorSetLayout );
+    AE3D_CHECK_VULKAN( err, "Unable to create descriptor set layout" );
 
+    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
+    pipelineLayoutCreateInfo.pNext = nullptr;
+    pipelineLayoutCreateInfo.setLayoutCount = 1;
+    pipelineLayoutCreateInfo.pSetLayouts = &Global::descriptorSetLayout;
+    pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
+    pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
+    err = vkCreatePipelineLayout( GfxDeviceGlobal::device, &pipelineLayoutCreateInfo, nullptr, &Global::pipelineLayout );
+    AE3D_CHECK_VULKAN( err, "Unable to create pipeline layout" );
+
+    Global::attributeDescriptions[ 0 ].binding = 0;
+    Global::attributeDescriptions[ 0 ].location = 0;
+    Global::attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32_SFLOAT;
+    Global::attributeDescriptions[ 0 ].offset = 0;
+
+    Global::attributeDescriptions[ 1 ].binding = 1;
+    Global::attributeDescriptions[ 1 ].location = 0;
+    Global::attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
+    Global::attributeDescriptions[ 1 ].offset = sizeof( float ) * 2;
+
+    Global::attributeDescriptions[ 2 ].binding = 0;
+    Global::attributeDescriptions[ 2 ].location = 0;
+    Global::attributeDescriptions[ 2 ].format = VK_FORMAT_UNDEFINED;
+    Global::attributeDescriptions[ 2 ].offset = 0;
+
+    VkGraphicsPipelineCreateInfo pipelineCreateInfo = { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
 }
 
 Vec3 ae3d::VR::GetRightHandPosition()

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Misc3D", "Misc3D.vcxproj", "{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}"
 EndProject
@@ -13,6 +13,7 @@ Global
 		Release D3D12|x64 = Release D3D12|x64
 		Release OpenGL|x64 = Release OpenGL|x64
 		Release OpenVR|x64 = Release OpenVR|x64
+		Release Vulkan OpenVR|x64 = Release Vulkan OpenVR|x64
 		Release Vulkan|x64 = Release Vulkan|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
@@ -28,10 +29,15 @@ Global
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release OpenGL|x64.Build.0 = Release|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release OpenVR|x64.ActiveCfg = Release OpenVR|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release OpenVR|x64.Build.0 = Release OpenVR|x64
+		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release Vulkan OpenVR|x64.ActiveCfg = Release Vulkan OpenVR|x64
+		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release Vulkan OpenVR|x64.Build.0 = Release Vulkan OpenVR|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release Vulkan|x64.ActiveCfg = Release Vulkan|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release Vulkan|x64.Build.0 = Release Vulkan|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2D7F3054-1B55-4B59-A53A-160891E007A1}
 	EndGlobalSection
 EndGlobal

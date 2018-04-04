@@ -97,7 +97,7 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subRes
         AE3D_CHECK_D3D( hr, "command list reset in InitializeTexture" );
 
         UpdateSubresources( GfxDeviceGlobal::graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, subResourceCount, subResources );
-        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
 
         hr = GfxDeviceGlobal::graphicsCommandList->Close();
         AE3D_CHECK_D3D( hr, "command list close in InitializeTexture" );
