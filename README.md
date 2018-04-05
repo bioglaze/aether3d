@@ -13,7 +13,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 # Features
 
   - Windows, macOS, iOS and Linux support.
-  - OpenGL 4.1, Vulkan, D3D12 and Metal renderers.
+  - Vulkan, D3D12 and Metal renderers.
   - Forward+ light culling
   - Component-based game object system.
   - VR support. Tested on HTC Vive.
@@ -35,7 +35,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
   - Physically-based rendering
   - Clustered Forward shading
-  - ACES tone mapping
+  - Tone mapping
   - Post-processing effects
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
 
@@ -50,21 +50,21 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 ## Windows
 
-  - Open the project in Engine\VisualStudio_* in VS2017 and build it. For MinGW you can use Engine/Makefile_OpenGL or Makefile_Vulkan.
-  - Build and run Samples\01_OpenWindow.
-  - Vulkan users: built-in shader sources are located in aether3d_build/Samples that comes with sample asset archive. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd in Engine/assets. 
-  - FBX converter tries to find FBX SDK 2018.1.1 in its default install location (English language localization)
+  - Open the project in Engine\VisualStudio_* in VS2017 and build it. For MinGW you can use Engine/Makefile_Vulkan.
+  - Build and run Samples\01_OpenWindow. On MinGW the command is `make vulkan`
+  - Vulkan users: built-in shader sources are located in aether3d_build/Samples that comes with sample asset archive. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd in Engine/Assets. 
+  - FBX converter tries to find FBX SDK 2019.0 in its default install location (English language localization)
   
 ### OpenVR
   - Copy OpenVR headers into Engine\ThirdParty\headers
-  - Open OpenGL renderer's Visual Studio solution and select target ***OpenVR Release***
-  - Build and run Samples/04_Misc3D target ***OpenVR Release*** in VS2017.
+  - Open Vulkan renderer's Visual Studio solution and select target ***OpenVR Release***
+  - Build and run Samples/04_Misc3D target ***Release Vulkan OpenVR*** in VS2017.
 
 ## macOS
 
-  - Open the project Engine/Aether3D_OSX or Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
-  - Open the project Samples/01_OpenWindow or Samples/MetalSampleOSX and run it or run the Makefile. 
-  - FBX converter tries to find FBX SDK 2018.1.1 in its default install location.
+  - Open the project Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
+  - Open the project Samples/MetalSampleOSX and run it or run the Makefile. 
+  - FBX converter tries to find FBX SDK 2019.0 in its default install location.
 
 ## Linux
 
@@ -72,7 +72,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 `sudo apt install libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev`
 
-  - Either run `make -f Makefile_OpenGL` or `make -f Makefile_Vulkan` in Engine.
+  - Run `make -f Makefile_Vulkan` in Engine.
 
 ## iOS
   - Build Aether3D_iOS in Engine. It creates a framework.
@@ -104,7 +104,6 @@ Third party library licenses are:
 
   - stb_image.c is in public domain
   - stb_vorbis.c is in public domain
-  - glxw is under zlib license
   - OpenAL-soft is under LGPLv2 license
   - Nuklear UI is in public domain
 
