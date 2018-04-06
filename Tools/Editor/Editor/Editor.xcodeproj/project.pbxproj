@@ -15,6 +15,14 @@
 		ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */; };
 		ABD0C8BA2070B34C0049EEAE /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B92070B34C0049EEAE /* OpenAL.framework */; };
 		ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8BB2070B3550049EEAE /* MetalKit.framework */; };
+		ABE44D172077C7EF00DF1BAF /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D0E2077C7EF00DF1BAF /* LightCuller.metal */; };
+		ABE44D182077C7EF00DF1BAF /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D0F2077C7EF00DF1BAF /* Skybox.metal */; };
+		ABE44D192077C7EF00DF1BAF /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D102077C7EF00DF1BAF /* Standard.metal */; };
+		ABE44D1A2077C7EF00DF1BAF /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D112077C7EF00DF1BAF /* SDF.metal */; };
+		ABE44D1B2077C7EF00DF1BAF /* SpriteShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D122077C7EF00DF1BAF /* SpriteShader.metal */; };
+		ABE44D1C2077C7EF00DF1BAF /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D142077C7EF00DF1BAF /* Unlit.metal */; };
+		ABE44D1D2077C7EF00DF1BAF /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D152077C7EF00DF1BAF /* Moments.metal */; };
+		ABE44D1E2077C7EF00DF1BAF /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE44D162077C7EF00DF1BAF /* DepthNormals.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +68,15 @@
 		ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
 		ABD0C8B92070B34C0049EEAE /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		ABD0C8BB2070B3550049EEAE /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		ABE44D0E2077C7EF00DF1BAF /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../../../aether3d_build/Samples/LightCuller.metal; sourceTree = "<group>"; };
+		ABE44D0F2077C7EF00DF1BAF /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../../../aether3d_build/Samples/Skybox.metal; sourceTree = "<group>"; };
+		ABE44D102077C7EF00DF1BAF /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../../../aether3d_build/Samples/Standard.metal; sourceTree = "<group>"; };
+		ABE44D112077C7EF00DF1BAF /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../../../aether3d_build/Samples/SDF.metal; sourceTree = "<group>"; };
+		ABE44D122077C7EF00DF1BAF /* SpriteShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SpriteShader.metal; path = ../../../../../aether3d_build/Samples/SpriteShader.metal; sourceTree = "<group>"; };
+		ABE44D132077C7EF00DF1BAF /* ubo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ubo.h; path = ../../../../../aether3d_build/Samples/ubo.h; sourceTree = "<group>"; };
+		ABE44D142077C7EF00DF1BAF /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../../../aether3d_build/Samples/Unlit.metal; sourceTree = "<group>"; };
+		ABE44D152077C7EF00DF1BAF /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../../../aether3d_build/Samples/Moments.metal; sourceTree = "<group>"; };
+		ABE44D162077C7EF00DF1BAF /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../../../aether3d_build/Samples/DepthNormals.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +96,7 @@
 		AB010CC8206F70B40014ED08 = {
 			isa = PBXGroup;
 			children = (
+				ABE44D0D2077C7A100DF1BAF /* Shaders */,
 				ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */,
 				ABD0C8982070B1ED0049EEAE /* Include */,
 				AB010CD3206F70B40014ED08 /* macOS */,
@@ -156,6 +174,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		ABE44D0D2077C7A100DF1BAF /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				ABE44D162077C7EF00DF1BAF /* DepthNormals.metal */,
+				ABE44D0E2077C7EF00DF1BAF /* LightCuller.metal */,
+				ABE44D152077C7EF00DF1BAF /* Moments.metal */,
+				ABE44D112077C7EF00DF1BAF /* SDF.metal */,
+				ABE44D0F2077C7EF00DF1BAF /* Skybox.metal */,
+				ABE44D122077C7EF00DF1BAF /* SpriteShader.metal */,
+				ABE44D102077C7EF00DF1BAF /* Standard.metal */,
+				ABE44D132077C7EF00DF1BAF /* ubo.h */,
+				ABE44D142077C7EF00DF1BAF /* Unlit.metal */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -182,7 +216,7 @@
 		AB010CC9206F70B40014ED08 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Timo Wiren";
 				TargetAttributes = {
 					AB010CD0206F70B40014ED08 = {
@@ -226,9 +260,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABE44D182077C7EF00DF1BAF /* Skybox.metal in Sources */,
+				ABE44D1B2077C7EF00DF1BAF /* SpriteShader.metal in Sources */,
 				AB010CE7206F70B40014ED08 /* main.m in Sources */,
+				ABE44D1D2077C7EF00DF1BAF /* Moments.metal in Sources */,
+				ABE44D1C2077C7EF00DF1BAF /* Unlit.metal in Sources */,
+				ABE44D1E2077C7EF00DF1BAF /* DepthNormals.metal in Sources */,
+				ABE44D172077C7EF00DF1BAF /* LightCuller.metal in Sources */,
 				AB010CDC206F70B40014ED08 /* GameViewController.mm in Sources */,
+				ABE44D192077C7EF00DF1BAF /* Standard.metal in Sources */,
 				AB010CD6206F70B40014ED08 /* AppDelegate.m in Sources */,
+				ABE44D1A2077C7EF00DF1BAF /* SDF.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,6 +302,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -267,6 +310,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -315,6 +359,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -322,6 +367,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
