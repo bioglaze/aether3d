@@ -24,7 +24,7 @@
 
    <ul>
    <li>Windows, macOS, iOS and GNU/Linux.</li>
-   <li>OpenGL 4.1, Vulkan (WIP) Metal and D3D12 renderers.</li>
+   <li>Vulkan (WIP) Metal and D3D12 renderers.</li>
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
@@ -35,7 +35,7 @@
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Skinned animation.</li>
    <li>Scene serialization.</li>
-   <li>Scene editor built using Qt and WYSIWYG rendering.</li>
+   <li>Scene editor built using WYSIWYG rendering.</li>
    <li>XBox controller support.</li>
    <li>Wireframe rendering.</li>
    <li>Line rendering.</li>
@@ -52,7 +52,7 @@
 
    \subsection win1 Windows/Visual Studio
    
-   You'll need Visual Studio 2017 or newer. Build Engine/VisualStudio_GL45, Engine/VisualStudio_D3D12 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
+   You'll need Visual Studio 2017 or newer. Build Engine/VisualStudio_D3D12 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    You'll need OpenAL32.dll from OpenAL Soft either in your system directory or in the directory used to run samples/editor.
  
@@ -63,23 +63,19 @@
 
    \subsection osx macOS/Xcode
 
-   OpenGL: Build Engine/Aether3D_OSX. Make sure the built library is in aether3d_build. Then build and run Samples/01_OpenWindow, making
-   sure the running folder is set to aether3d_build/Samples.
-
    Metal: Build Engine/Aether3D_OSX_Metal. Make sure the built library is in aether3d_build. Then build and run Samples/MetalSampleOSX, making
    sure the running folder is set to aether3d_build/Samples.
 
    \subsection osx_cmd macOS and GNU/Linux Command Line
 
-   Run Makefile_OpenGL or Makefile_Vulkan (on Linux) in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
+   Run Makefile_Vulkan (on Linux) in Engine. Then run the Makefile in Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    On GNU/Linux you need at least the following packages: <pre>libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev</pre>
 
    \section Tools
  
    \subsection Editor
  
-   Editor is used to create scenes by placing and moving GameObjects, adding components etc. It's built on top of Qt 5 so you'll need to
-   install Qt development files. The .pro project can be opened with QtCreator or other tool. On Windows, you'll need OpenAL32.dll in aether3d/Tools/Editor/copy_to_output
+   Editor is used to create scenes by placing and moving GameObjects, adding components etc.
  
    \subsection CombineFiles
  
