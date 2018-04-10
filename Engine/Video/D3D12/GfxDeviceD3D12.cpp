@@ -1381,7 +1381,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     }
 
     /*ID3D12DebugDevice* d3dDebug = nullptr;
-    GfxDeviceGlobal::device->QueryInterface(__uuidof(ID3D12DebugDevice), reinterpret_cast<void**>(&d3dDebug));
+    GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &d3dDebug ) );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::device );
     d3dDebug->ReportLiveDeviceObjects( D3D12_RLDO_DETAIL );
     AE3D_SAFE_RELEASE( d3dDebug );*/

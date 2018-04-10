@@ -14,7 +14,7 @@ namespace debug
 #if DEBUG
     bool enabled = true;
 #else
-    bool enabled = true;
+    bool enabled = false;
 #endif
     bool hasMarker = false;
 

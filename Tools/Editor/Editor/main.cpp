@@ -1,4 +1,4 @@
-#include "Scene.hpp"
+#include "SceneView.hpp"
 #include "System.hpp"
 #include "Window.hpp"
 
@@ -21,8 +21,9 @@ int main()
     Window::GetSize( winWidth, winHeight );
     System::Print( "window size: %dx%d\n", winWidth, winHeight );
 
-    Scene scene;
-    
+    SceneView sceneView;
+    sceneView.Init();
+
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -91,9 +92,7 @@ int main()
 
         //nk_input_end( &ctx );
 
-        scene.Render();
-        //DrawNuklear( &ctx, &cmds, width, height );
-        scene.EndFrame();
+        sceneView.Render();
 
         Window::SwapBuffers();
     }
