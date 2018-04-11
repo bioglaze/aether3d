@@ -9,7 +9,7 @@ INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 GCCWARNINGS := -g -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
- -Wunsafe-loop-optimizations -Wvector-operation-performance -Wuseless-cast -Wformat=2
+ -Wvector-operation-performance -Wuseless-cast -Wformat=2
 
 NEW_GCC_WARNINGS := -Wduplicated-cond -Wduplicated-branches -Wrestrict
 
@@ -22,19 +22,8 @@ ifeq ($(COMPILER), g++)
 WARNINGS := $(GCCWARNINGS)
 endif
 
-ifeq ($(UNAME), Darwin)
-COMPILER := clang++
-CCOMPILER := clang
-STD_LIB := -std=c++11 -stdlib=libc++
-WARNINGS := -Wall -ansi -pedantic
-ENGINE_LIB := libaether3d_osx_vulkan.a
-endif
-
 ifeq ($(UNAME), Linux)
-DEFINES := -msse3 -DSIMD_SSE3 -DDEBUG -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
-endif
-ifeq ($(UNAME), Darwin)
-DEFINES := -DRENDERER_VULKAN
+DEFINES := -msse3 -O3 -DSIMD_SSE3 -DDEBUG -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
 endif
 
 ifeq ($(OS),Windows_NT)
@@ -42,16 +31,12 @@ ENGINE_LIB := libaether3d_win_vulkan.a
 CCOMPILER := gcc
 WARNINGS := -Wall -ansi -pedantic
 OUTPUT_DIR := ..\..\aether3d_build
-DEFINES := -DRENDERER_VULKAN -DVK_USE_PLATFORM_WIN32_KHR
+DEFINES := -msse3 -O3 -DSIMD_SSE3 -DRENDERER_VULKAN -DVK_USE_PLATFORM_WIN32_KHR
 endif
 
 all:
 ifeq ($(OS),Windows_NT)
 	IF exist $(OUTPUT_DIR) ( echo building ) ELSE ( mkdir $(OUTPUT_DIR) )
-endif
-ifeq ($(UNAME), Darwin)
-	mkdir -p $(OUTPUT_DIR)
-	rm -f $(OUTPUT_DIR)/libaether3d_osx_vulkan.a
 endif
 ifeq ($(UNAME), Linux)
 	mkdir -p $(OUTPUT_DIR)
@@ -104,9 +89,6 @@ ifeq ($(OS),Windows_NT)
 endif
 	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
 ifeq ($(UNAME), Linux)
-	rm $(OUTPUT_DIR)/*.o
-endif
-ifeq ($(UNAME), Darwin)
 	rm $(OUTPUT_DIR)/*.o
 endif
 ifeq ($(OS),Windows_NT)

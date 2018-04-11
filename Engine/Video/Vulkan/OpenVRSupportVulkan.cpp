@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <cstring>
 #include <openvr.h>
 #include "CameraComponent.hpp"
 #include "GameObject.hpp"
@@ -92,8 +93,8 @@ void SetupDistortion()
     const short lensGridSegmentCountH = 43;
     const short lensGridSegmentCountV = 43;
 
-    const float w = (float)(1.0 / float( lensGridSegmentCountH - 1 ));
-    const float h = (float)(1.0 / float( lensGridSegmentCountV - 1 ));
+    const float w = (float)(1.0f / float( lensGridSegmentCountH - 1 ));
+    const float h = (float)(1.0f / float( lensGridSegmentCountV - 1 ));
 
     float u, v = 0;
 
@@ -440,7 +441,7 @@ void ae3d::VR::CalcEyePose()
     Global::validPoseCount = 0;
     Global::poseClasses = "";
 
-    for (int deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
+    for (unsigned deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
     {
         if (Global::trackedDevicePose[ deviceIndex ].bPoseIsValid)
         {
@@ -464,7 +465,7 @@ void ae3d::VR::CalcEyePose()
         }
     }
 
-    for (int deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
+    for (unsigned deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
     {
         if (Global::devClassChar[ deviceIndex ] == 'C' && Global::leftHandIndex == -1)
         {
@@ -520,7 +521,7 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float /*yawDegrees*/, int e
     camera.GetComponent< TransformComponent >()->SetVrView( view );
     camera.GetComponent< CameraComponent >()->SetProjection( projMat );
 
-    Global::vrFov = float( std::atan( Global::height / nearPlane ) ) * (180.0f / 3.14159265f);
+    Global::vrFov = std::atan( Global::height / nearPlane ) * (180.0f / 3.14159265f);
     //System::Print("vrFor: %f\n", Global::vrFov );
 }
 #endif

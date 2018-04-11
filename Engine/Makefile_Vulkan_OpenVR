@@ -3,13 +3,13 @@ OUTPUT_DIR := ../../aether3d_build
 UNAME := $(shell uname)
 COMPILER ?= g++
 CCOMPILER ?= gcc
-ENGINE_LIB := libaether3d_gl_linux.a
+ENGINE_LIB := libaether3d_linux_vulkan_openvr.a
 STD_LIB := -std=c++11
-INCLUDES := -IInclude -IVideo -ICore -IThirdParty
-GCCWARNINGS := -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
+INCLUDES := -IInclude -IVideo -ICore -IThirdParty -IThirdParty/headers
+GCCWARNINGS := -g -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
- -Wvector-operation-performance -Wuseless-cast -Wformat=2 
+ -Wvector-operation-performance -Wuseless-cast -Wformat=2
 
 NEW_GCC_WARNINGS := -Wduplicated-cond -Wduplicated-branches -Wrestrict
 
@@ -22,53 +22,45 @@ ifeq ($(COMPILER), g++)
 WARNINGS := $(GCCWARNINGS)
 endif
 
-ifeq ($(UNAME), Darwin)
-COMPILER := clang++
-CCOMPILER := clang
-STD_LIB := -std=c++11 -stdlib=libc++
-WARNINGS := -Wall -ansi -pedantic
-ENGINE_LIB := libaether3d_gl_osx.a
+ifeq ($(UNAME), Linux)
+DEFINES := -msse3 -O3 -DSIMD_SSE3 -DDEBUG -DAE3D_OPENVR -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
 endif
 
-DEFINES := -msse3 -O3 -DSIMD_SSE3 -DRENDERER_OPENGL -DDEBUG
-
 ifeq ($(OS),Windows_NT)
-ENGINE_LIB := libaether3d_gl_win.a
+ENGINE_LIB := libaether3d_win_vulkan_openvr.a
 CCOMPILER := gcc
 WARNINGS := -Wall -ansi -pedantic
 OUTPUT_DIR := ..\..\aether3d_build
+DEFINES := -DRENDERER_VULKAN -DSIMD_SSE3 -DAE3D_OPENVR -DVK_USE_PLATFORM_WIN32_KHR
 endif
 
 all:
 ifeq ($(OS),Windows_NT)
 	IF exist $(OUTPUT_DIR) ( echo building ) ELSE ( mkdir $(OUTPUT_DIR) )
 endif
-ifeq ($(UNAME), Darwin)
-	mkdir -p $(OUTPUT_DIR)
-	rm -f $(OUTPUT_DIR)/libaether3d_osx.a
-endif
 ifeq ($(UNAME), Linux)
 	mkdir -p $(OUTPUT_DIR)
-	rm -f $(OUTPUT_DIR)/libaether3d_gl_linux.a
+	rm -f $(OUTPUT_DIR)/libaether3d_linux_vulkan_openvr.a
 endif
-	$(CCOMPILER) $(INCLUDES) -c ThirdParty/GL/glxw.c -o $(OUTPUT_DIR)/glxw.o
 	$(CCOMPILER) -c ThirdParty/stb_image.c -o $(OUTPUT_DIR)/stb_image.o
 	$(CCOMPILER) -c ThirdParty/stb_vorbis.c -o $(OUTPUT_DIR)/stb_vorbis.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/GfxDeviceGL.cpp -o $(OUTPUT_DIR)/GfxDeviceGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/RenderTextureGL.cpp -o $(OUTPUT_DIR)/RenderTextureGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/RendererGL.cpp -o $(OUTPUT_DIR)/RendererGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/ComputeShaderGL.cpp -o $(OUTPUT_DIR)/ComputeShaderGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/ShaderGL.cpp -o $(OUTPUT_DIR)/ShaderGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/Texture2D_GL.cpp -o $(OUTPUT_DIR)/Texture2D_GL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/TextureCubeGL.cpp -o $(OUTPUT_DIR)/TextureCube.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/VertexBufferGL.cpp -o $(OUTPUT_DIR)/VertexBufferGL.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/DDSLoader.cpp -o $(OUTPUT_DIR)/DDSLoader.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/GfxDeviceVulkan.cpp -o $(OUTPUT_DIR)/GfxDeviceVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RenderTextureVulkan.cpp -o $(OUTPUT_DIR)/RenderTextureVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/RendererCommon.cpp -o $(OUTPUT_DIR)/RendererCommon.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/RendererVulkan.cpp -o $(OUTPUT_DIR)/RendererVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/ShaderVulkan.cpp -o $(OUTPUT_DIR)/ShaderVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/ComputeShaderVulkan.cpp -o $(OUTPUT_DIR)/ComputeShaderVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/Texture2DVulkan.cpp -o $(OUTPUT_DIR)/Texture2DVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/TextureCubeVulkan.cpp -o $(OUTPUT_DIR)/TextureCubeVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/VulkanUtils.cpp -o $(OUTPUT_DIR)/VulkanUtils.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/TextureCommon.cpp -o $(OUTPUT_DIR)/TextureCommon.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/VertexBufferVulkan.cpp -o $(OUTPUT_DIR)/VertexBufferVulkan.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/LightTilerVulkan.cpp -o $(OUTPUT_DIR)/LightTilerVulkan.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Material.cpp -o $(OUTPUT_DIR)/Material.o	
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/DDSLoader.cpp -o $(OUTPUT_DIR)/DDSLoader.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/DirectionalLightComponent.cpp -o $(OUTPUT_DIR)/DirectionalLightComponent.o	
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpotLightComponent.cpp -o $(OUTPUT_DIR)/SpotLightComponent.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/PointLightComponent.cpp -o $(OUTPUT_DIR)/PointLightComponentNull.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/PointLightComponent.cpp -o $(OUTPUT_DIR)/PointLightComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TransformComponent.cpp -o $(OUTPUT_DIR)/TransformComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/SpriteRendererComponent.cpp -o $(OUTPUT_DIR)/SpriteRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/AudioSourceComponent.cpp -o $(OUTPUT_DIR)/AudioSourceComponent.o
@@ -78,10 +70,10 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileWatcher.cpp -o $(OUTPUT_DIR)/FileWatcher.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Mesh.cpp -o $(OUTPUT_DIR)/Mesh.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/MathUtil.cpp -o $(OUTPUT_DIR)/MathUtil.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Statistics.cpp -o $(OUTPUT_DIR)/Statistics.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Font.cpp -o $(OUTPUT_DIR)/Font.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioClip.cpp -o $(OUTPUT_DIR)/AudioClip.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/MathUtil.cpp -o $(OUTPUT_DIR)/MathUtil.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Statistics.cpp -o $(OUTPUT_DIR)/Statistics.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/AudioSystemOpenAL.cpp -o $(OUTPUT_DIR)/AudioSystemOpenAL.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/FileSystem.cpp -o $(OUTPUT_DIR)/FileSystem.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/MatrixSSE3.cpp -o $(OUTPUT_DIR)/MatrixSSE3.o
@@ -89,25 +81,18 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Scene.cpp -o $(OUTPUT_DIR)/Scene.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/Frustum.cpp -o $(OUTPUT_DIR)/Frustum.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Core/System.cpp -o $(OUTPUT_DIR)/System.o
-ifeq ($(UNAME), Darwin)
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/WindowOSX_GL.mm -o $(OUTPUT_DIR)/Window.o
-endif
 ifeq ($(UNAME), Linux)
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowXCB.cpp -o $(OUTPUT_DIR)/Window.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/Vulkan/OpenVRSupportVulkan.cpp -o $(OUTPUT_DIR)/OpenVRSupportVulkan.o
 endif
 ifeq ($(OS),Windows_NT)
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/WindowWin32.cpp -o $(OUTPUT_DIR)/Window.o
-	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Video/OGL/WindowWin32GL.cpp -o $(OUTPUT_DIR)/WindowGL.o
 endif
 	ar rcs $(OUTPUT_DIR)/$(ENGINE_LIB) $(OUTPUT_DIR)/*.o
 ifeq ($(UNAME), Linux)
 	rm $(OUTPUT_DIR)/*.o
 endif
-ifeq ($(UNAME), Darwin)
-	rm $(OUTPUT_DIR)/*.o
-endif
 ifeq ($(OS),Windows_NT)
 	del $(OUTPUT_DIR)\*.o
 endif
-
 
