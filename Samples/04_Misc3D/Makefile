@@ -3,7 +3,8 @@ COMPILER ?= g++
 ENGINE_LIB := libaether3d_gl_linux.a
 LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
 VULKAN_LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lvulkan -lopenal
-LIB_PATH := -L.
+VULKAN_LINKER_OPENVR := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lvulkan -lopenal -lopenvr
+LIB_PATH := -L. -L../../Engine/ThirdParty/lib
 
 ifeq ($(UNAME), Darwin)
 COMPILER := clang++ --stdlib=libc++ -DAETHER3D_UNIX
@@ -32,3 +33,8 @@ endif
 vulkan:
 	mkdir -p ../../../aether3d_build/Samples
 	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -I../../Engine/ThirdParty -I../../Engine/Include Misc3D.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/Misc3D_vulkan $(VULKAN_LINKER)
+
+vulkan_openvr:
+	mkdir -p ../../../aether3d_build/Samples
+	$(COMPILER) -DRENDERER_VULKAN -DAE3D_OPENVR $(WARNINGS) $(LIB_PATH) -I../../Engine/ThirdParty -I../../Engine/Include Misc3D.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan_openvr.a -o ../../../aether3d_build/Samples/Misc3D_vulkan_openvr $(VULKAN_OPENVR_LINKER)
+
