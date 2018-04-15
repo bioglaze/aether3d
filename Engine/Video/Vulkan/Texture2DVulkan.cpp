@@ -16,9 +16,6 @@
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
-void Tokenize( const std::string& str,
-               std::vector< std::string >& tokens,
-               const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
 
 namespace MathUtil
 {
@@ -170,7 +167,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageCreateInfo.extent = { static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height), 1 };
+    imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
     imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
     VkResult err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
@@ -196,7 +193,6 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
 
     VkBuffer stagingBuffer = VK_NULL_HANDLE;
-    VkDeviceMemory stagingMemory = VK_NULL_HANDLE;
 
     VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
     VkDeviceSize bc1Size = (width / 4) * (height / 4) * bc1BlockSize;
@@ -214,6 +210,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     memAllocInfo.allocationSize = memReqs.size;
     memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+    VkDeviceMemory stagingMemory = VK_NULL_HANDLE;
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
 
@@ -343,29 +340,6 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
         vkCmdBlitImage( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_GENERAL, image,
             VK_IMAGE_LAYOUT_GENERAL, 1, &imageBlit, VK_FILTER_LINEAR );
-    }
-
-    if (mipLevelCount == 1)
-    {
-        imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        imageMemoryBarrier.pNext = nullptr;
-        imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-        imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-        imageMemoryBarrier.srcAccessMask = 0;
-        imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-        imageMemoryBarrier.image = image;
-        imageMemoryBarrier.subresourceRange = range;
-
-        vkCmdPipelineBarrier(
-            GfxDeviceGlobal::texCmdBuffer,
-            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-            VK_PIPELINE_STAGE_TRANSFER_BIT,
-            0,
-            0, nullptr,
-            0, nullptr,
-            1, &imageMemoryBarrier );
     }
 
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
