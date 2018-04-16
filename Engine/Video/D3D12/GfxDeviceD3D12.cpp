@@ -600,7 +600,8 @@ void CreateRootSignature()
         ID3DBlob* pOutBlob = nullptr;
         ID3DBlob* pErrorBlob = nullptr;
         HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
-        
+		AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
+
         hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignatureGraphics ) );
         AE3D_CHECK_D3D( hr, "Failed to create root signature" );
         GfxDeviceGlobal::rootSignatureGraphics->SetName( L"Graphics Root Signature" );

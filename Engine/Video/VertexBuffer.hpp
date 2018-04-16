@@ -79,6 +79,10 @@ namespace ae3d
             Vec3 normal;
         };
 
+#if RENDERER_VULKAN
+		VertexBuffer() : bindingDescriptions(), attributeDescriptions() {}
+#endif
+
 #if RENDERER_D3D12
         /// Return Stride in bytes.
         unsigned GetStride() const;
