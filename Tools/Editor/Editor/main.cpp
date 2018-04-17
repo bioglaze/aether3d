@@ -22,7 +22,7 @@ int main()
     System::Print( "window size: %dx%d\n", winWidth, winHeight );
 
     SceneView sceneView;
-    sceneView.Init();
+    sceneView.Init( width, height );
 
     while (Window::IsOpen() && !quit)
     {

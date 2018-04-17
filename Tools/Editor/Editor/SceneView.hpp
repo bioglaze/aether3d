@@ -5,7 +5,7 @@
 class SceneView
 {
 public:
-    void Init();
+    void Init( int width, int height );
     void Render();
 
 private:
