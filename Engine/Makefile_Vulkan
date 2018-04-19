@@ -8,7 +8,7 @@ STD_LIB := -std=c++11
 INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 GCCWARNINGS := -g -Wall -pedantic -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
  -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
- -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wtrampolines \
+ -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wtrampolines \
  -Wvector-operation-performance -Wuseless-cast -Wformat=2
 
 NEW_GCC_WARNINGS := -Wduplicated-cond -Wduplicated-branches -Wrestrict

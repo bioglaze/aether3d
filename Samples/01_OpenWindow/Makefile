@@ -2,7 +2,7 @@ UNAME := $(shell uname)
 COMPILER ?= g++
 ENGINE_LIB := libaether3d_gl_linux.a
 LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lGL -lopenal
-VULKAN_LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lopenal -ltalvos-vulkan
+VULKAN_LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11 -lopenal -lvulkan
 LIB_PATH := -L.
 
 ifeq ($(UNAME), Darwin)

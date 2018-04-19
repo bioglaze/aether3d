@@ -1,6 +1,7 @@
 #include "SceneView.hpp"
 #include "CameraComponent.hpp"
 #include "GameObject.hpp"
+#include "MeshRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "Vec3.hpp"
 
@@ -15,6 +16,23 @@ void SceneView::Init( int width, int height )
     camera.AddComponent<TransformComponent>();
 
     scene.Add( &camera );
+
+    unlitShader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
+                      "unlitVert", "unlitFrag",
+                      FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
+                      FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+
+    // Test content
+    
+    gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+
+    material.SetShader( &unlitShader );
+    material.SetTexture( "textureMap", &gliderTex );
+    material.SetBackFaceCulling( true );
+
+    cube.AddComponent< MeshRendererComponent >();
+    cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+
 }
 
 void SceneView::Render()
