@@ -10,10 +10,12 @@ using namespace ae3d;
 void SceneView::Init( int width, int height )
 {
     camera.AddComponent< CameraComponent >();
-    camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
+    camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
     camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera.AddComponent<TransformComponent>();
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
     scene.Add( &camera );
 
@@ -30,9 +32,15 @@ void SceneView::Init( int width, int height )
     material.SetTexture( "textureMap", &gliderTex );
     material.SetBackFaceCulling( true );
 
+    cubeMesh.Load( FileSystem::FileContents( "cube.ae3d" ) );
+    
     cube.AddComponent< MeshRendererComponent >();
+    cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-
+    cube.AddComponent< TransformComponent >();
+    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
+    cube.SetName( "cube" );
+    scene.Add( &cube );
 }
 
 void SceneView::Render()

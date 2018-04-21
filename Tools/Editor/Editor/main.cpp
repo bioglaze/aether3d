@@ -11,15 +11,10 @@ int main()
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
-    Window::GetSize( width, height );
     System::LoadBuiltinAssets();
 
     bool quit = false;   
     double x = 0, y = 0;
-    
-    int winWidth, winHeight;
-    Window::GetSize( winWidth, winHeight );
-    System::Print( "window size: %dx%d\n", winWidth, winHeight );
 
     SceneView sceneView;
     sceneView.Init( width, height );

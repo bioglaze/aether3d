@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.hpp"
 #include "FileSystem.hpp"
+#include "Mesh.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
@@ -21,4 +22,5 @@ private:
     ae3d::GameObject cube;
     ae3d::Texture2D gliderTex;
     ae3d::Material material;
+    ae3d::Mesh cubeMesh;
 };
