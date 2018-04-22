@@ -20,7 +20,7 @@ void SceneView::Init( int width, int height )
     scene.Add( &camera );
 
     unlitShader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
-                      "unlitVert", "unlitFrag",
+                      "unlit_vertex", "unlit_fragment",
                       FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
                       FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 

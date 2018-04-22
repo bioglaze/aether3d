@@ -152,14 +152,14 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float3 vecToLightWS = center.xyz - in.positionWS.xyz;
         const float3 lightDirVS = normalize( vecToLightVS );
         
-        const float dotNL = clamp( dot( normalize( in.normalVS ), lightDirVS ), 0.0, 1.0 );
+        const float dotNL = clamp( dot( normalize( in.normalVS ), lightDirVS ), 0.0f, 1.0f );
         const float lightDistance = length( vecToLightWS );
         float falloff = 1;
         
         if (lightDistance < radius)
         {
             float x = lightDistance / radius;
-            falloff = -0.05 + 1.05 / (1.0 + 5.0 * x * x);
+            falloff = -0.05f + 1.05f / (1.0f + 5.0f * x * x);
             //outColor.rgb += max( 0.0, dotNL );// * falloff;
             outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * falloff;
         }

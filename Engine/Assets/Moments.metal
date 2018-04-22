@@ -26,7 +26,7 @@ vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
     
     float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms.localToClip * in_position;
-    out.position.z = out.position.z * 0.5 + 0.5; // -1..1 to 0..1 conversion
+    out.position.z = out.position.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
     return out;
 }
 
@@ -39,7 +39,7 @@ fragment float4 moments_fragment( ColorInOut in [[stage_in]] )
     
     float moment1 = linearDepth;
     // Compute second moment over the pixel extents.
-    float moment2 = linearDepth * linearDepth + 0.25 * (dx * dx + dy * dy);
+    float moment2 = linearDepth * linearDepth + 0.25f * (dx * dx + dy * dy);
 
     return float4( moment1, moment2, 0.0, 0.0 );
 }

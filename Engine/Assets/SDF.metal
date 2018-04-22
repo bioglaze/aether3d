@@ -44,7 +44,7 @@ fragment half4 sdf_fragment( ColorInOut in [[stage_in]],
 {
     const float edgeDistance = 0.5;
     float distance = half4(texture.sample(s, in.texCoords)).r;
-    float edgeWidth = 0.7 * length( float2( dfdx( distance ), dfdy( distance ) ) );
+    float edgeWidth = 0.7f * length( float2( dfdx( distance ), dfdy( distance ) ) );
     float opacity = smoothstep( edgeDistance - edgeWidth, edgeDistance + edgeWidth, distance );
 
     return half4( in.color.rgb, opacity );

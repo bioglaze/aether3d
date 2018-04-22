@@ -12,6 +12,12 @@
 		AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB010CE0206F70B40014ED08 /* Assets.xcassets */; };
 		AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB010CE2206F70B40014ED08 /* Main.storyboard */; };
 		AB010CE7206F70B40014ED08 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AB010CE6206F70B40014ED08 /* main.m */; };
+		AB1C97DB207D0D5C00777794 /* FullscreenTriangle.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB1C97DA207D0D5C00777794 /* FullscreenTriangle.metal */; };
+		ABB3603D208C4F05007133FD /* SceneView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB3603C208C4F05007133FD /* SceneView.cpp */; };
+		ABB36040208C4F83007133FD /* cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABB3603E208C4F83007133FD /* cube.ae3d */; };
+		ABB36041208C4F83007133FD /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABB3603F208C4F83007133FD /* glider.png */; };
+		ABB36043208C5244007133FD /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB36042208C5244007133FD /* Metal.framework */; };
+		ABB36045208C529B007133FD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB36044208C529B007133FD /* AppKit.framework */; };
 		ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */; };
 		ABD0C8BA2070B34C0049EEAE /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B92070B34C0049EEAE /* OpenAL.framework */; };
 		ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8BB2070B3550049EEAE /* MetalKit.framework */; };
@@ -36,6 +42,13 @@
 		AB010CE5206F70B40014ED08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB010CE6206F70B40014ED08 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AB010CE8206F70B40014ED08 /* Editor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Editor.entitlements; sourceTree = "<group>"; };
+		AB1C97DA207D0D5C00777794 /* FullscreenTriangle.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = FullscreenTriangle.metal; path = ../../../../Engine/Assets/FullscreenTriangle.metal; sourceTree = "<group>"; };
+		ABB3603B208C4F05007133FD /* SceneView.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SceneView.hpp; sourceTree = SOURCE_ROOT; };
+		ABB3603C208C4F05007133FD /* SceneView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneView.cpp; sourceTree = SOURCE_ROOT; };
+		ABB3603E208C4F83007133FD /* cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = cube.ae3d; path = ../../../../../aether3d_build/Samples/cube.ae3d; sourceTree = "<group>"; };
+		ABB3603F208C4F83007133FD /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
+		ABB36042208C5244007133FD /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		ABB36044208C529B007133FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		ABD0C8992070B2090049EEAE /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../../../../Engine/Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 		ABD0C89A2070B2090049EEAE /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../../../Engine/Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		ABD0C89B2070B2090049EEAE /* SpriteRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpriteRendererComponent.hpp; path = ../../../../Engine/Include/SpriteRendererComponent.hpp; sourceTree = "<group>"; };
@@ -84,9 +97,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABB36045208C529B007133FD /* AppKit.framework in Frameworks */,
+				ABB36043208C5244007133FD /* Metal.framework in Frameworks */,
+				ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */,
 				ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */,
 				ABD0C8BA2070B34C0049EEAE /* OpenAL.framework in Frameworks */,
-				ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,10 +131,14 @@
 		AB010CD3206F70B40014ED08 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
+				ABB3603E208C4F83007133FD /* cube.ae3d */,
+				ABB3603F208C4F83007133FD /* glider.png */,
 				AB010CD4206F70B40014ED08 /* AppDelegate.h */,
 				AB010CD5206F70B40014ED08 /* AppDelegate.m */,
 				AB010CDA206F70B40014ED08 /* GameViewController.h */,
 				AB010CDB206F70B40014ED08 /* GameViewController.mm */,
+				ABB3603C208C4F05007133FD /* SceneView.cpp */,
+				ABB3603B208C4F05007133FD /* SceneView.hpp */,
 				AB010CE0206F70B40014ED08 /* Assets.xcassets */,
 				AB010CE2206F70B40014ED08 /* Main.storyboard */,
 				AB010CE5206F70B40014ED08 /* Info.plist */,
@@ -168,6 +187,8 @@
 		ABD0C8B82070B34C0049EEAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ABB36044208C529B007133FD /* AppKit.framework */,
+				ABB36042208C5244007133FD /* Metal.framework */,
 				ABD0C8BB2070B3550049EEAE /* MetalKit.framework */,
 				ABD0C8B92070B34C0049EEAE /* OpenAL.framework */,
 			);
@@ -178,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				ABE44D162077C7EF00DF1BAF /* DepthNormals.metal */,
+				AB1C97DA207D0D5C00777794 /* FullscreenTriangle.metal */,
 				ABE44D0E2077C7EF00DF1BAF /* LightCuller.metal */,
 				ABE44D152077C7EF00DF1BAF /* Moments.metal */,
 				ABE44D112077C7EF00DF1BAF /* SDF.metal */,
@@ -248,6 +270,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABB36041208C4F83007133FD /* glider.png in Resources */,
+				ABB36040208C4F83007133FD /* cube.ae3d in Resources */,
 				AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */,
 				AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */,
 			);
@@ -262,6 +286,7 @@
 			files = (
 				ABE44D182077C7EF00DF1BAF /* Skybox.metal in Sources */,
 				ABE44D1B2077C7EF00DF1BAF /* SpriteShader.metal in Sources */,
+				AB1C97DB207D0D5C00777794 /* FullscreenTriangle.metal in Sources */,
 				AB010CE7206F70B40014ED08 /* main.m in Sources */,
 				ABE44D1D2077C7EF00DF1BAF /* Moments.metal in Sources */,
 				ABE44D1C2077C7EF00DF1BAF /* Unlit.metal in Sources */,
@@ -271,6 +296,7 @@
 				ABE44D192077C7EF00DF1BAF /* Standard.metal in Sources */,
 				AB010CD6206F70B40014ED08 /* AppDelegate.m in Sources */,
 				ABE44D1A2077C7EF00DF1BAF /* SDF.metal in Sources */,
+				ABB3603D208C4F05007133FD /* SceneView.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,9 +425,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
 				CODE_SIGN_ENTITLEMENTS = macOS/Editor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
@@ -417,9 +445,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
 				CODE_SIGN_ENTITLEMENTS = macOS/Editor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
