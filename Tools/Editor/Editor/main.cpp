@@ -31,6 +31,8 @@ int main()
             if (event.type == WindowEventType::Close)
             {
                 quit = true;
+				System::Deinit();
+				return 0;
             }
             
             if (event.type == WindowEventType::KeyDown ||
