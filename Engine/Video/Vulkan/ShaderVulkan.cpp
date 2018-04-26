@@ -31,7 +31,7 @@ namespace ShaderGlobal
 
 void ae3d::Shader::DestroyShaders()
 {
-    for (std::size_t moduleIndex = 0; moduleIndex < ShaderGlobal::moduleIndex; ++moduleIndex)
+    for (int moduleIndex = 0; moduleIndex < ShaderGlobal::moduleIndex; ++moduleIndex)
     {
         vkDestroyShaderModule( GfxDeviceGlobal::device, ShaderGlobal::modulesToReleaseAtExit[ moduleIndex ], nullptr );
     }

@@ -19,7 +19,7 @@ compiler:
   - gcc
 script:
   - cd Engine
-  - make -f Makefile_OpenGL
+  - make -f Makefile_Vulkan
   - cd ../Tools/OBJ_Converter
   - make
   - make -f Makefile_mtl
@@ -40,6 +40,5 @@ script:
   - cd ../NuklearTest
   - make
   - cd ../../Engine
-  - make -f Makefile_Vulkan
   - cd ../Tools/Editor
 
