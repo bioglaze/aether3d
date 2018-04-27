@@ -299,6 +299,9 @@ int main()
         Window::SwapBuffers();
     }
 
+	nk_font_atlas_clear( &atlas );
+	nk_free( &ctx );
+
     System::Deinit();
 	return 0;
 }

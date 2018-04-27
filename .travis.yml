@@ -6,12 +6,12 @@ sudo: required
 dist: trusty
 
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev
-#  - wget -O vulkansdk-linux-x86_64-1.1.70.1.run https://vulkan.lunarg.com/sdk/download/1.1.70.1/linux/vulkansdk-linux-x86_64-1.1.70.1.run
-#  - chmod ugo+x vulkansdk-linux-x86_64-1.1.70.1.run
-#  - ./vulkansdk-linux-x86_64-1.1.70.1.run
-#  - export VULKAN_SDK=$TRAVIS_BUILD_DIR/VulkanSDK/1.1.70.1/x86_64  
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get -qq update; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev; fi
+  - wget -O vulkansdk-linux-x86_64-1.1.73.0.run https://vulkan.lunarg.com/sdk/download/1.1.73.0/linux/vulkansdk-linux-x86_64-1.1.73.0.run
+  - chmod ugo+x vulkansdk-linux-x86_64-1.1.73.0.run
+  - ./vulkansdk-linux-x86_64-1.1.73.0.run
+  - export VULKAN_SDK=$TRAVIS_BUILD_DIR/VulkanSDK/1.1.73.0/x86_64  
 
 language: cpp
 compiler:
@@ -34,11 +34,11 @@ script:
   - cd ../../Samples/01_OpenWindow
   - make
   - cd ../03_Misc2D
-  - make
+  - make vulkan
   - cd ../04_Misc3D
-  - make
+  - make vulkan
   - cd ../NuklearTest
-  - make
+  - make vulkan
   - cd ../../Engine
   - cd ../Tools/Editor
 
