@@ -27,8 +27,8 @@ endif
 ifneq ($(OS),Windows_NT)
 	mkdir -p ../../../aether3d_build/Samples
 endif
-	$(COMPILER) -DRENDERER_OPENGL -O3 $(WARNINGS) $(LIB_PATH) -I../../Engine/Include NuklearTest.cpp -std=c++11 ../../../aether3d_build/$(ENGINE_LIB) -o ../../../aether3d_build/Samples/NuklearTest_gl $(LINKER)
+	$(COMPILER) -DRENDERER_OPENGL $(WARNINGS) $(LIB_PATH) -I../../Engine/Include NuklearTest.cpp -std=c++11 ../../../aether3d_build/$(ENGINE_LIB) -o ../../../aether3d_build/Samples/NuklearTest_gl $(LINKER)
 
 vulkan:
 	mkdir -p ../../../aether3d_build/Samples
-	$(COMPILER) -DRENDERER_VULKAN -O3 $(WARNINGS) $(LIB_PATH) -I../../Engine/ThirdParty -I../../Engine/Include NuklearTest.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/NuklearTest_vulkan $(VULKAN_LINKER)
+	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -I../../Engine/ThirdParty -I../../Engine/Include NuklearTest.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/NuklearTest_vulkan $(VULKAN_LINKER)

@@ -32,7 +32,7 @@ void SceneView::Init( int width, int height )
     material.SetTexture( "textureMap", &gliderTex );
     material.SetBackFaceCulling( true );
 
-    cubeMesh.Load( FileSystem::FileContents( "cube.ae3d" ) );
+    cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
