@@ -7,7 +7,7 @@ dist: trusty
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get -qq update; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev libvulkan-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev; fi
     # - wget -O vulkansdk-linux-x86_64-1.1.73.0.run https://vulkan.lunarg.com/sdk/download/1.1.73.0/linux/vulkansdk-linux-x86_64-1.1.73.0.run
     # - chmod ugo+x vulkansdk-linux-x86_64-1.1.73.0.run
     # - ./vulkansdk-linux-x86_64-1.1.73.0.run

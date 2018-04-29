@@ -33,7 +33,7 @@ float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float d
     
     float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
     
-    float variance = max( moments.y - moments.x * moments.x, -0.001 );
+    float variance = max( moments.y - moments.x * moments.x, -0.001f );
 
     float delta = depth - moments.x;
     float p = smoothstep( depth - 0.02f, depth, moments.x );
