@@ -328,64 +328,8 @@ void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
     }
 }
 
-void ae3d::Scene::Render()
+void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
 {
-#if RENDERER_OPENGL
-    Statistics::BeginFrameTimeProfiling();
-#endif
-#if RENDERER_VULKAN
-    GfxDevice::BeginFrame();
-#endif
-    GenerateAABB();
-#if RENDERER_D3D12
-    GfxDevice::ResetCommandList();
-#endif
-    Statistics::ResetFrameStatistics();
-    TransformComponent::UpdateLocalMatrices();
-
-    std::vector< GameObject* > rtCameras;
-    rtCameras.reserve( gameObjects.size() / 4 );
-    std::vector< GameObject* > cameras;
-    cameras.reserve( gameObjects.size() / 4 );
-    
-    for (auto gameObject : gameObjects)
-    {
-        if (gameObject == nullptr || !gameObject->IsEnabled())
-        {
-            continue;
-        }
-
-        auto cameraComponent = gameObject->GetComponent<CameraComponent>();
-        
-        if (cameraComponent && cameraComponent->GetTargetTexture() != nullptr && gameObject->GetComponent<TransformComponent>())
-        {
-            rtCameras.push_back( gameObject );
-        }
-        if (cameraComponent && cameraComponent->GetTargetTexture() == nullptr && gameObject->GetComponent<TransformComponent>())
-        {
-            cameras.push_back( gameObject );
-        }
-    }
-#if RENDERER_VULKAN
-    if (cameras.empty())
-    {
-        GfxDevice::BeginRenderPassAndCommandBuffer();
-        GfxDevice::EndRenderPassAndCommandBuffer();
-    }
-#endif
-
-    auto cameraSortFunction = [](GameObject* g1, GameObject* g2) { return g1->GetComponent< CameraComponent >()->GetRenderOrder() <
-        g2->GetComponent< CameraComponent >()->GetRenderOrder(); };
-    std::sort( std::begin( cameras ), std::end( cameras ), cameraSortFunction );
-
-	RenderDepthAndNormalsForAllCameras( rtCameras );
-	RenderRTCameras( rtCameras );
-	RenderDepthAndNormalsForAllCameras( cameras );
-
-#if RENDERER_VULKAN
-    GfxDevice::BeginRenderPassAndCommandBuffer();
-#endif
-
     for (auto camera : cameras)
     {
         bool hasShadow = false;
@@ -394,6 +338,10 @@ void ae3d::Scene::Render()
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
 
+            GfxDeviceGlobal::perObjectUboStruct.lightType = 0;
+
+            // Shadow pass
+
             if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
             {
                 auto cameraPos = cameraTransform->GetWorldPosition();
@@ -401,14 +349,7 @@ void ae3d::Scene::Render()
 
                 AudioSystem::SetListenerPosition( cameraPos.x, cameraPos.y, cameraPos.z );
                 AudioSystem::SetListenerOrientation( cameraDir.x, cameraDir.y, cameraDir.z );
-            }
 
-            GfxDeviceGlobal::perObjectUboStruct.lightType = 0;
-
-            // Shadow pass
-
-            if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
-            {
                 for (auto go : gameObjects)
                 {
                     if (!go || !go->IsEnabled())
@@ -533,21 +474,79 @@ void ae3d::Scene::Render()
             GfxDeviceGlobal::perObjectUboStruct.minAmbient = 1;
         }
 #endif
-#if !RENDERER_METAL
-        RenderWithCamera( camera, 0, "Primary Pass" );
-#endif
     }
+}
+
+void ae3d::Scene::Render()
+{
+#if RENDERER_OPENGL
+    Statistics::BeginFrameTimeProfiling();
+#endif
+#if RENDERER_VULKAN
+    GfxDevice::BeginFrame();
+#endif
+    GenerateAABB();
+#if RENDERER_D3D12
+    GfxDevice::ResetCommandList();
+#endif
+    Statistics::ResetFrameStatistics();
+    TransformComponent::UpdateLocalMatrices();
+
+    std::vector< GameObject* > rtCameras;
+    rtCameras.reserve( gameObjects.size() / 4 );
+    std::vector< GameObject* > cameras;
+    cameras.reserve( gameObjects.size() / 4 );
+    
+    for (auto gameObject : gameObjects)
+    {
+        if (gameObject == nullptr || !gameObject->IsEnabled())
+        {
+            continue;
+        }
+
+        auto cameraComponent = gameObject->GetComponent<CameraComponent>();
+        
+        if (cameraComponent && cameraComponent->GetTargetTexture() != nullptr && gameObject->GetComponent<TransformComponent>())
+        {
+            rtCameras.push_back( gameObject );
+        }
+        if (cameraComponent && cameraComponent->GetTargetTexture() == nullptr && gameObject->GetComponent<TransformComponent>())
+        {
+            cameras.push_back( gameObject );
+        }
+    }
+#if RENDERER_VULKAN
+    if (cameras.empty())
+    {
+        GfxDevice::BeginRenderPassAndCommandBuffer();
+        GfxDevice::EndRenderPassAndCommandBuffer();
+    }
+#endif
+
+    auto cameraSortFunction = [](GameObject* g1, GameObject* g2) { return g1->GetComponent< CameraComponent >()->GetRenderOrder() <
+        g2->GetComponent< CameraComponent >()->GetRenderOrder(); };
+    std::sort( std::begin( cameras ), std::end( cameras ), cameraSortFunction );
+
+    RenderShadowMaps( rtCameras );
+    RenderDepthAndNormalsForAllCameras( rtCameras );
+    RenderRTCameras( rtCameras );
+    RenderDepthAndNormalsForAllCameras( cameras );
+
+#if RENDERER_VULKAN
+    GfxDevice::BeginRenderPassAndCommandBuffer();
+#endif
+
 #if RENDERER_METAL
     GfxDevice::BeginBackBufferEncoding();
-    
+#endif    
     for (auto camera : cameras)
     {
         RenderWithCamera( camera, 0, "Primary Pass" );
     }
-#endif
+    
     GfxDevice::SetRenderTarget( nullptr, 0 );
 #if RENDERER_D3D12
-	GfxDevice::ClearScreen( GfxDevice::ClearFlags::Depth );
+    GfxDevice::ClearScreen( GfxDevice::ClearFlags::Depth );
 #endif
 }
 

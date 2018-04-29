@@ -531,7 +531,7 @@ int main()
 #ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
 #endif
-    //scene.Add( &spotLight );
+    scene.Add( &spotLight );
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );

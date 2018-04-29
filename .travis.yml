@@ -7,13 +7,13 @@ dist: trusty
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get -qq update; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev; fi
-  - wget -O vulkansdk-linux-x86_64-1.1.73.0.run https://vulkan.lunarg.com/sdk/download/1.1.73.0/linux/vulkansdk-linux-x86_64-1.1.73.0.run
-  - chmod ugo+x vulkansdk-linux-x86_64-1.1.73.0.run
-  - ./vulkansdk-linux-x86_64-1.1.73.0.run
-  - export VULKAN_SDK=$TRAVIS_BUILD_DIR/VulkanSDK/1.1.73.0/x86_64  
-  - export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
-  - export VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -y libopenal-dev libx11-xcb-dev libxcb1-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-keysyms1-dev libvulkan-dev; fi
+    # - wget -O vulkansdk-linux-x86_64-1.1.73.0.run https://vulkan.lunarg.com/sdk/download/1.1.73.0/linux/vulkansdk-linux-x86_64-1.1.73.0.run
+    # - chmod ugo+x vulkansdk-linux-x86_64-1.1.73.0.run
+    # - ./vulkansdk-linux-x86_64-1.1.73.0.run
+    # - export VULKAN_SDK=$TRAVIS_BUILD_DIR/VulkanSDK/1.1.73.0/x86_64  
+    # - export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
+    #  - export VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d
 
 language: cpp
 compiler:
@@ -33,14 +33,14 @@ script:
   - make
   - ./01_Math
   - ./01_MathSSE
-  - cd ../../Samples/01_OpenWindow
-  - make
-  - cd ../03_Misc2D
-  - make vulkan
-  - cd ../04_Misc3D
-  - make vulkan
-  - cd ../NuklearTest
-  - make vulkan
+    #- cd ../../Samples/01_OpenWindow
+    #- make
+    #- cd ../03_Misc2D
+    #- make vulkan
+    #- cd ../04_Misc3D
+    #- make vulkan
+    #- cd ../NuklearTest
+    #- make vulkan
   - cd ../../Engine
   - cd ../Tools/Editor
 

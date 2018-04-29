@@ -53,6 +53,7 @@ namespace ae3d
     private:
         void RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const char* debugGroupName );
         void RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace );
+        void RenderShadowMaps( std::vector< GameObject* >& cameras );
         void RenderRTCameras( std::vector< GameObject* >& rtCameras );
         void RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >& cameras );
         void RenderDepthAndNormals( class CameraComponent* camera, const struct Matrix44& view, std::vector< unsigned > gameObjectsWithMeshRenderer,
