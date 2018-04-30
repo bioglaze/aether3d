@@ -45,7 +45,17 @@ void SceneView::Init( int width, int height )
 
 void SceneView::Render()
 {
+    camera.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
+    camera.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
+    camera.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+
     scene.Render();
     //DrawNuklear( &ctx, &cmds, width, height );
     scene.EndFrame();
+}
+
+void SceneView::RotateCamera( float xDegrees, float yDegrees )
+{
+    camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), xDegrees );
+    camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), yDegrees );
 }

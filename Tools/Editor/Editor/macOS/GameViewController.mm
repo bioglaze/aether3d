@@ -40,8 +40,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-    //camera3d.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( theEvent.deltaX ) / 20 );
-    //camera3d.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( theEvent.deltaY ) / 20 );
+    sceneView.RotateCamera( -float( theEvent.deltaX ) / 20, -float( theEvent.deltaY ) / 20 );
 }
 
 - (void)_render
