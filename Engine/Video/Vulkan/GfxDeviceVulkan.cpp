@@ -1304,7 +1304,7 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
-        const int AE3D_DESCRIPTOR_SETS_COUNT = 550;
+        const int AE3D_DESCRIPTOR_SETS_COUNT = 1550;
 
         const std::uint32_t typeCount = 11;
         VkDescriptorPoolSize typeCounts[ typeCount ];
@@ -2160,11 +2160,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMapFace*/ )
 {
-    if (!target)
-    {
-        //target = &GfxDeviceGlobal::hdrTarget;
-    }
-
     GfxDeviceGlobal::currentCmdBuffer = target ? GfxDeviceGlobal::offscreenCmdBuffer : GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
     GfxDeviceGlobal::renderTexture0 = target;
     GfxDeviceGlobal::frameBuffer0 = target ? target->GetFrameBuffer() : VK_NULL_HANDLE;

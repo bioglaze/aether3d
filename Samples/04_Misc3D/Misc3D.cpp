@@ -1,5 +1,6 @@
 #include <string>
 #include <cmath>
+#include <cstdint>
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
@@ -37,25 +38,28 @@
 
 using namespace ae3d;
 
+// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
+// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+struct pcg32_random_t
+{
+    std::uint64_t state;
+    std::uint64_t inc;
+};
+
+std::uint32_t pcg32_random_r( pcg32_random_t* rng )
+{
+    std::uint64_t oldstate = rng->state;
+    rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
+    std::uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+    std::uint32_t rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
+pcg32_random_t rng;
+
 int Random100()
 {
-    constexpr int A = 5;
-    constexpr int C = 3;
-
-    static int prev = 1;
-
-    // Hack to prevent lights wandering off
-    static int iterations = 0;
-    ++iterations;
-    
-    if (iterations == 600)
-    {
-        iterations = 0;
-        prev = 1;
-    }
-    
-    prev = (A * prev + C) % 101;
-    return prev;
+    return pcg32_random_r( &rng );
 }
 
 int main()
@@ -409,7 +413,6 @@ int main()
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
-                //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 2, -4, -100 + (float)col * 2 ) );
                 pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -12, -150 + (float)col * 4 ) );
 
                 scene.Add( &pointLights[ pointLightIndex ] );
