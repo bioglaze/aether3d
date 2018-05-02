@@ -31,8 +31,13 @@ endif
 	$(COMPILER) -DRENDERER_OPENGL $(WARNINGS) $(LIB_PATH) -I../../Engine/Include Misc3D.cpp -std=c++11 ../../../aether3d_build/$(ENGINE_LIB) -o ../../../aether3d_build/Samples/Misc3D_gl $(LINKER)
 
 vulkan:
+ifneq ($(OS),Windows_NT)
 	mkdir -p ../../../aether3d_build/Samples
 	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -I../../Engine/ThirdParty -I../../Engine/Include Misc3D.cpp -std=c++11 ../../../aether3d_build/libaether3d_linux_vulkan.a -o ../../../aether3d_build/Samples/Misc3D_vulkan $(VULKAN_LINKER)
+endif
+ifeq ($(OS),Windows_NT)
+	$(COMPILER) -DRENDERER_VULKAN $(WARNINGS) $(LIB_PATH) -L$(VULKAN_SDK)/Lib -I../../Engine/ThirdParty -I../../Engine/Include Misc3D.cpp -std=c++11 ../../../aether3d_build/libaether3d_win_vulkan.a -o ../../../aether3d_build/Samples/Misc3D_vulkan -lOpenAL32 -lgdi32 -lvulkan-1
+endif
 
 vulkan_openvr:
 	mkdir -p ../../../aether3d_build/Samples
