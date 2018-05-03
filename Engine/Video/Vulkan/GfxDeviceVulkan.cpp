@@ -92,6 +92,7 @@ namespace GfxDeviceGlobal
     VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue computeQueue = VK_NULL_HANDLE;
+    std::uint32_t graphicsQueueIndex = 0;
     std::vector< VkImage > swapchainImages;
     std::vector< SwapchainBuffer > swapchainBuffers;
     std::vector< VkFramebuffer > frameBuffers;
@@ -929,6 +930,7 @@ namespace ae3d
         }
 
         System::Assert( graphicsQueueIndex < queueCount, "graphicsQueueIndex" );
+        GfxDeviceGlobal::graphicsQueueIndex = graphicsQueueIndex;
 
         float queuePriorities = 0;
         VkDeviceQueueCreateInfo queueCreateInfo = {};

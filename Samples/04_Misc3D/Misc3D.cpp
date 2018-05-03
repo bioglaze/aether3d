@@ -88,7 +88,7 @@ int main()
     System::InitAudio();
     System::InitGamePad();
 
-#if defined( AE3D_OPENVR )
+#ifdef AE3D_OPENVR
     VR::GetIdealWindowSize( width, height );
 #endif
 
@@ -108,7 +108,9 @@ int main()
 #endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
+#ifndef AE3D_OPENVR
     camera.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
+#endif
     //camera.GetComponent<CameraComponent>()->SetViewport( 0, 0, originalWidth / 2, originalHeight );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
@@ -499,7 +501,9 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
+#ifndef AE3D_OPENVR
     scene.Add( &camera2d );
+#endif
     scene.Add( &statsContainer );
 #ifdef TEST_RENDER_TEXTURE_CUBE
     scene.Add( &rtCube );
@@ -809,6 +813,7 @@ int main()
         }
         
         VR::SubmitFrame();
+        //scene.EndFrame();
 #else
         if (reload)
         {
@@ -821,8 +826,8 @@ int main()
         System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ) );
         System::Draw( &camera2dTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ) );
 #else
-	System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
-	System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
 #endif
         scene.EndFrame();
 #endif

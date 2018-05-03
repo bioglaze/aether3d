@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstring>
 #include <openvr.h>
+#include <vulkan/vulkan.h>
 #include "CameraComponent.hpp"
 #include "GameObject.hpp"
 #include "FileSystem.hpp"
@@ -20,10 +21,16 @@ using namespace ae3d;
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
+    extern VkPhysicalDevice physicalDevice;
+    extern VkInstance instance;
+    extern VkQueue graphicsQueue;
+    extern std::uint32_t graphicsQueueIndex;
 }
 
 struct FramebufferDesc
 {
+    int width;
+    int height;
 };
 
 struct Vector2
@@ -83,8 +90,10 @@ float GetVRFov()
     return Global::vrFov;
 }
 
-bool CreateFrameBuffer( int width, int height, FramebufferDesc& framebufferDesc )
+bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDesc )
 {
+    outFramebufferDesc.width = width;
+    outFramebufferDesc.height = height;
     return true;
 }
 
@@ -384,17 +393,32 @@ void ae3d::VR::SubmitFrame()
 
     RenderDistortion();
 
-    vr::Texture_t leftEyeTexture;// = { (void*)Global::leftEyeDesc.resolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-    vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &leftEyeTexture );
+    vr::VRVulkanTextureData_t vulkanData;
+    //vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.m_pImage;
+    vulkanData.m_pDevice = (VkDevice_T *)GfxDeviceGlobal::device;
+    vulkanData.m_pPhysicalDevice = (VkPhysicalDevice_T *)GfxDeviceGlobal::physicalDevice;
+    vulkanData.m_pInstance = (VkInstance_T *)GfxDeviceGlobal::instance;
+    vulkanData.m_pQueue = (VkQueue_T *)GfxDeviceGlobal::graphicsQueue;
+    vulkanData.m_nQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
+
+    vulkanData.m_nWidth = Global::leftEyeDesc.width;
+    vulkanData.m_nHeight = Global::leftEyeDesc.height;
+    vulkanData.m_nFormat = VK_FORMAT_R8G8B8A8_SRGB;
+    //vulkanData.m_nSampleCount = m_nMSAASampleCount;
+
+    vr::Texture_t texture = { &vulkanData, vr::TextureType_Vulkan, vr::ColorSpace_Auto };
+    vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &texture, nullptr );
 
     if (submitResult != vr::VRCompositorError_None)
     {
         System::Print( "VR submit for left eye returned error %d\n", submitResult );
     }
 
-    vr::Texture_t rightEyeTexture;// = { (void*)Global::rightEyeDesc.resolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-    
-    submitResult = vr::VRCompositor()->Submit( vr::Eye_Right, &rightEyeTexture );
+    //vulkanData.m_nImage = (uint64_t)Global::rightEyeDesc.m_pImage;
+    vulkanData.m_nWidth = Global::rightEyeDesc.width;
+    vulkanData.m_nHeight = Global::rightEyeDesc.height;
+
+    submitResult = vr::VRCompositor()->Submit( vr::Eye_Right, &texture, nullptr );
     
     if (submitResult != vr::VRCompositorError_None)
     {
