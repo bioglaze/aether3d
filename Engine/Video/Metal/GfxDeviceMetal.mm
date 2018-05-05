@@ -185,6 +185,9 @@ void UploadPerObjectUbo()
     uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents];
 
     std::memcpy( bufferPointer, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
+#if !TARGET_OS_IPHONE
+    [uniformBuffer didModifyRange:NSMakeRange( 0, sizeof( GfxDeviceGlobal::perObjectUboStruct ) )];
+#endif
 }
 
 namespace ae3d
@@ -318,7 +321,11 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
     
     for (std::size_t uboIndex = 0; uboIndex < GfxDeviceGlobal::uniformBuffers.size(); ++uboIndex)
     {
+#if !TARGET_OS_IPHONE
+        GfxDeviceGlobal::uniformBuffers[ uboIndex ] = [GfxDevice::GetMetalDevice() newBufferWithLength:UNIFORM_BUFFER_SIZE options:MTLResourceStorageModeManaged];
+#else
         GfxDeviceGlobal::uniformBuffers[ uboIndex ] = [GfxDevice::GetMetalDevice() newBufferWithLength:UNIFORM_BUFFER_SIZE options:MTLResourceCPUCacheModeDefaultCache];
+#endif
         GfxDeviceGlobal::uniformBuffers[ uboIndex ].label = @"uniform buffer";
     }
     
