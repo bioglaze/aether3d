@@ -20,24 +20,29 @@ using namespace ae3d;
 
 void ae3d::LightTiler::Init()
 {
+#if !TARGET_OS_IPHONE
+    auto options = MTLResourceStorageModeManaged;
+#else
+    auto options = MTLResourceCPUCacheModeDefaultCache;
+#endif
     pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
-                                 options:MTLResourceCPUCacheModeDefaultCache];
+                                 options:options];
     pointLightCenterAndRadiusBuffer.label = @"pointLightCenterAndRadiusBuffer";
 
     pointLightColorBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
-                                         options:MTLResourceCPUCacheModeDefaultCache];
+                                         options:options];
     pointLightColorBuffer.label = @"pointLightColorBuffer";
 
     spotLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
-                                         options:MTLResourceCPUCacheModeDefaultCache];
+                                         options:options];
     spotLightCenterAndRadiusBuffer.label = @"spotLightCenterAndRadiusBuffer";
 
     spotLightParamsBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
-                                        options:MTLResourceCPUCacheModeDefaultCache];
+                                        options:options];
     spotLightParamsBuffer.label = @"spotLightParamsBuffer";
 
     spotLightColorBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
-                               options:MTLResourceCPUCacheModeDefaultCache];
+                               options:options];
     spotLightColorBuffer.label = @"spotLightColorBuffer";
 
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
@@ -96,5 +101,13 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
     bufferPointer = (uint8_t *)[spotLightColorBuffer contents];
     memcpy( bufferPointer, &spotLightColors[ 0 ], MaxLights * 4 * sizeof( float ) );
+    
+#if !TARGET_OS_IPHONE
+    [pointLightCenterAndRadiusBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
+    [pointLightColorBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
+    [spotLightCenterAndRadiusBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
+    [spotLightParamsBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
+    [spotLightColorBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
+#endif
 }
 

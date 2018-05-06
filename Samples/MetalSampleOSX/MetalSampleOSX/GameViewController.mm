@@ -9,6 +9,7 @@
 #include <cmath>
 #include <vector>
 #include <map>
+#include <cstdint>
 
 #import "CameraComponent.hpp"
 #import "SpriteRendererComponent.hpp"
@@ -44,25 +45,28 @@ const int MULTISAMPLE_COUNT = 1;
 const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
+// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
+// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+struct pcg32_random_t
+{
+    std::uint64_t state;
+    std::uint64_t inc;
+};
+
+std::uint32_t pcg32_random_r( pcg32_random_t* rng )
+{
+    std::uint64_t oldstate = rng->state;
+    rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
+    std::uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+    std::int32_t rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
+pcg32_random_t rng;
+
 int Random100()
 {
-    constexpr int A = 5;
-    constexpr int C = 3;
-    
-    static int prev = 1;
-    
-    // Hack to prevent lights wandering off
-    static int iterations = 0;
-    ++iterations;
-    
-    if (iterations == 1200)
-    {
-        iterations = 0;
-        prev = 1;
-    }
-    
-    prev = (A * prev + C) % 101;
-    return prev;
+    return pcg32_random_r( &rng );
 }
 
 NSViewController* myViewController;
@@ -955,8 +959,8 @@ using namespace ae3d;
     for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
     {
         const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
-        const float xOffset = 0;//(Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-        const float yOffset = 0;//(Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
     }
 #endif

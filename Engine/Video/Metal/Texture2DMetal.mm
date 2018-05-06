@@ -175,7 +175,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
                                                            width:defaultTexture.width
                                                           height:defaultTexture.height
                                                        mipmapped:NO];
-        textureDescriptor.usage = MTLTextureUsageUnknown;
+        //textureDescriptor.usage = MTLTextureUsageUnknown;
         defaultTexture.metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
         defaultTexture.metalTexture.label = @"Default texture";
 
