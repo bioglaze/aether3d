@@ -43,12 +43,15 @@ void SceneView::Init( int width, int height )
     scene.Add( &cube );
 }
 
-void SceneView::Render()
+void SceneView::MoveCamera( const ae3d::Vec3& moveDir )
 {
     camera.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
     camera.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
     camera.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+}
 
+void SceneView::Render()
+{
     scene.Render();
     //DrawNuklear( &ctx, &cmds, width, height );
     scene.EndFrame();

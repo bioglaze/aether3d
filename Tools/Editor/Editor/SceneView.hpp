@@ -6,7 +6,11 @@
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "Texture2D.hpp"
-#include "Vec3.hpp"
+
+namespace ae3d
+{
+    struct Vec3;
+}
 
 class SceneView
 {
@@ -14,12 +18,12 @@ public:
     void Init( int width, int height );
     void Render();
     void RotateCamera( float xDegrees, float yDegrees );
+    void MoveCamera( const ae3d::Vec3& moveDir );
     
 private:
     ae3d::GameObject camera;
     ae3d::Scene scene;
     ae3d::Shader unlitShader;
-    ae3d::Vec3 moveDir;
     
     // TODO: Test content, remove when stuff works.
     ae3d::GameObject cube;

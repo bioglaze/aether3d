@@ -4,10 +4,13 @@
 
 @end
 
+extern NSViewController* myViewController;
+
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    [_window makeFirstResponder:myViewController];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
