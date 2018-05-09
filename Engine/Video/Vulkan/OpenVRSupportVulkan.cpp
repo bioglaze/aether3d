@@ -18,6 +18,11 @@
 
 using namespace ae3d;
 
+namespace ae3d
+{
+    std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties );
+}
+
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
@@ -29,6 +34,14 @@ namespace GfxDeviceGlobal
 
 struct FramebufferDesc
 {
+    VkImage image;
+    VkImageView imageView;
+    VkDeviceMemory deviceMemory;
+    VkImage depthStencilImage;
+    VkImageView depthStencilImageView;
+    VkDeviceMemory depthStencilDeviceMemory;
+    VkFramebuffer framebuffer;
+    VkRenderPass renderPass;
     int width;
     int height;
 };
@@ -94,6 +107,181 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
 {
     outFramebufferDesc.width = width;
     outFramebufferDesc.height = height;
+
+    VkImageCreateInfo imageCreateInfo = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
+    imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageCreateInfo.extent.width = width;
+    imageCreateInfo.extent.height = height;
+    imageCreateInfo.extent.depth = 1;
+    imageCreateInfo.mipLevels = 1;
+    imageCreateInfo.arrayLayers = 1;
+    imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+    imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    imageCreateInfo.samples = (VkSampleCountFlagBits)1;
+    imageCreateInfo.usage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+    imageCreateInfo.flags = 0;
+
+    VkResult result = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &outFramebufferDesc.image );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    VkMemoryRequirements memoryRequirements = {};
+    vkGetImageMemoryRequirements( GfxDeviceGlobal::device, outFramebufferDesc.image, &memoryRequirements );
+
+    VkMemoryAllocateInfo memoryAllocateInfo = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
+    memoryAllocateInfo.allocationSize = memoryRequirements.size;
+    memoryAllocateInfo.memoryTypeIndex = GetMemoryType( memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+
+    result = vkAllocateMemory( GfxDeviceGlobal::device, &memoryAllocateInfo, nullptr, &outFramebufferDesc.deviceMemory );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    result = vkBindImageMemory( GfxDeviceGlobal::device, outFramebufferDesc.image, outFramebufferDesc.deviceMemory, 0 );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    VkImageViewCreateInfo imageViewCreateInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+    imageViewCreateInfo.flags = 0;
+    imageViewCreateInfo.image = outFramebufferDesc.image;
+    imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    imageViewCreateInfo.format = imageCreateInfo.format;
+    imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
+    imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+    imageViewCreateInfo.subresourceRange.levelCount = 1;
+    imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+    imageViewCreateInfo.subresourceRange.layerCount = 1;
+    result = vkCreateImageView( GfxDeviceGlobal::device, &imageViewCreateInfo, nullptr, &outFramebufferDesc.imageView );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    // Depth / Stencil
+    imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageCreateInfo.format = VK_FORMAT_D32_SFLOAT;
+    imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    result = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &outFramebufferDesc.depthStencilImage );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+    vkGetImageMemoryRequirements( GfxDeviceGlobal::device, outFramebufferDesc.depthStencilImage, &memoryRequirements );
+
+    memoryAllocateInfo.allocationSize = memoryRequirements.size;
+    memoryAllocateInfo.memoryTypeIndex = GetMemoryType( memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+
+    result = vkAllocateMemory( GfxDeviceGlobal::device, &memoryAllocateInfo, nullptr, &outFramebufferDesc.depthStencilDeviceMemory );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    result = vkBindImageMemory( GfxDeviceGlobal::device, outFramebufferDesc.depthStencilImage, outFramebufferDesc.depthStencilDeviceMemory, 0 );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    imageViewCreateInfo.image = outFramebufferDesc.depthStencilImage;
+    imageViewCreateInfo.format = imageCreateInfo.format;
+    imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    result = vkCreateImageView( GfxDeviceGlobal::device, &imageViewCreateInfo, nullptr, &outFramebufferDesc.depthStencilImageView );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    // Renderpass
+    //const std::uint32_t totalAttachments = 2;
+    VkAttachmentDescription attachmentDescs[ 2 ];
+    VkAttachmentReference attachmentReferences[ 2 ];
+    attachmentReferences[ 0 ].attachment = 0;
+    attachmentReferences[ 0 ].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    attachmentReferences[ 1 ].attachment = 1;
+    attachmentReferences[ 1 ].layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    attachmentDescs[ 0 ].format = VK_FORMAT_R8G8B8A8_SRGB;
+    attachmentDescs[ 0 ].samples = imageCreateInfo.samples;
+    attachmentDescs[ 0 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachmentDescs[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachmentDescs[ 0 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachmentDescs[ 0 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachmentDescs[ 0 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    attachmentDescs[ 0 ].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    attachmentDescs[ 0 ].flags = 0;
+
+    attachmentDescs[ 1 ].format = VK_FORMAT_D32_SFLOAT;
+    attachmentDescs[ 1 ].samples = imageCreateInfo.samples;
+    attachmentDescs[ 1 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachmentDescs[ 1 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachmentDescs[ 1 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachmentDescs[ 1 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachmentDescs[ 1 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    attachmentDescs[ 1 ].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    attachmentDescs[ 1 ].flags = 0;
+
+    VkSubpassDescription subPassCreateInfo = {};
+    subPassCreateInfo.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subPassCreateInfo.flags = 0;
+    subPassCreateInfo.inputAttachmentCount = 0;
+    subPassCreateInfo.pInputAttachments = nullptr;
+    subPassCreateInfo.colorAttachmentCount = 1;
+    subPassCreateInfo.pColorAttachments = &attachmentReferences[ 0 ];
+    subPassCreateInfo.pResolveAttachments = nullptr;
+    subPassCreateInfo.pDepthStencilAttachment = &attachmentReferences[ 1 ];
+    subPassCreateInfo.preserveAttachmentCount = 0;
+    subPassCreateInfo.pPreserveAttachments = nullptr;
+
+    VkRenderPassCreateInfo renderPassCreateInfo = {};
+    renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassCreateInfo.flags = 0;
+    renderPassCreateInfo.attachmentCount = 2;
+    renderPassCreateInfo.pAttachments = &attachmentDescs[ 0 ];
+    renderPassCreateInfo.subpassCount = 1;
+    renderPassCreateInfo.pSubpasses = &subPassCreateInfo;
+    renderPassCreateInfo.dependencyCount = 0;
+    renderPassCreateInfo.pDependencies = nullptr;
+
+    result = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassCreateInfo, NULL, &outFramebufferDesc.renderPass );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    VkImageView attachments[ 2 ] = { outFramebufferDesc.imageView, outFramebufferDesc.depthStencilImageView };
+    VkFramebufferCreateInfo framebufferCreateInfo = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
+    framebufferCreateInfo.renderPass = outFramebufferDesc.renderPass;
+    framebufferCreateInfo.attachmentCount = 2;
+    framebufferCreateInfo.pAttachments = &attachments[ 0 ];
+    framebufferCreateInfo.width = width;
+    framebufferCreateInfo.height = height;
+    framebufferCreateInfo.layers = 1;
+    result = vkCreateFramebuffer( GfxDeviceGlobal::device, &framebufferCreateInfo, NULL, &outFramebufferDesc.framebuffer );
+    if (result != VK_SUCCESS)
+    {
+        System::Print( "Failed to create a framebuffer!\n" );
+        return false;
+    }
+
+    //outFramebufferDesc.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    //outFramebufferDesc.depthStencilImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
     return true;
 }
 
@@ -322,8 +510,8 @@ void ae3d::VR::Init()
     Global::hmd->GetRecommendedRenderTargetSize( &Global::width, &Global::height );
     System::Print( "OpenVR width: %d, height: %d\n", Global::width, Global::height );
 
-    CreateFrameBuffer( Global::width, Global::height, Global::leftEyeDesc );
-    CreateFrameBuffer( Global::width, Global::height, Global::rightEyeDesc );
+    bool res = CreateFrameBuffer( Global::width, Global::height, Global::leftEyeDesc );
+    res = CreateFrameBuffer( Global::width, Global::height, Global::rightEyeDesc );
 
     Global::lensDistort.LoadSPIRV( ae3d::FileSystem::FileContents( "vr_companion_vert.spv" ), ae3d::FileSystem::FileContents( "vr_companion_vert.spv" ) );
     SetupDescriptors();
@@ -341,10 +529,16 @@ void ae3d::VR::Init()
 
 void ae3d::VR::Deinit()
 {
-    System::Print("window size: %d x %d\n", WindowGlobal::windowWidth, WindowGlobal::windowHeight );
-
     if (Global::hmd)
     {
+        vkDestroyImage( GfxDeviceGlobal::device, Global::leftEyeDesc.image, nullptr );
+        vkDestroyImageView( GfxDeviceGlobal::device, Global::leftEyeDesc.imageView, nullptr );
+        vkFreeMemory( GfxDeviceGlobal::device, Global::leftEyeDesc.deviceMemory, nullptr );
+
+        vkDestroyImage( GfxDeviceGlobal::device, Global::rightEyeDesc.image, nullptr );
+        vkDestroyImageView( GfxDeviceGlobal::device, Global::rightEyeDesc.imageView, nullptr );
+        vkFreeMemory( GfxDeviceGlobal::device, Global::rightEyeDesc.deviceMemory, nullptr );
+
         vr::VR_Shutdown();
         Global::hmd = nullptr;
     }
@@ -394,7 +588,7 @@ void ae3d::VR::SubmitFrame()
     RenderDistortion();
 
     vr::VRVulkanTextureData_t vulkanData;
-    //vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.m_pImage;
+    vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.image;
     vulkanData.m_pDevice = (VkDevice_T *)GfxDeviceGlobal::device;
     vulkanData.m_pPhysicalDevice = (VkPhysicalDevice_T *)GfxDeviceGlobal::physicalDevice;
     vulkanData.m_pInstance = (VkInstance_T *)GfxDeviceGlobal::instance;
@@ -404,7 +598,7 @@ void ae3d::VR::SubmitFrame()
     vulkanData.m_nWidth = Global::leftEyeDesc.width;
     vulkanData.m_nHeight = Global::leftEyeDesc.height;
     vulkanData.m_nFormat = VK_FORMAT_R8G8B8A8_SRGB;
-    //vulkanData.m_nSampleCount = m_nMSAASampleCount;
+    vulkanData.m_nSampleCount = 1;
 
     vr::Texture_t texture = { &vulkanData, vr::TextureType_Vulkan, vr::ColorSpace_Auto };
     vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &texture, nullptr );
@@ -414,7 +608,7 @@ void ae3d::VR::SubmitFrame()
         System::Print( "VR submit for left eye returned error %d\n", submitResult );
     }
 
-    //vulkanData.m_nImage = (uint64_t)Global::rightEyeDesc.m_pImage;
+    vulkanData.m_nImage = (uint64_t)Global::rightEyeDesc.image;
     vulkanData.m_nWidth = Global::rightEyeDesc.width;
     vulkanData.m_nHeight = Global::rightEyeDesc.height;
 
