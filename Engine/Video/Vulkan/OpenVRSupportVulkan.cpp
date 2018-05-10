@@ -29,6 +29,7 @@ namespace GfxDeviceGlobal
     extern VkPhysicalDevice physicalDevice;
     extern VkInstance instance;
     extern VkQueue graphicsQueue;
+    extern VkCommandBuffer offscreenCmdBuffer;
     extern std::uint32_t graphicsQueueIndex;
 }
 
@@ -42,6 +43,8 @@ struct FramebufferDesc
     VkDeviceMemory depthStencilDeviceMemory;
     VkFramebuffer framebuffer;
     VkRenderPass renderPass;
+    VkImageLayout imageLayout;
+    VkImageLayout depthStencilImageLayout;
     int width;
     int height;
 };
@@ -117,7 +120,7 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     imageCreateInfo.arrayLayers = 1;
     imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    imageCreateInfo.samples = (VkSampleCountFlagBits)1;
+    imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageCreateInfo.usage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
     imageCreateInfo.flags = 0;
 
@@ -279,8 +282,8 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
         return false;
     }
 
-    //outFramebufferDesc.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    //outFramebufferDesc.depthStencilImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    outFramebufferDesc.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    outFramebufferDesc.depthStencilImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     return true;
 }
@@ -629,14 +632,61 @@ void ae3d::VR::SetEye( int eye )
         return;
     }
 
-    if (eye == 0)
+    VkViewport viewport = { 0.0f, 0.0f, (float)Global::width, (float)Global::height, 0.0f, 1.0f };
+    vkCmdSetViewport( GfxDeviceGlobal::offscreenCmdBuffer, 0, 1, &viewport );
+    VkRect2D scissor = { 0, 0, Global::width, Global::height };
+    vkCmdSetScissor( GfxDeviceGlobal::offscreenCmdBuffer, 0, 1, &scissor );
+
+    FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
+
+    // Transition eye image to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+    VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+    imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    imageMemoryBarrier.oldLayout = eye == 0 ? Global::leftEyeDesc.imageLayout : Global::rightEyeDesc.imageLayout;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    imageMemoryBarrier.image = fbDesc.image;
+    imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
+    imageMemoryBarrier.subresourceRange.levelCount = 1;
+    imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+    imageMemoryBarrier.subresourceRange.layerCount = 1;
+    imageMemoryBarrier.srcQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
+    imageMemoryBarrier.dstQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
+    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+    fbDesc.imageLayout = imageMemoryBarrier.newLayout;
+
+    // Transition the depth buffer to VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL on first use
+    if (fbDesc.depthStencilImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
     {
-        //glClearColor( 0.15f, 0.15f, 0.58f, 1.0f );
+        imageMemoryBarrier.image = fbDesc.depthStencilImage;
+        imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        imageMemoryBarrier.srcAccessMask = 0;
+        imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        imageMemoryBarrier.oldLayout = fbDesc.depthStencilImageLayout;
+        imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+        fbDesc.depthStencilImageLayout = imageMemoryBarrier.newLayout;
     }
-    if (eye == 1)
-    {
-        //glClearColor( 0.15f, 0.55f, 0.18f, 1.0f );
-    }
+
+    // Start the renderpass
+    VkRenderPassBeginInfo renderPassBeginInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+    renderPassBeginInfo.renderPass = fbDesc.renderPass;
+    renderPassBeginInfo.framebuffer = fbDesc.framebuffer;
+    renderPassBeginInfo.renderArea.offset.x = 0;
+    renderPassBeginInfo.renderArea.offset.y = 0;
+    renderPassBeginInfo.renderArea.extent.width = Global::width;
+    renderPassBeginInfo.renderArea.extent.height = Global::height;
+    renderPassBeginInfo.clearValueCount = 2;
+    VkClearValue clearValues[ 2 ];
+    clearValues[ 0 ].color.float32[ 0 ] = 0.0f;
+    clearValues[ 0 ].color.float32[ 1 ] = 0.0f;
+    clearValues[ 0 ].color.float32[ 2 ] = 0.0f;
+    clearValues[ 0 ].color.float32[ 3 ] = 1.0f;
+    clearValues[ 1 ].depthStencil.depth = 1.0f;
+    clearValues[ 1 ].depthStencil.stencil = 0;
+    renderPassBeginInfo.pClearValues = &clearValues[ 0 ];
+    vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
 }
 
 void ae3d::VR::UnsetEye( int eye )
@@ -644,7 +694,30 @@ void ae3d::VR::UnsetEye( int eye )
     if (!Global::hmd)
     {
         return;
-    }    
+    }
+
+    vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
+
+    FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
+
+    // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
+    VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+    imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    imageMemoryBarrier.image = fbDesc.image;
+    imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
+    imageMemoryBarrier.subresourceRange.levelCount = 1;
+    imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+    imageMemoryBarrier.subresourceRange.layerCount = 1;
+    imageMemoryBarrier.srcQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
+    imageMemoryBarrier.dstQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
+    imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    imageMemoryBarrier.oldLayout = fbDesc.imageLayout;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+    fbDesc.imageLayout = imageMemoryBarrier.newLayout;
 }
 
 void ae3d::VR::CalcEyePose()
