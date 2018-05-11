@@ -62,3 +62,39 @@ void SceneView::RotateCamera( float xDegrees, float yDegrees )
     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), xDegrees );
     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), yDegrees );
 }
+
+void TransformGizmo::Init( ae3d::Shader* shader )
+{
+    translateMesh.Load( FileSystem::FileContents( "cursor_translate.ae3d" ) );
+    
+    xAxisMaterial.SetShader( shader );
+    //xAxisMaterial.SetTexture( "textureMap", &translateTex );
+    xAxisMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
+    xAxisMaterial.SetBackFaceCulling( true );
+    xAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
+    float factor = -100;
+    float units = 0;
+    xAxisMaterial.SetDepthOffset( factor, units );
+    yAxisMaterial.SetDepthOffset( factor, units );
+    zAxisMaterial.SetDepthOffset( factor, units );
+    
+    yAxisMaterial.SetShader( shader );
+    //yAxisMaterial.SetTexture( "textureMap", &translateTex );
+    yAxisMaterial.SetVector( "tint", { 0, 1, 0, 1 } );
+    yAxisMaterial.SetBackFaceCulling( true );
+    yAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
+    
+    zAxisMaterial.SetShader( shader );
+    //zAxisMaterial.SetTexture( "textureMap", &translateTex );
+    zAxisMaterial.SetVector( "tint", { 0, 0, 1, 1 } );
+    zAxisMaterial.SetBackFaceCulling( true );
+    zAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
+    
+    go.AddComponent< MeshRendererComponent >();
+    go.GetComponent< MeshRendererComponent >()->SetMesh( &translateMesh );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &xAxisMaterial, 1 );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &yAxisMaterial, 2 );
+    go.GetComponent< MeshRendererComponent >()->SetMaterial( &zAxisMaterial, 0 );
+    go.AddComponent< TransformComponent >();
+    go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
+}

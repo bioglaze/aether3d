@@ -12,6 +12,20 @@ namespace ae3d
     struct Vec3;
 }
 
+struct TransformGizmo
+{
+    void Init( ae3d::Shader* shader );
+    void SetPosition( const ae3d::Vec3& position );
+
+    ae3d::Mesh mesh;
+    
+    ae3d::GameObject go;
+    ae3d::Mesh translateMesh;
+    ae3d::Material xAxisMaterial;
+    ae3d::Material yAxisMaterial;
+    ae3d::Material zAxisMaterial;
+};
+
 class SceneView
 {
 public:
@@ -24,6 +38,7 @@ private:
     ae3d::GameObject camera;
     ae3d::Scene scene;
     ae3d::Shader unlitShader;
+    TransformGizmo transformGizmo;
     
     // TODO: Test content, remove when stuff works.
     ae3d::GameObject cube;
