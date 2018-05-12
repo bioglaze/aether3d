@@ -16,7 +16,7 @@ extern ae3d::FileWatcher fileWatcher;
 
 struct ae3d::Mesh::Impl
 {
-    Impl()
+    Impl() noexcept
     {
         static_assert( sizeof( ae3d::Mesh::Impl ) <= ae3d::Mesh::StorageSize, "Impl too big!");
         static_assert( ae3d::Mesh::StorageAlign % alignof( ae3d::Mesh::Impl ) == 0, "Impl misaligned!");

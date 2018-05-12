@@ -10,7 +10,7 @@ namespace ae3d
     class SpotLightComponent
     {
     public:
-		SpotLightComponent() : shadowMap() {}
+		SpotLightComponent() noexcept : shadowMap() {}
 
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }

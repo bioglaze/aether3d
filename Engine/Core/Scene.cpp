@@ -62,6 +62,11 @@ namespace Global
     extern Vec3 vrEyePosition;
 }
 
+namespace VRGlobal
+{
+    extern int eye;
+}
+
 namespace SceneGlobal
 {
     GameObject shadowCamera;
@@ -482,8 +487,17 @@ void ae3d::Scene::Render()
 #if RENDERER_OPENGL
     Statistics::BeginFrameTimeProfiling();
 #endif
+
 #if RENDERER_VULKAN
+#if AE3D_OPENVR
+    if (VRGlobal::eye == 0)
+    {
+        GfxDevice::BeginFrame();
+    }
+#else
     GfxDevice::BeginFrame();
+#endif
+
 #endif
     GenerateAABB();
 #if RENDERER_D3D12

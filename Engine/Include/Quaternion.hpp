@@ -11,7 +11,7 @@ namespace ae3d
     struct Quaternion
     {
         /// Constructor.
-        Quaternion() : x( 0 ), y( 0 ), z( 0 ), w( 1 ) {}
+        Quaternion() noexcept : x( 0 ), y( 0 ), z( 0 ), w( 1 ) {}
         
         /**
          \param vec Vector.

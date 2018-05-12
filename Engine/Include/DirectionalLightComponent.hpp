@@ -10,7 +10,7 @@ namespace ae3d
     class DirectionalLightComponent
     {
     public:
-		DirectionalLightComponent() : shadowMap() {}
+		DirectionalLightComponent() noexcept : shadowMap() {}
 
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }

@@ -12,7 +12,7 @@ namespace ae3d
     class CameraComponent
     {
     public:
-		CameraComponent() : depthNormalsTexture(), viewport() {}
+		CameraComponent() noexcept : depthNormalsTexture(), viewport() {}
 
         /// Projection type
         enum class ProjectionType { Orthographic, Perspective };

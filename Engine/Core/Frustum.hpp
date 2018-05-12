@@ -16,7 +16,7 @@ class Frustum
 {
 public:
     // Workaround to silence a CppCheck warning that the class doesn't have a constructor.
-    Frustum() = default;
+    Frustum() noexcept = default;
 
     const Vec3& NearTopLeft() const;
     const Vec3& NearTopRight() const;

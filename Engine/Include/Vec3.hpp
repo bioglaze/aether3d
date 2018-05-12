@@ -112,7 +112,7 @@ namespace ae3d
         static Vec3 Reflect( const Vec3& vec, const Vec3& normal ) { return vec - normal * Dot( normal, vec ) * 2; }
 
         // Default constructor
-        Vec3() {}
+        Vec3() noexcept {}
 
         /// Move constructor
         Vec3( Vec3&& v ) noexcept = default;
@@ -359,7 +359,7 @@ namespace ae3d
         /// W coordinate.
         float w = 0;
 
-        Vec4() {}
+        Vec4() noexcept {}
         
         /**
          Constructor.

@@ -23,6 +23,11 @@ namespace ae3d
     std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties );
 }
 
+namespace VRGlobal
+{
+    int eye = 0;
+}
+
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
@@ -51,7 +56,7 @@ struct FramebufferDesc
 
 struct Vector2
 {
-    Vector2() : x( 0 ), y( 0 ) {}
+    Vector2() noexcept : x( 0 ), y( 0 ) {}
     Vector2( float aX, float aY ) : x( aX ), y( aY ) {}
 
     float x, y;
@@ -520,14 +525,11 @@ void ae3d::VR::Init()
     SetupDescriptors();
     SetupDistortion();
 
-    if (Global::hmd)
-    {
-        vr::HmdMatrix34_t matEye = Global::hmd->GetEyeToHeadTransform( vr::Eye_Left );
-        ConvertSteamVRMatrixToMatrix4( matEye, Global::eyePosLeft );
+    vr::HmdMatrix34_t matEye = Global::hmd->GetEyeToHeadTransform( vr::Eye_Left );
+    ConvertSteamVRMatrixToMatrix4( matEye, Global::eyePosLeft );
         
-        matEye = Global::hmd->GetEyeToHeadTransform( vr::Eye_Right );
-        ConvertSteamVRMatrixToMatrix4( matEye, Global::eyePosRight );
-    }
+    matEye = Global::hmd->GetEyeToHeadTransform( vr::Eye_Right );
+    ConvertSteamVRMatrixToMatrix4( matEye, Global::eyePosRight );
 }
 
 void ae3d::VR::Deinit()
@@ -632,6 +634,17 @@ void ae3d::VR::SetEye( int eye )
         return;
     }
 
+    VRGlobal::eye = eye;
+
+    if (eye == 0)
+    {
+        VkCommandBufferBeginInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
+        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+    }
+
     VkViewport viewport = { 0.0f, 0.0f, (float)Global::width, (float)Global::height, 0.0f, 1.0f };
     vkCmdSetViewport( GfxDeviceGlobal::offscreenCmdBuffer, 0, 1, &viewport );
     VkRect2D scissor = { 0, 0, Global::width, Global::height };
@@ -702,8 +715,6 @@ void ae3d::VR::UnsetEye( int eye )
 
     // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
     VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
-    imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
-    imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     imageMemoryBarrier.image = fbDesc.image;
     imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
@@ -718,6 +729,11 @@ void ae3d::VR::UnsetEye( int eye )
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
     fbDesc.imageLayout = imageMemoryBarrier.newLayout;
+
+    if (eye == 1)
+    {
+        vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
+    }
 }
 
 void ae3d::VR::CalcEyePose()
@@ -730,7 +746,7 @@ void ae3d::VR::CalcEyePose()
     vr::VRCompositor()->WaitGetPoses( Global::trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0 );
 
     Global::validPoseCount = 0;
-    Global::poseClasses = "";
+    Global::poseClasses.clear();
 
     for (unsigned deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
     {

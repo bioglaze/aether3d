@@ -9,7 +9,7 @@ namespace ae3d
     class PointLightComponent
     {
     public:
-		PointLightComponent() : shadowMap() {}
+		PointLightComponent() noexcept : shadowMap() {}
 
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }

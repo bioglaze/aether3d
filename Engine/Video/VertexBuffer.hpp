@@ -23,7 +23,7 @@ namespace ae3d
         /// Triangle of 3 vertices.
         struct Face
         {
-            Face() : a(0), b(0), c(0) {}
+            Face() noexcept : a(0), b(0), c(0) {}
             
             Face( unsigned short fa, unsigned short fb, unsigned short fc )
             : a( fa )
@@ -37,7 +37,7 @@ namespace ae3d
         /// Vertex with position, texture coordinate and color.
         struct VertexPTC
         {
-            VertexPTC() {}
+            VertexPTC() noexcept {}
             VertexPTC( const Vec3& pos, float aU, float aV )
             : position( pos )
             , u( aU )
@@ -80,7 +80,7 @@ namespace ae3d
         };
 
 #if RENDERER_VULKAN
-		VertexBuffer() : bindingDescriptions(), attributeDescriptions() {}
+		VertexBuffer() noexcept : bindingDescriptions(), attributeDescriptions() {}
 #endif
 
 #if RENDERER_D3D12
