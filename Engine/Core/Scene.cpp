@@ -1008,7 +1008,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     static Shader tempShader;
     tempShader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
         "unlit_vertex", "unlit_fragment",
-        FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
+        FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Material* tempMaterial = new Material();
@@ -1497,8 +1497,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             std::string glslVert = vertexShaderName + std::string( ".vsh" );
             std::string glslFrag = fragmentShaderName + std::string( ".fsh" );
-            std::string hlslVert = vertexShaderName + std::string( ".hlsl" );
-            std::string hlslFrag = fragmentShaderName + std::string( ".hlsl" );
+            std::string hlslVert = vertexShaderName + std::string( ".obj" );
+            std::string hlslFrag = fragmentShaderName + std::string( ".obj" );
             std::string spvVert = vertexShaderName + std::string( "_vert.spv" );
             std::string spvFrag = fragmentShaderName + std::string( "_frag.fsh" );
             

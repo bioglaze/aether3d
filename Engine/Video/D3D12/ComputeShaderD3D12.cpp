@@ -106,12 +106,6 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
 void ae3d::ComputeShader::Load( const char* source )
 {
-    for (int slotIndex = 0; slotIndex < SLOT_COUNT; ++slotIndex)
-    {
-        uniformBuffers[ slotIndex ] = nullptr;
-        textureBuffers[ slotIndex ] = nullptr;
-        uavBuffers[ slotIndex ] = nullptr;
-    }
     const std::size_t sourceLength = std::string( source ).size();
     ID3DBlob* blobError = nullptr;
     HRESULT hr = D3DCompile( source, sourceLength, "CSMain", nullptr /*defines*/, D3D_COMPILE_STANDARD_FILE_INCLUDE, "CSMain", "cs_5_1",
@@ -132,8 +126,28 @@ void ae3d::ComputeShader::Load( const char* source )
 
 void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSystem::FileContentsData& dataHLSL, const FileSystem::FileContentsData& /*dataSPIRV*/ )
 {
-    const std::string dataStr = std::string( std::begin( dataHLSL.data ), std::end( dataHLSL.data ) );
-    Load( dataStr.c_str() );
+    for (int slotIndex = 0; slotIndex < SLOT_COUNT; ++slotIndex)
+    {
+        uniformBuffers[ slotIndex ] = nullptr;
+        textureBuffers[ slotIndex ] = nullptr;
+        uavBuffers[ slotIndex ] = nullptr;
+    }
+
+    if (dataHLSL.path.find( ".obj" ) != std::string::npos)
+    {
+        wchar_t wstr[ 256 ];
+        std::mbstowcs( wstr, dataHLSL.path.c_str(), 256 );
+
+        HRESULT hr = D3DReadFileToBlob( wstr, &blobShader );
+        AE3D_CHECK_D3D( hr, "Shader bytecode reading failed!" );
+        
+        Global::computeShaders.push_back( blobShader );
+    }
+    else
+    {
+        const std::string dataStr = std::string( std::begin( dataHLSL.data ), std::end( dataHLSL.data ) );
+        Load( dataStr.c_str() );
+    }
 }
 
 void ae3d::ComputeShader::SetRenderTexture( RenderTexture* /*renderTexture*/, unsigned /*slot*/ )

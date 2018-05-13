@@ -120,7 +120,27 @@ void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexDataGLSL*/,
     vertexPath = vertexDataHLSL.path;
     fragmentPath = fragmentDataHLSL.path;
 
-    Load( vertexStr.c_str(), fragmentStr.c_str() );
+    if (vertexPath.find( ".obj" ) != std::string::npos && fragmentPath.find( ".obj" ) != std::string::npos)
+    {
+        wchar_t wstr[ 256 ];
+        std::mbstowcs( wstr, vertexPath.c_str(), 256 );
+
+        HRESULT hr = D3DReadFileToBlob( wstr, &blobShaderVertex );
+        AE3D_CHECK_D3D( hr, "Shader bytecode reading failed!" );
+
+        std::mbstowcs( wstr, fragmentPath.c_str(), 256 );
+        hr = D3DReadFileToBlob( wstr, &blobShaderPixel );
+        AE3D_CHECK_D3D( hr, "Shader bytecode reading failed!" );
+
+        Global::shaders.push_back( blobShaderVertex );
+        Global::shaders.push_back( blobShaderPixel );
+
+        ReflectVariables();
+    }
+    else
+    {
+        Load( vertexStr.c_str(), fragmentStr.c_str() );
+    }
 
     bool isInCache = false;
     

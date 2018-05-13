@@ -222,13 +222,13 @@ int main()
     Shader shader;
     shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
                  "unlitVert", "unlitFrag",
-                 FileSystem::FileContents( "unlit_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
+                 FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                  FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Shader shaderSkin;
     shaderSkin.Load( FileSystem::FileContents( "unlit_skin.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
                 "unlitVert", "unlitFrag",
-                FileSystem::FileContents( "unlit_skin_vert.hlsl" ), FileSystem::FileContents( "unlit_frag.hlsl" ),
+                FileSystem::FileContents( "unlit_skin_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Texture2D gliderTex;
@@ -273,7 +273,7 @@ int main()
     Shader shaderCubeMap;
     shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ),
                         "unlitVert", "unlitFrag",
-                        FileSystem::FileContents( "unlit_cube_vert.hlsl" ), FileSystem::FileContents( "unlit_cube_frag.hlsl" ),
+                        FileSystem::FileContents( "unlit_cube_vert.obj" ), FileSystem::FileContents( "unlit_cube_frag.obj" ),
                         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     GameObject lightParent;
@@ -381,7 +381,7 @@ int main()
     Shader standardShader;
     standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
         "standard_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "Standard_vert.hlsl" ), ae3d::FileSystem::FileContents( "Standard_frag.hlsl" ),
+        ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
         ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
 
     Material standardMaterial;
