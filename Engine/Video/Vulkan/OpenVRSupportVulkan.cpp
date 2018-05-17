@@ -594,10 +594,10 @@ void ae3d::VR::SubmitFrame()
 
     vr::VRVulkanTextureData_t vulkanData;
     vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.image;
-    vulkanData.m_pDevice = (VkDevice_T *)GfxDeviceGlobal::device;
-    vulkanData.m_pPhysicalDevice = (VkPhysicalDevice_T *)GfxDeviceGlobal::physicalDevice;
-    vulkanData.m_pInstance = (VkInstance_T *)GfxDeviceGlobal::instance;
-    vulkanData.m_pQueue = (VkQueue_T *)GfxDeviceGlobal::graphicsQueue;
+    vulkanData.m_pDevice = GfxDeviceGlobal::device;
+    vulkanData.m_pPhysicalDevice = GfxDeviceGlobal::physicalDevice;
+    vulkanData.m_pInstance = GfxDeviceGlobal::instance;
+    vulkanData.m_pQueue = GfxDeviceGlobal::graphicsQueue;
     vulkanData.m_nQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
 
     vulkanData.m_nWidth = Global::leftEyeDesc.width;
@@ -654,6 +654,7 @@ void ae3d::VR::SetEye( int eye )
 
     // Transition eye image to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
     VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+    imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     imageMemoryBarrier.oldLayout = eye == 0 ? Global::leftEyeDesc.imageLayout : Global::rightEyeDesc.imageLayout;
@@ -683,7 +684,8 @@ void ae3d::VR::SetEye( int eye )
     }
 
     // Start the renderpass
-    VkRenderPassBeginInfo renderPassBeginInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+    VkRenderPassBeginInfo renderPassBeginInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };    
+    renderPassBeginInfo.pNext = nullptr;
     renderPassBeginInfo.renderPass = fbDesc.renderPass;
     renderPassBeginInfo.framebuffer = fbDesc.framebuffer;
     renderPassBeginInfo.renderArea.offset.x = 0;
@@ -715,6 +717,7 @@ void ae3d::VR::UnsetEye( int eye )
 
     // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
     VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+    imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.image = fbDesc.image;
     imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
