@@ -19,6 +19,9 @@ int main()
     SceneView sceneView;
     sceneView.Init( width, height );
 
+    Vec3 moveDir;
+    constexpr float velocity = 0.2f;
+    
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -44,6 +47,23 @@ int main()
                 {
                     quit = true;
                 }
+                else if (keyCode == KeyCode::A)
+                {
+                    moveDir.x = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                }
+                else if (keyCode == KeyCode::D)
+                {
+                    moveDir.x = event.type == WindowEventType::KeyDown ? velocity : 0;
+                }
+                else if (keyCode == KeyCode::W)
+                {
+                    moveDir.z = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                }
+                else if (keyCode == KeyCode::S)
+                {
+                    moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
+                }
+
                 /*else if (keyCode == KeyCode::A)
                 {
                     nk_input_char( &ctx, 'a' );
@@ -89,6 +109,8 @@ int main()
 
         //nk_input_end( &ctx );
 
+        //sceneView.RotateCamera( -float( theEvent.deltaX ) / 20, -float( theEvent.deltaY ) / 20 );
+        sceneView.MoveCamera( moveDir );
         sceneView.Render();
 
         Window::SwapBuffers();
