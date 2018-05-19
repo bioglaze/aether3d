@@ -130,8 +130,6 @@ namespace GfxDeviceGlobal
     std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
     std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
     std::vector< ae3d::VertexBuffer > lineBuffers;
-    ae3d::RenderTexture hdrTarget;
-    VkPipeline fullscreenTrianglePSO;
     bool usedOffscreen = false;
 }
 
@@ -1679,13 +1677,6 @@ namespace ae3d
         renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
         renderer.builtinShaders.fullscreenTriangleShader.LoadSPIRV( FileSystem::FileContents( "fullscreen_triangle_vert.spv" ), FileSystem::FileContents( "sprite_frag.spv" ) );
 
-        VertexBuffer emptyBuffer;
-        const std::uint64_t psoHash = GetPSOHash( emptyBuffer, renderer.builtinShaders.fullscreenTriangleShader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Front,
-            ae3d::GfxDevice::FillMode::Solid, GfxDeviceGlobal::hdrTarget.GetRenderPass(), ae3d::GfxDevice::PrimitiveTopology::Triangles );
-        CreatePSO( emptyBuffer, renderer.builtinShaders.fullscreenTriangleShader, ae3d::GfxDevice::BlendMode::Off, ae3d::GfxDevice::DepthFunc::NoneWriteOff, ae3d::GfxDevice::CullMode::Front,
-            ae3d::GfxDevice::FillMode::Solid, GfxDeviceGlobal::hdrTarget.GetRenderPass(), ae3d::GfxDevice::PrimitiveTopology::Triangles, psoHash );
-        GfxDeviceGlobal::fullscreenTrianglePSO = GfxDeviceGlobal::psoCache[ psoHash ];
-
         GfxDeviceGlobal::lightTiler.Init();
 
         VkCommandBufferAllocateInfo cmdBufInfo = {};
@@ -1696,8 +1687,6 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &GfxDeviceGlobal::texCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
-
-        GfxDeviceGlobal::hdrTarget.Create2D( GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "hdrTarget" );
     }
 }
 
