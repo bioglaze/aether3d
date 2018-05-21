@@ -21,6 +21,12 @@ int main()
 
     Vec3 moveDir;
     constexpr float velocity = 0.2f;
+
+    int lastMouseX = 0;
+    int lastMouseY = 0;
+    int deltaX = 0;
+    int deltaY = 0;
+    bool isRightMouseDown = false;
     
     while (Window::IsOpen() && !quit)
     {
@@ -86,6 +92,10 @@ int main()
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
+                deltaX = x - lastMouseX;
+                deltaY = y - lastMouseY;
+                lastMouseX = x;
+                lastMouseY = y;
                 //std::cout << "mouse position: " << x << ", y: " << y << std::endl;
                 //nk_input_motion( &ctx, (int)x, (int)y );
             }
@@ -103,13 +113,35 @@ int main()
                 y = height - event.mouseY;
                 //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 0 );
             }
+
+            if (event.type == WindowEventType::Mouse2Down)
+            {
+                x = event.mouseX;
+                y = height - event.mouseY;
+                isRightMouseDown = true;
+                //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 1 );
+            }
+
+            if (event.type == WindowEventType::Mouse2Up || event.type == WindowEventType::Mouse1Up)
+            {
+                x = event.mouseX;
+                y = height - event.mouseY;
+                isRightMouseDown = false;
+                deltaX = 0;
+                deltaY = 0;
+                //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 0 );
+            }
             
             //nk_input_button( &ctx, NK_BUTTON_RIGHT, (int)x, (int)y, (event.type == WindowEventType::Mouse2Down) ? 1 : 0 );
         }
 
         //nk_input_end( &ctx );
 
-        //sceneView.RotateCamera( -float( theEvent.deltaX ) / 20, -float( theEvent.deltaY ) / 20 );
+        if (isRightMouseDown)
+        {
+            sceneView.RotateCamera( -float( deltaX ) / 20, -float( deltaY ) / 20 );
+        }
+        
         sceneView.MoveCamera( moveDir );
         sceneView.Render();
 
