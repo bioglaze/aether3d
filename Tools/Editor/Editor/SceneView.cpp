@@ -50,10 +50,13 @@ void SceneView::MoveCamera( const ae3d::Vec3& moveDir )
     camera.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
 }
 
-void SceneView::Render()
+void SceneView::BeginRender()
 {
     scene.Render();
-    //DrawNuklear( &ctx, &cmds, width, height );
+}
+
+void SceneView::EndRender()
+{
     scene.EndFrame();
 }
 

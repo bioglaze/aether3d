@@ -1,3 +1,4 @@
+#include "Inspector.hpp"
 #include "SceneView.hpp"
 #include "System.hpp"
 #include "Window.hpp"
@@ -19,6 +20,9 @@ int main()
     SceneView sceneView;
     sceneView.Init( width, height );
 
+    Inspector inspector;
+    inspector.Init();
+    
     Vec3 moveDir;
     constexpr float velocity = 0.2f;
 
@@ -143,7 +147,9 @@ int main()
         }
         
         sceneView.MoveCamera( moveDir );
-        sceneView.Render();
+        sceneView.BeginRender();
+        inspector.Render( width, height );
+        sceneView.EndRender();
 
         Window::SwapBuffers();
     }

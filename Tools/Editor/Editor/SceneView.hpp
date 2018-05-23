@@ -30,7 +30,8 @@ class SceneView
 {
 public:
     void Init( int width, int height );
-    void Render();
+    void BeginRender();
+    void EndRender();
     void RotateCamera( float xDegrees, float yDegrees );
     void MoveCamera( const ae3d::Vec3& moveDir );
     
