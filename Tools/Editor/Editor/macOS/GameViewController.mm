@@ -1,4 +1,5 @@
 #import "GameViewController.h"
+#import "Inspector.hpp"
 #import "System.hpp"
 #import "SceneView.hpp"
 
@@ -8,6 +9,7 @@ NSViewController* myViewController;
 {
     MTKView *_view;
     SceneView sceneView;
+    Inspector inspector;
     ae3d::Vec3 moveDir;
 }
 
@@ -31,6 +33,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     ae3d::System::LoadBuiltinAssets();
     
     sceneView.Init( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
+    inspector.Init();
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -120,7 +123,9 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     {
         ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
         ae3d::System::BeginFrame();
-        sceneView.Render();
+        sceneView.BeginRender();
+        inspector.Render( width, height );
+        sceneView.EndRender();
         ae3d::System::EndFrame();
     }
 }

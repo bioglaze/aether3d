@@ -14,7 +14,7 @@ void ae3d::VertexBuffer::SetDebugName( const char* name )
     vertexBuffer.label = [NSString stringWithUTF8String:name];
 }
 
-void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
+void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount, Storage storage )
 {
     if (faceCount == 0)
     {
@@ -22,27 +22,38 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     }
     
     vertexFormat = VertexFormat::PTC;
-    vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexPTC ) * vertexCount
-                      options:MTLResourceStorageModePrivate];
+    
+    if (storage == Storage::GPU)
+    {
+        vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexPTC ) * vertexCount
+                       options:MTLResourceStorageModePrivate];
+        
+        id<MTLBuffer> blitBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
+                                       length:sizeof( VertexPTC ) * vertexCount
+                                      options:MTLResourceCPUCacheModeDefaultCache];
+        blitBuffer.label = @"BlitBuffer";
+        
+        id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
+        cmd_buffer.label = @"BlitCommandBuffer";
+        id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+        [blit_encoder copyFromBuffer:blitBuffer
+                        sourceOffset:0
+                            toBuffer:vertexBuffer
+                   destinationOffset:0
+                                size:sizeof( VertexPTC ) * vertexCount];
+        [blit_encoder endEncoding];
+        [cmd_buffer commit];
+        [cmd_buffer waitUntilCompleted];
+    }
+    else
+    {
+        vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
+                                       length:sizeof( VertexPTC ) * vertexCount
+                                      options:MTLResourceCPUCacheModeDefaultCache];
+    }
+    
     vertexBuffer.label = @"Vertex buffer PTC";
     
-    id<MTLBuffer> blitBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
-                                   length:sizeof( VertexPTC ) * vertexCount
-                                  options:MTLResourceCPUCacheModeDefaultCache];
-    blitBuffer.label = @"BlitBuffer";
-    
-    id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
-    cmd_buffer.label = @"BlitCommandBuffer";
-    id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
-    [blit_encoder copyFromBuffer:blitBuffer
-                    sourceOffset:0
-                        toBuffer:vertexBuffer
-               destinationOffset:0
-                            size:sizeof( VertexPTC ) * vertexCount];
-    [blit_encoder endEncoding];
-    [cmd_buffer commit];
-    [cmd_buffer waitUntilCompleted];
-
     std::vector< float > positions( vertexCount * 3 );
     
     for (int v = 0; v < vertexCount; ++v)

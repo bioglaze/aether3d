@@ -129,7 +129,8 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 }
 
-void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
+void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount,
+                                   Storage storage )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;

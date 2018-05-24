@@ -60,7 +60,7 @@ void ae3d::Renderer::GenerateSkybox()
         { 2, 0, 1 }
     };
 
-    skyboxBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
+    skyboxBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ), VertexBuffer::Storage::GPU );
 }
 
 void ae3d::Renderer::GenerateQuadBuffer()
@@ -79,7 +79,7 @@ void ae3d::Renderer::GenerateQuadBuffer()
         { 2, 3, 0 }
     };
     
-    quadBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ) );
+    quadBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ), VertexBuffer::Storage::GPU );
 }
 
 void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera )
@@ -121,7 +121,7 @@ int ae3d::GfxDevice::CreateLineBuffer( const Vec3* lines, int lineCount, const V
     }
 
     GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
-    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ) );
+    GfxDeviceGlobal::lineBuffers.back().Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ), VertexBuffer::Storage::GPU );
     GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
 
     return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;

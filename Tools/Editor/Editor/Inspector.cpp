@@ -9,7 +9,11 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_IMPLEMENTATION
+#if RENDERER_METAL
+#include "nuklear.h"
+#else
 #include "../../Samples/NuklearTest/nuklear.h"
+#endif
 
 using namespace ae3d;
 

@@ -259,7 +259,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         
         m().subMeshes.resize( 1 );
         auto& firstSubMesh = m().subMeshes[ 0 ];
-        firstSubMesh.vertexBuffer.Generate( indices.data(), static_cast< int >(indices.size()), vertices.data(), static_cast< int >(vertices.size()) );
+        firstSubMesh.vertexBuffer.Generate( indices.data(), static_cast< int >(indices.size()), vertices.data(), static_cast< int >(vertices.size()), VertexBuffer::Storage::GPU );
         firstSubMesh.vertexBuffer.SetDebugName( "default mesh" );
         firstSubMesh.aabbMin = {-s, -s, -s};
         firstSubMesh.aabbMax = { s,  s, s };

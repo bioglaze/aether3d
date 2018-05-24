@@ -27,6 +27,7 @@
 		ABB36041208C4F83007133FD /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABB3603F208C4F83007133FD /* glider.png */; };
 		ABB36043208C5244007133FD /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB36042208C5244007133FD /* Metal.framework */; };
 		ABB36045208C529B007133FD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB36044208C529B007133FD /* AppKit.framework */; };
+		ABBDD28920B7296B00AA93C7 /* Inspector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABBDD28820B7296B00AA93C7 /* Inspector.cpp */; };
 		ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */; };
 		ABD0C8BA2070B34C0049EEAE /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B92070B34C0049EEAE /* OpenAL.framework */; };
 		ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8BB2070B3550049EEAE /* MetalKit.framework */; };
@@ -60,6 +61,8 @@
 		ABB3603F208C4F83007133FD /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		ABB36042208C5244007133FD /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		ABB36044208C529B007133FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		ABBDD28720B7296B00AA93C7 /* Inspector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Inspector.hpp; sourceTree = SOURCE_ROOT; };
+		ABBDD28820B7296B00AA93C7 /* Inspector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Inspector.cpp; sourceTree = SOURCE_ROOT; };
 		ABD0C8992070B2090049EEAE /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../../../../Engine/Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 		ABD0C89A2070B2090049EEAE /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../../../Engine/Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		ABD0C89B2070B2090049EEAE /* SpriteRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpriteRendererComponent.hpp; path = ../../../../Engine/Include/SpriteRendererComponent.hpp; sourceTree = "<group>"; };
@@ -139,6 +142,8 @@
 				AB010CD5206F70B40014ED08 /* AppDelegate.m */,
 				AB010CDA206F70B40014ED08 /* GameViewController.h */,
 				AB010CDB206F70B40014ED08 /* GameViewController.mm */,
+				ABBDD28820B7296B00AA93C7 /* Inspector.cpp */,
+				ABBDD28720B7296B00AA93C7 /* Inspector.hpp */,
 				ABB3603C208C4F05007133FD /* SceneView.cpp */,
 				ABB3603B208C4F05007133FD /* SceneView.hpp */,
 				AB010CE0206F70B40014ED08 /* Assets.xcassets */,
@@ -291,6 +296,7 @@
 				ABAA98B020963B4C00DC1F42 /* Standard.metal in Sources */,
 				ABAA98B320963B4C00DC1F42 /* FullscreenTriangle.metal in Sources */,
 				ABAA98B720963B4C00DC1F42 /* SDF.metal in Sources */,
+				ABBDD28920B7296B00AA93C7 /* Inspector.cpp in Sources */,
 				AB010CDC206F70B40014ED08 /* GameViewController.mm in Sources */,
 				ABAA98B220963B4C00DC1F42 /* SpriteShader.metal in Sources */,
 				AB010CD6206F70B40014ED08 /* AppDelegate.m in Sources */,
@@ -437,6 +443,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
+				HEADER_SEARCH_PATHS = ../../../Samples/NuklearTest;
 				INFOPLIST_FILE = macOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = ../../../../aether3d_build;
@@ -457,6 +464,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
+				HEADER_SEARCH_PATHS = ../../../Samples/NuklearTest;
 				INFOPLIST_FILE = macOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = ../../../../aether3d_build;

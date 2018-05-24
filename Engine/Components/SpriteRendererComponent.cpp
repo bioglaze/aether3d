@@ -92,7 +92,7 @@ void CreateVertexBuffer( std::vector< Sprite >& sprites, ae3d::VertexBuffer& out
         tri2.c = i * quadVertexCount + 0;
     }
     
-    outVertexBuffer.Generate( faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()) );
+    outVertexBuffer.Generate( faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()), ae3d::VertexBuffer::Storage::GPU );
     outVertexBuffer.SetDebugName( "sprite buffer" );
 }
 

@@ -18,6 +18,7 @@ namespace ae3d
     class VertexBuffer
     {
     public:
+        enum class Storage { CPU, GPU };
         enum class VertexFormat { PTC, PTN, PTNTC, PTNTC_Skinned, Empty };
 
         /// Triangle of 3 vertices.
@@ -119,7 +120,8 @@ namespace ae3d
         /// \param faceCount Face count.
         /// \param vertices Vertices.
         /// \param vertexCount Vertex count.
-        void Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount );
+        /// \param storage Use CPU if you need to modify the data after calling this method.
+        void Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount, Storage storage );
 
         /// Generates the buffer from supplied geometry.
         /// \param faces Faces.
