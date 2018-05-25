@@ -353,7 +353,7 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount,
-                                  Storage storage )
+                                  Storage /*storage*/ )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;

@@ -1104,7 +1104,7 @@ void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, 
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
 {
-    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
+    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ), VertexBuffer::Storage::CPU );
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()

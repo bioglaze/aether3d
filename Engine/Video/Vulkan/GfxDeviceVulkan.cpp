@@ -1672,7 +1672,7 @@ namespace ae3d
         err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, nullptr, &GfxDeviceGlobal::queryPool );
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
 
-        GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
+        GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ), VertexBuffer::Storage::CPU );
 
         renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
         renderer.builtinShaders.fullscreenTriangleShader.LoadSPIRV( FileSystem::FileContents( "fullscreen_triangle_vert.spv" ), FileSystem::FileContents( "sprite_frag.spv" ) );
@@ -1724,7 +1724,7 @@ void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, 
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
 {
-    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ) );
+    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ), VertexBuffer::Storage::CPU );
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
