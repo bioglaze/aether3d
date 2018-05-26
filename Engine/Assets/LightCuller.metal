@@ -141,11 +141,11 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     minZ = as_type< float >( zMax );
     maxZ = as_type< float >( zMin );
 
-    uint numPointLights = uniforms.numLights & 0xFFFFu;
+    int numPointLights = uniforms.numLights & 0xFFFFu;
 
-    for (uint i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
+    for (int i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
     {
-        uint il = localIdxFlattened + i;
+        int il = localIdxFlattened + i;
 
         if (il < numPointLights)
         {
@@ -162,7 +162,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                 {
                     // do a thread-safe increment of the list counter
                     // and put the index of this light into the list
-                    uint dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
+                    int dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
                     ldsLightIdx[ dstIdx ] = il;
                 }
             }
@@ -171,14 +171,14 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
-    uint numPointLightsInThisTile = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
+    int numPointLightsInThisTile = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
 
     // Spot lights.
-    uint numSpotLights = (uniforms.numLights & 0xFFFF0000u) >> 16;
+    int numSpotLights = (uniforms.numLights & 0xFFFF0000u) >> 16;
 
-    for (uint i = 0; i < numSpotLights; i += NUM_THREADS_PER_TILE)
+    for (int i = 0; i < numSpotLights; i += NUM_THREADS_PER_TILE)
     {
-        uint il = localIdxFlattened + i;
+        int il = localIdxFlattened + i;
 
         if (il < numSpotLights)
         {
@@ -193,7 +193,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < radius))
                 {
-                    uint dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
+                    int dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
                     ldsLightIdx[ dstIdx ] = il;
                 }
             }
@@ -202,16 +202,16 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
     {   // write back
-        uint startOffset = uniforms.maxNumLightsPerTile * tileIdxFlattened;
+        int startOffset = uniforms.maxNumLightsPerTile * tileIdxFlattened;
 
-        for (uint i = localIdxFlattened; i < numPointLightsInThisTile; i += NUM_THREADS_PER_TILE)
+        for (int i = localIdxFlattened; i < numPointLightsInThisTile; i += NUM_THREADS_PER_TILE)
         {
             // per-tile list of light indices
             perTileLightIndexBufferOut[ startOffset + i ] = ldsLightIdx[ i ];
         }
 
-        uint jMax = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
-        for (uint j = localIdxFlattened + numPointLightsInThisTile; j < jMax; j += NUM_THREADS_PER_TILE)
+        int jMax = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
+        for (int j = localIdxFlattened + numPointLightsInThisTile; j < jMax; j += NUM_THREADS_PER_TILE)
         {
             // per-tile list of light indices
             perTileLightIndexBufferOut[ startOffset + j + 1 ] = ldsLightIdx[ j ];
