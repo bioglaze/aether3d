@@ -26,7 +26,7 @@ namespace debug
     PFN_vkCmdDebugMarkerEndEXT CmdDebugMarkerEnd = nullptr;
     PFN_vkCmdDebugMarkerInsertEXT CmdDebugMarkerInsertEXT = nullptr;
 
-    VkDebugReportCallbackEXT debugReportCallback = nullptr;
+    VkDebugReportCallbackEXT debugReportCallback;
 
     VkBool32 messageCallback( VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*objType*/, std::uint64_t /*srcObject*/,
         std::size_t /*location*/, std::int32_t msgCode, const char* pLayerPrefix, const char* pMsg, void* /*pUserData*/ )

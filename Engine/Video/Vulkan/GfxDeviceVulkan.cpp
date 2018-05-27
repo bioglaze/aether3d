@@ -623,6 +623,12 @@ namespace ae3d
         surfaceCreateInfo.window = WindowGlobal::window;
         err = vkCreateXcbSurfaceKHR( GfxDeviceGlobal::instance, &surfaceCreateInfo, nullptr, &GfxDeviceGlobal::surface );
 #endif
+#if VK_USE_PLATFORM_ANDROID_KHR
+        VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
+        surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+        surfaceCreateInfo.window = WindowGlobal::window;
+        err = vkCreateAndroidSurfaceKHR( GfxDeviceGlobal::instance, &surfaceCreateInfo, nullptr, &GfxDeviceGlobal::surface );
+#endif
         AE3D_CHECK_VULKAN( err, "create surface" );
         System::Assert( GfxDeviceGlobal::surface != VK_NULL_HANDLE, "no surface" );
         
