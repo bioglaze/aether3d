@@ -17,10 +17,6 @@ struct ColorInOut
     half4  color;
 };
 
-constexpr sampler shadowSampler(coord::normalized,
-                                address::clamp_to_zero,
-                                filter::linear);
-
 struct Vertex
 {
     float3 position [[attribute(0)]];

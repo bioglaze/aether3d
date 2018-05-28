@@ -16,6 +16,7 @@
 
 #define MYMAX(x, y) ((x) > (y) ? (x) : (y))
 
+extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
 namespace Texture2DGlobal
@@ -171,20 +172,45 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         defaultTexture.opaque = false;
         
         MTLTextureDescriptor* textureDescriptor =
-        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
+        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm_sRGB
                                                            width:defaultTexture.width
                                                           height:defaultTexture.height
                                                        mipmapped:NO];
-        //textureDescriptor.usage = MTLTextureUsageUnknown;
-        defaultTexture.metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
-        defaultTexture.metalTexture.label = @"Default texture";
-
+        id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+        stagingTexture.label = @"texture loaded from data";
+        
+        MTLTextureDescriptor* textureDescriptor2 =
+        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm_sRGB
+                                                           width:defaultTexture.width
+                                                          height:defaultTexture.height
+                                                       mipmapped:NO];
+        textureDescriptor2.usage = MTLTextureUsageShaderRead;
+        textureDescriptor2.storageMode = MTLStorageModePrivate;
+        defaultTexture.metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor2];
+        defaultTexture.metalTexture.label = stagingTexture.label;
+        
         const int components = 4;
         int data[ 128 * 128 * components ] = { 0xFFC0CB };
-
+        
         MTLRegion region = MTLRegionMake2D(0, 0, defaultTexture.width, defaultTexture.height);
         const int bytesPerRow = components * defaultTexture.width;
-        [defaultTexture.metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
+        [stagingTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
+
+        id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
+        cmd_buffer.label = @"BlitCommandBuffer";
+        id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+        [blit_encoder copyFromTexture:stagingTexture
+                          sourceSlice:0
+                          sourceLevel:0
+                         sourceOrigin:MTLOriginMake( 0, 0, 0 )
+                           sourceSize:MTLSizeMake( defaultTexture.width, defaultTexture.height, 1 )
+                            toTexture:defaultTexture.metalTexture
+                     destinationSlice:0
+                     destinationLevel:0
+                    destinationOrigin:MTLOriginMake( 0, 0, 0 ) ];
+        [blit_encoder endEncoding];
+        [cmd_buffer commit];
+        [cmd_buffer waitUntilCompleted];
     }
 
     return &defaultTexture;
@@ -203,6 +229,8 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
                                                        width:width
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+    textureDescriptor.usage = MTLTextureUsageShaderRead;
+    textureDescriptor.storageMode = MTLStorageModeShared;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     metalTexture.label = @"texture loaded from data";
     
@@ -210,11 +238,11 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     [metalTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];
-    
+
     if (mipmaps == Mipmaps::Generate)
     {
-        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
-        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLCommandQueue> commandQueue2 = [GfxDevice::GetMetalDevice() newCommandQueue];
+        id<MTLCommandBuffer> commandBuffer = [commandQueue2 commandBuffer];
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
         [commandEncoder generateMipmapsForTexture:metalTexture];
         [commandEncoder endEncoding];
@@ -299,6 +327,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
                                                            width:width
                                                           height:height
                                                        mipmapped:NO];//(mipmaps == Mipmaps::None ? NO : YES)];
+        textureDescriptor.usage = MTLTextureUsageShaderRead;
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
         
         std::size_t pos = fileContents.path.find_last_of( "/" );
@@ -395,27 +424,52 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
                                                        width:width
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
-    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+    id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     
     std::size_t pos = fileContents.path.find_last_of( "/" );
     if (pos != std::string::npos)
     {
         std::string fileName = fileContents.path.substr( pos );
-        metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+        stagingTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
     }
     else
     {
-        metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
+        stagingTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
     }
     
     const int bytesPerRow = width * 4;
 
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
-    [metalTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
+    [stagingTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
+    
+    MTLTextureDescriptor* textureDescriptor2 =
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+                                                       width:width
+                                                      height:height
+                                                   mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+    textureDescriptor2.usage = MTLTextureUsageShaderRead;
+    textureDescriptor2.storageMode = MTLStorageModePrivate;
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor2];
+    metalTexture.label = stagingTexture.label;
+    
+    id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
+    cmd_buffer.label = @"BlitCommandBuffer";
+    id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+    [blit_encoder copyFromTexture:stagingTexture
+                    sourceSlice:0
+                      sourceLevel:0
+                     sourceOrigin:MTLOriginMake( 0, 0, 0 )
+                       sourceSize:MTLSizeMake( width, height, 1 )
+                        toTexture:metalTexture
+               destinationSlice:0
+                 destinationLevel:0
+                destinationOrigin:MTLOriginMake( 0, 0, 0 ) ];
+    [blit_encoder endEncoding];
+    [cmd_buffer commit];
+    [cmd_buffer waitUntilCompleted];
 
     if (mipmaps == Mipmaps::Generate)
     {
-        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
         [commandEncoder generateMipmapsForTexture:metalTexture];
@@ -529,7 +583,6 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
         
         if (mipmaps == Mipmaps::Generate)
         {
-            id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
             id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
             id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
             [commandEncoder generateMipmapsForTexture:metalTexture];

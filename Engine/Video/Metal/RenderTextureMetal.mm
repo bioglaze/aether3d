@@ -87,6 +87,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
                                                        size:width
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+    textureDescriptor.storageMode = MTLStorageModePrivate;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     
     if (metalTexture == nullptr)
