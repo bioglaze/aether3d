@@ -230,14 +230,39 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     textureDescriptor.usage = MTLTextureUsageShaderRead;
-    textureDescriptor.storageMode = MTLStorageModeShared;
-    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
-    metalTexture.label = @"texture loaded from data";
+    id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+    stagingTexture.label = @"texture loaded from data";
     
     const int bytesPerRow = width * channels;
     
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
-    [metalTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];
+    [stagingTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];
+
+    MTLTextureDescriptor* textureDescriptor2 =
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+                                                       width:width
+                                                      height:height
+                                                   mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+    textureDescriptor2.usage = MTLTextureUsageShaderRead;
+    textureDescriptor2.storageMode = MTLStorageModePrivate;
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor2];
+    metalTexture.label = stagingTexture.label;
+    
+    id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
+    cmd_buffer.label = @"BlitCommandBuffer";
+    id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+    [blit_encoder copyFromTexture:stagingTexture
+                      sourceSlice:0
+                      sourceLevel:0
+                     sourceOrigin:MTLOriginMake( 0, 0, 0 )
+                       sourceSize:MTLSizeMake( width, height, 1 )
+                        toTexture:metalTexture
+                 destinationSlice:0
+                 destinationLevel:0
+                destinationOrigin:MTLOriginMake( 0, 0, 0 ) ];
+    [blit_encoder endEncoding];
+    [cmd_buffer commit];
+    [cmd_buffer waitUntilCompleted];
 
     if (mipmaps == Mipmaps::Generate)
     {

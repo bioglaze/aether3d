@@ -33,7 +33,7 @@ int atlasHeight = 0;
 Texture2D nkFontTexture;
 nk_buffer cmds;
 
-void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
+void DrawNuklear( nk_buffer* uiCommands, int width, int height )
 {
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
@@ -65,7 +65,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     nk_buffer vbuf, ebuf;
     nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY );
     nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
-    nk_convert( ctx, uiCommands, &vbuf, &ebuf, &config );
+    nk_convert( &ctx, uiCommands, &vbuf, &ebuf, &config );
 
     System::UnmapUIVertexBuffer();
     
@@ -75,7 +75,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     const float scaleX = 1;
     const float scaleY = 1;
     
-    nk_draw_foreach( cmd, ctx, uiCommands )
+    nk_draw_foreach( cmd, &ctx, uiCommands )
     {
         if (cmd->elem_count == 0)
         {
@@ -90,7 +90,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
         offset += cmd->elem_count;
     }
 
-    nk_clear( ctx );
+    nk_clear( &ctx );
 }
 
 void Inspector::Init()
@@ -122,7 +122,7 @@ void Inspector::Render( int width, int height )
             System::Print("Pressed a button\n");
         }
 
-        DrawNuklear( &ctx, &cmds, width, height );
+        DrawNuklear( &cmds, width, height );
         nk_end( &ctx );
     }
 }

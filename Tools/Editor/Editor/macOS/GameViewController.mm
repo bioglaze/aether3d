@@ -116,8 +116,8 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 {
     sceneView.MoveCamera( moveDir );
 
-    const int width = self.view.bounds.size.width * 2;
-    const int height = self.view.bounds.size.height * 2;
+    const int width = self.view.bounds.size.width;
+    const int height = self.view.bounds.size.height;
     
     if (_view.currentRenderPassDescriptor != nil)
     {
