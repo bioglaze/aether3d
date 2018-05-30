@@ -81,12 +81,12 @@ void DrawNuklear( nk_buffer* uiCommands, int width, int height )
         {
             continue;
         }
-        
+
         System::DrawUI( (int)(cmd->clip_rect.x * scaleX),
                         (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
                         (int)(cmd->clip_rect.w * scaleX),
                         (int)(cmd->clip_rect.h * scaleY),
-                        cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
+                        cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
         offset += cmd->elem_count;
     }
 
@@ -108,7 +108,6 @@ void Inspector::Init()
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
-
 }
 
 void Inspector::Render( int width, int height )
@@ -116,7 +115,17 @@ void Inspector::Render( int width, int height )
     if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
         nk_layout_row_static( &ctx, 30, 80, 1 );
-            
+
+        nk_label( &ctx, "object name", NK_TEXT_LEFT );
+
+        static float posX;
+        static float posY;
+        static float posZ;
+
+        nk_property_float( &ctx, "#X:", -1024.0f, &posX, 1024.0f, 1, 1 );
+        nk_property_float( &ctx, "#Y:", -1024.0f, &posY, 1024.0f, 1, 1 );
+        nk_property_float( &ctx, "#Z:", -1024.0f, &posZ, 1024.0f, 1, 1 );
+
         if (nk_button_label( &ctx, "button" ))
         {
             System::Print("Pressed a button\n");
