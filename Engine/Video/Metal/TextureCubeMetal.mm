@@ -11,9 +11,6 @@
 #include "System.hpp"
 
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
-void Tokenize( const std::string& str,
-              std::vector< std::string >& tokens,
-              const std::string& delimiters = " " ); // Defined in TextureCommon.cpp
 
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                               const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,

@@ -1,8 +1,5 @@
 #include "Texture2D.hpp"
-#include <map>
 #include <string>
-#include <vector>
-#include <sstream>
 #include <stdint.h>
 #define STB_IMAGE_IMPLEMENTATION
 #if TARGET_OS_IPHONE
@@ -19,10 +16,6 @@
 extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
-namespace Texture2DGlobal
-{
-    std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
-}
 
 namespace PVRType
 {

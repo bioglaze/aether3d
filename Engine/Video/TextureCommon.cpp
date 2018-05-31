@@ -7,6 +7,13 @@
 #include "System.hpp"
 #include "FileSystem.hpp"
 
+#if RENDERER_METAL
+namespace Texture2DGlobal
+{
+    std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
+}
+#endif
+
 bool HasStbExtension( const std::string& path )
 {
     // Checks for uncompressed formats in texture's file name.

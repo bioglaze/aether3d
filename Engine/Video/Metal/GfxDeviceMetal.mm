@@ -3,8 +3,6 @@
 #import <MetalKit/MetalKit.h>
 #include <cmath>
 #include <unordered_map>
-#include <sstream>
-#include <list>
 #include <vector>
 #include "GfxDevice.hpp"
 #include "LightTiler.hpp"
@@ -198,12 +196,19 @@ namespace ae3d
         {
             std::string GetStatistics()
             {
-                std::stringstream stm;
-                stm << "frame time: " << ::Statistics::GetFrameTimeMS() << "\n";
-                stm << "shadow map time: " << ::Statistics::GetShadowMapTimeMS() << " ms\n";
-                stm << "depth pass time: " << ::Statistics::GetDepthNormalsTimeMS() << " ms\n";
-                stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
-                return stm.str();
+                std::string str( "frame time: " );
+                str += std::to_string( ::Statistics::GetFrameTimeMS() );
+                str += "\n";
+                str += "shadow map time: ";
+                str += std::to_string( ::Statistics::GetShadowMapTimeMS() );
+                str += "\n";
+                str += "depth pass time: ";
+                str += std::to_string( ::Statistics::GetDepthNormalsTimeMS() );
+                str += "\n";
+                str += "draw calls: ";
+                str += std::to_string( ::Statistics::GetDrawCalls() );
+                str += "\n";
+                return str;
             }
         }
     }
