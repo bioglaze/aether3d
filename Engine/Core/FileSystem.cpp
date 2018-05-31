@@ -1,5 +1,6 @@
 #include "FileSystem.hpp"
 #include "System.hpp"
+#include <algorithm>
 #include <fstream>
 #include <vector>
 
