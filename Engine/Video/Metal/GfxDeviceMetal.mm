@@ -24,7 +24,7 @@ id <MTLLibrary> defaultLibrary;
 id <MTLDepthStencilState> depthStateLessEqualWriteOn;
 id <MTLDepthStencilState> depthStateLessEqualWriteOff;
 id <MTLDepthStencilState> depthStateNoneWriteOff;
-id <CAMetalDrawable> currentDrawable; // This frame's framebuffer drawable
+MTKView* view;
 
 MTLRenderPassDescriptor* renderPassDescriptorApp = nullptr;
 MTLRenderPassDescriptor* renderPassDescriptorFBO = nullptr;
@@ -288,10 +288,9 @@ void ae3d::GfxDevice::Init( int width, int height )
     GfxDeviceGlobal::backBufferHeight = height;
 }
 
-void ae3d::GfxDevice::SetCurrentDrawableMetal( id <CAMetalDrawable> aDrawable, MTLRenderPassDescriptor* renderPass )
+void ae3d::GfxDevice::SetCurrentDrawableMetal( MTKView* aView )
 {
-    currentDrawable = aDrawable;
-    renderPassDescriptorApp = renderPass;
+    view = aView;
 }
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
@@ -305,7 +304,7 @@ void ae3d::GfxDevice::PopGroupMarker()
     [renderEncoder popDebugGroup];
 }
 
-void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize )
+void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int sampleCount, int uiVBSize, int uiIBSize )
 {
     if (sampleCount < 1 || sampleCount > 8)
     {
@@ -319,8 +318,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* view, int 
 
     renderPassDescriptorFBO = [MTLRenderPassDescriptor renderPassDescriptor];
 
-    GfxDeviceGlobal::backBufferWidth = view.bounds.size.width;
-    GfxDeviceGlobal::backBufferHeight = view.bounds.size.height;
+    GfxDeviceGlobal::backBufferWidth = aView.bounds.size.width;
+    GfxDeviceGlobal::backBufferHeight = aView.bounds.size.height;
     GfxDeviceGlobal::sampleCount = sampleCount;
     GfxDeviceGlobal::uniformBuffers.resize( 1400 );
     
@@ -779,9 +778,9 @@ void ae3d::GfxDevice::BeginFrame()
 
 void ae3d::GfxDevice::PresentDrawable()
 {
-    if (currentDrawable != nil)
+    if (view.currentDrawable != nil)
     {
-        [commandBuffer presentDrawable:currentDrawable];
+        [commandBuffer presentDrawable:view.currentDrawable];
         [commandBuffer commit];
     }
 }
@@ -803,7 +802,7 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
 
 void ae3d::GfxDevice::BeginBackBufferEncoding()
 {
-    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptorApp];
+    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:view.currentRenderPassDescriptor];
     renderEncoder.label = @"BackBufferRenderEncoder";
 
     GfxDeviceGlobal::currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;

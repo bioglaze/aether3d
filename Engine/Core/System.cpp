@@ -53,9 +53,9 @@ void ae3d::System::InitMetal( id <MTLDevice> device, MTKView* view, int sampleCo
     GfxDevice::InitMetal( device, view, sampleCount, uiVBSize, uiIBSize );
 }
 
-void ae3d::System::SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass )
+void ae3d::System::SetCurrentDrawableMetal( MTKView* view )
 {
-    GfxDevice::SetCurrentDrawableMetal( drawable, renderPass );
+    GfxDevice::SetCurrentDrawableMetal( view );
 }
 
 void ae3d::System::BeginFrame()

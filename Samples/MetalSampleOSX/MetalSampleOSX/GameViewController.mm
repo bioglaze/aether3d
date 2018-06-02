@@ -57,7 +57,7 @@ std::uint32_t pcg32_random_r( pcg32_random_t* rng )
 {
     std::uint64_t oldstate = rng->state;
     rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
-    std::uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+    std::uint32_t xorshifted = (std::uint32_t)( ((oldstate >> 18u) ^ oldstate) >> 27u );
     std::int32_t rot = oldstate >> 59u;
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
@@ -827,9 +827,9 @@ using namespace ae3d;
     const int width = self.view.bounds.size.width * 2;
     const int height = self.view.bounds.size.height * 2;
     
-    if (_view.currentRenderPassDescriptor != nil)
+    //if (_view.currentRenderPassDescriptor != nil)
     {
-        ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
+        ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         scene.Render();
         //scene2.Render();

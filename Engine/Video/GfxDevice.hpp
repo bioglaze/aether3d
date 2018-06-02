@@ -96,7 +96,7 @@ namespace ae3d
 #if RENDERER_METAL
         static const int UNIFORM_BUFFER_SIZE = sizeof( PerObjectUboStruct ) + 64 * 81;
         void InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize );
-        void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
+        void SetCurrentDrawableMetal( MTKView* view );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
         id <MTLDevice> GetMetalDevice();
         id <MTLLibrary> GetDefaultMetalShaderLibrary();

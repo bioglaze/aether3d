@@ -161,7 +161,7 @@ namespace ae3d
         
 #if RENDERER_METAL
         void InitMetal( id< MTLDevice > metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize );
-        void SetCurrentDrawableMetal( id <CAMetalDrawable> drawable, MTLRenderPassDescriptor* renderPass );
+        void SetCurrentDrawableMetal( MTKView* view );
         void BeginFrame();
         void EndFrame();
 #endif
