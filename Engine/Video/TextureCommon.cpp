@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <string>
 #include <map>
 #include <vector>
@@ -14,19 +13,24 @@ namespace Texture2DGlobal
 }
 #endif
 
+// Checks for uncompressed formats in texture's file name.
+static const std::string extensions[] =
+{
+    ".png", ".PNG", ".jpg", ".JPG", ".tga", ".TGA",
+    ".bmp", ".BMP", ".gif", ".GIF"
+};
+
 bool HasStbExtension( const std::string& path )
 {
-    // Checks for uncompressed formats in texture's file name.
-    static const std::string extensions[] =
+    for (const auto& e : extensions)
     {
-        ".png", ".PNG", ".jpg", ".JPG", ".tga", ".TGA",
-        ".bmp", ".BMP", ".gif", ".GIF"
-    };
-    
-    const bool extensionFound = std::any_of( std::begin( extensions ), std::end( extensions ),
-                                            [&]( const std::string& extension ) { return path.find( extension ) != std::string::npos; } );
-    
-    return extensionFound;
+        if (path.find( e ) != std::string::npos)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Tokenize( const std::string& str,

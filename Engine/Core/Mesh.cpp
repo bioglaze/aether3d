@@ -399,7 +399,15 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             }
         }
         
-        std::string subMeshDebugName = meshData.path + std::string( ":" ) + subMesh.name;
+        const std::size_t pos = meshData.path.find_last_of( "/" );
+        std::string shortPath = meshData.path;
+        
+        if (pos != std::string::npos)
+        {
+            shortPath = meshData.path.substr( pos );
+        }
+
+        std::string subMeshDebugName = shortPath + std::string( ":" ) + subMesh.name;
         subMesh.vertexBuffer.SetDebugName( subMeshDebugName.c_str() );
     }
     

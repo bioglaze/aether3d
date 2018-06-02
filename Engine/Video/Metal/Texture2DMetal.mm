@@ -16,7 +16,6 @@
 extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
-
 namespace PVRType
 {
     enum Enum
@@ -381,7 +380,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         
         const uint32_t w  = (header->xSize[ 2 ] << 16) + (header->xSize[ 1 ] << 8) + header->xSize[ 0 ];
         const uint32_t h = (header->ySize[ 2 ] << 16) + (header->ySize[ 1 ] << 8) + header->ySize[ 0 ];
-        const uint32_t depth  = (header->zSize[ 2 ] << 16) + (header->zSize[ 1 ] << 8) + header->zSize[ 0 ];
         
         const uint32_t widthInBlocks =  (w + header->blockDimX - 1) / header->blockDimX;
         const uint32_t blockSize = 4 * 4;
@@ -405,7 +403,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         
         if (mipmaps == Mipmaps::Generate)
         {
-            id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
             id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
             id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
             [commandEncoder generateMipmapsForTexture:metalTexture];
@@ -719,7 +716,6 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
     
     if (mipmaps == Mipmaps::Generate)
     {
-        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
         [commandEncoder generateMipmapsForTexture:metalTexture];

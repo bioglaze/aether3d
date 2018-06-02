@@ -250,7 +250,7 @@ int gTouchCount;
 {
     [self _update];
 
-    ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
+    ae3d::System::SetCurrentDrawableMetal( _view );
     ae3d::System::BeginFrame();
     scene.Render();
     scene.EndFrame();

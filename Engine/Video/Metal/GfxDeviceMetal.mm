@@ -426,11 +426,11 @@ std::uint64_t GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blend
     return outResult;
 }
 
-id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
+id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
                                     ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
                                    MTLPixelFormat depthFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
-    const std::uint64_t psoHash = GetPSOHash( shader, blendMode, depthFunc, vertexFormat, pixelFormat, depthFormat, sampleCount, topology );
+    const std::uint64_t psoHash = GetPSOHash( shader, blendMode, /* unused on Metal*/ ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn, vertexFormat, pixelFormat, depthFormat, sampleCount, topology );
 
     if (GfxDeviceGlobal::psoCache.find( psoHash ) == std::end( GfxDeviceGlobal::psoCache ))
     {
@@ -674,7 +674,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     }
 #endif
 
-    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, depthFunc, vertexBuffer.GetVertexFormat(), pixelFormat,
+    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, vertexBuffer.GetVertexFormat(), pixelFormat,
                                                   depthFormat, sampleCount, topology )];
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
@@ -802,9 +802,18 @@ void ae3d::GfxDevice::SetMultiSampling( bool enable )
 
 void ae3d::GfxDevice::BeginBackBufferEncoding()
 {
-    renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:view.currentRenderPassDescriptor];
-    renderEncoder.label = @"BackBufferRenderEncoder";
-
+    MTLRenderPassDescriptor* renderPassDescriptor = view.currentRenderPassDescriptor;
+    
+    if (renderPassDescriptor != nil)
+    {
+        renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+        renderEncoder.label = @"BackBufferRenderEncoder";
+    }
+    else
+    {
+        renderEncoder = nil;
+    }
+    
     GfxDeviceGlobal::currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
 }
 

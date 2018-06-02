@@ -32,7 +32,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -373,7 +373,7 @@ using namespace ae3d;
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
@@ -481,7 +481,7 @@ using namespace ae3d;
     rtCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     rtCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &rtCubeMaterial, 0 );
     rtCube.AddComponent<ae3d::TransformComponent>();
-    rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { -5, 0, -85 } );
+    rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { -5, 2, -85 } );
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
 
     standardCubeBL.AddComponent<ae3d::MeshRendererComponent>();
@@ -832,6 +832,9 @@ using namespace ae3d;
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         scene.Render();
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+
         //scene2.Render();
         //System::DrawLines( lineHandle, lineView, lineProjection );
         Matrix44 viewMat = camera3d.GetComponent< CameraComponent >()->GetView();
@@ -850,9 +853,6 @@ using namespace ae3d;
                           camera3d.GetComponent< CameraComponent >()->GetProjection() );
         System::Draw( &gliderTex, 40, 240, 100, 100, self.view.bounds.size.width, self.view.bounds.size.height, Vec4( 1, 1, 1, 1 ) );
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );
-
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
 
 #ifdef TEST_NUKLEAR_UI
         nk_input_begin( &ctx );

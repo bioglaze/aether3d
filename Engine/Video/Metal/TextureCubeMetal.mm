@@ -10,6 +10,7 @@
 #include "FileSystem.hpp"
 #include "System.hpp"
 
+extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
@@ -58,18 +59,18 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                                                           size:width
                                                                                         mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
-    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
+    id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
 
     const std::size_t pos = fileContents[ 0 ]->path.find_last_of( "/" );
     
     if (pos != std::string::npos)
     {
         std::string fileName = fileContents[ 0 ]->path.substr( pos );
-        metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+        stagingTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
     }
     else
     {
-        metalTexture.label = [NSString stringWithUTF8String:fileContents[ 0 ]->path.c_str()];
+        stagingTexture.label = [NSString stringWithUTF8String:fileContents[ 0 ]->path.c_str()];
     }
     
     const NSUInteger bytesPerPixel = 4;
@@ -98,7 +99,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             opaque = (components == 3 || components == 1);
             
-            [metalTexture replaceRegion:region
+            [stagingTexture replaceRegion:region
                        mipmapLevel:0
                              slice:face
                          withBytes:data
@@ -122,7 +123,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             const int bytesPerRow2 = width * 4;
 
             region = MTLRegionMake2D( 0, 0, width, height );
-            [metalTexture replaceRegion:region
+            [stagingTexture replaceRegion:region
                             mipmapLevel:0
                                   slice:face
                               withBytes:&output.imageData[ output.dataOffsets[ 0 ] ]
@@ -138,12 +139,42 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     if (mipmaps == Mipmaps::Generate)
     {
-        id<MTLCommandQueue> commandQueue = [GfxDevice::GetMetalDevice() newCommandQueue];
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
-        [commandEncoder generateMipmapsForTexture:metalTexture];
+        [commandEncoder generateMipmapsForTexture:stagingTexture];
         [commandEncoder endEncoding];
         [commandBuffer commit];
         [commandBuffer waitUntilCompleted];
+    }
+    
+    MTLTextureDescriptor* descriptor2 = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+                                                                                             size:width
+                                                                                        mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+    descriptor2.usage = MTLTextureUsageShaderRead;
+    descriptor2.storageMode = MTLStorageModePrivate;
+    
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor2];
+    metalTexture.label = stagingTexture.label;
+    
+    for (int mipIndex = 0; mipIndex < (int)[stagingTexture mipmapLevelCount]; ++mipIndex)
+    {
+        for (int faceIndex = 0; faceIndex < 6; ++faceIndex)
+        {
+            id <MTLCommandBuffer> cmd_buffer = [commandQueue commandBuffer];
+            cmd_buffer.label = @"BlitCommandBuffer";
+            id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+            [blit_encoder copyFromTexture:stagingTexture
+                              sourceSlice:faceIndex
+                              sourceLevel:mipIndex
+                             sourceOrigin:MTLOriginMake( 0, 0, 0 )
+                               sourceSize:MTLSizeMake( width >> mipIndex, height >> mipIndex, 1 )
+                                toTexture:metalTexture
+                         destinationSlice:faceIndex
+                         destinationLevel:mipIndex
+                        destinationOrigin:MTLOriginMake( 0, 0, 0 ) ];
+            [blit_encoder endEncoding];
+            [cmd_buffer commit];
+            [cmd_buffer waitUntilCompleted];
+        }
     }
 }
