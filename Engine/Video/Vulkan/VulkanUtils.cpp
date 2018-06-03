@@ -4,8 +4,6 @@
 #include <vector>
 #include "Macros.hpp"
 #include "System.hpp"
-#include "VertexBuffer.hpp"
-#include "Shader.hpp"
 #include "Statistics.hpp"
 #include "GfxDevice.hpp"
 

@@ -6,7 +6,7 @@
 #include "System.hpp"
 #include "FileSystem.hpp"
 
-#if RENDERER_METAL
+#if defined( RENDERER_METAL ) || defined( RENDERER_VULKAN )
 namespace Texture2DGlobal
 {
     std::map< std::string, ae3d::Texture2D > hashToCachedTexture;

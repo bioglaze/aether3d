@@ -433,28 +433,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
 
                             for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
                             {
-                                const float scale = 2000;
-
-                                static const Vec3 directions[ 6 ] =
-                                {
-                                    Vec3( 1,  0,  0 ) * scale, // posX
-                                    Vec3( -1,  0,  0 ) * scale, // negX
-                                    Vec3( 0,  1,  0 ) * scale, // posY
-                                    Vec3( 0, -1,  0 ) * scale, // negY
-                                    Vec3( 0,  0,  1 ) * scale, // posZ
-                                    Vec3( 0,  0, -1 ) * scale  // negZ
-                                };
-
-                                static const Vec3 ups[ 6 ] =
-                                {
-                                    Vec3( 0,  -1,  0 ),
-                                    Vec3( 0,  -1,  0 ),
-                                    Vec3( 0,  0,  1 ),
-                                    Vec3( 0,  0, -1 ),
-                                    Vec3( 0, -1,  0 ),
-                                    Vec3( 0, -1,  0 )
-                                };
-
                                 lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
                                 RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
                             }
@@ -1341,9 +1319,9 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 return DeserializeResult::ParseError;
             }
 
-            float scale;
-            lineStream >> scale;
-            outGameObjects.back().GetComponent< TransformComponent >()->SetLocalScale( scale );
+            float objScale;
+            lineStream >> objScale;
+            outGameObjects.back().GetComponent< TransformComponent >()->SetLocalScale( objScale );
         }
         else if (token == "texture2d")
         {

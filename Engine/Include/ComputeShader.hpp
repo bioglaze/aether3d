@@ -1,7 +1,6 @@
 #ifndef COMPUTE_SHADER_H
 #define COMPUTE_SHADER_H
 
-#include <string>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
@@ -73,7 +72,6 @@ namespace ae3d
 
     private:
         static const int SLOT_COUNT = 4;
-        std::string path;
         
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;

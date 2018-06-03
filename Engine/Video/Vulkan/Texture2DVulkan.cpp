@@ -1,5 +1,4 @@
 #include "Texture2D.hpp"
-#include <map>
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -37,7 +36,6 @@ namespace GfxDeviceGlobal
 
 namespace Texture2DGlobal
 {
-    std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
     ae3d::Texture2D defaultTexture;
     std::vector< VkSampler > samplersToReleaseAtExit;
     std::vector< VkImage > imagesToReleaseAtExit;
