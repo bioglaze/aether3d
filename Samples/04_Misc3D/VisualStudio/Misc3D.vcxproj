@@ -206,7 +206,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib;%VULKAN_SDK%\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_Vulkan_d.lib;vulkan-1.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
@@ -333,7 +333,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib;%VULKAN_SDK%\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>openvr_api.lib;libOpenAL32.dll.a;Aether3D_Vulkan_OpenVR_r.lib;vulkan-1.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
@@ -360,7 +360,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib;%VULKAN_SDK%\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_Vulkan_r.lib;vulkan-1.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>

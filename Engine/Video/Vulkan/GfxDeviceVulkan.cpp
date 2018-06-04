@@ -958,6 +958,7 @@ namespace ae3d
         enabledFeatures.textureCompressionBC = GfxDeviceGlobal::deviceFeatures.textureCompressionBC;
         enabledFeatures.fillModeNonSolid = GfxDeviceGlobal::deviceFeatures.fillModeNonSolid;
         enabledFeatures.samplerAnisotropy = GfxDeviceGlobal::deviceFeatures.samplerAnisotropy;
+        enabledFeatures.fragmentStoresAndAtomics = GfxDeviceGlobal::deviceFeatures.fragmentStoresAndAtomics;
 
         if (debug::enabled)
         {

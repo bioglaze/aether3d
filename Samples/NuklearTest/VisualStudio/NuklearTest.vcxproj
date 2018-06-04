@@ -109,7 +109,7 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_VULKAN;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib;%VULKAN_SDK%\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_Vulkan_d.lib;vulkan-1.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
     </Link>
     <Manifest>
