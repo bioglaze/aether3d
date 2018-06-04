@@ -135,3 +135,9 @@ void Inspector::Render( int width, int height )
         nk_end( &ctx );
     }
 }
+
+void Inspector::Deinit()
+{
+    nk_font_atlas_clear( &atlas );
+    nk_free( &ctx );
+}

@@ -15,7 +15,7 @@ int main()
     System::LoadBuiltinAssets();
 
     bool quit = false;   
-    double x = 0, y = 0;
+    int x = 0, y = 0;
 
     SceneView sceneView;
     sceneView.Init( width, height );
@@ -154,6 +154,7 @@ int main()
         Window::SwapBuffers();
     }
 
+    inspector.Deinit();
     System::Deinit();
 
     return 0;
