@@ -223,7 +223,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             perTileLightIndexBufferOut[ startOffset + numPointLightsInThisTile ] = LIGHT_INDEX_BUFFER_SENTINEL;
 
             // mark the end of each per-tile list with a sentinel (spot lights)
-            uint offs = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
+            int offs = atomic_load_explicit( &ldsLightIdxCounter, memory_order::memory_order_relaxed );
             perTileLightIndexBufferOut[ startOffset + offs + 1 ] = LIGHT_INDEX_BUFFER_SENTINEL;
         }
     }

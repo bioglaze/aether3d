@@ -32,11 +32,11 @@ struct StandardVertex
     float4 color [[attribute(2)]];
 };
 
-static uint GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, const device uint* perTileLightIndexBuffer )
+static int GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, const device uint* perTileLightIndexBuffer )
 {
-    uint numLightsInThisTile = 0;
-    uint index = maxNumLightsPerTile * tileIndex;
-    uint nextLightIndex = perTileLightIndexBuffer[ index ];
+    int numLightsInThisTile = 0;
+    int index = maxNumLightsPerTile * tileIndex;
+    int nextLightIndex = perTileLightIndexBuffer[ index ];
 
     // count point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
@@ -62,24 +62,24 @@ static uint GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, co
     return numLightsInThisTile;
 }
 
-static uint GetTileIndex( float2 ScreenPos, int windowWidth )
+static int GetTileIndex( float2 ScreenPos, int windowWidth )
 {
     float tileRes = float( TILE_RES );
-    uint numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
-    uint tileIdx = uint( floor( ScreenPos.x / tileRes ) + floor( ScreenPos.y / tileRes ) * numCellsX );
+    int numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
+    int tileIdx = int( floor( ScreenPos.x / tileRes ) + floor( ScreenPos.y / tileRes ) * numCellsX );
     return tileIdx;
 }
 
 // calculate the number of tiles in the horizontal direction
-static uint GetNumTilesX( int windowWidth )
+static int GetNumTilesX( int windowWidth )
 {
-    return uint(((windowWidth + TILE_RES - 1) / float(TILE_RES)));
+    return int(((windowWidth + TILE_RES - 1) / float(TILE_RES)));
 }
 
 // calculate the number of tiles in the vertical direction
-static uint GetNumTilesY( int windowHeight )
+static int GetNumTilesY( int windowHeight )
 {
-    return uint(((windowHeight + TILE_RES - 1) / float(TILE_RES)));
+    return int(((windowHeight + TILE_RES - 1) / float(TILE_RES)));
 }
 
 float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, float3 v )
@@ -133,15 +133,15 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
     
-    const uint tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
-    uint index = uniforms.maxNumLightsPerTile * tileIndex;
-    uint nextLightIndex = perTileLightIndexBuffer[ index ];
+    const int tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
+    int index = uniforms.maxNumLightsPerTile * tileIndex;
+    int nextLightIndex = perTileLightIndexBuffer[ index ];
 
     float4 outColor = float4( 0.25, 0.25, 0.25, 1 );
 
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
-        const uint lightIndex = nextLightIndex;
+        const int lightIndex = nextLightIndex;
         index++;
         nextLightIndex = perTileLightIndexBuffer[ index ];
 
@@ -176,7 +176,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
-        const uint lightIndex = nextLightIndex;
+        const int lightIndex = nextLightIndex;
         ++index;
         nextLightIndex = perTileLightIndexBuffer[ index ];
         
@@ -199,7 +199,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     }
     
 #ifdef DEBUG_LIGHT_COUNT
-    const uint numLights = GetNumLightsInThisTile( tileIndex, uniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
+    const int numLights = GetNumLightsInThisTile( tileIndex, uniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 
     if (numLights == 0)
     {

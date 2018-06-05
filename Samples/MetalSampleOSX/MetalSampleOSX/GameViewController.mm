@@ -316,7 +316,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -373,7 +373,7 @@ using namespace ae3d;
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
@@ -849,9 +849,9 @@ using namespace ae3d;
         Matrix44::Multiply( lineTransform, spotRot, lineTransform );
         lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
         Matrix44::Multiply( lineTransform, viewMat, viewMat );
-        System::DrawLines( coneLineHandle, viewMat,
+        /*System::DrawLines( coneLineHandle, viewMat,
                           camera3d.GetComponent< CameraComponent >()->GetProjection() );
-        System::Draw( &gliderTex, 40, 240, 100, 100, self.view.bounds.size.width, self.view.bounds.size.height, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &gliderTex, 40, 240, 100, 100, self.view.bounds.size.width, self.view.bounds.size.height, Vec4( 1, 1, 1, 1 ) );*/
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );
 
 #ifdef TEST_NUKLEAR_UI
