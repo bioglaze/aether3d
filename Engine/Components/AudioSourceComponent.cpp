@@ -1,16 +1,17 @@
 #include "AudioSourceComponent.hpp"
 #include "AudioSystem.hpp"
-#include <vector>
 #include <string>
 
-std::vector< ae3d::AudioSourceComponent > audioSourceComponents;
+static constexpr int MaxComponents = 30;
+
+ae3d::AudioSourceComponent audioSourceComponents[ MaxComponents ];
 unsigned nextFreeAudioSourceComponent = 0;
 
 unsigned ae3d::AudioSourceComponent::New()
 {
-    if (nextFreeAudioSourceComponent == audioSourceComponents.size())
+    if (nextFreeAudioSourceComponent == MaxComponents - 1)
     {
-        audioSourceComponents.resize( audioSourceComponents.size() + 10 );
+        return nextFreeAudioSourceComponent;
     }
     
     return nextFreeAudioSourceComponent++;
@@ -18,7 +19,7 @@ unsigned ae3d::AudioSourceComponent::New()
 
 ae3d::AudioSourceComponent* ae3d::AudioSourceComponent::Get( unsigned index )
 {
-    return &audioSourceComponents[index];
+    return &audioSourceComponents[ index ];
 }
 
 void ae3d::AudioSourceComponent::SetClipId( unsigned audioClipId )

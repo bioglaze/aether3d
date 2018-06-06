@@ -1,9 +1,9 @@
 #include "CameraComponent.hpp"
-#include <vector>
 #include <locale>
 #include <sstream>
 
-std::vector< ae3d::CameraComponent > cameraComponents;
+static constexpr int MaxComponents = 20;
+ae3d::CameraComponent cameraComponents[ MaxComponents ];
 unsigned nextFreeCameraComponent = 0;
 
 namespace GfxDeviceGlobal
@@ -14,9 +14,9 @@ namespace GfxDeviceGlobal
 
 unsigned ae3d::CameraComponent::New()
 {
-    if (nextFreeCameraComponent == cameraComponents.size())
+    if (nextFreeCameraComponent == MaxComponents - 1)
     {
-        cameraComponents.resize( cameraComponents.size() + 10 );
+        return nextFreeCameraComponent;
     }
 
     cameraComponents[ nextFreeCameraComponent ].viewport[ 0 ] = 0;

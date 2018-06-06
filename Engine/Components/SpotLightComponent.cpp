@@ -1,15 +1,18 @@
 #include "SpotLightComponent.hpp"
+#include "System.hpp"
 #include <string>
-#include <vector>
 
-std::vector< ae3d::SpotLightComponent > spotLightComponents;
+static constexpr int MaxComponents = 100;
+ae3d::SpotLightComponent spotLightComponents[ MaxComponents ];
 unsigned nextFreeSpotlLightComponent = 0;
 
 unsigned ae3d::SpotLightComponent::New()
 {
-    if (nextFreeSpotlLightComponent == spotLightComponents.size())
+    System::Assert( nextFreeSpotlLightComponent < MaxComponents, "Too many spot light components!" );
+    
+    if (nextFreeSpotlLightComponent == MaxComponents - 1)
     {
-        spotLightComponents.resize( spotLightComponents.size() + 10 );
+        return nextFreeSpotlLightComponent;
     }
     
     return nextFreeSpotlLightComponent++;
