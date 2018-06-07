@@ -143,7 +143,11 @@ int main()
 
         if (isRightMouseDown)
         {
+#ifdef __linux__
+            sceneView.RotateCamera( float( deltaX ) / 20, float( deltaY ) / 20 );
+#else
             sceneView.RotateCamera( -float( deltaX ) / 20, -float( deltaY ) / 20 );
+#endif
         }
         
         sceneView.MoveCamera( moveDir );

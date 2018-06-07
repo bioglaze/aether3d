@@ -10,12 +10,12 @@ using namespace ae3d;
 void SceneView::Init( int width, int height )
 {
     camera.AddComponent< CameraComponent >();
-    camera.GetComponent<CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
-    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 1, 400 );
-    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
-    camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
-    camera.AddComponent<TransformComponent>();
-    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
+    camera.GetComponent< CameraComponent >()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
+    camera.GetComponent< CameraComponent >()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+    camera.AddComponent< TransformComponent >();
+    camera.GetComponent< TransformComponent >()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
     scene.Add( &camera );
 
@@ -24,6 +24,8 @@ void SceneView::Init( int width, int height )
                       FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                       FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
+    transformGizmo.Init( &unlitShader );
+    
     // Test content
     
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
@@ -41,13 +43,19 @@ void SceneView::Init( int width, int height )
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
     cube.SetName( "cube" );
     scene.Add( &cube );
+
+    // Test code
+    scene.Add( &transformGizmo.go );
+    transformGizmo.xAxisMaterial.SetTexture( "textureMap", &gliderTex );
+    transformGizmo.yAxisMaterial.SetTexture( "textureMap", &gliderTex );
+    transformGizmo.zAxisMaterial.SetTexture( "textureMap", &gliderTex );
 }
 
 void SceneView::MoveCamera( const ae3d::Vec3& moveDir )
 {
-    camera.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
-    camera.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
-    camera.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+    camera.GetComponent< TransformComponent >()->MoveUp( moveDir.y );
+    camera.GetComponent< TransformComponent >()->MoveForward( moveDir.z );
+    camera.GetComponent< TransformComponent >()->MoveRight( moveDir.x );
 }
 
 void SceneView::BeginRender()
