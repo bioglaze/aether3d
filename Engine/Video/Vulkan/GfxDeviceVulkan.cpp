@@ -102,7 +102,7 @@ namespace GfxDeviceGlobal
     VkSemaphore offscreenSemaphore = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
     VkQueryPool queryPool = VK_NULL_HANDLE;
-    std::vector< float > timings;
+    float timings[ 3 ];
     VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     std::map< std::uint64_t, VkPipeline > psoCache;
@@ -622,12 +622,12 @@ namespace ae3d
         
         std::uint32_t queueCount;
         vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, nullptr );
+        System::Assert( queueCount >= 1 && queueCount < 5, "None or more queues than buffers have elements! Increase element count." );
 
-        std::vector < VkQueueFamilyProperties > queueProps( queueCount );
-        vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, queueProps.data() );
-        System::Assert( queueCount >= 1, "no queues" );
+        VkQueueFamilyProperties queueProps[ 5 ];
+        vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, &queueProps[ 0 ] );
 
-        std::vector< VkBool32 > supportsPresent( queueCount );
+        VkBool32 supportsPresent[ 5 ];
 
         for (std::uint32_t i = 0; i < queueCount; ++i)
         {
@@ -1658,11 +1658,10 @@ namespace ae3d
         GfxDevice::SetClearColor( 0, 0, 0 );
         GfxDevice::CreateUniformBuffers();
 
-        GfxDeviceGlobal::timings.resize( 3 );
         VkQueryPoolCreateInfo queryPoolInfo = {};
         queryPoolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
         queryPoolInfo.queryType = VK_QUERY_TYPE_TIMESTAMP;
-        queryPoolInfo.queryCount = (std::uint32_t)GfxDeviceGlobal::timings.size() - 1;
+        queryPoolInfo.queryCount = 2;
 
         err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, nullptr, &GfxDeviceGlobal::queryPool );
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
@@ -2049,7 +2048,6 @@ void ae3d::GfxDevice::Present()
     if (GfxDeviceGlobal::usedOffscreen)
     {
         GfxDeviceGlobal::usedOffscreen = false;
-        GfxDeviceGlobal::timings.resize( 1 );
         std::uint32_t start = 0;
         std::uint32_t end = 0;
         

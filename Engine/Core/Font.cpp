@@ -64,8 +64,8 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
 {
     const std::string textStr( text );
     
-    std::vector< ae3d::VertexBuffer::VertexPTC > vertices( textStr.size() * 6 );
-    std::vector< ae3d::VertexBuffer::Face > faces( textStr.size() * 2 );
+    ae3d::VertexBuffer::VertexPTC* vertices = new ae3d::VertexBuffer::VertexPTC[ textStr.size() * 6 ];
+    ae3d::VertexBuffer::Face* faces = new ae3d::VertexBuffer::Face[ textStr.size() * 2 ];
 
     float accumX = 0;
     float y = 0;
@@ -132,8 +132,11 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
         vertices[ c * 6 + 5 ].color = color;
     }
     
-    outVertexBuffer.Generate( faces.data(), static_cast<int>(faces.size()), vertices.data(), static_cast<int>(vertices.size()), VertexBuffer::Storage::GPU );
+    outVertexBuffer.Generate( faces, int( textStr.size() * 2 ), vertices, int( textStr.size() * 6 ), VertexBuffer::Storage::GPU );
     outVertexBuffer.SetDebugName( text );
+
+    delete[] vertices;
+    delete[] faces;
 }
 
 void ae3d::Font::LoadBMFont( Texture2D* fontTex, const FileSystem::FileContentsData& metaData )
