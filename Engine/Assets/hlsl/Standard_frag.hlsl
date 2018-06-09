@@ -98,7 +98,8 @@ float4 main( PS_INPUT input ) : SV_Target
             falloff = -0.05f + 1.05f / (1.0f + 20.0f * x * x);
             //accumDiffuseAndSpecular.rgb += max( 0.0f, dotNL );// * falloff;
             //accumDiffuseAndSpecular.rgb = float3( 1.0f, 0.0f, 0.0f );
-            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb;
+            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2;
+            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * abs( dot( lightDirVS, normalize( input.normalVS ) ) );
         }
 
         //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;

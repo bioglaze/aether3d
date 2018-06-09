@@ -8,3 +8,4 @@
 *.ilk
 *.suo
 *.db
+.vs/

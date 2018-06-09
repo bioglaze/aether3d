@@ -68,7 +68,25 @@ void ShaderReload( const std::string& path )
             const auto fragmentData = ae3d::FileSystem::FileContents( entry.fragmentPath.c_str() );
             const std::string fragmentStr = std::string( std::begin( fragmentData.data ), std::end( fragmentData.data ) );
 
-            entry.shader->Load( vertexStr.c_str(), fragmentStr.c_str() );
+            if (entry.vertexPath.find( ".obj" ) != std::string::npos && entry.fragmentPath.find( ".obj" ) != std::string::npos)
+            {
+                wchar_t wstr[ 256 ];
+                std::mbstowcs( wstr, entry.vertexPath.c_str(), 256 );
+
+                HRESULT hr = D3DReadFileToBlob( wstr, &entry.shader->blobShaderVertex );
+                AE3D_CHECK_D3D( hr, "Shader bytecode reading failed!" );
+
+                std::mbstowcs( wstr, entry.fragmentPath.c_str(), 256 );
+                hr = D3DReadFileToBlob( wstr, &entry.shader->blobShaderPixel );
+                AE3D_CHECK_D3D( hr, "Shader bytecode reading failed!" );
+
+                //ReflectVariables();
+            }
+            else
+            {
+                entry.shader->Load( vertexStr.c_str(), fragmentStr.c_str() );
+            }
+
             ClearPSOCache();
         }
     }
