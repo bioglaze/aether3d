@@ -399,7 +399,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             }
         }
         
-        const std::size_t pos = meshData.path.find_last_of( "/" );
+        const std::size_t pos = meshData.path.find_last_of( '/' );
         std::string shortPath = meshData.path;
         
         if (pos != std::string::npos)

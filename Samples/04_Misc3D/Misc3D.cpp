@@ -34,7 +34,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
 
@@ -429,7 +429,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     std::vector< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -503,8 +503,8 @@ int main()
     scene.Add( &camera );
 #ifndef AE3D_OPENVR
     scene.Add( &camera2d );
-#endif
     scene.Add( &statsContainer );
+#endif
 #ifdef TEST_RENDER_TEXTURE_CUBE
     scene.Add( &rtCube );
     scene.Add( &cameraCubeRT );
@@ -809,11 +809,11 @@ int main()
             VR::SetEye( eye );
             VR::CalcCameraForEye( camera, yaw, eye );
             scene.Render();
+            scene.EndFrame();
             VR::UnsetEye( eye );
         }
         
         VR::SubmitFrame();
-        //scene.EndFrame();
 #else
         if (reload)
         {

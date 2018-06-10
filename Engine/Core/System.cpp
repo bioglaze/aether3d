@@ -161,7 +161,8 @@ void ae3d::System::Print( const char* format, ... )
 
 void ae3d::System::Assert( bool condition, const char* message )
 {
-#if DEBUG
+//#if DEBUG
+#if 1
     if (!condition)
     {
         Print("Assertion failed: %s\n", message);

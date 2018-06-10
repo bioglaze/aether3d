@@ -15,6 +15,7 @@
 #include "Shader.hpp"
 #include "TransformComponent.hpp"
 #include "Vec3.hpp"
+#include "VulkanUtils.hpp"
 
 using namespace ae3d;
 
@@ -111,7 +112,7 @@ float GetVRFov()
     return Global::vrFov;
 }
 
-bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDesc )
+bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDesc, const char* debugName )
 {
     outFramebufferDesc.width = width;
     outFramebufferDesc.height = height;
@@ -135,6 +136,8 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
         System::Print( "Failed to create a framebuffer!\n" );
         return false;
     }
+
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)outFramebufferDesc.image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
 
     VkMemoryRequirements memoryRequirements = {};
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, outFramebufferDesc.image, &memoryRequirements );
@@ -518,8 +521,8 @@ void ae3d::VR::Init()
     Global::hmd->GetRecommendedRenderTargetSize( &Global::width, &Global::height );
     System::Print( "OpenVR width: %d, height: %d\n", Global::width, Global::height );
 
-    bool res = CreateFrameBuffer( Global::width, Global::height, Global::leftEyeDesc );
-    res = CreateFrameBuffer( Global::width, Global::height, Global::rightEyeDesc );
+    bool res = CreateFrameBuffer( Global::width, Global::height, Global::leftEyeDesc, "left eye" );
+    res = CreateFrameBuffer( Global::width, Global::height, Global::rightEyeDesc, "right eye" );
 
     Global::lensDistort.LoadSPIRV( ae3d::FileSystem::FileContents( "vr_companion_vert.spv" ), ae3d::FileSystem::FileContents( "vr_companion_vert.spv" ) );
     SetupDescriptors();
@@ -624,6 +627,7 @@ void ae3d::VR::SubmitFrame()
         System::Print( "VR submit for right eye returned error %d\n", submitResult );
     }
 
+    // FIXME: Maybe this should be moved after present
     vr::VRCompositor()->PostPresentHandoff();
 }
 

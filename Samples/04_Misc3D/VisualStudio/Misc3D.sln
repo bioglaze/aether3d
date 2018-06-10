@@ -9,6 +9,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug D3D12|x64 = Debug D3D12|x64
 		Debug OpenGL|x64 = Debug OpenGL|x64
+		Debug Vulkan OpenVR|x64 = Debug Vulkan OpenVR|x64
 		Debug Vulkan|x64 = Debug Vulkan|x64
 		Release D3D12|x64 = Release D3D12|x64
 		Release OpenGL|x64 = Release OpenGL|x64
@@ -21,6 +22,8 @@ Global
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug D3D12|x64.Build.0 = D3D12 Debug|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug OpenGL|x64.ActiveCfg = Debug|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug OpenGL|x64.Build.0 = Debug|x64
+		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug Vulkan OpenVR|x64.ActiveCfg = Debug Vulkan OpenVR|x64
+		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug Vulkan OpenVR|x64.Build.0 = Debug Vulkan OpenVR|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug Vulkan|x64.ActiveCfg = Debug Vulkan|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Debug Vulkan|x64.Build.0 = Debug Vulkan|x64
 		{35F2C02B-FFF4-4D85-B36B-F0E1D3E060C5}.Release D3D12|x64.ActiveCfg = D3D12 Release|x64
