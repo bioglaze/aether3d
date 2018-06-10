@@ -128,7 +128,8 @@ namespace ae3d
         /// \param xScreenSize X viewport size in pixels
         /// \param yScreenSize Y viewport size in pixels
         /// \param tintColor Tint color
-        void Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor );
+        /// \param blend Enable blending
+        void Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, bool blend );
         
         /// Draws lines using a line loop. Currently only implemented in OpenGL. Should be called after Scene::Render().
         /// \param handle Handle, created with CreateLineBuffer.

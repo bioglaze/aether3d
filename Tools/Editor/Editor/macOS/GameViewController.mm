@@ -121,7 +121,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     
     if (_view.currentRenderPassDescriptor != nil)
     {
-        ae3d::System::SetCurrentDrawableMetal( _view.currentDrawable, _view.currentRenderPassDescriptor );
+        ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         sceneView.BeginRender();
         inspector.Render( width, height );

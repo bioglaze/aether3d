@@ -3,8 +3,6 @@
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"
-#import <simd/simd.h>
-#import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #include <cmath>
 #include <vector>
@@ -832,8 +830,8 @@ using namespace ae3d;
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         scene.Render();
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ) );
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
+        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), true );
 
         //scene2.Render();
         //System::DrawLines( lineHandle, lineView, lineProjection );

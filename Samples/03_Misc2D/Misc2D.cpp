@@ -200,7 +200,7 @@ int main()
         }
 
         scene.Render();
-        System::Draw( &spriteTex, 40, 240, 100, 100, (float)width, (float)height, Vec4( 1, 0.2f, 0.2f, 1.0f ) );
+        System::Draw( &spriteTex, 40, 240, 100, 100, (float)width, (float)height, Vec4( 1, 0.2f, 0.2f, 1.0f ), true );
         System::DrawLines( lineHandle, lineView, lineProjection );
         scene.EndFrame();
         

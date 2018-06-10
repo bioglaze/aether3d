@@ -1,6 +1,5 @@
 #include <vector>
 #include <map>
-#import <simd/simd.h>
 #import "GameViewController.h"
 
 #import "Aether3D_iOS/CameraComponent.hpp"

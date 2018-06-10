@@ -12,6 +12,10 @@
 		AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB010CE0206F70B40014ED08 /* Assets.xcassets */; };
 		AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB010CE2206F70B40014ED08 /* Main.storyboard */; };
 		AB010CE7206F70B40014ED08 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AB010CE6206F70B40014ED08 /* main.m */; };
+		AB0B89BE20CD936400FF33FA /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BA20CD936300FF33FA /* camera.png */; };
+		AB0B89BF20CD936400FF33FA /* cursor_translate.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */; };
+		AB0B89C020CD936400FF33FA /* light.png in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BC20CD936300FF33FA /* light.png */; };
+		AB0B89C120CD936400FF33FA /* audio_source.png in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BD20CD936400FF33FA /* audio_source.png */; };
 		ABAA98A420963B1300DC1F42 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */; };
 		ABAA98B020963B4C00DC1F42 /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A520963B4B00DC1F42 /* Standard.metal */; };
 		ABAA98B120963B4C00DC1F42 /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A620963B4B00DC1F42 /* Moments.metal */; };
@@ -44,6 +48,10 @@
 		AB010CE5206F70B40014ED08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB010CE6206F70B40014ED08 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AB010CE8206F70B40014ED08 /* Editor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Editor.entitlements; sourceTree = "<group>"; };
+		AB0B89BA20CD936300FF33FA /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = camera.png; path = ../../../../../aether3d_build/Samples/camera.png; sourceTree = "<group>"; };
+		AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = cursor_translate.ae3d; path = ../../../../../aether3d_build/Samples/cursor_translate.ae3d; sourceTree = "<group>"; };
+		AB0B89BC20CD936300FF33FA /* light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = light.png; path = ../../../../../aether3d_build/Samples/light.png; sourceTree = "<group>"; };
+		AB0B89BD20CD936400FF33FA /* audio_source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = audio_source.png; path = ../../../../../aether3d_build/Samples/audio_source.png; sourceTree = "<group>"; };
 		ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
 		ABAA98A520963B4B00DC1F42 /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		ABAA98A620963B4B00DC1F42 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
@@ -136,6 +144,10 @@
 		AB010CD3206F70B40014ED08 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
+				AB0B89BD20CD936400FF33FA /* audio_source.png */,
+				AB0B89BA20CD936300FF33FA /* camera.png */,
+				AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */,
+				AB0B89BC20CD936300FF33FA /* light.png */,
 				ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */,
 				ABB3603F208C4F83007133FD /* glider.png */,
 				AB010CD4206F70B40014ED08 /* AppDelegate.h */,
@@ -278,10 +290,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB0B89C020CD936400FF33FA /* light.png in Resources */,
 				ABAA98A420963B1300DC1F42 /* textured_cube.ae3d in Resources */,
 				ABB36041208C4F83007133FD /* glider.png in Resources */,
 				AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */,
+				AB0B89BF20CD936400FF33FA /* cursor_translate.ae3d in Resources */,
+				AB0B89C120CD936400FF33FA /* audio_source.png in Resources */,
 				AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */,
+				AB0B89BE20CD936400FF33FA /* camera.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

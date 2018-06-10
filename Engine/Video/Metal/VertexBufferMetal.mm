@@ -402,11 +402,27 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     }
 
     vertexFormat = VertexFormat::PTNTC_Skinned;
-    vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
-                       length:sizeof( VertexPTNTC_Skinned ) * vertexCount
-                      options:MTLResourceCPUCacheModeDefaultCache];
-    vertexBuffer.label = @"Vertex buffer VertexPTNTC_Skinned";
+    vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexPTNTC_Skinned ) * vertexCount
+                      options:MTLResourceStorageModePrivate];
+    vertexBuffer.label = @"Vertex buffer PTNTC_Skinned";
     
+    id<MTLBuffer> blitBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
+                                   length:sizeof( VertexPTNTC_Skinned ) * vertexCount
+                                  options:MTLResourceCPUCacheModeDefaultCache];
+    blitBuffer.label = @"BlitBuffer";
+    
+    id <MTLCommandBuffer> cmd_buffer = [commandQueue commandBuffer];
+    cmd_buffer.label = @"BlitCommandBuffer";
+    id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+    [blit_encoder copyFromBuffer:blitBuffer
+                    sourceOffset:0
+                        toBuffer:vertexBuffer
+               destinationOffset:0
+                            size:sizeof( VertexPTNTC_Skinned ) * vertexCount];
+    [blit_encoder endEncoding];
+    [cmd_buffer commit];
+    [cmd_buffer waitUntilCompleted];
+
     std::vector< float > positions( vertexCount * 3 );
     
     for (int v = 0; v < vertexCount; ++v)
