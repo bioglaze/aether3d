@@ -10,3 +10,5 @@
 *.db
 .vs/
 x64/
+xcuserdata/
+

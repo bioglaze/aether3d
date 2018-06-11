@@ -38,7 +38,8 @@
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 
-const int POINT_LIGHT_COUNT = 100;
+const int MaxBuffersInFlight = 3;
+const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
 const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
@@ -284,6 +285,8 @@ using namespace ae3d;
     GameObject bigCubeInScene2;
     GameObject pointLights[ POINT_LIGHT_COUNT ];
     
+    dispatch_semaphore_t inFlightSemaphore;
+    
 #ifdef TEST_NUKLEAR_UI
     nk_context ctx;
     nk_font_atlas atlas;
@@ -304,6 +307,8 @@ using namespace ae3d;
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     _view.sampleCount = MULTISAMPLE_COUNT;
     _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+    
+    inFlightSemaphore = dispatch_semaphore_create( MaxBuffersInFlight );
     
     myViewController = self;
     
@@ -608,21 +613,21 @@ using namespace ae3d;
     {
         int pointLightIndex = 0;
         
-        for (int row = 0; row < 10; ++row)
+        for (int row = 0; row < 50; ++row)
         {
-            for (int col = 0; col < 10; ++col)
+            for (int col = 0; col < 40; ++col)
             {
                 pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
-                //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9 + row * 4, -4, -85 + col * 4 ) );
-                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( (float)row * 5, -12, -100 + (float)col * 4 ) );
-
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -12, -150 + (float)col * 4 ) );
+                
                 scene.Add( &pointLights[ pointLightIndex ] );
                 ++pointLightIndex;
             }
         }
+
     }
 #endif
 
@@ -959,8 +964,10 @@ using namespace ae3d;
         const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
         const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        
         pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
     }
+
 #endif
 }
 
@@ -971,6 +978,8 @@ using namespace ae3d;
 
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
+    //dispatch_semaphore_wait( _inFlightSemaphore, DISPATCH_TIME_FOREVER );
+    
     @autoreleasepool {
         [self _render];
     }
