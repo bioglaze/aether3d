@@ -19,6 +19,7 @@ struct Uniforms
     uint numLights; // 16 bits for point light count, 16 for spot light count
     uint padding;
     float4 tex0scaleOffset;
+    float4 tilesXY;
     matrix_float4x4 boneMatrices[ 80 ];
 };
 

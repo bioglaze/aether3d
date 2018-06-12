@@ -53,13 +53,13 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     commandBuffer.label = @"ComputeCommand";
     
     id<MTLComputeCommandEncoder> commandEncoder = [commandBuffer computeCommandEncoder];
-    [commandEncoder setComputePipelineState:pipeline];
-
     for (std::size_t i = 0; i < SLOT_COUNT; ++i)
     {
         [commandEncoder setBuffer:uniforms[ i ] offset:0 atIndex:i];
         [commandEncoder setTexture:(renderTextures[ i ] ? renderTextures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
     }
+
+    [commandEncoder setComputePipelineState:pipeline];
     
     [commandEncoder dispatchThreadgroups:threadgroups threadsPerThreadgroup:threadgroupCounts];
     [commandEncoder endEncoding];

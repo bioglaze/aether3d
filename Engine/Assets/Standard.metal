@@ -70,18 +70,6 @@ static int GetTileIndex( float2 ScreenPos, int windowWidth )
     return tileIdx;
 }
 
-// calculate the number of tiles in the horizontal direction
-static int GetNumTilesX( int windowWidth )
-{
-    return int(((windowWidth + TILE_RES - 1) / float(TILE_RES)));
-}
-
-// calculate the number of tiles in the vertical direction
-static int GetNumTilesY( int windowHeight )
-{
-    return int(((windowHeight + TILE_RES - 1) / float(TILE_RES)));
-}
-
 float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, float3 v )
 {
     return normalize( v.x * normalize( tangent ) + v.y * normalize( bitangent ) + v.z * normalize( normal ) );
@@ -111,6 +99,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     return out;
 }
 
+//[[early_fragment_tests]]
 fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],

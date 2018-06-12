@@ -23,7 +23,7 @@ void ae3d::LightTiler::Init()
 #if !TARGET_OS_IPHONE
     auto options = MTLResourceStorageModeManaged;
 #else
-    auto options = MTLResourceCPUCacheModeDefaultCache;
+    auto options = MTLResourceStorageModeShared;
 #endif
     pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                  options:options];
@@ -74,6 +74,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = depthNormalTarget.GetHeight();
     GfxDeviceGlobal::perObjectUboStruct.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GetMaxNumLightsPerTile();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = GetNumTilesX();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = GetNumTilesY();
     
     UploadPerObjectUbo();
 
@@ -87,27 +89,29 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
 
 void ae3d::LightTiler::UpdateLightBuffers()
 {
+    const int copySize = MaxLights * 4 * sizeof( float );
+    
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, &pointLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &pointLightCenterAndRadius[ 0 ], copySize );
 
     bufferPointer = (uint8_t *)[pointLightColorBuffer contents];
-    memcpy( bufferPointer, &pointLightColors[ 0 ], MaxLights * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &pointLightColors[ 0 ], copySize );
 
     bufferPointer = (uint8_t *)[spotLightCenterAndRadiusBuffer contents];
-    memcpy( bufferPointer, &spotLightCenterAndRadius[ 0 ], MaxLights * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &spotLightCenterAndRadius[ 0 ], copySize );
 
     bufferPointer = (uint8_t *)[spotLightParamsBuffer contents];
-    memcpy( bufferPointer, &spotLightParams[ 0 ], MaxLights * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &spotLightParams[ 0 ], copySize );
 
     bufferPointer = (uint8_t *)[spotLightColorBuffer contents];
-    memcpy( bufferPointer, &spotLightColors[ 0 ], MaxLights * 4 * sizeof( float ) );
+    memcpy( bufferPointer, &spotLightColors[ 0 ], copySize );
     
 #if !TARGET_OS_IPHONE
-    [pointLightCenterAndRadiusBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
-    [pointLightColorBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
-    [spotLightCenterAndRadiusBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
-    [spotLightParamsBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
-    [spotLightColorBuffer didModifyRange:NSMakeRange( 0, MaxLights * 4 * sizeof( float ) )];
+    [pointLightCenterAndRadiusBuffer didModifyRange:NSMakeRange( 0, copySize )];
+    [pointLightColorBuffer didModifyRange:NSMakeRange( 0, copySize )];
+    [spotLightCenterAndRadiusBuffer didModifyRange:NSMakeRange( 0, copySize )];
+    [spotLightParamsBuffer didModifyRange:NSMakeRange( 0, copySize )];
+    [spotLightColorBuffer didModifyRange:NSMakeRange( 0, copySize )];
 #endif
 }
 

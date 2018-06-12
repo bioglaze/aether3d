@@ -36,16 +36,6 @@ static float4 CreatePlaneEquation( float4 b, float4 c )
     return n;
 }
 
-static uint GetNumTilesX( uint windowWidth )
-{
-    return uint(( ( windowWidth + TILE_RES - 1 ) / float( TILE_RES ) ));
-}
-
-static uint GetNumTilesY( uint windowHeight )
-{
-    return uint(( ( windowHeight + TILE_RES - 1 ) / float( TILE_RES ) ));
-}
-
 // point-plane distance, simplified for the case where the plane passes through the origin
 static float GetSignedDistanceFromPlane( float4 p, float4 eqn )
 {
@@ -72,7 +62,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     uint2 groupIdx = dtid;
 
     uint localIdxFlattened = localIdx.x + localIdx.y * TILE_RES;
-    uint tileIdxFlattened = groupIdx.x + groupIdx.y * GetNumTilesX( uniforms.windowWidth );
+    uint tileIdxFlattened = groupIdx.x + groupIdx.y * uniforms.tilesXY.x;
 
     if (localIdxFlattened == 0)
     {
@@ -90,8 +80,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         uint pyp = TILE_RES * (groupIdx.y + 1);
 
         // Evenly divisible by tile res
-        float winWidth  = float( TILE_RES * GetNumTilesX( uniforms.windowWidth ) );
-        float winHeight = float( TILE_RES * GetNumTilesY( uniforms.windowHeight) );
+        float winWidth  = float( TILE_RES * uniforms.tilesXY.x );
+        float winHeight = float( TILE_RES * uniforms.tilesXY.y );
 
         float4 v0 = float4( pxm / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
         float4 v1 = float4( pxp / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
@@ -120,9 +110,6 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     // calculate the min and max depth for this tile,
     // to form the front and back of the frustum
 
-    float minZ = FLT_MAX;
-    float maxZ = 0.0f;
-
     float depth = depthNormalsTexture.read( globalIdx.xy ).x;
 
     uint z = as_type< uint >( depth );
@@ -138,8 +125,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     uint zMin = atomic_load_explicit( &ldsZMin, memory_order::memory_order_relaxed );
     uint zMax = atomic_load_explicit( &ldsZMax, memory_order::memory_order_relaxed );
-    minZ = as_type< float >( zMax );
-    maxZ = as_type< float >( zMin );
+    float minZ = as_type< float >( zMax );
+    float maxZ = as_type< float >( zMin );
 
     int numPointLights = uniforms.numLights & 0xFFFFu;
 
