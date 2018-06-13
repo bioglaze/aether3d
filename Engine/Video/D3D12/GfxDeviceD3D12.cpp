@@ -1259,9 +1259,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         cpuHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(), &srvDesc, cpuHandle );
 
-        unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
-        unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
-        unsigned numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
+        const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
+        const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
+        const unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
 
         GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
         GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;

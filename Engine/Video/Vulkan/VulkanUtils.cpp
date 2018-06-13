@@ -1,7 +1,6 @@
 #include <vulkan/vulkan.h>
 #include <cstring>
 #include <cstdint>
-#include <vector>
 #include "Macros.hpp"
 #include "System.hpp"
 #include "Statistics.hpp"
@@ -152,14 +151,21 @@ namespace ae3d
         instanceCreateInfo.pNext = nullptr;
         instanceCreateInfo.pApplicationInfo = &appInfo;
 
-        std::vector< const char* > enabledExtensions;
-        enabledExtensions.push_back( VK_KHR_SURFACE_EXTENSION_NAME );
+        const char* enabledExtensions[] =
+        {
+            VK_KHR_SURFACE_EXTENSION_NAME,
 #if VK_USE_PLATFORM_WIN32_KHR
-        enabledExtensions.push_back( VK_KHR_WIN32_SURFACE_EXTENSION_NAME );
+            VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
 #endif
 #if VK_USE_PLATFORM_XCB_KHR
-        enabledExtensions.push_back( VK_KHR_XCB_SURFACE_EXTENSION_NAME );
+            VK_KHR_XCB_SURFACE_EXTENSION_NAME,
 #endif
+#if VK_USE_PLATFORM_ANDROID_KHR
+            VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
+#endif
+            VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+        };
+        
         const char *validationLayerNames[] =
         {
             "VK_LAYER_LUNARG_standard_validation"
@@ -167,14 +173,12 @@ namespace ae3d
 
         if (debug::enabled)
         {
-            enabledExtensions.push_back( VK_EXT_DEBUG_REPORT_EXTENSION_NAME );
-
             instanceCreateInfo.ppEnabledLayerNames = validationLayerNames;
             instanceCreateInfo.enabledLayerCount = 1;
         }
 
-        instanceCreateInfo.enabledExtensionCount = static_cast<std::uint32_t>(enabledExtensions.size());
-        instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions.data();
+        instanceCreateInfo.enabledExtensionCount = debug::enabled ? 3 : 2;
+        instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
 
         VkResult result = vkCreateInstance( &instanceCreateInfo, nullptr, outInstance );
         AE3D_CHECK_VULKAN( result, "instance" );

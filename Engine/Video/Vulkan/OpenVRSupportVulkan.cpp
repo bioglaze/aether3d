@@ -19,11 +19,6 @@
 
 using namespace ae3d;
 
-namespace ae3d
-{
-    std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties );
-}
-
 namespace VRGlobal
 {
     int eye = 0;
@@ -117,7 +112,9 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     outFramebufferDesc.width = width;
     outFramebufferDesc.height = height;
 
-    VkImageCreateInfo imageCreateInfo = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
+    VkImageCreateInfo imageCreateInfo;
+    imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageCreateInfo.pNext = nullptr;
     imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     imageCreateInfo.extent.width = width;
     imageCreateInfo.extent.height = height;
@@ -142,7 +139,9 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     VkMemoryRequirements memoryRequirements = {};
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, outFramebufferDesc.image, &memoryRequirements );
 
-    VkMemoryAllocateInfo memoryAllocateInfo = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
+    VkMemoryAllocateInfo memoryAllocateInfo;
+    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryAllocateInfo.pNext = nullptr;
     memoryAllocateInfo.allocationSize = memoryRequirements.size;
     memoryAllocateInfo.memoryTypeIndex = GetMemoryType( memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
@@ -160,7 +159,9 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
         return false;
     }
 
-    VkImageViewCreateInfo imageViewCreateInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+    VkImageViewCreateInfo imageViewCreateInfo;
+    imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    imageViewCreateInfo.pNext = nullptr;
     imageViewCreateInfo.flags = 0;
     imageViewCreateInfo.image = outFramebufferDesc.image;
     imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -276,7 +277,9 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     }
 
     VkImageView attachments[ 2 ] = { outFramebufferDesc.imageView, outFramebufferDesc.depthStencilImageView };
-    VkFramebufferCreateInfo framebufferCreateInfo = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
+    VkFramebufferCreateInfo framebufferCreateInfo;
+    framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebufferCreateInfo.pNext = nullptr;
     framebufferCreateInfo.renderPass = outFramebufferDesc.renderPass;
     framebufferCreateInfo.attachmentCount = 2;
     framebufferCreateInfo.pAttachments = &attachments[ 0 ];
@@ -301,8 +304,8 @@ void SetupDistortion()
     const short lensGridSegmentCountH = 43;
     const short lensGridSegmentCountV = 43;
 
-    const float w = (float)(1.0f / float( lensGridSegmentCountH - 1 ));
-    const float h = (float)(1.0f / float( lensGridSegmentCountV - 1 ));
+    const float w = 1.0f / float( lensGridSegmentCountH - 1 );
+    const float h = 1.0f / float( lensGridSegmentCountV - 1 );
 
     float u, v = 0;
 
@@ -320,7 +323,8 @@ void SetupDistortion()
 
             vr::DistortionCoordinates_t dc0;
             const bool success = Global::hmd->ComputeDistortion( vr::Eye_Left, u, v, &dc0 );
-
+            ae3d::System::Assert( success, "Distortion computation failed" );
+            
             vert.texCoordRed = Vector2( dc0.rfRed[ 0 ], 1 - dc0.rfRed[ 1 ] );
             vert.texCoordGreen = Vector2( dc0.rfGreen[ 0 ], 1 - dc0.rfGreen[ 1 ] );
             vert.texCoordBlue = Vector2( dc0.rfBlue[ 0 ], 1 - dc0.rfBlue[ 1 ] );
@@ -340,6 +344,7 @@ void SetupDistortion()
 
             vr::DistortionCoordinates_t dc0;
             const bool success = Global::hmd->ComputeDistortion( vr::Eye_Right, u, v, &dc0 );
+            ae3d::System::Assert( success, "Distortion computation failed" );
 
             vert.texCoordRed = Vector2( dc0.rfRed[ 0 ], 1 - dc0.rfRed[ 1 ] );
             vert.texCoordGreen = Vector2( dc0.rfGreen[ 0 ], 1 - dc0.rfGreen[ 1 ] );
@@ -453,13 +458,16 @@ void SetupDescriptors()
     layoutBindings[ 2 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
     layoutBindings[ 2 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
+    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
+    descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorSetLayoutCreateInfo.pNext = nullptr;
     descriptorSetLayoutCreateInfo.bindingCount = 3;
     descriptorSetLayoutCreateInfo.pBindings = &layoutBindings[ 0 ];
     VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorSetLayoutCreateInfo, nullptr, &Global::descriptorSetLayout );
     AE3D_CHECK_VULKAN( err, "Unable to create descriptor set layout" );
 
-    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
+    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
+    pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutCreateInfo.pNext = nullptr;
     pipelineLayoutCreateInfo.setLayoutCount = 1;
     pipelineLayoutCreateInfo.pSetLayouts = &Global::descriptorSetLayout;
@@ -482,8 +490,6 @@ void SetupDescriptors()
     Global::attributeDescriptions[ 2 ].location = 0;
     Global::attributeDescriptions[ 2 ].format = VK_FORMAT_UNDEFINED;
     Global::attributeDescriptions[ 2 ].offset = 0;
-
-    VkGraphicsPipelineCreateInfo pipelineCreateInfo = { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
 }
 
 Vec3 ae3d::VR::GetRightHandPosition()
@@ -657,7 +663,8 @@ void ae3d::VR::SetEye( int eye )
     FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
 
     // Transition eye image to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-    VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+    VkImageMemoryBarrier imageMemoryBarrier;
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
@@ -688,7 +695,8 @@ void ae3d::VR::SetEye( int eye )
     }
 
     // Start the renderpass
-    VkRenderPassBeginInfo renderPassBeginInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };    
+    VkRenderPassBeginInfo renderPassBeginInfo;
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassBeginInfo.pNext = nullptr;
     renderPassBeginInfo.renderPass = fbDesc.renderPass;
     renderPassBeginInfo.framebuffer = fbDesc.framebuffer;
@@ -720,7 +728,8 @@ void ae3d::VR::UnsetEye( int eye )
     FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
 
     // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
-    VkImageMemoryBarrier imageMemoryBarrier = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+    VkImageMemoryBarrier imageMemoryBarrier;
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.image = fbDesc.image;
     imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

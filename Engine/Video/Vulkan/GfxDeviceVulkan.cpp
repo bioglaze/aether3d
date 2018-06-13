@@ -1908,6 +1908,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
     GfxDeviceGlobal::perObjectUboStruct.numLights = lightCount;
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = GfxDeviceGlobal::lightTiler.GetNumTilesX();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = GfxDeviceGlobal::lightTiler.GetNumTilesY();
 
     UploadPerObjectUbo();
 

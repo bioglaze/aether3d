@@ -57,9 +57,10 @@ namespace ae3d
         VkBufferView* GetSpotLightParamsView() { return &spotLightParamsView; }
         VkBufferView* GetLightIndexBufferView() { return &perTileLightIndexBufferView; }
 #endif
-    private:
         unsigned GetNumTilesX() const;
         unsigned GetNumTilesY() const;
+
+    private:
         
 #if RENDERER_METAL
         id< MTLBuffer > pointLightCenterAndRadiusBuffer;
