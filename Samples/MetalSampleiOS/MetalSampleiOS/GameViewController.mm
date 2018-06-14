@@ -19,9 +19,34 @@
 #import "Aether3D_iOS/System.hpp"
 #import "Aether3D_iOS/Material.hpp"
 
+const int POINT_LIGHT_COUNT = 50 * 40;
 #define MULTISAMPLE_COUNT 1
 #define MAX_UI_VERTEX_MEMORY (512 * 1024)
 #define MAX_UI_ELEMENT_MEMORY (128 * 1024)
+
+// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
+// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+struct pcg32_random_t
+{
+    std::uint64_t state;
+    std::uint64_t inc;
+};
+
+std::uint32_t pcg32_random_r( pcg32_random_t* rng )
+{
+    std::uint64_t oldstate = rng->state;
+    rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
+    std::uint32_t xorshifted = (std::uint32_t)( ((oldstate >> 18u) ^ oldstate) >> 27u );
+    std::int32_t rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
+pcg32_random_t rng;
+
+int Random100()
+{
+    return pcg32_random_r( &rng );
+}
 
 struct MyTouch
 {
@@ -29,8 +54,8 @@ struct MyTouch
     int x, y;
 };
 
-struct MyTouch gTouches[ 8 ];
-int gTouchCount;
+MyTouch gTouches[ 8 ];
+int gTouchCount = 0;
 
 @implementation GameViewController
 {
@@ -49,6 +74,7 @@ int gTouchCount;
     ae3d::GameObject spotLight;
     ae3d::GameObject bigCube;
     ae3d::GameObject bigCube2;
+    ae3d::GameObject pointLights[ POINT_LIGHT_COUNT ];
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -73,7 +99,7 @@ int gTouchCount;
     
     touchBeginX = 0;
     touchBeginY = 0;
-
+    
     device = MTLCreateSystemDefaultDevice();
     assert( device );
     
@@ -93,7 +119,7 @@ int gTouchCount;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
     camera2d.SetName( "camera2d" );
-    //scene.Add( &camera2d );
+    scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -211,7 +237,7 @@ int gTouchCount;
     standardCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( ae3d::FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -230,6 +256,27 @@ int gTouchCount;
         scene.Add( &sponzaGameObjects[ i ] );
     }
 #endif
+    
+    // Inits point lights for Forward+
+    {
+        int pointLightIndex = 0;
+        
+        for (int row = 0; row < 50; ++row)
+        {
+            for (int col = 0; col < 40; ++col)
+            {
+                pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
+                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
+                pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -12, -150 + (float)col * 4 ) );
+                
+                scene.Add( &pointLights[ pointLightIndex ] );
+                ++pointLightIndex;
+            }
+        }
+    }
+
 }
 
 - (void)_setupView
@@ -237,7 +284,8 @@ int gTouchCount;
     _view = (MTKView *)self.view;
     _view.device = device;
     _view.delegate = self;
-    
+    _view.multipleTouchEnabled = YES;
+
     // Setup the render target, choose values based on your app
     //_view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
@@ -271,6 +319,27 @@ int gTouchCount;
     
     std::string stats = ae3d::System::Statistics::GetStatistics();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
+    
+//#ifdef TEST_FORWARD_PLUS
+    static float y = -14;
+    y += 0.1f;
+    
+    if (y > 30)
+    {
+        y = -14;
+    }
+    
+    for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
+    {
+        const ae3d::Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
+        const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        
+        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+    }
+    
+//#endif
+
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
@@ -288,6 +357,7 @@ int gTouchCount;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    NSLog(@"touchesBegan");
     for (UITouch* touch in touches)
     {
         const CGPoint touchLocation = [touch locationInView:touch.view];
@@ -363,6 +433,9 @@ int gTouchCount;
             }
         }
     }
+    
+    // debug
+    gTouchCount = 0;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event 

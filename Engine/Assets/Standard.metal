@@ -1,7 +1,7 @@
 #include <metal_stdlib>
 #include <simd/simd.h>
 
-#define TILE_RES 16
+#define TILE_RES 32
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
 
@@ -141,7 +141,7 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float3 vecToLightWS = center.xyz - in.positionWS.xyz;
         const float3 lightDirVS = normalize( vecToLightVS );
         
-        const float dotNL = clamp( dot( normalize( in.normalVS ), lightDirVS ), 0.0f, 1.0f );
+        const float dotNL = saturate( dot( normalize( in.normalVS ), lightDirVS ) );
         const float lightDistance = length( vecToLightWS );
         float falloff = 1;
         

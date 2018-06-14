@@ -110,7 +110,11 @@ namespace ae3d
         VkPipeline pso;
         VkPipelineLayout psoLayout;
 #endif
+#if RENDERER_METAL
+        static const int TileRes = 32;
+#else
         static const int TileRes = 16;
+#endif
         static const int MaxLights = 2048;
         static const unsigned MaxLightsPerTile = 544;
         Vec4 pointLightCenterAndRadius[ MaxLights ];
