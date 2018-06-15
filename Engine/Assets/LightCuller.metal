@@ -43,23 +43,29 @@ static float GetSignedDistanceFromPlane( float4 p, float4 eqn )
     return dot( eqn.xyz, p.xyz );
 }
 
+struct PointLight
+{
+    float4 d[ 2048 ];
+};
+
 kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[texture(0)]],
                          constant Uniforms& uniforms [[ buffer(0) ]],
-                         constant float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
+                         //constant float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
+                         constant PointLight& pointLightBufferCenterAndRadius [[ buffer(1) ]],
                          device uint* perTileLightIndexBufferOut [[ buffer(2) ]],
                          constant float4* spotLightBufferCenterAndRadius [[ buffer(3) ]],
-                         uint2 gid [[thread_position_in_grid]],
-                         uint2 tid [[thread_position_in_threadgroup]],
-                         uint2 dtid [[threadgroup_position_in_grid]])
+                         ushort2 gid [[thread_position_in_grid]],
+                         ushort2 tid [[thread_position_in_threadgroup]],
+                         ushort2 dtid [[threadgroup_position_in_grid]])
 {
     threadgroup uint ldsLightIdx[ MAX_NUM_LIGHTS_PER_TILE ];
     threadgroup atomic_uint ldsZMax;
     threadgroup atomic_uint ldsZMin;
     threadgroup atomic_uint ldsLightIdxCounter;
 
-    uint2 globalIdx = gid;
-    uint2 localIdx = tid;
-    uint2 groupIdx = dtid;
+    ushort2 globalIdx = gid;
+    ushort2 localIdx = tid;
+    ushort2 groupIdx = dtid;
 
     uint localIdxFlattened = localIdx.x + localIdx.y * TILE_RES;
     uint tileIdxFlattened = groupIdx.x + groupIdx.y * uniforms.tilesXY.x;
@@ -99,7 +105,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         // with the positive half-space outside the frustum (and remember,
         // view space is left handed, so use the left-hand rule to determine
         // cross product direction)
-        for (uint i = 0; i < 4; ++i)
+        for (short i = 0; i < 4; ++i)
         {
             frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ], frustum[ (i + 1) & 3 ] );
         }
@@ -110,7 +116,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     // calculate the min and max depth for this tile,
     // to form the front and back of the frustum
 
-    float depth = depthNormalsTexture.read( globalIdx.xy ).x;
+    float depth = depthNormalsTexture.read( uint2( globalIdx.xy ) ).x;
 
     uint z = as_type< uint >( depth );
 
@@ -130,13 +136,13 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     int numPointLights = uniforms.numLights & 0xFFFFu;
 
-    for (int i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
+    for (short i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
     {
         int il = localIdxFlattened + i;
 
         if (il < numPointLights)
         {
-            float4 center = pointLightBufferCenterAndRadius[ il ];
+            float4 center = pointLightBufferCenterAndRadius.d[ il ];
             float radius = center.w;
             center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f ) ).xyz;
 
@@ -164,7 +170,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     // Spot lights.
     int numSpotLights = (uniforms.numLights & 0xFFFF0000u) >> 16;
 
-    for (int i = 0; i < numSpotLights; i += NUM_THREADS_PER_TILE)
+    for (short i = 0; i < numSpotLights; i += NUM_THREADS_PER_TILE)
     {
         int il = localIdxFlattened + i;
 

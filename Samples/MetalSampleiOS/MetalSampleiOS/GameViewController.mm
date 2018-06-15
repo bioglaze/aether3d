@@ -119,7 +119,7 @@ int gTouchCount = 0;
     camera2d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<ae3d::TransformComponent>();
     camera2d.SetName( "camera2d" );
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
 
@@ -237,7 +237,7 @@ int gTouchCount = 0;
     standardCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( ae3d::FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
     
@@ -318,7 +318,7 @@ int gTouchCount = 0;
     cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
     std::string stats = ae3d::System::Statistics::GetStatistics();
-    text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
+    //text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
     
 //#ifdef TEST_FORWARD_PLUS
     static float y = -14;
@@ -335,7 +335,7 @@ int gTouchCount = 0;
         const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         
-        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+        //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
     }
     
 //#endif
@@ -357,7 +357,6 @@ int gTouchCount = 0;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchesBegan");
     for (UITouch* touch in touches)
     {
         const CGPoint touchLocation = [touch locationInView:touch.view];

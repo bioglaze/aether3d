@@ -4,7 +4,6 @@
 #define TILE_RES 32
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
-
 //#define DEBUG_LIGHT_COUNT
 
 using namespace metal;

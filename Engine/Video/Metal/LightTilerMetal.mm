@@ -23,7 +23,7 @@ void ae3d::LightTiler::Init()
 #if !TARGET_OS_IPHONE
     auto options = MTLResourceStorageModeManaged;
 #else
-    auto options = MTLResourceStorageModeShared;
+    auto options = MTLResourceCPUCacheModeDefaultCache;
 #endif
     pointLightCenterAndRadiusBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:MaxLights * sizeof( Vec4 )
                                  options:options];

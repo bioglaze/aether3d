@@ -319,7 +319,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -964,7 +964,7 @@ using namespace ae3d;
         const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         
-        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+        //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
     }
 
 #endif
