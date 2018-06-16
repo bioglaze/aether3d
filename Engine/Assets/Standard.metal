@@ -61,11 +61,11 @@ static int GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, con
     return numLightsInThisTile;
 }
 
-static int GetTileIndex( float2 ScreenPos, int windowWidth )
+static short GetTileIndex( half2 ScreenPos, short windowWidth )
 {
-    float tileRes = float( TILE_RES );
-    int numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
-    int tileIdx = int( floor( ScreenPos.x / tileRes ) + floor( ScreenPos.y / tileRes ) * numCellsX );
+    half tileRes = 1.0h / half( TILE_RES );
+    short numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
+    short tileIdx = short( floor( ScreenPos.x * tileRes ) + floor( ScreenPos.y * tileRes ) * numCellsX );
     return tileIdx;
 }
 
@@ -99,7 +99,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
 }
 
 //[[early_fragment_tests]]
-fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
+fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
                                texture2d<float, access::sample> normalMap [[texture(2)]],
@@ -114,14 +114,14 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
                                sampler sampler0 [[sampler(0)]] )
 {
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
-    const float4 albedoColor = float4( albedoSmoothnessMap.sample( sampler0, uv ) );
+    const half4 albedoColor = half4( albedoSmoothnessMap.sample( sampler0, uv ) );
     const float smoothness = albedoColor.a;
     const float4 normalTS = float4( normalMap.sample( sampler0, uv ) );
     const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
     
-    const int tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
+    const short tileIndex = GetTileIndex( half2(in.position.xy), (short)uniforms.windowWidth );
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
@@ -144,12 +144,13 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float lightDistance = length( vecToLightWS );
         float falloff = 1;
         
+        // TODO: Move pointLightBufferColors out of if
         if (lightDistance < radius)
         {
             float x = lightDistance / radius;
             falloff = -0.05f + 1.05f / (1.0f + 5.0f * x * x);
             //outColor.rgb += max( 0.0, dotNL );// * falloff;
-            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * falloff;
+            outColor.rgb = fma( pointLightBufferColors[ lightIndex ].rgb, falloff, outColor.rgb );
         }
         
         //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
@@ -207,5 +208,5 @@ fragment float4 standard_fragment( StandardColorInOut in [[stage_in]],
     }
 #endif
     
-    return albedoColor * outColor;
+    return albedoColor * half4(outColor);
 }

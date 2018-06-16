@@ -672,17 +672,17 @@ using namespace ae3d;
     scene.Add( &bigCube );
     //scene.Add( &cubePTN2 );
     //scene.Add( &cubePTN );
-    scene.Add( &rtCube );
+    //scene.Add( &rtCube );
     scene.Add( &rotatingCube );
-    scene.Add( &wireframeGo );
+    //scene.Add( &wireframeGo );
     scene.Add( &spriteContainer );
     scene.Add( &textSDF );
     scene.Add( &text );
     //scene.Add( &bigCube2 );
     //scene.Add( &bigCube3 );
-    scene.Add( &animatedGo );
+    //scene.Add( &animatedGo );
     //scene.Add( &pointLight );
-    scene.Add( &spotLight );
+    //scene.Add( &spotLight );
 #ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
 #endif

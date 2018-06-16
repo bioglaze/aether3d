@@ -23,24 +23,16 @@ static float4 ConvertClipToView( float4 p, matrix_float4x4 clipToView )
 
 // this creates the standard Hessian-normal-form plane equation from three points,
 // except it is simplified for the case where the first point is the origin
-static float4 CreatePlaneEquation( float4 b, float4 c )
+static float3 CreatePlaneEquation( float3 b, float3 c )
 {
-    float4 n;
-
-    // normalize(cross( b.xyz-a.xyz, c.xyz-a.xyz )), except we know "a" is the origin
-    n.xyz = normalize( cross( b.xyz, c.xyz ) );
-
-    // -(n dot a), except we know "a" is the origin
-    n.w = 0;
-
-    return n;
+    return normalize( cross( b, c ) );
 }
 
 // point-plane distance, simplified for the case where the plane passes through the origin
-static float GetSignedDistanceFromPlane( float4 p, float4 eqn )
+static float GetSignedDistanceFromPlane( float3 p, float3 eqn )
 {
     // dot( eqn.xyz, p.xyz ) + eqn.w, except we know eqn.w is zero (see CreatePlaneEquation above)
-    return dot( eqn.xyz, p.xyz );
+    return dot( eqn, p );
 }
 
 struct PointLight
@@ -50,8 +42,8 @@ struct PointLight
 
 kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[texture(0)]],
                          constant Uniforms& uniforms [[ buffer(0) ]],
-                         //constant float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
-                         constant PointLight& pointLightBufferCenterAndRadius [[ buffer(1) ]],
+                         constant float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
+                         //constant PointLight& pointLightBufferCenterAndRadius [[ buffer(1) ]],
                          device uint* perTileLightIndexBufferOut [[ buffer(2) ]],
                          constant float4* spotLightBufferCenterAndRadius [[ buffer(3) ]],
                          ushort2 gid [[thread_position_in_grid]],
@@ -77,7 +69,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         atomic_store_explicit( &ldsLightIdxCounter, 0, memory_order_relaxed );
     }
 
-    float4 frustumEqn[ 4 ];
+    float3 frustumEqn[ 4 ];
     {
         // construct frustum for this tile
         uint pxm = TILE_RES * groupIdx.x;
@@ -107,7 +99,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         // cross product direction)
         for (short i = 0; i < 4; ++i)
         {
-            frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ], frustum[ (i + 1) & 3 ] );
+            frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ].xyz, frustum[ (i + 1) & 3 ].xyz );
         }
     }
 
@@ -116,7 +108,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     // calculate the min and max depth for this tile,
     // to form the front and back of the frustum
 
-    float depth = depthNormalsTexture.read( uint2( globalIdx.xy ) ).x;
+    float depth = depthNormalsTexture.read( (uint2)globalIdx.xy ).x;
 
     uint z = as_type< uint >( depth );
 
@@ -142,17 +134,17 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
         if (il < numPointLights)
         {
-            float4 center = pointLightBufferCenterAndRadius.d[ il ];
+            float4 center = pointLightBufferCenterAndRadius[ il ];
             float radius = center.w;
             center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f ) ).xyz;
 
             //if (-center.z + minZ < radius && center.z - maxZ < radius)
             //if (-center.z < radius)
             {
-                if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < radius))
+                if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 2 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 3 ] ) < radius))
                 {
                     // do a thread-safe increment of the list counter
                     // and put the index of this light into the list
@@ -182,10 +174,10 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
             if (-center.z + minZ < radius && center.z - maxZ < radius)
             {
-                if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < radius))
+                if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 2 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 3 ] ) < radius))
                 {
                     int dstIdx = atomic_fetch_add_explicit( &ldsLightIdxCounter, 1, memory_order::memory_order_relaxed );
                     ldsLightIdx[ dstIdx ] = il;
