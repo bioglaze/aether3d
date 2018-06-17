@@ -1330,6 +1330,43 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             lineStream >> name >> path;
             
+            if (!lineStream.eof())
+            {
+                std::string compressedTexturePath;
+                lineStream >> compressedTexturePath;
+                
+#if !TARGET_OS_IPHONE
+                if (compressedTexturePath.find( ".dds" ) != std::string::npos)
+                {
+                    path = compressedTexturePath;
+                }
+                else if (!lineStream.eof())
+                {
+                    lineStream >> compressedTexturePath;
+                    
+                    if (compressedTexturePath.find( ".dds" ) != std::string::npos)
+                    {
+                        path = compressedTexturePath;
+                    }
+                }
+#endif
+#if TARGET_OS_IPHONE
+                if (compressedTexturePath.find( ".astc" ) != std::string::npos)
+                {
+                    path = compressedTexturePath;
+                }
+                else if (!lineStream.eof())
+                {
+                    lineStream >> compressedTexturePath;
+                    
+                    if (compressedTexturePath.find( ".astc" ) != std::string::npos)
+                    {
+                        path = compressedTexturePath;
+                    }
+                }
+#endif
+            }
+
             outTexture2Ds[ name ] = new Texture2D();
             outTexture2Ds[ name ]->Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
         }
@@ -1407,6 +1444,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             std::string textureName;
             
             lineStream >> uniformName >> textureName;
+            
             outMaterials[ currentMaterialName ]->SetTexture( uniformName.c_str(), outTexture2Ds[ textureName ]);
         }
         else if (token == "audiosource")

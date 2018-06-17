@@ -347,7 +347,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         textureDescriptor.usage = MTLTextureUsageShaderRead;
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
         
-        std::size_t pos = fileContents.path.find_last_of( "/" );
+        const std::size_t pos = fileContents.path.find_last_of( "/" );
         if (pos != std::string::npos)
         {
             std::string fileName = fileContents.path.substr( pos );
@@ -396,7 +396,17 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
                                                                                              height:height
                                                                                           mipmapped:(mipmaps == Mipmaps::Generate ? YES : NO)];
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
-        metalTexture.label = [NSString stringWithFormat:@"%s", path.c_str()];
+
+        const std::size_t pos = fileContents.path.find_last_of( "/" );
+        if (pos != std::string::npos)
+        {
+            std::string fileName = fileContents.path.substr( pos );
+            metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+        }
+        else
+        {
+            metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
+        }
 
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         [metalTexture replaceRegion:region mipmapLevel:0 withBytes:bytes bytesPerRow:bytesPerRow];
