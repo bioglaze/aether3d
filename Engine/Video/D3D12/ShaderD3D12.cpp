@@ -283,7 +283,7 @@ void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::TextureCube* texture,
     }
 }
 
-//void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
+void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
 void ae3d::Shader::SetRenderTexture( const char* /*name*/, ae3d::RenderTexture* texture, int textureUnit )
 {
@@ -301,7 +301,7 @@ void ae3d::Shader::SetRenderTexture( const char* /*name*/, ae3d::RenderTexture* 
         GfxDeviceGlobal::texture1 = texture;
     }
 
-    //TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
+    TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )
