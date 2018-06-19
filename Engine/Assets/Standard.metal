@@ -1,7 +1,7 @@
 #include <metal_stdlib>
 #include <simd/simd.h>
 
-#define TILE_RES 32
+#define TILE_RES 16
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
 //#define DEBUG_LIGHT_COUNT
@@ -61,11 +61,11 @@ static int GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, con
     return numLightsInThisTile;
 }
 
-static short GetTileIndex( half2 ScreenPos, short windowWidth )
+static int GetTileIndex( float2 ScreenPos, int windowWidth )
 {
-    half tileRes = 1.0h / half( TILE_RES );
-    short numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
-    short tileIdx = short( floor( ScreenPos.x * tileRes ) + floor( ScreenPos.y * tileRes ) * numCellsX );
+    float tileRes = 1.0f / float( TILE_RES );
+    int numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
+    int tileIdx = int( floor( ScreenPos.x * tileRes ) + floor( ScreenPos.y * tileRes ) * numCellsX );
     return tileIdx;
 }
 
@@ -121,7 +121,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
     
-    const short tileIndex = GetTileIndex( half2(in.position.xy), (short)uniforms.windowWidth );
+    const int tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
@@ -150,7 +150,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
             float x = lightDistance / radius;
             falloff = -0.05f + 1.05f / (1.0f + 5.0f * x * x);
             //outColor.rgb += max( 0.0, dotNL );// * falloff;
-            outColor.rgb = fma( pointLightBufferColors[ lightIndex ].rgb, falloff, outColor.rgb );
+            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * falloff;
         }
         
         //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;

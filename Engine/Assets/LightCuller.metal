@@ -6,7 +6,7 @@ using namespace metal;
 
 #include "MetalCommon.h"
 
-#define TILE_RES 32
+#define TILE_RES 16
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define MAX_NUM_LIGHTS_PER_TILE 544
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
@@ -19,13 +19,6 @@ static float4 ConvertClipToView( float4 p, matrix_float4x4 clipToView )
     //p.y = -p.y;
 
     return p;
-}
-
-// this creates the standard Hessian-normal-form plane equation from three points,
-// except it is simplified for the case where the first point is the origin
-static float3 CreatePlaneEquation( float3 b, float3 c )
-{
-    return normalize( cross( b, c ) );
 }
 
 // point-plane distance, simplified for the case where the plane passes through the origin
@@ -42,20 +35,18 @@ struct PointLight
 
 kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[texture(0)]],
                          constant Uniforms& uniforms [[ buffer(0) ]],
-                         constant float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
-                         //constant PointLight& pointLightBufferCenterAndRadius [[ buffer(1) ]],
+                         const device float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
                          device uint* perTileLightIndexBufferOut [[ buffer(2) ]],
-                         constant float4* spotLightBufferCenterAndRadius [[ buffer(3) ]],
-                         ushort2 gid [[thread_position_in_grid]],
+                         const device float4* spotLightBufferCenterAndRadius [[ buffer(3) ]],
                          ushort2 tid [[thread_position_in_threadgroup]],
                          ushort2 dtid [[threadgroup_position_in_grid]])
 {
     threadgroup uint ldsLightIdx[ MAX_NUM_LIGHTS_PER_TILE ];
-    threadgroup atomic_uint ldsZMax;
-    threadgroup atomic_uint ldsZMin;
+    //threadgroup atomic_uint ldsZMax;
+    //threadgroup atomic_uint ldsZMin;
     threadgroup atomic_uint ldsLightIdxCounter;
 
-    ushort2 globalIdx = gid;
+    //ushort2 globalIdx = gid;
     ushort2 localIdx = tid;
     ushort2 groupIdx = dtid;
 
@@ -64,8 +55,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     if (localIdxFlattened == 0)
     {
-        atomic_store_explicit( &ldsZMin, 0x7f7fffff, memory_order_relaxed ); // FLT_MAX as uint
-        atomic_store_explicit( &ldsZMax, 0, memory_order_relaxed );
+        //atomic_store_explicit( &ldsZMin, 0x7f7fffff, memory_order_relaxed ); // FLT_MAX as uint
+        //atomic_store_explicit( &ldsZMax, 0, memory_order_relaxed );
         atomic_store_explicit( &ldsLightIdxCounter, 0, memory_order_relaxed );
     }
 
@@ -80,6 +71,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         // Evenly divisible by tile res
         float winWidth  = float( TILE_RES * uniforms.tilesXY.x );
         float winHeight = float( TILE_RES * uniforms.tilesXY.y );
+        //float winWidth  = float( TILE_RES * GetNumTilesX( uniforms.windowWidth ) );
+        //float winHeight = float( TILE_RES * GetNumTilesY( uniforms.windowHeight ) );
 
         float4 v0 = float4( pxm / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
         float4 v1 = float4( pxp / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
@@ -97,9 +90,9 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         // with the positive half-space outside the frustum (and remember,
         // view space is left handed, so use the left-hand rule to determine
         // cross product direction)
-        for (short i = 0; i < 4; ++i)
+        for (int i = 0; i < 4; ++i)
         {
-            frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ].xyz, frustum[ (i + 1) & 3 ].xyz );
+            frustumEqn[ i ] = normalize( cross( frustum[ i ].xyz, frustum[ (i + 1) & 3 ].xyz ));
         }
     }
 
@@ -108,27 +101,27 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     // calculate the min and max depth for this tile,
     // to form the front and back of the frustum
 
-    float depth = depthNormalsTexture.read( (uint2)globalIdx.xy ).x;
+    //float depth = depthNormalsTexture.read( (uint2)globalIdx.xy ).x;
 
-    uint z = as_type< uint >( depth );
+    //uint z = as_type< uint >( depth );
 
-    if (depth != 0.0f)
+    //if (depth != 0.0f)
     {
         // returned value is previous value in lds*
-        /*uint i =*/ atomic_fetch_min_explicit( &ldsZMin, z, memory_order::memory_order_relaxed );
-        /*uint j =*/ atomic_fetch_max_explicit( &ldsZMax, z, memory_order::memory_order_relaxed );
+        /*uint i =*/ //atomic_fetch_min_explicit( &ldsZMin, z, memory_order::memory_order_relaxed );
+        /*uint j =*/ //atomic_fetch_max_explicit( &ldsZMax, z, memory_order::memory_order_relaxed );
     }
 
-    threadgroup_barrier( mem_flags::mem_threadgroup );
+    /*threadgroup_barrier( mem_flags::mem_threadgroup );
 
     uint zMin = atomic_load_explicit( &ldsZMin, memory_order::memory_order_relaxed );
     uint zMax = atomic_load_explicit( &ldsZMax, memory_order::memory_order_relaxed );
     float minZ = as_type< float >( zMax );
-    float maxZ = as_type< float >( zMin );
+    float maxZ = as_type< float >( zMin );*/
 
     int numPointLights = uniforms.numLights & 0xFFFFu;
 
-    for (short i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
+    for (int i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
     {
         int il = localIdxFlattened + i;
 
@@ -139,7 +132,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f ) ).xyz;
 
             //if (-center.z + minZ < radius && center.z - maxZ < radius)
-            //if (-center.z < radius)
+            if (center.z < radius)
             {
                 if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
@@ -162,7 +155,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
     // Spot lights.
     int numSpotLights = (uniforms.numLights & 0xFFFF0000u) >> 16;
 
-    for (short i = 0; i < numSpotLights; i += NUM_THREADS_PER_TILE)
+    for (int i = 0; i < numSpotLights; i += NUM_THREADS_PER_TILE)
     {
         int il = localIdxFlattened + i;
 
@@ -172,7 +165,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             float radius = center.w * 5.0f; // FIXME: Multiply was added, but more clever culling should be done instead.
             center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f )).xyz;
 
-            if (-center.z + minZ < radius && center.z - maxZ < radius)
+            //if (-center.z + minZ < radius && center.z - maxZ < radius)
             {
                 if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
