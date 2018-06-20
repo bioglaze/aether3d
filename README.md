@@ -80,11 +80,11 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Open Samples/MetalSampleiOS and build and run it.
 
 # Tested GPUs
-  - AMD Radeon R9 Nano on Ubuntu 17.10 and Windows 10
-  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS Sierra
+  - AMD Radeon R9 Nano on Ubuntu 18.04 and Windows 10
+  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS High Sierra
   - NVIDIA GTX 980 on Windows 10
   - NVIDIA GTX 660 on Windows 7
-  - Intel Skylake HD530 on Ubuntu 17.10
+  - Intel Skylake HD530 on Ubuntu 18.04
 
 # Running Tests
 
