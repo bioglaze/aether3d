@@ -1227,7 +1227,7 @@ namespace ae3d
         image.arrayLayers = 1;
         image.samples = GfxDeviceGlobal::msaaSampleBits;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
-        image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
         image.flags = 0;
 
         VkMemoryAllocateInfo mem_alloc = {};
@@ -1908,8 +1908,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
     GfxDeviceGlobal::perObjectUboStruct.numLights = lightCount;
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = GfxDeviceGlobal::lightTiler.GetNumTilesX();
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = GfxDeviceGlobal::lightTiler.GetNumTilesY();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = (float)GfxDeviceGlobal::lightTiler.GetNumTilesX();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = (float)GfxDeviceGlobal::lightTiler.GetNumTilesY();
 
     UploadPerObjectUbo();
 

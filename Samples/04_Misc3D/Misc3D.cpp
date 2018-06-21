@@ -454,7 +454,8 @@ int main()
     // Sponza ends
     
     RenderTexture rtTex;
-    rtTex.Create2D( 512, 512, RenderTexture::DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear, "rtTex" );
+    const auto dataType = camera2d.GetComponent<CameraComponent>()->GetTargetTexture() != nullptr ? RenderTexture::DataType::Float : RenderTexture::DataType::UByte;
+    rtTex.Create2D( 512, 512, dataType, TextureWrap::Clamp, TextureFilter::Linear, "rtTex" );
     
     GameObject renderTextureContainer;
     renderTextureContainer.SetName( "renderTextureContainer" );

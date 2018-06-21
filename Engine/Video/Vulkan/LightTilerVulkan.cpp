@@ -330,8 +330,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = depthNormalTarget.GetHeight();
     GfxDeviceGlobal::perObjectUboStruct.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GetMaxNumLightsPerTile();
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = GetNumTilesX();
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = GetNumTilesY();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = (float)GetNumTilesX();
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = (float)GetNumTilesY();
     
     GfxDeviceGlobal::view0 = depthNormalTarget.GetColorView();
     GfxDeviceGlobal::sampler0 = depthNormalTarget.GetSampler();
