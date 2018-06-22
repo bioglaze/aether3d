@@ -16,6 +16,12 @@
 extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 
+namespace MathUtil
+{
+    int Min( int a, int b );
+    int Max( int a, int b );
+}
+
 namespace PVRType
 {
     enum Enum
@@ -321,6 +327,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         }
         
         int bytesPerRow = width * 2;
+        int multiplier = 2;
         
         MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm;
         
@@ -332,34 +339,77 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         {
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
             bytesPerRow = width * 4;
+            multiplier = 4;
         }
         else if (output.format == DDSLoader::Format::BC3)
         {
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
             bytesPerRow = width * 4;
+            multiplier = 4;
         }
 
         MTLTextureDescriptor* textureDescriptor =
         [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                            width:width
                                                           height:height
-                                                       mipmapped:NO];//(mipmaps == Mipmaps::None ? NO : YES)];
+                                                       mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
         textureDescriptor.usage = MTLTextureUsageShaderRead;
-        metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+        id< MTLTexture > stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
         
         const std::size_t pos = fileContents.path.find_last_of( "/" );
         if (pos != std::string::npos)
         {
             std::string fileName = fileContents.path.substr( pos );
-            metalTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
+            stagingTexture.label = [NSString stringWithUTF8String:fileName.c_str()];
         }
         else
         {
-            metalTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
+            stagingTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
         }
 
-        MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
-        [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&output.imageData[ output.dataOffsets[ 0 ] ] bytesPerRow:bytesPerRow];
+        mipLevelCount = mipmaps == Mipmaps::Generate ? (int)output.dataOffsets.size() : 1;
+
+        for (int mipIndex = 0; mipIndex < mipLevelCount; ++mipIndex)
+        {
+            const int mipWidth = MathUtil::Max( width >> mipIndex, 1 );
+            const int mipHeight = MathUtil::Max( height >> mipIndex, 1 );
+            const int mipBytesPerRow = mipWidth <= 2 ? 8 : mipWidth * multiplier;
+            
+            MTLRegion region = MTLRegionMake2D( 0, 0, mipWidth, mipHeight );
+            [stagingTexture replaceRegion:region mipmapLevel:mipIndex withBytes:&output.imageData[ output.dataOffsets[ mipIndex ] ] bytesPerRow:mipBytesPerRow];
+        }
+        
+        MTLTextureDescriptor* textureDescriptor2 =
+        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
+                                                           width:width
+                                                          height:height
+                                                       mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+        textureDescriptor2.usage = MTLTextureUsageShaderRead;
+        textureDescriptor2.storageMode = MTLStorageModePrivate;
+        metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor2];
+        metalTexture.label = stagingTexture.label;
+        
+        for (int mipIndex = 0; mipIndex < mipLevelCount; ++mipIndex)
+        {
+            const int mipWidth = MathUtil::Max( width >> mipIndex, 1 );
+            const int mipHeight = MathUtil::Max( height >> mipIndex, 1 );
+
+            id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
+            cmd_buffer.label = @"BlitCommandBuffer";
+            id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+            [blit_encoder copyFromTexture:stagingTexture
+                              sourceSlice:0
+                              sourceLevel:mipIndex
+                             sourceOrigin:MTLOriginMake( 0, 0, 0 )
+                               sourceSize:MTLSizeMake( mipWidth, mipHeight, 1 )
+                                toTexture:metalTexture
+                         destinationSlice:0
+                         destinationLevel:mipIndex
+                        destinationOrigin:MTLOriginMake( 0, 0, 0 ) ];
+            [blit_encoder endEncoding];
+            [cmd_buffer commit];
+            [cmd_buffer waitUntilCompleted];
+        }
 #else
         ae3d::System::Print( ".dds loading not supported on iOS. Tried to load %s\n", fileContents.path.c_str() );
 #endif
