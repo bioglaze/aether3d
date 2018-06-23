@@ -3,6 +3,9 @@
 #define _AMD64_
 #include <debugapi.h>
 #endif
+#if VK_USE_PLATFORM_ANDROID_KHR
+#include <android/log.h>
+#endif
 #include <cstdarg>
 #include <cassert>
 #include "AudioSystem.hpp"
@@ -153,6 +156,9 @@ void ae3d::System::Print( const char* format, ... )
 #endif
     va_end(ap);
     std::printf( "%s", msg );
+#if VK_USE_PLATFORM_ANDROID_KHR
+    __android_log_print( ANDROID_LOG_INFO, "Aether3D", "%s", msg );
+#endif
 #if _MSC_VER
     OutputDebugStringA( &msg[ 0 ] );
 #endif
