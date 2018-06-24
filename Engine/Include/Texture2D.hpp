@@ -6,13 +6,18 @@
 #include <vulkan/vulkan.h>
 #endif
 
+namespace DDSLoader
+{
+    struct Output;
+}
+
 namespace ae3d
 {
     namespace FileSystem
     {
         struct FileContentsData;
     }
-
+    
     /// 2D texture.
     class Texture2D : public TextureBase
     {
@@ -23,7 +28,7 @@ namespace ae3d
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
-        /// \param mipmaps Mipmaps
+        /// \param mipmaps Mipmaps. If set to Generate and the image already contains mipmaps, they are used, otherwise mipchain is generated.
         /// \param colorSpace Color space.
         /// \param anisotropy Anisotropy. Value range is 1-16 depending on support. On Metal the value is bucketed into 1, 2, 4, 8 and 16.
         void Load( const FileSystem::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps, ColorSpace colorSpace, Anisotropy anisotropy );
@@ -65,6 +70,7 @@ namespace ae3d
         void LoadPVRv3( const char* path );
 #endif
 #if RENDERER_VULKAN
+        void CreateVulkanObjects( const DDSLoader::Output& mipChain, int bytesPerPixel, VkFormat format );
         void CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format );
         VkImage image = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;

@@ -140,13 +140,264 @@ bool isBC3( VkFormat format )
     return format == VK_FORMAT_BC3_UNORM_BLOCK || format == VK_FORMAT_BC3_SRGB_BLOCK;
 }
 
+void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, int bytesPerPixel, VkFormat format )
+{
+    VkImageCreateInfo imageCreateInfo = {};
+    imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageCreateInfo.pNext = nullptr;
+    imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageCreateInfo.format = format;
+    imageCreateInfo.mipLevels = mipLevelCount;
+    imageCreateInfo.arrayLayers = 1;
+    imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
+    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+
+    VkResult err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
+    AE3D_CHECK_VULKAN( err, "vkCreateImage" );
+    Texture2DGlobal::imagesToReleaseAtExit.push_back( image );
+
+    VkMemoryRequirements memReqs = {};
+    vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
+
+    VkMemoryAllocateInfo memAllocInfo = {};
+    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memAllocInfo.pNext = nullptr;
+    memAllocInfo.allocationSize = memReqs.size;
+    memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+
+    err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
+    AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+    Statistics::IncAllocCalls();
+    Statistics::IncTotalAllocCalls();
+    Texture2DGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
+
+    err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
+    AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
+
+    std::vector< VkBuffer > stagingBuffers( mipLevelCount );
+    std::vector< VkDeviceMemory > stagingMemory( mipLevelCount );
+
+    for (int mipIndex = 0; mipIndex < mipLevelCount; ++mipIndex)
+    {
+        const std::int32_t mipWidth = MathUtil::Max( width >> mipIndex, 1 );
+        const std::int32_t mipHeight = MathUtil::Max( height >> mipIndex, 1 );
+
+        const VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
+        const VkDeviceSize bc1Size = (mipWidth / 4) * (mipHeight / 4) * bc1BlockSize;
+        VkDeviceSize imageSize = (isBC1( format ) || isBC2( format ) || isBC3( format )) ? bc1Size : (mipWidth * mipHeight * bytesPerPixel);
+
+        // FIXME: This is a hack, figure out proper fix.
+        if (imageSize == 0)
+        {
+            imageSize = 16;
+        }
+        
+        VkBufferCreateInfo bufferCreateInfo = {};
+        bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferCreateInfo.size = imageSize;
+        bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffers[ mipIndex ] );
+        AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
+
+        vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers[ mipIndex ], &memReqs );
+
+        memAllocInfo.allocationSize = memReqs.size;
+        memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+        err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipIndex ] );
+        AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+
+        err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers[ mipIndex ], stagingMemory[ mipIndex ], 0 );
+        AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
+
+        void* stagingData;
+        err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory[ mipIndex ], 0, memReqs.size, 0, &stagingData );
+        AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
+        int amountToCopy = imageSize;
+        if (mipChain.dataOffsets[ mipIndex ] + imageSize >= mipChain.imageData.size())
+        {
+            amountToCopy = mipChain.imageData.size() - mipChain.dataOffsets[ mipIndex ];
+        }
+        
+        std::memcpy( stagingData, &mipChain.imageData[ mipChain.dataOffsets[ mipIndex ] ], amountToCopy );
+
+        VkMappedMemoryRange flushRange = {};
+        flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+        flushRange.pNext = nullptr;
+        flushRange.memory = stagingMemory[ mipIndex ];
+        flushRange.offset = 0;
+        flushRange.size = imageSize;
+        vkFlushMappedMemoryRanges( GfxDeviceGlobal::device, 1, &flushRange );
+
+        vkUnmapMemory( GfxDeviceGlobal::device, stagingMemory[ mipIndex ] );
+    }
+
+    VkImageViewCreateInfo viewInfo = {};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.pNext = nullptr;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = format;
+    viewInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
+    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+    viewInfo.subresourceRange.levelCount = mipLevelCount;
+    viewInfo.image = image;
+    err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
+    AE3D_CHECK_VULKAN( err, "vkCreateImageView in Texture2D" );
+    Texture2DGlobal::imageViewsToReleaseAtExit.push_back( view );
+
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufInfo.pNext = nullptr;
+    cmdBufInfo.pInheritanceInfo = nullptr;
+    cmdBufInfo.flags = 0;
+
+    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
+
+    VkImageSubresourceRange range = {};
+    range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    range.baseMipLevel = 0;
+    range.levelCount = mipLevelCount;
+    range.baseArrayLayer = 0;
+    range.layerCount = 1;
+
+    VkImageMemoryBarrier imageMemoryBarrier = {};
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    imageMemoryBarrier.pNext = nullptr;
+    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.srcAccessMask = 0;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imageMemoryBarrier.image = image;
+    imageMemoryBarrier.subresourceRange = range;
+
+    vkCmdPipelineBarrier(
+            GfxDeviceGlobal::texCmdBuffer,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &imageMemoryBarrier );
+
+    for (int mipLevel = 0; mipLevel < mipLevelCount; ++mipLevel)
+    {
+        const std::int32_t mipWidth = MathUtil::Max( width >> mipLevel, 1 );
+        const std::int32_t mipHeight = MathUtil::Max( height >> mipLevel, 1 );
+
+        VkBufferImageCopy bufferCopyRegion = {};
+        bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        bufferCopyRegion.imageSubresource.mipLevel = mipLevel;
+        bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
+        bufferCopyRegion.imageSubresource.layerCount = 1;
+        bufferCopyRegion.imageExtent.width = mipWidth;
+        bufferCopyRegion.imageExtent.height = mipHeight;
+        bufferCopyRegion.imageExtent.depth = 1;
+        bufferCopyRegion.bufferOffset = 0;
+
+        vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffers[ mipLevel ], image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
+    }
+
+    imageMemoryBarrier = {};
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    imageMemoryBarrier.pNext = nullptr;
+    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.srcAccessMask = 0;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+    imageMemoryBarrier.image = image;
+    imageMemoryBarrier.subresourceRange = range;
+    
+    vkCmdPipelineBarrier(
+        GfxDeviceGlobal::texCmdBuffer,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &imageMemoryBarrier );
+
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    imageMemoryBarrier.pNext = nullptr;
+    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageMemoryBarrier.image = image;
+    imageMemoryBarrier.subresourceRange = range;
+    imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
+    imageMemoryBarrier.subresourceRange.levelCount = mipLevelCount;
+
+    vkCmdPipelineBarrier(
+            GfxDeviceGlobal::texCmdBuffer,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &imageMemoryBarrier );
+
+    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+
+    for (int mipLevel = 0; mipLevel < mipLevelCount; ++mipLevel)
+    {
+        vkDestroyBuffer( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], nullptr );
+        vkFreeMemory( GfxDeviceGlobal::device, stagingMemory[ mipLevel ], nullptr );
+    }
+    
+    VkSamplerCreateInfo samplerInfo = {};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext = nullptr;
+    samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+    samplerInfo.minFilter = samplerInfo.magFilter;
+    samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.addressModeU = wrap == ae3d::TextureWrap::Repeat ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.addressModeV = samplerInfo.addressModeU;
+    samplerInfo.addressModeW = samplerInfo.addressModeU;
+    samplerInfo.mipLodBias = 0;
+    samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
+    samplerInfo.minLod = 0;
+    samplerInfo.maxLod = static_cast< float >(mipLevelCount);
+    samplerInfo.maxAnisotropy = GfxDeviceGlobal::deviceFeatures.samplerAnisotropy ? GetFloatAnisotropy( anisotropy ) : 1;
+    samplerInfo.anisotropyEnable = (anisotropy != Anisotropy::k1 && GfxDeviceGlobal::deviceFeatures.samplerAnisotropy) ? VK_TRUE : VK_FALSE;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+    err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
+    AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+    Texture2DGlobal::samplersToReleaseAtExit.push_back( sampler );
+
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
+}
+
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
 {
-    if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ) || isBC1( format ) || isBC2( format ) || isBC3( format ))
+    if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ))
     {
         if (mipmaps == Mipmaps::Generate)
         {
-            System::Print( "Mipmaps not generated for %s because the dimension (%dx%d) is not power-of-two or the texture is a .dds.\n", path.c_str(), width, height );
+            System::Print( "Mipmaps not generated for %s because the dimension (%dx%d) is not power-of-two.\n", path.c_str(), width, height );
         }
 
         mipmaps = Mipmaps::None;
@@ -420,7 +671,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         height = GfxDeviceGlobal::properties.limits.maxImageDimension2D;
     }
 
-    mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );
+    mipLevelCount = mipmaps == Mipmaps::Generate ? (int)ddsOutput.dataOffsets.size() : 1;
     int bytesPerPixel = 1;
 
     VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
@@ -443,7 +694,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     
     ae3d::System::Assert( ddsOutput.dataOffsets.size() > 0, "DDS reader error: dataoffsets is empty" );
 
-    CreateVulkanObjects( &fileContents.data[ ddsOutput.dataOffsets[ 0 ] ], bytesPerPixel, format );
+    CreateVulkanObjects( ddsOutput, bytesPerPixel, format );
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
