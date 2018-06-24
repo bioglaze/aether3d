@@ -165,16 +165,29 @@ namespace ae3d
 #endif
             VK_EXT_DEBUG_REPORT_EXTENSION_NAME
         };
-        
-        const char *validationLayerNames[] =
+
+#if VK_USE_PLATFORM_ANDROID_KHR
+        const char* validationLayerNames[] =
+        {
+            "VK_LAYER_GOOGLE_threading",
+            "VK_LAYER_LUNARG_parameter_validation",
+            "VK_LAYER_LUNARG_object_tracker",
+            "VK_LAYER_LUNARG_core_validation",
+            "VK_LAYER_GOOGLE_unique_objects"
+        };
+        instanceCreateInfo.enabledLayerCount = 5;
+#else
+        const char* validationLayerNames[] =
         {
             "VK_LAYER_LUNARG_standard_validation"
         };
 
+        instanceCreateInfo.enabledLayerCount = 1;
+#endif
+
         if (debug::enabled)
         {
             instanceCreateInfo.ppEnabledLayerNames = validationLayerNames;
-            instanceCreateInfo.enabledLayerCount = 1;
         }
 
         instanceCreateInfo.enabledExtensionCount = debug::enabled ? 3 : 2;

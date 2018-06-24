@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#if VK_USE_PLATFORM_ANDROID_KHR
+#include <android/asset_manager.h>
+#endif
 
 #if RENDERER_METAL
 const char* GetFullPath( const char* fileName )
@@ -44,6 +47,27 @@ namespace Global
     std::vector< PakFile > pakFiles;
 }
 
+#if VK_USE_PLATFORM_ANDROID_KHR
+extern AAssetManager* assetManager;
+
+ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* path )
+{
+    ae3d::FileSystem::FileContentsData outData;
+    outData.path = outData.path = path == nullptr ? "" : std::string( GetFullPath( path ) );
+
+    AAsset* file = AAssetManager_open( assetManager, path, AASSET_MODE_BUFFER );
+
+    if (file != nullptr)
+    {
+        size_t fileLength = AAsset_getLength( file );
+        outData.data.resize( fileLength );
+        outData.isLoaded = true;
+        AAsset_read( file, outData.data.data(), fileLength );
+    }
+
+    return outData;
+}
+#else
 ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* path )
 {
     ae3d::FileSystem::FileContentsData outData;
@@ -78,6 +102,7 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* p
 
     return outData;
 }
+#endif
 
 void ae3d::FileSystem::LoadPakFile( const char* path )
 {
