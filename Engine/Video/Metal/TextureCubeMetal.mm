@@ -36,7 +36,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     int firstImageComponents;
     const bool isFirstImageDDS = paths[ 0 ].find( ".dds" ) != std::string::npos || paths[ 0 ].find( ".DDS" ) != std::string::npos;
-    
+
+    MTLPixelFormat pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB;
+    NSUInteger bytesPerRow = width * 4;
+
     if (isFirstImageDDS)
     {
 #if !TARGET_OS_IPHONE
@@ -48,15 +51,32 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             ae3d::System::Print( "Could not load %s\n", fileContents[ 0 ]->path.c_str() );
             return;
         }
+        
+        if (output.format == DDSLoader::Format::BC1)
+        {
+            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
+            bytesPerRow = width * 2;
+        }
+        else if (output.format == DDSLoader::Format::BC2)
+        {
+            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
+            bytesPerRow = width * 4;
+        }
+        else if (output.format == DDSLoader::Format::BC3)
+        {
+            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
+            bytesPerRow = width * 4;
+        }
 #endif
     }
     else
     {
         unsigned char* firstImageData = stbi_load_from_memory( datas[ 0 ]->data(), static_cast<int>(datas[ 0 ]->size()), &width, &height, &firstImageComponents, 4 );
         stbi_image_free( firstImageData );
+        bytesPerRow = width * 4;
     }
     
-    MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+    MTLTextureDescriptor* descriptor = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:pixelFormat
                                                                                           size:width
                                                                                         mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
@@ -73,12 +93,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         stagingTexture.label = [NSString stringWithUTF8String:fileContents[ 0 ]->path.c_str()];
     }
     
-    const NSUInteger bytesPerPixel = 4;
-    NSUInteger bytesPerRow = bytesPerPixel * width;
     const NSUInteger bytesPerImage = bytesPerRow * width;
     
     MTLRegion region = MTLRegionMake2D( 0, 0, width, width );
-
+    bool isSomeFaceDDS = false;
+    
     for (int face = 0; face < 6; ++face)
     {
         const bool isDDS = paths[ face ].find( ".dds" ) != std::string::npos || paths[ face ].find( ".DDS" ) != std::string::npos;
@@ -95,15 +114,13 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 return;
             }
             
-            const int bytesPerRow2 = width * 4;
-
             opaque = (components == 3 || components == 1);
             
             [stagingTexture replaceRegion:region
                        mipmapLevel:0
                              slice:face
                          withBytes:data
-                       bytesPerRow:bytesPerRow2
+                       bytesPerRow:bytesPerRow
                      bytesPerImage:bytesPerImage];
 
             stbi_image_free( data );
@@ -111,6 +128,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         else if (isDDS)
         {
 #if !TARGET_OS_IPHONE
+            isSomeFaceDDS = true;
             DDSLoader::Output output;
             DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( *fileContents[ face ], 0, width, height, opaque, output );
 
@@ -137,7 +155,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
     }
 
-    if (mipmaps == Mipmaps::Generate)
+    if (mipmaps == Mipmaps::Generate && !isSomeFaceDDS)
     {
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
         id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
@@ -147,7 +165,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         [commandBuffer waitUntilCompleted];
     }
     
-    MTLTextureDescriptor* descriptor2 = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+    MTLTextureDescriptor* descriptor2 = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:pixelFormat
                                                                                              size:width
                                                                                         mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     descriptor2.usage = MTLTextureUsageShaderRead;
