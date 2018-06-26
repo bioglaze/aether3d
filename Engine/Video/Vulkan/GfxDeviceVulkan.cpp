@@ -801,7 +801,11 @@ namespace ae3d
         swapchainInfo.pQueueFamilyIndices = nullptr;
         swapchainInfo.presentMode = WindowGlobal::presentInterval == 0 ? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
         swapchainInfo.clipped = VK_TRUE;
+#if VK_USE_PLATFORM_ANDROID_KHR
         swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+#else
+        swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+#endif
 
         err = createSwapchainKHR( GfxDeviceGlobal::device, &swapchainInfo, nullptr, &GfxDeviceGlobal::swapChain );
         AE3D_CHECK_VULKAN( err, "swapchain" );
