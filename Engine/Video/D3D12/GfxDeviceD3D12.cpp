@@ -1205,7 +1205,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     
     if (GfxDeviceGlobal::sampleCount > 1)
     {
-        rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_B8G8R8A8_UNORM);
+        rtvFormat = (GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetDXGIFormat() : DXGI_FORMAT_B8G8R8A8_UNORM_SRGB);
     }
 
     const std::uint64_t psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
