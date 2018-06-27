@@ -138,14 +138,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 return;
             }
 
-            const int bytesPerRow2 = width * 4;
-
             region = MTLRegionMake2D( 0, 0, width, height );
             [stagingTexture replaceRegion:region
                             mipmapLevel:0
                                   slice:face
                               withBytes:&output.imageData[ output.dataOffsets[ 0 ] ]
-                            bytesPerRow:bytesPerRow2
+                            bytesPerRow:bytesPerRow
                           bytesPerImage:bytesPerImage];
 #endif
         }
