@@ -215,6 +215,20 @@ namespace ae3d
 
         VkBuffer indexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory indexMem = VK_NULL_HANDLE;
+
+        struct Buffer
+        {
+            int size = 0;
+            VkDeviceMemory memory;
+            VkBuffer buffer;
+        };
+
+        struct
+        {
+            Buffer vertices;
+            Buffer indices;
+        } stagingBuffers;
+
 #endif
     };
 }
