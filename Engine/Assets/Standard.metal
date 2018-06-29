@@ -106,11 +106,11 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> specularMap [[texture(3)]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
-                               constant float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
-                               constant float4* spotLightBufferCenterAndRadius [[ buffer(8) ]],
-                               constant float4* pointLightBufferColors [[ buffer(9) ]],
-                               constant float4* spotLightParams [[ buffer(10) ]],
-                               constant float4* spotLightBufferColors [[ buffer(11) ]],
+                               const device float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
+                               const device float4* spotLightBufferCenterAndRadius [[ buffer(8) ]],
+                               const device float4* pointLightBufferColors [[ buffer(9) ]],
+                               const device float4* spotLightParams [[ buffer(10) ]],
+                               const device float4* spotLightBufferColors [[ buffer(11) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
@@ -125,8 +125,15 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
-    float4 outColor = float4( 0.25, 0.25, 0.25, 1 );
+    float4 outColor = uniforms.lightColor;
 
+    // FIXME: convert from world-space to view-space
+    const float3 surfaceToLightVS = uniforms.lightDirection.xyz;
+    
+    const float3 diffuseDirectional = max( 0.0f, dot( normalVS, surfaceToLightVS ) );
+    outColor.rgb *= diffuseDirectional;
+    outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
+    
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
         const int lightIndex = nextLightIndex;

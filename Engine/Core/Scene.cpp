@@ -343,8 +343,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
 
-            GfxDeviceGlobal::perObjectUboStruct.lightType = 0;
-
             // Shadow pass
 
             if (camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
@@ -410,7 +408,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                             SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                             RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                             Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
                             hasShadow = true;
                         }
                         else if (spotLight)
@@ -420,11 +417,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                             RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                             Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
                             GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
-                            GfxDeviceGlobal::perObjectUboStruct.lightConeAngleCos = std::cos( spotLight->GetConeAngle() * 3.14159265f / 180.0f );
-                            GfxDeviceGlobal::perObjectUboStruct.lightPosition = Vec4( lightTransform->GetLocalPosition(), 1 );
-                            GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightTransform->GetViewDirection(), 0 );
-                            GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( spotLight->GetColor(), 1 );
-                            GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
                             hasShadow = true;
                         }
                         else if (pointLight)
@@ -656,7 +648,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     gameObjectsWithMeshRenderer.reserve( gameObjects.size() );
     int gameObjectIndex = -1;
     
-    GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
+    GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 0, 0, 0, 1 );
     
     for (auto gameObject : gameObjects)
     {
@@ -673,7 +665,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         
         if (dirLight)
         {
+            auto lightTransform = gameObject->GetComponent< TransformComponent >();
+            
             GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( dirLight->GetColor() );
+            GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightTransform != nullptr ? lightTransform->GetViewDirection() : Vec3( 1, 0, 0 ), 0 );
+            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
         }
         
         if (spriteRenderer)
