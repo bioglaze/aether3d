@@ -34,7 +34,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
 
@@ -143,7 +143,14 @@ int main()
     
     Texture2D fontTex;
     fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
-    
+
+    Texture2D pbrDiffuseTex;
+    pbrDiffuseTex.Load( FileSystem::FileContents("textures/pbr_metal_texture/metal_plate_d.png"), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    Texture2D pbrNormalTex;
+    pbrNormalTex.Load( FileSystem::FileContents("textures/pbr_metal_texture/metal_plate_n.png"), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    Texture2D pbrRoughnessTex;
+    pbrRoughnessTex.Load( FileSystem::FileContents("textures/pbr_metal_texture/metal_plate_rough.png"), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
 
@@ -258,10 +265,10 @@ int main()
     materialSkin.SetVector( "tint", { 1, 1, 1, 1 } );
 
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
     childCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
 
     GameObject copiedCube = cube;
@@ -289,6 +296,7 @@ int main()
 #else
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
 #endif
+    dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 0, 1, 0 ) );
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
@@ -387,6 +395,16 @@ int main()
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( "textureMap", &gliderTex );
+
+    Material pbrMaterial;
+    pbrMaterial.SetShader( &standardShader );
+    pbrMaterial.SetTexture( "textureMap", &gliderTex );
+    //pbrMaterial.SetTexture( "normalMap", &pbrNormalTex );
+    pbrMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
+    pbrMaterial.SetBackFaceCulling( true );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -100 ) );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
+    rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
 
     GameObject standardCubeTopCenter;
     standardCubeTopCenter.SetName( "standardCubeTopCenter" );
@@ -536,9 +554,9 @@ int main()
 #ifdef TEST_SHADOWS_POINT
     scene.Add( &pointLight );
 #endif
-#ifdef TEST_SHADOWS_DIR
+    //#ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
-#endif
+    //#endif
     scene.Add( &spotLight );
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );

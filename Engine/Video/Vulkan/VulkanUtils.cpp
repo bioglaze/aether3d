@@ -182,7 +182,7 @@ namespace ae3d
             "VK_LAYER_LUNARG_standard_validation"
         };
 
-        instanceCreateInfo.enabledLayerCount = 1;
+        instanceCreateInfo.enabledLayerCount = debug::enabled ? 1 : 0;
 #endif
 
         if (debug::enabled)

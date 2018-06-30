@@ -72,8 +72,13 @@ float4 main( PS_INPUT input ) : SV_Target
     const uint tileIndex = GetTileIndex( input.pos.xy );
     uint index = maxNumLightsPerTile * tileIndex;
     uint nextLightIndex = perTileLightIndexBuffer[ index ];
-    float3 accumDiffuseAndSpecular = float3( 0.1f, 0.1f, 0.1f );
 
+    float3 accumDiffuseAndSpecular = lightColor;
+    const float3 surfaceToLightVS = lightDirection.xyz;
+    const float3 diffuseDirectional = max( 0.0f, dot( input.normalVS, surfaceToLightVS ) );
+    accumDiffuseAndSpecular *= diffuseDirectional;
+    accumDiffuseAndSpecular = max( float3( 0.25f, 0.25f, 0.25f ), accumDiffuseAndSpecular );
+    
     //[loop] // Point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
