@@ -326,7 +326,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
             return;
         }
         
-        int bytesPerRow = width * 2;
         int multiplier = 2;
         
         MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm;
@@ -338,13 +337,11 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         else if (output.format == DDSLoader::Format::BC2)
         {
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
-            bytesPerRow = width * 4;
             multiplier = 4;
         }
         else if (output.format == DDSLoader::Format::BC3)
         {
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
-            bytesPerRow = width * 4;
             multiplier = 4;
         }
 
@@ -419,19 +416,41 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 #if TARGET_OS_IPHONE
         NSString* astcNSString = [NSString stringWithUTF8String: fileContents.path.c_str()];
         NSData* fileData = [NSData dataWithContentsOfFile:astcNSString];
-        ASTCHeader* header = (ASTCHeader*) [fileData bytes];
+        ASTCHeader* astcHeader = (ASTCHeader*) [fileData bytes];
+        PVRv2Header* pvrHeader = (PVRv2Header*) [fileData bytes];
+
         const uint32_t astcMagic = 0x5CA1AB13;
-        
-        if (header->magic != astcMagic)
+        // PVR
+        if (astcHeader->magic == 52)
         {
-            ae3d::System::Print( "Wrong magic in %s\n", fileContents.path.c_str() );
+            //System::Print("pvr width: %d, height %d\n", pvrHeader->width, pvrHeader->height);
+            
+            width = pvrHeader->width;
+            height = pvrHeader->height;
+            mipLevelCount = 1;
+
+            uint32_t flags = CFSwapInt32LittleToHost( pvrHeader->flags );
+            const uint32_t PVR_TEXTURE_FLAG_TYPE_MASK = 0xFF;
+            uint32_t formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
+            
+            if (formatFlags == PVRType::kPVRTextureFlagTypePVRTC_4 ||
+                formatFlags == PVRType::kPVRTextureFlagTypePVRTC_2)
+            {
+                ae3d::System::Print("type 4 or 2\n");
+            }
+            ae3d::System::Assert(false, "wrong magic");
+            return;
+        }
+        else if (astcHeader->magic != astcMagic)
+        {
+            ae3d::System::Print( "Warning! '%s' is not a supported ASTC file. Supported are created by texturetool as PVR and something else.\n", fileContents.path.c_str() );
             return;
         }
         
-        const uint32_t w  = (header->xSize[ 2 ] << 16) + (header->xSize[ 1 ] << 8) + header->xSize[ 0 ];
-        const uint32_t h = (header->ySize[ 2 ] << 16) + (header->ySize[ 1 ] << 8) + header->ySize[ 0 ];
+        const uint32_t w  = (astcHeader->xSize[ 2 ] << 16) + (astcHeader->xSize[ 1 ] << 8) + astcHeader->xSize[ 0 ];
+        const uint32_t h = (astcHeader->ySize[ 2 ] << 16) + (astcHeader->ySize[ 1 ] << 8) + astcHeader->ySize[ 0 ];
         
-        const uint32_t widthInBlocks =  (w + header->blockDimX - 1) / header->blockDimX;
+        const uint32_t widthInBlocks =  (w + astcHeader->blockDimX - 1) / astcHeader->blockDimX;
         const uint32_t blockSize = 4 * 4;
         uint8_t* bytes = (uint8_t*)([fileData bytes]) + sizeof( ASTCHeader );
         const uint32_t bytesPerRow = widthInBlocks * blockSize;
@@ -439,12 +458,12 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         width = w;
         height = h;
         mipLevelCount = 1;
-        const MTLPixelFormat pixelFormat = GetASTCPixelFormat( header->blockDimX, header->blockDimY );
+        const MTLPixelFormat pixelFormat = GetASTCPixelFormat( astcHeader->blockDimX, astcHeader->blockDimY );
         
         MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                                                               width:width
                                                                                              height:height
-                                                                                          mipmapped:(mipmaps == Mipmaps::Generate ? YES : NO)];
+                                                                                          mipmapped:NO];
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor];
 
         const std::size_t pos = fileContents.path.find_last_of( "/" );
@@ -460,16 +479,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         [metalTexture replaceRegion:region mipmapLevel:0 withBytes:bytes bytesPerRow:bytesPerRow];
-        
-        if (mipmaps == Mipmaps::Generate)
-        {
-            id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
-            id<MTLBlitCommandEncoder> commandEncoder = [commandBuffer blitCommandEncoder];
-            [commandEncoder generateMipmapsForTexture:metalTexture];
-            [commandEncoder endEncoding];
-            [commandBuffer commit];
-            [commandBuffer waitUntilCompleted];
-        }
 #else
      ae3d::System::Print( ".astc loading not supported on macOS. Tried to load %s\n", fileContents.path.c_str() );
 #endif
