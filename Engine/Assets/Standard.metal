@@ -134,6 +134,10 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     outColor.rgb *= diffuseDirectional;
     outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
     
+    const float3 surfaceToCameraVS = -in.positionVS;
+    const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( -surfaceToLightVS, normalVS ) ) ), 0.2f );
+    outColor.rgb += specularDirectional;
+    
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
         const int lightIndex = nextLightIndex;

@@ -46,10 +46,16 @@ void ae3d::Material::Apply()
 
     int texUnit = 0;
     
+    // FIXME: This is obsolete and overridden by the slot system below.
     for (const auto& tex2d : tex2ds)
     {
         shader->SetTexture( tex2d.first.c_str(), tex2d.second, texUnit );
         ++texUnit;
+    }
+
+    for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
+    {
+        shader->SetTexture( "texture", tex2dSlots[ slot ], slot );
     }
 
     for (const auto& texCube : texCubes)
@@ -109,6 +115,14 @@ void ae3d::Material::SetShader( Shader* aShader )
 void ae3d::Material::SetTexture( const char* name, Texture2D* texture )
 {
     tex2ds[ name ] = texture;
+}
+
+void ae3d::Material::SetTexture( Texture2D* texture, int slot )
+{
+    if (0 <= slot && slot < TEXTURE_SLOT_COUNT)
+    {
+        tex2dSlots[ slot ] = texture;
+    }
 }
 
 void ae3d::Material::SetTexture( const char* name, TextureCube* texture )

@@ -80,6 +80,10 @@ namespace ae3d
         /// \param texture Texture.
         void SetTexture( const char* name, class Texture2D* texture );
 
+        /// \param texture Texture.
+        /// \param slot Slot index.
+        void SetTexture( class Texture2D* texture, int slot );
+
         /// \param name Texture uniform name.
         /// \param texture Texture.
         void SetTexture( const char* name, class TextureCube* texture );
@@ -118,6 +122,8 @@ namespace ae3d
         std::unordered_map< std::string, Texture2D* > tex2ds;
         std::unordered_map< std::string, TextureCube* > texCubes;
         std::unordered_map< std::string, RenderTexture* > texRTs;
+        static constexpr int TEXTURE_SLOT_COUNT = 5;
+        Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ];
         Shader* shader = nullptr;
         DepthFunction depthFunction = DepthFunction::LessOrEqualWriteOn;
         BlendingMode blendingMode = BlendingMode::Off;

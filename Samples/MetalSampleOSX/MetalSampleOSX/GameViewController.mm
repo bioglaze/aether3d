@@ -30,7 +30,7 @@
 #import "Scene.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -234,6 +234,7 @@ using namespace ae3d;
     GameObject cameraCubeRT;
     GameObject animatedGo;
     GameObject wireframeGo;
+    GameObject pbrCube;
     
     Scene scene;
     
@@ -249,6 +250,7 @@ using namespace ae3d;
     Material rtCubeMaterial;
     Material transMaterial;
     Material standardMaterial;
+    Material pbrMaterial;
     
     Shader shader;
     Shader skinShader;
@@ -262,6 +264,9 @@ using namespace ae3d;
     Texture2D bc1Tex;
     Texture2D bc2Tex;
     Texture2D bc3Tex;
+    Texture2D pbrDiffuseTex;
+    Texture2D pbrNormalTex;
+    Texture2D pbrRoughnessTex;
     
     TextureCube skyTex;
 
@@ -319,7 +324,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -395,9 +400,13 @@ using namespace ae3d;
     /*skyTex.Load( FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
                 FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
                 FileSystem::FileContents( "/test_dxt1.dds" ), FileSystem::FileContents( "/test_dxt1.dds" ),
-                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );*/
-    //scene.SetSkybox( &skyTex );
+                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );*/
+    scene.SetSkybox( &skyTex );
     
+    pbrDiffuseTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+    pbrNormalTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    pbrRoughnessTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
     fontSDF.LoadBMFont( &fontTexSDF, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
 
@@ -471,6 +480,17 @@ using namespace ae3d;
     rotatingCube.AddComponent<ae3d::TransformComponent>();
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -8 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
+
+    pbrMaterial.SetShader( &standardShader );
+    pbrMaterial.SetTexture( &pbrNormalTex, 2 );
+    pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
+
+    pbrCube.AddComponent<ae3d::MeshRendererComponent>();
+    pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+    pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &pbrMaterial, 0 );
+    pbrCube.AddComponent<ae3d::TransformComponent>();
+    pbrCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 0, -8 ) );
+    pbrCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
 
     wireframeGo.AddComponent<ae3d::MeshRendererComponent>();
     wireframeGo.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -665,9 +685,10 @@ using namespace ae3d;
     //scene.Add( &standardCubeBL );
     //scene.Add( &standardCubeTR );
     //scene.Add( &standardCubeTL2 );
-    scene.Add( &standardCubeTopCenter );
-    scene.Add( &standardCubeSpotReceiver );
+    //scene.Add( &standardCubeTopCenter );
+    //scene.Add( &standardCubeSpotReceiver );
     //scene.Add( &standardCubeTL );
+    scene.Add( &pbrCube );
 #endif
     scene.Add( &bigCube );
     //scene.Add( &cubePTN2 );
@@ -683,9 +704,9 @@ using namespace ae3d;
     //scene.Add( &animatedGo );
     //scene.Add( &pointLight );
     //scene.Add( &spotLight );
-#ifdef TEST_SHADOWS_DIR
+//#ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
-#endif
+//#endif
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
@@ -923,6 +944,7 @@ using namespace ae3d;
     ae3d::Quaternion rotation;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
     rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
+    pbrCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
     //std::string drawCalls = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
     std::string stats = ae3d::System::Statistics::GetStatistics();

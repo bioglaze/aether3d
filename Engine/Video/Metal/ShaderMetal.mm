@@ -6,8 +6,7 @@
 #include "RenderTexture.hpp"
 #include "System.hpp"
 
-extern id<MTLTexture> texture0;
-extern id<MTLTexture> texture1;
+extern id<MTLTexture> textures[ 5 ];
 
 namespace GfxDeviceGlobal
 {
@@ -107,12 +106,12 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
     {
         if (textureUnit == 0)
         {
-            texture0 = texture->GetMetalTexture();
+            textures[ textureUnit ] = texture->GetMetalTexture();
             GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         }
-        else if (textureUnit == 1)
+        else if (textureUnit < 5)
         {
-            texture1 = texture->GetMetalTexture();
+            textures[ textureUnit ] = texture->GetMetalTexture();
         }
         else
         {
@@ -120,10 +119,6 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
         }
 
         GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap(), texture->GetAnisotropy() );
-    }
-    else
-    {
-        System::Print( "Shader tried to set null texture\n" );
     }
 }
 
@@ -133,12 +128,12 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* rend
     {
         if (textureUnit == 0)
         {
-            texture0 = renderTexture->GetMetalTexture();
+            textures[ 0 ] = renderTexture->GetMetalTexture();
             GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = renderTexture->GetScaleOffset();
         }
         else if (textureUnit == 1)
         {
-            texture1 = renderTexture->GetMetalTexture();
+            textures[ 1 ] = renderTexture->GetMetalTexture();
         }
         else
         {
@@ -146,10 +141,6 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* rend
         }
 
         GfxDeviceGlobal::SetSampler( textureUnit, renderTexture->GetFilter(), renderTexture->GetWrap(), renderTexture->GetAnisotropy() );
-    }
-    else
-    {
-        System::Print( "Shader tried to set null texture\n" );
     }
 }
 
@@ -159,12 +150,12 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
     {
         if (textureUnit == 0)
         {
-            texture0 = texture->GetMetalTexture();
+            textures[ 0 ] = texture->GetMetalTexture();
             GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         }
         else if (textureUnit == 1)
         {
-            texture1 = texture->GetMetalTexture();
+            textures[ 1 ] = texture->GetMetalTexture();
         }
         else
         {
@@ -172,10 +163,6 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
         }
         
         GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap(), texture->GetAnisotropy() );
-    }
-    else
-    {
-        System::Print( "Shader tried to set null texture\n" );
     }
 }
 

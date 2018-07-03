@@ -30,8 +30,7 @@ MTLRenderPassDescriptor* renderPassDescriptorApp = nullptr;
 MTLRenderPassDescriptor* renderPassDescriptorFBO = nullptr;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
-id<MTLTexture> texture0;
-id<MTLTexture> texture1;
+id<MTLTexture> textures[ 5 ];
 id<MTLTexture> msaaColorTarget;
 id<MTLTexture> msaaDepthTarget;
 
@@ -80,7 +79,7 @@ namespace GfxDeviceGlobal
     bool isRenderingToTexture = false;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     std::unordered_map< std::uint64_t, id <MTLRenderPipelineState> > psoCache;
-    id<MTLSamplerState> samplerStates[ 2 ];
+    id<MTLSamplerState> samplerStates[ 5 ];
     std::vector< id<MTLBuffer> > uniformBuffers;
     int currentUboIndex;
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
@@ -142,15 +141,17 @@ namespace GfxDeviceGlobal
             samplers[ samplerIndex ].pointClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
         }
 
-        samplerStates[ 0 ] = samplers[ SamplerIndexByAnisotropy::One ].pointClamp;
-        samplerStates[ 1 ] = samplers[ SamplerIndexByAnisotropy::One ].pointClamp;
+        for (int slot = 0; slot < 5; ++slot)
+        {
+            samplerStates[ slot ] = samplers[ SamplerIndexByAnisotropy::One ].pointClamp;
+        }
     }
     
     void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, ae3d::Anisotropy anisotropy )
     {
-        if (textureUnit > 1)
+        if (textureUnit > 4)
         {
-            ae3d::System::Print( "Trying to set a sampler with too high index\n" );
+            ae3d::System::Print( "Trying to set a sampler with too high index %d\n", textureUnit );
             return;
         }
         
@@ -638,15 +639,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 {
     Statistics::IncDrawCalls();
 
-    if (!texture0)
+    for (int slot = 0; slot < 5; ++slot)
     {
-        texture0 = Texture2D::GetDefaultTexture()->GetMetalTexture();
+        if (!textures[ slot ])
+        {
+            textures[ slot ] = Texture2D::GetDefaultTexture()->GetMetalTexture();
+        }
     }
-    if (!texture1)
-    {
-        texture1 = Texture2D::GetDefaultTexture()->GetMetalTexture();
-    }
-    
+
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
 
     const int sampleCount = GfxDeviceGlobal::isRenderingToTexture ? 1 : GfxDeviceGlobal::sampleCount;
@@ -702,10 +702,10 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
     [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
     [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
-    [renderEncoder setFragmentTexture:texture0 atIndex:0];
-    [renderEncoder setFragmentTexture:texture1 atIndex:1];
-    [renderEncoder setFragmentTexture:texture0 atIndex:2];
-    [renderEncoder setFragmentTexture:texture0 atIndex:3];
+    [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
+    [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
+    [renderEncoder setFragmentTexture:textures[ 2 ] atIndex:2];
+    [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
     
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {
@@ -727,6 +727,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 0 ] atIndex:0];
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 1 ] atIndex:1];
+    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 2 ] atIndex:2];
+    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 3 ] atIndex:3];
+    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 4 ] atIndex:4];
     
     if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
     {
@@ -772,8 +775,10 @@ void ae3d::GfxDevice::BeginFrame()
     commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
     
-    texture0 = nullptr;
-    texture1 = nullptr;
+    for (int slot = 0; slot < 5; ++slot)
+    {
+        textures[ slot ] = nullptr;
+    }
 }
 
 void ae3d::GfxDevice::PresentDrawable()

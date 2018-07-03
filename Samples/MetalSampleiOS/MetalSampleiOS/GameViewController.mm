@@ -19,7 +19,7 @@
 #import "Aether3D_iOS/System.hpp"
 #import "Aether3D_iOS/Material.hpp"
 
-const int POINT_LIGHT_COUNT = 50 * 40;
+const int POINT_LIGHT_COUNT = (50 * 40 + 48);
 #define MULTISAMPLE_COUNT 1
 #define MAX_UI_VERTEX_MEMORY (512 * 1024)
 #define MAX_UI_ELEMENT_MEMORY (128 * 1024)
@@ -132,11 +132,12 @@ int gTouchCount = 0;
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthNormals" );
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.SetName( "camera3d" );
-    camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 3, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
+    camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 3, -5, -85 }, { 120, -5, -85 }, { 0, 1, 0 } );
     scene.Add( &camera3d );
     
     fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
-    gliderTex.Load( ae3d::FileSystem::FileContents( "/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    //gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    gliderTex.Load( ae3d::FileSystem::FileContents( "textures/lion_compressonator.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     astcTex.Load( ae3d::FileSystem::FileContents( "/granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
 
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
@@ -191,7 +192,7 @@ int gTouchCount = 0;
     cubeFloor.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -7, -10 ) );
     cubeFloor.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 4 );
     cubeFloor.SetName( "cubeFloor" );
-    //scene.Add( &cubeFloor );
+    scene.Add( &cubeFloor );
 
     bigCube.AddComponent<ae3d::MeshRendererComponent>();
     bigCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -199,7 +200,7 @@ int gTouchCount = 0;
     bigCube.AddComponent<ae3d::TransformComponent>();
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -8, -10 ) );
     bigCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 5 );
-    scene.Add( &bigCube );
+    //scene.Add( &bigCube );
     
     bigCube2.AddComponent<ae3d::MeshRendererComponent>();
     bigCube2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -223,7 +224,7 @@ int gTouchCount = 0;
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -3, -10 ) );
     pointLight.SetName( "pointLight" );
-    scene.Add( &pointLight );
+    //scene.Add( &pointLight );
 
     spotLight.AddComponent<ae3d::SpotLightComponent>();
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
@@ -269,14 +270,27 @@ int gTouchCount = 0;
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
-                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -12, -150 + (float)col * 4 ) );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -19, -150 + (float)col * 4 ) );
                 
                 scene.Add( &pointLights[ pointLightIndex ] );
                 ++pointLightIndex;
             }
         }
+        
+        const int row = -2;
+        
+        for (int col = 0; col < 48; ++col)
+        {
+            pointLights[ pointLightIndex ].AddComponent<ae3d::PointLightComponent>();
+            pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetRadius( 3 );
+            pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
+            pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
+            pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -19, -150 + (float)col * 4 ) );
+            
+            scene.Add( &pointLights[ pointLightIndex ] );
+            ++pointLightIndex;
+        }
     }
-
 }
 
 - (void)_setupView
@@ -287,7 +301,6 @@ int gTouchCount = 0;
     _view.multipleTouchEnabled = YES;
 
     // Setup the render target, choose values based on your app
-    //_view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     _view.sampleCount = MULTISAMPLE_COUNT;
     _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
@@ -296,6 +309,13 @@ int gTouchCount = 0;
 - (void)_render
 {
     [self _update];
+
+    static int frame = 0;
+    ++frame;
+    if (frame == 200)
+    {
+        NSLog( @"breakpoint" );
+    }
 
     ae3d::System::SetCurrentDrawableMetal( _view );
     ae3d::System::BeginFrame();
@@ -321,7 +341,7 @@ int gTouchCount = 0;
     //text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
     
 //#ifdef TEST_FORWARD_PLUS
-    static float y = -14;
+    /*static float y = -14;
     y += 0.1f;
     
     if (y > 30)
@@ -335,8 +355,8 @@ int gTouchCount = 0;
         const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         
-        //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
-    }
+        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+    }*/
     
 //#endif
 

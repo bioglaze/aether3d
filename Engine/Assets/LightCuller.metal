@@ -38,6 +38,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                          const device float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
                          device uint* perTileLightIndexBufferOut [[ buffer(2) ]],
                          const device float4* spotLightBufferCenterAndRadius [[ buffer(3) ]],
+                         //ushort2 gid [[thread_position_in_grid]],
                          ushort2 tid [[thread_position_in_threadgroup]],
                          ushort2 dtid [[threadgroup_position_in_grid]])
 {
