@@ -65,6 +65,11 @@ uint GetTileIndex( float2 screenPos )
     return tileIdx;
 }
 
+float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, float3 v )
+{
+    return normalize( v.x * normalize( tangent ) + v.y * normalize( bitangent ) + v.z * normalize( normal ) );
+}
+
 float4 main( PS_INPUT input ) : SV_Target
 {
     const float4 albedo = tex.SampleLevel( sLinear, float2( input.positionVS_u.w, input.positionWS_v.w ), 0 );
@@ -73,12 +78,18 @@ float4 main( PS_INPUT input ) : SV_Target
     uint index = maxNumLightsPerTile * tileIndex;
     uint nextLightIndex = perTileLightIndexBuffer[ index ];
 
+    //const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
+
     float3 accumDiffuseAndSpecular = lightColor;
     const float3 surfaceToLightVS = lightDirection.xyz;
     const float3 diffuseDirectional = max( 0.0f, dot( input.normalVS, surfaceToLightVS ) );
     accumDiffuseAndSpecular *= diffuseDirectional;
     accumDiffuseAndSpecular = max( float3( 0.25f, 0.25f, 0.25f ), accumDiffuseAndSpecular );
-    
+
+    const float3 surfaceToCameraVS = -input.positionVS_u.xyz;
+    const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( -surfaceToLightVS, input.normalVS ) ) ), 0.2f );
+    accumDiffuseAndSpecular.rgb += specularDirectional;
+
     //[loop] // Point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {

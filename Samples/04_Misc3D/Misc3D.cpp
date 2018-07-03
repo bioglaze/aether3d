@@ -398,8 +398,8 @@ int main()
 
     Material pbrMaterial;
     pbrMaterial.SetShader( &standardShader );
-    pbrMaterial.SetTexture( "textureMap", &gliderTex );
-    //pbrMaterial.SetTexture( "normalMap", &pbrNormalTex );
+    pbrMaterial.SetTexture( "normalMap", &pbrNormalTex );
+    pbrMaterial.SetTexture( "textureMap", &pbrDiffuseTex );
     pbrMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     pbrMaterial.SetBackFaceCulling( true );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -100 ) );
