@@ -34,7 +34,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
 
@@ -394,11 +394,11 @@ int main()
 
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
-    standardMaterial.SetTexture( "textureMap", &gliderTex );
+    standardMaterial.SetTexture( &gliderTex, 0 );
 
     Material pbrMaterial;
     pbrMaterial.SetShader( &standardShader );
-    pbrMaterial.SetTexture( &pbrNormalTex, 0 );
+    pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
     pbrMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     pbrMaterial.SetBackFaceCulling( true );

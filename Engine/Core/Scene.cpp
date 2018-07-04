@@ -441,7 +441,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
         }
 
         // Defaults for a case where there are no shadow casting lights.
-#if !RENDERER_VULKAN && !RENDERER_METAL
+#if RENDERER_OPENGL
         if (!hasShadow && camera != nullptr && camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
         {
             Texture2D& whiteTexture = renderer.GetWhiteTexture();
