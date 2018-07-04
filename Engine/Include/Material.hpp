@@ -123,7 +123,7 @@ namespace ae3d
         std::unordered_map< std::string, TextureCube* > texCubes;
         std::unordered_map< std::string, RenderTexture* > texRTs;
         static constexpr int TEXTURE_SLOT_COUNT = 5;
-        Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ];
+        Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};
         Shader* shader = nullptr;
         DepthFunction depthFunction = DepthFunction::LessOrEqualWriteOn;
         BlendingMode blendingMode = BlendingMode::Off;

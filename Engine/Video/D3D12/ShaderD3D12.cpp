@@ -254,15 +254,11 @@ void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::Texture2D* texture, i
             GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         }
 
-        GfxDeviceGlobal::texture0 = texture;
+        GfxDeviceGlobal::texture0 = texture ? texture : Texture2D::GetDefaultTexture();
     }
     else if (textureUnit == 1)
     {
-        GfxDeviceGlobal::texture1 = texture;
-    }
-    else
-    {
-        System::Print( "SetTexture: too high texture unit %d\n", textureUnit );
+        GfxDeviceGlobal::texture1 = texture ? texture : Texture2D::GetDefaultTexture();
     }
 }
 
@@ -301,7 +297,10 @@ void ae3d::Shader::SetRenderTexture( const char* /*name*/, ae3d::RenderTexture* 
         GfxDeviceGlobal::texture1 = texture;
     }
 
-    TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
+    if (texture != nullptr)
+    {
+        TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
+    }
 }
 
 void ae3d::Shader::SetInt( const char* name, int value )

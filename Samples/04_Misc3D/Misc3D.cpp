@@ -34,7 +34,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 
 using namespace ae3d;
 
@@ -249,19 +249,19 @@ int main()
 
     Material materialClamp;
     materialClamp.SetShader( &shader );
-    materialClamp.SetTexture( "textureMap", &gliderClampTex );
+    materialClamp.SetTexture( &gliderClampTex, 0 );
     materialClamp.SetVector( "tint", { 1, 0, 0, 1 } );
     materialClamp.SetBackFaceCulling( true );
 
     Material material;
     material.SetShader( &shader );
-    material.SetTexture( "textureMap", &gliderTex );
+    material.SetTexture( &gliderTex, 0 );
     material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
 
     Material materialSkin;
     materialSkin.SetShader( &shaderSkin );
-    materialSkin.SetTexture( "textureMap", &playerTex );
+    materialSkin.SetTexture( &playerTex, 0 );
     materialSkin.SetVector( "tint", { 1, 1, 1, 1 } );
 
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
@@ -398,8 +398,8 @@ int main()
 
     Material pbrMaterial;
     pbrMaterial.SetShader( &standardShader );
-    pbrMaterial.SetTexture( "normalMap", &pbrNormalTex );
-    pbrMaterial.SetTexture( "textureMap", &pbrDiffuseTex );
+    pbrMaterial.SetTexture( &pbrNormalTex, 0 );
+    pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
     pbrMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     pbrMaterial.SetBackFaceCulling( true );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -100 ) );
@@ -505,7 +505,7 @@ int main()
 
     Material transMaterial;
     transMaterial.SetShader( &shader );
-    transMaterial.SetTexture( "textureMap", &transTex );
+    transMaterial.SetTexture( &transTex, 0 );
     transMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     transMaterial.SetBackFaceCulling( true );
     transMaterial.SetBlendingMode( Material::BlendingMode::Alpha );

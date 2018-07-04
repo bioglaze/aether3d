@@ -80,7 +80,7 @@ float4 main( PS_INPUT input ) : SV_Target
 
     //const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
 
-    float3 accumDiffuseAndSpecular = lightColor;
+    float3 accumDiffuseAndSpecular = lightColor.rgb;
     const float3 surfaceToLightVS = lightDirection.xyz;
     const float3 diffuseDirectional = max( 0.0f, dot( input.normalVS, surfaceToLightVS ) );
     accumDiffuseAndSpecular *= diffuseDirectional;

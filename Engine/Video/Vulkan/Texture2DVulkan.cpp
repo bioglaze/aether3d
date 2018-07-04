@@ -217,7 +217,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
         void* stagingData;
         err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory[ mipIndex ], 0, memReqs.size, 0, &stagingData );
         AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
-        int amountToCopy = imageSize;
+        VkDeviceSize amountToCopy = imageSize;
         if (mipChain.dataOffsets[ mipIndex ] + imageSize >= mipChain.imageData.size())
         {
             amountToCopy = mipChain.imageData.size() - mipChain.dataOffsets[ mipIndex ];
