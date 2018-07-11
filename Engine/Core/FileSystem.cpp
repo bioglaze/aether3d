@@ -109,17 +109,19 @@ void ae3d::FileSystem::LoadPakFile( const char* path )
     if (path == nullptr)
     {
         System::Print( "LoadPakFile: path is null\n" );
+        return;
     }
 
-    Global::pakFiles.emplace_back( PakFile() );
     unsigned entryCount = 0;
     std::ifstream ifs( path );
     if (!ifs.is_open())
     {
         System::Print( "LoadPakFile: Could not open %s\n", path );
+        return;
     }
 
     ifs.read( (char*)&entryCount, 4 );
+    Global::pakFiles.emplace_back( PakFile() );
     auto& pakFile = Global::pakFiles.back();
     pakFile.entries.resize( entryCount );
     pakFile.path = path;
