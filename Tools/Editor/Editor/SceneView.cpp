@@ -7,6 +7,95 @@
 
 using namespace ae3d;
 
+void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screenHeight, GameObject& camera, Vec3& outRayOrigin, Vec3& outRayTarget )
+{
+    const float aspect = screenHeight / screenWidth;
+    const float halfWidth = screenWidth * 0.5f;
+    const float halfHeight = screenHeight * 0.5f;
+    const float fov = camera.GetComponent< CameraComponent >()->GetFovDegrees() * (3.1415926535f / 180.0f);
+
+    // Normalizes screen coordinates and scales them to the FOV.
+    const float dx = std::tan( fov * 0.5f ) * (screenX / halfWidth - 1.0f) / aspect;
+    const float dy = std::tan( fov * 0.5f ) * (screenY / halfHeight - 1.0f);
+
+    Matrix44 view;
+    camera.GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
+    Matrix44 translation;
+    translation.Translate( -camera.GetComponent< TransformComponent >()->GetLocalPosition() );
+    Matrix44::Multiply( translation, view, view );
+
+    Matrix44 invView;
+    Matrix44::Invert( view, invView );
+
+    const float farp = camera.GetComponent< CameraComponent >()->GetFar();
+
+    outRayOrigin = camera.GetComponent< TransformComponent >()->GetLocalPosition();
+    outRayTarget = -Vec3( -dx * farp, dy * farp, farp );
+
+    Matrix44::TransformPoint( outRayTarget, invView, &outRayTarget );
+}
+
+template< typename T > class Array
+{
+  public:
+    ~Array()
+    {
+        delete[] elements;
+    }
+
+    T& operator[]( std::size_t index ) const
+    {
+        return elements[ index ];
+    }
+    
+    std::size_t GetLength() const
+    {
+        return elementCount;
+    }
+
+    void PushBack( const T& item )
+    {
+        T* after = new T[ elementCount + 1 ];
+
+        for (std::size_t index = 0; index < elementCount; ++index)
+        {
+            after[ index ] = elements[ index ];
+        }
+
+        after[ elementCount ] = item;
+        delete[] elements;
+        elements = after;
+        elementCount = elementCount + 1;
+    }
+    
+    void Allocate( std::size_t size )
+    {
+        elements = new T[ size ];
+        elementCount = size;
+    }
+    
+  private:
+    T* elements = nullptr;
+    std::size_t elementCount = 0;
+};
+
+struct CollisionInfo
+{
+    int x;
+};
+
+Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance )
+{
+    Vec3 rayOrigin, rayTarget;
+    ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
+    
+    Array< CollisionInfo > outColliders;
+    outColliders.Allocate( 10 );
+    outColliders[ 0 ].x = 1;
+    
+    return outColliders;
+}
+
 void SceneView::Init( int width, int height )
 {
     camera.AddComponent< CameraComponent >();
