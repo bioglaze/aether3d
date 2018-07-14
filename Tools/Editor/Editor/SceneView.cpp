@@ -4,6 +4,9 @@
 #include "MeshRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "Vec3.hpp"
+#include <algorithm>
+#include <vector>
+#include <cmath>
 
 using namespace ae3d;
 
@@ -43,6 +46,18 @@ template< typename T > class Array
         delete[] elements;
     }
 
+    T& operator=( const T& other )
+    {
+        delete[] elements;
+        elementCount = other.elementCount;
+        elements = new T[ elementCount ];
+
+        for (std::size_t index = 0; index < elementCount; ++index)
+        {
+            elements[ index ] = other.elements[ index ];
+        }
+    }
+    
     T& operator[]( std::size_t index ) const
     {
         return elements[ index ];
@@ -81,18 +96,162 @@ template< typename T > class Array
 
 struct CollisionInfo
 {
-    int x;
+    float meshDistance;
+    GameObject* go;
 };
 
-Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance )
+enum class CollisionTest
+{
+    AABB,
+    Triangles
+};
+
+float Max2( float a, float b )
+{
+    return a < b ? b : a;
+}
+
+float Min2( float a, float b )
+{
+    return a < b ? a : b;
+}
+
+bool AlmostEquals( float f, float v )
+{
+    return std::abs( f - v ) < 0.0001f;
+}
+
+float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min, const Vec3& max )
+{
+    const Vec3 dir = (target - origin).Normalized();
+
+    Vec3 dirfrac;
+    dirfrac.x = 1.0f / dir.x;
+    dirfrac.y = 1.0f / dir.y;
+    dirfrac.z = 1.0f / dir.z;
+
+    const float t1 = (min.x - origin.x) * dirfrac.x;
+    const float t2 = (max.x - origin.x) * dirfrac.x;
+    const float t3 = (min.y - origin.y) * dirfrac.y;
+    const float t4 = (max.y - origin.y) * dirfrac.y;
+    const float t5 = (min.z - origin.z) * dirfrac.z;
+    const float t6 = (max.z - origin.z) * dirfrac.z;
+
+    const float tmin = Max2( Max2( Min2(t1, t2), Min2(t3, t4)), Min2(t5, t6) );
+    const float tmax = Min2( Min2( Max2(t1, t2), Max2(t3, t4)), Max2(t5, t6) );
+
+    // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+    if (tmax < 0)
+    {
+        return -1.0f;
+    }
+
+    // if tmin > tmax, ray doesn't intersect AABB
+    if (tmin > tmax)
+    {
+        return -1.0f;
+    }
+
+    return tmin;
+}
+
+float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const std::vector< Vec3 >& vertices )
+{
+    for (std::size_t ve = 0; ve < vertices.size() / 3; ve += 3)
+    {
+        const Vec3& v0 = vertices[ ve * 3 + 0 ];
+        const Vec3& v1 = vertices[ ve * 3 + 1 ];
+        const Vec3& v2 = vertices[ ve * 3 + 2 ];
+
+        const Vec3 e1 = v1 - v0;
+        const Vec3 e2 = v2 - v0;
+
+        const Vec3 d = (target - origin).Normalized();
+
+        const Vec3 h = Vec3::Cross( d, e2 );
+        const float a = Vec3::Dot( e1, h );
+
+        if (AlmostEquals( a, 0 ))
+        {
+            continue;
+        }
+
+        const float f = 1.0f / a;
+        const Vec3 s = origin - v0;
+        const float u = f * Vec3::Dot( s, h );
+
+        if (u < 0 || u > 1)
+        {
+            continue;
+        }
+
+        const Vec3 q = Vec3::Cross( s, e1 );
+        const float v = f * Vec3::Dot( d, q );
+
+        if (v < 0 || u + v > 1)
+        {
+            continue;
+        }
+
+        const float t = f * Vec3::Dot( e2, q );
+
+        if (t > 0.0001f)
+        {
+            return t;
+        }
+    }
+
+    return -1;
+}
+
+Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, std::vector< GameObject* > gameObjects, CollisionTest collisionTest )
 {
     Vec3 rayOrigin, rayTarget;
     ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
     
     Array< CollisionInfo > outColliders;
-    outColliders.Allocate( 10 );
-    outColliders[ 0 ].x = 1;
-    
+
+    // Collects meshes that collide with the ray.
+    for (auto& go : gameObjects)
+    {
+        auto meshRenderer = go->GetComponent< MeshRendererComponent >();
+
+        if (!meshRenderer || !meshRenderer->GetMesh())
+        {
+            continue;
+        }
+
+        auto meshLocalToWorld = go->GetComponent< TransformComponent >() ? go->GetComponent< TransformComponent >()->GetLocalMatrix() : Matrix44::identity;
+        Vec3 oMin, oMax;
+        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMin(), meshLocalToWorld, &oMin );
+        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMax(), meshLocalToWorld, &oMax );
+
+        const float meshDistance = 0;//IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
+
+        if (0 < meshDistance && meshDistance < maxDistance)
+        {
+            CollisionInfo collisionInfo;
+            collisionInfo.go = go;
+            collisionInfo.meshDistance = meshDistance;
+
+            for (unsigned subMeshIndex = 0; subMeshIndex < meshRenderer->GetMesh()->GetSubMeshCount(); ++subMeshIndex)
+            {
+                Vec3 subMeshMin, subMeshMax;
+                Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( subMeshIndex ), meshLocalToWorld, &subMeshMin );
+                Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( subMeshIndex ), meshLocalToWorld, &subMeshMax );
+
+                std::vector< Vec3 > triangles = meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex );
+                const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
+                                                                                   : IntersectRayTriangles( rayOrigin, rayTarget, triangles );
+            }
+
+            outColliders.PushBack( collisionInfo );
+        }
+    }
+
+    //auto sortFunction = [](const CollisionInfo& info1, const CollisionInfo& info2) { return info1.meshDistance < info2.meshDistance; };
+    //std::sort( std::begin( outColliders ), std::end( outColliders ), sortFunction );
+
     return outColliders;
 }
 
