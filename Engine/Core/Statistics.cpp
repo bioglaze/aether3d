@@ -22,10 +22,12 @@ namespace Statistics
     float shadowMapTimeGpuMS = 0;
     float frameTimeMS = 0;
     float presentTimeMS = 0;
+    float sceneAABBTimeMS = 0;
     std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startPresentTimePoint;
+    std::chrono::time_point< std::chrono::high_resolution_clock > startSceneAABBPoint;
 }
 
 void Statistics::IncTriangleCount( int triangles )
@@ -255,6 +257,23 @@ void Statistics::ResetFrameStatistics()
     psoBindCount = 0;
 
     startFrameTimePoint = std::chrono::high_resolution_clock::now();
+}
+
+float Statistics::GetSceneAABBTimeMS()
+{
+    return sceneAABBTimeMS;
+}
+
+void Statistics::BeginSceneAABB()
+{
+    Statistics::startSceneAABBPoint = std::chrono::high_resolution_clock::now();
+}
+
+void Statistics::EndSceneAABB()
+{
+    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startSceneAABBPoint ).count();
+    Statistics::sceneAABBTimeMS = static_cast< float >(tDiff);
 }
 
 void UpdateFrameTiming()

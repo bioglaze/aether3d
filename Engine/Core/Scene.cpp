@@ -1572,6 +1572,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
 void ae3d::Scene::GenerateAABB()
 {
+    Statistics::BeginSceneAABB();
+    
     const float maxValue = 99999999.0f;
     aabbMin = {  maxValue,  maxValue,  maxValue };
     aabbMax = { -maxValue, -maxValue, -maxValue };
@@ -1627,4 +1629,6 @@ void ae3d::Scene::GenerateAABB()
             aabbMax.z = oAABBmax.z;
         }
     }
+    
+    Statistics::EndSceneAABB();
 }

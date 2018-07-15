@@ -14,10 +14,14 @@ namespace Statistics
     float GetShadowMapTimeGpuMS();
     float GetDepthNormalsTimeMS();
     float GetDepthNormalsTimeGpuMS();
-
+    float GetSceneAABBTimeMS();
+    
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
 
+    void BeginSceneAABB();
+    void EndSceneAABB();
+    
     void BeginPresentTimeProfiling();
     void EndPresentTimeProfiling();
     float GetPresentTimeMS();

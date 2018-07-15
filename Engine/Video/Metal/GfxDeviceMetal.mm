@@ -209,6 +209,9 @@ namespace ae3d
                 str += "draw calls: ";
                 str += std::to_string( ::Statistics::GetDrawCalls() );
                 str += "\n";
+                str += "scene AABB: ";
+                str += std::to_string( ::Statistics::GetSceneAABBTimeMS() );
+                str += "\n";
                 return str;
             }
         }
