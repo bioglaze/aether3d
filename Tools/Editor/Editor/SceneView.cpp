@@ -3,8 +3,8 @@
 #include "GameObject.hpp"
 #include "MeshRendererComponent.hpp"
 #include "TransformComponent.hpp"
+#include "System.hpp"
 #include "Vec3.hpp"
-#include <algorithm>
 #include <vector>
 #include <cmath>
 
@@ -37,62 +37,6 @@ void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screen
 
     Matrix44::TransformPoint( outRayTarget, invView, &outRayTarget );
 }
-
-template< typename T > class Array
-{
-  public:
-    ~Array()
-    {
-        delete[] elements;
-    }
-
-    T& operator=( const T& other )
-    {
-        delete[] elements;
-        elementCount = other.elementCount;
-        elements = new T[ elementCount ];
-
-        for (std::size_t index = 0; index < elementCount; ++index)
-        {
-            elements[ index ] = other.elements[ index ];
-        }
-    }
-    
-    T& operator[]( std::size_t index ) const
-    {
-        return elements[ index ];
-    }
-    
-    std::size_t GetLength() const
-    {
-        return elementCount;
-    }
-
-    void PushBack( const T& item )
-    {
-        T* after = new T[ elementCount + 1 ];
-
-        for (std::size_t index = 0; index < elementCount; ++index)
-        {
-            after[ index ] = elements[ index ];
-        }
-
-        after[ elementCount ] = item;
-        delete[] elements;
-        elements = after;
-        elementCount = elementCount + 1;
-    }
-    
-    void Allocate( std::size_t size )
-    {
-        elements = new T[ size ];
-        elementCount = size;
-    }
-    
-  private:
-    T* elements = nullptr;
-    std::size_t elementCount = 0;
-};
 
 struct CollisionInfo
 {
@@ -204,7 +148,7 @@ float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const std::
     return -1;
 }
 
-Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, std::vector< GameObject* > gameObjects, CollisionTest collisionTest )
+Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject >& gameObjects, CollisionTest collisionTest )
 {
     Vec3 rayOrigin, rayTarget;
     ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
@@ -212,8 +156,9 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
     Array< CollisionInfo > outColliders;
 
     // Collects meshes that collide with the ray.
-    for (auto& go : gameObjects)
+    for (std::size_t i = 0; i < gameObjects.GetLength(); ++i)
     {
+        GameObject* go = &gameObjects[ i ];
         auto meshRenderer = go->GetComponent< MeshRendererComponent >();
 
         if (!meshRenderer || !meshRenderer->GetMesh())
@@ -226,7 +171,7 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
         Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMin(), meshLocalToWorld, &oMin );
         Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMax(), meshLocalToWorld, &oMax );
 
-        const float meshDistance = 0;//IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
+        const float meshDistance = IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
 
         if (0 < meshDistance && meshDistance < maxDistance)
         {
@@ -284,13 +229,14 @@ void SceneView::Init( int width, int height )
 
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
-    cube.AddComponent< MeshRendererComponent >();
-    cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    cube.AddComponent< TransformComponent >();
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
-    cube.SetName( "cube" );
-    scene.Add( &cube );
+    gameObjects.PushBack( GameObject() );
+    gameObjects[ 0 ].AddComponent< MeshRendererComponent >();
+    gameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    gameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    gameObjects[ 0 ].AddComponent< TransformComponent >();
+    gameObjects[ 0 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
+    gameObjects[ 0 ].SetName( "cube" );
+    scene.Add( &gameObjects[ 0 ] );
 
     // Test code
     scene.Add( &transformGizmo.go );
@@ -314,6 +260,12 @@ void SceneView::BeginRender()
 void SceneView::EndRender()
 {
     scene.EndFrame();
+}
+
+void SceneView::SelectObject( int screenX, int screenY, int width, int height )
+{
+    Array< CollisionInfo > ci = GetColliders( camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles );
+    System::Print( "collider size: %d\n", ci.GetLength() );
 }
 
 void SceneView::RotateCamera( float xDegrees, float yDegrees )

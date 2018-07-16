@@ -104,7 +104,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    NSLog(@"mouseUp");
+    sceneView.SelectObject( (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
