@@ -11,7 +11,7 @@ SamplerState sLinear : register(s0);
 float4 main( VSOutput vsOut ) : SV_Target
 {
     const float edgeDistance = 0.5f;
-    float distance = tex.SampleLevel( sLinear, vsOut.uv, 0 ).r;
+    float distance = tex.Sample( sLinear, vsOut.uv ).r;
     float edgeWidth = 0.7f * length( float2( ddx( distance ), ddy( distance ) ) );
     float opacity = smoothstep( edgeDistance - edgeWidth, edgeDistance + edgeWidth, distance );
     return float4( vsOut.color.rgb, opacity );

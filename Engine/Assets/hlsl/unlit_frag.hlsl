@@ -41,5 +41,5 @@ float4 main( VSOutput vsOut ) : SV_Target
 {
     float depth = vsOut.projCoord.z / vsOut.projCoord.w;
     float shadow = max( 0.2f, VSM( depth, vsOut.projCoord ) );
-    return /*tint */ tex.SampleLevel( sLinear, vsOut.uv, 0 ) * shadow;
+    return /*tint */ tex.Sample( sLinear, vsOut.uv ) * shadow;
 }

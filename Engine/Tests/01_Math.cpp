@@ -231,12 +231,10 @@ bool TestMatrixInverse()
     Matrix44::Invert( mat, result );
 
     Matrix44 expectedResult;
+    // Note: This is correct for Vulkan renderer.
     const float exData[] = 
-    { 
-        0.552285f, -0, -0, -0, 
-        -0, 0.414214f, -0, -0, 
-        -0, -0, -0, -0.4975f, 
-        -0, -0, -1, 0.5025f
+    {
+        0.552285f, 0, 0, 0, 0, -0.414214f, 0, 0, 0, 0, 0, -0.995f, 0, 0, -1, 1
     };
     expectedResult.InitFrom( exData );
 
@@ -245,6 +243,24 @@ bool TestMatrixInverse()
         if (std::abs( result.m[ i ] - expectedResult.m[ i ] ) > 0.0001f)
         {
             std::cerr << "Matrix inverse failed!" << std::endl;
+            std::cerr << "Got: ";
+
+            for (int i = 0; i < 16; ++i)
+            {
+                std::cerr << result.m[ i ] << " ";
+            }
+
+            std::cerr << std::endl;
+
+            std::cerr << "Expected: ";
+            
+            for (int i = 0; i < 16; ++i)
+            {
+                std::cerr << expectedResult.m[ i ] << " ";
+            }
+
+            std::cerr << std::endl;
+            
             return false;
         }
     }

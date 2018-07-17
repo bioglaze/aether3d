@@ -10,5 +10,5 @@ SamplerState sLinear : register(s0);
 
 float4 main( VSOutput vsOut ) : SV_Target
 {
-    return tex.SampleLevel( sLinear, vsOut.uv, 0 );
+    return tex.Sample( sLinear, vsOut.uv );
 }
