@@ -1,6 +1,7 @@
 #include "Inspector.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
+#include "GameObject.hpp"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -121,7 +122,7 @@ void Inspector::Render( int width, int height )
     {
         nk_layout_row_static( &ctx, 30, 80, 1 );
 
-        nk_label( &ctx, "object name", NK_TEXT_LEFT );
+        nk_label( &ctx, gameObject ? gameObject->GetName().c_str() : "object name", NK_TEXT_LEFT );
 
         static float posX;
         static float posY;

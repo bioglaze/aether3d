@@ -262,10 +262,17 @@ void SceneView::EndRender()
     scene.EndFrame();
 }
 
-void SceneView::SelectObject( int screenX, int screenY, int width, int height )
+ae3d::GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int height )
 {
     Array< CollisionInfo > ci = GetColliders( camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles );
     System::Print( "collider size: %d\n", ci.GetLength() );
+    if (ci.GetLength() > 0)
+    {
+        transformGizmo.SetPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );
+        return ci[ 0 ].go;
+    }
+    
+    return nullptr;
 }
 
 void SceneView::RotateCamera( float xDegrees, float yDegrees )
@@ -279,7 +286,7 @@ void TransformGizmo::Init( ae3d::Shader* shader )
     translateMesh.Load( FileSystem::FileContents( "cursor_translate.ae3d" ) );
     
     xAxisMaterial.SetShader( shader );
-    //xAxisMaterial.SetTexture( "textureMap", &translateTex );
+    //xAxisMaterial.SetTexture( &translateTex, 0 );
     xAxisMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
     xAxisMaterial.SetBackFaceCulling( true );
     xAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
@@ -290,13 +297,13 @@ void TransformGizmo::Init( ae3d::Shader* shader )
     zAxisMaterial.SetDepthOffset( factor, units );
     
     yAxisMaterial.SetShader( shader );
-    //yAxisMaterial.SetTexture( "textureMap", &translateTex );
+    //yAxisMaterial.SetTexture( &translateTex, 0 );
     yAxisMaterial.SetVector( "tint", { 0, 1, 0, 1 } );
     yAxisMaterial.SetBackFaceCulling( true );
     yAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
     
     zAxisMaterial.SetShader( shader );
-    //zAxisMaterial.SetTexture( "textureMap", &translateTex );
+    //zAxisMaterial.SetTexture( &translateTex, 0 );
     zAxisMaterial.SetVector( "tint", { 0, 0, 1, 1 } );
     zAxisMaterial.SetBackFaceCulling( true );
     zAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
@@ -309,3 +316,9 @@ void TransformGizmo::Init( ae3d::Shader* shader )
     go.AddComponent< TransformComponent >();
     go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
 }
+
+void TransformGizmo::SetPosition( const ae3d::Vec3& position )
+{
+    go.GetComponent< TransformComponent >()->SetLocalPosition( position );
+}
+

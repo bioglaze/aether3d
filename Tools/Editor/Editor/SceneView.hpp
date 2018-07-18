@@ -11,6 +11,7 @@
 namespace ae3d
 {
     struct Vec3;
+    class GameObject;
 }
 
 struct TransformGizmo
@@ -40,11 +41,7 @@ template< typename T > class Array
         delete[] elements;
         elementCount = other.elementCount;
         elements = new T[ elementCount ];
-        
-        for (std::size_t index = 0; index < elementCount; ++index)
-        {
-            elements[ index ] = other.elements[ index ];
-        }
+        std::memcpy( elements, other.elements, elementCount * sizeof( T ) );
     }
     
     T& operator[]( std::size_t index ) const
@@ -60,7 +57,6 @@ template< typename T > class Array
     void PushBack( const T& item )
     {
         T* after = new T[ elementCount + 1 ];
-        
         std::memcpy( after, elements, elementCount * sizeof( T ) );
         
         after[ elementCount ] = item;
@@ -88,7 +84,7 @@ public:
     void EndRender();
     void RotateCamera( float xDegrees, float yDegrees );
     void MoveCamera( const ae3d::Vec3& moveDir );
-    void SelectObject( int screenX, int screenY, int width, int height );
+    ae3d::GameObject* SelectObject( int screenX, int screenY, int width, int height );
 
 private:
     Array< ae3d::GameObject > gameObjects;
