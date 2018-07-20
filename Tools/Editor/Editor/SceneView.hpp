@@ -54,7 +54,7 @@ template< typename T > class Array
         return elementCount;
     }
     
-    void PushBack( const T& item )
+    void Add( const T& item )
     {
         T* after = new T[ elementCount + 1 ];
         std::memcpy( after, elements, elementCount * sizeof( T ) );

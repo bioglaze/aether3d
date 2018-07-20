@@ -190,7 +190,7 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
                                                                                    : IntersectRayTriangles( rayOrigin, rayTarget, triangles );
             }
 
-            outColliders.PushBack( collisionInfo );
+            outColliders.Add( collisionInfo );
         }
     }
 
@@ -229,7 +229,7 @@ void SceneView::Init( int width, int height )
 
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
-    gameObjects.PushBack( GameObject() );
+    gameObjects.Add( GameObject() );
     gameObjects[ 0 ].AddComponent< MeshRendererComponent >();
     gameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     gameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
@@ -239,7 +239,6 @@ void SceneView::Init( int width, int height )
     scene.Add( &gameObjects[ 0 ] );
 
     // Test code
-    scene.Add( &transformGizmo.go );
     transformGizmo.xAxisMaterial.SetTexture( "textureMap", &gliderTex );
     transformGizmo.yAxisMaterial.SetTexture( "textureMap", &gliderTex );
     transformGizmo.zAxisMaterial.SetTexture( "textureMap", &gliderTex );
@@ -268,10 +267,12 @@ ae3d::GameObject* SceneView::SelectObject( int screenX, int screenY, int width, 
     System::Print( "collider size: %d\n", ci.GetLength() );
     if (ci.GetLength() > 0)
     {
+        scene.Add( &transformGizmo.go );
         transformGizmo.SetPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );
         return ci[ 0 ].go;
     }
-    
+
+    scene.Remove( &transformGizmo.go );
     return nullptr;
 }
 

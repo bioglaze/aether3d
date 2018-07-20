@@ -116,6 +116,12 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
                 //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 0 );
+                ae3d::GameObject* go = sceneView.SelectObject( x, y, width, height );
+                if (go)
+                {
+                    inspector.SetGameObject( go );
+                }
+
             }
 
             if (event.type == WindowEventType::Mouse2Down)
