@@ -365,7 +365,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         mipWidth = (mipWidth + 1) >> 1;
         mipHeight = (mipHeight + 1) >> 1;
 
-        texResources[ i ].pData = &ddsOutput.imageData[ ddsOutput.dataOffsets[ i - 1 ] ];
+        texResources[ i ].pData = &ddsOutput.imageData[ ddsOutput.dataOffsets[ i ] ];
         texResources[ i ].RowPitch = mipWidth * bytesPerPixel;
         texResources[ i ].SlicePitch = texResources[ i ].RowPitch * mipHeight;
     }

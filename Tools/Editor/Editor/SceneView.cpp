@@ -149,13 +149,11 @@ float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const std::
     return -1;
 }
 
-Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest )
+void GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest, Array< CollisionInfo >& outColliders )
 {
     Vec3 rayOrigin, rayTarget;
     ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
     
-    Array< CollisionInfo > outColliders;
-
     // Collects meshes that collide with the ray.
     for (int i = 0; i < gameObjects.GetLength(); ++i)
     {
@@ -202,8 +200,6 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
 
     //auto sortFunction = [](const CollisionInfo& info1, const CollisionInfo& info2) { return info1.meshDistance < info2.meshDistance; };
     //std::sort( std::begin( outColliders ), std::end( outColliders ), sortFunction );
-
-    return outColliders;
 }
 
 void SceneView::Init( int width, int height )
@@ -270,7 +266,9 @@ void SceneView::EndRender()
 
 GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int height )
 {
-    Array< CollisionInfo > ci = GetColliders( camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles );
+    Array< CollisionInfo > ci;
+    GetColliders( camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles, ci );
+
     if (ci.GetLength() > 0)
     {
         scene.Add( gameObjects[ 0 ] );

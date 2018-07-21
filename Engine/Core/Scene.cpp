@@ -987,7 +987,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
     Material* tempMaterial = new Material();
     tempMaterial->SetShader( &tempShader );
-    tempMaterial->SetTexture( "textureMap", Texture2D::GetDefaultTexture() );
+    tempMaterial->SetTexture( Texture2D::GetDefaultTexture(), 0 );
     tempMaterial->SetVector( "tint", { 1, 1, 1, 1 } );
     tempMaterial->SetBackFaceCulling( true );
     outMaterials[ "temp material" ] = tempMaterial;
@@ -1441,7 +1441,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             lineStream >> uniformName >> textureName;
             
-            outMaterials[ currentMaterialName ]->SetTexture( uniformName.c_str(), outTexture2Ds[ textureName ]);
+            outMaterials[ currentMaterialName ]->SetTexture( outTexture2Ds[ textureName ], 0 );
         }
         else if (token == "audiosource")
         {

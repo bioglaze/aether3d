@@ -32,6 +32,8 @@ template< typename T > class Array
     ~Array()
     {
         delete[] elements;
+        elements = nullptr;
+        elementCount = 0;
     }
     
     T& operator=( const T& other )
@@ -65,6 +67,7 @@ template< typename T > class Array
     
     void Allocate( int size )
     {
+        delete[] elements;
         elements = new T[ size ];
         elementCount = size;
     }
