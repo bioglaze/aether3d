@@ -16,12 +16,10 @@ namespace ae3d
 
 struct TransformGizmo
 {
-    void Init( ae3d::Shader* shader );
-    void SetPosition( const ae3d::Vec3& position );
+    void Init( ae3d::Shader* shader, ae3d::GameObject& go );
     
     ae3d::Mesh mesh;
     
-    ae3d::GameObject go;
     ae3d::Mesh translateMesh;
     ae3d::Material xAxisMaterial;
     ae3d::Material yAxisMaterial;
@@ -30,7 +28,7 @@ struct TransformGizmo
 
 template< typename T > class Array
 {
-    public:
+  public:
     ~Array()
     {
         delete[] elements;
@@ -44,12 +42,12 @@ template< typename T > class Array
         std::memcpy( elements, other.elements, elementCount * sizeof( T ) );
     }
     
-    T& operator[]( std::size_t index ) const
+    T& operator[]( int index ) const
     {
         return elements[ index ];
     }
     
-    std::size_t GetLength() const
+    int GetLength() const
     {
         return elementCount;
     }
@@ -65,15 +63,15 @@ template< typename T > class Array
         elementCount = elementCount + 1;
     }
     
-    void Allocate( std::size_t size )
+    void Allocate( int size )
     {
         elements = new T[ size ];
         elementCount = size;
     }
     
-    private:
+  private:
     T* elements = nullptr;
-    std::size_t elementCount = 0;
+    int elementCount = 0;
 };
 
 class SceneView
@@ -87,7 +85,7 @@ public:
     ae3d::GameObject* SelectObject( int screenX, int screenY, int width, int height );
 
 private:
-    Array< ae3d::GameObject > gameObjects;
+    Array< ae3d::GameObject* > gameObjects;
     ae3d::GameObject camera;
     ae3d::Scene scene;
     ae3d::Shader unlitShader;

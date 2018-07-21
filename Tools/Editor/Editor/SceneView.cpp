@@ -40,8 +40,9 @@ void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screen
 
 struct CollisionInfo
 {
-    float meshDistance;
     GameObject* go;
+    float meshDistance;
+    int subMeshIndex;
 };
 
 enum class CollisionTest
@@ -148,7 +149,7 @@ float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const std::
     return -1;
 }
 
-Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject >& gameObjects, CollisionTest collisionTest )
+Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest )
 {
     Vec3 rayOrigin, rayTarget;
     ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
@@ -156,9 +157,9 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
     Array< CollisionInfo > outColliders;
 
     // Collects meshes that collide with the ray.
-    for (std::size_t i = 0; i < gameObjects.GetLength(); ++i)
+    for (int i = 0; i < gameObjects.GetLength(); ++i)
     {
-        GameObject* go = &gameObjects[ i ];
+        GameObject* go = gameObjects[ i ];
         auto meshRenderer = go->GetComponent< MeshRendererComponent >();
 
         if (!meshRenderer || !meshRenderer->GetMesh())
@@ -178,7 +179,8 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
             CollisionInfo collisionInfo;
             collisionInfo.go = go;
             collisionInfo.meshDistance = meshDistance;
-
+            collisionInfo.subMeshIndex = 0;
+            
             for (unsigned subMeshIndex = 0; subMeshIndex < meshRenderer->GetMesh()->GetSubMeshCount(); ++subMeshIndex)
             {
                 Vec3 subMeshMin, subMeshMax;
@@ -188,6 +190,10 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
                 std::vector< Vec3 > triangles = meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex );
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
                                                                                    : IntersectRayTriangles( rayOrigin, rayTarget, triangles );
+                if (subMeshDistance > 0)
+                {
+                    collisionInfo.subMeshIndex = subMeshIndex;
+                }
             }
 
             outColliders.Add( collisionInfo );
@@ -203,10 +209,10 @@ Array< CollisionInfo > GetColliders( GameObject& camera, int screenX, int screen
 void SceneView::Init( int width, int height )
 {
     camera.AddComponent< CameraComponent >();
-    camera.GetComponent< CameraComponent >()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
+    camera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
-    camera.GetComponent< CameraComponent >()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+    camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.AddComponent< TransformComponent >();
     camera.GetComponent< TransformComponent >()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
@@ -217,8 +223,9 @@ void SceneView::Init( int width, int height )
                       FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                       FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
-    transformGizmo.Init( &unlitShader );
-    
+    gameObjects.Add( new GameObject() );
+    transformGizmo.Init( &unlitShader, *gameObjects[ 0 ] );
+
     // Test content
     
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
@@ -229,14 +236,14 @@ void SceneView::Init( int width, int height )
 
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
-    gameObjects.Add( GameObject() );
-    gameObjects[ 0 ].AddComponent< MeshRendererComponent >();
-    gameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    gameObjects[ 0 ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    gameObjects[ 0 ].AddComponent< TransformComponent >();
-    gameObjects[ 0 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
-    gameObjects[ 0 ].SetName( "cube" );
-    scene.Add( &gameObjects[ 0 ] );
+    gameObjects.Add( new GameObject() );
+    gameObjects[ 1 ]->AddComponent< MeshRendererComponent >();
+    gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
+    gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
+    gameObjects[ 1 ]->AddComponent< TransformComponent >();
+    gameObjects[ 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
+    gameObjects[ 1 ]->SetName( "cube" );
+    scene.Add( gameObjects[ 1 ] );
 
     // Test code
     transformGizmo.xAxisMaterial.SetTexture( "textureMap", &gliderTex );
@@ -244,7 +251,7 @@ void SceneView::Init( int width, int height )
     transformGizmo.zAxisMaterial.SetTexture( "textureMap", &gliderTex );
 }
 
-void SceneView::MoveCamera( const ae3d::Vec3& moveDir )
+void SceneView::MoveCamera( const Vec3& moveDir )
 {
     camera.GetComponent< TransformComponent >()->MoveUp( moveDir.y );
     camera.GetComponent< TransformComponent >()->MoveForward( moveDir.z );
@@ -261,18 +268,19 @@ void SceneView::EndRender()
     scene.EndFrame();
 }
 
-ae3d::GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int height )
+GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int height )
 {
     Array< CollisionInfo > ci = GetColliders( camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles );
-    System::Print( "collider size: %d\n", ci.GetLength() );
     if (ci.GetLength() > 0)
     {
-        scene.Add( &transformGizmo.go );
-        transformGizmo.SetPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );
+        scene.Add( gameObjects[ 0 ] );
+        gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );
+        System::Print( "collided with submesh: %d\n", ci[ 0 ].subMeshIndex );
+
         return ci[ 0 ].go;
     }
 
-    scene.Remove( &transformGizmo.go );
+    scene.Remove( gameObjects[ 0 ] );
     return nullptr;
 }
 
@@ -282,7 +290,7 @@ void SceneView::RotateCamera( float xDegrees, float yDegrees )
     camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), yDegrees );
 }
 
-void TransformGizmo::Init( ae3d::Shader* shader )
+void TransformGizmo::Init( Shader* shader, GameObject& go )
 {
     translateMesh.Load( FileSystem::FileContents( "cursor_translate.ae3d" ) );
     
@@ -290,7 +298,7 @@ void TransformGizmo::Init( ae3d::Shader* shader )
     //xAxisMaterial.SetTexture( &translateTex, 0 );
     xAxisMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
     xAxisMaterial.SetBackFaceCulling( true );
-    xAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
+    xAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     float factor = -100;
     float units = 0;
     xAxisMaterial.SetDepthOffset( factor, units );
@@ -301,14 +309,14 @@ void TransformGizmo::Init( ae3d::Shader* shader )
     //yAxisMaterial.SetTexture( &translateTex, 0 );
     yAxisMaterial.SetVector( "tint", { 0, 1, 0, 1 } );
     yAxisMaterial.SetBackFaceCulling( true );
-    yAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
+    yAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     
     zAxisMaterial.SetShader( shader );
     //zAxisMaterial.SetTexture( &translateTex, 0 );
     zAxisMaterial.SetVector( "tint", { 0, 0, 1, 1 } );
     zAxisMaterial.SetBackFaceCulling( true );
-    zAxisMaterial.SetDepthFunction( ae3d::Material::DepthFunction::LessOrEqualWriteOn );
-    
+    zAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
+
     go.AddComponent< MeshRendererComponent >();
     go.GetComponent< MeshRendererComponent >()->SetMesh( &translateMesh );
     go.GetComponent< MeshRendererComponent >()->SetMaterial( &xAxisMaterial, 1 );
@@ -316,10 +324,5 @@ void TransformGizmo::Init( ae3d::Shader* shader )
     go.GetComponent< MeshRendererComponent >()->SetMaterial( &zAxisMaterial, 0 );
     go.AddComponent< TransformComponent >();
     go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
-}
-
-void TransformGizmo::SetPosition( const ae3d::Vec3& position )
-{
-    go.GetComponent< TransformComponent >()->SetLocalPosition( position );
 }
 
