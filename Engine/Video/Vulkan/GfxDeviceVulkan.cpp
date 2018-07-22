@@ -1709,8 +1709,13 @@ void ae3d::GfxDevice::Init( int width, int height )
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* offset )
 {
-    int scissor[ 4 ] = { vpX < 8192 ? std::abs( vpX )  : 8192, vpY < 8192 ? std::abs( vpY ) : 8192, vpWidth < 8192 ? vpWidth : 8192, vpHeight < 8192 ? vpHeight : 8192 };
+    int scissor[ 4 ] = {};
+    scissor[ 0 ] = vpX < 0 ? 0 : vpX;
+    scissor[ 1 ] = vpY < 0 ? 0 : vpY;
+    scissor[ 2 ] = vpWidth > 8191 ? 8191 : vpWidth;
+    scissor[ 3 ] = vpHeight > 8191 ? 8191 : vpHeight;
     SetScissor( scissor );
+    
     Draw( GfxDeviceGlobal::uiVertexBuffer, (int)((size_t)offset), (int)((size_t)offset + elemCount), renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
