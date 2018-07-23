@@ -104,7 +104,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    ae3d::GameObject* go = sceneView.SelectObject( (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+    ae3d::GameObject* go = sceneView.SelectObject( (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
     if (go)
     {
         inspector.SetGameObject( go );
