@@ -76,10 +76,6 @@ namespace ae3d
         /// \param shader Shader.
         void SetShader( Shader* shader );
 
-        /// \param name Name. This is a uniform in the shader.
-        /// \param texture Texture.
-        void SetTexture( const char* name, class Texture2D* texture );
-
         /// \param texture Texture.
         /// \param slot Slot index.
         void SetTexture( class Texture2D* texture, int slot );
@@ -119,8 +115,7 @@ namespace ae3d
         std::unordered_map< std::string, int > ints;
         std::unordered_map< std::string, Vec3 > vec3s;
         std::unordered_map< std::string, Vec4 > vec4s;
-        std::unordered_map< std::string, Texture2D* > tex2ds;
-        std::unordered_map< std::string, TextureCube* > texCubes;
+        std::unordered_map< std::string, class TextureCube* > texCubes;
         std::unordered_map< std::string, RenderTexture* > texRTs;
         static constexpr int TEXTURE_SLOT_COUNT = 5;
         Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};

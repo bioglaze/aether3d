@@ -49,7 +49,7 @@ template< typename T > class Array
         return elements[ index ];
     }
     
-    int GetLength() const
+    int GetLength() const noexcept
     {
         return elementCount;
     }

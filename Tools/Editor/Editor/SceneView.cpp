@@ -69,11 +69,7 @@ bool AlmostEquals( float f, float v )
 float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min, const Vec3& max )
 {
     const Vec3 dir = (target - origin).Normalized();
-
-    Vec3 dirfrac;
-    dirfrac.x = 1.0f / dir.x;
-    dirfrac.y = 1.0f / dir.y;
-    dirfrac.z = 1.0f / dir.z;
+    const Vec3 dirfrac{ 1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z };
 
     const float t1 = (min.x - origin.x) * dirfrac.x;
     const float t2 = (max.x - origin.x) * dirfrac.x;
@@ -176,7 +172,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
         {
             CollisionInfo collisionInfo;
             collisionInfo.go = go;
-            collisionInfo.meshDistance = meshDistance;
+            collisionInfo.meshDistance = 99999;
             collisionInfo.subMeshIndex = 0;
             
             for (unsigned subMeshIndex = 0; subMeshIndex < meshRenderer->GetMesh()->GetSubMeshCount(); ++subMeshIndex)
@@ -188,9 +184,12 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
                 std::vector< Vec3 > triangles = meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex );
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
                                                                                    : IntersectRayTriangles( rayOrigin, rayTarget, triangles );
-                if (subMeshDistance > 0)
+
+                System::Print("distance to submesh %d: %f. rayOrigin: %.2f, %.2f, %.2f, rayTarget: %.2f, %.2f, %.2f\n", subMeshIndex, subMeshDistance, rayOrigin.x, rayOrigin.y, rayOrigin.z, rayTarget.x, rayTarget.y, rayTarget.z);
+                if (0 < subMeshDistance && subMeshDistance < collisionInfo.meshDistance)
                 {
                     collisionInfo.subMeshIndex = subMeshIndex;
+                    collisionInfo.meshDistance = subMeshDistance;
                 }
             }
 
@@ -227,7 +226,7 @@ void SceneView::Init( int width, int height )
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     material.SetShader( &unlitShader );
-    material.SetTexture( "textureMap", &gliderTex );
+    material.SetTexture( &gliderTex, 0 );
     material.SetBackFaceCulling( true );
 
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
@@ -242,9 +241,9 @@ void SceneView::Init( int width, int height )
     scene.Add( gameObjects[ 1 ] );
 
     // Test code
-    transformGizmo.xAxisMaterial.SetTexture( "textureMap", &gliderTex );
-    transformGizmo.yAxisMaterial.SetTexture( "textureMap", &gliderTex );
-    transformGizmo.zAxisMaterial.SetTexture( "textureMap", &gliderTex );
+    transformGizmo.xAxisMaterial.SetTexture( &gliderTex, 0 );
+    transformGizmo.yAxisMaterial.SetTexture( &gliderTex, 0 );
+    transformGizmo.zAxisMaterial.SetTexture( &gliderTex, 0 );
 }
 
 void SceneView::MoveCamera( const Vec3& moveDir )
