@@ -666,9 +666,12 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         if (dirLight)
         {
             auto lightTransform = gameObject->GetComponent< TransformComponent >();
-            
+
+            Vec4 lightDirection = Vec4( lightTransform != nullptr ? lightTransform->GetViewDirection() : Vec3( 1, 0, 0 ), 0 );
+            Vec3 lightDirectionVS;
+            Matrix44::TransformDirection( Vec3( lightDirection.x, lightDirection.y, lightDirection.z ), camera->GetView(), &lightDirectionVS );
             GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( dirLight->GetColor() );
-            GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightTransform != nullptr ? lightTransform->GetViewDirection() : Vec3( 1, 0, 0 ), 0 );
+            GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightDirectionVS.x, lightDirectionVS.y, lightDirectionVS.z, 0 );
             GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
         }
         
