@@ -162,10 +162,10 @@ int gTouchCount = 0;
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
     //standardMaterial.SetTexture( "textureMap", &gliderTex );
-    standardMaterial.SetTexture( "textureMap", &astcTex );
+    standardMaterial.SetTexture( &astcTex, 0 );
     
     cubeMaterial.SetShader( &shader );
-    cubeMaterial.SetTexture( "textureMap", &gliderTex );
+    cubeMaterial.SetTexture( &gliderTex, 0 );
     cubeMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
     
     cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );

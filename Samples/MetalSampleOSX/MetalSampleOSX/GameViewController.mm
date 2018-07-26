@@ -450,12 +450,12 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
 
     cubeMaterial.SetShader( &shader );
-    cubeMaterial.SetTexture( "textureMap", &gliderTex );
+    cubeMaterial.SetTexture( &gliderTex, 0 );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
     cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
 
     skinMaterial.SetShader( &skinShader );
-    skinMaterial.SetTexture( "textureMap", &gliderTex );
+    skinMaterial.SetTexture( &gliderTex, 0 );
 
     rtCubeMaterial.SetShader( &skyboxShader );
     rtCubeMaterial.SetRenderTexture( "skyMap", &cubeRT );
@@ -466,7 +466,7 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
-    standardMaterial.SetTexture( "textureMap", &gliderTex );
+    standardMaterial.SetTexture( &gliderTex, 0 );
 
     skyboxShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                         "skybox_vertex", "skybox_fragment",
@@ -719,7 +719,7 @@ using namespace ae3d;
                   ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
     
     transMaterial.SetShader( &shader );
-    transMaterial.SetTexture( "textureMap", &transTex );
+    transMaterial.SetTexture( &transTex, 0 );
 
     transMaterial.SetBackFaceCulling( true );
     //transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );

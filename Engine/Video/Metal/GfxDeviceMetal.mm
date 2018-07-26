@@ -86,6 +86,7 @@ namespace GfxDeviceGlobal
     ae3d::LightTiler lightTiler;
     std::vector< ae3d::VertexBuffer > lineBuffers;
     int viewport[ 4 ];
+    MTLScissorRect scissor;
     unsigned frameIndex = 0;
     ae3d::VertexBuffer uiBuffer;
     PerObjectUboStruct perObjectUboStruct;
@@ -236,9 +237,9 @@ id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
 
 void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* offset )
 {
-    int viewport[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
-    SetViewport( viewport );
-    Draw( GfxDeviceGlobal::uiBuffer, 0/*(int)((size_t)offset)*/, /*(int)((size_t)offset) +*/ elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+    int scissor[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
+    SetScissor( scissor );
+    Draw( GfxDeviceGlobal::uiBuffer, (int)((size_t)offset), (int)((size_t)offset) + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
@@ -284,6 +285,14 @@ void ae3d::GfxDevice::SetViewport( int viewport[ 4 ] )
     GfxDeviceGlobal::viewport[ 1 ] = viewport[ 1 ];
     GfxDeviceGlobal::viewport[ 2 ] = viewport[ 2 ];
     GfxDeviceGlobal::viewport[ 3 ] = viewport[ 3 ];
+}
+
+void ae3d::GfxDevice::SetScissor( int scissor[ 4 ] )
+{
+    GfxDeviceGlobal::scissor.x = scissor[ 0 ];
+    GfxDeviceGlobal::scissor.y = scissor[ 1 ];
+    GfxDeviceGlobal::scissor.width = scissor[ 2 ];
+    GfxDeviceGlobal::scissor.height = scissor[ 3 ];
 }
 
 void ae3d::GfxDevice::Init( int width, int height )
@@ -690,6 +699,24 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     viewport.znear = 0;
     viewport.zfar = 1;
     [renderEncoder setViewport:viewport];
+    
+    /*const int bw = GfxDeviceGlobal::backBufferWidth * 2;
+    const int bh = GfxDeviceGlobal::backBufferHeight * 2;
+    
+    MTLScissorRect scissor;
+    scissor.x = viewport.originX < 0 ? 0 : viewport.originX;
+    scissor.y = viewport.originY < 0 ? 0 : viewport.originY;
+    scissor.width = viewport.width > bw ? bw : viewport.width;
+    scissor.height = viewport.height > bh ? bh : viewport.height;
+    if (scissor.x + scissor.width > bw)
+    {
+        scissor.x = 0;
+    }
+    if (scissor.y + scissor.height > bh)
+    {
+        scissor.y = 0;
+    }
+    [renderEncoder setScissorRect:scissor];*/
     
     if (shader.GetMetalVertexShaderName() == "standard_vertex")
     {
