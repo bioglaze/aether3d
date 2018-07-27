@@ -1,7 +1,6 @@
 #ifndef CAMERA_COMPONENT_H
 #define CAMERA_COMPONENT_H
 
-#include <string>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 #include "RenderTexture.hpp"
@@ -23,6 +22,9 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
         
+        /// \return True if enabled.
+        bool IsEnabled() const { return isEnabled; }
+
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
@@ -113,9 +115,6 @@ namespace ae3d
 
         /// \return FOV in degrees.
         float GetFovDegrees() const { return fovDegrees; }
-
-        /// \return Textual representation of component.
-        std::string GetSerialized() const;
 
         /// \return Left clipping plane.
         float GetLeft() const { return orthoParams.left; }

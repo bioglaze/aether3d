@@ -1,11 +1,10 @@
 #ifndef VR_H
 #define VR_H
 
-#include "Vec3.hpp"
-
 namespace ae3d
 {
     class GameObject;
+    struct Vec3;
 
     namespace VR
     {

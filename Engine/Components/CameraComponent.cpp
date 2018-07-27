@@ -94,7 +94,7 @@ void ae3d::CameraComponent::SetViewport( int x, int y, int width, int height )
     viewport[ 3 ] = height;
 }
 
-std::string ae3d::CameraComponent::GetSerialized() const
+std::string GetSerialized( ae3d::CameraComponent* component )
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );
@@ -102,12 +102,12 @@ std::string ae3d::CameraComponent::GetSerialized() const
 
     outStream << "camera\n";
 
-    outStream << "ortho " << orthoParams.left << " " << orthoParams.right << " " << orthoParams.top << " " << orthoParams.down <<
-    " " << nearp << " " << farp << "\n";
+    outStream << "ortho " << component->GetLeft() << " " << component->GetRight() << " " << component->GetTop() << " " << component->GetBottom() <<
+    " " << component->GetNear() << " " << component->GetFar() << "\n";
 
     outStream << "projection ";
     
-    if (projectionType == ProjectionType::Perspective)
+    if (component->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
     {
         outStream << "perspective\n";
     }
@@ -116,12 +116,12 @@ std::string ae3d::CameraComponent::GetSerialized() const
         outStream << "orthographic\n";
     }
     
-    outStream << "persp " << fovDegrees << " " << aspect << " " << nearp << " " << farp << "\n";
-    outStream << "layermask " << layerMask << "\n";
-    outStream << "order " << renderOrder << "\n";
-    outStream << "viewport " << viewport[ 0 ] << " " << viewport[ 1 ] << " " << viewport[ 2 ] << " " << viewport[ 3 ] << "\n";
-    outStream << "clearcolor " << clearColor.x << " " << clearColor.y << " " << clearColor.z;
-    outStream << "enabled" << isEnabled << "\n";
+    outStream << "persp " << component->GetFovDegrees() << " " << component->GetAspect() << " " << component->GetNear() << " " << component->GetFar() << "\n";
+    outStream << "layermask " << component->GetLayerMask() << "\n";
+    outStream << "order " << component->GetRenderOrder() << "\n";
+    outStream << "viewport " << component->GetViewport()[ 0 ] << " " << component->GetViewport()[ 1 ] << " " << component->GetViewport()[ 2 ] << " " << component->GetViewport()[ 3 ] << "\n";
+    outStream << "clearcolor " << component->GetClearColor().x << " " << component->GetClearColor().y << " " << component->GetClearColor().z;
+    outStream << "enabled" << component->IsEnabled() << "\n";
     outStream << "\n\n";
 
     return outStream.str();
