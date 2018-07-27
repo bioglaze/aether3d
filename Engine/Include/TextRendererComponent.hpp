@@ -2,7 +2,6 @@
 #define TEXT_RENDERER_H
 
 #include <type_traits>
-#include <string>
 
 namespace ae3d
 {
@@ -43,8 +42,8 @@ namespace ae3d
         /// \param shaderType Shader type.
         void SetShader( ShaderType shaderType );
 
-        /// \return Textual representation of component.
-        std::string GetSerialized() const;
+        /// \param outStr Returns textual representation of component. Caller needs to allocate at least X bytes.
+        void GetSerialized( char* outStr ) const;
 
       private:
         friend class GameObject;

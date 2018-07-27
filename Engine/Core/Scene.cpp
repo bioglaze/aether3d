@@ -942,7 +942,9 @@ std::string ae3d::Scene::GetSerialized() const
         }
         if (gameObject->GetComponent<TextRendererComponent>())
         {
-            outSerialized += gameObject->GetComponent<TextRendererComponent>()->GetSerialized();
+            char str[ 512 ] = {};
+            gameObject->GetComponent<TextRendererComponent>()->GetSerialized( str );
+			outSerialized += std::string( str );
         }
         if (gameObject->GetComponent<AudioSourceComponent>())
         {

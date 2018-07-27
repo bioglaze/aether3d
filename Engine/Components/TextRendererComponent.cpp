@@ -2,6 +2,7 @@
 #include <locale>
 #include <vector>
 #include <sstream>
+#include <cstring>
 #include "Font.hpp"
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
@@ -133,7 +134,7 @@ void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )
     m().shader = aShaderType == ShaderType::Sprite ? &renderer.builtinShaders.spriteRendererShader : &renderer.builtinShaders.sdfShader;
 }
 
-std::string ae3d::TextRendererComponent::GetSerialized() const
+void ae3d::TextRendererComponent::GetSerialized( char* outStr ) const
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );
@@ -144,5 +145,6 @@ std::string ae3d::TextRendererComponent::GetSerialized() const
     outStream << "color " << color.x << " " << color.y << " " << color.z << " " << color.w << "\n";
     outStream << "enabled" << isEnabled << "\n";
     outStream << "text " << m().text << "\n\n";
-    return outStream.str();
+
+    std::strcpy( outStr, outStream.str().length() > 512 ? "!!too big string!!" : outStream.str().c_str() );
 }
