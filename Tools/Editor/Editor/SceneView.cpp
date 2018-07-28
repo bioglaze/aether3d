@@ -253,6 +253,14 @@ void SceneView::MoveCamera( const Vec3& moveDir )
     camera.GetComponent< TransformComponent >()->MoveRight( moveDir.x );
 }
 
+void SceneView::MoveSelection( const Vec3& moveDir )
+{
+    if (selectedGameObjects.GetLength() > 0 && selectedGameObjects[ 0 ]->GetComponent< TransformComponent >() != nullptr)
+    {
+        selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( selectedGameObjects[ 0 ]->GetComponent<TransformComponent>()->GetLocalPosition() + moveDir );
+    }
+}
+
 void SceneView::BeginRender()
 {
     scene.Render();
@@ -274,9 +282,12 @@ GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int he
         gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );
         System::Print( "collided with submesh: %d\n", ci[ 0 ].subMeshIndex );
 
+        selectedGameObjects.Add( ci[ 0 ].go );
+        
         return ci[ 0 ].go;
     }
 
+    selectedGameObjects.Allocate( 0 );
     scene.Remove( gameObjects[ 0 ] );
     return nullptr;
 }

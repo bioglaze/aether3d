@@ -7,13 +7,14 @@ using namespace ae3d;
 
 int main()
 {
-    int width = 640;
+    int width = 640 * 2;
     int height = 480;
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
+    Window::SetTitle( "Aether3D Editor" );
     System::LoadBuiltinAssets();
-
+    
     bool quit = false;   
     int x = 0, y = 0;
 
@@ -73,7 +74,23 @@ int main()
                 {
                     moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
                 }
-
+                else if (keyCode == KeyCode::Left)
+                {
+                    sceneView.MoveSelection( { -1, 0, 0 } );
+                }
+                else if (keyCode == KeyCode::Right)
+                {
+                    sceneView.MoveSelection( { 1, 0, 0 } );
+                }
+                else if (keyCode == KeyCode::Up)
+                {
+                    sceneView.MoveSelection( { 0, 1, 0 } );
+                }
+                else if (keyCode == KeyCode::Down)
+                {
+                    sceneView.MoveSelection( { 0, -1, 0 } );
+                }
+                
                 /*else if (keyCode == KeyCode::A)
                 {
                     nk_input_char( &ctx, 'a' );

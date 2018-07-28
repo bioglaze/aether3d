@@ -64,11 +64,11 @@ template< typename T > class Array
         elements = after;
         elementCount = elementCount + 1;
     }
-    
+
     void Allocate( int size )
     {
         delete[] elements;
-        elements = new T[ size ];
+        elements = size > 0 ? new T[ size ] : nullptr;
         elementCount = size;
     }
     
@@ -85,10 +85,12 @@ public:
     void EndRender();
     void RotateCamera( float xDegrees, float yDegrees );
     void MoveCamera( const ae3d::Vec3& moveDir );
+    void MoveSelection( const ae3d::Vec3& moveDir );
     ae3d::GameObject* SelectObject( int screenX, int screenY, int width, int height );
 
 private:
     Array< ae3d::GameObject* > gameObjects;
+    Array< ae3d::GameObject* > selectedGameObjects;
     ae3d::GameObject camera;
     ae3d::Scene scene;
     ae3d::Shader unlitShader;
