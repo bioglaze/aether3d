@@ -2,7 +2,6 @@
 #include <locale>
 #include <vector>
 #include <sstream>
-#include <cstring>
 #include "Font.hpp"
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
@@ -129,22 +128,32 @@ void ae3d::TextRendererComponent::Render( const float* localToClip )
     }
 }
 
+const char* ae3d::TextRendererComponent::GetText() const
+{
+    return m().text.c_str();
+}
+
+const ae3d::Vec4& ae3d::TextRendererComponent::GetColor() const
+{
+    return m().color;
+}
+
 void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )
 {
     m().shader = aShaderType == ShaderType::Sprite ? &renderer.builtinShaders.spriteRendererShader : &renderer.builtinShaders.sdfShader;
 }
 
-void ae3d::TextRendererComponent::GetSerialized( char* outStr ) const
+std::string GetSerialized( ae3d::TextRendererComponent* component )
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );
     outStream.imbue( c_locale );
 
     outStream << "textrenderer\n";
-    const auto& color = m().color;
+    const auto& color = component->GetColor();
     outStream << "color " << color.x << " " << color.y << " " << color.z << " " << color.w << "\n";
-    outStream << "enabled" << isEnabled << "\n";
-    outStream << "text " << m().text << "\n\n";
+    outStream << "enabled" << component->IsEnabled() << "\n";
+    outStream << "text " << std::string( component->GetText() ) << "\n\n";
 
-    std::strcpy( outStr, outStream.str().length() > 512 ? "!!too big string!!" : outStream.str().c_str() );
+    return outStream.str();
 }

@@ -36,6 +36,7 @@ extern Renderer renderer;
 float GetVRFov();
 void BeginOffscreen();
 void EndOffscreen();
+std::string GetSerialized( ae3d::TextRendererComponent* component );
 std::string GetSerialized( ae3d::CameraComponent* component );
 std::string GetSerialized( ae3d::AudioSourceComponent* component );
 std::string GetSerialized( ae3d::MeshRendererComponent* component );
@@ -943,9 +944,7 @@ std::string ae3d::Scene::GetSerialized() const
         }
         if (gameObject->GetComponent<TextRendererComponent>())
         {
-            char str[ 512 ] = {};
-            gameObject->GetComponent<TextRendererComponent>()->GetSerialized( str );
-			outSerialized += std::string( str );
+            outSerialized += ::GetSerialized( gameObject->GetComponent<TextRendererComponent>() );
         }
         if (gameObject->GetComponent<AudioSourceComponent>())
         {

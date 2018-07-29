@@ -5,6 +5,8 @@
 
 namespace ae3d
 {
+    struct Vec4;
+    
     /// Contains text.
     class TextRendererComponent
     {
@@ -27,6 +29,12 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \return True, if enabled.
+        bool IsEnabled() const { return isEnabled; }
+        
+        /// \return Color.
+        const Vec4& GetColor() const;
+        
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
@@ -36,14 +44,14 @@ namespace ae3d
         /// \param font Font.
         void SetFont( class Font* font );
         
+        /// \return Text.
+        const char* GetText() const;
+        
         /// \param text Text. Characters not in font are rendered empty.
         void SetText( const char* text );
 
         /// \param shaderType Shader type.
         void SetShader( ShaderType shaderType );
-
-        /// \param outStr Returns textual representation of component. Caller needs to allocate at least X bytes.
-        void GetSerialized( char* outStr ) const;
 
       private:
         friend class GameObject;
