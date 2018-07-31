@@ -1522,8 +1522,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> vertexShaderName >> fragmentShaderName;
 
             Shader* shader = new Shader();
-            shader->Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
-                            vertexShaderName.c_str(), fragmentShaderName.c_str(),
+            shader->Load(   vertexShaderName.c_str(), fragmentShaderName.c_str(),
                             FileSystem::FileContents( "unlit.hlsl" ), FileSystem::FileContents( "unlit.hlsl" ),
                             FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 

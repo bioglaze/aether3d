@@ -120,23 +120,33 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
-    
+    const float3 surfaceToLightVS = -uniforms.lightDirection.xyz;
+
+    const float3 V = float3( 0, 0, -1 );
+    const float3 L = surfaceToLightVS;
+    const float3 H = normalize( L + V );
+
+    float dotVH = saturate( dot( V, H ) );
+
+    // Schlick Fresnel.
+    float ref_at_norm_incidence = 1.0f;
+    float fresnel = pow( 1.0f - dotVH, 5.0f );
+    fresnel *= (1.0f - ref_at_norm_incidence);
+    fresnel += ref_at_norm_incidence;
+
     const int tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
     float4 outColor = uniforms.lightColor;
-
-    // FIXME: convert from world-space to view-space
-    const float3 surfaceToLightVS = uniforms.lightDirection.xyz;
     
     const float3 diffuseDirectional = max( 0.0f, dot( normalVS, surfaceToLightVS ) );
     outColor.rgb *= diffuseDirectional;
     outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
     
     const float3 surfaceToCameraVS = -in.positionVS;
-    const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( -surfaceToLightVS, normalVS ) ) ), 0.2f );
-    outColor.rgb += specularDirectional;
+    const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( surfaceToLightVS, normalVS ) ) ), 0.2f );
+    //outColor.rgb += specularDirectional;
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
