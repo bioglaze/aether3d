@@ -41,10 +41,6 @@ namespace ae3d
         /// \param debugName Debug name that is visible in graphics debugging tools.
         void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
 
-#if RENDERER_OPENGL
-        /// \return FBO.
-        unsigned GetFBO() const { return fboId; }
-#endif
 #if RENDERER_VULKAN
         /// \return frame buffer.
         VkFramebuffer GetFrameBuffer() { return frameBuffer; }
@@ -61,10 +57,6 @@ namespace ae3d
 
   private:
 
-#if RENDERER_OPENGL
-        unsigned rboId = 0;
-        unsigned fboId = 0;
-#endif
 #if RENDERER_VULKAN
         void CreateRenderPass();
 

@@ -19,8 +19,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     NSLog( @"Shader: Unimplemented method Load()\n" );
 }
 
-void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, const FileSystem::FileContentsData& /*fragmentGLSL*/,
-                        const char* aMetalVertexShaderName, const char* aMetalFragmentShaderName,
+void ae3d::Shader::Load( const char* aMetalVertexShaderName, const char* aMetalFragmentShaderName,
                         const FileSystem::FileContentsData& /*vertexHLSL*/, const FileSystem::FileContentsData& /*fragmentHLSL*/,
                         const FileSystem::FileContentsData& /*vertexSPIRV*/, const FileSystem::FileContentsData& /*fragmentSPIRV*/)
 {

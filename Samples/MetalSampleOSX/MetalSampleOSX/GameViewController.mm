@@ -439,13 +439,11 @@ using namespace ae3d;
     spriteContainer.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
     spriteContainer.SetLayer( 2 );
 
-    shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
-                "unlit_vertex", "unlit_fragment",
+    shader.Load( "unlit_vertex", "unlit_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
 
-    skinShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
-                "unlit_skin_vertex", "unlit_skin_fragment",
+    skinShader.Load( "unlit_skin_vertex", "unlit_skin_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
 
@@ -461,15 +459,13 @@ using namespace ae3d;
     rtCubeMaterial.SetRenderTexture( "skyMap", &cubeRT );
     rtCubeMaterial.SetBackFaceCulling( false );
     
-    standardShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
-                "standard_vertex", "standard_fragment",
+    standardShader.Load( "standard_vertex", "standard_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
 
-    skyboxShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
-                        "skybox_vertex", "skybox_fragment",
+    skyboxShader.Load( "skybox_vertex", "skybox_fragment",
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
 

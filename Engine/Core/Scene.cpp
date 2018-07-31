@@ -441,25 +441,11 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                 }
             }
         }
-
-        // Defaults for a case where there are no shadow casting lights.
-#if RENDERER_OPENGL
-        if (!hasShadow && camera != nullptr && camera->GetComponent<CameraComponent>()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
-        {
-            Texture2D& whiteTexture = renderer.GetWhiteTexture();
-            Material::SetGlobalTexture2D( "_ShadowMap", &whiteTexture );
-            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 1;
-        }
-#endif
     }
 }
 
 void ae3d::Scene::Render()
 {
-#if RENDERER_OPENGL
-    Statistics::BeginFrameTimeProfiling();
-#endif
-
 #if RENDERER_VULKAN
 #if AE3D_OPENVR
     if (VRGlobal::eye == 0)
@@ -985,8 +971,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     
     // FIXME: These ensure that the mesh is rendered. A proper fix would be to serialize materials.
     static Shader tempShader;
-    tempShader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
-        "unlit_vertex", "unlit_fragment",
+    tempShader.Load( "unlit_vertex", "unlit_fragment",
         FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
@@ -1512,16 +1497,13 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             std::string vertexShaderName, fragmentShaderName;
             lineStream >> vertexShaderName >> fragmentShaderName;
 
-            std::string glslVert = vertexShaderName + std::string( ".vsh" );
-            std::string glslFrag = fragmentShaderName + std::string( ".fsh" );
             std::string hlslVert = vertexShaderName + std::string( ".obj" );
             std::string hlslFrag = fragmentShaderName + std::string( ".obj" );
             std::string spvVert = vertexShaderName + std::string( "_vert.spv" );
             std::string spvFrag = fragmentShaderName + std::string( "_frag.fsh" );
             
             Shader* shader = new Shader();
-            shader->Load( FileSystem::FileContents( glslVert.c_str() ), FileSystem::FileContents( glslFrag.c_str() ),
-                          vertexShaderName.c_str(), fragmentShaderName.c_str(),
+            shader->Load( vertexShaderName.c_str(), fragmentShaderName.c_str(),
                           FileSystem::FileContents( hlslVert.c_str() ), FileSystem::FileContents( hlslFrag.c_str() ),
                           FileSystem::FileContents( spvVert.c_str() ), FileSystem::FileContents( spvFrag.c_str() ) );
 

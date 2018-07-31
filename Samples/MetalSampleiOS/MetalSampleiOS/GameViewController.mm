@@ -151,13 +151,11 @@ int gTouchCount = 0;
     text.SetName( "text" );
     scene.Add( &text );
     
-    shader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
-                "unlit_vertex", "unlit_fragment",
+    shader.Load( "unlit_vertex", "unlit_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     
-    standardShader.Load( ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
-                        "standard_vertex", "standard_fragment",
+    standardShader.Load( "standard_vertex", "standard_fragment",
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );

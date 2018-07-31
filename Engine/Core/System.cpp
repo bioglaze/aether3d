@@ -45,11 +45,6 @@ extern "C"
 }
 #endif
 
-void ae3d::System::InitGfxDeviceForEditor( int width, int height )
-{
-    GfxDevice::Init( width, height );
-}
-
 #if RENDERER_METAL
 void ae3d::System::InitMetal( id <MTLDevice> device, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize )
 {
@@ -185,19 +180,7 @@ void ae3d::System::Assert( bool condition, const char* message )
 void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, bool blend )
 {
     Matrix44 proj;
-
-#if RENDERER_OPENGL
-    if (texture->IsRenderTexture())
-    {
-        proj.MakeProjection( 0, xScreenSize, 0, yScreenSize, -1, 1 );
-    }
-    else
-    {
-        proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
-    }
-#else
     proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
-#endif
     
     Matrix44 translate;
     translate.SetTranslation( Vec3( x, y, 0 ) );

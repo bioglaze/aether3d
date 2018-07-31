@@ -39,27 +39,15 @@ namespace ae3d
         VkPipelineShaderStageCreateInfo& GetVertexInfo() { return vertexInfo; }
         VkPipelineShaderStageCreateInfo& GetFragmentInfo() { return fragmentInfo; }
 #endif
-        /// \param vertexDataGLSL GLSL Vertex shader file contents.
-        /// \param fragmentDataGLSL GLSL Fragment shader file contents.
         /// \param metalVertexShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param metalFragmentShaderName Fragment shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param vertexDataHLSL HLSL Vertex shader file contents.
         /// \param fragmentDataHLSL HLSL Fragment shader file contents.
         /// \param vertexDataSPIRV SPIR-V vertex shader file contents.
         /// \param fragmentDataSPIRV SPIR-V fragment shader file contents.
-        void Load( const FileSystem::FileContentsData& vertexDataGLSL, const FileSystem::FileContentsData& fragmentDataGLSL,
-                   const char* metalVertexShaderName, const char* metalFragmentShaderName,
+        void Load( const char* metalVertexShaderName, const char* metalFragmentShaderName,
                    const FileSystem::FileContentsData& vertexDataHLSL, const FileSystem::FileContentsData& fragmentDataHLSL,
                    const FileSystem::FileContentsData& vertexDataSPIRV, const FileSystem::FileContentsData& fragmentDataSPIRV );
-        
-#if RENDERER_OPENGL
-        /// \return True if the shader has been succesfully compiled and linked.
-        bool IsValid() const { return handle != 0; }
-        // Checks that the rendering state is valid.
-        void Validate();
-        unsigned GetHandle() const { return handle; }
-        unsigned GetUboLoc() const { return uboLoc; }
-#endif
         
         /// Activates the shader to be used in a draw call.
         void Use();
@@ -148,10 +136,6 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo vertexInfo;
         VkPipelineShaderStageCreateInfo fragmentInfo;        
-#endif
-#if RENDERER_OPENGL
-        unsigned handle = 0;
-        unsigned uboLoc = 0;
 #endif
 #if RENDERER_METAL
         std::string metalVertexShaderName;

@@ -227,14 +227,12 @@ int main()
     animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 90, 0 } ) );
     
     Shader shader;
-    shader.Load( FileSystem::FileContents( "unlit.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
-                 "unlitVert", "unlitFrag",
+    shader.Load( "unlitVert", "unlitFrag",
                  FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                  FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     Shader shaderSkin;
-    shaderSkin.Load( FileSystem::FileContents( "unlit_skin.vsh" ), FileSystem::FileContents( "unlit.fsh" ),
-                "unlitVert", "unlitFrag",
+    shaderSkin.Load( "unlitVert", "unlitFrag",
                 FileSystem::FileContents( "unlit_skin_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
@@ -278,8 +276,7 @@ int main()
     animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &materialSkin, 0 );
     
     Shader shaderCubeMap;
-    shaderCubeMap.Load( FileSystem::FileContents( "unlit_cube.vsh" ), FileSystem::FileContents( "unlit_cube.fsh" ),
-                        "unlitVert", "unlitFrag",
+    shaderCubeMap.Load( "unlitVert", "unlitFrag",
                         FileSystem::FileContents( "unlit_cube_vert.obj" ), FileSystem::FileContents( "unlit_cube_frag.obj" ),
                         FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
@@ -387,8 +384,7 @@ int main()
 
 #ifdef TEST_FORWARD_PLUS
     Shader standardShader;
-    standardShader.Load( ae3d::FileSystem::FileContents( "standard.vsh" ), ae3d::FileSystem::FileContents( "standard.fsh" ),
-        "standard_vertex", "standard_fragment",
+    standardShader.Load( "standard_vertex", "standard_fragment",
         ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
         ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
 

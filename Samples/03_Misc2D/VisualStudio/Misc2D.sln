@@ -1,31 +1,28 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Misc2D", "Misc2D.vcxproj", "{2ECCA482-D6E6-4602-B349-287A90A60810}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug D3D12|x64 = Debug D3D12|x64
-		Debug OpenGL|x64 = Debug OpenGL|x64
 		Debug Vulkan|x64 = Debug Vulkan|x64
 		Release D3D12|x64 = Release D3D12|x64
-		Release OpenGL|x64 = Release OpenGL|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2ECCA482-D6E6-4602-B349-287A90A60810}.Debug D3D12|x64.ActiveCfg = Debug D3D12|x64
 		{2ECCA482-D6E6-4602-B349-287A90A60810}.Debug D3D12|x64.Build.0 = Debug D3D12|x64
-		{2ECCA482-D6E6-4602-B349-287A90A60810}.Debug OpenGL|x64.ActiveCfg = Debug|x64
-		{2ECCA482-D6E6-4602-B349-287A90A60810}.Debug OpenGL|x64.Build.0 = Debug|x64
 		{2ECCA482-D6E6-4602-B349-287A90A60810}.Debug Vulkan|x64.ActiveCfg = Debug Vulkan|x64
 		{2ECCA482-D6E6-4602-B349-287A90A60810}.Debug Vulkan|x64.Build.0 = Debug Vulkan|x64
 		{2ECCA482-D6E6-4602-B349-287A90A60810}.Release D3D12|x64.ActiveCfg = Release D3D12|x64
 		{2ECCA482-D6E6-4602-B349-287A90A60810}.Release D3D12|x64.Build.0 = Release D3D12|x64
-		{2ECCA482-D6E6-4602-B349-287A90A60810}.Release OpenGL|x64.ActiveCfg = Release|x64
-		{2ECCA482-D6E6-4602-B349-287A90A60810}.Release OpenGL|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C112E6ED-F2AE-4AA0-A246-6661063BEF38}
 	EndGlobalSection
 EndGlobal

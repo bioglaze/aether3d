@@ -8,7 +8,7 @@
 #import <MetalKit/MetalKit.h>
 #endif
 
-#if !defined( RENDERER_D3D12 ) && !defined( RENDERER_VULKAN ) && !defined( RENDERER_METAL ) && !defined( RENDERER_OPENGL )
+#if !defined( RENDERER_D3D12 ) && !defined( RENDERER_VULKAN ) && !defined( RENDERER_METAL )
 #error No renderer defined
 #endif
 
@@ -131,7 +131,7 @@ namespace ae3d
         /// \param blend Enable blending
         void Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, bool blend );
         
-        /// Draws lines using a line loop. Currently only implemented in OpenGL. Should be called after Scene::Render().
+        /// Draws lines using a line loop. Should be called after Scene::Render().
         /// \param handle Handle, created with CreateLineBuffer.
         /// \param view Camera's view matrix.
         /// \param projection Camera's projection matrix.
@@ -156,9 +156,6 @@ namespace ae3d
 
         /// Loads built-in assets and shaders.
         void LoadBuiltinAssets();
-        
-        /// Loads OpenGL function pointers and sets backbuffer dimension. Doesn't create a context.
-        void InitGfxDeviceForEditor( int width, int height );
         
 #if RENDERER_METAL
         void InitMetal( id< MTLDevice > metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize );

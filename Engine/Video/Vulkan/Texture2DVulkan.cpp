@@ -476,7 +476,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     flushRange.pNext = nullptr;
     flushRange.memory = stagingMemory;
     flushRange.offset = 0;
-    flushRange.size = imageSize;
+    flushRange.size = VK_WHOLE_SIZE;
     vkFlushMappedMemoryRanges( GfxDeviceGlobal::device, 1, &flushRange );
 
     vkUnmapMemory( GfxDeviceGlobal::device, stagingMemory );

@@ -455,10 +455,6 @@ namespace ae3d
 
     void Window::SwapBuffers()
     {
-#if RENDERER_OPENGL
-        ::SwapBuffers( WindowGlobal::hdc );
-        Statistics::EndFrameTimeProfiling();
-#endif
 #if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
         GfxDevice::Present();
 #endif

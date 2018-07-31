@@ -108,8 +108,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
     }
 }
 
-void ae3d::Shader::Load( const FileSystem::FileContentsData& /*vertexGLSL*/, const FileSystem::FileContentsData& /*fragmentGLSL*/,
-    const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/,
+void ae3d::Shader::Load( const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/,
     const FileSystem::FileContentsData& /*vertexHLSL*/, const FileSystem::FileContentsData& /*fragmentHLSL*/,
     const FileSystem::FileContentsData& vertexDataSPIRV, const FileSystem::FileContentsData& fragmentDataSPIRV )
 {

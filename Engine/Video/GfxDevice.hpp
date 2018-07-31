@@ -142,21 +142,6 @@ namespace ae3d
 
         void Present();
         void ReleaseGPUObjects();
-
-#if RENDERER_OPENGL
-        unsigned CreateBufferId();
-        unsigned CreateTextureId();
-        unsigned CreateVaoId();
-        unsigned CreateShaderId( unsigned shaderType );
-        unsigned CreateProgramId();
-        unsigned CreateRboId();
-        unsigned CreateFboId();
-
-        void SetBackBufferDimensionAndFBO( int width, int height );
-        void ErrorCheckFBO();
-        bool HasExtension( const char* glExtension );
-        void DebugBlitFBO( unsigned handle, int width, int height );
-#endif
     }
 }
 #endif

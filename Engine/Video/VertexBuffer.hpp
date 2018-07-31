@@ -194,11 +194,6 @@ namespace ae3d
 #endif
         int elementCount = 0;
         VertexFormat vertexFormat = VertexFormat::PTC;
-#if RENDERER_OPENGL
-        unsigned vaoId = 0;
-        unsigned vboId = 0;
-        unsigned iboId = 0;
-#endif
 #if RENDERER_METAL
         id<MTLBuffer> vertexBuffer;
         id<MTLBuffer> indexBuffer;
