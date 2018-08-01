@@ -122,11 +122,29 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
     const float3 surfaceToLightVS = -uniforms.lightDirection.xyz;
 
+    const float3 N = normalVS;
     const float3 V = float3( 0, 0, -1 );
     const float3 L = surfaceToLightVS;
     const float3 H = normalize( L + V );
 
+    float dotNL = saturate( dot( N, L ) );
+    float dotNH = saturate( dot( N, H ) );
+    float dotNV = saturate( dot( N, V ) );
     float dotVH = saturate( dot( V, H ) );
+    float roughness = 0.9f;
+    float r_sq = roughness * roughness;
+
+    // Geometric term.
+    float geoNumerator = 2.0f * dotNH;
+    float geoB = (geoNumerator * dotNV) / dotVH;
+    float geoC = (geoNumerator * dotNL) / dotVH;
+    float geo = min( 1.0f, min( geoB, geoC ) );
+    
+    // Beckmann roughness.
+    float roughness_a = 1.0f / (4.0f * r_sq * pow( dotNH, 4 ));
+    float roughness_b = dotNH * dotNH - 1.0f;
+    float roughness_c = r_sq * dotNH * dotNH;
+    float roughness2 = roughness_a * exp( roughness_b / roughness_c );
 
     // Schlick Fresnel.
     float ref_at_norm_incidence = 1.0f;
@@ -134,15 +152,24 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     fresnel *= (1.0f - ref_at_norm_incidence);
     fresnel += ref_at_norm_incidence;
 
+    // Specular BRDF.
+    float Rs_numerator = fresnel * geo * roughness2;
+    float Rs_denominator = dotNV * dotNL;
+    float Rs = max( 0.0f, Rs_numerator / Rs_denominator ); // Added max() to prevent black areas.
+    
+    float4 ambient = float4( 0.1f, 0.1f, 0.1f, 1.0f );
+    //vec3 final = ambient * albedoTex + max( 0.0f, dotNL ) * (specularTex * Rs + albedoTex);
+
     const int tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
     float4 outColor = uniforms.lightColor;
-    
-    const float3 diffuseDirectional = max( 0.0f, dot( normalVS, surfaceToLightVS ) );
-    outColor.rgb *= diffuseDirectional;
-    outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
+    //vec3 final = ambient * albedoTex + max( 0.0f, dotNL ) * (specularTex * Rs + albedoTex);
+    outColor = ambient * float4( albedoColor ) + outColor * float4( albedoColor ) + max( 0.0f, dotNL ) * (Rs + float4(albedoColor));
+    //const float3 diffuseDirectional = max( 0.0f, dot( normalVS, surfaceToLightVS ) );
+    //outColor.rgb *= diffuseDirectional;
+    //outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
     
     const float3 surfaceToCameraVS = -in.positionVS;
     const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( surfaceToLightVS, normalVS ) ) ), 0.2f );
