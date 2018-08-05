@@ -1,5 +1,6 @@
 #include "SceneView.hpp"
 #include "CameraComponent.hpp"
+#include "FileSystem.hpp"
 #include "GameObject.hpp"
 #include "MeshRendererComponent.hpp"
 #include "TransformComponent.hpp"
@@ -7,6 +8,9 @@
 #include "Vec3.hpp"
 #include <vector>
 #include <cmath>
+#include <memory>
+#include <string>
+#include <vector>
 
 using namespace ae3d;
 
@@ -268,6 +272,30 @@ void SceneView::BeginRender()
 void SceneView::EndRender()
 {
     scene.EndFrame();
+}
+
+void SceneView::LoadScene( const ae3d::FileSystem::FileContentsData& contents )
+{
+    std::vector< ae3d::GameObject > gos;
+    std::map< std::string, class Texture2D* > texture2Ds;
+    std::map< std::string, class Material* > materials;
+    std::vector< class Mesh* > meshes;
+    Scene::DeserializeResult result = scene.Deserialize( contents, gos, texture2Ds, materials, meshes );
+
+    if (result == Scene::DeserializeResult::ParseError)
+    {
+        System::Print( "Could not parse scene file!\n" );
+        return;
+    }
+                    
+    /*gameObjects.clear();
+                    
+      for (auto& go : gos)
+      {
+      gameObjects.push_back( std::make_shared< ae3d::GameObject >() );
+      *gameObjects.back() = go;
+      scene.Add( gameObjects.back().get() );
+      }*/
 }
 
 GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int height )

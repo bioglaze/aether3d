@@ -1,5 +1,4 @@
 #pragma once
-#include "FileSystem.hpp"
 #include "GameObject.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
@@ -12,6 +11,11 @@ namespace ae3d
 {
     struct Vec3;
     class GameObject;
+
+    namespace FileSystem
+    {
+        struct FileContentsData;
+    }
 }
 
 struct TransformGizmo
@@ -83,6 +87,7 @@ public:
     void Init( int width, int height );
     void BeginRender();
     void EndRender();
+    void LoadScene( const ae3d::FileSystem::FileContentsData& contents );
     void RotateCamera( float xDegrees, float yDegrees );
     void MoveCamera( const ae3d::Vec3& moveDir );
     void MoveSelection( const ae3d::Vec3& moveDir );

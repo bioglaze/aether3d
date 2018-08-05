@@ -1,3 +1,5 @@
+#include <cstdio>
+#include "FileSystem.hpp"
 #include "Inspector.hpp"
 #include "SceneView.hpp"
 #include "System.hpp"
@@ -74,6 +76,19 @@ int main()
                 {
                     moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
                 }
+                else if (keyCode == KeyCode::O)
+                {
+#if _MSC_VER
+
+#else
+                    char path[ 1024 ];
+                    FILE* f = popen( "zenity --file-selection --title \"Load .scene file\"", "r" );
+                    fgets( path, 1024, f );
+                    std::string pathStr( path );
+                    auto contents = FileSystem::FileContents( path );
+                    sceneView.LoadScene( contents );
+#endif
+                }
                 else if (keyCode == KeyCode::Left)
                 {
                     sceneView.MoveSelection( { -1, 0, 0 } );
@@ -138,7 +153,6 @@ int main()
                 {
                     inspector.SetGameObject( go );
                 }
-
             }
 
             if (event.type == WindowEventType::Mouse2Down)
