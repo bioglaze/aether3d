@@ -1108,11 +1108,11 @@ void ae3d::CreateRenderer( int samples )
     GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* /*offset*/ )
+void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* offset )
 {
     int scissor[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
     SetScissor( scissor );
-    Draw( GfxDeviceGlobal::uiVertexBuffer, 0/*(size_t)offset*/, elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+    Draw( GfxDeviceGlobal::uiVertexBuffer, (size_t)offset, ((size_t)offset) + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, void** outMappedVertices, void** outMappedIndices )
