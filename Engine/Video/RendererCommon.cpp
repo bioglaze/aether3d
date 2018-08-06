@@ -32,7 +32,7 @@ void ae3d::Renderer::GenerateSkybox()
 {
     const float s = 50;
 
-    const std::vector< VertexBuffer::VertexPTC > vertices =
+    const VertexBuffer::VertexPTC vertices[ 8 ] =
     {
         { Vec3( -s, -s, s ), 0, 0 },
         { Vec3( s, -s, s ), 0, 0 },
@@ -44,7 +44,7 @@ void ae3d::Renderer::GenerateSkybox()
         { Vec3( -s, s, -s ), 0, 0 }
     };
 
-    const std::vector< VertexBuffer::Face > indices =
+    const VertexBuffer::Face indices[ 12 ] =
     {
         { 0, 4, 1 },
         { 4, 5, 1 },
@@ -60,12 +60,12 @@ void ae3d::Renderer::GenerateSkybox()
         { 2, 0, 1 }
     };
 
-    skyboxBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ), VertexBuffer::Storage::GPU );
+    skyboxBuffer.Generate( indices, 12, vertices, 8, VertexBuffer::Storage::GPU );
 }
 
 void ae3d::Renderer::GenerateQuadBuffer()
 {
-    const std::vector< VertexBuffer::VertexPTC > vertices =
+    const VertexBuffer::VertexPTC vertices[ 4 ] =
     {
         { Vec3( 0, 0, 0 ), 0, 0 },
         { Vec3( 1, 0, 0 ), 1, 0 },
@@ -73,13 +73,13 @@ void ae3d::Renderer::GenerateQuadBuffer()
         { Vec3( 0, 1, 0 ), 0, 1 }
     };
     
-    const std::vector< VertexBuffer::Face > indices =
+    VertexBuffer::Face indices[ 2 ] =
     {
         { 0, 1, 2 },
         { 2, 3, 0 }
     };
     
-    quadBuffer.Generate( indices.data(), static_cast< int >( indices.size() ), vertices.data(), static_cast< int >( vertices.size() ), VertexBuffer::Storage::GPU );
+    quadBuffer.Generate( indices, 2, vertices, 4, VertexBuffer::Storage::GPU );
 }
 
 void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera )

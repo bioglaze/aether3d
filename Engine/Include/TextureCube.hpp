@@ -1,7 +1,6 @@
 #ifndef TEXTURE_CUBE_H
 #define TEXTURE_CUBE_H
 
-#include <string>
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
 #endif

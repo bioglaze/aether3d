@@ -339,8 +339,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
 {
     for (auto camera : cameras)
     {
-        bool hasShadow = false;
-
         if (camera != nullptr && camera->GetComponent<TransformComponent>())
         {
             TransformComponent* cameraTransform = camera->GetComponent<TransformComponent>();
@@ -410,7 +408,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                             SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                             RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                             Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
-                            hasShadow = true;
                         }
                         else if (spotLight)
                         {
@@ -419,7 +416,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                             RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                             Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
                             GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
-                            hasShadow = true;
                         }
                         else if (pointLight)
                         {
@@ -433,7 +429,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
 
                             Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
                             GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
-                            hasShadow = true;
                         }
 
                         Statistics::EndShadowMapProfiling();
