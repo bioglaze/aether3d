@@ -34,6 +34,7 @@ int main()
     int deltaX = 0;
     int deltaY = 0;
     bool isRightMouseDown = false;
+    bool isMiddleMouseDown = false;
     
     while (Window::IsOpen() && !quit)
     {
@@ -85,7 +86,7 @@ int main()
                     FILE* f = popen( "zenity --file-selection --title \"Load .scene file\"", "r" );
                     fgets( path, 1024, f );
                     std::string pathStr( path );
-                    auto contents = FileSystem::FileContents( path );
+                    auto contents = FileSystem::FileContents( pathStr.c_str() );
                     sceneView.LoadScene( contents );
 #endif
                 }
@@ -163,6 +164,20 @@ int main()
                 //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 1 );
             }
 
+            if (event.type == WindowEventType::MouseMiddleDown)
+            {
+                isMiddleMouseDown = true;
+            }
+            
+            if (event.type == WindowEventType::MouseMiddleUp)
+            {
+                isMiddleMouseDown = false;
+                deltaX = 0;
+                deltaY = 0;
+                moveDir.x = 0;
+                moveDir.y = 0;
+            }
+            
             if (event.type == WindowEventType::Mouse2Up || event.type == WindowEventType::Mouse1Up)
             {
                 x = event.mouseX;
@@ -185,6 +200,12 @@ int main()
 #else
             sceneView.RotateCamera( -float( deltaX ) / 20, -float( deltaY ) / 20 );
 #endif
+        }
+
+        if (isMiddleMouseDown)
+        {
+            moveDir.x = deltaX / 20.0f;
+            moveDir.y = -deltaY / 20.0f;
         }
         
         sceneView.MoveCamera( moveDir );

@@ -8,10 +8,6 @@
 #include <X11/XF86keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
-#if RENDERER_OPENGL
-#include <GL/glxw.h>
-#include <GL/glx.h>
-#endif
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -19,14 +15,6 @@
 #include <dirent.h>
 #include <cstring>
 #include "GfxDevice.hpp"
-#include "Statistics.hpp"
-
-// Reference to setting up OpenGL in XCB: http://xcb.freedesktop.org/opengl/
-// Event tutorial: http://xcb.freedesktop.org/tutorial/events/
-
-#if RENDERER_OPENGL
-PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB;
-#endif
 
 struct GamePad
 {
@@ -107,9 +95,6 @@ namespace WindowGlobal
     
     int windowWidth = 640;
     int windowHeight = 480;
-#if RENDERER_OPENGL
-    GLXDrawable drawable = 0;
-#endif
     GamePad gamePad;
     float lastLeftThumbX = 0;
     float lastLeftThumbY = 0;
@@ -237,66 +222,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
 {
     WindowGlobal::presentInterval = (flags & ae3d::WindowCreateFlags::No_vsync) ? 0 : 1;
 
-#if RENDERER_OPENGL
-    int samples = 0;
-
-    if (flags & ae3d::WindowCreateFlags::MSAA4)
-    {
-        samples = 4;
-    }
-    else if (flags & ae3d::WindowCreateFlags::MSAA8)
-    {
-        samples = 8;
-    }
-    else if (flags & ae3d::WindowCreateFlags::MSAA16)
-    {
-        samples = 16;
-    }
-    
-    const int visualAttribs[] =
-    {
-        GLX_X_RENDERABLE, True,
-        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-        GLX_RENDER_TYPE, GLX_RGBA_BIT,
-        GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR,
-        GLX_RED_SIZE, 8,
-        GLX_GREEN_SIZE, 8,
-        GLX_BLUE_SIZE, 8,
-        GLX_ALPHA_SIZE, 8,
-        GLX_DEPTH_SIZE, 24,
-        GLX_STENCIL_SIZE, 8,
-        GLX_DOUBLEBUFFER, True,
-        GLX_SAMPLE_BUFFERS, samples > 0 ? 1 : 0,
-        GLX_SAMPLES, samples,
-        None
-    };
-
-    int fbcount;
-    GLXFBConfig* fbConfigs = glXChooseFBConfig( display, DefaultScreen( display ), visualAttribs, &fbcount );
-
-    if (!fbConfigs || fbcount == 0)
-    {
-        std::cerr << "glXChooseFBConfig didn't find any suitable configs." << std::endl;
-        return -1;
-    }
-
-    GLXFBConfig fb_config = fbConfigs[ 0 ];
-    
-    /* Select first framebuffer config and query visualID */
-    int visualID = 0;
-    glXGetFBConfigAttrib( display, fb_config, GLX_VISUAL_ID, &visualID );
-
-    GLXContext context = glXCreateNewContext( display, fb_config, GLX_RGBA_TYPE, nullptr, True );
-    
-    if (!context)
-    {
-        std::cerr << "glXCreateNewContext failed." << std::endl;
-        return -1;
-    }
-
-    XFree( fbConfigs );
-
-#endif
 #if RENDERER_VULKAN
     (void)default_screen;
     int visualID = screen->root_visual;
@@ -372,71 +297,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
         }
     }
     
-#if RENDERER_OPENGL    
-    GLXWindow glxwindow = glXCreateWindow( display, fb_config, WindowGlobal::window, nullptr );
-
-    glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)glXGetProcAddress( (const GLubyte*)"glXCreateContextAttribsARB");
-
-    if (glXCreateContextAttribsARB != nullptr)
-    {
-        const int contextAttrs[] =
-        {
-            GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-            GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-            GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-#if DEBUG
-            GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB | GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-#else
-            GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-#endif
-            0,
-        };
-
-        GLXContext coreContext = glXCreateContextAttribsARB( WindowGlobal::display, fb_config, nullptr, true, contextAttrs );
-
-        if (coreContext != nullptr)
-        {
-            context = coreContext;
-        }
-    }
-    
-    if (!glxwindow)
-    {
-        xcb_destroy_window( connection, WindowGlobal::window );
-        glXDestroyContext( display, context );
-        
-        std::cerr << "glXDestroyContext failed" << std::endl;
-        return -1;
-    }
-    
-    WindowGlobal::drawable = glxwindow;
-
-    if (!glXMakeContextCurrent( display, WindowGlobal::drawable, WindowGlobal::drawable, context ))
-    {
-        xcb_destroy_window( connection, WindowGlobal::window );
-        glXDestroyContext( display, context );
-        
-        std::cerr << "glXMakeContextCurrent failed" << std::endl;
-        return -1;
-    }
-
-    static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC) glXGetProcAddressARB((const GLubyte*)"glXSwapIntervalEXT");
-    static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC) glXGetProcAddressARB((const GLubyte*)"glXSwapIntervalMESA");
-
-    if (glXSwapIntervalEXT)
-    {
-        glXSwapIntervalEXT( display, WindowGlobal::drawable, WindowGlobal::presentInterval );
-    }
-    else if (glXSwapIntervalMESA)
-    {
-        glXSwapIntervalMESA( WindowGlobal::presentInterval );
-    }
-    else    
-    {
-        std::cerr << "glXSwapIntervalEXT and glXSwapIntervalMESA not found! VSync disabled." << std::endl;
-    }
-#endif
-
     return 0;
 }
 
@@ -533,23 +393,19 @@ void ae3d::Window::PumpEvents()
         {
             case 5: // XCB_EVENT_MASK_BUTTON_RELEASE doesn't work for some reason
             {
-                const xcb_query_pointer_reply_t* pointer = xcb_query_pointer_reply( WindowGlobal::connection, xcb_query_pointer(WindowGlobal::connection, XDefaultRootWindow(WindowGlobal::display)), nullptr );
-                const bool newb1 = (pointer->mask & XCB_BUTTON_MASK_1) != 0;
-                const bool newb2 = (pointer->mask & XCB_BUTTON_MASK_2) != 0;
-                const bool newb3 = (pointer->mask & XCB_BUTTON_MASK_3) != 0;
                 const xcb_button_release_event_t* be = (xcb_button_release_event_t*)event;
 
                 WindowGlobal::IncEventIndex();
                 
-                if (newb1)
+                if (be->detail == 1)
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse1Up;
                 }
-                else if (newb3)
+                else if (be->detail == 3)
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::Mouse2Up;
                 }
-                else if (newb2)
+                else if (be->detail == 2)
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseMiddleUp;
                 }
@@ -803,12 +659,6 @@ void ae3d::Window::PumpEvents()
 
 void ae3d::Window::SwapBuffers()
 {
-#if RENDERER_OPENGL
-    Statistics::BeginPresentTimeProfiling();
-    glXSwapBuffers( WindowGlobal::display, WindowGlobal::drawable );
-    Statistics::EndPresentTimeProfiling();
-    Statistics::EndFrameTimeProfiling();
-#endif
 #if RENDERER_VULKAN
     GfxDevice::Present();
 #endif
