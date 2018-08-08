@@ -2,6 +2,10 @@
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "GameObject.hpp"
+#include "AudioSourceComponent.hpp"
+#include "CameraComponent.hpp"
+#include "TransformComponent.hpp"
+#include "MeshRendererComponent.hpp"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -118,23 +122,45 @@ void Inspector::Init()
 
 void Inspector::Render( int width, int height )
 {
-    if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
         nk_layout_row_static( &ctx, 30, 80, 1 );
 
-        nk_label( &ctx, gameObject ? gameObject->GetName().c_str() : "object name", NK_TEXT_LEFT );
+        const char* str = gameObject ? gameObject->GetName().c_str() : "object name";
 
-        static float posX;
-        static float posY;
-        static float posZ;
+        nk_label( &ctx, str, NK_TEXT_LEFT );
 
-        nk_property_float( &ctx, "#X:", -1024.0f, &posX, 1024.0f, 1, 1 );
-        nk_property_float( &ctx, "#Y:", -1024.0f, &posY, 1024.0f, 1, 1 );
-        nk_property_float( &ctx, "#Z:", -1024.0f, &posZ, 1024.0f, 1, 1 );
-
-        if (nk_button_label( &ctx, "button" ))
+        TransformComponent* transform = gameObject ? gameObject->GetComponent< TransformComponent >() : nullptr;
+        MeshRendererComponent* meshRenderer = gameObject ? gameObject->GetComponent< MeshRendererComponent >() : nullptr;
+        AudioSourceComponent* audioSource = gameObject ? gameObject->GetComponent< AudioSourceComponent >() : nullptr;
+        CameraComponent* camera = gameObject ? gameObject->GetComponent< CameraComponent >() : nullptr;
+        
+        if (transform != nullptr)
         {
-            System::Print("Pressed a button\n");
+            Vec3 pos = transform->GetLocalPosition();
+            
+            nk_property_float( &ctx, "#X:", -1024.0f, &pos.x, 1024.0f, 1, 1 );
+            nk_property_float( &ctx, "#Y:", -1024.0f, &pos.y, 1024.0f, 1, 1 );
+            nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
+        }
+        
+        
+        if (meshRenderer == nullptr && nk_button_label( &ctx, "add mesh renderer component" ))
+        {
+            gameObject->AddComponent< MeshRendererComponent >();
+            System::Print("Added a mesh renderer\n");
+        }
+
+        if (audioSource == nullptr && nk_button_label( &ctx, "add audio source component" ))
+        {
+            gameObject->AddComponent< AudioSourceComponent >();
+            System::Print("Added audiosource\n");
+        }
+
+        if (camera == nullptr && nk_button_label( &ctx, "add camera component" ))
+        {
+            gameObject->AddComponent< CameraComponent >();
+            System::Print("Added camera\n");
         }
 
         DrawNuklear( &cmds, width, height );
