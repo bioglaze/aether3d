@@ -1,6 +1,7 @@
 #include "VertexBuffer.hpp"
 #include <vector>
 #include <cstring>
+#include <cstdint>
 #include "Macros.hpp"
 #include "Statistics.hpp"
 #include "System.hpp"
