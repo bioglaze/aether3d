@@ -44,7 +44,7 @@ namespace ae3d
     {
         namespace Statistics
         {
-            std::string GetStatistics()
+            void GetStatistics( char* outStr )
             {
                 std::stringstream stm;
                 stm << "frame time: " << ::Statistics::GetFrameTimeMS() << "ms\n";
@@ -57,7 +57,7 @@ namespace ae3d
                 stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
                 stm << "PSO binds: " << ::Statistics::GetPSOBindCalls() << "\n";
 
-                return stm.str();
+				std::strcpy( outStr, stm.str().c_str() );
 	    }
         }
     }
