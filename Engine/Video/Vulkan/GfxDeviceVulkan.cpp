@@ -139,7 +139,7 @@ namespace ae3d
     {
         namespace Statistics
         {
-            std::string GetStatistics()
+            void GetStatistics( char* outStr )
             {
                 std::string str;
                 str = "frame time: " + std::to_string( ::Statistics::GetFrameTimeMS() ) + " ms\n";
@@ -153,7 +153,7 @@ namespace ae3d
                 str += "mem alloc calls: " + std::to_string( ::Statistics::GetAllocCalls() ) + " (frame), " + std::to_string( ::Statistics::GetTotalAllocCalls() ) + " (total)\n";
                 str += "triangles: " + std::to_string( ::Statistics::GetTriangleCount() ) + "\n";
 
-                return str;
+				std::strcpy( outStr, str.c_str() );
             }
         }
     }

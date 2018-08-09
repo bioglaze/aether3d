@@ -782,15 +782,11 @@ int main()
         ++animationFrame;
         animatedGo.GetComponent< MeshRendererComponent >()->SetAnimationFrame( animationFrame );
 
-        /*std::string stats = std::string( "draw calls:" ) + std::to_string( System::Statistics::GetDrawCallCount() );
-        stats += std::string( "\nVAO binds:" ) + std::to_string( System::Statistics::GetVertexBufferBindCount() );
-        stats += std::string( "\nRT binds:" ) + std::to_string( System::Statistics::GetRenderTargetBindCount() );
-        stats += std::string( "\nTexture binds:" ) + std::to_string( System::Statistics::GetTextureBindCount() );
-        stats += std::string( "\nShader binds:" ) + std::to_string( System::Statistics::GetShaderBindCount() );
-        statsContainer.GetComponent<TextRendererComponent>()->SetText( stats.c_str() );*/
         if (animationFrame % 60 == 0)
         {
-            statsContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
+            static char statStr[ 512 ] = {};
+            System::Statistics::GetStatistics( statStr );
+            statsContainer.GetComponent<TextRendererComponent>()->SetText( statStr );
         }
         
 #ifdef TEST_FORWARD_PLUS

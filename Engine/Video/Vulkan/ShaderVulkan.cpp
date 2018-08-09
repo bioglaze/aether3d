@@ -37,7 +37,7 @@ void ae3d::Shader::DestroyShaders()
     }
 }
 
-void ae3d::Shader::Load( const char* /*vertexSourceGLSL*/, const char* /*fragmentSourceGLSL*/ )
+void ae3d::Shader::Load( const char* /*vertexSource*/, const char* /*fragmentSource*/ )
 {
 }
 

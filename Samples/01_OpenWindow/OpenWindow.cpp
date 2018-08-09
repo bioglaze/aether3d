@@ -64,66 +64,69 @@ int main()
     bool quit = false;
     int frame = 0;
 
-    while (Window::IsOpen() && !quit)
-    {
-        Window::PumpEvents();
-        WindowEvent event;
+	while( Window::IsOpen() && !quit )
+	{
+		Window::PumpEvents();
+		WindowEvent event;
 
-        while (Window::PollEvent( event ))
-        {
-            if (event.type == WindowEventType::Close)
-            {
-                quit = true;
-            }
-            
-            if (event.type == WindowEventType::KeyDown ||
-                event.type == WindowEventType::KeyUp)
-            {
-                KeyCode keyCode = event.keyCode;
+		while( Window::PollEvent( event ) )
+		{
+			if( event.type == WindowEventType::Close )
+			{
+				quit = true;
+			}
 
-                if (keyCode == KeyCode::Escape)
-                {
-                    quit = true;
-                }
-                if (keyCode == KeyCode::A)
-                {
-                    System::ReloadChangedAssets();
-                }
-            }
-        }
+			if( event.type == WindowEventType::KeyDown ||
+				event.type == WindowEventType::KeyUp )
+			{
+				KeyCode keyCode = event.keyCode;
 
-        // Tests renderer by rendering an empty frame or adding stuff while running
-        if (frame == 1)
-        {
-            scene.Add( &camera );
-        }
-        else if (frame == 2)
-        {
-            scene.Add( &spriteContainer );
-            scene.Add( &textContainer );
-        }
-        else if (frame == 3)
-        {
-            sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
-        }
-        else if (frame == 4)
-        {
-            camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
-        }
-        else if (frame == 5)
-        {
-            Vec3 screenPoint = camera.GetComponent<CameraComponent>()->GetScreenPoint( Vec3( 320, 200, 0 ), (float)width, (float)height );
-            System::Print( "screen point: %f, %f, %f\n", screenPoint.x, screenPoint.y, screenPoint.z );
-        }
+				if( keyCode == KeyCode::Escape )
+				{
+					quit = true;
+				}
+				if( keyCode == KeyCode::A )
+				{
+					System::ReloadChangedAssets();
+				}
+			}
+		}
 
-        scene.Render();
-        scene.EndFrame();
+		// Tests renderer by rendering an empty frame or adding stuff while running
+		if( frame == 1 )
+		{
+			scene.Add( &camera );
+		}
+		else if( frame == 2 )
+		{
+			scene.Add( &spriteContainer );
+			scene.Add( &textContainer );
+		}
+		else if( frame == 3 )
+		{
+			sprite->SetTexture( &spriteTex, Vec3( 420, 0, -0.6f ), Vec3( ( float )spriteTex.GetWidth(), ( float )spriteTex.GetHeight(), 1 ), Vec4( 1, 0.5f, 0.5f, 1 ) );
+		}
+		else if( frame == 4 )
+		{
+			camera.GetComponent<CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
+		}
+		else if( frame == 5 )
+		{
+			Vec3 screenPoint = camera.GetComponent<CameraComponent>()->GetScreenPoint( Vec3( 320, 200, 0 ), ( float )width, ( float )height );
+			System::Print( "screen point: %f, %f, %f\n", screenPoint.x, screenPoint.y, screenPoint.z );
+		}
 
-        Window::SwapBuffers();
+		scene.Render();
+		scene.EndFrame();
 
-        ++frame;
+		Window::SwapBuffers();
+
+		++frame;
+
+        char statStr[ 512 ] = {};
+        System::Statistics::GetStatistics( statStr );
         textContainer.GetComponent<TextRendererComponent>()->SetText( (frame % 5 == 0) ? "Aether3D \nGame Engine" : "Aether3D" );
-        textContainer.GetComponent<TextRendererComponent>()->SetText( System::Statistics::GetStatistics().c_str() );
+        textContainer.GetComponent<TextRendererComponent>()->SetText( statStr );
     }
 
     System::Deinit();

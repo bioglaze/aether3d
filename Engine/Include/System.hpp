@@ -1,8 +1,6 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include <string>
-
 #if RENDERER_METAL
 #import <QuartzCore/CAMetalLayer.h>
 #import <MetalKit/MetalKit.h>
@@ -189,7 +187,8 @@ namespace ae3d
 
         namespace Statistics
         {
-            std::string GetStatistics();
+			/// \param outStr Caller must allocate at least X bytes for the output.
+            void GetStatistics( char* outStr );
             int GetDrawCallCount();
             int GetVertexBufferBindCount();
             int GetTextureBindCount();

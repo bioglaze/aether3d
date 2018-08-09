@@ -25,10 +25,10 @@ namespace ae3d
     class Shader
     {
     public:
-        /// Loads a GLSL or HLSL shader from source code. For portability it's better to call the other
+        /// Loads a HLSL shader from source code. For portability it's better to call the other
         /// load method that can take all shaders as input.
-        /// \param vertexSource Vertex shader source. Language depends on the renderer.
-        /// \param fragmentSource Fragment shader source. Language depends on the renderer.
+        /// \param vertexSource Vertex shader source.
+        /// \param fragmentSource Fragment shader source.
         void Load( const char* vertexSource, const char* fragmentSource );
 #if RENDERER_VULKAN
         bool IsValid() const { return true; }
