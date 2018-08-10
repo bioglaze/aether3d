@@ -942,9 +942,9 @@ using namespace ae3d;
     rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     pbrCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
-    //std::string drawCalls = std::string( "draw calls:" ) + std::to_string( ae3d::System::Statistics::GetDrawCallCount() );
-    std::string stats = ae3d::System::Statistics::GetStatistics();
-    text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
+    char statStr[ 512 ] = {};
+    ae3d::System::Statistics::GetStatistics( statStr );
+    text.GetComponent<ae3d::TextRendererComponent>()->SetText( statStr );
     
     static int animationFrame = 0;
     ++animationFrame;

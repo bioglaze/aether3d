@@ -3,7 +3,6 @@
 #include <xinput.h>
 #include "GfxDevice.hpp"
 #include "System.hpp"
-#include "Statistics.hpp"
 
 typedef DWORD WINAPI x_input_get_state( DWORD dwUserIndex, XINPUT_STATE* pState );
 
@@ -455,9 +454,7 @@ namespace ae3d
 
     void Window::SwapBuffers()
     {
-#if defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
         GfxDevice::Present();
-#endif
         ++GfxDeviceGlobal::frameIndex;
     }
 }

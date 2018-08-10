@@ -335,8 +335,9 @@ int gTouchCount = 0;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
     cube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
-    std::string stats = ae3d::System::Statistics::GetStatistics();
-    //text.GetComponent<ae3d::TextRendererComponent>()->SetText( stats.c_str() );
+    char statStr[ 512 ] = {};
+    ae3d::System::Statistics::GetStatistics( statStr );
+    //text.GetComponent<ae3d::TextRendererComponent>()->SetText( statStr );
     
 //#ifdef TEST_FORWARD_PLUS
     /*static float y = -14;
