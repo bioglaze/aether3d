@@ -1832,10 +1832,6 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     GfxDeviceGlobal::clearColor.float32[ 3 ] = 0.0f;
 }
 
-void ae3d::GfxDevice::Set_sRGB_Writes( bool /*enable*/ )
-{
-}
-
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
 {
     outUsedMBytes = 0;
@@ -2221,6 +2217,3 @@ void EndOffscreen()
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
 }
 
-void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
-{
-}

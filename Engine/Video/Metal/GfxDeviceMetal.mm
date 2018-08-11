@@ -2,6 +2,7 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #include <cmath>
+#include <cstring>
 #include <unordered_map>
 #include <vector>
 #include "GfxDevice.hpp"
@@ -196,7 +197,7 @@ namespace ae3d
     {
         namespace Statistics
         {
-            std::string GetStatistics()
+            void GetStatistics( char* outStr )
             {
                 std::string str( "frame time: " );
                 str += std::to_string( ::Statistics::GetFrameTimeMS() );
@@ -213,7 +214,7 @@ namespace ae3d
                 str += "scene AABB: ";
                 str += std::to_string( ::Statistics::GetSceneAABBTimeMS() );
                 str += "\n";
-                return str;
+                std::strcpy( outStr, str.c_str() );
             }
         }
     }
@@ -828,10 +829,6 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
-{
-}
-
-void ae3d::GfxDevice::SetMultiSampling( bool enable )
 {
 }
 

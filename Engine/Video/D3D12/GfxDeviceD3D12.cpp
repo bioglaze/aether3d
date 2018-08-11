@@ -1347,10 +1347,6 @@ void ae3d::GfxDevice::SetScissor( int scissor[ 4 ] )
     GfxDeviceGlobal::graphicsCommandList->RSSetScissorRects( 1, &rect );
 }
 
-void ae3d::GfxDevice::SetMultiSampling( bool /*enable*/ )
-{
-}
-
 void ae3d::GfxDevice::ResetCommandList()
 {
     HRESULT hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );

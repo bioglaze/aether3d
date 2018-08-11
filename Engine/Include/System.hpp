@@ -2,7 +2,6 @@
 #define SYSTEM_H
 
 #if RENDERER_METAL
-#import <QuartzCore/CAMetalLayer.h>
 #import <MetalKit/MetalKit.h>
 #endif
 

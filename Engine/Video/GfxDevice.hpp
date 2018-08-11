@@ -5,7 +5,6 @@
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#import <QuartzCore/CAMetalLayer.h>
 #endif
 #include "Matrix.hpp"
 #include "Vec3.hpp"
@@ -95,7 +94,7 @@ namespace ae3d
         void* GetCurrentConstantBuffer();
 #endif
 #if RENDERER_METAL
-        static const int UNIFORM_BUFFER_SIZE = sizeof( PerObjectUboStruct ) + 64 * 81;
+        static const int UNIFORM_BUFFER_SIZE = sizeof( PerObjectUboStruct );
         void InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize );
         void SetCurrentDrawableMetal( MTKView* view );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
@@ -128,8 +127,6 @@ namespace ae3d
 
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture* target, unsigned cubeMapFace );
-        void SetMultiSampling( bool enable );
-        void Set_sRGB_Writes( bool enable );
         void SetViewport( int viewport[ 4 ] );
         void SetScissor( int scissor[ 4 ] );
 
