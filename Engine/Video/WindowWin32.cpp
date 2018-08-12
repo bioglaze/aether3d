@@ -401,11 +401,6 @@ namespace ae3d
         GetClientRect( WindowGlobal::hwnd, &rect );
         GfxDevice::Init( rect.right, rect.bottom );
         WindowGlobal::windowHeightWithoutTitleBar = rect.bottom;
-
-        if (samples > 0)
-        {
-            GfxDevice::SetMultiSampling( true );
-        }
     }
 
     void Window::SetTitle( const char* title )
