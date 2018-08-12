@@ -1,14 +1,14 @@
 #include "GameObject.hpp"
 #include <sstream>
-#include "TransformComponent.hpp"
-#include "MeshRendererComponent.hpp"
+#include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
-#include "AudioSourceComponent.hpp"
-#include "SpriteRendererComponent.hpp"
-#include "TextRendererComponent.hpp"
-#include "SpotLightComponent.hpp"
+#include "MeshRendererComponent.hpp"
 #include "PointLightComponent.hpp"
+#include "SpriteRendererComponent.hpp"
+#include "SpotLightComponent.hpp"
+#include "TransformComponent.hpp"
+#include "TextRendererComponent.hpp"
 
 using namespace ae3d;
 

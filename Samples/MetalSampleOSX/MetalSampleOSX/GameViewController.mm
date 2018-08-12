@@ -4,33 +4,32 @@
 // just remove the references to build.
 #import "GameViewController.h"
 #import <MetalKit/MetalKit.h>
-#include <cmath>
 #include <vector>
 #include <map>
+#include <cmath>
 #include <cstdint>
 
 #import "CameraComponent.hpp"
-#import "SpriteRendererComponent.hpp"
-#import "TextRendererComponent.hpp"
 #import "DirectionalLightComponent.hpp"
-#import "PointLightComponent.hpp"
-#import "SpotLightComponent.hpp"
-#import "SpriteRendererComponent.hpp"
-#import "MeshRendererComponent.hpp"
-#import "TransformComponent.hpp"
-#import "System.hpp"
 #import "Font.hpp"
 #import "FileSystem.hpp"
 #import "GameObject.hpp"
+#import "MeshRendererComponent.hpp"
 #import "Material.hpp"
 #import "Mesh.hpp"
+#import "PointLightComponent.hpp"
+#import "Shader.hpp"
+#import "System.hpp"
+#import "Scene.hpp"
+#import "SpotLightComponent.hpp"
+#import "SpriteRendererComponent.hpp"
 #import "Texture2D.hpp"
 #import "TextureCube.hpp"
-#import "Shader.hpp"
-#import "Scene.hpp"
+#import "TextRendererComponent.hpp"
+#import "TransformComponent.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -134,8 +133,6 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     
     const struct nk_draw_command* cmd = nullptr;
     nk_draw_index* offset = nullptr;
-    const float scaleX = 6;
-    const float scaleY = 3;
     
     nk_draw_foreach( cmd, ctx, uiCommands )
     {
@@ -144,10 +141,10 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
             continue;
         }
         
-        ae3d::System::DrawUI( (int)(cmd->clip_rect.x * scaleX),
-                       (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
-                       (int)(cmd->clip_rect.w * scaleX),
-                       (int)(cmd->clip_rect.h * scaleY),
+        ae3d::System::DrawUI( (int)(cmd->clip_rect.x),
+                       (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
+                       (int)(cmd->clip_rect.w),
+                       (int)(cmd->clip_rect.h),
                        cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
         offset += cmd->elem_count;
     }

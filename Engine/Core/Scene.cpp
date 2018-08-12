@@ -13,23 +13,21 @@
 #include "Frustum.hpp"
 #include "GameObject.hpp"
 #include "GfxDevice.hpp"
+#include "LightTiler.hpp"
 #include "Matrix.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
-#include "RenderTexture.hpp"
 #include "PointLightComponent.hpp"
+#include "RenderTexture.hpp"
+#include "Renderer.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "SpotLightComponent.hpp"
 #include "Statistics.hpp"
+#include "System.hpp"
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "Texture2D.hpp"
-#include "Renderer.hpp"
-#include "System.hpp"
-#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
-#include "LightTiler.hpp"
-#endif
 
 using namespace ae3d;
 extern Renderer renderer;
@@ -48,9 +46,7 @@ std::string GetSerialized( ae3d::TransformComponent* component );
 namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
-#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
     extern ae3d::LightTiler lightTiler;
-#endif
 }
 
 namespace MathUtil
@@ -249,7 +245,6 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
             RenderDepthAndNormals( cameraComponent, view, gameObjectsWithMeshRenderer, 0, frustum );
 
-#if defined( RENDERER_METAL ) || defined( RENDERER_D3D12 ) || defined( RENDERER_VULKAN )
             int goWithPointLightIndex = 0;
             int goWithSpotLightIndex = 0;
             
@@ -283,7 +278,6 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
             GfxDeviceGlobal::lightTiler.UpdateLightBuffers();
             GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, cameraComponent->GetProjection(),
                                                     view, cameraComponent->GetDepthNormalsTexture() );
-#endif
         }
     }
 

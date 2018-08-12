@@ -2,14 +2,14 @@
 #include <string>
 #include <vector>
 #include "Frustum.hpp"
+#include "GfxDevice.hpp"
 #include "Matrix.hpp"
 #include "Mesh.hpp"
-#include "GfxDevice.hpp"
 #include "Material.hpp"
-#include "VertexBuffer.hpp"
 #include "Shader.hpp"
 #include "System.hpp"
 #include "SubMesh.hpp"
+#include "VertexBuffer.hpp"
 #include "Vec3.hpp"
 
 using namespace ae3d;
