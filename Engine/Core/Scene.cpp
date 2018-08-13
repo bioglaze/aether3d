@@ -433,6 +433,23 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
     }
 }
 
+void BubbleSort( GameObject** gos, int count )
+{
+    for (int i = 0; i < count - 1; ++i)
+    {
+        for (int j = 0; j < count - i - 1; ++j)
+        {
+            if (gos[ j ]->GetComponent< CameraComponent >()->GetRenderOrder() >
+                gos[ j + 1 ]->GetComponent< CameraComponent >()->GetRenderOrder())
+            {
+                GameObject* temp = gos[ j ];
+                gos[ j ] = gos[ j + 1 ];
+                gos[ j + 1 ] = temp;
+            }
+        }
+    }
+}
+
 void ae3d::Scene::Render()
 {
 #if RENDERER_VULKAN
@@ -487,7 +504,8 @@ void ae3d::Scene::Render()
     auto cameraSortFunction = [](GameObject* g1, GameObject* g2) { return g1->GetComponent< CameraComponent >()->GetRenderOrder() <
         g2->GetComponent< CameraComponent >()->GetRenderOrder(); };
     std::sort( std::begin( cameras ), std::end( cameras ), cameraSortFunction );
-
+    //BubbleSort( cameras.data(), (int)cameras.size() );
+    
     RenderShadowMaps( rtCameras );
     RenderDepthAndNormalsForAllCameras( rtCameras );
     RenderRTCameras( rtCameras );
@@ -725,7 +743,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         EndOffscreen();
     }
 #endif
-    GfxDevice::ErrorCheck( "Scene render after rendering" );
 }
 
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44& worldToView, std::vector< unsigned > gameObjectsWithMeshRenderer,
@@ -769,7 +786,6 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
 #if RENDERER_VULKAN
     EndOffscreen();
 #endif
-    GfxDevice::ErrorCheck( "depthnormals render end" );
 }
 
 void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace )
@@ -879,8 +895,6 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
 #if RENDERER_VULKAN
     EndOffscreen();
 #endif
-
-    GfxDevice::ErrorCheck( "Scene render shadows end" );
 }
 
 void ae3d::Scene::SetSkybox( TextureCube* skyTexture )

@@ -1988,10 +1988,6 @@ std::uint8_t* ae3d::GfxDevice::GetCurrentUbo()
     return GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboData;
 }
 
-void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
-{
-}
-
 void ae3d::GfxDevice::BeginFrame()
 {
     ae3d::System::Assert( acquireNextImageKHR != nullptr, "function pointers not loaded" );

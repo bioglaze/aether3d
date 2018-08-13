@@ -135,7 +135,6 @@ void ae3d::System::LoadBuiltinAssets()
     renderer.GenerateQuadBuffer();
     renderer.GenerateSkybox();
     renderer.GenerateTextures();
-    GfxDevice::ErrorCheck( "Builtin shaders load end" );
 }
 
 void ae3d::System::Print( const char* format, ... )

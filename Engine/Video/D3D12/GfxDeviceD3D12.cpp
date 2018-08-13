@@ -17,7 +17,6 @@
 #include "Shader.hpp"
 #include "Statistics.hpp"
 #include "TextureBase.hpp"
-#include "RenderTexture.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
@@ -1569,10 +1568,6 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
     GfxDeviceGlobal::clearColor[ 0 ] = red;
     GfxDeviceGlobal::clearColor[ 1 ] = green;
     GfxDeviceGlobal::clearColor[ 2 ] = blue;
-}
-
-void ae3d::GfxDevice::ErrorCheck( const char* /*info*/ )
-{
 }
 
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )

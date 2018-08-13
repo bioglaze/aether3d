@@ -6,18 +6,18 @@
 #import "Aether3D_iOS/DirectionalLightComponent.hpp"
 #import "Aether3D_iOS/GameObject.hpp"
 #import "Aether3D_iOS/FileSystem.hpp"
-#import "Aether3D_iOS/Scene.hpp"
 #import "Aether3D_iOS/Font.hpp"
+#import "Aether3D_iOS/Material.hpp"
 #import "Aether3D_iOS/Mesh.hpp"
 #import "Aether3D_iOS/MeshRendererComponent.hpp"
 #import "Aether3D_iOS/PointLightComponent.hpp"
+#import "Aether3D_iOS/SpotLightComponent.hpp"
+#import "Aether3D_iOS/Scene.hpp"
+#import "Aether3D_iOS/Shader.hpp"
+#import "Aether3D_iOS/System.hpp"
 #import "Aether3D_iOS/Texture2D.hpp"
 #import "Aether3D_iOS/TransformComponent.hpp"
 #import "Aether3D_iOS/TextRendererComponent.hpp"
-#import "Aether3D_iOS/SpotLightComponent.hpp"
-#import "Aether3D_iOS/Shader.hpp"
-#import "Aether3D_iOS/System.hpp"
-#import "Aether3D_iOS/Material.hpp"
 
 const int POINT_LIGHT_COUNT = (50 * 40 + 48);
 #define MULTISAMPLE_COUNT 1

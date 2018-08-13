@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #if RENDERER_METAL
-#import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #endif
 #include "Matrix.hpp"
@@ -118,7 +117,6 @@ namespace ae3d
         void ClearScreen( unsigned clearFlags );
         void Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode, PrimitiveTopology topology );
         void DrawLines( int handle, Shader& shader );
-        void ErrorCheck( const char* info );
 
         void BeginDepthNormalsGpuQuery();
         void EndDepthNormalsGpuQuery();

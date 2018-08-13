@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #include <cmath>
 #include <cstring>
@@ -7,13 +6,13 @@
 #include <vector>
 #include "GfxDevice.hpp"
 #include "LightTiler.hpp"
-#include "VertexBuffer.hpp"
+#include "Renderer.hpp"
+#include "RenderTexture.hpp"
 #include "Shader.hpp"
 #include "System.hpp"
 #include "Statistics.hpp"
-#include "Renderer.hpp"
-#include "RenderTexture.hpp"
 #include "Texture2D.hpp"
+#include "VertexBuffer.hpp"
 
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 
@@ -375,7 +374,7 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
         return;
     }
     
-    MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:view.colorPixelFormat
+    MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:aView.colorPixelFormat
                                                                                         width:GfxDeviceGlobal::backBufferWidth * 2
                                                                                        height:GfxDeviceGlobal::backBufferHeight * 2
                                                                                     mipmapped:NO];
@@ -903,9 +902,5 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
     renderEncoder.label = @"FboRenderEncoder";
 
     GfxDeviceGlobal::currentRenderTargetDataType = renderTexture->GetDataType();
-}
-
-void ae3d::GfxDevice::ErrorCheck( const char* )
-{
 }
 

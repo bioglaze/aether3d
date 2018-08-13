@@ -37,7 +37,6 @@
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 
-const int MaxBuffersInFlight = 3;
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
 const int MAX_VERTEX_MEMORY = 512 * 1024;
@@ -287,8 +286,6 @@ using namespace ae3d;
     GameObject bigCubeInScene2;
     GameObject pointLights[ POINT_LIGHT_COUNT ];
     
-    dispatch_semaphore_t inFlightSemaphore;
-    
 #ifdef TEST_NUKLEAR_UI
     nk_context ctx;
     nk_font_atlas atlas;
@@ -310,8 +307,6 @@ using namespace ae3d;
     _view.sampleCount = MULTISAMPLE_COUNT;
     _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
     
-    inFlightSemaphore = dispatch_semaphore_create( MaxBuffersInFlight );
-    
     myViewController = self;
     
     [self _reshape];
@@ -321,7 +316,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -992,8 +987,6 @@ using namespace ae3d;
 
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
-    //dispatch_semaphore_wait( _inFlightSemaphore, DISPATCH_TIME_FOREVER );
-    
     @autoreleasepool {
         [self _render];
     }
