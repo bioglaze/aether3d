@@ -13,9 +13,9 @@
 #include "System.hpp"
 #include "Shader.hpp"
 #include "Statistics.hpp"
-#include "VertexBuffer.hpp"
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
+#include "VertexBuffer.hpp"
 #include "VulkanUtils.hpp"
 #if VK_USE_PLATFORM_XCB_KHR
 #include <X11/Xlib-xcb.h>
@@ -73,7 +73,7 @@ namespace GfxDeviceGlobal
     VkPhysicalDeviceProperties properties;
     VkClearColorValue clearColor;
     
-    std::vector< VkCommandBuffer > drawCmdBuffers;
+    VkCommandBuffer drawCmdBuffers[ 3 ];
     VkCommandBuffer setupCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer prePresentCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer postPresentCmdBuffer = VK_NULL_HANDLE;
@@ -123,12 +123,11 @@ namespace GfxDeviceGlobal
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int backBufferWidth;
     int backBufferHeight;
-    unsigned frameIndex = 0;
     ae3d::LightTiler lightTiler;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
     std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
-    std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
+    std::vector< ae3d::VertexBuffer::Face > uiFaces( 128 * 1024 );
     std::vector< ae3d::VertexBuffer > lineBuffers;
     bool usedOffscreen = false;
 }
@@ -427,18 +426,16 @@ namespace ae3d
         System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
         System::Assert( GfxDeviceGlobal::swapchainBuffers.size() > 0, "imageCount is 0" );
 
-        GfxDeviceGlobal::drawCmdBuffers.resize( GfxDeviceGlobal::swapchainBuffers.size() );
-
         VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
         commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         commandBufferAllocateInfo.commandPool = GfxDeviceGlobal::cmdPool;
         commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        commandBufferAllocateInfo.commandBufferCount = (std::uint32_t)GfxDeviceGlobal::drawCmdBuffers.size();
+        commandBufferAllocateInfo.commandBufferCount = (std::uint32_t)GfxDeviceGlobal::swapchainBuffers.size();
 
-        VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, GfxDeviceGlobal::drawCmdBuffers.data() );
+        VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, GfxDeviceGlobal::drawCmdBuffers );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
 
-        for (std::size_t i = 0; i < GfxDeviceGlobal::drawCmdBuffers.size(); ++i)
+        for (std::size_t i = 0; i < GfxDeviceGlobal::swapchainBuffers.size(); ++i)
         {
             debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::drawCmdBuffers[ i ], VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "drawCmdBuffer" );
         }
@@ -1880,7 +1877,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 {
     System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
-    System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::drawCmdBuffers.size(), "invalid draw buffer index" );
+    System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::swapchainBuffers.size(), "invalid draw buffer index" );
 
     if (GfxDeviceGlobal::view0 == VK_NULL_HANDLE || GfxDeviceGlobal::sampler0 == VK_NULL_HANDLE)
     {
