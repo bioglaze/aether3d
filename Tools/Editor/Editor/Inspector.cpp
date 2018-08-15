@@ -6,6 +6,7 @@
 #include "CameraComponent.hpp"
 #include "TransformComponent.hpp"
 #include "MeshRendererComponent.hpp"
+#include <cstring>
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -36,9 +37,8 @@ nk_font_atlas atlas;
 int atlasWidth = 0;
 int atlasHeight = 0;
 Texture2D nkFontTexture;
-nk_buffer cmds;
 
-void DrawNuklear( nk_buffer* uiCommands, int width, int height )
+void DrawNuklear( int width, int height )
 {
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
@@ -50,8 +50,8 @@ void DrawNuklear( nk_buffer* uiCommands, int width, int height )
 
     NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
-    config.vertex_size = sizeof( struct VertexPTC );
-    config.vertex_alignment = NK_ALIGNOF( struct VertexPTC );
+    config.vertex_size = sizeof( VertexPTC );
+    config.vertex_alignment = NK_ALIGNOF( VertexPTC );
     config.null = nullTexture;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;
@@ -66,31 +66,32 @@ void DrawNuklear( nk_buffer* uiCommands, int width, int height )
     void* vertices;
     void* elements;
     System::MapUIVertexBuffer( MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY, &vertices, &elements );
+    std::memset( vertices, 0, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
+    std::memset( elements, 0, MAX_ELEMENT_MEMORY * 3 * 2 );
     
-    nk_buffer vbuf, ebuf;
-    nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY );
-    nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
-    nk_convert( &ctx, uiCommands, &vbuf, &ebuf, &config );
-
+    nk_buffer vbuf, ebuf, uiCommands;
+    nk_buffer_init_default( &uiCommands );
+    nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
+    nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY * 3 * 2 );
+    const auto res = nk_convert( &ctx, &uiCommands, &vbuf, &ebuf, &config );
+    System::Assert( res == NK_CONVERT_SUCCESS, "buffer conversion failed!" );
+    
     System::UnmapUIVertexBuffer();
     
     const struct nk_draw_command* cmd = nullptr;
     nk_draw_index* offset = nullptr;
 
-    const float scaleX = 1;
-    const float scaleY = 1;
-    
-    nk_draw_foreach( cmd, &ctx, uiCommands )
+    nk_draw_foreach( cmd, &ctx, &uiCommands )
     {
         if (cmd->elem_count == 0)
         {
             continue;
         }
 
-        System::DrawUI( (int)(cmd->clip_rect.x * scaleX),
-                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
-                        (int)(cmd->clip_rect.w * scaleX),
-                        (int)(cmd->clip_rect.h * scaleY),
+        System::DrawUI( (int)(cmd->clip_rect.x),
+                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
+                        (int)(cmd->clip_rect.w),
+                        (int)(cmd->clip_rect.h),
                         cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
         offset += cmd->elem_count;
     }
@@ -112,7 +113,6 @@ void Inspector::Init()
     uiTextures[ 0 ] = &nkFontTexture;
     
     nk_init_default( &ctx, &nkFont->handle );
-    nk_buffer_init_default( &cmds );
 }
 
 void Inspector::Render( int width, int height )
@@ -158,7 +158,7 @@ void Inspector::Render( int width, int height )
             System::Print("Added camera\n");
         }
 
-        DrawNuklear( &cmds, width, height );
+        DrawNuklear( width, height );
         nk_end( &ctx );
     }
 }

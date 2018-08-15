@@ -29,7 +29,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
     myViewController = self;
     
-    ae3d::System::InitMetal( _view.device, _view, 1, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
+    ae3d::System::InitMetal( _view.device, _view, (int)_view.sampleCount, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
     
     sceneView.Init( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
