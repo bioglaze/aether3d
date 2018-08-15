@@ -450,6 +450,8 @@ namespace ae3d
     void Window::SwapBuffers()
     {
         GfxDevice::Present();
+#if RENDERER_D3D12
         ++GfxDeviceGlobal::frameIndex;
+#endif
     }
 }
