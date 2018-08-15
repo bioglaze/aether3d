@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>SIMD_SSE3;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;DEBUG;_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;RENDERER_D3D12</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ENABLE_EXTENDED_ALIGNED_STORAGE;SIMD_SSE3;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;DEBUG;_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;RENDERER_D3D12</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <EnablePREfast>false</EnablePREfast>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -79,7 +79,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\Include;..\ThirdParty;..\Video;..\Core</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>SIMD_SSE3;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;RENDERER_D3D12</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ENABLE_EXTENDED_ALIGNED_STORAGE;SIMD_SSE3;WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;RENDERER_D3D12</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
