@@ -1,11 +1,11 @@
 #include "Inspector.hpp"
-#include "System.hpp"
-#include "Texture2D.hpp"
-#include "GameObject.hpp"
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
-#include "TransformComponent.hpp"
+#include "GameObject.hpp"
 #include "MeshRendererComponent.hpp"
+#include "System.hpp"
+#include "Texture2D.hpp"
+#include "TransformComponent.hpp"
 #include <cstring>
 
 #define NK_INCLUDE_FIXED_TYPES
@@ -40,15 +40,14 @@ Texture2D nkFontTexture;
 
 void DrawNuklear( int width, int height )
 {
-    struct nk_convert_config config;
-    static const struct nk_draw_vertex_layout_element vertex_layout[] = {
-        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, position)},
-        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, uv)},
-        {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF(struct VertexPTC, col)},
+    nk_convert_config config = {};
+    static const nk_draw_vertex_layout_element vertex_layout[] = {
+        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF( VertexPTC, position )},
+        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF( VertexPTC, uv )},
+        {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF( VertexPTC, col )},
         {NK_VERTEX_LAYOUT_END}
     };
 
-    NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
     config.vertex_size = sizeof( VertexPTC );
     config.vertex_alignment = NK_ALIGNOF( VertexPTC );
@@ -138,7 +137,6 @@ void Inspector::Render( int width, int height )
             nk_property_float( &ctx, "#Y:", -1024.0f, &pos.y, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
         }
-        
         
         if (meshRenderer == nullptr && nk_button_label( &ctx, "add mesh renderer component" ))
         {

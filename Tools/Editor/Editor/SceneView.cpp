@@ -6,7 +6,6 @@
 #include "TransformComponent.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
-#include <vector>
 #include <cmath>
 #include <memory>
 #include <string>

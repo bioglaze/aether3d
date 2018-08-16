@@ -1,5 +1,6 @@
 #include "DDSLoader.hpp"
 #include <cstring>
+#include <stdint.h>
 #include "System.hpp"
 #include "FileSystem.hpp"
 
@@ -96,6 +97,70 @@ unsigned MyMax( unsigned a, unsigned b )
 {
     return (a > b ? a : b);
 }
+
+struct DDSInfo
+{
+    DDSInfo( bool aIsCompressed, bool aSwap, bool aHasPalette, int aDivSize, int aBlockBytes
+            )
+    : isCompressed( aIsCompressed )
+    , swap( aSwap )
+    , hasPalette( aHasPalette )
+    , divSize( aDivSize )
+    , blockBytes( aBlockBytes )
+    {}
+    
+    bool isCompressed; ///< Is the file compressed.
+    bool swap;
+    bool hasPalette; ///< Does the file contain a palette.
+    unsigned divSize;
+    unsigned blockBytes;
+};
+
+/**
+ DDS header structure.
+ */
+union DDSHeader
+{
+    struct
+    {
+        uint32_t dwMagic;
+        uint32_t dwSize;
+        uint32_t dwFlags;
+        uint32_t dwHeight;
+        uint32_t dwWidth;
+        uint32_t dwPitchOrLinearSize;
+        uint32_t dwDepth;
+        uint32_t dwMipMapCount;
+        uint32_t dwReserved1[ 11 ];
+        
+        // DDPIXELFORMAT
+        struct
+        {
+            uint32_t dwSize;
+            uint32_t dwFlags;
+            uint32_t dwFourCC;
+            uint32_t dwRGBBitCount;
+            uint32_t dwRBitMask;
+            uint32_t dwGBitMask;
+            uint32_t dwBBitMask;
+            uint32_t dwAlphaBitMask;
+        } sPixelFormat;
+        
+        // DDCAPS2
+        struct
+        {
+            uint32_t dwCaps1;
+            uint32_t dwCaps2;
+            uint32_t dwDDSX;
+            uint32_t dwReserved;
+        } sCaps;
+        
+        uint32_t dwReserved2;
+    } sHeader;
+    
+    uint8_t data[ 128 ];
+};
+
 DDSInfo loadInfoDXT1 = { true, false, false, 4, 8 };
 
 DDSInfo loadInfoDXT3 = { true, false, false, 4, 16 };
@@ -226,9 +291,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         ae3d::System::Assert( size == header.sHeader.dwPitchOrLinearSize, "DDSLoader: Wrong pitch or size" );
         ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_LINEARSIZE) != 0, "DDSLoader, need flag DDSD_LINEARSIZE" );
 
-        std::vector< unsigned char > data( size );
-
-        if (data.empty())
+        if (size == 0)
         {
             ae3d::System::Print("DDS loader error: Texture %s contents are empty.\n", fileContents.path.c_str() );
             outWidth    = 32;
@@ -242,7 +305,6 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
             output.dataOffsets[ ix ] = fileOffset;
 
             fileOffset += size;
@@ -257,14 +319,13 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         ae3d::System::Assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8, "DDSLoader: Wrong bit count" );
         size = header.sHeader.dwPitchOrLinearSize * ySize;
         ae3d::System::Assert( size == x * y * li->blockBytes, "DDSLoader: Invalid size" );
-        std::vector< unsigned char > data( size );
         unsigned palette[ 256 ];
         std::memcpy( &palette[ 0 ], fileContents.data.data() + fileOffset, 4 * 256 );
         fileOffset += 4 * 256;
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
+            output.dataOffsets[ ix ] = fileOffset;
             fileOffset += size;
 
             x = (x + 1) >> 1;
@@ -275,11 +336,10 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     else
     {
         size = x * y * li->blockBytes;        
-        std::vector< unsigned char > data( size );
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            std::memcpy( data.data(), fileContents.data.data() + fileOffset, size );
+            output.dataOffsets[ ix ] = fileOffset;
             fileOffset += size;
 
 			x = (x + 1)>>1;

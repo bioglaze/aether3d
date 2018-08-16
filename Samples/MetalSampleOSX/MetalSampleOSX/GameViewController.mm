@@ -33,7 +33,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_NUKLEAR_UI
+//#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 
@@ -316,7 +316,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
