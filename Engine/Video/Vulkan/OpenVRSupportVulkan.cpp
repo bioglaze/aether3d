@@ -572,10 +572,6 @@ void ae3d::VR::GetIdealWindowSize( int& outWidth, int& outHeight )
     outHeight = static_cast< int >( height );
 }
 
-void ae3d::VR::StartTracking( int /*windowWidth*/, int /*windowHeight*/ )
-{
-}
-
 void ae3d::VR::RecenterTracking()
 {
 }
