@@ -52,6 +52,7 @@
 		AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = cursor_translate.ae3d; path = ../../../../../aether3d_build/Samples/cursor_translate.ae3d; sourceTree = "<group>"; };
 		AB0B89BC20CD936300FF33FA /* light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = light.png; path = ../../../../../aether3d_build/Samples/light.png; sourceTree = "<group>"; };
 		AB0B89BD20CD936400FF33FA /* audio_source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = audio_source.png; path = ../../../../../aether3d_build/Samples/audio_source.png; sourceTree = "<group>"; };
+		AB1786F02128B05900659048 /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../../../../Engine/Include/Array.hpp; sourceTree = "<group>"; };
 		ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
 		ABAA98A520963B4B00DC1F42 /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		ABAA98A620963B4B00DC1F42 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
@@ -170,6 +171,7 @@
 		ABD0C8982070B1ED0049EEAE /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				AB1786F02128B05900659048 /* Array.hpp */,
 				ABD0C8B32070B20A0049EEAE /* AudioClip.hpp */,
 				ABD0C8AD2070B20A0049EEAE /* AudioSourceComponent.hpp */,
 				ABD0C89E2070B2090049EEAE /* CameraComponent.hpp */,
@@ -459,7 +461,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
-				HEADER_SEARCH_PATHS = ../../../Samples/NuklearTest;
+				HEADER_SEARCH_PATHS = (
+					../../../Samples/NuklearTest,
+					../../../Engine/Include,
+				);
 				INFOPLIST_FILE = macOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = ../../../../aether3d_build;
@@ -480,7 +485,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
-				HEADER_SEARCH_PATHS = ../../../Samples/NuklearTest;
+				HEADER_SEARCH_PATHS = (
+					../../../Samples/NuklearTest,
+					../../../Engine/Include,
+				);
 				INFOPLIST_FILE = macOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = ../../../../aether3d_build;

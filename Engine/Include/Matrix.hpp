@@ -1,5 +1,4 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#pragma once
 
 namespace ae3d
 {
@@ -170,4 +169,3 @@ namespace ae3d
         float m[16];
     };
 }
-#endif

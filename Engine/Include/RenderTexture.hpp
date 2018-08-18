@@ -1,5 +1,4 @@
-#ifndef RENDER_TEXTURE_H
-#define RENDER_TEXTURE_H
+#pragma once
 
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
@@ -77,4 +76,3 @@ namespace ae3d
         DataType dataType = DataType::UByte;
     };
 }
-#endif

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB1786EF2128AFD200659048 /* Array.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB1786EE2128AFD200659048 /* Array.hpp */; };
 		AB61DA531DAD62F80068A5FE /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB61DA521DAD62F80068A5FE /* MathUtil.cpp */; };
 		AB6E12D01C11D79B0020A929 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */; };
 		AB6E12D11C11D79B0020A929 /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C81C11D79B0020A929 /* CameraComponent.cpp */; };
@@ -86,6 +87,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AB1786EE2128AFD200659048 /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../Include/Array.hpp; sourceTree = "<group>"; };
 		AB61DA521DAD62F80068A5FE /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../Core/MathUtil.cpp; sourceTree = "<group>"; };
 		AB6E12BA1C11D7450020A929 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAether3D_OSX_Metal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
@@ -269,6 +271,7 @@
 		AB6E13071C11D7DB0020A929 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				AB1786EE2128AFD200659048 /* Array.hpp */,
 				AB6E13081C11D8020020A929 /* AudioClip.hpp */,
 				AB6E13091C11D8020020A929 /* AudioSourceComponent.hpp */,
 				AB6E130A1C11D8020020A929 /* CameraComponent.hpp */,
@@ -341,6 +344,7 @@
 				AB6E133A1C11D8020020A929 /* Vec3.hpp in Headers */,
 				AB6E13271C11D8020020A929 /* Font.hpp in Headers */,
 				AB6E13301C11D8020020A929 /* Scene.hpp in Headers */,
+				AB1786EF2128AFD200659048 /* Array.hpp in Headers */,
 				AB6E13321C11D8020020A929 /* SpotLightComponent.hpp in Headers */,
 				ABF549BA1DF337D500EFF25D /* Statistics.hpp in Headers */,
 				AB6E12F81C11D7B00020A929 /* SubMesh.hpp in Headers */,

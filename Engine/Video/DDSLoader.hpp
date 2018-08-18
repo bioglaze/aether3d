@@ -1,5 +1,5 @@
-#ifndef DDSLOADER_H
-#define DDSLOADER_H
+#pragma once
+
 #include <vector>
 
 namespace ae3d
@@ -38,4 +38,3 @@ namespace DDSLoader
      */
     LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& output );
 }
-#endif

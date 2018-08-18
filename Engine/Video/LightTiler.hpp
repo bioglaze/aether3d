@@ -1,5 +1,4 @@
-#ifndef LIGHT_TILER_HPP
-#define LIGHT_TILER_HPP
+#pragma once
 
 #if RENDERER_METAL
 #import <Metal/Metal.h>
@@ -122,6 +121,4 @@ namespace ae3d
         int activeSpotLights = 0;
     };
 }
-
-#endif
 

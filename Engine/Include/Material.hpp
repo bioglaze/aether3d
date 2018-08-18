@@ -1,5 +1,4 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -127,5 +126,3 @@ namespace ae3d
         bool cullBackFaces = true;
     };
 }
-
-#endif

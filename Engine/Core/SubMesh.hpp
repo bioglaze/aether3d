@@ -1,5 +1,4 @@
-#ifndef SUBMESH_H
-#define SUBMESH_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -29,5 +28,3 @@ namespace ae3d
         std::vector< Joint > joints;
     };
 }
-
-#endif

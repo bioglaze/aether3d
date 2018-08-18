@@ -1,5 +1,4 @@
-#ifndef DIRECTIONAL_LIGHT_HPP
-#define DIRECTIONAL_LIGHT_HPP
+#pragma once
 
 #include "RenderTexture.hpp"
 #include "Vec3.hpp"
@@ -57,4 +56,3 @@ namespace ae3d
         Vec3 color{ 1, 1, 1 };
     };
 }
-#endif

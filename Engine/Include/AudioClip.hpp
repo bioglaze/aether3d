@@ -1,5 +1,4 @@
-#ifndef AUDIO_CLIP_H
-#define AUDIO_CLIP_H
+#pragma once
 
 namespace ae3d
 {
@@ -27,4 +26,3 @@ namespace ae3d
     };
 }
 
-#endif

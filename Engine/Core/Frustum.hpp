@@ -1,5 +1,4 @@
-#ifndef FRUSTUM_H
-#define FRUSTUM_H
+#pragma once
 
 #include "Vec3.hpp"
 
@@ -134,5 +133,4 @@ private:
     } planes[ 6 ]; // Clipping planes.
 };
 }
-#endif
 

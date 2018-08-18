@@ -1,5 +1,4 @@
-#ifndef TEXTURE_CUBE_H
-#define TEXTURE_CUBE_H
+#pragma once
 
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
@@ -67,5 +66,3 @@ namespace ae3d
 #endif
     };
 }
-
-#endif

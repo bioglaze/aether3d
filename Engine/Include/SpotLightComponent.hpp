@@ -1,5 +1,4 @@
-#ifndef SPOT_LIGHT_HPP
-#define SPOT_LIGHT_HPP
+#pragma once
 
 #include "RenderTexture.hpp"
 #include "Vec3.hpp"
@@ -71,4 +70,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-#endif

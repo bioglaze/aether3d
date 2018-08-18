@@ -1,5 +1,4 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
 namespace ae3d
 {
@@ -103,4 +102,3 @@ namespace ae3d
         void SwapBuffers();
     }
 }
-#endif

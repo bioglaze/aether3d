@@ -1,5 +1,4 @@
-#ifndef GFX_DEVICE_H
-#define GFX_DEVICE_H
+#pragma once
 
 #include <cstdint>
 #if RENDERER_METAL
@@ -139,4 +138,3 @@ namespace ae3d
         void ReleaseGPUObjects();
     }
 }
-#endif

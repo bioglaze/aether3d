@@ -1,5 +1,4 @@
-#ifndef VERTEX_BUFFER_H
-#define VERTEX_BUFFER_H
+#pragma once
 
 #if RENDERER_D3D12
 #include <d3d12.h>
@@ -227,4 +226,3 @@ namespace ae3d
 #endif
     };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef TEXT_RENDERER_H
-#define TEXT_RENDERER_H
+#pragma once
 
 #include <type_traits>
 
@@ -82,5 +81,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-
-#endif

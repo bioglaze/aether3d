@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -142,4 +141,3 @@ namespace ae3d
 #endif
     };
 }
-#endif

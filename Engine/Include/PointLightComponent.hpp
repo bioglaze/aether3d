@@ -1,5 +1,4 @@
-#ifndef POINT_LIGHT_HPP
-#define POINT_LIGHT_HPP
+#pragma once
 
 #include "RenderTexture.hpp"
 
@@ -63,4 +62,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-#endif

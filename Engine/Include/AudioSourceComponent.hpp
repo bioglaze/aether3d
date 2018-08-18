@@ -1,5 +1,4 @@
-#ifndef AUDIO_SOURCE_COMPONENT
-#define AUDIO_SOURCE_COMPONENT
+#pragma once
 
 namespace ae3d
 {
@@ -53,5 +52,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef AUDIO_SYSTEM_H
-#define AUDIO_SYSTEM_H
+#pragma once
 
 namespace ae3d
 {
@@ -42,5 +41,3 @@ namespace ae3d
         void SetListenerOrientation( float forwardX, float forwardY, float forwardZ );
     }
 }
-
-#endif

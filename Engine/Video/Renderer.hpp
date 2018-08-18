@@ -1,5 +1,4 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#pragma once
 
 #include "ComputeShader.hpp"
 #include "Shader.hpp"
@@ -50,5 +49,3 @@ namespace ae3d
         Texture2D whiteTexture;
     };    
 }
-
-#endif

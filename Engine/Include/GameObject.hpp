@@ -1,5 +1,4 @@
-#ifndef GAME_OBJECT_H
-#define GAME_OBJECT_H
+#pragma once
 
 #include <string>
 
@@ -101,4 +100,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#pragma once
 
 #if RENDERER_METAL
 #import <MetalKit/MetalKit.h>
@@ -199,4 +198,3 @@ namespace ae3d
         }
     }
 }
-#endif

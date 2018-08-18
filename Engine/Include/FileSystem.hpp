@@ -1,5 +1,4 @@
-#ifndef FILE_SYSTEM_H
-#define FILE_SYSTEM_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -33,4 +32,3 @@ namespace ae3d
         void UnloadPakFile(const char* path);
     }
 }
-#endif

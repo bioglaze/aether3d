@@ -1,5 +1,4 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include <type_traits>
 #include <vector>
@@ -79,5 +78,3 @@ namespace ae3d
         std::vector< SubMesh >& GetSubMeshes();
     };
 }
-
-#endif

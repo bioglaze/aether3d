@@ -1,5 +1,4 @@
-#ifndef COMPUTE_SHADER_H
-#define COMPUTE_SHADER_H
+#pragma once
 
 #if RENDERER_METAL
 #import <Metal/Metal.h>
@@ -89,4 +88,3 @@ namespace ae3d
 #endif
     };
 }
-#endif

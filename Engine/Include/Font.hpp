@@ -1,5 +1,4 @@
-#ifndef FONT_H
-#define FONT_H
+#pragma once
 
 namespace ae3d
 {
@@ -68,4 +67,3 @@ namespace ae3d
     };
 }
 
-#endif

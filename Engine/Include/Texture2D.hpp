@@ -1,5 +1,4 @@
-#ifndef TEXTURE_2D_H
-#define TEXTURE_2D_H
+#pragma once
 
 #include "TextureBase.hpp"
 #if RENDERER_VULKAN
@@ -78,4 +77,3 @@ namespace ae3d
 #endif
     };
 }
-#endif

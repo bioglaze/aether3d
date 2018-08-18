@@ -1,5 +1,4 @@
-#ifndef TRANSFORM_COMPONENT_H
-#define TRANSFORM_COMPONENT_H
+#pragma once
 
 #include "Vec3.hpp"
 #include "Matrix.hpp"
@@ -119,5 +118,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-
-#endif

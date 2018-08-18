@@ -1,5 +1,4 @@
-#ifndef SCENE_H
-#define SCENE_H
+#pragma once
 
 #include <vector>
 #include <map>
@@ -67,4 +66,3 @@ namespace ae3d
         Vec3 aabbMax;
     };
 }
-#endif

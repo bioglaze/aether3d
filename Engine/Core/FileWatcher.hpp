@@ -1,5 +1,4 @@
-#ifndef FILEWATCHER_H
-#define FILEWATCHER_H
+#pragma once
 
 #include <string>
 #include <functional>
@@ -28,5 +27,3 @@ namespace ae3d
         std::map< std::string, Entry > pathToEntry;
     };    
 }
-
-#endif

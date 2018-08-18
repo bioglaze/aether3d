@@ -1,5 +1,4 @@
-#ifndef QUATERNION_H
-#define QUATERNION_H
+#pragma once
 
 #include <cmath>
 #include "Vec3.hpp"
@@ -321,4 +320,3 @@ namespace ae3d
         }
     };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef VEC3_H
-#define VEC3_H
+#pragma once
 
 #include <cmath>
 
@@ -484,4 +483,3 @@ namespace ae3d
         }
     };
 }
-#endif

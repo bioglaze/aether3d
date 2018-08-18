@@ -1,5 +1,4 @@
-#ifndef STATISTICS_HPP
-#define STATISTICS_HPP
+#pragma once
 
 namespace Statistics
 {
@@ -54,5 +53,3 @@ namespace Statistics
     void SetDepthNormalsGpuTime( float timeMS );
     void SetShadowMapGpuTime( float timeMS );
 }
-
-#endif

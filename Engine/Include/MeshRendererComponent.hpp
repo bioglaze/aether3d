@@ -1,5 +1,4 @@
-#ifndef MESH_RENDERER_COMPONENT
-#define MESH_RENDERER_COMPONENT
+#pragma once
 
 #include <vector>
 
@@ -73,5 +72,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-
-#endif

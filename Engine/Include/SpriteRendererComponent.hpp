@@ -1,5 +1,4 @@
-#ifndef SPRITE_RENDERER_COMPONENT_H
-#define SPRITE_RENDERER_COMPONENT_H
+#pragma once
 
 #include <type_traits>
 #include <string>
@@ -96,4 +95,3 @@ namespace ae3d
         bool isEnabled = true;
     };
 }
-#endif

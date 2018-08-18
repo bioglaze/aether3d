@@ -1,5 +1,4 @@
-#ifndef TEXTURE_BASE_H
-#define TEXTURE_BASE_H
+#pragma once
 
 #include <string>
 #if RENDERER_METAL
@@ -176,5 +175,3 @@ namespace ae3d
 #endif
     };
 }
-
-#endif
