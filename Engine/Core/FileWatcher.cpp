@@ -4,7 +4,7 @@
 
 ae3d::FileWatcher fileWatcher;
 
-void ae3d::FileWatcher::AddFile( const std::string& path, std::function<void(const std::string&)> updateFunc )
+void ae3d::FileWatcher::AddFile( const std::string& path, void(*updateFunc)(const std::string&) )
 {
     pathToEntry[ path ] = Entry();
     pathToEntry[ path ].path = path;

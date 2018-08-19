@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <functional>
 #include <map>
 
 namespace ae3d
@@ -10,7 +9,7 @@ namespace ae3d
     class FileWatcher
     {
     public:
-        void AddFile( const std::string& path, std::function<void(const std::string&)> updateFunc );
+        void AddFile( const std::string& path, void(*updateFunc)(const std::string&)  );
         // Scans for all watched file modification timestamps and calls updateFunc if they have been updated.
         void Poll();
 
@@ -21,7 +20,7 @@ namespace ae3d
             int minute = 0;
             int second = 0;
             std::string path;
-            std::function<void(const std::string&)> updateFunc;
+            void(*updateFunc)(const std::string&);
         };
         
         std::map< std::string, Entry > pathToEntry;
