@@ -29,12 +29,11 @@ namespace DDSLoader
      Loads a .dds file.
      
      \param fileContents Contents of .dds file.
-     \param cubeMapFace Cube map face index 1-6. For 2D textures use 0.
      \param outWidth Stores the width of the texture in pixels.
      \param outHeight Stores the height of the texture in pixels.
      \param outOpaque Stores info about alpha channel.
      \param output Stores information needed to create D3D12 and Metal API objects.
      \return Load result.
      */
-    LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& output );
+    LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int& outWidth, int& outHeight, bool& outOpaque, Output& output );
 }

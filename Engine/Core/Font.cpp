@@ -1,8 +1,8 @@
 #include "Font.hpp"
 #include <sstream>
-#include <vector>
-#include "System.hpp"
+#include "Array.hpp"
 #include "FileSystem.hpp"
+#include "System.hpp"
 #include "Texture2D.hpp"
 #include "VertexBuffer.hpp"
 #include "Vec3.hpp"
@@ -294,7 +294,8 @@ void ae3d::Font::LoadBMFontMetaBinary(const FileSystem::FileContentsData& metaDa
         int blockSize;
         ifs.read( (char*)&blockSize, 4 );
         
-        std::vector< unsigned char > blockData( blockSize );
+        Array< unsigned char > blockData;
+        blockData.Allocate( blockSize );
         
         if (blockType == BlockType::Info)
         {
@@ -322,11 +323,13 @@ void ae3d::Font::LoadBMFontMetaBinary(const FileSystem::FileContentsData& metaDa
         }
         else if (blockType == BlockType::Chars)
         {
-            std::vector< CharacterBlock > blocks( blockSize / sizeof( CharacterBlock ) );
-            ifs.read( (char*)&blocks[ 0 ].id, blockSize );
-            System::Assert( blocks.size() <= 256, "Too many glyphs." );
+            Array< CharacterBlock > blocks;
+            blocks.Allocate( blockSize / sizeof( CharacterBlock ) );
             
-            for (std::size_t c = 0; c < blocks.size(); ++c)
+            ifs.read( (char*)&blocks[ 0 ].id, blockSize );
+            System::Assert( blocks.GetLength() <= 256, "Too many glyphs." );
+            
+            for (int c = 0; c < blocks.GetLength(); ++c)
             {
                 chars[ blocks[ c ].id ].x = blocks[ c ].x;
                 chars[ blocks[ c ].id ].y = blocks[ c ].y;

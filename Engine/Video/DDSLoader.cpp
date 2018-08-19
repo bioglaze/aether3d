@@ -177,10 +177,8 @@ DDSInfo loadInfoBGR565 = { false, true, false, 1, 2 };
 
 DDSInfo loadInfoIndex8 = { false, false, true, 1, 1 };
 
-DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int cubeMapFace, int& outWidth, int& outHeight, bool& outOpaque, Output& output )
+DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int& outWidth, int& outHeight, bool& outOpaque, Output& output )
 {
-    ae3d::System::Assert( cubeMapFace >= 0 && cubeMapFace < 7, "DDSLoader: Wrong cubemap face" );
-
     DDSHeader header;
     int mipMapCount = 0;
 

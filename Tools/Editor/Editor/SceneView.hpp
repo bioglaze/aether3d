@@ -6,7 +6,6 @@
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "Texture2D.hpp"
-#include <cstring>
 
 namespace ae3d
 {

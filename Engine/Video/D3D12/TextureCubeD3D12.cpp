@@ -5,8 +5,8 @@
 #include "stb_image.c"
 #include "DescriptorHeapManager.hpp"
 #include "DDSLoader.hpp"
-#include "GfxDevice.hpp"
 #include "FileSystem.hpp"
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
 
@@ -57,7 +57,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         {
             DDSLoader::Output ddsOutput;
             auto fileContents = FileSystem::FileContents( posX.path.c_str() );
-            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
+            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput );
 
             if (loadResult != DDSLoader::LoadResult::Success)
             {
@@ -153,7 +153,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             isStbImage[ face ] = false;
 
             auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
-            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput[ face ] );
+            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput[ face ] );
 
             if (loadResult != DDSLoader::LoadResult::Success)
             {

@@ -318,7 +318,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
 #if !TARGET_OS_IPHONE
         DDSLoader::Output output;
-        DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, output );
+        DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( fileContents, width, height, opaque, output );
         
         if (ddsLoadResult != DDSLoader::LoadResult::Success)
         {

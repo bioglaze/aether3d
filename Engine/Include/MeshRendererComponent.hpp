@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include "Array.hpp"
 
 namespace ae3d
 {
@@ -63,8 +63,8 @@ namespace ae3d
                      const Matrix44& shadowView, const Matrix44& shadowProjection, class Shader* overrideShader, RenderType renderType );
 
         Mesh* mesh = nullptr;
-        std::vector< Material* > materials;
-        std::vector< bool > isSubMeshCulled;
+        Array< Material* > materials;
+        Array< bool > isSubMeshCulled;
         GameObject* gameObject = nullptr;
         int animFrame = 0;
         bool isCulled = false;

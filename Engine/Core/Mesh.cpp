@@ -229,7 +229,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
     {
         const float s = 1;
         
-        const std::vector< VertexBuffer::VertexPTC > vertices =
+        const VertexBuffer::VertexPTC vertices[ 8 ] =
         {
             { Vec3( -s, -s, s ), 0, 0 },
             { Vec3( s, -s, s ), 0, 0 },
@@ -241,7 +241,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             { Vec3( -s, s, -s ), 0, 0 }
         };
         
-        const std::vector< VertexBuffer::Face > indices =
+        const VertexBuffer::Face indices[ 12 ] =
         {
             { 0, 4, 1 },
             { 4, 5, 1 },
@@ -259,7 +259,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         
         m().subMeshes.resize( 1 );
         auto& firstSubMesh = m().subMeshes[ 0 ];
-        firstSubMesh.vertexBuffer.Generate( indices.data(), static_cast< int >(indices.size()), vertices.data(), static_cast< int >(vertices.size()), VertexBuffer::Storage::GPU );
+        firstSubMesh.vertexBuffer.Generate( indices, 12, vertices, 8, VertexBuffer::Storage::GPU );
         firstSubMesh.vertexBuffer.SetDebugName( "default mesh" );
         firstSubMesh.aabbMin = {-s, -s, -s};
         firstSubMesh.aabbMax = { s,  s, s };

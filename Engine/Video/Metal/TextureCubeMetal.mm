@@ -44,7 +44,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     {
 #if !TARGET_OS_IPHONE
         DDSLoader::Output output;
-        DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( *fileContents[ 0 ], 0, width, height, opaque, output );
+        DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( *fileContents[ 0 ], width, height, opaque, output );
         
         if (ddsLoadResult != DDSLoader::LoadResult::Success)
         {
@@ -130,7 +130,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 #if !TARGET_OS_IPHONE
             isSomeFaceDDS = true;
             DDSLoader::Output output;
-            DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( *fileContents[ face ], 0, width, height, opaque, output );
+            DDSLoader::LoadResult ddsLoadResult = DDSLoader::Load( *fileContents[ face ], width, height, opaque, output );
 
             if (ddsLoadResult != DDSLoader::LoadResult::Success)
             {

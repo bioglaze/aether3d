@@ -80,6 +80,7 @@
 		ABB6E0B01C7C564C0014B78B /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABB6E0AF1C7C564C0014B78B /* TextureCubeMetal.mm */; };
 		ABB79F981BA9B7A5002A1B5F /* DirectionalLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */; };
 		ABB79F9A1BA9B7BC002A1B5F /* DirectionalLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		ABC015CF21294C9500E9DB4E /* Array.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABC015CE21294C9500E9DB4E /* Array.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E51B1A277B0017797C /* RenderTexture.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E61B1A277B0017797C /* TextureBase.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF549B51DF3368C00EFF25D /* Statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABF549B31DF3368C00EFF25D /* Statistics.cpp */; };
@@ -162,6 +163,7 @@
 		ABB6E0AF1C7C564C0014B78B /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../../Video/Metal/TextureCubeMetal.mm; sourceTree = "<group>"; };
 		ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DirectionalLightComponent.cpp; path = ../../Components/DirectionalLightComponent.cpp; sourceTree = "<group>"; };
 		ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
+		ABC015CE21294C9500E9DB4E /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../../Include/Array.hpp; sourceTree = "<group>"; };
 		ABF341E51B1A277B0017797C /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../Include/RenderTexture.hpp; sourceTree = "<group>"; };
 		ABF341E61B1A277B0017797C /* TextureBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../../Include/TextureBase.hpp; sourceTree = "<group>"; };
 		ABF549B31DF3368C00EFF25D /* Statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Statistics.cpp; path = ../../Core/Statistics.cpp; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 		4449E8401B14B3FF009A869C /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				ABC015CE21294C9500E9DB4E /* Array.hpp */,
 				4449E8411B14B423009A869C /* AudioClip.hpp */,
 				4449E8421B14B423009A869C /* AudioSourceComponent.hpp */,
 				4449E8431B14B423009A869C /* CameraComponent.hpp */,
@@ -361,6 +364,7 @@
 				4449E8611B14B423009A869C /* TransformComponent.hpp in Headers */,
 				4449E85A1B14B423009A869C /* Quaternion.hpp in Headers */,
 				4449E85F1B14B423009A869C /* TextRendererComponent.hpp in Headers */,
+				ABC015CF21294C9500E9DB4E /* Array.hpp in Headers */,
 				4449E8561B14B423009A869C /* Font.hpp in Headers */,
 				ABF549B61DF3368C00EFF25D /* Statistics.hpp in Headers */,
 				AB190E341B57DE85005ECE49 /* Material.hpp in Headers */,

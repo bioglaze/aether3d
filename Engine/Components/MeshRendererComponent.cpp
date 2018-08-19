@@ -40,7 +40,7 @@ unsigned ae3d::MeshRendererComponent::New()
 
 Material* ae3d::MeshRendererComponent::GetMaterial( int subMeshIndex )
 {
-    return (std::size_t)subMeshIndex < materials.size() ? materials[ subMeshIndex ] : nullptr;
+    return subMeshIndex < materials.GetLength() ? materials[ subMeshIndex ] : nullptr;
 }
 
 ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
@@ -81,7 +81,7 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
 
     std::vector< SubMesh >& subMeshes = mesh->GetSubMeshes();
 
-    for (std::size_t subMeshIndex = 0; subMeshIndex < subMeshes.size(); ++subMeshIndex)
+    for (int subMeshIndex = 0; subMeshIndex < (int)subMeshes.size(); ++subMeshIndex)
     {
         isSubMeshCulled[ subMeshIndex ] = false;
 
@@ -121,7 +121,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
     
     std::vector< SubMesh >& subMeshes = mesh->GetSubMeshes();
 
-    for (std::size_t subMeshIndex = 0; subMeshIndex < subMeshes.size(); ++subMeshIndex)
+    for (int subMeshIndex = 0; subMeshIndex < (int)subMeshes.size(); ++subMeshIndex)
     {
         if (isSubMeshCulled[ subMeshIndex ])
         {
@@ -214,7 +214,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
 
 void ae3d::MeshRendererComponent::SetMaterial( Material* material, int subMeshIndex )
 {
-    if (subMeshIndex >= 0 && subMeshIndex < int( materials.size() ))
+    if (subMeshIndex >= 0 && subMeshIndex < materials.GetLength() )
     {
         materials[ subMeshIndex ] = material;
     }
@@ -226,7 +226,7 @@ void ae3d::MeshRendererComponent::SetMesh( Mesh* aMesh )
 
     if (mesh != nullptr)
     {
-        materials.resize( mesh->GetSubMeshes().size() );
-        isSubMeshCulled.resize( mesh->GetSubMeshes().size() );
+        materials.Allocate( (int)mesh->GetSubMeshes().size() );
+        isSubMeshCulled.Allocate( (int)mesh->GetSubMeshes().size() );
     }
 }

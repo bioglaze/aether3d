@@ -6,12 +6,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
 #include "DescriptorHeapManager.hpp"
+#include "DDSLoader.hpp"
 #include "FileWatcher.hpp"
 #include "FileSystem.hpp"
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
-#include "DDSLoader.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
@@ -299,7 +299,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
 {
     DDSLoader::Output ddsOutput;
     auto fileContents = FileSystem::FileContents( aPath );
-    const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, 0, width, height, opaque, ddsOutput );
+    const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput );
 
     if (loadResult != DDSLoader::LoadResult::Success)
     {

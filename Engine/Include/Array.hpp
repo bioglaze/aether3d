@@ -4,6 +4,13 @@
 
 template< typename T > struct Array
 {
+    Array() {}
+    
+    Array( const Array<T>& other )
+    {
+        *this = other;
+    }
+
     ~Array()
     {
         delete[] elements;
@@ -11,12 +18,18 @@ template< typename T > struct Array
         elementCount = 0;
     }
     
-    T& operator=( const T& other )
+    Array<T>& operator=( const Array<T>& other )
     {
+        if (this == &other)
+        {
+            return *this;
+        }
+        
         delete[] elements;
         elementCount = other.elementCount;
         elements = new T[ elementCount ];
         memcpy( elements, other.elements, elementCount * sizeof( T ) );
+        return *this;
     }
     
     T& operator[]( int index ) const
@@ -31,7 +44,7 @@ template< typename T > struct Array
     
     void Add( const T& item )
     {
-        T* after = new T[ elementCount + 1 ];
+        T* after = new T[ elementCount + 1 ]();
         memcpy( after, elements, elementCount * sizeof( T ) );
         
         after[ elementCount ] = item;
@@ -43,7 +56,7 @@ template< typename T > struct Array
     void Allocate( int size )
     {
         delete[] elements;
-        elements = size > 0 ? new T[ size ] : nullptr;
+        elements = size > 0 ? new T[ size ]() : nullptr;
         elementCount = size;
     }
     
