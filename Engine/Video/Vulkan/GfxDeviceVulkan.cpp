@@ -1937,7 +1937,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     vkCmdBindVertexBuffers( GfxDeviceGlobal::currentCmdBuffer, VertexBuffer::VERTEX_BUFFER_BIND_ID, 1, vertexBuffer.GetVertexBuffer(), offsets );
 
     vkCmdBindIndexBuffer( GfxDeviceGlobal::currentCmdBuffer, *vertexBuffer.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT16 );
-    vkCmdDrawIndexed( GfxDeviceGlobal::currentCmdBuffer, (endIndex - startIndex) * 3, 1, startIndex * 3, 0, 0 );
+    vkCmdDrawIndexed( GfxDeviceGlobal::currentCmdBuffer, (endIndex - startIndex) * 3, 1, startIndex, 0, 0 );
     Statistics::IncTriangleCount( endIndex - startIndex );
     Statistics::IncDrawCalls();
 }

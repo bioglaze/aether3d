@@ -118,7 +118,7 @@ void Inspector::Render( int width, int height )
 {
     if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
-        nk_layout_row_static( &ctx, 30, 80, 1 );
+        nk_layout_row_static( &ctx, 30, 150, 1 );
 
         const char* str = gameObject ? gameObject->GetName().c_str() : "object name";
 

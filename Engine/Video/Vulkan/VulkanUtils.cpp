@@ -9,7 +9,7 @@
 namespace debug
 {
 #if DEBUG
-    bool enabled = false;
+    bool enabled = true;
 #else
     bool enabled = false;
 #endif
