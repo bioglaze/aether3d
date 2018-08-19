@@ -327,9 +327,9 @@ void ae3d::Font::LoadBMFontMetaBinary(const FileSystem::FileContentsData& metaDa
             blocks.Allocate( blockSize / sizeof( CharacterBlock ) );
             
             ifs.read( (char*)&blocks[ 0 ].id, blockSize );
-            System::Assert( blocks.GetLength() <= 256, "Too many glyphs." );
+            System::Assert( blocks.count <= 256, "Too many glyphs." );
             
-            for (int c = 0; c < blocks.GetLength(); ++c)
+            for (int c = 0; c < blocks.count; ++c)
             {
                 chars[ blocks[ c ].id ].x = blocks[ c ].x;
                 chars[ blocks[ c ].id ].y = blocks[ c ].y;

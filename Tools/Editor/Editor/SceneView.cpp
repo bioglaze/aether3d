@@ -154,7 +154,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
     ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
     
     // Collects meshes that collide with the ray.
-    for (int i = 0; i < gameObjects.GetLength(); ++i)
+    for (int i = 0; i < gameObjects.count; ++i)
     {
         GameObject* go = gameObjects[ i ];
         auto meshRenderer = go->GetComponent< MeshRendererComponent >();
@@ -257,7 +257,7 @@ void SceneView::MoveCamera( const Vec3& moveDir )
 
 void SceneView::MoveSelection( const Vec3& moveDir )
 {
-    if (selectedGameObjects.GetLength() > 0 && selectedGameObjects[ 0 ]->GetComponent< TransformComponent >() != nullptr)
+    if (selectedGameObjects.count > 0 && selectedGameObjects[ 0 ]->GetComponent< TransformComponent >() != nullptr)
     {
         selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( selectedGameObjects[ 0 ]->GetComponent<TransformComponent>()->GetLocalPosition() + moveDir );
     }
@@ -302,7 +302,7 @@ GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int he
     Array< CollisionInfo > ci;
     GetColliders( camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles, ci );
 
-    if (ci.GetLength() > 0)
+    if (ci.count > 0)
     {
         scene.Add( gameObjects[ 0 ] );
         gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );

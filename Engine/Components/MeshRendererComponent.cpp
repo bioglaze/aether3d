@@ -40,7 +40,7 @@ unsigned ae3d::MeshRendererComponent::New()
 
 Material* ae3d::MeshRendererComponent::GetMaterial( int subMeshIndex )
 {
-    return subMeshIndex < materials.GetLength() ? materials[ subMeshIndex ] : nullptr;
+    return subMeshIndex < materials.count ? materials[ subMeshIndex ] : nullptr;
 }
 
 ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
@@ -214,7 +214,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
 
 void ae3d::MeshRendererComponent::SetMaterial( Material* material, int subMeshIndex )
 {
-    if (subMeshIndex >= 0 && subMeshIndex < materials.GetLength() )
+    if (subMeshIndex >= 0 && subMeshIndex < materials.count )
     {
         materials[ subMeshIndex ] = material;
     }

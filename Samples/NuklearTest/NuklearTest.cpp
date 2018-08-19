@@ -71,9 +71,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     const struct nk_draw_command* cmd = nullptr;
     nk_draw_index* offset = nullptr;
 
-    const float scaleX = 1;
-    const float scaleY = 1;
-    
+    int i = 0;
     nk_draw_foreach( cmd, ctx, uiCommands )
     {
         if (cmd->elem_count == 0)
@@ -81,14 +79,15 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
             continue;
         }
         
-        System::DrawUI( (int)(cmd->clip_rect.x * scaleX),
-                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h)) * scaleY),
-                        (int)(cmd->clip_rect.w * scaleX),
-                        (int)(cmd->clip_rect.h * scaleY),
+        System::DrawUI( (int)(cmd->clip_rect.x),
+                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
+                        (int)(cmd->clip_rect.w),
+                        (int)(cmd->clip_rect.h),
                         cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
         offset += cmd->elem_count;
+        ++i;
     }
-
+    System::Print("i: %d\n", i);
     nk_clear( ctx );
 }
 

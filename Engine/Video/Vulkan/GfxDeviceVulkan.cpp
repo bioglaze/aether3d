@@ -5,6 +5,7 @@
 #include <vector> 
 #include <string>
 #include <vulkan/vulkan.h>
+#include "Array.hpp"
 #include "FileSystem.hpp"
 #include "LightTiler.hpp"
 #include "Macros.hpp"
@@ -32,6 +33,9 @@ PFN_vkGetPhysicalDeviceSurfaceFormatsKHR getPhysicalDeviceSurfaceFormatsKHR = nu
 PFN_vkGetSwapchainImagesKHR getSwapchainImagesKHR = nullptr;
 PFN_vkAcquireNextImageKHR acquireNextImageKHR = nullptr;
 PFN_vkQueuePresentKHR queuePresentKHR = nullptr;
+
+constexpr int UI_VERTICE_COUNT = 512 * 1024;
+constexpr int UI_FACE_COUNT = 128 * 1024;
 
 struct Ubo
 {
@@ -93,9 +97,9 @@ namespace GfxDeviceGlobal
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue computeQueue = VK_NULL_HANDLE;
     std::uint32_t graphicsQueueIndex = 0;
-    std::vector< VkImage > swapchainImages;
-    std::vector< SwapchainBuffer > swapchainBuffers;
-    std::vector< VkFramebuffer > frameBuffers;
+    Array< VkImage > swapchainImages;
+    Array< SwapchainBuffer > swapchainBuffers;
+    Array< VkFramebuffer > frameBuffers;
     VkPhysicalDeviceFeatures deviceFeatures;
     VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE;
     VkSemaphore renderCompleteSemaphore = VK_NULL_HANDLE;
@@ -107,7 +111,7 @@ namespace GfxDeviceGlobal
     VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     std::map< std::uint64_t, VkPipeline > psoCache;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-    std::vector< VkDescriptorSet > descriptorSets;
+    Array< VkDescriptorSet > descriptorSets;
     int descriptorSetIndex = 0;
     std::uint32_t queueNodeIndex = UINT32_MAX;
     std::uint32_t currentBuffer = 0;
@@ -117,8 +121,8 @@ namespace GfxDeviceGlobal
     VkImageView view1 = VK_NULL_HANDLE;
     VkSampler sampler0 = VK_NULL_HANDLE;
     VkSampler sampler1 = VK_NULL_HANDLE;
-    std::vector< VkBuffer > pendingFreeVBs;
-    std::vector< Ubo > ubos;
+    Array< VkBuffer > pendingFreeVBs;
+    Array< Ubo > ubos;
     int currentUbo = 0;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
     int backBufferWidth;
@@ -126,8 +130,8 @@ namespace GfxDeviceGlobal
     ae3d::LightTiler lightTiler;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
-    std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
-    std::vector< ae3d::VertexBuffer::Face > uiFaces( 128 * 1024 );
+    ae3d::VertexBuffer::VertexPTC uiVertices[ UI_VERTICE_COUNT ];
+    ae3d::VertexBuffer::Face uiFaces[ UI_FACE_COUNT ];
     std::vector< ae3d::VertexBuffer > lineBuffers;
     bool usedOffscreen = false;
 }
@@ -370,7 +374,7 @@ namespace ae3d
         }
         else if (depthFunc == ae3d::GfxDevice::DepthFunc::NoneWriteOff)
         {
-            depthStencilState.depthCompareOp = VK_COMPARE_OP_NEVER;
+            depthStencilState.depthCompareOp = VK_COMPARE_OP_ALWAYS;
         }
         else
         {
@@ -424,18 +428,18 @@ namespace ae3d
     {
         System::Assert( GfxDeviceGlobal::cmdPool != VK_NULL_HANDLE, "command pool not initialized" );
         System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
-        System::Assert( GfxDeviceGlobal::swapchainBuffers.size() > 0, "imageCount is 0" );
+        System::Assert( GfxDeviceGlobal::swapchainBuffers.count > 0, "imageCount is 0" );
 
         VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
         commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         commandBufferAllocateInfo.commandPool = GfxDeviceGlobal::cmdPool;
         commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        commandBufferAllocateInfo.commandBufferCount = (std::uint32_t)GfxDeviceGlobal::swapchainBuffers.size();
+        commandBufferAllocateInfo.commandBufferCount = (std::uint32_t)GfxDeviceGlobal::swapchainBuffers.count;
 
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, GfxDeviceGlobal::drawCmdBuffers );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
 
-        for (std::size_t i = 0; i < GfxDeviceGlobal::swapchainBuffers.size(); ++i)
+        for (int i = 0; i < GfxDeviceGlobal::swapchainBuffers.count; ++i)
         {
             debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::drawCmdBuffers[ i ], VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "drawCmdBuffer" );
         }
@@ -698,14 +702,16 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfaceFormatsKHR" );
         ae3d::System::Assert( formatCount > 0, "no formats" );
         
-        std::vector< VkSurfaceFormatKHR > surfFormats( formatCount );
-        err = getPhysicalDeviceSurfaceFormatsKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &formatCount, surfFormats.data() );
+        Array< VkSurfaceFormatKHR > surfFormats;
+        surfFormats.Allocate( formatCount );
+        
+        err = getPhysicalDeviceSurfaceFormatsKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &formatCount, surfFormats.elements );
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfaceFormatsKHR" );
 
         bool foundSRGB = false;
         VkFormat sRGBFormat = VK_FORMAT_B8G8R8A8_SRGB;
 
-        for (std::size_t formatIndex = 0; formatIndex < surfFormats.size(); ++formatIndex)
+        for (int formatIndex = 0; formatIndex < surfFormats.count; ++formatIndex)
         {
             if (surfFormats[ formatIndex ].format == VK_FORMAT_B8G8R8A8_SRGB || surfFormats[ formatIndex ].format == VK_FORMAT_R8G8B8A8_SRGB)
             {
@@ -744,8 +750,10 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfacePresentModesKHR" );
         ae3d::System::Assert( presentModeCount > 0, "no present modes" );
         
-        std::vector< VkPresentModeKHR > presentModes( presentModeCount );
-        err = getPhysicalDeviceSurfacePresentModesKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &presentModeCount, presentModes.data() );
+        Array< VkPresentModeKHR > presentModes;
+        presentModes.Allocate( presentModeCount );
+        
+        err = getPhysicalDeviceSurfacePresentModesKHR( GfxDeviceGlobal::physicalDevice, GfxDeviceGlobal::surface, &presentModeCount, presentModes.elements );
         AE3D_CHECK_VULKAN( err, "getPhysicalDeviceSurfacePresentModesKHR" );
 
         VkExtent2D swapchainExtent = {};
@@ -813,12 +821,12 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "getSwapchainImagesKHR" );
         ae3d::System::Assert( imageCount > 0, "imageCount" );
         
-        GfxDeviceGlobal::swapchainImages.resize( imageCount );
+        GfxDeviceGlobal::swapchainImages.Allocate( imageCount );
 
-        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, GfxDeviceGlobal::swapchainImages.data() );
+        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, GfxDeviceGlobal::swapchainImages.elements );
         AE3D_CHECK_VULKAN( err, "getSwapchainImagesKHR" );
 
-        GfxDeviceGlobal::swapchainBuffers.resize( imageCount );
+        GfxDeviceGlobal::swapchainBuffers.Allocate( imageCount );
 
         for (std::uint32_t i = 0; i < imageCount; ++i)
         {
@@ -910,8 +918,10 @@ namespace ae3d
             System::Print( "Your system doesn't have physical Vulkan devices.\n" );
         }
 
-        std::vector< VkQueueFamilyProperties > queueProps( queueCount );
-        vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, queueProps.data() );
+        Array< VkQueueFamilyProperties > queueProps;
+        queueProps.Allocate( queueCount );
+        
+        vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, queueProps.elements );
         std::uint32_t graphicsQueueIndex = 0;
 
         for (graphicsQueueIndex = 0; graphicsQueueIndex < queueCount; ++graphicsQueueIndex)
@@ -937,12 +947,14 @@ namespace ae3d
 
         std::uint32_t deviceExtensionCount;
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, nullptr );
-        std::vector< VkExtensionProperties > availableDeviceExtensions( deviceExtensionCount );
-        vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.data() );
+        Array< VkExtensionProperties > availableDeviceExtensions;
+        availableDeviceExtensions.Allocate( deviceExtensionCount );
+        
+        vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.elements );
 
-        for (auto& i : availableDeviceExtensions)
+        for (int i = 0; i < availableDeviceExtensions.count; ++i)
         {
-            if (std::string( i.extensionName ) == std::string( VK_EXT_DEBUG_MARKER_EXTENSION_NAME ))
+            if (std::strcmp( availableDeviceExtensions[ i ].extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME ) == 0)
             {
                 deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
                 debug::hasMarker = true;
@@ -981,8 +993,9 @@ namespace ae3d
         vkGetPhysicalDeviceMemoryProperties( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::deviceMemoryProperties );
         vkGetDeviceQueue( GfxDeviceGlobal::device, graphicsQueueIndex, 0, &GfxDeviceGlobal::graphicsQueue );
 
-        const std::vector< VkFormat > depthFormats = { VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D16_UNORM_S8_UINT, VK_FORMAT_D16_UNORM };
+        const VkFormat depthFormats[ 4 ] = { VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D16_UNORM_S8_UINT, VK_FORMAT_D16_UNORM };
         bool depthFormatFound = false;
+        
         for (auto& format : depthFormats)
         {
             VkFormatProperties formatProps;
@@ -1017,9 +1030,9 @@ namespace ae3d
         frameBufferCreateInfo.layers = 1;
 
         // Create frame buffers for every swap chain image
-        GfxDeviceGlobal::frameBuffers.resize( GfxDeviceGlobal::swapchainBuffers.size() );
+        GfxDeviceGlobal::frameBuffers.Allocate( GfxDeviceGlobal::swapchainBuffers.count );
         
-        for (std::uint32_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); i++)
+        for (int i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
         {
             attachments[ 0 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
             VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
@@ -1048,9 +1061,9 @@ namespace ae3d
         frameBufferCreateInfo.layers = 1;
 
         // Create frame buffers for every swap chain image
-        GfxDeviceGlobal::frameBuffers.resize( GfxDeviceGlobal::swapchainBuffers.size() );
+        GfxDeviceGlobal::frameBuffers.Allocate( GfxDeviceGlobal::swapchainBuffers.count );
 
-        for (std::uint32_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); i++)
+        for (int i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
         {
             attachments[ 1 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
             VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
@@ -1338,9 +1351,9 @@ namespace ae3d
         VkResult err = vkCreateDescriptorPool( GfxDeviceGlobal::device, &descriptorPoolInfo, nullptr, &GfxDeviceGlobal::descriptorPool );
         AE3D_CHECK_VULKAN( err, "vkCreateDescriptorPool" );
 
-        GfxDeviceGlobal::descriptorSets.resize( AE3D_DESCRIPTOR_SETS_COUNT );
+        GfxDeviceGlobal::descriptorSets.Allocate( AE3D_DESCRIPTOR_SETS_COUNT );
 
-        for (std::size_t i = 0; i < GfxDeviceGlobal::descriptorSets.size(); ++i)
+        for (int i = 0; i < GfxDeviceGlobal::descriptorSets.count; ++i)
         {
             VkDescriptorSetAllocateInfo allocInfo = {};
             allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -1356,7 +1369,7 @@ namespace ae3d
     VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1 )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
-        GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.size();
+        GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.count;
 
         // Binding 0 : Uniform buffer
         VkWriteDescriptorSet uboSet = {};
@@ -1667,7 +1680,7 @@ namespace ae3d
         err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, nullptr, &GfxDeviceGlobal::queryPool );
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
 
-        GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ), VertexBuffer::Storage::CPU );
+        GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces, UI_FACE_COUNT, GfxDeviceGlobal::uiVertices, UI_VERTICE_COUNT, VertexBuffer::Storage::CPU );
 
         renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
         renderer.builtinShaders.fullscreenTriangleShader.LoadSPIRV( FileSystem::FileContents( "fullscreen_triangle_vert.spv" ), FileSystem::FileContents( "sprite_frag.spv" ) );
@@ -1718,13 +1731,13 @@ void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int e
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, void** outMappedVertices, void** outMappedIndices )
 {
-    *outMappedVertices = GfxDeviceGlobal::uiVertices.data();
-    *outMappedIndices = GfxDeviceGlobal::uiFaces.data();
+    *outMappedVertices = GfxDeviceGlobal::uiVertices;
+    *outMappedIndices = GfxDeviceGlobal::uiFaces;
 }
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
 {
-    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces.data(), int( GfxDeviceGlobal::uiFaces.size() ), GfxDeviceGlobal::uiVertices.data(), int( GfxDeviceGlobal::uiVertices.size() ), VertexBuffer::Storage::CPU );
+    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces, UI_FACE_COUNT, GfxDeviceGlobal::uiVertices, UI_VERTICE_COUNT, VertexBuffer::Storage::CPU );
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
@@ -1759,17 +1772,15 @@ void ae3d::GfxDevice::PopGroupMarker()
 
 void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
 {
-    std::vector< VkClearValue > clearValues;
+    VkClearValue clearValues[ 3 ];
     if (GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT)
     {
-        clearValues.resize( 3 );
         clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
         clearValues[ 1 ].color = GfxDeviceGlobal::clearColor;
         clearValues[ 2 ].depthStencil = { 1.0f, 0 };
     }
     else
     {
-        clearValues.resize( 2 );
         clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
         clearValues[ 1 ].depthStencil = { 1.0f, 0 };
     }
@@ -1792,8 +1803,8 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     renderPassBeginInfo.renderArea.offset.y = 0;
     renderPassBeginInfo.renderArea.extent.width = width;
     renderPassBeginInfo.renderArea.extent.height = height;
-    renderPassBeginInfo.clearValueCount = (std::uint32_t)clearValues.size();
-    renderPassBeginInfo.pClearValues = clearValues.data();
+    renderPassBeginInfo.clearValueCount = GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT ? 3 : 2;
+    renderPassBeginInfo.pClearValues = clearValues;
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
 
     vkCmdBeginRenderPass( GfxDeviceGlobal::currentCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
@@ -1877,7 +1888,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 {
     System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
-    System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::swapchainBuffers.size(), "invalid draw buffer index" );
+    System::Assert( (int)GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::swapchainBuffers.count, "invalid draw buffer index" );
 
     if (GfxDeviceGlobal::view0 == VK_NULL_HANDLE || GfxDeviceGlobal::sampler0 == VK_NULL_HANDLE)
     {
@@ -1889,9 +1900,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
 
-    if (Statistics::GetDrawCalls() >= (int)GfxDeviceGlobal::descriptorSets.size())
+    if (Statistics::GetDrawCalls() >= GfxDeviceGlobal::descriptorSets.count)
     {
-        System::Print( "Skipping draw because draw call count %d exceeds descriptor set count %ld \n", Statistics::GetDrawCalls(), GfxDeviceGlobal::descriptorSets.size() );
+        System::Print( "Skipping draw because draw call count %d exceeds descriptor set count %ld \n", Statistics::GetDrawCalls(), GfxDeviceGlobal::descriptorSets.count );
         return;
     }
 
@@ -1933,14 +1944,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
 void ae3d::GfxDevice::GetNewUniformBuffer()
 {
-    GfxDeviceGlobal::currentUbo = (GfxDeviceGlobal::currentUbo + 1) % GfxDeviceGlobal::ubos.size();
+    GfxDeviceGlobal::currentUbo = (GfxDeviceGlobal::currentUbo + 1) % GfxDeviceGlobal::ubos.count;
 }
 
 void ae3d::GfxDevice::CreateUniformBuffers()
 {
-    GfxDeviceGlobal::ubos.resize( 1800 );
+    GfxDeviceGlobal::ubos.Allocate( 1800 );
 
-    for (std::size_t uboIndex = 0; uboIndex < GfxDeviceGlobal::ubos.size(); ++uboIndex)
+    for (int uboIndex = 0; uboIndex < GfxDeviceGlobal::ubos.count; ++uboIndex)
     {
         auto& ubo = GfxDeviceGlobal::ubos[ uboIndex ];
 
@@ -2067,12 +2078,12 @@ void ae3d::GfxDevice::Present()
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 
-    for (std::size_t i = 0; i < GfxDeviceGlobal::pendingFreeVBs.size(); ++i)
+    for (int i = 0; i < GfxDeviceGlobal::pendingFreeVBs.count; ++i)
     {
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeVBs[ i ], nullptr );
     }
 
-    GfxDeviceGlobal::pendingFreeVBs.clear();
+    GfxDeviceGlobal::pendingFreeVBs.Allocate( 0 );
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
@@ -2082,12 +2093,12 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
     debug::Free( GfxDeviceGlobal::instance );
     
-    for (std::size_t i = 0; i < GfxDeviceGlobal::swapchainBuffers.size(); ++i)
+    for (int i = 0; i < GfxDeviceGlobal::swapchainBuffers.count; ++i)
     {
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
 
-    for (std::size_t i = 0; i < GfxDeviceGlobal::frameBuffers.size(); ++i)
+    for (int i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
     {
         vkDestroyFramebuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::frameBuffers[ i ], nullptr );
     }
@@ -2111,7 +2122,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorMem, nullptr );
     }
 
-    for (std::size_t i = 0; i < GfxDeviceGlobal::ubos.size(); ++i)
+    for (int i = 0; i < GfxDeviceGlobal::ubos.count; ++i)
     {
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::ubos[ i ].uboMemory, nullptr );
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::ubos[ i ].ubo, nullptr );

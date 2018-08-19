@@ -178,7 +178,7 @@ int main()
     rotatingCube.AddComponent< MeshRendererComponent >();
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     rotatingCube.AddComponent< TransformComponent >();
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -100 } );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { -4, 0, -100 } );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 1 );
 
     GameObject childCube;
@@ -397,7 +397,7 @@ int main()
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
     pbrMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     pbrMaterial.SetBackFaceCulling( true );
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -100 ) );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
 

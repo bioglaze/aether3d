@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"
+#include "Array.hpp"
 #include "DDSLoader.hpp"
 #include "FileSystem.hpp"
 #include "Macros.hpp"
@@ -178,9 +179,11 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
 
-    std::vector< VkBuffer > stagingBuffers( mipLevelCount );
-    std::vector< VkDeviceMemory > stagingMemory( mipLevelCount );
-
+    Array< VkBuffer > stagingBuffers;
+    stagingBuffers.Allocate( mipLevelCount );
+    Array< VkDeviceMemory > stagingMemory;
+    stagingMemory.Allocate( mipLevelCount );
+    
     for (int mipIndex = 0; mipIndex < mipLevelCount; ++mipIndex)
     {
         const std::int32_t mipWidth = MathUtil::Max( width >> mipIndex, 1 );
@@ -732,14 +735,14 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (Texture2DGlobal::defaultTexture.view == VK_NULL_HANDLE)
     {
-        std::vector< std::uint8_t > imageData( 32 * 32 * 4 );
+        std::uint8_t imageData[ 32 * 32 * 4 ];
         
         for (int i = 0; i < 32 * 32 * 4; ++i)
         {
             imageData[ i ] = 0xFF;
         }
 
-        Texture2DGlobal::defaultTexture.LoadFromData( imageData.data(), 32, 32, 4, "default texture 2d" );
+        Texture2DGlobal::defaultTexture.LoadFromData( imageData, 32, 32, 4, "default texture 2d" );
     }
 
     return &Texture2DGlobal::defaultTexture;

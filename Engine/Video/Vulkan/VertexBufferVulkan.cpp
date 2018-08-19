@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstring>
 #include <cstdint>
+#include "Array.hpp"
 #include "Macros.hpp"
 #include "Statistics.hpp"
 #include "System.hpp"
@@ -11,7 +12,7 @@ namespace GfxDeviceGlobal
 {
     extern VkDevice device;
     extern VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
-    extern std::vector< VkBuffer > pendingFreeVBs;
+    extern Array< VkBuffer > pendingFreeVBs;
     extern VkCommandPool cmdPool;
     extern VkQueue graphicsQueue;
 }
@@ -143,8 +144,8 @@ void MarkForFreeing( VkBuffer vertexBuffer, VkDeviceMemory vertexMem, VkBuffer i
 
     vkFreeMemory( GfxDeviceGlobal::device, vertexMem, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, indexMem, nullptr );
-    GfxDeviceGlobal::pendingFreeVBs.push_back( vertexBuffer );
-    GfxDeviceGlobal::pendingFreeVBs.push_back( indexBuffer );
+    GfxDeviceGlobal::pendingFreeVBs.Add( vertexBuffer );
+    GfxDeviceGlobal::pendingFreeVBs.Add( indexBuffer );
 }
 
 void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int vertexBufferSize, int vertexStride, const void* indexData, int indexBufferSize )
@@ -363,9 +364,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
 
-    std::vector< VertexPTNTC > verticesPTNTC( vertexCount );
-
-    for (std::size_t vertexInd = 0; vertexInd < verticesPTNTC.size(); ++vertexInd)
+    Array< VertexPTNTC > verticesPTNTC;
+    verticesPTNTC.Allocate( vertexCount );
+    
+    for (int vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
     {
         verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
         verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
@@ -375,7 +377,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         verticesPTNTC[ vertexInd ].color = vertices[ vertexInd ].color;
     }
 
-    GenerateVertexBuffer( static_cast< const void*>( verticesPTNTC.data() ), vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), static_cast< const void* >(faces), elementCount * 2 );
+    GenerateVertexBuffer( static_cast< const void*>( verticesPTNTC.elements ), vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), static_cast< const void* >(faces), elementCount * 2 );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
@@ -383,9 +385,10 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
 
-    std::vector< VertexPTNTC > verticesPTNTC( vertexCount );
+    Array< VertexPTNTC > verticesPTNTC;
+    verticesPTNTC.Allocate( vertexCount );
 
-    for (std::size_t vertexInd = 0; vertexInd < verticesPTNTC.size(); ++vertexInd)
+    for (int vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
     {
         verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
         verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
@@ -395,7 +398,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         verticesPTNTC[ vertexInd ].color = Vec4( 1, 1, 1, 1 );
     }
 
-    GenerateVertexBuffer( static_cast< const void*>( verticesPTNTC.data() ), vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), static_cast< const void* >( faces ), elementCount * 2 );
+    GenerateVertexBuffer( static_cast< const void*>( verticesPTNTC.elements ), vertexCount * sizeof( VertexPTNTC ), sizeof( VertexPTNTC ), static_cast< const void* >( faces ), elementCount * 2 );
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )

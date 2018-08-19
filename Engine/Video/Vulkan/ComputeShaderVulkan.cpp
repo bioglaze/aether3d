@@ -1,4 +1,5 @@
 #include "ComputeShader.hpp"
+#include "Array.hpp"
 #include "FileSystem.hpp"
 #include "System.hpp"
 #include "Macros.hpp"
@@ -12,12 +13,12 @@ namespace GfxDeviceGlobal
 
 namespace ComputeShaderGlobal
 {
-    std::vector< VkShaderModule > modulesToReleaseAtExit;
+    Array< VkShaderModule > modulesToReleaseAtExit;
 }
 
 void ae3d::ComputeShader::DestroyShaders()
 {
-    for (std::size_t moduleIndex = 0; moduleIndex < ComputeShaderGlobal::modulesToReleaseAtExit.size(); ++moduleIndex)
+    for (int moduleIndex = 0; moduleIndex < ComputeShaderGlobal::modulesToReleaseAtExit.count; ++moduleIndex)
     {
         vkDestroyShaderModule( GfxDeviceGlobal::device, ComputeShaderGlobal::modulesToReleaseAtExit[ moduleIndex ], nullptr );
     }
@@ -46,7 +47,7 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
     AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, contents.path.c_str() );
-    ComputeShaderGlobal::modulesToReleaseAtExit.push_back( shaderModule );
+    ComputeShaderGlobal::modulesToReleaseAtExit.Add( shaderModule );
 
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     info.stage = VK_SHADER_STAGE_COMPUTE_BIT;
