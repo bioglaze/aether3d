@@ -320,6 +320,7 @@
     <ClCompile Include="..\OpenWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Engine\Include\Array.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\DirectionalLightComponent.hpp" />

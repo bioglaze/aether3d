@@ -266,5 +266,8 @@
     <ClInclude Include="..\Video\LightTiler.hpp">
       <Filter>Video</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\Array.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

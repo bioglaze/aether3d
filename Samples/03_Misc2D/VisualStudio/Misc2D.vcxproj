@@ -221,6 +221,7 @@
     <ClCompile Include="..\Misc2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Engine\Include\Array.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\AudioClip.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\AudioSourceComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\CameraComponent.hpp" />
