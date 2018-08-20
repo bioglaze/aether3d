@@ -92,7 +92,8 @@ void DrawNuklear( int width, int height )
                         (int)(cmd->clip_rect.w),
                         (int)(cmd->clip_rect.h),
                         cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
-        offset += cmd->elem_count;
+        offset += cmd->elem_count / 3;
+        System::Print("elem_count: %d\n", cmd->elem_count);
     }
 
     nk_clear( &ctx );

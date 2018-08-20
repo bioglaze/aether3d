@@ -83,7 +83,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                         (int)(cmd->clip_rect.w),
                         (int)(cmd->clip_rect.h),
                         cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
-        offset += cmd->elem_count;
+        offset += cmd->elem_count / 3;
     }
 
     nk_clear( ctx );

@@ -20,7 +20,7 @@
 
    <ul>
    <li>Windows, macOS, iOS and GNU/Linux.</li>
-   <li>Vulkan (WIP) Metal and D3D12 renderers.</li>
+   <li>Vulkan, Metal and D3D12 renderers.</li>
    <li>Sprite batching.</li>
    <li>Audio support: .wav and .ogg.</li>
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
