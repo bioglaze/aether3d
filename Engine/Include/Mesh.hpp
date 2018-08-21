@@ -75,6 +75,6 @@ namespace ae3d
         
         std::aligned_storage<StorageSize, StorageAlign>::type _storage = {};
         
-        std::vector< SubMesh >& GetSubMeshes();
+        SubMesh* GetSubMeshes( int& outCount );
     };
 }

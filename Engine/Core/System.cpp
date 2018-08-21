@@ -6,8 +6,8 @@
 #if VK_USE_PLATFORM_ANDROID_KHR
 #include <android/log.h>
 #endif
-#include <cstdarg>
-#include <cassert>
+#include <stdarg.h>
+#include <assert.h>
 #include "AudioSystem.hpp"
 #include "GfxDevice.hpp"
 #include "FileWatcher.hpp"

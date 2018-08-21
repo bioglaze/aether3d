@@ -157,9 +157,10 @@ const char* ae3d::Mesh::GetSubMeshName( unsigned index ) const
     return m().subMeshes[ index < m().subMeshes.size() ? index : 0 ].name.c_str();
 }
 
-std::vector< ae3d::SubMesh >& ae3d::Mesh::GetSubMeshes()
+ae3d::SubMesh* ae3d::Mesh::GetSubMeshes( int& outCount )
 {
-    return m().subMeshes;
+	outCount = (int)m().subMeshes.size();
+    return m().subMeshes.data();
 }
 
 std::vector< Vec3 > ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIndex ) const

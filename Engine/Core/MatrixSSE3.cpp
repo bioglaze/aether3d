@@ -1,9 +1,7 @@
 #ifdef SIMD_SSE3
 #include "Matrix.hpp"
 #include <pmmintrin.h>
-#include <xmmintrin.h>
 #include "Vec3.hpp"
-#include "Macros.hpp"
 
 #ifndef M_PI
 #    define M_PI 3.14159265358979f

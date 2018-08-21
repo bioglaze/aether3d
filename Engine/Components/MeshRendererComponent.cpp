@@ -79,9 +79,10 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
         return;
     }
 
-    std::vector< SubMesh >& subMeshes = mesh->GetSubMeshes();
+    int subMeshCount = 0;
+    SubMesh* subMeshes = mesh->GetSubMeshes( subMeshCount);
 
-    for (int subMeshIndex = 0; subMeshIndex < (int)subMeshes.size(); ++subMeshIndex)
+    for (int subMeshIndex = 0; subMeshIndex < subMeshCount; ++subMeshIndex)
     {
         isSubMeshCulled[ subMeshIndex ] = false;
 
@@ -119,9 +120,10 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
         return;
     }
     
-    std::vector< SubMesh >& subMeshes = mesh->GetSubMeshes();
+	int subMeshCount = 0;
+    SubMesh* subMeshes = mesh->GetSubMeshes( subMeshCount );
 
-    for (int subMeshIndex = 0; subMeshIndex < (int)subMeshes.size(); ++subMeshIndex)
+    for (int subMeshIndex = 0; subMeshIndex < subMeshCount; ++subMeshIndex)
     {
         if (isSubMeshCulled[ subMeshIndex ])
         {
@@ -226,7 +228,9 @@ void ae3d::MeshRendererComponent::SetMesh( Mesh* aMesh )
 
     if (mesh != nullptr)
     {
-        materials.Allocate( (int)mesh->GetSubMeshes().size() );
-        isSubMeshCulled.Allocate( (int)mesh->GetSubMeshes().size() );
+        int subMeshCount = 0;
+        SubMesh* subMeshes = mesh->GetSubMeshes( subMeshCount );
+        materials.Allocate( subMeshCount );
+        isSubMeshCulled.Allocate( subMeshCount );
     }
 }
