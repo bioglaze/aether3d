@@ -1717,13 +1717,13 @@ void ae3d::GfxDevice::Init( int width, int height )
     GfxDeviceGlobal::backBufferHeight = height;
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* offset )
+void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, void* offset )
 {
     int scissor[ 4 ] = {};
-    scissor[ 0 ] = vpX < 0 ? 0 : vpX;
-    scissor[ 1 ] = vpY < 0 ? 0 : vpY;
-    scissor[ 2 ] = vpWidth > 8191 ? 8191 : vpWidth;
-    scissor[ 3 ] = vpHeight > 8191 ? 8191 : vpHeight;
+    scissor[ 0 ] = scX < 0 ? 0 : scX;
+    scissor[ 1 ] = scY < 0 ? 0 : scY;
+    scissor[ 2 ] = scWidth > 8191 ? 8191 : scWidth;
+    scissor[ 3 ] = scHeight > 8191 ? 8191 : scHeight;
     SetScissor( scissor );
     
     Draw( GfxDeviceGlobal::uiVertexBuffer, (int)((size_t)offset), (int)((size_t)offset + elemCount), renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );

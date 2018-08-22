@@ -150,7 +150,7 @@ float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const Vec3*
 void GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest, Array< CollisionInfo >& outColliders )
 {
     Vec3 rayOrigin, rayTarget;
-    ScreenPointToRay( screenX, screenY, width, height, camera, rayOrigin, rayTarget );
+    ScreenPointToRay( screenX, screenY, (float)width, (float)height, camera, rayOrigin, rayTarget );
     
     // Collects meshes that collide with the ray.
     for (int i = 0; i < gameObjects.count; ++i)

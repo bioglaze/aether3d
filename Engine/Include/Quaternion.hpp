@@ -113,7 +113,7 @@ namespace ae3d
             flattened = flattened.Normalized();
             
             // get angle between original vector and projected transform to get angle around normal
-            return acos( Vec3::Dot( orthonormal1, flattened ) );
+            return acosf( Vec3::Dot( orthonormal1, flattened ) );
         }
         
         /**
@@ -122,7 +122,7 @@ namespace ae3d
          */
         void GetAxisAngle( Vec3& outAxis, float& outAngleRad ) const
         {
-            const float scale = sqrt( x * x + y * y + z * z );
+            const float scale = sqrtf( x * x + y * y + z * z );
             
             if (fabs( scale ) < 0.00001f)
             {
@@ -135,7 +135,7 @@ namespace ae3d
                 outAxis.z = z / scale;
             }
             
-            outAngleRad = acos( w ) * 2;
+            outAngleRad = acosf( w ) * 2;
         }
         
         /// \param euler Euler angles in degrees.
@@ -164,12 +164,12 @@ namespace ae3d
             
             angleRad *= 0.5f;
             
-            const float sinAngle = sin( angleRad );
+            const float sinAngle = sinf( angleRad );
             
             x = axis.x * sinAngle;
             y = axis.y * sinAngle;
             z = axis.z * sinAngle;
-            w = cos( angleRad );
+            w = cosf( angleRad );
         }
         
         /**
@@ -215,7 +215,7 @@ namespace ae3d
                 }
             }
             
-            const float factor = 0.5f / sqrt( t );
+            const float factor = 0.5f / sqrtf( t );
             x *= factor;
             y *= factor;
             z *= factor;
@@ -264,9 +264,9 @@ namespace ae3d
         Vec3 GetEuler() const
         {
             Vec3 out;
-            out.z = atan2( 2 * y * w - 2 * x * z, 1 - 2 * y * y - 2 * z * z );
-            out.y = asin( 2 * x * y + 2 * z * w );
-            out.x = atan2( 2 * x * w - 2 * y * z, 1 - 2 * x * x - 2 * z * z );
+            out.z = atan2f( 2 * y * w - 2 * x * z, 1 - 2 * y * y - 2 * z * z );
+            out.y = asinf( 2 * x * y + 2 * z * w );
+            out.x = atan2f( 2 * x * w - 2 * y * z, 1 - 2 * x * x - 2 * z * z );
             return out / (3.14159265358979f / 180.0f);
         }
         
@@ -276,9 +276,9 @@ namespace ae3d
             const float mag2 = w * w + x * x + y * y + z * z;
             const float acceptableDelta = 0.00001f;
             
-            if (fabs( mag2 ) > acceptableDelta && fabs( mag2 - 1.0f ) > acceptableDelta)
+            if (fabsf( mag2 ) > acceptableDelta && fabsf( mag2 - 1.0f ) > acceptableDelta)
             {
-                const float oneOverMag = 1.0f / sqrt( mag2 );
+                const float oneOverMag = 1.0f / sqrtf( mag2 );
                 
                 x *= oneOverMag;
                 y *= oneOverMag;

@@ -315,7 +315,7 @@ namespace ae3d
             
             const float len = Length();
             
-            if( abs( len ) < 0.0001f )
+            if (fabsf( len ) < 0.0001f )
             {
                 out.x = 1.0f;
                 out.y = 0.0f;
@@ -334,13 +334,13 @@ namespace ae3d
         bool IsAlmost( const Vec3& v2 ) const
         {
             const float epsilon = 0.0001f;
-            return abs( x - v2.x ) < epsilon &&
-            abs( y - v2.y ) < epsilon &&
-            abs( z - v2.z ) < epsilon;
+            return fabsf( x - v2.x ) < epsilon &&
+                fabsf( y - v2.y ) < epsilon &&
+                fabsf( z - v2.z ) < epsilon;
         }
 
         /// \return length.
-        float Length() const { return sqrt( x * x + y * y + z * z ); }
+        float Length() const { return sqrtf( x * x + y * y + z * z ); }
 
         /// Resets this vector's values to 0.
         void Zero() { x = y = z = 0; }
@@ -393,10 +393,10 @@ namespace ae3d
         bool IsAlmost( const Vec4& v2 ) const
         {
             const float epsilon = 0.0001f;
-            return abs( x - v2.x ) < epsilon &&
-                   abs( y - v2.y ) < epsilon &&
-                   abs( z - v2.z ) < epsilon &&
-                   abs( w - v2.w ) < epsilon;
+            return fabsf( x - v2.x ) < epsilon &&
+                fabsf( y - v2.y ) < epsilon &&
+                fabsf( z - v2.z ) < epsilon &&
+                fabsf( w - v2.w ) < epsilon;
         }
 
         /**
@@ -458,7 +458,7 @@ namespace ae3d
         }
 
         /// \return length.
-        float Length() const { return sqrt( x * x + y * y + z * z ); }
+        float Length() const { return sqrtf( x * x + y * y + z * z ); }
 
         /**
          Normalizes this vector.
@@ -467,7 +467,7 @@ namespace ae3d
         {
             const float len = Length();
 
-            if (abs( len ) < 0.0001f)
+            if (fabsf( len ) < 0.0001f)
             {
                 x = 1;
                 y = 0;

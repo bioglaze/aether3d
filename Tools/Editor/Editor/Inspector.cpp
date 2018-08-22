@@ -72,9 +72,18 @@ void DrawNuklear( int width, int height )
     nk_buffer_init_default( &uiCommands );
     nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
     nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY * 3 * 2 );
+
     const auto res = nk_convert( &ctx, &uiCommands, &vbuf, &ebuf, &config );
     System::Assert( res == NK_CONVERT_SUCCESS, "buffer conversion failed!" );
     
+#if RENDERER_VULKAN
+    for (int i = 0; i < MAX_VERTEX_MEMORY / sizeof( VertexPTC ); ++i)
+    {
+        VertexPTC* vert = &((VertexPTC*)vertices)[ i ];
+        vert->position[ 1 ] = height - vert->position[ 1 ];
+    }
+#endif
+
     System::UnmapUIVertexBuffer();
     
     const struct nk_draw_command* cmd = nullptr;
@@ -88,10 +97,15 @@ void DrawNuklear( int width, int height )
         }
 
         System::DrawUI( (int)(cmd->clip_rect.x),
+#if RENDERER_VULKAN
+                        (int)(cmd->clip_rect.y - cmd->clip_rect.h),
+#else
                         (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
+#endif
                         (int)(cmd->clip_rect.w),
                         (int)(cmd->clip_rect.h),
                         cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
+
         offset += cmd->elem_count / 3;
     }
 

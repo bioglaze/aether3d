@@ -59,7 +59,7 @@ namespace MathUtil
 
     float Floor( float f )
     {
-        return floor( f );
+        return floorf( f );
     }
 
     bool IsNaN( float f )

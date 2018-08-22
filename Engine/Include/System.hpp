@@ -133,16 +133,16 @@ namespace ae3d
         /// \param projection Camera's projection matrix.
         void DrawLines( int handle, const Matrix44& view, const Matrix44& projection );
         
-        /// \param vpX Viewport x.
-        /// \param vpY Viewport y.
-        /// \param vpWidth Viewport width.
-        /// \param vpHeight Viewport height.
+        /// \param scX Scissor x.
+        /// \param scY Scissor y.
+        /// \param scWidth Scissor width.
+        /// \param scHeight Scissor height.
         /// \param elemCount Element count.
         /// \param texture Texture
         /// \param offset Offset into vertex buffer.
         /// \param windowWidth Window width in pixels.
         /// \param windowHeight Window height in pixels.
-        void DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset, int windowWidth, int windowHeight );
+        void DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, Texture2D* texture, void* offset, int windowWidth, int windowHeight );
 
         /// Releases all resources allocated by the engine. Call when exiting.
         void Deinit();

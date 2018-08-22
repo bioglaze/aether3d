@@ -229,7 +229,7 @@ void ae3d::MeshRendererComponent::SetMesh( Mesh* aMesh )
     if (mesh != nullptr)
     {
         int subMeshCount = 0;
-        SubMesh* subMeshes = mesh->GetSubMeshes( subMeshCount );
+        mesh->GetSubMeshes( subMeshCount );
         materials.Allocate( subMeshCount );
         isSubMeshCulled.Allocate( subMeshCount );
     }

@@ -92,6 +92,19 @@ void ShaderReload( const std::string& path )
     }
 }
 
+int ae3d::Shader::GetUniformLocation( const char* name )
+{
+    for (int i = 0; i < uniformLocations.count; ++i)
+    {
+        if (strcmp( uniformLocations[ i ].uniformName, name ) == 0)
+        {
+            return uniformLocations[ i ].offset;
+        }
+    }
+
+    return -1;
+}
+
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
 {
     const std::size_t vertexSourceLength = std::string( vertexSource ).size();
@@ -188,6 +201,32 @@ void ae3d::Shader::ReflectVariables()
     reflector->GetDesc( &descShader );
     AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
+    int uniformCount = 0;
+
+    for (UINT i = 0; i < descShader.ConstantBuffers; ++i)
+    {
+        auto buffer = reflector->GetConstantBufferByIndex( i );
+
+        D3D12_SHADER_BUFFER_DESC desc;
+        hr = buffer->GetDesc( &desc );
+        AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
+
+        for (UINT j = 0; j < desc.Variables; ++j)
+        {
+            auto var = buffer->GetVariableByIndex( j );
+            D3D12_SHADER_VARIABLE_DESC descVar;
+            hr = var->GetDesc( &descVar );
+            AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
+            
+            ++uniformCount;
+
+            ae3d::System::Assert( descVar.StartOffset + descVar.Size < (unsigned)AE3D_CB_SIZE, "too big constant buffer" );
+        }
+    }
+
+    uniformLocations.Allocate( uniformCount );
+    uniformCount = 0;
+
     for (UINT i = 0; i < descShader.ConstantBuffers; ++i)
     {
         auto buffer = reflector->GetConstantBufferByIndex( i );
@@ -203,7 +242,11 @@ void ae3d::Shader::ReflectVariables()
             hr = var->GetDesc( &descVar );
             AE3D_CHECK_D3D( hr, "Shader desc reflection failed" );
 
-            uniformLocations[ std::string( descVar.Name ) ].i = descVar.StartOffset;
+            uniformLocations[ uniformCount ].offset = descVar.StartOffset;
+            strncpy( uniformLocations[ uniformCount ].uniformName, descVar.Name, 128 );
+
+            ++uniformCount;
+
             ae3d::System::Assert( descVar.StartOffset + descVar.Size < (unsigned)AE3D_CB_SIZE, "too big constant buffer" );
         }
     }
@@ -219,7 +262,7 @@ void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
     System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
     
-    const int offset = uniformLocations[ name ].i;
+    const int offset = GetUniformLocation( name );
 
     if (offset != -1)
     {
@@ -231,7 +274,7 @@ void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, in
 {
     System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
-    const int offset = uniformLocations[ name ].i;
+    const int offset = GetUniformLocation( name );
 
     if (offset != -1)
     {
@@ -306,7 +349,7 @@ void ae3d::Shader::SetInt( const char* name, int value )
 {
     System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
-    const int offset = uniformLocations[ name ].i;
+    const int offset = GetUniformLocation( name );
 
     if (offset != -1)
     {
@@ -318,7 +361,7 @@ void ae3d::Shader::SetFloat( const char* name, float value )
 {
     System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
-    const int offset = uniformLocations[ name ].i;
+    const int offset = GetUniformLocation( name );
 
     if (offset != -1)
     {
@@ -330,7 +373,7 @@ void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
     System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
-    const int offset = uniformLocations[ name ].i;
+    const int offset = GetUniformLocation( name );
 
     if (offset != -1)
     {
@@ -342,7 +385,7 @@ void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
     System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
 
-    const int offset = uniformLocations[ name ].i;
+    const int offset = GetUniformLocation( name );
 
     if (offset != -1)
     {

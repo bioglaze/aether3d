@@ -84,7 +84,7 @@ void ae3d::System::UnmapUIVertexBuffer()
     GfxDevice::UnmapUIVertexBuffer();
 }
 
-void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, Texture2D* texture, void* offset, int windowWidth, int windowHeight )
+void ae3d::System::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, Texture2D* texture, void* offset, int windowWidth, int windowHeight )
 {
     float ortho[ 4 ][ 4 ] = {
         { 2, 0, 0, 0 },
@@ -94,19 +94,13 @@ void ae3d::System::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elem
     };
     ortho[ 0 ][ 0 ] /= (float)windowWidth;
     ortho[ 1 ][ 1 ] /= (float)windowHeight;
-    
+
     renderer.builtinShaders.uiShader.Use();
     renderer.builtinShaders.uiShader.SetTexture( "textureMap", texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
-    
-#if RENDERER_VULKAN
-    Matrix44 proj;
-    proj.MakeProjection( 0, (float)windowWidth, (float)windowHeight, 0, -1, 1 );
-    GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &proj.m[ 0 ] );
-#endif
 
-    GfxDevice::DrawUI( vpX, vpY, vpWidth, vpHeight, elemCount, offset );
+    GfxDevice::DrawUI( scX, scY, scWidth, scHeight, elemCount, offset );
 }
 
 void ae3d::System::EnableWindowsMemleakDetection()

@@ -61,7 +61,7 @@ void Frustum::SetProjection( float fieldOfView, float aAspect, float aNear, floa
     
     // Computes width and height of the near and far plane sections.
     const float deg2rad = 3.14159265358979f / 180.0f;
-    const float tang = tan( deg2rad * fieldOfView * 0.5f );
+    const float tang = tanf( deg2rad * fieldOfView * 0.5f );
     nearHeight = zNear * tang;
     nearWidth  = nearHeight * aAspect;
     farHeight  = zFar * tang;

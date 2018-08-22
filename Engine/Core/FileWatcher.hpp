@@ -20,7 +20,7 @@ namespace ae3d
             int minute = 0;
             int second = 0;
             std::string path;
-            void(*updateFunc)(const std::string&);
+            void(*updateFunc)(const std::string&) = nullptr;
         };
         
         std::map< std::string, Entry > pathToEntry;

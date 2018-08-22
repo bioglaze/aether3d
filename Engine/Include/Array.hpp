@@ -6,6 +6,8 @@ template< typename T > struct Array
 {
     Array() {}
     
+    Array( int elementCount ) { Allocate( elementCount );  }
+
     Array( const Array<T>& other ) { *this = other; }
 
     ~Array()

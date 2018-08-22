@@ -16,9 +16,9 @@ const float biasDataColMajor[] =
     0, 0, 0.5f, 0,
     0.5f, 0.5f, 0.5f, 1 };
 
+#if AE3D_CHECK_FOR_NAN
     void CheckNaN( const Matrix44& matrix )
     {
-#if AE3D_CHECK_FOR_NAN
         for (int i = 0; i < 16; ++i)
         {
             if (!isfinite( matrix.m[ i ]))
@@ -26,8 +26,8 @@ const float biasDataColMajor[] =
                 ae3d::System::Assert( false, "Matrix contains NaN or Inf" );
             }
         }
-#endif
     }
+#endif
 }
 
 using namespace ae3d;
@@ -247,7 +247,7 @@ void Matrix44::MakeIdentity()
 #if RENDERER_VULKAN
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
-    const float f = 1.0f / tan( (0.5f * fovDegrees) * (float)M_PI / 180.0f );
+    const float f = 1.0f / tanf( (0.5f * fovDegrees) * (float)M_PI / 180.0f );
 
     const float proj[] =
     {
@@ -281,7 +281,7 @@ void Matrix44::MakeProjection( float left, float right, float bottom, float top,
 
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
-    const float top = tan( fovDegrees * (static_cast< float >( M_PI ) / 360.0f) ) * nearDepth;
+    const float top = tanf( fovDegrees * ((float)( M_PI ) / 360.0f) ) * nearDepth;
     const float bottom = -top;
     const float left = aspect * bottom;
     const float right = aspect * top;
@@ -342,12 +342,12 @@ void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 void Matrix44::MakeRotationXYZ( float xDeg, float yDeg, float zDeg )
 {
     const float deg2rad = static_cast< float >( M_PI ) / 180.0f;
-    const float sx = sin( xDeg * deg2rad );
-    const float sy = sin( yDeg * deg2rad );
-    const float sz = sin( zDeg * deg2rad );
-    const float cx = cos( xDeg * deg2rad );
-    const float cy = cos( yDeg * deg2rad );
-    const float cz = cos( zDeg * deg2rad );
+    const float sx = sinf( xDeg * deg2rad );
+    const float sy = sinf( yDeg * deg2rad );
+    const float sz = sinf( zDeg * deg2rad );
+    const float cx = cosf( xDeg * deg2rad );
+    const float cy = cosf( yDeg * deg2rad );
+    const float cz = cosf( zDeg * deg2rad );
 
     m[ 0 ] = cy * cz;
     m[ 1 ] = cz * sx * sy - cx * sz;

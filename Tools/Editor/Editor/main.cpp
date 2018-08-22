@@ -10,7 +10,7 @@ using namespace ae3d;
 int main()
 {
     int width = 640 * 2;
-    int height = 480;
+    int height = 480 * 2;
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
