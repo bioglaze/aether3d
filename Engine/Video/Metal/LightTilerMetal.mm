@@ -1,5 +1,4 @@
 #include "LightTiler.hpp"
-#include <cmath>
 #include "ComputeShader.hpp"
 #include "GfxDevice.hpp"
 #include "Matrix.hpp"

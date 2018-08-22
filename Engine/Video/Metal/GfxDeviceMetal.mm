@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <MetalKit/MetalKit.h>
-#include <cmath>
-#include <cstring>
+#include <string.h>
 #include <unordered_map>
 #include <vector>
 #include "GfxDevice.hpp"
@@ -184,7 +183,7 @@ void UploadPerObjectUbo()
     id<MTLBuffer> uniformBuffer = ae3d::GfxDevice::GetCurrentUniformBuffer();
     uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents];
 
-    std::memcpy( bufferPointer, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
+    memcpy( bufferPointer, &GfxDeviceGlobal::perObjectUboStruct, sizeof( GfxDeviceGlobal::perObjectUboStruct ) );
 #if !TARGET_OS_IPHONE
     [uniformBuffer didModifyRange:NSMakeRange( 0, sizeof( GfxDeviceGlobal::perObjectUboStruct ) )];
 #endif

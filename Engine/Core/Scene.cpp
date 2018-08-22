@@ -4,7 +4,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <cmath>
 #include "AudioSourceComponent.hpp"
 #include "AudioSystem.hpp"
 #include "CameraComponent.hpp"

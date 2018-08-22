@@ -59,7 +59,7 @@ namespace MathUtil
 
     float Floor( float f )
     {
-        return std::floor( f );
+        return floor( f );
     }
 
     bool IsNaN( float f )
@@ -69,7 +69,7 @@ namespace MathUtil
 
     bool IsFinite( float f )
     {
-        return std::isfinite( f );
+        return isfinite( f );
     }
 
     bool IsPowerOfTwo( unsigned i )
@@ -89,6 +89,6 @@ namespace MathUtil
 
     int GetMipmapCount( int width, int height )
     {
-        return 1 + static_cast< int >(std::floor( std::log2( Max( width, height ) ) ));
+        return 1 + static_cast< int >(floor( log2( Max( width, height ) ) ));
     }
 }

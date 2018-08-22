@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cmath>
+#include <math.h>
 
 namespace ae3d
 {
@@ -315,7 +315,7 @@ namespace ae3d
             
             const float len = Length();
             
-            if( std::abs( len ) < 0.0001f )
+            if( abs( len ) < 0.0001f )
             {
                 out.x = 1.0f;
                 out.y = 0.0f;
@@ -334,13 +334,13 @@ namespace ae3d
         bool IsAlmost( const Vec3& v2 ) const
         {
             const float epsilon = 0.0001f;
-            return std::abs( x - v2.x ) < epsilon &&
-            std::abs( y - v2.y ) < epsilon &&
-            std::abs( z - v2.z ) < epsilon;
+            return abs( x - v2.x ) < epsilon &&
+            abs( y - v2.y ) < epsilon &&
+            abs( z - v2.z ) < epsilon;
         }
 
         /// \return length.
-        float Length() const { return std::sqrt( x * x + y * y + z * z ); }
+        float Length() const { return sqrt( x * x + y * y + z * z ); }
 
         /// Resets this vector's values to 0.
         void Zero() { x = y = z = 0; }
@@ -377,7 +377,7 @@ namespace ae3d
         Vec4( const Vec4& other ) noexcept = default;
 
         /// \param v Vec3
-        explicit Vec4(const Vec3& v) : x(v.x), y(v.y), z(v.z), w(1) {}
+        explicit Vec4( const Vec3& v ) : x( v.x ), y( v.y ), z( v.z ), w( 1 ) {}
 
         /**
            Constructor.
@@ -393,10 +393,10 @@ namespace ae3d
         bool IsAlmost( const Vec4& v2 ) const
         {
             const float epsilon = 0.0001f;
-            return std::abs( x - v2.x ) < epsilon &&
-                   std::abs( y - v2.y ) < epsilon &&
-                   std::abs( z - v2.z ) < epsilon &&
-                   std::abs( w - v2.w ) < epsilon;
+            return abs( x - v2.x ) < epsilon &&
+                   abs( y - v2.y ) < epsilon &&
+                   abs( z - v2.z ) < epsilon &&
+                   abs( w - v2.w ) < epsilon;
         }
 
         /**
@@ -458,7 +458,7 @@ namespace ae3d
         }
 
         /// \return length.
-        float Length() const { return std::sqrt( x * x + y * y + z * z ); }
+        float Length() const { return sqrt( x * x + y * y + z * z ); }
 
         /**
          Normalizes this vector.
@@ -467,7 +467,7 @@ namespace ae3d
         {
             const float len = Length();
 
-            if (std::abs( len ) < 0.0001f)
+            if (abs( len ) < 0.0001f)
             {
                 x = 1;
                 y = 0;

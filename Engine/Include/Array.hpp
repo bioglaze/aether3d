@@ -6,10 +6,7 @@ template< typename T > struct Array
 {
     Array() {}
     
-    Array( const Array<T>& other )
-    {
-        *this = other;
-    }
+    Array( const Array<T>& other ) { *this = other; }
 
     ~Array()
     {
@@ -32,15 +29,9 @@ template< typename T > struct Array
         return *this;
     }
     
-    T& operator[]( int index )
-    {
-        return elements[ index ];
-    }
+    T& operator[]( int index ) { return elements[ index ]; }
 
-    const T& operator[]( int index ) const
-    {
-        return elements[ index ];
-    }
+    const T& operator[]( int index ) const { return elements[ index ]; }
     
     void Add( const T& item )
     {

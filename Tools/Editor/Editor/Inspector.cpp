@@ -6,7 +6,7 @@
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "TransformComponent.hpp"
-#include <cstring>
+#include <string.h>
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -65,8 +65,8 @@ void DrawNuklear( int width, int height )
     void* vertices;
     void* elements;
     System::MapUIVertexBuffer( MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY, &vertices, &elements );
-    std::memset( vertices, 0, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
-    std::memset( elements, 0, MAX_ELEMENT_MEMORY * 3 * 2 );
+    memset( vertices, 0, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
+    memset( elements, 0, MAX_ELEMENT_MEMORY * 3 * 2 );
     
     nk_buffer vbuf, ebuf, uiCommands;
     nk_buffer_init_default( &uiCommands );
@@ -93,7 +93,6 @@ void DrawNuklear( int width, int height )
                         (int)(cmd->clip_rect.h),
                         cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
         offset += cmd->elem_count / 3;
-        System::Print("elem_count: %d\n", cmd->elem_count);
     }
 
     nk_clear( &ctx );

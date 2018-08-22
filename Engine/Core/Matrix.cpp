@@ -1,8 +1,6 @@
 #include "Matrix.hpp"
-#include <cstring>
-#include <cmath>
+#include <string.h>
 #include "Vec3.hpp"
-#include "System.hpp"
 
 #ifndef M_PI
 #    define M_PI 3.14159265358979f
@@ -20,10 +18,10 @@ const float biasDataColMajor[] =
 
     void CheckNaN( const Matrix44& matrix )
     {
-#if DEBUG
+#if AE3D_CHECK_FOR_NAN
         for (int i = 0; i < 16; ++i)
         {
-            if (!std::isfinite( matrix.m[ i ]))
+            if (!isfinite( matrix.m[ i ]))
             {
                 ae3d::System::Assert( false, "Matrix contains NaN or Inf" );
             }
@@ -108,9 +106,9 @@ void Matrix44::InverseTranspose( const float m[ 16 ], float* out )
     const float det = m[ 0 ] * out[ 0 ] + m[ 1 ] * out[ 1 ] + m[ 2 ] * out[ 2 ] + m[ 3 ] * out[ 3 ];
     const float acceptableDelta = 0.0001f;
     
-    if (std::fabs( det ) < acceptableDelta)
+    if (fabs( det ) < acceptableDelta)
     {
-        std::memcpy( out, &identity.m[ 0 ], sizeof( Matrix44 ) );
+        memcpy( out, &identity.m[ 0 ], sizeof( Matrix44 ) );
         return;
     }
     for (int i = 0; i < 16; ++i)
@@ -226,7 +224,7 @@ Matrix44::Matrix44( const float* data )
 
 void Matrix44::InitFrom( const float* data )
 {
-    std::memcpy( m, data, sizeof( m ) );
+    memcpy( m, data, sizeof( m ) );
 }
 
 void Matrix44::SetTranslation( const Vec3& translation )
@@ -238,7 +236,7 @@ void Matrix44::SetTranslation( const Vec3& translation )
 
 void Matrix44::MakeIdentity()
 {
-    std::memset( &m[ 0 ], 0, sizeof( m ) );
+    memset( &m[ 0 ], 0, sizeof( m ) );
 
     m[  0 ] = 1;
     m[  5 ] = 1;
@@ -249,7 +247,7 @@ void Matrix44::MakeIdentity()
 #if RENDERER_VULKAN
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
-    const float f = 1.0f / std::tan( (0.5f * fovDegrees) * (float)M_PI / 180.0f );
+    const float f = 1.0f / tan( (0.5f * fovDegrees) * (float)M_PI / 180.0f );
 
     const float proj[] =
     {
@@ -283,7 +281,7 @@ void Matrix44::MakeProjection( float left, float right, float bottom, float top,
 
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {
-    const float top = std::tan( fovDegrees * (static_cast< float >( M_PI ) / 360.0f) ) * nearDepth;
+    const float top = tan( fovDegrees * (static_cast< float >( M_PI ) / 360.0f) ) * nearDepth;
     const float bottom = -top;
     const float left = aspect * bottom;
     const float right = aspect * top;
@@ -344,12 +342,12 @@ void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 void Matrix44::MakeRotationXYZ( float xDeg, float yDeg, float zDeg )
 {
     const float deg2rad = static_cast< float >( M_PI ) / 180.0f;
-    const float sx = std::sin( xDeg * deg2rad );
-    const float sy = std::sin( yDeg * deg2rad );
-    const float sz = std::sin( zDeg * deg2rad );
-    const float cx = std::cos( xDeg * deg2rad );
-    const float cy = std::cos( yDeg * deg2rad );
-    const float cz = std::cos( zDeg * deg2rad );
+    const float sx = sin( xDeg * deg2rad );
+    const float sy = sin( yDeg * deg2rad );
+    const float sz = sin( zDeg * deg2rad );
+    const float cx = cos( xDeg * deg2rad );
+    const float cy = cos( yDeg * deg2rad );
+    const float cz = cos( zDeg * deg2rad );
 
     m[ 0 ] = cy * cz;
     m[ 1 ] = cz * sx * sy - cx * sz;

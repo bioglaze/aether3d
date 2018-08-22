@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#include <string.h>
 #include "Shader.hpp"
 #include "GfxDevice.hpp"
 #include "Texture2D.hpp"
@@ -12,6 +13,19 @@ namespace GfxDeviceGlobal
 {
     void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, ae3d::Anisotropy anisotropy );
     extern PerObjectUboStruct perObjectUboStruct;
+}
+
+int ae3d::Shader::GetUniformLocation( const char* name )
+{
+    for (int i = 0; i < uniformLocations.count; ++i)
+    {
+        if (strcmp( uniformLocations[ i ].uniformName, name ) == 0)
+        {
+            return uniformLocations[ i ].offset;
+        }
+    }
+    
+    return -1;
 }
 
 void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
@@ -56,18 +70,32 @@ void ae3d::Shader::Use()
 
 void ae3d::Shader::LoadUniforms( MTLRenderPipelineReflection* reflection )
 {
+    int count = 0;
+    
     for (MTLArgument *arg in reflection.vertexArguments)
     {
-        //if ([arg.name isEqualToString:@"uniforms_t"])
+        if (arg.bufferDataType == MTLDataTypeStruct)
         {
-            if (arg.bufferDataType == MTLDataTypeStruct)
+            for( MTLStructMember* reflectedUniform in arg.bufferStructType.members )
             {
-                for( MTLStructMember* reflectedUniform in arg.bufferStructType.members )
-                {
-                    System::Assert( reflectedUniform.offset + 16 * 4 < GfxDevice::UNIFORM_BUFFER_SIZE, "Uniform buffer is too small" );
-
-                    uniformLocations[ reflectedUniform.name.UTF8String ].i = (int)reflectedUniform.offset;
-                }
+                System::Assert( reflectedUniform.offset + 16 * 4 < GfxDevice::UNIFORM_BUFFER_SIZE, "Uniform buffer is too small" );
+                ++count;
+            }
+        }
+    }
+    
+    uniformLocations.Allocate( count );
+    count = 0;
+    
+    for (MTLArgument *arg in reflection.vertexArguments)
+    {
+        if (arg.bufferDataType == MTLDataTypeStruct)
+        {
+            for( MTLStructMember* reflectedUniform in arg.bufferStructType.members )
+            {
+                uniformLocations[ count ].offset = (int)reflectedUniform.offset;
+                strncpy( uniformLocations[ count ].uniformName, reflectedUniform.name.UTF8String, 128 );
+                ++count;
             }
         }
     }
@@ -75,27 +103,31 @@ void ae3d::Shader::LoadUniforms( MTLRenderPipelineReflection* reflection )
 
 void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
 {
-    if (uniformLocations.find( name ) == std::end( uniformLocations ))
+    const int offset = GetUniformLocation( name );
+    
+    if (offset == -1)
     {
         //System::Print( "SetMatrix: could not find %s\n", name );
         return;
     }
     
     id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
-    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniformLocations[ name ].i;
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + offset;
     memcpy( bufferPointer, matrix4x4, 16 * 4 );
 }
 
 void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, int count )
 {
-    if (uniformLocations.find( name ) == std::end( uniformLocations ))
+    const int offset = GetUniformLocation( name );
+
+    if (offset == -1)
     {
         //System::Print( "SetMatrixArray: could not find %s\n", name );
         return;
     }
     
     id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
-    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniformLocations[ name ].i;
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + offset;
     memcpy( bufferPointer, matrix4x4s, 16 * 4 * count );
 }
 
@@ -167,49 +199,57 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
 
 void ae3d::Shader::SetInt( const char* name, int value )
 {
-    if (uniformLocations.find( name ) == std::end( uniformLocations ))
+    const int offset = GetUniformLocation( name );
+
+    if (offset == -1)
     {
         return;
     }
 
     id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
-    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniformLocations[ name ].i;
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + offset;
     memcpy( bufferPointer, &value, 4 );
 }
 
 void ae3d::Shader::SetFloat( const char* name, float value )
 {
-    if (uniformLocations.find( name ) == std::end( uniformLocations ))
+    const int offset = GetUniformLocation( name );
+
+    if (offset == -1)
     {
         return;
     }
     
     id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
-    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniformLocations[ name ].i;
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + offset;
     memcpy( bufferPointer, &value, 4 );
 }
 
 void ae3d::Shader::SetVector3( const char* name, const float* vec3 )
 {
-    if (uniformLocations.find( name ) == std::end( uniformLocations ))
+    const int offset = GetUniformLocation( name );
+
+    if (offset == -1)
     {
         return;
     }
     
     id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
-    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniformLocations[ name ].i;
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + offset;
     memcpy( bufferPointer, vec3, 3 * 4 );
 }
 
 void ae3d::Shader::SetVector4( const char* name, const float* vec4 )
 {
-    if (uniformLocations.find( name ) == std::end( uniformLocations ))
+    const int offset = GetUniformLocation( name );
+
+    if (offset == -1)
     {
         return;
     }
     
     id<MTLBuffer> uniformBuffer = GfxDevice::GetCurrentUniformBuffer();
-    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + uniformLocations[ name ].i;
+    uint8_t* bufferPointer = (uint8_t *)[uniformBuffer contents] + offset;
     memcpy( bufferPointer, vec4, 4 * 4 );
 }
 

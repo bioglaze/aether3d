@@ -6,8 +6,7 @@
 #include "TransformComponent.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
-#include <cmath>
-#include <memory>
+#include <math.h>
 #include <string>
 #include <vector>
 
@@ -21,8 +20,8 @@ void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screen
     const float fov = camera.GetComponent< CameraComponent >()->GetFovDegrees() * (3.1415926535f / 180.0f);
 
     // Normalizes screen coordinates and scales them to the FOV.
-    const float dx = std::tan( fov * 0.5f ) * (screenX / halfWidth - 1.0f) / aspect;
-    const float dy = std::tan( fov * 0.5f ) * (screenY / halfHeight - 1.0f);
+    const float dx = tan( fov * 0.5f ) * (screenX / halfWidth - 1.0f) / aspect;
+    const float dy = tan( fov * 0.5f ) * (screenY / halfHeight - 1.0f);
 
     Matrix44 view;
     camera.GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
@@ -66,7 +65,7 @@ float Min2( float a, float b )
 
 bool AlmostEquals( float f, float v )
 {
-    return std::abs( f - v ) < 0.0001f;
+    return abs( f - v ) < 0.0001f;
 }
 
 float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min, const Vec3& max )
@@ -99,9 +98,9 @@ float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min,
     return tmin;
 }
 
-float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const std::vector< Vec3 >& vertices )
+float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const Vec3* vertices, int vertexCount )
 {
-    for (std::size_t ve = 0; ve < vertices.size() / 3; ve += 3)
+    for (int ve = 0; ve < vertexCount / 3; ve += 3)
     {
         const Vec3& v0 = vertices[ ve * 3 + 0 ];
         const Vec3& v1 = vertices[ ve * 3 + 1 ];
@@ -186,7 +185,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
 
                 std::vector< Vec3 > triangles = meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex );
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
-                                                                                   : IntersectRayTriangles( rayOrigin, rayTarget, triangles );
+                                                                                   : IntersectRayTriangles( rayOrigin, rayTarget, triangles.data(), (int)triangles.size() );
 
                 System::Print("distance to submesh %d: %f. rayOrigin: %.2f, %.2f, %.2f, rayTarget: %.2f, %.2f, %.2f\n", subMeshIndex, subMeshDistance, rayOrigin.x, rayOrigin.y, rayOrigin.z, rayTarget.x, rayTarget.y, rayTarget.z);
                 if (0 < subMeshDistance && subMeshDistance < collisionInfo.meshDistance)

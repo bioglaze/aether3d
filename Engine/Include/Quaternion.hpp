@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cmath>
+#include <math.h>
 #include "Vec3.hpp"
 #include "Matrix.hpp"
 
@@ -67,10 +67,10 @@ namespace ae3d
         {
             const float acceptableDelta = 0.00001f;
 
-            return std::fabs(x - q.x) < acceptableDelta &&
-                   std::fabs(y - q.y) < acceptableDelta &&
-                   std::fabs(z - q.z) < acceptableDelta &&
-                   std::fabs(w - q.w) < acceptableDelta;
+            return fabs(x - q.x) < acceptableDelta &&
+                   fabs(y - q.y) < acceptableDelta &&
+                   fabs(z - q.z) < acceptableDelta &&
+                   fabs(w - q.w) < acceptableDelta;
         }
         
         /**
@@ -113,7 +113,7 @@ namespace ae3d
             flattened = flattened.Normalized();
             
             // get angle between original vector and projected transform to get angle around normal
-            return std::acos( Vec3::Dot( orthonormal1, flattened ) );
+            return acos( Vec3::Dot( orthonormal1, flattened ) );
         }
         
         /**
@@ -122,9 +122,9 @@ namespace ae3d
          */
         void GetAxisAngle( Vec3& outAxis, float& outAngleRad ) const
         {
-            const float scale = std::sqrt( x * x + y * y + z * z );
+            const float scale = sqrt( x * x + y * y + z * z );
             
-            if (std::fabs( scale ) < 0.00001f)
+            if (fabs( scale ) < 0.00001f)
             {
                 outAxis = Vec3( 0, 0, 0 );
             }
@@ -135,7 +135,7 @@ namespace ae3d
                 outAxis.z = z / scale;
             }
             
-            outAngleRad = std::acos( w ) * 2;
+            outAngleRad = acos( w ) * 2;
         }
         
         /// \param euler Euler angles in degrees.
@@ -164,12 +164,12 @@ namespace ae3d
             
             angleRad *= 0.5f;
             
-            const float sinAngle = std::sin( angleRad );
+            const float sinAngle = sin( angleRad );
             
             x = axis.x * sinAngle;
             y = axis.y * sinAngle;
             z = axis.z * sinAngle;
-            w = std::cos( angleRad );
+            w = cos( angleRad );
         }
         
         /**
@@ -215,7 +215,7 @@ namespace ae3d
                 }
             }
             
-            const float factor = 0.5f / std::sqrt( t );
+            const float factor = 0.5f / sqrt( t );
             x *= factor;
             y *= factor;
             z *= factor;
@@ -264,9 +264,9 @@ namespace ae3d
         Vec3 GetEuler() const
         {
             Vec3 out;
-            out.z = std::atan2( 2 * y * w - 2 * x * z, 1 - 2 * y * y - 2 * z * z );
-            out.y = std::asin( 2 * x * y + 2 * z * w );
-            out.x = std::atan2( 2 * x * w - 2 * y * z, 1 - 2 * x * x - 2 * z * z );
+            out.z = atan2( 2 * y * w - 2 * x * z, 1 - 2 * y * y - 2 * z * z );
+            out.y = asin( 2 * x * y + 2 * z * w );
+            out.x = atan2( 2 * x * w - 2 * y * z, 1 - 2 * x * x - 2 * z * z );
             return out / (3.14159265358979f / 180.0f);
         }
         
@@ -276,9 +276,9 @@ namespace ae3d
             const float mag2 = w * w + x * x + y * y + z * z;
             const float acceptableDelta = 0.00001f;
             
-            if (std::fabs( mag2 ) > acceptableDelta && std::fabs( mag2 - 1.0f ) > acceptableDelta)
+            if (fabs( mag2 ) > acceptableDelta && fabs( mag2 - 1.0f ) > acceptableDelta)
             {
-                const float oneOverMag = 1.0f / std::sqrt( mag2 );
+                const float oneOverMag = 1.0f / sqrt( mag2 );
                 
                 x *= oneOverMag;
                 y *= oneOverMag;
@@ -305,7 +305,7 @@ namespace ae3d
             Matrix44::TransformDirection( normal, orthoX, &ww );
             const float dot = Vec3::Dot( normal, ww );
             
-            if (std::fabs( dot ) > 0.6f)
+            if (fabs( dot ) > 0.6f)
             {
                 Matrix44 orthoY( 0, 90, 0 );
                 Matrix44::TransformDirection( normal, orthoY, &ww );

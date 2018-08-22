@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <string>
 #if RENDERER_METAL
 #import <Metal/Metal.h>
@@ -12,6 +11,7 @@
 #include <vulkan/vulkan.h>
 #include <cstdint>
 #endif
+#include "Array.hpp"
 
 namespace ae3d
 {
@@ -117,15 +117,17 @@ namespace ae3d
         /// Destroys all shaders. Called internally at exit.
         static void DestroyShaders();
 
-        /// Wraps an int that is defaulted to -1. Needed for uniform handling.
-        struct IntDefaultedToMinusOne
+    private:
+        struct UniformLocation
         {
+            char uniformName[ 128 ];
             /// -1 means unused/missing uniform.
-            int i = -1;
+            int offset = -1;
         };
 
-    private:
-        std::map<std::string, IntDefaultedToMinusOne > uniformLocations;
+        int GetUniformLocation( const char* name );
+        
+        Array< UniformLocation > uniformLocations;
         std::string vertexPath;
         std::string fragmentPath;
 
