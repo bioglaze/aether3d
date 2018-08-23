@@ -10,7 +10,7 @@ namespace
 {
     bool IsAlmost( float f1, float f2 )
     {
-        return std::abs( f1 - f2 ) < 0.0001f;
+        return fabsf( f1 - f2 ) < 0.0001f;
     }
 
     std::vector< ae3d::TransformComponent > transformComponents;

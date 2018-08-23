@@ -67,10 +67,10 @@ namespace ae3d
         {
             const float acceptableDelta = 0.00001f;
 
-            return fabs(x - q.x) < acceptableDelta &&
-                   fabs(y - q.y) < acceptableDelta &&
-                   fabs(z - q.z) < acceptableDelta &&
-                   fabs(w - q.w) < acceptableDelta;
+            return fabsf(x - q.x) < acceptableDelta &&
+                   fabsf(y - q.y) < acceptableDelta &&
+                   fabsf(z - q.z) < acceptableDelta &&
+                   fabsf(w - q.w) < acceptableDelta;
         }
         
         /**
@@ -124,7 +124,7 @@ namespace ae3d
         {
             const float scale = sqrtf( x * x + y * y + z * z );
             
-            if (fabs( scale ) < 0.00001f)
+            if (fabsf( scale ) < 0.00001f)
             {
                 outAxis = Vec3( 0, 0, 0 );
             }
@@ -305,7 +305,7 @@ namespace ae3d
             Matrix44::TransformDirection( normal, orthoX, &ww );
             const float dot = Vec3::Dot( normal, ww );
             
-            if (fabs( dot ) > 0.6f)
+            if (fabsf( dot ) > 0.6f)
             {
                 Matrix44 orthoY( 0, 90, 0 );
                 Matrix44::TransformDirection( normal, orthoY, &ww );

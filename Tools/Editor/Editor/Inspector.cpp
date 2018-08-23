@@ -77,7 +77,7 @@ void DrawNuklear( int width, int height )
     System::Assert( res == NK_CONVERT_SUCCESS, "buffer conversion failed!" );
     
 #if RENDERER_VULKAN
-    for (int i = 0; i < MAX_VERTEX_MEMORY / sizeof( VertexPTC ); ++i)
+    for (int i = 0; i < MAX_VERTEX_MEMORY / (int)sizeof( VertexPTC ); ++i)
     {
         VertexPTC* vert = &((VertexPTC*)vertices)[ i ];
         vert->position[ 1 ] = height - vert->position[ 1 ];
@@ -128,6 +128,26 @@ void Inspector::Init()
     nk_init_default( &ctx, &nkFont->handle );
 }
 
+void Inspector::BeginInput()
+{
+    nk_input_begin( &ctx );
+}
+
+void Inspector::EndInput()
+{
+    nk_input_end( &ctx );
+}
+
+void Inspector::HandleLeftMouseClick( int x, int y, int state )
+{
+    nk_input_button( &ctx, NK_BUTTON_LEFT, x, y, state );
+}
+
+void Inspector::HandleMouseMotion( int x, int y )
+{
+    nk_input_motion( &ctx, x, y );
+}
+
 void Inspector::Render( int width, int height )
 {
     if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
@@ -143,7 +163,7 @@ void Inspector::Render( int width, int height )
         AudioSourceComponent* audioSource = gameObject ? gameObject->GetComponent< AudioSourceComponent >() : nullptr;
         CameraComponent* camera = gameObject ? gameObject->GetComponent< CameraComponent >() : nullptr;
         
-        if (transform != nullptr)
+        if (gameObject != nullptr && transform != nullptr)
         {
             Vec3 pos = transform->GetLocalPosition();
             
@@ -152,19 +172,19 @@ void Inspector::Render( int width, int height )
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
         }
         
-        if (meshRenderer == nullptr && nk_button_label( &ctx, "add mesh renderer component" ))
+        if (gameObject != nullptr && meshRenderer == nullptr && nk_button_label( &ctx, "add mesh renderer component" ))
         {
             gameObject->AddComponent< MeshRendererComponent >();
             System::Print("Added a mesh renderer\n");
         }
 
-        if (audioSource == nullptr && nk_button_label( &ctx, "add audio source component" ))
+        if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "add audio source component" ))
         {
             gameObject->AddComponent< AudioSourceComponent >();
             System::Print("Added audiosource\n");
         }
 
-        if (camera == nullptr && nk_button_label( &ctx, "add camera component" ))
+        if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "add camera component" ))
         {
             gameObject->AddComponent< CameraComponent >();
             System::Print("Added camera\n");

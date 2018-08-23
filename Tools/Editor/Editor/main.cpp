@@ -41,7 +41,7 @@ int main()
         Window::PumpEvents();
         WindowEvent event;
 
-        //nk_input_begin( &ctx );
+        inspector.BeginInput();
 
         while (Window::PollEvent( event ))
         {
@@ -82,11 +82,15 @@ int main()
 #if _MSC_VER
 
 #else
-                    char path[ 1024 ];
+                    char path[ 1024 ] = {};
                     FILE* f = popen( "zenity --file-selection --title \"Load .scene file\"", "r" );
                     fgets( path, 1024, f );
-                    std::string pathStr( path );
-                    auto contents = FileSystem::FileContents( pathStr.c_str() );
+
+                    if (strlen( path ) > 0)
+                    {
+                        path[ strlen( path ) - 1 ] = 0;
+                    }
+                    auto contents = FileSystem::FileContents( path );
                     sceneView.LoadScene( contents );
 #endif
                 }
@@ -134,21 +138,22 @@ int main()
                 lastMouseX = x;
                 lastMouseY = y;
                 //std::cout << "mouse position: " << x << ", y: " << y << std::endl;
-                //nk_input_motion( &ctx, (int)x, (int)y );
+                inspector.HandleMouseMotion( x, y );
             }
 
             if (event.type == WindowEventType::Mouse1Down)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
-                //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 1 );
+                inspector.HandleLeftMouseClick( x, y, 1 );
             }
 
             if (event.type == WindowEventType::Mouse1Up)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
-                //nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 0 );
+                inspector.HandleLeftMouseClick( x, y, 0 );
+
                 ae3d::GameObject* go = sceneView.SelectObject( x, y, width, height );
                 if (go)
                 {
@@ -191,7 +196,7 @@ int main()
             //nk_input_button( &ctx, NK_BUTTON_RIGHT, (int)x, (int)y, (event.type == WindowEventType::Mouse2Down) ? 1 : 0 );
         }
 
-        //nk_input_end( &ctx );
+        inspector.EndInput();
 
         if (isRightMouseDown)
         {
