@@ -112,7 +112,7 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     outFramebufferDesc.width = width;
     outFramebufferDesc.height = height;
 
-    VkImageCreateInfo imageCreateInfo;
+    VkImageCreateInfo imageCreateInfo = {};
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageCreateInfo.pNext = nullptr;
     imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -121,6 +121,8 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     imageCreateInfo.extent.depth = 1;
     imageCreateInfo.mipLevels = 1;
     imageCreateInfo.arrayLayers = 1;
+    imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -220,8 +222,8 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
 
     // Renderpass
     //const std::uint32_t totalAttachments = 2;
-    VkAttachmentDescription attachmentDescs[ 2 ];
-    VkAttachmentReference attachmentReferences[ 2 ];
+    VkAttachmentDescription attachmentDescs[ 2 ] = {};
+    VkAttachmentReference attachmentReferences[ 2 ] = {};
     attachmentReferences[ 0 ].attachment = 0;
     attachmentReferences[ 0 ].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     attachmentReferences[ 1 ].attachment = 1;
@@ -277,7 +279,7 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     }
 
     VkImageView attachments[ 2 ] = { outFramebufferDesc.imageView, outFramebufferDesc.depthStencilImageView };
-    VkFramebufferCreateInfo framebufferCreateInfo;
+    VkFramebufferCreateInfo framebufferCreateInfo = {};
     framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     framebufferCreateInfo.pNext = nullptr;
     framebufferCreateInfo.renderPass = outFramebufferDesc.renderPass;
@@ -458,7 +460,7 @@ void SetupDescriptors()
     layoutBindings[ 2 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
     layoutBindings[ 2 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
+    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
     descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     descriptorSetLayoutCreateInfo.pNext = nullptr;
     descriptorSetLayoutCreateInfo.bindingCount = 3;
@@ -466,7 +468,7 @@ void SetupDescriptors()
     VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorSetLayoutCreateInfo, nullptr, &Global::descriptorSetLayout );
     AE3D_CHECK_VULKAN( err, "Unable to create descriptor set layout" );
 
-    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
+    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
     pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutCreateInfo.pNext = nullptr;
     pipelineLayoutCreateInfo.setLayoutCount = 1;

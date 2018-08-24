@@ -4,6 +4,7 @@
 namespace ae3d
 {
     struct Vec3;
+    class GameObject;
 
     namespace VR
     {
@@ -41,7 +42,7 @@ namespace ae3d
         /// \param camera Camera. Must contain TransformComponent and CameraComponent.
         /// \param yawDegrees Yaw in degrees.
         /// \param eye 0 for left eye, 1 for right.
-        void CalcCameraForEye( class GameObject& camera, float yawDegrees, int eye );
+        void CalcCameraForEye( GameObject& camera, float yawDegrees, int eye );
 
         /// Re-centers the sensor position and orientation.
         void RecenterTracking();

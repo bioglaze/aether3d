@@ -1,4 +1,7 @@
-#include <cstdio>
+#include <stdio.h>
+#if _MSC_VER
+#include <Windows.h>
+#endif
 #include "FileSystem.hpp"
 #include "Inspector.hpp"
 #include "SceneView.hpp"
@@ -15,6 +18,7 @@ int main()
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
     Window::SetTitle( "Aether3D Editor" );
+    Window::GetSize( width, height );
     System::LoadBuiltinAssets();
     
     bool quit = false;   
@@ -80,7 +84,25 @@ int main()
                 else if (keyCode == KeyCode::O)
                 {
 #if _MSC_VER
+                    OPENFILENAME ofn = {};
+                    TCHAR szFile[ 260 ] = {};
 
+                    ofn.lStructSize = sizeof( ofn );
+                    ofn.hwndOwner = GetActiveWindow();
+                    ofn.lpstrFile = szFile;
+                    ofn.nMaxFile = sizeof( szFile );
+                    ofn.lpstrFilter = "All\0*.*\0Scene\0*.SCENE\0";
+                    ofn.nFilterIndex = 1;
+                    ofn.lpstrFileTitle = nullptr;
+                    ofn.nMaxFileTitle = 0;
+                    ofn.lpstrInitialDir = nullptr;
+                    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+                    if (GetOpenFileName( &ofn ) == TRUE)
+                    {
+                        auto contents = FileSystem::FileContents( ofn.lpstrFile );
+                        sceneView.LoadScene( contents );
+                    }
 #else
                     char path[ 1024 ] = {};
                     FILE* f = popen( "zenity --file-selection --title \"Load .scene file\"", "r" );

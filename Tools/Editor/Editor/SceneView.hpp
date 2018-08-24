@@ -10,7 +10,6 @@
 namespace ae3d
 {
     struct Vec3;
-    class GameObject;
 
     namespace FileSystem
     {

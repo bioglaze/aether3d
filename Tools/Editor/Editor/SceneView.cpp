@@ -20,9 +20,9 @@ void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screen
     const float fov = camera.GetComponent< CameraComponent >()->GetFovDegrees() * (3.1415926535f / 180.0f);
 
     // Normalizes screen coordinates and scales them to the FOV.
-    const float dx = tan( fov * 0.5f ) * (screenX / halfWidth - 1.0f) / aspect;
-    const float dy = tan( fov * 0.5f ) * (screenY / halfHeight - 1.0f);
-
+    const float dx = tanf( fov * 0.5f ) * (screenX / halfWidth - 1.0f) / aspect;
+    const float dy = tanf( fov * 0.5f ) * (screenY / halfHeight - 1.0f);
+    
     Matrix44 view;
     camera.GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
