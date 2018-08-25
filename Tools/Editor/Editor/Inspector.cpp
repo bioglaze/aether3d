@@ -154,10 +154,15 @@ void Inspector::Render( int width, int height )
     {
         nk_layout_row_static( &ctx, 30, 150, 1 );
 
+        // Gameobject is selected.
+        
         const char* str = gameObject ? gameObject->GetName().c_str() : "object name";
 
-        nk_label( &ctx, str, NK_TEXT_LEFT );
-
+        if (gameObject != nullptr)
+        {
+            nk_label( &ctx, str, NK_TEXT_LEFT );
+        }
+        
         TransformComponent* transform = gameObject ? gameObject->GetComponent< TransformComponent >() : nullptr;
         MeshRendererComponent* meshRenderer = gameObject ? gameObject->GetComponent< MeshRendererComponent >() : nullptr;
         AudioSourceComponent* audioSource = gameObject ? gameObject->GetComponent< AudioSourceComponent >() : nullptr;
@@ -172,22 +177,39 @@ void Inspector::Render( int width, int height )
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
         }
         
-        if (gameObject != nullptr && meshRenderer == nullptr && nk_button_label( &ctx, "add mesh renderer component" ))
+        if (gameObject != nullptr && meshRenderer == nullptr && nk_button_label( &ctx, "add mesh renderer" ))
         {
             gameObject->AddComponent< MeshRendererComponent >();
             System::Print("Added a mesh renderer\n");
         }
 
-        if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "add audio source component" ))
+        if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "add audio source" ))
         {
             gameObject->AddComponent< AudioSourceComponent >();
             System::Print("Added audiosource\n");
         }
 
-        if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "add camera component" ))
+        if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "add camera" ))
         {
             gameObject->AddComponent< CameraComponent >();
             System::Print("Added camera\n");
+        }
+
+        // Gameobject is not selected.
+        
+        if (gameObject == nullptr && nk_button_label( &ctx, "add game object" ))
+        {
+            System::Print("Added game object (TODO)\n");
+        }
+
+        if (gameObject == nullptr && nk_button_label( &ctx, "open scene" ))
+        {
+            System::Print("Opened scene (TODO)\n");
+        }
+
+        if (gameObject == nullptr && nk_button_label( &ctx, "save scene" ))
+        {
+            System::Print("Opened scene (TODO)\n");
         }
 
         DrawNuklear( width, height );

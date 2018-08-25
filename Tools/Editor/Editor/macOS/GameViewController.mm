@@ -2,22 +2,34 @@
 #import "Inspector.hpp"
 #import "System.hpp"
 #import "SceneView.hpp"
+#import "Vec3.hpp"
 
 NSViewController* myViewController;
 
 @implementation GameViewController
 {
     MTKView *_view;
-    SceneView sceneView;
+    SceneView* sceneView;
     Inspector inspector;
     ae3d::Vec3 moveDir;
 }
+
+struct InputEvent
+{
+    bool isActive;
+    int x, y;
+    int button;
+};
+
+InputEvent inputEvent;
 
 const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)viewDidLoad
 {
+    sceneView = nullptr;
+    
     [super viewDidLoad];
     
     _view = (MTKView *)self.view;
@@ -32,8 +44,13 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     ae3d::System::InitMetal( _view.device, _view, (int)_view.sampleCount, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
     
-    sceneView.Init( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
+    svInit( &sceneView, self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
     inspector.Init();
+}
+
+- (BOOL)acceptsFirstResponder
+{
+    return YES;
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -100,33 +117,54 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 - (void)mouseDown:(NSEvent *)theEvent
 {
     NSLog(@"mouseDown");
+    inputEvent.button = 1;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    ae3d::GameObject* go = sceneView.SelectObject( (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+    ae3d::GameObject* go = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
     inspector.SetGameObject( go );
+    
+    inputEvent.button = 0;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-    sceneView.RotateCamera( -float( theEvent.deltaX ) / 20, -float( theEvent.deltaY ) / 20 );
+    svRotateCamera( sceneView, -float( theEvent.deltaX ) / 20, -float( theEvent.deltaY ) / 20 );
 }
 
 - (void)_render
 {
-    sceneView.MoveCamera( moveDir );
-
-    const int width = self.view.bounds.size.width;
-    const int height = self.view.bounds.size.height;
+    inspector.BeginInput();
     
-    if (_view.currentRenderPassDescriptor != nil)
+    if (inputEvent.button == 1 && inputEvent.isActive)
     {
+        inspector.HandleLeftMouseClick( inputEvent.x, inputEvent.y, 1 );
+        inspector.HandleMouseMotion( inputEvent.x, inputEvent.y );
+    }
+    inputEvent.isActive = false;
+    inputEvent.x = 0;
+    inputEvent.y = 0;
+    inputEvent.button = -1;
+    inspector.EndInput();
+    
+    if (_view.currentRenderPassDescriptor != nil && sceneView != nullptr)
+    {
+        const int width = self.view.bounds.size.width;
+        const int height = self.view.bounds.size.height;
+
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
-        sceneView.BeginRender();
+        svMoveCamera( sceneView, moveDir );
+        svBeginRender( sceneView );
         inspector.Render( width, height );
-        sceneView.EndRender();
+        svEndRender( sceneView );
         ae3d::System::EndFrame();
     }
 }
@@ -138,11 +176,12 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     }
 }
 
-- (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {
-
+- (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
+{
 }
 
-- (void)encodeWithCoder:(nonnull NSCoder *)aCoder {
+- (void)encodeWithCoder:(nonnull NSCoder *)aCoder
+{
 }
 
 @end

@@ -2,6 +2,7 @@
 #include <map>
 #import "GameViewController.h"
 
+#import "Aether3D_iOS/Array.hpp"
 #import "Aether3D_iOS/CameraComponent.hpp"
 #import "Aether3D_iOS/DirectionalLightComponent.hpp"
 #import "Aether3D_iOS/GameObject.hpp"
@@ -88,7 +89,7 @@ int gTouchCount = 0;
     std::vector< ae3d::GameObject > sponzaGameObjects;
     std::map< std::string, ae3d::Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, ae3d::Texture2D* > sponzaTextureNameToTexture;
-    std::vector< ae3d::Mesh* > sponzaMeshes;
+    Array< ae3d::Mesh* > sponzaMeshes;
     int touchBeginX;
     int touchBeginY;
 }

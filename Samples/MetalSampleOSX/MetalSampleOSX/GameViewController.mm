@@ -6,9 +6,10 @@
 #import <MetalKit/MetalKit.h>
 #include <vector>
 #include <map>
-#include <cmath>
+#include <math.h>
 #include <cstdint>
 
+#import "Array.hpp"
 #import "CameraComponent.hpp"
 #import "DirectionalLightComponent.hpp"
 #import "Font.hpp"
@@ -109,8 +110,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     
     NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
-    config.vertex_size = sizeof( struct VertexPTC );
-    config.vertex_alignment = NK_ALIGNOF( struct VertexPTC );
+    config.vertex_size = sizeof( VertexPTC );
+    config.vertex_alignment = NK_ALIGNOF( VertexPTC );
     config.null = nullTexture;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;
@@ -160,11 +161,11 @@ int CreateConeLines()
     
     for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
-        const float x = std::cos( angleDeg * 3.14159f / 180.0f );
-        const float y = std::sin( angleDeg * 3.14159f / 180.0f );
+        const float x = cosf( angleDeg * 3.14159f / 180.0f );
+        const float y = sinf( angleDeg * 3.14159f / 180.0f );
         
-        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f );
-        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float x2 = cosf( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float y2 = sinf( (angleDeg + angleStep) * 3.14159f / 180.0f );
         
         lines.push_back( ae3d::Vec3( x, y, 0 ) );
         lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
@@ -172,11 +173,11 @@ int CreateConeLines()
     
     for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
-        const float x = std::cos( angleDeg * 3.14159f / 180.0f ) * 2;
-        const float y = std::sin( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float x = cosf( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = sinf( angleDeg * 3.14159f / 180.0f ) * 2;
         
-        const float x2 = std::cos( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
-        const float y2 = std::sin( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+        const float x2 = cosf( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+        const float y2 = sinf( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
         
         lines.push_back( ae3d::Vec3( x, y, 1 ) );
         lines.push_back( ae3d::Vec3( x2, y2, 1 ) );
@@ -184,11 +185,11 @@ int CreateConeLines()
     
     for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
-        const float x = std::cos( angleDeg * 3.14159f / 180.0f ) * 2;
-        const float y = std::sin( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float x = cosf( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = sinf( angleDeg * 3.14159f / 180.0f ) * 2;
         
-        const float x2 = std::cos( (angleDeg) * 3.14159f / 180.0f );
-        const float y2 = std::sin( (angleDeg) * 3.14159f / 180.0f );
+        const float x2 = cosf( (angleDeg) * 3.14159f / 180.0f );
+        const float y2 = sinf( (angleDeg) * 3.14159f / 180.0f );
         
         lines.push_back( ae3d::Vec3( x, y, 1 ) );
         lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
@@ -274,7 +275,7 @@ using namespace ae3d;
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
-    std::vector< Mesh* > sponzaMeshes;
+    Array< Mesh* > sponzaMeshes;
     Vec3 moveDir;
     
     Matrix44 lineView;
@@ -316,7 +317,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -948,7 +949,7 @@ using namespace ae3d;
         text.GetComponent<ae3d::TextRendererComponent>()->SetText( "this is a long string. this is a long string" );
     }
 
-    //pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -8, 0, -85 + std::sin( angle / 2 ) * 2 ) );
+    //pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -8, 0, -85 + sinf( angle / 2 ) * 2 ) );
     //pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 11, 0, -85 ) );
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9.8f, 0, -85 ) );
     

@@ -1,9 +1,15 @@
 #include "SceneView.hpp"
+#include "Array.hpp"
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
+#include "Material.hpp"
+#include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
+#include "Texture2D.hpp"
 #include "TransformComponent.hpp"
+#include "Scene.hpp"
+#include "Shader.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
 #include <math.h>
@@ -11,6 +17,42 @@
 #include <vector>
 
 using namespace ae3d;
+
+struct TransformGizmo
+{
+    void Init( Shader* shader, GameObject& go );
+    
+    Mesh mesh;
+    
+    Mesh translateMesh;
+    Material xAxisMaterial;
+    Material yAxisMaterial;
+    Material zAxisMaterial;
+};
+
+struct SceneView
+{
+    /*void Init( int width, int height );
+     void BeginRender();
+     void EndRender();
+     void LoadScene( const ae3d::FileSystem::FileContentsData& contents );
+     void RotateCamera( float xDegrees, float yDegrees );
+     void MoveCamera( const ae3d::Vec3& moveDir );
+     void MoveSelection( const ae3d::Vec3& moveDir );
+     ae3d::GameObject* SelectObject( int screenX, int screenY, int width, int height );*/
+    
+    Array< GameObject* > gameObjects;
+    Array< GameObject* > selectedGameObjects;
+    GameObject camera;
+    Scene scene;
+    Shader unlitShader;
+    TransformGizmo transformGizmo;
+    
+    // TODO: Test content, remove when stuff works.
+    Texture2D gliderTex;
+    Material material;
+    Mesh cubeMesh;
+};
 
 void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screenHeight, GameObject& camera, Vec3& outRayOrigin, Vec3& outRayTarget )
 {
@@ -187,7 +229,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
                                                                                    : IntersectRayTriangles( rayOrigin, rayTarget, triangles.data(), (int)triangles.size() );
 
-                System::Print("distance to submesh %d: %f. rayOrigin: %.2f, %.2f, %.2f, rayTarget: %.2f, %.2f, %.2f\n", subMeshIndex, subMeshDistance, rayOrigin.x, rayOrigin.y, rayOrigin.z, rayTarget.x, rayTarget.y, rayTarget.z);
+                //System::Print("distance to submesh %d: %f. rayOrigin: %.2f, %.2f, %.2f, rayTarget: %.2f, %.2f, %.2f\n", subMeshIndex, subMeshDistance, rayOrigin.x, rayOrigin.y, rayOrigin.z, rayTarget.x, rayTarget.y, rayTarget.z);
                 if (0 < subMeshDistance && subMeshDistance < collisionInfo.meshDistance)
                 {
                     collisionInfo.subMeshIndex = subMeshIndex;
@@ -203,82 +245,84 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
     //std::sort( std::begin( outColliders ), std::end( outColliders ), sortFunction );
 }
 
-void SceneView::Init( int width, int height )
+void svInit( SceneView** sv, int width, int height )
 {
-    camera.AddComponent< CameraComponent >();
-    camera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
-    camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
-    camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
-    camera.AddComponent< TransformComponent >();
-    camera.GetComponent< TransformComponent >()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
+    *sv = new SceneView();
+    
+    (*sv)->camera.AddComponent< CameraComponent >();
+    (*sv)->camera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+    (*sv)->camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    (*sv)->camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
+    (*sv)->camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+    (*sv)->camera.AddComponent< TransformComponent >();
+    (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
 
-    scene.Add( &camera );
+    (*sv)->scene.Add( &(*sv)->camera );
 
-    unlitShader.Load( "unlit_vertex", "unlit_fragment",
+    (*sv)->unlitShader.Load( "unlit_vertex", "unlit_fragment",
                       FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                       FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
-    gameObjects.Add( new GameObject() );
-    transformGizmo.Init( &unlitShader, *gameObjects[ 0 ] );
+    (*sv)->gameObjects.Add( new GameObject() );
+    (*sv)->transformGizmo.Init( &(*sv)->unlitShader, *(*sv)->gameObjects[ 0 ] );
 
     // Test content
     
-    gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
-    material.SetShader( &unlitShader );
-    material.SetTexture( &gliderTex, 0 );
-    material.SetBackFaceCulling( true );
+    (*sv)->material.SetShader( &(*sv)->unlitShader );
+    (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
+    (*sv)->material.SetBackFaceCulling( true );
 
-    cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
+    (*sv)->cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
-    gameObjects.Add( new GameObject() );
-    gameObjects[ 1 ]->AddComponent< MeshRendererComponent >();
-    gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    gameObjects[ 1 ]->AddComponent< TransformComponent >();
-    gameObjects[ 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
-    gameObjects[ 1 ]->SetName( "cube" );
-    scene.Add( gameObjects[ 1 ] );
+    (*sv)->gameObjects.Add( new GameObject() );
+    (*sv)->gameObjects[ 1 ]->AddComponent< MeshRendererComponent >();
+    (*sv)->gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( &(*sv)->cubeMesh );
+    (*sv)->gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( &(*sv)->material, 0 );
+    (*sv)->gameObjects[ 1 ]->AddComponent< TransformComponent >();
+    (*sv)->gameObjects[ 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
+    (*sv)->gameObjects[ 1 ]->SetName( "cube" );
+    (*sv)->scene.Add( (*sv)->gameObjects[ 1 ] );
 
     // Test code
-    transformGizmo.xAxisMaterial.SetTexture( &gliderTex, 0 );
-    transformGizmo.yAxisMaterial.SetTexture( &gliderTex, 0 );
-    transformGizmo.zAxisMaterial.SetTexture( &gliderTex, 0 );
+    (*sv)->transformGizmo.xAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
+    (*sv)->transformGizmo.yAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
+    (*sv)->transformGizmo.zAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
 }
 
-void SceneView::MoveCamera( const Vec3& moveDir )
+void svMoveCamera( SceneView* sv, const Vec3& moveDir )
 {
-    camera.GetComponent< TransformComponent >()->MoveUp( moveDir.y );
-    camera.GetComponent< TransformComponent >()->MoveForward( moveDir.z );
-    camera.GetComponent< TransformComponent >()->MoveRight( moveDir.x );
+    sv->camera.GetComponent< TransformComponent >()->MoveUp( moveDir.y );
+    sv->camera.GetComponent< TransformComponent >()->MoveForward( moveDir.z );
+    sv->camera.GetComponent< TransformComponent >()->MoveRight( moveDir.x );
 }
 
-void SceneView::MoveSelection( const Vec3& moveDir )
+void svMoveSelection( SceneView* sv, const Vec3& moveDir )
 {
-    if (selectedGameObjects.count > 0 && selectedGameObjects[ 0 ]->GetComponent< TransformComponent >() != nullptr)
+    if (sv->selectedGameObjects.count > 0 && sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >() != nullptr)
     {
-        selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( selectedGameObjects[ 0 ]->GetComponent<TransformComponent>()->GetLocalPosition() + moveDir );
+        sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( sv->selectedGameObjects[ 0 ]->GetComponent<TransformComponent>()->GetLocalPosition() + moveDir );
     }
 }
 
-void SceneView::BeginRender()
+void svBeginRender( SceneView* sv )
 {
-    scene.Render();
+    sv->scene.Render();
 }
 
-void SceneView::EndRender()
+void svEndRender( SceneView* sv )
 {
-    scene.EndFrame();
+    sv->scene.EndFrame();
 }
 
-void SceneView::LoadScene( const ae3d::FileSystem::FileContentsData& contents )
+void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& contents )
 {
     std::vector< ae3d::GameObject > gos;
     std::map< std::string, class Texture2D* > texture2Ds;
     std::map< std::string, class Material* > materials;
-    std::vector< class Mesh* > meshes;
-    Scene::DeserializeResult result = scene.Deserialize( contents, gos, texture2Ds, materials, meshes );
+    Array< class Mesh* > meshes;
+    Scene::DeserializeResult result = sv->scene.Deserialize( contents, gos, texture2Ds, materials, meshes );
 
     if (result == Scene::DeserializeResult::ParseError)
     {
@@ -296,31 +340,31 @@ void SceneView::LoadScene( const ae3d::FileSystem::FileContentsData& contents )
       }*/
 }
 
-GameObject* SceneView::SelectObject( int screenX, int screenY, int width, int height )
+GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, int height )
 {
     Array< CollisionInfo > ci;
-    GetColliders( camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles, ci );
+    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
 
     if (ci.count > 0)
     {
-        scene.Add( gameObjects[ 0 ] );
-        gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );
-        System::Print( "collided with submesh: %d\n", ci[ 0 ].subMeshIndex );
+        sv->scene.Add( sv->gameObjects[ 0 ] );
+        sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );
+        //System::Print( "collided with submesh: %d\n", ci[ 0 ].subMeshIndex );
 
-        selectedGameObjects.Add( ci[ 0 ].go );
+        sv->selectedGameObjects.Add( ci[ 0 ].go );
         
         return ci[ 0 ].go;
     }
 
-    selectedGameObjects.Allocate( 0 );
-    scene.Remove( gameObjects[ 0 ] );
+    sv->selectedGameObjects.Allocate( 0 );
+    sv->scene.Remove( sv->gameObjects[ 0 ] );
     return nullptr;
 }
 
-void SceneView::RotateCamera( float xDegrees, float yDegrees )
+void svRotateCamera( SceneView* sv, float xDegrees, float yDegrees )
 {
-    camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), xDegrees );
-    camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), yDegrees );
+    sv->camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), xDegrees );
+    sv->camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), yDegrees );
 }
 
 void TransformGizmo::Init( Shader* shader, GameObject& go )
