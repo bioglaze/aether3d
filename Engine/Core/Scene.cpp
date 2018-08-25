@@ -957,7 +957,7 @@ std::string ae3d::Scene::GetSerialized() const
 ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects,
                                                         std::map< std::string, Texture2D* >& outTexture2Ds,
                                                         std::map< std::string, Material* >& outMaterials,
-                                                        std::vector< Mesh* >& outMeshes ) const
+                                                        Array< Mesh* >& outMeshes ) const
 {
     // TODO: It would be better to store the token strings into somewhere accessible to GetSerialized() to prevent typos etc.
 
@@ -1198,7 +1198,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< MeshRendererComponent >();
             
-            outMeshes.push_back( new Mesh() );
+            outMeshes.Add( new Mesh() );
         }
         else if (token == "spriterenderer")
         {
@@ -1252,8 +1252,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             std::string meshFile;
             lineStream >> meshFile;
 
-            outMeshes.back()->Load( FileSystem::FileContents( meshFile.c_str() ) );
-			meshRenderer->SetMesh( outMeshes.back() );
+            outMeshes[ outMeshes.count - 1 ]->Load( FileSystem::FileContents( meshFile.c_str() ) );
+			meshRenderer->SetMesh( outMeshes[ outMeshes.count - 1 ] );
 
             meshRenderer->SetMaterial( tempMaterial, 0 );
         }

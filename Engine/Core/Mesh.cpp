@@ -390,9 +390,15 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
                 is.read( (char*)&subMesh.joints[ j ].parentIndex, 4 );
                 int jointNameLength;
                 is.read( (char*)&jointNameLength, sizeof( int ) );
-                std::vector< char > jointName( jointNameLength + 1 );
-                is.read( &jointName[ 0 ], jointNameLength );
-                subMesh.joints[ j ].name = std::string( jointName.data(), jointName.size() - 1 );
+                
+                if (jointNameLength > 128)
+                {
+                    System::Print( "Mesh %s has a joint with too long name, max is 128.\n", meshData.path.c_str() );
+                    return LoadResult::Corrupted;
+                }
+
+                is.read( subMesh.joints[ j ].name, jointNameLength );
+                subMesh.joints[ j ].name[ jointNameLength ] = 0;
                 int animLength;
                 is.read( (char*)&animLength, sizeof( int ) );
                 subMesh.joints[ j ].animTransforms.resize( animLength );

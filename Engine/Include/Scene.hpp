@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "Array.hpp"
 #include "Vec3.hpp"
 
 namespace ae3d
@@ -47,7 +48,7 @@ namespace ae3d
         DeserializeResult Deserialize( const FileSystem::FileContentsData& serialized, std::vector< GameObject >& outGameObjects,
                                        std::map< std::string, class Texture2D* >& outTexture2Ds,
                                        std::map< std::string, class Material* >& outMaterials,
-                                       std::vector< class Mesh* >& outMeshes ) const;
+                                       Array< class Mesh* >& outMeshes ) const;
         
     private:
         void RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const char* debugGroupName );

@@ -1,5 +1,6 @@
 #include <string>
 #include <cstdint>
+#include "Array.hpp"
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
 #include "Font.hpp"
@@ -440,7 +441,7 @@ int main()
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
-    std::vector< Mesh* > sponzaMeshes;
+    Array< Mesh* > sponzaMeshes;
 #if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
@@ -848,9 +849,9 @@ int main()
         delete mat.second;
     }
     
-    for (auto& mesh : sponzaMeshes)
+    for (Mesh* *it = sponzaMeshes.elements; it != sponzaMeshes.elements + sponzaMeshes.count; ++it)
     {
-        delete mesh;
+        delete *it;
     }
     
     for (auto& t : sponzaTextureNameToTexture)

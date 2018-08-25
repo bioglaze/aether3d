@@ -12,7 +12,7 @@ namespace ae3d
         Matrix44 globalBindposeInverse;
         std::vector< Matrix44 > animTransforms;
         int parentIndex = -1;
-        std::string name;
+        char name[ 128 ];
     };
 
     struct SubMesh
