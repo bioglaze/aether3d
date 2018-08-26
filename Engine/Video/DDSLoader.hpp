@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include "Array.hpp"
 
 namespace ae3d
 {
@@ -20,8 +20,8 @@ namespace DDSLoader
 
     struct Output
     {
-        std::vector< unsigned char > imageData;
-        std::vector< std::size_t > dataOffsets; // Mipmap offsets in imageData
+        Array< unsigned char > imageData;
+        Array< int > dataOffsets; // Mipmap offsets in imageData
         Format format = Format::Invalid;
     };
  

@@ -364,7 +364,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
             stagingTexture.label = [NSString stringWithUTF8String:fileContents.path.c_str()];
         }
 
-        mipLevelCount = mipmaps == Mipmaps::Generate ? (int)output.dataOffsets.size() : 1;
+        mipLevelCount = mipmaps == Mipmaps::Generate ? output.dataOffsets.count : 1;
 
         for (int mipIndex = 0; mipIndex < mipLevelCount; ++mipIndex)
         {

@@ -17,6 +17,7 @@ float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 
 extern ae3d::Renderer renderer;
 
+constexpr int UboCount = 1400;
 id <MTLDevice> device;
 id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
@@ -79,7 +80,7 @@ namespace GfxDeviceGlobal
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     std::unordered_map< std::uint64_t, id <MTLRenderPipelineState> > psoCache;
     id<MTLSamplerState> samplerStates[ 5 ];
-    std::vector< id<MTLBuffer> > uniformBuffers;
+    id<MTLBuffer> uniformBuffers[ UboCount ];
     int currentUboIndex;
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
     ae3d::LightTiler lightTiler;
@@ -225,7 +226,7 @@ namespace
 
 id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
 {
-    GfxDeviceGlobal::currentUboIndex = (GfxDeviceGlobal::currentUboIndex + 1) % GfxDeviceGlobal::uniformBuffers.size();
+    GfxDeviceGlobal::currentUboIndex = (GfxDeviceGlobal::currentUboIndex + 1) % UboCount;
     return GfxDeviceGlobal::uniformBuffers[ GfxDeviceGlobal::currentUboIndex ];
 }
 
@@ -333,9 +334,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
     GfxDeviceGlobal::backBufferWidth = aView.bounds.size.width;
     GfxDeviceGlobal::backBufferHeight = aView.bounds.size.height;
     GfxDeviceGlobal::sampleCount = sampleCount;
-    GfxDeviceGlobal::uniformBuffers.resize( 1400 );
     
-    for (std::size_t uboIndex = 0; uboIndex < GfxDeviceGlobal::uniformBuffers.size(); ++uboIndex)
+    for (std::size_t uboIndex = 0; uboIndex < UboCount; ++uboIndex)
     {
 #if !TARGET_OS_IPHONE
         GfxDeviceGlobal::uniformBuffers[ uboIndex ] = [GfxDevice::GetMetalDevice() newBufferWithLength:UNIFORM_BUFFER_SIZE options:MTLResourceStorageModeManaged];

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <type_traits>
-#include <vector>
+#include "Array.hpp"
 
 namespace ae3d
 {
@@ -53,8 +53,7 @@ namespace ae3d
         /// \return Axis-aligned bounding box maximum in local coordinates.
         const Vec3& GetSubMeshAABBMax( unsigned subMeshIndex ) const;
 
-        /// \return Submesh triangles
-        std::vector< Vec3 > GetSubMeshFlattenedTriangles( unsigned subMeshIndex ) const;
+        void GetSubMeshFlattenedTriangles( unsigned subMeshIndex, Array< Vec3 >& outTriangles ) const;
         
         /// \return Submesh count.
         unsigned GetSubMeshCount() const;

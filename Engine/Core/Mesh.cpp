@@ -163,22 +163,21 @@ ae3d::SubMesh* ae3d::Mesh::GetSubMeshes( int& outCount )
     return m().subMeshes.data();
 }
 
-std::vector< Vec3 > ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIndex ) const
+void ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIndex, Array< Vec3 >& outTriangles ) const
 {
     if (subMeshIndex >= m().subMeshes.size())
     {
         System::Print( "Invalid submesh index in GetSubMeshFlattenedTriangles\n" );
-        std::vector< Vec3 > outTriangles;
-        return outTriangles;
+        return;
     }
     
     auto& subMesh = m().subMeshes[ subMeshIndex ];
-    const std::size_t faceCount = subMesh.vertexBuffer.GetFaceCount();
-    std::vector< Vec3 > outTriangles( faceCount * 3 );
+    const int faceCount = subMesh.vertexBuffer.GetFaceCount();
+    outTriangles.Allocate( faceCount * 3 );
     
     if (!subMesh.verticesPTNTC.empty())
     {
-        for (std::size_t faceIndex = 0; faceIndex < faceCount / 3; ++faceIndex)
+        for (int faceIndex = 0; faceIndex < faceCount / 3; ++faceIndex)
         {
             const auto& face = subMesh.indices[ faceIndex ];
             outTriangles[ faceIndex * 3 + 0 ] = subMesh.verticesPTNTC.at( face.a ).position;
@@ -188,7 +187,7 @@ std::vector< Vec3 > ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIn
     }
     else if (!subMesh.verticesPTN.empty())
     {
-        for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex)
+        for (int faceIndex = 0; faceIndex < faceCount; ++faceIndex)
         {
             const auto& face = subMesh.indices[ faceIndex ];
             outTriangles[ faceIndex * 3 + 0 ] = subMesh.verticesPTN.at( face.a ).position;
@@ -200,8 +199,6 @@ std::vector< Vec3 > ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIn
     {
         System::Print("Empty vertex data in subMesh!\n");
     }
-    
-    return outTriangles;
 }
 
 unsigned ae3d::Mesh::GetSubMeshCount() const

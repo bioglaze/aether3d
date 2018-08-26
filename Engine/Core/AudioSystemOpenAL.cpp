@@ -1,6 +1,5 @@
 #include "AudioSystem.hpp"
 #include <sstream>
-#include <vector>
 #include <string>
 #include <cstdint>
 #if defined __APPLE__
@@ -12,6 +11,7 @@
 #endif
 #define STB_VORBIS_HEADER_ONLY
 #include "stb_vorbis.c"
+#include "Array.hpp"
 #include "System.hpp"
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
@@ -30,7 +30,7 @@ namespace AudioGlobal
 {
     ALCdevice* device = nullptr;
     ALCcontext* context = nullptr;
-    std::vector< ClipInfo > clips;
+    Array< ClipInfo > clips;
 }
 
 namespace
@@ -234,19 +234,19 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
 
 void AudioReload( const std::string& path )
 {
-    for (auto& clip : AudioGlobal::clips)
+    for (ClipInfo *it = AudioGlobal::clips.elements; it != AudioGlobal::clips.elements + AudioGlobal::clips.count; ++it)
     {
-        if (path == clip.path)
+        if (path == it->path)
         {
             const std::string extension = path.substr( path.length() - 3, path.length() );
             
             if (extension == "wav" || extension == "WAV")
             {
-                LoadWav( ae3d::FileSystem::FileContents( path.c_str() ), clip );
+                LoadWav( ae3d::FileSystem::FileContents( path.c_str() ), *it );
             }
             else if (extension == "ogg" || extension == "OGG")
             {
-                LoadOgg( ae3d::FileSystem::FileContents( path.c_str() ), clip );
+                LoadOgg( ae3d::FileSystem::FileContents( path.c_str() ), *it );
             }
             else
             {
@@ -273,11 +273,11 @@ void ae3d::AudioSystem::Init()
 
 void ae3d::AudioSystem::Deinit()
 {
-    for (const auto& it : AudioGlobal::clips)
+    for (ClipInfo *it = AudioGlobal::clips.elements; it != AudioGlobal::clips.elements + AudioGlobal::clips.count; ++it)
     {
-        alSourceStopv( 1, &it.srcID );
-        alDeleteSources( 1, &it.srcID );
-        alDeleteBuffers( 1, &it.bufID );
+        alSourceStopv( 1, &it->srcID );
+        alDeleteSources( 1, &it->srcID );
+        alDeleteBuffers( 1, &it->bufID );
     }
     
     alcMakeContextCurrent( nullptr );
@@ -296,7 +296,7 @@ void ae3d::AudioSystem::Deinit()
 unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData& clipData )
 {
     // Checks cache for an already loaded clip from the same path.
-    for (std::size_t i = 0; i < AudioGlobal::clips.size(); ++i)
+    for (int i = 0; i < AudioGlobal::clips.count; ++i)
     {
         if (AudioGlobal::clips[ i ].path == clipData.path)
         {
@@ -310,14 +310,14 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
         return 0;
     }
 
-    const unsigned clipId = static_cast< unsigned >( AudioGlobal::clips.size() );
+    const unsigned clipId = static_cast< unsigned >( AudioGlobal::clips.count );
 
     ClipInfo info;
     info.path = clipData.path;
     alGenBuffers( 1, &info.bufID );
     alGenSources( 1, &info.srcID );
 
-    AudioGlobal::clips.push_back( info );
+    AudioGlobal::clips.Add( info );
 
     const std::string extension = clipData.path.substr( clipData.path.length() - 3, clipData.path.length() );
     
@@ -346,12 +346,12 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
 
 float ae3d::AudioSystem::GetClipLengthForId( unsigned handle )
 {
-    return handle < AudioGlobal::clips.size() ? AudioGlobal::clips[ handle ].lengthInSeconds : 1;
+    return (int)handle < AudioGlobal::clips.count ? AudioGlobal::clips[ handle ].lengthInSeconds : 1;
 }
 
 void ae3d::AudioSystem::Play( unsigned clipId, bool isLooping )
 {
-    if (clipId >= AudioGlobal::clips.size())
+    if ((int)clipId >= AudioGlobal::clips.count)
     {
         return;
     }

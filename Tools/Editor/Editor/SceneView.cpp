@@ -216,9 +216,10 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
                 Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( subMeshIndex ), meshLocalToWorld, &subMeshMin );
                 Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( subMeshIndex ), meshLocalToWorld, &subMeshMax );
 
-                std::vector< Vec3 > triangles = meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex );
+                Array< Vec3 > triangles;
+                meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex, triangles );
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
-                                                                                   : IntersectRayTriangles( rayOrigin, rayTarget, triangles.data(), (int)triangles.size() );
+                                                                                   : IntersectRayTriangles( rayOrigin, rayTarget, triangles.elements, triangles.count );
 
                 //System::Print("distance to submesh %d: %f. rayOrigin: %.2f, %.2f, %.2f, rayTarget: %.2f, %.2f, %.2f\n", subMeshIndex, subMeshDistance, rayOrigin.x, rayOrigin.y, rayOrigin.z, rayTarget.x, rayTarget.y, rayTarget.z);
                 if (0 < subMeshDistance && subMeshDistance < collisionInfo.meshDistance)

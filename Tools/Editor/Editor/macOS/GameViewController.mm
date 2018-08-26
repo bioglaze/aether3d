@@ -12,6 +12,7 @@ NSViewController* myViewController;
     SceneView* sceneView;
     Inspector inspector;
     ae3d::Vec3 moveDir;
+    ae3d::GameObject* selectedGO;
 }
 
 struct InputEvent
@@ -29,6 +30,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 - (void)viewDidLoad
 {
     sceneView = nullptr;
+    selectedGO = nullptr;
     
     [super viewDidLoad];
     
@@ -125,8 +127,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    ae3d::GameObject* go = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
-    inspector.SetGameObject( go );
+    selectedGO = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
     
     inputEvent.button = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
@@ -159,11 +160,13 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         const int width = self.view.bounds.size.width;
         const int height = self.view.bounds.size.height;
 
+        Inspector::Command inspectorCommand;
+        
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         svMoveCamera( sceneView, moveDir );
         svBeginRender( sceneView );
-        inspector.Render( width, height );
+        inspector.Render( width, height, selectedGO, inspectorCommand );
         svEndRender( sceneView );
         ae3d::System::EndFrame();
     }

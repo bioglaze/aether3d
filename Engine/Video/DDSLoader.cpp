@@ -1,5 +1,5 @@
 #include "DDSLoader.hpp"
-#include <cstring>
+#include <string.h>
 #include <stdint.h>
 #include "System.hpp"
 #include "FileSystem.hpp"
@@ -298,12 +298,14 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
             return LoadResult::FileNotFound;
         }
 
-        output.imageData = fileContents.data;
-        output.dataOffsets.resize( mipMapCount );
+        output.imageData.Allocate( (int)fileContents.data.size() );
+        
+        memcpy( output.imageData.elements, fileContents.data.data(), output.imageData.count );
+        output.dataOffsets.Allocate( mipMapCount );
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            output.dataOffsets[ ix ] = fileOffset;
+            output.dataOffsets[ ix ] = (int)fileOffset;
 
             fileOffset += size;
             x = (x + 1) >> 1;
@@ -323,7 +325,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            output.dataOffsets[ ix ] = fileOffset;
+            output.dataOffsets[ ix ] = (int)fileOffset;
             fileOffset += size;
 
             x = (x + 1) >> 1;
@@ -337,7 +339,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
         for (int ix = 0; ix < mipMapCount; ++ix)
         {
-            output.dataOffsets[ ix ] = fileOffset;
+            output.dataOffsets[ ix ] = (int)fileOffset;
             fileOffset += size;
 
 			x = (x + 1)>>1;
