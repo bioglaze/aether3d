@@ -62,6 +62,9 @@
       <AdditionalLibraryDirectories>..\..\..\..\..\aether3d_build;..\..\..\..\Engine\ThirdParty\lib;%VULKAN_SDK%\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>Comdlg32.lib;libOpenAL32.dll.a;vulkan-1.lib;Aether3D_Vulkan_d.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

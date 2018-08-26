@@ -1,15 +1,13 @@
-#include <map>
-#include <iostream>
-#include <string>
+#include <string.h>
 #include "CameraComponent.hpp"
-#include "TransformComponent.hpp"
+#include "FileSystem.hpp"
 #include "GameObject.hpp"
 #include "Scene.hpp"
 #include "System.hpp"
-#include "FileSystem.hpp"
+#include "Texture2D.hpp"
+#include "TransformComponent.hpp"
 #include "Vec3.hpp"
 #include "Window.hpp"
-#include "Texture2D.hpp"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -30,22 +28,22 @@ struct VertexPTC
 };
 
 nk_draw_null_texture nullTexture;
-std::map< int, Texture2D* > uiTextures;
+Texture2D* uiTextures[ 1 ];
 
 void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
     struct nk_convert_config config;
     static const struct nk_draw_vertex_layout_element vertex_layout[] = {
-        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, position)},
-        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(struct VertexPTC, uv)},
-        {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF(struct VertexPTC, col)},
+        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(VertexPTC, position)},
+        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(VertexPTC, uv)},
+        {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF(VertexPTC, col)},
         {NK_VERTEX_LAYOUT_END}
     };
 
     NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
-    config.vertex_size = sizeof( struct VertexPTC );
-    config.vertex_alignment = NK_ALIGNOF( struct VertexPTC );
+    config.vertex_size = sizeof( VertexPTC );
+    config.vertex_alignment = NK_ALIGNOF( VertexPTC );
     config.null = nullTexture;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;
@@ -60,7 +58,9 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     void* vertices;
     void* elements;
     System::MapUIVertexBuffer( MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY, &vertices, &elements );
-    
+    memset( vertices, 0, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
+    memset( elements, 0, MAX_ELEMENT_MEMORY * 3 * 2 );
+
     nk_buffer vbuf, ebuf;
     nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY );
     nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
@@ -93,7 +93,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
 #endif
                         (int)(cmd->clip_rect.w),
                         (int)(cmd->clip_rect.h),
-                        cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
+                        cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
         offset += cmd->elem_count / 3;
     }
 
@@ -141,7 +141,7 @@ int main()
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
     
-    uiTextures[ nk_handle_id( nkFontTexture.GetID() ).id ] = &nkFontTexture;
+    uiTextures[ 0 /*nk_handle_id( nkFontTexture.GetID() ).id*/ ] = &nkFontTexture;
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
@@ -197,7 +197,6 @@ int main()
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
-                //std::cout << "mouse position: " << x << ", y: " << y << std::endl;
                 nk_input_motion( &ctx, (int)x, (int)y );
             }
 

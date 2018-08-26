@@ -148,18 +148,19 @@ void Inspector::HandleMouseMotion( int x, int y )
     nk_input_motion( &ctx, x, y );
 }
 
-void Inspector::Render( int width, int height )
+void Inspector::Render( int width, int height, GameObject* gameObject, Command& outCommand )
 {
+    outCommand = Command::Empty;
+
     if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
         nk_layout_row_static( &ctx, 30, 150, 1 );
 
         // Gameobject is selected.
-        
-        const char* str = gameObject ? gameObject->GetName().c_str() : "object name";
 
         if (gameObject != nullptr)
         {
+            const char* str = gameObject ? gameObject->GetName().c_str() : "object name";
             nk_label( &ctx, str, NK_TEXT_LEFT );
         }
         
@@ -200,16 +201,19 @@ void Inspector::Render( int width, int height )
         if (gameObject == nullptr && nk_button_label( &ctx, "add game object" ))
         {
             System::Print("Added game object (TODO)\n");
+            outCommand = Command::CreateGO;
         }
 
         if (gameObject == nullptr && nk_button_label( &ctx, "open scene" ))
         {
             System::Print("Opened scene (TODO)\n");
+            outCommand = Command::OpenScene;
         }
 
         if (gameObject == nullptr && nk_button_label( &ctx, "save scene" ))
         {
-            System::Print("Opened scene (TODO)\n");
+            System::Print("saved scene (TODO)\n");
+            outCommand = Command::SaveScene;
         }
 
         DrawNuklear( width, height );

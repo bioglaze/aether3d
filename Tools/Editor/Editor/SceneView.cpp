@@ -32,15 +32,6 @@ struct TransformGizmo
 
 struct SceneView
 {
-    /*void Init( int width, int height );
-     void BeginRender();
-     void EndRender();
-     void LoadScene( const ae3d::FileSystem::FileContentsData& contents );
-     void RotateCamera( float xDegrees, float yDegrees );
-     void MoveCamera( const ae3d::Vec3& moveDir );
-     void MoveSelection( const ae3d::Vec3& moveDir );
-     ae3d::GameObject* SelectObject( int screenX, int screenY, int width, int height );*/
-    
     Array< GameObject* > gameObjects;
     Array< GameObject* > selectedGameObjects;
     GameObject camera;

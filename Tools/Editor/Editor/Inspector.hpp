@@ -8,15 +8,13 @@ namespace ae3d
 class Inspector
 {
   public:
+    enum class Command { Empty, CreateGO, OpenScene, SaveScene };
+
     void Init();
     void BeginInput();
     void EndInput();
     void Deinit();
     void HandleLeftMouseClick( int x, int y, int state );
     void HandleMouseMotion( int x, int y );
-    void Render( int width, int height );
-    void SetGameObject( ae3d::GameObject* go ) { gameObject = go; }
-    
-private:
-    ae3d::GameObject* gameObject = nullptr;
+    void Render( int width, int height, ae3d::GameObject* gameObject, Command& outCommand );
 };
