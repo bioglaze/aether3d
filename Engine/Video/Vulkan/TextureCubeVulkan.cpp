@@ -253,7 +253,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 height = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
             }
 
-            mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );
+            mipLevelCount = ddsOutput.dataOffsets.count;
             int bytesPerPixel = 1;
 
             imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
@@ -274,7 +274,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 bytesPerPixel = 2;
             }
 
-            ae3d::System::Assert( ddsOutput.dataOffsets.size() > 0, "DDS reader error: dataoffsets is empty" );
+            ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
             imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
 

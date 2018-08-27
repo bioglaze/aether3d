@@ -221,9 +221,9 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
         err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory[ mipIndex ], 0, memReqs.size, 0, &stagingData );
         AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
         VkDeviceSize amountToCopy = imageSize;
-        if (mipChain.dataOffsets[ mipIndex ] + imageSize >= mipChain.imageData.size())
+        if (mipChain.dataOffsets[ mipIndex ] + imageSize >= mipChain.imageData.count)
         {
-            amountToCopy = mipChain.imageData.size() - mipChain.dataOffsets[ mipIndex ];
+            amountToCopy = mipChain.imageData.count - mipChain.dataOffsets[ mipIndex ];
         }
         
         std::memcpy( stagingData, &mipChain.imageData[ mipChain.dataOffsets[ mipIndex ] ], amountToCopy );
@@ -674,7 +674,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         height = GfxDeviceGlobal::properties.limits.maxImageDimension2D;
     }
 
-    mipLevelCount = mipmaps == Mipmaps::Generate ? (int)ddsOutput.dataOffsets.size() : 1;
+    mipLevelCount = mipmaps == Mipmaps::Generate ? (int)ddsOutput.dataOffsets.count : 1;
     int bytesPerPixel = 1;
 
     VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
@@ -695,7 +695,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         bytesPerPixel = 2;
     }
     
-    ae3d::System::Assert( ddsOutput.dataOffsets.size() > 0, "DDS reader error: dataoffsets is empty" );
+    ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
     CreateVulkanObjects( ddsOutput, bytesPerPixel, format );
 }

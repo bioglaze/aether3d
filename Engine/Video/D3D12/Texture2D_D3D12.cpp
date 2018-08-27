@@ -307,7 +307,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         return;
     }
 
-    mipLevelCount = static_cast< int >( ddsOutput.dataOffsets.size() );
+	mipLevelCount = ddsOutput.dataOffsets.count;
     int bytesPerPixel = 2;
 
     dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC1_UNORM : DXGI_FORMAT_BC1_UNORM_SRGB;
