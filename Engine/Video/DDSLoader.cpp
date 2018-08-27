@@ -195,7 +195,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         return LoadResult::FileNotFound;
     }
     
-    std::memcpy( &header, fileContents.data.data(), sizeof( header ) );
+    memcpy( &header, fileContents.data.data(), sizeof( header ) );
 
     ae3d::System::Assert( header.sHeader.dwMagic == DDS_MAGIC, "DDSLoader: Wrong magic" );
     ae3d::System::Assert( header.sHeader.dwSize == 124, "DDSLoader: Wrong header size" );
@@ -320,7 +320,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         size = header.sHeader.dwPitchOrLinearSize * ySize;
         ae3d::System::Assert( size == x * y * li->blockBytes, "DDSLoader: Invalid size" );
         unsigned palette[ 256 ];
-        std::memcpy( &palette[ 0 ], fileContents.data.data() + fileOffset, 4 * 256 );
+        memcpy( &palette[ 0 ], fileContents.data.data() + fileOffset, 4 * 256 );
         fileOffset += 4 * 256;
 
         for (int ix = 0; ix < mipMapCount; ++ix)
