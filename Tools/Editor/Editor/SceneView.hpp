@@ -14,6 +14,7 @@ namespace ae3d
 struct SceneView;
 
 void svInit( SceneView** sceneView, int width, int height );
+void svAddGameObject( SceneView* sceneView );
 void svBeginRender( SceneView* sceneView );
 void svEndRender( SceneView* sceneView );
 void svLoadScene( SceneView* sceneView, const ae3d::FileSystem::FileContentsData& contents );

@@ -298,6 +298,12 @@ void svMoveSelection( SceneView* sv, const Vec3& moveDir )
     }
 }
 
+void svAddGameObject( SceneView* sv )
+{
+    sv->gameObjects.Add( new GameObject() );
+    sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
+}
+
 void svBeginRender( SceneView* sv )
 {
     sv->scene.Render();

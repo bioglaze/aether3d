@@ -159,13 +159,10 @@ void Matrix44::Multiply( const Matrix44& a, const Matrix44& b, Matrix44& out )
 
 void ae3d::Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4* out )
 {
-    Vec4 tmp;
-    tmp.x = mat.m[0] * vec.x + mat.m[ 4 ] * vec.y + mat.m[ 8] * vec.z + mat.m[12] * vec.w;
-    tmp.y = mat.m[1] * vec.x + mat.m[ 5 ] * vec.y + mat.m[ 9] * vec.z + mat.m[13] * vec.w;
-    tmp.z = mat.m[2] * vec.x + mat.m[ 6 ] * vec.y + mat.m[10] * vec.z + mat.m[14] * vec.w;
-    tmp.w = mat.m[3] * vec.x + mat.m[ 7 ] * vec.y + mat.m[11] * vec.z + mat.m[15] * vec.w;
-    
-    *out = tmp;
+    out->x = mat.m[0] * vec.x + mat.m[ 4 ] * vec.y + mat.m[ 8] * vec.z + mat.m[12] * vec.w;
+    out->y = mat.m[1] * vec.x + mat.m[ 5 ] * vec.y + mat.m[ 9] * vec.z + mat.m[13] * vec.w;
+    out->z = mat.m[2] * vec.x + mat.m[ 6 ] * vec.y + mat.m[10] * vec.z + mat.m[14] * vec.w;
+    out->w = mat.m[3] * vec.x + mat.m[ 7 ] * vec.y + mat.m[11] * vec.z + mat.m[15] * vec.w;
     
 #if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
@@ -177,12 +174,9 @@ void ae3d::Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4*
 
 void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 {
-    Vec3 tmp;
-    tmp.x = mat.m[0] * vec.x + mat.m[ 4 ] * vec.y + mat.m[ 8] * vec.z + mat.m[12];
-    tmp.y = mat.m[1] * vec.x + mat.m[ 5 ] * vec.y + mat.m[ 9] * vec.z + mat.m[13];
-    tmp.z = mat.m[2] * vec.x + mat.m[ 6 ] * vec.y + mat.m[10] * vec.z + mat.m[14];
-
-    *out = tmp;
+    out->x = mat.m[0] * vec.x + mat.m[ 4 ] * vec.y + mat.m[ 8] * vec.z + mat.m[12];
+    out->y = mat.m[1] * vec.x + mat.m[ 5 ] * vec.y + mat.m[ 9] * vec.z + mat.m[13];
+    out->z = mat.m[2] * vec.x + mat.m[ 6 ] * vec.y + mat.m[10] * vec.z + mat.m[14];
     
 #if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
@@ -191,14 +185,10 @@ void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 
 void Matrix44::TransformDirection( const Vec3& dir, const Matrix44& mat, Vec3* out )
 {
-    Vec3 tmp;
+    out->x = mat.m[0] * dir.x + mat.m[ 4 ] * dir.y + mat.m[ 8] * dir.z;
+    out->y = mat.m[1] * dir.x + mat.m[ 5 ] * dir.y + mat.m[ 9] * dir.z;
+    out->z = mat.m[2] * dir.x + mat.m[ 6 ] * dir.y + mat.m[10] * dir.z;
 
-    tmp.x = mat.m[0] * dir.x + mat.m[ 4 ] * dir.y + mat.m[ 8] * dir.z;
-    tmp.y = mat.m[1] * dir.x + mat.m[ 5 ] * dir.y + mat.m[ 9] * dir.z;
-    tmp.z = mat.m[2] * dir.x + mat.m[ 6 ] * dir.y + mat.m[10] * dir.z;
-
-    *out = tmp;
-    
 #if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
 #endif

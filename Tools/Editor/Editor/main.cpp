@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #if _MSC_VER
 #include <Windows.h>
 #endif
@@ -184,7 +185,12 @@ int main()
         inspector.Render( width, height, selectedGO, inspectorCommand );
         svEndRender( sceneView );
 
-        if (inspectorCommand == Inspector::Command::OpenScene)
+        switch (inspectorCommand)
+        {
+        case Inspector::Command::CreateGO:
+            svAddGameObject( sceneView );
+            break;
+        case Inspector::Command::OpenScene:
         {
 #if _MSC_VER
             OPENFILENAME ofn = {};
@@ -216,10 +222,14 @@ int main()
                 path[ strlen( path ) - 1 ] = 0;
             }
             auto contents = FileSystem::FileContents( path );
-            sceneView.LoadScene( contents );
+            svLoadScene( sceneView, contents );
 #endif
         }
-
+        break;
+        default:
+            break;
+        }
+        
         Window::SwapBuffers();
     }
 

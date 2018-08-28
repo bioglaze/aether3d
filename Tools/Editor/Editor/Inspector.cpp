@@ -178,41 +178,47 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
         }
         
-        if (gameObject != nullptr && meshRenderer == nullptr && nk_button_label( &ctx, "add mesh renderer" ))
+        if (gameObject != nullptr && meshRenderer == nullptr && nk_button_label( &ctx, "Add mesh renderer" ))
         {
             gameObject->AddComponent< MeshRendererComponent >();
-            System::Print("Added a mesh renderer\n");
+        }
+        else if (gameObject != nullptr && meshRenderer != nullptr && nk_button_label( &ctx, "Remove mesh renderer" ))
+        {
+            gameObject->RemoveComponent< MeshRendererComponent >();
         }
 
-        if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "add audio source" ))
+        if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "Add audio source" ))
         {
             gameObject->AddComponent< AudioSourceComponent >();
-            System::Print("Added audiosource\n");
+        }
+        else if (gameObject != nullptr && audioSource != nullptr && nk_button_label( &ctx, "Remove audio source" ))
+        {
+            gameObject->RemoveComponent< AudioSourceComponent >();
         }
 
-        if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "add camera" ))
+        if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "Add camera" ))
         {
             gameObject->AddComponent< CameraComponent >();
-            System::Print("Added camera\n");
+        }
+        else if (gameObject != nullptr && camera != nullptr && nk_button_label( &ctx, "Remove camera" ))
+        {
+            gameObject->RemoveComponent< CameraComponent >();
         }
 
         // Gameobject is not selected.
         
         if (gameObject == nullptr && nk_button_label( &ctx, "add game object" ))
         {
-            System::Print("Added game object (TODO)\n");
             outCommand = Command::CreateGO;
         }
 
         if (gameObject == nullptr && nk_button_label( &ctx, "open scene" ))
         {
-            System::Print("Opened scene (TODO)\n");
             outCommand = Command::OpenScene;
         }
 
         if (gameObject == nullptr && nk_button_label( &ctx, "save scene" ))
         {
-            System::Print("saved scene (TODO)\n");
             outCommand = Command::SaveScene;
         }
 

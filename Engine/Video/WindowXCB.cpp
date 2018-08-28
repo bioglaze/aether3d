@@ -1,5 +1,4 @@
 #include "Window.hpp"
-#include <iostream>
 #include <map>
 #include <xcb/xcb_icccm.h>
 #include <xcb/xcb_keysyms.h>
@@ -8,12 +7,13 @@
 #include <X11/XF86keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
-#include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <linux/joystick.h>
 #include <dirent.h>
-#include <cstring>
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
 #include "GfxDevice.hpp"
 
 struct GamePad
@@ -133,7 +133,6 @@ namespace WindowGlobal
     };
 }
 
-// readdir( dir, &entry, &result ) && result
 void PlatformInitGamePad()
 {
     DIR* dir = opendir( "/dev/input" );
@@ -152,7 +151,6 @@ void PlatformInitGamePad()
             if (fd < 0)
             {
                 // Permissions could cause this code path.
-                //std::cerr << "Unable to open joystick file" << std::endl;
                 continue;
             }
 
@@ -171,7 +169,6 @@ void PlatformInitGamePad()
             ioctl( fd, JSIOCGAXES, &axes );
             uint8_t buttons;
             ioctl( fd, JSIOCGBUTTONS, &buttons );
-            //std::cout << "d_name: " << std::string( entry.d_name ) << ", name " << std::string( name ) << ", version " << version << ", axes " << axes << ", buttons " << buttons << std::endl; 
             WindowGlobal::gamePad.fd = fd;
             WindowGlobal::gamePad.isActive = true;
             // XBox One Controller values. Should also work for 360 Controller.
@@ -213,14 +210,11 @@ void LoadAtoms()
     WindowGlobal::wm_delete_window = wm_delete_window_cookie_reply->atom;
 }
 
-static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, int default_screen, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
+static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
     WindowGlobal::presentInterval = (flags & ae3d::WindowCreateFlags::No_vsync) ? 0 : 1;
 
-#if RENDERER_VULKAN
-    (void)default_screen;
     int visualID = screen->root_visual;
-#endif
     
     xcb_colormap_t colormap = xcb_generate_id( connection );
     WindowGlobal::window = xcb_generate_id( connection );
@@ -249,7 +243,6 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
                       valuelist
                       );
 
-
     xcb_map_window( connection, WindowGlobal::window );
 
     xcb_size_hints_t hints;
@@ -272,7 +265,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
 
         if (!xcb_ewmh_init_atoms_replies( &WindowGlobal::EWMH, WindowGlobal::EWMHCookie, nullptr ))
         {
-            std::cout << "Fullscreen not supported." << std::endl;
+            printf( "Fullscreen not supported.\n" );
         }
 
         xcb_ewmh_request_change_wm_state( &WindowGlobal::EWMH, XDefaultScreen( display ), WindowGlobal::window,
@@ -288,7 +281,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
 
         if (!reply)
         {
-            std::cerr << "Full screen reply failed" << std::endl;
+            printf( "Full screen reply failed\n" );
         }
     }
     
@@ -306,7 +299,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 
     if (!WindowGlobal::display)
     {
-        std::cerr << "Can't open display" << std::endl;
+        printf( "Can't open display\n" );
         return;
     }
     
@@ -318,7 +311,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     if (!WindowGlobal::connection)
     {
         XCloseDisplay( WindowGlobal::display );
-        std::cerr << "Can't get xcb connection from display" << std::endl;
+        printf( "Can't get xcb connection from display\n" );
         return;
     }
     
@@ -330,13 +323,13 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     
     WindowGlobal::key_symbols = xcb_key_symbols_alloc( WindowGlobal::connection );
 
-    if (CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, default_screen, screen, width, height, flags ) == -1)
+    if (CreateWindowAndContext( WindowGlobal::display, WindowGlobal::connection, screen, width, height, flags ) == -1)
     {
         return;
     }
 
     GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
-#if RENDERER_VULKAN
+
     int samples = 0;
 
     if (flags & ae3d::WindowCreateFlags::MSAA4)
@@ -353,7 +346,6 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     }
 
     ae3d::CreateRenderer( samples );
-#endif
     SetTitle( "Aether3D Game Engine" );
     WindowGlobal::isOpen = true;
 }
@@ -496,7 +488,7 @@ void ae3d::Window::PumpEvents()
                     }
                     else
                     {
-                        std::cerr << "got client message" << std::endl;
+                        printf( "got client message\n" );
                     }
                 }
                 //else
@@ -510,7 +502,6 @@ void ae3d::Window::PumpEvents()
                 break;
             }
         default:
-            // std::cout << "got respone_type " << response_type << std::endl;
             break;
         }
 
@@ -581,7 +572,6 @@ void ae3d::Window::PumpEvents()
             }
             else
             {
-                //std::cout << "pressed button " << (int)j.number << std::endl;
             }
         }
         else if (j.type == JS_EVENT_AXIS)
@@ -654,9 +644,7 @@ void ae3d::Window::PumpEvents()
 
 void ae3d::Window::SwapBuffers()
 {
-#if RENDERER_VULKAN
     GfxDevice::Present();
-#endif
 }
 
 bool ae3d::Window::PollEvent( WindowEvent& outEvent )
