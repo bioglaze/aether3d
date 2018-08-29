@@ -1720,7 +1720,7 @@ void ae3d::GfxDevice::Init( int width, int height )
     GfxDeviceGlobal::backBufferHeight = height;
 }
 
-void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, void* offset )
+void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, int offset )
 {
     int scissor[ 4 ] = {};
     scissor[ 0 ] = scX < 0 ? 0 : scX;
@@ -1729,7 +1729,7 @@ void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int e
     scissor[ 3 ] = scHeight > 8191 ? 8191 : scHeight;
     SetScissor( scissor );
     
-    Draw( GfxDeviceGlobal::uiVertexBuffer, (int)((size_t)offset), (int)((size_t)offset + elemCount), renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+    Draw( GfxDeviceGlobal::uiVertexBuffer, offset, offset + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, void** outMappedVertices, void** outMappedIndices )

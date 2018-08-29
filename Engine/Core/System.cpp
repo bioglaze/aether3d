@@ -84,7 +84,7 @@ void ae3d::System::UnmapUIVertexBuffer()
     GfxDevice::UnmapUIVertexBuffer();
 }
 
-void ae3d::System::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, Texture2D* texture, void* offset, int windowWidth, int windowHeight )
+void ae3d::System::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, Texture2D* texture, int offset, int windowWidth, int windowHeight )
 {
     float ortho[ 4 ][ 4 ] = {
         { 2, 0, 0, 0 },

@@ -674,7 +674,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         height = GfxDeviceGlobal::properties.limits.maxImageDimension2D;
     }
 
-    mipLevelCount = mipmaps == Mipmaps::Generate ? (int)ddsOutput.dataOffsets.count : 1;
+    mipLevelCount = mipmaps == Mipmaps::Generate ? ddsOutput.dataOffsets.count : 1;
     int bytesPerPixel = 1;
 
     VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;

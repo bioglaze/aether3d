@@ -87,7 +87,7 @@ void DrawNuklear( int width, int height )
     System::UnmapUIVertexBuffer();
     
     const struct nk_draw_command* cmd = nullptr;
-    nk_draw_index* offset = nullptr;
+    int offset = 0;
 
     nk_draw_foreach( cmd, &ctx, &uiCommands )
     {

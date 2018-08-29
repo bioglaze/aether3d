@@ -131,8 +131,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     
     ae3d::System::UnmapUIVertexBuffer();
     
-    const struct nk_draw_command* cmd = nullptr;
-    nk_draw_index* offset = nullptr;
+    const nk_draw_command* cmd = nullptr;
+    int offset = 0;
     
     nk_draw_foreach( cmd, ctx, uiCommands )
     {

@@ -66,7 +66,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
     nk_convert( ctx, uiCommands, &vbuf, &ebuf, &config );
 #if RENDERER_VULKAN
-    for (int i = 0; i < MAX_VERTEX_MEMORY / sizeof( VertexPTC ); ++i)
+    for (int i = 0; i < MAX_VERTEX_MEMORY / (int)sizeof( VertexPTC ); ++i)
     {
         VertexPTC* vert = &((VertexPTC*)vertices)[ i ];
         vert->position[ 1 ] = height - vert->position[ 1 ];
@@ -75,8 +75,8 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
 
     System::UnmapUIVertexBuffer();
     
-    const struct nk_draw_command* cmd = nullptr;
-    nk_draw_index* offset = nullptr;
+    const nk_draw_command* cmd = nullptr;
+    int offset = 0;
 
     nk_draw_foreach( cmd, ctx, uiCommands )
     {

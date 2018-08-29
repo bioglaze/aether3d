@@ -235,11 +235,11 @@ id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()
     return GfxDeviceGlobal::uniformBuffers[ GfxDeviceGlobal::currentUboIndex ];
 }
 
-void ae3d::GfxDevice::DrawUI( int vpX, int vpY, int vpWidth, int vpHeight, int elemCount, void* offset )
+void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, int offset )
 {
-    int scissor[ 4 ] = { vpX, vpY, vpWidth, vpHeight };
+    int scissor[ 4 ] = { scX, scY, scWidth, scHeight };
     SetScissor( scissor );
-    Draw( GfxDeviceGlobal::uiBuffer, (int)((size_t)offset), (int)((size_t)offset) + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+    Draw( GfxDeviceGlobal::uiBuffer, offset, offset + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
