@@ -17,6 +17,7 @@ void svInit( SceneView** sceneView, int width, int height );
 void svAddGameObject( SceneView* sceneView );
 void svBeginRender( SceneView* sceneView );
 void svEndRender( SceneView* sceneView );
+ae3d::GameObject** svGetGameObjects( SceneView* sceneView, int& outCount );
 void svLoadScene( SceneView* sceneView, const ae3d::FileSystem::FileContentsData& contents );
 void svRotateCamera( SceneView* sceneView, float xDegrees, float yDegrees );
 void svMoveCamera( SceneView* sceneView, const ae3d::Vec3& moveDir );

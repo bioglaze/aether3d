@@ -62,8 +62,8 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 ## macOS
 
-  - Open the project Engine/Aether3D_OSX_Metal in Xcode and build it or run the Makefile.
-  - Open the project Samples/MetalSampleOSX and run it or run the Makefile. 
+  - Open the project Engine/Aether3D_OSX_Metal in Xcode and build it.
+  - Open the project Samples/MetalSampleOSX and run it. 
   - FBX converter tries to find FBX SDK 2019.0 in its default install location.
 
 ## Linux

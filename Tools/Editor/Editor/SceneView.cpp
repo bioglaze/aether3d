@@ -283,6 +283,12 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->transformGizmo.zAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
 }
 
+GameObject** svGetGameObjects( SceneView* sceneView, int& outCount )
+{
+    outCount = sceneView->gameObjects.count;
+    return sceneView->gameObjects.elements;
+}
+
 void svMoveCamera( SceneView* sv, const Vec3& moveDir )
 {
     sv->camera.GetComponent< TransformComponent >()->MoveUp( moveDir.y );
@@ -301,6 +307,7 @@ void svMoveSelection( SceneView* sv, const Vec3& moveDir )
 void svAddGameObject( SceneView* sv )
 {
     sv->gameObjects.Add( new GameObject() );
+    sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( "GameObject" );
     sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
 }
 

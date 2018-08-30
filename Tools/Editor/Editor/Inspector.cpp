@@ -21,6 +21,10 @@
 #include "../../Samples/NuklearTest/nuklear.h"
 #endif
 
+// TODO REMOVE
+#include <stdio.h>
+#include <string>
+
 using namespace ae3d;
 
 struct VertexPTC
@@ -148,7 +152,7 @@ void Inspector::HandleMouseMotion( int x, int y )
     nk_input_motion( &ctx, x, y );
 }
 
-void Inspector::Render( int width, int height, GameObject* gameObject, Command& outCommand )
+void Inspector::Render( int width, int height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, int goCount )
 {
     outCommand = Command::Empty;
 
@@ -222,6 +226,13 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
             outCommand = Command::SaveScene;
         }
 
+        // Hierarchy
+
+        for (int i = 0; i < goCount; ++i)
+        {
+            nk_label( &ctx, gameObjects[ i ]->GetName().c_str(), NK_TEXT_LEFT );
+        }
+        
         DrawNuklear( width, height );
         nk_end( &ctx );
     }

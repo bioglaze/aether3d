@@ -3,7 +3,9 @@
 #if _MSC_VER
 #include <Windows.h>
 #endif
+#include "Array.hpp"
 #include "FileSystem.hpp"
+#include "GameObject.hpp"
 #include "Inspector.hpp"
 #include "SceneView.hpp"
 #include "System.hpp"
@@ -182,7 +184,9 @@ int main()
 
         svMoveCamera( sceneView, moveDir );
         svBeginRender( sceneView );
-        inspector.Render( width, height, selectedGO, inspectorCommand );
+        int goCount = 0;
+        GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
+        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount );
         svEndRender( sceneView );
 
         switch (inspectorCommand)
