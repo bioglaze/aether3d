@@ -32,8 +32,8 @@ Texture2D* uiTextures[ 1 ];
 
 void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
-    struct nk_convert_config config;
-    static const struct nk_draw_vertex_layout_element vertex_layout[] = {
+    nk_convert_config config;
+    static const nk_draw_vertex_layout_element vertex_layout[] = {
         {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(VertexPTC, position)},
         {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(VertexPTC, uv)},
         {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF(VertexPTC, col)},

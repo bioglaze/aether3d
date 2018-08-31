@@ -21,10 +21,6 @@
 #include "../../Samples/NuklearTest/nuklear.h"
 #endif
 
-// TODO REMOVE
-#include <stdio.h>
-#include <string>
-
 using namespace ae3d;
 
 struct VertexPTC
@@ -90,7 +86,7 @@ void DrawNuklear( int width, int height )
 
     System::UnmapUIVertexBuffer();
     
-    const struct nk_draw_command* cmd = nullptr;
+    const nk_draw_command* cmd = nullptr;
     int offset = 0;
 
     nk_draw_foreach( cmd, &ctx, &uiCommands )
@@ -230,7 +226,7 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
 
         for (int i = 0; i < goCount; ++i)
         {
-            nk_label( &ctx, gameObjects[ i ]->GetName().c_str(), NK_TEXT_LEFT );
+            //nk_label( &ctx, gameObjects[ i ]->GetName().c_str(), NK_TEXT_LEFT );
         }
         
         DrawNuklear( width, height );
