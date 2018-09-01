@@ -44,7 +44,7 @@ void ae3d::Material::Apply()
         shader->SetFloat( f.first.c_str(), f.second );
     }
 
-    int texUnit = 0;
+    int texUnit = 1;
     
     for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
     {
