@@ -15,6 +15,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include <stdio.h>
 
 using namespace ae3d;
 
@@ -343,6 +344,19 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
       *gameObjects.back() = go;
       scene.Add( gameObjects.back().get() );
       }*/
+}
+
+void svSaveScene( SceneView* sv, char* path )
+{
+    const std::string sceneStr = sv->scene.GetSerialized();
+    FILE* f = fopen( path, "wb" );
+    if (!f)
+    {
+        System::Print( "Could not open file for saving: %s\n", path );
+    }
+    
+    fprintf( f, "%s\n", sceneStr.c_str() );
+    fclose( f );
 }
 
 GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, int height )

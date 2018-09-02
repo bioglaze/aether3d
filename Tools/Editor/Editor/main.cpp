@@ -67,41 +67,36 @@ int main()
             {
                 KeyCode keyCode = event.keyCode;
 
-                if (keyCode == KeyCode::Escape)
+                switch( keyCode )
                 {
+                case KeyCode::Escape:
                     quit = true;
-                }
-                else if (keyCode == KeyCode::A)
-                {
+                    break;
+                case KeyCode::A:
                     moveDir.x = event.type == WindowEventType::KeyDown ? -velocity : 0;
-                }
-                else if (keyCode == KeyCode::D)
-                {
+                    break;
+                case KeyCode::D:
                     moveDir.x = event.type == WindowEventType::KeyDown ? velocity : 0;
-                }
-                else if (keyCode == KeyCode::W)
-                {
+                    break;
+                case KeyCode::W:
                     moveDir.z = event.type == WindowEventType::KeyDown ? -velocity : 0;
-                }
-                else if (keyCode == KeyCode::S)
-                {
+                    break;
+                case KeyCode::S:
                     moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
-                }
-                else if (keyCode == KeyCode::Left)
-                {
+                    break;
+                case KeyCode::Left:
                     svMoveSelection( sceneView, { -1, 0, 0 } );
-                }
-                else if (keyCode == KeyCode::Right)
-                {
+                    break;
+                case KeyCode::Right:
                     svMoveSelection( sceneView, { 1, 0, 0 } );
-                }
-                else if (keyCode == KeyCode::Up)
-                {
+                    break;
+                case KeyCode::Up:
                     svMoveSelection( sceneView, { 0, 1, 0 } );
-                }
-                else if (keyCode == KeyCode::Down)
-                {
+                    break;
+                case KeyCode::Down:
                     svMoveSelection( sceneView, { 0, -1, 0 } );
+                    break;
+                default: break;
                 }
             }
 
@@ -227,6 +222,48 @@ int main()
             }
             auto contents = FileSystem::FileContents( path );
             svLoadScene( sceneView, contents );
+#endif
+        }
+        break;
+        case Inspector::Command::SaveScene:
+        {
+#if _MSC_VER
+            OPENFILENAME ofn = {};
+            TCHAR szFile[ 260 ] = {};
+
+            ofn.lStructSize = sizeof( ofn );
+            ofn.hwndOwner = GetActiveWindow();
+            ofn.lpstrFile = szFile;
+            ofn.nMaxFile = sizeof( szFile );
+            ofn.lpstrFilter = "All\0*.*\0Scene\0*.SCENE\0";
+            ofn.nFilterIndex = 1;
+            ofn.lpstrFileTitle = nullptr;
+            ofn.nMaxFileTitle = 0;
+            ofn.lpstrInitialDir = nullptr;
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+            if (GetOpenFileName( &ofn ) == TRUE)
+            {
+                svSaveScene( sceneView, ofn.lpstrFile );
+            }
+#else
+            char path[ 1024 ] = {};
+            FILE* f = popen( "zenity --file-selection --save --title \"Save .scene file\"", "w" );
+
+            if (!f)
+            {
+                System::Print( "Could not open file for saving.\n" );
+                break;
+            }
+            
+            fgets( path, 1024, f );
+            fclose( f );
+            if (strlen( path ) > 0)
+            {
+                path[ strlen( path ) - 1 ] = 0;
+            }
+            System::Print("path len: %d\n", strlen( path ));
+            svSaveScene( sceneView, path );
 #endif
         }
         break;
