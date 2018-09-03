@@ -249,7 +249,8 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     (*sv)->camera.AddComponent< TransformComponent >();
     (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
-
+    (*sv)->camera.SetName( "EditorCamera" );
+    
     (*sv)->scene.Add( &(*sv)->camera );
 
     (*sv)->unlitShader.Load( "unlit_vertex", "unlit_fragment",
@@ -420,5 +421,6 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     go.GetComponent< MeshRendererComponent >()->SetMaterial( &zAxisMaterial, 0 );
     go.AddComponent< TransformComponent >();
     go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
+    go.SetName( "EditorGizmo" );
 }
 
