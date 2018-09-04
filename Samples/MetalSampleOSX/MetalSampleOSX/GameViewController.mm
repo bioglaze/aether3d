@@ -39,7 +39,7 @@
 //#define TEST_RENDER_TEXTURE_CUBE
 
 const int POINT_LIGHT_COUNT = 50 * 40;
-const int MULTISAMPLE_COUNT = 1;
+const int MULTISAMPLE_COUNT = 4;
 const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
@@ -317,7 +317,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 

@@ -224,8 +224,6 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
 
         // Hierarchy
 
-        nk_label( &ctx, "Hierarchy", NK_TEXT_LEFT );
-
         static const char* goNames[] = { "GameObject1", "GameObject2", "GameObject3" };
         static int currentGo = 0;
 
@@ -237,7 +235,11 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
             }
         }
 
-        currentGo = nk_combo( &ctx, goNames, 3, currentGo, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
+        if (gameObject == nullptr)
+        {
+            nk_label( &ctx, "Hierarchy", NK_TEXT_LEFT );
+            currentGo = nk_combo( &ctx, goNames, 3, currentGo, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
+        }
         
         DrawNuklear( width, height );
         nk_end( &ctx );

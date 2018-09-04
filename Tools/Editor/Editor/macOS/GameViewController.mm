@@ -1,4 +1,5 @@
 #import "GameViewController.h"
+#include "GameObject.hpp"
 #import "Inspector.hpp"
 #import "System.hpp"
 #import "SceneView.hpp"
@@ -166,7 +167,9 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         ae3d::System::BeginFrame();
         svMoveCamera( sceneView, moveDir );
         svBeginRender( sceneView );
-        inspector.Render( width, height, selectedGO, inspectorCommand );
+        int goCount = 0;
+        ae3d::GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
+        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount );
         svEndRender( sceneView );
         ae3d::System::EndFrame();
     }
