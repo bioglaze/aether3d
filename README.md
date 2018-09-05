@@ -14,7 +14,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
   - Windows, macOS, iOS and Linux support.
   - Vulkan, D3D12 and Metal renderers.
-  - Forward+ light culling
+  - Forward+ light culling.
   - Component-based game object system.
   - VR support. Tested on HTC Vive.
   - Sprite rendering, texture atlasing and batching.
@@ -29,12 +29,13 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Cross-Platform WYSIWYG scene editor.
   - Statically linked into your application.
   - Wireframe rendering mode.
-  - Line rendering
+  - Line rendering.
 
 # Planned Features
 
   - Physically-based rendering
   - Clustered Forward shading
+  - Particles
   - Tone mapping
   - Post-processing effects
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
@@ -82,8 +83,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 # Tested GPUs
   - AMD Radeon R9 Nano on Ubuntu 18.04 and Windows 10
   - NVIDIA GTX 750M on MacBook Pro 2013 and macOS High Sierra
-  - NVIDIA GTX 980 on Windows 10
-  - NVIDIA GTX 660 on Windows 7
+  - NVIDIA GTX 1080 on Windows 10
   - Intel Skylake HD530 on Ubuntu 18.04
 
 # Running Tests
