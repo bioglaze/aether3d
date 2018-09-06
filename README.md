@@ -16,7 +16,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Vulkan, D3D12 and Metal renderers.
   - Forward+ light culling.
   - Component-based game object system.
-  - VR support. Tested on HTC Vive.
+  - VR support in Vulkan backend. Tested on HTC Vive.
   - Sprite rendering, texture atlasing and batching.
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Skinned animation for meshes imported from FBX.
