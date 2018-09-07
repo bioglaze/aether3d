@@ -109,6 +109,7 @@ int main()
                 lastMouseX = x;
                 lastMouseY = y;
                 inspector.HandleMouseMotion( x, y );
+                svHandleMouseMotion( sceneView, x, y );
             }
 
             if (event.type == WindowEventType::Mouse1Down)
@@ -116,6 +117,7 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
                 inspector.HandleLeftMouseClick( x, y, 1 );
+                svHandleLeftMouseDown( sceneView, x, y, width, height );
             }
 
             if (event.type == WindowEventType::Mouse1Up)

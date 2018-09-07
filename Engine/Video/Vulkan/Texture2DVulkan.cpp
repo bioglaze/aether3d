@@ -221,7 +221,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
         err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory[ mipIndex ], 0, memReqs.size, 0, &stagingData );
         AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
         VkDeviceSize amountToCopy = imageSize;
-        if (mipChain.dataOffsets[ mipIndex ] + imageSize >= mipChain.imageData.count)
+        if (mipChain.dataOffsets[ mipIndex ] + imageSize >= (unsigned)mipChain.imageData.count)
         {
             amountToCopy = mipChain.imageData.count - mipChain.dataOffsets[ mipIndex ];
         }
@@ -446,9 +446,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     VkBuffer stagingBuffer = VK_NULL_HANDLE;
 
-    VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
-    VkDeviceSize bc1Size = (width / 4) * (height / 4) * bc1BlockSize;
-    VkDeviceSize imageSize = (isBC1( format ) || isBC2( format ) || isBC3( format )) ? bc1Size : (width * height * bytesPerPixel);
+    VkDeviceSize imageSize = width * height * bytesPerPixel;
 
     VkBufferCreateInfo bufferCreateInfo = {};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

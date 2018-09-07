@@ -381,6 +381,29 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
     return nullptr;
 }
 
+void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, int height )
+{
+    Array< CollisionInfo > ci;
+    Array< GameObject* > gameObjects;
+
+    GetColliders( sv->camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles, ci );
+
+    const bool isGizmo = ci.count > 0 ? false : (gameObjects[ 0 ] == sv->gameObjects[ 0 ]);
+    
+    if (isGizmo)
+    {
+
+    }
+}
+
+void svHandleMouseMotion( SceneView* sv, int screenX, int screenY )
+{
+    if (sv->selectedGameObjects.count > 0)
+    {
+
+    }
+}
+
 void svRotateCamera( SceneView* sv, float xDegrees, float yDegrees )
 {
     sv->camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), xDegrees );
