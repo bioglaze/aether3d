@@ -48,7 +48,6 @@ namespace WindowGlobal
     bool isOpen = false;
     bool isGamePadConnected = false;
     HWND hwnd;
-    HDC hdc;
     ae3d::KeyCode keyMap[ 256 ];
 }
 
@@ -375,8 +374,6 @@ namespace ae3d
             nullptr,    // we aren't using menus
             hInstance,    // application handle
             nullptr );    // used with multiple windows    
-
-        WindowGlobal::hdc = GetDC( WindowGlobal::hwnd );
 
         ShowWindow( WindowGlobal::hwnd, SW_SHOW );
         
