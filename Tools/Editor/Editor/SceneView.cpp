@@ -29,6 +29,8 @@ struct TransformGizmo
     Material xAxisMaterial;
     Material yAxisMaterial;
     Material zAxisMaterial;
+
+	bool isSelected = false;
 };
 
 struct SceneView
@@ -384,23 +386,26 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, int height )
 {
     Array< CollisionInfo > ci;
-    Array< GameObject* > gameObjects;
 
-    GetColliders( sv->camera, screenX, screenY, width, height, 200, gameObjects, CollisionTest::Triangles, ci );
+    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
 
-    const bool isGizmo = ci.count > 0 ? false : (gameObjects[ 0 ] == sv->gameObjects[ 0 ]);
-    
-    if (isGizmo)
-    {
-
-    }
+    const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
+	sv->transformGizmo.isSelected = isGizmo;
 }
 
-void svHandleMouseMotion( SceneView* sv, int screenX, int screenY )
+void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
-    if (sv->selectedGameObjects.count > 0)
+    if (sv->transformGizmo.isSelected)
     {
-
+		const Vec3 delta{ deltaX / 20.0f, -deltaY / 20.0f, 0.0f };
+		const Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();
+		sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
+		
+		for (int i = 0; i < sv->selectedGameObjects.count; ++i)
+		{
+			const Vec3 old = sv->selectedGameObjects[ i ]->GetComponent< TransformComponent >()->GetLocalPosition();
+			sv->selectedGameObjects[ i ]->GetComponent< TransformComponent >()->SetLocalPosition( old + delta );
+		}
     }
 }
 

@@ -109,7 +109,7 @@ int main()
                 lastMouseX = x;
                 lastMouseY = y;
                 inspector.HandleMouseMotion( x, y );
-                svHandleMouseMotion( sceneView, x, y );
+                svHandleMouseMotion( sceneView, deltaX, deltaY );
             }
 
             if (event.type == WindowEventType::Mouse1Down)
@@ -167,7 +167,7 @@ int main()
 #ifdef __linux__
             svRotateCamera( sceneView, float( deltaX ) / 20, float( deltaY ) / 20 );
 #else
-            svRotateCamera( sceneView , -float( deltaX ) / 20, -float( deltaY ) / 20 );
+            svRotateCamera( sceneView, -float( deltaX ) / 20, -float( deltaY ) / 20 );
 #endif
         }
 
