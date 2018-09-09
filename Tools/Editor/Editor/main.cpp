@@ -208,7 +208,7 @@ int main()
             ofn.lpstrInitialDir = nullptr;
             ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-            if (GetOpenFileName( &ofn ) == TRUE)
+            if (GetOpenFileName( &ofn ) != FALSE)
             {
                 auto contents = FileSystem::FileContents( ofn.lpstrFile );
                 svLoadScene( sceneView, contents );
@@ -244,7 +244,7 @@ int main()
             ofn.lpstrInitialDir = nullptr;
             ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-            if (GetOpenFileName( &ofn ) == TRUE)
+            if (GetOpenFileName( &ofn ) != FALSE)
             {
                 svSaveScene( sceneView, ofn.lpstrFile );
             }

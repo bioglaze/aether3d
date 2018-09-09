@@ -30,7 +30,7 @@ struct TransformGizmo
     Material yAxisMaterial;
     Material zAxisMaterial;
 
-	bool isSelected = false;
+	int selectedMesh = 0;
 };
 
 struct SceneView
@@ -390,12 +390,17 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
     GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
-	sv->transformGizmo.isSelected = isGizmo;
+	sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
+}
+
+void svHandleLeftMouseUp( SceneView* sv )
+{
+    sv->transformGizmo.selectedMesh = -1;
 }
 
 void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
-    if (sv->transformGizmo.isSelected)
+    if (sv->transformGizmo.selectedMesh != -1)
     {
 		const Vec3 delta{ deltaX / 20.0f, -deltaY / 20.0f, 0.0f };
 		const Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();

@@ -160,7 +160,7 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
 
         if (gameObject != nullptr)
         {
-            const char* str = gameObject ? gameObject->GetName().c_str() : "object name";
+            const char* str = gameObject->GetName().c_str();
             nk_label( &ctx, str, NK_TEXT_LEFT );
         }
         
