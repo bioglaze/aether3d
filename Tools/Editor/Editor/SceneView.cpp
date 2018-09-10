@@ -390,7 +390,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
     GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
-	sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
+    sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
 }
 
 void svHandleLeftMouseUp( SceneView* sv )
@@ -402,15 +402,14 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
     if (sv->transformGizmo.selectedMesh != -1)
     {
-		const Vec3 delta{ deltaX / 20.0f, -deltaY / 20.0f, 0.0f };
-		const Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();
-		sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
+        const Vec3 delta{ deltaX / 20.0f, -deltaY / 20.0f, 0.0f };
+        const Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();
+        sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
 		
-		for (int i = 0; i < sv->selectedGameObjects.count; ++i)
-		{
-			const Vec3 old = sv->selectedGameObjects[ i ]->GetComponent< TransformComponent >()->GetLocalPosition();
-			sv->selectedGameObjects[ i ]->GetComponent< TransformComponent >()->SetLocalPosition( old + delta );
-		}
+        for (int i = 0; i < sv->selectedGameObjects.count; ++i)
+        {
+            sv->selectedGameObjects[ i ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
+        }
     }
 }
 
