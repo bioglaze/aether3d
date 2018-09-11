@@ -39,7 +39,7 @@
 //#define TEST_RENDER_TEXTURE_CUBE
 
 const int POINT_LIGHT_COUNT = 50 * 40;
-const int MULTISAMPLE_COUNT = 4;
+const int MULTISAMPLE_COUNT = 1;
 const int MAX_VERTEX_MEMORY = 512 * 1024;
 const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
@@ -96,7 +96,7 @@ struct VertexPTC
 
 nk_draw_null_texture nullTexture;
 nk_font* nkFont = nullptr;
-std::map< int, ae3d::Texture2D* > uiTextures;
+ae3d::Texture2D uiTextures[ 1 ];
 
 void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
@@ -145,7 +145,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
                        (int)(cmd->clip_rect.w),
                        (int)(cmd->clip_rect.h),
-                       cmd->elem_count, uiTextures[ cmd->texture.id ], offset, width, height );
+                       cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
         offset += cmd->elem_count / 3;
     }
     
@@ -734,7 +734,7 @@ using namespace ae3d;
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
     
-    uiTextures[ nk_handle_id( nkFontTexture.GetID() ).id ] = &nkFontTexture;
+    uiTextures[ 0 /*nk_handle_id( nkFontTexture.GetID() ).id*/ ] = &nkFontTexture;
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );

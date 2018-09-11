@@ -138,7 +138,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-    svRotateCamera( sceneView, -float( theEvent.deltaX ) / 20, -float( theEvent.deltaY ) / 20 );
+    const float deltaX = -float( theEvent.deltaX ) / 20;
+    const float deltaY = -float( theEvent.deltaY ) / 20;
+    
+    svRotateCamera( sceneView, deltaX, deltaY );
+    svHandleMouseMotion( sceneView, deltaX, deltaY );
 }
 
 - (void)_render
@@ -147,9 +151,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     
     if (inputEvent.button == 1 && inputEvent.isActive)
     {
+        svHandleLeftMouseDown( sceneView, inputEvent.x, inputEvent.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
         inspector.HandleLeftMouseClick( inputEvent.x, inputEvent.y, 1 );
         inspector.HandleMouseMotion( inputEvent.x, inputEvent.y );
     }
+
     inputEvent.isActive = false;
     inputEvent.x = 0;
     inputEvent.y = 0;
