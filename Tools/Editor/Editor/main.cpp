@@ -72,6 +72,12 @@ int main()
                 case KeyCode::Escape:
                     quit = true;
                     break;
+                case KeyCode::Q:
+                    moveDir.y = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                    break;
+                case KeyCode::E:
+                    moveDir.y = event.type == WindowEventType::KeyDown ? velocity : 0;
+                    break;
                 case KeyCode::A:
                     moveDir.x = event.type == WindowEventType::KeyDown ? -velocity : 0;
                     break;
@@ -125,7 +131,7 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
                 inspector.HandleLeftMouseClick( x, y, 0 );
-
+                svHandleLeftMouseUp( sceneView );
                 selectedGO = svSelectObject( sceneView, x, y, width, height );
             }
 

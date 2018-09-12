@@ -367,7 +367,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
     Array< CollisionInfo > ci;
     GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
 
-    if (ci.count > 0)
+    if (ci.count > 0 && ci[ 0 ].go != sv->gameObjects[ 0 ])
     {
         sv->scene.Add( sv->gameObjects[ 0 ] );
         sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( ci[ 0 ].go->GetComponent<TransformComponent>()->GetLocalPosition() );

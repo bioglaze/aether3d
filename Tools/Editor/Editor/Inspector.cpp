@@ -1,12 +1,16 @@
 #include "Inspector.hpp"
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
+#include "DirectionalLightComponent.hpp"
 #include "GameObject.hpp"
 #include "MeshRendererComponent.hpp"
+#include "PointLightComponent.hpp"
+#include "SpotLightComponent.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "TransformComponent.hpp"
 #include <string.h>
+#include <stdio.h>
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -152,7 +156,7 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
 {
     outCommand = Command::Empty;
 
-    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 500 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
         nk_layout_row_static( &ctx, 30, 150, 1 );
 
@@ -163,12 +167,13 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
             const char* str = gameObject->GetName().c_str();
             nk_label( &ctx, str, NK_TEXT_LEFT );
         }
-        
+
         TransformComponent* transform = gameObject ? gameObject->GetComponent< TransformComponent >() : nullptr;
         MeshRendererComponent* meshRenderer = gameObject ? gameObject->GetComponent< MeshRendererComponent >() : nullptr;
         AudioSourceComponent* audioSource = gameObject ? gameObject->GetComponent< AudioSourceComponent >() : nullptr;
         CameraComponent* camera = gameObject ? gameObject->GetComponent< CameraComponent >() : nullptr;
-        
+        PointLightComponent* pointLight = gameObject ? gameObject->GetComponent< PointLightComponent >() : nullptr;
+
         if (gameObject != nullptr && transform != nullptr)
         {
             Vec3 pos = transform->GetLocalPosition();
@@ -205,6 +210,22 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
             gameObject->RemoveComponent< CameraComponent >();
         }
 
+        if (gameObject != nullptr && pointLight == nullptr && nk_button_label( &ctx, "Add point light" ))
+        {
+            gameObject->AddComponent< PointLightComponent >();
+        }
+        else if (gameObject != nullptr && pointLight != nullptr && nk_button_label( &ctx, "Remove point light" ))
+        {
+            gameObject->RemoveComponent< PointLightComponent >();
+        }
+
+        if (gameObject != nullptr && pointLight != nullptr)
+        {
+            char buffer[ 260 ] = {};
+            snprintf( buffer, 260, "Radius: %.2f", pointLight->GetRadius() );
+            nk_label( &ctx, buffer, NK_TEXT_LEFT );
+        }
+
         // Gameobject is not selected.
         
         if (gameObject == nullptr && nk_button_label( &ctx, "add game object" ))
@@ -227,11 +248,11 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         static const char* goNames[] = { "GameObject1", "GameObject2", "GameObject3" };
         static int currentGo = 0;
 
-        for (int i = 0; i < goCount; ++i)
+        for (int i = 1; i < goCount; ++i)
         {
-            if (i < 3)
+            if (i < 4)
             {
-                goNames[ i ] = gameObjects[ i ]->GetName().c_str();
+                goNames[ i - 1 ] = gameObjects[ i ]->GetName().c_str();
             }
         }
 
