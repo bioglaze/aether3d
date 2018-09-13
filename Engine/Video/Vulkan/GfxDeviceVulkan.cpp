@@ -23,7 +23,6 @@
 #endif
 
 extern ae3d::Renderer renderer;
-void EndOffscreen();
 #if VK_USE_PLATFORM_ANDROID_KHR
 ANativeWindow* nativeWindow;
 #endif

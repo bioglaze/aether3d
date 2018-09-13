@@ -1,5 +1,4 @@
-#ifndef VR_H
-#define VR_H
+#pragma once
 
 namespace ae3d
 {
@@ -48,5 +47,3 @@ namespace ae3d
         void RecenterTracking();
     }
 }
-
-#endif
