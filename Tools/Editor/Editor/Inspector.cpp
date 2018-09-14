@@ -221,9 +221,11 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
 
         if (gameObject != nullptr && pointLight != nullptr)
         {
-            char buffer[ 260 ] = {};
-            snprintf( buffer, 260, "Radius: %.2f", pointLight->GetRadius() );
-            nk_label( &ctx, buffer, NK_TEXT_LEFT );
+            //nk_label( &ctx, "Radius", NK_TEXT_LEFT );
+
+            static float radius = 0;
+            radius = pointLight->GetRadius();
+            nk_property_float( &ctx, "#Radius:", -0.0f, &radius, 1024.0f, 1, 1 );
         }
 
         // Gameobject is not selected.
