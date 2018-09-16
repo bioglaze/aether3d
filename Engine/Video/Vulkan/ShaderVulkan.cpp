@@ -53,6 +53,14 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 
     // Vertex shader
     {
+        std::uint32_t magic;
+        std::memcpy( &magic, vertexData.data.data(), 4 );
+        
+        if (magic != 0x07230203)
+        {
+            System::Print( "Invalid magic in %s\n", vertexData.path.c_str() );
+        }
+        
         vertexPath = vertexData.path;
 
         VkShaderModuleCreateInfo moduleCreateInfo;
@@ -81,6 +89,14 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 
     // Fragment shader
     {
+        std::uint32_t magic;
+        std::memcpy( &magic, fragmentData.data.data(), 4 );
+        
+        if (magic != 0x07230203)
+        {
+            System::Print( "Invalid magic in %s\n", fragmentData.path.c_str() );
+        }
+
         fragmentPath = fragmentData.path;
 
         VkShaderModuleCreateInfo moduleCreateInfo;
