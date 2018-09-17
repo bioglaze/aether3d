@@ -675,14 +675,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         depthFormat = MTLPixelFormatDepth32Float;
     }
 #else
-    if (GfxDeviceGlobal::sampleCount == 1 && GfxDeviceGlobal::isRenderingToTexture)
-    {
-        depthFormat = MTLPixelFormatDepth32Float;
-    }
-    if (GfxDeviceGlobal::sampleCount > 1 && GfxDeviceGlobal::isRenderingToTexture)
-    {
-        depthFormat = MTLPixelFormatInvalid;
-    }
+    depthFormat = MTLPixelFormatDepth32Float;
 #endif
 
     [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, vertexBuffer.GetVertexFormat(), pixelFormat,
@@ -889,13 +882,10 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
     renderPassDescriptorFBO.colorAttachments[0].loadAction = texLoadAction;
     renderPassDescriptorFBO.stencilAttachment = nil;
 
-    if (GfxDeviceGlobal::sampleCount == 1)
-    {
-        renderPassDescriptorFBO.depthAttachment.slice = cubeMapFace;
-        renderPassDescriptorFBO.depthAttachment.texture = depthTexture;
-        renderPassDescriptorFBO.depthAttachment.loadAction = depthLoadAction;
-        renderPassDescriptorFBO.depthAttachment.clearDepth = 1.0;
-    }
+    renderPassDescriptorFBO.depthAttachment.slice = cubeMapFace;
+    renderPassDescriptorFBO.depthAttachment.texture = depthTexture;
+    renderPassDescriptorFBO.depthAttachment.loadAction = depthLoadAction;
+    renderPassDescriptorFBO.depthAttachment.clearDepth = 1.0;
 
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptorFBO];
     renderEncoder.label = @"FboRenderEncoder";
