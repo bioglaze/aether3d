@@ -12,9 +12,9 @@
 #include "Shader.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
-#include <math.h>
 #include <string>
 #include <vector>
+#include <math.h>
 #include <stdio.h>
 
 using namespace ae3d;
@@ -78,9 +78,9 @@ void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screen
 
 struct CollisionInfo
 {
-    GameObject* go;
-    float meshDistance;
-    int subMeshIndex;
+    GameObject* go = nullptr;
+    float meshDistance = 0;
+    int subMeshIndex = 0;
 };
 
 enum class CollisionTest
@@ -224,7 +224,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
                                                                                    : IntersectRayTriangles( rayOrigin, rayTarget, triangles.elements, triangles.count );
 
-                System::Print("distance to submesh %d: %f. rayOrigin: %.2f, %.2f, %.2f, rayTarget: %.2f, %.2f, %.2f\n", subMeshIndex, subMeshDistance, rayOrigin.x, rayOrigin.y, rayOrigin.z, rayTarget.x, rayTarget.y, rayTarget.z);
+                //System::Print("distance to submesh %d: %f. rayOrigin: %.2f, %.2f, %.2f, rayTarget: %.2f, %.2f, %.2f\n", subMeshIndex, subMeshDistance, rayOrigin.x, rayOrigin.y, rayOrigin.z, rayTarget.x, rayTarget.y, rayTarget.z);
                 if (0 < subMeshDistance && subMeshDistance < collisionInfo.meshDistance)
                 {
                     collisionInfo.subMeshIndex = subMeshIndex;
