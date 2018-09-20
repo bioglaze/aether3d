@@ -492,6 +492,7 @@
 				);
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -505,6 +506,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
