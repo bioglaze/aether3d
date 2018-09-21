@@ -182,14 +182,11 @@ namespace ae3d
 {
     std::uint32_t GetMemoryType( std::uint32_t typeBits, VkFlags properties )
     {
-        for (std::uint32_t i = 0; i < 32; i++)
+        for (std::uint32_t i = 0; i < 32; ++i)
         {
-            if ((typeBits & 1) == 1)
+            if ((typeBits & 1) == 1 && (GfxDeviceGlobal::deviceMemoryProperties.memoryTypes[ i ].propertyFlags & properties) == properties )
             {
-                if ((GfxDeviceGlobal::deviceMemoryProperties.memoryTypes[ i ].propertyFlags & properties) == properties)
-                {
-                    return i;
-                }
+                return i;
             }
             typeBits >>= 1;
         }
@@ -832,6 +829,8 @@ namespace ae3d
 
         for (std::uint32_t i = 0; i < imageCount; ++i)
         {
+            GfxDeviceGlobal::swapchainBuffers[ i ].image = GfxDeviceGlobal::swapchainImages[ i ];
+
             VkImageViewCreateInfo colorAttachmentView = {};
             colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
             colorAttachmentView.pNext = nullptr;
@@ -849,16 +848,13 @@ namespace ae3d
             colorAttachmentView.subresourceRange.layerCount = 1;
             colorAttachmentView.viewType = VK_IMAGE_VIEW_TYPE_2D;
             colorAttachmentView.flags = 0;
-
-            GfxDeviceGlobal::swapchainBuffers[ i ].image = GfxDeviceGlobal::swapchainImages[ i ];
+            colorAttachmentView.image = GfxDeviceGlobal::swapchainBuffers[ i ].image;
 
             SetImageLayout(
             GfxDeviceGlobal::setupCmdBuffer,
             GfxDeviceGlobal::swapchainBuffers[ i ].image,
             VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 0, 1 );
-            
-            colorAttachmentView.image = GfxDeviceGlobal::swapchainBuffers[ i ].image;
 
             err = vkCreateImageView( GfxDeviceGlobal::device, &colorAttachmentView, nullptr, &GfxDeviceGlobal::swapchainBuffers[ i ].view );
             AE3D_CHECK_VULKAN( err, "vkCreateImageView" );
