@@ -115,9 +115,9 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
 {
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
     const half4 albedoColor = half4( albedoSmoothnessMap.sample( sampler0, uv ) );
-    const float smoothness = albedoColor.a;
+    //const float smoothness = albedoColor.a;
     const float4 normalTS = float4( normalMap.sample( sampler0, uv ) );
-    const float4 specular = float4( specularMap.sample( sampler0, uv ) );
+    //const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
     const float3 surfaceToLightVS = -uniforms.lightDirection.xyz;
@@ -171,8 +171,8 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     //outColor.rgb *= diffuseDirectional;
     //outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
     
-    const float3 surfaceToCameraVS = -in.positionVS;
-    const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( surfaceToLightVS, normalVS ) ) ), 0.2f );
+    //const float3 surfaceToCameraVS = -in.positionVS;
+    //const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( surfaceToLightVS, normalVS ) ) ), 0.2f );
     //outColor.rgb += specularDirectional;
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
@@ -184,11 +184,11 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float4 center = pointLightBufferCenterAndRadius[ lightIndex ];
         const float radius = center.w;
 
-        const float3 vecToLightVS = (uniforms.localToView * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
+        //const float3 vecToLightVS = (uniforms.localToView * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
         const float3 vecToLightWS = center.xyz - in.positionWS.xyz;
-        const float3 lightDirVS = normalize( vecToLightVS );
+        //const float3 lightDirVS = normalize( vecToLightVS );
         
-        const float dotNL = saturate( dot( normalize( in.normalVS ), lightDirVS ) );
+        //const float dotNL = saturate( dot( normalize( in.normalVS ), lightDirVS ) );
         const float lightDistance = length( vecToLightWS );
         float falloff = 1;
         
@@ -219,16 +219,16 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         
         const float4 params = spotLightParams[ lightIndex ];
         const float4 center = spotLightBufferCenterAndRadius[ lightIndex ];
-        const float radius = center.w;
+        //const float radius = center.w;
         
         const float3 vecToLight = normalize( center.xyz - in.positionWS.xyz );
         const float spotAngle = dot( -params.xyz, vecToLight );
         const float cosineOfConeAngle = abs( params.w );
         
         // Falloff
-        const float dist = distance( in.positionWS.xyz, center.xyz );
-        const float a = dist / radius + 1.0f;
-        const float att = 1.0f / (a * a);
+        //const float dist = distance( in.positionWS.xyz, center.xyz );
+        //const float a = dist / radius + 1.0f;
+        //const float att = 1.0f / (a * a);
         const float3 color = spotLightBufferColors[ lightIndex ].rgb;// * att;// * specularTex;
         
         const float3 accumDiffuseAndSpecular = spotAngle > cosineOfConeAngle ? color : float3( 0.0, 0.0, 0.0 );
