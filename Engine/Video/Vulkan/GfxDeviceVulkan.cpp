@@ -1071,20 +1071,7 @@ namespace ae3d
 
     VkSampleCountFlagBits GetSampleBits( int msaaSampleCount )
     {
-        if (msaaSampleCount == 4)
-        {
-            return VK_SAMPLE_COUNT_4_BIT;
-        }
-        else if (msaaSampleCount == 8)
-        {
-            return VK_SAMPLE_COUNT_8_BIT;
-        }
-        else if (msaaSampleCount == 16)
-        {
-            return VK_SAMPLE_COUNT_16_BIT;
-        }
-
-        return VK_SAMPLE_COUNT_1_BIT;
+        return (VkSampleCountFlagBits)msaaSampleCount;
     }
 
     void CreateRenderPassNonMSAA()
