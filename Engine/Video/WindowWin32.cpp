@@ -377,7 +377,7 @@ namespace ae3d
 
         ShowWindow( WindowGlobal::hwnd, SW_SHOW );
         
-        int samples = 0;
+        int samples = 1;
 
         if (flags & WindowCreateFlags::MSAA4)
         {
