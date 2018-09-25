@@ -271,7 +271,7 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     renderPassCreateInfo.dependencyCount = 0;
     renderPassCreateInfo.pDependencies = nullptr;
 
-    result = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassCreateInfo, NULL, &outFramebufferDesc.renderPass );
+    result = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassCreateInfo, nullptr, &outFramebufferDesc.renderPass );
     if (result != VK_SUCCESS)
     {
         System::Print( "Failed to create a framebuffer!\n" );
@@ -288,7 +288,7 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     framebufferCreateInfo.width = width;
     framebufferCreateInfo.height = height;
     framebufferCreateInfo.layers = 1;
-    result = vkCreateFramebuffer( GfxDeviceGlobal::device, &framebufferCreateInfo, NULL, &outFramebufferDesc.framebuffer );
+    result = vkCreateFramebuffer( GfxDeviceGlobal::device, &framebufferCreateInfo, nullptr, &outFramebufferDesc.framebuffer );
     if (result != VK_SUCCESS)
     {
         System::Print( "Failed to create a framebuffer!\n" );
@@ -541,6 +541,12 @@ void ae3d::VR::Init()
         
     matEye = Global::hmd->GetEyeToHeadTransform( vr::Eye_Right );
     ConvertSteamVRMatrixToMatrix4( matEye, Global::eyePosRight );
+
+    if (!vr::VRCompositor())
+    {
+        System::Assert( false, "Unable to init VR compositor!\n" );
+        return;
+    }
 }
 
 void ae3d::VR::Deinit()
@@ -612,8 +618,14 @@ void ae3d::VR::SubmitFrame()
     vulkanData.m_nFormat = VK_FORMAT_R8G8B8A8_SRGB;
     vulkanData.m_nSampleCount = 1;
 
+    vr::VRTextureBounds_t bounds;
+    bounds.uMin = 0.0f;
+    bounds.uMax = 1.0f;
+    bounds.vMin = 0.0f;
+    bounds.vMax = 1.0f;
+
     vr::Texture_t texture = { &vulkanData, vr::TextureType_Vulkan, vr::ColorSpace_Auto };
-    vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &texture, nullptr );
+    vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &texture, &bounds );
 
     if (submitResult != vr::VRCompositorError_None)
     {
@@ -624,7 +636,7 @@ void ae3d::VR::SubmitFrame()
     vulkanData.m_nWidth = Global::rightEyeDesc.width;
     vulkanData.m_nHeight = Global::rightEyeDesc.height;
 
-    submitResult = vr::VRCompositor()->Submit( vr::Eye_Right, &texture, nullptr );
+    submitResult = vr::VRCompositor()->Submit( vr::Eye_Right, &texture, &bounds );
     
     if (submitResult != vr::VRCompositorError_None)
     {
@@ -724,6 +736,7 @@ void ae3d::VR::UnsetEye( int eye )
     vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
 
     FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
+    System::Assert( fbDesc.image != VK_NULL_HANDLE, "UnsetEye has bad image!" );
 
     // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
     VkImageMemoryBarrier imageMemoryBarrier;

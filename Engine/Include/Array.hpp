@@ -27,7 +27,12 @@ template< typename T > struct Array
         delete[] elements;
         count = other.count;
         elements = new T[ count ];
-        memcpy( elements, other.elements, count * sizeof( T ) );
+
+        for (int i = 0; i < count; ++i)
+        {
+            elements[ i ] = other.elements[ i ];
+        }
+
         return *this;
     }
     
@@ -38,8 +43,12 @@ template< typename T > struct Array
     void Add( const T& item )
     {
         T* after = new T[ count + 1 ]();
-        memcpy( after, elements, count * sizeof( T ) );
         
+        for (int i = 0; i < count; ++i)
+        {
+            after[ i ] = elements[ i ];
+        }
+
         after[ count ] = item;
         delete[] elements;
         elements = after;

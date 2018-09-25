@@ -47,26 +47,26 @@ float4 ConvertProjToView( float4 p )
 
 // this creates the standard Hessian-normal-form plane equation from three points, 
 // except it is simplified for the case where the first point is the origin
-float4 CreatePlaneEquation( float4 b, float4 c )
+float4 CreatePlaneEquation( float3 b, float3 c )
 {
-    float4 n;
+    float3 n;
 
     // normalize(cross( b.xyz-a.xyz, c.xyz-a.xyz )), except we know "a" is the origin
     n.xyz = normalize( cross( b.xyz, c.xyz ) );
 
     // -(n dot a), except we know "a" is the origin
-    n.w = 0;
+    //n.w = 0;
 
-    return n;
+    return float4( n, 0 );
 }
 
 // point-plane distance, simplified for the case where 
 // the plane passes through the origin
-float GetSignedDistanceFromPlane( float4 p, float4 eqn )
+float GetSignedDistanceFromPlane( float3 p, float3 eqn )
 {
     // dot( eqn.xyz, p.xyz ) + eqn.w, , except we know eqn.w is zero 
     // (see CreatePlaneEquation above)
-    return dot( eqn.xyz, p.xyz );
+    return dot( eqn, p );
 }
 
 void CalculateMinMaxDepthInLds( uint3 globalThreadIdx, uint depthBufferSampleIdx )
@@ -96,7 +96,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         ldsLightIdxCounter = 0;
     }
 
-    float4 frustumEqn[ 4 ];
+    float3 frustumEqn[ 4 ];
     {  
         // construct frustum for this tile
         uint pxm = TILE_RES * groupIdx.x;
@@ -120,7 +120,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         // cross product direction)
         for (uint i = 0; i < 4; i++)
         {
-            frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ], frustum[ (i + 1) & 3 ] );
+            frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ].xyz, frustum[ (i + 1) & 3 ].xyz ).xyz;
         }
     }
 
@@ -158,10 +158,10 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
             // test if sphere is intersecting or inside frustum
             if (-center.z + minZ < radius && center.z - maxZ < radius)
             {
-                if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < radius))
+                if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 2 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 3 ] ) < radius))
                 {
                     // do a thread-safe increment of the list counter 
                     // and put the index of this light into the list
@@ -194,10 +194,10 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
             // test if sphere is intersecting or inside frustum
             if (-center.z - minZ < radius && center.z - maxZ < radius)
             {
-                if ((GetSignedDistanceFromPlane( center, frustumEqn[ 0 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 1 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 2 ] ) < radius) &&
-                    (GetSignedDistanceFromPlane( center, frustumEqn[ 3 ] ) < radius))
+                if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 2 ] ) < radius) &&
+                    (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 3 ] ) < radius))
                 {
                     // do a thread-safe increment of the list counter 
                     // and put the index of this light into the list
