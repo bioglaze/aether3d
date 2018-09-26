@@ -330,7 +330,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
 
     GfxDevice::Init( WindowGlobal::windowWidth, WindowGlobal::windowHeight );
 
-    int samples = 0;
+    int samples = 1;
 
     if (flags & ae3d::WindowCreateFlags::MSAA4)
     {
