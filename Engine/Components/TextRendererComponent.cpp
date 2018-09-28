@@ -44,6 +44,7 @@ struct ae3d::TextRendererComponent::Impl
 
     VertexBuffer vertexBuffer;
     std::string text = "text";
+    std::string oldText;
     Font* font = nullptr;
     Vec4 color = { 1, 1, 1, 1 };
     bool isDirty = true;
@@ -88,8 +89,9 @@ void ae3d::TextRendererComponent::SetColor( const Vec4& aColor )
 
 void ae3d::TextRendererComponent::SetText( const char* aText )
 {
-    m().text = aText == nullptr ? std::string() : std::string( aText );
+    std::string text = aText == nullptr ? std::string() : std::string( aText );
     m().isDirty = true;
+    m().text = text;
 }
 
 void ae3d::TextRendererComponent::SetFont( Font* aFont )
@@ -107,8 +109,9 @@ void ae3d::TextRendererComponent::Render( const float* localToClip )
 
     if (m().isDirty)
     {
-        if (!m().text.empty())
+        if (!m().text.empty() && m().oldText != m().text)
         {
+            m().oldText = m().text;
             m().font->CreateVertexBuffer( m().text.c_str(), m().color, m().vertexBuffer );
         }
 
