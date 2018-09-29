@@ -14,7 +14,6 @@
 #include "VertexBuffer.hpp"
 
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
-
 extern ae3d::Renderer renderer;
 
 constexpr int UboCount = 1400;
@@ -90,6 +89,7 @@ namespace GfxDeviceGlobal
     unsigned frameIndex = 0;
     ae3d::VertexBuffer uiBuffer;
     PerObjectUboStruct perObjectUboStruct;
+    id <MTLRenderPipelineState> cachedPSO;
     
     struct Samplers
     {
@@ -665,8 +665,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     depthFormat = MTLPixelFormatDepth32Float;
 
-    [renderEncoder setRenderPipelineState:GetPSO( shader, blendMode, vertexBuffer.GetVertexFormat(), pixelFormat,
-                                                  depthFormat, sampleCount, topology )];
+    id <MTLRenderPipelineState> pso = GetPSO( shader, blendMode, vertexBuffer.GetVertexFormat(), pixelFormat,
+                                             depthFormat, sampleCount, topology );
+    if (GfxDeviceGlobal::cachedPSO != pso)
+    {
+        GfxDeviceGlobal::cachedPSO = pso;
+        [renderEncoder setRenderPipelineState:GfxDeviceGlobal::cachedPSO];
+    }
+    
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
     
@@ -781,6 +787,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
 void ae3d::GfxDevice::BeginFrame()
 {
+    GfxDeviceGlobal::cachedPSO = nil;
     commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"MyCommand";
     
