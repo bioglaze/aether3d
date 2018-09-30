@@ -11,6 +11,7 @@
 		AB1C9A141F0A607200948D46 /* human_anim_test2.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */; };
 		AB2345001DEABFB8004C4DEE /* default_white.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2344FF1DEABFB8004C4DEE /* default_white.png */; };
 		AB29D4481D772C7400E998FC /* test_dxt1.dds in Resources */ = {isa = PBXBuildFile; fileRef = AB29D4471D772C7400E998FC /* test_dxt1.dds */; };
+		AB2BB1402160FA8100454B1E /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB2BB13F2160FA8100454B1E /* Bloom.metal */; };
 		AB2CA8251C1332A900D4D7C4 /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */; };
 		AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */; };
 		AB2CA8291C13664600D4D7C4 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8281C13664600D4D7C4 /* glider.png */; };
@@ -65,6 +66,7 @@
 		AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = human_anim_test2.ae3d; path = ../../../../aether3d_build/Samples/human_anim_test2.ae3d; sourceTree = "<group>"; };
 		AB2344FF1DEABFB8004C4DEE /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
 		AB29D4471D772C7400E998FC /* test_dxt1.dds */ = {isa = PBXFileReference; lastKnownFileType = file; name = test_dxt1.dds; path = ../../../../aether3d_build/Samples/test_dxt1.dds; sourceTree = "<group>"; };
+		AB2BB13F2160FA8100454B1E /* Bloom.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Bloom.metal; path = ../../../Engine/Assets/Bloom.metal; sourceTree = "<group>"; };
 		AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
 		AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
 		AB2CA8281C13664600D4D7C4 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
@@ -222,6 +224,7 @@
 				AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */,
 				ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */,
 				ABCD9C6B1C131DA300B94BD0 /* font.png */,
+				AB2BB13F2160FA8100454B1E /* Bloom.metal */,
 				AB7839E31C70CA950065EF51 /* DepthNormals.metal */,
 				AB05A58C201783C7009FB5BD /* FullscreenTriangle.metal */,
 				ABFD71AB1D81E55B003770D4 /* LightCuller.metal */,
@@ -405,6 +408,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */,
+				AB2BB1402160FA8100454B1E /* Bloom.metal in Sources */,
 				AB657725200FD3BD0089CB54 /* MetalCommon.h in Sources */,
 				ABE04F831C1216A80025C436 /* main.m in Sources */,
 				ABE04FC41C1217F00025C436 /* Moments.metal in Sources */,

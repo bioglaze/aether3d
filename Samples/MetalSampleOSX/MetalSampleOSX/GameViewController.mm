@@ -11,6 +11,7 @@
 
 #import "Array.hpp"
 #import "CameraComponent.hpp"
+#import "ComputeShader.hpp"
 #import "DirectionalLightComponent.hpp"
 #import "Font.hpp"
 #import "FileSystem.hpp"
@@ -31,6 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
+//#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -145,7 +147,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
                        (int)(cmd->clip_rect.w),
                        (int)(cmd->clip_rect.h),
-                       cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
+                       cmd->elem_count, &uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
         offset += cmd->elem_count / 3;
     }
     
@@ -253,6 +255,7 @@ using namespace ae3d;
     Shader skinShader;
     Shader skyboxShader;
     Shader standardShader;
+    ComputeShader bloomShader;
     
     Texture2D fontTex;
     Texture2D fontTexSDF;
@@ -439,6 +442,8 @@ using namespace ae3d;
     skinShader.Load( "unlit_skin_vertex", "unlit_skin_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
+
+    bloomShader.Load( "bloom", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
 
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
@@ -731,10 +736,8 @@ using namespace ae3d;
     nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
     
-    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
+    uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
-    
-    uiTextures[ 0 /*nk_handle_id( nkFontTexture.GetID() ).id*/ ] = &nkFontTexture;
     
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
@@ -917,6 +920,10 @@ using namespace ae3d;
         DrawNuklear( &ctx, &cmds, self.view.bounds.size.width, self.view.bounds.size.height );
 #endif
         scene.EndFrame();
+#ifdef TEST_BLOOM
+        bloomShader.SetRenderTexture( &cameraTex, 0 );
+        bloomShader.Dispatch( self.view.bounds.size.width, self.view.bounds.size.height, 1 );
+#endif
         ae3d::System::EndFrame();
     }
 }
@@ -977,7 +984,6 @@ using namespace ae3d;
         
         //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
     }
-
 #endif
 }
 
