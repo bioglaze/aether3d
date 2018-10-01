@@ -4,6 +4,7 @@
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
+#include "ComputeShader.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "Font.hpp"
@@ -35,6 +36,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
+//#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -234,6 +236,9 @@ int main()
     shaderSkin.Load( "unlitVert", "unlitFrag",
                 FileSystem::FileContents( "unlit_skin_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+
+    ComputeShader shaderBloom;
+    shaderBloom.Load( "", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
 
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
@@ -832,6 +837,9 @@ int main()
             reload = false;
         }
         scene.Render();
+#ifdef TEST_BLOOM
+        shaderBloom.SetRenderTexture( &cameraTex, 0 );
+#endif
 #if RENDERER_D3D12
         System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), false );
         System::Draw( &camera2dTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), true );
