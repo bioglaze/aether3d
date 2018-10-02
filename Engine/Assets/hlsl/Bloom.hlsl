@@ -25,5 +25,5 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         bloomTex[ globalIdx.xy ] = float4(0, 1, 0, 1);
     }
 
-    bloomTex[ globalIdx.xy ] = float4( 1, 0, 0, 1 );
+    bloomTex[ globalIdx.xy ] = colorTex.Load( uint3(globalIdx.x, globalIdx.y, 0) );
 }

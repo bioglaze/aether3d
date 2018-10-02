@@ -60,9 +60,16 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     System::Assert( info.module != VK_NULL_HANDLE, "compute shader module not created" );
 }
 
-void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* /*renderTexture*/, unsigned /*slot*/ )
+void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, unsigned slot )
 {
-	System::Print( "ComputeShader:SetRenderTexture unimplemented\n" );
+    if (slot < SLOT_COUNT)
+    {
+        renderTextures[ slot ] = renderTexture;
+    }
+    else
+    {
+        System::Print( "ComputeShader:SetRenderTexture: Too high slot!\n" );
+    }
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
