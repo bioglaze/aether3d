@@ -41,6 +41,8 @@ namespace ae3d
         /// \param contents SPIR-V file contents.
         void LoadSPIRV( const FileSystem::FileContentsData& contents );
         VkPipelineShaderStageCreateInfo& GetInfo() { return info; }
+        /// \return PSO
+        VkPipeline GetPSO() const { return pso; }
 #endif
         /// \param metalShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param dataHLSL HLSL shader file contents.
@@ -74,6 +76,7 @@ namespace ae3d
         
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;
+        VkPipeline pso = VK_NULL_HANDLE;
 #endif
 #if RENDERER_METAL
         id <MTLFunction> function;

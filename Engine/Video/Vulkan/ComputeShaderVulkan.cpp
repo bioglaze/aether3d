@@ -9,11 +9,14 @@ namespace GfxDeviceGlobal
 {
     extern VkDevice device;
     extern VkCommandBuffer computeCmdBuffer;
+    extern VkPipelineLayout pipelineLayout;
+    extern VkPipelineCache pipelineCache;
 }
 
 namespace ComputeShaderGlobal
 {
     Array< VkShaderModule > modulesToReleaseAtExit;
+    Array< VkPipeline > psosToReleaseAtExit;
 }
 
 void ae3d::ComputeShader::DestroyShaders()
@@ -21,6 +24,11 @@ void ae3d::ComputeShader::DestroyShaders()
     for (int moduleIndex = 0; moduleIndex < ComputeShaderGlobal::modulesToReleaseAtExit.count; ++moduleIndex)
     {
         vkDestroyShaderModule( GfxDeviceGlobal::device, ComputeShaderGlobal::modulesToReleaseAtExit[ moduleIndex ], nullptr );
+    }
+
+    for (int psoIndex = 0; psoIndex < ComputeShaderGlobal::psosToReleaseAtExit.count; ++psoIndex)
+    {
+        vkDestroyPipeline( GfxDeviceGlobal::device, ComputeShaderGlobal::psosToReleaseAtExit[ psoIndex ], nullptr );
     }
 }
 
@@ -58,6 +66,16 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     info.pSpecializationInfo = nullptr;
 
     System::Assert( info.module != VK_NULL_HANDLE, "compute shader module not created" );
+
+    VkComputePipelineCreateInfo psoInfo = {};
+    psoInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+    psoInfo.layout = GfxDeviceGlobal::pipelineLayout;
+    psoInfo.stage = GetInfo();
+
+    err = vkCreateComputePipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &psoInfo, nullptr, &pso );
+    AE3D_CHECK_VULKAN( err, "Compute PSO" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "light tiler PSO" );
+    ComputeShaderGlobal::psosToReleaseAtExit.Add( pso );
 }
 
 void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, unsigned slot )

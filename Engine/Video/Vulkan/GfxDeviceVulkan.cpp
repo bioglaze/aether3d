@@ -1300,7 +1300,7 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 1550;
 
-        const std::uint32_t typeCount = 11;
+        const std::uint32_t typeCount = 12;
         VkDescriptorPoolSize typeCounts[ typeCount ];
         typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
@@ -1324,6 +1324,8 @@ namespace ae3d
         typeCounts[ 9 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 		typeCounts[10 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
 		typeCounts[10 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        typeCounts[11 ].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        typeCounts[11 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1465,9 +1467,19 @@ namespace ae3d
 		bufferSet5.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightColorBufferView();
 		bufferSet5.dstBinding = 10;
 
-        const int setCount = 11;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4, bufferSet5 };
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
+        // Binding 11 : Writable texture
+        VkWriteDescriptorSet rwImageSet = {};
+        rwImageSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        rwImageSet.dstSet = outDescriptorSet;
+        rwImageSet.descriptorCount = 1;
+        rwImageSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        rwImageSet.pImageInfo = nullptr; // FIXME: Provide this as a parameter
+        rwImageSet.dstBinding = 11;
+
+        const int setCount = 12;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4, bufferSet5, rwImageSet };
+        // FIXME: Remove the "-1" after RWImage is provided to this method!
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount - 1, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
@@ -1562,10 +1574,18 @@ namespace ae3d
 		layoutBindingBuffer5.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 		layoutBindingBuffer5.pImmutableSamplers = nullptr;
 
-        constexpr int bindingCount = 11;
+        // Binding 11 : Writable texture
+        VkDescriptorSetLayoutBinding layoutBindingRWImage = {};
+        layoutBindingRWImage.binding = 11;
+        layoutBindingRWImage.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        layoutBindingRWImage.descriptorCount = 1;
+        layoutBindingRWImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindingRWImage.pImmutableSamplers = nullptr;
+
+        constexpr int bindingCount = 12;
         const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
                                                                         layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2,
-                                                                        layoutBindingBuffer3, layoutBindingBuffer4, layoutBindingBuffer5 };
+                                                                        layoutBindingBuffer3, layoutBindingBuffer4, layoutBindingBuffer5, layoutBindingRWImage };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

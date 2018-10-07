@@ -106,8 +106,6 @@ namespace ae3d
         VkBuffer perTileLightIndexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory perTileLightIndexBufferMemory = VK_NULL_HANDLE;
         VkBufferView perTileLightIndexBufferView;
-        VkPipeline pso;
-        VkPipelineLayout psoLayout;
 #endif
         static const int TileRes = 16;
         static const int MaxLights = 2048;

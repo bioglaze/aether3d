@@ -22,9 +22,7 @@ namespace GfxDeviceGlobal
     extern VkDevice device;
     extern PerObjectUboStruct perObjectUboStruct;
     extern VkCommandBuffer computeCmdBuffer;
-    extern VkPipelineCache pipelineCache;
     extern VkDescriptorSetLayout descriptorSetLayout;
-    extern VkPipelineLayout pipelineLayout;
     extern VkQueue computeQueue;
     extern VkImageView view0;
     extern VkSampler sampler0;
@@ -53,7 +51,6 @@ void ae3d::LightTiler::DestroyBuffers()
     vkFreeMemory( GfxDeviceGlobal::device, spotLightColorMemory, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, spotLightCenterAndRadiusMemory, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, spotLightParamsMemory, nullptr );
-    vkDestroyPipeline( GfxDeviceGlobal::device, pso, nullptr );
 }
 
 void ae3d::LightTiler::Init()
@@ -291,15 +288,6 @@ void ae3d::LightTiler::Init()
         AE3D_CHECK_VULKAN( err, "spot light color view" );
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightColorView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "spotLightColorView" );
     }
-
-    VkComputePipelineCreateInfo psoInfo = {};
-    psoInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-    psoInfo.layout = GfxDeviceGlobal::pipelineLayout;
-    psoInfo.stage = renderer.builtinShaders.lightCullShader.GetInfo();
-    
-    VkResult err = vkCreateComputePipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &psoInfo, nullptr, &pso );
-    AE3D_CHECK_VULKAN( err, "Light tiler PSO" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "light tiler PSO" );
 }
 
 void ae3d::LightTiler::UpdateLightBuffers()
@@ -362,7 +350,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
                                     VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0, 0,
                                      nullptr, 1, &lightIndexToCompute, 0, nullptr );
     
-    vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pso );
+    vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, shader.GetPSO() );
 
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 

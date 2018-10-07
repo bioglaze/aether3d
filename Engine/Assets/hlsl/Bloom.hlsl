@@ -7,7 +7,8 @@
 #include "ubo.h"
 
 layout( set = 0, binding = 1 ) Texture2D colorTex : register(t0);
-layout( set = 0, binding = 2 ) RWTexture2D<float4> bloomTex : register(u0);
+layout( set = 0, binding = 2 ) Buffer<float4> unused : register(t0);
+layout( set = 0, binding = 11 ) RWTexture2D<float4> bloomTex : register(u0);
 
 groupshared uint helper[ 128 ];
 
