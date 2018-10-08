@@ -35,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 
 using namespace ae3d;
@@ -239,10 +239,11 @@ int main()
     shaderSkin.Load( "unlitVert", "unlitFrag",
                 FileSystem::FileContents( "unlit_skin_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
-
+#ifdef TEST_BLOOM
     ComputeShader shaderBloom;
     shaderBloom.Load( "", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
-
+#endif
+    
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 

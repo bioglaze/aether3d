@@ -5,6 +5,8 @@
 #include "Macros.hpp"
 #include "VulkanUtils.hpp"
 
+void BindComputeDescriptorSet();
+
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
@@ -94,5 +96,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 {
     System::Assert( GfxDeviceGlobal::computeCmdBuffer != VK_NULL_HANDLE, "Uninitialized compute command buffer" );
 
+    BindComputeDescriptorSet();
+
+    vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pso );
     vkCmdDispatch( GfxDeviceGlobal::computeCmdBuffer, groupCountX, groupCountY, groupCountZ );
 }

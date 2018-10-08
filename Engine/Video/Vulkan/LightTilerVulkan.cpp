@@ -28,7 +28,6 @@ namespace GfxDeviceGlobal
     extern VkSampler sampler0;
 }
 
-void BindComputeDescriptorSet();
 void UploadPerObjectUbo();
 
 void ae3d::LightTiler::DestroyBuffers()
@@ -332,8 +331,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::computeCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
-    BindComputeDescriptorSet();
-
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
@@ -350,8 +347,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
                                     VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0, 0,
                                      nullptr, 1, &lightIndexToCompute, 0, nullptr );
     
-    vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, shader.GetPSO() );
-
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 
     VkBufferMemoryBarrier lightIndexToFrag = {};
