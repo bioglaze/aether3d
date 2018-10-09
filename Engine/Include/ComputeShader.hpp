@@ -23,6 +23,12 @@ namespace ae3d
     class ComputeShader
     {
     public:
+        /// Call before Dispatch.
+        void Begin();
+
+        /// Call after Dispatch.
+        void End();
+        
         /// Dispatches the shader.
         /// \param groupCountX X count
         /// \param groupCountY Y count

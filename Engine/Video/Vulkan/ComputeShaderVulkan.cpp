@@ -10,6 +10,7 @@ void BindComputeDescriptorSet();
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
+    extern VkQueue computeQueue;
     extern VkCommandBuffer computeCmdBuffer;
     extern VkPipelineLayout pipelineLayout;
     extern VkPipelineCache pipelineCache;
@@ -90,6 +91,38 @@ void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, 
     {
         System::Print( "ComputeShader:SetRenderTexture: Too high slot!\n" );
     }
+}
+
+void ae3d::ComputeShader::Begin()
+{
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::computeCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+}
+
+void ae3d::ComputeShader::End()
+{
+    vkEndCommandBuffer( GfxDeviceGlobal::computeCmdBuffer );
+
+    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pWaitDstStageMask = &pipelineStages;
+    submitInfo.waitSemaphoreCount = 0;
+    submitInfo.pWaitSemaphores = nullptr;//&GfxDeviceGlobal::presentCompleteSemaphore;
+    submitInfo.signalSemaphoreCount = 0;
+    submitInfo.pSignalSemaphores = nullptr;//&GfxDeviceGlobal::renderCompleteSemaphore;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::computeCmdBuffer;
+
+    VkResult err = vkQueueSubmit( GfxDeviceGlobal::computeQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit compute" );
+
+    err = vkQueueWaitIdle( GfxDeviceGlobal::computeQueue );
+    AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
