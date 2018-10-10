@@ -34,6 +34,16 @@ void DestroyComputeShaders()
     }
 }
 
+void ae3d::ComputeShader::Begin()
+{
+
+}
+
+void ae3d::ComputeShader::End()
+{
+
+}
+
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
 {
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
