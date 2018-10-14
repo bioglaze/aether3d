@@ -478,7 +478,6 @@ namespace ae3d
 
         VkImageMemoryBarrier prePresentBarrier = {};
         prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        prePresentBarrier.pNext = nullptr;
         prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         prePresentBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         prePresentBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -520,7 +519,6 @@ namespace ae3d
 
         VkImageMemoryBarrier postPresentBarrier = {};
         postPresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        postPresentBarrier.pNext = nullptr;
         postPresentBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
         postPresentBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         postPresentBarrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
@@ -578,7 +576,6 @@ namespace ae3d
         info.commandBufferCount = 1;
         info.commandPool = GfxDeviceGlobal::cmdPool;
         info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        info.pNext = nullptr;
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &info, &GfxDeviceGlobal::setupCmdBuffer );
@@ -791,7 +788,6 @@ namespace ae3d
 
         VkSwapchainCreateInfoKHR swapchainInfo = {};
         swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        swapchainInfo.pNext = nullptr;
         swapchainInfo.surface = GfxDeviceGlobal::surface;
         swapchainInfo.minImageCount = desiredNumberOfSwapchainImages;
         swapchainInfo.imageFormat = GfxDeviceGlobal::colorFormat;
@@ -833,7 +829,6 @@ namespace ae3d
 
             VkImageViewCreateInfo colorAttachmentView = {};
             colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            colorAttachmentView.pNext = nullptr;
             colorAttachmentView.format = GfxDeviceGlobal::colorFormat;
             colorAttachmentView.components = {
                 VK_COMPONENT_SWIZZLE_R,
@@ -978,7 +973,6 @@ namespace ae3d
         
         VkDeviceCreateInfo deviceCreateInfo = {};
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        deviceCreateInfo.pNext = nullptr;
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
@@ -1019,7 +1013,6 @@ namespace ae3d
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        frameBufferCreateInfo.pNext = nullptr;
         frameBufferCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
         frameBufferCreateInfo.attachmentCount = 2;
         frameBufferCreateInfo.pAttachments = attachments;
@@ -1050,7 +1043,6 @@ namespace ae3d
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        frameBufferCreateInfo.pNext = nullptr;
         frameBufferCreateInfo.renderPass = GfxDeviceGlobal::renderPass;
         frameBufferCreateInfo.attachmentCount = 4;
         frameBufferCreateInfo.pAttachments = attachments;
@@ -1109,17 +1101,13 @@ namespace ae3d
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.flags = 0;
         subpass.inputAttachmentCount = 0;
-        subpass.pInputAttachments = nullptr;
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments = &colorReference;
-        subpass.pResolveAttachments = nullptr;
         subpass.pDepthStencilAttachment = &depthReference;
         subpass.preserveAttachmentCount = 0;
-        subpass.pPreserveAttachments = nullptr;
 
         VkRenderPassCreateInfo renderPassInfo = {};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassInfo.pNext = nullptr;
         renderPassInfo.attachmentCount = 2;
         renderPassInfo.pAttachments = attachments;
         renderPassInfo.subpassCount = 1;
@@ -1218,7 +1206,6 @@ namespace ae3d
     {
         VkImageCreateInfo image = {};
         image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        image.pNext = nullptr;
         image.imageType = VK_IMAGE_TYPE_2D;
         image.format = GfxDeviceGlobal::depthFormat;
         image.extent = { static_cast< std::uint32_t >( WindowGlobal::windowWidth ), static_cast< std::uint32_t >( WindowGlobal::windowHeight ), 1 };
@@ -1231,13 +1218,11 @@ namespace ae3d
 
         VkMemoryAllocateInfo mem_alloc = {};
         mem_alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        mem_alloc.pNext = nullptr;
         mem_alloc.allocationSize = 0;
         mem_alloc.memoryTypeIndex = 0;
 
         VkImageViewCreateInfo depthStencilView = {};
         depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        depthStencilView.pNext = nullptr;
         depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
         depthStencilView.format = GfxDeviceGlobal::depthFormat;
         depthStencilView.flags = 0;
@@ -1329,7 +1314,6 @@ namespace ae3d
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        descriptorPoolInfo.pNext = nullptr;
         descriptorPoolInfo.poolSizeCount = typeCount;
         descriptorPoolInfo.pPoolSizes = typeCounts;
         descriptorPoolInfo.maxSets = AE3D_DESCRIPTOR_SETS_COUNT;
@@ -1589,7 +1573,6 @@ namespace ae3d
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        descriptorLayout.pNext = nullptr;
         descriptorLayout.bindingCount = bindingCount;
         descriptorLayout.pBindings = bindings;
 
@@ -1598,7 +1581,6 @@ namespace ae3d
 
         VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {};
         pPipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pPipelineLayoutCreateInfo.pNext = nullptr;
         pPipelineLayoutCreateInfo.setLayoutCount = 1;
         pPipelineLayoutCreateInfo.pSetLayouts = &GfxDeviceGlobal::descriptorSetLayout;
 
@@ -1610,7 +1592,6 @@ namespace ae3d
     {
         VkSemaphoreCreateInfo semaphoreCreateInfo = {};
         semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        semaphoreCreateInfo.pNext = nullptr;
 
         VkResult err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::presentCompleteSemaphore );
         AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
@@ -1795,14 +1776,12 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
 
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    cmdBufInfo.pNext = nullptr;
 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassBeginInfo.pNext = nullptr;
     renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderPass;
     renderPassBeginInfo.renderArea.offset.x = 0;
     renderPassBeginInfo.renderArea.offset.y = 0;
@@ -1976,7 +1955,6 @@ void ae3d::GfxDevice::CreateUniformBuffers()
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &ubo.uboMemory );
@@ -2046,7 +2024,6 @@ void ae3d::GfxDevice::Present()
 
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.pNext = nullptr;
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = &GfxDeviceGlobal::swapChain;
     presentInfo.pImageIndices = &GfxDeviceGlobal::currentBuffer;
@@ -2187,7 +2164,6 @@ void BeginOffscreen()
 
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassBeginInfo.pNext = nullptr;
     renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderTexture0->GetRenderPass();
     renderPassBeginInfo.renderArea.offset.x = 0;
     renderPassBeginInfo.renderArea.offset.y = 0;
