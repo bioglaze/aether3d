@@ -356,6 +356,7 @@ void svSaveScene( SceneView* sv, char* path )
     if (!f)
     {
         System::Print( "Could not open file for saving: %s\n", path );
+        return;
     }
     
     fprintf( f, "%s\n", sceneStr.c_str() );
