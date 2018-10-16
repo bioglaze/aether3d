@@ -220,6 +220,13 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
             gameObject->RemoveComponent< PointLightComponent >();
         }
 
+        if (gameObject != nullptr && pointLight != nullptr)
+        {
+            static float radius = 0;
+            radius = pointLight->GetRadius();
+            nk_property_float( &ctx, "#Radius:", -0.0f, &radius, 1024.0f, 1, 1 );
+        }
+
         if (gameObject != nullptr && spotLight == nullptr && nk_button_label( &ctx, "Add spot light" ))
         {
             gameObject->AddComponent< SpotLightComponent >();
@@ -228,16 +235,6 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         {
             gameObject->RemoveComponent< SpotLightComponent >();
         }
-
-        if (gameObject != nullptr && pointLight != nullptr)
-        {
-            //nk_label( &ctx, "Radius", NK_TEXT_LEFT );
-
-            static float radius = 0;
-            radius = pointLight->GetRadius();
-            nk_property_float( &ctx, "#Radius:", -0.0f, &radius, 1024.0f, 1, 1 );
-        }
-
         
         // Gameobject is not selected.
         
