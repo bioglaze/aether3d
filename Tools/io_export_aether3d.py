@@ -245,6 +245,11 @@ class Aether3DExporter( bpy.types.Operator ):
         else:
             color = ( 1.0, 1.0, 1.0, 1.0 )
 
+        # tangent
+        #print( "tangent: " + str( mesh.tangent_space.face[ face.index ].vertices[ face_vi ].tangent ) )
+        #print( "tangent " + str( face.tangent ))
+        #print( "tangent " + str( mesh.vertices[ face.vertices[face_vi] ].tangent )) # mesh.vertices is MeshVertex        
+        
         outVertex = Vertex()
         outVertex.co = co
         outVertex.normal = no
@@ -284,14 +289,16 @@ class Aether3DExporter( bpy.types.Operator ):
             mesh = Mesh()
             mesh.vertices = []
             mesh.faces = []
+            mesh.name = obj.name
             
             obj.data.calc_tessface()
+            obj.data.calc_tangents()
+            
             object[ OBJ.MAT ] = obj.matrix_world.copy()
             object[ OBJ.LOC ] = object[ OBJ.MAT ].to_translation()
             object[ OBJ.ROT ] = object[ OBJ.MAT ].to_quaternion()
             object[ OBJ.SCA ] = object[ OBJ.MAT ].to_scale()
             object[ OBJ.UVL ] = None
-            mesh.name = obj.name
 
             for uvt in obj.data.tessface_uv_textures:
                 if uvt.active_render:
