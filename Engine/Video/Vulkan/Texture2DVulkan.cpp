@@ -38,6 +38,7 @@ namespace GfxDeviceGlobal
 namespace Texture2DGlobal
 {
     ae3d::Texture2D defaultTexture;
+    ae3d::Texture2D defaultTextureUAV;
     std::vector< VkSampler > samplersToReleaseAtExit;
     std::vector< VkImage > imagesToReleaseAtExit;
     std::vector< VkImageView > imageViewsToReleaseAtExit;
@@ -744,4 +745,22 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     }
 
     return &Texture2DGlobal::defaultTexture;
+}
+
+ae3d::Texture2D* ae3d::Texture2D::GetDefaultTextureUAV()
+{
+    if (Texture2DGlobal::defaultTextureUAV.view == VK_NULL_HANDLE)
+    {
+        std::uint8_t imageData[ 32 * 32 * 4 ];
+        
+        for (int i = 0; i < 32 * 32 * 4; ++i)
+        {
+            imageData[ i ] = 0xFF;
+        }
+
+        // TODO: Actually make this an UAV
+        Texture2DGlobal::defaultTextureUAV.LoadFromData( imageData, 32, 32, 4, "default texture 2d UAV" );
+    }
+
+    return &Texture2DGlobal::defaultTextureUAV;
 }

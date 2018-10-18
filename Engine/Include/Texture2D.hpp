@@ -23,6 +23,9 @@ namespace ae3d
     public:
         /// Gets a default texture that is always available after System::LoadBuiltinAssets().
         static Texture2D* GetDefaultTexture();
+
+        /// Gets a default texture UAV (read-write) that is always available after System::LoadBuiltinAssets().
+        static Texture2D* GetDefaultTextureUAV();
         
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.

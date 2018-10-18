@@ -850,7 +850,7 @@ int main()
 #endif
 #ifdef TEST_BLOOM
         shaderBloom.SetRenderTexture( &cameraTex, 0 );
-        shaderBloom.SetRenderTexture( &bloomTex, 1 );
+        shaderBloom.SetRenderTexture( &bloomTex, 11 );
         shaderBloom.Begin();
         shaderBloom.Dispatch( width / 8, height / 8, 1 );
         shaderBloom.End();

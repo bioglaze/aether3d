@@ -121,6 +121,7 @@ namespace GfxDeviceGlobal
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
     VkImageView view0 = VK_NULL_HANDLE;
     VkImageView view1 = VK_NULL_HANDLE;
+    VkImageView view11 = VK_NULL_HANDLE;
     VkSampler sampler0 = VK_NULL_HANDLE;
     VkSampler sampler1 = VK_NULL_HANDLE;
     Array< VkBuffer > pendingFreeVBs;
@@ -1337,7 +1338,7 @@ namespace ae3d
         }
     }
 
-    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1 )
+    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1, const VkImageView& view11 )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.count;
@@ -1451,18 +1452,23 @@ namespace ae3d
 		bufferSet5.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightColorBufferView();
 		bufferSet5.dstBinding = 10;
 
+        VkDescriptorImageInfo sampler11Desc = {};
+        sampler11Desc.sampler = sampler1;
+        sampler11Desc.imageView = view11;
+        sampler11Desc.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+
         // Binding 11 : Writable texture
         VkWriteDescriptorSet rwImageSet = {};
         rwImageSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         rwImageSet.dstSet = outDescriptorSet;
         rwImageSet.descriptorCount = 1;
         rwImageSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        rwImageSet.pImageInfo = nullptr; // FIXME: Provide this as a parameter
+        rwImageSet.pImageInfo = &sampler11Desc;
         rwImageSet.dstBinding = 11;
 
         const int setCount = 12;
         VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4, bufferSet5, rwImageSet };
-        // FIXME: Remove the "-1" after RWImage is provided to this method!
+        // TODO: Remove - 1 when default UAV texture is in.
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount - 1, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1686,7 +1692,8 @@ namespace ae3d
 
 void BindComputeDescriptorSet()
 {
-    VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::view1, GfxDeviceGlobal::sampler1 );
+    VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0,
+                                                                 GfxDeviceGlobal::view1, GfxDeviceGlobal::sampler1, GfxDeviceGlobal::view11 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1910,7 +1917,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     UploadPerObjectUbo();
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::view1, GfxDeviceGlobal::sampler1 );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::view1,
+                                                           GfxDeviceGlobal::sampler1, GfxDeviceGlobal::view11 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -2000,6 +2008,7 @@ void ae3d::GfxDevice::BeginFrame()
     GfxDeviceGlobal::view0 = Texture2D::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::sampler0 = Texture2D::GetDefaultTexture()->GetSampler();
     GfxDeviceGlobal::view1 = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::view11 = Texture2D::GetDefaultTextureUAV()->GetView();
     GfxDeviceGlobal::sampler1 = Texture2D::GetDefaultTexture()->GetSampler();
 }
 

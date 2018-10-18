@@ -1,6 +1,7 @@
 #include "ComputeShader.hpp"
 #include "Array.hpp"
 #include "FileSystem.hpp"
+#include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Macros.hpp"
 #include "VulkanUtils.hpp"
@@ -14,6 +15,7 @@ namespace GfxDeviceGlobal
     extern VkCommandBuffer computeCmdBuffer;
     extern VkPipelineLayout pipelineLayout;
     extern VkPipelineCache pipelineCache;
+    extern VkImageView view11;
 }
 
 namespace ComputeShaderGlobal
@@ -86,6 +88,11 @@ void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, 
     if (slot < SLOT_COUNT)
     {
         renderTextures[ slot ] = renderTexture;
+
+        if (slot == 11)
+        {
+            GfxDeviceGlobal::view11 = renderTexture->GetColorView();
+        }
     }
     else
     {
