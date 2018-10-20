@@ -43,16 +43,17 @@ namespace ae3d
         /// \param colorSpace Color space.
         /// \param anisotropy Anisotropy. Value range is 1-16 depending on support. On Metal the value is bucketed into 1, 2, 4, 8 and 16.
         void LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap wrap, TextureFilter filter, ColorSpace colorSpace, Anisotropy anisotropy );
-
+        
+#if RENDERER_VULKAN
+        VkImageView& GetView() { return view; }
+        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, VkImageUsageFlags usageFlags );
+#else
         /// \param imageData Raw pixel data
         /// \param width Width in pixels
         /// \param height Height in pixels
         /// \param channels Channels in the image, must be 3 or 4
         /// \param debugName Null-terminated string of texture's debug name that is visible in graphics debugging tools
         void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName );
-        
-#if RENDERER_VULKAN
-        VkImageView& GetView() { return view; }
 #endif
         /// Destroys all textures. Called internally at exit.
         static void DestroyTextures();
@@ -73,7 +74,7 @@ namespace ae3d
 #endif
 #if RENDERER_VULKAN
         void CreateVulkanObjects( const DDSLoader::Output& mipChain, int bytesPerPixel, VkFormat format );
-        void CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format );
+        void CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format, VkImageUsageFlags usageFlags );
         VkImage image = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
         VkDeviceMemory deviceMemory = VK_NULL_HANDLE;

@@ -68,7 +68,7 @@ void ae3d::Texture2D::DestroyTextures()
     }
 }
 
-void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName, VkImageUsageFlags usageFlags )
 {
     width = aWidth;
     height = aHeight;
@@ -76,7 +76,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     filter = TextureFilter::Linear;
     opaque = channels == 3;
 
-    CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB );
+    CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
 
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, debugName );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
@@ -180,10 +180,8 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
 
-    Array< VkBuffer > stagingBuffers;
-    stagingBuffers.Allocate( mipLevelCount );
-    Array< VkDeviceMemory > stagingMemory;
-    stagingMemory.Allocate( mipLevelCount );
+    Array< VkBuffer > stagingBuffers( mipLevelCount );
+    Array< VkDeviceMemory > stagingMemory( mipLevelCount );
     
     for (int mipIndex = 0; mipIndex < mipLevelCount; ++mipIndex)
     {
@@ -395,7 +393,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
 
-void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format )
+void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format, VkImageUsageFlags usageFlags )
 {
     if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ))
     {
@@ -421,7 +419,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
-    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    imageCreateInfo.usage = usageFlags;
 
     VkResult err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage" );
@@ -475,7 +473,6 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     VkMappedMemoryRange flushRange = {};
     flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    flushRange.pNext = nullptr;
     flushRange.memory = stagingMemory;
     flushRange.offset = 0;
     flushRange.size = VK_WHOLE_SIZE;
@@ -485,7 +482,6 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    viewInfo.pNext = nullptr;
     viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
     viewInfo.format = format;
     viewInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
@@ -735,7 +731,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    CreateVulkanObjects( data, 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB );
+    CreateVulkanObjects( data, 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
 
     stbi_image_free( data );
 }
@@ -751,7 +747,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
             imageData[ i ] = 0xFF;
         }
 
-        Texture2DGlobal::defaultTexture.LoadFromData( imageData, 32, 32, 4, "default texture 2d" );
+        Texture2DGlobal::defaultTexture.LoadFromData( imageData, 32, 32, 4, "default texture 2d", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
     }
 
     return &Texture2DGlobal::defaultTexture;
@@ -768,8 +764,8 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTextureUAV()
             imageData[ i ] = 0xFF;
         }
 
-        // TODO: Actually make this an UAV
-        Texture2DGlobal::defaultTextureUAV.LoadFromData( imageData, 32, 32, 4, "default texture 2d UAV" );
+        Texture2DGlobal::defaultTextureUAV.LoadFromData( imageData, 32, 32, 4, "default texture 2d UAV",
+                                                         VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT );
     }
 
     return &Texture2DGlobal::defaultTextureUAV;

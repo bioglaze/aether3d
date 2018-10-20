@@ -1468,8 +1468,7 @@ namespace ae3d
 
         const int setCount = 12;
         VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4, bufferSet5, rwImageSet };
-        // TODO: Remove - 1 when default UAV texture is in.
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount - 1, sets, 0, nullptr );
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
@@ -1565,17 +1564,17 @@ namespace ae3d
 		layoutBindingBuffer5.pImmutableSamplers = nullptr;
 
         // Binding 11 : Writable texture
-        VkDescriptorSetLayoutBinding layoutBindingRWImage = {};
-        layoutBindingRWImage.binding = 11;
-        layoutBindingRWImage.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        layoutBindingRWImage.descriptorCount = 1;
-        layoutBindingRWImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingRWImage.pImmutableSamplers = nullptr;
+        VkDescriptorSetLayoutBinding layoutBindingUAV = {};
+        layoutBindingUAV.binding = 11;
+        layoutBindingUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        layoutBindingUAV.descriptorCount = 1;
+        layoutBindingUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindingUAV.pImmutableSamplers = nullptr;
 
         constexpr int bindingCount = 12;
         const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
                                                                         layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2,
-                                                                        layoutBindingBuffer3, layoutBindingBuffer4, layoutBindingBuffer5, layoutBindingRWImage };
+                                                                        layoutBindingBuffer3, layoutBindingBuffer4, layoutBindingBuffer5, layoutBindingUAV };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
