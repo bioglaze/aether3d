@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include "FileSystem.hpp"
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
 #include "TextureBase.hpp"
@@ -48,6 +49,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 {
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
     System::Assert( GfxDeviceGlobal::computeCbvSrvUavHeap != nullptr, "heap not initialized" );
+
+    SetUniformBuffer( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
 
     D3D12_CPU_DESCRIPTOR_HANDLE handle = GfxDeviceGlobal::computeCbvSrvUavHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -102,7 +105,11 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     GpuResource depthNormals = {};
     depthNormals.resource = textureBuffers[ 1 ];
     depthNormals.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
+
+    if (depthNormals.resource != nullptr)
+    {
+        TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
+    }
 
     GfxDeviceGlobal::cachedPSO = GfxDeviceGlobal::lightTilerPSO;
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );

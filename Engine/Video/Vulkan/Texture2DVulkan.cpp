@@ -626,6 +626,12 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
             0, nullptr,
             1, &imageMemoryBarrier );
 
+    if (usageFlags & VK_IMAGE_USAGE_STORAGE_BIT)
+    {
+        SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT,
+            VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, 1, 0, 1 );
+    }
+
     vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );

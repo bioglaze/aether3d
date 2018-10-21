@@ -361,7 +361,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     memcpy_s( ae3d::GfxDevice::GetCurrentMappedConstantBuffer(), AE3D_CB_SIZE, &uniforms, sizeof( PerObjectUboStruct ) );
 
-    shader.SetUniformBuffer( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
     shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );
     shader.SetTextureBuffer( 1, depthNormalTarget.GetGpuResource()->resource );
     shader.SetTextureBuffer( 2, spotLightCenterAndRadiusBuffer );
