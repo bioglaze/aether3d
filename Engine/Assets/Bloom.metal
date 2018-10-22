@@ -22,12 +22,12 @@ kernel void bloom(texture2d<float, access::read> colorTexture [[texture(0)]],
     // Blur
     for (int x = 0; x < 9; ++x)
     {
-        accumColor += colorTexture.read( gid.xy + ushort2( x - 4, 0 ) ) * weights[ x ];
+        accumColor += colorTexture.read( gid.xy + ushort2( x, 0 ) ) * weights[ x ];
     }
     
     //accumColor /= 9;
     
     const float luminance = dot( accumColor.rgb, float3( 0.2126f, 0.7152f, 0.0722f ) );
-    
+
     bloomTexture.write( accumColor, gid.xy );
 }

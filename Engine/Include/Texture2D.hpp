@@ -27,6 +27,11 @@ namespace ae3d
         /// Gets a default texture UAV (read-write) that is always available after System::LoadBuiltinAssets().
         static Texture2D* GetDefaultTextureUAV();
         
+        /// \param width Width in pixels.
+        /// \param height height in pixels.
+        /// \param debugName Debug name.
+        void CreateUAV( int width, int height, const char* debugName );
+        
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.

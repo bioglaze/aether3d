@@ -32,13 +32,19 @@ void ae3d::ComputeShader::Load( const char* metalShaderName, const FileSystem::F
     }
 }
 
-void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsigned slot )
+void ae3d::ComputeShader::SetRenderTexture( unsigned slot, RenderTexture* renderTexture )
 {
     System::Assert( slot < SLOT_COUNT, "Too high slot" );
     renderTextures[ slot ] = renderTexture;
 }
 
-void ae3d::ComputeShader::SetUniformBuffer( int slotIndex, id< MTLBuffer > buffer )
+void ae3d::ComputeShader::SetTexture2D( unsigned slotIndex, Texture2D* texture )
+{
+    System::Assert( slotIndex < SLOT_COUNT, "Too high slot" );
+    textures[ slotIndex ] = texture;
+}
+
+void ae3d::ComputeShader::SetUniformBuffer( unsigned slotIndex, id< MTLBuffer > buffer )
 {
     System::Assert( slotIndex < SLOT_COUNT, "Too high slot" );
     uniforms[ slotIndex ] = buffer;
@@ -60,6 +66,11 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     {
         [commandEncoder setBuffer:uniforms[ i ] offset:0 atIndex:i];
         [commandEncoder setTexture:(renderTextures[ i ] ? renderTextures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
+        
+        if (!renderTextures[ i ])
+        {
+            [commandEncoder setTexture:(textures[ i ] ? textures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
+        }
     }
 
     [commandEncoder dispatchThreadgroups:threadgroups threadsPerThreadgroup:threadgroupCounts];

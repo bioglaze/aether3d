@@ -83,7 +83,7 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     ComputeShaderGlobal::psosToReleaseAtExit.Add( pso );
 }
 
-void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, unsigned slot )
+void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* renderTexture )
 {
     if (slot < SLOT_COUNT)
     {

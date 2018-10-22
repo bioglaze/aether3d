@@ -32,7 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -274,7 +274,7 @@ using namespace ae3d;
     RenderTexture cubeRT;
     RenderTexture cameraTex;
     RenderTexture camera2dTex;
-    RenderTexture bloomTex;
+    Texture2D bloomTex;
     
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
@@ -646,7 +646,8 @@ using namespace ae3d;
 #endif
 
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
-    bloomTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+    bloomTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "bloomTex" );
+    //bloomTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
 
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
@@ -853,8 +854,8 @@ using namespace ae3d;
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), true );
 #ifdef TEST_BLOOM
-        bloomShader.SetRenderTexture( &cameraTex, 0 );
-        bloomShader.SetRenderTexture( &bloomTex, 1 );
+        bloomShader.SetRenderTexture( 0, &cameraTex );
+        bloomShader.SetTexture2D( 1, &bloomTex );
         bloomShader.Dispatch( (self.view.bounds.size.width * 2) / 16, (self.view.bounds.size.height * 2) / 16, 1 );
         System::Draw( &bloomTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
 #endif

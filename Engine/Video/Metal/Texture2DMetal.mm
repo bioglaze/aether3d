@@ -214,6 +214,25 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &defaultTexture;
 }
 
+void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName )
+{
+    width = aWidth;
+    height = aHeight;
+    wrap = TextureWrap::Repeat;
+    filter = TextureFilter::Linear;
+    opaque = true;
+
+    MTLTextureDescriptor* textureDescriptor =
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA32Float
+                                                       width:width
+                                                      height:height
+                                                   mipmapped:NO];
+    textureDescriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+    metalTexture.label = [NSString stringWithUTF8String:debugName];
+}
+
 void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
 {
     width = aWidth;

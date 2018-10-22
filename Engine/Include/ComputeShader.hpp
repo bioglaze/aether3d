@@ -63,12 +63,17 @@ namespace ae3d
         /// Sets a uniform buffer.
         /// \param slotIndex slot index
         /// \param buffer Uniform buffer
-        void SetUniformBuffer( int slotIndex, id< MTLBuffer > buffer );
+        void SetUniformBuffer( unsigned slot, id< MTLBuffer > buffer );
+
+        /// Sets a texture.
+        /// \param slot slot index
+        /// \param texture texture.
+        void SetTexture2D( unsigned slot, Texture2D* texture );
 #endif
         /// Sets a render texture into a slot.
-        /// \param renderTexture render texture.
         /// \param slot slot index.
-        void SetRenderTexture( class RenderTexture* renderTexture, unsigned slot );
+        /// \param renderTexture render texture.
+        void SetRenderTexture( unsigned slot, class RenderTexture* renderTexture );
         
 #if RENDERER_D3D12
         void SetUniformBuffer( unsigned slot, ID3D12Resource* buffer );
@@ -88,6 +93,7 @@ namespace ae3d
         id <MTLFunction> function;
         id<MTLComputePipelineState> pipeline;
         id<MTLBuffer> uniforms[ SLOT_COUNT ];
+        Texture2D* textures[ SLOT_COUNT ];
 #endif
         RenderTexture* renderTextures[ SLOT_COUNT ];
 #if RENDERER_D3D12
