@@ -393,6 +393,11 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
 }
 
+void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName )
+{
+    LoadFromData( nullptr, aWidth, aHeight, 4, debugName, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
+}
+
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format, VkImageUsageFlags usageFlags )
 {
     if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ))
@@ -469,7 +474,11 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     void* stagingData;
     err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory, 0, memReqs.size, 0, &stagingData );
     AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
-    std::memcpy( stagingData, data, imageSize );
+    
+    if (data)
+    {
+        std::memcpy( stagingData, data, imageSize );
+    }
 
     VkMappedMemoryRange flushRange = {};
     flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;

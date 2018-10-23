@@ -96,7 +96,11 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subRes
         hr = GfxDeviceGlobal::graphicsCommandList->Reset( GfxDeviceGlobal::commandListAllocator, nullptr );
         AE3D_CHECK_D3D( hr, "command list reset in InitializeTexture" );
 
-        UpdateSubresources( GfxDeviceGlobal::graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, subResourceCount, subResources );
+        if (subResources->pData)
+        {
+            UpdateSubresources( GfxDeviceGlobal::graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, subResourceCount, subResources );
+        }
+
         TransitionResource( gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
 
         hr = GfxDeviceGlobal::graphicsCommandList->Close();
@@ -174,6 +178,21 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
+void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName )
+{
+    LoadFromData( nullptr, aWidth, aHeight, 4, debugName );
+
+    uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+    uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+    uavDesc.Texture2D.MipSlice = 0;
+    uavDesc.Texture2D.PlaneSlice = 0;
+
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResource.resource, nullptr, &uavDesc, uav );
+}
+
 void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
 {
     width = aWidth;
@@ -191,7 +210,8 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
+    // FIXME: This is a hack
+    descTex.Flags = imageData ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;

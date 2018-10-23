@@ -155,6 +155,7 @@ namespace ae3d
         GpuResource gpuResource;
         GpuResource gpuResourceDepth;
 
+        D3D12_CPU_DESCRIPTOR_HANDLE uav = {};
         D3D12_CPU_DESCRIPTOR_HANDLE srv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};

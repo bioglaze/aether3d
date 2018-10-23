@@ -36,7 +36,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -96,8 +96,8 @@ int main()
     RenderTexture cameraTex;
     cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
 
-    RenderTexture bloomTex;
-    bloomTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "bloomTex" );
+    Texture2D bloomTex;
+    bloomTex.CreateUAV( width, height, "bloomTex" );
 
     RenderTexture camera2dTex;
     camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
@@ -849,8 +849,8 @@ int main()
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), true );
 #endif
 #ifdef TEST_BLOOM
-        shaderBloom.SetRenderTexture( &cameraTex, 0 );
-        shaderBloom.SetRenderTexture( &bloomTex, 11 );
+        shaderBloom.SetRenderTexture( 0, &cameraTex );
+        //shaderBloom.SetTexture( &bloomTex, 11 );
         shaderBloom.Begin();
         shaderBloom.Dispatch( width / 8, height / 8, 1 );
         shaderBloom.End();
