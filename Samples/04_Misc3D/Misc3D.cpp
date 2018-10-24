@@ -36,7 +36,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -850,7 +850,7 @@ int main()
 #endif
 #ifdef TEST_BLOOM
         shaderBloom.SetRenderTexture( 0, &cameraTex );
-        //shaderBloom.SetTexture( &bloomTex, 11 );
+        shaderBloom.SetTexture2D( 11, &bloomTex );
         shaderBloom.Begin();
         shaderBloom.Dispatch( width / 8, height / 8, 1 );
         shaderBloom.End();

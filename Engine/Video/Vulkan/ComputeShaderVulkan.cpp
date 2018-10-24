@@ -1,9 +1,10 @@
 #include "ComputeShader.hpp"
 #include "Array.hpp"
 #include "FileSystem.hpp"
+#include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
-#include "Macros.hpp"
+#include "Texture2D.hpp"
 #include "VulkanUtils.hpp"
 
 void BindComputeDescriptorSet();
@@ -92,6 +93,24 @@ void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* 
         if (slot == 11)
         {
             GfxDeviceGlobal::view11 = renderTexture->GetColorView();
+        }
+    }
+    else
+    {
+        System::Print( "ComputeShader:SetRenderTexture: Too high slot!\n" );
+    }
+}
+
+void ae3d::ComputeShader::SetTexture2D( unsigned slot, class Texture2D* texture )
+{
+    if (slot < SLOT_COUNT)
+    {
+        textures[ slot ] = texture;
+
+        // FIXME: This is a hack
+        if (slot == 11)
+        {
+            GfxDeviceGlobal::view11 = texture->GetView();
         }
     }
     else

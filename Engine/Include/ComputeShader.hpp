@@ -49,6 +49,10 @@ namespace ae3d
         VkPipelineShaderStageCreateInfo& GetInfo() { return info; }
         /// \return PSO
         VkPipeline GetPSO() const { return pso; }
+        /// Sets a texture.
+        /// \param slot slot index
+        /// \param texture texture.
+        void SetTexture2D( unsigned slot, Texture2D* texture );
 #endif
         /// \param metalShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param dataHLSL HLSL shader file contents.
@@ -79,6 +83,7 @@ namespace ae3d
         void SetUniformBuffer( unsigned slot, ID3D12Resource* buffer );
         void SetTextureBuffer( unsigned slot, ID3D12Resource* buffer );
         void SetUAVBuffer( unsigned slot, ID3D12Resource* buffer );
+        void SetTexture2D( unsigned slot, Texture2D* texture );
         ID3DBlob* blobShader = nullptr;
 #endif
 
@@ -88,6 +93,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;
         VkPipeline pso = VK_NULL_HANDLE;
+        Texture2D* textures[ SLOT_COUNT ];
 #endif
 #if RENDERER_METAL
         id <MTLFunction> function;

@@ -6,6 +6,7 @@
 #include "Macros.hpp"
 #include "System.hpp"
 #include "TextureBase.hpp"
+#include "Texture2D.hpp"
 
 extern int AE3D_CB_SIZE;
 
@@ -43,6 +44,12 @@ void ae3d::ComputeShader::Begin()
 void ae3d::ComputeShader::End()
 {
 
+}
+
+void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
+{
+    // FIXME: This is a hack
+    SetUAVBuffer( slot, texture->GetGpuResource()->resource );
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
@@ -118,7 +125,10 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeap->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 
-    TransitionResource( depthNormals, D3D12_RESOURCE_STATE_RENDER_TARGET );
+    if (depthNormals.resource != nullptr)
+    {
+        TransitionResource( depthNormals, D3D12_RESOURCE_STATE_RENDER_TARGET );
+    }
 }
 
 void ae3d::ComputeShader::Load( const char* source )
