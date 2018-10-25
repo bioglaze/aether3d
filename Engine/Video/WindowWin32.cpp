@@ -327,6 +327,8 @@ namespace ae3d
 
     void Window::Create(int width, int height, WindowCreateFlags flags)
     {
+        SetEnvironmentVariable( "DISABLE_VK_LAYER_VALVE_steam_overlay_1", "1" );
+
         InitKeyMap();
         WindowGlobal::windowWidth = width == 0 ? GetSystemMetrics( SM_CXSCREEN ) : width;
         WindowGlobal::windowHeight = height == 0 ? GetSystemMetrics( SM_CYSCREEN ) : height;
