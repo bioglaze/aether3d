@@ -3,11 +3,14 @@
 #if RENDERER_METAL
 #import <Metal/Metal.h>
 #endif
-#if RENDERER_D3D12
-#include <d3d12.h>
-#endif
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
+#endif
+
+#if RENDERER_D3D12
+struct ID3D12Resource;
+typedef struct ID3D10Blob* LPD3D10BLOB;
+typedef ID3D10Blob ID3DBlob;
 #endif
 
 namespace ae3d
