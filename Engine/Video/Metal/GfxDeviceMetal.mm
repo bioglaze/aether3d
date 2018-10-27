@@ -885,5 +885,6 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
     renderEncoder.label = @"FboRenderEncoder";
 
     GfxDeviceGlobal::currentRenderTargetDataType = renderTexture->GetDataType();
+    GfxDeviceGlobal::cachedPSO = nil;
 }
 
