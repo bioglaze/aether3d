@@ -34,7 +34,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
-    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
     textureDescriptor.storageMode = MTLStorageModePrivate;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
 

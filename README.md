@@ -34,7 +34,6 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 # Planned Features
 
   - Physically-based rendering
-  - Clustered Forward shading
   - Particles
   - Tone mapping
   - Post-processing effects
