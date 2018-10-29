@@ -4,6 +4,9 @@
 #include "System.hpp"
 #include "FileSystem.hpp"
 
+// TODO remove
+#include "System.hpp"
+
 #define DDS_MAGIC 0x20534444 ///<  little-endian
 
 //  DDS_header.dwFlags
@@ -37,6 +40,10 @@
 #define DDSCAPS2_CUBEMAP_NEGATIVEZ  0x00008000 
 #define DDSCAPS2_VOLUME             0x00200000 
 
+#define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
+((uint32)(uint8)(ch0) | ((uint32)(uint8)(ch1) << 8) |       \
+((uint32)(uint8)(ch2) << 16) | ((uint32)(uint8)(ch3) << 24))
+
 #define D3DFMT_DXT1 827611204 ///< DXT1 compression texture format 
 #define D3DFMT_DXT2 0 ///< DXT2 compression texture format, FIXME: find this
 #define D3DFMT_DXT3 861165636 ///< DXT3 compression texture format 
@@ -54,6 +61,22 @@
 #define PF_IS_DXT5(pf) \
   ((pf.dwFlags & DDPF_FOURCC) && \
    (pf.dwFourCC == D3DFMT_DXT5))
+
+#define PF_IS_BC5U(pf) \
+((pf.dwFlags & DDPF_FOURCC) && \
+(pf.dwFourCC == MAKEFOURCC('B', 'C', '5', 'U') ))
+
+#define PF_IS_BC5S(pf) \
+((pf.dwFlags & DDPF_FOURCC) && \
+(pf.dwFourCC == MAKEFOURCC('B', 'C', '5', 'S') ))
+
+#define PF_IS_DX10(pf) \
+((pf.dwFlags & DDPF_FOURCC) && \
+(pf.dwFourCC == MAKEFOURCC('D', 'X', '1', '0') ))
+
+#define PF_IS_BC5_ATI2(pf) \
+((pf.dwFlags & DDPF_FOURCC) && \
+(pf.dwFourCC == MAKEFOURCC('A', 'T', 'I', '2') ))
 
 #define PF_IS_BGRA8(pf) \
   ((pf.dwFlags & DDPF_RGB) && \
@@ -167,6 +190,8 @@ DDSInfo loadInfoDXT3 = { true, false, false, 4, 16 };
 
 DDSInfo loadInfoDXT5 = { true, false, false, 4, 16 };
 
+DDSInfo loadInfoBC5 = { true, false, false, 4, 16 };
+
 DDSInfo loadInfoBGRA8 = { false, false, false, 1, 4 };
 
 DDSInfo loadInfoBGR8 = { false, false, false, 1, 3 };
@@ -233,6 +258,34 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else if (PF_IS_DXT5( header.sHeader.sPixelFormat ))
     {
+        li = &loadInfoDXT5;
+        outOpaque = false;
+        output.format = DDSLoader::Format::BC3;
+    }
+    else if (PF_IS_BC5S( header.sHeader.sPixelFormat ))
+    {
+        ae3d::System::Print("Found BC5S\n");
+        li = &loadInfoDXT5;
+        outOpaque = false;
+        output.format = DDSLoader::Format::BC3;
+    }
+    else if (PF_IS_BC5U( header.sHeader.sPixelFormat ))
+    {
+        ae3d::System::Print("Found BC5U\n");
+        li = &loadInfoDXT5;
+        outOpaque = false;
+        output.format = DDSLoader::Format::BC3;
+    }
+    else if (PF_IS_BC5_ATI2( header.sHeader.sPixelFormat ))
+    {
+        ae3d::System::Print("Found ATI2\n");
+        li = &loadInfoDXT5;
+        outOpaque = false;
+        output.format = DDSLoader::Format::BC3;
+    }
+    else if (PF_IS_DX10( header.sHeader.sPixelFormat ))
+    {
+        ae3d::System::Print("Found DX10\n");
         li = &loadInfoDXT5;
         outOpaque = false;
         output.format = DDSLoader::Format::BC3;
