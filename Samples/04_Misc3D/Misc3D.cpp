@@ -146,14 +146,16 @@ int main()
     camera2d.AddComponent<TransformComponent>();
     
     Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+    fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D pbrDiffuseTex;
-    pbrDiffuseTex.Load( FileSystem::FileContents("textures/pbr_metal_texture/metal_plate_d.png"), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    pbrDiffuseTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     Texture2D pbrNormalTex;
-    pbrNormalTex.Load( FileSystem::FileContents("textures/pbr_metal_texture/metal_plate_n.png"), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    pbrNormalTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
     Texture2D pbrRoughnessTex;
-    pbrRoughnessTex.Load( FileSystem::FileContents("textures/pbr_metal_texture/metal_plate_rough.png"), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    Texture2D pbrNormalTex2;
+    pbrNormalTex2.Load( FileSystem::FileContents( "grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
@@ -451,7 +453,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)

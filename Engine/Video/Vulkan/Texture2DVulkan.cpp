@@ -635,10 +635,13 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
             0, nullptr,
             1, &imageMemoryBarrier );
 
+    layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
     if (usageFlags & VK_IMAGE_USAGE_STORAGE_BIT)
     {
         SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT,
             VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, 1, 0, 1 );
+        layout = VK_IMAGE_LAYOUT_GENERAL;
     }
 
     vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );

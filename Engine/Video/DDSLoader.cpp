@@ -41,8 +41,8 @@
 #define DDSCAPS2_VOLUME             0x00200000 
 
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-((uint32)(uint8)(ch0) | ((uint32)(uint8)(ch1) << 8) |       \
-((uint32)(uint8)(ch2) << 16) | ((uint32)(uint8)(ch3) << 24))
+((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) |       \
+((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24))
 
 #define D3DFMT_DXT1 827611204 ///< DXT1 compression texture format 
 #define D3DFMT_DXT2 0 ///< DXT2 compression texture format, FIXME: find this
@@ -192,6 +192,8 @@ DDSInfo loadInfoDXT5 = { true, false, false, 4, 16 };
 
 DDSInfo loadInfoBC5 = { true, false, false, 4, 16 };
 
+DDSInfo loadInfoBC5_ATI2 = { true, false, false, 4, 16 };
+
 DDSInfo loadInfoBGRA8 = { false, false, false, 1, 4 };
 
 DDSInfo loadInfoBGR8 = { false, false, false, 1, 3 };
@@ -225,8 +227,7 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     ae3d::System::Assert( header.sHeader.dwMagic == DDS_MAGIC, "DDSLoader: Wrong magic" );
     ae3d::System::Assert( header.sHeader.dwSize == 124, "DDSLoader: Wrong header size" );
   
-    if (!(header.sHeader.dwFlags & DDSD_PIXELFORMAT) ||
-        !(header.sHeader.dwFlags & DDSD_CAPS) )
+    if (!(header.sHeader.dwFlags & DDSD_PIXELFORMAT) || !(header.sHeader.dwFlags & DDSD_CAPS) )
     {
         ae3d::System::Print( "DDS loader error: Texture %s doesn't contain pixelformat or caps.\n", fileContents.path.c_str() );
         outWidth    = 32;
@@ -265,21 +266,21 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     else if (PF_IS_BC5S( header.sHeader.sPixelFormat ))
     {
         ae3d::System::Print("Found BC5S\n");
-        li = &loadInfoDXT5;
+        li = &loadInfoBC5;
         outOpaque = false;
         output.format = DDSLoader::Format::BC3;
     }
     else if (PF_IS_BC5U( header.sHeader.sPixelFormat ))
     {
         ae3d::System::Print("Found BC5U\n");
-        li = &loadInfoDXT5;
+        li = &loadInfoBC5;
         outOpaque = false;
         output.format = DDSLoader::Format::BC3;
     }
     else if (PF_IS_BC5_ATI2( header.sHeader.sPixelFormat ))
     {
-        ae3d::System::Print("Found ATI2\n");
-        li = &loadInfoDXT5;
+        ae3d::System::Print("Found BC5: ATI2\n");
+        li = &loadInfoBC5_ATI2;
         outOpaque = false;
         output.format = DDSLoader::Format::BC3;
     }

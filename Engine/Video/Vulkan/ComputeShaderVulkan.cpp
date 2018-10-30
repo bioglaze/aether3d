@@ -89,11 +89,6 @@ void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* 
     if (slot < SLOT_COUNT)
     {
         renderTextures[ slot ] = renderTexture;
-
-        if (slot == 11)
-        {
-            GfxDeviceGlobal::view11 = renderTexture->GetColorView();
-        }
     }
     else
     {
