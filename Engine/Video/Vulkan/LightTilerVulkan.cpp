@@ -24,8 +24,8 @@ namespace GfxDeviceGlobal
     extern VkCommandBuffer computeCmdBuffer;
     extern VkDescriptorSetLayout descriptorSetLayout;
     extern VkQueue computeQueue;
-    extern VkImageView view0;
-    extern VkSampler sampler0;
+    extern VkImageView boundViews[ 2 ];
+    extern VkSampler boundSamplers[ 2 ];
 }
 
 void UploadPerObjectUbo();
@@ -320,8 +320,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = (float)GetNumTilesX();
     GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = (float)GetNumTilesY();
     
-    GfxDeviceGlobal::view0 = depthNormalTarget.GetColorView();
-    GfxDeviceGlobal::sampler0 = depthNormalTarget.GetSampler();
+    GfxDeviceGlobal::boundViews[ 0 ] = depthNormalTarget.GetColorView();
+    GfxDeviceGlobal::boundSamplers[ 0 ] = depthNormalTarget.GetSampler();
     
     UploadPerObjectUbo();
 

@@ -51,6 +51,7 @@ namespace ae3d
         
 #if RENDERER_VULKAN
         VkImageView& GetView() { return view; }
+        VkImage& GetImage() { return image; }
         void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, VkImageUsageFlags usageFlags );
         VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
 #else

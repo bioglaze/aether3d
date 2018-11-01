@@ -96,7 +96,7 @@ void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* 
     }
 }
 
-void ae3d::ComputeShader::SetTexture2D( unsigned slot, class Texture2D* texture )
+void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
 {
     if (slot < SLOT_COUNT)
     {

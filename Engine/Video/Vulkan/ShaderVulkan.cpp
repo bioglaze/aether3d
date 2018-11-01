@@ -16,10 +16,8 @@ constexpr int MaxModuleCount = 200;
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
-    extern VkImageView view0;
-    extern VkSampler sampler0;
-    extern VkImageView view1;
-    extern VkSampler sampler1;
+    extern VkImageView boundViews[ 2 ];
+    extern VkSampler boundSamplers[ 2 ];
 	extern PerObjectUboStruct perObjectUboStruct;
 }
 
@@ -165,13 +163,13 @@ void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int tex
     if (textureUnit == 0)
     {
 		GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
-        GfxDeviceGlobal::view0 = texture->GetView();
-        GfxDeviceGlobal::sampler0 = texture->GetSampler();
+        GfxDeviceGlobal::boundViews[ 0 ] = texture->GetView();
+        GfxDeviceGlobal::boundSamplers[ 0 ] = texture->GetSampler();
     }
     else if (textureUnit == 1)
     {
-        GfxDeviceGlobal::view1 = texture->GetView();
-        GfxDeviceGlobal::sampler1 = texture->GetSampler();
+        GfxDeviceGlobal::boundViews[ 1 ] = texture->GetView();
+        GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
     else
     {
@@ -188,13 +186,13 @@ void ae3d::Shader::SetTexture( const char* /*name*/, TextureCube* texture, int t
     
     if (textureUnit == 0)
     {
-        GfxDeviceGlobal::view0 = texture->GetView();
-        GfxDeviceGlobal::sampler0 = texture->GetSampler();
+        GfxDeviceGlobal::boundViews[ 0 ] = texture->GetView();
+        GfxDeviceGlobal::boundSamplers[ 0 ] = texture->GetSampler();
     }
     else if (textureUnit == 1)
     {
-        GfxDeviceGlobal::view1 = texture->GetView();
-        GfxDeviceGlobal::sampler1 = texture->GetSampler();
+        GfxDeviceGlobal::boundViews[ 1 ] = texture->GetView();
+        GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
     else
     {
@@ -211,13 +209,13 @@ void ae3d::Shader::SetRenderTexture( const char* /*name*/, RenderTexture* textur
     
     if (textureUnit == 0)
     {
-        GfxDeviceGlobal::view0 = texture->GetColorView();
-        GfxDeviceGlobal::sampler0 = texture->GetSampler();
+        GfxDeviceGlobal::boundViews[ 0 ] = texture->GetColorView();
+        GfxDeviceGlobal::boundSamplers[ 0 ] = texture->GetSampler();
     }
     else if (textureUnit == 1)
     {
-        GfxDeviceGlobal::view1 = texture->GetColorView();
-        GfxDeviceGlobal::sampler1 = texture->GetSampler();
+        GfxDeviceGlobal::boundViews[ 1 ] = texture->GetColorView();
+        GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
     else
     {

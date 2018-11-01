@@ -119,11 +119,10 @@ namespace GfxDeviceGlobal
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
-    VkImageView view0 = VK_NULL_HANDLE;
-    VkImageView view1 = VK_NULL_HANDLE;
+    VkImageView boundViews[ 2 ];
     VkImageView view11 = VK_NULL_HANDLE;
-    VkSampler sampler0 = VK_NULL_HANDLE;
-    VkSampler sampler1 = VK_NULL_HANDLE;
+    VkImage image11 = VK_NULL_HANDLE;
+    VkSampler boundSamplers[ 2 ];
     Array< VkBuffer > pendingFreeVBs;
     Array< Ubo > ubos;
     int currentUbo = 0;
@@ -1691,8 +1690,8 @@ namespace ae3d
 
 void BindComputeDescriptorSet()
 {
-    VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0,
-                                                                 GfxDeviceGlobal::view1, GfxDeviceGlobal::sampler1, GfxDeviceGlobal::view11 );
+    VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ],
+                                                                 GfxDeviceGlobal::boundViews[ 1 ], GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::view11 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1880,7 +1879,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
     System::Assert( (int)GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::swapchainBuffers.count, "invalid draw buffer index" );
 
-    if (GfxDeviceGlobal::view0 == VK_NULL_HANDLE || GfxDeviceGlobal::sampler0 == VK_NULL_HANDLE)
+    if (GfxDeviceGlobal::boundViews[ 0 ] == VK_NULL_HANDLE || GfxDeviceGlobal::boundSamplers[ 0 ] == VK_NULL_HANDLE)
     {
         return;
     }
@@ -1916,8 +1915,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     UploadPerObjectUbo();
 
-    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::view0, GfxDeviceGlobal::sampler0, GfxDeviceGlobal::view1,
-                                                           GfxDeviceGlobal::sampler1, GfxDeviceGlobal::view11 );
+    VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ], GfxDeviceGlobal::boundViews[ 1 ],
+                                                           GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::view11 );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -2004,11 +2003,12 @@ void ae3d::GfxDevice::BeginFrame()
 
     SubmitPostPresentBarrier();
 
-    GfxDeviceGlobal::view0 = Texture2D::GetDefaultTexture()->GetView();
-    GfxDeviceGlobal::sampler0 = Texture2D::GetDefaultTexture()->GetSampler();
-    GfxDeviceGlobal::view1 = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 0 ] = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 1 ] = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundSamplers[ 0 ] = Texture2D::GetDefaultTexture()->GetSampler();
+    GfxDeviceGlobal::boundSamplers[ 1 ] = Texture2D::GetDefaultTexture()->GetSampler();
     GfxDeviceGlobal::view11 = Texture2D::GetDefaultTextureUAV()->GetView();
-    GfxDeviceGlobal::sampler1 = Texture2D::GetDefaultTexture()->GetSampler();
+    GfxDeviceGlobal::image11 = Texture2D::GetDefaultTexture()->GetImage();
 }
 
 void ae3d::GfxDevice::Present()
