@@ -72,7 +72,6 @@ void ae3d::LightTiler::Init()
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &perTileLightIndexBufferMemory );
@@ -108,7 +107,6 @@ void ae3d::LightTiler::Init()
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &pointLightCenterAndRadiusMemory );
@@ -147,7 +145,6 @@ void ae3d::LightTiler::Init()
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &pointLightColorMemory );
@@ -186,7 +183,6 @@ void ae3d::LightTiler::Init()
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightCenterAndRadiusMemory );
@@ -225,7 +221,6 @@ void ae3d::LightTiler::Init()
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightParamsMemory );
@@ -264,7 +259,6 @@ void ae3d::LightTiler::Init()
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = nullptr;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightColorMemory );
