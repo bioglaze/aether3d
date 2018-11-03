@@ -83,7 +83,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     VkImageCreateInfo imageCreateInfo = {};
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageCreateInfo.pNext = nullptr;
     imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     imageCreateInfo.format = format;
     imageCreateInfo.mipLevels = 1;
@@ -93,7 +92,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-    imageCreateInfo.flags = 0;
     
     VkImage images[ 6 ];
     VkDeviceMemory deviceMemories[ 6 ];
@@ -106,10 +104,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    cmdBufInfo.pNext = nullptr;
-    cmdBufInfo.pInheritanceInfo = nullptr;
-    cmdBufInfo.flags = 0;
-
+ 
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
 
@@ -194,7 +189,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             VkMappedMemoryRange flushRange = {};
             flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-            flushRange.pNext = nullptr;
             flushRange.memory = deviceMemories[ face ];
             flushRange.offset = 0;
             flushRange.size = width * height * bytesPerPixel;
@@ -213,7 +207,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             VkImageMemoryBarrier imageMemoryBarrier = {};
             imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-            imageMemoryBarrier.pNext = nullptr;
             imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             imageMemoryBarrier.srcAccessMask = 0;
@@ -315,7 +308,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             VkMappedMemoryRange flushRange = {};
             flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-            flushRange.pNext = nullptr;
             flushRange.memory = deviceMemories[ face ];
             flushRange.offset = 0;
             flushRange.size = memReqs.size;
@@ -401,7 +393,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     VkImageMemoryBarrier imageMemoryBarrier = {};
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     imageMemoryBarrier.srcAccessMask = 0;
@@ -425,7 +416,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pNext = nullptr;
     submitInfo.waitSemaphoreCount = 0;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
@@ -437,7 +427,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    viewInfo.pNext = nullptr;
     viewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
     viewInfo.format = imageCreateInfo.format;
     viewInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
@@ -453,7 +442,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.pNext = nullptr;
     samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
     samplerInfo.minFilter = samplerInfo.magFilter;
     samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
