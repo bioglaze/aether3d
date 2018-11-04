@@ -233,7 +233,6 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.pNext = nullptr;
     samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
     samplerInfo.minFilter = samplerInfo.magFilter;
     samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
@@ -312,7 +311,6 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 
     VkMemoryAllocateInfo memAllocInfo = {};
     memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memAllocInfo.pNext = nullptr;
     memAllocInfo.allocationSize = memReqs.size;
     memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &color.mem );
@@ -423,7 +421,6 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.pNext = nullptr;
     samplerInfo.magFilter = filter == ae3d::TextureFilter::Nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
     samplerInfo.minFilter = samplerInfo.magFilter;
     samplerInfo.mipmapMode = filter == ae3d::TextureFilter::Nearest ? VK_SAMPLER_MIPMAP_MODE_NEAREST : VK_SAMPLER_MIPMAP_MODE_LINEAR;
@@ -488,13 +485,11 @@ void ae3d::RenderTexture::CreateRenderPass()
 
     VkRenderPassCreateInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.pNext = nullptr;
     renderPassInfo.attachmentCount = 2;
     renderPassInfo.pAttachments = attachments;
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpass;
     renderPassInfo.dependencyCount = 0;
-    renderPassInfo.pDependencies = nullptr;
 
     VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &renderPass );
     AE3D_CHECK_VULKAN( err, "RenderTexture vkCreateRenderPass" );
