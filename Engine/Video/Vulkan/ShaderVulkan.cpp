@@ -19,6 +19,7 @@ namespace GfxDeviceGlobal
     extern VkImageView boundViews[ 2 ];
     extern VkSampler boundSamplers[ 2 ];
 	extern PerObjectUboStruct perObjectUboStruct;
+    extern VkCommandBuffer texCmdBuffer;
 }
 
 namespace ShaderGlobal
@@ -165,6 +166,19 @@ void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int tex
 		GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         GfxDeviceGlobal::boundViews[ 0 ] = texture->GetView();
         GfxDeviceGlobal::boundSamplers[ 0 ] = texture->GetSampler();
+
+        /*VkCommandBufferBeginInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
+
+        SetImageLayout(
+            GfxDeviceGlobal::texCmdBuffer,
+            texture->GetImage(),
+            VK_IMAGE_ASPECT_COLOR_BIT, texture->layout,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 0, 1 );
+            vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );*/
     }
     else if (textureUnit == 1)
     {
