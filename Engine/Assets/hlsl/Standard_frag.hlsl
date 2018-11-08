@@ -106,7 +106,12 @@ float4 main( PS_INPUT input ) : SV_Target
         const float3 vecToLightWS = centerAndRadius.xyz - input.positionWS_v.xyz;
         const float3 lightDirVS = normalize( vecToLightVS );
 
+        const float3 V = normalize( input.positionVS_u.xyz );
+        const float3 L = normalize( vecToLightVS );
+        const float3 H = normalize( L + V );
+
         const float dotNL = saturate( dot( normalize( normalVS ), lightDirVS ) );
+        const float dotVH = saturate( dot( V, H ) );
         const float lightDistance = length( vecToLightWS );
         float falloff = 1.0f;
 
@@ -114,9 +119,16 @@ float4 main( PS_INPUT input ) : SV_Target
         {
             const float x = lightDistance / radius;
             falloff = -0.05f + 1.05f / (1.0f + 20.0f * x * x);
+
+            // Schlick Fresnel.
+            const float ref_at_norm_incidence = 1.0f;
+            float fresnel = pow( 1.0f - dotVH, 5.0f );
+            fresnel *= (1.0f - ref_at_norm_incidence);
+            fresnel += ref_at_norm_incidence;
+
             //accumDiffuseAndSpecular.rgb += max( 0.0f, dotNL );// * falloff;
             //accumDiffuseAndSpecular.rgb = float3( 1.0f, 0.0f, 0.0f );
-            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2;
+            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2 * fresnel;
             //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * abs( dot( lightDirVS, normalize( input.normalVS ) ) );
         }
 
