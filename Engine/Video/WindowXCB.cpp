@@ -129,6 +129,7 @@ namespace WindowGlobal
         { XK_Down, ae3d::KeyCode::Down },
         { XK_Escape, ae3d::KeyCode::Escape },
         { XK_Return, ae3d::KeyCode::Enter },
+        { XK_Delete, ae3d::KeyCode::Delete },
         { XK_space, ae3d::KeyCode::Space }
     };
 }

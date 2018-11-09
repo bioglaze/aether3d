@@ -420,6 +420,17 @@ void svRotateCamera( SceneView* sv, float xDegrees, float yDegrees )
     sv->camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), yDegrees );
 }
 
+void svDeleteGameObject( SceneView* sv )
+{
+    if (sv->selectedGameObjects.count > 0)
+    {
+        sv->scene.Remove( sv->selectedGameObjects[ 0 ] );
+        sv->selectedGameObjects.Allocate( 0 );
+        //sv->transformGizmo.selectedMesh = -1;
+        sv->scene.Remove( sv->gameObjects[ 0 ] );
+    }
+}
+
 void TransformGizmo::Init( Shader* shader, GameObject& go )
 {
     translateMesh.Load( FileSystem::FileContents( "cursor_translate.ae3d" ) );

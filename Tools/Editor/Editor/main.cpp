@@ -102,6 +102,10 @@ int main()
                 case KeyCode::Down:
                     svMoveSelection( sceneView, { 0, -1, 0 } );
                     break;
+                case KeyCode::Delete:
+                    svDeleteGameObject( sceneView );
+                    selectedGO = nullptr;
+                    break;
                 default: break;
                 }
             }
