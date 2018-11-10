@@ -26,6 +26,7 @@
 		AB9D9A2C1C96E993009DF897 /* left.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A251C96E993009DF897 /* left.jpg */; };
 		AB9D9A2D1C96E993009DF897 /* right.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A261C96E993009DF897 /* right.jpg */; };
 		AB9D9A2E1C96E993009DF897 /* top.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A271C96E993009DF897 /* top.jpg */; };
+		ABB724A12187603C000D9EB6 /* grass_n_bc5.dds in Resources */ = {isa = PBXBuildFile; fileRef = ABB724A02187603C000D9EB6 /* grass_n_bc5.dds */; };
 		ABC1CC7F2067CE6F003D0A2D /* atlas_cegui.xml in Resources */ = {isa = PBXBuildFile; fileRef = ABC1CC7D2067CE6E003D0A2D /* atlas_cegui.xml */; };
 		ABC1CC802067CE6F003D0A2D /* atlas_cegui.png in Resources */ = {isa = PBXBuildFile; fileRef = ABC1CC7E2067CE6E003D0A2D /* atlas_cegui.png */; };
 		ABCBC06A1E052C82000F0B6D /* textures in Resources */ = {isa = PBXBuildFile; fileRef = ABCBC0691E052C82000F0B6D /* textures */; };
@@ -83,6 +84,7 @@
 		AB9D9A251C96E993009DF897 /* left.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = left.jpg; path = ../../../../aether3d_build/Samples/skybox/left.jpg; sourceTree = "<group>"; };
 		AB9D9A261C96E993009DF897 /* right.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = right.jpg; path = ../../../../aether3d_build/Samples/skybox/right.jpg; sourceTree = "<group>"; };
 		AB9D9A271C96E993009DF897 /* top.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = top.jpg; path = ../../../../aether3d_build/Samples/skybox/top.jpg; sourceTree = "<group>"; };
+		ABB724A02187603C000D9EB6 /* grass_n_bc5.dds */ = {isa = PBXFileReference; lastKnownFileType = file; name = grass_n_bc5.dds; path = ../../../../aether3d_build/Samples/grass_n_bc5.dds; sourceTree = "<group>"; };
 		ABC1CC7D2067CE6E003D0A2D /* atlas_cegui.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = atlas_cegui.xml; path = ../../../../aether3d_build/Samples/atlas_cegui.xml; sourceTree = "<group>"; };
 		ABC1CC7E2067CE6E003D0A2D /* atlas_cegui.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = atlas_cegui.png; path = ../../../../aether3d_build/Samples/atlas_cegui.png; sourceTree = "<group>"; };
 		ABC6B4B92131426B00B947D1 /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../../Engine/Include/Array.hpp; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				ABCBC06C1E052CAA000F0B6D /* sponza.scene */,
 				ABCBC0691E052C82000F0B6D /* textures */,
 				AB2344FF1DEABFB8004C4DEE /* default_white.png */,
+				ABB724A02187603C000D9EB6 /* grass_n_bc5.dds */,
 				ABCFF6B31D79C2D300BD7AF0 /* test_dxt3.dds */,
 				ABCFF6B41D79C2D300BD7AF0 /* test_dxt5.dds */,
 				AB29D4471D772C7400E998FC /* test_dxt1.dds */,
@@ -381,6 +384,7 @@
 				AB9D9A291C96E993009DF897 /* back.jpg in Resources */,
 				AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */,
 				AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */,
+				ABB724A12187603C000D9EB6 /* grass_n_bc5.dds in Resources */,
 				ABC1CC7F2067CE6F003D0A2D /* atlas_cegui.xml in Resources */,
 				AB2345001DEABFB8004C4DEE /* default_white.png in Resources */,
 				AB2CA8291C13664600D4D7C4 /* glider.png in Resources */,

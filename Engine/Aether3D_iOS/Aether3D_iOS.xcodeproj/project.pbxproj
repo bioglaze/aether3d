@@ -341,10 +341,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4449E8531B14B423009A869C /* AudioSourceComponent.hpp in Headers */,
+				4449E8521B14B423009A869C /* AudioClip.hpp in Headers */,
+				ABC015CF21294C9500E9DB4E /* Array.hpp in Headers */,
 				AB921DB31CC21B34008F5750 /* ComputeShader.hpp in Headers */,
+				4449E8541B14B423009A869C /* CameraComponent.hpp in Headers */,
+				ABB79F9A1BA9B7BC002A1B5F /* DirectionalLightComponent.hpp in Headers */,
 				4449E8551B14B423009A869C /* FileSystem.hpp in Headers */,
 				AB922E571B404FFB000F3488 /* MeshRendererComponent.hpp in Headers */,
-				ABB79F9A1BA9B7BC002A1B5F /* DirectionalLightComponent.hpp in Headers */,
 				4449E85D1B14B423009A869C /* SpriteRendererComponent.hpp in Headers */,
 				4449E85C1B14B423009A869C /* Shader.hpp in Headers */,
 				441392061B6F441500B98C1E /* Frustum.hpp in Headers */,
@@ -352,19 +355,16 @@
 				AB521D111BC045BC004CDF06 /* TextureCube.hpp in Headers */,
 				ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */,
 				4449E8601B14B423009A869C /* Texture2D.hpp in Headers */,
-				4449E8541B14B423009A869C /* CameraComponent.hpp in Headers */,
 				4449E85E1B14B423009A869C /* System.hpp in Headers */,
 				AB29D44A1D773E6800E998FC /* DDSLoader.hpp in Headers */,
 				449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */,
 				4449E85B1B14B423009A869C /* Scene.hpp in Headers */,
 				4449E8571B14B423009A869C /* GameObject.hpp in Headers */,
-				4449E8521B14B423009A869C /* AudioClip.hpp in Headers */,
 				4449E8591B14B423009A869C /* Matrix.hpp in Headers */,
 				AB922E561B404FFB000F3488 /* Mesh.hpp in Headers */,
 				4449E8611B14B423009A869C /* TransformComponent.hpp in Headers */,
 				4449E85A1B14B423009A869C /* Quaternion.hpp in Headers */,
 				4449E85F1B14B423009A869C /* TextRendererComponent.hpp in Headers */,
-				ABC015CF21294C9500E9DB4E /* Array.hpp in Headers */,
 				4449E8561B14B423009A869C /* Font.hpp in Headers */,
 				ABF549B61DF3368C00EFF25D /* Statistics.hpp in Headers */,
 				AB190E341B57DE85005ECE49 /* Material.hpp in Headers */,
@@ -628,10 +628,6 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"~/Desktop",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					RENDERER_METAL,
@@ -654,10 +650,6 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"~/Desktop",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				INFOPLIST_FILE = Aether3D_iOS/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

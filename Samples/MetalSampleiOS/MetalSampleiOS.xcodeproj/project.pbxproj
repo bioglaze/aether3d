@@ -15,7 +15,6 @@
 		AB6DECD81EC82B350019358C /* gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD31EC82B350019358C /* gradient.png */; };
 		AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD41EC82B350019358C /* new_sponza.ae3d */; };
 		AB6DECDA1EC82B350019358C /* sponza.scene in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD51EC82B350019358C /* sponza.scene */; };
-		AB811CCF1C23433500911AB6 /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; };
 		AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD01C2344BA00911AB6 /* OpenAL.framework */; };
 		AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD21C2346F400911AB6 /* MetalKit.framework */; };
 		AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */; };
@@ -37,6 +36,7 @@
 		ABD3AB341C29D7F700E78933 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB301C29D7F700E78933 /* font.png */; };
 		ABD3AB351C29D7F700E78933 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB311C29D7F700E78933 /* glider.png */; };
 		ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */; };
+		ABD3FFDD219713A700625539 /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; };
 		ABFE40681D8D1DE000195AD2 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFE40671D8D1DE000195AD2 /* LightCuller.metal */; };
 /* End PBXBuildFile section */
 
@@ -111,7 +111,7 @@
 			files = (
 				AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */,
 				AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */,
-				AB811CCF1C23433500911AB6 /* Aether3D_iOS.framework in Frameworks */,
+				ABD3FFDD219713A700625539 /* Aether3D_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +134,7 @@
 				ABA29F421C19E1F90098E21D /* MetalSampleiOS */,
 				ABA29F5F1C19E1F90098E21D /* MetalSampleiOSTests */,
 				ABA29F411C19E1F90098E21D /* Products */,
+				ABD3FFDC219713A700625539 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -206,6 +207,13 @@
 				ABD3AB291C29D79F00E78933 /* Unlit.metal */,
 			);
 			name = Shaders;
+			sourceTree = "<group>";
+		};
+		ABD3FFDC219713A700625539 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -407,6 +415,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "~/Desktop";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -463,6 +472,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "~/Desktop";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -491,8 +501,9 @@
 					RENDERER_METAL,
 				);
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
+				MTL_OPTIMIZATION_LEVEL = 3;
 				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -505,8 +516,9 @@
 				FRAMEWORK_SEARCH_PATHS = "~/Desktop";
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
+				MTL_OPTIMIZATION_LEVEL = 3;
 				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

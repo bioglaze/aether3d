@@ -32,12 +32,12 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
-#define TEST_RENDER_TEXTURE_2D
+//#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 
 const int POINT_LIGHT_COUNT = 50 * 40;
@@ -257,6 +257,7 @@ using namespace ae3d;
     Shader standardShader;
     ComputeShader bloomShader;
     
+    Texture2D atlasTex;
     Texture2D fontTex;
     Texture2D fontTexSDF;
     Texture2D gliderTex;
@@ -264,6 +265,7 @@ using namespace ae3d;
     Texture2D bc1Tex;
     Texture2D bc2Tex;
     Texture2D bc3Tex;
+    Texture2D bc5Tex;
     Texture2D pbrDiffuseTex;
     Texture2D pbrNormalTex;
     Texture2D pbrRoughnessTex;
@@ -321,7 +323,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -378,7 +380,7 @@ using namespace ae3d;
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
@@ -389,6 +391,8 @@ using namespace ae3d;
     bc1Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc2Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt3.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc3Tex.Load( ae3d::FileSystem::FileContents( "/test_dxt5.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    bc5Tex.Load( ae3d::FileSystem::FileContents( "/grass_n_bc5.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+
     skyTex.Load( ae3d::FileSystem::FileContents( "/left.jpg" ), ae3d::FileSystem::FileContents( "/right.jpg" ),
                 ae3d::FileSystem::FileContents( "/bottom.jpg" ), ae3d::FileSystem::FileContents( "/top.jpg" ),
                 ae3d::FileSystem::FileContents( "/front.jpg" ), ae3d::FileSystem::FileContents( "/back.jpg" ),
@@ -406,6 +410,7 @@ using namespace ae3d;
 
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
     fontSDF.LoadBMFont( &fontTexSDF, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
+    atlasTex.LoadFromAtlas( FileSystem::FileContents( "/atlas_cegui.png" ), FileSystem::FileContents( "/atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::RGB, Anisotropy::k1 );
 
     text.AddComponent<ae3d::TextRendererComponent>();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( "Aether3D Game Engine" );
@@ -430,6 +435,7 @@ using namespace ae3d;
     sprite->SetTexture( &bc2Tex, Vec3( 120, 200, -0.5f ), Vec3( (float)bc2Tex.GetWidth(), (float)bc2Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     sprite->SetTexture( &bc3Tex, Vec3( 120, 300, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     sprite->SetTexture( &gliderTex, Vec3( 220, 120, -0.5f ), Vec3( (float)gliderTex.GetWidth(), (float)gliderTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    sprite->SetTexture( &atlasTex, Vec3( 300, 120, -0.5f ), Vec3( (float)atlasTex.GetWidth(), (float)atlasTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     
     spriteContainer.AddComponent<TransformComponent>();
     //spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
@@ -600,7 +606,7 @@ using namespace ae3d;
 #ifdef TEST_SHADOWS_DIR
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 1024 );
 #endif
-    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetColor( { 1, 0, 0 } );
+    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetColor( { 1, 1, 1 } );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
 
@@ -945,8 +951,8 @@ using namespace ae3d;
     
     ae3d::Quaternion rotation;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
-    rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
-    pbrCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
+    //rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
+    //pbrCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
     char statStr[ 512 ] = {};
     ae3d::System::Statistics::GetStatistics( statStr );
