@@ -35,6 +35,7 @@ PFN_vkGetPhysicalDeviceSurfaceFormatsKHR getPhysicalDeviceSurfaceFormatsKHR = nu
 PFN_vkGetSwapchainImagesKHR getSwapchainImagesKHR = nullptr;
 PFN_vkAcquireNextImageKHR acquireNextImageKHR = nullptr;
 PFN_vkQueuePresentKHR queuePresentKHR = nullptr;
+PFN_vkGetShaderInfoAMD getShaderInfoAMD;
 
 constexpr int UI_VERTICE_COUNT = 512 * 1024;
 constexpr int UI_FACE_COUNT = 128 * 1024;
@@ -884,6 +885,8 @@ namespace ae3d
 
         queuePresentKHR = (PFN_vkQueuePresentKHR)vkGetDeviceProcAddr( GfxDeviceGlobal::device, "vkQueuePresentKHR" );
         System::Assert( queuePresentKHR != nullptr, "Could not load vkQueuePresentKHR function" );
+
+        getShaderInfoAMD = (PFN_vkGetShaderInfoAMD)vkGetDeviceProcAddr( GfxDeviceGlobal::device, "vkGetShaderInfoAMD" );
     }
 
     void CreateDevice()
@@ -1870,6 +1873,20 @@ void ae3d::GfxDevice::SetScissor( int aScissor[ 4 ] )
     scissor.offset.x = (std::uint32_t)aScissor[ 0 ];
     scissor.offset.y = (std::uint32_t)aScissor[ 1 ];
     vkCmdSetScissor( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &scissor );
+}
+
+static void PrintShaderStatistics( VkPipeline pso )
+{
+    VkShaderStatisticsInfoAMD statistics = {};
+    size_t dataSize = sizeof( statistics );
+
+    if (getShaderInfoAMD && getShaderInfoAMD( GfxDeviceGlobal::device, pso,
+                                              VK_SHADER_STAGE_FRAGMENT_BIT, VK_SHADER_INFO_TYPE_STATISTICS_AMD,
+                                              &dataSize, &statistics ) == VK_SUCCESS)
+    {
+        ae3d::System::Print( "VGPR usage: %d\n", statistics.resourceUsage.numUsedVgprs );
+        ae3d::System::Print( "SGPR usage: %d\n", statistics.resourceUsage.numUsedSgprs );
+    }
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc,
