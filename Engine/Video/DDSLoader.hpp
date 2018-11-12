@@ -16,7 +16,7 @@ namespace DDSLoader
     /// Load result
     enum class LoadResult { Success, UnknownPixelFormat, FileNotFound };
     /// Format
-    enum class Format { Invalid, BC1, BC2, BC3 };
+    enum class Format { Invalid, BC1, BC2, BC3, BC5 };
 
     struct Output
     {

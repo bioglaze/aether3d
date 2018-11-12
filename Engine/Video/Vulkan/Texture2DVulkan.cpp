@@ -700,6 +700,11 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
         bytesPerPixel = 2;
     }
+    else if (ddsOutput.format == DDSLoader::Format::BC5)
+    {
+        format = VK_FORMAT_BC5_UNORM_BLOCK;
+        bytesPerPixel = 2;
+    }
     
     ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
