@@ -75,10 +75,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GetMaxNumLightsPerTile();
     GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = GetNumTilesX();
     GfxDeviceGlobal::perObjectUboStruct.tilesXY.y = GetNumTilesY();
-    
-    UploadPerObjectUbo();
 
-    shader.SetUniformBuffer( 0, GfxDevice::GetCurrentUniformBuffer() );
     shader.SetUniformBuffer( 1, pointLightCenterAndRadiusBuffer );
     shader.SetUniformBuffer( 2, perTileLightIndexBuffer);
     shader.SetUniformBuffer( 3, spotLightCenterAndRadiusBuffer );

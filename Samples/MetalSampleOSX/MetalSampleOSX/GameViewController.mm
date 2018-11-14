@@ -32,7 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -256,6 +256,8 @@ using namespace ae3d;
     Shader skyboxShader;
     Shader standardShader;
     ComputeShader bloomShader;
+    ComputeShader downSampleAndThresholdShader;
+    ComputeShader blurShader;
     
     Texture2D atlasTex;
     Texture2D fontTex;
@@ -277,6 +279,7 @@ using namespace ae3d;
     RenderTexture cameraTex;
     RenderTexture camera2dTex;
     Texture2D bloomTex;
+    Texture2D blurTex;
     
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
@@ -451,7 +454,9 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
 
     bloomShader.Load( "bloom", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
-
+    downSampleAndThresholdShader.Load( "downsampleAndThreshold", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+    blurShader.Load( "blur", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+    
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
@@ -652,9 +657,8 @@ using namespace ae3d;
 #endif
 
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
-    bloomTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "bloomTex" );
-    //bloomTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
-
+    bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex" );
+    blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D
@@ -860,9 +864,19 @@ using namespace ae3d;
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), true );
 #ifdef TEST_BLOOM
-        bloomShader.SetRenderTexture( 0, &cameraTex );
-        bloomShader.SetTexture2D( 1, &bloomTex );
-        bloomShader.Dispatch( (self.view.bounds.size.width * 2) / 16, (self.view.bounds.size.height * 2) / 16, 1 );
+        downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+        downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
+        downSampleAndThresholdShader.Dispatch( (self.view.bounds.size.width * 2) / 16, (self.view.bounds.size.height * 2) / 16, 1 );
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 1, &bloomTex );
+        blurShader.SetBlurDirection( 1, 0 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+        
+        /*blurShader.SetTexture2D( 0, &bloomTex );
+        blurShader.SetTexture2D( 1, &blurTex );
+        blurShader.SetBlurDirection( 0, 1 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+*/
         System::Draw( &bloomTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
 #endif
 

@@ -5,7 +5,14 @@
 #include "System.hpp"
 #include "Texture2D.hpp"
 
+void UploadPerObjectUbo();
+
 extern id <MTLCommandQueue> commandQueue;
+
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
 
 void ae3d::ComputeShader::Load( const char* source )
 {
@@ -44,6 +51,12 @@ void ae3d::ComputeShader::SetTexture2D( unsigned slotIndex, Texture2D* texture )
     textures[ slotIndex ] = texture;
 }
 
+void ae3d::ComputeShader::SetBlurDirection( float x, float y )
+{
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
+}
+
 void ae3d::ComputeShader::SetUniformBuffer( unsigned slotIndex, id< MTLBuffer > buffer )
 {
     System::Assert( slotIndex < SLOT_COUNT, "Too high slot" );
@@ -55,6 +68,9 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     MTLSize threadgroupCounts = MTLSizeMake( 16, 16, 1 );
     MTLSize threadgroups = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
 
+    SetUniformBuffer( 0, GfxDevice::GetCurrentUniformBuffer() );
+    UploadPerObjectUbo();
+    
     id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"ComputeCommand";
     

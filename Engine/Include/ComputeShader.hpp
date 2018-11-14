@@ -38,6 +38,10 @@ namespace ae3d
         /// \param groupCountZ Z count
         void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ );
 
+        /// \param x 1 if should blur in x direction.
+        /// \param y 1 if should blur in x direction.
+        void SetBlurDirection( float x, float y );
+        
         /// Internal loading method. End-users should use the method that takes all languages as parameters.
         /// \param source Source string.
         void Load( const char* source );
