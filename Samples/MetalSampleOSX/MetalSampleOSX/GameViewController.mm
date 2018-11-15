@@ -32,7 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -866,18 +866,18 @@ using namespace ae3d;
 #ifdef TEST_BLOOM
         downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
         downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
-        downSampleAndThresholdShader.Dispatch( (self.view.bounds.size.width * 2) / 16, (self.view.bounds.size.height * 2) / 16, 1 );
+        downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 1, &bloomTex );
         blurShader.SetBlurDirection( 1, 0 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
         
-        /*blurShader.SetTexture2D( 0, &bloomTex );
+        blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 1, &blurTex );
         blurShader.SetBlurDirection( 0, 1 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-*/
-        System::Draw( &bloomTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
+
+        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
 #endif
 
         //scene2.Render();

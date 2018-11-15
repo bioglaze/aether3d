@@ -17,7 +17,7 @@ kernel void downsampleAndThreshold(texture2d<float, access::read> colorTexture [
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
-    const float4 color = colorTexture.read( gid.xy );
+    const float4 color = colorTexture.read( gid );
     const float luminance = dot( color.rgb, float3( 0.2126f, 0.7152f, 0.0722f ) );
     const float luminanceThreshold = 0.8f;
     const float4 finalColor = luminance > luminanceThreshold ? color : float4( 0, 0, 0, 0 );
@@ -31,26 +31,27 @@ kernel void blur(texture2d<float, access::read> inputTexture [[texture(0)]],
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
-    constexpr float weights[ 9 ] = { 0.000229f, 0.005977f, 0.060598f,
-        0.241732f, 0.382928f, 0.241732f,
-        0.060598f, 0.005977f, 0.000229f };
-    
     float4 accumColor = float4( 0, 0, 0, 0 );
     
-    for (int x = 0; x < 9; ++x)
+    // Box
+    /*for (int x = 0; x < 13; ++x)
     {
-        const float4 color = inputTexture.read( gid.xy + ushort2( uniforms.tilesXY.z, uniforms.tilesXY.w ) ) * weights[ x ];
+        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z, x * uniforms.tilesXY.w ) );
         accumColor += color;
     }
     
-    resultTexture.write( accumColor, gid.xy );
-}
+    accumColor /= 13;
+*/
+    // Gaussian
+    constexpr float weights[ 9 ] = { 0.000229f, 0.005977f, 0.060598f,
+        0.241732f, 0.382928f, 0.241732f,
+        0.060598f, 0.005977f, 0.000229f };
 
-kernel void bloom(texture2d<float, access::read> colorTexture [[texture(0)]],
-                  texture2d<float, access::write> bloomTexture [[texture(1)]],
-                  constant Uniforms& uniforms [[ buffer(0) ]],
-                  ushort2 gid [[thread_position_in_grid]],
-                  ushort2 tid [[thread_position_in_threadgroup]],
-                  ushort2 dtid [[threadgroup_position_in_grid]])
-{
+    for (int x = 0; x < 9; ++x)
+    {
+        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z, x * uniforms.tilesXY.w ) ) * weights[ x ];
+        accumColor += color;
+    }
+    
+    resultTexture.write( float4(accumColor.rgb, 1), gid.xy );
 }
