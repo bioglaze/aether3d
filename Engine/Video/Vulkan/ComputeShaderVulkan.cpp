@@ -1,6 +1,7 @@
 #include "ComputeShader.hpp"
 #include "Array.hpp"
 #include "FileSystem.hpp"
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
@@ -17,6 +18,7 @@ namespace GfxDeviceGlobal
     extern VkPipelineLayout pipelineLayout;
     extern VkPipelineCache pipelineCache;
     extern VkImageView view11;
+    extern PerObjectUboStruct perObjectUboStruct;
 }
 
 namespace ComputeShaderGlobal
@@ -82,6 +84,12 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     AE3D_CHECK_VULKAN( err, "Compute PSO" );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "light tiler PSO" );
     ComputeShaderGlobal::psosToReleaseAtExit.Add( pso );
+}
+
+void ae3d::ComputeShader::SetBlurDirection( float x, float y )
+{
+	GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
+	GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
 }
 
 void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* renderTexture )

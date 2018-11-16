@@ -36,7 +36,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -97,7 +97,10 @@ int main()
     cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
 
     Texture2D bloomTex;
-    bloomTex.CreateUAV( width, height, "bloomTex" );
+    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex" );
+
+	Texture2D blurTex;
+	blurTex.CreateUAV( width / 2, height / 2, "blurTex" );
 
     RenderTexture camera2dTex;
     camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
@@ -242,8 +245,11 @@ int main()
                 FileSystem::FileContents( "unlit_skin_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 #ifdef TEST_BLOOM
-    ComputeShader shaderBloom;
-    shaderBloom.Load( "bloom", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
+    ComputeShader blurShader;
+	blurShader.Load( "blur", FileSystem::FileContents( "Blur.obj" ), FileSystem::FileContents( "Blur.spv" ) );
+
+	ComputeShader downsampleAndThresholdShader;
+	downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "DownsampleThreshold.obj" ), FileSystem::FileContents( "DownsampleThreshold.spv" ) );
 #endif
     
     Texture2D gliderTex;
@@ -851,12 +857,26 @@ int main()
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), true );
 #endif
 #ifdef TEST_BLOOM
-        shaderBloom.SetRenderTexture( 0, &cameraTex );
+        /*shaderBloom.SetRenderTexture( 0, &cameraTex );
         shaderBloom.SetTexture2D( 11, &bloomTex );
         shaderBloom.Begin();
         shaderBloom.Dispatch( width / 8, height / 8, 1 );
         shaderBloom.End();
-        System::Draw( &bloomTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
+        System::Draw( &bloomTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );*/
+        downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+        downsampleAndThresholdShader.SetTexture2D( 1, &blurTex );
+        downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 1, &bloomTex );
+        blurShader.SetBlurDirection( 1, 0 );
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+
+        blurShader.SetTexture2D( 0, &bloomTex );
+        blurShader.SetTexture2D( 1, &blurTex );
+        blurShader.SetBlurDirection( 0, 1 );
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+
+        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
 #endif
         scene.EndFrame();
 #endif

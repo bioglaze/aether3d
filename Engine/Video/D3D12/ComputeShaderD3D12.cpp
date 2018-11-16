@@ -21,6 +21,7 @@ namespace GfxDeviceGlobal
     extern ID3D12DescriptorHeap* computeCbvSrvUavHeap;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
     extern ID3D12PipelineState* cachedPSO;
+	extern PerObjectUboStruct perObjectUboStruct;
 }
 
 namespace Global
@@ -50,6 +51,12 @@ void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
 {
     // FIXME: This is a hack
     SetUAVBuffer( slot, texture->GetGpuResource()->resource );
+}
+
+void ae3d::ComputeShader::SetBlurDirection( float x, float y )
+{
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
