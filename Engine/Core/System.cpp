@@ -170,7 +170,7 @@ void ae3d::System::Assert( bool condition, const char* message )
 #endif
 }
 
-void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, bool blend )
+void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, BlendMode blendMode )
 {
     Matrix44 proj;
     proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
@@ -210,7 +210,18 @@ void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, fl
     viewport[ 3 ] = (int)yScreenSize;
     GfxDevice::SetViewport( viewport );
 
-    GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, blend ? GfxDevice::BlendMode::AlphaBlend : GfxDevice::BlendMode::Off,
+    GfxDevice::BlendMode gfxBlendMode = GfxDevice::BlendMode::Off;
+    
+    if (blendMode == BlendMode::Alpha)
+    {
+        gfxBlendMode = GfxDevice::BlendMode::AlphaBlend;
+    }
+    else if (blendMode == BlendMode::Additive)
+    {
+        gfxBlendMode = GfxDevice::BlendMode::Additive;
+    }
+
+    GfxDevice::Draw( renderer.GetQuadBuffer(), 0, 2, renderer.builtinShaders.spriteRendererShader, gfxBlendMode,
                      GfxDevice::DepthFunc::NoneWriteOff, GfxDevice::CullMode::Off, GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 

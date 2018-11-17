@@ -32,7 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -861,8 +861,8 @@ using namespace ae3d;
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         scene.Render();
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), true );
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
 #ifdef TEST_BLOOM
         downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
         downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
@@ -877,7 +877,8 @@ using namespace ae3d;
         blurShader.SetBlurDirection( 0, 1 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
 
-        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), false );
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
 #endif
 
         //scene2.Render();
@@ -895,8 +896,7 @@ using namespace ae3d;
         lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
         Matrix44::Multiply( lineTransform, viewMat, viewMat );
         /*System::DrawLines( coneLineHandle, viewMat,
-                          camera3d.GetComponent< CameraComponent >()->GetProjection() );
-        System::Draw( &gliderTex, 40, 240, 100, 100, self.view.bounds.size.width, self.view.bounds.size.height, Vec4( 1, 1, 1, 1 ) );*/
+                          camera3d.GetComponent< CameraComponent >()->GetProjection() );*/
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 8 ) );
 
 #ifdef TEST_NUKLEAR_UI

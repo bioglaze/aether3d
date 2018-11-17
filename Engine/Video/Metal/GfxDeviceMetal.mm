@@ -467,8 +467,9 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = format;
         pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;
-        pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
-        pipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+        //pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+        pipelineStateDescriptor.colorAttachments[0].sourceRGBBlendFactor = blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend ?  MTLBlendFactorSourceAlpha : MTLBlendFactorOne;
+        pipelineStateDescriptor.colorAttachments[0].destinationRGBBlendFactor = blendMode == ae3d::GfxDevice::BlendMode::AlphaBlend ?  MTLBlendFactorOneMinusSourceAlpha : MTLBlendFactorOne;
         pipelineStateDescriptor.colorAttachments[0].rgbBlendOperation = MTLBlendOperationAdd;
         pipelineStateDescriptor.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorSourceAlpha;
         pipelineStateDescriptor.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;

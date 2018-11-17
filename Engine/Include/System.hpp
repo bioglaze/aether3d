@@ -94,6 +94,8 @@ namespace ae3d
     /// High-level functions
     namespace System
     {
+        enum class BlendMode { Off, Alpha, Additive };
+        
         /// \param vertexSize Vertex size.
         /// \param indexSize Index size.
         /// \param outMappedVertices Mapped vertices.
@@ -124,8 +126,8 @@ namespace ae3d
         /// \param xScreenSize X viewport size in pixels
         /// \param yScreenSize Y viewport size in pixels
         /// \param tintColor Tint color
-        /// \param blend Enable blending
-        void Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, bool blend );
+        /// \param blendMode Blending mode
+        void Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, BlendMode blendMode );
         
         /// Draws lines using a line loop. Should be called after Scene::Render().
         /// \param handle Handle, created with CreateLineBuffer.
