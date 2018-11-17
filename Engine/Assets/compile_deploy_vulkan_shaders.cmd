@@ -14,6 +14,7 @@
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\vr_companion_frag.hlsl -o ..\..\..\aether3d_build\Samples\vr_companion_frag.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\vr_companion_vert.hlsl -o ..\..\..\aether3d_build\Samples\vr_companion_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\Bloom.hlsl -o ..\..\..\aether3d_build\Samples\Bloom.spv
+%VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\Blur.hlsl -o ..\..\..\aether3d_build\Samples\Blur.spv
 
 @REM %VULKAN_SDK%\Bin\spirv-opt hlsl\sprite_vert.spv --inline-entry-points-exhaustive --convert-local-access-chains --eliminate-local-single-block --eliminate-local-single-store --eliminate-insert-extract --eliminate-dead-code-aggressive --eliminate-dead-branches --merge-blocks --eliminate-local-single-block --eliminate-local-single-store --eliminate-local-multi-store --eliminate-insert-extract --eliminate-dead-code-aggressive --eliminate-common-uniform -o ..\..\..\aether3d_build\Samples\sprite_vert_opt.spv
 @REM %VULKAN_SDK%\Bin\spirv-remap --strip all --dce all -i hlsl\sprite_vert_opt.spv -o ..\..\..\aether3d_build\Samples\

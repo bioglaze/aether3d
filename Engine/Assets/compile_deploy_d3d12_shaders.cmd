@@ -26,5 +26,6 @@
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T cs_5_1 /Fo ..\..\..\aether3d_build\Samples\LightCuller.obj /E CSMain hlsl\LightCuller.hlsl
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\fullscreen_triangle_vert.obj hlsl\fullscreen_triangle_vert.hlsl
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T cs_5_1 /Fo ..\..\..\aether3d_build\Samples\Bloom.obj /E CSMain hlsl\Bloom.hlsl
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T cs_5_1 /Fo ..\..\..\aether3d_build\Samples\Blur.obj /E CSMain hlsl\Blur.hlsl
 
 pause
