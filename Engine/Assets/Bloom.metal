@@ -49,7 +49,7 @@ kernel void blur(texture2d<float, access::read> inputTexture [[texture(0)]],
 
     for (int x = 0; x < 9; ++x)
     {
-        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z, x * uniforms.tilesXY.w ) ) * weights[ x ];
+        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z - 5, x * uniforms.tilesXY.w - 5 ) ) * weights[ x ];
         accumColor += color;
     }
     

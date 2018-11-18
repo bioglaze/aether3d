@@ -32,7 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -255,7 +255,6 @@ using namespace ae3d;
     Shader skinShader;
     Shader skyboxShader;
     Shader standardShader;
-    ComputeShader bloomShader;
     ComputeShader downSampleAndThresholdShader;
     ComputeShader blurShader;
     
@@ -453,7 +452,6 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
 
-    bloomShader.Load( "bloom", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     downSampleAndThresholdShader.Load( "downsampleAndThreshold", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     blurShader.Load( "blur", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     
