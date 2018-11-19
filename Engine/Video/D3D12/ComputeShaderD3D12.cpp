@@ -184,9 +184,16 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     }
 }
 
-void ae3d::ComputeShader::SetRenderTexture( unsigned /* slot */, RenderTexture* /*renderTexture*/ )
+void ae3d::ComputeShader::SetRenderTexture( unsigned slot, RenderTexture* renderTexture )
 {
-
+    if (slot < SLOT_COUNT)
+    {
+        renderTextures[ slot ] = renderTexture;
+    }
+    else
+    {
+        System::Print( "SetRenderTexture: too high slot, max is 3\n" );
+    }
 }
 
 void ae3d::ComputeShader::SetUniformBuffer( unsigned slot, ID3D12Resource* buffer )

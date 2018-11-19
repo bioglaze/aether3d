@@ -70,6 +70,7 @@ static void InitKeyMap()
     WindowGlobal::keyMap[ 40 ] = ae3d::KeyCode::Down;
     WindowGlobal::keyMap[ 27 ] = ae3d::KeyCode::Escape;
     WindowGlobal::keyMap[ 32 ] = ae3d::KeyCode::Space;
+    WindowGlobal::keyMap[ 46 ] = ae3d::KeyCode::Delete;
 
     WindowGlobal::keyMap[ 65 ] = ae3d::KeyCode::A;
     WindowGlobal::keyMap[ 66 ] = ae3d::KeyCode::B;

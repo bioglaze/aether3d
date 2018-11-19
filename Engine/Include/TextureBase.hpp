@@ -92,6 +92,7 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeDSV( unsigned cubeMapFace ) { return cubeDsvs[ cubeMapFace ]; }
         D3D12_CPU_DESCRIPTOR_HANDLE& GetCubeRTV( unsigned cubeMapFace ) { return cubeRtvs[ cubeMapFace ]; }
         const D3D12_SHADER_RESOURCE_VIEW_DESC* GetSRVDesc() const { return &srvDesc; }
+        const D3D12_UNORDERED_ACCESS_VIEW_DESC* GetUAVDesc() const { return &uavDesc; }
 #endif
         /// \return Color space.
         ColorSpace GetColorSpace() const { return colorSpace; }
@@ -160,6 +161,7 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE rtv = {};
         D3D12_CPU_DESCRIPTOR_HANDLE dsv = {};
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 
         D3D12_CPU_DESCRIPTOR_HANDLE cubeRtvs[ 6 ] = {};
         D3D12_CPU_DESCRIPTOR_HANDLE cubeDsvs[ 6 ] = {};
