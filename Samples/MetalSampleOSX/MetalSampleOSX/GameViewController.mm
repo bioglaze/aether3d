@@ -32,7 +32,7 @@
 #import "Window.hpp"
 
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -860,7 +860,7 @@ using namespace ae3d;
         ae3d::System::BeginFrame();
         scene.Render();
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 #ifdef TEST_BLOOM
         downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
         downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );

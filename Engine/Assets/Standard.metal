@@ -93,7 +93,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
     out.bitangentVS_v.xyz = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
     out.bitangentVS_v.w = vert.texcoord.y;
-    out.normalVS = (uniforms.localToView * float4( vert.normal.xyz, 0 )).xyz;
+    out.normalVS = (uniforms.localToView * float4( vert.normal, 0 )).xyz;
     
     return out;
 }
@@ -127,35 +127,35 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 L = surfaceToLightVS;
     const float3 H = normalize( L + V );
 
-    float dotNL = saturate( dot( N, L ) );
-    float dotNH = saturate( dot( N, H ) );
-    float dotNV = saturate( dot( N, V ) );
-    float dotVH = saturate( dot( V, H ) );
-    float roughness = 0.9f;
-    float r_sq = roughness * roughness;
+    const float dotNL = saturate( dot( N, L ) );
+    const float dotNH = saturate( dot( N, H ) );
+    const float dotNV = saturate( dot( N, V ) );
+    const float dotVH = saturate( dot( V, H ) );
+    const float roughness = 0.9f;
+    const float r_sq = roughness * roughness;
 
     // Geometric term.
-    float geoNumerator = 2.0f * dotNH;
-    float geoB = (geoNumerator * dotNV) / dotVH;
-    float geoC = (geoNumerator * dotNL) / dotVH;
-    float geo = min( 1.0f, min( geoB, geoC ) );
+    const float geoNumerator = 2.0f * dotNH;
+    const float geoB = (geoNumerator * dotNV) / dotVH;
+    const float geoC = (geoNumerator * dotNL) / dotVH;
+    const float geo = min( 1.0f, min( geoB, geoC ) );
     
     // Beckmann roughness.
-    float roughness_a = 1.0f / (4.0f * r_sq * pow( dotNH, 4 ));
-    float roughness_b = dotNH * dotNH - 1.0f;
-    float roughness_c = r_sq * dotNH * dotNH;
-    float roughness2 = roughness_a * exp( roughness_b / roughness_c );
+    const float roughness_a = 1.0f / (4.0f * r_sq * pow( dotNH, 4 ));
+    const float roughness_b = dotNH * dotNH - 1.0f;
+    const float roughness_c = r_sq * dotNH * dotNH;
+    const float roughness2 = roughness_a * exp( roughness_b / roughness_c );
 
     // Schlick Fresnel.
-    float ref_at_norm_incidence = 1.0f;
+    const float ref_at_norm_incidence = 1.0f;
     float fresnel = pow( 1.0f - dotVH, 5.0f );
     fresnel *= (1.0f - ref_at_norm_incidence);
     fresnel += ref_at_norm_incidence;
 
     // Specular BRDF.
-    float Rs_numerator = fresnel * geo * roughness2;
-    float Rs_denominator = dotNV * dotNL;
-    float Rs = max( 0.0f, Rs_numerator / Rs_denominator ); // Added max() to prevent black areas.
+    const float Rs_numerator = fresnel * geo * roughness2;
+    const float Rs_denominator = dotNV * dotNL;
+    const float Rs = max( 0.0f, Rs_numerator / Rs_denominator ); // Added max() to prevent black areas.
     
     float4 ambient = float4( 0.1f, 0.1f, 0.1f, 1.0f );
     //vec3 final = ambient * albedoTex + max( 0.0f, dotNL ) * (specularTex * Rs + albedoTex);
@@ -166,7 +166,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
 
     float4 outColor = uniforms.lightColor;
     //vec3 final = ambient * albedoTex + max( 0.0f, dotNL ) * (specularTex * Rs + albedoTex);
-    outColor = ambient * float4( albedoColor ) + outColor * float4( albedoColor ) + max( 0.0f, dotNL ) * (Rs + float4(albedoColor));
+    outColor = ambient * float4( albedoColor ) + outColor * float4( albedoColor ) + max( 0.0f, dotNL );// * (Rs + float4(albedoColor));
     //const float3 diffuseDirectional = max( 0.0f, dot( normalVS, surfaceToLightVS ) );
     //outColor.rgb *= diffuseDirectional;
     //outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
