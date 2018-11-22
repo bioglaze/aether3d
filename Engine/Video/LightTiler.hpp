@@ -81,31 +81,31 @@ namespace ae3d
         VkBuffer pointLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory pointLightCenterAndRadiusMemory = VK_NULL_HANDLE;
         void* mappedPointLightCenterAndRadiusMemory = nullptr;
-        VkBufferView pointLightBufferView;
+        VkBufferView pointLightBufferView = VK_NULL_HANDLE;
         
         VkBuffer pointLightColorBuffer = VK_NULL_HANDLE;
         VkDeviceMemory pointLightColorMemory = VK_NULL_HANDLE;
         void* mappedPointLightColorMemory = nullptr;
-        VkBufferView pointLightColorView;
+        VkBufferView pointLightColorView = VK_NULL_HANDLE;
 
         VkBuffer spotLightColorBuffer = VK_NULL_HANDLE;
         VkDeviceMemory spotLightColorMemory = VK_NULL_HANDLE;
         void* mappedSpotLightColorMemory = nullptr;
-        VkBufferView spotLightColorView;
+        VkBufferView spotLightColorView = VK_NULL_HANDLE;
 
         VkBuffer spotLightCenterAndRadiusBuffer = VK_NULL_HANDLE;
         VkDeviceMemory spotLightCenterAndRadiusMemory = VK_NULL_HANDLE;
         void* mappedSpotLightCenterAndRadiusMemory = nullptr;
-        VkBufferView spotLightBufferView;
+        VkBufferView spotLightBufferView = VK_NULL_HANDLE;
 
         VkBuffer spotLightParamsBuffer = VK_NULL_HANDLE;
         VkDeviceMemory spotLightParamsMemory = VK_NULL_HANDLE;
         void* mappedSpotLightParamsMemory = nullptr;
-        VkBufferView spotLightParamsView;
+        VkBufferView spotLightParamsView = VK_NULL_HANDLE;
         
         VkBuffer perTileLightIndexBuffer = VK_NULL_HANDLE;
         VkDeviceMemory perTileLightIndexBufferMemory = VK_NULL_HANDLE;
-        VkBufferView perTileLightIndexBufferView;
+        VkBufferView perTileLightIndexBufferView = VK_NULL_HANDLE;
 #endif
         static const int TileRes = 16;
         static const int MaxLights = 2048;
