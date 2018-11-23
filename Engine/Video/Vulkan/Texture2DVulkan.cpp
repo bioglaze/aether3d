@@ -126,22 +126,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, fileContents.path.c_str() );
 }
 
-bool isBC1( VkFormat format )
-{
-    return format == VK_FORMAT_BC1_RGB_UNORM_BLOCK || format == VK_FORMAT_BC1_RGB_SRGB_BLOCK ||
-           format == VK_FORMAT_BC1_RGBA_UNORM_BLOCK || format == VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
-}
-
-bool isBC2( VkFormat format )
-{
-    return format == VK_FORMAT_BC2_UNORM_BLOCK || format == VK_FORMAT_BC2_SRGB_BLOCK;
-}
-
-bool isBC3( VkFormat format )
-{
-    return format == VK_FORMAT_BC3_UNORM_BLOCK || format == VK_FORMAT_BC3_SRGB_BLOCK;
-}
-
 void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, int bytesPerPixel, VkFormat format )
 {
     VkImageCreateInfo imageCreateInfo = {};
@@ -187,8 +171,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
         const std::int32_t mipHeight = MathUtil::Max( height >> mipIndex, 1 );
 
         const VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
-        const VkDeviceSize bc1Size = (mipWidth / 4) * (mipHeight / 4) * bc1BlockSize;
-        VkDeviceSize imageSize = (isBC1( format ) || isBC2( format ) || isBC3( format )) ? bc1Size : (mipWidth * mipHeight * bytesPerPixel);
+        VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * bc1BlockSize;
 
         // FIXME: This is a hack, figure out proper fix.
         if (imageSize == 0)

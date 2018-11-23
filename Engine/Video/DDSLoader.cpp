@@ -267,28 +267,28 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     {
         ae3d::System::Print("Found BC5S\n");
         li = &loadInfoBC5;
-        outOpaque = false;
+        outOpaque = true;
         output.format = DDSLoader::Format::BC5;
     }
     else if (PF_IS_BC5U( header.sHeader.sPixelFormat ))
     {
         ae3d::System::Print("Found BC5U\n");
         li = &loadInfoBC5;
-        outOpaque = false;
+        outOpaque = true;
         output.format = DDSLoader::Format::BC5;
     }
     else if (PF_IS_BC5_ATI2( header.sHeader.sPixelFormat ))
     {
         ae3d::System::Print("Found BC5: ATI2\n");
         li = &loadInfoBC5_ATI2;
-        outOpaque = false;
+        outOpaque = true;
         output.format = DDSLoader::Format::BC5;
     }
     else if (PF_IS_DX10( header.sHeader.sPixelFormat ))
     {
         ae3d::System::Print("Found DX10\n");
         li = &loadInfoDXT5;
-        outOpaque = false;
+        outOpaque = true;
         output.format = DDSLoader::Format::BC5;
     }
     else if (PF_IS_BGRA8( header.sHeader.sPixelFormat ))
