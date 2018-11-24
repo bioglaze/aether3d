@@ -19,7 +19,7 @@ kernel void downsampleAndThreshold(texture2d<float, access::read> colorTexture [
 {
     const float4 color = colorTexture.read( gid );
     const float luminance = dot( color.rgb, float3( 0.2126f, 0.7152f, 0.0722f ) );
-    const float luminanceThreshold = 0.8f;
+    const float luminanceThreshold = 0.7f;
     const float4 finalColor = luminance > luminanceThreshold ? color : float4( 0, 0, 0, 0 );
     downsampledBrightTexture.write( finalColor, gid.xy / 2 );
 }
@@ -34,16 +34,17 @@ kernel void blur(texture2d<float, access::read> inputTexture [[texture(0)]],
     float4 accumColor = float4( 0, 0, 0, 0 );
     
     // Box
-    /*for (int x = 0; x < 13; ++x)
+    const int radius = 13;
+    for (int x = 0; x < radius; ++x)
     {
-        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z, x * uniforms.tilesXY.w ) );
+        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z - radius / 2, x * uniforms.tilesXY.w - radius / 2 ) );
         accumColor += color;
     }
     
-    accumColor /= 13;
-*/
+    accumColor /= radius;
+
     // Gaussian
-    constexpr float weights[ 9 ] = { 0.000229f, 0.005977f, 0.060598f,
+    /*constexpr float weights[ 9 ] = { 0.000229f, 0.005977f, 0.060598f,
         0.241732f, 0.382928f, 0.241732f,
         0.060598f, 0.005977f, 0.000229f };
 
@@ -51,7 +52,7 @@ kernel void blur(texture2d<float, access::read> inputTexture [[texture(0)]],
     {
         const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z - 5, x * uniforms.tilesXY.w - 5 ) ) * weights[ x ];
         accumColor += color;
-    }
+    }*/
     
     resultTexture.write( float4(accumColor.rgb, 1), gid.xy );
 }

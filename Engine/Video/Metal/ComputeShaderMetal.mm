@@ -70,7 +70,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     SetUniformBuffer( 0, GfxDevice::GetCurrentUniformBuffer() );
     UploadPerObjectUbo();
-    
+    GfxDevice::GetNewUniformBuffer();
     id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
     commandBuffer.label = @"ComputeCommand";
     
