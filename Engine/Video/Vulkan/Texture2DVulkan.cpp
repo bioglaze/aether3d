@@ -171,7 +171,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
         const std::int32_t mipHeight = MathUtil::Max( height >> mipIndex, 1 );
 
         const VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
-        VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * bc1BlockSize;
+        VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * (format == VK_FORMAT_BC5_UNORM_BLOCK ? 16 : bc1BlockSize);
 
         // FIXME: This is a hack, figure out proper fix.
         if (imageSize == 0)
