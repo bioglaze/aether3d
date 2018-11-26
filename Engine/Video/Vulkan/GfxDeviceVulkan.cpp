@@ -1289,31 +1289,21 @@ namespace ae3d
         const int AE3D_DESCRIPTOR_SETS_COUNT = 1550;
 
         const std::uint32_t typeCount = 12;
-        VkDescriptorPoolSize typeCounts[ typeCount ];
-        typeCounts[ 0 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        typeCounts[ 0 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 1 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        typeCounts[ 1 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 2 ].type = VK_DESCRIPTOR_TYPE_SAMPLER;
-        typeCounts[ 2 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 3 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        typeCounts[ 3 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 4 ].type = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-        typeCounts[ 4 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 5 ].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        typeCounts[ 5 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 6 ].type = VK_DESCRIPTOR_TYPE_SAMPLER;
-        typeCounts[ 6 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 7 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        typeCounts[ 7 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 8 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        typeCounts[ 8 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[ 9 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        typeCounts[ 9 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-		typeCounts[10 ].type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-		typeCounts[10 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
-        typeCounts[11 ].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        typeCounts[11 ].descriptorCount = AE3D_DESCRIPTOR_SETS_COUNT;
+        const VkDescriptorPoolSize typeCounts[ typeCount ] =
+        {
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT }
+        };
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
