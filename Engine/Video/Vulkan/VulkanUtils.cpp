@@ -1,6 +1,7 @@
 #include <vulkan/vulkan.h>
 #include <cstring>
 #include <cstdint>
+#include <stdio.h>
 #include "Macros.hpp"
 #include "System.hpp"
 #include "Statistics.hpp"
@@ -14,78 +15,167 @@ namespace debug
     bool enabled = false;
 #endif
     bool hasMarker = false;
+	
+    PFN_vkSetDebugUtilsObjectNameEXT setDebugUtilsObjectNameEXT;
 
-    PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = nullptr;
-    PFN_vkDestroyDebugReportCallbackEXT DestroyDebugReportCallback = nullptr;
-    PFN_vkDebugReportMessageEXT dbgBreakCallback = nullptr;
-    PFN_vkDebugMarkerSetObjectNameEXT DebugMarkerSetObjectName = nullptr;
-    PFN_vkCmdDebugMarkerBeginEXT CmdDebugMarkerBegin = nullptr;
-    PFN_vkCmdDebugMarkerEndEXT CmdDebugMarkerEnd = nullptr;
-    PFN_vkCmdDebugMarkerInsertEXT CmdDebugMarkerInsertEXT = nullptr;
+	static const char* getObjectType( VkObjectType type )
+	{
+		switch( type )
+		{
+		case VK_OBJECT_TYPE_QUERY_POOL:
+			return "VK_OBJECT_TYPE_QUERY_POOL";
+		case VK_OBJECT_TYPE_OBJECT_TABLE_NVX:
+			return "VK_OBJECT_TYPE_OBJECT_TABLE_NVX";
+		case VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION:
+			return "VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION";
+		case VK_OBJECT_TYPE_SEMAPHORE:
+			return "VK_OBJECT_TYPE_SEMAPHORE";
+		case VK_OBJECT_TYPE_SHADER_MODULE:
+			return "VK_OBJECT_TYPE_SHADER_MODULE";
+		case VK_OBJECT_TYPE_SWAPCHAIN_KHR:
+			return "VK_OBJECT_TYPE_SWAPCHAIN_KHR";
+		case VK_OBJECT_TYPE_SAMPLER:
+			return "VK_OBJECT_TYPE_SAMPLER";
+		case VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX:
+			return "VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX";
+		case VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT:
+			return "VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT";
+		case VK_OBJECT_TYPE_IMAGE:
+			return "VK_OBJECT_TYPE_IMAGE";
+		case VK_OBJECT_TYPE_UNKNOWN:
+			return "VK_OBJECT_TYPE_UNKNOWN";
+		case VK_OBJECT_TYPE_DESCRIPTOR_POOL:
+			return "VK_OBJECT_TYPE_DESCRIPTOR_POOL";
+		case VK_OBJECT_TYPE_COMMAND_BUFFER:
+			return "VK_OBJECT_TYPE_COMMAND_BUFFER";
+		case VK_OBJECT_TYPE_BUFFER:
+			return "VK_OBJECT_TYPE_BUFFER";
+		case VK_OBJECT_TYPE_SURFACE_KHR:
+			return "VK_OBJECT_TYPE_SURFACE_KHR";
+		case VK_OBJECT_TYPE_INSTANCE:
+			return "VK_OBJECT_TYPE_INSTANCE";
+		case VK_OBJECT_TYPE_VALIDATION_CACHE_EXT:
+			return "VK_OBJECT_TYPE_VALIDATION_CACHE_EXT";
+		case VK_OBJECT_TYPE_IMAGE_VIEW:
+			return "VK_OBJECT_TYPE_IMAGE_VIEW";
+		case VK_OBJECT_TYPE_DESCRIPTOR_SET:
+			return "VK_OBJECT_TYPE_DESCRIPTOR_SET";
+		case VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT:
+			return "VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT";
+		case VK_OBJECT_TYPE_COMMAND_POOL:
+			return "VK_OBJECT_TYPE_COMMAND_POOL";
+		case VK_OBJECT_TYPE_PHYSICAL_DEVICE:
+			return "VK_OBJECT_TYPE_PHYSICAL_DEVICE";
+		case VK_OBJECT_TYPE_DISPLAY_KHR:
+			return "VK_OBJECT_TYPE_DISPLAY_KHR";
+		case VK_OBJECT_TYPE_BUFFER_VIEW:
+			return "VK_OBJECT_TYPE_BUFFER_VIEW";
+		case VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT:
+			return "VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT";
+		case VK_OBJECT_TYPE_FRAMEBUFFER:
+			return "VK_OBJECT_TYPE_FRAMEBUFFER";
+		case VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE:
+			return "VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE";
+		case VK_OBJECT_TYPE_PIPELINE_CACHE:
+			return "VK_OBJECT_TYPE_PIPELINE_CACHE";
+		case VK_OBJECT_TYPE_PIPELINE_LAYOUT:
+			return "VK_OBJECT_TYPE_PIPELINE_LAYOUT";
+		case VK_OBJECT_TYPE_DEVICE_MEMORY:
+			return "VK_OBJECT_TYPE_DEVICE_MEMORY";
+		case VK_OBJECT_TYPE_FENCE:
+			return "VK_OBJECT_TYPE_FENCE";
+		case VK_OBJECT_TYPE_QUEUE:
+			return "VK_OBJECT_TYPE_QUEUE";
+		case VK_OBJECT_TYPE_DEVICE:
+			return "VK_OBJECT_TYPE_DEVICE";
+		case VK_OBJECT_TYPE_RENDER_PASS:
+			return "VK_OBJECT_TYPE_RENDER_PASS";
+		case VK_OBJECT_TYPE_DISPLAY_MODE_KHR:
+			return "VK_OBJECT_TYPE_DISPLAY_MODE_KHR";
+		case VK_OBJECT_TYPE_EVENT:
+			return "VK_OBJECT_TYPE_EVENT";
+		case VK_OBJECT_TYPE_PIPELINE:
+			return "VK_OBJECT_TYPE_PIPELINE";
+		default:
+			return "unhandled type";
+		}
+	}
 
-    VkDebugReportCallbackEXT debugReportCallback;
+	VKAPI_ATTR VkBool32 VKAPI_CALL dbgFunc( VkDebugUtilsMessageSeverityFlagBitsEXT msgSeverity, VkDebugUtilsMessageTypeFlagsEXT msgType,
+		const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* /*userData*/ )
+	{
+		if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
+		{
+			printf( "ERROR: %s\n", callbackData->pMessage );
+		}
+		else if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
+		{
+			printf( "WARNING: %s\n", callbackData->pMessage );
+		}
+		else if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT )
+		{
+			printf( "INFO: %s\n", callbackData->pMessage );
+		}
+		else if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
+		{
+			printf( "VERBOSE: %s\n", callbackData->pMessage );
+		}
 
-    VkBool32 messageCallback( VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT /*objType*/, std::uint64_t /*srcObject*/,
-        std::size_t /*location*/, std::int32_t msgCode, const char* pLayerPrefix, const char* pMsg, void* /*pUserData*/ )
-    {
-        if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
-        {
-            ae3d::System::Print( "Vulkan error: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
-            ae3d::System::Assert( false, "Vulkan error" );
-        }
-        else if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
-        {
-            ae3d::System::Print( "Vulkan perf warning: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
-        }
-        else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
-        {
-            ae3d::System::Print( "Vulkan warning: [%s], code: %d: %s\n", pLayerPrefix, msgCode, pMsg );
+		if( msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT )
+		{
+			printf( "GENERAL: %s\n", callbackData->pMessage );
+		}
+		else if( msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT )
+		{
+			printf( "PERF: %s\n", callbackData->pMessage );
+		}
+
+		if( callbackData->objectCount > 0 )
+		{
+			printf( "Objects: %u\n", callbackData->objectCount );
+
+			for( uint32_t i = 0; i < callbackData->objectCount; ++i )
+			{
+				const char* name = callbackData->pObjects[ i ].pObjectName ? callbackData->pObjects[ i ].pObjectName : "unnamed";
+				printf( "Object %u: name: %s, type: %s\n", i, name, getObjectType( callbackData->pObjects[ i ].objectType ) );
+			}
+		}
+
 #if _MSC_VER && DEBUG
-            __debugbreak();
+		__debugbreak();
 #endif
-            //ae3d::System::Assert( false, "Vulkan warning" );
-        }
 
-        return VK_FALSE;
-    }
+		return VK_FALSE;
+	}
 
     void Setup( VkInstance instance )
     {
-        CreateDebugReportCallback = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkCreateDebugReportCallbackEXT" );
-        DestroyDebugReportCallback = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr( instance, "vkDestroyDebugReportCallbackEXT" );
-        dbgBreakCallback = (PFN_vkDebugReportMessageEXT)vkGetInstanceProcAddr( instance, "vkDebugReportMessageEXT" );
-
-        ae3d::System::Assert( CreateDebugReportCallback != nullptr, "CreateDebugReportCallback" );
-
-        VkDebugReportCallbackCreateInfoEXT dbgCreateInfo;
-        dbgCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
-        dbgCreateInfo.pNext = nullptr;
-        dbgCreateInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)messageCallback;
-        dbgCreateInfo.pUserData = nullptr;
-        dbgCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-        VkResult err = CreateDebugReportCallback( instance, &dbgCreateInfo, nullptr, &debugReportCallback );
-        AE3D_CHECK_VULKAN( err, "Unable to create debug report callback" );
+		PFN_vkCreateDebugUtilsMessengerEXT dbgCreateDebugUtilsMessenger = ( PFN_vkCreateDebugUtilsMessengerEXT )vkGetInstanceProcAddr( instance, "vkCreateDebugUtilsMessengerEXT" );
+		VkDebugUtilsMessengerCreateInfoEXT dbg_messenger_create_info = {};
+		dbg_messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+		dbg_messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		dbg_messenger_create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+		dbg_messenger_create_info.pfnUserCallback = dbgFunc;
+		VkResult err = dbgCreateDebugUtilsMessenger( instance, &dbg_messenger_create_info, nullptr, &renderers[ 0 ].dbgMessenger );
+		AE3D_CHECK_VULKAN( err, "Unable to create debug report callback" );
     }
 
     void SetupDevice( VkDevice device )
     {
-        DebugMarkerSetObjectName = (PFN_vkDebugMarkerSetObjectNameEXT)vkGetDeviceProcAddr( device, "vkDebugMarkerSetObjectNameEXT" );
-        CmdDebugMarkerBegin = (PFN_vkCmdDebugMarkerBeginEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerBeginEXT" );
-        CmdDebugMarkerEnd = (PFN_vkCmdDebugMarkerEndEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerEndEXT" );
-        CmdDebugMarkerInsertEXT = (PFN_vkCmdDebugMarkerInsertEXT)vkGetDeviceProcAddr( device, "vkCmdDebugMarkerInsertEXT" );   
+		setDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)vkGetDeviceProcAddr( device, "vkSetDebugUtilsObjectNameEXT" );
     }
 
-    void SetObjectName( VkDevice device, std::uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name )
+    void SetObjectName( VkDevice device, std::uint64_t object, VkObjectType objectType, const char* name )
     {
-        if (DebugMarkerSetObjectName && hasMarker)
+        if ( setDebugUtilsObjectNameEXT && hasMarker)
         {
-            VkDebugMarkerObjectNameInfoEXT nameInfo = {};
-            nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
-            nameInfo.objectType = objectType;
-            nameInfo.object = object;
-            nameInfo.pObjectName = name;
-            DebugMarkerSetObjectName( device, &nameInfo );
-        }
+			VkDebugUtilsObjectNameInfoEXT nameInfo = {};
+			nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			nameInfo.objectType = objectType;
+			nameInfo.objectHandle = object;
+			nameInfo.pObjectName = name;
+			setDebugUtilsObjectNameEXT( device, &nameInfo );
+		}
     }
 
     void BeginRegion( VkCommandBuffer cmdbuffer, const char* pMarkerName, float r, float g, float b )
@@ -163,7 +253,7 @@ namespace ae3d
 #if VK_USE_PLATFORM_ANDROID_KHR
             VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
 #endif
-            VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+			VK_EXT_DEBUG_UTILS_EXTENSION_NAME
         };
 
 #if VK_USE_PLATFORM_ANDROID_KHR
