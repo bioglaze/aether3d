@@ -1,5 +1,4 @@
 #include "GameObject.hpp"
-#include <sstream>
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
@@ -108,12 +107,17 @@ bool ae3d::GameObject::IsEnabled() const
 
 std::string ae3d::GameObject::GetSerialized() const
 {
-    const std::string serializedName = name.empty() ? "empty" : name;
-    std::stringstream outStream;
-    outStream << "gameobject\n";
-    outStream << "name " << serializedName << "\n";
-    outStream << "layer " << layer << "\n";
-    outStream << "enabled " << (isEnabled ? 1 : 0) << "\n\n";
+    std::string serializedName = name.empty() ? "empty" : name;
+    serializedName += "gameobject\n";
+    serializedName += "name ";
+    serializedName += serializedName;
+    serializedName += "\n";
+    serializedName += "layer ";
+    serializedName += layer;
+    serializedName += "\n";
+    serializedName += "enabled ";
+    serializedName += (isEnabled ? "1" : "0");
+    serializedName += "\n\n";
 
-    return outStream.str();
+    return serializedName;
 }

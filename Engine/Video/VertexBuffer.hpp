@@ -150,7 +150,7 @@ namespace ae3d
 #if RENDERER_METAL
         id<MTLBuffer> GetVertexBuffer() const { return vertexBuffer; }
         id<MTLBuffer> GetIndexBuffer() const { return indexBuffer; }
-#if 1
+
         id<MTLBuffer> positionBuffer;
         id<MTLBuffer> texcoordBuffer;
         id<MTLBuffer> colorBuffer;
@@ -158,7 +158,6 @@ namespace ae3d
         id<MTLBuffer> tangentBuffer;
         id<MTLBuffer> boneBuffer;
         id<MTLBuffer> weightBuffer;
-#endif
         
 #endif
 #if RENDERER_VULKAN
