@@ -65,7 +65,7 @@ void ae3d::LightTiler::Init()
         bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &perTileLightIndexBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)perTileLightIndexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "perTileLightIndexBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)perTileLightIndexBuffer, VK_OBJECT_TYPE_BUFFER, "perTileLightIndexBuffer" );
 
         VkMemoryRequirements memReqs;
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, perTileLightIndexBuffer, &memReqs );
@@ -89,7 +89,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &perTileLightIndexBufferView );
         AE3D_CHECK_VULKAN( err, "light index buffer view" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)perTileLightIndexBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "perTileLightIndexBufferView" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)perTileLightIndexBufferView, VK_OBJECT_TYPE_BUFFER_VIEW, "perTileLightIndexBufferView" );
     }
 
     // Point light center/radius buffer
@@ -100,7 +100,7 @@ void ae3d::LightTiler::Init()
         bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &pointLightCenterAndRadiusBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightCenterAndRadiusBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "pointLightCenterAndRadiusBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightCenterAndRadiusBuffer, VK_OBJECT_TYPE_BUFFER, "pointLightCenterAndRadiusBuffer" );
 
         VkMemoryRequirements memReqs;
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, pointLightCenterAndRadiusBuffer, &memReqs );
@@ -127,7 +127,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightBufferView );
         AE3D_CHECK_VULKAN( err, "point light buffer view" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "pointLightBufferView" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightBufferView, VK_OBJECT_TYPE_BUFFER_VIEW, "pointLightBufferView" );
     }
 
     // Point light color buffer
@@ -138,7 +138,7 @@ void ae3d::LightTiler::Init()
         bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &pointLightColorBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightColorBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "pointLightColorBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightColorBuffer, VK_OBJECT_TYPE_BUFFER, "pointLightColorBuffer" );
 
         VkMemoryRequirements memReqs;
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, pointLightColorBuffer, &memReqs );
@@ -165,7 +165,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &pointLightColorView );
         AE3D_CHECK_VULKAN( err, "point light color view" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightColorView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "pointLightColorView" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightColorView, VK_OBJECT_TYPE_BUFFER_VIEW, "pointLightColorView" );
     }
 
     // Spot light buffer
@@ -176,7 +176,7 @@ void ae3d::LightTiler::Init()
         bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &spotLightCenterAndRadiusBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightCenterAndRadiusBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "spotLightCenterAndRadiusBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightCenterAndRadiusBuffer, VK_OBJECT_TYPE_BUFFER, "spotLightCenterAndRadiusBuffer" );
 
         VkMemoryRequirements memReqs;
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, spotLightCenterAndRadiusBuffer, &memReqs );
@@ -203,7 +203,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &spotLightBufferView );
         AE3D_CHECK_VULKAN( err, "spot light buffer view" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightBufferView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "spotLightBufferView" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightBufferView, VK_OBJECT_TYPE_BUFFER_VIEW, "spotLightBufferView" );
     }
 
     // Spot light params buffer
@@ -214,7 +214,7 @@ void ae3d::LightTiler::Init()
         bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &spotLightParamsBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightParamsBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "spotLightParamsBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightParamsBuffer, VK_OBJECT_TYPE_BUFFER, "spotLightParamsBuffer" );
 
         VkMemoryRequirements memReqs;
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, spotLightParamsBuffer, &memReqs );
@@ -241,7 +241,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &spotLightParamsView );
         AE3D_CHECK_VULKAN( err, "spot light params buffer view" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightParamsView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "spotLightParamsBufferView" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightParamsView, VK_OBJECT_TYPE_BUFFER_VIEW, "spotLightParamsBufferView" );
     }
 
     // Spot light color buffer
@@ -252,7 +252,7 @@ void ae3d::LightTiler::Init()
         bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT;
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &spotLightColorBuffer );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightColorBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "spotLightColorBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightColorBuffer, VK_OBJECT_TYPE_BUFFER, "spotLightColorBuffer" );
 
         VkMemoryRequirements memReqs;
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, spotLightColorBuffer, &memReqs );
@@ -279,7 +279,7 @@ void ae3d::LightTiler::Init()
 
         err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &spotLightColorView );
         AE3D_CHECK_VULKAN( err, "spot light color view" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightColorView, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, "spotLightColorView" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightColorView, VK_OBJECT_TYPE_BUFFER_VIEW, "spotLightColorView" );
     }
 }
 

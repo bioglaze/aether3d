@@ -72,7 +72,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         VkShaderModule shaderModule;
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
         AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, vertexData.path.c_str() );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_OBJECT_TYPE_SHADER_MODULE, vertexData.path.c_str() );
         ShaderGlobal::modulesToReleaseAtExit[ ShaderGlobal::moduleIndex++ ] = shaderModule;
 
         vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -108,7 +108,7 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         VkShaderModule shaderModule;
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
         AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, fragmentData.path.c_str() );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_OBJECT_TYPE_SHADER_MODULE, fragmentData.path.c_str() );
         ShaderGlobal::modulesToReleaseAtExit[ ShaderGlobal::moduleIndex++ ] = shaderModule;
 
         fragmentInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

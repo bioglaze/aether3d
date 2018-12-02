@@ -34,7 +34,7 @@ namespace debug
     void Setup( VkInstance instance );
     void SetupDevice( VkDevice device );
     void Free( VkInstance instance );
-    void SetObjectName( VkDevice device, std::uint64_t object, VkDebugReportObjectTypeEXT objectType, const char* name );
+    void SetObjectName( VkDevice device, std::uint64_t object, VkObjectType objectType, const char* name );
     void BeginRegion( VkCommandBuffer cmdbuffer, const char* pMarkerName, float r, float g, float b );
     void EndRegion( VkCommandBuffer cmdBuffer );
 }

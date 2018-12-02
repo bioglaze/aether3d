@@ -62,7 +62,7 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     VkShaderModule shaderModule;
     VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
     AE3D_CHECK_VULKAN( err, "vkCreateShaderModule compute" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, contents.path.c_str() );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_OBJECT_TYPE_SHADER_MODULE, contents.path.c_str() );
     ComputeShaderGlobal::modulesToReleaseAtExit.Add( shaderModule );
 
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -82,7 +82,7 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
 
     err = vkCreateComputePipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &psoInfo, nullptr, &pso );
     AE3D_CHECK_VULKAN( err, "Compute PSO" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "light tiler PSO" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_OBJECT_TYPE_PIPELINE, "light tiler PSO" );
     ComputeShaderGlobal::psosToReleaseAtExit.Add( pso );
 }
 

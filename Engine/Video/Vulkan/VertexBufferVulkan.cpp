@@ -38,7 +38,7 @@ void ae3d::VertexBuffer::DestroyBuffers()
 
 void ae3d::VertexBuffer::SetDebugName( const char* name )
 {
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, name );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)vertexBuffer, VK_OBJECT_TYPE_BUFFER, name );
 }
 
 void CopyBuffer( VkBuffer source, VkBuffer& destination, int bufferSize )
@@ -90,7 +90,7 @@ void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkB
     bufferInfo.usage = usageFlags;
     VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &buffer );
     AE3D_CHECK_VULKAN( err, "vkCreateBuffer" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, debugName );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)buffer, VK_OBJECT_TYPE_BUFFER, debugName );
 
     VkMemoryRequirements memReqs;
     VkMemoryAllocateInfo memAlloc = {};

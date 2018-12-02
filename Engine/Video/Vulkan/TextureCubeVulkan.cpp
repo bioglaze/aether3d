@@ -336,7 +336,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage in TextureCube" );
     TextureCubeGlobal::imagesToReleaseAtExit.push_back( image );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, paths[ 0 ].c_str() );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, paths[ 0 ].c_str() );
 
     VkMemoryRequirements memReqs;
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
@@ -458,5 +458,5 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &sampler );
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     TextureCubeGlobal::samplersToReleaseAtExit.push_back( sampler );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }

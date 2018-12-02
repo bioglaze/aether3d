@@ -17,6 +17,9 @@ namespace debug
     bool hasMarker = false;
 	
     PFN_vkSetDebugUtilsObjectNameEXT setDebugUtilsObjectNameEXT;
+    PFN_vkCmdBeginDebugUtilsLabelEXT CmdBeginDebugUtilsLabelEXT;
+    PFN_vkCmdEndDebugUtilsLabelEXT CmdEndDebugUtilsLabelEXT;
+    VkDebugUtilsMessengerEXT dbgMessenger = VK_NULL_HANDLE;
 
 	static const char* getObjectType( VkObjectType type )
 	{
@@ -141,22 +144,29 @@ namespace debug
 			}
 		}
 
+        if( !(msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) )
+        {
 #if _MSC_VER && DEBUG
-		__debugbreak();
+            __debugbreak();
 #endif
-
+            ae3d::System::Assert( false, "Vulkan error!" );
+        }
+        
 		return VK_FALSE;
 	}
 
     void Setup( VkInstance instance )
     {
 		PFN_vkCreateDebugUtilsMessengerEXT dbgCreateDebugUtilsMessenger = ( PFN_vkCreateDebugUtilsMessengerEXT )vkGetInstanceProcAddr( instance, "vkCreateDebugUtilsMessengerEXT" );
+        CmdBeginDebugUtilsLabelEXT = ( PFN_vkCmdBeginDebugUtilsLabelEXT )vkGetInstanceProcAddr( instance, "vkCmdBeginDebugUtilsLabelEXT" );
+        CmdEndDebugUtilsLabelEXT = ( PFN_vkCmdEndDebugUtilsLabelEXT )vkGetInstanceProcAddr( instance, "vkCmdEndDebugUtilsLabelEXT" );
+
 		VkDebugUtilsMessengerCreateInfoEXT dbg_messenger_create_info = {};
 		dbg_messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 		dbg_messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 		dbg_messenger_create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 		dbg_messenger_create_info.pfnUserCallback = dbgFunc;
-		VkResult err = dbgCreateDebugUtilsMessenger( instance, &dbg_messenger_create_info, nullptr, &renderers[ 0 ].dbgMessenger );
+		VkResult err = dbgCreateDebugUtilsMessenger( instance, &dbg_messenger_create_info, nullptr, &dbgMessenger );
 		AE3D_CHECK_VULKAN( err, "Unable to create debug report callback" );
     }
 
@@ -167,7 +177,7 @@ namespace debug
 
     void SetObjectName( VkDevice device, std::uint64_t object, VkObjectType objectType, const char* name )
     {
-        if ( setDebugUtilsObjectNameEXT && hasMarker)
+        if (setDebugUtilsObjectNameEXT && hasMarker)
         {
 			VkDebugUtilsObjectNameInfoEXT nameInfo = {};
 			nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
@@ -180,25 +190,25 @@ namespace debug
 
     void BeginRegion( VkCommandBuffer cmdbuffer, const char* pMarkerName, float r, float g, float b )
     {
-        if (CmdDebugMarkerBegin && hasMarker)
+        if (hasMarker)
         {
-            const float color[ 4 ] = { r, g, b, 1 };
-            VkDebugMarkerMarkerInfoEXT markerInfo = {};
-            markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-            markerInfo.color[ 0 ] = color[ 0 ];
-            markerInfo.color[ 1 ] = color[ 1 ];
-            markerInfo.color[ 2 ] = color[ 2 ];
-            markerInfo.color[ 3 ] = color[ 3 ];
-            markerInfo.pMarkerName = pMarkerName;
-            CmdDebugMarkerBegin( cmdbuffer, &markerInfo );
+            VkDebugUtilsLabelEXT label = {};
+            label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+            label.pNext = nullptr;
+            label.pLabelName = pMarkerName;
+            label.color[ 0 ] = r;
+            label.color[ 1 ] = g;
+            label.color[ 2 ] = b;
+            label.color[ 3 ] = 1;
+            CmdBeginDebugUtilsLabelEXT( cmdbuffer, &label );
         }
     }
 
     void EndRegion( VkCommandBuffer cmdBuffer )
     {
-        if (CmdDebugMarkerEnd && hasMarker)
+        if (hasMarker)
         {
-            CmdDebugMarkerEnd( cmdBuffer );
+            CmdEndDebugUtilsLabelEXT( cmdBuffer );
         }
     }
 
@@ -206,7 +216,9 @@ namespace debug
     {
         if (enabled)
         {
-            DestroyDebugReportCallback( instance, debugReportCallback, nullptr );
+            PFN_vkDestroyDebugUtilsMessengerEXT dbgDestroyDebugUtilsMessenger;
+            dbgDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr( instance, "vkDestroyDebugUtilsMessengerEXT" );
+            dbgDestroyDebugUtilsMessenger( instance, dbgMessenger, nullptr );
         }
     }
 }

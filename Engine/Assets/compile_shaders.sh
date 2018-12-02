@@ -14,4 +14,5 @@ $VULKAN_SDK/bin/glslangValidator -D -V -S vert -e main hlsl/fullscreen_triangle_
 $VULKAN_SDK/bin/glslangValidator -D -V -S frag -e main hlsl/vr_companion_frag.hlsl -o ../../../aether3d_build/Samples/vr_companion_frag.spv
 $VULKAN_SDK/bin/glslangValidator -D -V -S vert -e main hlsl/vr_companion_vert.hlsl -o ../../../aether3d_build/Samples/vr_companion_vert.spv
 $VULKAN_SDK/bin/glslangValidator -D -V -S comp -e CSMain hlsl/Bloom.hlsl -o ../../../aether3d_build/Samples/Bloom.spv
+$VULKAN_SDK/bin/glslangValidator -D -V -S comp -e CSMain hlsl/Blur.hlsl -o ../../../aether3d_build/Samples/Blur.spv
 

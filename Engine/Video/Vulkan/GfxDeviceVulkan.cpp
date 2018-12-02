@@ -441,22 +441,22 @@ namespace ae3d
 
         for (int i = 0; i < GfxDeviceGlobal::swapchainBuffers.count; ++i)
         {
-            debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::drawCmdBuffers[ i ], VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "drawCmdBuffer" );
+            debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::drawCmdBuffers[ i ], VK_OBJECT_TYPE_COMMAND_BUFFER, "drawCmdBuffer" );
         }
         
         commandBufferAllocateInfo.commandBufferCount = 1;
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::postPresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::postPresentCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "postPresentCmdBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::postPresentCmdBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "postPresentCmdBuffer" );
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::prePresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::prePresentCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "prePresentCmdBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::prePresentCmdBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "prePresentCmdBuffer" );
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, &GfxDeviceGlobal::offscreenCmdBuffer );
         AE3D_CHECK_VULKAN( err, "Offscreen command buffer" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::offscreenCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "offscreenCmdBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::offscreenCmdBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "offscreenCmdBuffer" );
 
         VkCommandBufferAllocateInfo computeBufAllocateInfo = {};
         computeBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -466,7 +466,7 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &computeBufAllocateInfo, &GfxDeviceGlobal::computeCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::computeCmdBuffer, VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, "computeCmdBuffer" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::computeCmdBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "computeCmdBuffer" );
     }
 
     void SubmitPrePresentBarrier()
@@ -810,7 +810,7 @@ namespace ae3d
 
         err = createSwapchainKHR( GfxDeviceGlobal::device, &swapchainInfo, nullptr, &GfxDeviceGlobal::swapChain );
         AE3D_CHECK_VULKAN( err, "swapchain" );
-        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::swapChain, VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT, "swap chain" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::swapChain, VK_OBJECT_TYPE_SWAPCHAIN_KHR, "swap chain" );
 
         std::uint32_t imageCount;
         err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, nullptr );

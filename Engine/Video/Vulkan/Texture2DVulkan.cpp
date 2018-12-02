@@ -78,8 +78,8 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
 
     CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
 
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, debugName );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_OBJECT_TYPE_IMAGE_VIEW, debugName );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, debugName );
 }
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
@@ -122,8 +122,8 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         System::Print( "Unknown/unsupported texture file extension: %s\n", fileContents.path.c_str() );
     }
 
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, fileContents.path.c_str() );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, fileContents.path.c_str() );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_OBJECT_TYPE_IMAGE_VIEW, fileContents.path.c_str() );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, fileContents.path.c_str() );
 }
 
 void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, int bytesPerPixel, VkFormat format )
@@ -363,7 +363,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, in
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     Texture2DGlobal::samplersToReleaseAtExit.push_back( sampler );
 
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }
 
 void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName )
@@ -639,7 +639,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
     Texture2DGlobal::samplersToReleaseAtExit.push_back( sampler );
 
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, "sampler" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }
 
 void ae3d::Texture2D::LoadDDS( const char* aPath )
