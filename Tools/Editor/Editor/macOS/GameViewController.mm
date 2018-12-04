@@ -122,7 +122,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     NSLog(@"mouseDown");
     inputEvent.button = 1;
     inputEvent.x = (int)theEvent.locationInWindow.x;
-    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
 }
 
@@ -132,7 +132,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     
     inputEvent.button = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
-    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
 }
 
