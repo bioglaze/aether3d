@@ -62,12 +62,10 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
         
         vertexPath = vertexData.path;
 
-        VkShaderModuleCreateInfo moduleCreateInfo;
+        VkShaderModuleCreateInfo moduleCreateInfo = {};
         moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        moduleCreateInfo.pNext = nullptr;
         moduleCreateInfo.codeSize = vertexData.data.size();
         moduleCreateInfo.pCode = (const std::uint32_t*)vertexData.data.data();
-        moduleCreateInfo.flags = 0;
 
         VkShaderModule shaderModule;
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
@@ -98,12 +96,10 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 
         fragmentPath = fragmentData.path;
 
-        VkShaderModuleCreateInfo moduleCreateInfo;
+        VkShaderModuleCreateInfo moduleCreateInfo = {};
         moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        moduleCreateInfo.pNext = nullptr;
         moduleCreateInfo.codeSize = fragmentData.data.size();
         moduleCreateInfo.pCode = (const std::uint32_t*)fragmentData.data.data();
-        moduleCreateInfo.flags = 0;
 
         VkShaderModule shaderModule;
         VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
