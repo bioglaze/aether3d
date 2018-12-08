@@ -107,13 +107,12 @@ bool ae3d::GameObject::IsEnabled() const
 
 std::string ae3d::GameObject::GetSerialized() const
 {
-    std::string serializedName = name.empty() ? "empty" : name;
-    serializedName += "gameobject\n";
+    std::string serializedName = "gameobject\n";
     serializedName += "name ";
-    serializedName += serializedName;
+    serializedName += name.empty() ? "empty" : name;
     serializedName += "\n";
     serializedName += "layer ";
-    serializedName += layer;
+    serializedName += std::to_string( layer );
     serializedName += "\n";
     serializedName += "enabled ";
     serializedName += (isEnabled ? "1" : "0");
