@@ -11,6 +11,8 @@
 struct ID3D12Resource;
 typedef struct ID3D10Blob* LPD3D10BLOB;
 typedef ID3D10Blob ID3DBlob;
+
+struct ID3D12PipelineState;
 #endif
 
 namespace ae3d
@@ -92,6 +94,7 @@ namespace ae3d
         void SetUAVBuffer( unsigned slot, ID3D12Resource* buffer );
         void SetTexture2D( unsigned slot, Texture2D* texture );
         ID3DBlob* blobShader = nullptr;
+        ID3D12PipelineState* pso = nullptr;
 #endif
 
     private:

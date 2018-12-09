@@ -3,7 +3,6 @@
 #include "ComputeShader.hpp"
 
 ae3d::Renderer renderer;
-void CreateComputePSO( ae3d::ComputeShader& shader );
 void CreateFullscreenTrianglePSO( ID3DBlob* vertexBlob, ID3DBlob* pixelBlob );
 
 void ae3d::BuiltinShaders::Load()
@@ -18,5 +17,4 @@ void ae3d::BuiltinShaders::Load()
     CreateFullscreenTrianglePSO( fullscreenTriangleShader.blobShaderVertex, fullscreenTriangleShader.blobShaderPixel );
 
     lightCullShader.Load( "", FileSystem::FileContents( "LightCuller.obj" ), FileSystem::FileContents( "" ) );
-    CreateComputePSO( lightCullShader );
 }

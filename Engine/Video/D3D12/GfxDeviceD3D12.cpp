@@ -167,7 +167,6 @@ namespace GfxDeviceGlobal
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignatureGraphics = nullptr;
     ID3D12RootSignature* rootSignatureTileCuller = nullptr;
-    ID3D12PipelineState* lightTilerPSO = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
     float clearColor[ 4 ] = { 0, 0, 0, 0 };
     std::vector< PSOEntry > psoCache;
@@ -657,17 +656,6 @@ std::uint64_t GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::S
     outResult += ((unsigned)topology) * 256;
 
     return outResult;
-}
-
-void CreateComputePSO( ae3d::ComputeShader& shader )
-{
-    D3D12_COMPUTE_PIPELINE_STATE_DESC descPso = {};
-    descPso.CS = { reinterpret_cast<BYTE*>( shader.blobShader->GetBufferPointer() ), shader.blobShader->GetBufferSize() };
-    descPso.pRootSignature = GfxDeviceGlobal::rootSignatureTileCuller;
-
-    HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &GfxDeviceGlobal::lightTilerPSO ) );
-    AE3D_CHECK_D3D( hr, "Failed to create compute PSO" );
-    GfxDeviceGlobal::lightTilerPSO->SetName( L"PSO Tile Culler" );
 }
 
 void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
@@ -1399,7 +1387,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::lightTilerPSO );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeap );
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryBuffer );

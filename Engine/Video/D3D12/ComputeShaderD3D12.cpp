@@ -17,7 +17,6 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern ID3D12RootSignature* rootSignatureTileCuller;
-    extern ID3D12PipelineState* lightTilerPSO;
     extern ID3D12DescriptorHeap* computeCbvSrvUavHeap;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
     extern ID3D12PipelineState* cachedPSO;
@@ -27,6 +26,7 @@ namespace GfxDeviceGlobal
 namespace Global
 {
     std::vector< ID3DBlob* > computeShaders;
+    std::vector< ID3D12PipelineState* > psos;
 }
 
 void DestroyComputeShaders()
@@ -35,16 +35,19 @@ void DestroyComputeShaders()
     {
         AE3D_SAFE_RELEASE( Global::computeShaders[ i ] );
     }
+
+    for (std::size_t i = 0; i < Global::psos.size(); ++i)
+    {
+        AE3D_SAFE_RELEASE( Global::psos[ i ] );
+    }
 }
 
 void ae3d::ComputeShader::Begin()
 {
-
 }
 
 void ae3d::ComputeShader::End()
 {
-
 }
 
 void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
@@ -63,6 +66,18 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 {
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
     System::Assert( GfxDeviceGlobal::computeCbvSrvUavHeap != nullptr, "heap not initialized" );
+
+    if (!pso)
+    {
+        D3D12_COMPUTE_PIPELINE_STATE_DESC descPso = {};
+        descPso.CS = { reinterpret_cast<BYTE*>(blobShader->GetBufferPointer()), blobShader->GetBufferSize() };
+        descPso.pRootSignature = GfxDeviceGlobal::rootSignatureTileCuller;
+
+        HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &pso ) );
+        AE3D_CHECK_D3D( hr, "Failed to create compute PSO" );
+        pso->SetName( L"PSO" );
+        Global::psos.push_back( pso );
+    }
 
     SetUniformBuffer( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
 
@@ -125,8 +140,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
         TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
     }
 
-    GfxDeviceGlobal::cachedPSO = GfxDeviceGlobal::lightTilerPSO;
-    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( GfxDeviceGlobal::lightTilerPSO );
+    GfxDeviceGlobal::cachedPSO = pso;
+    GfxDeviceGlobal::graphicsCommandList->SetPipelineState( pso );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeap );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeap->GetGPUDescriptorHandleForHeapStart() );
