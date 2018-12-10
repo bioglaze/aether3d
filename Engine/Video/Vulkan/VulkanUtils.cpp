@@ -25,80 +25,43 @@ namespace debug
 	{
 		switch( type )
 		{
-		case VK_OBJECT_TYPE_QUERY_POOL:
-			return "VK_OBJECT_TYPE_QUERY_POOL";
-		case VK_OBJECT_TYPE_OBJECT_TABLE_NVX:
-			return "VK_OBJECT_TYPE_OBJECT_TABLE_NVX";
-		case VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION:
-			return "VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION";
-		case VK_OBJECT_TYPE_SEMAPHORE:
-			return "VK_OBJECT_TYPE_SEMAPHORE";
-		case VK_OBJECT_TYPE_SHADER_MODULE:
-			return "VK_OBJECT_TYPE_SHADER_MODULE";
-		case VK_OBJECT_TYPE_SWAPCHAIN_KHR:
-			return "VK_OBJECT_TYPE_SWAPCHAIN_KHR";
-		case VK_OBJECT_TYPE_SAMPLER:
-			return "VK_OBJECT_TYPE_SAMPLER";
-		case VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX:
-			return "VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX";
-		case VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT:
-			return "VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT";
-		case VK_OBJECT_TYPE_IMAGE:
-			return "VK_OBJECT_TYPE_IMAGE";
-		case VK_OBJECT_TYPE_UNKNOWN:
-			return "VK_OBJECT_TYPE_UNKNOWN";
-		case VK_OBJECT_TYPE_DESCRIPTOR_POOL:
-			return "VK_OBJECT_TYPE_DESCRIPTOR_POOL";
-		case VK_OBJECT_TYPE_COMMAND_BUFFER:
-			return "VK_OBJECT_TYPE_COMMAND_BUFFER";
-		case VK_OBJECT_TYPE_BUFFER:
-			return "VK_OBJECT_TYPE_BUFFER";
-		case VK_OBJECT_TYPE_SURFACE_KHR:
-			return "VK_OBJECT_TYPE_SURFACE_KHR";
-		case VK_OBJECT_TYPE_INSTANCE:
-			return "VK_OBJECT_TYPE_INSTANCE";
-		case VK_OBJECT_TYPE_VALIDATION_CACHE_EXT:
-			return "VK_OBJECT_TYPE_VALIDATION_CACHE_EXT";
-		case VK_OBJECT_TYPE_IMAGE_VIEW:
-			return "VK_OBJECT_TYPE_IMAGE_VIEW";
-		case VK_OBJECT_TYPE_DESCRIPTOR_SET:
-			return "VK_OBJECT_TYPE_DESCRIPTOR_SET";
-		case VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT:
-			return "VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT";
-		case VK_OBJECT_TYPE_COMMAND_POOL:
-			return "VK_OBJECT_TYPE_COMMAND_POOL";
-		case VK_OBJECT_TYPE_PHYSICAL_DEVICE:
-			return "VK_OBJECT_TYPE_PHYSICAL_DEVICE";
-		case VK_OBJECT_TYPE_DISPLAY_KHR:
-			return "VK_OBJECT_TYPE_DISPLAY_KHR";
-		case VK_OBJECT_TYPE_BUFFER_VIEW:
-			return "VK_OBJECT_TYPE_BUFFER_VIEW";
-		case VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT:
-			return "VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT";
-		case VK_OBJECT_TYPE_FRAMEBUFFER:
-			return "VK_OBJECT_TYPE_FRAMEBUFFER";
-		case VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE:
-			return "VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE";
-		case VK_OBJECT_TYPE_PIPELINE_CACHE:
-			return "VK_OBJECT_TYPE_PIPELINE_CACHE";
-		case VK_OBJECT_TYPE_PIPELINE_LAYOUT:
-			return "VK_OBJECT_TYPE_PIPELINE_LAYOUT";
-		case VK_OBJECT_TYPE_DEVICE_MEMORY:
-			return "VK_OBJECT_TYPE_DEVICE_MEMORY";
-		case VK_OBJECT_TYPE_FENCE:
-			return "VK_OBJECT_TYPE_FENCE";
-		case VK_OBJECT_TYPE_QUEUE:
-			return "VK_OBJECT_TYPE_QUEUE";
-		case VK_OBJECT_TYPE_DEVICE:
-			return "VK_OBJECT_TYPE_DEVICE";
-		case VK_OBJECT_TYPE_RENDER_PASS:
-			return "VK_OBJECT_TYPE_RENDER_PASS";
-		case VK_OBJECT_TYPE_DISPLAY_MODE_KHR:
-			return "VK_OBJECT_TYPE_DISPLAY_MODE_KHR";
-		case VK_OBJECT_TYPE_EVENT:
-			return "VK_OBJECT_TYPE_EVENT";
-		case VK_OBJECT_TYPE_PIPELINE:
-			return "VK_OBJECT_TYPE_PIPELINE";
+		case VK_OBJECT_TYPE_QUERY_POOL: return "VK_OBJECT_TYPE_QUERY_POOL";
+		case VK_OBJECT_TYPE_OBJECT_TABLE_NVX: return "VK_OBJECT_TYPE_OBJECT_TABLE_NVX";
+		case VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION: return "VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION";
+		case VK_OBJECT_TYPE_SEMAPHORE: return "VK_OBJECT_TYPE_SEMAPHORE";
+		case VK_OBJECT_TYPE_SHADER_MODULE: return "VK_OBJECT_TYPE_SHADER_MODULE";
+		case VK_OBJECT_TYPE_SWAPCHAIN_KHR: return "VK_OBJECT_TYPE_SWAPCHAIN_KHR";
+		case VK_OBJECT_TYPE_SAMPLER: return "VK_OBJECT_TYPE_SAMPLER";
+		case VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX: return "VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX";
+		case VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT: return "VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT";
+		case VK_OBJECT_TYPE_IMAGE: return "VK_OBJECT_TYPE_IMAGE";
+		case VK_OBJECT_TYPE_UNKNOWN: return "VK_OBJECT_TYPE_UNKNOWN";
+		case VK_OBJECT_TYPE_DESCRIPTOR_POOL: return "VK_OBJECT_TYPE_DESCRIPTOR_POOL";
+		case VK_OBJECT_TYPE_COMMAND_BUFFER: return "VK_OBJECT_TYPE_COMMAND_BUFFER";
+		case VK_OBJECT_TYPE_BUFFER: return "VK_OBJECT_TYPE_BUFFER";
+		case VK_OBJECT_TYPE_SURFACE_KHR: return "VK_OBJECT_TYPE_SURFACE_KHR";
+		case VK_OBJECT_TYPE_INSTANCE: return "VK_OBJECT_TYPE_INSTANCE";
+		case VK_OBJECT_TYPE_VALIDATION_CACHE_EXT: return "VK_OBJECT_TYPE_VALIDATION_CACHE_EXT";
+		case VK_OBJECT_TYPE_IMAGE_VIEW: return "VK_OBJECT_TYPE_IMAGE_VIEW";
+		case VK_OBJECT_TYPE_DESCRIPTOR_SET: return "VK_OBJECT_TYPE_DESCRIPTOR_SET";
+		case VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT: return "VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT";
+		case VK_OBJECT_TYPE_COMMAND_POOL: return "VK_OBJECT_TYPE_COMMAND_POOL";
+		case VK_OBJECT_TYPE_PHYSICAL_DEVICE: return "VK_OBJECT_TYPE_PHYSICAL_DEVICE";
+		case VK_OBJECT_TYPE_DISPLAY_KHR: return "VK_OBJECT_TYPE_DISPLAY_KHR";
+		case VK_OBJECT_TYPE_BUFFER_VIEW: return "VK_OBJECT_TYPE_BUFFER_VIEW";
+		case VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT: return "VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT";
+		case VK_OBJECT_TYPE_FRAMEBUFFER: return "VK_OBJECT_TYPE_FRAMEBUFFER";
+		case VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE: return "VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE";
+		case VK_OBJECT_TYPE_PIPELINE_CACHE: return "VK_OBJECT_TYPE_PIPELINE_CACHE";
+		case VK_OBJECT_TYPE_PIPELINE_LAYOUT: return "VK_OBJECT_TYPE_PIPELINE_LAYOUT";
+		case VK_OBJECT_TYPE_DEVICE_MEMORY: return "VK_OBJECT_TYPE_DEVICE_MEMORY";
+		case VK_OBJECT_TYPE_FENCE: return "VK_OBJECT_TYPE_FENCE";
+		case VK_OBJECT_TYPE_QUEUE: return "VK_OBJECT_TYPE_QUEUE";
+		case VK_OBJECT_TYPE_DEVICE: return "VK_OBJECT_TYPE_DEVICE";
+		case VK_OBJECT_TYPE_RENDER_PASS: return "VK_OBJECT_TYPE_RENDER_PASS";
+		case VK_OBJECT_TYPE_DISPLAY_MODE_KHR: return "VK_OBJECT_TYPE_DISPLAY_MODE_KHR";
+		case VK_OBJECT_TYPE_EVENT: return "VK_OBJECT_TYPE_EVENT";
+		case VK_OBJECT_TYPE_PIPELINE: return "VK_OBJECT_TYPE_PIPELINE";
 		default:
 			return "unhandled type";
 		}
@@ -107,40 +70,40 @@ namespace debug
 	VKAPI_ATTR VkBool32 VKAPI_CALL dbgFunc( VkDebugUtilsMessageSeverityFlagBitsEXT msgSeverity, VkDebugUtilsMessageTypeFlagsEXT msgType,
 		const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* /*userData*/ )
 	{
-		if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT )
+		if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 		{
-			printf( "ERROR: %s\n", callbackData->pMessage );
+			ae3d::System::Print( "ERROR: %s\n", callbackData->pMessage );
 		}
-		else if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT )
+		else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 		{
-			printf( "WARNING: %s\n", callbackData->pMessage );
+            ae3d::System::Print( "WARNING: %s\n", callbackData->pMessage );
 		}
-		else if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT )
+		else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
 		{
-			printf( "INFO: %s\n", callbackData->pMessage );
+            ae3d::System::Print( "INFO: %s\n", callbackData->pMessage );
 		}
-		else if( msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT )
+		else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
 		{
-			printf( "VERBOSE: %s\n", callbackData->pMessage );
+            ae3d::System::Print( "VERBOSE: %s\n", callbackData->pMessage );
 		}
 
-		if( msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT )
+		if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
 		{
-			printf( "GENERAL: %s\n", callbackData->pMessage );
+            ae3d::System::Print( "GENERAL: %s\n", callbackData->pMessage );
 		}
-		else if( msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT )
+		else if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
 		{
-			printf( "PERF: %s\n", callbackData->pMessage );
+            ae3d::System::Print( "PERF: %s\n", callbackData->pMessage );
 		}
 
 		if( callbackData->objectCount > 0 )
 		{
-			printf( "Objects: %u\n", callbackData->objectCount );
+            ae3d::System::Print( "Objects: %u\n", callbackData->objectCount );
 
 			for( uint32_t i = 0; i < callbackData->objectCount; ++i )
 			{
 				const char* name = callbackData->pObjects[ i ].pObjectName ? callbackData->pObjects[ i ].pObjectName : "unnamed";
-				printf( "Object %u: name: %s, type: %s\n", i, name, getObjectType( callbackData->pObjects[ i ].objectType ) );
+                ae3d::System::Print( "Object %u: name: %s, type: %s\n", i, name, getObjectType( callbackData->pObjects[ i ].objectType ) );
 			}
 		}
 
@@ -265,7 +228,10 @@ namespace ae3d
 #if VK_USE_PLATFORM_ANDROID_KHR
             VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
 #endif
-			VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+#if AE3D_OPENVR
+            VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+#endif
         };
 
 #if VK_USE_PLATFORM_ANDROID_KHR
@@ -292,7 +258,11 @@ namespace ae3d
             instanceCreateInfo.ppEnabledLayerNames = validationLayerNames;
         }
 
+#if AE3D_OPENVR
+        instanceCreateInfo.enabledExtensionCount = debug::enabled ? 4 : 3;
+#else
         instanceCreateInfo.enabledExtensionCount = debug::enabled ? 3 : 2;
+#endif
         instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
 
         VkResult result = vkCreateInstance( &instanceCreateInfo, nullptr, outInstance );

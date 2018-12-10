@@ -136,7 +136,7 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
         return false;
     }
 
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)outFramebufferDesc.image, VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, debugName );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)outFramebufferDesc.image, VK_OBJECT_TYPE_IMAGE, debugName );
 
     VkMemoryRequirements memoryRequirements = {};
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, outFramebufferDesc.image, &memoryRequirements );
@@ -437,11 +437,6 @@ void ConvertSteamVRMatrixToMatrix4( const vr::HmdMatrix34_t &steamMatrix, Matrix
     outMatrix.Transpose( outMatrix );
 }
 
-void RenderDistortion()
-{
-    System::Assert( Global::lensDistort.IsValid(), "lens distortion shader is not valid" );
-}
-
 void SetupDescriptors()
 {
     VkDescriptorSetLayoutBinding layoutBindings[ 3 ] = {};
@@ -602,8 +597,6 @@ void ae3d::VR::SubmitFrame()
             //m_rbShowTrackedDevice[ unDevice ] = state.ulButtonPressed == 0;
         }
     }
-
-    RenderDistortion();
 
     vr::VRVulkanTextureData_t vulkanData;
     vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.image;
