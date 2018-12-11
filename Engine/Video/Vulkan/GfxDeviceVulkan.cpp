@@ -1238,6 +1238,7 @@ namespace ae3d
 
         VkResult err = vkCreateImage( GfxDeviceGlobal::device, &image, nullptr, &GfxDeviceGlobal::depthStencil.image );
         AE3D_CHECK_VULKAN( err, "depth stencil" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::depthStencil.image, VK_OBJECT_TYPE_IMAGE, "depthstencil" );
 
         VkMemoryRequirements memReqs;
         vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, &memReqs );

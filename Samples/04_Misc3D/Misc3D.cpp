@@ -831,14 +831,14 @@ int main()
         //System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
         camera.GetComponent< CameraComponent >()->SetViewport( 0, 0, width, height );
         
-        for (int eye = 0; eye < 2; ++eye)
+        /*for (int eye = 0; eye < 2; ++eye)
         {
             VR::SetEye( eye );
             VR::CalcCameraForEye( camera, yaw, eye );
-            scene.Render();
-            scene.EndFrame();
+            //scene.Render();
+            //scene.EndFrame();
             VR::UnsetEye( eye );
-        }
+        }*/
         
         VR::SubmitFrame();
 #else
