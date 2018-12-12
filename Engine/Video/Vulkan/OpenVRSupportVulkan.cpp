@@ -825,7 +825,7 @@ void ae3d::VR::SubmitFrame()
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
 
     // submit
-    vr::VRVulkanTextureData_t vulkanData;
+    vr::VRVulkanTextureData_t vulkanData = {};
     vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.image;
     vulkanData.m_pDevice = (VkDevice_T *)GfxDeviceGlobal::device;
     vulkanData.m_pPhysicalDevice = (VkPhysicalDevice_T *)GfxDeviceGlobal::physicalDevice;
@@ -838,12 +838,7 @@ void ae3d::VR::SubmitFrame()
     vulkanData.m_nFormat = VK_FORMAT_R8G8B8A8_SRGB;
     vulkanData.m_nSampleCount = 1;
 
-    vr::VRTextureBounds_t bounds;
-    bounds.uMin = 0.0f;
-    bounds.uMax = 1.0f;
-    bounds.vMin = 0.0f;
-    bounds.vMax = 1.0f;
-
+    vr::VRTextureBounds_t bounds{ 0.0f, 0.0f, 1.0f, 1.0f };
     vr::Texture_t texture = { &vulkanData, vr::TextureType_Vulkan, vr::ColorSpace_Auto };
     vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &texture, &bounds );
 
@@ -985,7 +980,8 @@ void ae3d::VR::CalcEyePose()
         return;
     }
 
-    vr::VRCompositor()->WaitGetPoses( Global::trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0 );
+    vr::EVRCompositorError error = vr::VRCompositor()->WaitGetPoses( Global::trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0 );
+    System::Assert( error == vr::VRCompositorError_None, "VR error" );
 
     Global::validPoseCount = 0;
     Global::poseClasses.clear();
