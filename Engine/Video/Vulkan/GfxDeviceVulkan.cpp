@@ -1474,7 +1474,6 @@ namespace ae3d
         layoutBindingUBO.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         layoutBindingUBO.descriptorCount = 1;
         layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingUBO.pImmutableSamplers = nullptr;
 
         // Binding 1 : Image
         VkDescriptorSetLayoutBinding layoutBindingImage = {};
@@ -1482,7 +1481,6 @@ namespace ae3d
         layoutBindingImage.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
         layoutBindingImage.descriptorCount = 1;
         layoutBindingImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingImage.pImmutableSamplers = nullptr;
 
         // Binding 2 : Sampler
         VkDescriptorSetLayoutBinding layoutBindingSampler = {};
@@ -1490,7 +1488,6 @@ namespace ae3d
         layoutBindingSampler.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
         layoutBindingSampler.descriptorCount = 1;
         layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingSampler.pImmutableSamplers = nullptr;
 
         // Binding 3 : Buffer
         VkDescriptorSetLayoutBinding layoutBindingBuffer = {};
@@ -1498,7 +1495,6 @@ namespace ae3d
         layoutBindingBuffer.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         layoutBindingBuffer.descriptorCount = 1;
         layoutBindingBuffer.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingBuffer.pImmutableSamplers = nullptr;
 
         // Binding 4 : Buffer (UAV)
         VkDescriptorSetLayoutBinding layoutBindingBufferUAV = {};
@@ -1506,7 +1502,6 @@ namespace ae3d
         layoutBindingBufferUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
         layoutBindingBufferUAV.descriptorCount = 1;
         layoutBindingBufferUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingBufferUAV.pImmutableSamplers = nullptr;
 
         // Binding 5 : Image
         VkDescriptorSetLayoutBinding layoutBindingImage2 = {};
@@ -1514,7 +1509,6 @@ namespace ae3d
         layoutBindingImage2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
         layoutBindingImage2.descriptorCount = 1;
         layoutBindingImage2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingImage2.pImmutableSamplers = nullptr;
 
         // Binding 6 : Sampler
         VkDescriptorSetLayoutBinding layoutBindingSampler2 = {};
@@ -1522,7 +1516,6 @@ namespace ae3d
         layoutBindingSampler2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
         layoutBindingSampler2.descriptorCount = 1;
         layoutBindingSampler2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingSampler2.pImmutableSamplers = nullptr;
 
         // Binding 7 : Buffer
         VkDescriptorSetLayoutBinding layoutBindingBuffer2 = {};
@@ -1530,7 +1523,6 @@ namespace ae3d
         layoutBindingBuffer2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         layoutBindingBuffer2.descriptorCount = 1;
         layoutBindingBuffer2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        layoutBindingBuffer2.pImmutableSamplers = nullptr;
 
         // Binding 8 : Buffer
         VkDescriptorSetLayoutBinding layoutBindingBuffer3 = {};
@@ -1538,7 +1530,6 @@ namespace ae3d
         layoutBindingBuffer3.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         layoutBindingBuffer3.descriptorCount = 1;
         layoutBindingBuffer3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingBuffer3.pImmutableSamplers = nullptr;
 
         // Binding 9 : Buffer
         VkDescriptorSetLayoutBinding layoutBindingBuffer4 = {};
@@ -1546,7 +1537,6 @@ namespace ae3d
         layoutBindingBuffer4.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
         layoutBindingBuffer4.descriptorCount = 1;
         layoutBindingBuffer4.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        layoutBindingBuffer4.pImmutableSamplers = nullptr;
 
 		// Binding 10 : Buffer
 		VkDescriptorSetLayoutBinding layoutBindingBuffer5 = {};
@@ -1554,7 +1544,6 @@ namespace ae3d
 		layoutBindingBuffer5.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
 		layoutBindingBuffer5.descriptorCount = 1;
 		layoutBindingBuffer5.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		layoutBindingBuffer5.pImmutableSamplers = nullptr;
 
         // Binding 11 : Writable texture
         VkDescriptorSetLayoutBinding layoutBindingUAV = {};
@@ -1562,7 +1551,6 @@ namespace ae3d
         layoutBindingUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
         layoutBindingUAV.descriptorCount = 1;
         layoutBindingUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-        layoutBindingUAV.pImmutableSamplers = nullptr;
 
         constexpr int bindingCount = 12;
         const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
