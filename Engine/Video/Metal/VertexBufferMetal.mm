@@ -4,6 +4,7 @@
 #include "System.hpp"
 
 extern id <MTLCommandQueue> commandQueue;
+static int vertexBufferMemoryUsage = 0;
 
 void ae3d::VertexBuffer::Bind() const
 {
@@ -150,6 +151,15 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     indexBuffer.label = @"Index buffer";
     
     elementCount = faceCount * 3;
+    
+    vertexBufferMemoryUsage += [vertexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [indexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [weightBuffer allocatedSize];
+    vertexBufferMemoryUsage += [boneBuffer allocatedSize];
+    vertexBufferMemoryUsage += [tangentBuffer allocatedSize];
+    vertexBufferMemoryUsage += [normalBuffer allocatedSize];
+    vertexBufferMemoryUsage += [texcoordBuffer allocatedSize];
+    vertexBufferMemoryUsage += [colorBuffer allocatedSize];
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTN* vertices, int vertexCount )
@@ -260,6 +270,15 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     indexBuffer.label = @"Index buffer";
     
     elementCount = faceCount * 3;
+    
+    vertexBufferMemoryUsage += [vertexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [indexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [weightBuffer allocatedSize];
+    vertexBufferMemoryUsage += [boneBuffer allocatedSize];
+    vertexBufferMemoryUsage += [tangentBuffer allocatedSize];
+    vertexBufferMemoryUsage += [normalBuffer allocatedSize];
+    vertexBufferMemoryUsage += [texcoordBuffer allocatedSize];
+    vertexBufferMemoryUsage += [colorBuffer allocatedSize];
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC* vertices, int vertexCount )
@@ -392,6 +411,15 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     indexBuffer.label = @"Index buffer";
     
     elementCount = faceCount * 3;
+    
+    vertexBufferMemoryUsage += [vertexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [indexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [weightBuffer allocatedSize];
+    vertexBufferMemoryUsage += [boneBuffer allocatedSize];
+    vertexBufferMemoryUsage += [tangentBuffer allocatedSize];
+    vertexBufferMemoryUsage += [normalBuffer allocatedSize];
+    vertexBufferMemoryUsage += [texcoordBuffer allocatedSize];
+    vertexBufferMemoryUsage += [colorBuffer allocatedSize];
 }
 
 void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTNTC_Skinned* vertices, int vertexCount )
@@ -530,4 +558,13 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     indexBuffer.label = @"Index buffer";
     
     elementCount = faceCount * 3;
+    
+    vertexBufferMemoryUsage += [vertexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [indexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [weightBuffer allocatedSize];
+    vertexBufferMemoryUsage += [boneBuffer allocatedSize];
+    vertexBufferMemoryUsage += [tangentBuffer allocatedSize];
+    vertexBufferMemoryUsage += [normalBuffer allocatedSize];
+    vertexBufferMemoryUsage += [texcoordBuffer allocatedSize];
+    vertexBufferMemoryUsage += [colorBuffer allocatedSize];
 }

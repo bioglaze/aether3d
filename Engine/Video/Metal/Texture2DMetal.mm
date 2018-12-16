@@ -15,6 +15,7 @@
 
 extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
+static int tex2dMemoryUsage = 0;
 
 namespace MathUtil
 {
@@ -231,6 +232,7 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName 
 
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     metalTexture.label = [NSString stringWithUTF8String:debugName];
+    tex2dMemoryUsage += [metalTexture allocatedSize];
 }
 
 void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
@@ -264,6 +266,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     textureDescriptor2.storageMode = MTLStorageModePrivate;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor2];
     metalTexture.label = stagingTexture.label;
+    tex2dMemoryUsage += [metalTexture allocatedSize];
     
     id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
     cmd_buffer.label = @"BlitCommandBuffer";
@@ -511,6 +514,8 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     {
         ae3d::System::Print( "Unhandled texture extension in %s\n", fileContents.path.c_str() );
     }
+    
+    tex2dMemoryUsage += [metalTexture allocatedSize];
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )
