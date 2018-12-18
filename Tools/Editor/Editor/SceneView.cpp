@@ -431,6 +431,17 @@ void svDeleteGameObject( SceneView* sv )
     }
 }
 
+void svFocusOnSelected( SceneView* sv )
+{
+    if (sv->selectedGameObjects.count > 0)
+    {
+        GameObject* go = sv->selectedGameObjects[ 0 ];
+        TransformComponent* tc = go->GetComponent< TransformComponent >();
+        Vec3 goPos = tc->GetWorldPosition();
+        sv->camera.GetComponent<TransformComponent>()->LookAt( goPos, goPos + Vec3( 0, 0, 5 ), Vec3( 0, 1, 0 ) );
+    }
+}
+
 void TransformGizmo::Init( Shader* shader, GameObject& go )
 {
     translateMesh.Load( FileSystem::FileContents( "cursor_translate.ae3d" ) );

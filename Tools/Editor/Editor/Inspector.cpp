@@ -240,6 +240,12 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         {
             gameObject->RemoveComponent< SpotLightComponent >();
         }
+
+        if (gameObject != nullptr && spotLight != nullptr)
+        {
+            const char* str = "testing";
+            nk_label( &ctx, str, NK_TEXT_LEFT );
+        }
         
         // Gameobject is not selected.
         

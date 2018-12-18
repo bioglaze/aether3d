@@ -93,6 +93,9 @@ int main()
                 case KeyCode::Left:
                     svMoveSelection( sceneView, { -1, 0, 0 } );
                     break;
+                case KeyCode::F:
+                    svFocusOnSelected( sceneView );
+                    break;
                 case KeyCode::Right:
                     svMoveSelection( sceneView, { 1, 0, 0 } );
                     break;
