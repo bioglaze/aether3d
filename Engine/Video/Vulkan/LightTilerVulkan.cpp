@@ -364,9 +364,9 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pWaitDstStageMask = &pipelineStages;
     submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitSemaphores = nullptr;//&GfxDeviceGlobal::presentCompleteSemaphore;
+    submitInfo.pWaitSemaphores = nullptr;
     submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores = nullptr;//&GfxDeviceGlobal::renderCompleteSemaphore;
+    submitInfo.pSignalSemaphores = nullptr;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &GfxDeviceGlobal::computeCmdBuffer;
 

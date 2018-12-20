@@ -316,8 +316,6 @@ void Matrix44::MakeProjection( float left, float right, float bottom, float top,
 void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 {
     const Vec3 zAxis = (center - eye).Normalized();
-    //const Vec3 xAxis = Vec3::Cross( zAxis, up ).Normalized();
-    //const Vec3 yAxis = Vec3::Cross( xAxis, zAxis );
 
     // Mirrored (fixes cube map RT camera face orientation):
     const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
@@ -363,11 +361,6 @@ void Matrix44::MakeRotationXYZ( float xDeg, float yDeg, float zDeg )
 
 void Matrix44::Scale( float x, float y, float z )
 {
-    /*if (Vec3( x, y, z ).IsAlmost( Vec3( 1, 1, 1 ) ))
-    {
-        return;
-    }*/
-
     Matrix44 scale;
 
     scale.m[  0 ] = x;
