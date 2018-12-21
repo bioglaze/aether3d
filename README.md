@@ -36,7 +36,8 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Physically-based rendering
   - Particles
   - Tone mapping
-  - Post-processing effects
+  - Bloom
+  - DoF
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
 
 # API documentation
