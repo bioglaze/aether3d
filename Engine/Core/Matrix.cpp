@@ -319,7 +319,7 @@ void Matrix44::MakeLookAt( const Vec3& eye, const Vec3& center, const Vec3& up )
 
     // Mirrored (fixes cube map RT camera face orientation):
     const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
-    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
+    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis ).Normalized();
     
     m[  0 ] = xAxis.x; m[  1 ] = xAxis.y; m[  2 ] = xAxis.z; m[  3 ] = -Vec3::Dot( xAxis, eye );
     m[  4 ] = yAxis.x; m[  5 ] = yAxis.y; m[  6 ] = yAxis.z; m[  7 ] = -Vec3::Dot( yAxis, eye );
