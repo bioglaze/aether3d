@@ -12,6 +12,7 @@
 
 extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
+static int textureCubeMemoryUsage = 0;
 
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                               const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
@@ -193,4 +194,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             [cmd_buffer waitUntilCompleted];
         }
     }
+    
+    textureCubeMemoryUsage += [metalTexture allocatedSize];
 }

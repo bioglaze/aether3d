@@ -6,7 +6,7 @@ void Frustum::UpdateCornersAndCenters( const Vec3& cameraPosition, const Vec3& z
 {
     const Vec3 up( 0, 1, 0 );
     const Vec3 xAxis = Vec3::Cross( up, zAxis ).Normalized();
-    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis );
+    const Vec3 yAxis = Vec3::Cross( zAxis, xAxis ).Normalized();
     
     // Computes the centers of near and far planes.
     nearCenter = cameraPosition - zAxis * zNear;

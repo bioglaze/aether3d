@@ -78,44 +78,6 @@
 ((pf.dwFlags & DDPF_FOURCC) && \
 (pf.dwFourCC == MAKEFOURCC('A', 'T', 'I', '2') ))
 
-#define PF_IS_BGRA8(pf) \
-  ((pf.dwFlags & DDPF_RGB) && \
-   (pf.dwFlags & DDPF_ALPHAPIXELS) && \
-   (pf.dwRGBBitCount == 32) && \
-   (pf.dwRBitMask == 0xff0000) && \
-   (pf.dwGBitMask == 0xff00) && \
-   (pf.dwBBitMask == 0xff) && \
-   (pf.dwAlphaBitMask == 0xff000000U))
-
-#define PF_IS_BGR8(pf) \
-  ((pf.dwFlags & DDPF_RGB) && \
-  !(pf.dwFlags & DDPF_ALPHAPIXELS) && \
-   (pf.dwRGBBitCount == 24) && \
-   (pf.dwRBitMask == 0xff0000) && \
-   (pf.dwGBitMask == 0xff00) && \
-   (pf.dwBBitMask == 0xff))
-
-#define PF_IS_BGR5A1(pf) \
-  ((pf.dwFlags & DDPF_RGB) && \
-   (pf.dwFlags & DDPF_ALPHAPIXELS) && \
-   (pf.dwRGBBitCount == 16) && \
-   (pf.dwRBitMask == 0x00007c00) && \
-   (pf.dwGBitMask == 0x000003e0) && \
-   (pf.dwBBitMask == 0x0000001f) && \
-   (pf.dwAlphaBitMask == 0x00008000))
-
-#define PF_IS_BGR565(pf) \
-  ((pf.dwFlags & DDPF_RGB) && \
-  !(pf.dwFlags & DDPF_ALPHAPIXELS) && \
-   (pf.dwRGBBitCount == 16) && \
-   (pf.dwRBitMask == 0x0000f800) && \
-   (pf.dwGBitMask == 0x000007e0) && \
-   (pf.dwBBitMask == 0x0000001f))
-
-#define PF_IS_INDEX8(pf) \
-  ((pf.dwFlags & DDPF_INDEXED) && \
-   (pf.dwRGBBitCount == 8))
-
 unsigned MyMax( unsigned a, unsigned b )
 {
     return (a > b ? a : b);
@@ -193,16 +155,6 @@ DDSInfo loadInfoDXT5 = { true, false, false, 4, 16 };
 DDSInfo loadInfoBC5 = { true, false, false, 4, 16 };
 
 DDSInfo loadInfoBC5_ATI2 = { true, false, false, 4, 16 };
-
-DDSInfo loadInfoBGRA8 = { false, false, false, 1, 4 };
-
-DDSInfo loadInfoBGR8 = { false, false, false, 1, 3 };
-
-DDSInfo loadInfoBGR5A1 = { false, true, false, 1, 2 };
-
-DDSInfo loadInfoBGR565 = { false, true, false, 1, 2 };
-
-DDSInfo loadInfoIndex8 = { false, false, true, 1, 1 };
 
 DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int& outWidth, int& outHeight, bool& outOpaque, Output& output )
 {
@@ -290,36 +242,6 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         li = &loadInfoDXT5;
         outOpaque = true;
         output.format = DDSLoader::Format::BC5;
-    }
-    else if (PF_IS_BGRA8( header.sHeader.sPixelFormat ))
-    {
-        li = &loadInfoBGRA8;
-        outOpaque = false;
-        output.format = DDSLoader::Format::Invalid;
-    }
-    else if (PF_IS_BGR8( header.sHeader.sPixelFormat ))
-    {
-        li = &loadInfoBGR8;
-        outOpaque = true;
-        output.format = DDSLoader::Format::Invalid;
-    }
-    else if (PF_IS_BGR5A1( header.sHeader.sPixelFormat ))
-    {
-        li = &loadInfoBGR5A1;
-        outOpaque = false;
-        output.format = DDSLoader::Format::Invalid;
-    }
-    else if (PF_IS_BGR565( header.sHeader.sPixelFormat ))
-    {
-        li = &loadInfoBGR565;
-        outOpaque = true;
-        output.format = DDSLoader::Format::Invalid;
-    }
-    else if (PF_IS_INDEX8( header.sHeader.sPixelFormat ))
-    {
-        li = &loadInfoIndex8;
-        outOpaque = true;
-        output.format = DDSLoader::Format::Invalid;
     }
     else
     {
