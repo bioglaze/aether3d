@@ -85,18 +85,16 @@ unsigned MyMax( unsigned a, unsigned b )
 
 struct DDSInfo
 {
-    DDSInfo( bool aIsCompressed, bool aSwap, bool aHasPalette, int aDivSize, int aBlockBytes
+    DDSInfo( bool aIsCompressed, bool aSwap, int aDivSize, int aBlockBytes
             )
     : isCompressed( aIsCompressed )
     , swap( aSwap )
-    , hasPalette( aHasPalette )
     , divSize( aDivSize )
     , blockBytes( aBlockBytes )
     {}
     
     bool isCompressed; ///< Is the file compressed.
     bool swap;
-    bool hasPalette; ///< Does the file contain a palette.
     unsigned divSize;
     unsigned blockBytes;
 };
@@ -146,15 +144,15 @@ union DDSHeader
     uint8_t data[ 128 ];
 };
 
-DDSInfo loadInfoDXT1 = { true, false, false, 4, 8 };
+DDSInfo loadInfoDXT1 = { true, false, 4, 8 };
 
-DDSInfo loadInfoDXT3 = { true, false, false, 4, 16 };
+DDSInfo loadInfoDXT3 = { true, false, 4, 16 };
 
-DDSInfo loadInfoDXT5 = { true, false, false, 4, 16 };
+DDSInfo loadInfoDXT5 = { true, false, 4, 16 };
 
-DDSInfo loadInfoBC5 = { true, false, false, 4, 16 };
+DDSInfo loadInfoBC5 = { true, false, 4, 16 };
 
-DDSInfo loadInfoBC5_ATI2 = { true, false, false, 4, 16 };
+DDSInfo loadInfoBC5_ATI2 = { true, false, 4, 16 };
 
 DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int& outWidth, int& outHeight, bool& outOpaque, Output& output )
 {
@@ -287,26 +285,6 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
             x = (x + 1) >> 1;
             y = (y + 1) >> 1;
             size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
-        }
-    }
-    else if (li->hasPalette)
-    {
-        ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_PITCH) != 0, "DDSLoader: need flag DDSD_PITCH" );
-        ae3d::System::Assert( header.sHeader.sPixelFormat.dwRGBBitCount == 8, "DDSLoader: Wrong bit count" );
-        size = header.sHeader.dwPitchOrLinearSize * ySize;
-        ae3d::System::Assert( size == x * y * li->blockBytes, "DDSLoader: Invalid size" );
-        unsigned palette[ 256 ];
-        memcpy( &palette[ 0 ], fileContents.data.data() + fileOffset, 4 * 256 );
-        fileOffset += 4 * 256;
-
-        for (int ix = 0; ix < mipMapCount; ++ix)
-        {
-            output.dataOffsets[ ix ] = (int)fileOffset;
-            fileOffset += size;
-
-            x = (x + 1) >> 1;
-            y = (y + 1) >> 1;
-            size = x * y * li->blockBytes;
         }
     }
     else
