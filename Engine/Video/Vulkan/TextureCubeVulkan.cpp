@@ -14,6 +14,7 @@ bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 namespace MathUtil
 {
     bool IsPowerOfTwo( unsigned i );
+    int Max( int a, int b );
 }
 
 namespace GfxDeviceGlobal
@@ -424,6 +425,33 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in TextureCube" );
 
     vkDeviceWaitIdle( GfxDeviceGlobal::device );
+
+    for (int face = 0; face < 6; ++face)
+    {
+        for (int i = 1; i < mipLevelCount; ++i)
+        {
+            const std::int32_t mipWidth = MathUtil::Max( width >> i, 1 );
+            const std::int32_t mipHeight = MathUtil::Max( height >> i, 1 );
+
+            VkImageBlit imageBlit = {};
+            imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageBlit.srcSubresource.baseArrayLayer = face;
+            imageBlit.srcSubresource.layerCount = 1;
+            imageBlit.srcSubresource.mipLevel = 0;
+            imageBlit.srcOffsets[ 0 ] = { 0, 0, 0 };
+            imageBlit.srcOffsets[ 1 ] = { width, height, 1 };
+
+            imageBlit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageBlit.dstSubresource.baseArrayLayer = face;
+            imageBlit.dstSubresource.layerCount = 1;
+            imageBlit.dstSubresource.mipLevel = i;
+            imageBlit.dstOffsets[ 0 ] = { 0, 0, 0 };
+            imageBlit.dstOffsets[ 1 ] = { mipWidth, mipHeight, 1 };
+
+            vkCmdBlitImage( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_GENERAL, image,
+                VK_IMAGE_LAYOUT_GENERAL, 1, &imageBlit, VK_FILTER_LINEAR );
+        }
+    }
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
