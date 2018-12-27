@@ -192,7 +192,6 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float lightDistance = length( vecToLightWS );
         float falloff = 1;
         
-        // TODO: Move pointLightBufferColors out of if
         if (lightDistance < radius)
         {
             float x = lightDistance / radius;

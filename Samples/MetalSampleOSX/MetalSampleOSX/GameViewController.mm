@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 #include <math.h>
-#include <cstdint>
+#include <stdint.h>
 
 #import "Array.hpp"
 #import "CameraComponent.hpp"
@@ -49,16 +49,16 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 // Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
 struct pcg32_random_t
 {
-    std::uint64_t state;
-    std::uint64_t inc;
+    uint64_t state;
+    uint64_t inc;
 };
 
-std::uint32_t pcg32_random_r( pcg32_random_t* rng )
+uint32_t pcg32_random_r( pcg32_random_t* rng )
 {
-    std::uint64_t oldstate = rng->state;
+    uint64_t oldstate = rng->state;
     rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
-    std::uint32_t xorshifted = (std::uint32_t)( ((oldstate >> 18u) ^ oldstate) >> 27u );
-    std::int32_t rot = oldstate >> 59u;
+    uint32_t xorshifted = (uint32_t)( ((oldstate >> 18u) ^ oldstate) >> 27u );
+    int32_t rot = oldstate >> 59u;
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
 
@@ -325,7 +325,7 @@ using namespace ae3d;
     //ae3d::System::InitAudio();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -382,7 +382,7 @@ using namespace ae3d;
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
-    scene.Add( &camera2d );
+    //scene.Add( &camera2d );
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
