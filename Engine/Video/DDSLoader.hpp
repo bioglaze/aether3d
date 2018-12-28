@@ -16,7 +16,7 @@ namespace DDSLoader
     /// Load result
     enum class LoadResult { Success, UnknownPixelFormat, FileNotFound };
     /// Format
-    enum class Format { Invalid, BC1, BC2, BC3, BC5 };
+    enum class Format { Invalid, BC1, BC2, BC3, BC4, BC5 };
 
     struct Output
     {
@@ -32,7 +32,7 @@ namespace DDSLoader
      \param outWidth Stores the width of the texture in pixels.
      \param outHeight Stores the height of the texture in pixels.
      \param outOpaque Stores info about alpha channel.
-     \param output Stores information needed to create D3D12 and Metal API objects.
+     \param output Stores information needed to create graphics API objects.
      \return Load result.
      */
     LoadResult Load( const ae3d::FileSystem::FileContentsData& fileContents, int& outWidth, int& outHeight, bool& outOpaque, Output& output );

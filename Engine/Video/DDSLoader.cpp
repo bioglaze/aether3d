@@ -62,6 +62,14 @@
   ((pf.dwFlags & DDPF_FOURCC) && \
    (pf.dwFourCC == D3DFMT_DXT5))
 
+#define PF_IS_BC4U(pf) \
+((pf.dwFlags & DDPF_FOURCC) && \
+(pf.dwFourCC == MAKEFOURCC('B', 'C', '4', 'U') ))
+
+#define PF_IS_BC4S(pf) \
+((pf.dwFlags & DDPF_FOURCC) && \
+(pf.dwFourCC == MAKEFOURCC('B', 'C', '4', 'S') ))
+
 #define PF_IS_BC5U(pf) \
 ((pf.dwFlags & DDPF_FOURCC) && \
 (pf.dwFourCC == MAKEFOURCC('B', 'C', '5', 'U') ))
@@ -85,16 +93,11 @@ unsigned MyMax( unsigned a, unsigned b )
 
 struct DDSInfo
 {
-    DDSInfo( bool aIsCompressed, bool aSwap, int aDivSize, int aBlockBytes
-            )
-    : isCompressed( aIsCompressed )
-    , swap( aSwap )
+    DDSInfo( int aDivSize, int aBlockBytes )
     , divSize( aDivSize )
     , blockBytes( aBlockBytes )
     {}
     
-    bool isCompressed; ///< Is the file compressed.
-    bool swap;
     unsigned divSize;
     unsigned blockBytes;
 };
@@ -144,15 +147,12 @@ union DDSHeader
     uint8_t data[ 128 ];
 };
 
-DDSInfo loadInfoDXT1 = { true, false, 4, 8 };
-
-DDSInfo loadInfoDXT3 = { true, false, 4, 16 };
-
-DDSInfo loadInfoDXT5 = { true, false, 4, 16 };
-
-DDSInfo loadInfoBC5 = { true, false, 4, 16 };
-
-DDSInfo loadInfoBC5_ATI2 = { true, false, 4, 16 };
+DDSInfo loadInfoDXT1 = { 4, 8 };
+DDSInfo loadInfoDXT3 = { 4, 16 };
+DDSInfo loadInfoDXT5 = { 4, 16 };
+DDSInfo loadInfoBC4 = { 4, 16 };
+DDSInfo loadInfoBC5 = { 4, 16 };
+DDSInfo loadInfoBC5_ATI2 = { 4, 16 };
 
 DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData& fileContents, int& outWidth, int& outHeight, bool& outOpaque, Output& output )
 {
@@ -212,6 +212,20 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         li = &loadInfoDXT5;
         outOpaque = false;
         output.format = DDSLoader::Format::BC3;
+    }
+    else if (PF_IS_BC4U( header.sHeader.sPixelFormat ))
+    {
+        ae3d::System::Print("Found BC4U\n");
+        li = &loadInfoBC4;
+        outOpaque = true;
+        output.format = DDSLoader::Format::BC4;
+    }
+    else if (PF_IS_BC4S( header.sHeader.sPixelFormat ))
+    {
+        ae3d::System::Print("Found BC4S\n");
+        li = &loadInfoBC4;
+        outOpaque = true;
+        output.format = DDSLoader::Format::BC4;
     }
     else if (PF_IS_BC5S( header.sHeader.sPixelFormat ))
     {
