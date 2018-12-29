@@ -94,7 +94,7 @@ unsigned MyMax( unsigned a, unsigned b )
 struct DDSInfo
 {
     DDSInfo( int aDivSize, int aBlockBytes )
-    , divSize( aDivSize )
+    : divSize( aDivSize )
     , blockBytes( aBlockBytes )
     {}
     
@@ -271,49 +271,32 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
 
     std::size_t fileOffset = sizeof( header );
 
-    if (li->isCompressed)
+    size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
+    ae3d::System::Assert( size == header.sHeader.dwPitchOrLinearSize, "DDSLoader: Wrong pitch or size" );
+    ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_LINEARSIZE) != 0, "DDSLoader, need flag DDSD_LINEARSIZE" );
+    
+    if (size == 0)
     {
-        size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
-        ae3d::System::Assert( size == header.sHeader.dwPitchOrLinearSize, "DDSLoader: Wrong pitch or size" );
-        ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_LINEARSIZE) != 0, "DDSLoader, need flag DDSD_LINEARSIZE" );
-
-        if (size == 0)
-        {
-            ae3d::System::Print("DDS loader error: Texture %s contents are empty.\n", fileContents.path.c_str() );
-            outWidth    = 32;
-            outHeight   = 32;
-            outOpaque = true;
-            return LoadResult::FileNotFound;
-        }
-
-        output.imageData.Allocate( (int)fileContents.data.size() );
-        
-        memcpy( output.imageData.elements, fileContents.data.data(), output.imageData.count );
-        output.dataOffsets.Allocate( mipMapCount );
-
-        for (int ix = 0; ix < mipMapCount; ++ix)
-        {
-            output.dataOffsets[ ix ] = (int)fileOffset;
-
-            fileOffset += size;
-            x = (x + 1) >> 1;
-            y = (y + 1) >> 1;
-            size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
-        }
+        ae3d::System::Print("DDS loader error: Texture %s contents are empty.\n", fileContents.path.c_str() );
+        outWidth    = 32;
+        outHeight   = 32;
+        outOpaque = true;
+        return LoadResult::FileNotFound;
     }
-    else
+    
+    output.imageData.Allocate( (int)fileContents.data.size() );
+    
+    memcpy( output.imageData.elements, fileContents.data.data(), output.imageData.count );
+    output.dataOffsets.Allocate( mipMapCount );
+    
+    for (int ix = 0; ix < mipMapCount; ++ix)
     {
-        size = x * y * li->blockBytes;        
-
-        for (int ix = 0; ix < mipMapCount; ++ix)
-        {
-            output.dataOffsets[ ix ] = (int)fileOffset;
-            fileOffset += size;
-
-			x = (x + 1)>>1;
-            y = (y + 1)>>1;
-            size = x * y * li->blockBytes;
-        }
+        output.dataOffsets[ ix ] = (int)fileOffset;
+        
+        fileOffset += size;
+        x = (x + 1) >> 1;
+        y = (y + 1) >> 1;
+        size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
     }
 
     return LoadResult::Success;
