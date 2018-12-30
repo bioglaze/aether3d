@@ -1,5 +1,5 @@
 #include <string>
-#include <cstdint>
+#include <stdint.h>
 #include "Array.hpp"
 #include "AudioClip.hpp"
 #include "AudioSourceComponent.hpp"
@@ -44,16 +44,16 @@ using namespace ae3d;
 // Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
 struct pcg32_random_t
 {
-    std::uint64_t state;
-    std::uint64_t inc;
+    uint64_t state;
+    uint64_t inc;
 };
 
-std::uint32_t pcg32_random_r( pcg32_random_t* rng )
+uint32_t pcg32_random_r( pcg32_random_t* rng )
 {
-    std::uint64_t oldstate = rng->state;
+    uint64_t oldstate = rng->state;
     rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
-    std::uint32_t xorshifted = std::uint32_t( ((oldstate >> 18u) ^ oldstate) >> 27u );
-    std::int32_t rot = oldstate >> 59u;
+    uint32_t xorshifted = uint32_t( ((oldstate >> 18u) ^ oldstate) >> 27u );
+    int32_t rot = oldstate >> 59u;
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
 
@@ -383,7 +383,7 @@ int main()
     skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );
     /*skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),

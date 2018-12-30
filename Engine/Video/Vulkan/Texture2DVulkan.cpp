@@ -126,7 +126,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, fileContents.path.c_str() );
 }
 
-void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, int bytesPerPixel, VkFormat format )
+void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, VkFormat format )
 {
     VkImageCreateInfo imageCreateInfo = {};
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -696,7 +696,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     
     ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
-    CreateVulkanObjects( ddsOutput, bytesPerPixel, format );
+    CreateVulkanObjects( ddsOutput, format );
 }
 
 void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents )

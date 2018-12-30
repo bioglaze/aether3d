@@ -80,7 +80,7 @@ namespace ae3d
         void LoadPVRv3( const char* path );
 #endif
 #if RENDERER_VULKAN
-        void CreateVulkanObjects( const DDSLoader::Output& mipChain, int bytesPerPixel, VkFormat format );
+        void CreateVulkanObjects( const DDSLoader::Output& mipChain, VkFormat format );
         void CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format, VkImageUsageFlags usageFlags );
         VkImage image = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
