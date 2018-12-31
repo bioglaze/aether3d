@@ -62,8 +62,7 @@ int main()
 				return 0;
             }
             
-            if (event.type == WindowEventType::KeyDown ||
-                event.type == WindowEventType::KeyUp)
+            if (event.type == WindowEventType::KeyDown || event.type == WindowEventType::KeyUp)
             {
                 KeyCode keyCode = event.keyCode;
 
@@ -124,16 +123,14 @@ int main()
                 inspector.HandleMouseMotion( x, y );
                 svHandleMouseMotion( sceneView, deltaX, deltaY );
             }
-
-            if (event.type == WindowEventType::Mouse1Down)
+            else if (event.type == WindowEventType::Mouse1Down)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
                 inspector.HandleLeftMouseClick( x, y, 1 );
                 svHandleLeftMouseDown( sceneView, x, y, width, height );
             }
-
-            if (event.type == WindowEventType::Mouse1Up)
+            else if (event.type == WindowEventType::Mouse1Up)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
@@ -141,20 +138,17 @@ int main()
                 svHandleLeftMouseUp( sceneView );
                 selectedGO = svSelectObject( sceneView, x, y, width, height );
             }
-
-            if (event.type == WindowEventType::Mouse2Down)
+            else if (event.type == WindowEventType::Mouse2Down)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
                 isRightMouseDown = true;
             }
-
-            if (event.type == WindowEventType::MouseMiddleDown)
+            else if (event.type == WindowEventType::MouseMiddleDown)
             {
                 isMiddleMouseDown = true;
             }
-            
-            if (event.type == WindowEventType::MouseMiddleUp)
+            else if (event.type == WindowEventType::MouseMiddleUp)
             {
                 isMiddleMouseDown = false;
                 deltaX = 0;
@@ -162,8 +156,7 @@ int main()
                 moveDir.x = 0;
                 moveDir.y = 0;
             }
-            
-            if (event.type == WindowEventType::Mouse2Up || event.type == WindowEventType::Mouse1Up)
+            else if (event.type == WindowEventType::Mouse2Up || event.type == WindowEventType::Mouse1Up)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;

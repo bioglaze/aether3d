@@ -135,8 +135,8 @@ namespace ae3d
         void ReflectVariables();
 #endif
 #if RENDERER_VULKAN
-        VkPipelineShaderStageCreateInfo vertexInfo;
-        VkPipelineShaderStageCreateInfo fragmentInfo;        
+        VkPipelineShaderStageCreateInfo vertexInfo = {};
+        VkPipelineShaderStageCreateInfo fragmentInfo = {};
 #endif
 #if RENDERER_METAL
         std::string metalVertexShaderName;
