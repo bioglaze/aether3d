@@ -250,7 +250,7 @@ int main()
             ofn.lpstrInitialDir = nullptr;
             ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-            if (GetOpenFileName( &ofn ) != FALSE)
+            if (GetSaveFileName( &ofn ) != FALSE)
             {
                 svSaveScene( sceneView, ofn.lpstrFile );
             }

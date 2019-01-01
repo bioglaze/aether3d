@@ -121,7 +121,7 @@ std::string GetSerialized( ae3d::CameraComponent* component )
     outStream << "order " << component->GetRenderOrder() << "\n";
     outStream << "viewport " << component->GetViewport()[ 0 ] << " " << component->GetViewport()[ 1 ] << " " << component->GetViewport()[ 2 ] << " " << component->GetViewport()[ 3 ] << "\n";
     outStream << "clearcolor " << component->GetClearColor().x << " " << component->GetClearColor().y << " " << component->GetClearColor().z;
-    outStream << "enabled" << component->IsEnabled() << "\n";
+    outStream << "\nenabled " << component->IsEnabled() << "\n";
     outStream << "\n\n";
 
     return outStream.str();
