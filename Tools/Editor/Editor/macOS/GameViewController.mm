@@ -129,7 +129,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 - (void)mouseUp:(NSEvent *)theEvent
 {
     selectedGO = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
-    
+    NSLog(@"mouseUp");
     inputEvent.button = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
@@ -156,6 +156,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         inspector.HandleMouseMotion( inputEvent.x, inputEvent.y );
     }
 
+    if (inputEvent.button == 0 && inputEvent.isActive)
+    {
+        inspector.HandleLeftMouseClick( inputEvent.x, inputEvent.y, 0 );
+    }
+    
     inputEvent.isActive = false;
     inputEvent.x = 0;
     inputEvent.y = 0;
@@ -183,9 +188,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)drawInMTKView:(nonnull MTKView *)view
 {
-    @autoreleasepool {
-        [self _render];
-    }
+    @autoreleasepool { [self _render]; }
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
