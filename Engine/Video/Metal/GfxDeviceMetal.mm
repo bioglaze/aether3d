@@ -212,7 +212,9 @@ namespace ae3d
                 str += "\n";
                 str += "scene AABB: ";
                 str += std::to_string( ::Statistics::GetSceneAABBTimeMS() );
-                str += "\n";
+                str += "\nmemory: ";
+                str += std::to_string([device currentAllocatedSize] / (1024 * 1024));
+                str += " MiB\n";
                 std::strcpy( outStr, str.c_str() );
             }
         }
