@@ -1198,7 +1198,19 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< MeshRendererComponent >();
             
-            outMeshes.Add( new Mesh() );
+            std::string path;
+            lineStream >> path;
+            
+            Mesh* mesh = new Mesh();
+            mesh->Load( FileSystem::FileContents( path.c_str() ) );
+
+            outMeshes.Add( mesh );
+            outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMesh( mesh );
+            
+            for (int i = 0; i < mesh->GetSubMeshCount(); ++i)
+            {
+                outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMaterial( tempMaterial, i );
+            }
         }
         else if (token == "spriterenderer")
         {

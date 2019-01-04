@@ -48,9 +48,21 @@ ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
     return &meshRendererComponents[ index ];
 }
 
-std::string GetSerialized( ae3d::MeshRendererComponent* /*component*/ )
+std::string GetSerialized( ae3d::MeshRendererComponent* component )
 {
-    return "meshrenderer\n\n";
+    std::string outStr( "meshrenderer " );
+    
+    if (component->GetMesh())
+    {
+        outStr += std::string( component->GetMesh()->GetPath() );
+    }
+    else
+    {
+        outStr += "none";
+    }
+
+    outStr += "\n\n";
+    return outStr;
 }
 
 void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld )
