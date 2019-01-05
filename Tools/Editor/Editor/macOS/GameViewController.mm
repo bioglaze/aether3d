@@ -1,11 +1,27 @@
+#import "Cocoa/Cocoa.h"
+#include <string>
 #import "GameViewController.h"
 #include "GameObject.hpp"
+#include "FileSystem.hpp"
 #import "Inspector.hpp"
 #import "System.hpp"
 #import "SceneView.hpp"
 #import "Vec3.hpp"
 
 NSViewController* myViewController;
+
+std::string GetOpenPath()
+{
+    NSOpenPanel *op = [NSOpenPanel openPanel];
+    
+    if ([op runModal] == NSModalResponseOK)
+    {
+        NSURL *nsurl = [[op URLs] objectAtIndex:0];
+        return std::string([[nsurl path] UTF8String]);
+    }
+    
+    return "";
+}
 
 @implementation GameViewController
 {
@@ -183,6 +199,31 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount );
         svEndRender( sceneView );
         ae3d::System::EndFrame();
+        
+        switch (inspectorCommand)
+        {
+            case Inspector::Command::CreateGO:
+                svAddGameObject( sceneView );
+                break;
+            case Inspector::Command::OpenScene:
+            {
+                std::string path = GetOpenPath();
+                NSLog(@"path: %s", path.c_str());
+                if (path != "")
+                {
+                    auto contents = ae3d::FileSystem::FileContents( path.c_str() );
+                    svLoadScene( sceneView, contents );
+                }
+            }
+                break;
+            case Inspector::Command::SaveScene:
+            {
+
+            }
+                break;
+            default:
+                break;
+        }
     }
 }
 

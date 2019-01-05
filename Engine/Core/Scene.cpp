@@ -1207,7 +1207,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outMeshes.Add( mesh );
             outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMesh( mesh );
             
-            for (int i = 0; i < mesh->GetSubMeshCount(); ++i)
+            for (unsigned i = 0; i < mesh->GetSubMeshCount(); ++i)
             {
                 outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMaterial( tempMaterial, i );
             }
