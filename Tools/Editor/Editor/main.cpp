@@ -207,7 +207,7 @@ int main()
             ofn.hwndOwner = GetActiveWindow();
             ofn.lpstrFile = szFile;
             ofn.nMaxFile = sizeof( szFile );
-            ofn.lpstrFilter = "All\0*.*\0Scene\0*.SCENE\0";
+            ofn.lpstrFilter = "Scene\0*.SCENE\0All\0*.*\0";
             ofn.nFilterIndex = 1;
             ofn.lpstrFileTitle = nullptr;
             ofn.nMaxFileTitle = 0;
@@ -243,7 +243,7 @@ int main()
             ofn.hwndOwner = GetActiveWindow();
             ofn.lpstrFile = szFile;
             ofn.nMaxFile = sizeof( szFile );
-            ofn.lpstrFilter = "All\0*.*\0Scene\0*.SCENE\0";
+            ofn.lpstrFilter = "Scene\0*.SCENE\0All\0*.*\0";
             ofn.nFilterIndex = 1;
             ofn.lpstrFileTitle = nullptr;
             ofn.nMaxFileTitle = 0;
