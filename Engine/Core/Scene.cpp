@@ -1178,6 +1178,42 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> red >> green >> blue;
             outGameObjects.back().GetComponent< CameraComponent >()->SetClearColor( { red, green, blue } );
         }
+        else if (token == "layermask")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found layermask but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            unsigned layerMask;
+            lineStream >> layerMask;
+            outGameObjects.back().GetComponent< CameraComponent >()->SetLayerMask( layerMask );
+        }
+        else if (token == "viewport")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found viewport but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            unsigned x, y, w, h;
+            lineStream >> x >> y >> w >> h;
+            outGameObjects.back().GetComponent< CameraComponent >()->SetViewport( x, y, w, h );
+        }
+        else if (token == "order")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found order but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            unsigned order = 0;
+            lineStream >> order;
+            outGameObjects.back().GetComponent< CameraComponent >()->SetRenderOrder( order );
+        }
         else if (token == "transform")
         {
             if (outGameObjects.empty())
