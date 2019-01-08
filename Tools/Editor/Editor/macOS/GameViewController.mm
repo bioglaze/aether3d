@@ -23,6 +23,20 @@ std::string GetOpenPath()
     return "";
 }
 
+std::string GetSavePath()
+{
+    NSSavePanel *op = [NSSavePanel savePanel];
+    [op setExtensionHidden:NO];
+    [op setDirectoryURL:[NSURL URLWithString:NSHomeDirectory()]];
+    
+    if ([op runModal] == NSModalResponseOK)
+    {
+        //return std::string([[nsurl path] UTF8String]);
+    }
+    
+    return "";
+}
+
 @implementation GameViewController
 {
     MTKView *_view;
@@ -218,7 +232,12 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
                 break;
             case Inspector::Command::SaveScene:
             {
-
+                std::string path = GetSavePath();
+                NSLog(@"path: %s", path.c_str());
+                if (path != "")
+                {
+                    svSaveScene( sceneView, (char*)path.c_str() );
+                }
             }
                 break;
             default:
