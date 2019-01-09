@@ -67,6 +67,9 @@
   <ItemGroup>
     <ClCompile Include="..\convert_obj.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
