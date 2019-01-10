@@ -4,9 +4,6 @@
 #include "System.hpp"
 #include "FileSystem.hpp"
 
-// TODO remove
-#include "System.hpp"
-
 #define DDS_MAGIC 0x20534444 ///<  little-endian
 
 //  DDS_header.dwFlags
