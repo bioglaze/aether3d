@@ -170,16 +170,16 @@ void ae3d::System::Assert( bool condition, const char* message )
 #endif
 }
 
-void ae3d::System::Draw( TextureBase* texture, float x, float y, float xSize, float ySize, float xScreenSize, float yScreenSize, const Vec4& tintColor, BlendMode blendMode )
+void ae3d::System::Draw( TextureBase* texture, int x, int y, int xSize, int ySize, int xScreenSize, int yScreenSize, const Vec4& tintColor, BlendMode blendMode )
 {
     Matrix44 proj;
-    proj.MakeProjection( 0, xScreenSize, yScreenSize, 0, -1, 1 );
+    proj.MakeProjection( 0, (float)xScreenSize, (float)yScreenSize, 0, -1, 1 );
     
     Matrix44 translate;
-    translate.SetTranslation( Vec3( x, y, 0 ) );
+    translate.SetTranslation( Vec3( (float)x, (float)y, 0 ) );
     
     Matrix44 scale;
-    scale.Scale( xSize, ySize, 1 );
+    scale.Scale( (float)xSize, (float)ySize, 1 );
     
     Matrix44 mvp;
     Matrix44::Multiply( scale, translate, scale );

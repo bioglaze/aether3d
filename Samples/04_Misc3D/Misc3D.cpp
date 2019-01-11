@@ -36,7 +36,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_BLOOM
 
 using namespace ae3d;
 
