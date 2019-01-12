@@ -664,7 +664,6 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     }
 
     mipLevelCount = mipmaps == Mipmaps::Generate ? ddsOutput.dataOffsets.count : 1;
-    int bytesPerPixel = 1;
 
     VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
 
@@ -676,22 +675,18 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     if (ddsOutput.format == DDSLoader::Format::BC2)
     {
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
-        bytesPerPixel = 2;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC3)
     {
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
-        bytesPerPixel = 2;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC4)
     {
         format = VK_FORMAT_BC4_UNORM_BLOCK;
-        bytesPerPixel = 2;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC5)
     {
         format = VK_FORMAT_BC5_UNORM_BLOCK;
-        bytesPerPixel = 2;
     }
     
     ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );

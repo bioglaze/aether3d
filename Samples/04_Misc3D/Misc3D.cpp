@@ -36,7 +36,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -859,16 +859,21 @@ int main()
 #ifdef TEST_BLOOM
         downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
         downsampleAndThresholdShader.SetTexture2D( 1, &blurTex );
+        downsampleAndThresholdShader.Begin();
         downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+        downsampleAndThresholdShader.End();
+        
         blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 11, &bloomTex );
         blurShader.SetBlurDirection( 1, 0 );
+        blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
-
+        
         blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 11, &blurTex );
         blurShader.SetBlurDirection( 0, 1 );
         blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
 
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );

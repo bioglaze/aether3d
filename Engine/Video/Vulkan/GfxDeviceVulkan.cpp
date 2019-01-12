@@ -1667,6 +1667,7 @@ namespace ae3d
 
         err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &cmdBufInfo, &GfxDeviceGlobal::texCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::texCmdBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "texCmdBuffer" );
     }
 }
 

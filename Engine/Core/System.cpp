@@ -206,8 +206,8 @@ void ae3d::System::Draw( TextureBase* texture, int x, int y, int xSize, int ySiz
     int viewport[ 4 ];
     viewport[ 0 ] = 0;
     viewport[ 1 ] = 0;
-    viewport[ 2 ] = (int)xScreenSize;
-    viewport[ 3 ] = (int)yScreenSize;
+    viewport[ 2 ] = xScreenSize;
+    viewport[ 3 ] = yScreenSize;
     GfxDevice::SetViewport( viewport );
 
     GfxDevice::BlendMode gfxBlendMode = GfxDevice::BlendMode::Off;
