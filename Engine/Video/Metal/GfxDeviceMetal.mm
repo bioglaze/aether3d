@@ -24,6 +24,7 @@ id <MTLDepthStencilState> depthStateLessEqualWriteOn;
 id <MTLDepthStencilState> depthStateLessEqualWriteOff;
 id <MTLDepthStencilState> depthStateNoneWriteOff;
 MTKView* view;
+extern int tex2dMemoryUsage;
 
 MTLRenderPassDescriptor* renderPassDescriptorApp = nullptr;
 MTLRenderPassDescriptor* renderPassDescriptorFBO = nullptr;
@@ -214,6 +215,9 @@ namespace ae3d
                 str += std::to_string( ::Statistics::GetSceneAABBTimeMS() );
                 str += "\nmemory: ";
                 str += std::to_string([device currentAllocatedSize] / (1024 * 1024));
+                str += " MiB\n";
+                str += "textures: ";
+                str += std::to_string(tex2dMemoryUsage / (1024 * 1024));
                 str += " MiB\n";
                 std::strcpy( outStr, str.c_str() );
             }

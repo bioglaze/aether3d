@@ -15,7 +15,7 @@
 
 extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
-static int tex2dMemoryUsage = 0;
+int tex2dMemoryUsage = 0;
 
 namespace MathUtil
 {
