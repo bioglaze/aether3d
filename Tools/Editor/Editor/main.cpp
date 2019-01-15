@@ -14,6 +14,23 @@
 
 using namespace ae3d;
 
+#if _MSC_VER
+void GetOpenPath( char* path )
+{
+}
+#else
+void GetOpenPath( char* path )
+{
+    FILE* f = popen( "zenity --file-selection --title \"Load .scene file\"", "r" );
+    fgets( path, 1024, f );
+    
+    if (strlen( path ) > 0)
+    {
+        path[ strlen( path ) - 1 ] = 0;
+    }
+}
+#endif
+
 int main()
 {
     int width = 640 * 2;
@@ -221,13 +238,7 @@ int main()
             }
 #else
             char path[ 1024 ] = {};
-            FILE* f = popen( "zenity --file-selection --title \"Load .scene file\"", "r" );
-            fgets( path, 1024, f );
-
-            if (strlen( path ) > 0)
-            {
-                path[ strlen( path ) - 1 ] = 0;
-            }
+            GetOpenPath( path );
             auto contents = FileSystem::FileContents( path );
             svLoadScene( sceneView, contents );
 #endif

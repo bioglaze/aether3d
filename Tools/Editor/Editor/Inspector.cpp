@@ -2,7 +2,9 @@
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
+#include "FileSystem.hpp"
 #include "GameObject.hpp"
+#include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
 #include "PointLightComponent.hpp"
 #include "SpotLightComponent.hpp"
@@ -26,6 +28,8 @@
 #endif
 
 using namespace ae3d;
+
+void GetOpenPath( char* path );
 
 struct VertexPTC
 {
@@ -196,6 +200,15 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         else if (gameObject != nullptr && meshRenderer != nullptr && nk_button_label( &ctx, "Remove mesh renderer" ))
         {
             gameObject->RemoveComponent< MeshRendererComponent >();
+        }
+
+        if (gameObject != nullptr && meshRenderer != nullptr && nk_button_label( &ctx, "Set mesh" ))
+        {
+            Mesh* mesh = new Mesh;
+            char path[ 1024 ];
+            GetOpenPath( path );
+            mesh->Load( FileSystem::FileContents( path ) );
+            gameObject->GetComponent< MeshRendererComponent >()->SetMesh( mesh );
         }
 
         if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "Add audio source" ))
