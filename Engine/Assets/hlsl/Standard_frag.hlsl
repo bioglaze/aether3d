@@ -71,6 +71,31 @@ float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, f
     return normalize( v.x * normalize( tangent ) + v.y * normalize( bitangent ) + v.z * normalize( normal ) );
 }
 
+float D_GGX( float dotNH, float a )
+{
+    float a2 = a * a;
+    float f = (dotNH * a2 - dotNH) * dotNH + 1.0f;
+    return a2 / (3.14159265f * f * f);
+}
+
+float F_Schlick( float dotVH, float3 f0 )
+{
+    return f0 + (float3( 1.0f ) - f0) * pow( 1.0f - dotVH, 5.0f );
+}
+
+float V_SmithGGXCorrelated( float dotNV, float dotNL, float a )
+{
+    float a2 = a * a;
+    float GGXL = dotNV * sqrt( (-dotNL * a2 + dotNL) * dotNL + a2 );
+    float GGXV = dotNL * sqrt( (-dotNV * a2 + dotNV) * dotNV + a2 );
+    return 0.5f / (GGXV + GGXL);
+}
+
+float Fd_Lambert()
+{
+    return 1.0f / 3.14159265f;
+}
+
 float4 main( PS_INPUT input ) : SV_Target
 {
     const float4 albedo = tex.Sample( sLinear, float2( input.positionVS_u.w, input.positionWS_v.w ) );
@@ -106,35 +131,37 @@ float4 main( PS_INPUT input ) : SV_Target
         const float3 vecToLightWS = centerAndRadius.xyz - input.positionWS_v.xyz;
         const float3 lightDirVS = normalize( vecToLightVS );
 
+        const float3 N = normalize( normalVS );
         const float3 V = normalize( input.positionVS_u.xyz );
         const float3 L = normalize( vecToLightVS );
         const float3 H = normalize( L + V );
 
-        const float dotNL = saturate( dot( normalize( normalVS ), lightDirVS ) );
+        const float dotNV = abs( dot( N, V ) ) + 1e-5f; 
+        const float dotNL = saturate( dot( N, lightDirVS ) );
         const float dotVH = saturate( dot( V, H ) );
+        const float dotLH = saturate( dot( L, H ) );
+        const float dotNH = saturate( dot( N, H ) );
+        
         const float lightDistance = length( vecToLightWS );
         float falloff = 1.0f;
-
+        float3 f0 = float3( 0.5f );
+        
+        float roughness = 0.02f;
+        float a = roughness * roughness;
+        float D = D_GGX( dotNH, a );
+        float3 F = F_Schlick( dotLH, f0 );
+        float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
+        float3 Fr = (D * v) * F;
+        float3 Fd = Fd_Lambert();
+        
         if (lightDistance < radius)
         {
             const float x = lightDistance / radius;
             falloff = -0.05f + 1.05f / (1.0f + 20.0f * x * x);
 
-            // Schlick Fresnel.
-            const float ref_at_norm_incidence = 1.0f;
-            float fresnel = pow( 1.0f - dotVH, 5.0f );
-            fresnel *= (1.0f - ref_at_norm_incidence);
-            fresnel += ref_at_norm_incidence;
-
-            //accumDiffuseAndSpecular.rgb += max( 0.0f, dotNL );// * falloff;
-            //accumDiffuseAndSpecular.rgb = float3( 1.0f, 0.0f, 0.0f );
-            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2 * fresnel;
-            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * abs( dot( lightDirVS, normalize( input.normalVS ) ) );
+            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2;
+            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * Fr * Fd;
         }
-
-        //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
-        //outColor.rgb += -dot( lightDirVS, normalize( in.normalVS ) );
-        //accumDiffuseAndSpecular += lightDistance < radius ? 1.0f : 0.25f;
     }
 
     // move past the first sentinel to get to the spot lights

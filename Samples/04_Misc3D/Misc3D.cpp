@@ -35,7 +35,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 
 using namespace ae3d;
@@ -175,6 +175,9 @@ int main()
     Mesh cubeMesh;
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
+    Mesh sphereMesh;
+    sphereMesh.Load( FileSystem::FileContents( "sphere.ae3d" ) );
+
     Mesh cubeMeshScaledUV;
     //cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
 
@@ -254,6 +257,9 @@ int main()
     
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+
+    Texture2D asphaltTex;
+    asphaltTex.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D gliderClampTex;
     gliderClampTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
@@ -418,6 +424,24 @@ int main()
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
 
+    GameObject spheres[ 5 ];
+    Material sphereMaterials[ 5 ];
+    
+    for (int i = 0; i < 5; ++i)
+    {
+        sphereMaterials[ i ].SetShader( &shader );
+        sphereMaterials[ i ].SetTexture( &asphaltTex, 0 );
+        sphereMaterials[ i ].SetVector( "tint", { 1, 1, 1, 1 } );
+        sphereMaterials[ i ].SetBackFaceCulling( true );
+
+        spheres[ i ].AddComponent< MeshRendererComponent >();
+        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &sphereMesh );
+        //spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &sphereMaterials[ i ], 0 );
+        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
+        spheres[ i ].AddComponent< TransformComponent >();
+        spheres[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { float( i ) * 3, 6, -88 } );
+    }
+
     GameObject standardCubeTopCenter;
     standardCubeTopCenter.SetName( "standardCubeTopCenter" );
     standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
@@ -459,7 +483,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -562,6 +586,11 @@ int main()
     //scene.Add( &childCube );
     //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
+
+    for (int i = 0; i < 5; ++i)
+    {
+        scene.Add( &spheres[ i ]);
+    }
     
 #ifdef TEST_SHADOWS_POINT
     scene.Add( &pointLight );
