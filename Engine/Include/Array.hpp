@@ -57,6 +57,11 @@ template< typename T > struct Array
     
     void Allocate( int size )
     {
+        if (count == size)
+        {
+            return;
+        }
+        
         delete[] elements;
         elements = size > 0 ? new T[ size ]() : nullptr;
         count = size;
