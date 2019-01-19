@@ -98,6 +98,39 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     return out;
 }
 
+float D_GGX( float dotNH, float a )
+{
+    float a2 = a * a;
+    float f = (dotNH * a2 - dotNH) * dotNH + 1.0f;
+    return a2 / (3.14159265f * f * f);
+}
+
+float3 F_Schlick( float dotVH, float3 f0 )
+{
+    return f0 + (float3( 1.0f ) - f0) * pow( 1.0f - dotVH, 5.0f );
+}
+
+float V_SmithGGXCorrelated( float dotNV, float dotNL, float a )
+{
+    float a2 = a * a;
+    float GGXL = dotNV * sqrt( (-dotNL * a2 + dotNL) * dotNL + a2 );
+    float GGXV = dotNL * sqrt( (-dotNV * a2 + dotNV) * dotNV + a2 );
+    return 0.5f / (GGXV + GGXL);
+}
+
+float Fd_Lambert()
+{
+    return 1.0f / 3.14159265f;
+}
+
+float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
+{
+    float distanceSquare = dot( posToLight, posToLight );
+    float factor = distanceSquare * lightInvRadius * lightInvRadius;
+    float smoothFactor = max( 1.0f - factor * factor, 0.0f );
+    return (smoothFactor * smoothFactor) / max( distanceSquare, 1e-4 );
+}
+
 //[[early_fragment_tests]]
 fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
@@ -120,60 +153,36 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     //const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
-    const float3 surfaceToLightVS = -uniforms.lightDirection.xyz;
+    const float3 surfaceToDirectionalLightVS = -uniforms.lightDirection.xyz;
 
-    const float3 N = normalVS;
-    const float3 V = float3( 0, 0, -1 );
-    const float3 L = surfaceToLightVS;
+    const float3 N = normalize( normalVS );
+    const float3 V = normalize( in.positionVS.xyz );
+    const float3 L = normalize( -surfaceToDirectionalLightVS );
     const float3 H = normalize( L + V );
-
-    const float dotNL = saturate( dot( N, L ) );
+    
+    const float dotNV = abs( dot( N, V ) ) + 1e-5f;
+    const float dotNL = saturate( dot( N, -surfaceToDirectionalLightVS ) );
+    const float dotLH = saturate( dot( L, H ) );
     const float dotNH = saturate( dot( N, H ) );
-    const float dotNV = saturate( dot( N, V ) );
-    const float dotVH = saturate( dot( V, H ) );
-    const float roughness = 0.9f;
-    const float r_sq = roughness * roughness;
-
-    // Geometric term.
-    const float geoNumerator = 2.0f * dotNH;
-    const float geoB = (geoNumerator * dotNV) / dotVH;
-    const float geoC = (geoNumerator * dotNL) / dotVH;
-    const float geo = min( 1.0f, min( geoB, geoC ) );
     
-    // Beckmann roughness.
-    const float roughness_a = 1.0f / (4.0f * r_sq * pow( dotNH, 4 ));
-    const float roughness_b = dotNH * dotNH - 1.0f;
-    const float roughness_c = r_sq * dotNH * dotNH;
-    const float roughness2 = roughness_a * exp( roughness_b / roughness_c );
-
-    // Schlick Fresnel.
-    const float ref_at_norm_incidence = 1.0f;
-    float fresnel = pow( 1.0f - dotVH, 5.0f );
-    fresnel *= (1.0f - ref_at_norm_incidence);
-    fresnel += ref_at_norm_incidence;
-
-    // Specular BRDF.
-    const float Rs_numerator = fresnel * geo * roughness2;
-    const float Rs_denominator = dotNV * dotNL;
-    const float Rs = max( 0.0f, Rs_numerator / Rs_denominator ); // Added max() to prevent black areas.
+    const float3 f0 = float3( 0.5f );
     
+    const float roughness = 0.5f;
+    const float a = roughness * roughness;
+    const float D = D_GGX( dotNH, a );
+    const float3 F = F_Schlick( dotLH, f0 );
+    const float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
+    const float3 Fr = (D * v) * F;
+    const float3 Fd = Fd_Lambert();
+
     float4 ambient = float4( 0.1f, 0.1f, 0.1f, 1.0f );
-    //vec3 final = ambient * albedoTex + max( 0.0f, dotNL ) * (specularTex * Rs + albedoTex);
 
     const int tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
     float4 outColor = uniforms.lightColor;
-    //vec3 final = ambient * albedoTex + max( 0.0f, dotNL ) * (specularTex * Rs + albedoTex);
-    outColor = ambient * float4( albedoColor ) + outColor * float4( albedoColor ) + max( 0.0f, dotNL );// * (Rs + float4(albedoColor));
-    //const float3 diffuseDirectional = max( 0.0f, dot( normalVS, surfaceToLightVS ) );
-    //outColor.rgb *= diffuseDirectional;
-    //outColor.rgb = max( outColor.rgb, float3( 0.25f, 0.25f, 0.25f ) );
-    
-    //const float3 surfaceToCameraVS = -in.positionVS;
-    //const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( surfaceToLightVS, normalVS ) ) ), 0.2f );
-    //outColor.rgb += specularDirectional;
+    outColor = ambient * float4( albedoColor ) + outColor * float4( albedoColor ) + max( 0.0f, dotNL );
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
@@ -183,27 +192,14 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
 
         const float4 center = pointLightBufferCenterAndRadius[ lightIndex ];
         const float radius = center.w;
-
-        //const float3 vecToLightVS = (uniforms.localToView * float4( center.xyz, 1 )).xyz - in.positionVS.xyz;
         const float3 vecToLightWS = center.xyz - in.positionWS.xyz;
-        //const float3 lightDirVS = normalize( vecToLightVS );
-        
-        //const float dotNL = saturate( dot( normalize( in.normalVS ), lightDirVS ) );
         const float lightDistance = length( vecToLightWS );
-        float falloff = 1;
         
         if (lightDistance < radius)
         {
-            float x = lightDistance / radius;
-            falloff = -0.05f + 1.05f / (1.0f + 5.0f * x * x);
-            //outColor.rgb += max( 0.0, dotNL );// * falloff;
-            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * falloff;
+            float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
+            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
         }
-        
-        //outColor.rgb += lightDistance < radius ? abs(dot( lightDirVS, normalize( in.normalVS ) )) : 0;
-        
-        //outColor.rgb += -dot( lightDirVS, normalize( in.normalVS ) );
-        //outColor.rgb += lightDistance < radius ? 1 : 0.25;
     }
     
     // Moves past the first sentinel to get to the spot lights.
@@ -218,16 +214,11 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         
         const float4 params = spotLightParams[ lightIndex ];
         const float4 center = spotLightBufferCenterAndRadius[ lightIndex ];
-        //const float radius = center.w;
         
         const float3 vecToLight = normalize( center.xyz - in.positionWS.xyz );
         const float spotAngle = dot( -params.xyz, vecToLight );
         const float cosineOfConeAngle = abs( params.w );
         
-        // Falloff
-        //const float dist = distance( in.positionWS.xyz, center.xyz );
-        //const float a = dist / radius + 1.0f;
-        //const float att = 1.0f / (a * a);
         const float3 color = spotLightBufferColors[ lightIndex ].rgb;// * att;// * specularTex;
         
         const float3 accumDiffuseAndSpecular = spotAngle > cosineOfConeAngle ? color : float3( 0.0, 0.0, 0.0 );

@@ -23,6 +23,12 @@ std::string GetOpenPath()
     return "";
 }
 
+void GetOpenPath( char* outPath )
+{
+    static std::string path = GetOpenPath();
+    outPath = (char*)path.c_str();
+}
+
 std::string GetSavePath()
 {
     NSSavePanel *op = [NSSavePanel savePanel];

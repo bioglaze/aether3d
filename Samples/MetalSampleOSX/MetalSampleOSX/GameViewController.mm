@@ -31,7 +31,7 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
