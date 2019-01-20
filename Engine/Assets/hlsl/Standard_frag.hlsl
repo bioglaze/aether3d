@@ -78,7 +78,7 @@ float D_GGX( float dotNH, float a )
     return a2 / (3.14159265f * f * f);
 }
 
-float F_Schlick( float dotVH, float3 f0 )
+float3 F_Schlick( float dotVH, float3 f0 )
 {
     return f0 + (float3( 1.0f ) - f0) * pow( 1.0f - dotVH, 5.0f );
 }
@@ -94,6 +94,14 @@ float V_SmithGGXCorrelated( float dotNV, float dotNL, float a )
 float Fd_Lambert()
 {
     return 1.0f / 3.14159265f;
+}
+
+float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
+{
+    float distanceSquare = dot( posToLight, posToLight );
+    float factor = distanceSquare * lightInvRadius * lightInvRadius;
+    float smoothFactor = max( 1.0f - factor * factor, 0.0f );
+    return (smoothFactor * smoothFactor) / max( distanceSquare, 1e-4 );
 }
 
 float4 main( PS_INPUT input ) : SV_Target
@@ -117,6 +125,9 @@ float4 main( PS_INPUT input ) : SV_Target
     const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( -surfaceToLightVS, input.normalVS ) ) ), 0.2f );
     //accumDiffuseAndSpecular.rgb += specularDirectional;
 
+    const float3 N = normalize( normalVS );
+    const float3 V = normalize( input.positionVS_u.xyz );
+
     //[loop] // Point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
@@ -131,8 +142,6 @@ float4 main( PS_INPUT input ) : SV_Target
         const float3 vecToLightWS = centerAndRadius.xyz - input.positionWS_v.xyz;
         const float3 lightDirVS = normalize( vecToLightVS );
 
-        const float3 N = normalize( normalVS );
-        const float3 V = normalize( input.positionVS_u.xyz );
         const float3 L = normalize( vecToLightVS );
         const float3 H = normalize( L + V );
 
@@ -143,9 +152,8 @@ float4 main( PS_INPUT input ) : SV_Target
         const float dotNH = saturate( dot( N, H ) );
         
         const float lightDistance = length( vecToLightWS );
-        float falloff = 1.0f;
-        float3 f0 = float3( 0.5f );
-        
+
+        float3 f0 = float3( 0.5f );        
         float roughness = 0.02f;
         float a = roughness * roughness;
         float D = D_GGX( dotNH, a );
@@ -156,11 +164,10 @@ float4 main( PS_INPUT input ) : SV_Target
         
         if (lightDistance < radius)
         {
-            const float x = lightDistance / radius;
-            falloff = -0.05f + 1.05f / (1.0f + 20.0f * x * x);
+            const float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
 
-            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2;
-            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * Fr * Fd;
+            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2;
+            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation;// * Fr * Fd;
         }
     }
 
