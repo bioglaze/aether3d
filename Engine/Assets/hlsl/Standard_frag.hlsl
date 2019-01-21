@@ -154,10 +154,10 @@ float4 main( PS_INPUT input ) : SV_Target
         const float lightDistance = length( vecToLightWS );
 
         float3 f0 = float3( 0.5f );        
-        float roughness = 0.02f;
+        float roughness = 0.2f;
         float a = roughness * roughness;
-        float D = D_GGX( dotNH, a );
-        float3 F = F_Schlick( dotLH, f0 );
+        float D = 1;//D_GGX( dotNH, a );
+        float3 F = float3(1);//F_Schlick( dotLH, f0 );
         float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
         float3 Fr = (D * v) * F;
         float3 Fd = Fd_Lambert();
@@ -167,7 +167,7 @@ float4 main( PS_INPUT input ) : SV_Target
             const float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
 
             //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2;
-            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation;// * Fr * Fd;
+            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
         }
     }
 
