@@ -1220,7 +1220,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     cbvDesc.SizeInBytes = AE3D_CB_SIZE;
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
 
-	const UINT incrementSize = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );;
+	const UINT incrementSize = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 	cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
 
@@ -1255,6 +1255,10 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
         GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
         GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
+
+        // FIXME: Why doesn't this work?
+        //cpuHandle.ptr += incrementSize;
+        //GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
     }
     else
     {

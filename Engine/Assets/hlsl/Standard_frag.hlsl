@@ -18,14 +18,14 @@ struct PS_INPUT
     float3 normalVS : NORMAL;
 };
 
-layout(set=0, binding=1) Texture2D tex : register(t0);
-layout(set=0, binding=2) SamplerState sLinear : register(s0);
-layout(set=0, binding=3) Buffer<float4> pointLightBufferCenterAndRadius : register(t1);
-layout(set=0, binding=4) RWBuffer<uint> perTileLightIndexBuffer : register(u1);
-layout(set=0, binding=5) Texture2D normalTex : register(t1);
-layout(set=0, binding=7) Buffer<float4> pointLightColors : register(t2);
-layout(set=0, binding=8) Buffer<float4> spotLightBufferCenterAndRadius : register(t3);
-layout(set=0, binding=9) Buffer<float4> spotLightParams : register(t4);
+layout( set = 0, binding = 1 ) Texture2D tex : register(t0);
+layout( set = 0, binding = 2 ) SamplerState sLinear : register(s0);
+layout( set = 0, binding = 3 ) Buffer<float4> pointLightBufferCenterAndRadius : register(t1);
+layout( set = 0, binding = 4 ) RWBuffer<uint> perTileLightIndexBuffer : register(u1);
+layout( set = 0, binding = 7 ) Buffer<float4> pointLightColors : register(t2);
+layout( set = 0, binding = 8 ) Buffer<float4> spotLightBufferCenterAndRadius : register(t3);
+layout( set = 0, binding = 9 ) Buffer<float4> spotLightParams : register(t4);
+layout( set = 0, binding = 5 ) Texture2D normalTex : register(t5);
 
 #define TILE_RES 16
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
@@ -80,7 +80,7 @@ float D_GGX( float dotNH, float a )
 
 float3 F_Schlick( float dotVH, float3 f0 )
 {
-    return f0 + (float3( 1.0f ) - f0) * pow( 1.0f - dotVH, 5.0f );
+    return f0 + (float3( 1, 1, 1 ) - f0) * pow( 1.0f - dotVH, 5.0f );
 }
 
 float V_SmithGGXCorrelated( float dotNV, float dotNL, float a )
@@ -107,7 +107,11 @@ float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
 float4 main( PS_INPUT input ) : SV_Target
 {
     const float4 albedo = tex.Sample( sLinear, float2( input.positionVS_u.w, input.positionWS_v.w ) );
-    const float4 normalTS = normalTex.Sample( sLinear, float2( input.positionVS_u.w, input.positionWS_v.w ) );
+#if !VULKAN
+    const float4 normalTS = float4( 0, 0, 1, 0 );
+#else
+    const float4 normalTS = normalTex.Sample( sLinear, float2(input.positionVS_u.w, input.positionWS_v.w) );
+#endif
 
     const uint tileIndex = GetTileIndex( input.pos.xy );
     uint index = maxNumLightsPerTile * tileIndex;
@@ -153,11 +157,11 @@ float4 main( PS_INPUT input ) : SV_Target
         
         const float lightDistance = length( vecToLightWS );
 
-        float3 f0 = float3( 0.5f );        
+        float3 f0 = float3( 0.5f, 0.5f, 0.5f );
         float roughness = 0.2f;
         float a = roughness * roughness;
         float D = 1;//D_GGX( dotNH, a );
-        float3 F = float3(1);//F_Schlick( dotLH, f0 );
+        float3 F = float3( 1, 1, 1 );//F_Schlick( dotLH, f0 );
         float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
         float3 Fr = (D * v) * F;
         float3 Fd = Fd_Lambert();
