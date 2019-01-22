@@ -17,6 +17,24 @@ using namespace ae3d;
 #if _MSC_VER
 void GetOpenPath( char* path )
 {
+    OPENFILENAME ofn = {};
+    TCHAR szFile[ 260 ] = {};
+
+    ofn.lStructSize = sizeof( ofn );
+    ofn.hwndOwner = GetActiveWindow();
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = sizeof( szFile );
+    ofn.lpstrFilter = "Scene\0*.SCENE\0All\0*.*\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = nullptr;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = nullptr;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileName( &ofn ) != FALSE)
+    {
+        strncpy( path, ofn.lpstrFile, 1024 );
+    }
 }
 #else
 void GetOpenPath( char* path )
