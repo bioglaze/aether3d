@@ -15,7 +15,7 @@ layout(set=0, binding=0) cbuffer cbPerFrame : register(b0)
     uint windowWidth;
     uint windowHeight;
     uint numLights; // 16 bits for point light count, 16 for spot light count
-    uint padding;
+    float f0;
     float4 tex0scaleOffset;
     float4 tilesXY;
     matrix boneMatrices[ 80 ];

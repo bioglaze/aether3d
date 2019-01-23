@@ -430,14 +430,16 @@ int main()
     for (int i = 0; i < 5; ++i)
     {
         sphereMaterials[ i ].SetShader( &shader );
-        sphereMaterials[ i ].SetTexture( &asphaltTex, 0 );
+        sphereMaterials[ i ].SetTexture( &pbrNormalTex, 1 );
+        sphereMaterials[ i ].SetTexture( &pbrDiffuseTex, 0 );
         sphereMaterials[ i ].SetVector( "tint", { 1, 1, 1, 1 } );
         sphereMaterials[ i ].SetBackFaceCulling( true );
+        sphereMaterials[ i ].SetF0( 1.0f / (i+1) );
 
         spheres[ i ].AddComponent< MeshRendererComponent >();
         spheres[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &sphereMesh );
-        //spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &sphereMaterials[ i ], 0 );
-        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
+        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &sphereMaterials[ i ], 0 );
+        //spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
         spheres[ i ].AddComponent< TransformComponent >();
         spheres[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { float( i ) * 3, 6, -88 } );
     }
@@ -483,7 +485,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)

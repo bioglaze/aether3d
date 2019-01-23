@@ -10,6 +10,11 @@ std::unordered_map< std::string, float > ae3d::Material::sFloats;
 std::unordered_map< std::string, int > ae3d::Material::sInts;
 std::unordered_map< std::string, ae3d::Vec3 > ae3d::Material::sVec3s;
 
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+}
+
 bool ae3d::Material::IsValidShader() const
 {
     return shader && shader->IsValid();
@@ -98,11 +103,18 @@ void ae3d::Material::Apply()
     {
         GfxDevice::SetPolygonOffset( false, 0, 0 );
     }
+
+    GfxDeviceGlobal::perObjectUboStruct.f0 = f0;
 }
 
 void ae3d::Material::SetShader( Shader* aShader )
 {
     shader = aShader;
+}
+
+void ae3d::Material::SetF0( float af0 )
+{
+    f0 = af0;
 }
 
 void ae3d::Material::SetTexture( Texture2D* texture, int slot )

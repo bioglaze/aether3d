@@ -157,11 +157,11 @@ float4 main( PS_INPUT input ) : SV_Target
         
         const float lightDistance = length( vecToLightWS );
 
-        float3 f0 = float3( 0.5f, 0.5f, 0.5f );
+        float3 f0v = float3( f0, f0, f0 );
         float roughness = 0.2f;
         float a = roughness * roughness;
         float D = 1;//D_GGX( dotNH, a );
-        float3 F = float3( 1, 1, 1 );//F_Schlick( dotLH, f0 );
+        float3 F = float3( 1, 1, 1 );//F_Schlick( dotLH, f0v );
         float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
         float3 Fr = (D * v) * F;
         float3 Fd = Fd_Lambert();

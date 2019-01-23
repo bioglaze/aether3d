@@ -79,6 +79,9 @@ namespace ae3d
         /// \param slot Slot index.
         void SetTexture( class Texture2D* texture, int slot );
 
+        /// \param f0 Reflectance at grazing angle.
+        void SetF0( float f0 );
+
         /// \param name Texture uniform name.
         /// \param texture Texture.
         void SetTexture( const char* name, class TextureCube* texture );
@@ -123,6 +126,7 @@ namespace ae3d
         BlendingMode blendingMode = BlendingMode::Off;
         float depthFactor = 0;
         float depthUnits = 0;
+        float f0 = 0.5f;
         bool cullBackFaces = true;
     };
 }
