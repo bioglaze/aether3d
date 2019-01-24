@@ -197,6 +197,24 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         
         if (lightDistance < radius)
         {
+            const float3 vecToLightVS = (uniforms.localToView * float4( vecToLightWS, 0 )).xyz;
+            const float3 L = normalize( -vecToLightVS );
+            const float3 H = normalize( L + V );
+            
+            const float dotNL = saturate( dot( N, -L ) );
+            const float dotLH = saturate( dot( L, H ) );
+            const float dotNH = saturate( dot( N, H ) );
+            
+            const float3 f0 = float3( uniforms.f0 );
+            
+            const float roughness = 0.5f;
+            const float a = roughness * roughness;
+            const float D = D_GGX( dotNH, a );
+            const float3 F = F_Schlick( dotLH, f0 );
+            const float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
+            const float3 Fr = (D * v) * F;
+            const float3 Fd = Fd_Lambert();
+
             float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
             outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
         }
