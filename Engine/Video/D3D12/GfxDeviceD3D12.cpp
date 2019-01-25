@@ -159,7 +159,6 @@ namespace GfxDeviceGlobal
     ae3d::RenderTexture* currentRenderTarget = nullptr;
     unsigned currentRenderTargetCubeMapFace = 0;
 
-    ID3D12PipelineState* fullscreenTrianglePSO;
     ID3D12Resource* renderTargets[ 2 ] = { nullptr, nullptr };
     GpuResource rtvResources[ 2 ];
 
@@ -352,51 +351,6 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
 
     Statistics::IncBarrierCalls();
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &BarrierDesc );
-}
-
-void CreateFullscreenTrianglePSO( ID3DBlob* vertexBlob, ID3DBlob* pixelBlob )
-{
-    D3D12_RASTERIZER_DESC descRaster = {};
-    descRaster.CullMode = D3D12_CULL_MODE_FRONT;
-    descRaster.FrontCounterClockwise = FALSE;
-    descRaster.FillMode = D3D12_FILL_MODE_SOLID;
-
-    const D3D12_RENDER_TARGET_BLEND_DESC blendOff =
-    {
-        FALSE, FALSE,
-        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-        D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-        D3D12_LOGIC_OP_NOOP,
-        D3D12_COLOR_WRITE_ENABLE_ALL,
-    };
-
-    D3D12_BLEND_DESC descBlend = {};
-    descBlend.AlphaToCoverageEnable = FALSE;
-    descBlend.IndependentBlendEnable = FALSE;
-    descBlend.RenderTarget[ 0 ] = blendOff;
-
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC descPso = {};
-    descPso.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
-    descPso.pRootSignature = GfxDeviceGlobal::rootSignatureGraphics;
-    descPso.VS = { reinterpret_cast<BYTE*>( vertexBlob->GetBufferPointer()), vertexBlob->GetBufferSize() };
-    descPso.PS = { reinterpret_cast<BYTE*>( pixelBlob->GetBufferPointer()), pixelBlob->GetBufferSize() };
-    descPso.RasterizerState = descRaster;
-    descPso.BlendState = descBlend;
-    descPso.DepthStencilState.StencilEnable = FALSE;
-    descPso.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-    descPso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    descPso.DepthStencilState.DepthEnable = FALSE;
-    descPso.SampleMask = UINT_MAX;
-    descPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    descPso.NumRenderTargets = 1;
-    descPso.RTVFormats[ 0 ] = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
-    descPso.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    descPso.SampleDesc.Count = GfxDeviceGlobal::sampleCount;
-    descPso.SampleDesc.Quality = GfxDeviceGlobal::sampleCount > 1 ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
-
-    HRESULT hr = GfxDeviceGlobal::device->CreateGraphicsPipelineState( &descPso, IID_PPV_ARGS( &GfxDeviceGlobal::fullscreenTrianglePSO ) );
-    AE3D_CHECK_D3D( hr, "Failed to create PSO" );
-    GfxDeviceGlobal::fullscreenTrianglePSO->SetName( L"PSO Fullscreen Triangle" );
 }
 
 void CreateTimerQuery()
@@ -1372,8 +1326,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::depthTexture );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandListAllocator );
     DescriptorHeapManager::Deinit();
-
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::fullscreenTrianglePSO );
 
     for (std::size_t psoIndex = 0; psoIndex < GfxDeviceGlobal::psoCache.size(); ++psoIndex)
     {

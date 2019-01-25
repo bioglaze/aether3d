@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AB05A58D201783C7009FB5BD /* FullscreenTriangle.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB05A58C201783C7009FB5BD /* FullscreenTriangle.metal */; };
 		AB1C9A141F0A607200948D46 /* human_anim_test2.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */; };
 		AB2345001DEABFB8004C4DEE /* default_white.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2344FF1DEABFB8004C4DEE /* default_white.png */; };
 		AB29D4481D772C7400E998FC /* test_dxt1.dds in Resources */ = {isa = PBXBuildFile; fileRef = AB29D4471D772C7400E998FC /* test_dxt1.dds */; };
@@ -63,7 +62,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AB05A58C201783C7009FB5BD /* FullscreenTriangle.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = FullscreenTriangle.metal; path = ../../../Engine/Assets/FullscreenTriangle.metal; sourceTree = "<group>"; };
 		AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = human_anim_test2.ae3d; path = ../../../../aether3d_build/Samples/human_anim_test2.ae3d; sourceTree = "<group>"; };
 		AB2344FF1DEABFB8004C4DEE /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
 		AB29D4471D772C7400E998FC /* test_dxt1.dds */ = {isa = PBXFileReference; lastKnownFileType = file; name = test_dxt1.dds; path = ../../../../aether3d_build/Samples/test_dxt1.dds; sourceTree = "<group>"; };
@@ -229,7 +227,6 @@
 				ABCD9C6B1C131DA300B94BD0 /* font.png */,
 				AB2BB13F2160FA8100454B1E /* Bloom.metal */,
 				AB7839E31C70CA950065EF51 /* DepthNormals.metal */,
-				AB05A58C201783C7009FB5BD /* FullscreenTriangle.metal */,
 				ABFD71AB1D81E55B003770D4 /* LightCuller.metal */,
 				AB657724200FD3BD0089CB54 /* MetalCommon.h */,
 				ABE04FBF1C1217F00025C436 /* Moments.metal */,
@@ -418,7 +415,6 @@
 				ABE04FC41C1217F00025C436 /* Moments.metal in Sources */,
 				AB4ADC2A1D8EB2800032CBDD /* Standard.metal in Sources */,
 				ABE04F861C1216A80025C436 /* GameViewController.mm in Sources */,
-				AB05A58D201783C7009FB5BD /* FullscreenTriangle.metal in Sources */,
 				ABE04FC71C1217F00025C436 /* SpriteShader.metal in Sources */,
 				ABE04F801C1216A80025C436 /* AppDelegate.m in Sources */,
 				AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */,

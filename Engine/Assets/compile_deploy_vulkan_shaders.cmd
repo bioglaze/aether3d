@@ -10,7 +10,6 @@
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\LightCuller.hlsl -o ..\..\..\aether3d_build\Samples\LightCuller.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\Standard_vert.hlsl -o ..\..\..\aether3d_build\Samples\Standard_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\Standard_frag.hlsl -o ..\..\..\aether3d_build\Samples\Standard_frag.spv
-%VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\fullscreen_triangle_vert.hlsl -o ..\..\..\aether3d_build\Samples\fullscreen_triangle_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\vr_companion_frag.hlsl -o ..\..\..\aether3d_build\Samples\vr_companion_frag.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\vr_companion_vert.hlsl -o ..\..\..\aether3d_build\Samples\vr_companion_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\Bloom.hlsl -o ..\..\..\aether3d_build\Samples\Bloom.spv
