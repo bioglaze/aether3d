@@ -121,16 +121,28 @@ float4 main( PS_INPUT input ) : SV_Target
 
     float3 accumDiffuseAndSpecular = lightColor.rgb;
     const float3 surfaceToLightVS = lightDirection.xyz;
-    const float3 diffuseDirectional = max( 0.0f, dot( input.normalVS, surfaceToLightVS ) );
-    accumDiffuseAndSpecular *= diffuseDirectional;
-    accumDiffuseAndSpecular = max( float3( 0.25f, 0.25f, 0.25f ), accumDiffuseAndSpecular );
-
-    const float3 surfaceToCameraVS = -input.positionVS_u.xyz;
-    const float specularDirectional = pow( max( 0.0f, dot( surfaceToCameraVS, reflect( -surfaceToLightVS, input.normalVS ) ) ), 0.2f );
-    //accumDiffuseAndSpecular.rgb += specularDirectional;
 
     const float3 N = normalize( normalVS );
     const float3 V = normalize( input.positionVS_u.xyz );
+    const float3 L = lightDirection.xyz;
+    const float3 H = normalize( L + V );
+
+    const float dotNH = saturate( dot( N, H ) );
+    const float dotLH = saturate( dot( L, H ) );
+    const float dotNV = abs( dot( N, V ) ) + 1e-5f;
+    const float dotNL = saturate( dot( N, -surfaceToLightVS ) );
+
+    float3 f0v = float3(f0, f0, f0);
+    float roughness = 0.2f;
+    float a = roughness * roughness;
+    float D = D_GGX( dotNH, a );
+    float3 F = F_Schlick( dotLH, f0v );
+    float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
+    float3 Fr = (D * v) * F;
+    float3 Fd = Fd_Lambert();
+
+    //accumDiffuseAndSpecular *= Fr * Fd * dotNL;
+    accumDiffuseAndSpecular *= Fd * dotNL;
 
     //[loop] // Point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
@@ -160,8 +172,8 @@ float4 main( PS_INPUT input ) : SV_Target
         float3 f0v = float3( f0, f0, f0 );
         float roughness = 0.2f;
         float a = roughness * roughness;
-        float D = 1;//D_GGX( dotNH, a );
-        float3 F = float3( 1, 1, 1 );//F_Schlick( dotLH, f0v );
+        float D = D_GGX( dotNH, a );
+        float3 F = F_Schlick( dotLH, f0v );
         float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
         float3 Fr = (D * v) * F;
         float3 Fd = Fd_Lambert();

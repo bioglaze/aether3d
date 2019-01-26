@@ -1655,7 +1655,6 @@ namespace ae3d
         GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces, UI_FACE_COUNT, GfxDeviceGlobal::uiVertices, UI_VERTICE_COUNT, VertexBuffer::Storage::CPU );
 
         renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
-        renderer.builtinShaders.fullscreenTriangleShader.LoadSPIRV( FileSystem::FileContents( "fullscreen_triangle_vert.spv" ), FileSystem::FileContents( "sprite_frag.spv" ) );
 
         GfxDeviceGlobal::lightTiler.Init();
 
