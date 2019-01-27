@@ -1,5 +1,6 @@
 #import "Cocoa/Cocoa.h"
 #include <string>
+#include <string.h>
 #import "GameViewController.h"
 #include "GameObject.hpp"
 #include "FileSystem.hpp"
@@ -26,7 +27,8 @@ std::string GetOpenPath()
 void GetOpenPath( char* outPath )
 {
     static std::string path = GetOpenPath();
-    outPath = (char*)path.c_str();
+    strcpy( outPath, path.c_str() );
+    
 }
 
 std::string GetSavePath()

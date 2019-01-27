@@ -20,7 +20,6 @@
 		ABAA98B020963B4C00DC1F42 /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A520963B4B00DC1F42 /* Standard.metal */; };
 		ABAA98B120963B4C00DC1F42 /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A620963B4B00DC1F42 /* Moments.metal */; };
 		ABAA98B220963B4C00DC1F42 /* SpriteShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A720963B4B00DC1F42 /* SpriteShader.metal */; };
-		ABAA98B320963B4C00DC1F42 /* FullscreenTriangle.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A820963B4C00DC1F42 /* FullscreenTriangle.metal */; };
 		ABAA98B420963B4C00DC1F42 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A920963B4C00DC1F42 /* Skybox.metal */; };
 		ABAA98B520963B4C00DC1F42 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98AA20963B4C00DC1F42 /* Unlit.metal */; };
 		ABAA98B620963B4C00DC1F42 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98AB20963B4C00DC1F42 /* LightCuller.metal */; };
@@ -58,7 +57,6 @@
 		ABAA98A520963B4B00DC1F42 /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		ABAA98A620963B4B00DC1F42 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
 		ABAA98A720963B4B00DC1F42 /* SpriteShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SpriteShader.metal; path = ../../../../Engine/Assets/SpriteShader.metal; sourceTree = "<group>"; };
-		ABAA98A820963B4C00DC1F42 /* FullscreenTriangle.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = FullscreenTriangle.metal; path = ../../../../Engine/Assets/FullscreenTriangle.metal; sourceTree = "<group>"; };
 		ABAA98A920963B4C00DC1F42 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
 		ABAA98AA20963B4C00DC1F42 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
 		ABAA98AB20963B4C00DC1F42 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; };
@@ -223,7 +221,6 @@
 			children = (
 				ABE82EA321DCD8F100072FB1 /* Bloom.metal */,
 				ABAA98AF20963B4C00DC1F42 /* DepthNormals.metal */,
-				ABAA98A820963B4C00DC1F42 /* FullscreenTriangle.metal */,
 				ABAA98AB20963B4C00DC1F42 /* LightCuller.metal */,
 				ABAA98AC20963B4C00DC1F42 /* MetalCommon.h */,
 				ABAA98A620963B4B00DC1F42 /* Moments.metal */,
@@ -315,7 +312,6 @@
 			files = (
 				AB010CE7206F70B40014ED08 /* main.m in Sources */,
 				ABAA98B020963B4C00DC1F42 /* Standard.metal in Sources */,
-				ABAA98B320963B4C00DC1F42 /* FullscreenTriangle.metal in Sources */,
 				ABAA98B720963B4C00DC1F42 /* SDF.metal in Sources */,
 				ABBDD28920B7296B00AA93C7 /* Inspector.cpp in Sources */,
 				ABE82EA421DCD8F100072FB1 /* Bloom.metal in Sources */,

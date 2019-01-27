@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AB05A58F201784B9009FB5BD /* FullscreenTriangle.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB05A58E201784B9009FB5BD /* FullscreenTriangle.metal */; };
 		AB1A16212020E579005FCEBB /* granite.astc in Resources */ = {isa = PBXBuildFile; fileRef = AB1A16202020E579005FCEBB /* granite.astc */; };
 		AB632E4820DEBF3200A35F0E /* glider_textool.astc in Resources */ = {isa = PBXBuildFile; fileRef = AB632E4720DEBF3200A35F0E /* glider_textool.astc */; };
 		AB6DECD61EC82B350019358C /* textures in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD11EC82B350019358C /* textures */; };
@@ -50,7 +49,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AB05A58E201784B9009FB5BD /* FullscreenTriangle.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = FullscreenTriangle.metal; path = ../../../Engine/Assets/FullscreenTriangle.metal; sourceTree = "<group>"; };
 		AB1A16202020E579005FCEBB /* granite.astc */ = {isa = PBXFileReference; lastKnownFileType = file; name = granite.astc; path = ../../../../aether3d_build/Samples/granite.astc; sourceTree = "<group>"; };
 		AB632E4720DEBF3200A35F0E /* glider_textool.astc */ = {isa = PBXFileReference; lastKnownFileType = file; name = glider_textool.astc; path = ../../../../aether3d_build/Samples/glider_textool.astc; sourceTree = "<group>"; };
 		AB657726200FD4BA0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
@@ -181,7 +179,6 @@
 			isa = PBXGroup;
 			children = (
 				AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */,
-				AB05A58E201784B9009FB5BD /* FullscreenTriangle.metal */,
 				ABFE40671D8D1DE000195AD2 /* LightCuller.metal */,
 				AB657726200FD4BA0089CB54 /* MetalCommon.h */,
 				ABD3AB251C29D79F00E78933 /* Moments.metal */,
@@ -316,7 +313,6 @@
 			files = (
 				ABD3AB2E1C29D79F00E78933 /* Unlit.metal in Sources */,
 				ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */,
-				AB05A58F201784B9009FB5BD /* FullscreenTriangle.metal in Sources */,
 				ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */,
 				AB9CA0011D8ECA760049A3AF /* Standard.metal in Sources */,
 				ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */,
