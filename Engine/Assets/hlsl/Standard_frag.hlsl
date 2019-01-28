@@ -224,7 +224,9 @@ float4 main( PS_INPUT input ) : SV_Target
         //accumDiffuseAndSpecular += LightColorDiffuse + LightColorSpecular;
         //accumDiffuseAndSpecular = float3( 0, 1, 0 );
     }
-        
+    
+    accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
+    
     //return float4(accumDiffuseAndSpecular, 1 );
 #ifdef DEBUG_LIGHT_COUNT
     const uint numLights = GetNumLightsInThisTile( tileIndex );
