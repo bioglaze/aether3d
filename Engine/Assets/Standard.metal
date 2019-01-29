@@ -165,7 +165,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float dotLH = saturate( dot( L, H ) );
     const float dotNH = saturate( dot( N, H ) );
     
-    const float3 f0 = float3( 0.5f );
+    const float3 f0 = float3( uniforms.f0, uniforms.f0, uniforms.f0 );
     
     const float roughness = 0.5f;
     const float a = roughness * roughness;
@@ -243,6 +243,8 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         outColor.rgb += accumDiffuseAndSpecular;
     }
     
+	outColor.rgb = max( outColor.rgb, float3( uniforms.minAmbient, uniforms.minAmbient, uniforms.minAmbient ) );
+
 #ifdef DEBUG_LIGHT_COUNT
     const int numLights = GetNumLightsInThisTile( tileIndex, uniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 
