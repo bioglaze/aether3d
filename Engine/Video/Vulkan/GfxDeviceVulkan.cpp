@@ -149,6 +149,7 @@ namespace ae3d
             {
                 std::string str;
                 str = "frame time: " + std::to_string( ::Statistics::GetFrameTimeMS() ) + " ms\n";
+                str += "present time CPU: " + std::to_string( ::Statistics::GetPresentTimeMS() ) + " ms\n";                
                 str += "shadow pass time CPU: " + std::to_string( ::Statistics::GetShadowMapTimeMS() ) + " ms\n";
                 str += "shadow pass time GPU: " + std::to_string( ::Statistics::GetShadowMapTimeGpuMS() ) + " ms\n";
                 str += "depth pass time CPU: " + std::to_string( ::Statistics::GetDepthNormalsTimeMS() ) + " ms\n";
@@ -2009,6 +2010,8 @@ void ae3d::GfxDevice::BeginFrame()
 
 void ae3d::GfxDevice::Present()
 {
+    Statistics::BeginPresentTimeProfiling();
+    
     VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
     VkSubmitInfo submitInfo = {};
@@ -2071,6 +2074,7 @@ void ae3d::GfxDevice::Present()
     }
 
     GfxDeviceGlobal::pendingFreeVBs.Allocate( 0 );
+    Statistics::EndPresentTimeProfiling();
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
