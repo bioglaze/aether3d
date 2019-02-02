@@ -39,7 +39,7 @@ void GetOpenPath( char* path )
 #else
 void GetOpenPath( char* path )
 {
-    FILE* f = popen( "zenity --file-selection --title \"Load .scene file\"", "r" );
+    FILE* f = popen( "zenity --file-selection --title \"Load .scene or .ae3d file\"", "r" );
     fgets( path, 1024, f );
     
     if (strlen( path ) > 0)
@@ -203,7 +203,7 @@ int main()
 
         inspector.EndInput();
 
-        if (isRightMouseDown)
+        if (isRightMouseDown && event.type == WindowEventType::MouseMove)
         {
 #ifdef __linux__
             svRotateCamera( sceneView, float( deltaX ) / 20, float( deltaY ) / 20 );
