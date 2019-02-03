@@ -16,7 +16,12 @@ namespace ae3d
     {
         struct FileContentsData;
     }
-    
+
+    enum class TextureLayout
+    {
+        General, ShaderRead
+    };
+        
     /// 2D texture.
     class Texture2D : public TextureBase
     {
@@ -26,6 +31,9 @@ namespace ae3d
 
         /// Gets a default texture UAV (read-write) that is always available after System::LoadBuiltinAssets().
         static Texture2D* GetDefaultTextureUAV();
+
+        /// \param layout Layout.
+        void SetLayout( TextureLayout layout );
         
         /// \param width Width in pixels.
         /// \param height height in pixels.

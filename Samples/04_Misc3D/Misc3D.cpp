@@ -35,8 +35,8 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+//#define TEST_FORWARD_PLUS
+#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -485,7 +485,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -589,11 +589,12 @@ int main()
     //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
 
+#ifdef TEST_FORWARD_PLUS
     for (int i = 0; i < 5; ++i)
     {
         scene.Add( &spheres[ i ]);
     }
-    
+#endif    
 #ifdef TEST_SHADOWS_POINT
     scene.Add( &pointLight );
 #endif
@@ -888,13 +889,15 @@ int main()
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 #endif
 #ifdef TEST_BLOOM
+        blurTex.SetLayout( TextureLayout::General );
         downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
         downsampleAndThresholdShader.SetTexture2D( 1, &blurTex );
         downsampleAndThresholdShader.Begin();
         downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
         downsampleAndThresholdShader.End();
+        blurTex.SetLayout( TextureLayout::ShaderRead );
         
-        blurShader.SetTexture2D( 0, &blurTex );
+        /*blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 11, &bloomTex );
         blurShader.SetBlurDirection( 1, 0 );
         blurShader.Begin();
@@ -904,7 +907,7 @@ int main()
         blurShader.SetTexture2D( 11, &blurTex );
         blurShader.SetBlurDirection( 0, 1 );
         blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
+        blurShader.End();*/
 
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );

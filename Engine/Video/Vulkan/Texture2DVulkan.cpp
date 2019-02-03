@@ -371,6 +371,24 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName 
     LoadFromData( nullptr, aWidth, aHeight, 4, debugName, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT );
 }
 
+void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
+{
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufInfo.pInheritanceInfo = nullptr;
+    cmdBufInfo.flags = 0;
+
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
+
+    layout = aLayout == TextureLayout::General ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+    SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT,
+                    VK_IMAGE_LAYOUT_UNDEFINED, layout, 1, 0, 1 );
+
+    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+}
+
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format, VkImageUsageFlags usageFlags )
 {
     if (!MathUtil::IsPowerOfTwo( width ) || !MathUtil::IsPowerOfTwo( height ))
