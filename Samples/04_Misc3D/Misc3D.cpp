@@ -35,8 +35,8 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+#define TEST_FORWARD_PLUS
+//#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -384,6 +384,7 @@ int main()
 #endif
 
     Scene scene;
+    scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
     
     TextureCube skybox;
     skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
@@ -429,7 +430,7 @@ int main()
     
     for (int i = 0; i < 5; ++i)
     {
-        sphereMaterials[ i ].SetShader( &shader );
+        sphereMaterials[ i ].SetShader( &standardShader );
         sphereMaterials[ i ].SetTexture( &pbrNormalTex, 1 );
         sphereMaterials[ i ].SetTexture( &pbrDiffuseTex, 0 );
         sphereMaterials[ i ].SetVector( "tint", { 1, 1, 1, 1 } );
@@ -785,7 +786,6 @@ int main()
                 else if (keyCode == KeyCode::R)
                 {
                     reload = true;
-                    //System::ReloadChangedAssets();
                 }
             }
             else if (event.type == WindowEventType::MouseMove)

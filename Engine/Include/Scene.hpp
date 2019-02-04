@@ -32,6 +32,9 @@ namespace ae3d
         /// Renders the scene.
         void Render();
 
+        /// \param color Ambient color.
+        void SetAmbient( const struct Vec3& color );
+        
         /// \param skyTexture Skybox texture.
         void SetSkybox( class TextureCube* skyTexture );
         
@@ -65,5 +68,6 @@ namespace ae3d
         TextureCube* skybox = nullptr;
         Vec3 aabbMin;
         Vec3 aabbMax;
+        Vec3 ambientColor = Vec3( 0.1f, 0.1f, 0.1f );
     };
 }

@@ -133,7 +133,7 @@ float4 main( PS_INPUT input ) : SV_Target
     const float dotNL = saturate( dot( N, -surfaceToLightVS ) );
 
     float3 f0v = float3(f0, f0, f0);
-    float roughness = 0.2f;
+    float roughness = 0.9f;
     float a = roughness * roughness;
     float D = D_GGX( dotNH, a );
     float3 F = F_Schlick( dotLH, f0v );

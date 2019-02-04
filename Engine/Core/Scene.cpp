@@ -305,6 +305,11 @@ static const Vec3 ups[ 6 ] =
     Vec3( 0, -1,  0 )
 };
 
+void ae3d::Scene::SetAmbient( const Vec3& color )
+{
+    ambientColor = color;
+}
+
 void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
 {
     for (auto rtCamera : rtCameras)
@@ -408,7 +413,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                             SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                             RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                             Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
-                            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
                         }
                         else if (pointLight)
                         {
@@ -421,7 +425,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                             }
 
                             Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
-                            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
                         }
 
                         Statistics::EndShadowMapProfiling();
@@ -643,6 +646,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     int gameObjectIndex = -1;
     
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 0, 0, 0, 1 );
+    GfxDeviceGlobal::perObjectUboStruct.minAmbient = ambientColor.x;
     
     for (auto gameObject : gameObjects)
     {
@@ -666,7 +670,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
             Matrix44::TransformDirection( Vec3( lightDirection.x, lightDirection.y, lightDirection.z ), camera->GetView(), &lightDirectionVS );
             GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( dirLight->GetColor() );
             GfxDeviceGlobal::perObjectUboStruct.lightDirection = Vec4( lightDirectionVS.x, lightDirectionVS.y, lightDirectionVS.z, 0 );
-            GfxDeviceGlobal::perObjectUboStruct.minAmbient = 0.2f;
         }
         
         if (spriteRenderer)
