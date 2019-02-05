@@ -111,6 +111,11 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subRes
     }
 }
 
+void ae3d::Texture2D::SetLayout( ae3d::TextureLayout /* layout */ )
+{
+
+}
+
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (Texture2DGlobal::defaultTexture.GetWidth() == 0)
