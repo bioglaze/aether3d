@@ -51,6 +51,7 @@ namespace ae3d
                 stm << "shadow pass time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << "ms\n";
                 stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
                 stm << "depth pass time GPU: " << ::Statistics::GetDepthNormalsTimeGpuMS() << "ms\n";
+                stm << "light culler time GPU: " << ::Statistics::GetLightCullerTimeGpuMS() << "ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
@@ -122,6 +123,7 @@ struct TimerQuery
     int profileCount = 0;
     std::uint64_t depthNormalsProfilerIndex = 0;
     std::uint64_t shadowMapProfilerIndex = 0;
+    std::uint64_t lightCullerProfilerIndex = 0;
     std::uint64_t frequency = 0;
 };
 
@@ -1078,6 +1080,19 @@ void ae3d::GfxDevice::EndDepthNormalsGpuQuery()
     const float timeMS = (float)GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.depthNormalsProfilerIndex ].timeSamples[ GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.depthNormalsProfilerIndex ].currSample ];
 
     Statistics::SetDepthNormalsGpuTime( timeMS );
+}
+
+void ae3d::GfxDevice::BeginLightCullerGpuQuery()
+{
+    GfxDeviceGlobal::timerQuery.lightCullerProfilerIndex = GfxDeviceGlobal::timerQuery.Start( "LightCuller" );
+}
+
+void ae3d::GfxDevice::EndLightCullerGpuQuery()
+{
+    GfxDeviceGlobal::timerQuery.End( GfxDeviceGlobal::timerQuery.lightCullerProfilerIndex );
+    const float timeMS = (float)GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.lightCullerProfilerIndex ].timeSamples[ GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.lightCullerProfilerIndex ].currSample ];
+
+    Statistics::SetLightCullerTimeGpuMS( timeMS );
 }
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()

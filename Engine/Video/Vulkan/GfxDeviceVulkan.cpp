@@ -1730,6 +1730,14 @@ void ae3d::GfxDevice::EndShadowMapGpuQuery()
 {
 }
 
+void ae3d::GfxDevice::BeginLightCullerGpuQuery()
+{
+}
+
+void ae3d::GfxDevice::EndLightCullerGpuQuery()
+{
+}
+
 void ae3d::GfxDevice::SetPolygonOffset( bool, float, float )
 {
 }

@@ -121,6 +121,8 @@ namespace ae3d
         void EndDepthNormalsGpuQuery();
         void BeginShadowMapGpuQuery();
         void EndShadowMapGpuQuery();
+        void BeginLightCullerGpuQuery();
+        void EndLightCullerGpuQuery();
 
         void SetClearColor( float red, float green, float blue );
         void SetRenderTarget( RenderTexture* target, unsigned cubeMapFace );

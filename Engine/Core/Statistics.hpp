@@ -2,6 +2,9 @@
 
 namespace Statistics
 {
+    void BeginLightCullerProfiling();
+    void EndLightCullerProfiling();
+
     void BeginShadowMapProfiling();
     void EndShadowMapProfiling();
 
@@ -14,7 +17,8 @@ namespace Statistics
     float GetDepthNormalsTimeMS();
     float GetDepthNormalsTimeGpuMS();
     float GetSceneAABBTimeMS();
-    
+    float GetLightCullerTimeGpuMS();
+
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
 
@@ -52,4 +56,5 @@ namespace Statistics
     int GetPSOBindCalls();
     void SetDepthNormalsGpuTime( float timeMS );
     void SetShadowMapGpuTime( float timeMS );
+    void SetLightCullerTimeGpuMS( float timeMS );
 }

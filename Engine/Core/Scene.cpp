@@ -275,8 +275,10 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
             }
 
             GfxDeviceGlobal::lightTiler.UpdateLightBuffers();
+            Statistics::BeginLightCullerProfiling();
             GfxDeviceGlobal::lightTiler.CullLights( renderer.builtinShaders.lightCullShader, cameraComponent->GetProjection(),
                                                     view, cameraComponent->GetDepthNormalsTexture() );
+            Statistics::EndLightCullerProfiling();
         }
     }
 

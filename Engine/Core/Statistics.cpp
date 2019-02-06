@@ -23,6 +23,7 @@ namespace Statistics
     float frameTimeMS = 0;
     float presentTimeMS = 0;
     float sceneAABBTimeMS = 0;
+    float lightCullerTimeGpuMS = 0;
     std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
@@ -55,6 +56,11 @@ void Statistics::SetShadowMapGpuTime( float timeMS )
     shadowMapTimeGpuMS = timeMS;
 }
 
+void Statistics::SetLightCullerTimeGpuMS( float timeMS )
+{
+    lightCullerTimeGpuMS = timeMS;
+}
+
 void Statistics::BeginPresentTimeProfiling()
 {
     Statistics::startPresentTimePoint = std::chrono::high_resolution_clock::now();
@@ -65,6 +71,16 @@ void Statistics::EndPresentTimeProfiling()
     auto tEnd = std::chrono::high_resolution_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startPresentTimePoint ).count();
     Statistics::presentTimeMS = static_cast< float >(tDiff);
+}
+
+void Statistics::BeginLightCullerProfiling()
+{
+    ae3d::GfxDevice::BeginLightCullerGpuQuery();
+}
+
+void Statistics::EndLightCullerProfiling()
+{
+    ae3d::GfxDevice::EndLightCullerGpuQuery();
 }
 
 void Statistics::BeginShadowMapProfiling()
@@ -257,6 +273,11 @@ void Statistics::ResetFrameStatistics()
     psoBindCount = 0;
 
     startFrameTimePoint = std::chrono::high_resolution_clock::now();
+}
+
+float Statistics::GetLightCullerTimeGpuMS()
+{
+    return lightCullerTimeGpuMS;
 }
 
 float Statistics::GetSceneAABBTimeMS()
