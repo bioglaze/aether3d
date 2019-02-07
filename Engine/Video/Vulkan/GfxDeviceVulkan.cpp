@@ -37,8 +37,8 @@ PFN_vkAcquireNextImageKHR acquireNextImageKHR = nullptr;
 PFN_vkQueuePresentKHR queuePresentKHR = nullptr;
 PFN_vkGetShaderInfoAMD getShaderInfoAMD;
 
-constexpr int UI_VERTICE_COUNT = 512 * 1024;
-constexpr int UI_FACE_COUNT = 128 * 1024;
+constexpr unsigned UI_VERTICE_COUNT = 512 * 1024;
+constexpr unsigned UI_FACE_COUNT = 128 * 1024;
 
 struct Ubo
 {
