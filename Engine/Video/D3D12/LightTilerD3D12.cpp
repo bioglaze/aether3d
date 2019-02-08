@@ -15,8 +15,8 @@ using namespace ae3d;
 
 namespace GfxDeviceGlobal
 {
-    extern int backBufferWidth;
-    extern int backBufferHeight;
+    extern unsigned backBufferWidth;
+    extern unsigned backBufferHeight;
     extern ID3D12Device* device;
     extern ID3D12Resource* uav1;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;

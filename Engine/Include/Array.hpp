@@ -28,7 +28,7 @@ template< typename T > struct Array
         count = other.count;
         elements = new T[ count ];
 
-        for (int i = 0; i < count; ++i)
+        for ( unsigned i = 0; i < count; ++i)
         {
             elements[ i ] = other.elements[ i ];
         }
@@ -36,15 +36,15 @@ template< typename T > struct Array
         return *this;
     }
     
-    T& operator[]( int index ) { return elements[ index ]; }
+    T& operator[]( unsigned index ) { return elements[ index ]; }
 
-    const T& operator[]( int index ) const { return elements[ index ]; }
+    const T& operator[]( unsigned index ) const { return elements[ index ]; }
     
     void Add( const T& item )
     {
         T* after = new T[ count + 1 ]();
         
-        for (int i = 0; i < count; ++i)
+        for ( unsigned i = 0; i < count; ++i)
         {
             after[ i ] = elements[ i ];
         }
@@ -55,7 +55,7 @@ template< typename T > struct Array
         count = count + 1;
     }
     
-    void Allocate( int size )
+    void Allocate( unsigned size )
     {
         if (count == size)
         {
@@ -68,6 +68,6 @@ template< typename T > struct Array
     }
     
     T* elements = nullptr;
-    int count = 0;
+	unsigned count = 0;
 };
 

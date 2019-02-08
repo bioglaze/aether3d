@@ -296,11 +296,11 @@ void ae3d::AudioSystem::Deinit()
 unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData& clipData )
 {
     // Checks cache for an already loaded clip from the same path.
-    for (int i = 0; i < AudioGlobal::clips.count; ++i)
+    for (unsigned i = 0; i < AudioGlobal::clips.count; ++i)
     {
         if (AudioGlobal::clips[ i ].path == clipData.path)
         {
-            return static_cast< unsigned >( i );
+            return i;
         }
     }
     

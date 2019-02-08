@@ -8,8 +8,8 @@ unsigned nextFreeCameraComponent = 0;
 
 namespace GfxDeviceGlobal
 {
-    extern int backBufferWidth;
-    extern int backBufferHeight;
+    extern unsigned backBufferWidth;
+    extern unsigned backBufferHeight;
 }
 
 unsigned ae3d::CameraComponent::New()

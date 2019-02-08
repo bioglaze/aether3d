@@ -23,7 +23,7 @@ namespace ae3d
 
         /// \param material Material.
         /// \param subMeshIndex Sub mesh index.
-        void SetMaterial( Material* material, int subMeshIndex );
+        void SetMaterial( Material* material, unsigned subMeshIndex );
 
         /// \param aMesh Mesh.
         void SetMesh( Mesh* aMesh );

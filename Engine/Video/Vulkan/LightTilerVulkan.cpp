@@ -17,8 +17,8 @@ namespace MathUtil
 
 namespace GfxDeviceGlobal
 {
-    extern int backBufferWidth;
-    extern int backBufferHeight;
+    extern unsigned backBufferWidth;
+    extern unsigned backBufferHeight;
     extern VkDevice device;
     extern PerObjectUboStruct perObjectUboStruct;
     extern VkCommandBuffer computeCmdBuffer;

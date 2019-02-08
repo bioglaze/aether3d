@@ -73,8 +73,8 @@ int GetSamplerIndexByAnisotropy( ae3d::Anisotropy anisotropy )
 
 namespace GfxDeviceGlobal
 {
-    int backBufferWidth = 0;
-    int backBufferHeight = 0;
+    unsigned backBufferWidth = 0;
+    unsigned backBufferHeight = 0;
     int sampleCount = 1;
     bool isRenderingToTexture = false;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;

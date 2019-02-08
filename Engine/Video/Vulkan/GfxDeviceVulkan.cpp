@@ -115,7 +115,7 @@ namespace GfxDeviceGlobal
     std::map< std::uint64_t, VkPipeline > psoCache;
     VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
     Array< VkDescriptorSet > descriptorSets;
-    int descriptorSetIndex = 0;
+    unsigned descriptorSetIndex = 0;
     std::uint32_t queueNodeIndex = UINT32_MAX;
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
@@ -126,10 +126,10 @@ namespace GfxDeviceGlobal
     VkSampler boundSamplers[ 2 ];
     Array< VkBuffer > pendingFreeVBs;
     Array< Ubo > ubos;
-    int currentUbo = 0;
+	unsigned currentUbo = 0;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
-    int backBufferWidth;
-    int backBufferHeight;
+	unsigned backBufferWidth;
+	unsigned backBufferHeight;
     ae3d::LightTiler lightTiler;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
@@ -440,7 +440,7 @@ namespace ae3d
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, GfxDeviceGlobal::drawCmdBuffers );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
 
-        for (int i = 0; i < GfxDeviceGlobal::swapchainBuffers.count; ++i)
+        for (unsigned i = 0; i < GfxDeviceGlobal::swapchainBuffers.count; ++i)
         {
             debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::drawCmdBuffers[ i ], VK_OBJECT_TYPE_COMMAND_BUFFER, "drawCmdBuffer" );
         }
@@ -709,7 +709,7 @@ namespace ae3d
         bool foundSRGB = false;
         VkFormat sRGBFormat = VK_FORMAT_B8G8R8A8_SRGB;
 
-        for (int formatIndex = 0; formatIndex < surfFormats.count; ++formatIndex)
+        for (unsigned formatIndex = 0; formatIndex < surfFormats.count; ++formatIndex)
         {
             if (surfFormats[ formatIndex ].format == VK_FORMAT_B8G8R8A8_SRGB || surfFormats[ formatIndex ].format == VK_FORMAT_R8G8B8A8_SRGB)
             {
@@ -949,7 +949,7 @@ namespace ae3d
         
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.elements );
 
-        for (int i = 0; i < availableDeviceExtensions.count; ++i)
+        for (unsigned i = 0; i < availableDeviceExtensions.count; ++i)
         {
             if (std::strcmp( availableDeviceExtensions[ i ].extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME ) == 0)
             {
@@ -1027,7 +1027,7 @@ namespace ae3d
         // Create frame buffers for every swap chain image
         GfxDeviceGlobal::frameBuffers.Allocate( GfxDeviceGlobal::swapchainBuffers.count );
         
-        for (int i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
+        for (unsigned i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
         {
             attachments[ 0 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
             VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
@@ -1057,7 +1057,7 @@ namespace ae3d
         // Create frame buffers for every swap chain image
         GfxDeviceGlobal::frameBuffers.Allocate( GfxDeviceGlobal::swapchainBuffers.count );
 
-        for (int i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
+        for (unsigned i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
         {
             attachments[ 1 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
             VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
@@ -1319,7 +1319,7 @@ namespace ae3d
 
         GfxDeviceGlobal::descriptorSets.Allocate( AE3D_DESCRIPTOR_SETS_COUNT );
 
-        for (int i = 0; i < GfxDeviceGlobal::descriptorSets.count; ++i)
+        for (unsigned i = 0; i < GfxDeviceGlobal::descriptorSets.count; ++i)
         {
             VkDescriptorSetAllocateInfo allocInfo = {};
             allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -1894,7 +1894,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         return;
     }
 
-    if (Statistics::GetDrawCalls() >= GfxDeviceGlobal::descriptorSets.count)
+    if (Statistics::GetDrawCalls() >= (int)GfxDeviceGlobal::descriptorSets.count)
     {
         System::Print( "Skipping draw because draw call count %d exceeds descriptor set count %ld \n", Statistics::GetDrawCalls(), GfxDeviceGlobal::descriptorSets.count );
         return;
@@ -1946,7 +1946,7 @@ void ae3d::GfxDevice::CreateUniformBuffers()
 {
     GfxDeviceGlobal::ubos.Allocate( 1800 );
 
-    for (int uboIndex = 0; uboIndex < GfxDeviceGlobal::ubos.count; ++uboIndex)
+    for (unsigned uboIndex = 0; uboIndex < GfxDeviceGlobal::ubos.count; ++uboIndex)
     {
         auto& ubo = GfxDeviceGlobal::ubos[ uboIndex ];
 
@@ -2076,7 +2076,7 @@ void ae3d::GfxDevice::Present()
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 
-    for (int i = 0; i < GfxDeviceGlobal::pendingFreeVBs.count; ++i)
+    for (unsigned i = 0; i < GfxDeviceGlobal::pendingFreeVBs.count; ++i)
     {
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeVBs[ i ], nullptr );
     }
@@ -2092,12 +2092,12 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
     debug::Free( GfxDeviceGlobal::instance );
     
-    for (int i = 0; i < GfxDeviceGlobal::swapchainBuffers.count; ++i)
+    for (unsigned i = 0; i < GfxDeviceGlobal::swapchainBuffers.count; ++i)
     {
         vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::swapchainBuffers[ i ].view, nullptr );
     }
 
-    for (int i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
+    for (unsigned i = 0; i < GfxDeviceGlobal::frameBuffers.count; ++i)
     {
         vkDestroyFramebuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::frameBuffers[ i ], nullptr );
     }
@@ -2121,7 +2121,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorMem, nullptr );
     }
 
-    for (int i = 0; i < GfxDeviceGlobal::ubos.count; ++i)
+    for (unsigned i = 0; i < GfxDeviceGlobal::ubos.count; ++i)
     {
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::ubos[ i ].uboMemory, nullptr );
         vkDestroyBuffer( GfxDeviceGlobal::device, GfxDeviceGlobal::ubos[ i ].ubo, nullptr );

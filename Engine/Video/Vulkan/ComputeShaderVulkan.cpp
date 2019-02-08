@@ -29,12 +29,12 @@ namespace ComputeShaderGlobal
 
 void ae3d::ComputeShader::DestroyShaders()
 {
-    for (int moduleIndex = 0; moduleIndex < ComputeShaderGlobal::modulesToReleaseAtExit.count; ++moduleIndex)
+    for (unsigned moduleIndex = 0; moduleIndex < ComputeShaderGlobal::modulesToReleaseAtExit.count; ++moduleIndex)
     {
         vkDestroyShaderModule( GfxDeviceGlobal::device, ComputeShaderGlobal::modulesToReleaseAtExit[ moduleIndex ], nullptr );
     }
 
-    for (int psoIndex = 0; psoIndex < ComputeShaderGlobal::psosToReleaseAtExit.count; ++psoIndex)
+    for (unsigned psoIndex = 0; psoIndex < ComputeShaderGlobal::psosToReleaseAtExit.count; ++psoIndex)
     {
         vkDestroyPipeline( GfxDeviceGlobal::device, ComputeShaderGlobal::psosToReleaseAtExit[ psoIndex ], nullptr );
     }

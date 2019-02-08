@@ -15,7 +15,7 @@ namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
     extern std::vector< ae3d::VertexBuffer > lineBuffers;
-    extern int backBufferHeight;
+    extern unsigned backBufferHeight;
 }
 
 namespace MathUtil

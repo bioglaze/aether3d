@@ -150,8 +150,8 @@ namespace GfxDeviceGlobal
     } samplers[ 4 ];
  
     const unsigned BufferCount = 2;
-    int backBufferWidth = 640;
-    int backBufferHeight = 400;
+    unsigned backBufferWidth = 640;
+    unsigned backBufferHeight = 400;
 
     ID3D12Device* device = nullptr;
     IDXGISwapChain3* swapChain = nullptr;
