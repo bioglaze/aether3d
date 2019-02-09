@@ -10,6 +10,7 @@ using namespace metal;
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define MAX_NUM_LIGHTS_PER_TILE 544
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
+#define USE_MINMAX_Z 1
 
 static float4 ConvertClipToView( float4 p, matrix_float4x4 clipToView )
 {
@@ -38,16 +39,17 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
                          const device float4* pointLightBufferCenterAndRadius [[ buffer(1) ]],
                          device uint* perTileLightIndexBufferOut [[ buffer(2) ]],
                          const device float4* spotLightBufferCenterAndRadius [[ buffer(3) ]],
-                         //ushort2 gid [[thread_position_in_grid]],
+                         ushort2 gid [[thread_position_in_grid]],
                          ushort2 tid [[thread_position_in_threadgroup]],
                          ushort2 dtid [[threadgroup_position_in_grid]])
 {
     threadgroup uint ldsLightIdx[ MAX_NUM_LIGHTS_PER_TILE ];
-    //threadgroup atomic_uint ldsZMax;
-    //threadgroup atomic_uint ldsZMin;
     threadgroup atomic_uint ldsLightIdxCounter;
-
-    //ushort2 globalIdx = gid;
+#if USE_MINMAX_Z
+    threadgroup atomic_uint ldsZMax;
+    threadgroup atomic_uint ldsZMin;
+#endif
+    ushort2 globalIdx = gid;
     ushort2 localIdx = tid;
     ushort2 groupIdx = dtid;
 
@@ -56,8 +58,10 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     if (localIdxFlattened == 0)
     {
-        //atomic_store_explicit( &ldsZMin, 0x7f7fffff, memory_order_relaxed ); // FLT_MAX as uint
-        //atomic_store_explicit( &ldsZMax, 0, memory_order_relaxed );
+#if USE_MINMAX_Z
+        atomic_store_explicit( &ldsZMin, 0x7f7fffff, memory_order_relaxed ); // FLT_MAX as uint
+        atomic_store_explicit( &ldsZMax, 0, memory_order_relaxed );
+#endif
         atomic_store_explicit( &ldsLightIdxCounter, 0, memory_order_relaxed );
     }
 
@@ -72,8 +76,6 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         // Evenly divisible by tile res
         float winWidth  = float( TILE_RES * uniforms.tilesXY.x );
         float winHeight = float( TILE_RES * uniforms.tilesXY.y );
-        //float winWidth  = float( TILE_RES * GetNumTilesX( uniforms.windowWidth ) );
-        //float winHeight = float( TILE_RES * GetNumTilesY( uniforms.windowHeight ) );
 
         float4 v0 = float4( pxm / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
         float4 v1 = float4( pxp / winWidth * 2.0f - 1.0f, (winHeight - pym) / winHeight * 2.0f - 1.0f, 1.0f, 1.0f );
@@ -99,27 +101,29 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
+#if USE_MINMAX_Z
     // calculate the min and max depth for this tile,
     // to form the front and back of the frustum
 
-    //float depth = depthNormalsTexture.read( (uint2)globalIdx.xy ).x;
+    float depth = depthNormalsTexture.read( (uint2)globalIdx.xy ).x;
 
-    //uint z = as_type< uint >( depth );
+    uint z = as_type< uint >( depth );
 
-    //if (depth != 0.0f)
+    if (depth != 0.0f)
     {
         // returned value is previous value in lds*
-        /*uint i =*/ //atomic_fetch_min_explicit( &ldsZMin, z, memory_order::memory_order_relaxed );
-        /*uint j =*/ //atomic_fetch_max_explicit( &ldsZMax, z, memory_order::memory_order_relaxed );
+        /*uint i =*/ atomic_fetch_min_explicit( &ldsZMin, z, memory_order::memory_order_relaxed );
+        /*uint j =*/ atomic_fetch_max_explicit( &ldsZMax, z, memory_order::memory_order_relaxed );
     }
 
-    /*threadgroup_barrier( mem_flags::mem_threadgroup );
+    threadgroup_barrier( mem_flags::mem_threadgroup );
 
     uint zMin = atomic_load_explicit( &ldsZMin, memory_order::memory_order_relaxed );
     uint zMax = atomic_load_explicit( &ldsZMax, memory_order::memory_order_relaxed );
     float minZ = as_type< float >( zMax );
-    float maxZ = as_type< float >( zMin );*/
-
+    float maxZ = as_type< float >( zMin );
+#endif
+    
     int numPointLights = uniforms.numLights & 0xFFFFu;
 
     for (int i = 0; i < numPointLights; i += NUM_THREADS_PER_TILE)
@@ -132,8 +136,11 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             float radius = center.w;
             center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f ) ).xyz;
 
-            //if (-center.z + minZ < radius && center.z - maxZ < radius)
+#if USE_MINMAX_Z
+            if (-center.z + minZ < radius && center.z - maxZ < radius)
+#else
             if (center.z < radius)
+#endif
             {
                 if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
@@ -165,8 +172,9 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
             float4 center = spotLightBufferCenterAndRadius[ il ];
             float radius = center.w * 5.0f; // FIXME: Multiply was added, but more clever culling should be done instead.
             center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f )).xyz;
-
-            //if (-center.z + minZ < radius && center.z - maxZ < radius)
+#if USE_MINMAX_Z
+            if (-center.z + minZ < radius && center.z - maxZ < radius)
+#endif
             {
                 if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&

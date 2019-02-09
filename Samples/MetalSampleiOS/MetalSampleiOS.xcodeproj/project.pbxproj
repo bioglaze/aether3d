@@ -35,6 +35,7 @@
 		ABD3AB351C29D7F700E78933 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB311C29D7F700E78933 /* glider.png */; };
 		ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */; };
 		ABD3FFDD219713A700625539 /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; };
+		ABDB1666220B739700C25C04 /* checker.pvr in Resources */ = {isa = PBXBuildFile; fileRef = ABDB1665220B739700C25C04 /* checker.pvr */; };
 		ABFE40681D8D1DE000195AD2 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFE40671D8D1DE000195AD2 /* LightCuller.metal */; };
 /* End PBXBuildFile section */
 
@@ -84,6 +85,7 @@
 		ABD3AB301C29D7F700E78933 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
 		ABD3AB311C29D7F700E78933 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
+		ABDB1665220B739700C25C04 /* checker.pvr */ = {isa = PBXFileReference; lastKnownFileType = file; name = checker.pvr; path = ../../../../aether3d_build/Samples/checker.pvr; sourceTree = "<group>"; };
 		ABFE40671D8D1DE000195AD2 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -150,6 +152,7 @@
 		ABA29F431C19E1F90098E21D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				ABDB1665220B739700C25C04 /* checker.pvr */,
 				AB632E4720DEBF3200A35F0E /* glider_textool.astc */,
 				AB1A16202020E579005FCEBB /* granite.astc */,
 				AB6DECD11EC82B350019358C /* textures */,
@@ -289,6 +292,7 @@
 				AB6DECD71EC82B350019358C /* default_white.png in Resources */,
 				AB6DECD61EC82B350019358C /* textures in Resources */,
 				ABD3AB351C29D7F700E78933 /* glider.png in Resources */,
+				ABDB1666220B739700C25C04 /* checker.pvr in Resources */,
 				ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */,
 				AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */,
 				ABA29F511C19E1F90098E21D /* Main.storyboard in Resources */,

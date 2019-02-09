@@ -17,7 +17,7 @@ namespace GfxDeviceGlobal
 
 int ae3d::Shader::GetUniformLocation( const char* name )
 {
-    for (int i = 0; i < uniformLocations.count; ++i)
+    for (unsigned i = 0; i < uniformLocations.count; ++i)
     {
         if (strcmp( uniformLocations[ i ].uniformName, name ) == 0)
         {

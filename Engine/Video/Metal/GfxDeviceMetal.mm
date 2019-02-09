@@ -792,6 +792,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     }
 }
 
+void ae3d::GfxDevice::BeginLightCullerGpuQuery()
+{
+}
+
+void ae3d::GfxDevice::EndLightCullerGpuQuery()
+{
+}
+
 void ae3d::GfxDevice::BeginFrame()
 {
     GfxDeviceGlobal::cachedPSO = nil;
