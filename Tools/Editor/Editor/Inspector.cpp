@@ -1,5 +1,6 @@
 #include "Inspector.hpp"
 #include "AudioSourceComponent.hpp"
+#include "AudioClip.hpp"
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
@@ -218,6 +219,15 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         else if (gameObject != nullptr && audioSource != nullptr && nk_button_label( &ctx, "Remove audio source" ))
         {
             gameObject->RemoveComponent< AudioSourceComponent >();
+        }
+
+        if (gameObject != nullptr && audioSource != nullptr && nk_button_label( &ctx, "Set audio clip" ))
+        {
+            char path[ 1024 ];
+            GetOpenPath( path );
+            AudioClip* audioClip = new AudioClip;
+            audioClip->Load( FileSystem::FileContents( path ) );
+            gameObject->GetComponent< AudioSourceComponent >()->SetClipId( audioClip->GetId() );
         }
 
         if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "Add camera" ))
