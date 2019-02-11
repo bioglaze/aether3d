@@ -63,11 +63,18 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         positions[ v * 3 + 1 ] = vertices[ v ].position.y;
         positions[ v * 3 + 2 ] = vertices[ v ].position.z;
     }
-        
-    positionBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
+    
+    if (positionCount != (unsigned)vertexCount)
+    {
+        positionBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                          length:3 * 4 * vertexCount
                         options:MTLResourceCPUCacheModeDefaultCache];
-    positionBuffer.label = @"Position buffer";
+        positionBuffer.label = @"Position buffer";
+    }
+    else
+    {
+        memcpy( [positionBuffer contents], positions.data(), 3 * 4 * vertexCount );
+    }
     
     std::vector< float > texcoords( vertexCount * 2 );
     
@@ -77,10 +84,17 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         texcoords[ v * 2 + 1 ] = vertices[ v ].v;
     }
     
-    texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:texcoords.data()
+    if (positionCount != (unsigned)vertexCount)
+    {
+        texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:texcoords.data()
                          length:2 * 4 * vertexCount
                         options:MTLResourceCPUCacheModeDefaultCache];
-    texcoordBuffer.label = @"Texcoord buffer";
+        texcoordBuffer.label = @"Texcoord buffer";
+    }
+    else
+    {
+        memcpy( [texcoordBuffer contents], texcoords.data(), 2 * 4 * vertexCount );
+    }
     
     std::vector< float > colors( vertexCount * 4 );
     
@@ -91,11 +105,18 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         colors[ v * 4 + 2 ] = vertices[ v ].color.z;
         colors[ v * 4 + 3 ] = vertices[ v ].color.w;
     }
-        
-    colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
+    
+    if (positionCount != (unsigned)vertexCount)
+    {
+        colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
                       length:4 * 4 * vertexCount
                      options:MTLResourceCPUCacheModeDefaultCache];
-    colorBuffer.label = @"Color buffer";
+        colorBuffer.label = @"Color buffer";
+    }
+    else
+    {
+        memcpy( [colorBuffer contents], colors.data(), 4 * 4 * vertexCount );
+    }
     
     std::vector< float > normals( vertexCount * 3 );
     
@@ -104,11 +125,18 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         normals[ v ] = 1;
     }
     
-    normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
+    if (positionCount != (unsigned)vertexCount)
+    {
+        normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:normals.data()
                        length:3 * 4 * vertexCount
                       options:MTLResourceCPUCacheModeDefaultCache];
-    normalBuffer.label = @"Normal buffer";
-    
+        normalBuffer.label = @"Normal buffer";
+    }
+    else
+    {
+        memcpy( [normalBuffer contents], normals.data(), 3 * 4 * vertexCount );
+    }
+
     std::vector< float > tangents( vertexCount * 4 );
     
     for (std::size_t v = 0; v < tangents.size(); ++v)
@@ -116,11 +144,18 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         tangents[ v ] = 1;
     }
     
-    tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
+    if (positionCount != (unsigned)vertexCount)
+    {
+        tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
                         length:4 * 4 * vertexCount
                        options:MTLResourceCPUCacheModeDefaultCache];
-    tangentBuffer.label = @"Tangent buffer";
-    
+        tangentBuffer.label = @"Tangent buffer";
+    }
+    else
+    {
+        memcpy( [tangentBuffer contents], tangents.data(), 4 * 4 * vertexCount );
+    }
+
     std::vector< int > bones( vertexCount * 4 );
     
     for (std::size_t v = 0; v < bones.size(); ++v)
@@ -151,7 +186,8 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     indexBuffer.label = @"Index buffer";
     
     elementCount = faceCount * 3;
-    
+    positionCount = vertexCount;
+
     vertexBufferMemoryUsage += [vertexBuffer allocatedSize];
     vertexBufferMemoryUsage += [indexBuffer allocatedSize];
     vertexBufferMemoryUsage += [weightBuffer allocatedSize];
