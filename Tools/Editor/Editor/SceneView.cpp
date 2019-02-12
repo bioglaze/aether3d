@@ -189,7 +189,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
     ScreenPointToRay( screenX, screenY, (float)width, (float)height, camera, rayOrigin, rayTarget );
     
     // Collects meshes that collide with the ray.
-    for (int i = 0; i < gameObjects.count; ++i)
+    for (unsigned i = 0; i < gameObjects.count; ++i)
     {
         GameObject* go = gameObjects[ i ];
         auto meshRenderer = go->GetComponent< MeshRendererComponent >();
@@ -407,7 +407,7 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
         const Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();
         sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
 		
-        for (int i = 0; i < sv->selectedGameObjects.count; ++i)
+        for (unsigned i = 0; i < sv->selectedGameObjects.count; ++i)
         {
             sv->selectedGameObjects[ i ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
         }

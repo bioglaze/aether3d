@@ -367,7 +367,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     Array< VertexPTNTC > verticesPTNTC;
     verticesPTNTC.Allocate( vertexCount );
     
-    for (int vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
+    for (unsigned vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
     {
         verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
         verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
@@ -388,7 +388,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     Array< VertexPTNTC > verticesPTNTC;
     verticesPTNTC.Allocate( vertexCount );
 
-    for (int vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
+    for (unsigned vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
     {
         verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
         verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
