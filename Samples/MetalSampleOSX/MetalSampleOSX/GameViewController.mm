@@ -31,9 +31,9 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
-//#define TEST_SHADOWS_DIR
+#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
@@ -707,7 +707,7 @@ using namespace ae3d;
     scene.Add( &text );
     //scene.Add( &bigCube2 );
     //scene.Add( &bigCube3 );
-    //scene.Add( &animatedGo );
+    scene.Add( &animatedGo );
     //scene.Add( &pointLight );
     scene.Add( &spotLight );
 //#ifdef TEST_SHADOWS_DIR
