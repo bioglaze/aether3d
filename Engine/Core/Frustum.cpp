@@ -122,7 +122,7 @@ bool Frustum::BoxInFrustum( const Vec3& min, const Vec3& max ) const
 {
     bool result = true;
     
-    Vec3 pos = min;
+    Vec3 pos;
     //Vec3 neg = max;
     
     // Determines positive and negative vertex in relation to the normal.

@@ -245,18 +245,18 @@ bool TestMatrixInverse()
             std::cerr << "Matrix inverse failed!" << std::endl;
             std::cerr << "Got: ";
 
-            for (int i = 0; i < 16; ++i)
+            for (int j = 0; j < 16; ++j)
             {
-                std::cerr << result.m[ i ] << " ";
+                std::cerr << result.m[ j ] << " ";
             }
 
             std::cerr << std::endl;
 
             std::cerr << "Expected: ";
             
-            for (int i = 0; i < 16; ++i)
+            for (int j = 0; j < 16; ++j)
             {
-                std::cerr << expectedResult.m[ i ] << " ";
+                std::cerr << expectedResult.m[ j ] << " ";
             }
 
             std::cerr << std::endl;

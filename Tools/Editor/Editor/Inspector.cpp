@@ -88,7 +88,7 @@ void DrawNuklear( int width, int height )
 #if RENDERER_VULKAN
     for (int i = 0; i < MAX_VERTEX_MEMORY / (int)sizeof( VertexPTC ); ++i)
     {
-        VertexPTC* vert = &((VertexPTC*)vertices)[ i ];
+        VertexPTC* vert = &(static_cast<VertexPTC*>(vertices))[ i ];
         vert->position[ 1 ] = height - vert->position[ 1 ];
     }
 #endif
@@ -290,7 +290,6 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         // Hierarchy
 
         static const char* goNames[] = { "GameObject1", "GameObject2", "GameObject3" };
-        static int currentGo = 0;
 
         for (int i = 1; i < goCount; ++i)
         {
@@ -303,6 +302,7 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         if (gameObject == nullptr)
         {
             nk_label( &ctx, "Hierarchy", NK_TEXT_LEFT );
+            static int currentGo = 0;
             currentGo = nk_combo( &ctx, goNames, 3, currentGo, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
         }
         
