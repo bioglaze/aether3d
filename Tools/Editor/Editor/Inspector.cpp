@@ -47,7 +47,12 @@ int atlasWidth = 0;
 int atlasHeight = 0;
 Texture2D nkFontTexture;
 
-void DrawNuklear( int width, int height )
+static unsigned Min2( unsigned a, unsigned b )
+{
+    return a < b ? a : b;
+}
+
+static void DrawNuklear( int width, int height )
 {
     nk_convert_config config = {};
     static const nk_draw_vertex_layout_element vertex_layout[] = {
@@ -288,12 +293,12 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         }
 
         // Hierarchy
-
-        static const char* goNames[] = { "GameObject1", "GameObject2", "GameObject3" };
+        constexpr unsigned nameCount = 100;
+        static const char* goNames[ nameCount ] = {};
 
         for (int i = 1; i < goCount; ++i)
         {
-            if (i < 4)
+            if (i < nameCount)
             {
                 goNames[ i - 1 ] = gameObjects[ i ]->GetName().c_str();
             }
@@ -303,7 +308,8 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         {
             nk_label( &ctx, "Hierarchy", NK_TEXT_LEFT );
             static int currentGo = 0;
-            currentGo = nk_combo( &ctx, goNames, 3, currentGo, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
+            const unsigned itemCount = Min2( nameCount, goCount - 1 );
+            currentGo = nk_combo( &ctx, goNames, itemCount, currentGo, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
         }
         
         DrawNuklear( width, height );
