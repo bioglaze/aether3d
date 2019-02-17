@@ -718,7 +718,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 
         auto* meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
         meshRenderer->Cull( frustum, meshLocalToWorld );
-        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, MeshRendererComponent::RenderType::Opaque );
+        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, nullptr, MeshRendererComponent::RenderType::Opaque );
     }
 
     for (auto j : gameObjectsWithMeshRenderer)
@@ -731,7 +731,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         Matrix44::Multiply( meshLocalToWorld, view, localToView );
         Matrix44::Multiply( localToView, camera->GetProjection(), localToClip );
         
-        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, MeshRendererComponent::RenderType::Transparent );
+        gameObjects[ j ]->GetComponent< MeshRendererComponent >()->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, nullptr, nullptr, MeshRendererComponent::RenderType::Transparent );
     }
 
     GfxDevice::PopGroupMarker();
@@ -780,8 +780,9 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
         auto meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
 
         meshRenderer->Cull( frustum, meshLocalToWorld );
-        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
-        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
+        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
+        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader,
+                             &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
     }
 
     GfxDevice::PopGroupMarker();
@@ -888,7 +889,8 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         auto* meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
 
         meshRenderer->Cull( frustum, meshLocalToWorld );
-        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader, MeshRendererComponent::RenderType::Opaque );
+        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader,
+                             &renderer.builtinShaders.momentsSkinShader, MeshRendererComponent::RenderType::Opaque );
     }
 
     GfxDevice::PopGroupMarker();

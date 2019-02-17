@@ -125,7 +125,8 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
 }
 
 void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Matrix44& localToClip, const Matrix44& localToWorld,
-                                          const Matrix44& shadowView, const Matrix44& shadowProjection, Shader* overrideShader, RenderType renderType )
+                                          const Matrix44& shadowView, const Matrix44& shadowProjection, Shader* overrideShader,
+                                          Shader* overrideSkinShader, RenderType renderType )
 {
     if (isCulled || !mesh || !isEnabled)
     {
@@ -153,6 +154,12 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
         }
 
         Shader* shader = overrideShader ? overrideShader : materials[ subMeshIndex ]->GetShader();
+        
+        if (overrideSkinShader && !subMeshes[ subMeshIndex ].joints.empty())
+        {
+            shader = overrideSkinShader;
+        }
+        
         GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
         GfxDevice::BlendMode blendMode = GfxDevice::BlendMode::Off;
 

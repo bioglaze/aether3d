@@ -8,8 +8,13 @@ using namespace metal;
 struct Vertex
 {
     float3 position [[attribute(0)]];
-    //int4 boneIndex [[attribute(5)]];
-    //float4 boneWeights [[attribute(6)]];
+};
+
+struct VertexSkin
+{
+    float3 position [[attribute(0)]];
+    int4 boneIndex [[attribute(5)]];
+    float4 boneWeights [[attribute(6)]];
 };
 
 struct ColorInOut
@@ -17,18 +22,27 @@ struct ColorInOut
     float4 position [[position]];
 };
 
+vertex ColorInOut moments_skin_vertex( VertexSkin vert [[stage_in]],
+                                       constant Uniforms& uniforms [[ buffer(5) ]])
+{
+    ColorInOut out;
+    
+    float4 in_position = float4( vert.position, 1.0 );
+     
+     float4 position2 = uniforms.boneMatrices[ vert.boneIndex.x ] * in_position * vert.boneWeights.x;
+     position2 += uniforms.boneMatrices[ vert.boneIndex.y ] * in_position * vert.boneWeights.y;
+     position2 += uniforms.boneMatrices[ vert.boneIndex.z ] * in_position * vert.boneWeights.z;
+     position2 += uniforms.boneMatrices[ vert.boneIndex.w ] * in_position * vert.boneWeights.w;
+     out.position = uniforms.localToClip * position2;
+    
+    out.position.z = out.position.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
+    return out;
+}
+
 vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
                                constant Uniforms& uniforms [[ buffer(5) ]])
 {
     ColorInOut out;
-    
-    /*float4 in_position = float4( vert.position, 1.0 );
-    
-    float4 position2 = uniforms.boneMatrices[ vert.boneIndex.x ] * in_position * vert.boneWeights.x;
-    position2 += uniforms.boneMatrices[ vert.boneIndex.y ] * in_position * vert.boneWeights.y;
-    position2 += uniforms.boneMatrices[ vert.boneIndex.z ] * in_position * vert.boneWeights.z;
-    position2 += uniforms.boneMatrices[ vert.boneIndex.w ] * in_position * vert.boneWeights.w;
-    out.position = uniforms.localToClip * position2;*/
 
     float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms.localToClip * in_position;

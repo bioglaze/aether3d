@@ -18,6 +18,7 @@ namespace ae3d
         Shader sdfShader;
         Shader skyboxShader;
         Shader momentsShader;
+        Shader momentsSkinShader;
         Shader depthNormalsShader;
         Shader uiShader;
         ComputeShader lightCullShader;
