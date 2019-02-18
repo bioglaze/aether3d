@@ -285,7 +285,7 @@ int main()
             }
 #else
             char path[ 1024 ] = {};
-            FILE* f = popen( "zenity --file-selection --save --title \"Save .scene file\"", "w" );
+            FILE* f = popen( "zenity --file-selection --save --title \"Save .scene file\"", "r" );
 
             if (!f)
             {

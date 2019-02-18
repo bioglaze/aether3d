@@ -167,7 +167,7 @@ void Inspector::HandleMouseMotion( int x, int y )
     nk_input_motion( &ctx, x, y );
 }
 
-void Inspector::Render( int width, int height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, int goCount )
+void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, unsigned goCount )
 {
     outCommand = Command::Empty;
 
@@ -296,7 +296,7 @@ void Inspector::Render( int width, int height, GameObject* gameObject, Command& 
         constexpr unsigned nameCount = 100;
         static const char* goNames[ nameCount ] = {};
 
-        for (int i = 1; i < goCount; ++i)
+        for (unsigned i = 1; i < goCount; ++i)
         {
             if (i < nameCount)
             {
