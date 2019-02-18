@@ -435,7 +435,7 @@ namespace ae3d
         commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         commandBufferAllocateInfo.commandPool = GfxDeviceGlobal::cmdPool;
         commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        commandBufferAllocateInfo.commandBufferCount = (std::uint32_t)GfxDeviceGlobal::swapchainBuffers.count;
+        commandBufferAllocateInfo.commandBufferCount = GfxDeviceGlobal::swapchainBuffers.count;
 
         VkResult err = vkAllocateCommandBuffers( GfxDeviceGlobal::device, &commandBufferAllocateInfo, GfxDeviceGlobal::drawCmdBuffers );
         AE3D_CHECK_VULKAN( err, "vkAllocateCommandBuffers" );
@@ -1882,7 +1882,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 {
     System::Assert( startIndex > -1 && startIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in startIndex" );
     System::Assert( endIndex > -1 && endIndex >= startIndex && endIndex <= vertexBuffer.GetFaceCount() / 3, "Invalid vertex buffer draw range in endIndex" );
-    System::Assert( (int)GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::swapchainBuffers.count, "invalid draw buffer index" );
+    System::Assert( GfxDeviceGlobal::currentBuffer < GfxDeviceGlobal::swapchainBuffers.count, "invalid draw buffer index" );
 
     if (GfxDeviceGlobal::boundViews[ 0 ] == VK_NULL_HANDLE || GfxDeviceGlobal::boundSamplers[ 0 ] == VK_NULL_HANDLE)
     {

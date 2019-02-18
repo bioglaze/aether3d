@@ -235,7 +235,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
 
 void ae3d::MeshRendererComponent::SetMaterial( Material* material, unsigned subMeshIndex )
 {
-    if (subMeshIndex >= 0 && (unsigned)subMeshIndex < materials.count )
+    if (subMeshIndex < materials.count )
     {
         materials[ subMeshIndex ] = material;
     }
