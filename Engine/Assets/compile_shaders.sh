@@ -3,6 +3,8 @@ $VULKAN_SDK/bin/glslangValidator -D -V -S frag -e main hlsl/sprite_frag.hlsl -o 
 $VULKAN_SDK/bin/glslangValidator -D -V -S vert -e main hlsl/unlit_vert.hlsl -o ../../../aether3d_build/Samples/unlit_vert.spv
 $VULKAN_SDK/bin/glslangValidator -D -V -S frag -e main hlsl/unlit_frag.hlsl -o ../../../aether3d_build/Samples/unlit_frag.spv
 $VULKAN_SDK/bin/glslangValidator -D -V -S vert -e main hlsl/unlit_skin_vert.hlsl -o ../../../aether3d_build/Samples/unlit_skin_vert.spv
+$VULKAN_SDK/bin/glslangValidator -D -V -S vert -e main hlsl/moments_vert.hlsl -o ../../../aether3d_build/Samples/moments_vert.spv
+$VULKAN_SDK/bin/glslangValidator -D -V -S frag -e main hlsl/moments_frag.hlsl -o ../../../aether3d_build/Samples/moments_frag.spv
 $VULKAN_SDK/bin/glslangValidator -D -V -S vert -e main hlsl/skybox_vert.hlsl -o ../../../aether3d_build/Samples/skybox_vert.spv
 $VULKAN_SDK/bin/glslangValidator -D -V -S frag -e main hlsl/skybox_frag.hlsl -o ../../../aether3d_build/Samples/skybox_frag.spv
 $VULKAN_SDK/bin/glslangValidator -D -V -S vert -e main hlsl/depthnormals_vert.hlsl -o ../../../aether3d_build/Samples/depthnormals_vert.spv
