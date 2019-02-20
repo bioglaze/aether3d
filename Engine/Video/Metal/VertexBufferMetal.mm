@@ -48,11 +48,18 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     }
     else
     {
-        vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
+        if (positionCount != (unsigned)vertexCount)
+        {
+            vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                                        length:sizeof( VertexPTC ) * vertexCount
                                       options:MTLResourceCPUCacheModeDefaultCache];
+        }
+        else
+        {
+            memcpy( [vertexBuffer contents], vertices, sizeof( VertexPTC ) * vertexCount );
+        }
     }
-    
+
     vertexBuffer.label = @"Vertex buffer PTC";
     
     std::vector< float > positions( vertexCount * 3 );
@@ -118,12 +125,7 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         memcpy( [colorBuffer contents], colors.data(), 4 * 4 * vertexCount );
     }
     
-    std::vector< float > normals( vertexCount * 3 );
-    
-    for (std::size_t v = 0; v < normals.size(); ++v)
-    {
-        normals[ v ] = 1;
-    }
+    std::vector< float > normals( vertexCount * 3, 1 );
     
     if (positionCount != (unsigned)vertexCount)
     {
@@ -137,13 +139,8 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         memcpy( [normalBuffer contents], normals.data(), 3 * 4 * vertexCount );
     }
 
-    std::vector< float > tangents( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < tangents.size(); ++v)
-    {
-        tangents[ v ] = 1;
-    }
-    
+    std::vector< float > tangents( vertexCount * 4, 1 );
+
     if (positionCount != (unsigned)vertexCount)
     {
         tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
@@ -156,38 +153,50 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         memcpy( [tangentBuffer contents], tangents.data(), 4 * 4 * vertexCount );
     }
 
-    std::vector< int > bones( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < bones.size(); ++v)
+    if (positionCount != (unsigned)vertexCount)
     {
-        bones[ v ] = 0;
-    }
+        std::vector< int > bones( vertexCount * 4, 0 );
 
-    boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
+        boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
                      length:4 * 4 * vertexCount
                     options:MTLResourceCPUCacheModeDefaultCache];
-    boneBuffer.label = @"Bone buffer";
-    
-    std::vector< float > weights( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < weights.size(); ++v)
+        boneBuffer.label = @"Bone buffer";
+    }
+    else
     {
-        weights[ v ] = 1;
+        memset( [boneBuffer contents], 0, 4 * 4 * vertexCount );
     }
     
-    weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
+    std::vector< float > weights( vertexCount * 4, 1 );
+
+    if (positionCount != (unsigned)vertexCount)
+    {
+        weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
                        length:4 * 4 * vertexCount
                       options:MTLResourceCPUCacheModeDefaultCache];
-    weightBuffer.label = @"Weight buffer";
+        weightBuffer.label = @"Weight buffer";
+    }
+    else
+    {
+        memcpy( [weightBuffer contents], weights.data(), 4 * 4 * vertexCount );
+    }
     
-    indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
+    if (triangleCount != (unsigned)faceCount)
+    {
+        indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:faces
                       length:sizeof( Face ) * faceCount
                      options:MTLResourceCPUCacheModeDefaultCache];
-    indexBuffer.label = @"Index buffer";
+        indexBuffer.label = @"Index buffer";
+    }
+    else
+    {
+        memcpy( [indexBuffer contents], faces, sizeof( Face ) * faceCount );
+    }
     
     elementCount = faceCount * 3;
     positionCount = vertexCount;
-
+    triangleCount = faceCount;
+    
     vertexBufferMemoryUsage += [vertexBuffer allocatedSize];
     vertexBufferMemoryUsage += [indexBuffer allocatedSize];
     vertexBufferMemoryUsage += [weightBuffer allocatedSize];

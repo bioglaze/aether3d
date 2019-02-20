@@ -159,6 +159,7 @@ namespace ae3d
         id<MTLBuffer> boneBuffer;
         id<MTLBuffer> weightBuffer;
         unsigned positionCount = 0;
+        unsigned triangleCount = 0;
 #endif
 #if RENDERER_VULKAN
         static const unsigned VERTEX_BUFFER_BIND_ID = 0;
