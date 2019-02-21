@@ -123,13 +123,11 @@ bool Frustum::BoxInFrustum( const Vec3& min, const Vec3& max ) const
     bool result = true;
     
     Vec3 pos;
-    //Vec3 neg = max;
     
     // Determines positive and negative vertex in relation to the normal.
     for (unsigned p = 0; p < 6; ++p)
     {
         pos = min;
-        //neg = max;
         
         if (planes[ p ].normal.x >= 0)
         {
@@ -143,19 +141,6 @@ bool Frustum::BoxInFrustum( const Vec3& min, const Vec3& max ) const
         {
             pos.z = max.z;
         }
-        
-        /*if (m->planes[ p ].normal.x >= 0)
-         {
-         neg.x = min.x;
-         }
-         if (m->planes[ p ].normal.y >= 0)
-         {
-         neg.y = min.y;
-         }
-         if (m->planes[ p ].normal.z >= 0)
-         {
-         neg.z = min.z;
-         }*/
         
         if (planes[ p ].Distance( pos ) < 0)
         {
