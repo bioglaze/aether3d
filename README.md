@@ -21,6 +21,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Skinned animation for meshes imported from FBX.
   - Variance shadow mapping.
+  - Bloom
   - Audio support for .wav and .ogg.
   - Hot-reloading of assets.
   - Custom model format with .obj, .fbx and Blender exporter.
@@ -36,7 +37,6 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Physically-based rendering
   - Particles
   - Tone mapping
-  - Bloom
   - DoF
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
 
