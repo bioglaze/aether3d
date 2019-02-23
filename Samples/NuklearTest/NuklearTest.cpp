@@ -32,7 +32,7 @@ Texture2D* uiTextures[ 1 ];
 
 void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
 {
-    nk_convert_config config;
+    nk_convert_config config = {};
     static const nk_draw_vertex_layout_element vertex_layout[] = {
         {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF(VertexPTC, position)},
         {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF(VertexPTC, uv)},
@@ -40,7 +40,6 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
         {NK_VERTEX_LAYOUT_END}
     };
 
-    NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
     config.vertex_size = sizeof( VertexPTC );
     config.vertex_alignment = NK_ALIGNOF( VertexPTC );
@@ -66,7 +65,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
     nk_convert( ctx, uiCommands, &vbuf, &ebuf, &config );
 #if RENDERER_VULKAN
-    for (int i = 0; i < MAX_VERTEX_MEMORY / (int)sizeof( VertexPTC ); ++i)
+    for (unsigned i = 0; i < MAX_VERTEX_MEMORY / (unsigned)sizeof( VertexPTC ); ++i)
     {
         VertexPTC* vert = &((VertexPTC*)vertices)[ i ];
         vert->position[ 1 ] = height - vert->position[ 1 ];
