@@ -134,9 +134,9 @@ float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min,
     return tmin;
 }
 
-float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const Vec3* vertices, int vertexCount )
+float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const Vec3* vertices, unsigned vertexCount )
 {
-    for (int ve = 0; ve < vertexCount / 3; ve += 3)
+    for (unsigned ve = 0; ve < vertexCount / 3; ve += 3)
     {
         const Vec3& v0 = vertices[ ve * 3 + 0 ];
         const Vec3& v1 = vertices[ ve * 3 + 1 ];
