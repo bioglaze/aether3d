@@ -19,7 +19,7 @@ namespace ae3d
         bool IsEnabled() const { return isEnabled; }
         
         /// \return Clip's id
-        unsigned GetClipID() const { return clipId; }
+        unsigned GetClipId() const { return clipId; }
         
         /// \param audioClipId Audio clip id.
         void SetClipId( unsigned audioClipId );

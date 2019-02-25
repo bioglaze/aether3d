@@ -235,6 +235,11 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             gameObject->GetComponent< AudioSourceComponent >()->SetClipId( audioClip->GetId() );
         }
 
+        if (gameObject != nullptr && audioSource != nullptr && gameObject->GetComponent< AudioSourceComponent >()->GetClipId() != 0 && nk_button_label( &ctx, "Play audio clip" ))
+        {
+            gameObject->GetComponent< AudioSourceComponent >()->Play();
+        }
+        
         if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "Add camera" ))
         {
             gameObject->AddComponent< CameraComponent >();

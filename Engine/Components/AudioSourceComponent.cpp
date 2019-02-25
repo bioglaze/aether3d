@@ -38,7 +38,7 @@ void ae3d::AudioSourceComponent::Play() const
 std::string GetSerialized( ae3d::AudioSourceComponent* component )
 {
     std::string str( "audiosource\n" );
-    str += std::to_string( component->GetClipID() ) + "\n";
+    str += std::to_string( component->GetClipId() ) + "\n";
     str += "enabled " + std::to_string( (int)component->IsEnabled() ) + "\n\n\n";
     
     return str;
