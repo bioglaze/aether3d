@@ -1,4 +1,4 @@
-// Ogg Vorbis audio decoder - v1.13b - public domain
+// Ogg Vorbis audio decoder - v1.15 - public domain
 // http://nothings.org/stb_vorbis/
 //
 // Original version written by Sean Barrett in 2007.
@@ -30,24 +30,27 @@
 //    Tom Beaumont       Ingo Leitgeb        Nicolas Guillemot
 //    Phillip Bennefall  Rohit               Thiago Goulart
 //    manxorist@github   saga musix          github:infatum
+//    Timur Gagiev
 //
 // Partial history:
-//    1.13    - 2018/01/29 - fix truncation of last frame (hopefully)
-//    1.12    - 2017/11/21 - limit residue begin/end to blocksize/2 to avoid large temp allocs in bad/corrupt files
-//    1.11    - 2017/07/23 - fix MinGW compilation 
-//    1.10    - 2017/03/03 - more robust seeking; fix negative ilog(); clear error in open_memory
-//    1.09    - 2016/04/04 - back out 'truncation of last frame' fix from previous version
-//    1.08    - 2016/04/02 - warnings; setup memory leaks; truncation of last frame
-//    1.07    - 2015/01/16 - fixes for crashes on invalid files; warning fixes; const
-//    1.06    - 2015/08/31 - full, correct support for seeking API (Dougall Johnson)
+//    1.15    - 2019-02-07 - explicit failure if Ogg Skeleton data is found
+//    1.14    - 2018-02-11 - delete bogus dealloca usage
+//    1.13    - 2018-01-29 - fix truncation of last frame (hopefully)
+//    1.12    - 2017-11-21 - limit residue begin/end to blocksize/2 to avoid large temp allocs in bad/corrupt files
+//    1.11    - 2017-07-23 - fix MinGW compilation 
+//    1.10    - 2017-03-03 - more robust seeking; fix negative ilog(); clear error in open_memory
+//    1.09    - 2016-04-04 - back out 'truncation of last frame' fix from previous version
+//    1.08    - 2016-04-02 - warnings; setup memory leaks; truncation of last frame
+//    1.07    - 2015-01-16 - fixes for crashes on invalid files; warning fixes; const
+//    1.06    - 2015-08-31 - full, correct support for seeking API (Dougall Johnson)
 //                           some crash fixes when out of memory or with corrupt files
 //                           fix some inappropriately signed shifts
-//    1.05    - 2015/04/19 - don't define __forceinline if it's redundant
-//    1.04    - 2014/08/27 - fix missing const-correct case in API
-//    1.03    - 2014/08/07 - warning fixes
-//    1.02    - 2014/07/09 - declare qsort comparison as explicitly _cdecl in Windows
-//    1.01    - 2014/06/18 - fix stb_vorbis_get_samples_float (interleaved was correct)
-//    1.0     - 2014/05/26 - fix memory leaks; fix warnings; fix bugs in >2-channel;
+//    1.05    - 2015-04-19 - don't define __forceinline if it's redundant
+//    1.04    - 2014-08-27 - fix missing const-correct case in API
+//    1.03    - 2014-08-07 - warning fixes
+//    1.02    - 2014-07-09 - declare qsort comparison as explicitly _cdecl in Windows
+//    1.01    - 2014-06-18 - fix stb_vorbis_get_samples_float (interleaved was correct)
+//    1.0     - 2014-05-26 - fix memory leaks; fix warnings; fix bugs in >2-channel;
 //                           (API change) report sample rate for decode-full-file funcs
 //
 // See end of file for full version history.
@@ -251,7 +254,7 @@ extern stb_vorbis * stb_vorbis_open_file(FILE *f, int close_handle_on_close,
 // create an ogg vorbis decoder from an open FILE *, looking for a stream at
 // the _current_ seek point (ftell). on failure, returns NULL and sets *error.
 // note that stb_vorbis must "own" this stream; if you seek it in between
-// calls to stb_vorbis, it will become confused. Morever, if you attempt to
+// calls to stb_vorbis, it will become confused. Moreover, if you attempt to
 // perform stb_vorbis_seek_*() operations on this file, it will assume it
 // owns the _entire_ rest of the file after the start point. Use the next
 // function, stb_vorbis_open_file_section(), to limit it.
@@ -372,7 +375,8 @@ enum STBVorbisError
    VORBIS_invalid_first_page,
    VORBIS_bad_packet_type,
    VORBIS_cant_find_last_page,
-   VORBIS_seek_failed
+   VORBIS_seek_failed,
+   VORBIS_ogg_skeleton_not_supported
 };
 
 
@@ -882,11 +886,7 @@ static int error(vorb *f, enum STBVorbisError e)
 #define array_size_required(count,size)  (count*(sizeof(void *)+(size)))
 
 #define temp_alloc(f,size)              (f->alloc.alloc_buffer ? setup_temp_malloc(f,size) : alloca(size))
-#ifdef dealloca
-#define temp_free(f,p)                  (f->alloc.alloc_buffer ? 0 : dealloca(size))
-#else
 #define temp_free(f,p)                  0
-#endif
 #define temp_alloc_save(f)              ((f)->temp_offset)
 #define temp_alloc_restore(f,p)         ((f)->temp_offset = (p))
 
@@ -1075,7 +1075,7 @@ static int compute_codewords(Codebook *c, uint8 *len, int n, uint32 *values)
       assert(z >= 0 && z < 32);
       available[z] = 0;
       add_entry(c, bit_reverse(res), i, m++, len[i], values);
-      // propogate availability up the tree
+      // propagate availability up the tree
       if (z != len[i]) {
          assert(len[i] >= 0 && len[i] < 32);
          for (y=len[i]; y > z; --y) {
@@ -2639,7 +2639,7 @@ static void inverse_mdct(float *buffer, int n, vorb *f, int blocktype)
    // once I combined the passes.
 
    // so there's a missing 'times 2' here (for adding X to itself).
-   // this propogates through linearly to the end, where the numbers
+   // this propagates through linearly to the end, where the numbers
    // are 1/2 too small, and need to be compensated for.
 
    {
@@ -3580,7 +3580,22 @@ static int start_decoder(vorb *f)
    if (f->page_flag & PAGEFLAG_continued_packet)    return error(f, VORBIS_invalid_first_page);
    // check for expected packet length
    if (f->segment_count != 1)                       return error(f, VORBIS_invalid_first_page);
-   if (f->segments[0] != 30)                        return error(f, VORBIS_invalid_first_page);
+   if (f->segments[0] != 30) {
+      // check for the Ogg skeleton fishead identifying header to refine our error
+      if (f->segments[0] == 64 &&
+          getn(f, header, 6) &&
+          header[0] == 'f' &&
+          header[1] == 'i' &&
+          header[2] == 's' &&
+          header[3] == 'h' &&
+          header[4] == 'e' &&
+          header[5] == 'a' &&
+          get8(f)   == 'd' &&
+          get8(f)   == '\0')                        return error(f, VORBIS_ogg_skeleton_not_supported);
+      else
+                                                    return error(f, VORBIS_invalid_first_page);
+   }
+
    // read packet
    // check packet header
    if (get8(f) != VORBIS_packet_id)                 return error(f, VORBIS_invalid_first_page);
@@ -4057,6 +4072,7 @@ static int start_decoder(vorb *f)
       f->previous_window[i] = (float *) setup_malloc(f, sizeof(float) * f->blocksize_1/2);
       f->finalY[i]          = (int16 *) setup_malloc(f, sizeof(int16) * longest_floorlist);
       if (f->channel_buffers[i] == NULL || f->previous_window[i] == NULL || f->finalY[i] == NULL) return error(f, VORBIS_outofmem);
+      memset(f->channel_buffers[i], 0, sizeof(float) * f->blocksize_1);
       #ifdef STB_VORBIS_NO_DEFER_FLOOR
       f->floor_buffers[i]   = (float *) setup_malloc(f, sizeof(float) * f->blocksize_1/2);
       if (f->floor_buffers[i] == NULL) return error(f, VORBIS_outofmem);
@@ -4567,7 +4583,7 @@ static int get_seek_page_info(stb_vorbis *f, ProbedPage *z)
    return 1;
 }
 
-// rarely used function to seek back to the preceeding page while finding the
+// rarely used function to seek back to the preceding page while finding the
 // start of a packet
 static int go_to_page_before(stb_vorbis *f, unsigned int limit_offset)
 {
@@ -5363,22 +5379,22 @@ int stb_vorbis_get_samples_float(stb_vorbis *f, int channels, float **buffer, in
 #endif // STB_VORBIS_NO_PULLDATA_API
 
 /* Version history
-    1.12    - 2017/11/21 - limit residue begin/end to blocksize/2 to avoid large temp allocs in bad/corrupt files
-    1.11    - 2017/07/23 - fix MinGW compilation 
-    1.10    - 2017/03/03 - more robust seeking; fix negative ilog(); clear error in open_memory
-    1.09    - 2016/04/04 - back out 'avoid discarding last frame' fix from previous version
-    1.08    - 2016/04/02 - fixed multiple warnings; fix setup memory leaks;
+    1.12    - 2017-11-21 - limit residue begin/end to blocksize/2 to avoid large temp allocs in bad/corrupt files
+    1.11    - 2017-07-23 - fix MinGW compilation 
+    1.10    - 2017-03-03 - more robust seeking; fix negative ilog(); clear error in open_memory
+    1.09    - 2016-04-04 - back out 'avoid discarding last frame' fix from previous version
+    1.08    - 2016-04-02 - fixed multiple warnings; fix setup memory leaks;
                            avoid discarding last frame of audio data
-    1.07    - 2015/01/16 - fixed some warnings, fix mingw, const-correct API
+    1.07    - 2015-01-16 - fixed some warnings, fix mingw, const-correct API
                            some more crash fixes when out of memory or with corrupt files 
-    1.06    - 2015/08/31 - full, correct support for seeking API (Dougall Johnson)
+    1.06    - 2015-08-31 - full, correct support for seeking API (Dougall Johnson)
                            some crash fixes when out of memory or with corrupt files
-    1.05    - 2015/04/19 - don't define __forceinline if it's redundant
-    1.04    - 2014/08/27 - fix missing const-correct case in API
-    1.03    - 2014/08/07 - Warning fixes
-    1.02    - 2014/07/09 - Declare qsort compare function _cdecl on windows
-    1.01    - 2014/06/18 - fix stb_vorbis_get_samples_float
-    1.0     - 2014/05/26 - fix memory leaks; fix warnings; fix bugs in multichannel
+    1.05    - 2015-04-19 - don't define __forceinline if it's redundant
+    1.04    - 2014-08-27 - fix missing const-correct case in API
+    1.03    - 2014-08-07 - Warning fixes
+    1.02    - 2014-07-09 - Declare qsort compare function _cdecl on windows
+    1.01    - 2014-06-18 - fix stb_vorbis_get_samples_float
+    1.0     - 2014-05-26 - fix memory leaks; fix warnings; fix bugs in multichannel
                            (API change) report sample rate for decode-full-file funcs
     0.99996 - bracket #include <malloc.h> for macintosh compilation by Laurent Gomila
     0.99995 - use union instead of pointer-cast for fast-float-to-int to avoid alias-optimization problem
@@ -5461,3 +5477,4 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ------------------------------------------------------------------------------
 */
+
