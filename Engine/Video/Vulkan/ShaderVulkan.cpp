@@ -1,6 +1,8 @@
 #include "Shader.hpp"
+#include "Array.hpp"
 #include "GfxDevice.hpp"
 #include "FileSystem.hpp"
+#include "FileWatcher.hpp"
 #include "Macros.hpp"
 #include "Matrix.hpp"
 #include "System.hpp"
@@ -10,6 +12,8 @@
 #include "VulkanUtils.hpp"
 #include "Vec3.hpp"
 #include <cstring>
+
+extern ae3d::FileWatcher fileWatcher;
 
 constexpr int MaxModuleCount = 200;
 
@@ -28,6 +32,107 @@ namespace ShaderGlobal
     VkShaderModule modulesToReleaseAtExit[ MaxModuleCount ];
 }
 
+struct ShaderCacheEntry
+{
+    ShaderCacheEntry() {}
+    ShaderCacheEntry( const std::string& vp, const std::string& fp, ae3d::Shader* aShader )
+        : vertexPath( vp )
+        , fragmentPath( fp )
+        , shader( aShader ) {}
+
+    std::string vertexPath;
+    std::string fragmentPath;
+    ae3d::Shader* shader = nullptr;
+};
+
+Array< ShaderCacheEntry > cacheEntries;
+
+static void LoadSPIRV( const ae3d::FileSystem::FileContentsData& vertexData, const ae3d::FileSystem::FileContentsData& fragmentData )
+{
+    // Vertex shader
+    {
+        std::uint32_t magic;
+        std::memcpy( &magic, vertexData.data.data(), 4 );
+        
+        if (magic != 0x07230203)
+        {
+            ae3d::System::Print( "Invalid magic in %s\n", vertexData.path.c_str() );
+        }
+        
+        //vertexPath = vertexData.path;
+
+        VkShaderModuleCreateInfo moduleCreateInfo = {};
+        moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        moduleCreateInfo.codeSize = vertexData.data.size();
+        moduleCreateInfo.pCode = (const std::uint32_t*)vertexData.data.data();
+
+        VkShaderModule shaderModule;
+        VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
+        AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_OBJECT_TYPE_SHADER_MODULE, vertexData.path.c_str() );
+        ShaderGlobal::modulesToReleaseAtExit[ ShaderGlobal::moduleIndex++ ] = shaderModule;
+
+        /*vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        vertexInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+        vertexInfo.module = shaderModule;
+        vertexInfo.pName = "main";
+        vertexInfo.pNext = nullptr;
+        vertexInfo.flags = 0;
+        vertexInfo.pSpecializationInfo = nullptr;
+
+        ae3d::System::Assert( vertexInfo.module != VK_NULL_HANDLE, "vertex shader module not created" );*/
+    }
+
+    // Fragment shader
+    {
+        std::uint32_t magic;
+        std::memcpy( &magic, fragmentData.data.data(), 4 );
+        
+        if (magic != 0x07230203)
+        {
+            ae3d::System::Print( "Invalid magic in %s\n", fragmentData.path.c_str() );
+        }
+
+        //fragmentPath = fragmentData.path;
+
+        VkShaderModuleCreateInfo moduleCreateInfo = {};
+        moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        moduleCreateInfo.codeSize = fragmentData.data.size();
+        moduleCreateInfo.pCode = (const std::uint32_t*)fragmentData.data.data();
+
+        VkShaderModule shaderModule;
+        VkResult err = vkCreateShaderModule( GfxDeviceGlobal::device, &moduleCreateInfo, nullptr, &shaderModule );
+        AE3D_CHECK_VULKAN( err, "vkCreateShaderModule vertex" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)shaderModule, VK_OBJECT_TYPE_SHADER_MODULE, fragmentData.path.c_str() );
+        ShaderGlobal::modulesToReleaseAtExit[ ShaderGlobal::moduleIndex++ ] = shaderModule;
+
+        /*fragmentInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        fragmentInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragmentInfo.module = shaderModule;
+        fragmentInfo.pName = "main";
+        fragmentInfo.pNext = nullptr;
+        fragmentInfo.flags = 0;
+        fragmentInfo.pSpecializationInfo = nullptr;
+
+        ae3d::System::Assert( fragmentInfo.module != VK_NULL_HANDLE, "fragment shader module not created" );*/
+    }
+
+    ae3d::System::Print("Reloaded shader\nx");
+}
+
+void ShaderReload( const std::string& path )
+{
+    ae3d::System::Print("Reloading shader %s\n", path.c_str());
+
+    for (unsigned i = 0; i < cacheEntries.count; ++i)
+    {
+        if (cacheEntries[ i ].vertexPath == path || cacheEntries[ i ].fragmentPath == path)
+        {
+            LoadSPIRV( ae3d::FileSystem::FileContents( cacheEntries[ i ].vertexPath.c_str() ), ae3d::FileSystem::FileContents( cacheEntries[ i ].fragmentPath.c_str() ) );
+        }
+    }
+}
+
 void ae3d::Shader::DestroyShaders()
 {
     for (int moduleIndex = 0; moduleIndex < ShaderGlobal::moduleIndex; ++moduleIndex)
@@ -44,7 +149,9 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 {
     System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
     System::Assert( ShaderGlobal::moduleIndex + 2 < MaxModuleCount, "too many shader modules" );
-    
+
+    System::Print("Loading shader %s\n", vertexData.path.c_str());
+
     if (!vertexData.isLoaded || !fragmentData.isLoaded)
     {
         return;
@@ -117,6 +224,11 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
 
         System::Assert( fragmentInfo.module != VK_NULL_HANDLE, "fragment shader module not created" );
     }
+
+    fileWatcher.AddFile( vertexData.path, ShaderReload );
+    fileWatcher.AddFile( fragmentData.path, ShaderReload );
+    ShaderCacheEntry entry{ vertexData.path, fragmentData.path, this };
+    cacheEntries.Add( entry );
 }
 
 void ae3d::Shader::Load( const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/,
