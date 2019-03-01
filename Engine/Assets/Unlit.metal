@@ -67,12 +67,18 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
 fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
                                texture2d<float, access::sample> textureMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
+                               constant Uniforms& uniforms [[ buffer(5) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
     float4 sampledColor = textureMap.sample( sampler0, in.texCoords ) * in.tintColor;
 
     float depth = in.projCoord.z / in.projCoord.w;
-    depth = depth * 0.5f + 0.5f;
+
+    if (uniforms.lightType == 2)
+    {
+        depth = depth * 0.5f + 0.5f;
+    }
+    
     float shadow = max( 0.2f, VSM( _ShadowMap, in.projCoord, depth ) );
     
     return sampledColor * float4( shadow, shadow, shadow, 1 );

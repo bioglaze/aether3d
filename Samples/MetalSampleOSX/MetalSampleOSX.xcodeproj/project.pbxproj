@@ -190,8 +190,8 @@
 			children = (
 				ABE04F7E1C1216A80025C436 /* AppDelegate.h */,
 				ABE04F7F1C1216A80025C436 /* AppDelegate.m */,
-				ABE04F841C1216A80025C436 /* GameViewController.h */,
 				ABE04F851C1216A80025C436 /* GameViewController.mm */,
+				ABE04F841C1216A80025C436 /* GameViewController.h */,
 				ABE04F8A1C1216A80025C436 /* Assets.xcassets */,
 				ABE04F8C1C1216A80025C436 /* MainMenu.xib */,
 				ABE04F8F1C1216A80025C436 /* Info.plist */,

@@ -18,7 +18,7 @@ struct PerObjectUboStruct
     ae3d::Vec4 lightDirection;
     ae3d::Vec4 lightColor = ae3d::Vec4( 1, 1, 1, 1 );
     float lightConeAngleCos = 0;
-    int lightType = 0;
+    int lightType = 0; // 0: None, 1: Spot, 2: Dir, 3: Point
     float minAmbient = 0.2f;
     unsigned maxNumLightsPerTile = 0;
     unsigned windowWidth = 1;

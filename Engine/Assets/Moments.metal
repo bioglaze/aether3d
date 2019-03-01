@@ -35,7 +35,11 @@ vertex ColorInOut moments_skin_vertex( VertexSkin vert [[stage_in]],
      position2 += uniforms.boneMatrices[ vert.boneIndex.w ] * in_position * vert.boneWeights.w;
      out.position = uniforms.localToClip * position2;
     
-    out.position.z = out.position.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
+    if (uniforms.lightType == 2)
+    {
+        out.position.z = out.position.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
+    }
+    
     return out;
 }
 
@@ -46,7 +50,12 @@ vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
 
     float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms.localToClip * in_position;
-    out.position.z = out.position.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
+
+    if (uniforms.lightType == 2)
+    {
+        out.position.z = out.position.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
+    }
+    
     return out;
 }
 

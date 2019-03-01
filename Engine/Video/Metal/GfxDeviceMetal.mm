@@ -682,6 +682,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
+    [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
     
     MTLViewport viewport;
     viewport.originX = GfxDeviceGlobal::viewport[ 0 ];
