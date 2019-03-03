@@ -40,6 +40,12 @@ float VSM( float depth, float4 projCoord )
 float4 main( VSOutput vsOut ) : SV_Target
 {
     float depth = vsOut.projCoord.z / vsOut.projCoord.w;
+
+    if (lightType == 2)
+    {
+        depth = depth * 0.5f + 0.5f;
+    }
+
     float shadow = max( 0.2f, VSM( depth, vsOut.projCoord ) );
     return /*tint */ tex.Sample( sLinear, vsOut.uv ) * shadow;
 }
