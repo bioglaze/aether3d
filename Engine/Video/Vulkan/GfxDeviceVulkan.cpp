@@ -1703,6 +1703,11 @@ void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int e
     Draw( GfxDeviceGlobal::uiVertexBuffer, offset, offset + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
+void ae3d::GfxDevice::ResetPSOCache()
+{
+    GfxDeviceGlobal::psoCache.clear();
+}
+
 void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, void** outMappedVertices, void** outMappedIndices )
 {
     *outMappedVertices = GfxDeviceGlobal::uiVertices;

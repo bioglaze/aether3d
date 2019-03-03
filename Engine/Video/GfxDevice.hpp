@@ -106,6 +106,7 @@ namespace ae3d
         void EndBackBufferEncoding();
 #endif
 #if RENDERER_VULKAN
+        void ResetPSOCache();
         void GetNewUniformBuffer();
         void CreateUniformBuffers();
         std::uint8_t* GetCurrentUbo();

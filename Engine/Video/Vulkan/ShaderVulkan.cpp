@@ -58,6 +58,8 @@ void ShaderReload( const std::string& path )
             cacheEntries[ i ].shader->LoadSPIRV( ae3d::FileSystem::FileContents( cacheEntries[ i ].vertexPath.c_str() ), ae3d::FileSystem::FileContents( cacheEntries[ i ].fragmentPath.c_str() ) );
         }
     }
+
+    ae3d::GfxDevice::ResetPSOCache();
 }
 
 void ae3d::Shader::DestroyShaders()

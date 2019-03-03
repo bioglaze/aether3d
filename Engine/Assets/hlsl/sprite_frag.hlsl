@@ -16,6 +16,5 @@ layout(set=0, binding=2) SamplerState sLinear : register(s0);
 
 float4 main( VSOutput vsOut ) : SV_Target
 {
-    //return float4( 1, 0, 0, 1 );
     return tex.Sample( sLinear, vsOut.uv ) * vsOut.color;
-};
+}
