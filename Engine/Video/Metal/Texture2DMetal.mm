@@ -366,9 +366,14 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
             multiplier = 4;
         }
-        else if (output.format == DDSLoader::Format::BC5)
+        else if (output.format == DDSLoader::Format::BC5U)
         {
             pixelFormat = MTLPixelFormatBC5_RGUnorm;
+            multiplier = 4;
+        }
+        else if (output.format == DDSLoader::Format::BC5S)
+        {
+            pixelFormat = MTLPixelFormatBC5_RGSnorm;
             multiplier = 4;
         }
 

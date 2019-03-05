@@ -702,11 +702,15 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     {
         format = VK_FORMAT_BC4_UNORM_BLOCK;
     }
-    else if (ddsOutput.format == DDSLoader::Format::BC5)
+    else if (ddsOutput.format == DDSLoader::Format::BC5U)
     {
         format = VK_FORMAT_BC5_UNORM_BLOCK;
     }
-    
+    else if( ddsOutput.format == DDSLoader::Format::BC5S )
+    {
+        format = VK_FORMAT_BC5_SNORM_BLOCK;
+    }
+
     ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
     CreateVulkanObjects( ddsOutput, format );
