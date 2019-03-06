@@ -4,6 +4,7 @@
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\unlit_frag.hlsl -o ..\..\..\aether3d_build\Samples\unlit_frag.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\unlit_skin_vert.hlsl -o ..\..\..\aether3d_build\Samples\unlit_skin_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\moments_vert.hlsl -o ..\..\..\aether3d_build\Samples\moments_vert.spv
+%VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\moments_skin_vert.hlsl -o ..\..\..\aether3d_build\Samples\moments_skin_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\moments_frag.hlsl -o ..\..\..\aether3d_build\Samples\moments_frag.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\skybox_vert.hlsl -o ..\..\..\aether3d_build\Samples\skybox_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\skybox_frag.hlsl -o ..\..\..\aether3d_build\Samples\skybox_frag.spv

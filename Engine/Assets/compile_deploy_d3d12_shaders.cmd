@@ -3,6 +3,7 @@
 
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /Fo ..\..\..\aether3d_build\Samples\moments_frag.obj hlsl\moments_frag.hlsl
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\moments_vert.obj hlsl\moments_vert.hlsl
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\moments_skin_vert.obj hlsl\moments_skin_vert.hlsl
 
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /Fo ..\..\..\aether3d_build\Samples\sdf_frag.obj hlsl\sdf_frag.hlsl
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\fxc" /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\sdf_vert.obj hlsl\sdf_vert.hlsl
