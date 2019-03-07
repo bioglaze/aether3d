@@ -550,7 +550,7 @@ void CreateRootSignature()
                                                  D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
         D3D12_ROOT_SIGNATURE_DESC descRootSignature;
-        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        descRootSignature.Flags = flags;
         descRootSignature.NumParameters = 2;
         descRootSignature.NumStaticSamplers = 0;
         descRootSignature.pParameters = rootParam;
@@ -583,7 +583,7 @@ void CreateRootSignature()
         ID3DBlob* pErrorBlob = nullptr;
         
         D3D12_ROOT_SIGNATURE_DESC descRootSignature;
-        descRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+        descRootSignature.Flags = flags;
         descRootSignature.NumParameters = 1;
         descRootSignature.NumStaticSamplers = 0;
         descRootSignature.pParameters = rootParam;
