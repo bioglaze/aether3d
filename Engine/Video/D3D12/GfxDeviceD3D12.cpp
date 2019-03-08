@@ -500,9 +500,9 @@ void CreateSamplers()
         handleGPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
 
         descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
 
         GfxDeviceGlobal::samplers[ samplerIndex ].linearClampCPU = handleCPU;
         GfxDeviceGlobal::samplers[ samplerIndex ].linearClampGPU = handleGPU;
@@ -521,9 +521,9 @@ void CreateSamplers()
         handleGPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
 
         descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+        descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+        descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
         GfxDeviceGlobal::samplers[ samplerIndex ].pointClampCPU = handleCPU;
         GfxDeviceGlobal::samplers[ samplerIndex ].pointClampGPU = handleGPU;
         GfxDeviceGlobal::device->CreateSampler( &descSampler, GfxDeviceGlobal::samplers[ samplerIndex ].pointClampCPU );

@@ -584,7 +584,7 @@ int main()
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
 #endif
-    scene.Add( &animatedGo );
+    //scene.Add( &animatedGo );
     scene.Add( &cubePTN );
     //scene.Add( &childCube );
     //scene.Add( &copiedCube );
