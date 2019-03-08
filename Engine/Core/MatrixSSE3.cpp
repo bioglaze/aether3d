@@ -3,10 +3,6 @@
 #include <pmmintrin.h>
 #include "Vec3.hpp"
 
-#ifndef M_PI
-#    define M_PI 3.14159265358979f
-#endif
-
 using namespace ae3d;
 
 void Matrix44::Multiply( const Matrix44& ma, const Matrix44& mb, Matrix44& out )
