@@ -124,6 +124,29 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
     }
 }
 
+void ae3d::MeshRendererComponent::ApplySkin( unsigned subMeshIndex )
+{
+    int subMeshCount = 0;
+    SubMesh* subMeshes = mesh->GetSubMeshes( subMeshCount );
+
+    if (!subMeshes[ subMeshIndex ].joints.empty())
+    {
+        for (std::size_t j = 0; j < subMeshes[ subMeshIndex ].joints.size(); ++j)
+        {
+            const auto& joint = subMeshes[ subMeshIndex ].joints[ j ];
+            
+            if (!joint.animTransforms.empty())
+            {
+                const std::size_t frames = joint.animTransforms.size();
+                Matrix44::Multiply( joint.globalBindposeInverse,
+                                   joint.animTransforms[ animFrame % frames ],
+                                   GfxDeviceGlobal::perObjectUboStruct.boneMatrices[ j ] );
+            }
+        }
+    }
+
+}
+
 void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Matrix44& localToClip, const Matrix44& localToWorld,
                                           const Matrix44& shadowView, const Matrix44& shadowProjection, Shader* overrideShader,
                                           Shader* overrideSkinShader, RenderType renderType )
@@ -168,6 +191,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
             shader->Use();
             GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
             GfxDeviceGlobal::perObjectUboStruct.localToView = localToView;
+            ApplySkin( subMeshIndex );
         }
         else
         {
@@ -184,23 +208,9 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
             GfxDeviceGlobal::perObjectUboStruct.localToView = localToView;
             GfxDeviceGlobal::perObjectUboStruct.localToWorld = localToWorld;
             GfxDeviceGlobal::perObjectUboStruct.localToShadowClip = localToShadowClip;
+
+            ApplySkin( subMeshIndex );
             
-            if (!subMeshes[ subMeshIndex ].joints.empty())
-            {
-                for (std::size_t j = 0; j < subMeshes[ subMeshIndex ].joints.size(); ++j)
-                {
-                    const auto& joint = subMeshes[ subMeshIndex ].joints[ j ];
-
-                    if (!joint.animTransforms.empty())
-                    {
-                        const std::size_t frames = joint.animTransforms.size();
-                        Matrix44::Multiply( joint.globalBindposeInverse,
-                                            joint.animTransforms[ animFrame % frames ],
-                                            GfxDeviceGlobal::perObjectUboStruct.boneMatrices[ j ] );
-                    }
-                }
-            }
-
             if (!materials[ subMeshIndex ]->IsBackFaceCulled())
             {
                 cullMode = GfxDevice::CullMode::Off;
