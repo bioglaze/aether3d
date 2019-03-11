@@ -68,6 +68,20 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
             bytesPerRow = width * 4;
         }
+        else if (output.format == DDSLoader::Format::BC5U)
+        {
+            pixelFormat = MTLPixelFormatBC5_RGUnorm;
+            bytesPerRow = width * 4;
+        }
+        else if (output.format == DDSLoader::Format::BC5S)
+        {
+            pixelFormat = MTLPixelFormatBC5_RGSnorm;
+            bytesPerRow = width * 4;
+        }
+        else
+        {
+            System::Assert( false, "Unhandled DDS compression" );
+        }
 #endif
     }
     else

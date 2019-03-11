@@ -52,6 +52,10 @@ namespace ae3d
         /// \return Component at index or null if index is invalid.
         static MeshRendererComponent* Get( unsigned index );
         
+        /// Applies skin
+        /// \param subMeshIndex Submesh index
+        void ApplySkin( unsigned subMeshIndex );
+        
         /// \param cameraFrustum cameraFrustum
         /// \param localToWorld Local-to-World matrix
         void Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld );
