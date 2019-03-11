@@ -267,6 +267,20 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
                 bytesPerPixel = 2;
             }
+            else if (ddsOutput.format == DDSLoader::Format::BC5U)
+            {
+                imageCreateInfo.format = VK_FORMAT_BC5_UNORM_BLOCK;
+                bytesPerPixel = 2;
+            }
+            else if (ddsOutput.format == DDSLoader::Format::BC5S)
+            {
+                imageCreateInfo.format = VK_FORMAT_BC5_SNORM_BLOCK;
+                bytesPerPixel = 2;
+            }
+            else
+            {
+                ae3d::System::Assert( false, "DDS reader error: Unhandled DDS format!" );
+            }
 
             ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 

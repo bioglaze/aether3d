@@ -341,10 +341,24 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC2_UNORM : DXGI_FORMAT_BC2_UNORM_SRGB;
         bytesPerPixel = 4;
     }
-    if (ddsOutput.format == DDSLoader::Format::BC3)
+    else if (ddsOutput.format == DDSLoader::Format::BC3)
     {
         dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC3_UNORM : DXGI_FORMAT_BC3_UNORM_SRGB;
         bytesPerPixel = 4;
+    }
+    else if (ddsOutput.format == DDSLoader::Format::BC5S)
+    {
+        dxgiFormat = DXGI_FORMAT_BC5_SNORM;
+        bytesPerPixel = 4;
+    }
+    else if (ddsOutput.format == DDSLoader::Format::BC5U)
+    {
+        dxgiFormat = DXGI_FORMAT_BC5_UNORM;
+        bytesPerPixel = 4;
+    }
+    else
+    {
+        System::Assert( false, "Unhandled DDS format!" );
     }
 
     D3D12_RESOURCE_DESC descTex = {};
