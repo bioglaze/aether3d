@@ -65,9 +65,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 return;
             }
 
-            dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC1_UNORM : DXGI_FORMAT_BC1_UNORM_SRGB;
-
-            if (ddsOutput.format == DDSLoader::Format::BC2)
+            if (ddsOutput.format == DDSLoader::Format::BC1)
+            {
+                dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC1_UNORM : DXGI_FORMAT_BC1_UNORM_SRGB;
+            }
+            else if (ddsOutput.format == DDSLoader::Format::BC2)
             {
                 dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC2_UNORM : DXGI_FORMAT_BC2_UNORM_SRGB;
                 bytesPerPixel = 4;

@@ -121,6 +121,7 @@ int main()
     //camera.GetComponent<CameraComponent>()->SetViewport( 0, 0, originalWidth / 2, originalHeight );
     camera.AddComponent<TransformComponent>();
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
+    camera.SetName( "camera" );
 
 #ifdef TEST_RENDER_TEXTURE_CUBE
     RenderTexture cubeRT;
@@ -206,6 +207,7 @@ int main()
     cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshScaledUV );
     cubeScaledUV.AddComponent< TransformComponent >();
     cubeScaledUV.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -84 } );
+    cubeScaledUV.SetName( "cubeScaledUV" );
 
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
@@ -221,6 +223,7 @@ int main()
     cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
     cubePTN.AddComponent< TransformComponent >();
     cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+    cubePTN.SetName( "cubePTN" );
 
 #ifdef TEST_RENDER_TEXTURE_CUBE
     GameObject rtCube;
@@ -237,7 +240,8 @@ int main()
     animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { 13, -14, -80 } );
     animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.0075f );
     animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 90, 0 } ) );
-    
+    animatedGo.SetName( "animatedGo" );
+
     Shader shader;
     shader.Load( "unlitVert", "unlitFrag",
                  FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
@@ -584,7 +588,7 @@ int main()
 #ifdef TEST_VERTEX_LAYOUTS
     scene.Add( &cubePTN );
 #endif
-    //scene.Add( &animatedGo );
+    scene.Add( &animatedGo );
     scene.Add( &cubePTN );
     //scene.Add( &childCube );
     //scene.Add( &copiedCube );

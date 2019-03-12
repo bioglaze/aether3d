@@ -903,7 +903,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         Matrix44::Multiply( localToView, camera->GetProjection(), localToClip );
 
         auto* meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
-
+        
         meshRenderer->Cull( frustum, meshLocalToWorld );
         meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader,
                              &renderer.builtinShaders.momentsSkinShader, MeshRendererComponent::RenderType::Opaque );
