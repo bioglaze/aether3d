@@ -215,14 +215,14 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         ae3d::System::Print("Found BC4U\n");
         li = &loadInfoBC4;
         outOpaque = true;
-        output.format = DDSLoader::Format::BC4;
+        output.format = DDSLoader::Format::BC4U;
     }
     else if (PF_IS_BC4S( header.sHeader.sPixelFormat ))
     {
         ae3d::System::Print("Found BC4S\n");
         li = &loadInfoBC4;
         outOpaque = true;
-        output.format = DDSLoader::Format::BC4;
+        output.format = DDSLoader::Format::BC4S;
     }
     else if (PF_IS_BC5S( header.sHeader.sPixelFormat ))
     {
