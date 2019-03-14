@@ -26,7 +26,8 @@ VSOutput main( float3 pos : POSITION, float2 uv : TEXCOORD, float3 nor : NORMAL,
     
     if (lightType == 2)
     {
-        vsOut.pos.z = vsOut.pos.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
+        // Disabled to get animatedGO's shadow working on Vulkan on Linux
+        //        vsOut.pos.z = vsOut.pos.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
     }
 
     return vsOut;

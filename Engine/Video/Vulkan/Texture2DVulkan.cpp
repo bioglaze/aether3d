@@ -698,9 +698,13 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     {
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
     }
-    else if (ddsOutput.format == DDSLoader::Format::BC4)
+    else if (ddsOutput.format == DDSLoader::Format::BC4U)
     {
         format = VK_FORMAT_BC4_UNORM_BLOCK;
+    }
+    else if (ddsOutput.format == DDSLoader::Format::BC4S)
+    {
+        format = VK_FORMAT_BC4_SNORM_BLOCK;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC5U)
     {

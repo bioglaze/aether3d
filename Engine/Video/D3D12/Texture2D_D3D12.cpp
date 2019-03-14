@@ -348,6 +348,16 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         dxgiFormat = (colorSpace == ColorSpace::RGB) ? DXGI_FORMAT_BC3_UNORM : DXGI_FORMAT_BC3_UNORM_SRGB;
         bytesPerPixel = 4;
     }
+    else if (ddsOutput.format == DDSLoader::Format::BC4U)
+    {
+        dxgiFormat = DXGI_FORMAT_BC4_UNORM;
+        bytesPerPixel = 4;
+    }
+    else if (ddsOutput.format == DDSLoader::Format::BC4S)
+    {
+        dxgiFormat = DXGI_FORMAT_BC4_SNORM;
+        bytesPerPixel = 4;
+    }
     else if (ddsOutput.format == DDSLoader::Format::BC5S)
     {
         dxgiFormat = DXGI_FORMAT_BC5_SNORM;

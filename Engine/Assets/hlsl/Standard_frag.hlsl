@@ -217,9 +217,9 @@ float4 main( PS_INPUT input ) : SV_Target
         const float dist = distance( input.positionWS_v.xyz, centerAndRadius.xyz );
         const float a = dist / centerAndRadius.w + 1.0f;
         const float att = 1.0f / (a * a);
-        const float3 color = /*spotLightColors[ nLightIndex ].rgb*/ float3( 1, 1, 1 ) * att;// * specularTex;
-
-        accumDiffuseAndSpecular += spotAngle > cosineOfConeAngle ? color : float3( 0, 0, 0 );
+        //const float3 color = /*spotLightColors[ nLightIndex ].rgb*/ float3( 1, 1, 1 ) * att;// * specularTex;
+        const float3 color = float3( 1, 0, 0 );
+        accumDiffuseAndSpecular += spotAngle > cosineOfConeAngle ? color : float3( 1, 0, 0 );
 
         //accumDiffuseAndSpecular += LightColorDiffuse + LightColorSpecular;
         //accumDiffuseAndSpecular = float3( 0, 1, 0 );
