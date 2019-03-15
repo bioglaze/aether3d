@@ -22,9 +22,7 @@ struct ColorInOut
     float2 texCoords;
 };
 
-constexpr sampler s(coord::normalized,
-                    address::repeat,
-                    filter::linear);
+constexpr sampler s( coord::normalized, address::repeat, filter::linear );
 
 vertex ColorInOut sdf_vertex( Vertex vert [[stage_in]],
                               constant Uniforms& uniforms [[ buffer(5) ]])

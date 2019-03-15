@@ -21,9 +21,7 @@ struct Vertex
     float2 texcoord [[attribute(1)]];
 };
 
-constexpr sampler s(coord::normalized,
-                    address::repeat,
-                    filter::linear);
+constexpr sampler samp( coord::normalized, address::repeat, filter::linear );
 
 vertex ColorInOut skybox_vertex( Vertex vert [[stage_in]],
                                 constant Uniforms& uniforms [[ buffer(5) ]])
@@ -40,6 +38,6 @@ vertex ColorInOut skybox_vertex( Vertex vert [[stage_in]],
 fragment half4 skybox_fragment( ColorInOut in [[stage_in]],
                                 texturecube<float, access::sample> texture [[texture(0)]] )
 {
-    half4 sampledColor = half4( texture.sample( s, in.texCoords ) );
+    half4 sampledColor = half4( texture.sample( samp, in.texCoords ) );
     return half4(sampledColor);
 }

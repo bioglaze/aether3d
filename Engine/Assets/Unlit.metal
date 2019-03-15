@@ -17,9 +17,7 @@ struct ColorInOut
     half4  color;
 };
 
-constexpr sampler shadowSampler(coord::normalized,
-                                address::clamp_to_zero,
-                                filter::linear);
+constexpr sampler shadowSampler( coord::normalized, address::clamp_to_zero, filter::linear );
 
 float linstep( float low, float high, float v )
 {
