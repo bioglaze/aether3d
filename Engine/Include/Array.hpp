@@ -1,12 +1,10 @@
 #pragma once
 
-#include <string.h>
-
 template< typename T > struct Array
 {
     Array() {}
     
-    explicit Array( int elementCount ) { Allocate( elementCount );  }
+    explicit Array( unsigned elementCount ) { Allocate( elementCount );  }
 
     Array( const Array<T>& other ) { *this = other; }
 

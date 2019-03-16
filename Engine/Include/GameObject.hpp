@@ -72,7 +72,7 @@ namespace ae3d
         bool IsEnabled() const;
     
         /// \return Game Object's name.
-        const std::string& GetName() const { return name; }
+        const char* GetName() const { return name.c_str(); }
         
         /// \param aLayer Layer for controlling camera visibility etc. Must be power of two (2, 4, 8 etc.)
         void SetLayer( unsigned aLayer ) { layer = aLayer; }

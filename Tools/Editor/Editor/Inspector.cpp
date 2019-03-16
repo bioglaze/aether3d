@@ -179,8 +179,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
         if (gameObject != nullptr)
         {
-            const char* str = gameObject->GetName().c_str();
-            nk_label( &ctx, str, NK_TEXT_LEFT );
+            nk_label( &ctx, gameObject->GetName(), NK_TEXT_LEFT );
         }
 
         TransformComponent* transform = gameObject ? gameObject->GetComponent< TransformComponent >() : nullptr;
@@ -305,7 +304,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             if (i < nameCount)
             {
-                goNames[ i - 1 ] = gameObjects[ i ]->GetName().c_str();
+                goNames[ i - 1 ] = gameObjects[ i ]->GetName();
             }
         }
 

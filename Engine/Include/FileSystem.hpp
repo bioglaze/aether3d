@@ -23,12 +23,12 @@ namespace ae3d
 
         \param path Path.
         */
-        FileContentsData FileContents(const char* path);
+        FileContentsData FileContents( const char* path );
 
         /// \param path .pak file path. After this call FileContents() searches first in all loaded .pak files and if the file is not found, it's loaded without .pak file.
-        void LoadPakFile(const char* path);
+        void LoadPakFile( const char* path );
 
         /// \param path .pak file. If it was loaded, it's unloaded and FileContents() does not search files inside it.
-        void UnloadPakFile(const char* path);
+        void UnloadPakFile( const char* path );
     }
 }

@@ -1620,7 +1620,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             {
                 if (!mr->GetMaterial( i ))
                 {
-                    System::Print( "Scene parser: missing material for mesh renderer in game object %s in subMesh %s\n", go.GetName().c_str(), mr->GetMesh()->GetSubMeshName( i ) );
+                    System::Print( "Scene parser: missing material for mesh renderer in game object %s in subMesh %s\n", go.GetName(), mr->GetMesh()->GetSubMeshName( i ) );
                 }
             }
         }
