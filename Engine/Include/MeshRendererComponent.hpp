@@ -11,6 +11,12 @@ namespace ae3d
         /// \return GameObject that owns this component.
         class GameObject* GetGameObject() const { return gameObject; }
 
+        /// \return True, if the object casts shadow.
+        bool CastsShadow() const { return castShadow; }
+        
+        /// \param enabled True, if the object casts shadow.
+        void SetCastShadow( bool enabled ) { castShadow = enabled; }
+        
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
@@ -80,5 +86,6 @@ namespace ae3d
         bool isCulled = false;
         bool isWireframe = false;
         bool isEnabled = true;
+        bool castShadow = true;
     };
 }
