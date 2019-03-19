@@ -61,8 +61,10 @@ std::string GetSerialized( ae3d::MeshRendererComponent* component )
         outStr += "none";
     }
 
-    outStr += "cast_shadow ";
+    outStr += "\nmeshrenderer_cast_shadow ";
     outStr += component->CastsShadow() ? "1" : "0";
+    outStr += "\nmeshrenderer_enabled ";
+    outStr += component->IsEnabled() ? "1" : "0";
     outStr += "\n\n";
     
     return outStr;

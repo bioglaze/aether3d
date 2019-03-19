@@ -879,7 +879,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         
         auto meshRenderer = gameObject->GetComponent< MeshRendererComponent >();
         
-        if (meshRenderer)
+        if (meshRenderer && meshRenderer->CastsShadow())
         {
             gameObjectsWithMeshRenderer.push_back( gameObjectIndex );
         }
@@ -1065,6 +1065,27 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> enabled;
             outGameObjects.back().SetEnabled( enabled != 0 );
         }
+        else if (token == "meshrenderer_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found layer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto meshRenderer = outGameObjects.back().GetComponent< MeshRendererComponent >();
+
+            if (meshRenderer == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found meshrenderer_enabled but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            meshRenderer->SetEnabled( enabled != 0 );
+        }
         else if (token == "dirlight")
         {
             if (outGameObjects.empty())
@@ -1247,6 +1268,26 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< TransformComponent >();
         }
+        else if (token == "meshrenderer_cast_shadow")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found meshrenderer_cast_shadow but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            auto meshRenderer = outGameObjects.back().GetComponent< MeshRendererComponent >();
+
+            if (meshRenderer == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found mesh_cast_shadow but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            std::string str;
+            lineStream >> str;
+            meshRenderer->SetCastShadow( str == std::string( "1" ) );
+        }
         else if (token == "meshrenderer")
         {
             if (outGameObjects.empty())
@@ -1303,30 +1344,6 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outTexture2Ds[ spritePath ]->Load( FileSystem::FileContents( spritePath.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
             outGameObjects.back().GetComponent< SpriteRendererComponent >()->SetTexture( outTexture2Ds[ spritePath ], Vec3( x, y, 0 ), Vec3( x, y, 1 ), Vec4( 1, 1, 1, 1 ) );
-        }
-        else if (token == "meshpath")
-        {
-            if (outGameObjects.empty())
-            {
-                System::Print( "Failed to parse %s at line %d: found meshFile but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
-                return DeserializeResult::ParseError;
-            }
-
-            auto meshRenderer = outGameObjects.back().GetComponent< MeshRendererComponent >();
-
-            if (!meshRenderer)
-            {
-                System::Print( "Failed to parse %s at line %d: found meshpath but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
-                return DeserializeResult::ParseError;
-            }
-
-            std::string meshFile;
-            lineStream >> meshFile;
-
-            outMeshes[ outMeshes.count - 1 ]->Load( FileSystem::FileContents( meshFile.c_str() ) );
-			meshRenderer->SetMesh( outMeshes[ outMeshes.count - 1 ] );
-
-            meshRenderer->SetMaterial( tempMaterial, 0 );
         }
         else if (token == "position")
         {

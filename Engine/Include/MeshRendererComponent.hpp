@@ -16,6 +16,9 @@ namespace ae3d
         
         /// \param enabled True, if the object casts shadow.
         void SetCastShadow( bool enabled ) { castShadow = enabled; }
+
+        /// \return True, if the component is enabled.
+        bool IsEnabled() const { return isEnabled; }
         
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
