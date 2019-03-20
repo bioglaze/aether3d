@@ -1069,7 +1069,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found layer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found meshrenderer_enabled but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1085,6 +1085,48 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             }
 
             meshRenderer->SetEnabled( enabled != 0 );
+        }
+        else if (token == "transform_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found transform_enabled but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto transform = outGameObjects.back().GetComponent< TransformComponent >();
+
+            if (transform == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found transform_enabled but the game object doesn't have a transform component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            transform->SetEnabled( enabled != 0 );
+        }
+        else if (token == "camera_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found camera_enabled but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto camera = outGameObjects.back().GetComponent< CameraComponent >();
+
+            if (camera == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found camera_enabled but the game object doesn't have a camera component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            camera->SetEnabled( enabled != 0 );
         }
         else if (token == "dirlight")
         {
@@ -1297,20 +1339,33 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             }
 
             outGameObjects.back().AddComponent< MeshRendererComponent >();
-            
-            std::string path;
-            lineStream >> path;
-            
-            Mesh* mesh = new Mesh();
-            mesh->Load( FileSystem::FileContents( path.c_str() ) );
-
-            outMeshes.Add( mesh );
-            outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMesh( mesh );
-            
-            for (unsigned i = 0; i < mesh->GetSubMeshCount(); ++i)
+        }
+        else if (token == "meshpath")
+        {
+            if (outGameObjects.empty())
             {
-                outGameObjects.back().GetComponent< MeshRendererComponent >()->SetMaterial( tempMaterial, i );
+                System::Print( "Failed to parse %s at line %d: found meshFile but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
             }
+
+            auto meshRenderer = outGameObjects.back().GetComponent< MeshRendererComponent >();
+
+            if (!meshRenderer)
+            {
+                System::Print( "Failed to parse %s at line %d: found meshpath but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            std::string meshFile;
+            lineStream >> meshFile;
+
+            Mesh* mesh = new Mesh();
+            outMeshes.Add( mesh );
+
+            outMeshes[ outMeshes.count - 1 ]->Load( FileSystem::FileContents( meshFile.c_str() ) );
+			meshRenderer->SetMesh( outMeshes[ outMeshes.count - 1 ] );
+
+            meshRenderer->SetMaterial( tempMaterial, 0 );
         }
         else if (token == "spriterenderer")
         {

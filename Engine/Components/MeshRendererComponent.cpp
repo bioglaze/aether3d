@@ -50,7 +50,7 @@ ae3d::MeshRendererComponent* ae3d::MeshRendererComponent::Get( unsigned index )
 
 std::string GetSerialized( ae3d::MeshRendererComponent* component )
 {
-    std::string outStr( "meshrenderer " );
+    std::string outStr( "meshrenderer\nmeshpath " );
     
     if (component->GetMesh())
     {
