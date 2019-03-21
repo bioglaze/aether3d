@@ -216,7 +216,8 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
             const float3 Fd = Fd_Lambert();
 
             float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
-            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
+            //outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
+            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * attenuation * Fd * 4;
         }
     }
     
