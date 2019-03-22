@@ -113,7 +113,19 @@ namespace ae3d
             flattened = flattened.Normalized();
             
             // get angle between original vector and projected transform to get angle around normal
-            return acosf( Vec3::Dot( orthonormal1, flattened ) );
+            float dot = Vec3::Dot( orthonormal1, flattened );
+
+            if (dot < -1)
+            {
+                dot = -1;
+            }
+            
+            if (dot > 1)
+            {
+                dot = 1;
+            }
+
+            return acosf( dot );
         }
         
         /**
@@ -135,7 +147,19 @@ namespace ae3d
                 outAxis.z = z / scale;
             }
             
-            outAngleRad = acosf( w ) * 2;
+            float ww = w;
+            
+            if (ww < -1)
+            {
+                ww = -1;
+            }
+            
+            if (ww > 1)
+            {
+                ww = 1;
+            }
+            
+            outAngleRad = acosf( ww ) * 2;
         }
         
         /// \param euler Euler angles in degrees.
