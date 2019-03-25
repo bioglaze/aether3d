@@ -153,7 +153,7 @@ namespace debug
 
     void BeginRegion( VkCommandBuffer cmdbuffer, const char* pMarkerName, float r, float g, float b )
     {
-        if (hasMarker)
+        if (CmdBeginDebugUtilsLabelEXT && hasMarker)
         {
             VkDebugUtilsLabelEXT label = {};
             label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
@@ -169,7 +169,7 @@ namespace debug
 
     void EndRegion( VkCommandBuffer cmdBuffer )
     {
-        if (hasMarker)
+        if (CmdEndDebugUtilsLabelEXT && hasMarker)
         {
             CmdEndDebugUtilsLabelEXT( cmdBuffer );
         }
