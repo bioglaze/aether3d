@@ -454,7 +454,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
-				CODE_SIGN_ENTITLEMENTS = macOS/Editor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
@@ -478,7 +477,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
-				CODE_SIGN_ENTITLEMENTS = macOS/Editor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;

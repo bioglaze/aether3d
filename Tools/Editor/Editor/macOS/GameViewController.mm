@@ -39,7 +39,9 @@ std::string GetSavePath()
     
     if ([op runModal] == NSModalResponseOK)
     {
-        //return std::string([[nsurl path] UTF8String]);
+        NSMutableString* saveString = [NSMutableString stringWithString:
+                                  [[op URL] absoluteString]];
+        return std::string([saveString UTF8String]);
     }
     
     return "";
@@ -241,6 +243,8 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
             case Inspector::Command::SaveScene:
             {
                 std::string path = GetSavePath();
+                // remove "file://"
+                path = path.substr( 7 );
                 NSLog(@"path: %s", path.c_str());
                 if (path != "")
                 {
