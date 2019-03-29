@@ -6,9 +6,9 @@
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
 #include "Matrix.hpp"
-#include "VertexBuffer.hpp"
 #include "SubMesh.hpp"
 #include "System.hpp"
+#include "VertexBuffer.hpp"
 
 using namespace ae3d;
 

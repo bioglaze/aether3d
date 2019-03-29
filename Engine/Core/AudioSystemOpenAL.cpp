@@ -12,9 +12,9 @@
 #define STB_VORBIS_HEADER_ONLY
 #include "stb_vorbis.c"
 #include "Array.hpp"
-#include "System.hpp"
 #include "FileSystem.hpp"
 #include "FileWatcher.hpp"
+#include "System.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 

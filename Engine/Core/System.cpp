@@ -13,9 +13,9 @@
 #include "FileWatcher.hpp"
 #include "Matrix.hpp"
 #include "Renderer.hpp"
-#include "Texture2D.hpp"
 #include "Shader.hpp"
 #include "Statistics.hpp"
+#include "Texture2D.hpp"
 #include "Vec3.hpp"
 
 extern ae3d::Renderer renderer;
