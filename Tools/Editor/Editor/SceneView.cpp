@@ -41,7 +41,9 @@ struct SceneView
     Scene scene;
     Shader unlitShader;
     TransformGizmo transformGizmo;
-    
+    Texture2D lightTex;
+    Texture2D cameraTex;
+
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
     Material material;
@@ -265,6 +267,8 @@ void svInit( SceneView** sv, int width, int height )
     // Test content
     
     (*sv)->gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->cameraTex.Load( FileSystem::FileContents( "camera.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->lightTex.Load( FileSystem::FileContents( "light.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     (*sv)->material.SetShader( &(*sv)->unlitShader );
     (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
@@ -479,3 +483,10 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     go.SetName( "EditorGizmo" );
 }
 
+void svDrawSprites( SceneView* sv )
+{
+    for (unsigned goIndex = 0; goIndex < sv->gameObjects.count; ++goIndex)
+    {
+
+    }
+}
