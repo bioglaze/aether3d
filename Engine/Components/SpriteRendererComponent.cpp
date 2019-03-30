@@ -5,11 +5,11 @@
 #include "GfxDevice.hpp"
 #include "Renderer.hpp"
 #include "RenderTexture.hpp"
+#include "System.hpp"
 #include "Texture2D.hpp"
 #include "TextureBase.hpp"
 #include "Vec3.hpp"
 #include "VertexBuffer.hpp"
-#include "System.hpp"
 
 extern ae3d::Renderer renderer;
 
