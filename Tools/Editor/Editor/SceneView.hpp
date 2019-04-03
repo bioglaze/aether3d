@@ -15,6 +15,7 @@ struct SceneView;
 
 void svInit( SceneView** sceneView, int width, int height );
 void svAddGameObject( SceneView* sceneView );
+void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight );
 void svBeginRender( SceneView* sceneView );
 void svEndRender( SceneView* sceneView );
 ae3d::GameObject** svGetGameObjects( SceneView* sceneView, int& outCount );

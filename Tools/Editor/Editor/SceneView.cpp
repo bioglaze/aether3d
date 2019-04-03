@@ -483,10 +483,37 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     go.SetName( "EditorGizmo" );
 }
 
-void svDrawSprites( SceneView* sv )
+void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
 {
+    ae3d::TransformComponent* cameraTransform = sv->camera.GetComponent<TransformComponent>();
+    ae3d::CameraComponent* camera = sv->camera.GetComponent<CameraComponent>();
+    const unsigned texWidth = sv->lightTex.GetWidth();
+    const unsigned texHeight = sv->lightTex.GetHeight();
+    
     for (unsigned goIndex = 0; goIndex < sv->gameObjects.count; ++goIndex)
     {
-
+        ae3d::TransformComponent* goTransform = sv->camera.GetComponent<TransformComponent>();
+        
+        const float distance = (cameraTransform->GetLocalPosition() - goTransform->GetLocalPosition()).Length();
+        const float lerpDistance = 10;
+        float opacity = 1;
+        
+        if (distance < lerpDistance)
+        {
+            opacity = distance / lerpDistance;
+        }
+        
+        const Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), screenWidth, screenHeight );
+        const Vec3 viewDir = cameraTransform->GetViewDirection();
+        const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraTransform->GetLocalPosition()).Normalized();
+        const float viewDotLight = Vec3::Dot( viewDir, lightDir ) ;
+        
+        if (viewDotLight <= 0 &&
+            screenPoint.x > -texWidth && screenPoint.y > -texHeight &&
+            screenPoint.x < screenWidth && screenPoint.y < screenHeight)
+        {
+            const float size = screenHeight / distance;
+            ae3d::System::Draw( &sv->lightTex, 0, 0, texWidth, texHeight, screenWidth, screenHeight, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+        }
     }
 }

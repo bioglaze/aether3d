@@ -218,6 +218,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         ae3d::System::BeginFrame();
         svMoveCamera( sceneView, moveDir );
         svBeginRender( sceneView );
+        svDrawSprites( sceneView, width, height );
         int goCount = 0;
         ae3d::GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
         inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount );
