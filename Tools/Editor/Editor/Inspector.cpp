@@ -210,10 +210,14 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         if (gameObject != nullptr && meshRenderer != nullptr && nk_button_label( &ctx, "Set mesh" ))
         {
             Mesh* mesh = new Mesh;
-            char path[ 1024 ];
+            char path[ 1024 ] = {};
             GetOpenPath( path );
-            mesh->Load( FileSystem::FileContents( path ) );
-            gameObject->GetComponent< MeshRendererComponent >()->SetMesh( mesh );
+
+            if (strlen(path) > 0)
+            {
+                mesh->Load( FileSystem::FileContents( path ) );
+                gameObject->GetComponent< MeshRendererComponent >()->SetMesh( mesh );
+            }
         }
 
         if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "Add audio source" ))

@@ -244,8 +244,13 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
             case Inspector::Command::SaveScene:
             {
                 std::string path = GetSavePath();
-                // remove "file://"
-                path = path.substr( 7 );
+                
+                if (path.length() > 7)
+                {
+                    // remove "file://"
+                    path = path.substr( 7 );
+                }
+                
                 NSLog(@"path: %s", path.c_str());
                 if (path != "")
                 {
