@@ -212,49 +212,45 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     }
     else if (PF_IS_BC4U( header.sHeader.sPixelFormat ))
     {
-        ae3d::System::Print("Found BC4U\n");
         li = &loadInfoBC4;
         outOpaque = true;
         output.format = DDSLoader::Format::BC4U;
     }
     else if (PF_IS_BC4S( header.sHeader.sPixelFormat ))
     {
-        ae3d::System::Print("Found BC4S\n");
         li = &loadInfoBC4;
         outOpaque = true;
         output.format = DDSLoader::Format::BC4S;
     }
     else if (PF_IS_BC5S( header.sHeader.sPixelFormat ))
     {
-        ae3d::System::Print("Found BC5S\n");
         li = &loadInfoBC5;
         outOpaque = true;
         output.format = DDSLoader::Format::BC5S;
     }
     else if (PF_IS_BC5U( header.sHeader.sPixelFormat ))
     {
-        ae3d::System::Print("Found BC5U\n");
         li = &loadInfoBC5;
         outOpaque = true;
         output.format = DDSLoader::Format::BC5U;
     }
     else if (PF_IS_BC5_ATI2( header.sHeader.sPixelFormat ))
     {
-        ae3d::System::Print("Found BC5: ATI2\n");
         li = &loadInfoBC5_ATI2;
         outOpaque = true;
         output.format = DDSLoader::Format::BC5U;
     }
     else if (PF_IS_DX10( header.sHeader.sPixelFormat ))
     {
-        ae3d::System::Print("Found DX10\n");
         li = &loadInfoDXT5;
         outOpaque = true;
         output.format = DDSLoader::Format::BC5U;
     }
     else
     {
-        ae3d::System::Print("DDS loader error: Texture %s has unknown pixelformat.\n", fileContents.path.c_str() );
+        // (pf.dwFlags & DDPF_FOURCC) && pf.dwFourCC
+        ae3d::System::Print("DDS loader error: Texture %s has unknown pixelformat. Has FourCC: %d, FourCC: %d\n", fileContents.path.c_str(),
+                            (header.sHeader.dwFlags & DDPF_FOURCC), header.sHeader.sPixelFormat.dwFourCC );
         outWidth    = 32;
         outHeight   = 32;
         outOpaque = true;
