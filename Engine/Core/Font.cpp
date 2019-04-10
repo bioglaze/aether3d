@@ -1,5 +1,6 @@
 #include "Font.hpp"
 #include <sstream>
+#include <string>
 #include "Array.hpp"
 #include "FileSystem.hpp"
 #include "System.hpp"

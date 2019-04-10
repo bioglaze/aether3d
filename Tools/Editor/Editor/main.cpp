@@ -59,6 +59,7 @@ int main()
     Window::SetTitle( "Aether3D Editor" );
     Window::GetSize( width, height );
     System::LoadBuiltinAssets();
+    System::InitGamePad();
     
     bool quit = false;   
     int x = 0, y = 0;
@@ -78,7 +79,12 @@ int main()
     int deltaY = 0;
     bool isRightMouseDown = false;
     bool isMiddleMouseDown = false;
-    
+
+    float gamePadLeftThumbX = 0;
+    float gamePadLeftThumbY = 0;
+    float gamePadRightThumbX = 0;
+    float gamePadRightThumbY = 0;
+
     ae3d::GameObject* selectedGO = nullptr;
 
     while (Window::IsOpen() && !quit)
@@ -198,6 +204,27 @@ int main()
                 isRightMouseDown = false;
                 deltaX = 0;
                 deltaY = 0;
+            }
+            else if (event.type == WindowEventType::GamePadLeftThumbState)
+            {           
+                gamePadLeftThumbX = event.gamePadThumbX;
+                gamePadLeftThumbY = event.gamePadThumbY;
+                moveDir.z = -gamePadLeftThumbY;
+                moveDir.x = gamePadLeftThumbX;
+            }
+            else if (event.type == WindowEventType::GamePadRightThumbState)
+            {
+                gamePadRightThumbX = event.gamePadThumbX;
+                gamePadRightThumbY = event.gamePadThumbY;
+                svRotateCamera( sceneView, -float( gamePadRightThumbX ) / 10, float( gamePadRightThumbY ) / 10 );
+            }
+            else if (event.type == WindowEventType::GamePadButtonY)
+            {
+                moveDir.y = 0.1f;
+            }
+            else if (event.type == WindowEventType::GamePadButtonA)
+            {
+                moveDir.y = -0.1f;
             }
         }
 
