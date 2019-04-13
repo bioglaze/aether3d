@@ -18,6 +18,7 @@ void svAddGameObject( SceneView* sceneView );
 void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight );
 void svBeginRender( SceneView* sceneView );
 void svEndRender( SceneView* sceneView );
+bool svIsTransformGizmoSelected( SceneView* sceneView );
 ae3d::GameObject** svGetGameObjects( SceneView* sceneView, int& outCount );
 void svLoadScene( SceneView* sceneView, const ae3d::FileSystem::FileContentsData& contents );
 void svSaveScene( SceneView* sceneView, char* path );

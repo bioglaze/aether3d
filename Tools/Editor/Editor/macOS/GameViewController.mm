@@ -181,7 +181,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     const float deltaX = -float( theEvent.deltaX ) / 20;
     const float deltaY = -float( theEvent.deltaY ) / 20;
     
-    svRotateCamera( sceneView, deltaX, deltaY );
+    if (!svIsTransformGizmoSelected( sceneView ))
+    {
+        svRotateCamera( sceneView, deltaX, deltaY );
+    }
+    
     svHandleMouseMotion( sceneView, deltaX, deltaY );
 }
 

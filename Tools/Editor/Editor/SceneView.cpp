@@ -403,6 +403,11 @@ void svHandleLeftMouseUp( SceneView* sv )
     sv->transformGizmo.selectedMesh = -1;
 }
 
+bool svIsTransformGizmoSelected( SceneView* sceneView )
+{
+    return sceneView->transformGizmo.selectedMesh != -1;
+}
+
 void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
     if (sv->transformGizmo.selectedMesh != -1)
@@ -513,7 +518,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             screenPoint.x < screenWidth && screenPoint.y < screenHeight)
         {
             const float size = screenHeight / distance;
-            ae3d::System::Draw( &sv->lightTex, 0, 0, texWidth, texHeight, screenWidth, screenHeight, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+            ae3d::System::Draw( &sv->lightTex, screenPoint.x, screenPoint.y, texWidth, texHeight, screenWidth, screenHeight, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
     }
 }
