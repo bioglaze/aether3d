@@ -714,7 +714,11 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     {
         format = VK_FORMAT_BC5_SNORM_BLOCK;
     }
-
+    else
+    {
+        ae3d::System::Assert( false, "Unhandled compression format!" );
+    }
+    
     ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
     CreateVulkanObjects( ddsOutput, format );
