@@ -43,6 +43,9 @@ struct SceneView
     TransformGizmo transformGizmo;
     Texture2D lightTex;
     Texture2D cameraTex;
+    Matrix44 lineView;
+    Matrix44 lineProjection;
+    int lineHandle;
 
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
@@ -285,6 +288,14 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->gameObjects[ 1 ]->SetName( "cube" );
     (*sv)->scene.Add( (*sv)->gameObjects[ 1 ] );
 
+    (*sv)->lineProjection.MakeProjection( 0, width, height, 0, 0, 1 );
+    Vec3 lines[ 4 ];
+    lines[ 0 ] = Vec3( 10, 10, -0.5f );
+    lines[ 1 ] = Vec3( 50, 10, -0.5f );
+    lines[ 2 ] = Vec3( 50, 50, -0.5f );
+    lines[ 3 ] = Vec3( 10, 10, -0.5f );
+    (*sv)->lineHandle = System::CreateLineBuffer( lines, 4, Vec3( 1, 0, 0 ) );
+
     // Test code
     (*sv)->transformGizmo.xAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
     (*sv)->transformGizmo.yAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
@@ -521,4 +532,6 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             ae3d::System::Draw( &sv->lightTex, (int)screenPoint.x, (int)screenPoint.y, texWidth, texHeight, screenWidth, screenHeight, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
     }
+    
+    System::DrawLines( sv->lineHandle, sv->lineView, sv->lineProjection );
 }
