@@ -693,24 +693,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     viewport.zfar = 1;
     [renderEncoder setViewport:viewport];
     
-    /*const int bw = GfxDeviceGlobal::backBufferWidth * 2;
-    const int bh = GfxDeviceGlobal::backBufferHeight * 2;
-    
-    MTLScissorRect scissor;
-    scissor.x = viewport.originX < 0 ? 0 : viewport.originX;
-    scissor.y = viewport.originY < 0 ? 0 : viewport.originY;
-    scissor.width = viewport.width > bw ? bw : viewport.width;
-    scissor.height = viewport.height > bh ? bh : viewport.height;
-    if (scissor.x + scissor.width > bw)
-    {
-        scissor.x = 0;
-    }
-    if (scissor.y + scissor.height > bh)
-    {
-        scissor.y = 0;
-    }
-    [renderEncoder setScissorRect:scissor];*/
-    
     if (shader.GetMetalVertexShaderName() == "standard_vertex")
     {
         [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
