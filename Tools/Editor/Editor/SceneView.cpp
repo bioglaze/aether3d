@@ -289,12 +289,16 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->scene.Add( (*sv)->gameObjects[ 1 ] );
 
     (*sv)->lineProjection.MakeProjection( 0, width, height, 0, 0, 1 );
-    Vec3 lines[ 4 ];
-    lines[ 0 ] = Vec3( 10, 10, -0.5f );
-    lines[ 1 ] = Vec3( 50, 10, -0.5f );
-    lines[ 2 ] = Vec3( 50, 50, -0.5f );
-    lines[ 3 ] = Vec3( 10, 10, -0.5f );
-    (*sv)->lineHandle = System::CreateLineBuffer( lines, 4, Vec3( 1, 0, 0 ) );
+    constexpr unsigned LineCount = 40;
+    Vec3 lines[ LineCount ];
+    
+    for (unsigned i = 0; i < LineCount / 2; ++i)
+    {
+        lines[ i * 2 + 0 ] = Vec3( i, 0, -5 );
+        lines[ i * 2 + 1 ] = Vec3( i, 0, -15 );
+    }
+    
+    (*sv)->lineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
 
     // Test code
     (*sv)->transformGizmo.xAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
@@ -508,7 +512,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
     
     for (unsigned goIndex = 0; goIndex < sv->gameObjects.count; ++goIndex)
     {
-        ae3d::TransformComponent* goTransform = sv->camera.GetComponent<TransformComponent>();
+        ae3d::TransformComponent* goTransform = sv->gameObjects[ goIndex ]->GetComponent<TransformComponent>();
         
         const float distance = (cameraTransform->GetLocalPosition() - goTransform->GetLocalPosition()).Length();
         const float lerpDistance = 10;
@@ -533,5 +537,5 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         }
     }
     
-    System::DrawLines( sv->lineHandle, sv->lineView, sv->lineProjection );
+    System::DrawLines( sv->lineHandle, camera->GetView(), camera->GetProjection() );
 }
