@@ -118,8 +118,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         stagingTexture.label = [NSString stringWithUTF8String:fileContents[ 0 ]->path.c_str()];
     }
     
-    const NSUInteger bytesPerImage = bytesPerRow * width;
-    
     MTLRegion region = MTLRegionMake2D( 0, 0, width, width );
     bool isSomeFaceDDS = false;
     
@@ -146,7 +144,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                              slice:face
                          withBytes:data
                        bytesPerRow:bytesPerRow
-                     bytesPerImage:bytesPerImage];
+                     bytesPerImage:0];
 
             stbi_image_free( data );
         }
@@ -169,7 +167,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                                   slice:face
                               withBytes:&output.imageData[ output.dataOffsets[ 0 ] ]
                             bytesPerRow:bytesPerRow
-                          bytesPerImage:bytesPerImage];
+                          bytesPerImage:0];
 #endif
         }
         else
