@@ -247,7 +247,7 @@ namespace ae3d
 #else
         const char* validationLayerNames[] =
         {
-            "VK_LAYER_LUNARG_standard_validation"
+            "VK_LAYER_KHRONOS_validation"
         };
 
         instanceCreateInfo.enabledLayerCount = debug::enabled ? 1 : 0;
