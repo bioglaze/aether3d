@@ -71,12 +71,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         else if (output.format == DDSLoader::Format::BC4U)
         {
             pixelFormat = MTLPixelFormatBC4_RUnorm;
-            bytesPerRow = width * 4;
+            bytesPerRow = width * 2;
         }
         else if (output.format == DDSLoader::Format::BC4S)
         {
             pixelFormat = MTLPixelFormatBC4_RSnorm;
-            bytesPerRow = width * 4;
+            bytesPerRow = width * 2;
         }
         else if (output.format == DDSLoader::Format::BC5U)
         {

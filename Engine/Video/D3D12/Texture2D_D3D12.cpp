@@ -351,12 +351,12 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     else if (ddsOutput.format == DDSLoader::Format::BC4U)
     {
         dxgiFormat = DXGI_FORMAT_BC4_UNORM;
-        bytesPerPixel = 4;
+        bytesPerPixel = 2;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC4S)
     {
         dxgiFormat = DXGI_FORMAT_BC4_SNORM;
-        bytesPerPixel = 4;
+        bytesPerPixel = 2;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC5S)
     {

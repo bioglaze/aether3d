@@ -79,6 +79,10 @@
 ((pf.dwFlags & DDPF_FOURCC) && \
 (pf.dwFourCC == MAKEFOURCC('D', 'X', '1', '0') ))
 
+#define PF_IS_BC5_ATI1(pf) \
+((pf.dwFlags & DDPF_FOURCC) && \
+(pf.dwFourCC == MAKEFOURCC('A', 'T', 'I', '1') ))
+
 #define PF_IS_BC5_ATI2(pf) \
 ((pf.dwFlags & DDPF_FOURCC) && \
 (pf.dwFourCC == MAKEFOURCC('A', 'T', 'I', '2') ))
@@ -233,6 +237,12 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
         li = &loadInfoBC5;
         outOpaque = true;
         output.format = DDSLoader::Format::BC5U;
+    }
+    else if (PF_IS_BC5_ATI1( header.sHeader.sPixelFormat ))
+    {
+        li = &loadInfoDXT1;
+        outOpaque = true;
+        output.format = DDSLoader::Format::BC4U;
     }
     else if (PF_IS_BC5_ATI2( header.sHeader.sPixelFormat ))
     {

@@ -369,12 +369,12 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         else if (output.format == DDSLoader::Format::BC4U)
         {
             pixelFormat = MTLPixelFormatBC4_RUnorm;
-            multiplier = 4;
+            multiplier = 2;
         }
         else if (output.format == DDSLoader::Format::BC4S)
         {
             pixelFormat = MTLPixelFormatBC4_RSnorm;
-            multiplier = 4;
+            multiplier = 2;
         }
         else if (output.format == DDSLoader::Format::BC5U)
         {
