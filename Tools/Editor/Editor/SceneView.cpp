@@ -527,13 +527,15 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         const Vec3 viewDir = cameraTransform->GetViewDirection();
         const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraTransform->GetLocalPosition()).Normalized();
         const float viewDotLight = Vec3::Dot( viewDir, lightDir ) ;
+        const float screenScale = 2;
         
         if (viewDotLight <= 0 &&
             screenPoint.x > -(float)texWidth && screenPoint.y > -(float)texHeight &&
-            screenPoint.x < screenWidth && screenPoint.y < screenHeight)
+            screenPoint.x < screenWidth * screenScale && screenPoint.y < screenHeight * screenScale)
         {
             const float size = screenHeight / distance;
-            ae3d::System::Draw( &sv->lightTex, (int)screenPoint.x, (int)screenPoint.y, texWidth, texHeight, screenWidth, screenHeight, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+            ae3d::System::Draw( &sv->lightTex, (int)screenPoint.x, (int)screenPoint.y, texWidth, texHeight,
+                                screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
     }
     
