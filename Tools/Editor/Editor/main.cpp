@@ -249,6 +249,7 @@ int main()
 
         svMoveCamera( sceneView, moveDir );
         svBeginRender( sceneView );
+        svDrawSprites( sceneView, width, height );
         int goCount = 0;
         GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
         inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount );
