@@ -534,7 +534,12 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             screenPoint.x < screenWidth * screenScale && screenPoint.y < screenHeight * screenScale)
         {
             const float size = screenHeight / distance;
-            ae3d::System::Draw( &sv->lightTex, (int)screenPoint.x, (int)screenPoint.y, texWidth, texHeight,
+#if RENDERER_VULKAN
+            float y = screenHeight /* screenScale*/ -  (int)screenPoint.y;
+#else
+            float y = (int)screenPoint.y;
+#endif
+            ae3d::System::Draw( &sv->lightTex, (int)screenPoint.x, y, texWidth, texHeight,
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
     }

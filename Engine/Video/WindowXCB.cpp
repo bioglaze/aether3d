@@ -246,7 +246,7 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
 
     xcb_map_window( connection, WindowGlobal::window );
 
-    xcb_size_hints_t hints;
+    xcb_size_hints_t hints = {};
 
     xcb_icccm_size_hints_set_min_size( &hints, WindowGlobal::windowWidth, WindowGlobal::windowHeight );
     xcb_icccm_size_hints_set_max_size( &hints, WindowGlobal::windowWidth, WindowGlobal::windowHeight );
