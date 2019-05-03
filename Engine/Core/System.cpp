@@ -100,6 +100,13 @@ void ae3d::System::DrawUI( int scX, int scY, int scWidth, int scHeight, int elem
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
 
+    int viewport[ 4 ];
+    viewport[ 0 ] = 0;
+    viewport[ 1 ] = 0;
+    viewport[ 2 ] = windowWidth;
+    viewport[ 3 ] = windowHeight;
+    GfxDevice::SetViewport( viewport );
+
     GfxDevice::DrawUI( scX, scY, scWidth, scHeight, elemCount, offset );
 }
 
