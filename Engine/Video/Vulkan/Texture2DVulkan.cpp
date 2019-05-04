@@ -690,7 +690,11 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
     }
 
-    if (ddsOutput.format == DDSLoader::Format::BC2)
+    if (ddsOutput.format == DDSLoader::Format::BC1)
+    {
+        // Nothing to do here, defaults to BC1
+    }
+    else if (ddsOutput.format == DDSLoader::Format::BC2)
     {
         format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
     }
@@ -716,6 +720,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     }
     else
     {
+        ae3d::System::Print( "File: %s\n", aPath  );
         ae3d::System::Assert( false, "Unhandled compression format!" );
     }
     
