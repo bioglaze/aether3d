@@ -331,6 +331,7 @@ void svAddGameObject( SceneView* sv )
 {
     sv->gameObjects.Add( new GameObject() );
     sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( "GameObject" );
+    sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< TransformComponent >();
     sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
 }
 
@@ -513,6 +514,11 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
     for (unsigned goIndex = 0; goIndex < sv->gameObjects.count; ++goIndex)
     {
         ae3d::TransformComponent* goTransform = sv->gameObjects[ goIndex ]->GetComponent<TransformComponent>();
+
+        if (!goTransform)
+        {
+            continue;
+        }
         
         const float distance = (cameraTransform->GetLocalPosition() - goTransform->GetLocalPosition()).Length();
         const float lerpDistance = 10;
