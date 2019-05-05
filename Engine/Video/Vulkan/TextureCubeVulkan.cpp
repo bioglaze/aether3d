@@ -247,7 +247,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 height = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
             }
 
-            mipLevelCount = ddsOutput.dataOffsets.count;
+            mipLevelCount = mipmaps == Mipmaps::None ? 1 : ddsOutput.dataOffsets.count;
             int bytesPerPixel = 1;
 
             imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
@@ -257,7 +257,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
             }
 
-            if (ddsOutput.format == DDSLoader::Format::BC2)
+            if (ddsOutput.format == DDSLoader::Format::BC1)
+            {
+                // Nothing to do here, defaults to BC1
+            }
+            else if (ddsOutput.format == DDSLoader::Format::BC2)
             {
                 imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
                 bytesPerPixel = 2;
@@ -266,6 +270,14 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             {
                 imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
                 bytesPerPixel = 2;
+            }
+            else if (ddsOutput.format == DDSLoader::Format::BC4U)
+            {
+                format = VK_FORMAT_BC4_UNORM_BLOCK;
+            }
+            else if (ddsOutput.format == DDSLoader::Format::BC4S)
+            {
+                format = VK_FORMAT_BC4_SNORM_BLOCK;
             }
             else if (ddsOutput.format == DDSLoader::Format::BC5U)
             {
@@ -317,9 +329,9 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
             AE3D_CHECK_VULKAN( err, "vkMapMemory in TextureCube" );
 
-            bytesPerPixel = 4;
+            const size_t amountToCopy = (width * height * bytesPerPixel) < memReqs.size ? (width * height * bytesPerPixel) : memReqs.size;
 
-            std::memcpy( mapped, &ddsOutput.imageData[ ddsOutput.dataOffsets[ 0 ] ], width * height * bytesPerPixel );
+            std::memcpy( mapped, &ddsOutput.imageData[ ddsOutput.dataOffsets[ 0 ] ], amountToCopy );
 
             VkMappedMemoryRange flushRange = {};
             flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -343,7 +355,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     }
  
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     imageCreateInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     imageCreateInfo.arrayLayers = 6;
     imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -440,6 +452,9 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     vkDeviceWaitIdle( GfxDeviceGlobal::device );
 
+    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
+
     for (int face = 0; face < 6; ++face)
     {
         for (int i = 1; i < mipLevelCount; ++i)
@@ -466,6 +481,19 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 VK_IMAGE_LAYOUT_GENERAL, 1, &imageBlit, VK_FILTER_LINEAR );
         }
     }
+
+    err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
+
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.waitSemaphoreCount = 0;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in TextureCube" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
 
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
