@@ -428,7 +428,11 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
     if (sv->transformGizmo.selectedMesh != -1)
     {
+#if RENDERER_VULKAN
         const Vec3 delta{ deltaX / 20.0f, -deltaY / 20.0f, 0.0f };
+#else
+        const Vec3 delta{ -deltaX / 20.0f, deltaY / 20.0f, 0.0f };
+#endif
         const Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();
         sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
 		
@@ -541,11 +545,13 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         {
             const float size = screenHeight / distance;
 #if RENDERER_VULKAN
+            float x = (int)screenPoint.x;
             float y = screenHeight /* screenScale*/ -  (int)screenPoint.y;
 #else
-            float y = (int)screenPoint.y;
+            float x = (int)screenPoint.x * screenScale;
+            float y = (int)screenPoint.y * screenScale;
 #endif
-            ae3d::System::Draw( &sv->lightTex, (int)screenPoint.x, y, texWidth, texHeight,
+            ae3d::System::Draw( &sv->lightTex, x, y, texWidth, texHeight,
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
     }
