@@ -43,11 +43,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>Editor_Vulkan</TargetName>
+    <TargetName>Editor_Vulkan_d</TargetName>
     <OutDir>..\..\..\..\..\aether3d_build\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\..\aether3d_build\</OutDir>
+    <TargetName>Editor_Vulkan_r</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -84,6 +85,9 @@
       <AdditionalDependencies>Comdlg32.lib;libOpenAL32.dll.a;vulkan-1.lib;Aether3D_Vulkan_r.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\..\aether3d_build;..\..\..\..\Engine\ThirdParty\lib;%VULKAN_SDK%\Lib</AdditionalLibraryDirectories>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Inspector.cpp" />
