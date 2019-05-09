@@ -351,7 +351,7 @@ using namespace ae3d;
 #endif
 
     cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
-
+    ae3d::System::Print( "width: %f, height: %f\n", self.view.bounds.size.width, self.view.bounds.size.height );
     camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
 
     camera2d.SetName( "Camera2D" );
@@ -1002,13 +1002,13 @@ using namespace ae3d;
         y = -14;
     }
     
-    for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
+    for (unsigned pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
     {
         const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
         const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-        const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+        const float zOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         
-        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + zOffset ) );
     }
 #endif
 }

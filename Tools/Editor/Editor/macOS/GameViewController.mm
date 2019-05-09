@@ -195,14 +195,14 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     
     if (inputEvent.button == 1 && inputEvent.isActive)
     {
-        svHandleLeftMouseDown( sceneView, inputEvent.x, inputEvent.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
-        inspector.HandleLeftMouseClick( inputEvent.x, inputEvent.y, 1 );
-        inspector.HandleMouseMotion( inputEvent.x, inputEvent.y );
+        svHandleLeftMouseDown( sceneView, inputEvent.x * 2, inputEvent.y * 2, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+        inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
+        inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
     }
 
     if (inputEvent.button == 0 && inputEvent.isActive)
     {
-        inspector.HandleLeftMouseClick( inputEvent.x, inputEvent.y, 0 );
+        inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
     }
     
     inputEvent.isActive = false;
