@@ -515,7 +515,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
     const unsigned texWidth = sv->lightTex.GetWidth();
     const unsigned texHeight = sv->lightTex.GetHeight();
     
-    for (unsigned goIndex = 0; goIndex < sv->gameObjects.count; ++goIndex)
+    for (unsigned goIndex = 1; goIndex < sv->gameObjects.count; ++goIndex)
     {
         ae3d::TransformComponent* goTransform = sv->gameObjects[ goIndex ]->GetComponent<TransformComponent>();
 
