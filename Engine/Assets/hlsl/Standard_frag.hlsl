@@ -199,19 +199,12 @@ float4 main( PS_INPUT input ) : SV_Target
         nextLightIndex = perTileLightIndexBuffer[ index ];
 
         const float4 centerAndRadius = spotLightBufferCenterAndRadius[ lightIndex ];
-        const float4 spotParams = spotLightParams[ lightIndex ];
-        
-        // reconstruct z component of the light dir from x and y
-        float3 spotLightDir;
-        spotLightDir.xy = spotParams.xy;
-        spotLightDir.z = sqrt( 1 - spotLightDir.x * spotLightDir.x - spotLightDir.y * spotLightDir.y );
-
-        // the sign bit for cone angle is used to store the sign for the z component of the light dir
-        spotLightDir.z = (spotParams.z > 0) ? spotLightDir.z : -spotLightDir.z;
+        const float4 spotParams = spotLightParams[ lightIndex ];        
+        float3 spotLightDir = spotParams.xyz;
 
         const float3 vecToLight = normalize( centerAndRadius.xyz - input.positionWS_v.xyz );
         const float spotAngle = dot( -spotLightDir.xyz, vecToLight );
-        const float cosineOfConeAngle = (spotParams.z > 0) ? spotParams.z : -spotParams.z;
+        const float cosineOfConeAngle = abs( spotParams.w );
 
         // Falloff
         const float dist = distance( input.positionWS_v.xyz, centerAndRadius.xyz );
@@ -219,7 +212,7 @@ float4 main( PS_INPUT input ) : SV_Target
         const float att = 1.0f / (a * a);
         //const float3 color = /*spotLightColors[ nLightIndex ].rgb*/ float3( 1, 1, 1 ) * att;// * specularTex;
         const float3 color = float3( 1, 0, 0 );
-        accumDiffuseAndSpecular += spotAngle > cosineOfConeAngle ? color : float3( 1, 0, 0 );
+        accumDiffuseAndSpecular += spotAngle > cosineOfConeAngle ? color : float3( 0, 0, 0 );
 
         //accumDiffuseAndSpecular += LightColorDiffuse + LightColorSpecular;
         //accumDiffuseAndSpecular = float3( 0, 1, 0 );
