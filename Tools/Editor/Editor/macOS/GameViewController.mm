@@ -24,11 +24,10 @@ std::string GetOpenPath()
     return "";
 }
 
-void GetOpenPath( char* outPath )
+void GetOpenPath( char* outPath, const char* extension )
 {
     static std::string path = GetOpenPath();
     strcpy( outPath, path.c_str() );
-    
 }
 
 std::string GetSavePath()

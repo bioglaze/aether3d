@@ -30,7 +30,7 @@
 
 using namespace ae3d;
 
-void GetOpenPath( char* path );
+void GetOpenPath( char* path, const char* extension );
 
 struct VertexPTC
 {
@@ -211,7 +211,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             Mesh* mesh = new Mesh;
             char path[ 1024 ] = {};
-            GetOpenPath( path );
+            GetOpenPath( path, "ae3d" );
 
             if (strlen(path) > 0)
             {
@@ -231,11 +231,15 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
         if (gameObject != nullptr && audioSource != nullptr && nk_button_label( &ctx, "Set audio clip" ))
         {
-            char path[ 1024 ];
-            GetOpenPath( path );
-            AudioClip* audioClip = new AudioClip;
-            audioClip->Load( FileSystem::FileContents( path ) );
-            gameObject->GetComponent< AudioSourceComponent >()->SetClipId( audioClip->GetId() );
+            char path[ 1024 ] = {};
+            GetOpenPath( path, "wav" );
+            
+            if (path[ 0 ] != '\0')
+            {
+                AudioClip* audioClip = new AudioClip;
+                audioClip->Load( FileSystem::FileContents( path ) );
+                gameObject->GetComponent< AudioSourceComponent >()->SetClipId( audioClip->GetId() );
+            }
         }
 
         if (gameObject != nullptr && audioSource != nullptr && gameObject->GetComponent< AudioSourceComponent >()->GetClipId() != 0 && nk_button_label( &ctx, "Play audio clip" ))

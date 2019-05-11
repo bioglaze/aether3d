@@ -543,7 +543,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             screenPoint.x > -(float)texWidth && screenPoint.y > -(float)texHeight &&
             screenPoint.x < screenWidth * screenScale && screenPoint.y < screenHeight * screenScale)
         {
-            const float size = screenHeight / distance;
+            //const float spriteScale = screenHeight / distance;
 #if RENDERER_VULKAN
             float x = (int)screenPoint.x;
             float y = screenHeight /* screenScale*/ -  (int)screenPoint.y;

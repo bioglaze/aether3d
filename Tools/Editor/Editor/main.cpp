@@ -15,7 +15,7 @@
 using namespace ae3d;
 
 #if _MSC_VER
-void GetOpenPath( char* path )
+void GetOpenPath( char* path, const char* extension )
 {
     OPENFILENAME ofn = {};
     TCHAR szFile[ 260 ] = {};
@@ -24,7 +24,19 @@ void GetOpenPath( char* path )
     ofn.hwndOwner = GetActiveWindow();
     ofn.lpstrFile = szFile;
     ofn.nMaxFile = sizeof( szFile );
-    ofn.lpstrFilter = "Scene\0*.SCENE\0All\0*.*\0";
+    if (strstr( extension, "ae3d" ))
+    {
+        ofn.lpstrFilter = "Mesh\0*.ae3d\0All\0*.*\0";
+    }
+    else if (strstr( extension, "scene" ))
+    {
+        ofn.lpstrFilter = "Scene\0*.scene\0All\0*.*\0";
+    }
+    else if (strstr( extension, "wav" ))
+    {
+        ofn.lpstrFilter = "Audio\0*.wav;obj\0All\0*.*\0";
+    }
+
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = nullptr;
     ofn.nMaxFileTitle = 0;
@@ -37,7 +49,7 @@ void GetOpenPath( char* path )
     }
 }
 #else
-void GetOpenPath( char* path )
+void GetOpenPath( char* path, const char* extension )
 {
     FILE* f = popen( "zenity --file-selection --title \"Load .scene or .ae3d file\"", "r" );
     fgets( path, 1024, f );
