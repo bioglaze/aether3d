@@ -18,6 +18,8 @@ std::string GetOpenPath()
     if ([op runModal] == NSModalResponseOK)
     {
         NSURL *nsurl = [[op URLs] objectAtIndex:0];
+        std::string tmp = std::string([[nsurl path] UTF8String]);
+        printf("GetOpenPath: %s\n", tmp.c_str());
         return std::string([[nsurl path] UTF8String]);
     }
     

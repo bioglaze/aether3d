@@ -136,12 +136,12 @@ int gTouchCount = 0;
     camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 3, -5, -85 }, { 120, -5, -85 }, { 0, 1, 0 } );
     scene.Add( &camera3d );
     
-    fontTex.Load( ae3d::FileSystem::FileContents( "/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    fontTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     //gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "textures/lion_compressonator.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
-    astcTex.Load( ae3d::FileSystem::FileContents( "/granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    astcTex.Load( ae3d::FileSystem::FileContents( "granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
 
-    font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "/font_txt.fnt" ) );
+    font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "font_txt.fnt" ) );
     text.AddComponent<ae3d::TextRendererComponent>();
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( "Aether3D Game Engine" );
     text.GetComponent<ae3d::TextRendererComponent>()->SetFont( &font );
@@ -167,7 +167,7 @@ int gTouchCount = 0;
     cubeMaterial.SetTexture( &gliderTex, 0 );
     cubeMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
     
-    cubeMesh.Load( ae3d::FileSystem::FileContents( "/textured_cube.ae3d" ) );
+    cubeMesh.Load( ae3d::FileSystem::FileContents( "textured_cube.ae3d" ) );
     
     cube.AddComponent<ae3d::MeshRendererComponent>();
     cube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );

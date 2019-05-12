@@ -10,6 +10,11 @@
 #if RENDERER_METAL
 const char* GetFullPath( const char* fileName )
 {
+    if (fileName && fileName[ 0 ] == '/')
+    {
+        return fileName;
+    }
+    
     std::string nameWithSlash( "/" );
     nameWithSlash += fileName;
     std::replace( std::begin( nameWithSlash ), std::end( nameWithSlash ), '\\', '/' );
