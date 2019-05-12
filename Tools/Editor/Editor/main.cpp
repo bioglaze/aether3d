@@ -1,3 +1,5 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include <stdio.h>
 #include <string.h>
 #if _MSC_VER
@@ -191,6 +193,14 @@ int main()
                 svHandleLeftMouseUp( sceneView );
                 selectedGO = svSelectObject( sceneView, x, y, width, height );
             }
+            else if (event.type == WindowEventType::Mouse2Up)
+            {
+                x = event.mouseX;
+                y = height - event.mouseY;
+                isRightMouseDown = false;
+                deltaX = 0;
+                deltaY = 0;
+            }
             else if (event.type == WindowEventType::Mouse2Down)
             {
                 x = event.mouseX;
@@ -208,14 +218,6 @@ int main()
                 deltaY = 0;
                 moveDir.x = 0;
                 moveDir.y = 0;
-            }
-            else if (event.type == WindowEventType::Mouse2Up || event.type == WindowEventType::Mouse1Up)
-            {
-                x = event.mouseX;
-                y = height - event.mouseY;
-                isRightMouseDown = false;
-                deltaX = 0;
-                deltaY = 0;
             }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
             {           

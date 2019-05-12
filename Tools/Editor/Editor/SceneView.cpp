@@ -1,3 +1,5 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "SceneView.hpp"
 #include "Array.hpp"
 #include "CameraComponent.hpp"
@@ -45,7 +47,7 @@ struct SceneView
     Texture2D cameraTex;
     Matrix44 lineView;
     Matrix44 lineProjection;
-    int lineHandle;
+    int lineHandle = 0;
 
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
