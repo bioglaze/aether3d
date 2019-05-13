@@ -49,7 +49,8 @@ struct PakFile
 
 namespace Global
 {
-    std::vector< PakFile > pakFiles;
+    PakFile pakFiles[ 5 ];
+	unsigned packFileCount = 0;
 }
 
 #if VK_USE_PLATFORM_ANDROID_KHR
@@ -126,8 +127,8 @@ void ae3d::FileSystem::LoadPakFile( const char* path )
     }
 
     ifs.read( (char*)&entryCount, 4 );
-    Global::pakFiles.emplace_back( PakFile() );
-    auto& pakFile = Global::pakFiles.back();
+    auto& pakFile = Global::pakFiles[ Global::packFileCount ];
+	++Global::packFileCount;
     pakFile.entries.resize( entryCount );
     pakFile.path = path;
 
@@ -152,7 +153,8 @@ void ae3d::FileSystem::UnloadPakFile( const char* path )
     {
         if (pakFile.path == std::string( path ))
         {
-            Global::pakFiles.erase( std::begin( Global::pakFiles ) + i );
+			// FIXME: Do something here.
+            //Global::pakFiles.erase( std::begin( Global::pakFiles ) + i );
             return;
         }
         ++i;
