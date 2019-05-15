@@ -298,7 +298,7 @@ int main()
             }
 #else
             char path[ 1024 ] = {};
-            GetOpenPath( path );
+            GetOpenPath( path, "scene" );
             auto contents = FileSystem::FileContents( path );
             svLoadScene( sceneView, contents );
 #endif

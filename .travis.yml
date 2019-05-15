@@ -27,7 +27,9 @@ script:
   - make -f Makefile_mtl
   - cd ../SDF_Generator
   - make
-  - cd ../CombineFiles
+  - cd ../Editor/Editor
+  - make
+  - cd ../../CombineFiles
   - make
   # - cd ../../Engine/Tests
   # - make
@@ -41,6 +43,4 @@ script:
     #- make vulkan
     #- cd ../NuklearTest
     #- make vulkan
-  - cd ../../Engine
-  - cd ../Tools/Editor
 

@@ -1,4 +1,5 @@
 #include "Scene.hpp"
+#include <algorithm>
 #include <locale>
 #include <string>
 #include <sstream>
