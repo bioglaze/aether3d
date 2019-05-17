@@ -80,28 +80,9 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
 
-    VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
-
-    VkImageCreateInfo imageCreateInfo = {};
-    imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageCreateInfo.format = format;
-    imageCreateInfo.mipLevels = 1;
-    imageCreateInfo.arrayLayers = 1;
-    imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
-    imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-    imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-    
+    VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;    
     VkImage images[ 6 ];
     VkDeviceMemory deviceMemories[ 6 ];
-
-    VkMemoryAllocateInfo memAllocInfo = {};
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memAllocInfo.pNext = nullptr;
-    memAllocInfo.memoryTypeIndex = 0;
-    memAllocInfo.allocationSize = 0;
 
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -135,7 +116,19 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             }
 
             opaque = (components == 3 || components == 1);
+
+            VkImageCreateInfo imageCreateInfo = {};
+            imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+            imageCreateInfo.arrayLayers = 1;
             imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
+            imageCreateInfo.format = format;
+            imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+            imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+            imageCreateInfo.mipLevels = 1;
+            imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+            imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
+            imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
             err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &images[ face ] );
             AE3D_CHECK_VULKAN( err, "vkCreateImage" );
@@ -143,8 +136,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             VkMemoryRequirements memReqs;
             vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
+            VkMemoryAllocateInfo memAllocInfo = {};
+            memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            memAllocInfo.pNext = nullptr;
             memAllocInfo.allocationSize = memReqs.size;
-
             memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
@@ -247,28 +242,27 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 height = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
             }
 
-            mipLevelCount = mipmaps == Mipmaps::None ? 1 : ddsOutput.dataOffsets.count;
             int bytesPerPixel = 1;
 
-            imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+            mipLevelCount = mipmaps == Mipmaps::None ? 1 : ddsOutput.dataOffsets.count;
 
             if (!opaque)
             {
-                imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+               format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
             }
 
             if (ddsOutput.format == DDSLoader::Format::BC1)
             {
-                // Nothing to do here, defaults to BC1
+               format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
             }
             else if (ddsOutput.format == DDSLoader::Format::BC2)
             {
-                imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
+                format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
                 bytesPerPixel = 2;
             }
             else if (ddsOutput.format == DDSLoader::Format::BC3)
             {
-                imageCreateInfo.format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
+                format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
                 bytesPerPixel = 2;
             }
             else if (ddsOutput.format == DDSLoader::Format::BC4U)
@@ -281,12 +275,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             }
             else if (ddsOutput.format == DDSLoader::Format::BC5U)
             {
-                imageCreateInfo.format = VK_FORMAT_BC5_UNORM_BLOCK;
+                format = VK_FORMAT_BC5_UNORM_BLOCK;
                 bytesPerPixel = 2;
             }
             else if (ddsOutput.format == DDSLoader::Format::BC5S)
             {
-                imageCreateInfo.format = VK_FORMAT_BC5_SNORM_BLOCK;
+                format = VK_FORMAT_BC5_SNORM_BLOCK;
                 bytesPerPixel = 2;
             }
             else
@@ -296,7 +290,18 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
+            VkImageCreateInfo imageCreateInfo = {};
+            imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+            imageCreateInfo.arrayLayers = 1;
             imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
+            imageCreateInfo.format = format;
+            imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+            imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+            imageCreateInfo.mipLevels = mipLevelCount;
+            imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
+            imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+            imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
             err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &images[ face ] );
             AE3D_CHECK_VULKAN( err, "vkCreateImage" );
@@ -304,8 +309,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             VkMemoryRequirements memReqs;
             vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
-            memAllocInfo.allocationSize = memReqs.size;
 
+            VkMemoryAllocateInfo memAllocInfo = {};
+            memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            memAllocInfo.pNext = nullptr;
+            memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 
             err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemories[ face ] );
@@ -353,12 +361,20 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             System::Print( "Unknown/unsupported texture file extension: %s\n", paths[ face ].c_str() );
         }
     }
- 
+
+    VkImageCreateInfo imageCreateInfo = {};
+    imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageCreateInfo.arrayLayers = 6;
+    imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
+    imageCreateInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+    imageCreateInfo.format = format;
+    imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageCreateInfo.mipLevels = mipLevelCount;
+    imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    imageCreateInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-    imageCreateInfo.arrayLayers = 6;
-    imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage in TextureCube" );
@@ -367,9 +383,13 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     VkMemoryRequirements memReqs;
     vkGetImageMemoryRequirements( GfxDeviceGlobal::device, image, &memReqs );
+    
+    VkMemoryAllocateInfo memAllocInfo = {};
+    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memAllocInfo.pNext = nullptr;
     memAllocInfo.allocationSize = memReqs.size;
-
     memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+    
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &deviceMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory in TextureCube" );
     TextureCubeGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
