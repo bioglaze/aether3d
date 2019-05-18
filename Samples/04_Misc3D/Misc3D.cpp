@@ -222,7 +222,7 @@ int main()
     cubePTN.AddComponent< MeshRendererComponent >();
     cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
     cubePTN.AddComponent< TransformComponent >();
-    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, -2, -100 } );
     cubePTN.SetName( "cubePTN" );
 
 #ifdef TEST_RENDER_TEXTURE_CUBE
@@ -330,12 +330,11 @@ int main()
 #else
     spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 1024 );
 #endif
-    spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 25 );
+    spotLight.GetComponent<SpotLightComponent>()->SetRadius( 2 );
+    spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
     spotLight.AddComponent<TransformComponent>();
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
-    //spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 0, -1, 0 }, { 0, 1, 0 } );
-    //spotLight.GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -110 }, { 0, -1, 0 }, { 0, 1, 0 } );
     //spotLight.GetComponent<TransformComponent>()->SetParent( lightParent.GetComponent< TransformComponent >() );
 
     GameObject pointLight;
@@ -391,14 +390,14 @@ int main()
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
     
     TextureCube skybox;
-    /*skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
+    skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );*/
-    skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+    /*skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-        TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+        TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );*/
 #ifdef TEST_RENDER_TEXTURE_CUBE
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
@@ -455,7 +454,7 @@ int main()
     standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
     standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -100 ) );
+    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 5, -120 ) );
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
     scene.Add( &standardCubeTopCenter );
 

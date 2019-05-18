@@ -11,6 +11,7 @@ layout(set=0, binding=3) Buffer<float4> pointLightBufferCenterAndRadius : regist
 layout(set=0, binding=4) RWBuffer<uint> perTileLightIndexBufferOut : register(u0);
 layout(set=0, binding=8) Buffer<float4> spotLightBufferCenterAndRadius : register(t2);
 
+#define USE_MINMAX_Z 1
 #define TILE_RES 16
 #define NUM_THREADS_X TILE_RES
 #define NUM_THREADS_Y TILE_RES
@@ -118,7 +119,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         // with the positive half-space outside the frustum (and remember, 
         // view space is left handed, so use the left-hand rule to determine 
         // cross product direction)
-        for (uint i = 0; i < 4; i++)
+        for (uint i = 0; i < 4; ++i)
         {
             frustumEqn[ i ] = CreatePlaneEquation( frustum[ i ].xyz, frustum[ (i + 1) & 3 ].xyz ).xyz;
         }
@@ -128,6 +129,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     // have been completed and all threads in the group have reached this call.
     GroupMemoryBarrierWithGroupSync();
 
+#if USE_MINMAX_Z
     // calculate the min and max depth for this tile, 
     // to form the front and back of the frustum
 
@@ -142,7 +144,8 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     //        AMD's ForwarPlus11 sample uses reverse depth test so maybe that's why this swap is needed. [2014-07-07]
     minZ = asfloat( ldsZMax );
     maxZ = asfloat( ldsZMin );
-
+#endif
+    
     // loop over the lights and do a sphere vs. frustum intersection test
     uint uNumPointLights = numLights & 0xFFFFu;
 
@@ -156,7 +159,11 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
             center.xyz = mul( localToView, float4( center.xyz, 1 ) ).xyz;
 
             // test if sphere is intersecting or inside frustum
+#if USE_MINMAX_Z
             if (-center.z + minZ < radius && center.z - maxZ < radius)
+#else
+            if (center.z < radius)
+#endif
             {
                 if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
@@ -185,14 +192,17 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
         if (jl < numSpotLights)
         {
-            //float4 center = float4(0, 0, 0, 1);
             float4 center = spotLightBufferCenterAndRadius[ jl ];
-            //float radius = 20.0;
-            float radius = center.w;
+            float radius = 20.0;
+            //float radius = center.w;
             center.xyz = mul( localToView, float4( center.xyz, 1 ) ).xyz;
 
             // test if sphere is intersecting or inside frustum
+#if USE_MINMAX_Z
             if (-center.z - minZ < radius && center.z - maxZ < radius)
+#else
+            // Nothing to do here
+#endif
             {
                 if ((GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 0 ] ) < radius) &&
                     (GetSignedDistanceFromPlane( center.xyz, frustumEqn[ 1 ] ) < radius) &&
@@ -216,13 +226,11 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
         for (uint i = localIdxFlattened; i < uNumPointLightsInThisTile; i += NUM_THREADS_PER_TILE)
         {
-            // per-tile list of light indices
             perTileLightIndexBufferOut[ startOffset + i ] = ldsLightIdx[ i ];
         }
 
         for (uint j = (localIdxFlattened + uNumPointLightsInThisTile); j < ldsLightIdxCounter; j += NUM_THREADS_PER_TILE)
         {
-            // per-tile list of light indices
             perTileLightIndexBufferOut[ startOffset + j + 1 ] = ldsLightIdx[ j ];
         }
 

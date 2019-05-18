@@ -25,6 +25,7 @@ layout( set = 0, binding = 4 ) RWBuffer<uint> perTileLightIndexBuffer : register
 layout( set = 0, binding = 7 ) Buffer<float4> pointLightColors : register(t2);
 layout( set = 0, binding = 8 ) Buffer<float4> spotLightBufferCenterAndRadius : register(t3);
 layout( set = 0, binding = 9 ) Buffer<float4> spotLightParams : register(t4);
+//layout( set = 0, binding = 10 ) Buffer<float4> spotLightColors : register(t6);
 layout( set = 0, binding = 5 ) Texture2D normalTex : register(t5);
 
 #define TILE_RES 16
