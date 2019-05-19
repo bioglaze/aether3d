@@ -1216,6 +1216,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         cpuHandle.ptr += incrementSize;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(), &srvDesc, cpuHandle );
 
+        cpuHandle.ptr += incrementSize;
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle );
+
         const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
         const unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
