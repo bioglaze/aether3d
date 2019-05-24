@@ -19,6 +19,7 @@
 		AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */; };
 		AB657725200FD3BD0089CB54 /* MetalCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = AB657724200FD3BD0089CB54 /* MetalCommon.h */; };
 		AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7839E31C70CA950065EF51 /* DepthNormals.metal */; };
+		AB8DDA4F22985D0F00630045 /* explosion.wav in Resources */ = {isa = PBXBuildFile; fileRef = AB8DDA4E22985D0F00630045 /* explosion.wav */; };
 		AB9330F11F744513004E4640 /* UnlitSkin.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9330F01F744513004E4640 /* UnlitSkin.metal */; };
 		AB9D9A291C96E993009DF897 /* back.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A221C96E993009DF897 /* back.jpg */; };
 		AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A231C96E993009DF897 /* bottom.jpg */; };
@@ -77,6 +78,7 @@
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
 		AB657724200FD3BD0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
+		AB8DDA4E22985D0F00630045 /* explosion.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = explosion.wav; path = ../../../../aether3d_build/Samples/explosion.wav; sourceTree = "<group>"; };
 		AB9330F01F744513004E4640 /* UnlitSkin.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = UnlitSkin.metal; path = ../../../Engine/Assets/UnlitSkin.metal; sourceTree = "<group>"; };
 		AB9D9A221C96E993009DF897 /* back.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = back.jpg; path = ../../../../aether3d_build/Samples/skybox/back.jpg; sourceTree = "<group>"; };
 		AB9D9A231C96E993009DF897 /* bottom.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bottom.jpg; path = ../../../../aether3d_build/Samples/skybox/bottom.jpg; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB8DDA4E22985D0F00630045 /* explosion.wav */,
 				ABC1CC7E2067CE6E003D0A2D /* atlas_cegui.png */,
 				ABC1CC7D2067CE6E003D0A2D /* atlas_cegui.xml */,
 				AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */,
@@ -390,6 +393,7 @@
 				AB2345001DEABFB8004C4DEE /* default_white.png in Resources */,
 				AB2CA8291C13664600D4D7C4 /* glider.png in Resources */,
 				ABCBC06D1E052CAA000F0B6D /* new_sponza.ae3d in Resources */,
+				AB8DDA4F22985D0F00630045 /* explosion.wav in Resources */,
 				AB9D9A2E1C96E993009DF897 /* top.jpg in Resources */,
 				AB9D9A2C1C96E993009DF897 /* left.jpg in Resources */,
 				ABE04F8E1C1216A80025C436 /* MainMenu.xib in Resources */,

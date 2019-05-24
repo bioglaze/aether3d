@@ -10,6 +10,8 @@
 #include <stdint.h>
 
 #import "Array.hpp"
+#import "AudioSourceComponent.hpp"
+#import "AudioClip.hpp"
 #import "CameraComponent.hpp"
 #import "ComputeShader.hpp"
 #import "DirectionalLightComponent.hpp"
@@ -234,7 +236,10 @@ using namespace ae3d;
     GameObject animatedGo;
     GameObject wireframeGo;
     GameObject pbrCube;
-    
+    GameObject audioGo;
+    GameObject audioContainer;
+    AudioClip audioClip;
+
     Scene scene;
     
     Font font;
@@ -323,10 +328,16 @@ using namespace ae3d;
 
     ae3d::System::InitMetal( _view.device, _view, MULTISAMPLE_COUNT, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
-    //ae3d::System::InitAudio();
+    ae3d::System::InitAudio();
+
+    audioClip.Load( FileSystem::FileContents( "explosion.wav" ) );
+    
+    audioContainer.AddComponent<AudioSourceComponent>();
+    audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
+    audioContainer.GetComponent<AudioSourceComponent>()->Play();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -400,12 +411,12 @@ using namespace ae3d;
     skyTex.Load( ae3d::FileSystem::FileContents( "left.jpg" ), ae3d::FileSystem::FileContents( "right.jpg" ),
                 ae3d::FileSystem::FileContents( "bottom.jpg" ), ae3d::FileSystem::FileContents( "top.jpg" ),
                 ae3d::FileSystem::FileContents( "front.jpg" ), ae3d::FileSystem::FileContents( "back.jpg" ),
-                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB );
+                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB );
     
-    /*skyTex.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+    skyTex.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
                 FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
                 FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );*/
+                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
     scene.SetSkybox( &skyTex );
     
     pbrDiffuseTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
@@ -664,8 +675,6 @@ using namespace ae3d;
 #ifdef TEST_RENDER_TEXTURE_2D
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
 #endif
-    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), ae3d::Vec3( 50, 100, -0.6f ), ae3d::Vec3( 768*2, 512*2, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-    //renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( dirLight.GetComponent<ae3d::DirectionalLightComponent>()->GetShadowMap(), ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 512, 512, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
     
     rtCamera.AddComponent<ae3d::CameraComponent>();
@@ -819,8 +828,6 @@ using namespace ae3d;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    //ae3d::System::Print( "mouseDown x: %f, y: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y );
-    
     camera3d.GetComponent<ae3d::TransformComponent>()->MoveForward( -1 );
     
     inputEvent.button = 1;
@@ -831,7 +838,6 @@ using namespace ae3d;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    //ae3d::System::Print( "mouseUp x: %f, y: %f, height: %f\n", theEvent.locationInWindow.x, theEvent.locationInWindow.y, self.view.bounds.size.height );
     inputEvent.button = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
@@ -966,7 +972,6 @@ using namespace ae3d;
     ae3d::Quaternion rotation;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
     rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
-    //pbrCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
     
     char statStr[ 512 ] = {};
     ae3d::System::Statistics::GetStatistics( statStr );
@@ -982,8 +987,6 @@ using namespace ae3d;
         text.GetComponent<ae3d::TextRendererComponent>()->SetText( "this is a long string. this is a long string" );
     }
 
-    //pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -8, 0, -85 + sinf( angle / 2 ) * 2 ) );
-    //pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 11, 0, -85 ) );
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9.8f, 0, -85 ) );
     
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
