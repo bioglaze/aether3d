@@ -6,8 +6,8 @@
 #endif
 #include "stb_image.c"
 #include "DDSLoader.hpp"
-#include "GfxDevice.hpp"
 #include "FileSystem.hpp"
+#include "GfxDevice.hpp"
 #include "System.hpp"
 
 extern id <MTLCommandQueue> commandQueue;

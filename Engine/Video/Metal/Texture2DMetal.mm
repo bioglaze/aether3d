@@ -8,8 +8,8 @@
 #include "stb_image.c"
 #include "DDSLoader.hpp"
 #include "FileSystem.hpp"
-#include "System.hpp"
 #include "GfxDevice.hpp"
+#include "System.hpp"
 
 #define MYMAX(x, y) ((x) > (y) ? (x) : (y))
 
