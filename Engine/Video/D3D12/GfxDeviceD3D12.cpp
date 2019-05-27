@@ -27,7 +27,7 @@ void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
-constexpr int RESOURCE_BINDING_COUNT = 7;
+constexpr int RESOURCE_BINDING_COUNT = 9;
 
 namespace WindowGlobal
 {
@@ -536,7 +536,7 @@ void CreateRootSignature()
     {
         CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 5, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 7, 0 );
         descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1 );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
@@ -1219,6 +1219,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         cpuHandle.ptr += incrementSize;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle );
 
+        cpuHandle.ptr += incrementSize;
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle );
+
         const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
         const unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
@@ -1235,6 +1238,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     else
     {
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+        cpuHandle.ptr += incrementSize;
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+
         cpuHandle.ptr += incrementSize;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
 

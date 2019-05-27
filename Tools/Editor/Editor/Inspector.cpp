@@ -1,3 +1,5 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "Inspector.hpp"
 #include "AudioSourceComponent.hpp"
 #include "AudioClip.hpp"
@@ -16,7 +18,6 @@
 #include <stdio.h>
 
 #define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 #define NK_INCLUDE_FONT_BAKING

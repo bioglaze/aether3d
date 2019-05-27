@@ -73,7 +73,7 @@ namespace ae3d
         bool IsCube() const { return isCube; }
 
         /// \return Path where this texture was loaded from, if it was loaded from a file.
-        std::string GetPath() const { return path; }
+        const std::string& GetPath() const { return path; }
 
 #if RENDERER_VULKAN
         VkSampler GetSampler() const { return sampler; }

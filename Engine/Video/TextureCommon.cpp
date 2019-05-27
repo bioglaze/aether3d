@@ -90,9 +90,12 @@ namespace ae3d
     }
 }
 
+void ClearPSOCache();
+
 void TexReload( const std::string& path )
 {
     std::string cacheHash = GetCacheHash( path, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+    ae3d::System::Print("reloading texture %s\n", path.c_str());
 
     if (Texture2DGlobal::hashToCachedTexture.find( cacheHash ) != std::end( Texture2DGlobal::hashToCachedTexture ))
     {
@@ -163,6 +166,10 @@ void TexReload( const std::string& path )
         auto& tex = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
         tex.Load( ae3d::FileSystem::FileContents( path.c_str() ), tex.GetWrap(), tex.GetFilter(), tex.GetMipmaps(), tex.GetColorSpace(), tex.GetAnisotropy() );
     }
+
+#if RENDERER_D3D12
+    ClearPSOCache();
+#endif
 }
 
 void ae3d::Texture2D::LoadFromAtlas( const FileSystem::FileContentsData& atlasTextureData, const FileSystem::FileContentsData& atlasMetaData, const char* textureName, TextureWrap aWrap, TextureFilter aFilter, ColorSpace aColorSpace, Anisotropy aAnisotropy )
