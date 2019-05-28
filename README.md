@@ -4,7 +4,7 @@
 
 This codebase will evolve into the next generation [Aether3D](http://twiren.kapsi.fi/aether3d.html). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
-Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.7.8.
+Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.8.
 
 Author: [Timo Wirén](http://twiren.kapsi.fi)
 
@@ -26,7 +26,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Hot-reloading of assets.
   - Custom model format with .obj, .fbx and Blender exporter.
   - Virtual file system for .pak files.
-  - XBox controller support.
+  - Xbox controller support.
   - Cross-Platform WYSIWYG scene editor.
   - Statically linked into your application.
   - Wireframe rendering mode.
@@ -42,12 +42,12 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # API documentation
 
-[link](http://twiren.kapsi.fi/doc_v0.7.8/html/)
+[link](http://twiren.kapsi.fi/doc_v0.8/html/)
 
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
-  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.7.8.zip) and extract it into aether3d_build/Samples after building.
+  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.8.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 
