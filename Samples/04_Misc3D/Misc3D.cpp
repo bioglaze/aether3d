@@ -136,6 +136,7 @@ int main()
     cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     cameraCubeRT.AddComponent<TransformComponent>();
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
+    cameraCubeRT.SetName( "cameraCubeRT" );
 #endif
     
     GameObject camera2d;
@@ -148,6 +149,7 @@ int main()
     camera2d.GetComponent<CameraComponent>()->SetTargetTexture( &camera2dTex );
     camera2d.GetComponent<CameraComponent>()->SetRenderOrder( 2 );
     camera2d.AddComponent<TransformComponent>();
+    camera2d.SetName( "camera2d" );
     
     Texture2D fontTex;
     fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
@@ -534,6 +536,8 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     rtCamera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
+    rtCamera.GetComponent<CameraComponent>()->SetLayerMask( 0x1 );
+    rtCamera.GetComponent<CameraComponent>()->SetRenderOrder( 0 );
     rtCamera.AddComponent<TransformComponent>();
     //rtCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, -70 ) );
     

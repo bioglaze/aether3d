@@ -513,6 +513,7 @@ void ae3d::Scene::Render()
 #endif
 
     BubbleSort( cameras.data(), (int)cameras.size() );
+    BubbleSort( rtCameras.data(), (int)rtCameras.size() );
     
     RenderShadowMaps( rtCameras );
     RenderDepthAndNormalsForAllCameras( rtCameras );
