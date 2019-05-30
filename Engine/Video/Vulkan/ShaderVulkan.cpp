@@ -208,19 +208,6 @@ void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int tex
 		GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         GfxDeviceGlobal::boundViews[ 0 ] = texture->GetView();
         GfxDeviceGlobal::boundSamplers[ 0 ] = texture->GetSampler();
-
-        /*VkCommandBufferBeginInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
-        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
-
-        SetImageLayout(
-            GfxDeviceGlobal::texCmdBuffer,
-            texture->GetImage(),
-            VK_IMAGE_ASPECT_COLOR_BIT, texture->layout,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 0, 1 );
-            vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );*/
     }
     else if (textureUnit == 1)
     {
@@ -256,13 +243,13 @@ void ae3d::Shader::SetTexture( const char* /*name*/, TextureCube* texture, int t
     }
 }
 
-void ae3d::Shader::SetRenderTexture( const char* /*name*/, RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( const char* name, RenderTexture* texture, int textureUnit )
 {
     if (texture == nullptr)
     {
         return;
     }
-    
+
     if (textureUnit == 0)
     {
         GfxDeviceGlobal::boundViews[ 0 ] = texture->GetColorView();
@@ -277,7 +264,6 @@ void ae3d::Shader::SetRenderTexture( const char* /*name*/, RenderTexture* textur
     {
         System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
     }
-
 }
 
 void ae3d::Shader::SetInt( const char* /*name*/, int /*value*/ )
