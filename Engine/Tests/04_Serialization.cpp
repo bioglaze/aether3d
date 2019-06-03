@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "Array.hpp"
 #include "CameraComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
@@ -24,7 +25,7 @@ int main()
     std::vector< GameObject > gameObjects;
     std::map< std::string, Material* > materialNameToMaterial;
     std::map< std::string, Texture2D* > textureNameToTexture;
-    std::vector< Mesh* > meshes;
+    Array< Mesh* > meshes;
     Scene scene;
     
     auto res = scene.Deserialize( FileSystem::FileContents( "scene.scene" ), gameObjects, textureNameToTexture,
