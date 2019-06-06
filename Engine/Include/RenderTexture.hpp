@@ -24,13 +24,16 @@ namespace ae3d
 
         /// \return Data type.
         DataType GetDataType() const { return dataType; }
+
+        /// \param target Target to resolve to.
+        void ResolveTo( RenderTexture* target );
         
         /// \param width Width.
         /// \param height Height.
         /// \param dataType Data type.
         /// \param wrap Wrapping mode.
         /// \param filter Filtering mode.
-        /// \param debugName Debug name that is visible in graphics debugging tools.
+        /// \param debugName Debug name that is visible in graphics debugging tools. If the name is "resolve", the texture can be used for resolving MSAA render targets with resolveTo().
         void Create2D( int width, int height, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
 
         /// \param dimension Dimension.
@@ -72,6 +75,7 @@ namespace ae3d
         FrameBufferAttachment depth;
         VkFormat colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
         VkRenderPass renderPass = VK_NULL_HANDLE;
+        int sampleCount = 1;
 #endif
         DataType dataType = DataType::UByte;
     };

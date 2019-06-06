@@ -337,7 +337,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
             AE3D_CHECK_VULKAN( err, "vkMapMemory in TextureCube" );
 
-            const size_t amountToCopy = (width * height * bytesPerPixel) < memReqs.size ? (width * height * bytesPerPixel) : memReqs.size;
+            const size_t amountToCopy = unsigned(width * height * bytesPerPixel) < memReqs.size ? unsigned(width * height * bytesPerPixel) : memReqs.size;
 
             std::memcpy( mapped, &ddsOutput.imageData[ ddsOutput.dataOffsets[ 0 ] ], amountToCopy );
 

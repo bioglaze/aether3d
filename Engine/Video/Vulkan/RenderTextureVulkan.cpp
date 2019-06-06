@@ -1,5 +1,6 @@
 #include "RenderTexture.hpp"
 #include <vector>
+#include <string.h>
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
@@ -18,6 +19,8 @@ namespace GfxDeviceGlobal
     extern VkCommandBuffer setupCmdBuffer;
     extern VkFormat colorFormat;
     extern VkFormat depthFormat;
+    extern VkCommandBuffer currentCmdBuffer;
+    extern VkSampleCountFlagBits msaaSampleBits;
 }
 
 namespace RenderTextureGlobal
@@ -86,6 +89,69 @@ static void CreateSampler( ae3d::TextureFilter filter, ae3d::TextureWrap wrap, V
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)outSampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }
 
+void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
+{    
+    GfxDevice::EndRenderPass();
+
+    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
+                    GetColorImage(),
+                    VK_IMAGE_ASPECT_COLOR_BIT,
+                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    VK_IMAGE_LAYOUT_GENERAL,
+                    1, 0, 1 );
+
+    static bool firstTime = true;
+    if (firstTime)
+    {
+        SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
+                    target->GetColorImage(),
+                    VK_IMAGE_ASPECT_COLOR_BIT,
+                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    VK_IMAGE_LAYOUT_GENERAL,
+                    1, 0, 1 );
+        firstTime = false;
+    }
+    else
+    {
+        SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
+                    target->GetColorImage(),
+                    VK_IMAGE_ASPECT_COLOR_BIT,
+                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    VK_IMAGE_LAYOUT_GENERAL,
+                    1, 0, 1 );
+    }
+
+    VkImageResolve regions = {};
+    regions.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    regions.srcSubresource.layerCount = 1;
+    regions.srcOffset = {};
+    regions.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    regions.dstSubresource.layerCount = 1;
+    regions.dstOffset = {};
+    regions.extent = { (uint32_t)width, (uint32_t)height, 1 };
+    
+    vkCmdResolveImage( GfxDeviceGlobal::currentCmdBuffer,
+                       color.image,
+                       VK_IMAGE_LAYOUT_GENERAL,
+                       target->GetColorImage(),
+                       VK_IMAGE_LAYOUT_GENERAL,
+                       1,
+                       &regions );
+
+    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
+                    GetColorImage(),
+                    VK_IMAGE_ASPECT_COLOR_BIT,
+                    VK_IMAGE_LAYOUT_GENERAL,
+                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
+
+    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
+                    target->GetColorImage(),
+                    VK_IMAGE_ASPECT_COLOR_BIT,
+                    VK_IMAGE_LAYOUT_GENERAL,
+                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 0, 1 );
+    GfxDevice::BeginRenderPass();
+}
+
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
 {
     if (aWidth <= 0 || aHeight <= 0)
@@ -102,7 +168,9 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isRenderTexture = true;
     dataType = aDataType;
     handle = 1;
-
+    const bool isMultisampled = !debugName || strstr( debugName, "resolve" ) == nullptr;
+    sampleCount = isMultisampled ? (int)GfxDeviceGlobal::msaaSampleBits : 1;
+    
     // Color
 
     if (dataType == DataType::UByte)
@@ -132,7 +200,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     colorImage.extent.depth = 1;
     colorImage.mipLevels = 1;
     colorImage.arrayLayers = 1;
-    colorImage.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorImage.samples = isMultisampled ? GfxDeviceGlobal::msaaSampleBits : VK_SAMPLE_COUNT_1_BIT;
     colorImage.tiling = VK_IMAGE_TILING_OPTIMAL;
     colorImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     colorImage.flags = 0;
@@ -177,7 +245,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         color.image,
         VK_IMAGE_ASPECT_COLOR_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED,
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
+                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
     
     colorImageView.image = color.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageView, nullptr, &color.view );
@@ -300,7 +368,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     colorImage.extent.depth = 1;
     colorImage.mipLevels = 1;
     colorImage.arrayLayers = 6;
-    colorImage.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorImage.samples = GfxDeviceGlobal::msaaSampleBits;
     colorImage.tiling = VK_IMAGE_TILING_OPTIMAL;
     colorImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     colorImage.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
@@ -431,7 +499,7 @@ void ae3d::RenderTexture::CreateRenderPass()
 {
     VkAttachmentDescription attachments[ 2 ];
     attachments[ 0 ].format = colorFormat;
-    attachments[ 0 ].samples = VK_SAMPLE_COUNT_1_BIT;
+    attachments[ 0 ].samples = sampleCount == 1 ? VK_SAMPLE_COUNT_1_BIT : GfxDeviceGlobal::msaaSampleBits;
     attachments[ 0 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[ 0 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -441,7 +509,7 @@ void ae3d::RenderTexture::CreateRenderPass()
     attachments[ 0 ].flags = 0;
 
     attachments[ 1 ].format = GfxDeviceGlobal::depthFormat;
-    attachments[ 1 ].samples = VK_SAMPLE_COUNT_1_BIT;
+    attachments[ 1 ].samples = attachments[ 0 ].samples;
     attachments[ 1 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[ 1 ].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachments[ 1 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;

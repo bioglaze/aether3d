@@ -308,9 +308,19 @@ namespace ae3d
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
         }
 
+        if (oldImageLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+        {
+            imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        }
+
         if (oldImageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
         {
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        }
+
+        if (oldImageLayout == VK_IMAGE_LAYOUT_GENERAL)
+        {
+            imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         }
 
         if (newImageLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
@@ -337,7 +347,11 @@ namespace ae3d
 
         if (newImageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
         {
-            imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+            if (imageMemoryBarrier.srcAccessMask == 0)
+            {
+                imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+            }
+            
             imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
         }
 
@@ -379,6 +393,19 @@ namespace ae3d
             destStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
         }
 
+        if (imageMemoryBarrier.srcAccessMask & VK_ACCESS_TRANSFER_READ_BIT)
+        {
+            srcStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        }
+        if (imageMemoryBarrier.srcAccessMask & VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT)
+        {
+            srcStageFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        }
+        if (imageMemoryBarrier.srcAccessMask & VK_ACCESS_SHADER_READ_BIT)
+        {
+            srcStageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        }
+        
         vkCmdPipelineBarrier(
             cmdbuffer,
             srcStageFlags,

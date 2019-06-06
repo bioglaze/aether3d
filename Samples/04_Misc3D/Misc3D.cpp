@@ -30,12 +30,13 @@
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.zip
 
 //#define TEST_RENDER_TEXTURE_2D
+#define TEST_MSAA
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 
 using namespace ae3d;
@@ -80,8 +81,11 @@ int main()
     }
     
     System::EnableWindowsMemleakDetection();
-
+#ifdef TEST_MSAA
+    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::MSAA4 );
+#else
     Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
+#endif
     Window::GetSize( width, height );
     Window::SetTitle( "Misc3D" );
     VR::Init();
@@ -102,6 +106,9 @@ int main()
 	Texture2D blurTex;
 	blurTex.CreateUAV( width / 2, height / 2, "blurTex" );
 
+    RenderTexture resolvedTex;
+    resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve" );
+        
     RenderTexture camera2dTex;
     camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
 
@@ -891,6 +898,10 @@ int main()
 #if RENDERER_D3D12
         System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &camera2dTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+#elif defined( TEST_MSAA )
+        cameraTex.ResolveTo( &resolvedTex );
+        System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        //System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 #else
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );

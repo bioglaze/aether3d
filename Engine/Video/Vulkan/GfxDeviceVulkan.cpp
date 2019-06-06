@@ -1809,6 +1809,50 @@ void ae3d::GfxDevice::BeginRenderPassAndCommandBuffer()
     vkCmdSetScissor( GfxDeviceGlobal::currentCmdBuffer, 0, 1, &scissor );
 }
 
+void ae3d::GfxDevice::BeginRenderPass()
+{
+    const uint32_t width = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetWidth() : WindowGlobal::windowWidth;
+    const uint32_t height = GfxDeviceGlobal::renderTexture0 ? GfxDeviceGlobal::renderTexture0->GetHeight() : WindowGlobal::windowHeight;
+
+    VkClearValue clearValues[ 3 ];
+    
+    if (GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT)
+    {
+        clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
+        clearValues[ 1 ].color = GfxDeviceGlobal::clearColor;
+        clearValues[ 2 ].depthStencil = { 1.0f, 0 };
+    }
+    else
+    {
+        clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
+        clearValues[ 1 ].depthStencil = { 1.0f, 0 };
+    }
+
+    VkRenderPassBeginInfo renderPassBeginInfo = {};
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.renderPass = GfxDeviceGlobal::renderPass;
+    renderPassBeginInfo.renderArea.offset.x = 0;
+    renderPassBeginInfo.renderArea.offset.y = 0;
+    renderPassBeginInfo.renderArea.extent.width = width;
+    renderPassBeginInfo.renderArea.extent.height = height;
+    renderPassBeginInfo.clearValueCount = GfxDeviceGlobal::msaaSampleBits != VK_SAMPLE_COUNT_1_BIT ? 3 : 2;
+    renderPassBeginInfo.pClearValues = clearValues;
+    renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffers[ GfxDeviceGlobal::currentBuffer ];
+
+    vkCmdBeginRenderPass( GfxDeviceGlobal::currentCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+}
+
+void ae3d::GfxDevice::EndRenderPass()
+{
+    vkCmdEndRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
+}
+
+void ae3d::GfxDevice::EndCommandBuffer()
+{
+    VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
+    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
+}
+
 void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
 {
     vkCmdEndRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );

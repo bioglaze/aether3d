@@ -111,7 +111,10 @@ namespace ae3d
         void CreateUniformBuffers();
         std::uint8_t* GetCurrentUbo();
         void BeginRenderPassAndCommandBuffer();
+        void BeginRenderPass();
         void EndRenderPassAndCommandBuffer();
+        void EndRenderPass();
+        void EndCommandBuffer();
         void BeginFrame();
 #endif
         void ClearScreen( unsigned clearFlags );
