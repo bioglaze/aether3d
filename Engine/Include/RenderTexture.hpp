@@ -55,6 +55,12 @@ namespace ae3d
 
         /// \return Color image.
         VkImage GetColorImage() { return color.image; }
+
+        /// \return Color image layout.
+        VkImageLayout GetColorImageLayout() const { return layout; }
+
+        /// \param aLayout New color image layout.
+        void SetColorImageLayout( VkImageLayout aLayout ) { layout = aLayout; }
 #endif
 
   private:
@@ -76,6 +82,7 @@ namespace ae3d
         VkFormat colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
         VkRenderPass renderPass = VK_NULL_HANDLE;
         int sampleCount = 1;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
 #endif
         DataType dataType = DataType::UByte;
     };
