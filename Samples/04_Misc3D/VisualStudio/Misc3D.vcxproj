@@ -361,7 +361,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\..\Engine\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Engine\Include;..\..\..\Engine\ThirdParty</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessorDefinitions>_ENABLE_EXTENDED_ALIGNED_STORAGE;AE3D_OPENVR;RENDERER_VULKAN;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>

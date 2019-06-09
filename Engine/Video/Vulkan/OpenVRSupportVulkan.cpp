@@ -39,7 +39,7 @@ struct FramebufferDesc
     VkImage image = VK_NULL_HANDLE;
     VkImageView imageView;
     VkDeviceMemory deviceMemory;
-    VkImage depthStencilImage;
+    VkImage depthStencilImage = VK_NULL_HANDLE;
     VkImageView depthStencilImageView;
     VkDeviceMemory depthStencilDeviceMemory;
     VkFramebuffer framebuffer;
@@ -89,7 +89,6 @@ namespace Global
     std::string poseClasses;
     char devClassChar[ vr::k_unMaxTrackedDeviceCount ];   // for each device, a character representing its class
     Matrix44 devicePose[ vr::k_unMaxTrackedDeviceCount ];
-    Shader lensDistort;
     Vec3 vrEyePosition; // Used in Scene.cpp for frustum culling
     Vec3 leftControllerPosition;
     Vec3 rightControllerPosition;
@@ -530,7 +529,6 @@ void ae3d::VR::Init()
     bool res = CreateFrameBuffer( Global::width, Global::height, Global::leftEyeDesc, "left eye" );
     res = CreateFrameBuffer( Global::width, Global::height, Global::rightEyeDesc, "right eye" );
 
-    Global::lensDistort.LoadSPIRV( ae3d::FileSystem::FileContents( "vr_companion_vert.spv" ), ae3d::FileSystem::FileContents( "vr_companion_vert.spv" ) );
     SetupDescriptors();
     SetupDistortion();
 
@@ -854,7 +852,6 @@ void ae3d::VR::SubmitFrame()
     {
         System::Print( "VR submit for right eye returned error %d\n", submitResult );
     }
-
 }
 
 void ae3d::VR::SetEye( int eye )
