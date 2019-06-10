@@ -1179,7 +1179,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     {
         CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
     }
-    
+    System::Print("GfxDeviceGlobal::currentConstantBufferIndex: %d\n", GfxDeviceGlobal::currentConstantBufferIndex );
+
     const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * RESOURCE_BINDING_COUNT) % GfxDeviceGlobal::constantBuffers.size();
 
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
@@ -1518,9 +1519,15 @@ void ae3d::GfxDevice::Present()
     hr = GfxDeviceGlobal::commandQueue->GetTimestampFrequency( &GfxDeviceGlobal::timerQuery.frequency );
     AE3D_CHECK_D3D( hr, "Failed to get timer query frequency" );
 
-    std::uint64_t* queryData = 0;
+    std::uint64_t* queryData = nullptr;
     D3D12_RANGE range = { 0, GfxDeviceGlobal::timerQuery.MaxNumTimers };
-    GfxDeviceGlobal::timerQuery.queryBuffer->Map( 0, &range, (void**)&queryData );
+    hr = GfxDeviceGlobal::timerQuery.queryBuffer->Map( 0, &range, (void**)&queryData );
+    
+    if (FAILED( hr ))
+    {
+        return;
+    }
+
     std::uint64_t* frameQueryData = queryData + ((GfxDeviceGlobal::frameIndex % 2) * GfxDeviceGlobal::timerQuery.MaxNumTimers * 2);
 
     for (std::uint64_t profileIdx = 0; profileIdx < GfxDeviceGlobal::timerQuery.profileCount; ++profileIdx)
