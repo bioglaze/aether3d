@@ -463,16 +463,8 @@ void BubbleSort( GameObject** gos, int count )
 
 void ae3d::Scene::Render()
 {
-#if RENDERER_VULKAN
-#if AE3D_OPENVR
-    if (VRGlobal::eye == 0)
-    {
-        GfxDevice::BeginFrame();
-    }
-#else
+#if RENDERER_VULKAN && !AE3D_OPENVR
     GfxDevice::BeginFrame();
-#endif
-
 #endif
     GenerateAABB();
 #if RENDERER_D3D12
@@ -520,7 +512,7 @@ void ae3d::Scene::Render()
     RenderRTCameras( rtCameras );
     RenderDepthAndNormalsForAllCameras( cameras );
 
-#if RENDERER_VULKAN
+#if RENDERER_VULKAN && !AE3D_OPENVR
     GfxDevice::BeginRenderPassAndCommandBuffer();
 #endif
 

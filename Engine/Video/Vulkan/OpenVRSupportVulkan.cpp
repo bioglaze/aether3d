@@ -1,6 +1,7 @@
 #if AE3D_OPENVR
 #include "VR.hpp"
 #include <cstdint>
+#include <cassert>
 #include <string>
 #include <vector>
 #include <cstring>
@@ -8,6 +9,7 @@
 #include <vulkan/vulkan.h>
 #include "CameraComponent.hpp"
 #include "GameObject.hpp"
+#include "GfxDevice.hpp"
 #include "FileSystem.hpp"
 #include "Matrix.hpp"
 #include "Macros.hpp"
@@ -16,6 +18,9 @@
 #include "TransformComponent.hpp"
 #include "Vec3.hpp"
 #include "VulkanUtils.hpp"
+
+void SubmitQueue();
+void sceneRenderFunc( int eye );
 
 using namespace ae3d;
 
@@ -30,8 +35,9 @@ namespace GfxDeviceGlobal
     extern VkPhysicalDevice physicalDevice;
     extern VkInstance instance;
     extern VkQueue graphicsQueue;
-    extern VkCommandBuffer offscreenCmdBuffer;
     extern std::uint32_t graphicsQueueIndex;
+    extern VkCommandBuffer currentCmdBuffer;
+    extern VkRenderPass renderPass;
 }
 
 struct FramebufferDesc
@@ -587,7 +593,12 @@ void ae3d::VR::SubmitFrame()
         return;
     }
 
-    /*for (vr::TrackedDeviceIndex_t controllerIndex = 0; controllerIndex < vr::k_unMaxTrackedDeviceCount; ++controllerIndex)
+    vr::VREvent_t event;
+    while (Global::hmd->PollNextEvent( &event, sizeof( event ) ))
+    {
+    }
+
+    for (vr::TrackedDeviceIndex_t controllerIndex = 0; controllerIndex < vr::k_unMaxTrackedDeviceCount; ++controllerIndex)
     {
         vr::VRControllerState_t state;
 
@@ -599,64 +610,26 @@ void ae3d::VR::SubmitFrame()
         }
     }
 
-    vr::VRVulkanTextureData_t vulkanData;
-    vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.image;
-    vulkanData.m_pDevice = GfxDeviceGlobal::device;
-    vulkanData.m_pPhysicalDevice = GfxDeviceGlobal::physicalDevice;
-    vulkanData.m_pInstance = GfxDeviceGlobal::instance;
-    vulkanData.m_pQueue = GfxDeviceGlobal::graphicsQueue;
-    vulkanData.m_nQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
-
-    vulkanData.m_nWidth = Global::leftEyeDesc.width;
-    vulkanData.m_nHeight = Global::leftEyeDesc.height;
-    vulkanData.m_nFormat = VK_FORMAT_R8G8B8A8_SRGB;
-    vulkanData.m_nSampleCount = 1;
-
-    vr::VRTextureBounds_t bounds;
-    bounds.uMin = 0.0f;
-    bounds.uMax = 1.0f;
-    bounds.vMin = 0.0f;
-    bounds.vMax = 1.0f;
-
-    vr::Texture_t texture = { &vulkanData, vr::TextureType_Vulkan, vr::ColorSpace_Auto };
-    vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &texture, &bounds );
-
-    if (submitResult != vr::VRCompositorError_None)
-    {
-        System::Print( "VR submit for left eye returned error %d\n", submitResult );
-    }
-
-    vulkanData.m_nImage = (uint64_t)Global::rightEyeDesc.image;
-    vulkanData.m_nWidth = Global::rightEyeDesc.width;
-    vulkanData.m_nHeight = Global::rightEyeDesc.height;
-
-    submitResult = vr::VRCompositor()->Submit( vr::Eye_Right, &texture, &bounds );
-    
-    if (submitResult != vr::VRCompositorError_None)
-    {
-        System::Print( "VR submit for right eye returned error %d\n", submitResult );
-    }
-
-    // FIXME: Maybe this should be moved after present
-    vr::VRCompositor()->PostPresentHandoff();*/
+    GfxDevice::BeginFrame();
 
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
+    VkCommandBuffer cmdBuffer = GfxDeviceGlobal::currentCmdBuffer;
+
     VkViewport viewport = { 0.0f, 0.0f, (float)Global::width, (float)Global::height, 0.0f, 1.0f };
-    vkCmdSetViewport( GfxDeviceGlobal::offscreenCmdBuffer, 0, 1, &viewport );
+    vkCmdSetViewport( cmdBuffer, 0, 1, &viewport );
     VkRect2D scissor = { 0, 0, Global::width, Global::height };
-    vkCmdSetScissor( GfxDeviceGlobal::offscreenCmdBuffer, 0, 1, &scissor );
+    vkCmdSetScissor( cmdBuffer, 0, 1, &scissor );
 
     FramebufferDesc& fbDesc = Global::leftEyeDesc;
 
     // Transition eye image to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
     VkImageMemoryBarrier imageMemoryBarrier = {};
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     imageMemoryBarrier.oldLayout = Global::leftEyeDesc.imageLayout;
@@ -669,7 +642,7 @@ void ae3d::VR::SubmitFrame()
     imageMemoryBarrier.subresourceRange.layerCount = 1;
     imageMemoryBarrier.srcQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
     imageMemoryBarrier.dstQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
-    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+    vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
     fbDesc.imageLayout = imageMemoryBarrier.newLayout;
 
     // Transition the depth buffer to VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL on first use
@@ -681,14 +654,13 @@ void ae3d::VR::SubmitFrame()
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
         imageMemoryBarrier.oldLayout = fbDesc.depthStencilImageLayout;
         imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+        vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
         fbDesc.depthStencilImageLayout = imageMemoryBarrier.newLayout;
     }
 
     // Start the renderpass
     VkRenderPassBeginInfo renderPassBeginInfo = {};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassBeginInfo.pNext = nullptr;
     renderPassBeginInfo.renderPass = fbDesc.renderPass;
     renderPassBeginInfo.framebuffer = fbDesc.framebuffer;
     renderPassBeginInfo.renderArea.offset.x = 0;
@@ -698,23 +670,23 @@ void ae3d::VR::SubmitFrame()
     renderPassBeginInfo.clearValueCount = 2;
     VkClearValue clearValues[ 2 ];
     clearValues[ 0 ].color.float32[ 0 ] = 0.0f;
-    clearValues[ 0 ].color.float32[ 1 ] = 0.0f;
+    clearValues[ 0 ].color.float32[ 1 ] = 1.0f;
     clearValues[ 0 ].color.float32[ 2 ] = 0.0f;
     clearValues[ 0 ].color.float32[ 3 ] = 1.0f;
     clearValues[ 1 ].depthStencil.depth = 1.0f;
     clearValues[ 1 ].depthStencil.stencil = 0;
     renderPassBeginInfo.pClearValues = &clearValues[ 0 ];
-    vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+    vkCmdBeginRenderPass( cmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+    
+    GfxDeviceGlobal::renderPass = fbDesc.renderPass;
 
-    // RenderScene( left );
+    int vrEye = 0;
+    sceneRenderFunc( vrEye );
 
-    vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
-
-    System::Assert( fbDesc.image != VK_NULL_HANDLE, "UnsetEye has bad image!" );
+    vkCmdEndRenderPass( cmdBuffer );
 
     // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.image = fbDesc.image;
     imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
@@ -727,18 +699,17 @@ void ae3d::VR::SubmitFrame()
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
     imageMemoryBarrier.oldLayout = fbDesc.imageLayout;
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+    vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
     fbDesc.imageLayout = imageMemoryBarrier.newLayout;
 
     // Right eye
-    fbDesc = Global::rightEyeDesc;
+    FramebufferDesc& fbDesc2 = Global::rightEyeDesc;
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.pNext = nullptr;
     imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     imageMemoryBarrier.oldLayout = Global::rightEyeDesc.imageLayout;
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    imageMemoryBarrier.image = fbDesc.image;
+    imageMemoryBarrier.image = fbDesc2.image;
     imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
     imageMemoryBarrier.subresourceRange.levelCount = 1;
@@ -746,50 +717,50 @@ void ae3d::VR::SubmitFrame()
     imageMemoryBarrier.subresourceRange.layerCount = 1;
     imageMemoryBarrier.srcQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
     imageMemoryBarrier.dstQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
-    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
-    fbDesc.imageLayout = imageMemoryBarrier.newLayout;
+    vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+    fbDesc2.imageLayout = imageMemoryBarrier.newLayout;
 
     // Transition the depth buffer to VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL on first use
-    if (fbDesc.depthStencilImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
+    if (fbDesc2.depthStencilImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
     {
-        imageMemoryBarrier.image = fbDesc.depthStencilImage;
+        imageMemoryBarrier.image = fbDesc2.depthStencilImage;
         imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
         imageMemoryBarrier.srcAccessMask = 0;
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        imageMemoryBarrier.oldLayout = fbDesc.depthStencilImageLayout;
+        imageMemoryBarrier.oldLayout = fbDesc2.depthStencilImageLayout;
         imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
-        fbDesc.depthStencilImageLayout = imageMemoryBarrier.newLayout;
+        vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+        fbDesc2.depthStencilImageLayout = imageMemoryBarrier.newLayout;
     }
 
     // Start the renderpass
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassBeginInfo.pNext = nullptr;
-    renderPassBeginInfo.renderPass = fbDesc.renderPass;
-    renderPassBeginInfo.framebuffer = fbDesc.framebuffer;
+    renderPassBeginInfo.renderPass = fbDesc2.renderPass;
+    renderPassBeginInfo.framebuffer = fbDesc2.framebuffer;
     renderPassBeginInfo.renderArea.offset.x = 0;
     renderPassBeginInfo.renderArea.offset.y = 0;
     renderPassBeginInfo.renderArea.extent.width = Global::width;
     renderPassBeginInfo.renderArea.extent.height = Global::height;
     renderPassBeginInfo.clearValueCount = 2;
-    clearValues[ 0 ].color.float32[ 0 ] = 0.0f;
+    clearValues[ 0 ].color.float32[ 0 ] = 1.0f;
     clearValues[ 0 ].color.float32[ 1 ] = 0.0f;
     clearValues[ 0 ].color.float32[ 2 ] = 0.0f;
     clearValues[ 0 ].color.float32[ 3 ] = 1.0f;
     clearValues[ 1 ].depthStencil.depth = 1.0f;
     clearValues[ 1 ].depthStencil.stencil = 0;
     renderPassBeginInfo.pClearValues = &clearValues[ 0 ];
-    vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+    vkCmdBeginRenderPass( cmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
 
-    // RenderScene( right );
+    GfxDeviceGlobal::renderPass = fbDesc2.renderPass;
 
-    vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
-    
+    vrEye = 1;
+    sceneRenderFunc( vrEye );
+
+    vkCmdEndRenderPass( cmdBuffer );
 
     // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.pNext = nullptr;
-    imageMemoryBarrier.image = fbDesc.image;
+    imageMemoryBarrier.image = fbDesc2.image;
     imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
     imageMemoryBarrier.subresourceRange.levelCount = 1;
@@ -799,175 +770,38 @@ void ae3d::VR::SubmitFrame()
     imageMemoryBarrier.dstQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
     imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    imageMemoryBarrier.oldLayout = fbDesc.imageLayout;
+    imageMemoryBarrier.oldLayout = fbDesc2.imageLayout;
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
-    fbDesc.imageLayout = imageMemoryBarrier.newLayout;
+    vkCmdPipelineBarrier( cmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
+    fbDesc2.imageLayout = imageMemoryBarrier.newLayout;
 
-    vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
+    vkEndCommandBuffer( cmdBuffer );
 
-    // end frame
-    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    SubmitQueue();
 
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pWaitDstStageMask = &pipelineStages;
-    submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitSemaphores = nullptr;//&GfxDeviceGlobal::offscreenSemaphore;
-    submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores = nullptr;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &GfxDeviceGlobal::offscreenCmdBuffer;
+    // TESTING END
 
-    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
-    AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
-
-    // submit
-    vr::VRVulkanTextureData_t vulkanData = {};
+    vr::VRVulkanTextureData_t vulkanData;
     vulkanData.m_nImage = (uint64_t)Global::leftEyeDesc.image;
-    vulkanData.m_pDevice = (VkDevice_T *)GfxDeviceGlobal::device;
-    vulkanData.m_pPhysicalDevice = (VkPhysicalDevice_T *)GfxDeviceGlobal::physicalDevice;
-    vulkanData.m_pInstance = (VkInstance_T *)GfxDeviceGlobal::instance;
-    vulkanData.m_pQueue = (VkQueue_T *)GfxDeviceGlobal::graphicsQueue;
+    vulkanData.m_pDevice = GfxDeviceGlobal::device;
+    vulkanData.m_pPhysicalDevice = GfxDeviceGlobal::physicalDevice;
+    vulkanData.m_pInstance = GfxDeviceGlobal::instance;
+    vulkanData.m_pQueue = GfxDeviceGlobal::graphicsQueue;
     vulkanData.m_nQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
 
-    vulkanData.m_nWidth = Global::leftEyeDesc.width;
-    vulkanData.m_nHeight = Global::leftEyeDesc.height;
+    vulkanData.m_nWidth = Global::width;
+    vulkanData.m_nHeight = Global::height;
     vulkanData.m_nFormat = VK_FORMAT_R8G8B8A8_SRGB;
     vulkanData.m_nSampleCount = 1;
 
     vr::VRTextureBounds_t bounds{ 0.0f, 0.0f, 1.0f, 1.0f };
     vr::Texture_t texture = { &vulkanData, vr::TextureType_Vulkan, vr::ColorSpace_Auto };
     vr::EVRCompositorError submitResult = vr::VRCompositor()->Submit( vr::Eye_Left, &texture, &bounds );
-
-    if (submitResult != vr::VRCompositorError_None)
-    {
-        System::Print( "VR submit for left eye returned error %d\n", submitResult );
-    }
-
+    assert( (submitResult == vr::VRCompositorError_None || submitResult == vr::VRCompositorError_DoNotHaveFocus) && "Submit failed for left eye!" );
     vulkanData.m_nImage = (uint64_t)Global::rightEyeDesc.image;
+
     submitResult = vr::VRCompositor()->Submit( vr::Eye_Right, &texture, &bounds );
-
-    if (submitResult != vr::VRCompositorError_None)
-    {
-        System::Print( "VR submit for right eye returned error %d\n", submitResult );
-    }
-}
-
-void ae3d::VR::SetEye( int eye )
-{
-    if (!Global::hmd)
-    {
-        return;
-    }
-
-    VRGlobal::eye = eye;
-
-    if (eye == 0)
-    {
-        VkCommandBufferBeginInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
-        AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
-    }
-
-    VkViewport viewport = { 0.0f, 0.0f, (float)Global::width, (float)Global::height, 0.0f, 1.0f };
-    vkCmdSetViewport( GfxDeviceGlobal::offscreenCmdBuffer, 0, 1, &viewport );
-    VkRect2D scissor = { 0, 0, Global::width, Global::height };
-    vkCmdSetScissor( GfxDeviceGlobal::offscreenCmdBuffer, 0, 1, &scissor );
-
-    FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
-
-    // Transition eye image to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-    VkImageMemoryBarrier imageMemoryBarrier = {};
-    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.pNext = nullptr;
-    imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT;
-    imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    imageMemoryBarrier.oldLayout = eye == 0 ? Global::leftEyeDesc.imageLayout : Global::rightEyeDesc.imageLayout;
-    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    imageMemoryBarrier.image = fbDesc.image;
-    imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
-    imageMemoryBarrier.subresourceRange.levelCount = 1;
-    imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
-    imageMemoryBarrier.subresourceRange.layerCount = 1;
-    imageMemoryBarrier.srcQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
-    imageMemoryBarrier.dstQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
-    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
-    fbDesc.imageLayout = imageMemoryBarrier.newLayout;
-
-    // Transition the depth buffer to VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL on first use
-    if (fbDesc.depthStencilImageLayout == VK_IMAGE_LAYOUT_UNDEFINED)
-    {
-        imageMemoryBarrier.image = fbDesc.depthStencilImage;
-        imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        imageMemoryBarrier.srcAccessMask = 0;
-        imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        imageMemoryBarrier.oldLayout = fbDesc.depthStencilImageLayout;
-        imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
-        fbDesc.depthStencilImageLayout = imageMemoryBarrier.newLayout;
-    }
-
-    // Start the renderpass
-    VkRenderPassBeginInfo renderPassBeginInfo = {};
-    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassBeginInfo.pNext = nullptr;
-    renderPassBeginInfo.renderPass = fbDesc.renderPass;
-    renderPassBeginInfo.framebuffer = fbDesc.framebuffer;
-    renderPassBeginInfo.renderArea.offset.x = 0;
-    renderPassBeginInfo.renderArea.offset.y = 0;
-    renderPassBeginInfo.renderArea.extent.width = Global::width;
-    renderPassBeginInfo.renderArea.extent.height = Global::height;
-    renderPassBeginInfo.clearValueCount = 2;
-    VkClearValue clearValues[ 2 ];
-    clearValues[ 0 ].color.float32[ 0 ] = 0.0f;
-    clearValues[ 0 ].color.float32[ 1 ] = 0.0f;
-    clearValues[ 0 ].color.float32[ 2 ] = 0.0f;
-    clearValues[ 0 ].color.float32[ 3 ] = 1.0f;
-    clearValues[ 1 ].depthStencil.depth = 1.0f;
-    clearValues[ 1 ].depthStencil.stencil = 0;
-    renderPassBeginInfo.pClearValues = &clearValues[ 0 ];
-    vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
-}
-
-void ae3d::VR::UnsetEye( int eye )
-{
-    if (!Global::hmd)
-    {
-        return;
-    }
-
-    vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
-
-    FramebufferDesc& fbDesc = eye == 0 ? Global::leftEyeDesc : Global::rightEyeDesc;
-    System::Assert( fbDesc.image != VK_NULL_HANDLE, "UnsetEye has bad image!" );
-
-    // Transition eye image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for display on the companion window
-    VkImageMemoryBarrier imageMemoryBarrier = {};
-    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.pNext = nullptr;
-    imageMemoryBarrier.image = fbDesc.image;
-    imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
-    imageMemoryBarrier.subresourceRange.levelCount = 1;
-    imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
-    imageMemoryBarrier.subresourceRange.layerCount = 1;
-    imageMemoryBarrier.srcQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
-    imageMemoryBarrier.dstQueueFamilyIndex = GfxDeviceGlobal::graphicsQueueIndex;
-    imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    imageMemoryBarrier.oldLayout = fbDesc.imageLayout;
-    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    vkCmdPipelineBarrier( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier );
-    fbDesc.imageLayout = imageMemoryBarrier.newLayout;
-
-    if (eye == 1)
-    {
-        vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
-    }
+    assert( (submitResult == vr::VRCompositorError_None || submitResult == vr::VRCompositorError_DoNotHaveFocus) && "Submit failed for left eye!" );
 }
 
 void ae3d::VR::CalcEyePose()
@@ -1064,6 +898,5 @@ void ae3d::VR::CalcCameraForEye( GameObject& camera, float /*yawDegrees*/, int e
     camera.GetComponent< CameraComponent >()->SetProjection( projMat );
 
     Global::vrFov = std::atan( Global::height / nearPlane ) * (180.0f / 3.14159265f);
-    //System::Print("vrFor: %f\n", Global::vrFov );
 }
 #endif

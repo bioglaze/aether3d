@@ -18,6 +18,7 @@
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
 #include "VulkanUtils.hpp"
+#include "VR.hpp"
 #if VK_USE_PLATFORM_XCB_KHR
 #include <X11/Xlib-xcb.h>
 #endif
@@ -2073,10 +2074,8 @@ void ae3d::GfxDevice::BeginFrame()
     GfxDeviceGlobal::image11 = Texture2D::GetDefaultTexture()->GetImage();
 }
 
-void ae3d::GfxDevice::Present()
+void SubmitQueue()
 {
-    Statistics::BeginPresentTimeProfiling();
-    
     VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
     VkSubmitInfo submitInfo = {};
@@ -2091,6 +2090,31 @@ void ae3d::GfxDevice::Present()
 
     VkResult err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+}
+
+void ae3d::GfxDevice::Present()
+{
+    Statistics::BeginPresentTimeProfiling();
+    VkResult err = VK_SUCCESS;
+
+#if AE3D_OPENVR
+    VR::SubmitFrame();
+#else
+    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pWaitDstStageMask = &pipelineStages;
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+#endif
 
     SubmitPrePresentBarrier();
 

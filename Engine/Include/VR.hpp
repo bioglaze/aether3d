@@ -26,14 +26,6 @@ namespace ae3d
         /// Displays the image on the device. Called after both eyes have been rendered.
         void SubmitFrame();
 
-        /// Sets active eye. Called before scene.Render().
-        /// \param eye 0 for left eye, 1 for right.
-        void SetEye( int eye );
-
-        /// Unsets active eye. Called after scene.Render().
-        /// \param eye 0 for left eye, 1 for right.
-        void UnsetEye( int eye );
-
         /// Gets the pose from device.
         void CalcEyePose();
 

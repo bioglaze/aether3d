@@ -327,6 +327,8 @@ void ae3d::System::RunUnitTests()
 #if !AE3D_OPENVR
 namespace ae3d
 {
+    class GameObject;
+
     namespace VR
     {
         void Init()
@@ -353,6 +355,10 @@ namespace ae3d
         Vec3 GetRightHandPosition()
         {
             return Vec3( 1, 0, 0 );
+        }
+
+        void CalcCameraForEye( class GameObject& camera, float /*yawDegrees*/, int eye )
+        {
         }
     }
 }

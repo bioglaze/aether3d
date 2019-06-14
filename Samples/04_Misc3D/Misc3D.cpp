@@ -30,7 +30,7 @@
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.zip
 
 //#define TEST_RENDER_TEXTURE_2D
-#define TEST_MSAA
+//#define TEST_MSAA
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
@@ -63,6 +63,15 @@ pcg32_random_t rng;
 int Random100()
 {
     return pcg32_random_r( &rng );
+}
+
+Scene scene;
+GameObject camera;
+
+void sceneRenderFunc( int eye )
+{
+    VR::CalcCameraForEye( camera, 0, eye );
+    scene.Render();
 }
 
 int main()
@@ -112,7 +121,6 @@ int main()
     RenderTexture camera2dTex;
     camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
 
-    GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
@@ -395,7 +403,6 @@ int main()
 
 #endif
 
-    Scene scene;
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
     
     TextureCube skybox;
@@ -876,17 +883,6 @@ int main()
         Vec3 pos = VR::GetLeftHandPosition();
         //System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
         camera.GetComponent< CameraComponent >()->SetViewport( 0, 0, width, height );
-        
-        /*for (int eye = 0; eye < 2; ++eye)
-        {
-            VR::SetEye( eye );
-            VR::CalcCameraForEye( camera, yaw, eye );
-            //scene.Render();
-            //scene.EndFrame();
-            VR::UnsetEye( eye );
-        }*/
-        
-        VR::SubmitFrame();
 #else
         if (reload)
         {
