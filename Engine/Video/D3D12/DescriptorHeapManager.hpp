@@ -15,7 +15,7 @@ public:
     static D3D12_CPU_DESCRIPTOR_HANDLE GetCbvSrvUavCpuHandle( unsigned index );
 
     static void Deinit();
-    static const UINT numDescriptors = 2048;
+    static const UINT numDescriptors = 12000;
 
 private:
     static ID3D12DescriptorHeap* cbvSrvUavHeap;

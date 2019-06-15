@@ -876,7 +876,7 @@ void CreateDepthStencil()
 
 void CreateConstantBuffers()
 {
-    GfxDeviceGlobal::constantBuffers.resize( 2000 );
+    GfxDeviceGlobal::constantBuffers.resize( 10000 );
     GfxDeviceGlobal::mappedConstantBuffers.resize( GfxDeviceGlobal::constantBuffers.size() );
     ae3d::System::Assert( DescriptorHeapManager::numDescriptors >= GfxDeviceGlobal::constantBuffers.size(), "There are more constant buffers than descriptors" );
 
@@ -1234,6 +1234,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     else
     {
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+        cpuHandle.ptr += incrementSize;
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+
         cpuHandle.ptr += incrementSize;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
 

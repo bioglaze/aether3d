@@ -11,7 +11,6 @@ layout(set=0, binding=0) cbuffer cbPerFrame : register(b0)
     float lightConeAngle;
     int lightType;
     float minAmbient;
-    int isVR;
     uint maxNumLightsPerTile;
     uint windowWidth;
     uint windowHeight;
@@ -19,6 +18,6 @@ layout(set=0, binding=0) cbuffer cbPerFrame : register(b0)
     float f0;
     float4 tex0scaleOffset;
     float4 tilesXY;
-    int padding[ 3 ];
     matrix boneMatrices[ 80 ];
+    int isVR;
 };
