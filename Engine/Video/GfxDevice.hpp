@@ -20,6 +20,7 @@ struct PerObjectUboStruct
     float lightConeAngleCos = 0;
     int lightType = 0; // 0: None, 1: Spot, 2: Dir, 3: Point
     float minAmbient = 0.2f;
+    int isVR = 0;
     unsigned maxNumLightsPerTile = 0;
     unsigned windowWidth = 1;
     unsigned windowHeight = 1;
@@ -27,6 +28,7 @@ struct PerObjectUboStruct
     float f0 = 0.8f;
     ae3d::Vec4 tex0scaleOffset = ae3d::Vec4( 1, 1, 0, 0 );
     ae3d::Vec4 tilesXY = ae3d::Vec4( 0, 0, 0, 0 );
+    int padding[ 3 ];
     ae3d::Matrix44 boneMatrices[ 80 ];
 };
 

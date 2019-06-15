@@ -23,6 +23,12 @@ VSOutput main( float3 pos : POSITION, float2 uv : TEXCOORD, float3 nor : NORMAL,
 
     VSOutput vsOut;
     vsOut.pos = mul( localToClip, position2 );
+
+    if (isVR == 1)
+    {
+        vsOut.pos.y = -vsOut.pos.y;
+    }
+
     vsOut.uv = uv;
     vsOut.color = color;
     vsOut.projCoord = mul( localToShadowClip, position2 );

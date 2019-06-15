@@ -309,105 +309,6 @@ bool CreateFrameBuffer( int width, int height, FramebufferDesc& outFramebufferDe
     return true;
 }
 
-void SetupDistortion()
-{
-    const short lensGridSegmentCountH = 43;
-    const short lensGridSegmentCountV = 43;
-
-    const float w = 1.0f / float( lensGridSegmentCountH - 1 );
-    const float h = 1.0f / float( lensGridSegmentCountV - 1 );
-
-    float u, v = 0;
-
-    std::vector< VertexDataLens > vVerts( 0 );
-    VertexDataLens vert;
-
-    // Left eye distortion verts
-    float Xoffset = -1;
-    for (int y = 0; y < lensGridSegmentCountV; ++y)
-    {
-        for (int x = 0; x < lensGridSegmentCountH; ++x)
-        {
-            u = x * w; v = 1 - y * h;
-            vert.position = Vector2( Xoffset + u, -1 + 2 * y*h );
-
-            vr::DistortionCoordinates_t dc0;
-            const bool success = Global::hmd->ComputeDistortion( vr::Eye_Left, u, v, &dc0 );
-            ae3d::System::Assert( success, "Distortion computation failed" );
-            
-            vert.texCoordRed = Vector2( dc0.rfRed[ 0 ], 1 - dc0.rfRed[ 1 ] );
-            vert.texCoordGreen = Vector2( dc0.rfGreen[ 0 ], 1 - dc0.rfGreen[ 1 ] );
-            vert.texCoordBlue = Vector2( dc0.rfBlue[ 0 ], 1 - dc0.rfBlue[ 1 ] );
-
-            vVerts.push_back( vert );
-        }
-    }
-
-    // Right eye distortion verts
-    Xoffset = 0;
-    for (int y = 0; y < lensGridSegmentCountV; ++y)
-    {
-        for (int x = 0; x < lensGridSegmentCountH; ++x)
-        {
-            u = x * w; v = 1 - y * h;
-            vert.position = Vector2( Xoffset + u, -1 + 2 * y * h );
-
-            vr::DistortionCoordinates_t dc0;
-            const bool success = Global::hmd->ComputeDistortion( vr::Eye_Right, u, v, &dc0 );
-            ae3d::System::Assert( success, "Distortion computation failed" );
-
-            vert.texCoordRed = Vector2( dc0.rfRed[ 0 ], 1 - dc0.rfRed[ 1 ] );
-            vert.texCoordGreen = Vector2( dc0.rfGreen[ 0 ], 1 - dc0.rfGreen[ 1 ] );
-            vert.texCoordBlue = Vector2( dc0.rfBlue[ 0 ], 1 - dc0.rfBlue[ 1 ] );
-
-            vVerts.push_back( vert );
-        }
-    }
-
-    std::vector<short> vIndices;
-    short a, b, c, d;
-
-    short offset = 0;
-    for (short y = 0; y < lensGridSegmentCountV - 1; ++y)
-    {
-        for (short x = 0; x < lensGridSegmentCountH - 1; ++x)
-        {
-            a = lensGridSegmentCountH * y + x + offset;
-            b = lensGridSegmentCountH * y + x + 1 + offset;
-            c = (y + 1) * lensGridSegmentCountH + x + 1 + offset;
-            d = (y + 1) * lensGridSegmentCountH + x + offset;
-            vIndices.push_back( a );
-            vIndices.push_back( b );
-            vIndices.push_back( c );
-
-            vIndices.push_back( a );
-            vIndices.push_back( c );
-            vIndices.push_back( d );
-        }
-    }
-
-    offset = lensGridSegmentCountH * lensGridSegmentCountV;
-    for (short y = 0; y < lensGridSegmentCountV - 1; ++y)
-    {
-        for (short x = 0; x < lensGridSegmentCountH - 1; ++x)
-        {
-            a = lensGridSegmentCountH * y + x + offset;
-            b = lensGridSegmentCountH * y + x + 1 + offset;
-            c = (y + 1) * lensGridSegmentCountH + x + 1 + offset;
-            d = (y + 1) * lensGridSegmentCountH + x + offset;
-            vIndices.push_back( a );
-            vIndices.push_back( b );
-            vIndices.push_back( c );
-
-            vIndices.push_back( a );
-            vIndices.push_back( c );
-            vIndices.push_back( d );
-        }
-    }
-    
-    Global::indexSize = static_cast< unsigned int >( vIndices.size() );
-}
-
 std::string GetTrackedDeviceString( vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL )
 {
     std::uint32_t unRequiredBufferLen = pHmd->GetStringTrackedDeviceProperty( unDevice, prop, NULL, 0, peError );
@@ -536,7 +437,6 @@ void ae3d::VR::Init()
     res = CreateFrameBuffer( Global::width, Global::height, Global::rightEyeDesc, "right eye" );
 
     SetupDescriptors();
-    SetupDistortion();
 
     vr::HmdMatrix34_t matEye = Global::hmd->GetEyeToHeadTransform( vr::Eye_Left );
     ConvertSteamVRMatrixToMatrix4( matEye, Global::eyePosLeft );
@@ -873,6 +773,7 @@ void ae3d::VR::CalcEyePose()
         Global::vrEyePosition = Vec3( Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 12 ],
                                       Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 13 ],
                                       Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 14 ] );
+        Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 14 ] -= 80;
         Matrix44::Invert( Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ], Global::mat4HMDPose );
     }
 }

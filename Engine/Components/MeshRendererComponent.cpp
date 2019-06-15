@@ -191,6 +191,10 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
         GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
         GfxDevice::BlendMode blendMode = GfxDevice::BlendMode::Off;
 
+#if AE3D_OPENVR
+        GfxDeviceGlobal::perObjectUboStruct.isVR = 1;
+#endif
+
         if (overrideShader)
         {
             shader->Use();

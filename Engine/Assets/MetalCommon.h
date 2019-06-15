@@ -13,6 +13,7 @@ struct Uniforms
     float lightConeAngle;
     int lightType; // 0: None, 1: Spot, 2: Dir, 3: Point
     float minAmbient;
+    int isVR;
     uint maxNumLightsPerTile;
     uint windowWidth;
     uint windowHeight;
@@ -20,6 +21,7 @@ struct Uniforms
     float f0;
     float4 tex0scaleOffset;
     float4 tilesXY;
+    int padding[ 3 ];
     matrix_float4x4 boneMatrices[ 80 ];
 };
 
