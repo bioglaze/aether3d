@@ -93,7 +93,7 @@ namespace ae3d
         void* GetCurrentConstantBuffer();
 #endif
 #if RENDERER_METAL
-        static const int UNIFORM_BUFFER_SIZE = sizeof( PerObjectUboStruct );
+        static const int UNIFORM_BUFFER_SIZE = sizeof( PerObjectUboStruct ) + 16 * 4;
         void InitMetal( id <MTLDevice> metalDevice, MTKView* view, int sampleCount, int uiVBSize, int uiIBSize );
         void SetCurrentDrawableMetal( MTKView* view );
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
