@@ -204,7 +204,7 @@ void ae3d::System::Draw( TextureBase* texture, int x, int y, int xSize, int ySiz
     }
     else if (texture->IsRenderTexture())
     {
-        renderer.builtinShaders.spriteRendererShader.SetRenderTexture( "textureMap", (RenderTexture*)texture, 0 );
+        renderer.builtinShaders.spriteRendererShader.SetRenderTexture( (RenderTexture*)texture, 0 );
     }
     
     GfxDeviceGlobal::perObjectUboStruct.localToClip = mvp;
@@ -357,7 +357,7 @@ namespace ae3d
             return Vec3( 1, 0, 0 );
         }
 
-        void CalcCameraForEye( class GameObject& camera, float /*yawDegrees*/, int eye )
+        void CalcCameraForEye( class GameObject& /*camera*/, float /*yawDegrees*/, int /*eye*/ )
         {
         }
     }

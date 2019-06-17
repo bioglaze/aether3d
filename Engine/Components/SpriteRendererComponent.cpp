@@ -175,7 +175,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* loc
 
         if (drawable.texture->IsRenderTexture())
         {
-            renderer.builtinShaders.spriteRendererShader.SetRenderTexture( "textureMap", static_cast< ae3d::RenderTexture* >(drawable.texture), 0 );
+            renderer.builtinShaders.spriteRendererShader.SetRenderTexture( static_cast< ae3d::RenderTexture* >(drawable.texture), 0 );
         }
         else
         {

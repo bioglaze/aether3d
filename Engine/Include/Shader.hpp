@@ -70,10 +70,9 @@ namespace ae3d
         /// \param textureUnit Texture unit.
         void SetTexture( const char* name, class TextureCube* texture, int textureUnit );
 
-        /// \param name Texture uniform name.
         /// \param renderTexture RenderTexture.
         /// \param textureUnit Texture unit.
-        void SetRenderTexture( const char* name, class RenderTexture* renderTexture, int textureUnit );
+        void SetRenderTexture( class RenderTexture* renderTexture, int textureUnit );
 
         /// \param name Integer uniform name.
         /// \param value Value.

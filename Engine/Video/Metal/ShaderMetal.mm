@@ -153,7 +153,7 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
     }
 }
 
-void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* renderTexture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* renderTexture, int textureUnit )
 {
     if (renderTexture != nullptr)
     {
@@ -168,7 +168,7 @@ void ae3d::Shader::SetRenderTexture( const char* name, ae3d::RenderTexture* rend
         }
         else
         {
-            System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
+            System::Print( "Shader %s tried to set a texture into unit that is not handled\n", metalVertexShaderName.c_str() );
         }
 
         GfxDeviceGlobal::SetSampler( textureUnit, renderTexture->GetFilter(), renderTexture->GetWrap(), renderTexture->GetAnisotropy() );

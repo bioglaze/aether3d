@@ -64,13 +64,13 @@ void ae3d::Material::Apply()
 
     for (const auto& texRT : texRTs)
     {
-        shader->SetRenderTexture( texRT.first.c_str(), texRT.second, texUnit );
+        shader->SetRenderTexture( texRT.second, texUnit );
         ++texUnit;
     }
 
     for (const auto& globalTexRT : sTexRTs)
     {
-        shader->SetRenderTexture( globalTexRT.first.c_str(), globalTexRT.second, texUnit );
+        shader->SetRenderTexture( globalTexRT.second, texUnit );
         ++texUnit;
     }
 

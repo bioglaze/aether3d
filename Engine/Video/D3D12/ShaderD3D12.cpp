@@ -323,7 +323,7 @@ void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::TextureCube* texture,
 
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
-void ae3d::Shader::SetRenderTexture( const char* /*name*/, ae3d::RenderTexture* texture, int textureUnit )
+void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* texture, int textureUnit )
 {
     if (textureUnit == 0)
     {
