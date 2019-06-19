@@ -35,6 +35,7 @@ namespace TextureCubeGlobal
     std::vector< VkImage > imagesToReleaseAtExit;
     std::vector< VkImageView > imageViewsToReleaseAtExit;
     std::vector< VkDeviceMemory > memoryToReleaseAtExit;
+    std::vector< VkBuffer > buffersToReleaseAtExit;
 }
 
 void ae3d::TextureCube::DestroyTextures()
@@ -57,6 +58,11 @@ void ae3d::TextureCube::DestroyTextures()
     for (std::size_t memoryIndex = 0; memoryIndex < TextureCubeGlobal::memoryToReleaseAtExit.size(); ++memoryIndex)
     {
         vkFreeMemory( GfxDeviceGlobal::device, TextureCubeGlobal::memoryToReleaseAtExit[ memoryIndex ], nullptr );
+    }
+
+    for (std::size_t bufferIndex = 0; bufferIndex < TextureCubeGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
+    {
+        vkDestroyBuffer( GfxDeviceGlobal::device, TextureCubeGlobal::buffersToReleaseAtExit[ bufferIndex ], nullptr );
     }
 }
 
@@ -89,6 +95,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
  
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
+
+    DDSLoader::Output ddsOutput[ 6 ];
 
     for (int face = 0; face < 6; ++face)
     {
@@ -223,9 +231,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
         else if (isDDS && GfxDeviceGlobal::deviceFeatures.textureCompressionBC)
         {
-            DDSLoader::Output ddsOutput;
             auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
-            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput );
+            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput[ face ] );
 
             if (loadResult != DDSLoader::LoadResult::Success)
             {
@@ -244,41 +251,41 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             int bytesPerPixel = 1;
 
-            mipLevelCount = mipmaps == Mipmaps::None ? 1 : ddsOutput.dataOffsets.count;
-
+            mipLevelCount = mipmaps == Mipmaps::None ? 1 : ddsOutput[ face ].dataOffsets.count;
+        
             if (!opaque)
             {
                format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
             }
 
-            if (ddsOutput.format == DDSLoader::Format::BC1)
+            if (ddsOutput[ face ].format == DDSLoader::Format::BC1)
             {
                format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
             }
-            else if (ddsOutput.format == DDSLoader::Format::BC2)
+            else if (ddsOutput[ face ].format == DDSLoader::Format::BC2)
             {
                 format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
                 bytesPerPixel = 2;
             }
-            else if (ddsOutput.format == DDSLoader::Format::BC3)
+            else if (ddsOutput[ face ].format == DDSLoader::Format::BC3)
             {
                 format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
                 bytesPerPixel = 2;
             }
-            else if (ddsOutput.format == DDSLoader::Format::BC4U)
+            else if (ddsOutput[ face ].format == DDSLoader::Format::BC4U)
             {
                 format = VK_FORMAT_BC4_UNORM_BLOCK;
             }
-            else if (ddsOutput.format == DDSLoader::Format::BC4S)
+            else if (ddsOutput[ face ].format == DDSLoader::Format::BC4S)
             {
                 format = VK_FORMAT_BC4_SNORM_BLOCK;
             }
-            else if (ddsOutput.format == DDSLoader::Format::BC5U)
+            else if (ddsOutput[ face ].format == DDSLoader::Format::BC5U)
             {
                 format = VK_FORMAT_BC5_UNORM_BLOCK;
                 bytesPerPixel = 2;
             }
-            else if (ddsOutput.format == DDSLoader::Format::BC5S)
+            else if (ddsOutput[ face ].format == DDSLoader::Format::BC5S)
             {
                 format = VK_FORMAT_BC5_SNORM_BLOCK;
                 bytesPerPixel = 2;
@@ -288,7 +295,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 ae3d::System::Assert( false, "DDS reader error: Unhandled DDS format!" );
             }
 
-            ae3d::System::Assert( ddsOutput.dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
+            ae3d::System::Assert( ddsOutput[face ].dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
             VkImageCreateInfo imageCreateInfo = {};
             imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -307,6 +314,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             AE3D_CHECK_VULKAN( err, "vkCreateImage" );
             TextureCubeGlobal::imagesToReleaseAtExit.push_back( images[ face ] );
 
+            System::Print("images[ %d ]: %X\n", face, images[ face ] );
+            
             VkMemoryRequirements memReqs;
             vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
 
@@ -339,7 +348,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             const size_t amountToCopy = unsigned(width * height * bytesPerPixel) < memReqs.size ? unsigned(width * height * bytesPerPixel) : memReqs.size;
 
-            std::memcpy( mapped, &ddsOutput.imageData[ ddsOutput.dataOffsets[ 0 ] ], amountToCopy );
+            std::memcpy( mapped, &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ 0 ] ], amountToCopy );
 
             VkMappedMemoryRange flushRange = {};
             flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -378,6 +387,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &image );
     AE3D_CHECK_VULKAN( err, "vkCreateImage in TextureCube" );
+
     TextureCubeGlobal::imagesToReleaseAtExit.push_back( image );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, paths[ 0 ].c_str() );
 
@@ -458,6 +468,14 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                          0, nullptr,
                          1, &imageMemoryBarrier );
 
+    if (mipLevelCount > 1)
+    {
+        for (int mipLevel = 0; mipLevel < mipLevelCount; ++mipLevel)
+        {
+            SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6, mipLevel, 1 );            
+        }
+    }
+
     err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
 
@@ -477,31 +495,77 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     for (int face = 0; face < 6; ++face)
     {
-        for (int i = 1; i < mipLevelCount; ++i)
+        Array< VkBuffer > stagingBuffers( mipLevelCount );
+        Array< VkDeviceMemory > stagingMemory( mipLevelCount );
+
+        for (int mipLevel = 1; mipLevel < mipLevelCount; ++mipLevel)
         {
-            const std::int32_t mipWidth = MathUtil::Max( width >> i, 1 );
-            const std::int32_t mipHeight = MathUtil::Max( height >> i, 1 );
+            const std::int32_t mipWidth = MathUtil::Max( width >> mipLevel, 1 );
+            const std::int32_t mipHeight = MathUtil::Max( height >> mipLevel, 1 );
 
-            VkImageBlit imageBlit = {};
-            imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            imageBlit.srcSubresource.baseArrayLayer = face;
-            imageBlit.srcSubresource.layerCount = 1;
-            imageBlit.srcSubresource.mipLevel = 0;
-            imageBlit.srcOffsets[ 0 ] = { 0, 0, 0 };
-            imageBlit.srcOffsets[ 1 ] = { width, height, 1 };
+            const VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
+            VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * (format == VK_FORMAT_BC5_UNORM_BLOCK ? 16 : bc1BlockSize);
 
-            imageBlit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            imageBlit.dstSubresource.baseArrayLayer = face;
-            imageBlit.dstSubresource.layerCount = 1;
-            imageBlit.dstSubresource.mipLevel = i;
-            imageBlit.dstOffsets[ 0 ] = { 0, 0, 0 };
-            imageBlit.dstOffsets[ 1 ] = { mipWidth, mipHeight, 1 };
+            // FIXME: This is a hack, figure out proper fix.
+            if (imageSize == 0)
+            {
+                imageSize = 16;
+            }
 
-            vkCmdBlitImage( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_GENERAL, image,
-                VK_IMAGE_LAYOUT_GENERAL, 1, &imageBlit, VK_FILTER_LINEAR );
+            VkBufferCreateInfo bufferCreateInfo = {};
+            bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            bufferCreateInfo.size = imageSize;
+            bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+            bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffers[ mipLevel ] );
+            AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
+            TextureCubeGlobal::buffersToReleaseAtExit.push_back( stagingBuffers[ mipLevel ] );
+
+            vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], &memReqs );
+
+            memAllocInfo.allocationSize = memReqs.size;
+            memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+            err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipLevel ] );
+            AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+            TextureCubeGlobal::memoryToReleaseAtExit.push_back( stagingMemory[ mipLevel ] );
+            
+            err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], stagingMemory[ mipLevel ], 0 );
+            AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
+
+            void* stagingData;
+            err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory[ mipLevel ], 0, memReqs.size, 0, &stagingData );
+            AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
+
+            VkDeviceSize amountToCopy = imageSize;
+            if (ddsOutput[ face ].dataOffsets[ mipLevel ] + imageSize >= ddsOutput[ face ].imageData.count)
+            {
+                amountToCopy = ddsOutput[ face ].imageData.count - ddsOutput[ face ].dataOffsets[ mipLevel ];
+            }
+        
+            std::memcpy( stagingData, &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ mipLevel ] ], amountToCopy );
+
+            VkBufferImageCopy bufferCopyRegion = {};
+            bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            bufferCopyRegion.imageSubresource.mipLevel = mipLevel;
+            bufferCopyRegion.imageSubresource.baseArrayLayer = face;
+            bufferCopyRegion.imageSubresource.layerCount = 1;
+            bufferCopyRegion.imageExtent.width = mipWidth;
+            bufferCopyRegion.imageExtent.height = mipHeight;
+            bufferCopyRegion.imageExtent.depth = 1;
+            bufferCopyRegion.bufferOffset = 0;
+
+            vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffers[ mipLevel ], image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
         }
     }
 
+    if (mipLevelCount > 1)
+    {
+        for (int mipLevel = 0; mipLevel < mipLevelCount; ++mipLevel)
+        {
+            SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6, mipLevel, 1 );
+        }
+    }
+    
     err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
 
