@@ -4,8 +4,6 @@
 #define register(a) blank
 #endif
 
-//#define DEBUG_LIGHT_COUNT
-
 #include "ubo.h"
 
 struct PS_INPUT
@@ -30,6 +28,7 @@ layout( set = 0, binding = 5 ) Texture2D normalTex : register(t5);
 
 #define TILE_RES 16
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
+//#define DEBUG_LIGHT_COUNT
 
 uint GetNumLightsInThisTile( uint tileIndex )
 {
@@ -183,8 +182,8 @@ float4 main( PS_INPUT input ) : SV_Target
         {
             const float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
 
-            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * falloff * 2;
-            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
+            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation * 2;
+            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
         }
     }
 
