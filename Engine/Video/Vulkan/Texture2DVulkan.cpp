@@ -387,6 +387,16 @@ void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
                     VK_IMAGE_LAYOUT_UNDEFINED, layout, 1, 0, 1 );
 
     vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
 }
 
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format, VkImageUsageFlags usageFlags )

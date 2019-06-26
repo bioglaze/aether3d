@@ -209,7 +209,7 @@ int main()
     rotatingCube.AddComponent< MeshRendererComponent >();
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     rotatingCube.AddComponent< TransformComponent >();
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { -4, 0, -100 } );
+    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { -2, 0, -108 } );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 1 );
 
     GameObject childCube;
@@ -239,7 +239,7 @@ int main()
     cubePTN.AddComponent< MeshRendererComponent >();
     cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
     cubePTN.AddComponent< TransformComponent >();
-    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, -2, -100 } );
+    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, -2, -105 } );
     cubePTN.SetName( "cubePTN" );
 
 #ifdef TEST_RENDER_TEXTURE_CUBE
@@ -336,7 +336,7 @@ int main()
 #else
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
 #endif
-    dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 0, 1, 0 ) );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 1, 1, 1 ) );
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
@@ -351,7 +351,7 @@ int main()
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
     spotLight.AddComponent<TransformComponent>();
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -110 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -110 }, { 0, -1, 0 }, { 0, 1, 0 } );
     //spotLight.GetComponent<TransformComponent>()->SetParent( lightParent.GetComponent< TransformComponent >() );
 
     GameObject pointLight;
@@ -406,14 +406,14 @@ int main()
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
     
     TextureCube skybox;
-    skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
+    /*skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
-    /*skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );*/
+    skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-        TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB );*/
+        TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );
 #ifdef TEST_RENDER_TEXTURE_CUBE
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
@@ -601,9 +601,6 @@ int main()
     scene.Add( &cube3 );
     scene.Add( &cube4 );
     scene.Add( &smallCube1 );
-#endif
-#ifdef TEST_VERTEX_LAYOUTS
-    scene.Add( &cubePTN );
 #endif
     scene.Add( &animatedGo );
     scene.Add( &cubePTN );
@@ -905,7 +902,11 @@ int main()
 #ifdef TEST_BLOOM
         blurTex.SetLayout( TextureLayout::General );
         downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+#if RENDERER_D3D12
         downsampleAndThresholdShader.SetTexture2D( 1, &blurTex );
+#else
+        downsampleAndThresholdShader.SetTexture2D( 11, &blurTex );
+#endif
         downsampleAndThresholdShader.Begin();
         downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
         downsampleAndThresholdShader.End();
@@ -925,6 +926,7 @@ int main()
 
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+        //blurTex.SetLayout( TextureLayout::General );
 #endif
         scene.EndFrame();
 #endif
