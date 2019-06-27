@@ -304,7 +304,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             imageCreateInfo.format = format;
             imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
             imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-            imageCreateInfo.mipLevels = mipLevelCount;
+            imageCreateInfo.mipLevels = 1;
             imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
             imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
             imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
