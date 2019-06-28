@@ -19,6 +19,7 @@ namespace GfxDeviceGlobal
     extern VkPipelineCache pipelineCache;
     extern VkImageView view11;
     extern PerObjectUboStruct perObjectUboStruct;
+    extern VkImageView boundViews[ 2 ];
 }
 
 namespace ComputeShaderGlobal
@@ -97,6 +98,11 @@ void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* 
     if (slot < SLOT_COUNT)
     {
         renderTextures[ slot ] = renderTexture;
+
+        if (slot < 2)
+        {
+            GfxDeviceGlobal::boundViews[ slot ] = renderTexture->GetColorView();
+        }
     }
     else
     {
@@ -110,6 +116,11 @@ void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
     {
         textures[ slot ] = texture;
 
+        if (slot < 2)
+        {
+            GfxDeviceGlobal::boundViews[ slot ] = texture->GetView();
+        }
+        
         // FIXME: This is a hack
         if (slot == 11)
         {
