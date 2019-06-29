@@ -381,10 +381,10 @@ void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
 
+    auto oldLayout = layout;
     layout = aLayout == TextureLayout::General ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-    SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_UNDEFINED, layout, 1, 0, 1 );
+    SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, oldLayout, layout, 1, 0, 1 );
 
     vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
 
@@ -396,6 +396,7 @@ void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
 
+    // FIXME: This is slow
     vkDeviceWaitIdle( GfxDeviceGlobal::device );
 }
 

@@ -37,7 +37,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+//#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -910,21 +910,26 @@ int main()
         downsampleAndThresholdShader.Begin();
         downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
         downsampleAndThresholdShader.End();
+
+        blurTex.SetLayout( TextureLayout::ShaderRead );
+        //bloomTex.SetLayout( TextureLayout::General );
         
-        /*blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 11, &bloomTex );
         blurShader.SetBlurDirection( 1, 0 );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
-        
+
+        /*blurTex.SetLayout( TextureLayout::General );
+        bloomTex.SetLayout( TextureLayout::ShaderRead );
+        System::Print("blurTex: 0x%X, bloomTex: 0x%X\n", blurTex.GetImage(), bloomTex.GetImage());
         blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 11, &blurTex );
         blurShader.SetBlurDirection( 0, 1 );
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();*/
+        blurShader.Dispatch( width / 16, height / 16, 1 );*/
 
+        blurShader.End();
         blurTex.SetLayout( TextureLayout::ShaderRead );
-
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
         //blurTex.SetLayout( TextureLayout::General );

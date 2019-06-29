@@ -89,16 +89,14 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
 
 void ae3d::ComputeShader::SetBlurDirection( float x, float y )
 {
-	GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
-	GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
+    GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
 }
 
 void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* renderTexture )
 {
     if (slot < SLOT_COUNT)
     {
-        renderTextures[ slot ] = renderTexture;
-
         if (slot < 2)
         {
             GfxDeviceGlobal::boundViews[ slot ] = renderTexture->GetColorView();
@@ -114,8 +112,6 @@ void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
 {
     if (slot < SLOT_COUNT)
     {
-        textures[ slot ] = texture;
-
         if (slot < 2)
         {
             GfxDeviceGlobal::boundViews[ slot ] = texture->GetView();

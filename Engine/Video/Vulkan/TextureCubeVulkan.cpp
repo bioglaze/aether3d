@@ -314,8 +314,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             AE3D_CHECK_VULKAN( err, "vkCreateImage" );
             TextureCubeGlobal::imagesToReleaseAtExit.push_back( images[ face ] );
 
-            System::Print("images[ %d ]: %X\n", face, images[ face ] );
-            
             VkMemoryRequirements memReqs;
             vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
 

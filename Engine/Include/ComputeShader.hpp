@@ -55,9 +55,13 @@ namespace ae3d
         /// Loads SPIR-V shader.
         /// \param contents SPIR-V file contents.
         void LoadSPIRV( const FileSystem::FileContentsData& contents );
+
+        /// \return Shader info.
         VkPipelineShaderStageCreateInfo& GetInfo() { return info; }
+
         /// \return PSO
         VkPipeline GetPSO() const { return pso; }
+
         /// Sets a texture.
         /// \param slot slot index
         /// \param texture texture.
