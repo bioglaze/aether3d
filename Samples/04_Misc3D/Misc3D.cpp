@@ -30,7 +30,7 @@
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.zip
 
 //#define TEST_RENDER_TEXTURE_2D
-//#define TEST_MSAA
+#define TEST_MSAA
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
@@ -406,14 +406,14 @@ int main()
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
     
     TextureCube skybox;
-    /*skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
+    skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );*/
-    skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );
+    /*skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
         FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-        TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );
+        TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );*/
 #ifdef TEST_RENDER_TEXTURE_CUBE
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
@@ -505,7 +505,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -919,20 +919,23 @@ int main()
         blurShader.SetBlurDirection( 1, 0 );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
 
-        /*blurTex.SetLayout( TextureLayout::General );
+        blurShader.Begin();
+
+        blurTex.SetLayout( TextureLayout::General );
         bloomTex.SetLayout( TextureLayout::ShaderRead );
-        System::Print("blurTex: 0x%X, bloomTex: 0x%X\n", blurTex.GetImage(), bloomTex.GetImage());
+        //System::Print("blurTex: 0x%X, bloomTex: 0x%X\n", blurTex.GetImage(), bloomTex.GetImage());
         blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 11, &blurTex );
         blurShader.SetBlurDirection( 0, 1 );
-        blurShader.Dispatch( width / 16, height / 16, 1 );*/
-
+        blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
+        
         blurTex.SetLayout( TextureLayout::ShaderRead );
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
-        //blurTex.SetLayout( TextureLayout::General );
+        bloomTex.SetLayout( TextureLayout::General );
 #endif
         scene.EndFrame();
 #endif

@@ -9,6 +9,7 @@
 #include "VulkanUtils.hpp"
 
 void BindComputeDescriptorSet();
+void UploadPerObjectUbo();
 
 namespace GfxDeviceGlobal
 {
@@ -148,9 +149,9 @@ void ae3d::ComputeShader::End()
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pWaitDstStageMask = &pipelineStages;
     submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitSemaphores = nullptr;//&GfxDeviceGlobal::presentCompleteSemaphore;
+    submitInfo.pWaitSemaphores = nullptr;
     submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores = nullptr;//&GfxDeviceGlobal::renderCompleteSemaphore;
+    submitInfo.pSignalSemaphores = nullptr;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &GfxDeviceGlobal::computeCmdBuffer;
 
@@ -166,6 +167,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     System::Assert( GfxDeviceGlobal::computeCmdBuffer != VK_NULL_HANDLE, "Uninitialized compute command buffer" );
 
     BindComputeDescriptorSet();
+    UploadPerObjectUbo();
 
     vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pso );
     vkCmdDispatch( GfxDeviceGlobal::computeCmdBuffer, groupCountX, groupCountY, groupCountZ );

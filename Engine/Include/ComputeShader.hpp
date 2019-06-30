@@ -40,8 +40,9 @@ namespace ae3d
         /// \param groupCountZ Z count
         void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ );
 
+        /// Stores blur direction in uniform buffer's tilesXY.zw components.
         /// \param x 1 if should blur in x direction.
-        /// \param y 1 if should blur in x direction.
+        /// \param y 1 if should blur in y direction.
         void SetBlurDirection( float x, float y );
         
         /// Internal loading method. End-users should use the method that takes all languages as parameters.
