@@ -11,7 +11,7 @@ layout(set=0, binding=3) Buffer<float4> pointLightBufferCenterAndRadius : regist
 layout(set=0, binding=4) RWBuffer<uint> perTileLightIndexBufferOut : register(u0);
 layout(set=0, binding=8) Buffer<float4> spotLightBufferCenterAndRadius : register(t2);
 
-#define USE_MINMAX_Z 1
+#define USE_MINMAX_Z 0
 #define TILE_RES 16
 #define NUM_THREADS_X TILE_RES
 #define NUM_THREADS_Y TILE_RES
@@ -199,8 +199,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
             // test if sphere is intersecting or inside frustum
 #if USE_MINMAX_Z
-            // Swapped minZ and maxZ here to get spot light working.
-            if (-center.z - maxZ < radius && center.z - minZ < radius)
+            if (-center.z - minZ < radius && center.z - maxZ < radius)
 #else
             // Nothing to do here
 #endif

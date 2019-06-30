@@ -30,13 +30,13 @@
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.zip
 
 //#define TEST_RENDER_TEXTURE_2D
-#define TEST_MSAA
+//#define TEST_MSAA
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 
 using namespace ae3d;
@@ -351,7 +351,7 @@ int main()
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
     spotLight.AddComponent<TransformComponent>();
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -110 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -95 }, { 0, -1, 0 }, { 0, 1, 0 } );
     //spotLight.GetComponent<TransformComponent>()->SetParent( lightParent.GetComponent< TransformComponent >() );
 
     GameObject pointLight;

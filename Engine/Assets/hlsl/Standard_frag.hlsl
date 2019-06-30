@@ -202,7 +202,7 @@ float4 main( PS_INPUT input ) : SV_Target
         const float4 spotParams = spotLightParams[ lightIndex ];        
         float3 spotLightDir = spotParams.xyz;
 
-        const float3 vecToLight = normalize( centerAndRadius.xyz - input.positionWS_v.xyz );
+        const float3 vecToLight = -normalize( centerAndRadius.xyz - input.positionWS_v.xyz );
         const float spotAngle = dot( -spotLightDir.xyz, vecToLight );
         const float cosineOfConeAngle = abs( spotParams.w );
 

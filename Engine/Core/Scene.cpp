@@ -75,9 +75,13 @@ namespace SceneGlobal
 void SetupCameraForSpotShadowCasting( const Vec3& lightPosition, const Vec3& lightDirection, ae3d::CameraComponent& outCamera,
                                      ae3d::TransformComponent& outCameraTransform )
 {
+#if RENDERER_METAL
     outCameraTransform.LookAt( lightPosition, lightPosition - lightDirection * 200, Vec3( 0, 1, 0 ) );
+#else
+    outCameraTransform.LookAt( lightPosition, lightPosition + lightDirection * 200, Vec3( 0, 1, 0 ) );
+#endif
     outCamera.SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
-    outCamera.SetProjection( 45, 1, 1, 200 );
+    outCamera.SetProjection( 45, 1, 0.1f, 200 );
 }
 
 void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const Frustum& eyeFrustum, const Vec3& sceneAABBmin, const Vec3& sceneAABBmax,
