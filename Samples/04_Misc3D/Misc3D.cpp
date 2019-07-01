@@ -36,8 +36,8 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+//#define TEST_FORWARD_PLUS
+#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -505,7 +505,7 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)
@@ -914,8 +914,13 @@ int main()
         blurTex.SetLayout( TextureLayout::ShaderRead );
         //bloomTex.SetLayout( TextureLayout::General );
         
+#if RENDERER_D3D12
         blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 11, &bloomTex );
+		blurShader.SetUAVBuffer( 0, bloomTex.GetGpuResource()->resource );
+#else
+		blurShader.SetTexture2D( 0, &blurTex );
+		blurShader.SetTexture2D( 11, &bloomTex );
+#endif
         blurShader.SetBlurDirection( 1, 0 );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
@@ -926,8 +931,13 @@ int main()
         blurTex.SetLayout( TextureLayout::General );
         bloomTex.SetLayout( TextureLayout::ShaderRead );
         //System::Print("blurTex: 0x%X, bloomTex: 0x%X\n", blurTex.GetImage(), bloomTex.GetImage());
+#if RENDERER_D3D12
         blurShader.SetTexture2D( 0, &bloomTex );
-        blurShader.SetTexture2D( 11, &blurTex );
+		blurShader.SetUAVBuffer( 0, blurTex.GetGpuResource()->resource );
+#else
+		blurShader.SetTexture2D( 0, &bloomTex );
+		blurShader.SetTexture2D( 11, &blurTex );
+#endif
         blurShader.SetBlurDirection( 0, 1 );
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();

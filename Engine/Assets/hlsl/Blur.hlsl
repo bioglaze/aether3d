@@ -8,7 +8,7 @@
 
 layout( set = 0, binding = 1 ) Texture2D inputTexture : register(t0);
 layout( set = 0, binding = 2 ) Buffer<float4> unused : register(t0);
-layout( set = 0, binding = 11 ) RWTexture2D<float4> blurTex : register(u11);
+layout( set = 0, binding = 11 ) RWTexture2D<float4> blurTex : register(u0);
 
 groupshared uint helper[ 128 ];
 
