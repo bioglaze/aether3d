@@ -772,7 +772,7 @@ void ae3d::VR::CalcEyePose()
     {
         Global::vrEyePosition = Vec3( Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 12 ],
                                       Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 13 ],
-                                      Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 14 ] );
+                                      Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 14 ] - 80 );
         Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ].m[ 14 ] -= 80;
         Matrix44::Invert( Global::devicePose[ vr::k_unTrackedDeviceIndex_Hmd ], Global::mat4HMDPose );
     }

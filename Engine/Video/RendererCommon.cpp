@@ -90,6 +90,9 @@ void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponen
     builtinShaders.skyboxShader.Use();
     builtinShaders.skyboxShader.SetTexture( "skyMap", skyTexture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
+#if AE3D_OPENVR
+    GfxDeviceGlobal::perObjectUboStruct.isVR = 1;
+#endif
 
     GfxDevice::PushGroupMarker( "Skybox" );
     GfxDevice::Draw( skyboxBuffer, 0, skyboxBuffer.GetFaceCount() / 3, builtinShaders.skyboxShader, GfxDevice::BlendMode::Off,
