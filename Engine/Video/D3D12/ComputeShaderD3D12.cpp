@@ -50,12 +50,6 @@ void ae3d::ComputeShader::End()
 {
 }
 
-void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
-{
-    // FIXME: This is a hack
-    SetUAVBuffer( slot, texture->GetGpuResource()->resource );
-}
-
 void ae3d::ComputeShader::SetBlurDirection( float x, float y )
 {
     GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
@@ -79,7 +73,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
         Global::psos.push_back( pso );
     }
 
-    SetUniformBuffer( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
+    SetCBV( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
 
     D3D12_CPU_DESCRIPTOR_HANDLE handle = GfxDeviceGlobal::computeCbvSrvUavHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -90,42 +84,15 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
-    srvDesc0.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    srvDesc0.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-    srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc0.Buffer.FirstElement = 0;
-    srvDesc0.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    srvDesc0.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
-    srvDesc0.Buffer.StructureByteStride = 0;
-
-    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 0 ], &srvDesc0, handle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 0 ], &srvDescs[ 0 ], handle );
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
-    srvDesc1.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    srvDesc1.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc1.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc1.Texture2D.MipLevels = 1;
-    srvDesc1.Texture2D.MostDetailedMip = 0;
-    srvDesc1.Texture2D.PlaneSlice = 0;
-    srvDesc1.Texture2D.ResourceMinLODClamp = 0.0f;
-
-    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 1 ], &srvDesc1, handle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 1 ], &srvDescs[ 1 ], handle );
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
-    srvDesc2.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-    srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc2.Buffer.FirstElement = 0;
-    srvDesc2.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    srvDesc2.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
-    srvDesc2.Buffer.StructureByteStride = 0;
-
-    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 2 ], &srvDesc2, handle );
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 2 ], &srvDescs[ 2 ], handle );
 
     handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
@@ -211,7 +178,7 @@ void ae3d::ComputeShader::SetRenderTexture( unsigned slot, RenderTexture* render
     }
 }
 
-void ae3d::ComputeShader::SetUniformBuffer( unsigned slot, ID3D12Resource* buffer )
+void ae3d::ComputeShader::SetCBV( unsigned slot, ID3D12Resource* buffer )
 {
     if (slot < SLOT_COUNT)
     {
@@ -223,11 +190,12 @@ void ae3d::ComputeShader::SetUniformBuffer( unsigned slot, ID3D12Resource* buffe
     }
 }
 
-void ae3d::ComputeShader::SetTextureBuffer( unsigned slot, ID3D12Resource* buffer )
+void ae3d::ComputeShader::SetSRV( unsigned slot, ID3D12Resource* buffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc )
 {
     if (slot < SLOT_COUNT)
     {
         textureBuffers[ slot ] = buffer;
+        srvDescs[ slot ] = srvDesc;
     }
     else
     {
@@ -235,11 +203,12 @@ void ae3d::ComputeShader::SetTextureBuffer( unsigned slot, ID3D12Resource* buffe
     }
 }
 
-void ae3d::ComputeShader::SetUAVBuffer( unsigned slot, ID3D12Resource* buffer )
+void ae3d::ComputeShader::SetUAV( unsigned slot, ID3D12Resource* buffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc )
 {
     if (slot < SLOT_COUNT)
     {
         uavBuffers[ slot ] = buffer;
+        GfxDeviceGlobal::uav1Desc = uavDesc;
     }
     else
     {

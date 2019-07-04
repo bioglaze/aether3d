@@ -6,13 +6,8 @@
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
 #endif
-
 #if RENDERER_D3D12
-struct ID3D12Resource;
-typedef struct ID3D10Blob* LPD3D10BLOB;
-typedef ID3D10Blob ID3DBlob;
-
-struct ID3D12PipelineState;
+#include <d3d12.h>
 #endif
 
 namespace ae3d
@@ -94,10 +89,9 @@ namespace ae3d
         void SetRenderTexture( unsigned slot, class RenderTexture* renderTexture );
         
 #if RENDERER_D3D12
-        void SetUniformBuffer( unsigned slot, ID3D12Resource* buffer );
-        void SetTextureBuffer( unsigned slot, ID3D12Resource* buffer );
-        void SetUAVBuffer( unsigned slot, ID3D12Resource* buffer );
-        void SetTexture2D( unsigned slot, Texture2D* texture );
+        void SetCBV( unsigned slot, ID3D12Resource* buffer );
+        void SetSRV( unsigned slot, ID3D12Resource* buffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
+        void SetUAV( unsigned slot, ID3D12Resource* buffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc );
         ID3DBlob* blobShader = nullptr;
         ID3D12PipelineState* pso = nullptr;
 #endif
@@ -121,6 +115,7 @@ namespace ae3d
         ID3D12Resource* uniformBuffers[ SLOT_COUNT ];
         ID3D12Resource* textureBuffers[ SLOT_COUNT ];
         ID3D12Resource* uavBuffers[ SLOT_COUNT ];
+        D3D12_SHADER_RESOURCE_VIEW_DESC srvDescs[ SLOT_COUNT ];
 #endif
     };
 }

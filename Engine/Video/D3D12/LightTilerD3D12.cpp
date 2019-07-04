@@ -361,11 +361,40 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
     memcpy_s( ae3d::GfxDevice::GetCurrentMappedConstantBuffer(), AE3D_CB_SIZE, &uniforms, sizeof( PerObjectUboStruct ) );
 
-    shader.SetTextureBuffer( 0, pointLightCenterAndRadiusBuffer );
-    shader.SetTextureBuffer( 1, depthNormalTarget.GetGpuResource()->resource );
-    shader.SetTextureBuffer( 2, spotLightCenterAndRadiusBuffer );
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
+    srvDesc0.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    srvDesc0.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+    srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc0.Buffer.FirstElement = 0;
+    srvDesc0.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+    srvDesc0.Buffer.NumElements = 2048;
+    srvDesc0.Buffer.StructureByteStride = 0;
 
-    shader.SetUAVBuffer( 0, perTileLightIndexBuffer );
+    shader.SetSRV( 0, pointLightCenterAndRadiusBuffer, srvDesc0 );
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
+    srvDesc1.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    srvDesc1.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc1.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc1.Texture2D.MipLevels = 1;
+    srvDesc1.Texture2D.MostDetailedMip = 0;
+    srvDesc1.Texture2D.PlaneSlice = 0;
+    srvDesc1.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    shader.SetSRV( 1, depthNormalTarget.GetGpuResource()->resource, srvDesc1 );
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
+    srvDesc2.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+    srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc2.Buffer.FirstElement = 0;
+    srvDesc2.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+    srvDesc2.Buffer.NumElements = 2048;
+    srvDesc2.Buffer.StructureByteStride = 0;
+
+    shader.SetSRV( 2, spotLightCenterAndRadiusBuffer, srvDesc2 );
+
+    shader.SetUAV( 0, perTileLightIndexBuffer, GfxDeviceGlobal::uav1Desc );
 
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 }
