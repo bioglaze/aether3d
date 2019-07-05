@@ -17,10 +17,11 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern ID3D12RootSignature* rootSignatureTileCuller;
-    extern ID3D12DescriptorHeap* computeCbvSrvUavHeap;
+    extern ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 3 ];
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
     extern ID3D12PipelineState* cachedPSO;
 	extern PerObjectUboStruct perObjectUboStruct;
+    extern ID3D12Resource* uav1;
 }
 
 namespace Global
@@ -58,8 +59,10 @@ void ae3d::ComputeShader::SetBlurDirection( float x, float y )
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
 {
+    static int heapIndex = 0;
+    heapIndex = (heapIndex + 1) % 3;
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
-    System::Assert( GfxDeviceGlobal::computeCbvSrvUavHeap != nullptr, "heap not initialized" );
+    System::Assert( GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ] != nullptr, "heap not initialized" );
 
     if (!pso)
     {
@@ -75,7 +78,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     SetCBV( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
 
-    D3D12_CPU_DESCRIPTOR_HANDLE handle = GfxDeviceGlobal::computeCbvSrvUavHeap->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetCPUDescriptorHandleForHeapStart();
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = uniformBuffers[ 0 ]->GetGPUVirtualAddress();
@@ -109,9 +112,9 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     GfxDeviceGlobal::cachedPSO = pso;
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( pso );
-    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeap );
+    GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ] );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
-    GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeap->GetGPUDescriptorHandleForHeapStart() );
+    GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 
     if (depthNormals.resource != nullptr)
@@ -186,7 +189,7 @@ void ae3d::ComputeShader::SetCBV( unsigned slot, ID3D12Resource* buffer )
     }
     else
     {
-        System::Print( "SetUniformBuffer: too high slot, max is 3\n" );
+        System::Print( "SetCBV: too high slot, max is 3\n" );
     }
 }
 
@@ -199,7 +202,7 @@ void ae3d::ComputeShader::SetSRV( unsigned slot, ID3D12Resource* buffer, const D
     }
     else
     {
-        System::Print( "SetTextureBuffer: too high slot, max is 3\n" );
+        System::Print( "SetSRV: too high slot, max is 3\n" );
     }
 }
 
@@ -209,9 +212,10 @@ void ae3d::ComputeShader::SetUAV( unsigned slot, ID3D12Resource* buffer, const D
     {
         uavBuffers[ slot ] = buffer;
         GfxDeviceGlobal::uav1Desc = uavDesc;
+        GfxDeviceGlobal::uav1 = buffer;
     }
     else
     {
-        System::Print( "SetUAVBuffer: too high slot, max is 3\n" );
+        System::Print( "SetUAV: too high slot, max is 3\n" );
     }
 }

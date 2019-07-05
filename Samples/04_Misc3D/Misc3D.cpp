@@ -902,8 +902,10 @@ int main()
 #ifdef TEST_BLOOM
         blurTex.SetLayout( TextureLayout::General );
 #if RENDERER_D3D12
+        GpuResource nullResource = {};
+
         downsampleAndThresholdShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
-        downsampleAndThresholdShader.SetSRV( 1, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+        downsampleAndThresholdShader.SetSRV( 1, nullResource.resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
         downsampleAndThresholdShader.SetSRV( 2, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
         downsampleAndThresholdShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
@@ -915,11 +917,10 @@ int main()
         downsampleAndThresholdShader.End();
 
         blurTex.SetLayout( TextureLayout::ShaderRead );
-        //bloomTex.SetLayout( TextureLayout::General );
-        
+
 #if RENDERER_D3D12
         blurShader.SetSRV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() );
-        blurShader.SetSRV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
+        blurShader.SetSRV( 1, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
         blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
         blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
 #else
@@ -935,7 +936,6 @@ int main()
 
         blurTex.SetLayout( TextureLayout::General );
         bloomTex.SetLayout( TextureLayout::ShaderRead );
-        //System::Print("blurTex: 0x%X, bloomTex: 0x%X\n", blurTex.GetImage(), bloomTex.GetImage());
 #if RENDERER_D3D12
         blurShader.SetSRV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetSRVDesc() );
         blurShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
@@ -946,14 +946,15 @@ int main()
         blurShader.SetBlurDirection( 0, 1 );
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
-        
+
         blurTex.SetLayout( TextureLayout::ShaderRead );
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
         bloomTex.SetLayout( TextureLayout::General );
 #endif
-        scene.EndFrame();
+        
 #endif
+        scene.EndFrame();
         Window::SwapBuffers();
     }
 

@@ -192,7 +192,7 @@ namespace GfxDeviceGlobal
     ID3D12Resource* msaaDepth = nullptr;
     D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
-    ID3D12DescriptorHeap* computeCbvSrvUavHeap = nullptr;
+    ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 3 ] = {};
     TimerQuery timerQuery;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
@@ -1034,6 +1034,7 @@ void ae3d::CreateRenderer( int samples )
     CreateConstantBuffers();
 
     // Compute heap
+    for (int i = 0; i < 3; ++i)
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -1041,9 +1042,9 @@ void ae3d::CreateRenderer( int samples )
         desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         desc.NodeMask = 0;
 
-        hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::computeCbvSrvUavHeap ) );
+        hr = GfxDeviceGlobal::device->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &GfxDeviceGlobal::computeCbvSrvUavHeaps[ i ] ) );
         AE3D_CHECK_D3D( hr, "Failed to create CBV_SRV_UAV descriptor heap" );
-        GfxDeviceGlobal::computeCbvSrvUavHeap->SetName( L"Compute CBV SRV UAV heap" );
+        GfxDeviceGlobal::computeCbvSrvUavHeaps[ i ]->SetName( L"Compute CBV SRV UAV heap" );
     }
 
     GfxDeviceGlobal::lightTiler.Init();
@@ -1366,7 +1367,9 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeap );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeaps[ 0 ] );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeaps[ 1 ] );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeaps[ 2 ] );
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryBuffer );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryHeap );
