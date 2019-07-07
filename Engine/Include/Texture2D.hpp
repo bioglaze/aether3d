@@ -1,9 +1,6 @@
 #pragma once
 
 #include "TextureBase.hpp"
-#if RENDERER_VULKAN
-#include <vulkan/vulkan.h>
-#endif
 
 namespace DDSLoader
 {

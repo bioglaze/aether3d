@@ -1,8 +1,5 @@
 #pragma once
 
-#if RENDERER_VULKAN
-#include <vulkan/vulkan.h>
-#endif
 #include "TextureBase.hpp"
 
 namespace ae3d
