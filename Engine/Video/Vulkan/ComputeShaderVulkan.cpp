@@ -1,12 +1,15 @@
 #include "ComputeShader.hpp"
 #include "Array.hpp"
 #include "FileSystem.hpp"
+#include "FileWatcher.hpp"
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "VulkanUtils.hpp"
+
+extern ae3d::FileWatcher fileWatcher;
 
 void BindComputeDescriptorSet();
 void UploadPerObjectUbo();
@@ -27,6 +30,32 @@ namespace ComputeShaderGlobal
 {
     Array< VkShaderModule > modulesToReleaseAtExit;
     Array< VkPipeline > psosToReleaseAtExit;
+}
+
+struct ComputeShaderCacheEntry
+{
+    ComputeShaderCacheEntry() {}
+    ComputeShaderCacheEntry( const std::string& aPath, ae3d::ComputeShader* aShader ) : path( aPath ), shader( aShader ) {}
+
+    std::string path;
+    ae3d::ComputeShader* shader = nullptr;
+};
+
+Array< ComputeShaderCacheEntry > computeCacheEntries;
+
+void ComputeShaderReload( const std::string& path )
+{
+    ae3d::System::Print( "Reloading shader %s\n", path.c_str() );
+
+    for (unsigned i = 0; i < computeCacheEntries.count; ++i)
+    {
+        if (computeCacheEntries[ i ].path == path)
+        {
+            computeCacheEntries[ i ].shader->LoadSPIRV( ae3d::FileSystem::FileContents( computeCacheEntries[ i ].path.c_str() ) );
+        }
+    }
+
+    ae3d::GfxDevice::ResetPSOCache();
 }
 
 void ae3d::ComputeShader::DestroyShaders()
@@ -54,6 +83,8 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
 
 void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& contents )
 {
+    const bool addToCache = info.module == VK_NULL_HANDLE;
+
     VkShaderModuleCreateInfo moduleCreateInfo;
     moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     moduleCreateInfo.pNext = nullptr;
@@ -86,6 +117,13 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     AE3D_CHECK_VULKAN( err, "Compute PSO" );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_OBJECT_TYPE_PIPELINE, "light tiler PSO" );
     ComputeShaderGlobal::psosToReleaseAtExit.Add( pso );
+
+    if( addToCache )
+    {
+        fileWatcher.AddFile( contents.path, ComputeShaderReload );
+        ComputeShaderCacheEntry entry{ contents.path, this };
+        computeCacheEntries.Add( entry );
+    }
 }
 
 void ae3d::ComputeShader::SetBlurDirection( float x, float y )
