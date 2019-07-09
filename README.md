@@ -40,6 +40,34 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - DoF
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
 
+# Sample Code
+
+    ```
+    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen );
+	
+    RenderTexture cameraTex;
+    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+
+    GameObject camera;
+    camera.AddComponent<CameraComponent>();
+    camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
+    camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+    camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)width / (float)height, 0.1f, 200 );
+
+    Mesh sphereMesh;
+    sphereMesh.Load( FileSystem::FileContents( "sphere.ae3d" ) );
+
+    GameObject sphere;
+    sphere.AddComponent< MeshRendererComponent >();
+    sphere.GetComponent< MeshRendererComponent >()->SetMesh( &sphereMesh );
+    sphere.AddComponent< TransformComponent >();
+    sphere.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+
+    Scene scene;
+    scene.Add( &camera );
+    scene.Add( &sphere );
+	```
+
 # API documentation
 
 [link](http://twiren.kapsi.fi/doc_v0.8/html/)
@@ -60,7 +88,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Copy OpenVR headers into Engine\ThirdParty\headers
   - Copy OpenVR DLL into aether3d_build\Samples
   - Open Vulkan renderer's Visual Studio solution and select target ***OpenVR Release***
-  - Build and run Samples\04_Misc3D target ***Release Vulkan OpenVR*** in VS2017.
+  - Build and run Samples\04_Misc3D target ***Release Vulkan OpenVR*** in VS2017. Also copy OpenVR.dll into build directory.
 
 ## macOS
 
