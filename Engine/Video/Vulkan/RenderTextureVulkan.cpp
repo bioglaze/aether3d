@@ -107,7 +107,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
                     target->GetColorImage(),
                     VK_IMAGE_ASPECT_COLOR_BIT,
                     VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    VK_IMAGE_LAYOUT_GENERAL,
+                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     1, 0, 1 );
         firstTime = false;
     }
@@ -117,7 +117,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
                     target->GetColorImage(),
                     VK_IMAGE_ASPECT_COLOR_BIT,
                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                    VK_IMAGE_LAYOUT_GENERAL,
+                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     1, 0, 1 );
     }
 
@@ -134,7 +134,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
                        color.image,
                        VK_IMAGE_LAYOUT_GENERAL,
                        target->GetColorImage(),
-                       VK_IMAGE_LAYOUT_GENERAL,
+                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                        1,
                        &regions );
 
@@ -147,7 +147,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
                     target->GetColorImage(),
                     VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_GENERAL,
+                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 0, 1 );
     GfxDevice::BeginRenderPass();
 }
@@ -202,7 +202,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     colorImage.arrayLayers = 1;
     colorImage.samples = isMultisampled ? GfxDeviceGlobal::msaaSampleBits : VK_SAMPLE_COUNT_1_BIT;
     colorImage.tiling = VK_IMAGE_TILING_OPTIMAL;
-    colorImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    colorImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     colorImage.flags = 0;
 
     VkImageViewCreateInfo colorImageView = {};
