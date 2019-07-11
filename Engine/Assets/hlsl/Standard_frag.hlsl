@@ -107,11 +107,7 @@ float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
 float4 main( PS_INPUT input ) : SV_Target
 {
     const float4 albedo = tex.Sample( sLinear, float2( input.positionVS_u.w, input.positionWS_v.w ) );
-#if !VULKAN
-    const float4 normalTS = float4( 0, 0, 1, 0 );
-#else
-    const float4 normalTS = normalTex.Sample( sLinear, float2(input.positionVS_u.w, input.positionWS_v.w) );
-#endif
+    const float4 normalTS = float4( normalTex.Sample( sLinear, float2(input.positionVS_u.w, input.positionWS_v.w) ).xyz, 0 );
 
     const uint tileIndex = GetTileIndex( input.pos.xy );
     uint index = maxNumLightsPerTile * tileIndex;

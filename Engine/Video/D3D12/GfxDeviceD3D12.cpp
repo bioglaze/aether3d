@@ -1218,7 +1218,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(), &srvDesc, cpuHandle );
 
         cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
 
         cpuHandle.ptr += incrementSize;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle );
