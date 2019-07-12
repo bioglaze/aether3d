@@ -37,7 +37,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_BLOOM
 
 using namespace ae3d;
 
@@ -927,7 +927,7 @@ int main()
         blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 11, &bloomTex );
 #endif
-        blurShader.SetBlurDirection( 1, 0 );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
@@ -943,7 +943,7 @@ int main()
         blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 11, &blurTex );
 #endif
-        blurShader.SetBlurDirection( 0, 1 );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
 

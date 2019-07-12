@@ -51,10 +51,13 @@ void ae3d::ComputeShader::SetTexture2D( unsigned slotIndex, Texture2D* texture )
     textures[ slotIndex ] = texture;
 }
 
-void ae3d::ComputeShader::SetBlurDirection( float x, float y )
+void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
 {
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
+    if( uniform == UniformName::TilesZW )
+    {
+        GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
+        GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
+    }
 }
 
 void ae3d::ComputeShader::SetUniformBuffer( unsigned slotIndex, id< MTLBuffer > buffer )

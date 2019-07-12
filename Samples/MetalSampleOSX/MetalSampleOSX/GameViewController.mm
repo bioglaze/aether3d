@@ -875,12 +875,12 @@ using namespace ae3d;
         downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 1, &bloomTex );
-        blurShader.SetBlurDirection( 1, 0 );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
         
         blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 1, &blurTex );
-        blurShader.SetBlurDirection( 0, 1 );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
 
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );

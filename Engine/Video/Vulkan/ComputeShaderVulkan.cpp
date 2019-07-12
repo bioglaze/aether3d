@@ -126,10 +126,13 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     }
 }
 
-void ae3d::ComputeShader::SetBlurDirection( float x, float y )
+void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
 {
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
-    GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
+    if( uniform == UniformName::TilesZW )
+    {
+        GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
+        GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
+    }
 }
 
 void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* renderTexture )
