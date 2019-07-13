@@ -97,7 +97,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
                     GetColorImage(),
                     VK_IMAGE_ASPECT_COLOR_BIT,
                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                    VK_IMAGE_LAYOUT_GENERAL,
+                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                     1, 0, 1 );
 
     static bool firstTime = true;
@@ -132,7 +132,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     
     vkCmdResolveImage( GfxDeviceGlobal::currentCmdBuffer,
                        color.image,
-                       VK_IMAGE_LAYOUT_GENERAL,
+                       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                        target->GetColorImage(),
                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                        1,
@@ -141,7 +141,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
                     GetColorImage(),
                     VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_GENERAL,
+                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                     VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
     SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
