@@ -146,7 +146,12 @@ void ae3d::TransformComponent::SetLocalScale( float aLocalScale )
 void ae3d::TransformComponent::SolveLocalMatrix()
 {
     localRotation.GetMatrix( localMatrix );
-    localMatrix.Scale( localScale, localScale, localScale );
+    
+    if (localScale != 1)
+    {
+        localMatrix.Scale( localScale, localScale, localScale );
+    }
+    
     localMatrix.SetTranslation( localPosition );
 }
 

@@ -125,32 +125,31 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         memcpy( [colorBuffer contents], colors.data(), 4 * 4 * vertexCount );
     }
     
-    std::vector< float > normals( vertexCount * 3, 1 );
     
+    // Reusing position buffer to avoid dynamic allocation.
     if (positionCount != (unsigned)vertexCount)
     {
-        normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:normals.data()
+        normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                        length:3 * 4 * vertexCount
                       options:MTLResourceCPUCacheModeDefaultCache];
         normalBuffer.label = @"Normal buffer";
     }
     else
     {
-        memcpy( [normalBuffer contents], normals.data(), 3 * 4 * vertexCount );
+        memcpy( [normalBuffer contents], positions.data(), 3 * 4 * vertexCount );
     }
 
-    std::vector< float > tangents( vertexCount * 4, 1 );
-
+    // Reusing color buffer to avoid dynamic allocation.
     if (positionCount != (unsigned)vertexCount)
     {
-        tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
+        tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
                         length:4 * 4 * vertexCount
                        options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
     }
     else
     {
-        memcpy( [tangentBuffer contents], tangents.data(), 4 * 4 * vertexCount );
+        memcpy( [tangentBuffer contents], colors.data(), 4 * 4 * vertexCount );
     }
 
     if (positionCount != (unsigned)vertexCount)
@@ -247,16 +246,15 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
                         options:MTLResourceCPUCacheModeDefaultCache];
     texcoordBuffer.label = @"Texcoord buffer";
     
-    std::vector< float > normals( vertexCount * 3 );
-    
+    // Reusing positions vector to avoid dynamic allocation.
     for (int v = 0; v < vertexCount; ++v)
     {
-        normals[ v * 3 + 0 ] = vertices[ v ].normal.x;
-        normals[ v * 3 + 1 ] = vertices[ v ].normal.y;
-        normals[ v * 3 + 2 ] = vertices[ v ].normal.z;
+        positions[ v * 3 + 0 ] = vertices[ v ].normal.x;
+        positions[ v * 3 + 1 ] = vertices[ v ].normal.y;
+        positions[ v * 3 + 2 ] = vertices[ v ].normal.z;
     }
     
-    normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:normals.data()
+    normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                        length:3 * 4 * vertexCount
                       options:MTLResourceCPUCacheModeDefaultCache];
     normalBuffer.label = @"Normal buffer";
