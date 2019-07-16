@@ -60,5 +60,6 @@ namespace ae3d
         GameObject* gameObject = nullptr;
         bool castsShadow = false;
         bool isEnabled = true;
+        int cachedShadowMapSize = 0;
     };
 }

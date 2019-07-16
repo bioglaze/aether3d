@@ -70,7 +70,18 @@ void ae3d::Material::Apply()
 
     for (const auto& globalTexRT : sTexRTs)
     {
+#if RENDERER_METAL
+        if (globalTexRT.second && globalTexRT.second->IsCube())
+        {
+            shader->SetRenderTexture( globalTexRT.second, 2 );
+        }
+        else
+        {
+            shader->SetRenderTexture( globalTexRT.second, texUnit );
+        }
+#else
         shader->SetRenderTexture( globalTexRT.second, texUnit );
+#endif
         ++texUnit;
     }
 

@@ -68,5 +68,6 @@ namespace ae3d
         float radius = 2;
         bool castsShadow = false;
         bool isEnabled = true;
+        int cachedShadowMapSize = 0;
     };
 }

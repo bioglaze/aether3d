@@ -412,7 +412,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                 {
                     SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                     SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
-                    GfxDeviceGlobal::perObjectUboStruct.lightType = 2;
+                    GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Dir;
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                 }
@@ -420,14 +420,14 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                 {
                     SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
                     SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
-                    GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
+                    GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
                 }
                 else if (pointLight)
                 {
                     SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<PointLightComponent>()->shadowMap );
-                    GfxDeviceGlobal::perObjectUboStruct.lightType = 3;
+                    GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Point;
                     
                     for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
                     {
@@ -646,7 +646,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 0, 0, 0, 1 );
     GfxDeviceGlobal::perObjectUboStruct.minAmbient = ambientColor.x;
-    GfxDeviceGlobal::perObjectUboStruct.lightType = 0;
+    GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::None;
     
     for (auto gameObject : gameObjects)
     {
@@ -674,12 +674,12 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
             // FIXME: This is an ugly hack to get shadow shaders to work with different light types.
             if (dirLight->CastsShadow())
             {
-                GfxDeviceGlobal::perObjectUboStruct.lightType = 2;
+                GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Dir;
             }
         }
         else
         {
-            GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
+            GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
         }
         
         if (spriteRenderer)
@@ -847,12 +847,12 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     if (camera->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
     {
         frustum.SetProjection( camera->GetFovDegrees(), camera->GetAspect(), camera->GetNear(), camera->GetFar() );
-        GfxDeviceGlobal::perObjectUboStruct.lightType = 1;
+        GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
     }
     else
     {
         frustum.SetProjection( camera->GetLeft(), camera->GetRight(), camera->GetBottom(), camera->GetTop(), camera->GetNear(), camera->GetFar() );
-        GfxDeviceGlobal::perObjectUboStruct.lightType = 2;
+        GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Dir;
     }
     
     const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();

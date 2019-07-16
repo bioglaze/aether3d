@@ -65,6 +65,7 @@ vertex ColorInOut unlit_vertex(Vertex vert [[stage_in]],
 fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
                                texture2d<float, access::sample> textureMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
+                               texturecube<float, access::sample> _ShadowMapCube [[texture(2)]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
