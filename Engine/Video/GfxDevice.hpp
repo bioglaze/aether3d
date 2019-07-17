@@ -9,7 +9,7 @@
 
 struct PerObjectUboStruct
 {
-    enum LightType : int { None, Spot, Dir, Point };
+    enum LightType : int { Empty, Spot, Dir, Point };
     
     ae3d::Matrix44 localToClip;
     ae3d::Matrix44 localToView;
@@ -20,7 +20,7 @@ struct PerObjectUboStruct
     ae3d::Vec4 lightDirection;
     ae3d::Vec4 lightColor = ae3d::Vec4( 1, 1, 1, 1 );
     float lightConeAngleCos = 0;
-    LightType lightType = LightType::None;
+    LightType lightType = LightType::Empty;
     float minAmbient = 0.2f;
     unsigned maxNumLightsPerTile = 0;
     unsigned windowWidth = 1;

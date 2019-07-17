@@ -89,37 +89,25 @@ static void CreateSampler( ae3d::TextureFilter filter, ae3d::TextureWrap wrap, V
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)outSampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }
 
+void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
+{
+    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
+        GetColorImage(),
+        VK_IMAGE_ASPECT_COLOR_BIT,
+        layout,
+        aLayout,
+        1, 0, 1 );
+
+    layout = aLayout;
+}
+
 void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
 {    
     GfxDevice::EndRenderPass();
+    layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // Ending render pass sets layout to this, so track it.
 
-    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
-                    GetColorImage(),
-                    VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                    1, 0, 1 );
-
-    static bool firstTime = true;
-    if (firstTime)
-    {
-        SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
-                    target->GetColorImage(),
-                    VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    1, 0, 1 );
-        firstTime = false;
-    }
-    else
-    {
-        SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
-                    target->GetColorImage(),
-                    VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    1, 0, 1 );
-    }
+    SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
+    target->SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
 
     VkImageResolve regions = {};
     regions.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -138,17 +126,9 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
                        1,
                        &regions );
 
-    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
-                    GetColorImage(),
-                    VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
+    SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+    target->SetColorImageLayout( VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 
-    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
-                    target->GetColorImage(),
-                    VK_IMAGE_ASPECT_COLOR_BIT,
-                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 0, 1 );
     GfxDevice::BeginRenderPass();
 }
 

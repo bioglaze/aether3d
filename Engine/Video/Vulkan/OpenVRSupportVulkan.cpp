@@ -88,7 +88,6 @@ namespace Global
     unsigned int indexSize;
     float vrFov = 45;
     vr::TrackedDevicePose_t trackedDevicePose[ vr::k_unMaxTrackedDeviceCount ];
-    int validPoseCount;
     Matrix44 mat4HMDPose;
     Matrix44 eyePosLeft;
     Matrix44 eyePosRight;
@@ -714,14 +713,12 @@ void ae3d::VR::CalcEyePose()
     vr::EVRCompositorError error = vr::VRCompositor()->WaitGetPoses( Global::trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0 );
     System::Assert( error == vr::VRCompositorError_None, "VR error" );
 
-    Global::validPoseCount = 0;
     Global::poseClasses.clear();
 
     for (unsigned deviceIndex = 0; deviceIndex < vr::k_unMaxTrackedDeviceCount; ++deviceIndex)
     {
         if (Global::trackedDevicePose[ deviceIndex ].bPoseIsValid)
         {
-            ++Global::validPoseCount;
             ConvertSteamVRMatrixToMatrix4( Global::trackedDevicePose[ deviceIndex ].mDeviceToAbsoluteTracking, Global::devicePose[ deviceIndex ] );
             
             if (Global::devClassChar[ deviceIndex ] == 0)

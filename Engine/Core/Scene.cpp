@@ -646,7 +646,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 0, 0, 0, 1 );
     GfxDeviceGlobal::perObjectUboStruct.minAmbient = ambientColor.x;
-    GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::None;
+    GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Empty;
     
     for (auto gameObject : gameObjects)
     {
