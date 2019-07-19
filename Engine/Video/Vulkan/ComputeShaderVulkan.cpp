@@ -21,7 +21,6 @@ namespace GfxDeviceGlobal
     extern VkCommandBuffer computeCmdBuffer;
     extern VkPipelineLayout pipelineLayout;
     extern VkPipelineCache pipelineCache;
-    extern VkImageView view11;
     extern PerObjectUboStruct perObjectUboStruct;
     extern VkImageView boundViews[ 2 ];
 }
@@ -154,16 +153,7 @@ void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
 {
     if (slot < SLOT_COUNT)
     {
-        if (slot < 2)
-        {
-            GfxDeviceGlobal::boundViews[ slot ] = texture->GetView();
-        }
-        
-        // FIXME: This is a hack
-        if (slot == 11)
-        {
-            GfxDeviceGlobal::view11 = texture->GetView();
-        }
+        GfxDeviceGlobal::boundViews[ slot ] = texture->GetView();
     }
     else
     {

@@ -121,9 +121,7 @@ namespace GfxDeviceGlobal
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
-    VkImageView boundViews[ 2 ];
-    VkImageView view11 = VK_NULL_HANDLE;
-    VkImage image11 = VK_NULL_HANDLE;
+    VkImageView boundViews[ 12 ];
     VkSampler boundSamplers[ 2 ];
     Array< VkBuffer > pendingFreeVBs;
     Array< Ubo > ubos;
@@ -1675,7 +1673,7 @@ namespace ae3d
 void BindComputeDescriptorSet()
 {
     VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ],
-                                                                 GfxDeviceGlobal::boundViews[ 1 ], GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::view11 );
+                                                                 GfxDeviceGlobal::boundViews[ 1 ], GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ] );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1971,7 +1969,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     UploadPerObjectUbo();
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ], GfxDeviceGlobal::boundViews[ 1 ],
-                                                           GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::view11 );
+                                                           GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ] );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -2068,10 +2066,9 @@ void ae3d::GfxDevice::BeginFrame()
 
     GfxDeviceGlobal::boundViews[ 0 ] = Texture2D::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::boundViews[ 1 ] = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 11 ] = Texture2D::GetDefaultTextureUAV()->GetView();
     GfxDeviceGlobal::boundSamplers[ 0 ] = Texture2D::GetDefaultTexture()->GetSampler();
     GfxDeviceGlobal::boundSamplers[ 1 ] = Texture2D::GetDefaultTexture()->GetSampler();
-    GfxDeviceGlobal::view11 = Texture2D::GetDefaultTextureUAV()->GetView();
-    GfxDeviceGlobal::image11 = Texture2D::GetDefaultTexture()->GetImage();
 }
 
 void SubmitQueue()

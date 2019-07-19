@@ -42,8 +42,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # Sample Code
 
-    ```
-    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen );
+    Window::Create( width, height, WindowCreateFlags::Fullscreen );
 	
     RenderTexture cameraTex;
     cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
@@ -66,7 +65,6 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
     Scene scene;
     scene.Add( &camera );
     scene.Add( &sphere );
-	```
 
 # API documentation
 
