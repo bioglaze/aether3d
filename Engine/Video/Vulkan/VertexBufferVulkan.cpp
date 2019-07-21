@@ -358,8 +358,48 @@ void ae3d::VertexBuffer::CreateInputState( int vertexStride )
     inputStateCreateInfo.pVertexAttributeDescriptions = &attributeDescriptions[ 0 ];
 }
 
-void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount,
-                                  Storage /*storage*/ )
+void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
+{
+    vertexFormat = VertexFormat::PTNTC;
+    elementCount = faceCount * 3;
+
+    CreateBuffer( stagingBuffers.vertices.buffer, vertexCount * sizeof( VertexPTNTC ), stagingBuffers.vertices.memory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "dynamic vertex buffer" );
+
+    VkResult err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, 0, stagingBuffers.vertices.size, 0, (void **)&stagingBuffers.vertices.mappedData );
+    AE3D_CHECK_VULKAN( err, "vkMapMemory GenerateDynamic" );
+
+    CreateBuffer( stagingBuffers.indices.buffer, elementCount * 2, stagingBuffers.indices.memory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "dynamic index buffer" );
+
+    err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, 0, stagingBuffers.indices.size, 0, (void **)&stagingBuffers.indices.mappedData );
+    AE3D_CHECK_VULKAN( err, "vkMapMemory GenerateDynamic" );
+}
+
+void ae3d::VertexBuffer::UpdateDynamic( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
+{
+    System::Assert( stagingBuffers.indices.mappedData != nullptr, "Index buffer not initialized!" );
+    System::Assert( stagingBuffers.indices.buffer != VK_NULL_HANDLE, "Index buffer not initialized!" );
+    System::Assert( stagingBuffers.indices.size >= faceCount * 3 * 2, "Index buffer too small!" );
+    System::Assert( stagingBuffers.vertices.size >= vertexCount * sizeof( VertexPTNTC ), "Vertex buffer too small!" );
+
+    std::memcpy( stagingBuffers.indices.mappedData, faces, faceCount * 3 * 2 );
+
+    Array< VertexPTNTC > verticesPTNTC;
+    verticesPTNTC.Allocate( vertexCount );
+
+    for (unsigned vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
+    {
+        verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
+        verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
+        verticesPTNTC[ vertexInd ].v = vertices[ vertexInd ].v;
+        verticesPTNTC[ vertexInd ].normal = Vec3( 0, 0, 1 );
+        verticesPTNTC[ vertexInd ].tangent = Vec4( 1, 0, 0, 0 );
+        verticesPTNTC[ vertexInd ].color = vertices[ vertexInd ].color;
+    }
+
+    std::memcpy( stagingBuffers.vertices.mappedData, vertices, vertexCount * sizeof( VertexPTNTC ) );
+}
+
+void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount, Storage /*storage*/ )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;

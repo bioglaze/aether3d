@@ -122,6 +122,18 @@ namespace ae3d
         /// \param storage Use CPU if you need to modify the data after calling this method.
         void Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount, Storage storage );
 
+        /// Generates a buffer that can be updated using memcpy().
+        /// \param faceCount Face count.
+        /// \param vertexCount Vertex count.
+        void GenerateDynamic( int faceCount, int vertexCount );
+
+        /// Updates the buffer from supplied geometry.
+        /// \param faces Faces.
+        /// \param faceCount Face count.
+        /// \param vertices Vertices.
+        /// \param vertexCount Vertex count.
+        void UpdateDynamic( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount );
+
         /// Generates the buffer from supplied geometry.
         /// \param faces Faces.
         /// \param faceCount Face count.
@@ -215,6 +227,7 @@ namespace ae3d
             int size = 0;
             VkDeviceMemory memory;
             VkBuffer buffer;
+            void* mappedData = nullptr;
         };
 
         struct
