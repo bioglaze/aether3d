@@ -10,6 +10,7 @@
 #include <vulkan/vulkan.h>
 #endif
 #include "Vec3.hpp"
+#include "Array.hpp"
 
 namespace ae3d
 {
@@ -236,6 +237,7 @@ namespace ae3d
             Buffer indices;
         } stagingBuffers;
 
+        Array< VertexPTNTC > verticesPTNTC; // For dynamic buffer.
 #endif
     };
 }

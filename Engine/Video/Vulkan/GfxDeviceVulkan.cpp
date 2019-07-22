@@ -1652,7 +1652,7 @@ namespace ae3d
         err = vkCreateQueryPool( GfxDeviceGlobal::device, &queryPoolInfo, nullptr, &GfxDeviceGlobal::queryPool );
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
 
-        GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces, UI_FACE_COUNT, GfxDeviceGlobal::uiVertices, UI_VERTICE_COUNT, VertexBuffer::Storage::CPU );
+        GfxDeviceGlobal::uiVertexBuffer.GenerateDynamic( UI_FACE_COUNT, UI_VERTICE_COUNT );
 
         renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
 
@@ -1715,7 +1715,7 @@ void ae3d::GfxDevice::MapUIVertexBuffer( int /*vertexSize*/, int /*indexSize*/, 
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
 {
-    GfxDeviceGlobal::uiVertexBuffer.Generate( GfxDeviceGlobal::uiFaces, UI_FACE_COUNT, GfxDeviceGlobal::uiVertices, UI_VERTICE_COUNT, VertexBuffer::Storage::CPU );
+    GfxDeviceGlobal::uiVertexBuffer.UpdateDynamic( GfxDeviceGlobal::uiFaces, UI_FACE_COUNT, GfxDeviceGlobal::uiVertices, UI_VERTICE_COUNT );
 }
 
 void ae3d::GfxDevice::BeginDepthNormalsGpuQuery()
