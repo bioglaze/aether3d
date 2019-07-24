@@ -42,7 +42,8 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # Sample Code
 
-´´´C
+```C
+
     Window::Create( width, height, WindowCreateFlags::Fullscreen );
 	
     RenderTexture cameraTex;
@@ -66,6 +67,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
     Scene scene;
     scene.Add( &camera );
     scene.Add( &sphere );
+    
 ```
 
 # API documentation
