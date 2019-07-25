@@ -6,8 +6,6 @@
 #include "System.hpp"
 #include "Vec3.hpp"
 
-void UploadPerObjectUbo();
-
 namespace GfxDeviceGlobal
 {
     extern int backBufferWidth;
