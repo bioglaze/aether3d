@@ -62,13 +62,17 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
 
     vertexBuffer.label = @"Vertex buffer PTC";
     
-    std::vector< float > positions( vertexCount * 3 );
+    std::vector< float > positions( vertexCount * 4 );
+    int i = 0;
     
     for (int v = 0; v < vertexCount; ++v)
     {
-        positions[ v * 3 + 0 ] = vertices[ v ].position.x;
-        positions[ v * 3 + 1 ] = vertices[ v ].position.y;
-        positions[ v * 3 + 2 ] = vertices[ v ].position.z;
+        positions[ i ] = vertices[ v ].position.x;
+        ++i;
+        positions[ i ] = vertices[ v ].position.y;
+        ++i;
+        positions[ i ] = vertices[ v ].position.z;
+        ++i;
     }
     
     if (positionCount != (unsigned)vertexCount)
@@ -83,50 +87,54 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         memcpy( [positionBuffer contents], positions.data(), 3 * 4 * vertexCount );
     }
     
-    std::vector< float > texcoords( vertexCount * 2 );
-    
+    i = 0;
+
     for (int v = 0; v < vertexCount; ++v)
     {
-        texcoords[ v * 2 + 0 ] = vertices[ v ].u;
-        texcoords[ v * 2 + 1 ] = vertices[ v ].v;
+        positions[ i ] = vertices[ v ].u;
+        ++i;
+        positions[ i ] = vertices[ v ].v;
+        ++i;
     }
     
     if (positionCount != (unsigned)vertexCount)
     {
-        texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:texcoords.data()
+        texcoordBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                          length:2 * 4 * vertexCount
                         options:MTLResourceCPUCacheModeDefaultCache];
         texcoordBuffer.label = @"Texcoord buffer";
     }
     else
     {
-        memcpy( [texcoordBuffer contents], texcoords.data(), 2 * 4 * vertexCount );
+        memcpy( [texcoordBuffer contents], positions.data(), 2 * 4 * vertexCount );
     }
     
-    std::vector< float > colors( vertexCount * 4 );
+    i = 0;
     
     for (int v = 0; v < vertexCount; ++v)
     {
-        colors[ v * 4 + 0 ] = vertices[ v ].color.x;
-        colors[ v * 4 + 1 ] = vertices[ v ].color.y;
-        colors[ v * 4 + 2 ] = vertices[ v ].color.z;
-        colors[ v * 4 + 3 ] = vertices[ v ].color.w;
+        positions[ i ] = vertices[ v ].color.x;
+        ++i;
+        positions[ i ] = vertices[ v ].color.y;
+        ++i;
+        positions[ i ] = vertices[ v ].color.z;
+        ++i;
+        positions[ i ] = vertices[ v ].color.w;
+        ++i;
     }
     
     if (positionCount != (unsigned)vertexCount)
     {
-        colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
+        colorBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                       length:4 * 4 * vertexCount
                      options:MTLResourceCPUCacheModeDefaultCache];
         colorBuffer.label = @"Color buffer";
     }
     else
     {
-        memcpy( [colorBuffer contents], colors.data(), 4 * 4 * vertexCount );
+        memcpy( [colorBuffer contents], positions.data(), 4 * 4 * vertexCount );
     }
-    
-    
-    // Reusing position buffer to avoid dynamic allocation.
+
     if (positionCount != (unsigned)vertexCount)
     {
         normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
@@ -139,17 +147,16 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
         memcpy( [normalBuffer contents], positions.data(), 3 * 4 * vertexCount );
     }
 
-    // Reusing color buffer to avoid dynamic allocation.
     if (positionCount != (unsigned)vertexCount)
     {
-        tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:colors.data()
+        tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:positions.data()
                         length:4 * 4 * vertexCount
                        options:MTLResourceCPUCacheModeDefaultCache];
         tangentBuffer.label = @"Tangent buffer";
     }
     else
     {
-        memcpy( [tangentBuffer contents], colors.data(), 4 * 4 * vertexCount );
+        memcpy( [tangentBuffer contents], positions.data(), 4 * 4 * vertexCount );
     }
 
     if (positionCount != (unsigned)vertexCount)
