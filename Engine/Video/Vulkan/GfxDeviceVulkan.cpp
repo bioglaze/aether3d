@@ -2141,7 +2141,8 @@ void ae3d::GfxDevice::Present()
 		AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
 
         err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 1, 1, sizeof( std::uint64_t ), &end, 0, VK_QUERY_RESULT_WAIT_BIT );
-		AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
+        // Not checking result, because this can fail without issues in some cases, like with MSAA.
+		// AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
 
         const double dBegin = start * 1e-6 * (double)GfxDeviceGlobal::properties.limits.timestampPeriod;
         const double dEnd = end * 1e-6 * (double)GfxDeviceGlobal::properties.limits.timestampPeriod;

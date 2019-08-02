@@ -366,13 +366,13 @@ void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
     CreateBuffer( stagingBuffers.vertices.buffer, vertexCount * sizeof( VertexPTNTC ), stagingBuffers.vertices.memory, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "dynamic vertex buffer" );
     stagingBuffers.vertices.size = vertexCount * sizeof( VertexPTNTC );
 
-    VkResult err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, 0, stagingBuffers.vertices.size, 0, (void **)&stagingBuffers.vertices.mappedData );
+    VkResult err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, 0, stagingBuffers.vertices.size, 0, &stagingBuffers.vertices.mappedData );
     AE3D_CHECK_VULKAN( err, "vkMapMemory GenerateDynamic" );
 
     CreateBuffer( stagingBuffers.indices.buffer, elementCount * 2, stagingBuffers.indices.memory, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "dynamic index buffer" );
     stagingBuffers.indices.size = elementCount * 2;
 
-    err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, 0, stagingBuffers.indices.size, 0, (void **)&stagingBuffers.indices.mappedData );
+    err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, 0, stagingBuffers.indices.size, 0, &stagingBuffers.indices.mappedData );
     AE3D_CHECK_VULKAN( err, "vkMapMemory GenerateDynamic" );
 
     vertexBuffer = stagingBuffers.vertices.buffer;
@@ -388,7 +388,7 @@ void ae3d::VertexBuffer::UpdateDynamic( const Face* faces, int faceCount, const 
     System::Assert( stagingBuffers.indices.mappedData != nullptr, "Index buffer not initialized!" );
     System::Assert( stagingBuffers.indices.buffer != VK_NULL_HANDLE, "Index buffer not initialized!" );
     System::Assert( stagingBuffers.indices.size >= faceCount * 3 * 2, "Index buffer too small!" );
-    System::Assert( stagingBuffers.vertices.size >= vertexCount * sizeof( VertexPTNTC ), "Vertex buffer too small!" );
+    System::Assert( (std::size_t)stagingBuffers.vertices.size >= vertexCount * sizeof( VertexPTNTC ), "Vertex buffer too small!" );
 
     std::memcpy( stagingBuffers.indices.mappedData, faces, faceCount * 3 * 2 );
 
