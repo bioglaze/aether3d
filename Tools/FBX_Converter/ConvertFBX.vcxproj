@@ -57,13 +57,13 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.0\include";..\..\Engine\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.5\include";..\..\Engine\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_NULL</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.0\lib\vs2015\x64\debug"</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libfbxsdk-md.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.5\lib\vs2017\x64\debug"</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -73,7 +73,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.0\include";..\..\Engine\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.5\include";..\..\Engine\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);RENDERER_NULL</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -83,8 +83,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.0\lib\vs2015\x64\release"</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libfbxsdk-md.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"C:\Program Files\Autodesk\FBX\FBX SDK\2019.5\lib\vs2017\x64\release"</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
