@@ -66,6 +66,26 @@ void ae3d::TextureCube::DestroyTextures()
     }
 }
 
+ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
+{
+    if (TextureCubeGlobal::defaultTexture.view == VK_NULL_HANDLE)
+    {
+        std::uint8_t imageData[ 32 * 32 * 4 ];
+
+        for (int i = 0; i < 32 * 32 * 4; ++i)
+        {
+            imageData[ i ] = 0xFF;
+        }
+
+        // FIXME: This is a hack, implement LoadFromData instead
+        TextureCubeGlobal::defaultTexture.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+            FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+            FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
+    }
+
+    return &TextureCubeGlobal::defaultTexture;
+}
+
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                               const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
                               const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,

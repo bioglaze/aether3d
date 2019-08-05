@@ -13,6 +13,9 @@ namespace ae3d
     class TextureCube : public TextureBase
     {
   public:
+      /// Gets a default texture that is always available after System::LoadBuiltinAssets().
+      static TextureCube* GetDefaultTexture();
+
         /**
           \param negX Negative X axis texture.
           \param posX Positive X axis texture.

@@ -23,6 +23,7 @@ layout(set=0, binding=1) Texture2D<float4> tex : register(t0);
 layout(set=0, binding=5) Texture2D<float4> _ShadowMap : register(t1);
 layout(set=0, binding=2) SamplerState sampler0 : register(s0);
 layout(set=0, binding=6) SamplerState sampler1 : register(s1);
+layout(set=0, binding=12) TextureCube<float4> texCube : register(t2);
 
 float VSM( float depth, float4 projCoord )
 {

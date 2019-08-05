@@ -1289,7 +1289,7 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 1550;
 
-        const std::uint32_t typeCount = 12;
+        const std::uint32_t typeCount = 13;
         const VkDescriptorPoolSize typeCounts[ typeCount ] =
         {
             { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
@@ -1303,7 +1303,8 @@ namespace ae3d
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT }
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT }
         };
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
@@ -1459,8 +1460,22 @@ namespace ae3d
         rwImageSet.pImageInfo = &sampler11Desc;
         rwImageSet.dstBinding = 11;
 
-        const int setCount = 12;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4, bufferSet5, rwImageSet };
+        // Binding 12 : Image
+        VkDescriptorImageInfo sampler3Desc = {};
+        sampler3Desc.sampler = sampler1;
+        sampler3Desc.imageView = TextureCube::GetDefaultTexture()->GetView();
+        sampler3Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        VkWriteDescriptorSet imageSet3 = {};
+        imageSet3.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        imageSet3.dstSet = outDescriptorSet;
+        imageSet3.descriptorCount = 1;
+        imageSet3.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        imageSet3.pImageInfo = &sampler0Desc;
+        imageSet3.dstBinding = 12;
+
+        const int setCount = 13;
+        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4, bufferSet5, rwImageSet, imageSet3 };
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1552,10 +1567,17 @@ namespace ae3d
         layoutBindingUAV.descriptorCount = 1;
         layoutBindingUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        constexpr int bindingCount = 12;
+        // Binding 12 : Image
+        VkDescriptorSetLayoutBinding layoutBindingImage3 = {};
+        layoutBindingImage3.binding = 12;
+        layoutBindingImage3.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindingImage3.descriptorCount = 1;
+        layoutBindingImage3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+
+        constexpr int bindingCount = 13;
         const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
                                                                         layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2,
-                                                                        layoutBindingBuffer3, layoutBindingBuffer4, layoutBindingBuffer5, layoutBindingUAV };
+                                                                        layoutBindingBuffer3, layoutBindingBuffer4, layoutBindingBuffer5, layoutBindingUAV, layoutBindingImage3 };
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
