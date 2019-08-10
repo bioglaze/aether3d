@@ -150,7 +150,7 @@ namespace ae3d
                 str = "frame time: " + std::to_string( ::Statistics::GetFrameTimeMS() ) + " ms\n";
                 str += "present time CPU: " + std::to_string( ::Statistics::GetPresentTimeMS() ) + " ms\n";                
                 str += "shadow pass time CPU: " + std::to_string( ::Statistics::GetShadowMapTimeMS() ) + " ms\n";
-                str += "shadow pass time GPU: " + std::to_string( ::Statistics::GetShadowMapTimeGpuMS() ) + " ms\n";
+                str += "shadow pass time GPU: unimplemented\n";//std::to_string( ::Statistics::GetShadowMapTimeGpuMS() ) + " ms\n";
                 str += "depth pass time CPU: " + std::to_string( ::Statistics::GetDepthNormalsTimeMS() ) + " ms\n";
                 str += "depth pass time GPU: " + std::to_string( ::Statistics::GetDepthNormalsTimeGpuMS() ) + " ms\n";
                 str += "draw calls: " + std::to_string( ::Statistics::GetDrawCalls() ) + "\n";
@@ -2156,19 +2156,12 @@ void ae3d::GfxDevice::Present()
     if (GfxDeviceGlobal::usedOffscreen)
     {
         GfxDeviceGlobal::usedOffscreen = false;
-        std::uint64_t start = 0;
-        std::uint64_t end = 0;
-        
-		err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 1, sizeof( std::uint64_t ), &start, 0, VK_QUERY_RESULT_WAIT_BIT );
-		AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
 
-        err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 1, 1, sizeof( std::uint64_t ), &end, 0, VK_QUERY_RESULT_WAIT_BIT );
-        // Not checking result, because this can fail without issues in some cases, like with MSAA.
-		// AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
+        std::uint64_t timestamps[ 2 ] = {};
+		err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 2, sizeof( std::uint64_t ) * 2, timestamps, sizeof( std::uint64_t ), VK_QUERY_RESULT_64_BIT );
+		//AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
 
-        const double dBegin = start * 1e-6 * (double)GfxDeviceGlobal::properties.limits.timestampPeriod;
-        const double dEnd = end * 1e-6 * (double)GfxDeviceGlobal::properties.limits.timestampPeriod;
-        GfxDeviceGlobal::timings[ 0 ] = (float)((dEnd - dBegin) / 1);
+        GfxDeviceGlobal::timings[ 0 ] = (timestamps[ 1 ] - timestamps[ 0 ]) / 1000.0f;
 
         Statistics::SetDepthNormalsGpuTime( GfxDeviceGlobal::timings[ 0 ] );
     }
@@ -2274,7 +2267,7 @@ void BeginOffscreen()
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
     vkCmdResetQueryPool( GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::queryPool, 0, 2 );
-    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 0 );
+    vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 0 );
 
     VkClearValue clearValues[ 2 ];
     clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
