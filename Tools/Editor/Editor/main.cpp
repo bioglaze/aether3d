@@ -183,15 +183,28 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
                 inspector.HandleLeftMouseClick( x, y, 1 );
-                svHandleLeftMouseDown( sceneView, x, y, width, height );
+
+                const bool clickedOnInspector = x < 300;
+
+                if (!clickedOnInspector)
+                {
+                    svHandleLeftMouseDown( sceneView, x, y, width, height );
+                }
             }
             else if (event.type == WindowEventType::Mouse1Up)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
+
                 inspector.HandleLeftMouseClick( x, y, 0 );
-                svHandleLeftMouseUp( sceneView );
-                selectedGO = svSelectObject( sceneView, x, y, width, height );
+
+                const bool clickedOnInspector = x < 300;
+
+                if (!clickedOnInspector)
+                {
+                    svHandleLeftMouseUp( sceneView );
+                    selectedGO = svSelectObject( sceneView, x, y, width, height );
+                }
             }
             else if (event.type == WindowEventType::Mouse2Up)
             {
