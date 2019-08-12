@@ -2158,7 +2158,7 @@ void ae3d::GfxDevice::Present()
         GfxDeviceGlobal::usedOffscreen = false;
 
         std::uint64_t timestamps[ 2 ] = {};
-		err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 2, sizeof( std::uint64_t ) * 2, timestamps, sizeof( std::uint64_t ), VK_QUERY_RESULT_64_BIT );
+		err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 2, sizeof( std::uint64_t ) * 2, timestamps, sizeof( std::uint64_t ), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
 		//AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
 
         GfxDeviceGlobal::timings[ 0 ] = (timestamps[ 1 ] - timestamps[ 0 ]) / 1000.0f;
