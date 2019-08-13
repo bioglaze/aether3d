@@ -61,8 +61,6 @@ namespace ae3d
           \param position Position relative to the component's transform.
           \param dimensionPixels Dimension in pixels.
           \param tintColor Tint color in range 0-1.
-
-          // TODO [2015-03-28]: Set pivot, maybe also rotation.
          */
         void SetTexture( class TextureBase* texture, const struct Vec3& position, const Vec3& dimensionPixels, const struct Vec4& tintColor );
 

@@ -42,9 +42,7 @@
 ((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24))
 
 #define D3DFMT_DXT1 827611204 ///< DXT1 compression texture format 
-#define D3DFMT_DXT2 0 ///< DXT2 compression texture format, FIXME: find this
 #define D3DFMT_DXT3 861165636 ///< DXT3 compression texture format 
-#define D3DFMT_DXT4 0 ///< DXT4 compression texture format, FIXME: find this
 #define D3DFMT_DXT5 894720068 ///< DXT5 compression texture format 
 
 #define PF_IS_DXT1(pf) \

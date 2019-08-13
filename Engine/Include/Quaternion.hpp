@@ -98,7 +98,7 @@ namespace ae3d
          \brief Finds twist angle around axis.
          
          \param axis Axis.
-         \return Twist angle ( \todo in radians? )
+         \return Twist angle in radians.
          */
         float FindTwist( const Vec3& axis ) const
         {
