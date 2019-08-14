@@ -53,6 +53,16 @@ template< typename T > struct Array
         count = count + 1;
     }
     
+    void Remove( unsigned index )
+    {
+        for (unsigned i = index; i < count - 1 && count > 0; ++i)
+        {
+            elements[ i ] = elements[ i + 1 ];
+        }
+
+        --count;
+    }
+
     void Allocate( unsigned size )
     {
         if (count == size)

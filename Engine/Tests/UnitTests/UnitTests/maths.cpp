@@ -1,5 +1,6 @@
 #include <cmath>
 #include "CppUnitTest.h"
+#include "Array.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
 #include "Matrix.hpp"
@@ -315,5 +316,41 @@ namespace UnitTests
 
             Assert::IsTrue( serialized.find( "my game object" ) != std::string::npos );
         }
+
+        TEST_METHOD( ArrayTest1 )
+        {
+            Array< int > arr( 1 );
+            arr.Remove( 0 );
+
+            Assert::IsTrue( arr.count == 0 );
+        }
+
+        TEST_METHOD( ArrayTest2 )
+        {
+            Array< int > arr( 0 );
+            arr.Remove( 0 );
+
+            Assert::IsTrue( true );
+        }
+
+        TEST_METHOD( ArrayTest3 )
+        {
+            Array< int > arr1( 10 );
+            Array< int > arr2( 5 );
+            arr1 = arr2;
+
+            Assert::IsTrue( arr1.count == 5 );
+        }
+
+        TEST_METHOD( ArrayTest4 )
+        {
+            Array< int > arr1( 10 );
+            arr1[ 0 ] = 666;
+            Array< int > arr2( 5 );
+            arr2 = arr1;
+
+            Assert::IsTrue( arr2[ 0 ] == 666 );
+        }
+
     };
 }

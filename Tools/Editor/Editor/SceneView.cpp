@@ -48,6 +48,7 @@ struct SceneView
     Matrix44 lineView;
     Matrix44 lineProjection;
     int lineHandle = 0;
+    int selectedGOIndex = 0;
 
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
@@ -88,6 +89,7 @@ struct CollisionInfo
     GameObject* go = nullptr;
     float meshDistance = 0;
     int subMeshIndex = 0;
+    int gameObjectIndex = 0;
 };
 
 enum class CollisionTest
@@ -219,7 +221,8 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
             collisionInfo.go = go;
             collisionInfo.meshDistance = 99999;
             collisionInfo.subMeshIndex = 0;
-            
+            collisionInfo.gameObjectIndex = i;
+
             for (unsigned subMeshIndex = 0; subMeshIndex < meshRenderer->GetMesh()->GetSubMeshCount(); ++subMeshIndex)
             {
                 Vec3 subMeshMin, subMeshMax;
@@ -397,7 +400,8 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
         //System::Print( "collided with submesh: %d\n", ci[ 0 ].subMeshIndex );
 
         sv->selectedGameObjects.Add( ci[ 0 ].go );
-        
+        sv->selectedGOIndex = ci[ 0 ].gameObjectIndex;
+
         return ci[ 0 ].go;
     }
 
@@ -459,6 +463,7 @@ void svDeleteGameObject( SceneView* sv )
         sv->selectedGameObjects.Allocate( 0 );
         //sv->transformGizmo.selectedMesh = -1;
         sv->scene.Remove( sv->gameObjects[ 0 ] );
+        sv->gameObjects.Remove( sv->selectedGOIndex );
     }
 }
 
