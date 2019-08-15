@@ -367,11 +367,17 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
             }
             
             auto lightTransform = go->GetComponent<TransformComponent>();
+            
+            if (!lightTransform)
+            {
+                continue;
+            }
+            
             auto dirLight = go->GetComponent<DirectionalLightComponent>();
             auto spotLight = go->GetComponent<SpotLightComponent>();
             auto pointLight = go->GetComponent<PointLightComponent>();
 
-            if (lightTransform && ((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
+            if (((dirLight && dirLight->CastsShadow()) || (spotLight && spotLight->CastsShadow()) ||
                                    (pointLight && pointLight->CastsShadow())))
             {
                 Statistics::BeginShadowMapProfiling();
