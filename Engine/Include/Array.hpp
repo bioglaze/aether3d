@@ -60,7 +60,10 @@ template< typename T > struct Array
             elements[ i ] = elements[ i + 1 ];
         }
 
-        --count;
+        if (index > 0)
+        {
+            --count;
+        }
     }
 
     void Allocate( unsigned size )
