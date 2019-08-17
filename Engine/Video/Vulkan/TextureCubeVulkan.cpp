@@ -14,6 +14,7 @@ bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 namespace MathUtil
 {
     bool IsPowerOfTwo( unsigned i );
+    int GetMipmapCount( int width, int height );
     int Max( int a, int b );
 }
 
@@ -117,6 +118,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
 
     DDSLoader::Output ddsOutput[ 6 ];
+    bool isSomeFaceDDS = false;
 
     for (int face = 0; face < 6; ++face)
     {
@@ -144,6 +146,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             }
 
             opaque = (components == 3 || components == 1);
+            mipLevelCount = mipmaps == Mipmaps::None ? 1 : MathUtil::GetMipmapCount( width, height );
 
             VkImageCreateInfo imageCreateInfo = {};
             imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -251,6 +254,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
         else if (isDDS && GfxDeviceGlobal::deviceFeatures.textureCompressionBC)
         {
+            isSomeFaceDDS = true;
             auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
             const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput[ face ] );
 
@@ -518,65 +522,91 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
         for (int mipLevel = 1; mipLevel < mipLevelCount; ++mipLevel)
         {
-            const std::int32_t mipWidth = MathUtil::Max( width >> mipLevel, 1 );
-            const std::int32_t mipHeight = MathUtil::Max( height >> mipLevel, 1 );
-
-            const VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
-            VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * (format == VK_FORMAT_BC5_UNORM_BLOCK ? 16 : bc1BlockSize);
-
-            // FIXME: This is a hack, figure out proper fix.
-            if (imageSize == 0)
+            if (isSomeFaceDDS)
             {
-                imageSize = 16;
+                const std::int32_t mipWidth = MathUtil::Max( width >> mipLevel, 1 );
+                const std::int32_t mipHeight = MathUtil::Max( height >> mipLevel, 1 );
+
+                const VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
+                VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * (format == VK_FORMAT_BC5_UNORM_BLOCK ? 16 : bc1BlockSize);
+
+                // FIXME: This is a hack, figure out proper fix.
+                if (imageSize == 0)
+                {
+                    imageSize = 16;
+                }
+
+                VkBufferCreateInfo bufferCreateInfo = {};
+                bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+                bufferCreateInfo.size = imageSize;
+                bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+                bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+                err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffers[ mipLevel ] );
+                AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
+                TextureCubeGlobal::buffersToReleaseAtExit.push_back( stagingBuffers[ mipLevel ] );
+
+                vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], &memReqs );
+
+                memAllocInfo.allocationSize = memReqs.size;
+                memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
+                err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipLevel ] );
+                AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+                TextureCubeGlobal::memoryToReleaseAtExit.push_back( stagingMemory[ mipLevel ] );
+
+                err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], stagingMemory[ mipLevel ], 0 );
+                AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
+
+                void* stagingData;
+                err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory[ mipLevel ], 0, memReqs.size, 0, &stagingData );
+                AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
+
+                VkDeviceSize amountToCopy = imageSize;
+                if (ddsOutput[ face ].dataOffsets[ mipLevel ] + imageSize >= ddsOutput[ face ].imageData.count)
+                {
+                    amountToCopy = ddsOutput[ face ].imageData.count - ddsOutput[ face ].dataOffsets[ mipLevel ];
+                }
+
+                std::memcpy( stagingData, &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ mipLevel ] ], amountToCopy );
+
+                VkBufferImageCopy bufferCopyRegion = {};
+                bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                bufferCopyRegion.imageSubresource.mipLevel = mipLevel;
+                bufferCopyRegion.imageSubresource.baseArrayLayer = face;
+                bufferCopyRegion.imageSubresource.layerCount = 1;
+                bufferCopyRegion.imageExtent.width = mipWidth;
+                bufferCopyRegion.imageExtent.height = mipHeight;
+                bufferCopyRegion.imageExtent.depth = 1;
+                bufferCopyRegion.bufferOffset = 0;
+
+                vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffers[ mipLevel ], image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
             }
-
-            VkBufferCreateInfo bufferCreateInfo = {};
-            bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-            bufferCreateInfo.size = imageSize;
-            bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-            bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffers[ mipLevel ] );
-            AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
-            TextureCubeGlobal::buffersToReleaseAtExit.push_back( stagingBuffers[ mipLevel ] );
-
-            vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], &memReqs );
-
-            memAllocInfo.allocationSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
-            err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipLevel ] );
-            AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
-            TextureCubeGlobal::memoryToReleaseAtExit.push_back( stagingMemory[ mipLevel ] );
-            
-            err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], stagingMemory[ mipLevel ], 0 );
-            AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
-
-            void* stagingData;
-            err = vkMapMemory( GfxDeviceGlobal::device, stagingMemory[ mipLevel ], 0, memReqs.size, 0, &stagingData );
-            AE3D_CHECK_VULKAN( err, "vkMapMemory in Texture2D" );
-
-            VkDeviceSize amountToCopy = imageSize;
-            if (ddsOutput[ face ].dataOffsets[ mipLevel ] + imageSize >= ddsOutput[ face ].imageData.count)
+            else
             {
-                amountToCopy = ddsOutput[ face ].imageData.count - ddsOutput[ face ].dataOffsets[ mipLevel ];
+                const std::int32_t mipWidth = MathUtil::Max( width >> mipLevel, 1 );
+                const std::int32_t mipHeight = MathUtil::Max( height >> mipLevel, 1 );
+
+                VkImageBlit imageBlit = {};
+                imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                imageBlit.srcSubresource.baseArrayLayer = 0;
+                imageBlit.srcSubresource.layerCount = 1;
+                imageBlit.srcSubresource.mipLevel = 0;
+                imageBlit.srcOffsets[ 0 ] = { 0, 0, 0 };
+                imageBlit.srcOffsets[ 1 ] = { width, height, 1 };
+
+                imageBlit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                imageBlit.dstSubresource.baseArrayLayer = 0;
+                imageBlit.dstSubresource.layerCount = 1;
+                imageBlit.dstSubresource.mipLevel = mipLevel;
+                imageBlit.dstOffsets[ 0 ] = { 0, 0, 0 };
+                imageBlit.dstOffsets[ 1 ] = { mipWidth, mipHeight, 1 };
+
+                vkCmdBlitImage( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_GENERAL, image,
+                    VK_IMAGE_LAYOUT_GENERAL, 1, &imageBlit, VK_FILTER_LINEAR );
             }
-        
-            std::memcpy( stagingData, &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ mipLevel ] ], amountToCopy );
-
-            VkBufferImageCopy bufferCopyRegion = {};
-            bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            bufferCopyRegion.imageSubresource.mipLevel = mipLevel;
-            bufferCopyRegion.imageSubresource.baseArrayLayer = face;
-            bufferCopyRegion.imageSubresource.layerCount = 1;
-            bufferCopyRegion.imageExtent.width = mipWidth;
-            bufferCopyRegion.imageExtent.height = mipHeight;
-            bufferCopyRegion.imageExtent.depth = 1;
-            bufferCopyRegion.bufferOffset = 0;
-
-            vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffers[ mipLevel ], image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
         }
     }
 
-    if (mipLevelCount > 1)
+    if (mipLevelCount > 1 && isSomeFaceDDS)
     {
         for (int mipLevel = 0; mipLevel < mipLevelCount; ++mipLevel)
         {
