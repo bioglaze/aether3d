@@ -26,8 +26,11 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     
     if (storage == Storage::GPU)
     {
-        vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexPTC ) * vertexCount
+        if (positionCount != (unsigned)vertexCount)
+        {
+            vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexPTC ) * vertexCount
                        options:MTLResourceStorageModePrivate];
+        }
         
         id<MTLBuffer> blitBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:vertices
                                        length:sizeof( VertexPTC ) * vertexCount
