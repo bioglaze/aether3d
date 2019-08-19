@@ -1,7 +1,9 @@
 #include <iostream>
-#include "Vec3.hpp"
+#include <cassert>
+#include "Array.hpp"
 #include "Matrix.hpp"
 #include "Quaternion.hpp"
+#include "Vec3.hpp"
 
 using namespace ae3d;
 
@@ -361,6 +363,41 @@ bool TestQuaternion()
     return true;
 }
 
+bool TestArray1()
+{
+    Array< int > arr( 1 );
+    arr.Remove( 0 );
+
+    return arr.count == 0;
+}
+
+bool TestArray2()
+{
+    Array< int > arr( 0 );
+    arr.Remove( 0 );
+
+    return true;
+}
+
+bool TestArray3()
+{
+    Array< int > arr1( 10 );
+    Array< int > arr2( 5 );
+    arr1 = arr2;
+
+    return arr1.count == 5;
+}
+
+bool TestArray4()
+{
+    Array< int > arr1( 10 );
+    arr1[ 0 ] = 666;
+    Array< int > arr2( 5 );
+    arr2 = arr1;
+
+    return arr2[ 0 ] == 666;
+}
+
 int main()
 {
     bool result = true;
@@ -371,7 +408,13 @@ int main()
     result &= TestMatrixMultiply();
     result &= TestMatrixInverse();
     result &= TestQuaternion();
+    result &= TestArray1();
+    result &= TestArray2();
+    result &= TestArray3();
+    result &= TestArray4();
 
+    assert( result && "Math tests failed!" );
+    
     return result ? 0 : 1;
 }
 

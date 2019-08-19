@@ -60,7 +60,7 @@ template< typename T > struct Array
             elements[ i ] = elements[ i + 1 ];
         }
 
-        if (index > 0)
+        if (count > 0)
         {
             --count;
         }
