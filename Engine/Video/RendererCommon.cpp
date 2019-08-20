@@ -159,11 +159,11 @@ void ae3d::LightTiler::SetSpotLightParameters( int bufferIndex, Vec3& position, 
 
 unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
 {
-    const unsigned kAdjustmentMultipier = 32;
+    constexpr unsigned AdjustmentMultipier = 32;
 
     // I haven't tested at greater than 1080p, so cap it
     const unsigned uHeight = (GfxDeviceGlobal::backBufferHeight > 1080) ? 1080 : GfxDeviceGlobal::backBufferHeight;
 
     // adjust max lights per tile down as height increases
-    return (MaxLightsPerTile - (kAdjustmentMultipier * (uHeight / 120)));
+    return (MaxLightsPerTile - (AdjustmentMultipier * (uHeight / 120)));
 }
