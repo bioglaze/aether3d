@@ -515,11 +515,16 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
 
+    if (!isSomeFaceDDS && mipLevelCount > 1)
+    {
+        SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, 6, 0, mipLevelCount );
+    }
+
     for (int face = 0; face < 6; ++face)
     {
         Array< VkBuffer > stagingBuffers( mipLevelCount );
         Array< VkDeviceMemory > stagingMemory( mipLevelCount );
-
+        
         for (int mipLevel = 1; mipLevel < mipLevelCount; ++mipLevel)
         {
             if (isSomeFaceDDS)
@@ -612,6 +617,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         {
             SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6, mipLevel, 1 );
         }
+    }
+
+    if (mipLevelCount > 1 && !isSomeFaceDDS)
+    {
+        SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6, 0, mipLevelCount );
     }
     
     err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
