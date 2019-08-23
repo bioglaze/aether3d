@@ -74,8 +74,8 @@ namespace ae3d
             VkImageView view;
         };
 
-        FrameBufferAttachment color;
-        FrameBufferAttachment depth;
+		FrameBufferAttachment color = {};
+		FrameBufferAttachment depth = {};
         VkFormat colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
         VkRenderPass renderPass = VK_NULL_HANDLE;
         int sampleCount = 1;
