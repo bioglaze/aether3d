@@ -58,6 +58,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             DDSLoader::Output ddsOutput;
             auto fileContents = FileSystem::FileContents( posX.path.c_str() );
             const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput );
+            mipLevelCount = mipmaps == Mipmaps::Generate ? ddsOutput.dataOffsets.count : 1;
 
             if (loadResult != DDSLoader::LoadResult::Success)
             {
@@ -120,7 +121,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     descTex.Width = width;
     descTex.Height = (UINT)height;
     descTex.DepthOrArraySize = 6;
-    descTex.MipLevels = 1;
+    descTex.MipLevels = (UINT16)mipLevelCount;
     descTex.Format = dxgiFormat;
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
@@ -144,10 +145,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     TextureCubeGlobal::textures.push_back( gpuResource.resource );
 
     unsigned char* faceData[ 6 ] = {};
-    D3D12_SUBRESOURCE_DATA texResources[ 6 ] = {};
+    D3D12_SUBRESOURCE_DATA texResources[ 6 * 15 ] = {};
 
     bool isStbImage[ 6 ] = {};
     DDSLoader::Output ddsOutput[ 6 ];
+    int resCounter = 0;
 
     for (int face = 0; face < 6; ++face)
     {
@@ -189,11 +191,22 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             opaque = true;
 
-            faceData[ face ] = &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ 0 ] ];
+            unsigned mipWidth = width;
+            unsigned mipHeight = height;
 
-            texResources[ face ].pData = faceData[ face ];
-            texResources[ face ].RowPitch = width * bytesPerPixel;
-            texResources[ face ].SlicePitch = texResources[ face ].RowPitch * height;
+            for (int i = 0; i < mipLevelCount; ++i)
+            {
+                faceData[ face ] = &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ i ] ];
+
+                texResources[ resCounter ].pData = faceData[ face ];
+                texResources[ resCounter ].RowPitch = mipWidth * bytesPerPixel;
+                texResources[ resCounter ].SlicePitch = texResources[ resCounter ].RowPitch * mipHeight;
+                ++resCounter;
+
+                mipWidth = (mipWidth + 1) >> 1;
+                mipHeight = (mipHeight + 1) >> 1;
+
+            }
         }
         else
         {
@@ -201,12 +214,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         }
     }
 
-    InitializeTexture( gpuResource, &texResources[ 0 ], 6 );
+    InitializeTexture( gpuResource, &texResources[ 0 ], 6 * mipLevelCount );
 
     srvDesc.Format = dxgiFormat;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MipLevels = mipLevelCount;
     srvDesc.Texture2D.MostDetailedMip = 0;
     srvDesc.Texture2D.PlaneSlice = 0;
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
