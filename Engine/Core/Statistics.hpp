@@ -35,10 +35,6 @@ namespace Statistics
     int GetCreateConstantBufferCalls();
     void IncDrawCalls();
     int GetDrawCalls();
-    void IncVertexBufferBinds();
-    int GetVertexBufferBinds();
-    void IncTextureBinds();
-    int GetTextureBinds();
     void IncRenderTargetBinds();
     int GetRenderTargetBinds();
     void ResetFrameStatistics();

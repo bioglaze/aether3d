@@ -7,10 +7,8 @@ namespace Statistics
     int drawCalls = 0;
     int barrierCalls = 0;
     int fenceCalls = 0;
-    int textureBinds = 0;
     int shaderBinds = 0;
     int renderTargetBinds = 0;
-    int vertexBufferBinds = 0;
     int createConstantBufferCalls = 0;
     int allocCalls = 0;
     int totalAllocCalls = 0;
@@ -183,16 +181,6 @@ void Statistics::IncRenderTargetBinds()
     ++Statistics::renderTargetBinds;
 }
 
-void Statistics::IncVertexBufferBinds()
-{
-    ++Statistics::vertexBufferBinds;
-}
-
-void Statistics::IncTextureBinds()
-{
-    ++Statistics::textureBinds;
-}
-
 void Statistics::IncShaderBinds()
 {
     ++Statistics::shaderBinds;
@@ -233,19 +221,9 @@ int Statistics::GetDrawCalls()
     return Statistics::drawCalls;
 }
 
-int Statistics::GetTextureBinds()
-{
-    return Statistics::textureBinds;
-}
-
 int Statistics::GetRenderTargetBinds()
 {
     return Statistics::renderTargetBinds;
-}
-
-int Statistics::GetVertexBufferBinds()
-{
-    return Statistics::vertexBufferBinds;
 }
 
 int Statistics::GetShaderBinds()
@@ -263,9 +241,7 @@ void Statistics::ResetFrameStatistics()
     drawCalls = 0;
     barrierCalls = 0;
     fenceCalls = 0;
-    textureBinds = 0;
     shaderBinds = 0;
-    vertexBufferBinds = 0;
     renderTargetBinds = 0;
     createConstantBufferCalls = 0;
     allocCalls = 0;

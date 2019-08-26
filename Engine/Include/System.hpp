@@ -9,7 +9,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.8 Documentation
+   \mainpage Aether3D Game Engine v0.8.1 Documentation
 
    \section Introduction
 
@@ -190,8 +190,6 @@ namespace ae3d
 			/// \param outStr Caller must allocate at least X bytes for the output.
             void GetStatistics( char* outStr );
             int GetDrawCallCount();
-            int GetVertexBufferBindCount();
-            int GetTextureBindCount();
             int GetShaderBindCount();
             int GetRenderTargetBindCount();
             int GetBarrierCallCount();

@@ -259,16 +259,6 @@ int ae3d::System::Statistics::GetDrawCallCount()
     return ::Statistics::GetDrawCalls();
 }
 
-int ae3d::System::Statistics::GetVertexBufferBindCount()
-{
-    return ::Statistics::GetVertexBufferBinds();
-}
-
-int ae3d::System::Statistics::GetTextureBindCount()
-{
-    return ::Statistics::GetTextureBinds();
-}
-
 int ae3d::System::Statistics::GetRenderTargetBindCount()
 {
     return ::Statistics::GetRenderTargetBinds();
