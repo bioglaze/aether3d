@@ -352,12 +352,6 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
         {
             continue;
         }
-        
-        auto cameraPos = cameraTransform->GetWorldPosition();
-        auto cameraDir = cameraTransform->GetViewDirection();
-        
-        AudioSystem::SetListenerPosition( cameraPos.x, cameraPos.y, cameraPos.z );
-        AudioSystem::SetListenerOrientation( cameraDir.x, cameraDir.y, cameraDir.z );
 
         for (auto go : gameObjects)
         {
@@ -527,6 +521,13 @@ void ae3d::Scene::Render()
 #endif    
     for (auto camera : cameras)
     {
+        auto cameraTransform = camera->GetComponent< TransformComponent >();
+        auto cameraPos = cameraTransform->GetWorldPosition();
+        auto cameraDir = cameraTransform->GetViewDirection();
+        
+        AudioSystem::SetListenerPosition( cameraPos.x, cameraPos.y, cameraPos.z );
+        AudioSystem::SetListenerOrientation( cameraDir.x, cameraDir.y, cameraDir.z );
+
         RenderWithCamera( camera, 0, "Primary Pass" );
     }
     
