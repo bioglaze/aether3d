@@ -72,6 +72,8 @@ namespace SceneGlobal
     Matrix44 shadowCameraProjectionMatrix;
 }
 
+bool someLightCastsShadow = false;
+
 void SetupCameraForSpotShadowCasting( const Vec3& lightPosition, const Vec3& lightDirection, ae3d::CameraComponent& outCamera,
                                      ae3d::TransformComponent& outCameraTransform )
 {
@@ -507,7 +509,11 @@ void ae3d::Scene::Render()
     BubbleSort( cameras.data(), (int)cameras.size() );
     BubbleSort( rtCameras.data(), (int)rtCameras.size() );
     
-    RenderShadowMaps( rtCameras );
+    if (someLightCastsShadow)
+    {
+        RenderShadowMaps( rtCameras );
+    }
+
     RenderDepthAndNormalsForAllCameras( rtCameras );
     RenderRTCameras( rtCameras );
     RenderDepthAndNormalsForAllCameras( cameras );

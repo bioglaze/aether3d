@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 
+extern bool someLightCastsShadow;
 std::vector< ae3d::PointLightComponent > pointLightComponents;
 unsigned nextFreePointLightComponent = 0;
 
@@ -29,6 +30,7 @@ void ae3d::PointLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     
     if (castsShadow && cachedShadowMapSize != mapSize)
     {
+        someLightCastsShadow = true;
         cachedShadowMapSize = mapSize;
         shadowMap.CreateCube( mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "pointlight shadow" );
     }

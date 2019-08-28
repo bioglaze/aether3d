@@ -6,6 +6,7 @@
 
 std::vector< ae3d::DirectionalLightComponent > directionalLightComponents;
 unsigned nextFreeDirectionalLightComponent = 0;
+extern bool someLightCastsShadow;
 
 unsigned ae3d::DirectionalLightComponent::New()
 {
@@ -30,6 +31,7 @@ void ae3d::DirectionalLightComponent::SetCastShadow( bool enable, int shadowMapS
     // TODO: create only if not already created with current size.
     if (castsShadow)
     {
+        someLightCastsShadow = true;
         shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "dirlight shadow" );
     }
 }

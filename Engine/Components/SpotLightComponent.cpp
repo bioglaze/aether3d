@@ -2,6 +2,7 @@
 #include "System.hpp"
 #include <string>
 
+extern bool someLightCastsShadow;
 static constexpr int MaxComponents = 100;
 ae3d::SpotLightComponent spotLightComponents[ MaxComponents ];
 unsigned nextFreeSpotlLightComponent = 0;
@@ -30,6 +31,7 @@ void ae3d::SpotLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     
     if (castsShadow && cachedShadowMapSize != mapSize)
     {
+        someLightCastsShadow = true;
         cachedShadowMapSize = mapSize;
         shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "spotlight shadow" );
     }
