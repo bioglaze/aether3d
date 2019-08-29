@@ -121,7 +121,7 @@ namespace GfxDeviceGlobal
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
-    VkImageView boundViews[ 12 ];
+    VkImageView boundViews[ 13 ];
     VkSampler boundSamplers[ 2 ];
     Array< VkBuffer > pendingFreeVBs;
     Array< Ubo > ubos;
@@ -1332,7 +1332,7 @@ namespace ae3d
         }
     }
 
-    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1, const VkImageView& view11 )
+    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1, const VkImageView& view11, const VkImageView& view12 )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.count;
@@ -1463,7 +1463,7 @@ namespace ae3d
         // Binding 12 : Image
         VkDescriptorImageInfo sampler3Desc = {};
         sampler3Desc.sampler = sampler1;
-        sampler3Desc.imageView = TextureCube::GetDefaultTexture()->GetView();
+        sampler3Desc.imageView = view12;
         sampler3Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         VkWriteDescriptorSet imageSet3 = {};
@@ -1471,7 +1471,7 @@ namespace ae3d
         imageSet3.dstSet = outDescriptorSet;
         imageSet3.descriptorCount = 1;
         imageSet3.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        imageSet3.pImageInfo = &sampler0Desc;
+        imageSet3.pImageInfo = &sampler3Desc;
         imageSet3.dstBinding = 12;
 
         const int setCount = 13;
@@ -1695,7 +1695,7 @@ namespace ae3d
 void BindComputeDescriptorSet()
 {
     VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ],
-                                                                 GfxDeviceGlobal::boundViews[ 1 ], GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ] );
+                                                                 GfxDeviceGlobal::boundViews[ 1 ], GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ], GfxDeviceGlobal::boundViews[ 12 ] );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -1991,7 +1991,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     UploadPerObjectUbo();
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ], GfxDeviceGlobal::boundViews[ 1 ],
-                                                           GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ] );
+                                                           GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ], GfxDeviceGlobal::boundViews[ 12 ] );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -2089,6 +2089,7 @@ void ae3d::GfxDevice::BeginFrame()
     GfxDeviceGlobal::boundViews[ 0 ] = Texture2D::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::boundViews[ 1 ] = Texture2D::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::boundViews[ 11 ] = Texture2D::GetDefaultTextureUAV()->GetView();
+    GfxDeviceGlobal::boundViews[ 12 ] = TextureCube::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::boundSamplers[ 0 ] = Texture2D::GetDefaultTexture()->GetSampler();
     GfxDeviceGlobal::boundSamplers[ 1 ] = Texture2D::GetDefaultTexture()->GetSampler();
 }

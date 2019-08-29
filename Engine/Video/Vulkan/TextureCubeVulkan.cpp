@@ -77,7 +77,7 @@ ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
         {
             imageData[ i ] = 0xFF;
         }
-
+        System::Print("creating default cube texture\n");
         // FIXME: This is a hack, implement LoadFromData instead
         TextureCubeGlobal::defaultTexture.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
             FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
