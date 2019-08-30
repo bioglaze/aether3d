@@ -259,11 +259,7 @@ int main()
 
         if (isRightMouseDown && event.type == WindowEventType::MouseMove)
         {
-#ifdef __linux__
-            svRotateCamera( sceneView, float( deltaX ) / 20, float( deltaY ) / 20 );
-#else
             svRotateCamera( sceneView, -float( deltaX ) / 20, -float( deltaY ) / 20 );
-#endif
         }
 
         if (isMiddleMouseDown)
