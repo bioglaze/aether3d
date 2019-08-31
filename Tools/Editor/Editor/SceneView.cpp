@@ -390,6 +390,31 @@ void svSaveScene( SceneView* sv, char* path )
 
 GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, int height )
 {
+    ae3d::CameraComponent* camera = sv->camera.GetComponent<CameraComponent>();
+    const unsigned texWidth = sv->lightTex.GetWidth();
+    const unsigned texHeight = sv->lightTex.GetHeight();
+
+    // Checks if the mouse hit a sprite and selects the object.
+    for (unsigned goIndex = 1; goIndex < sv->gameObjects.count; ++goIndex)
+    {
+        TransformComponent* goTransform = sv->gameObjects[ goIndex ]->GetComponent< TransformComponent >();
+        const Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
+        System::Print("screenX: %d, screenY: %d, screenPoint: %f, %f\n", screenX, screenY, screenPoint.x, screenPoint.y);
+        
+        if (goTransform && screenX > screenPoint.x - texWidth / 2 && screenX < screenPoint.x + texWidth / 2 &&
+                         screenY > screenPoint.y - texHeight / 2 && screenY < screenPoint.y + texHeight / 2)
+        {
+            System::Print("Hit game object sprite\n");
+            sv->scene.Add( sv->gameObjects[ 0 ] );
+            sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( sv->gameObjects[ goIndex ]->GetComponent<TransformComponent>()->GetLocalPosition() );
+
+            sv->selectedGameObjects.Add( sv->gameObjects[ goIndex ] );
+            sv->selectedGOIndex = goIndex;
+            return sv->gameObjects[ goIndex ];
+        }
+    }
+
+    // Checks if the mouse hit a mesh and selects the object.
     Array< CollisionInfo > ci;
     GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
 
