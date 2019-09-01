@@ -168,7 +168,7 @@ void Inspector::HandleMouseMotion( int x, int y )
     nk_input_motion( &ctx, x, y );
 }
 
-void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, unsigned goCount )
+void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, unsigned goCount, ae3d::Material* material )
 {
     outCommand = Command::Empty;
 
@@ -218,6 +218,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             {
                 mesh->Load( FileSystem::FileContents( path ) );
                 gameObject->GetComponent< MeshRendererComponent >()->SetMesh( mesh );
+                gameObject->GetComponent< MeshRendererComponent >()->SetMaterial( material, 0 );
             }
         }
 

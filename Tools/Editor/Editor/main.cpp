@@ -275,7 +275,7 @@ int main()
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
         GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
-        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount );
+        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount, svGetMaterial( sceneView ) );
         svEndRender( sceneView );
 
         switch (inspectorCommand)

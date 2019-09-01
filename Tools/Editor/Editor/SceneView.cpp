@@ -311,6 +311,11 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->transformGizmo.zAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
 }
 
+ae3d::Material* svGetMaterial( SceneView* sceneView )
+{
+    return &sceneView->material;
+}
+
 GameObject** svGetGameObjects( SceneView* sceneView, int& outCount )
 {
     outCount = sceneView->gameObjects.count;
