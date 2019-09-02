@@ -44,8 +44,6 @@ nk_draw_null_texture nullTexture;
 Texture2D* uiTextures[ 1 ];
 nk_context ctx;
 nk_font_atlas atlas;
-int atlasWidth = 0;
-int atlasHeight = 0;
 Texture2D nkFontTexture;
 
 static unsigned Min2( unsigned a, unsigned b )
@@ -132,6 +130,8 @@ void Inspector::Init()
     nk_font_atlas_init_default( &atlas );
     nk_font_atlas_begin( &atlas );
 
+    int atlasWidth = 0;
+    int atlasHeight = 0;
     nk_font* nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
