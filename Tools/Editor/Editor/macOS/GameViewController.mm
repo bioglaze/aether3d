@@ -226,7 +226,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
         ae3d::GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
-        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount );
+        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount, svGetMaterial( sceneView ) );
         svEndRender( sceneView );
         ae3d::System::EndFrame();
         
