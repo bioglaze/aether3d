@@ -35,6 +35,12 @@ void ae3d::TextureCube::DestroyTextures()
     }
 }
 
+ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
+{
+	// TODO: Implement
+    return nullptr;
+}
+
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
           const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
           const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
@@ -155,7 +161,38 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     {
         const bool isDDS = paths[ face ].find( ".dds" ) != std::string::npos || paths[ face ].find( ".DDS" ) != std::string::npos;
         
-        if (HasStbExtension( paths[ face ] ))
+        if( isDDS )
+        {
+            isStbImage[ face ] = false;
+
+            auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
+            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput[ face ] );
+
+            if( loadResult != DDSLoader::LoadResult::Success )
+            {
+                ae3d::System::Print( "DDS Loader could not load %s", paths[ face ].c_str() );
+                return;
+            }
+
+            opaque = true;
+
+            unsigned mipWidth = width;
+            unsigned mipHeight = height;
+
+            for( int i = 0; i < mipLevelCount; ++i )
+            {
+                faceData[ face ] = &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ i ] ];
+
+                texResources[ resCounter ].pData = faceData[ face ];
+                texResources[ resCounter ].RowPitch = mipWidth * bytesPerPixel;
+                texResources[ resCounter ].SlicePitch = texResources[ resCounter ].RowPitch * mipHeight;
+                ++resCounter;
+
+                mipWidth = ( mipWidth + 1 ) >> 1;
+                mipHeight = ( mipHeight + 1 ) >> 1;
+           }
+        }
+        else if (HasStbExtension( paths[ face ] ))
         {
             isStbImage[ face ] = true;
 
@@ -175,38 +212,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             texResources[ face ].pData = faceData[ face ];
             texResources[ face ].RowPitch = width * bytesPerPixel;
             texResources[ face ].SlicePitch = texResources[ face ].RowPitch * height;
-        }
-        else if (isDDS)
-        {
-            isStbImage[ face ] = false;
-
-            auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
-            const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput[ face ] );
-
-            if (loadResult != DDSLoader::LoadResult::Success)
-            {
-                ae3d::System::Print( "DDS Loader could not load %s", paths[ face ].c_str() );
-                return;
-            }
-
-            opaque = true;
-
-            unsigned mipWidth = width;
-            unsigned mipHeight = height;
-
-            for (int i = 0; i < mipLevelCount; ++i)
-            {
-                faceData[ face ] = &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ i ] ];
-
-                texResources[ resCounter ].pData = faceData[ face ];
-                texResources[ resCounter ].RowPitch = mipWidth * bytesPerPixel;
-                texResources[ resCounter ].SlicePitch = texResources[ resCounter ].RowPitch * mipHeight;
-                ++resCounter;
-
-                mipWidth = (mipWidth + 1) >> 1;
-                mipHeight = (mipHeight + 1) >> 1;
-
-            }
         }
         else
         {
