@@ -25,6 +25,7 @@ namespace GfxDeviceGlobal
 namespace TextureCubeGlobal
 {
     std::vector< ID3D12Resource* > textures;
+	ae3d::TextureCube defaultTexture;
 }
 
 void ae3d::TextureCube::DestroyTextures()
@@ -37,8 +38,15 @@ void ae3d::TextureCube::DestroyTextures()
 
 ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
 {
-	// TODO: Implement
-    return nullptr;
+    if( TextureCubeGlobal::defaultTexture.srv.ptr == 0 )
+    {
+		// FIXME: This is a hack, implement LoadFromData instead
+		TextureCubeGlobal::defaultTexture.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+			FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+			FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
+    }
+
+    return &TextureCubeGlobal::defaultTexture;
 }
 
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
