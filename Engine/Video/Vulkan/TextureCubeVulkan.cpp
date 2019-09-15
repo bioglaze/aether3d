@@ -71,17 +71,40 @@ ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
 {
     if (TextureCubeGlobal::defaultTexture.view == VK_NULL_HANDLE)
     {
-        std::uint8_t imageData[ 32 * 32 * 4 ];
+        struct TGAHeader
+        {
+            std::uint8_t idLength;
+            std::uint8_t colorMap;
+            std::uint8_t imageType;
+            std::uint8_t colorMapSpec[ 5 ];
+            std::uint16_t xOrg;
+            std::uint16_t yOrg;
+            std::uint16_t width;
+            std::uint16_t height;
+            std::uint8_t pixelDepth;
+            std::uint8_t descriptor;
+        };
 
+        TGAHeader header = {};
+        header.imageType = 2;
+        header.width = 32;
+        header.height = 32;
+        header.pixelDepth = 32;
+        
+        std::vector< unsigned char > imageData( sizeof( TGAHeader ) + 32 * 32 * 4 );
+        std::memcpy( imageData.data(), &header, sizeof( TGAHeader ) );
+        
         for (int i = 0; i < 32 * 32 * 4; ++i)
         {
-            imageData[ i ] = 0xFF;
+            imageData[ i + sizeof( TGAHeader ) ] = 0xFF;
         }
-        System::Print("creating default cube texture\n");
-        // FIXME: This is a hack, implement LoadFromData instead
-        TextureCubeGlobal::defaultTexture.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-            FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-            FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
+
+        FileSystem::FileContentsData tgaData;
+        tgaData.isLoaded = true;
+        tgaData.path = "none.tga";
+        tgaData.data = imageData;
+        
+        TextureCubeGlobal::defaultTexture.Load( tgaData, tgaData, tgaData, tgaData, tgaData, tgaData, TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
     }
 
     return &TextureCubeGlobal::defaultTexture;
