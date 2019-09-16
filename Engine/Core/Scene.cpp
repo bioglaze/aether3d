@@ -270,7 +270,6 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
                 if (transform && spotLight)
                 {
                     auto worldPos = transform->GetWorldPosition();
-                    // FIXME: add falloff radius
                     GfxDeviceGlobal::lightTiler.SetSpotLightParameters( goWithSpotLightIndex, worldPos, spotLight->GetRadius(), Vec4( spotLight->GetColor() ), transform->GetViewDirection(), spotLight->GetConeAngle(), 3 );
                     ++goWithSpotLightIndex;
                 }
