@@ -25,7 +25,7 @@ layout( set = 0, binding = 7 ) Buffer<float4> pointLightColors : register(t2);
 layout( set = 0, binding = 8 ) Buffer<float4> spotLightBufferCenterAndRadius : register(t3);
 layout( set = 0, binding = 9 ) Buffer<float4> spotLightParams : register(t4);
 layout( set = 0, binding = 10 ) Buffer<float4> spotLightColors : register(t6);
-//layout( set = 0, binding = 12 ) TextureCube<float4> texCube : register(t7); 
+layout( set = 0, binding = 12 ) TextureCube<float4> texCube : register(t7); 
 
 #define TILE_RES 16
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
@@ -216,7 +216,7 @@ float4 main( PS_INPUT input ) : SV_Target
     }
     
     accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
-    //accumDiffuseAndSpecular.rgb = texCube.Sample( sLinear, N );
+    //accumDiffuseAndSpecular.rgb = texCube.Sample( sLinear, N ).rgb;
 
     //return float4(accumDiffuseAndSpecular, 1 );
 #ifdef DEBUG_LIGHT_COUNT

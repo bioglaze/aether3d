@@ -438,6 +438,7 @@ int main()
     pbrMaterial.SetShader( &standardShader );
     pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
+    //pbrMaterial.SetTexture( "", &skybox );
     pbrMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     pbrMaterial.SetBackFaceCulling( true );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );

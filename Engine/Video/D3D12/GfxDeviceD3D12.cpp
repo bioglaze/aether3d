@@ -27,7 +27,7 @@ void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
-constexpr int RESOURCE_BINDING_COUNT = 9;
+constexpr int RESOURCE_BINDING_COUNT = 10;
 
 namespace WindowGlobal
 {
@@ -173,6 +173,7 @@ namespace GfxDeviceGlobal
     std::vector< PSOEntry > psoCache;
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
+    ae3d::TextureBase* textureCube = nullptr;
     ID3D12Resource* uav1 = nullptr;
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc = {};
     std::vector< ae3d::VertexBuffer > lineBuffers;
@@ -536,7 +537,7 @@ void CreateRootSignature()
     {
         CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 7, 0 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0 );
         descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1 );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
@@ -1050,6 +1051,7 @@ void ae3d::CreateRenderer( int samples )
     GfxDeviceGlobal::lightTiler.Init();
     GfxDeviceGlobal::texture0 = Texture2D::GetDefaultTexture();
     GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
+    GfxDeviceGlobal::textureCube = TextureCube::GetDefaultTexture();
 }
 
 void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, int offset )
@@ -1221,7 +1223,10 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
 
         cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle );
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle ); // t6
+
+        cpuHandle.ptr += incrementSize;
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::textureCube->GetGpuResource()->resource, GfxDeviceGlobal::textureCube->GetSRVDesc(), cpuHandle ); // t7
 
         const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
         const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
@@ -1249,6 +1254,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
         cpuHandle.ptr += incrementSize;
         GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+
+        cpuHandle.ptr += incrementSize;
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::textureCube->GetGpuResource()->resource, GfxDeviceGlobal::textureCube->GetSRVDesc(), cpuHandle ); // t7
     }
 
     cpuHandle.ptr += incrementSize;
