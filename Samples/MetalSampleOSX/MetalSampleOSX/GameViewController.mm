@@ -33,11 +33,11 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
-#define TEST_SHADOWS_POINT
+//#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
@@ -402,7 +402,7 @@ using namespace ae3d;
     // TODO: SDF texture
     fontTexSDF.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
-    bc1Tex.Load( ae3d::FileSystem::FileContents( "test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    bc1Tex.Load( ae3d::FileSystem::FileContents( "test_dxt1.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::Generate, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc2Tex.Load( ae3d::FileSystem::FileContents( "test_dxt3.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc3Tex.Load( ae3d::FileSystem::FileContents( "test_dxt5.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc4Tex.Load( ae3d::FileSystem::FileContents( "spnza_bricks_a_spec_bc4.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
@@ -413,10 +413,10 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents( "front.jpg" ), ae3d::FileSystem::FileContents( "back.jpg" ),
                 ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB );
     
-    skyTex.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+    /*skyTex.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
                 FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
                 FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
+                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );*/
     scene.SetSkybox( &skyTex );
     
     pbrDiffuseTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
@@ -616,6 +616,7 @@ using namespace ae3d;
     animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &skinMaterial, 0 );
     animatedGo.AddComponent< TransformComponent >();
     animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, 0, -85 } );
+    animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 0, 0 } ) );
     animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();

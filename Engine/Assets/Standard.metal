@@ -137,6 +137,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
                                texture2d<float, access::sample> normalMap [[texture(2)]],
                                texture2d<float, access::sample> specularMap [[texture(3)]],
+                               texturecube<float, access::sample> cubeMap [[texture(4)]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
                                const device float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
@@ -159,7 +160,9 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 V = normalize( in.positionVS.xyz );
     const float3 L = normalize( -surfaceToDirectionalLightVS );
     const float3 H = normalize( L + V );
-    
+
+    const half4 cubeReflection = half4( cubeMap.sample( sampler0, N ) );
+
     const float dotNV = abs( dot( N, V ) ) + 1e-5f;
     const float dotNL = saturate( dot( N, -surfaceToDirectionalLightVS ) );
     const float dotLH = saturate( dot( L, H ) );

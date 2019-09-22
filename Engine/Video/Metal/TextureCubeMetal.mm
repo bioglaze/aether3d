@@ -13,6 +13,24 @@
 extern id <MTLCommandQueue> commandQueue;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
 static int textureCubeMemoryUsage = 0;
+ae3d::TextureCube defaultCube;
+
+ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
+{
+    if (defaultCube.GetMetalTexture() == nil)
+    {
+        MTLTextureDescriptor* descriptor2 = [MTLTextureDescriptor textureCubeDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
+                                                                                              size:64
+                                                                                         mipmapped:NO];
+        descriptor2.usage = MTLTextureUsageShaderRead;
+        descriptor2.storageMode = MTLStorageModePrivate;
+    
+        defaultCube.metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:descriptor2];
+        defaultCube.metalTexture.label = @"Default Cube Texture";
+    }
+    
+    return &defaultCube;
+}
 
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                               const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,

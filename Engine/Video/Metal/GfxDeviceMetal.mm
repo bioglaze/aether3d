@@ -11,6 +11,7 @@
 #include "System.hpp"
 #include "Statistics.hpp"
 #include "Texture2D.hpp"
+#include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
 
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
@@ -663,6 +664,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
             textures[ slot ] = Texture2D::GetDefaultTexture()->GetMetalTexture();
         }
     }
+
+    textures[ 4 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
 
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
 
