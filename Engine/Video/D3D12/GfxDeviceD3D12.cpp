@@ -2,7 +2,7 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <d3dx12.h>
-#include <pix.h>
+#include <pix3.h>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -1136,15 +1136,12 @@ void* ae3d::GfxDevice::GetCurrentConstantBuffer()
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
-    wchar_t wstr[ 128 ];
-    std::mbstowcs( wstr, name, 128 );
-    const UINT size = static_cast<UINT>((wcslen( wstr ) + 1) * sizeof( wstr[ 0 ] ));
-    GfxDeviceGlobal::graphicsCommandList->BeginEvent( DirectX::Detail::PIX_EVENT_UNICODE_VERSION, wstr, size );
+	PIXBeginEvent( 0, name );
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
-    GfxDeviceGlobal::graphicsCommandList->EndEvent();
+	PIXEndEvent();
 }
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
