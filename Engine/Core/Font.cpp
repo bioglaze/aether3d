@@ -133,7 +133,7 @@ void ae3d::Font::CreateVertexBuffer( const char* text, const Vec4& color, Vertex
         vertices[ c * 6 + 5 ].color = color;
     }
     
-    outVertexBuffer.Generate( faces, int( textStr.size() * 2 ), vertices, int( textStr.size() * 6 ), VertexBuffer::Storage::GPU );
+    outVertexBuffer.Generate( faces, int( textStr.size() * 2 ), vertices, int( textStr.size() * 6 ), VertexBuffer::Storage::CPU );
     outVertexBuffer.SetDebugName( text );
 
     delete[] vertices;
