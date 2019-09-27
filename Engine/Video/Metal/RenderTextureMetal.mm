@@ -28,6 +28,10 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     {
         format = MTLPixelFormatRGBA32Float;
     }
+    else if (dataType == DataType::Float16)
+    {
+        format = MTLPixelFormatRGBA16Float;
+    }
 
     MTLTextureDescriptor* textureDescriptor =
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:format
@@ -80,6 +84,10 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     else if (dataType == DataType::Float)
     {
         format = MTLPixelFormatRGBA32Float;
+    }
+    else if (dataType == DataType::Float16)
+    {
+        format = MTLPixelFormatRGBA16Float;
     }
 
     MTLTextureDescriptor* textureDescriptor =

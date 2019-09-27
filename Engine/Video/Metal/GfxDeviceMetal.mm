@@ -471,6 +471,10 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         {
             format = MTLPixelFormatRGBA32Float;
         }
+        else if (pixelFormat == ae3d::RenderTexture::DataType::Float16)
+        {
+            format = MTLPixelFormatRGBA16Float;
+        }
 
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = format;
         pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;

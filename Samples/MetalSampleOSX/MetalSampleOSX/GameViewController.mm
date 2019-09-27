@@ -361,9 +361,9 @@ using namespace ae3d;
     }
 #endif
 
-    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
     ae3d::System::Print( "width: %f, height: %f\n", self.view.bounds.size.width, self.view.bounds.size.height );
-    camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
+    camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
 
     camera2d.SetName( "Camera2D" );
     camera2d.AddComponent<ae3d::CameraComponent>();

@@ -13,6 +13,7 @@ namespace ae3d
         {
             UByte,
             Float,
+            Float16,
             R32G32
         };
 
