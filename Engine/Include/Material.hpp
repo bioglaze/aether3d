@@ -82,9 +82,9 @@ namespace ae3d
         /// \param f0 Reflectance at grazing angle.
         void SetF0( float f0 );
 
-        /// \param name Texture uniform name.
         /// \param texture Texture.
-        void SetTexture( const char* name, class TextureCube* texture );
+        /// \param slot Slot in the shader.
+        void SetTexture( class TextureCube* texture, int slot );
 
         /// \param name Texture uniform name.
         /// \param renderTexture Render texture.
@@ -117,10 +117,10 @@ namespace ae3d
         std::unordered_map< std::string, int > ints;
         std::unordered_map< std::string, Vec3 > vec3s;
         std::unordered_map< std::string, Vec4 > vec4s;
-        std::unordered_map< std::string, class TextureCube* > texCubes;
         std::unordered_map< std::string, RenderTexture* > texRTs;
         static constexpr int TEXTURE_SLOT_COUNT = 5;
         Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};
+        TextureCube* texCubeSlots[ TEXTURE_SLOT_COUNT ] = {};
         Shader* shader = nullptr;
         DepthFunction depthFunction = DepthFunction::LessOrEqualWriteOn;
         BlendingMode blendingMode = BlendingMode::Off;

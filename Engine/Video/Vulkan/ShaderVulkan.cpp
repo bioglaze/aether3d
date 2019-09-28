@@ -237,6 +237,11 @@ void ae3d::Shader::SetTexture( const char* /*name*/, TextureCube* texture, int t
         GfxDeviceGlobal::boundViews[ 1 ] = texture->GetView();
         GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
+    else if (textureUnit == 12)
+    {
+        GfxDeviceGlobal::boundViews[ 12 ] = texture->GetView();
+        //GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
+    }
     else
     {
         System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );

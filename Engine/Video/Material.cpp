@@ -56,11 +56,11 @@ void ae3d::Material::Apply()
         shader->SetTexture( "texture", tex2dSlots[ slot ], slot );
     }
 
-    for (const auto& texCube : texCubes)
+    /*for (const auto& texCube : texCubes)
     {
         shader->SetTexture( texCube.first.c_str(), texCube.second, texUnit );
         ++texUnit;
-    }
+        }*/
 
     for (const auto& texRT : texRTs)
     {
@@ -136,9 +136,12 @@ void ae3d::Material::SetTexture( Texture2D* texture, int slot )
     }
 }
 
-void ae3d::Material::SetTexture( const char* name, TextureCube* texture )
+void ae3d::Material::SetTexture( TextureCube* texture, int slot )
 {
-    texCubes[ name ] = texture;
+    if (0 <= slot && slot < TEXTURE_SLOT_COUNT)
+    {
+        texCubeSlots[ slot ] = texture;
+    }
 }
 
 void ae3d::Material::SetRenderTexture( const char* name, RenderTexture* renderTexture )
