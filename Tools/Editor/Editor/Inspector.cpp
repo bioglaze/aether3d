@@ -192,7 +192,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
         if (gameObject != nullptr && transform != nullptr)
         {
-            Vec3 pos = transform->GetLocalPosition();
+            Vec3& pos = transform->GetLocalPosition();
             
             nk_property_float( &ctx, "#X:", -1024.0f, &pos.x, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Y:", -1024.0f, &pos.y, 1024.0f, 1, 1 );
@@ -269,9 +269,8 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
         if (gameObject != nullptr && pointLight != nullptr)
         {
-            static float radius = 0;
-            radius = pointLight->GetRadius();
-            nk_property_float( &ctx, "#Radius:", -0.0f, &radius, 1024.0f, 1, 1 );
+            float& radius = pointLight->GetRadius();
+            nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
         }
 
         if (gameObject != nullptr && spotLight == nullptr && nk_button_label( &ctx, "Add spot light" ))

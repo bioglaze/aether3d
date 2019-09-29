@@ -13,6 +13,9 @@ namespace ae3d
         /// \return Local position.
         const Vec3& GetLocalPosition() const { return localPosition; }
 
+        /// \return Local position.
+        Vec3& GetLocalPosition() { return localPosition; }
+
         /// \return Local rotation.
         const Quaternion& GetLocalRotation() const { return localRotation; }
 

@@ -36,6 +36,9 @@ namespace ae3d
         RenderTexture* GetShadowMap() { return &shadowMap; }
 
         /// \return radius.
+        float& GetRadius() { return radius; }
+        
+        /// \return radius.
         float GetRadius() const { return radius; }
         
         /// \param aRadius radius
