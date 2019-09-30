@@ -47,7 +47,6 @@ int main()
     Material material;
     // Testing a material without a shader.
     //material.SetShader( &shader );
-    material.SetVector( "tint", { 1, 1, 1, 1 } );
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
     GameObject cubeZero;

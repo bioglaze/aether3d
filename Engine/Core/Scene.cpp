@@ -1010,7 +1010,6 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     Material* tempMaterial = new Material();
     tempMaterial->SetShader( &tempShader );
     tempMaterial->SetTexture( Texture2D::GetDefaultTexture(), 0 );
-    tempMaterial->SetVector( "tint", { 1, 1, 1, 1 } );
     tempMaterial->SetBackFaceCulling( true );
     outMaterials[ "temp material" ] = tempMaterial;
 
@@ -1551,30 +1550,6 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                     mr->SetMaterial( outMaterials[ materialName ], i );
                 }
             }
-        }
-        else if (token == "param_float")
-        {
-            std::string uniformName;
-            float floatValue;
-
-            lineStream >> uniformName >> floatValue;
-            outMaterials[ currentMaterialName ]->SetFloat( uniformName.c_str(), floatValue );
-        }
-        else if (token == "param_vec3")
-        {
-            std::string uniformName;
-            Vec3 vec3;
-
-            lineStream >> uniformName >> vec3.x >> vec3.y >> vec3.z;
-            outMaterials[ currentMaterialName ]->SetVector( uniformName.c_str(), vec3 );
-        }
-        else if (token == "param_vec4")
-        {
-            std::string uniformName;
-            Vec4 vec4;
-
-            lineStream >> uniformName >> vec4.x >> vec4.y >> vec4.z >> vec4.w;
-            outMaterials[ currentMaterialName ]->SetVector( uniformName.c_str(), vec4 );
         }
         else if (token == "param_texture")
         {

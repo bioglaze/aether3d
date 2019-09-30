@@ -471,7 +471,6 @@ using namespace ae3d;
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
-    cubeMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
 
     skinMaterial.SetShader( &skinShader );
     skinMaterial.SetTexture( &gliderTex, 0 );
