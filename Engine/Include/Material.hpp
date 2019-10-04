@@ -82,14 +82,6 @@ namespace ae3d
         /// \param name Float uniform name.
         /// \param value Value.
         void SetFloat( const char* name, float value );
-        
-        /// \param name Vector uniform name.
-        /// \param vec3 Vector.
-        void SetVector( const char* name, const Vec3& vec3 );
-
-        /// \param name Name. This is a uniform in the shader.
-        /// \param vec Vector.
-        void SetVector( const char* name, const Vec4& vec );
 
   private:
         static std::unordered_map< std::string, RenderTexture* > sTexRTs;
@@ -97,8 +89,6 @@ namespace ae3d
 
         std::unordered_map< std::string, float > floats;
         std::unordered_map< std::string, int > ints;
-        std::unordered_map< std::string, Vec3 > vec3s;
-        std::unordered_map< std::string, Vec4 > vec4s;
         std::unordered_map< std::string, RenderTexture* > texRTs;
         static constexpr int TEXTURE_SLOT_COUNT = 5;
         Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};

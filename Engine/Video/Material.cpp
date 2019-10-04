@@ -26,16 +26,6 @@ void ae3d::Material::Apply()
 
     shader->Use();
 
-    for (const auto& vec : vec3s)
-    {
-        shader->SetVector3( vec.first.c_str(), &vec.second.x );
-    }
-
-    for (const auto& vec : vec4s)
-    {
-        shader->SetVector4( vec.first.c_str(), &vec.second.x );
-    }
-
     for (const auto& i : ints)
     {
         shader->SetInt( i.first.c_str(), i.second );
@@ -150,14 +140,3 @@ void ae3d::Material::SetFloat( const char* name, float value )
 {
     floats[ name ] = value;
 }
-
-void ae3d::Material::SetVector( const char* name, const Vec3& vec )
-{
-    vec3s[ name ] = vec;
-}
-
-void ae3d::Material::SetVector( const char* name, const Vec4& vec )
-{
-    vec4s[ name ] = vec;
-}
-

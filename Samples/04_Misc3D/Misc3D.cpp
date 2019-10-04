@@ -291,19 +291,16 @@ int main()
     Material materialClamp;
     materialClamp.SetShader( &shader );
     materialClamp.SetTexture( &gliderClampTex, 0 );
-    materialClamp.SetVector( "tint", { 1, 0, 0, 1 } );
     materialClamp.SetBackFaceCulling( true );
 
     Material material;
     material.SetShader( &shader );
     material.SetTexture( &gliderTex, 0 );
-    material.SetVector( "tint", { 1, 1, 1, 1 } );
     material.SetBackFaceCulling( true );
 
     Material materialSkin;
     materialSkin.SetShader( &shaderSkin );
     materialSkin.SetTexture( &playerTex, 0 );
-    materialSkin.SetVector( "tint", { 1, 1, 1, 1 } );
 
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
@@ -439,7 +436,6 @@ int main()
     pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
     //pbrMaterial.SetTexture( "", &skybox );
-    pbrMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     pbrMaterial.SetBackFaceCulling( true );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
@@ -453,7 +449,6 @@ int main()
         sphereMaterials[ i ].SetShader( &standardShader );
         sphereMaterials[ i ].SetTexture( &pbrNormalTex, 1 );
         sphereMaterials[ i ].SetTexture( &pbrDiffuseTex, 0 );
-        sphereMaterials[ i ].SetVector( "tint", { 1, 1, 1, 1 } );
         sphereMaterials[ i ].SetBackFaceCulling( true );
         sphereMaterials[ i ].SetF0( 1.0f / (i+1) );
 
@@ -567,7 +562,6 @@ int main()
     Material transMaterial;
     transMaterial.SetShader( &shader );
     transMaterial.SetTexture( &transTex, 0 );
-    transMaterial.SetVector( "tint", { 1, 1, 1, 1 } );
     transMaterial.SetBackFaceCulling( true );
     transMaterial.SetBlendingMode( Material::BlendingMode::Alpha );
     
