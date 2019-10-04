@@ -6,9 +6,6 @@
 
 std::unordered_map< std::string, ae3d::RenderTexture* > ae3d::Material::sTexRTs;
 std::unordered_map< std::string, ae3d::Texture2D* > ae3d::Material::sTex2ds;
-std::unordered_map< std::string, float > ae3d::Material::sFloats;
-std::unordered_map< std::string, int > ae3d::Material::sInts;
-std::unordered_map< std::string, ae3d::Vec3 > ae3d::Material::sVec3s;
 
 namespace GfxDeviceGlobal
 {
@@ -91,21 +88,6 @@ void ae3d::Material::Apply()
         ++texUnit;
     }
 
-    for (const auto& globalFloat : sFloats)
-    {
-        shader->SetFloat( globalFloat.first.c_str(), globalFloat.second );
-    }
-
-    for (const auto& globalInt : sInts)
-    {
-        shader->SetInt( globalInt.first.c_str(), globalInt.second );
-    }
-
-    for (const auto& globalVec3 : sVec3s)
-    {
-        shader->SetVector3( globalVec3.first.c_str(), &globalVec3.second.x );
-    }
-
     if (depthUnits > 0.0001f || depthUnits < -0.0001f || depthFactor > 0.0001f || depthFactor < -0.0001f)
     {
         GfxDevice::SetPolygonOffset( true, depthFactor, depthUnits );
@@ -157,21 +139,6 @@ void ae3d::Material::SetGlobalRenderTexture( const char* name, RenderTexture* re
 void ae3d::Material::SetGlobalTexture2D( const char* name, Texture2D* texture2d )
 {
     sTex2ds[ name ] = texture2d;
-}
-
-void ae3d::Material::SetGlobalFloat( const char* name, float value )
-{
-    sFloats[ name ] = value;
-}
-
-void ae3d::Material::SetGlobalInt( const char* name, int value )
-{
-    sInts[ name ] = value;
-}
-
-void ae3d::Material::SetGlobalVector( const char* name, const Vec3& value )
-{
-    sVec3s[ name ] = value;
 }
 
 void ae3d::Material::SetInt( const char* name, int value )

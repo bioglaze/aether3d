@@ -26,21 +26,6 @@ namespace ae3d
         /// \param texture2d Texture.
         static void SetGlobalTexture2D( const char* name, class Texture2D* texture2d );
 
-        /// Sets a float into every material, overriding floats set by SetFloat.
-        /// \param name Float uniform name.
-        /// \param value Float value.
-        static void SetGlobalFloat( const char* name, float value );
-
-        /// Sets an int into every material, overriding ints set by SetInt.
-        /// \param name Int uniform name.
-        /// \param value Int value.
-        static void SetGlobalInt( const char* name, int value );
-
-        /// Sets a Vec3 into every material, overriding Vec3s set by SetVector.
-        /// \param name Vec3 uniform name.
-        /// \param value Vec3 value.
-        static void SetGlobalVector( const char* name, const Vec3& value );
-
         /// \return shader.
         class Shader* GetShader() { return shader; }
 
@@ -109,9 +94,6 @@ namespace ae3d
   private:
         static std::unordered_map< std::string, RenderTexture* > sTexRTs;
         static std::unordered_map< std::string, Texture2D* > sTex2ds;
-        static std::unordered_map< std::string, float > sFloats;
-        static std::unordered_map< std::string, int > sInts;
-        static std::unordered_map< std::string, Vec3 > sVec3s;
 
         std::unordered_map< std::string, float > floats;
         std::unordered_map< std::string, int > ints;
