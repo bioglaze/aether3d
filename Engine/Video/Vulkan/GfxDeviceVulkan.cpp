@@ -968,7 +968,8 @@ namespace ae3d
         enabledFeatures.fillModeNonSolid = GfxDeviceGlobal::deviceFeatures.fillModeNonSolid;
         enabledFeatures.samplerAnisotropy = GfxDeviceGlobal::deviceFeatures.samplerAnisotropy;
         enabledFeatures.fragmentStoresAndAtomics = GfxDeviceGlobal::deviceFeatures.fragmentStoresAndAtomics;
-
+        enabledFeatures.vertexPipelineStoresAndAtomics = GfxDeviceGlobal::deviceFeatures.vertexPipelineStoresAndAtomics;
+        
         if (debug::enabled)
         {
             enabledFeatures.robustBufferAccess = GfxDeviceGlobal::deviceFeatures.robustBufferAccess;

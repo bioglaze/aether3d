@@ -205,11 +205,17 @@ namespace ae3d
 
     void CreateInstance( VkInstance* outInstance )
     {
+        typedef VkResult(VKAPI_PTR * FuncPtrEnumerateInstanceVersion)(uint32_t * pApiVersion);
+        FuncPtrEnumerateInstanceVersion vulkan11EnumerateInstanceVersion = (FuncPtrEnumerateInstanceVersion)vkGetInstanceProcAddr( VK_NULL_HANDLE, "vkEnumerateInstanceVersion" );
+
+        unsigned apiVersion = 0;
+        const bool isVulkan11 = vulkan11EnumerateInstanceVersion && vulkan11EnumerateInstanceVersion( &apiVersion ) == VK_SUCCESS && VK_MAKE_VERSION( 1, 1, 0 ) <= apiVersion;
+
         VkApplicationInfo appInfo = {};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "Aether3D";
         appInfo.pEngineName = "Aether3D";
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        appInfo.apiVersion = isVulkan11 ? VK_API_VERSION_1_1 : VK_API_VERSION_1_0;
 
         VkInstanceCreateInfo instanceCreateInfo = {};
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -264,6 +270,16 @@ namespace ae3d
         instanceCreateInfo.enabledExtensionCount = debug::enabled ? 3 : 2;
 #endif
         instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
+
+#if 0
+    const VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT };
+    VkValidationFeaturesEXT features = {};
+    features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+    features.enabledValidationFeatureCount = 2;
+    features.pEnabledValidationFeatures = enables;
+
+    instanceCreateInfo.pNext = &features;
+#endif
 
         VkResult result = vkCreateInstance( &instanceCreateInfo, nullptr, outInstance );
         AE3D_CHECK_VULKAN( result, "instance" );
