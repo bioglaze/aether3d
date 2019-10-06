@@ -202,8 +202,12 @@ int main()
 
                 if (!clickedOnInspector)
                 {
+                    if (!svIsDraggingGizmo( sceneView ))
+                    {
+                        selectedGO = svSelectObject( sceneView, x, y, width, height );
+                    }
+
                     svHandleLeftMouseUp( sceneView );
-                    selectedGO = svSelectObject( sceneView, x, y, width, height );
                 }
             }
             else if (event.type == WindowEventType::Mouse2Up)

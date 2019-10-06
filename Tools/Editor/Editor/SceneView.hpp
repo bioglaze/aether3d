@@ -15,6 +15,7 @@ namespace ae3d
 struct SceneView;
 
 void svInit( SceneView** sceneView, int width, int height );
+bool svIsDraggingGizmo( SceneView* sv );
 void svAddGameObject( SceneView* sceneView );
 void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight );
 void svBeginRender( SceneView* sceneView );

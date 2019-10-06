@@ -460,6 +460,11 @@ bool svIsTransformGizmoSelected( SceneView* sceneView )
     return sceneView->transformGizmo.selectedMesh != -1;
 }
 
+bool svIsDraggingGizmo( SceneView* sv )
+{
+    return sv->transformGizmo.selectedMesh != -1;
+}
+
 void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
     if (sv->transformGizmo.selectedMesh != -1)
@@ -514,7 +519,6 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     
     xAxisMaterial.SetShader( shader );
     //xAxisMaterial.SetTexture( &translateTex, 0 );
-    xAxisMaterial.SetVector( "tint", { 1, 0, 0, 1 } );
     xAxisMaterial.SetBackFaceCulling( true );
     xAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     float factor = -100;
@@ -525,13 +529,11 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     
     yAxisMaterial.SetShader( shader );
     //yAxisMaterial.SetTexture( &translateTex, 0 );
-    yAxisMaterial.SetVector( "tint", { 0, 1, 0, 1 } );
     yAxisMaterial.SetBackFaceCulling( true );
     yAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     
     zAxisMaterial.SetShader( shader );
     //zAxisMaterial.SetTexture( &translateTex, 0 );
-    zAxisMaterial.SetVector( "tint", { 0, 0, 1, 1 } );
     zAxisMaterial.SetBackFaceCulling( true );
     zAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
 
