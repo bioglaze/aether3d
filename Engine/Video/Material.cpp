@@ -43,17 +43,18 @@ void ae3d::Material::Apply()
         shader->SetTexture( "texture", tex2dSlots[ slot ], slot );
     }
 
+    // TODO: Fix these
     /*for (const auto& texCube : texCubes)
     {
         shader->SetTexture( texCube.first.c_str(), texCube.second, texUnit );
         ++texUnit;
         }*/
 
-    for (const auto& texRT : texRTs)
+    /*for (const auto& texRT : texRTs)
     {
         shader->SetRenderTexture( texRT.second, texUnit );
         ++texUnit;
-    }
+        }*/
 
     for (const auto& globalTexRT : sTexRTs)
     {
@@ -116,9 +117,9 @@ void ae3d::Material::SetTexture( TextureCube* texture, int slot )
     }
 }
 
-void ae3d::Material::SetRenderTexture( const char* name, RenderTexture* renderTexture )
+void ae3d::Material::SetRenderTexture( RenderTexture* renderTexture, int slot )
 {
-    texRTs[ name ] = renderTexture;
+    rtSlots[ slot] = renderTexture;
 }
 
 void ae3d::Material::SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture )

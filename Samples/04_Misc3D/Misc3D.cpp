@@ -414,8 +414,7 @@ int main()
 #ifdef TEST_RENDER_TEXTURE_CUBE
     Material materialCubeRT;
     materialCubeRT.SetShader( &shaderCubeMap );
-    materialCubeRT.SetRenderTexture( "skyMap", &cubeRT );
-    materialCubeRT.SetVector( "tint", { 1, 1, 1, 1 } );
+    materialCubeRT.SetRenderTexture( &cubeRT, 0 );
     materialCubeRT.SetBackFaceCulling( true );
 
     rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
@@ -435,7 +434,7 @@ int main()
     pbrMaterial.SetShader( &standardShader );
     pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
-    //pbrMaterial.SetTexture( "", &skybox );
+    //pbrMaterial.SetTexture( &skybox, 12 );
     pbrMaterial.SetBackFaceCulling( true );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
