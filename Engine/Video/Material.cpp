@@ -40,13 +40,13 @@ void ae3d::Material::Apply()
     
     for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
     {
-        shader->SetTexture( "texture", tex2dSlots[ slot ], slot );
+        shader->SetTexture( tex2dSlots[ slot ], slot );
     }
 
     // TODO: Fix these
     /*for (const auto& texCube : texCubes)
     {
-        shader->SetTexture( texCube.first.c_str(), texCube.second, texUnit );
+        shader->SetTexture( texCube.second, texUnit );
         ++texUnit;
         }*/
 
@@ -75,7 +75,7 @@ void ae3d::Material::Apply()
 
     for (const auto& globalTex2d : sTex2ds)
     {
-        shader->SetTexture( globalTex2d.first.c_str(), globalTex2d.second, texUnit );
+        shader->SetTexture( globalTex2d.second, texUnit );
         ++texUnit;
     }
 

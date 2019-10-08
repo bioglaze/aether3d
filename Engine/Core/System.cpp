@@ -96,7 +96,7 @@ void ae3d::System::DrawUI( int scX, int scY, int scWidth, int scHeight, int elem
     ortho[ 1 ][ 1 ] /= (float)windowHeight;
 
     renderer.builtinShaders.uiShader.Use();
-    renderer.builtinShaders.uiShader.SetTexture( "textureMap", texture, 0 );
+    renderer.builtinShaders.uiShader.SetTexture( texture, 0 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( &ortho[ 0 ][ 0 ] );
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
 
@@ -196,11 +196,11 @@ void ae3d::System::Draw( TextureBase* texture, int x, int y, int xSize, int ySiz
 
     if (texture->IsCube() && !texture->IsRenderTexture())
     {
-        renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (TextureCube*)texture, 0 );
+        renderer.builtinShaders.spriteRendererShader.SetTexture( (TextureCube*)texture, 0 );
     }
     else if (!texture->IsCube() && !texture->IsRenderTexture())
     {
-        renderer.builtinShaders.spriteRendererShader.SetTexture( "textureMap", (Texture2D*)texture, 0 );
+        renderer.builtinShaders.spriteRendererShader.SetTexture( (Texture2D*)texture, 0 );
     }
     else if (texture->IsRenderTexture())
     {
@@ -242,7 +242,7 @@ void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& 
     Matrix44 viewProjection;
     Matrix44::Multiply( view, projection, viewProjection );
     renderer.builtinShaders.spriteRendererShader.Use();
-    renderer.builtinShaders.spriteRendererShader.SetTexture("textureMap", Texture2D::GetDefaultTexture(), 0 );
+    renderer.builtinShaders.spriteRendererShader.SetTexture( Texture2D::GetDefaultTexture(), 0 );
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip = viewProjection;
 

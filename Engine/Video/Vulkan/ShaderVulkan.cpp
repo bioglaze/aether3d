@@ -196,7 +196,7 @@ void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
     std::memcpy( &GfxDevice::GetCurrentUbo()[ offset ], data, dataBytes );
 }
 
-void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( Texture2D* texture, int textureUnit )
 {
     if (texture == nullptr)
     {
@@ -220,7 +220,7 @@ void ae3d::Shader::SetTexture( const char* /*name*/, Texture2D* texture, int tex
     }
 }
 
-void ae3d::Shader::SetTexture( const char* /*name*/, TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( TextureCube* texture, int textureUnit )
 {
     if (texture == nullptr)
     {

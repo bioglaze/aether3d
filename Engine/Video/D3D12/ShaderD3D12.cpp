@@ -287,7 +287,7 @@ void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
     memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, data, dataBytes );
 }
 
-void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( ae3d::Texture2D* texture, int textureUnit )
 {
     if (textureUnit == 0)
     {
@@ -304,7 +304,7 @@ void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::Texture2D* texture, i
     }
 }
 
-void ae3d::Shader::SetTexture( const char* /*name*/, ae3d::TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( ae3d::TextureCube* texture, int textureUnit )
 {
     if (textureUnit == 0)
     {

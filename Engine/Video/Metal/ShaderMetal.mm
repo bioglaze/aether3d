@@ -131,7 +131,7 @@ void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, in
     memcpy( bufferPointer, matrix4x4s, 16 * 4 * count );
 }
 
-void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int textureUnit )
+void ae3d::Shader::SetTexture( Texture2D* texture, int textureUnit )
 {
     if (texture != nullptr)
     {
@@ -146,7 +146,7 @@ void ae3d::Shader::SetTexture( const char* name, Texture2D* texture, int texture
         }
         else
         {
-            System::Print( "Shader %s tried to set a texture %s into unit %d that is not handled\n", metalVertexShaderName.c_str(), textureUnit, name );
+            System::Print( "Shader %s tried to set a texture into unit %d that is not handled\n", metalVertexShaderName.c_str(), textureUnit );
         }
 
         GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap(), texture->GetAnisotropy() );
@@ -179,7 +179,7 @@ void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* renderTexture, int tex
     }
 }
 
-void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textureUnit )
+void ae3d::Shader::SetTexture( TextureCube* texture, int textureUnit )
 {
     if (texture != nullptr)
     {
@@ -194,7 +194,7 @@ void ae3d::Shader::SetTexture( const char* name, TextureCube* texture, int textu
         }
         else
         {
-            System::Print( "Shader %s tried to set a texture %s into unit that is not handled\n", metalVertexShaderName.c_str(), name );
+            System::Print( "Shader %s tried to set a texture into unit %dthat is not handled\n", metalVertexShaderName.c_str(), textureUnit );
         }
         
         GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap(), texture->GetAnisotropy() );

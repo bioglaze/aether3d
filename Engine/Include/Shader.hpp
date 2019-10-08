@@ -60,15 +60,13 @@ namespace ae3d
         /// \param count Matrix count in the array.
         void SetMatrixArray( const char* name, const float* matrix4x4s, int count );
 
-        /// \param name Texture uniform name.
         /// \param texture Texture.
         /// \param textureUnit Texture unit.
-        void SetTexture( const char* name, class Texture2D* texture, int textureUnit );
+        void SetTexture( class Texture2D* texture, int textureUnit );
 
-        /// \param name Texture uniform name.
         /// \param texture Texture.
         /// \param textureUnit Texture unit.
-        void SetTexture( const char* name, class TextureCube* texture, int textureUnit );
+        void SetTexture( class TextureCube* texture, int textureUnit );
 
         /// \param renderTexture RenderTexture.
         /// \param textureUnit Texture unit.

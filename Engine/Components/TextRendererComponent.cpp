@@ -122,7 +122,7 @@ void ae3d::TextRendererComponent::Render( const float* localToClip )
     {
         auto shader = m().shader;
         shader->Use();
-        shader->SetTexture( "textureMap", m().font->GetTexture(), 0 );
+        shader->SetTexture(  m().font->GetTexture(), 0 );
         GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
         GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
         
