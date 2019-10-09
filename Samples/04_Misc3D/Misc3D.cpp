@@ -429,6 +429,7 @@ int main()
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
+    //standardMaterial.SetTexture( &skybox, 12 );
 
     Material pbrMaterial;
     pbrMaterial.SetShader( &standardShader );
@@ -512,6 +513,7 @@ int main()
     {
 #ifdef TEST_FORWARD_PLUS
         mat.second->SetShader( &standardShader );
+        //mat.second->SetTexture( &skybox, 12 );
 #else
         mat.second->SetShader( &shader );
 #endif

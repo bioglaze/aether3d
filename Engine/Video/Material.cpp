@@ -43,12 +43,15 @@ void ae3d::Material::Apply()
         shader->SetTexture( tex2dSlots[ slot ], slot );
     }
 
-    // TODO: Fix these
-    /*for (const auto& texCube : texCubes)
+    for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
     {
-        shader->SetTexture( texCube.second, texUnit );
-        ++texUnit;
-        }*/
+        if (texCubeSlots[ slot ])
+        {
+            shader->SetTexture( texCubeSlots[ slot ], slot );
+        }
+    }
+
+    // TODO: Fix these
 
     /*for (const auto& texRT : texRTs)
     {

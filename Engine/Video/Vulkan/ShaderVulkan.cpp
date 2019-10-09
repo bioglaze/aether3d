@@ -20,7 +20,7 @@ constexpr int MaxModuleCount = 600;
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
-    extern VkImageView boundViews[ 2 ];
+    extern VkImageView boundViews[ 13 ];
     extern VkSampler boundSamplers[ 2 ];
 	extern PerObjectUboStruct perObjectUboStruct;
     extern VkCommandBuffer texCmdBuffer;
