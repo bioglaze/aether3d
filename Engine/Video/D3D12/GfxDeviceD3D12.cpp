@@ -539,6 +539,7 @@ void CreateRootSignature()
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
         descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0 );
         descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1 );
+		ae3d::System::Assert( descRange1[ 0 ].NumDescriptors + descRange1[ 1 ].NumDescriptors + descRange1[ 2 ].NumDescriptors == RESOURCE_BINDING_COUNT, "Resource count mismatch!" );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
         descRange2[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 2, 0 );
