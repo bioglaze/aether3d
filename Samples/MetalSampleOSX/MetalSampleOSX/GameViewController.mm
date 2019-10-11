@@ -476,7 +476,7 @@ using namespace ae3d;
     skinMaterial.SetTexture( &gliderTex, 0 );
 
     rtCubeMaterial.SetShader( &skyboxShader );
-    rtCubeMaterial.SetRenderTexture( "skyMap", &cubeRT );
+    rtCubeMaterial.SetRenderTexture( &cubeRT, 0 );
     rtCubeMaterial.SetBackFaceCulling( false );
     
     standardShader.Load( "standard_vertex", "standard_fragment",
