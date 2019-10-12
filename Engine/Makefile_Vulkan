@@ -7,7 +7,7 @@ ENGINE_LIB := libaether3d_linux_vulkan.a
 STD_LIB := -std=c++11
 INCLUDES := -IInclude -IVideo -ICore -IThirdParty
 GCCWARNINGS := -g -Wall -pedantic -Wextra -Wshadow -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization \
- -Wdouble-promotion -Wformat=2 -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
+ -Wdouble-promotion -Winit-self -Winvalid-pch -Wlogical-op -Wmissing-include-dirs \
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wtrampolines \
  -Wvector-operation-performance -Wuseless-cast -Wformat=2
 
@@ -19,7 +19,7 @@ ifeq ($(COMPILER), clang)
 WARNINGS := $(CLANGWARNGING)
 endif
 ifeq ($(COMPILER), g++)
-WARNINGS := $(GCCWARNINGS)
+WARNINGS := $(GCCWARNINGS) $(NEW_GCC_WARNINGS)
 endif
 
 ifeq ($(UNAME), Linux)
