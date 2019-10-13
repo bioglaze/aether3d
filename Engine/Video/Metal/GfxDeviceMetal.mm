@@ -661,7 +661,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 {
     Statistics::IncDrawCalls();
 
-    for (int slot = 0; slot < 5; ++slot)
+    for (int slot = 0; slot < 4; ++slot)
     {
         if (!textures[ slot ])
         {
@@ -669,8 +669,11 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         }
     }
 
-    textures[ 4 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
-
+    if (!textures[ 4 ])
+    {
+        textures[ 4 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
+    }
+    
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
 
     const int sampleCount = GfxDeviceGlobal::isRenderingToTexture ? 1 : GfxDeviceGlobal::sampleCount;
@@ -717,6 +720,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
     [renderEncoder setFragmentTexture:textures[ 2 ] atIndex:2];
     [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
+    [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
     
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {

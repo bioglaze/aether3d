@@ -350,6 +350,7 @@ using namespace ae3d;
     {
 #ifdef TEST_FORWARD_PLUS
         mat.second->SetShader( &standardShader );
+        mat.second->SetTexture( &skyTex, 4 );
 #else
         mat.second->SetShader( &shader );
 #endif
@@ -450,7 +451,7 @@ using namespace ae3d;
     sprite->SetTexture( &bc2Tex, Vec3( 120, 200, -0.5f ), Vec3( (float)bc2Tex.GetWidth(), (float)bc2Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     sprite->SetTexture( &bc3Tex, Vec3( 120, 300, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     sprite->SetTexture( &gliderTex, Vec3( 220, 120, -0.5f ), Vec3( (float)gliderTex.GetWidth(), (float)gliderTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
-    sprite->SetTexture( &atlasTex, Vec3( 300, 120, -0.5f ), Vec3( (float)atlasTex.GetWidth(), (float)atlasTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    //sprite->SetTexture( &atlasTex, Vec3( 300, 120, -0.5f ), Vec3( (float)atlasTex.GetWidth(), (float)atlasTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     
     spriteContainer.AddComponent<TransformComponent>();
     //spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
@@ -500,7 +501,8 @@ using namespace ae3d;
     pbrMaterial.SetShader( &standardShader );
     pbrMaterial.SetTexture( &pbrNormalTex, 2 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
-
+    pbrMaterial.SetTexture( &skyTex, 4 );
+    
     pbrCube.AddComponent<ae3d::MeshRendererComponent>();
     pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &pbrMaterial, 0 );

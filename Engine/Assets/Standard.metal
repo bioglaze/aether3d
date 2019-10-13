@@ -270,5 +270,5 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     }
 #endif
     
-    return albedoColor * half4(outColor);
+    return albedoColor * half4( outColor ) * cubeReflection;
 }

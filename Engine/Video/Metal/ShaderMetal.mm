@@ -188,13 +188,13 @@ void ae3d::Shader::SetTexture( TextureCube* texture, int textureUnit )
             textures[ 0 ] = texture->GetMetalTexture();
             GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         }
-        else if (textureUnit == 1)
+        else if (textureUnit < 5)
         {
-            textures[ 1 ] = texture->GetMetalTexture();
+            textures[ textureUnit ] = texture->GetMetalTexture();
         }
         else
         {
-            System::Print( "Shader %s tried to set a texture into unit %dthat is not handled\n", metalVertexShaderName.c_str(), textureUnit );
+            System::Print( "Shader %s tried to set a texture into unit %d that is not handled\n", metalVertexShaderName.c_str(), textureUnit );
         }
         
         GfxDeviceGlobal::SetSampler( textureUnit, texture->GetFilter(), texture->GetWrap(), texture->GetAnisotropy() );

@@ -19,7 +19,7 @@ ifeq ($(COMPILER), clang)
 WARNINGS := $(CLANGWARNGING)
 endif
 ifeq ($(COMPILER), g++)
-WARNINGS := $(GCCWARNINGS) $(NEW_GCC_WARNINGS)
+WARNINGS := $(GCCWARNINGS)
 endif
 
 ifeq ($(UNAME), Linux)
