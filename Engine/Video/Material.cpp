@@ -31,11 +31,6 @@ void ae3d::Material::Apply()
         shader->SetInt( i.first.c_str(), i.second );
     }
 
-    for (const auto& f : floats)
-    {
-        shader->SetFloat( f.first.c_str(), f.second );
-    }
-
     int texUnit = 1;
     
     for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
@@ -138,9 +133,4 @@ void ae3d::Material::SetGlobalTexture2D( const char* name, Texture2D* texture2d 
 void ae3d::Material::SetInt( const char* name, int value )
 {
     ints[ name ] = value;
-}
-
-void ae3d::Material::SetFloat( const char* name, float value )
-{
-    floats[ name ] = value;
 }

@@ -78,16 +78,11 @@ namespace ae3d
         /// \param name Integer uniform name.
         /// \param value Value.
         void SetInt( const char* name, int value );
-        
-        /// \param name Float uniform name.
-        /// \param value Value.
-        void SetFloat( const char* name, float value );
 
   private:
         static std::unordered_map< std::string, RenderTexture* > sTexRTs;
         static std::unordered_map< std::string, Texture2D* > sTex2ds;
 
-        std::unordered_map< std::string, float > floats;
         std::unordered_map< std::string, int > ints;
         static constexpr int TEXTURE_SLOT_COUNT = 13;
         Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};
