@@ -20,6 +20,9 @@ namespace ae3d
         const Quaternion& GetLocalRotation() const { return localRotation; }
 
         /// \return Local scale.
+        float& GetLocalScale() { return localScale; }
+
+        /// \return Local scale.
         float GetLocalScale() const { return localScale; }
 
         /// \return World position.

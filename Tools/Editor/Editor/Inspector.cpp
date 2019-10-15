@@ -197,6 +197,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             nk_property_float( &ctx, "#X:", -1024.0f, &pos.x, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Y:", -1024.0f, &pos.y, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
+
+            float& scale = transform->GetLocalScale();
+            nk_property_float( &ctx, "#Scale:", 0.1f, &scale, 1024.0f, 1, 1 );
         }
         
         if (gameObject != nullptr && meshRenderer == nullptr && nk_button_label( &ctx, "Add mesh renderer" ))
