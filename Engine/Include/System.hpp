@@ -94,6 +94,7 @@ namespace ae3d
     /// High-level functions
     namespace System
     {
+        /// Blending mode.
         enum class BlendMode { Off, Alpha, Additive };
         
         /// \param vertexSize Vertex size.
@@ -113,6 +114,7 @@ namespace ae3d
 
         /// Creates a buffer for line drawing.
         /// \param lines Lines.
+        /// \param lineCount Line count.
         /// \param color Color.
         /// \return handle to the buffer. Used with DrawLines.
         int CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color );

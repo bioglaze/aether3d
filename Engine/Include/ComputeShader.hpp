@@ -23,6 +23,7 @@ namespace ae3d
     class ComputeShader
     {
     public:
+        /// Uniform. These correspond to variables in shader include file ubo.h and MetalCommon.h.
 		enum class UniformName { TilesZW };
 
         /// Call before Dispatch.
@@ -38,6 +39,7 @@ namespace ae3d
         void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ );
 
         /// Sets a uniform.
+        /// \param uniform Uniform.
         /// \param x X
         /// \param y Y
         void SetUniform( UniformName uniform, float x, float y );

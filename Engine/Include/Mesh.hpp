@@ -53,6 +53,9 @@ namespace ae3d
         /// \return Axis-aligned bounding box maximum in local coordinates.
         const Vec3& GetSubMeshAABBMax( unsigned subMeshIndex ) const;
 
+        /// Gets a raw triangle array, that can be used for example in picking.
+        /// \param subMeshIndex Sub mesh index.
+        /// \param outTriangles Triangles are returned in this array.
         void GetSubMeshFlattenedTriangles( unsigned subMeshIndex, Array< Vec3 >& outTriangles ) const;
         
         /// \return Submesh count.
