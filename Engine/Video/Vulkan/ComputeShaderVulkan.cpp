@@ -1,3 +1,5 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "ComputeShader.hpp"
 #include "Array.hpp"
 #include "FileSystem.hpp"
@@ -22,7 +24,7 @@ namespace GfxDeviceGlobal
     extern VkPipelineLayout pipelineLayout;
     extern VkPipelineCache pipelineCache;
     extern PerObjectUboStruct perObjectUboStruct;
-    extern VkImageView boundViews[ 2 ];
+    extern VkImageView boundViews[ 13 ];
 }
 
 namespace ComputeShaderGlobal

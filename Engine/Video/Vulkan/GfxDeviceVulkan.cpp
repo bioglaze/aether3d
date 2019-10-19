@@ -1,3 +1,5 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "GfxDevice.hpp"
 #include <cstdint>
 #include <cstring>
@@ -999,6 +1001,7 @@ namespace ae3d
 
             if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
             {
+                ae3d::System::Print("format: %d\n", format);
                 GfxDeviceGlobal::depthFormat = format;
                 depthFormatFound = true;
                 break;
@@ -2092,7 +2095,7 @@ void ae3d::GfxDevice::BeginFrame()
     GfxDeviceGlobal::boundViews[ 11 ] = Texture2D::GetDefaultTextureUAV()->GetView();
     GfxDeviceGlobal::boundViews[ 12 ] = TextureCube::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::boundSamplers[ 0 ] = Texture2D::GetDefaultTexture()->GetSampler();
-    GfxDeviceGlobal::boundSamplers[ 1 ] = Texture2D::GetDefaultTexture()->GetSampler();
+    GfxDeviceGlobal::boundSamplers[ 1 ] = GfxDeviceGlobal::boundSamplers[ 0 ];
 }
 
 void SubmitQueue()
