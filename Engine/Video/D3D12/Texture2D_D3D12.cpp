@@ -21,6 +21,13 @@ void TexReload( const std::string& path ); // Defined in TextureCommon.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
+struct Textures
+{
+    std::vector< ae3d::Texture2D* > pointers;
+};
+
+std::map< std::string, Textures > textures;
+
 namespace MathUtil
 {
     int GetMipmapCount( int width, int height );
@@ -277,6 +284,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     if (isCached && handle == 0)
     {
         *this = Texture2DGlobal::hashToCachedTexture[ cacheHash ];
+        textures[ cacheHash ].pointers.push_back( this );
         return;
     }
     
@@ -309,12 +317,27 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     srvDesc.Texture2D.PlaneSlice = 0;
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
     
+    const int oldHandle = handle;
+
     srv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
     handle = static_cast< unsigned >( srv.ptr );
     
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 
     Texture2DGlobal::hashToCachedTexture[ cacheHash ] = *this;
+
+    if (oldHandle != 0)
+    {
+        for (std::size_t i = 0; i < textures[ cacheHash ].pointers.size(); ++i)
+        {
+            *textures[ cacheHash ].pointers[ i ] = *this;
+        }
+    }
+    else
+    {
+        textures[ cacheHash ].pointers.push_back( this );
+    }
+
 #if DEBUG
     Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
     //Texture2DGlobal::PrintMemoryUsage();
