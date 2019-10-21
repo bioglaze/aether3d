@@ -78,8 +78,8 @@ int main()
 {
     bool fullScreen = false;
 
-    const int originalWidth = 1920 / 1;
-    const int originalHeight = 1080 / 1;
+    int originalWidth = 1920 / 1;
+    int originalHeight = 1080 / 1;
     int width = originalWidth;
     int height = originalHeight;
 
@@ -96,6 +96,13 @@ int main()
     Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
 #endif
     Window::GetSize( width, height );
+    
+    if (fullScreen)
+    {
+        originalWidth = width;
+        originalHeight = height;
+    }
+
     Window::SetTitle( "Misc3D" );
     VR::Init();
     System::LoadBuiltinAssets();
