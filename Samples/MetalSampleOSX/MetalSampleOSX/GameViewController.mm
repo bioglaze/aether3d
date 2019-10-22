@@ -1,5 +1,5 @@
 // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.8.zip
+// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.8.1.zip
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"
@@ -276,6 +276,7 @@ using namespace ae3d;
     Texture2D pbrDiffuseTex;
     Texture2D pbrNormalTex;
     Texture2D pbrRoughnessTex;
+    Texture2D playerTex;
     
     TextureCube skyTex;
 
@@ -409,6 +410,8 @@ using namespace ae3d;
     bc4Tex.Load( ae3d::FileSystem::FileContents( "spnza_bricks_a_spec_bc4.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     bc5Tex.Load( ae3d::FileSystem::FileContents( "grass_n_bc5.dds" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
 
+    playerTex.Load( ae3d::FileSystem::FileContents( "player.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+
     skyTex.Load( ae3d::FileSystem::FileContents( "left.jpg" ), ae3d::FileSystem::FileContents( "right.jpg" ),
                 ae3d::FileSystem::FileContents( "bottom.jpg" ), ae3d::FileSystem::FileContents( "top.jpg" ),
                 ae3d::FileSystem::FileContents( "front.jpg" ), ae3d::FileSystem::FileContents( "back.jpg" ),
@@ -474,7 +477,7 @@ using namespace ae3d;
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
 
     skinMaterial.SetShader( &skinShader );
-    skinMaterial.SetTexture( &gliderTex, 0 );
+    skinMaterial.SetTexture( &playerTex, 0 );
 
     rtCubeMaterial.SetShader( &skyboxShader );
     rtCubeMaterial.SetRenderTexture( &cubeRT, 0 );
@@ -616,7 +619,7 @@ using namespace ae3d;
     animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
     animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &skinMaterial, 0 );
     animatedGo.AddComponent< TransformComponent >();
-    animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, 0, -85 } );
+    animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, -12, -85 } );
     animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 0, 0 } ) );
     animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
 
