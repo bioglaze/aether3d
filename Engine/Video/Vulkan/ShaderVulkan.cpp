@@ -272,19 +272,3 @@ void ae3d::Shader::SetRenderTexture( RenderTexture* texture, int textureUnit )
         System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
     }
 }
-
-void ae3d::Shader::SetInt( const char* /*name*/, int /*value*/ )
-{
-}
-
-void ae3d::Shader::SetFloat( const char* /*name*/, float /*value*/ )
-{
-}
-
-void ae3d::Shader::SetVector3( const char* /*name*/, const float* /*vec3*/ )
-{
-}
-
-void ae3d::Shader::SetVector4( const char* /*name*/, const float* /*vec4*/ )
-{
-}

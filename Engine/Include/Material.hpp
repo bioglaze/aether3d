@@ -75,15 +75,10 @@ namespace ae3d
         /// \param slot Slot in the shader.
         void SetRenderTexture( RenderTexture* renderTexture, int slot );
         
-        /// \param name Integer uniform name.
-        /// \param value Value.
-        void SetInt( const char* name, int value );
-
   private:
         static std::unordered_map< std::string, RenderTexture* > sTexRTs;
         static std::unordered_map< std::string, Texture2D* > sTex2ds;
 
-        std::unordered_map< std::string, int > ints;
         static constexpr int TEXTURE_SLOT_COUNT = 13;
         Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};
         TextureCube* texCubeSlots[ TEXTURE_SLOT_COUNT ] = {};

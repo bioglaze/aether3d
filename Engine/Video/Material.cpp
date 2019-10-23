@@ -28,11 +28,6 @@ void ae3d::Material::Apply()
 
     shader->Use();
 
-    for (const auto& i : ints)
-    {
-        shader->SetInt( i.first.c_str(), i.second );
-    }
-
     int texUnit = 1;
     
     for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
@@ -130,9 +125,4 @@ void ae3d::Material::SetGlobalRenderTexture( const char* name, RenderTexture* re
 void ae3d::Material::SetGlobalTexture2D( const char* name, Texture2D* texture2d )
 {
     sTex2ds[ name ] = texture2d;
-}
-
-void ae3d::Material::SetInt( const char* name, int value )
-{
-    ints[ name ] = value;
 }

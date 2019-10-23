@@ -72,22 +72,6 @@ namespace ae3d
         /// \param textureUnit Texture unit.
         void SetRenderTexture( class RenderTexture* renderTexture, int textureUnit );
 
-        /// \param name Integer uniform name.
-        /// \param value Value.
-        void SetInt( const char* name, int value );
-
-        /// \param name Float uniform name.
-        /// \param value Value.
-        void SetFloat( const char* name, float value );
-
-        /// \param name Vector uniform name.
-        /// \param vec3 Vec3 contents.
-        void SetVector3( const char* name, const float* vec3 );
-
-        /// \param name Vector uniform name.
-        /// \param vec4 Vec4 contents.
-        void SetVector4( const char* name, const float* vec4 );
-
         /// \param offset Offset into the currently bound uniform buffer.
         /// \param data Data to be copied into the uniform buffer.
         /// \param dataBytes Copied data's size in bytes.
