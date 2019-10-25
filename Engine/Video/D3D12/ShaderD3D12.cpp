@@ -260,30 +260,6 @@ void ae3d::Shader::Use()
     GfxDevice::CreateNewUniformBuffer();
 }
 
-void ae3d::Shader::SetMatrix( const char* name, const float* matrix4x4 )
-{
-    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
-    
-    const int offset = GetUniformLocation( name );
-
-    if (offset != -1)
-    {
-        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, matrix4x4, 64 );
-    }
-}
-
-void ae3d::Shader::SetMatrixArray( const char* name, const float* matrix4x4s, int count )
-{
-    System::Assert( GfxDevice::GetCurrentMappedConstantBuffer() != nullptr, "CreateNewUniformBuffer probably not called!" );
-
-    const int offset = GetUniformLocation( name );
-
-    if (offset != -1)
-    {
-        memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, matrix4x4s, 64 * count );
-    }
-}
-
 void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
 {
     memcpy_s( (char*)GfxDevice::GetCurrentMappedConstantBuffer() + offset, AE3D_CB_SIZE, data, dataBytes );

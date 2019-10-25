@@ -51,15 +51,6 @@ namespace ae3d
         /// Activates the shader to be used in a draw call.
         void Use();
 
-        /// \param name Matrix uniform name.
-        /// \param matrix4x4 Contents of Matrix44.
-        void SetMatrix( const char* name, const float* matrix4x4 );
-
-        /// \param name Matrix array uniform name.
-        /// \param matrix4x4s Contents of Matrix44 array.
-        /// \param count Matrix count in the array.
-        void SetMatrixArray( const char* name, const float* matrix4x4s, int count );
-
         /// \param texture Texture.
         /// \param textureUnit Texture unit.
         void SetTexture( class Texture2D* texture, int textureUnit );
