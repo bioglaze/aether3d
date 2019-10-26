@@ -48,5 +48,7 @@ float4 main( VSOutput vsOut ) : SV_Target
     }
 
     float shadow = max( 0.2f, VSM( depth, vsOut.projCoord ) );
-    return /*tint */ tex.Sample( sampler0, vsOut.uv ) * shadow;
+    float4 outColor = tex.Sample( sampler0, vsOut.uv ) * shadow;
+    outColor.a = 1;
+    return outColor;
 }
