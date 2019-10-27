@@ -1015,6 +1015,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     tempMaterial->SetBackFaceCulling( true );
     outMaterials[ "temp material" ] = tempMaterial;
 
+    int textureUnit = 0;
     int lineNo = 0;
     while (!stream.eof())
     {
@@ -1511,6 +1512,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         }
         else if (token == "material")
         {
+            textureUnit = 0;
+            
             std::string materialName;
             lineStream >> materialName;
             currentMaterialName = materialName;
@@ -1560,7 +1563,14 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             
             lineStream >> uniformName >> textureName;
             
-            outMaterials[ currentMaterialName ]->SetTexture( outTexture2Ds[ textureName ], 0 );
+            outMaterials[ currentMaterialName ]->SetTexture( outTexture2Ds[ textureName ], textureUnit );
+            ++textureUnit;
+
+            if (textureUnit > 12)
+            {
+                System::Print( "Material %s uses too many textures! Max number is 13.\n", currentMaterialName.c_str() );
+                textureUnit = 0;
+            }
         }
         else if (token == "audiosource")
         {
