@@ -20,11 +20,6 @@ namespace ae3d
         /// \param name Texture uniform name.
         /// \param renderTexture Render texture.
         static void SetGlobalRenderTexture( const char* name, class RenderTexture* renderTexture );
-        
-        /// Sets a texture into every material, overriding textures set by SetTexture.
-        /// \param name Texture uniform name.
-        /// \param texture2d Texture.
-        static void SetGlobalTexture2D( const char* name, class Texture2D* texture2d );
 
         /// \return shader.
         class Shader* GetShader() { return shader; }
@@ -77,7 +72,6 @@ namespace ae3d
         
   private:
         static std::unordered_map< std::string, RenderTexture* > sTexRTs;
-        static std::unordered_map< std::string, Texture2D* > sTex2ds;
 
         static constexpr int TEXTURE_SLOT_COUNT = 13;
         Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};

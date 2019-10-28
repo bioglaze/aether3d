@@ -7,7 +7,6 @@
 #include "Shader.hpp"
 
 std::unordered_map< std::string, ae3d::RenderTexture* > ae3d::Material::sTexRTs;
-std::unordered_map< std::string, ae3d::Texture2D* > ae3d::Material::sTex2ds;
 
 namespace GfxDeviceGlobal
 {
@@ -68,12 +67,6 @@ void ae3d::Material::Apply()
         ++texUnit;
     }
 
-    for (const auto& globalTex2d : sTex2ds)
-    {
-        shader->SetTexture( globalTex2d.second, texUnit );
-        ++texUnit;
-    }
-
     if (depthUnits > 0.0001f || depthUnits < -0.0001f || depthFactor > 0.0001f || depthFactor < -0.0001f)
     {
         GfxDevice::SetPolygonOffset( true, depthFactor, depthUnits );
@@ -120,9 +113,4 @@ void ae3d::Material::SetRenderTexture( RenderTexture* renderTexture, int slot )
 void ae3d::Material::SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture )
 {
     sTexRTs[ name ] = renderTexture;
-}
-
-void ae3d::Material::SetGlobalTexture2D( const char* name, Texture2D* texture2d )
-{
-    sTex2ds[ name ] = texture2d;
 }
