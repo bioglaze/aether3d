@@ -417,7 +417,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                     SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                     GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Dir;
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
-                    Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<DirectionalLightComponent>()->shadowMap );
+                    Material::SetGlobalRenderTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                 }
                 else if (spotLight)
                 {
@@ -425,7 +425,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                     SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                     GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
-                    Material::SetGlobalRenderTexture( "_ShadowMap", &go->GetComponent<SpotLightComponent>()->shadowMap );
+                    Material::SetGlobalRenderTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
                 }
                 else if (pointLight)
                 {
@@ -439,7 +439,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                         RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
                     }
                     
-                    Material::SetGlobalRenderTexture( "_ShadowMapCube", &go->GetComponent<PointLightComponent>()->shadowMap );
+                    Material::SetGlobalRenderTexture( &go->GetComponent<PointLightComponent>()->shadowMap );
                 }
                 
                 Statistics::EndShadowMapProfiling();

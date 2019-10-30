@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include "Vec3.hpp"
-
 namespace ae3d
 {
     /// Material is used to render a mesh.
@@ -17,9 +13,8 @@ namespace ae3d
         enum class DepthFunction { NoneWriteOff, LessOrEqualWriteOn };
 
         /// Sets a texture into every material, overriding textures set by SetTexture.
-        /// \param name Texture uniform name.
         /// \param renderTexture Render texture.
-        static void SetGlobalRenderTexture( const char* name, class RenderTexture* renderTexture );
+        static void SetGlobalRenderTexture( class RenderTexture* renderTexture );
 
         /// \return shader.
         class Shader* GetShader() { return shader; }
@@ -71,7 +66,7 @@ namespace ae3d
         void SetRenderTexture( RenderTexture* renderTexture, int slot );
         
   private:
-        static std::unordered_map< std::string, RenderTexture* > sTexRTs;
+        static RenderTexture* sTexRT;
 
         static constexpr int TEXTURE_SLOT_COUNT = 13;
         Texture2D* tex2dSlots[ TEXTURE_SLOT_COUNT ] = {};

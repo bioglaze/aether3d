@@ -6,7 +6,7 @@
 #include "RenderTexture.hpp"
 #include "Shader.hpp"
 
-std::unordered_map< std::string, ae3d::RenderTexture* > ae3d::Material::sTexRTs;
+ae3d::RenderTexture* ae3d::Material::sTexRT;
 
 namespace GfxDeviceGlobal
 {
@@ -42,27 +42,19 @@ void ae3d::Material::Apply()
         }
     }
 
-    // TODO: Fix these
-
-    /*for (const auto& texRT : texRTs)
-    {
-        shader->SetRenderTexture( texRT.second, texUnit );
-        ++texUnit;
-        }*/
-
-    for (const auto& globalTexRT : sTexRTs)
+    if (sTexRT)
     {
 #if RENDERER_METAL
-        if (globalTexRT.second && globalTexRT.second->IsCube())
+        if (sTexRT->IsCube())
         {
-            shader->SetRenderTexture( globalTexRT.second, 2 );
+            shader->SetRenderTexture( sTexRT, 2 );
         }
         else
         {
-            shader->SetRenderTexture( globalTexRT.second, texUnit );
+            shader->SetRenderTexture( sTexRT, texUnit );
         }
 #else
-        shader->SetRenderTexture( globalTexRT.second, texUnit );
+        shader->SetRenderTexture( sTexRT, texUnit );
 #endif
         ++texUnit;
     }
@@ -110,7 +102,7 @@ void ae3d::Material::SetRenderTexture( RenderTexture* renderTexture, int slot )
     rtSlots[ slot] = renderTexture;
 }
 
-void ae3d::Material::SetGlobalRenderTexture( const char* name, RenderTexture* renderTexture )
+void ae3d::Material::SetGlobalRenderTexture( RenderTexture* renderTexture )
 {
-    sTexRTs[ name ] = renderTexture;
+    sTexRT = renderTexture;
 }
