@@ -82,7 +82,7 @@ namespace ae3d
         void Create( int width, int height, WindowCreateFlags flags );
 
         /// \param outWidth Returns window width in pixels.
-        /// \param outHeight Returns window height in pixels.
+        /// \param outHeight Returns window height in pixels, without the title bar.
         void GetSize( int& outWidth, int& outHeight );
 
         /// \return True if window is open.
