@@ -274,10 +274,10 @@ namespace ae3d
         instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
 
 #if 0
-    const VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT };
+    const VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT, VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT };
     VkValidationFeaturesEXT features = {};
     features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    features.enabledValidationFeatureCount = 2;
+    features.enabledValidationFeatureCount = 3;
     features.pEnabledValidationFeatures = enables;
 
     instanceCreateInfo.pNext = &features;
