@@ -1134,7 +1134,7 @@ namespace ae3d
         attachments[ 0 ].format = GfxDeviceGlobal::colorFormat;
         attachments[ 0 ].samples = GfxDeviceGlobal::msaaSampleBits;
         attachments[ 0 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 0 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 0 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachments[ 0 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 0 ].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -1157,7 +1157,7 @@ namespace ae3d
         attachments[ 2 ].format = GfxDeviceGlobal::depthFormat;
         attachments[ 2 ].samples = GfxDeviceGlobal::msaaSampleBits;
         attachments[ 2 ].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachments[ 2 ].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[ 2 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 2 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachments[ 2 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[ 2 ].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
