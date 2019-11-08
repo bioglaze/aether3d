@@ -94,11 +94,6 @@ int main()
     bool isRightMouseDown = false;
     bool isMiddleMouseDown = false;
 
-    float gamePadLeftThumbX = 0;
-    float gamePadLeftThumbY = 0;
-    float gamePadRightThumbX = 0;
-    float gamePadRightThumbY = 0;
-
     ae3d::GameObject* selectedGO = nullptr;
 
     while (Window::IsOpen() && !quit)
@@ -238,16 +233,12 @@ int main()
             }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
             {           
-                gamePadLeftThumbX = event.gamePadThumbX;
-                gamePadLeftThumbY = event.gamePadThumbY;
-                moveDir.z = -gamePadLeftThumbY;
-                moveDir.x = gamePadLeftThumbX;
+                moveDir.z = -event.gamePadThumbY;
+                moveDir.x = event.gamePadThumbX;
             }
             else if (event.type == WindowEventType::GamePadRightThumbState)
             {
-                gamePadRightThumbX = event.gamePadThumbX;
-                gamePadRightThumbY = event.gamePadThumbY;
-                svRotateCamera( sceneView, -float( gamePadRightThumbX ) / 10, float( gamePadRightThumbY ) / 10 );
+                svRotateCamera( sceneView, -float( event.gamePadThumbX ) / 10, float( event.gamePadThumbY ) / 10 );
             }
             else if (event.type == WindowEventType::GamePadButtonY)
             {
