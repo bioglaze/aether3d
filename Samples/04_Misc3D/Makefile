@@ -9,6 +9,7 @@ LIB_PATH := -L../../Engine/ThirdParty/lib
 endif
 
 WARNINGS := -g -Wpedantic -Wall -Wextra
+SANITIZERS := -fsanitize=address,undefined
 
 all:
 ifneq ($(OS),Windows_NT)
