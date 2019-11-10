@@ -103,12 +103,19 @@ int main()
 {
     int width = 640;
     int height = 480;
-    
+    int heightDelta = 0;
+    int realHeight = 0;
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );
-    Window::GetSize( width, height );
+    Window::GetSize( width, realHeight );
+#if RENDERER_VULKAN
+    heightDelta = 0;
+#else
+    heightDelta = (height - realHeight) / 2;
+#endif
+    height = realHeight;
     System::LoadBuiltinAssets();
-
+    System::Print("width: %d, height: %d, heightDelta: %d\n", width, height, heightDelta);
     GameObject camera;
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetProjection( 0, (float)width, (float)height, 0, 0, 1 );
@@ -151,10 +158,6 @@ int main()
    
     double x = 0, y = 0;
     
-    int winWidth, winHeight;
-    Window::GetSize( winWidth, winHeight );
-    System::Print( "window size: %dx%d\n", winWidth, winHeight );
-
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -199,21 +202,21 @@ int main()
             if (event.type == WindowEventType::MouseMove)
             {
                 x = event.mouseX;
-                y = height - event.mouseY;
+                y = height - event.mouseY + heightDelta;
                 nk_input_motion( &ctx, (int)x, (int)y );
             }
 
             if (event.type == WindowEventType::Mouse1Down)
             {
                 x = event.mouseX;
-                y = height - event.mouseY;
+                y = height - event.mouseY + heightDelta;
                 nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 1 );
             }
 
             if (event.type == WindowEventType::Mouse1Up)
             {
                 x = event.mouseX;
-                y = height - event.mouseY;
+                y = height - event.mouseY + heightDelta;
                 nk_input_button( &ctx, NK_BUTTON_LEFT, (int)x, (int)y, 0 );
             }
             

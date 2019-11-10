@@ -9,7 +9,6 @@
 #endif
 #if RENDERER_VULKAN
 #include <vulkan/vulkan.h>
-#include <cstdint>
 #endif
 #include "Array.hpp"
 

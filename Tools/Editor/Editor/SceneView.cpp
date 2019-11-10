@@ -403,6 +403,12 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
     for (unsigned goIndex = 1; goIndex < sv->gameObjects.count; ++goIndex)
     {
         TransformComponent* goTransform = sv->gameObjects[ goIndex ]->GetComponent< TransformComponent >();
+        
+        if (goTransform == nullptr)
+        {
+            continue;
+        }
+
         const Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
         System::Print("screenX: %d, screenY: %d, screenPoint: %f, %f\n", screenX, screenY, screenPoint.x, screenPoint.y);
         

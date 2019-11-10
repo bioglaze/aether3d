@@ -955,9 +955,8 @@ int main()
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
         bloomTex.SetLayout( TextureLayout::General );
 #endif
-        
-#endif
         scene.EndFrame();
+#endif
         Window::SwapBuffers();
     }
 

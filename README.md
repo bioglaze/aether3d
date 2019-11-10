@@ -4,7 +4,7 @@
 
 This codebase will evolve into the next generation [Aether3D](http://twiren.kapsi.fi/aether3d.html). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
-Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.8.
+Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.8.1
 
 Author: [Timo Wirén](http://twiren.kapsi.fi)
 
