@@ -17,11 +17,10 @@ before_install:
 
 language: cpp
 compiler:
-  - clang
   - gcc
 script:
-  - cd Engine
-  - make -f Makefile_Vulkan
+        #  - cd Engine
+        #  - make -f Makefile_Vulkan
   - cd ../Tools/OBJ_Converter
   - make
   - make -f Makefile_mtl
