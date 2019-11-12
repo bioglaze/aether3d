@@ -1166,7 +1166,7 @@ namespace ae3d
 
         // Depth resolve attachment
         attachments[ 3 ].format = GfxDeviceGlobal::depthFormat;
-        attachments[ 3 ].samples = GfxDeviceGlobal::msaaSampleBits;
+        attachments[ 3 ].samples = VK_SAMPLE_COUNT_1_BIT;
         attachments[ 3 ].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachments[ 3 ].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[ 3 ].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -1218,7 +1218,7 @@ namespace ae3d
         image.extent = { static_cast< std::uint32_t >( WindowGlobal::windowWidth ), static_cast< std::uint32_t >( WindowGlobal::windowHeight ), 1 };
         image.mipLevels = 1;
         image.arrayLayers = 1;
-        image.samples = GfxDeviceGlobal::msaaSampleBits;
+        image.samples = VK_SAMPLE_COUNT_1_BIT;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
         image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
         image.flags = 0;

@@ -583,7 +583,7 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-#ifndef AE3D_OPENVR
+#if !defined( AE3D_OPENVR ) && !defined( TEST_MSAA )
     scene.Add( &camera2d );
     scene.Add( &statsContainer );
 #endif

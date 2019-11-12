@@ -21,7 +21,7 @@ compiler:
 script:
         #  - cd Engine
         #  - make -f Makefile_Vulkan
-  - cd ../Tools/OBJ_Converter
+  - cd Tools/OBJ_Converter
   - make
   - make -f Makefile_mtl
   - cd ../SDF_Generator
