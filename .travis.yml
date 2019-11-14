@@ -21,7 +21,7 @@ compiler:
 script:
         #  - cd Engine
         #  - make -f Makefile_Vulkan
-  - mkdir /../aether3d_build
+  - mkdir ../aether3d_build
   - cd Tools/OBJ_Converter
   - make
   - make -f Makefile_mtl
