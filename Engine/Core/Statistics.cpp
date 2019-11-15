@@ -22,11 +22,11 @@ namespace Statistics
     float presentTimeMS = 0;
     float sceneAABBTimeMS = 0;
     float lightCullerTimeGpuMS = 0;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startFrameTimePoint;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startShadowMapTimePoint;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startDepthNormalsTimePoint;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startPresentTimePoint;
-    std::chrono::time_point< std::chrono::high_resolution_clock > startSceneAABBPoint;
+    std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
+    std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
+    std::chrono::time_point< std::chrono::steady_clock > startDepthNormalsTimePoint;
+    std::chrono::time_point< std::chrono::steady_clock > startPresentTimePoint;
+    std::chrono::time_point< std::chrono::steady_clock > startSceneAABBPoint;
 }
 
 void Statistics::IncTriangleCount( int triangles )
@@ -61,12 +61,12 @@ void Statistics::SetLightCullerTimeGpuMS( float timeMS )
 
 void Statistics::BeginPresentTimeProfiling()
 {
-    Statistics::startPresentTimePoint = std::chrono::high_resolution_clock::now();
+    Statistics::startPresentTimePoint = std::chrono::steady_clock::now();
 }
 
 void Statistics::EndPresentTimeProfiling()
 {
-    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startPresentTimePoint ).count();
     Statistics::presentTimeMS = static_cast< float >(tDiff);
 }
@@ -83,13 +83,13 @@ void Statistics::EndLightCullerProfiling()
 
 void Statistics::BeginShadowMapProfiling()
 {
-    Statistics::startShadowMapTimePoint = std::chrono::high_resolution_clock::now();
+    Statistics::startShadowMapTimePoint = std::chrono::steady_clock::now();
     ae3d::GfxDevice::BeginShadowMapGpuQuery();
 }
 
 void Statistics::EndShadowMapProfiling()
 {
-    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startShadowMapTimePoint ).count();
     Statistics::shadowMapTimeMS = static_cast< float >(tDiff);
     ae3d::GfxDevice::EndShadowMapGpuQuery();
@@ -97,13 +97,13 @@ void Statistics::EndShadowMapProfiling()
 
 void Statistics::BeginDepthNormalsProfiling()
 {
-    Statistics::startDepthNormalsTimePoint = std::chrono::high_resolution_clock::now();
+    Statistics::startDepthNormalsTimePoint = std::chrono::steady_clock::now();
     ae3d::GfxDevice::BeginDepthNormalsGpuQuery();
 }
 
 void Statistics::EndDepthNormalsProfiling()
 {
-    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startDepthNormalsTimePoint ).count();
     Statistics::depthNormalsTimeMS = static_cast< float >(tDiff);
     ae3d::GfxDevice::EndDepthNormalsGpuQuery();
@@ -111,12 +111,12 @@ void Statistics::EndDepthNormalsProfiling()
 
 void Statistics::BeginFrameTimeProfiling()
 {
-    Statistics::startFrameTimePoint = std::chrono::high_resolution_clock::now();
+    Statistics::startFrameTimePoint = std::chrono::steady_clock::now();
 }
 
 void Statistics::EndFrameTimeProfiling()
 {
-    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startFrameTimePoint ).count();
     Statistics::frameTimeMS = static_cast< float >(tDiff);
 }
@@ -248,7 +248,7 @@ void Statistics::ResetFrameStatistics()
     triangleCount = 0;
     psoBindCount = 0;
 
-    startFrameTimePoint = std::chrono::high_resolution_clock::now();
+    startFrameTimePoint = std::chrono::steady_clock::now();
 }
 
 float Statistics::GetLightCullerTimeGpuMS()
@@ -263,12 +263,12 @@ float Statistics::GetSceneAABBTimeMS()
 
 void Statistics::BeginSceneAABB()
 {
-    Statistics::startSceneAABBPoint = std::chrono::high_resolution_clock::now();
+    Statistics::startSceneAABBPoint = std::chrono::steady_clock::now();
 }
 
 void Statistics::EndSceneAABB()
 {
-    auto tEnd = std::chrono::high_resolution_clock::now();
+    auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startSceneAABBPoint ).count();
     Statistics::sceneAABBTimeMS = static_cast< float >(tDiff);
 }
