@@ -371,9 +371,9 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
     GfxDeviceGlobal::CreateSamplers();
     GfxDeviceGlobal::lightTiler.Init();
 
-    std::vector< VertexBuffer::VertexPTC > vertices( uiVBSize );
-    std::vector< VertexBuffer::Face > faces( uiIBSize );
-    GfxDeviceGlobal::uiBuffer.Generate( faces.data(), int( faces.size() ), vertices.data(), int( vertices.size() ), VertexBuffer::Storage::CPU );
+    Array< VertexBuffer::VertexPTC > vertices( uiVBSize );
+    Array< VertexBuffer::Face > faces( uiIBSize );
+    GfxDeviceGlobal::uiBuffer.Generate( faces.elements, int( faces.count ), vertices.elements, int( vertices.count ), VertexBuffer::Storage::CPU );
 
     if (sampleCount == 1)
     {
