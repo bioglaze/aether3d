@@ -150,7 +150,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
     const half4 albedoColor = half4( albedoSmoothnessMap.sample( sampler0, uv ) );
     //const float smoothness = albedoColor.a;
-    const float4 normalTS = float4( normalMap.sample( sampler0, uv ) );
+    const float4 normalTS = float4( normalMap.sample( sampler0, uv ).rgb * 2.0f - 1.0f, 0.0f );
     //const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
@@ -161,7 +161,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 L = normalize( -surfaceToDirectionalLightVS );
     const float3 H = normalize( L + V );
 
-    const half4 cubeReflection = half4( cubeMap.sample( sampler0, N ) );
+    const half4 cubeReflection = half4( cubeMap.sample( sampler0, normalTS.xyz ) );
 
     const float dotNV = abs( dot( N, V ) ) + 1e-5f;
     const float dotNL = saturate( dot( N, -surfaceToDirectionalLightVS ) );
@@ -271,4 +271,5 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
 #endif
     
     return albedoColor * half4( outColor ) * cubeReflection;
+    //return cubeReflection;
 }
