@@ -1,22 +1,22 @@
 bl_info = {
     'name': 'Export Aether3D model format (.ae3d)',
     'author': 'Timo Wiren',
-    'version': (0,5),
-    'blender': (2, 6, 8),
+    'version': (0,6),
+    'blender': (2, 80, 0),
     "api": 35622,
-    'location': 'File > Export',
-    'description': 'Exports selected meshes to the Aether3D Model Format (.ae3d)',
+    'location': 'File > Export > Aether3D',
+    'description': 'Exports selected meshes to the Aether3D Engine format (.ae3d)',
     'category': 'Import-Export'}
 
 import bpy
 import bpy.props
 import bpy.utils
+import ctypes
+import math
+import mathutils
 import os
 import sys
 import struct
-import math
-import mathutils
-import ctypes
 
 class Vertex:
     co = mathutils.Vector()
@@ -37,9 +37,6 @@ class Mesh:
 
 
     def generateAABB( self ):
-        #print( "" + self.name )
-        #print( "aabbMin: " + str(self.aabbMin[0]) + ", " + str( self.aabbMin[1] ) + ", " + str(self.aabbMin[2]) )
-
         self.aabbMin = [ 99999999.0, 99999999.0, 99999999.0 ]
         self.aabbMax = [-99999999.0,-99999999.0,-99999999.0 ]
 
@@ -151,8 +148,6 @@ class Aether3DExporter( bpy.types.Operator ):
     bl_label = "Export Aether3D"
     
     filepath = bpy.props.StringProperty()
-    filename = bpy.props.StringProperty()
-    directory = bpy.props.StringProperty()
     meshes = list()
     aabbMin = [ 99999999.0, 99999999.0, 99999999.0 ]
     aabbMax = [-99999999.0,-99999999.0,-99999999.0 ]
@@ -185,75 +180,67 @@ class Aether3DExporter( bpy.types.Operator ):
         ##  normal(smooth applied), else the face normal will be returned
         result = fop.normal  # init with the normal for the un-smooth case
     
-        ##  faulty (none-planar) faces may have a zero-length normal, and without
+        ##  faulty (non-planar) faces may have a zero-length normal, and without
         ##  direction you can't calculate direction difference
         if fop.normal.length > 0.0:
             for p in mesh.polygons:
                 if ( p != fop ) and ( mesh_vi in p.vertices ) and ( p.normal.length > 0.0):
-                    angle = int(round(math.degrees(fop.normal.angle(p.normal))))
+                    angle = int( round( math.degrees( fop.normal.angle( p.normal ) ) ))
                     if  angle <= mesh.auto_smooth_angle:
-                        result = mesh.vertices[mesh_vi].normal
+                        result = mesh.vertices[ mesh_vi ].normal
         return result
 
 
     def get_vertex_pnt( self, obj_prop, mesh, face, face_vi ):
         # position
-        co = obj_prop[ OBJ.LOC ] + mathutils.Vector(obj_prop[OBJ.ROT] * mathutils.Vector([ \
-                                                                                        mesh.vertices[face.vertices[face_vi]].co[0] * obj_prop[OBJ.SCA][0], \
-                                                                                        mesh.vertices[face.vertices[face_vi]].co[1] * obj_prop[OBJ.SCA][1], \
-                                                                                        mesh.vertices[face.vertices[face_vi]].co[2] * obj_prop[OBJ.SCA][2] \
+        co = obj_prop[ OBJ.LOC ] + mathutils.Vector( obj_prop[ OBJ.ROT ] @ mathutils.Vector([ \
+                                                                                        mesh.vertices[ face.vertices[ face_vi ] ].co[ 0 ] * obj_prop[ OBJ.SCA ][ 0 ], \
+                                                                                        mesh.vertices[ face.vertices[ face_vi ] ].co[ 1 ] * obj_prop[ OBJ.SCA ][ 1 ], \
+                                                                                        mesh.vertices[ face.vertices[ face_vi ] ].co[ 2 ] * obj_prop[ OBJ.SCA ][ 2 ] \
                                                                                         ]))
         # normal
         if face.use_smooth:
             if mesh.use_auto_smooth:
-                no = mathutils.Vector(obj_prop[OBJ.ROT] * get_autosmooth_normal(mesh, face, face.vertices[face_vi]))
+                no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ get_autosmooth_normal( mesh, face, face.vertices[ face_vi ] ))
             else:
-                no = mathutils.Vector(obj_prop[OBJ.ROT] * mesh.vertices[face.vertices[face_vi]].normal)
+                no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ mesh.vertices[ face.vertices[ face_vi ] ].normal )
         else:
-                no = mathutils.Vector(obj_prop[OBJ.ROT] * face.normal)
-
-        # texture coords
-        if obj_prop[ OBJ.UVL ] != None:
-            uv = (obj_prop[OBJ.UVL][face.index].uv[face_vi][0], \
-                  1 - obj_prop[OBJ.UVL][face.index].uv[face_vi][1])
-        else:
-            uv = (0.0, 0.0)
+                no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ face.normal )
 
         # color
-        if len( mesh.tessface_vertex_colors ) > 0:
-            vcolors = mesh.tessface_vertex_colors[ 0 ]
-            color = ( 1.0, 1.0, 1.0, 1.0 )
+        #if len( mesh.tessface_vertex_colors ) > 0:
+        #    vcolors = mesh.tessface_vertex_colors[ 0 ]
+        #    color = ( 1.0, 1.0, 1.0, 1.0 )
 
-            n = len(vcolors.data)
+        #    n = len(vcolors.data)
 
-            if face_vi == 0:
-                vcolors1 = (ctypes.c_float * (n * 3))()
-                vcolors.data.foreach_get( 'color1', vcolors1 )
-                color = (vcolors1[0], vcolors1[1], vcolors1[2], 1.0)
-            if face_vi == 1:
-                vcolors2 = (ctypes.c_float * (n * 3))()
-                vcolors.data.foreach_get( 'color2', vcolors2 )
-                color = (vcolors2[0], vcolors2[1], vcolors2[2], 1.0)
-            if face_vi == 2:
-                vcolors3 = (ctypes.c_float * (n * 3))()
-                vcolors.data.foreach_get( 'color3', vcolors3 )
-                color = (vcolors3[0], vcolors3[1], vcolors3[2], 1.0)
-            if face_vi == 3:
-                vcolors4 = (ctypes.c_float * (n * 3))()
-                vcolors.data.foreach_get( 'color4', vcolors4 )
-                color = (vcolors4[0], vcolors4[1], vcolors4[2], 1.0)
-        else:
-            color = ( 1.0, 1.0, 1.0, 1.0 )
+        #    if face_vi == 0:
+        #        vcolors1 = (ctypes.c_float * (n * 3))()
+        #        vcolors.data.foreach_get( 'color1', vcolors1 )
+        #        color = (vcolors1[0], vcolors1[1], vcolors1[2], 1.0)
+        #    if face_vi == 1:
+        #        vcolors2 = (ctypes.c_float * (n * 3))()
+        #        vcolors.data.foreach_get( 'color2', vcolors2 )
+        #        color = (vcolors2[0], vcolors2[1], vcolors2[2], 1.0)
+        #    if face_vi == 2:
+        #        vcolors3 = (ctypes.c_float * (n * 3))()
+        #        vcolors.data.foreach_get( 'color3', vcolors3 )
+        #        color = (vcolors3[0], vcolors3[1], vcolors3[2], 1.0)
+        #    if face_vi == 3:
+        #        vcolors4 = (ctypes.c_float * (n * 3))()
+        #        vcolors.data.foreach_get( 'color4', vcolors4 )
+        #        color = (vcolors4[0], vcolors4[1], vcolors4[2], 1.0)
+        #else:
+        color = ( 1.0, 1.0, 1.0, 1.0 )
 
         # tangent
         #print( "tangent: " + str( mesh.tangent_space.face[ face.index ].vertices[ face_vi ].tangent ) )
         #print( "tangent " + str( face.tangent ))
-        #print( "tangent " + str( mesh.vertices[ face.vertices[face_vi] ].tangent )) # mesh.vertices is MeshVertex        
+        #print( "tangent " + str( mesh.vertices[ face.vertices[face_vi] ].tangent ))
         
         outVertex = Vertex()
         outVertex.co = co
         outVertex.normal = no
-        outVertex.uv = uv
         outVertex.color = color
         outVertex.tangent = (1.0, 0.0, 0.0, 1.0)
 
@@ -281,32 +268,29 @@ class Aether3DExporter( bpy.types.Operator ):
             self.report({'WARNING'}, "No meshes selected!")
 
         override = self.get_override( 'VIEW_3D', 'WINDOW' )
-        #rotate about the X-axis by 45 degrees
-        #bpy.ops.transform.rotate(override, value=6.283/8, axis=(1,0,0))
-        bpy.ops.transform.rotate(override, value=-math.pi/2, axis=(1,0,0))
-    
+
         for obj in objects:
             mesh = Mesh()
             mesh.vertices = []
             mesh.faces = []
             mesh.name = obj.name
             
-            obj.data.calc_tessface()
+            obj.data.calc_loop_triangles()
             obj.data.calc_tangents()
             
-            object[ OBJ.MAT ] = obj.matrix_world.copy()
+            object[ OBJ.MAT ] = obj.matrix_world.copy() @ mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
             object[ OBJ.LOC ] = object[ OBJ.MAT ].to_translation()
             object[ OBJ.ROT ] = object[ OBJ.MAT ].to_quaternion()
             object[ OBJ.SCA ] = object[ OBJ.MAT ].to_scale()
             object[ OBJ.UVL ] = None
 
-            for uvt in obj.data.tessface_uv_textures:
+            for uvt in obj.data.uv_layers:
                 if uvt.active_render:
                     object[ OBJ.UVL ] = uvt.data
 
             f = 0
-
-            for face in obj.data.tessfaces:
+            
+            for face in obj.data.loop_triangles:
                 for vertex_id in (0, 1, 2):
                     vertex_pnt = self.get_vertex_pnt(object, obj.data, face, vertex_id)
                     mesh.vertices.append( vertex_pnt )
@@ -323,6 +307,15 @@ class Aether3DExporter( bpy.types.Operator ):
 
                     mesh.faces.append( tri )
                     f = f + 1
+
+            u = 0
+            
+            for uv_layer in obj.data.uv_layers:
+                for tri in obj.data.loop_triangles:
+                    for loop_index in tri.loops:
+                        mesh.vertices[ u ].uv = uv_layer.data[ loop_index ].uv
+                        u = u + 1
+
             mesh.generateAABB()
             mesh.generateTangents()
             self.meshes.append( mesh )
@@ -357,7 +350,7 @@ class Aether3DExporter( bpy.types.Operator ):
         # Mesh count, 2 bytes.
         nMeshes = struct.pack( 'H', len( self.meshes ) )
         f.write( nMeshes )
-
+        
         for mesh in self.meshes:
             # Writes mesh's AABB min and max.
             component = struct.pack( 'f', mesh.aabbMin[0] )
@@ -367,8 +360,6 @@ class Aether3DExporter( bpy.types.Operator ):
             component = struct.pack( 'f', mesh.aabbMin[2] )
             f.write( component )
     
-            #print( "min: " + str( mesh.aabbMin[0] ) + ", " + str( mesh.aabbMin[1] ) + ", " + str( mesh.aabbMin[2] ) )
-
             component = struct.pack( 'f', mesh.aabbMax[0] )
             f.write( component )
             component = struct.pack( 'f', mesh.aabbMax[1] )
@@ -382,7 +373,7 @@ class Aether3DExporter( bpy.types.Operator ):
 
             # Writes name.
             f.write( mesh.name.encode() )
-    
+
             # Writes # of vertices.
             nVertices = struct.pack( 'H', len( mesh.vertices ) )
             f.write( nVertices )
@@ -391,7 +382,7 @@ class Aether3DExporter( bpy.types.Operator ):
             vertexFormat = 0;
             vertexFormatPacked = struct.pack( 'b', vertexFormat )
             f.write( vertexFormatPacked )
-
+            
             # Writes vertices.
             for v in mesh.vertices:
                 # Position.
@@ -401,7 +392,7 @@ class Aether3DExporter( bpy.types.Operator ):
                 f.write( component )
                 component = struct.pack( 'f', v.co[ 2 ] )
                 f.write( component )
-    
+                
                 # Texture coordinate.
                 s = v.uv[ 0 ]
                 t = v.uv[ 1 ]
@@ -410,7 +401,7 @@ class Aether3DExporter( bpy.types.Operator ):
                 f.write( component )
                 component = struct.pack( 'f', t )
                 f.write( component )
-    
+                
                 # Normal.
                 component = struct.pack( 'f', v.normal[ 0 ] )
                 f.write( component )
@@ -451,7 +442,7 @@ class Aether3DExporter( bpy.types.Operator ):
                 f.write( component )
                 component = struct.pack( 'H', i[2] )
                 f.write( component )
-
+                
         # Terminator
         terminator = 100
         o = struct.pack( 'b', int( terminator ) )
@@ -483,13 +474,13 @@ def menu_func( self, context ):
     self.layout.operator(Aether3DExporter.bl_idname, text="Aether3D (.ae3d)").filepath = defaultPath
 
 def register():
-    bpy.utils.register_module( __name__ )
-    bpy.types.INFO_MT_file_export.append( menu_func )
+    bpy.utils.register_class( Aether3DExporter )
+    bpy.types.TOPBAR_MT_file_export.append( menu_func )
 
 
 def unregister():
-    bpy.utils.unregister_module( __name__ )
-    bpy.types.INFO_MT_file_export.remove( menu_func )
+    bpy.utils.unregister_class( Aether3DExporter )
+    bpy.types.TOPBAR_MT_file_export.remove( menu_func )
 
 
 if __name__ == "__main__":
