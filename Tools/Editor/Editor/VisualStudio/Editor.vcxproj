@@ -56,7 +56,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\Engine\Include;..\..\..\..\Engine\ThirdParty</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%VULKAN_SDK%\Include;..\..\..\..\Engine\Include;..\..\..\..\Engine\ThirdParty</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ENABLE_EXTENDED_ALIGNED_STORAGE;_MBCS;%(PreprocessorDefinitions);RENDERER_VULKAN;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -75,7 +75,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\Engine\Include;..\..\..\..\Engine\ThirdParty</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%VULKAN_SDK%\Include;..\..\..\..\Engine\Include;..\..\..\..\Engine\ThirdParty</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_ENABLE_EXTENDED_ALIGNED_STORAGE;_MBCS;%(PreprocessorDefinitions);RENDERER_VULKAN;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
