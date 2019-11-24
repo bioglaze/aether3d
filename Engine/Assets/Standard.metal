@@ -71,7 +71,7 @@ static int GetTileIndex( float2 ScreenPos, int windowWidth )
 
 float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, float3 v )
 {
-    return normalize( v.x * normalize( tangent ) + v.y * normalize( bitangent ) + v.z * normalize( normal ) );
+    return normalize( v.x * tangent + v.y * bitangent + v.z * normal );
 }
 
 vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
@@ -90,7 +90,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     
     out.tangentVS_u.xyz = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
     out.tangentVS_u.w = vert.texcoord.x;
-    float3 ct = normalize( cross( vert.normal, vert.tangent.xyz ) ) * vert.tangent.w;
+    float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
     out.bitangentVS_v.xyz = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
     out.bitangentVS_v.w = vert.texcoord.y;
     out.normalVS = (uniforms.localToView * float4( vert.normal, 0 )).xyz;
