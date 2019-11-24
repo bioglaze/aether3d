@@ -17,7 +17,7 @@
 
 using namespace ae3d;
 
-// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.8.zip
+// Sample assets can be downloaded from here:  http://twiren.kapsi.fi/files/aether3d_sample_v0.8.1.zip
 
 int main()
 {
@@ -54,9 +54,6 @@ int main()
     Texture2D bc3Tex;
     bc3Tex.Load( FileSystem::FileContents( "test_dxt5.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
 
-    Texture2D nonSquareTex;
-    nonSquareTex.Load( FileSystem::FileContents( "textures/chain_texture.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
-
     Texture2D notLoadedTex;
 
     Texture2D spriteTexFromAtlas;
@@ -72,6 +69,7 @@ int main()
     sprite->SetTexture( &bc3Tex, Vec3( 120, 270, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     //sprite->SetTexture( &notLoadedTex, Vec3( 120, 370, -0.5f ), Vec3( (float)spriteTex.GetWidth(), (float)spriteTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 0.5f ) );
     sprite->SetTexture( &spriteTexFromAtlas, Vec3( 260, 160, -0.5f ), Vec3( (float)spriteTexFromAtlas.GetWidth(), (float)spriteTexFromAtlas.GetHeight(), 1 ), Vec4( 1, 0, 1, 1 ) );
+    sprite->SetTexture( &mipTex, Vec3( 120, 300, -0.5f ), Vec3( (float)mipTex.GetWidth(), (float)mipTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
 
     spriteContainer.AddComponent<TransformComponent>();
     spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );

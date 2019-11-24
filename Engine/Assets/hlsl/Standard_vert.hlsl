@@ -36,7 +36,7 @@ PS_INPUT main( VS_INPUT input )
     output.normalVS = mul( localToView, float4(input.normal, 0) ).xyz;
     output.tangentVS = mul( localToView, float4(input.tangent.xyz, 0) ).xyz;
     float3 ct = cross( input.normal, input.tangent.xyz ) * input.tangent.w;
-    output.bitangentVS.xyz = normalize( mul( localToView, float4( ct, 0 ) ) ).xyz;
+    output.bitangentVS.xyz = mul( localToView, float4( ct, 0 ) ).xyz;
 
     return output;
 }

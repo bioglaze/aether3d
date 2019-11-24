@@ -81,7 +81,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 ## Windows
 
-  - Open the project in Engine\VisualStudio_* in VS2017 and build it. For MinGW you can use Engine\Makefile_Vulkan.
+  - Open the project in Engine\VisualStudio_* in Visual Studio and build it. For MinGW you can use Engine\Makefile_Vulkan.
   - Build and run Samples\01_OpenWindow. On MinGW the command is `make`
   - Vulkan users: built-in shader sources are located in aether3d_build\Samples that comes with sample asset archive. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd in Engine/Assets. 
   - FBX converter tries to find FBX SDK 2019.5 in its default install location (English language localization)
@@ -90,7 +90,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Copy OpenVR headers into Engine\ThirdParty\headers
   - Copy OpenVR DLL into aether3d_build\Samples
   - Open Vulkan renderer's Visual Studio solution and select target ***OpenVR Release***
-  - Build and run Samples\04_Misc3D target ***Release Vulkan OpenVR*** in VS2017. Also copy OpenVR.dll into build directory.
+  - Build and run Samples\04_Misc3D target ***Release Vulkan OpenVR*** in Visual Studio.
 
 ## macOS
 

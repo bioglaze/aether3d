@@ -38,6 +38,8 @@
 //#define TEST_SHADOWS_POINT
 #define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
+// Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
+#define TEST_SPONZA
 
 using namespace ae3d;
 
@@ -176,6 +178,7 @@ int main()
     Texture2D fontTex;
     fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
+#ifdef TEST_SPONZA
     Texture2D pbrDiffuseTex;
     pbrDiffuseTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     Texture2D pbrNormalTex;
@@ -184,7 +187,8 @@ int main()
     pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
     Texture2D pbrNormalTex2;
     pbrNormalTex2.Load( FileSystem::FileContents( "grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
-
+#endif
+    
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
 
@@ -438,6 +442,7 @@ int main()
     standardMaterial.SetTexture( &gliderTex, 0 );
     //standardMaterial.SetTexture( &skybox, 12 );
 
+#ifdef TEST_SPONZA
     Material pbrMaterial;
     pbrMaterial.SetShader( &standardShader );
     pbrMaterial.SetTexture( &pbrNormalTex, 1 );
@@ -447,7 +452,8 @@ int main()
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
-
+#endif
+    
     GameObject spheres[ 5 ];
     Material sphereMaterials[ 5 ];
     
@@ -503,12 +509,11 @@ int main()
     }
 #endif
 
-    // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#if 1
+#ifdef TEST_SPONZA
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                   sponzaMaterialNameToMaterial, sponzaMeshes );
     if (res != Scene::DeserializeResult::Success)

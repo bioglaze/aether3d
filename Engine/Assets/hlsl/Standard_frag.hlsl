@@ -69,7 +69,7 @@ uint GetTileIndex( float2 screenPos )
 
 float3 tangentSpaceTransform( float3 tangent, float3 bitangent, float3 normal, float3 v )
 {
-    return normalize( v.x * normalize( tangent ) + v.y * normalize( bitangent ) + v.z * normalize( normal ) );
+    return normalize( v.x * tangent + v.y * bitangent + v.z * normal );
 }
 
 float D_GGX( float dotNH, float a )
