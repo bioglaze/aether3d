@@ -488,7 +488,7 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
-
+    
     skyboxShader.Load( "skybox_vertex", "skybox_fragment",
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
@@ -504,8 +504,12 @@ using namespace ae3d;
     pbrMaterial.SetShader( &standardShader );
     pbrMaterial.SetTexture( &pbrNormalTex, 2 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
+#ifdef TEST_RENDER_TEXTURE_CUBE
+    pbrMaterial.SetRenderTexture( &cubeRT, 4 );
+#else
     pbrMaterial.SetTexture( &skyTex, 4 );
-    
+#endif
+
     pbrCube.AddComponent<ae3d::MeshRendererComponent>();
     pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &pbrMaterial, 0 );

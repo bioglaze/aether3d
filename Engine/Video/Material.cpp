@@ -40,6 +40,10 @@ void ae3d::Material::Apply()
         {
             shader->SetTexture( texCubeSlots[ slot ], slot );
         }
+        if (rtSlots[ slot ])
+        {
+            shader->SetRenderTexture( rtSlots[ slot ], slot );
+        }
     }
 
     if (sTexRT)
@@ -99,7 +103,7 @@ void ae3d::Material::SetTexture( TextureCube* texture, int slot )
 
 void ae3d::Material::SetRenderTexture( RenderTexture* renderTexture, int slot )
 {
-    rtSlots[ slot] = renderTexture;
+    rtSlots[ slot ] = renderTexture;
 }
 
 void ae3d::Material::SetGlobalRenderTexture( RenderTexture* renderTexture )
