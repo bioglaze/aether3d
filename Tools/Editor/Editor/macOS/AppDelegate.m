@@ -10,7 +10,7 @@ extern NSViewController* myViewController;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    [_window makeFirstResponder:myViewController];
+    [[ [myViewController view] window ] makeFirstResponder:myViewController];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
