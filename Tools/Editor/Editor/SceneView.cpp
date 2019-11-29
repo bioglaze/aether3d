@@ -293,14 +293,14 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->gameObjects[ 1 ]->SetName( "cube" );
     (*sv)->scene.Add( (*sv)->gameObjects[ 1 ] );
 
-    (*sv)->lineProjection.MakeProjection( 0, width, height, 0, 0, 1 );
+    (*sv)->lineProjection.MakeProjection( 0, (float)width, (float)height, 0, 0, 1 );
     constexpr unsigned LineCount = 40;
     Vec3 lines[ LineCount ];
     
     for (unsigned i = 0; i < LineCount / 2; ++i)
     {
-        lines[ i * 2 + 0 ] = Vec3( i, 0, -5 );
-        lines[ i * 2 + 1 ] = Vec3( i, 0, -15 );
+        lines[ i * 2 + 0 ] = Vec3( (float)i, 0, -5 );
+        lines[ i * 2 + 1 ] = Vec3( (float)i, 0, -15 );
     }
     
     (*sv)->lineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
@@ -525,7 +525,6 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     
     xAxisMaterial.SetShader( shader );
     //xAxisMaterial.SetTexture( &translateTex, 0 );
-    xAxisMaterial.SetBackFaceCulling( true );
     xAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     float factor = -100;
     float units = 0;
@@ -535,12 +534,10 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     
     yAxisMaterial.SetShader( shader );
     //yAxisMaterial.SetTexture( &translateTex, 0 );
-    yAxisMaterial.SetBackFaceCulling( true );
     yAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     
     zAxisMaterial.SetShader( shader );
     //zAxisMaterial.SetTexture( &translateTex, 0 );
-    zAxisMaterial.SetBackFaceCulling( true );
     zAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
 
     go.AddComponent< MeshRendererComponent >();
@@ -590,8 +587,8 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         {
             //const float spriteScale = screenHeight / distance;
 #if RENDERER_VULKAN
-            float x = (int)screenPoint.x;
-            float y = screenHeight /* screenScale*/ -  (int)screenPoint.y;
+            float x = screenPoint.x;
+            float y = screenHeight /* screenScale*/ - screenPoint.y;
 #else
             float x = (int)screenPoint.x * screenScale;
             float y = (int)screenPoint.y * screenScale;
