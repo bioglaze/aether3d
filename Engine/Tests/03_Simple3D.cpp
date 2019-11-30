@@ -81,6 +81,8 @@ int main()
     scene.Add( &cubeZero );
     
     scene.Render();
+    scene.EndFrame();
+    
     Window::SwapBuffers();
     System::Deinit();
 }
