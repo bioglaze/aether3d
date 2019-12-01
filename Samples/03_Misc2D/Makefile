@@ -4,7 +4,7 @@ VULKAN_LINKER := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xcb -lX11
 LIB_PATH := -L.
 
 ifeq ($(OS),Windows_NT)
-LIB_PATH := -L../../Engine/ThirdParty/lib
+LIB_PATH := -L../../Engine/ThirdParty/lib -I$(VULKAN_SDK)\Include
 endif
 
 WARNINGS := -Wpedantic -Wall -Wextra

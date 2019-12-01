@@ -31,7 +31,7 @@ endif
 ifeq ($(OS),Windows_NT)
 ENGINE_LIB := libaether3d_win_vulkan.a
 CCOMPILER := gcc
-WARNINGS := -Wall -ansi -pedantic
+WARNINGS := -Wall -ansi -pedantic -I$(VULKAN_SDK)\Include
 OUTPUT_DIR := ..\..\aether3d_build
 DEFINES := -msse3 -O3 -DSIMD_SSE3 -DRENDERER_VULKAN -DVK_USE_PLATFORM_WIN32_KHR
 endif

@@ -5,7 +5,7 @@ VULKAN_LINKER_OPENVR := -ldl -lxcb -lxcb-ewmh -lxcb-keysyms -lxcb-icccm -lX11-xc
 LIB_PATH := -L. -L../../Engine/ThirdParty/lib
 
 ifeq ($(OS),Windows_NT)
-LIB_PATH := -L../../Engine/ThirdParty/lib
+LIB_PATH := -L../../Engine/ThirdParty/lib -I$(VULKAN_SDK)\Include
 endif
 
 WARNINGS := -g -Wpedantic -Wall -Wextra
