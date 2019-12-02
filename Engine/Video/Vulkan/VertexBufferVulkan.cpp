@@ -13,7 +13,6 @@
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
-    extern VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
     extern Array< VkBuffer > pendingFreeVBs;
     extern VkCommandPool cmdPool;
     extern VkQueue graphicsQueue;

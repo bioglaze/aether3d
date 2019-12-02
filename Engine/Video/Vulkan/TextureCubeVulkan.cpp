@@ -23,7 +23,6 @@ namespace MathUtil
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
-    extern VkPhysicalDevice physicalDevice;
     extern VkQueue graphicsQueue;
     extern VkCommandPool cmdPool;
     extern VkPhysicalDeviceProperties properties;
