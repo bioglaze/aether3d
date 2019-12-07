@@ -346,12 +346,6 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
     BarrierDesc.Transition.StateAfter = newState;
     BarrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 
-    // Check to see if we already started the transition
-    if (newState == gpuResource.transitioningState)
-    {
-        gpuResource.transitioningState = (D3D12_RESOURCE_STATES)-1;
-    }
-
     gpuResource.usageState = newState;
 
     Statistics::IncBarrierCalls();
