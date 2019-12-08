@@ -3,7 +3,6 @@ bl_info = {
     'author': 'Timo Wiren',
     'version': (0,6),
     'blender': (2, 80, 0),
-    "api": 35622,
     'location': 'File > Export > Aether3D',
     'description': 'Exports selected meshes to the Aether3D Engine format (.ae3d)',
     'category': 'Import-Export'}
@@ -233,11 +232,6 @@ class Aether3DExporter( bpy.types.Operator ):
         #else:
         color = ( 1.0, 1.0, 1.0, 1.0 )
 
-        # tangent
-        #print( "tangent: " + str( mesh.tangent_space.face[ face.index ].vertices[ face_vi ].tangent ) )
-        #print( "tangent " + str( face.tangent ))
-        #print( "tangent " + str( mesh.vertices[ face.vertices[face_vi] ].tangent ))
-        
         outVertex = Vertex()
         outVertex.co = co
         outVertex.normal = no
@@ -309,15 +303,20 @@ class Aether3DExporter( bpy.types.Operator ):
                     f = f + 1
 
             u = 0
-            
+
             for uv_layer in obj.data.uv_layers:
                 for tri in obj.data.loop_triangles:
                     for loop_index in tri.loops:
                         mesh.vertices[ u ].uv = uv_layer.data[ loop_index ].uv
                         u = u + 1
 
+            u = 0
+            for p in obj.data.loops:
+                mesh.vertices[ u ].tangent = (p.tangent.x, p.tangent.y, p.tangent.z, p.bitangent_sign )
+                u = u + 1
+
             mesh.generateAABB()
-            mesh.generateTangents()
+            #mesh.generateTangents()
             self.meshes.append( mesh )
 
 
