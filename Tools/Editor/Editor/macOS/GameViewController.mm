@@ -99,8 +99,6 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-    NSLog(@"keyDown");
-    
     const float velocity = 0.3f;
     
     // Keycodes from: https://forums.macrumors.com/threads/nsevent-keycode-list.780577/
@@ -160,7 +158,6 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    NSLog(@"mouseDown");
     inputEvent.button = 1;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
@@ -170,7 +167,6 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 - (void)mouseUp:(NSEvent *)theEvent
 {
     selectedGO = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
-    NSLog(@"mouseUp");
     inputEvent.button = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
