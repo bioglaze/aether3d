@@ -280,6 +280,10 @@ void ae3d::Shader::SetTexture( ae3d::Texture2D* texture, int textureUnit )
     {
         GfxDeviceGlobal::texture1 = texture ? texture : Texture2D::GetDefaultTexture();
     }
+    else
+    {
+        //System::Assert( false, "unhandled texture unit!" );
+    }
 }
 
 void ae3d::Shader::SetTexture( ae3d::TextureCube* texture, int textureUnit )
@@ -296,6 +300,10 @@ void ae3d::Shader::SetTexture( ae3d::TextureCube* texture, int textureUnit )
     else if (textureUnit == 1)
     {
         GfxDeviceGlobal::texture1 = texture;
+    }
+    else
+    {
+        System::Assert( false, "unhandled texture unit!" );
     }
 }
 
@@ -315,6 +323,10 @@ void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* texture, int textureUn
     else if (textureUnit == 1)
     {
         GfxDeviceGlobal::texture1 = texture;
+    }
+    else
+    {
+        System::Assert( false, "unhandled texture unit!" );
     }
 
     if (texture != nullptr)

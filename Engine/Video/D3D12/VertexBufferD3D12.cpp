@@ -9,8 +9,6 @@
 #include "Macros.hpp"
 #include "TextureBase.hpp"
 
-void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
-
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
