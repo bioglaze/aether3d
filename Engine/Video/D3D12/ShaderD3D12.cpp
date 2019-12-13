@@ -24,6 +24,7 @@ namespace GfxDeviceGlobal
     extern ae3d::TextureBase* texture0;
     extern ae3d::TextureBase* texture1;
 	extern PerObjectUboStruct perObjectUboStruct;
+    extern ae3d::RenderTexture* currentRenderTarget;
 }
 
 namespace Global
@@ -311,6 +312,12 @@ void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newStat
 
 void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* texture, int textureUnit )
 {
+    // Prevents feedback.
+    if (texture != nullptr && texture == GfxDeviceGlobal::currentRenderTarget)
+    {
+        return;
+    }
+
     if (textureUnit == 0)
     {
         if( texture != nullptr )
