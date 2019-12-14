@@ -274,8 +274,9 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     std::size_t fileOffset = sizeof( header );
 
     std::size_t size = MyMax( li->divSize, x ) / li->divSize * MyMax( li->divSize, y ) / li->divSize * li->blockBytes;
-    ae3d::System::Assert( size == header.sHeader.dwPitchOrLinearSize, "DDSLoader: Wrong pitch or size" );
-    ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_LINEARSIZE) != 0, "DDSLoader, need flag DDSD_LINEARSIZE" );
+    // FIXME: A texture loaded from https://online-converting.com/image/convert2dds/ has dwPitchOrLinearSize set to 0, but otherwise seems to load correctly.
+    //ae3d::System::Assert( size == header.sHeader.dwPitchOrLinearSize, "DDSLoader: Wrong pitch or size" );
+    ae3d::System::Assert( (header.sHeader.dwFlags & DDSD_LINEARSIZE) != 0, "DDSLoader: need flag DDSD_LINEARSIZE" );
     
     if (size == 0)
     {
