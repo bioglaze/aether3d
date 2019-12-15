@@ -305,17 +305,10 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
         0, nullptr,
         1, &imageMemoryBarrier );
 
-    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
     imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageMemoryBarrier.image = image;
-    imageMemoryBarrier.subresourceRange = range;
-    imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
-    imageMemoryBarrier.subresourceRange.levelCount = mipLevelCount;
 
     vkCmdPipelineBarrier(
             GfxDeviceGlobal::texCmdBuffer,
