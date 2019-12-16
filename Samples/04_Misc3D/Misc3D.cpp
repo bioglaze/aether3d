@@ -31,15 +31,15 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_MSAA
-//#define TEST_RENDER_TEXTURE_CUBE
+#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#define TEST_SPONZA
+//#define TEST_SPONZA
 
 using namespace ae3d;
 
@@ -329,7 +329,7 @@ int main()
     Shader shaderCubeMap;
     shaderCubeMap.Load( "unlitVert", "unlitFrag",
                         FileSystem::FileContents( "unlit_cube_vert.obj" ), FileSystem::FileContents( "unlit_cube_frag.obj" ),
-                        FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+                        FileSystem::FileContents( "unlit_cube_vert.spv" ), FileSystem::FileContents( "unlit_cube_frag.spv" ) );
 
     GameObject lightParent;
     //lightParent.AddComponent< MeshRendererComponent >();
