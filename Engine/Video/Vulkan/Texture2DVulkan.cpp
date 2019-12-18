@@ -158,6 +158,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
     Statistics::IncAllocCalls();
     Statistics::IncTotalAllocCalls();
     Texture2DGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
+	debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )deviceMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "tex2d dds memory" );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
@@ -191,8 +192,10 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
 
         memAllocInfo.allocationSize = memReqs.size;
         memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
-        err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipIndex ] );
-        AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+
+		err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipIndex ] );
+		AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+		debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )deviceMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "tex2d memory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers[ mipIndex ], stagingMemory[ mipIndex ], 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
@@ -437,6 +440,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     Statistics::IncAllocCalls();
     Statistics::IncTotalAllocCalls();
     Texture2DGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
+	debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )deviceMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "tex2d memory" );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
