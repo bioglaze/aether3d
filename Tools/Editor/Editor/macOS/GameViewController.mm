@@ -11,15 +11,18 @@
 
 NSViewController* myViewController;
 
-std::string GetOpenPath()
+static std::string GetOpenPath( const char* extension )
 {
+    NSMutableArray *types = [NSMutableArray new];
+    [types addObject: [NSString stringWithUTF8String: extension]];
+    
     NSOpenPanel *op = [NSOpenPanel openPanel];
+    [op setAllowedFileTypes: types];
     
     if ([op runModal] == NSModalResponseOK)
     {
         NSURL *nsurl = [[op URLs] objectAtIndex:0];
         std::string tmp = std::string([[nsurl path] UTF8String]);
-        printf("GetOpenPath: %s\n", tmp.c_str());
         return std::string([[nsurl path] UTF8String]);
     }
     
@@ -28,7 +31,7 @@ std::string GetOpenPath()
 
 void GetOpenPath( char* outPath, const char* extension )
 {
-    static std::string path = GetOpenPath();
+    static std::string path = GetOpenPath( extension );
     strcpy( outPath, path.c_str() );
 }
 
@@ -233,8 +236,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
                 break;
             case Inspector::Command::OpenScene:
             {
-                std::string path = GetOpenPath();
-                NSLog(@"path: %s", path.c_str());
+                std::string path = GetOpenPath( "scene" );
                 if (path != "")
                 {
                     auto contents = ae3d::FileSystem::FileContents( path.c_str() );
