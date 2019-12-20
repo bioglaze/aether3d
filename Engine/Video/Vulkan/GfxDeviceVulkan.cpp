@@ -217,6 +217,7 @@ namespace ae3d
 
         VkResult err = vkCreateImage( GfxDeviceGlobal::device, &info, nullptr, &GfxDeviceGlobal::msaaTarget.colorImage );
         AE3D_CHECK_VULKAN( err, "Create MSAA color" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::msaaTarget.colorImage, VK_OBJECT_TYPE_IMAGE, "MSAA color" );
 
         VkMemoryRequirements memReqs;
         vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorImage, &memReqs );
@@ -226,6 +227,8 @@ namespace ae3d
         memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
         
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.colorMem );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::msaaTarget.colorMem, VK_OBJECT_TYPE_DEVICE_MEMORY, "msaaTarget colorMemory" );
+
         Statistics::IncTotalAllocCalls();
         AE3D_CHECK_VULKAN( err, "Create MSAA color" );
 
@@ -267,6 +270,7 @@ namespace ae3d
 
         VkResult err = vkCreateImage( GfxDeviceGlobal::device, &info, nullptr, &GfxDeviceGlobal::msaaTarget.depthImage );
         AE3D_CHECK_VULKAN( err, "MSAA depth image" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::msaaTarget.depthImage, VK_OBJECT_TYPE_IMAGE, "MSAA depth" );
 
         VkMemoryRequirements memReqs;
         vkGetImageMemoryRequirements( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, &memReqs );
@@ -278,6 +282,8 @@ namespace ae3d
         err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &GfxDeviceGlobal::msaaTarget.depthMem );
         Statistics::IncTotalAllocCalls();
         AE3D_CHECK_VULKAN( err, "MSAA depth memory" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::msaaTarget.depthMem, VK_OBJECT_TYPE_DEVICE_MEMORY, "msaaTarget depthMemory" );
+
         vkBindImageMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.depthImage, GfxDeviceGlobal::msaaTarget.depthMem, 0 );
 
         // Create image view for the MSAA target
@@ -1034,6 +1040,8 @@ namespace ae3d
         {
             attachments[ 0 ] = GfxDeviceGlobal::swapchainBuffers[ i ].view;
             VkResult err = vkCreateFramebuffer( GfxDeviceGlobal::device, &frameBufferCreateInfo, nullptr, &GfxDeviceGlobal::frameBuffers[ i ] );
+            debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::frameBuffers[ i ], VK_OBJECT_TYPE_FRAMEBUFFER, "framebuffer" );
+
             AE3D_CHECK_VULKAN( err, "vkCreateFramebuffer" );
         }
     }
@@ -1123,6 +1131,8 @@ namespace ae3d
         renderPassInfo.pDependencies = nullptr;
 
         VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &GfxDeviceGlobal::renderPass );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::renderPass, VK_OBJECT_TYPE_RENDER_PASS, "renderpass nonMSAA" );
+
         AE3D_CHECK_VULKAN( err, "vkCreateRenderPass" );   
     }
 

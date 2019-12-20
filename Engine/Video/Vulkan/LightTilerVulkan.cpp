@@ -77,6 +77,8 @@ void ae3d::LightTiler::Init()
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &perTileLightIndexBufferMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory perTileLightIndexBuffer" );
 
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)perTileLightIndexBufferMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "perTileLightIndexBufferMemory" );
+
         err = vkBindBufferMemory( GfxDeviceGlobal::device, perTileLightIndexBuffer, perTileLightIndexBufferMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory perTileLightIndexBuffer" );
 
@@ -111,6 +113,8 @@ void ae3d::LightTiler::Init()
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &pointLightCenterAndRadiusMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory pointLightCenterAndRadiusMemory" );
+
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightCenterAndRadiusMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "pointLightCenterAndRadiusMemory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, pointLightCenterAndRadiusBuffer, pointLightCenterAndRadiusMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory pointLightCenterAndRadiusBuffer" );
@@ -263,6 +267,8 @@ void ae3d::LightTiler::Init()
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightColorMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory spotLightColorMemory" );
+
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightColorMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "spotLightColorMemory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, spotLightColorBuffer, spotLightColorMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory spotLightColorBuffer" );

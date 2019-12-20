@@ -531,5 +531,7 @@ void ae3d::RenderTexture::CreateRenderPass()
     VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &renderPass );
     AE3D_CHECK_VULKAN( err, "RenderTexture vkCreateRenderPass" );
 
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)renderPass, VK_OBJECT_TYPE_RENDER_PASS, "renderpass cube" );
+
     RenderTextureGlobal::renderPassesToReleaseAtExit.push_back( renderPass );
 }
