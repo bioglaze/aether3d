@@ -26,8 +26,6 @@ void ae3d::Material::Apply()
     }
 
     shader->Use();
-
-    int texUnit = 1;
     
     for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
     {
@@ -48,6 +46,8 @@ void ae3d::Material::Apply()
 
     if (sTexRT)
     {
+        int texUnit = 1;
+
 #if RENDERER_METAL
         if (sTexRT->IsCube())
         {

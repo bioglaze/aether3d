@@ -1007,7 +1007,6 @@ namespace ae3d
 
             if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
             {
-                ae3d::System::Print("format: %d\n", format);
                 GfxDeviceGlobal::depthFormat = format;
                 depthFormatFound = true;
                 break;
