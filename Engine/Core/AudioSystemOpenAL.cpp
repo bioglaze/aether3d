@@ -306,7 +306,7 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
         return 0;
     }
 
-    const unsigned clipId = AudioGlobal::clips.count;
+    const unsigned clipId = AudioGlobal::clips.count + 1;
 
     ClipInfo info;
     info.path = clipData.path;

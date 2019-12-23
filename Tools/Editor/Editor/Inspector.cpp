@@ -234,7 +234,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             gameObject->RemoveComponent< AudioSourceComponent >();
         }
 
-        if (gameObject != nullptr && audioSource != nullptr && nk_button_label( &ctx, "Set audio clip" ))
+        if (gameObject != nullptr && audioSource != nullptr && gameObject->GetComponent< AudioSourceComponent >()->GetClipId() == 0 && nk_button_label( &ctx, "Set audio clip" ))
         {
             char path[ 1024 ] = {};
             GetOpenPath( path, "wav" );
