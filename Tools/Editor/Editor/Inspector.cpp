@@ -232,6 +232,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         else if (gameObject != nullptr && audioSource != nullptr && nk_button_label( &ctx, "Remove audio source" ))
         {
             gameObject->RemoveComponent< AudioSourceComponent >();
+            audioSource = nullptr;
         }
 
         if (gameObject != nullptr && audioSource != nullptr && gameObject->GetComponent< AudioSourceComponent >()->GetClipId() == 0 && nk_button_label( &ctx, "Set audio clip" ))
