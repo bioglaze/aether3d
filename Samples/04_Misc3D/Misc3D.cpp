@@ -153,7 +153,7 @@ int main()
     
     GameObject cameraCubeRT;
     cameraCubeRT.AddComponent<CameraComponent>();
-    cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 1 ) );
+    cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     cameraCubeRT.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     cameraCubeRT.GetComponent<CameraComponent>()->SetProjection( 45, 1, 1, 400 );
     cameraCubeRT.GetComponent<CameraComponent>()->SetTargetTexture( &cubeRT );
