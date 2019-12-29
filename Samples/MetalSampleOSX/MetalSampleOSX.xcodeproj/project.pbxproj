@@ -35,12 +35,12 @@
 		ABCBC06A1E052C82000F0B6D /* textures in Resources */ = {isa = PBXBuildFile; fileRef = ABCBC0691E052C82000F0B6D /* textures */; };
 		ABCBC06D1E052CAA000F0B6D /* new_sponza.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABCBC06B1E052CAA000F0B6D /* new_sponza.ae3d */; };
 		ABCBC06E1E052CAA000F0B6D /* sponza.scene in Resources */ = {isa = PBXBuildFile; fileRef = ABCBC06C1E052CAA000F0B6D /* sponza.scene */; };
-		ABCD9C671C12E1D900B94BD0 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */; };
 		ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABCD9C681C12F78200B94BD0 /* MetalKit.framework */; };
 		ABCD9C6C1C131DA300B94BD0 /* font_txt.fnt in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */; };
 		ABCD9C6D1C131DA300B94BD0 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABCD9C6B1C131DA300B94BD0 /* font.png */; };
 		ABCFF6B51D79C2D300BD7AF0 /* test_dxt3.dds in Resources */ = {isa = PBXBuildFile; fileRef = ABCFF6B31D79C2D300BD7AF0 /* test_dxt3.dds */; };
 		ABCFF6B61D79C2D300BD7AF0 /* test_dxt5.dds in Resources */ = {isa = PBXBuildFile; fileRef = ABCFF6B41D79C2D300BD7AF0 /* test_dxt5.dds */; };
+		ABD2D48323B8BFFC009750E7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD2D48223B8BFFC009750E7 /* AVFoundation.framework */; };
 		ABE04F801C1216A80025C436 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F7F1C1216A80025C436 /* AppDelegate.m */; };
 		ABE04F831C1216A80025C436 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F821C1216A80025C436 /* main.m */; };
 		ABE04F861C1216A80025C436 /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABE04F851C1216A80025C436 /* GameViewController.mm */; };
@@ -96,12 +96,12 @@
 		ABCBC0691E052C82000F0B6D /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
 		ABCBC06B1E052CAA000F0B6D /* new_sponza.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = new_sponza.ae3d; path = ../../../../aether3d_build/Samples/new_sponza.ae3d; sourceTree = "<group>"; };
 		ABCBC06C1E052CAA000F0B6D /* sponza.scene */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sponza.scene; path = ../../../../aether3d_build/Samples/sponza.scene; sourceTree = "<group>"; };
-		ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		ABCD9C681C12F78200B94BD0 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = font_txt.fnt; path = ../../../../aether3d_build/Samples/font_txt.fnt; sourceTree = "<group>"; };
 		ABCD9C6B1C131DA300B94BD0 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
 		ABCFF6B31D79C2D300BD7AF0 /* test_dxt3.dds */ = {isa = PBXFileReference; lastKnownFileType = file; name = test_dxt3.dds; path = ../../../../aether3d_build/Samples/test_dxt3.dds; sourceTree = "<group>"; };
 		ABCFF6B41D79C2D300BD7AF0 /* test_dxt5.dds */ = {isa = PBXFileReference; lastKnownFileType = file; name = test_dxt5.dds; path = ../../../../aether3d_build/Samples/test_dxt5.dds; sourceTree = "<group>"; };
+		ABD2D48223B8BFFC009750E7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		ABE04F7B1C1216A80025C436 /* MetalSampleOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalSampleOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABE04F7E1C1216A80025C436 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		ABE04F7F1C1216A80025C436 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -156,7 +156,7 @@
 			files = (
 				AB2CA8251C1332A900D4D7C4 /* libAether3D_OSX_Metal.a in Frameworks */,
 				ABCD9C691C12F78200B94BD0 /* MetalKit.framework in Frameworks */,
-				ABCD9C671C12E1D900B94BD0 /* OpenAL.framework in Frameworks */,
+				ABD2D48323B8BFFC009750E7 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,16 +170,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		ABD2D48123B8BFFC009750E7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ABD2D48223B8BFFC009750E7 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		ABE04F721C1216A80025C436 = {
 			isa = PBXGroup;
 			children = (
 				AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */,
 				ABCD9C681C12F78200B94BD0 /* MetalKit.framework */,
-				ABCD9C661C12E1D900B94BD0 /* OpenAL.framework */,
 				ABE04FA31C1217830025C436 /* Include */,
 				ABE04F7D1C1216A80025C436 /* MetalSampleOSX */,
 				ABE04F971C1216A80025C436 /* MetalSampleOSXTests */,
 				ABE04F7C1C1216A80025C436 /* Products */,
+				ABD2D48123B8BFFC009750E7 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};

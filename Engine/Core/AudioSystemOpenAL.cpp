@@ -2,13 +2,8 @@
 #include <sstream>
 #include <string>
 #include <cstdint>
-#if defined __APPLE__
-#    include <OpenAL/al.h>
-#    include <OpenAL/alc.h>
-#else
-#    include "AL/al.h"
-#    include "AL/alc.h"
-#endif
+#include "AL/al.h"
+#include "AL/alc.h"
 #define STB_VORBIS_HEADER_ONLY
 #include "stb_vorbis.c"
 #include "Array.hpp"
@@ -347,12 +342,12 @@ float ae3d::AudioSystem::GetClipLengthForId( unsigned handle )
 
 void ae3d::AudioSystem::Play( unsigned clipId, bool isLooping )
 {
-    if (clipId >= AudioGlobal::clips.count)
+    if (clipId >= AudioGlobal::clips.count + 1)
     {
         return;
     }
     
-    const auto srcID = AudioGlobal::clips[ clipId ].srcID;
+    const auto srcID = AudioGlobal::clips[ clipId - 1 ].srcID;
     
     ALint state;
     alGetSourcei( srcID, AL_SOURCE_STATE, &state );

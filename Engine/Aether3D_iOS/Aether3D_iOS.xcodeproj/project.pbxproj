@@ -28,7 +28,6 @@
 		4449E8621B14B423009A869C /* Vec3.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8511B14B423009A869C /* Vec3.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		4449E86E1B14B44E009A869C /* AudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4449E8641B14B44E009A869C /* AudioClip.cpp */; };
 		4449E86F1B14B44E009A869C /* AudioSystem.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8651B14B44E009A869C /* AudioSystem.hpp */; };
-		4449E8701B14B44E009A869C /* AudioSystemOpenAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4449E8661B14B44E009A869C /* AudioSystemOpenAL.cpp */; };
 		4449E8711B14B44E009A869C /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4449E8671B14B44E009A869C /* FileSystem.cpp */; };
 		4449E8721B14B44E009A869C /* FileWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4449E8681B14B44E009A869C /* FileWatcher.cpp */; };
 		4449E8731B14B44E009A869C /* FileWatcher.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8691B14B44E009A869C /* FileWatcher.hpp */; };
@@ -54,7 +53,6 @@
 		4449E89B1B14B4B5009A869C /* Renderer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8931B14B4B5009A869C /* Renderer.hpp */; };
 		4449E89C1B14B4B5009A869C /* VertexBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4449E8941B14B4B5009A869C /* VertexBuffer.hpp */; };
 		4449E89E1B14B570009A869C /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449E89D1B14B570009A869C /* Metal.framework */; };
-		4449E8A01B14B576009A869C /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449E89F1B14B576009A869C /* OpenAL.framework */; };
 		4498A00C1B1C397E00C2271C /* RenderTextureMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */; };
 		449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */; };
 		44E5FC991B399E6C009AC088 /* RendererCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC971B399E6C009AC088 /* RendererCommon.cpp */; };
@@ -81,6 +79,8 @@
 		ABB79F981BA9B7A5002A1B5F /* DirectionalLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */; };
 		ABB79F9A1BA9B7BC002A1B5F /* DirectionalLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABC015CF21294C9500E9DB4E /* Array.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABC015CE21294C9500E9DB4E /* Array.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		ABD2D48523B8C688009750E7 /* AudioSystemAV.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABD2D48423B8C688009750E7 /* AudioSystemAV.mm */; };
+		ABD2D48823B8C6E2009750E7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD2D48723B8C6E2009750E7 /* AVFoundation.framework */; };
 		ABF341E71B1A277B0017797C /* RenderTexture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E51B1A277B0017797C /* RenderTexture.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF341E61B1A277B0017797C /* TextureBase.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		ABF549B51DF3368C00EFF25D /* Statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABF549B31DF3368C00EFF25D /* Statistics.cpp */; };
@@ -111,7 +111,6 @@
 		4449E8511B14B423009A869C /* Vec3.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Vec3.hpp; path = ../../Include/Vec3.hpp; sourceTree = "<group>"; };
 		4449E8641B14B44E009A869C /* AudioClip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioClip.cpp; path = ../../Core/AudioClip.cpp; sourceTree = "<group>"; };
 		4449E8651B14B44E009A869C /* AudioSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioSystem.hpp; path = ../../Core/AudioSystem.hpp; sourceTree = "<group>"; };
-		4449E8661B14B44E009A869C /* AudioSystemOpenAL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSystemOpenAL.cpp; path = ../../Core/AudioSystemOpenAL.cpp; sourceTree = "<group>"; };
 		4449E8671B14B44E009A869C /* FileSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileSystem.cpp; path = ../../Core/FileSystem.cpp; sourceTree = "<group>"; };
 		4449E8681B14B44E009A869C /* FileWatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileWatcher.cpp; path = ../../Core/FileWatcher.cpp; sourceTree = "<group>"; };
 		4449E8691B14B44E009A869C /* FileWatcher.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FileWatcher.hpp; path = ../../Core/FileWatcher.hpp; sourceTree = "<group>"; };
@@ -137,7 +136,6 @@
 		4449E8931B14B4B5009A869C /* Renderer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Renderer.hpp; path = ../../Video/Renderer.hpp; sourceTree = "<group>"; };
 		4449E8941B14B4B5009A869C /* VertexBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = VertexBuffer.hpp; path = ../../Video/VertexBuffer.hpp; sourceTree = "<group>"; };
 		4449E89D1B14B570009A869C /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
-		4449E89F1B14B576009A869C /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../Include/TextureCube.hpp; sourceTree = "<group>"; };
 		4498A00B1B1C397E00C2271C /* RenderTextureMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RenderTextureMetal.mm; path = ../../Video/Metal/RenderTextureMetal.mm; sourceTree = "<group>"; };
 		449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SubMesh.hpp; path = ../../Core/SubMesh.hpp; sourceTree = "<group>"; };
@@ -164,6 +162,8 @@
 		ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DirectionalLightComponent.cpp; path = ../../Components/DirectionalLightComponent.cpp; sourceTree = "<group>"; };
 		ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DirectionalLightComponent.hpp; path = ../../Include/DirectionalLightComponent.hpp; sourceTree = "<group>"; };
 		ABC015CE21294C9500E9DB4E /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../../Include/Array.hpp; sourceTree = "<group>"; };
+		ABD2D48423B8C688009750E7 /* AudioSystemAV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AudioSystemAV.mm; path = ../../Core/AudioSystemAV.mm; sourceTree = "<group>"; };
+		ABD2D48723B8C6E2009750E7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		ABF341E51B1A277B0017797C /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../Include/RenderTexture.hpp; sourceTree = "<group>"; };
 		ABF341E61B1A277B0017797C /* TextureBase.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBase.hpp; path = ../../Include/TextureBase.hpp; sourceTree = "<group>"; };
 		ABF549B31DF3368C00EFF25D /* Statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Statistics.cpp; path = ../../Core/Statistics.cpp; sourceTree = "<group>"; };
@@ -175,7 +175,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4449E8A01B14B576009A869C /* OpenAL.framework in Frameworks */,
+				ABD2D48823B8C6E2009750E7 /* AVFoundation.framework in Frameworks */,
 				4449E89E1B14B570009A869C /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -186,10 +186,10 @@
 		4449E81A1B14B3E7009A869C = {
 			isa = PBXGroup;
 			children = (
-				4449E89F1B14B576009A869C /* OpenAL.framework */,
 				4449E89D1B14B570009A869C /* Metal.framework */,
 				4449E8261B14B3E8009A869C /* Aether3D_iOS */,
 				4449E8251B14B3E8009A869C /* Products */,
+				ABD2D48623B8C6E1009750E7 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -263,7 +263,7 @@
 			children = (
 				4449E8641B14B44E009A869C /* AudioClip.cpp */,
 				4449E8651B14B44E009A869C /* AudioSystem.hpp */,
-				4449E8661B14B44E009A869C /* AudioSystemOpenAL.cpp */,
+				ABD2D48423B8C688009750E7 /* AudioSystemAV.mm */,
 				4449E8671B14B44E009A869C /* FileSystem.cpp */,
 				4449E8681B14B44E009A869C /* FileWatcher.cpp */,
 				4449E8691B14B44E009A869C /* FileWatcher.hpp */,
@@ -331,6 +331,14 @@
 				4449E8941B14B4B5009A869C /* VertexBuffer.hpp */,
 			);
 			name = Video;
+			sourceTree = "<group>";
+		};
+		ABD2D48623B8C6E1009750E7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ABD2D48723B8C6E2009750E7 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -408,7 +416,7 @@
 		4449E81B1B14B3E7009A869C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Timo Wirén";
 				TargetAttributes = {
 					4449E8231B14B3E7009A869C = {
@@ -464,7 +472,6 @@
 				4449E8811B14B46C009A869C /* GameObject.cpp in Sources */,
 				AB190E321B57DE73005ECE49 /* Material.cpp in Sources */,
 				4449E8761B14B44E009A869C /* Scene.cpp in Sources */,
-				4449E8701B14B44E009A869C /* AudioSystemOpenAL.cpp in Sources */,
 				4449E8971B14B4B5009A869C /* RendererMetal.mm in Sources */,
 				4449E8821B14B46C009A869C /* SpriteRendererComponent.cpp in Sources */,
 				4449E8711B14B44E009A869C /* FileSystem.cpp in Sources */,
@@ -475,6 +482,7 @@
 				4449E88B1B14B48E009A869C /* stb_vorbis.c in Sources */,
 				ABB79F981BA9B7A5002A1B5F /* DirectionalLightComponent.cpp in Sources */,
 				AB61DA551DAD633F0068A5FE /* MathUtil.cpp in Sources */,
+				ABD2D48523B8C688009750E7 /* AudioSystemAV.mm in Sources */,
 				4449E87F1B14B46C009A869C /* AudioSourceComponent.cpp in Sources */,
 				4449E88A1B14B48E009A869C /* stb_image.c in Sources */,
 				4449E86E1B14B44E009A869C /* AudioClip.cpp in Sources */,
@@ -551,7 +559,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../ThirdParty,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -612,7 +620,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../ThirdParty,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -625,7 +633,7 @@
 		4449E83B1B14B3E8009A869C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -647,7 +655,7 @@
 		4449E83C1B14B3E8009A869C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;

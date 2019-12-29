@@ -78,6 +78,9 @@ ae3d::FileSystem::FileContentsData ae3d::FileSystem::FileContents( const char* p
 {
     ae3d::FileSystem::FileContentsData outData;
     outData.path = path == nullptr ? "" : std::string( GetFullPath( path ) );
+#if defined __APPLE__
+        outData.pathWithoutBundle = path;
+#endif
 
     for (const auto& pakFile : Global::pakFiles)
     {

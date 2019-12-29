@@ -32,8 +32,8 @@
 		ABB36045208C529B007133FD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB36044208C529B007133FD /* AppKit.framework */; };
 		ABBDD28920B7296B00AA93C7 /* Inspector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABBDD28820B7296B00AA93C7 /* Inspector.cpp */; };
 		ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */; };
-		ABD0C8BA2070B34C0049EEAE /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B92070B34C0049EEAE /* OpenAL.framework */; };
 		ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8BB2070B3550049EEAE /* MetalKit.framework */; };
+		ABD2D48A23B8C72C009750E7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD2D48923B8C72C009750E7 /* AVFoundation.framework */; };
 		ABE82EA421DCD8F100072FB1 /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE82EA321DCD8F100072FB1 /* Bloom.metal */; };
 /* End PBXBuildFile section */
 
@@ -101,8 +101,8 @@
 		ABD0C8B42070B20A0049EEAE /* RenderTexture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = RenderTexture.hpp; path = ../../../../Engine/Include/RenderTexture.hpp; sourceTree = "<group>"; };
 		ABD0C8B52070B20B0049EEAE /* TextureCube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureCube.hpp; path = ../../../../Engine/Include/TextureCube.hpp; sourceTree = "<group>"; };
 		ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
-		ABD0C8B92070B34C0049EEAE /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		ABD0C8BB2070B3550049EEAE /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		ABD2D48923B8C72C009750E7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		ABE82EA321DCD8F100072FB1 /* Bloom.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Bloom.metal; path = ../../../../Engine/Assets/Bloom.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -111,11 +111,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABD2D48A23B8C72C009750E7 /* AVFoundation.framework in Frameworks */,
 				ABB36045208C529B007133FD /* AppKit.framework in Frameworks */,
 				ABB36043208C5244007133FD /* Metal.framework in Frameworks */,
 				ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */,
 				ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */,
-				ABD0C8BA2070B34C0049EEAE /* OpenAL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,10 +208,10 @@
 		ABD0C8B82070B34C0049EEAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ABD2D48923B8C72C009750E7 /* AVFoundation.framework */,
 				ABB36044208C529B007133FD /* AppKit.framework */,
 				ABB36042208C5244007133FD /* Metal.framework */,
 				ABD0C8BB2070B3550049EEAE /* MetalKit.framework */,
-				ABD0C8B92070B34C0049EEAE /* OpenAL.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

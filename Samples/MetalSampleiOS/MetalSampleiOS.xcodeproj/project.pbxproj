@@ -14,7 +14,6 @@
 		AB6DECD81EC82B350019358C /* gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD31EC82B350019358C /* gradient.png */; };
 		AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD41EC82B350019358C /* new_sponza.ae3d */; };
 		AB6DECDA1EC82B350019358C /* sponza.scene in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD51EC82B350019358C /* sponza.scene */; };
-		AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD01C2344BA00911AB6 /* OpenAL.framework */; };
 		AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD21C2346F400911AB6 /* MetalKit.framework */; };
 		AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */; };
 		AB9CA0011D8ECA760049A3AF /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9CA0001D8ECA760049A3AF /* Standard.metal */; };
@@ -25,6 +24,7 @@
 		ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F521C19E1F90098E21D /* Assets.xcassets */; };
 		ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F541C19E1F90098E21D /* LaunchScreen.storyboard */; };
 		ABA29F611C19E1F90098E21D /* MetalSampleiOSTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */; };
+		ABD2D48C23B8C77E009750E7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD2D48B23B8C77E009750E7 /* AVFoundation.framework */; };
 		ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB251C29D79F00E78933 /* Moments.metal */; };
 		ABD3AB2B1C29D79F00E78933 /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB261C29D79F00E78933 /* SDF.metal */; };
 		ABD3AB2C1C29D79F00E78933 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB271C29D79F00E78933 /* Skybox.metal */; };
@@ -76,6 +76,7 @@
 		ABA29F5C1C19E1F90098E21D /* MetalSampleiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSampleiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MetalSampleiOSTests.mm; sourceTree = "<group>"; };
 		ABA29F621C19E1F90098E21D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABD2D48B23B8C77E009750E7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		ABD3AB251C29D79F00E78933 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
 		ABD3AB261C29D79F00E78933 /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../Engine/Assets/SDF.metal; sourceTree = "<group>"; };
 		ABD3AB271C29D79F00E78933 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
@@ -94,8 +95,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABD2D48C23B8C77E009750E7 /* AVFoundation.framework in Frameworks */,
 				AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */,
-				AB811CD11C2344BA00911AB6 /* OpenAL.framework in Frameworks */,
 				ABD3FFDD219713A700625539 /* Aether3D_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -197,6 +198,7 @@
 		ABD3FFDC219713A700625539 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ABD2D48B23B8C77E009750E7 /* AVFoundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -415,7 +417,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				MTL_FAST_MATH = NO;
 				MTL_OPTIMIZATION_LEVEL = 0;
@@ -467,7 +469,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				MTL_FAST_MATH = NO;
 				MTL_OPTIMIZATION_LEVEL = 0;

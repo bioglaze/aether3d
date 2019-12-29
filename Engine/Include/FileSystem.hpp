@@ -14,6 +14,11 @@ namespace ae3d
             std::vector<unsigned char> data;
             /// File path.
             std::string path;
+
+#if defined __APPLE__
+            /// Original path. Path without bundle.
+            std::string pathWithoutBundle;
+#endif            
             /// True if data has been loaded from path.
             bool isLoaded = false;
         };

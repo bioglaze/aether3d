@@ -20,7 +20,6 @@
 		AB6E12D81C11D79B0020A929 /* TransformComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12CF1C11D79B0020A929 /* TransformComponent.cpp */; };
 		AB6E12EA1C11D7B00020A929 /* AudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12DA1C11D7B00020A929 /* AudioClip.cpp */; };
 		AB6E12EB1C11D7B00020A929 /* AudioSystem.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB6E12DB1C11D7B00020A929 /* AudioSystem.hpp */; };
-		AB6E12EC1C11D7B00020A929 /* AudioSystemOpenAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12DC1C11D7B00020A929 /* AudioSystemOpenAL.cpp */; };
 		AB6E12ED1C11D7B00020A929 /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12DD1C11D7B00020A929 /* FileSystem.cpp */; };
 		AB6E12EE1C11D7B00020A929 /* FileWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12DE1C11D7B00020A929 /* FileWatcher.cpp */; };
 		AB6E12EF1C11D7B00020A929 /* FileWatcher.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB6E12DF1C11D7B00020A929 /* FileWatcher.hpp */; };
@@ -81,6 +80,7 @@
 		AB921DB11CC21AF4008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */; };
 		ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */; };
 		ABB6E0AE1C7C55E30014B78B /* TextureCubeMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */; };
+		ABD2D48023B8BD21009750E7 /* AudioSystemAV.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABD2D47F23B8BD21009750E7 /* AudioSystemAV.mm */; };
 		ABF549B91DF337D500EFF25D /* Statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABF549B71DF337D500EFF25D /* Statistics.cpp */; };
 		ABF549BA1DF337D500EFF25D /* Statistics.hpp in Headers */ = {isa = PBXBuildFile; fileRef = ABF549B81DF337D500EFF25D /* Statistics.hpp */; };
 		ABFD71AA1D81B73A003770D4 /* LightTilerMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABFD71A91D81B73A003770D4 /* LightTilerMetal.mm */; };
@@ -101,7 +101,6 @@
 		AB6E12CF1C11D79B0020A929 /* TransformComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformComponent.cpp; path = ../Components/TransformComponent.cpp; sourceTree = "<group>"; };
 		AB6E12DA1C11D7B00020A929 /* AudioClip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioClip.cpp; path = ../Core/AudioClip.cpp; sourceTree = "<group>"; };
 		AB6E12DB1C11D7B00020A929 /* AudioSystem.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AudioSystem.hpp; path = ../Core/AudioSystem.hpp; sourceTree = "<group>"; };
-		AB6E12DC1C11D7B00020A929 /* AudioSystemOpenAL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSystemOpenAL.cpp; path = ../Core/AudioSystemOpenAL.cpp; sourceTree = "<group>"; };
 		AB6E12DD1C11D7B00020A929 /* FileSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileSystem.cpp; path = ../Core/FileSystem.cpp; sourceTree = "<group>"; };
 		AB6E12DE1C11D7B00020A929 /* FileWatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileWatcher.cpp; path = ../Core/FileWatcher.cpp; sourceTree = "<group>"; };
 		AB6E12DF1C11D7B00020A929 /* FileWatcher.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FileWatcher.hpp; path = ../Core/FileWatcher.hpp; sourceTree = "<group>"; };
@@ -162,6 +161,7 @@
 		AB921DB01CC21AF4008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../Include/ComputeShader.hpp; sourceTree = "<group>"; };
 		ABA3F0281CC8091200B6A9D6 /* ComputeShaderMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ComputeShaderMetal.mm; path = ../Video/Metal/ComputeShaderMetal.mm; sourceTree = "<group>"; };
 		ABB6E0AD1C7C55E30014B78B /* TextureCubeMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TextureCubeMetal.mm; path = ../Video/Metal/TextureCubeMetal.mm; sourceTree = "<group>"; };
+		ABD2D47F23B8BD21009750E7 /* AudioSystemAV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AudioSystemAV.mm; path = ../Core/AudioSystemAV.mm; sourceTree = "<group>"; };
 		ABF549B71DF337D500EFF25D /* Statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Statistics.cpp; path = ../Core/Statistics.cpp; sourceTree = "<group>"; };
 		ABF549B81DF337D500EFF25D /* Statistics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Statistics.hpp; path = ../Core/Statistics.hpp; sourceTree = "<group>"; };
 		ABFD71A81D81B5E4003770D4 /* LightTiler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = LightTiler.hpp; path = ../Video/LightTiler.hpp; sourceTree = "<group>"; };
@@ -223,7 +223,7 @@
 			children = (
 				AB6E12DA1C11D7B00020A929 /* AudioClip.cpp */,
 				AB6E12DB1C11D7B00020A929 /* AudioSystem.hpp */,
-				AB6E12DC1C11D7B00020A929 /* AudioSystemOpenAL.cpp */,
+				ABD2D47F23B8BD21009750E7 /* AudioSystemAV.mm */,
 				AB6E12DD1C11D7B00020A929 /* FileSystem.cpp */,
 				AB6E12DE1C11D7B00020A929 /* FileWatcher.cpp */,
 				AB6E12DF1C11D7B00020A929 /* FileWatcher.hpp */,
@@ -429,6 +429,7 @@
 				AB6E134B1C11D8BC0020A929 /* stb_image.c in Sources */,
 				AB6E13431C11D8A00020A929 /* Material.cpp in Sources */,
 				AB6E12F51C11D7B00020A929 /* MatrixSSE3.cpp in Sources */,
+				ABD2D48023B8BD21009750E7 /* AudioSystemAV.mm in Sources */,
 				AB61DA531DAD62F80068A5FE /* MathUtil.cpp in Sources */,
 				ABF549B91DF337D500EFF25D /* Statistics.cpp in Sources */,
 				ABA3F0291CC8091200B6A9D6 /* ComputeShaderMetal.mm in Sources */,
@@ -444,7 +445,6 @@
 				AB6E13011C11D7C50020A929 /* GfxDeviceMetal.mm in Sources */,
 				AB6E12F61C11D7B00020A929 /* Mesh.cpp in Sources */,
 				AB6E12F71C11D7B00020A929 /* Scene.cpp in Sources */,
-				AB6E12EC1C11D7B00020A929 /* AudioSystemOpenAL.cpp in Sources */,
 				AB6E13461C11D8A00020A929 /* TextureCommon.cpp in Sources */,
 				AB6E13021C11D7C50020A929 /* RendererMetal.mm in Sources */,
 				AB6E12F31C11D7B00020A929 /* Matrix.cpp in Sources */,
