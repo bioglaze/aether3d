@@ -26,6 +26,7 @@ namespace GfxDeviceGlobal
     extern VkSampler boundSamplers[ 2 ];
 	extern PerObjectUboStruct perObjectUboStruct;
     extern VkCommandBuffer texCmdBuffer;
+    extern ae3d::RenderTexture* renderTexture0;
 }
 
 namespace ShaderGlobal
@@ -241,6 +242,12 @@ void ae3d::Shader::SetTexture( TextureCube* texture, int textureUnit )
 void ae3d::Shader::SetRenderTexture( RenderTexture* texture, int textureUnit )
 {
     if (texture == nullptr)
+    {
+        return;
+    }
+
+    // Prevents feedback.
+    if (texture == GfxDeviceGlobal::renderTexture0)
     {
         return;
     }

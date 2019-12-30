@@ -14,7 +14,7 @@ namespace ae3d
         /// \param clipData Clip data from .wav or .ogg file.
         void Load( const FileSystem::FileContentsData& clipData );
 
-        /// \return Clip's handle.
+        /// \return Clip's handle. 0 means that the clip is empty/not pointing to any audio clip.
         unsigned GetId() const { return handle; }
 
         /// \return Clip's length in seconds or 1 if the clip is not loaded.
