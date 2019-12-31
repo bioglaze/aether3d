@@ -1,7 +1,5 @@
 #include "AudioSystem.hpp"
-#include <sstream>
 #include <string>
-#include <cstdint>
 #import <AVFoundation/AVFoundation.h>
 #import <Foundation/NSURL.h>
 #define STB_VORBIS_HEADER_ONLY
@@ -115,10 +113,10 @@ void ae3d::AudioSystem::Play( unsigned clipId, bool isLooping )
 
 void ae3d::AudioSystem::SetListenerPosition( float x, float y, float z )
 {
-    ae3d::System::Print( "AudioSystem: SetListenerPosition is not implemented on macOS/iOS!\n" );
+    // TODO: Implement
 }
 
 void ae3d::AudioSystem::SetListenerOrientation( float forwardX, float forwardY, float forwardZ )
 {
-    ae3d::System::Print( "AudioSystem: SetListenerOrientation is not implemented on macOS/iOS!\n" );
+    // TODO: Implement
 }
