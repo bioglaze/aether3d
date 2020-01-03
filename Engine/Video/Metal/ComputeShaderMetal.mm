@@ -39,16 +39,28 @@ void ae3d::ComputeShader::Load( const char* metalShaderName, const FileSystem::F
     }
 }
 
-void ae3d::ComputeShader::SetRenderTexture( unsigned slot, RenderTexture* renderTexture )
+void ae3d::ComputeShader::SetRenderTexture( unsigned slotIndex, RenderTexture* renderTexture )
 {
-    System::Assert( slot < SLOT_COUNT, "Too high slot" );
-    renderTextures[ slot ] = renderTexture;
+    if (slotIndex < SLOT_COUNT)
+    {
+        renderTextures[ slotIndex ] = renderTexture;
+    }
+    else
+    {
+        System::Print( "ComputeShader: Too high slot count %u in SetRenderTexture!\n", slotIndex );
+    }
 }
 
 void ae3d::ComputeShader::SetTexture2D( unsigned slotIndex, Texture2D* texture )
 {
-    System::Assert( slotIndex < SLOT_COUNT, "Too high slot" );
-    textures[ slotIndex ] = texture;
+    if (slotIndex < SLOT_COUNT)
+    {
+        textures[ slotIndex ] = texture;
+    }
+    else
+    {
+        System::Print( "ComputeShader: Too high slot count %u in SetTexture2D!\n", slotIndex );
+    }
 }
 
 void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
@@ -62,8 +74,14 @@ void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
 
 void ae3d::ComputeShader::SetUniformBuffer( unsigned slotIndex, id< MTLBuffer > buffer )
 {
-    System::Assert( slotIndex < SLOT_COUNT, "Too high slot" );
-    uniforms[ slotIndex ] = buffer;
+    if (slotIndex < SLOT_COUNT)
+    {
+        uniforms[ slotIndex ] = buffer;
+    }
+    else
+    {
+        System::Print( "ComputeShader: Too high slot count %u in SetRenderUniformBuffer!\n", slotIndex );
+    }
 }
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )

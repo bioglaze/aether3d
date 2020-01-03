@@ -612,7 +612,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 void ae3d::Texture2D::LoadPVRv2( const char* path )
 {
 #if !TARGET_OS_IPHONE
-    System::Assert( false, "PVR2 loading only supported on iOS");
+    System::Print( "PVR2 loading only supported on iOS. Tried to load %s\n", path);
     return;
 #else
     NSString* pvrtcNSString = [NSString stringWithUTF8String: path];
@@ -727,7 +727,7 @@ void ae3d::Texture2D::LoadPVRv2( const char* path )
 void ae3d::Texture2D::LoadPVRv3( const char* path )
 {
 #if !TARGET_OS_IPHONE
-    System::Assert( false, "PVR3 loading only supported on iOS");
+    System::Print( "PVR3 loading only supported on iOS. Tried to load %s\n", path);
     return;
 #else
     NSString* pvrtcNSString = [NSString stringWithUTF8String: path];
