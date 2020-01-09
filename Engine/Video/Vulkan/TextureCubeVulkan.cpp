@@ -576,6 +576,8 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
                 err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffers[ mipLevel ] );
                 AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
+                debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingBuffers[ mipLevel ], VK_OBJECT_TYPE_BUFFER, "stagingDDSCube" );
+
                 TextureCubeGlobal::buffersToReleaseAtExit.push_back( stagingBuffers[ mipLevel ] );
 
                 vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], &memReqs );

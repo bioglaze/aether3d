@@ -187,6 +187,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
         bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffers[ mipIndex ] );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingBuffers[ mipIndex ], VK_OBJECT_TYPE_BUFFER, "stagingBuffer2D" );
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers[ mipIndex ], &memReqs );
 
@@ -456,6 +457,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &stagingBuffer );
     AE3D_CHECK_VULKAN( err, "vkCreateBuffer staging" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingBuffer, VK_OBJECT_TYPE_BUFFER, "staging2D" );
 
     vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffer, &memReqs );
 

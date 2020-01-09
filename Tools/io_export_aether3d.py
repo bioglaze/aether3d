@@ -206,30 +206,6 @@ class Aether3DExporter( bpy.types.Operator ):
         else:
                 no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ face.normal )
 
-        # color
-        #if len( mesh.tessface_vertex_colors ) > 0:
-        #    vcolors = mesh.tessface_vertex_colors[ 0 ]
-        #    color = ( 1.0, 1.0, 1.0, 1.0 )
-
-        #    n = len(vcolors.data)
-
-        #    if face_vi == 0:
-        #        vcolors1 = (ctypes.c_float * (n * 3))()
-        #        vcolors.data.foreach_get( 'color1', vcolors1 )
-        #        color = (vcolors1[0], vcolors1[1], vcolors1[2], 1.0)
-        #    if face_vi == 1:
-        #        vcolors2 = (ctypes.c_float * (n * 3))()
-        #        vcolors.data.foreach_get( 'color2', vcolors2 )
-        #        color = (vcolors2[0], vcolors2[1], vcolors2[2], 1.0)
-        #    if face_vi == 2:
-        #        vcolors3 = (ctypes.c_float * (n * 3))()
-        #        vcolors.data.foreach_get( 'color3', vcolors3 )
-        #        color = (vcolors3[0], vcolors3[1], vcolors3[2], 1.0)
-        #    if face_vi == 3:
-        #        vcolors4 = (ctypes.c_float * (n * 3))()
-        #        vcolors.data.foreach_get( 'color4', vcolors4 )
-        #        color = (vcolors4[0], vcolors4[1], vcolors4[2], 1.0)
-        #else:
         color = ( 1.0, 1.0, 1.0, 1.0 )
 
         outVertex = Vertex()
@@ -314,6 +290,12 @@ class Aether3DExporter( bpy.types.Operator ):
             for p in obj.data.loops:
                 mesh.vertices[ u ].tangent = (p.tangent.x, p.tangent.y, p.tangent.z, p.bitangent_sign )
                 u = u + 1
+
+            u = 0
+            for cc in obj.data.vertex_colors:
+                for c in cc.data:
+                    mesh.vertices[ u ].color = c.color
+                    u = u + 1
 
             mesh.generateAABB()
             #mesh.generateTangents()

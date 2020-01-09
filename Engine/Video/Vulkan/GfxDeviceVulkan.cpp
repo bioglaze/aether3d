@@ -2051,6 +2051,7 @@ void ae3d::GfxDevice::CreateUniformBuffers()
 
         VkResult err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferInfo, nullptr, &ubo.ubo );
         AE3D_CHECK_VULKAN( err, "vkCreateBuffer UBO" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)ubo.ubo, VK_OBJECT_TYPE_BUFFER, "ubo" );
 
         VkMemoryRequirements memReqs;
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, ubo.ubo, &memReqs );
