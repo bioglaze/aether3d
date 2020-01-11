@@ -26,7 +26,7 @@
    <li>Bitmap fonts using <a href="http://angelcode.com/products/bmfont/">BMFont</a>. Also supports SDF rendering.</li>
    <li>Virtual file system aka .pak archive files for faster loading.</li>
    <li>Custom mesh format, converters included for .obj, .fbx and Blender.</li>
-   <li>Shadow mapping from a directional or spot light (no lighting yet)</li>
+   <li>Shadow mapping from a directional or spot light</li>
    <li>VR support. Tested on HTC Vive.</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Skinned animation.</li>

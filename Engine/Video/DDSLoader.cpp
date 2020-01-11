@@ -175,8 +175,17 @@ DDSLoader::LoadResult DDSLoader::Load( const ae3d::FileSystem::FileContentsData&
     
     memcpy( &header, fileContents.data.data(), sizeof( header ) );
 
-    ae3d::System::Assert( header.sHeader.dwMagic == DDS_MAGIC, "DDSLoader: Wrong magic" );
-    ae3d::System::Assert( header.sHeader.dwSize == 124, "DDSLoader: Wrong header size" );
+    if (header.sHeader.dwMagic != DDS_MAGIC)
+    {
+        ae3d::System::Print( "DDSLoader: Wrong magic in file %s\n", fileContents.path.c_str() );
+        return LoadResult::FileNotFound;
+    }
+    
+    if (header.sHeader.dwSize != 124)
+    {
+        ae3d::System::Print( "DDSLoader: Wrong header size in file %s\n", fileContents.path.c_str() );
+        return LoadResult::FileNotFound;
+    }
   
     if (!(header.sHeader.dwFlags & DDSD_PIXELFORMAT) || !(header.sHeader.dwFlags & DDSD_CAPS) )
     {

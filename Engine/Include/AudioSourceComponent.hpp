@@ -24,7 +24,7 @@ namespace ae3d
         /// \param audioClipId Audio clip id.
         void SetClipId( unsigned audioClipId );
 
-        /// \param enable True, if clips played through this source will be affected by this GameObject's and camera's position.
+        /// \param enable True, if clips played through this source will be affected by this GameObject's and camera's position. Not implemented on macOS/iOS.
         void Set3D( bool enable ) { is3D = enable; }
         
         /// \param enable True, if the clip will be looped when playing.
