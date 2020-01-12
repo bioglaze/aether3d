@@ -204,8 +204,11 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         heapProps.CreationNodeMask = 1;
         heapProps.VisibleNodeMask = 1;
 
+        D3D12_CLEAR_VALUE clearValue = {};
+        clearValue.Format = dxgiFormat;
+
         HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
-            D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
+            D3D12_RESOURCE_STATE_COPY_DEST, &clearValue, IID_PPV_ARGS( &gpuResource.resource ) );
         AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
         wchar_t wstr[ 128 ];

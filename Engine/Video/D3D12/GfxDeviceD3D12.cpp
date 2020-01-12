@@ -477,7 +477,7 @@ void CreateSamplers()
     for (int samplerIndex = 0; samplerIndex < 4; ++samplerIndex)
     {
         D3D12_SAMPLER_DESC descSampler = {};
-        descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        descSampler.Filter = samplerIndex == 0 ? D3D12_FILTER_MIN_MAG_MIP_LINEAR : D3D12_FILTER_ANISOTROPIC;
         descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -496,7 +496,7 @@ void CreateSamplers()
         handleCPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
         handleGPU.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
 
-        descSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+        descSampler.Filter = samplerIndex == 0 ? D3D12_FILTER_MIN_MAG_MIP_LINEAR : D3D12_FILTER_ANISOTROPIC;
         descSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
         descSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
         descSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
