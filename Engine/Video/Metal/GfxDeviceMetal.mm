@@ -109,6 +109,7 @@ namespace GfxDeviceGlobal
 
             samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
             samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
+            samplerDescriptor.mipFilter = MTLSamplerMipFilterLinear;
             samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
             samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
             samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
@@ -118,6 +119,7 @@ namespace GfxDeviceGlobal
 
             samplerDescriptor.minFilter = MTLSamplerMinMagFilterLinear;
             samplerDescriptor.magFilter = MTLSamplerMinMagFilterLinear;
+            samplerDescriptor.mipFilter = MTLSamplerMipFilterLinear;
             samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
             samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
             samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
@@ -127,6 +129,7 @@ namespace GfxDeviceGlobal
 
             samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
             samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
+            samplerDescriptor.mipFilter = MTLSamplerMipFilterNearest;
             samplerDescriptor.sAddressMode = MTLSamplerAddressModeRepeat;
             samplerDescriptor.tAddressMode = MTLSamplerAddressModeRepeat;
             samplerDescriptor.rAddressMode = MTLSamplerAddressModeRepeat;
@@ -136,6 +139,7 @@ namespace GfxDeviceGlobal
 
             samplerDescriptor.minFilter = MTLSamplerMinMagFilterNearest;
             samplerDescriptor.magFilter = MTLSamplerMinMagFilterNearest;
+            samplerDescriptor.mipFilter = MTLSamplerMipFilterNearest;
             samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
             samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
             samplerDescriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
