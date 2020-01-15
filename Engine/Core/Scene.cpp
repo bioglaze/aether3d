@@ -1512,7 +1512,6 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             if (path.find( "_n." ) != std::string::npos)
             {
                 outTexture2Ds[ name ]->Load( FileSystem::FileContents( path.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
-                ae3d::System::Print("load normal map %s\n", path.c_str());
             }
             else
             {

@@ -80,10 +80,9 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     info.path = clipData.path;
     AudioGlobal::clips.Add( info );
 
-    //NSString* path = [NSString stringWithUTF8String: clipData.path.c_str()];
-    NSString* path = [NSString stringWithUTF8String: clipData.pathWithoutBundle.c_str()];
+    NSString* path = [NSString stringWithUTF8String: clipData.path.c_str()];
 
-    NSURL* url = [ [NSBundle mainBundle] URLForResource:path withExtension:nil];
+    NSURL* url = [ NSURL fileURLWithPath:path];
     AVAudioFile* avFile = [ [AVAudioFile alloc] initForReading:url error:nil ];
     AVAudioFormat* format = avFile.processingFormat;
     AVAudioFrameCount capacity = (AVAudioFrameCount)avFile.length;

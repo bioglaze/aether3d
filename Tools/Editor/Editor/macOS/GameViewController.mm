@@ -22,8 +22,9 @@ static std::string GetOpenPath( const char* extension )
     if ([op runModal] == NSModalResponseOK)
     {
         NSURL *nsurl = [[op URLs] objectAtIndex:0];
-        std::string tmp = std::string([[nsurl path] UTF8String]);
-        return std::string([[nsurl path] UTF8String]);
+        NSString *myString = [nsurl path];
+        std::string tmp = [myString UTF8String];
+        return tmp;
     }
     
     return "";
@@ -31,7 +32,8 @@ static std::string GetOpenPath( const char* extension )
 
 void GetOpenPath( char* outPath, const char* extension )
 {
-    static std::string path = GetOpenPath( extension );
+    //static std::string path;
+    std::string path = GetOpenPath( extension );
     strcpy( outPath, path.c_str() );
 }
 
