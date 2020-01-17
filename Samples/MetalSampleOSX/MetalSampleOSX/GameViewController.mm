@@ -40,7 +40,7 @@
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
-#define TEST_RENDER_TEXTURE_CUBE
+//#define TEST_RENDER_TEXTURE_CUBE
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -338,7 +338,7 @@ using namespace ae3d;
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 

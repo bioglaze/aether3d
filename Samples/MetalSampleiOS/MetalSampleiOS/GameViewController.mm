@@ -3,6 +3,8 @@
 #import "GameViewController.h"
 
 #import "Aether3D_iOS/Array.hpp"
+#import "Aether3D_iOS/AudioClip.hpp"
+#import "Aether3D_iOS/AudioSourceComponent.hpp"
 #import "Aether3D_iOS/CameraComponent.hpp"
 #import "Aether3D_iOS/DirectionalLightComponent.hpp"
 #import "Aether3D_iOS/GameObject.hpp"
@@ -17,6 +19,7 @@
 #import "Aether3D_iOS/Shader.hpp"
 #import "Aether3D_iOS/System.hpp"
 #import "Aether3D_iOS/Texture2D.hpp"
+#import "Aether3D_iOS/TextureCube.hpp"
 #import "Aether3D_iOS/TransformComponent.hpp"
 #import "Aether3D_iOS/TextRendererComponent.hpp"
 
@@ -76,6 +79,8 @@ int gTouchCount = 0;
     ae3d::GameObject bigCube;
     ae3d::GameObject bigCube2;
     ae3d::GameObject pointLights[ POINT_LIGHT_COUNT ];
+    ae3d::GameObject audioContainer;
+    ae3d::AudioClip audioClip;
     ae3d::Scene scene;
     ae3d::Font font;
     ae3d::Mesh cubeMesh;
@@ -86,6 +91,7 @@ int gTouchCount = 0;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
     ae3d::Texture2D astcTex;
+    ae3d::TextureCube skyTex;
     std::vector< ae3d::GameObject > sponzaGameObjects;
     std::map< std::string, ae3d::Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, ae3d::Texture2D* > sponzaTextureNameToTexture;
@@ -109,8 +115,14 @@ int gTouchCount = 0;
 
     ae3d::System::InitMetal( device, _view, MULTISAMPLE_COUNT, MAX_UI_VERTEX_MEMORY, MAX_UI_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
-    //ae3d::System::InitAudio();
+    ae3d::System::InitAudio();
     
+    audioClip.Load( ae3d::FileSystem::FileContents( "sine340.wav" ) );
+    
+    audioContainer.AddComponent<ae3d::AudioSourceComponent>();
+    audioContainer.GetComponent<ae3d::AudioSourceComponent>()->SetClipId( audioClip.GetId() );
+    audioContainer.GetComponent<ae3d::AudioSourceComponent>()->Play();
+
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
@@ -137,9 +149,13 @@ int gTouchCount = 0;
     scene.Add( &camera3d );
     
     fontTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
-    //gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
-    gliderTex.Load( ae3d::FileSystem::FileContents( "textures/lion_compressonator.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+    gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
     astcTex.Load( ae3d::FileSystem::FileContents( "granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::RGB, ae3d::Anisotropy::k1 );
+
+    skyTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
+                ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
+                ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
+                ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB );
 
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "font_txt.fnt" ) );
     text.AddComponent<ae3d::TextRendererComponent>();
@@ -245,10 +261,12 @@ int gTouchCount = 0;
         ae3d::System::Print( "Could not parse Sponza\n" );
     }
     
-    /*for (auto& mat : sponzaMaterialNameToMaterial)
-     {
-     mat.second->SetShader( &shader );
-     }*/
+    for (auto& mat : sponzaMaterialNameToMaterial)
+    {
+        //mat.second->SetShader( &shader );
+        mat.second->SetShader( &standardShader );
+        mat.second->SetTexture( &skyTex, 4 );
+    }
     
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
     {

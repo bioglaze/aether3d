@@ -1491,7 +1491,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 }
 #endif
 #if TARGET_OS_IPHONE
-                if (compressedTexturePath.find( ".astc" ) != std::string::npos)
+                // FIXME: Temporarily disabled because sponza.scene refers non-existing files.
+                /*if (compressedTexturePath.find( ".astc" ) != std::string::npos)
                 {
                     path = compressedTexturePath;
                 }
@@ -1503,7 +1504,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                     {
                         path = compressedTexturePath;
                     }
-                }
+                }*/
 #endif
             }
 

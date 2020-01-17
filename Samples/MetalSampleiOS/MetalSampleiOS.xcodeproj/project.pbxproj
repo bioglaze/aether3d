@@ -14,8 +14,12 @@
 		AB6DECD81EC82B350019358C /* gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD31EC82B350019358C /* gradient.png */; };
 		AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD41EC82B350019358C /* new_sponza.ae3d */; };
 		AB6DECDA1EC82B350019358C /* sponza.scene in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD51EC82B350019358C /* sponza.scene */; };
-		AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CD21C2346F400911AB6 /* MetalKit.framework */; };
 		AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */; };
+		AB9C9F8623D1F8EE007F9B6B /* sine340.wav in Resources */ = {isa = PBXBuildFile; fileRef = AB9C9F8523D1F8EE007F9B6B /* sine340.wav */; };
+		AB9C9F8B23D20213007F9B6B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB9C9F8A23D20213007F9B6B /* AVFoundation.framework */; };
+		AB9C9F8D23D2021E007F9B6B /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB9C9F8C23D2021E007F9B6B /* MetalKit.framework */; };
+		AB9C9F8F23D20240007F9B6B /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB9C9F8E23D20240007F9B6B /* Aether3D_iOS.framework */; };
+		AB9C9F9023D20240007F9B6B /* Aether3D_iOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AB9C9F8E23D20240007F9B6B /* Aether3D_iOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AB9CA0011D8ECA760049A3AF /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9CA0001D8ECA760049A3AF /* Standard.metal */; };
 		ABA29F451C19E1F90098E21D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F441C19E1F90098E21D /* main.m */; };
 		ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F471C19E1F90098E21D /* AppDelegate.m */; };
@@ -24,7 +28,6 @@
 		ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F521C19E1F90098E21D /* Assets.xcassets */; };
 		ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ABA29F541C19E1F90098E21D /* LaunchScreen.storyboard */; };
 		ABA29F611C19E1F90098E21D /* MetalSampleiOSTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */; };
-		ABD2D48C23B8C77E009750E7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD2D48B23B8C77E009750E7 /* AVFoundation.framework */; };
 		ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB251C29D79F00E78933 /* Moments.metal */; };
 		ABD3AB2B1C29D79F00E78933 /* SDF.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB261C29D79F00E78933 /* SDF.metal */; };
 		ABD3AB2C1C29D79F00E78933 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB271C29D79F00E78933 /* Skybox.metal */; };
@@ -34,7 +37,6 @@
 		ABD3AB341C29D7F700E78933 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB301C29D7F700E78933 /* font.png */; };
 		ABD3AB351C29D7F700E78933 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB311C29D7F700E78933 /* glider.png */; };
 		ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */; };
-		ABD3FFDD219713A700625539 /* Aether3D_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */; };
 		ABDB1666220B739700C25C04 /* checker.pvr in Resources */ = {isa = PBXBuildFile; fileRef = ABDB1665220B739700C25C04 /* checker.pvr */; };
 		ABFE40681D8D1DE000195AD2 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFE40671D8D1DE000195AD2 /* LightCuller.metal */; };
 /* End PBXBuildFile section */
@@ -49,6 +51,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		AB9C9F9123D20240007F9B6B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AB9C9F9023D20240007F9B6B /* Aether3D_iOS.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		AB1A16202020E579005FCEBB /* granite.astc */ = {isa = PBXFileReference; lastKnownFileType = file; name = granite.astc; path = ../../../../aether3d_build/Samples/granite.astc; sourceTree = "<group>"; };
 		AB632E4720DEBF3200A35F0E /* glider_textool.astc */ = {isa = PBXFileReference; lastKnownFileType = file; name = glider_textool.astc; path = ../../../../aether3d_build/Samples/glider_textool.astc; sourceTree = "<group>"; };
@@ -58,10 +74,11 @@
 		AB6DECD31EC82B350019358C /* gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gradient.png; path = ../../../../aether3d_build/Samples/gradient.png; sourceTree = "<group>"; };
 		AB6DECD41EC82B350019358C /* new_sponza.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = new_sponza.ae3d; path = ../../../../aether3d_build/Samples/new_sponza.ae3d; sourceTree = "<group>"; };
 		AB6DECD51EC82B350019358C /* sponza.scene */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sponza.scene; path = ../../../../aether3d_build/Samples/sponza.scene; sourceTree = "<group>"; };
-		AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aether3D_iOS.framework; path = ../../../../../Desktop/Aether3D_iOS.framework; sourceTree = "<group>"; };
-		AB811CD01C2344BA00911AB6 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
-		AB811CD21C2346F400911AB6 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
+		AB9C9F8523D1F8EE007F9B6B /* sine340.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = sine340.wav; path = ../../../../aether3d_build/Samples/sine340.wav; sourceTree = "<group>"; };
+		AB9C9F8A23D20213007F9B6B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		AB9C9F8C23D2021E007F9B6B /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		AB9C9F8E23D20240007F9B6B /* Aether3D_iOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Aether3D_iOS.framework; path = ../../../../../Desktop/Aether3D_iOS.framework; sourceTree = "<group>"; };
 		AB9CA0001D8ECA760049A3AF /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; };
 		ABA29F401C19E1F90098E21D /* MetalSampleiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalSampleiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA29F441C19E1F90098E21D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -76,7 +93,6 @@
 		ABA29F5C1C19E1F90098E21D /* MetalSampleiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalSampleiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA29F601C19E1F90098E21D /* MetalSampleiOSTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MetalSampleiOSTests.mm; sourceTree = "<group>"; };
 		ABA29F621C19E1F90098E21D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		ABD2D48B23B8C77E009750E7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		ABD3AB251C29D79F00E78933 /* Moments.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Moments.metal; path = ../../../Engine/Assets/Moments.metal; sourceTree = "<group>"; };
 		ABD3AB261C29D79F00E78933 /* SDF.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SDF.metal; path = ../../../Engine/Assets/SDF.metal; sourceTree = "<group>"; };
 		ABD3AB271C29D79F00E78933 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
@@ -95,9 +111,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ABD2D48C23B8C77E009750E7 /* AVFoundation.framework in Frameworks */,
-				AB811CD31C2346F400911AB6 /* MetalKit.framework in Frameworks */,
-				ABD3FFDD219713A700625539 /* Aether3D_iOS.framework in Frameworks */,
+				AB9C9F8F23D20240007F9B6B /* Aether3D_iOS.framework in Frameworks */,
+				AB9C9F8B23D20213007F9B6B /* AVFoundation.framework in Frameworks */,
+				AB9C9F8D23D2021E007F9B6B /* MetalKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,9 +130,6 @@
 		ABA29F371C19E1F90098E21D = {
 			isa = PBXGroup;
 			children = (
-				AB811CD21C2346F400911AB6 /* MetalKit.framework */,
-				AB811CD01C2344BA00911AB6 /* OpenAL.framework */,
-				AB811CCE1C23433500911AB6 /* Aether3D_iOS.framework */,
 				ABA29F421C19E1F90098E21D /* MetalSampleiOS */,
 				ABA29F5F1C19E1F90098E21D /* MetalSampleiOSTests */,
 				ABA29F411C19E1F90098E21D /* Products */,
@@ -153,6 +166,7 @@
 		ABA29F431C19E1F90098E21D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB9C9F8523D1F8EE007F9B6B /* sine340.wav */,
 				ABDB1665220B739700C25C04 /* checker.pvr */,
 				AB632E4720DEBF3200A35F0E /* glider_textool.astc */,
 				AB1A16202020E579005FCEBB /* granite.astc */,
@@ -198,7 +212,9 @@
 		ABD3FFDC219713A700625539 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				ABD2D48B23B8C77E009750E7 /* AVFoundation.framework */,
+				AB9C9F8E23D20240007F9B6B /* Aether3D_iOS.framework */,
+				AB9C9F8C23D2021E007F9B6B /* MetalKit.framework */,
+				AB9C9F8A23D20213007F9B6B /* AVFoundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -213,6 +229,7 @@
 				ABA29F3C1C19E1F90098E21D /* Sources */,
 				ABA29F3D1C19E1F90098E21D /* Frameworks */,
 				ABA29F3E1C19E1F90098E21D /* Resources */,
+				AB9C9F9123D20240007F9B6B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -298,6 +315,7 @@
 				ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */,
 				AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */,
 				ABA29F511C19E1F90098E21D /* Main.storyboard in Resources */,
+				AB9C9F8623D1F8EE007F9B6B /* sine340.wav in Resources */,
 				AB1A16212020E579005FCEBB /* granite.astc in Resources */,
 				AB6DECDA1EC82B350019358C /* sponza.scene in Resources */,
 			);
@@ -417,7 +435,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				MTL_FAST_MATH = NO;
 				MTL_OPTIMIZATION_LEVEL = 0;
@@ -469,7 +487,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				MTL_FAST_MATH = NO;
 				MTL_OPTIMIZATION_LEVEL = 0;
@@ -489,6 +507,7 @@
 					RENDERER_METAL,
 				);
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;
@@ -504,6 +523,7 @@
 				FRAMEWORK_SEARCH_PATHS = /Users/glaze/Desktop;
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;
