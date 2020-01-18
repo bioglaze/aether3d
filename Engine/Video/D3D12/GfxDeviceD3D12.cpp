@@ -1133,12 +1133,12 @@ void* ae3d::GfxDevice::GetCurrentConstantBuffer()
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
-	PIXBeginEvent( 0, name );
+	PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
-	PIXEndEvent();
+	PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
 }
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
