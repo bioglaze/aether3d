@@ -109,10 +109,8 @@ int ae3d::GfxDevice::CreateLineBuffer( const Vec3* lines, int lineCount, const V
         return -1;
     }
 
-    Array< VertexBuffer::Face > faces;
-    faces.Allocate( lineCount * 2 );
-    Array< VertexBuffer::VertexPTC > vertices;
-    vertices.Allocate( lineCount );
+    Array< VertexBuffer::Face > faces( lineCount * 2 );
+    Array< VertexBuffer::VertexPTC > vertices( lineCount );
     
     for (int lineIndex = 0; lineIndex < lineCount; ++lineIndex)
     {
