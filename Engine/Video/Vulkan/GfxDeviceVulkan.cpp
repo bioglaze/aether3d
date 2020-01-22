@@ -956,14 +956,7 @@ namespace ae3d
         
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.elements );
 
-        for (unsigned i = 0; i < availableDeviceExtensions.count; ++i)
-        {
-            if (std::strcmp( availableDeviceExtensions[ i ].extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME ) == 0)
-            {
-                deviceExtensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
-                debug::hasMarker = true;
-            }
-        }
+        debug::hasMarker = debug::enabled;
 
         vkGetPhysicalDeviceFeatures( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::deviceFeatures );
 
