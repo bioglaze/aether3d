@@ -103,7 +103,6 @@ namespace GfxDeviceGlobal
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue computeQueue = VK_NULL_HANDLE;
     std::uint32_t graphicsQueueIndex = 0;
-    Array< VkImage > swapchainImages;
     Array< SwapchainBuffer > swapchainBuffers;
     Array< VkFramebuffer > frameBuffers;
     VkPhysicalDeviceFeatures deviceFeatures;
@@ -824,17 +823,18 @@ namespace ae3d
         err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, nullptr );
         AE3D_CHECK_VULKAN( err, "getSwapchainImagesKHR" );
         ae3d::System::Assert( imageCount > 0, "imageCount" );
-        
-        GfxDeviceGlobal::swapchainImages.Allocate( imageCount );
 
-        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, GfxDeviceGlobal::swapchainImages.elements );
+        Array< VkImage > swapchainImages( imageCount );
+
+        err = getSwapchainImagesKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, &imageCount, swapchainImages.elements );
         AE3D_CHECK_VULKAN( err, "getSwapchainImagesKHR" );
 
         GfxDeviceGlobal::swapchainBuffers.Allocate( imageCount );
 
         for (std::uint32_t i = 0; i < imageCount; ++i)
         {
-            GfxDeviceGlobal::swapchainBuffers[ i ].image = GfxDeviceGlobal::swapchainImages[ i ];
+            GfxDeviceGlobal::swapchainBuffers[ i ].image = swapchainImages[ i ];
+            debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)swapchainImages[ i ], VK_OBJECT_TYPE_IMAGE, "swapchain image" );
 
             VkImageViewCreateInfo colorAttachmentView = {};
             colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1213,6 +1213,15 @@ namespace ae3d
 
     void CreateDepthStencil()
     {
+        // FIXME: This begin should not be needed, driver bug? First time observed after updating to Mesa 19.2.1 on AMD Radeon R9 Nano (2020-01-22)
+#if VK_USE_PLATFORM_XCB_KHR
+        VkCommandBufferBeginInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        VkResult errBegin = vkBeginCommandBuffer( GfxDeviceGlobal::setupCmdBuffer, &cmdBufInfo );
+        AE3D_CHECK_VULKAN( errBegin, "vkBeginCommandBuffer" );
+#endif
+        
         VkImageCreateInfo image = {};
         image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         image.imageType = VK_IMAGE_TYPE_2D;
