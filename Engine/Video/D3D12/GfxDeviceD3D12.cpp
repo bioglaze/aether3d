@@ -956,6 +956,14 @@ void ae3d::CreateRenderer( int samples )
     {
         OutputDebugStringA( "Failed to create debug layer!\n" );
     }
+
+    ID3D12DeviceRemovedExtendedDataSettings* dredSettings = nullptr;
+    dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &dredSettings ) );
+    if (dhr == S_OK)
+    {
+        dredSettings->SetAutoBreadcrumbsEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
+        dredSettings->SetPageFaultEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
+    }
 #endif
 
     IDXGIFactory2* factory = nullptr;
