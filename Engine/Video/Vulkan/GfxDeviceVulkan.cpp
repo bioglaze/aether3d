@@ -83,7 +83,7 @@ namespace GfxDeviceGlobal
     VkPhysicalDeviceProperties properties;
     VkClearColorValue clearColor;
     
-    VkCommandBuffer drawCmdBuffers[ 3 ];
+    VkCommandBuffer drawCmdBuffers[ 4 ];
     VkCommandBuffer setupCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer prePresentCmdBuffer = VK_NULL_HANDLE;
     VkCommandBuffer postPresentCmdBuffer = VK_NULL_HANDLE;
@@ -854,14 +854,14 @@ namespace ae3d
             colorAttachmentView.flags = 0;
             colorAttachmentView.image = GfxDeviceGlobal::swapchainBuffers[ i ].image;
 
+            err = vkCreateImageView( GfxDeviceGlobal::device, &colorAttachmentView, nullptr, &GfxDeviceGlobal::swapchainBuffers[ i ].view );
+            AE3D_CHECK_VULKAN( err, "vkCreateImageView" );
+
             SetImageLayout(
             GfxDeviceGlobal::setupCmdBuffer,
             GfxDeviceGlobal::swapchainBuffers[ i ].image,
             VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 0, 1 );
-
-            err = vkCreateImageView( GfxDeviceGlobal::device, &colorAttachmentView, nullptr, &GfxDeviceGlobal::swapchainBuffers[ i ].view );
-            AE3D_CHECK_VULKAN( err, "vkCreateImageView" );
         }
     }
 
@@ -1213,15 +1213,6 @@ namespace ae3d
 
     void CreateDepthStencil()
     {
-        // FIXME: This begin should not be needed, driver bug? First time observed after updating to Mesa 19.2.1 on AMD Radeon R9 Nano (2020-01-22)
-#if VK_USE_PLATFORM_XCB_KHR
-        VkCommandBufferBeginInfo cmdBufInfo = {};
-        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        VkResult errBegin = vkBeginCommandBuffer( GfxDeviceGlobal::setupCmdBuffer, &cmdBufInfo );
-        AE3D_CHECK_VULKAN( errBegin, "vkBeginCommandBuffer" );
-#endif
-        
         VkImageCreateInfo image = {};
         image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         image.imageType = VK_IMAGE_TYPE_2D;

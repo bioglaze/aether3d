@@ -82,8 +82,6 @@ void ae3d::Shader::LoadSPIRV( const FileSystem::FileContentsData& vertexData, co
     System::Assert( GfxDeviceGlobal::device != VK_NULL_HANDLE, "device not initialized" );
     System::Assert( ShaderGlobal::moduleIndex + 2 < MaxModuleCount, "too many shader modules" );
 
-    System::Print("Loading shader %s\n", vertexData.path.c_str());
-
     if (!vertexData.isLoaded || !fragmentData.isLoaded)
     {
         return;
