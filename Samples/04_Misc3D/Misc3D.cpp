@@ -36,10 +36,10 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#define TEST_SPONZA
+//#define TEST_SPONZA
 
 using namespace ae3d;
 
@@ -186,7 +186,9 @@ int main()
     Texture2D pbrRoughnessTex;
     pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
     Texture2D pbrNormalTex2;
-    pbrNormalTex2.Load( FileSystem::FileContents( "grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    pbrNormalTex2.Load( FileSystem::FileContents( "grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    Texture2D pbrSpecularTex;
+    pbrSpecularTex.Load( FileSystem::FileContents( "spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
 #endif
     
     Font font;
@@ -447,6 +449,7 @@ int main()
     pbrMaterial.SetShader( &standardShader );
     pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
+    //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
     //pbrMaterial.SetTexture( &skybox, 12 );
     pbrMaterial.SetBackFaceCulling( true );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
@@ -460,7 +463,7 @@ int main()
     for (int i = 0; i < 5; ++i)
     {
         sphereMaterials[ i ].SetShader( &standardShader );
-        sphereMaterials[ i ].SetTexture( &pbrNormalTex, 1 );
+        sphereMaterials[ i ].SetTexture( &pbrNormalTex2, 1 );
         sphereMaterials[ i ].SetTexture( &pbrDiffuseTex, 0 );
         sphereMaterials[ i ].SetBackFaceCulling( true );
         sphereMaterials[ i ].SetF0( 1.0f / (i+1) );

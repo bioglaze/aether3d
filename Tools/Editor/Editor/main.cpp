@@ -92,9 +92,7 @@ int main()
     Window::GetSize( width, height );
     System::LoadBuiltinAssets();
     System::InitGamePad();
-#if _MSC_VER
     System::InitAudio();
-#endif
 
     bool quit = false;   
     int x = 0, y = 0;
