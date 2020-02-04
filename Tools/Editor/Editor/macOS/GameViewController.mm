@@ -92,6 +92,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     
     ae3d::System::InitMetal( _view.device, _view, (int)_view.sampleCount, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
+    ae3d::System::InitAudio();
     
     svInit( &sceneView, self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
     inspector.Init();
