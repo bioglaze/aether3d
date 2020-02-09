@@ -111,6 +111,35 @@ ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
     return &TextureCubeGlobal::defaultTexture;
 }
 
+static unsigned GetMemoryUsage( unsigned width, unsigned height, VkFormat format )
+{
+    if (format == VK_FORMAT_BC1_RGBA_SRGB_BLOCK || format == VK_FORMAT_BC1_RGBA_UNORM_BLOCK)
+    {
+        return (width * height * 4) / 8;
+    }
+    else if (format == VK_FORMAT_BC2_SRGB_BLOCK || format == VK_FORMAT_BC2_UNORM_BLOCK)
+    {
+        return (width * height * 4) / 4;
+    }
+    else if (format == VK_FORMAT_BC3_SRGB_BLOCK || format == VK_FORMAT_BC3_UNORM_BLOCK)
+    {
+        // TODO: Verify this!
+        return (width * height * 4) / 4;
+    }
+    else if (format == VK_FORMAT_BC4_SNORM_BLOCK || format == VK_FORMAT_BC4_UNORM_BLOCK)
+    {
+        // TODO: Verify this!
+        return (width * height * 4) / 8;
+    }
+    else if (format == VK_FORMAT_BC5_SNORM_BLOCK || format == VK_FORMAT_BC5_UNORM_BLOCK)
+    {
+        // TODO: Verify this!
+        return (width * height * 4) / 4;
+    }
+
+    return width * height * 4;
+}
+
 void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const FileSystem::FileContentsData& posX,
                               const FileSystem::FileContentsData& negY, const FileSystem::FileContentsData& posY,
                               const FileSystem::FileContentsData& negZ, const FileSystem::FileContentsData& posZ,
@@ -132,7 +161,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
 
     VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;    
-    VkImage images[ 6 ];
+    VkBuffer buffers[ 6 ];
     VkDeviceMemory deviceMemories[ 6 ];
 
     VkCommandBufferBeginInfo cmdBufInfo = {};
@@ -172,25 +201,18 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             opaque = (components == 3 || components == 1);
             mipLevelCount = mipmaps == Mipmaps::None ? 1 : MathUtil::GetMipmapCount( width, height );
 
-            VkImageCreateInfo imageCreateInfo = {};
-            imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-            imageCreateInfo.arrayLayers = 1;
-            imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
-            imageCreateInfo.format = format;
-            imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-            imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-            imageCreateInfo.mipLevels = 1;
-            imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-            imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
-            imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+            VkBufferCreateInfo bufferCreateInfo = {};
+            bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            bufferCreateInfo.size = GetMemoryUsage( width, height, format );
+            bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+            bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &buffers[ face ] );
+            AE3D_CHECK_VULKAN( err, "vkCreateBuffer in TextureCube" );
 
-            err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &images[ face ] );
-            AE3D_CHECK_VULKAN( err, "vkCreateImage" );
-            TextureCubeGlobal::imagesToReleaseAtExit.push_back( images[ face ] );
+            TextureCubeGlobal::buffersToReleaseAtExit.push_back( buffers[ face ] );
 
             VkMemoryRequirements memReqs;
-            vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
+            vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, buffers[ face ], &memReqs );
             VkMemoryAllocateInfo memAllocInfo = {};
             memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
             memAllocInfo.pNext = nullptr;
@@ -205,16 +227,13 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
 			debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )deviceMemories[ face ], VK_OBJECT_TYPE_DEVICE_MEMORY, "cubemap memory" );
 
-            err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
-            AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
+            err = vkBindBufferMemory( GfxDeviceGlobal::device, buffers[ face ], deviceMemories[ face ], 0 );
+            AE3D_CHECK_VULKAN( err, "vkBindBufferMemory in TextureCube" );
 
             VkImageSubresource subRes = {};
             subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             subRes.mipLevel = 0;
             subRes.arrayLayer = 0;
-
-            VkSubresourceLayout subResLayout;
-            vkGetImageSubresourceLayout( GfxDeviceGlobal::device, images[ face ], &subRes, &subResLayout );
 
             void* mapped;
             err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
@@ -224,11 +243,12 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             if (MathUtil::IsPowerOfTwo( width ) && MathUtil::IsPowerOfTwo( height ))
             {
-                std::memcpy( mapped, data, width * height * bytesPerPixel );
+                std::memcpy( mapped, data, GetMemoryUsage( width, height, format ) );
             }
             else
             {
-                const std::size_t rowSize = bytesPerPixel * width;
+                System::Assert( false, "unhandled code for NPOT cube map" );
+                /*const std::size_t rowSize = bytesPerPixel * width;
                 char* mappedPos = (char*)mapped;
                 char* dataPos = (char*)data;
 
@@ -237,46 +257,19 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                     std::memcpy( mappedPos, dataPos, rowSize );
                     mappedPos += subResLayout.rowPitch;
                     dataPos += rowSize;
-                }
+                    }*/
             }
 
             VkMappedMemoryRange flushRange = {};
             flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
             flushRange.memory = deviceMemories[ face ];
             flushRange.offset = 0;
-            flushRange.size = width * height * bytesPerPixel;
+            flushRange.size = GetMemoryUsage( width, height, format );
             vkFlushMappedMemoryRanges( GfxDeviceGlobal::device, 1, &flushRange );
 
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
 
             stbi_image_free( data );
-
-            VkImageSubresourceRange range = {};
-            range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            range.baseMipLevel = 0;
-            range.levelCount = 1;
-            range.baseArrayLayer = 0;
-            range.layerCount = 1;
-
-            VkImageMemoryBarrier imageMemoryBarrier = {};
-            imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-            imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-            imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-            imageMemoryBarrier.srcAccessMask = 0;
-            imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-            imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-            imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-            imageMemoryBarrier.image = images[ face ];
-            imageMemoryBarrier.subresourceRange = range;
-
-            vkCmdPipelineBarrier(
-                                 GfxDeviceGlobal::texCmdBuffer,
-                                 VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                                 VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                 0,
-                                 0, nullptr,
-                                 0, nullptr,
-                                 1, &imageMemoryBarrier );            
         }
         else if (isDDS && GfxDeviceGlobal::deviceFeatures.textureCompressionBC)
         {
@@ -347,25 +340,18 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             ae3d::System::Assert( ddsOutput[face ].dataOffsets.count > 0, "DDS reader error: dataoffsets is empty" );
 
-            VkImageCreateInfo imageCreateInfo = {};
-            imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-            imageCreateInfo.arrayLayers = 1;
-            imageCreateInfo.extent = { (std::uint32_t)width, (std::uint32_t)height, 1 };
-            imageCreateInfo.format = format;
-            imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
-            imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-            imageCreateInfo.mipLevels = 1;
-            imageCreateInfo.tiling = VK_IMAGE_TILING_LINEAR;
-            imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-            imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+            VkBufferCreateInfo bufferCreateInfo = {};
+            bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            bufferCreateInfo.size = GetMemoryUsage( width, height, format );
+            bufferCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+            bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            err = vkCreateBuffer( GfxDeviceGlobal::device, &bufferCreateInfo, nullptr, &buffers[ face ] );
+            AE3D_CHECK_VULKAN( err, "vkCreateBuffer in TextureCube" );
 
-            err = vkCreateImage( GfxDeviceGlobal::device, &imageCreateInfo, nullptr, &images[ face ] );
-            AE3D_CHECK_VULKAN( err, "vkCreateImage" );
-            TextureCubeGlobal::imagesToReleaseAtExit.push_back( images[ face ] );
+            TextureCubeGlobal::buffersToReleaseAtExit.push_back( buffers[ face ] );
 
             VkMemoryRequirements memReqs;
-            vkGetImageMemoryRequirements( GfxDeviceGlobal::device, images[ face ], &memReqs );
+            vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, buffers[ face ], &memReqs );
 
             VkMemoryAllocateInfo memAllocInfo = {};
             memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -380,25 +366,20 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             Statistics::IncAllocCalls();
             Statistics::IncTotalAllocCalls();
 
-            err = vkBindImageMemory( GfxDeviceGlobal::device, images[ face ], deviceMemories[ face ], 0 );
-            AE3D_CHECK_VULKAN( err, "vkBindImageMemory in TextureCube" );
+            err = vkBindBufferMemory( GfxDeviceGlobal::device, buffers[ face ], deviceMemories[ face ], 0 );
+            AE3D_CHECK_VULKAN( err, "vkBindBufferMemory in TextureCube" );
 
             VkImageSubresource subRes = {};
             subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             subRes.mipLevel = 0;
             subRes.arrayLayer = 0;
 
-            VkSubresourceLayout subResLayout;
-            vkGetImageSubresourceLayout( GfxDeviceGlobal::device, images[ face ], &subRes, &subResLayout );
-
             void* mapped;
             err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
             AE3D_CHECK_VULKAN( err, "vkMapMemory in TextureCube" );
 
-            const size_t amountToCopy = unsigned(width * height * bytesPerPixel) < memReqs.size ? unsigned(width * height * bytesPerPixel) : memReqs.size;
-
-            std::memcpy( mapped, &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ 0 ] ], amountToCopy );
-
+            std::memcpy( mapped, &ddsOutput[ face ].imageData[ ddsOutput[ face ].dataOffsets[ 0 ] ], GetMemoryUsage( width, height, format ) );
+                
             VkMappedMemoryRange flushRange = {};
             flushRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
             flushRange.memory = deviceMemories[ face ];
@@ -407,12 +388,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             vkFlushMappedMemoryRanges( GfxDeviceGlobal::device, 1, &flushRange );
 
             vkUnmapMemory( GfxDeviceGlobal::device, deviceMemories[ face ] );
-
-            SetImageLayout( GfxDeviceGlobal::texCmdBuffer,
-                images[ face ],
-                VK_IMAGE_ASPECT_COLOR_BIT,
-                VK_IMAGE_LAYOUT_UNDEFINED,
-                VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 0, 1 );
         }
         else
         {
@@ -467,7 +442,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     for (int face = 0; face < 6; ++face)
     {
-        VkImageCopy copyRegion = {};
+        /*VkImageCopy copyRegion = {};
 
         copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         copyRegion.srcSubresource.baseArrayLayer = 0;
@@ -489,6 +464,17 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             images[ face ], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1, &copyRegion );
+        */
+        VkBufferImageCopy bufferCopyRegion = {};
+        bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        bufferCopyRegion.imageSubresource.mipLevel = 0;
+        bufferCopyRegion.imageSubresource.baseArrayLayer = face;
+        bufferCopyRegion.imageSubresource.layerCount = 1;
+        bufferCopyRegion.imageExtent.width = width;
+        bufferCopyRegion.imageExtent.height = height;
+        bufferCopyRegion.imageExtent.depth = 1;
+    
+        vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, buffers[ face ], image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
     }
 
     VkImageSubresourceRange range = {};
