@@ -60,6 +60,7 @@ std::string GetSavePath()
     Inspector inspector;
     ae3d::Vec3 moveDir;
     ae3d::GameObject* selectedGO;
+    bool isCmdDown;
 }
 
 struct InputEvent
@@ -89,6 +90,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
 
     myViewController = self;
+    isCmdDown = false;
     
     ae3d::System::InitMetal( _view.device, _view, (int)_view.sampleCount, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
@@ -101,6 +103,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 - (BOOL)acceptsFirstResponder
 {
     return YES;
+}
+
+- (void)flagsChanged:(NSEvent *)theEvent
+{
+    isCmdDown = [theEvent keyCode] == 55;
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -120,9 +127,36 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     {
         moveDir.z = -velocity;
     }
+    else if ([theEvent keyCode] == 0x01 && isCmdDown) // Cmd+S
+    {
+        isCmdDown = false;
+        std::string path = GetSavePath();
+        
+        if (path.length() > 7)
+        {
+            // remove "file://"
+            path = path.substr( 7 );
+        }
+        
+        if (path != "")
+        {
+            svSaveScene( sceneView, (char*)path.c_str() );
+        }
+    }
     else if ([theEvent keyCode] == 0x01) // S
     {
         moveDir.z = velocity;
+    }
+    else if ([theEvent keyCode] == 31 && isCmdDown) // Cmd+O
+    {
+        isCmdDown = false;
+        
+        std::string path = GetOpenPath( "scene" );
+        if (path != "")
+        {
+            auto contents = ae3d::FileSystem::FileContents( path.c_str() );
+            svLoadScene( sceneView, contents );
+        }
     }
     else if ([theEvent keyCode] == 0x0C) // Q
     {
