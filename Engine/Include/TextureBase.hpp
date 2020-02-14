@@ -45,12 +45,14 @@ namespace ae3d
         None
     };
 
+    /// Color space.
     enum class ColorSpace
     {
-        RGB,
+        Linear,
         SRGB
     };
-    
+
+    /// Anisotropy.
     enum class Anisotropy
     {
         k1,
@@ -143,7 +145,7 @@ namespace ae3d
         /// Anisotropy.
         Anisotropy anisotropy = Anisotropy::k1;
         /// Color space.
-        ColorSpace colorSpace = ColorSpace::RGB;
+        ColorSpace colorSpace = ColorSpace::Linear;
         /// Is the texture a cube map?
         bool isCube = false;
 

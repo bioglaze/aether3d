@@ -56,7 +56,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     int firstImageComponents;
     const bool isFirstImageDDS = paths[ 0 ].find( ".dds" ) != std::string::npos || paths[ 0 ].find( ".DDS" ) != std::string::npos;
 
-    MTLPixelFormat pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB;
+    MTLPixelFormat pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB;
     NSUInteger bytesPerRow = width * 4;
 
     if (isFirstImageDDS)
@@ -73,17 +73,17 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         
         if (output.format == DDSLoader::Format::BC1)
         {
-            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
+            pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
             bytesPerRow = width * 2;
         }
         else if (output.format == DDSLoader::Format::BC2)
         {
-            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
+            pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
             bytesPerRow = width * 4;
         }
         else if (output.format == DDSLoader::Format::BC3)
         {
-            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
+            pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
             bytesPerRow = width * 4;
         }
         else if (output.format == DDSLoader::Format::BC4U)

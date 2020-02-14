@@ -36,10 +36,10 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-//#define TEST_SPONZA
+#define TEST_SPONZA
 
 using namespace ae3d;
 
@@ -178,17 +178,23 @@ int main()
     Texture2D fontTex;
     fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
+    Texture2D normalTex;
+    normalTex.Load( FileSystem::FileContents( "textures/default_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+
+    Texture2D whiteTex;
+    whiteTex.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+
 #ifdef TEST_SPONZA
     Texture2D pbrDiffuseTex;
     pbrDiffuseTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     Texture2D pbrNormalTex;
-    pbrNormalTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    pbrNormalTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrRoughnessTex;
-    pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrNormalTex2;
-    pbrNormalTex2.Load( FileSystem::FileContents( "grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    pbrNormalTex2.Load( FileSystem::FileContents( "grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrSpecularTex;
-    pbrSpecularTex.Load( FileSystem::FileContents( "spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::RGB, Anisotropy::k1 );
+    pbrSpecularTex.Load( FileSystem::FileContents( "spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
 #endif
     
     Font font;
@@ -206,6 +212,9 @@ int main()
     Mesh cubeMesh;
     cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
 
+    Mesh cubeTangentMesh;
+    cubeTangentMesh.Load( FileSystem::FileContents( "tangent_test.ae3d" ) );
+
     Mesh sphereMesh;
     sphereMesh.Load( FileSystem::FileContents( "sphere.ae3d" ) );
 
@@ -217,6 +226,12 @@ int main()
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
     cube.AddComponent< TransformComponent >();
     cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+
+    GameObject cubeTangent;
+    cubeTangent.AddComponent< MeshRendererComponent >();
+    cubeTangent.GetComponent< MeshRendererComponent >()->SetMesh( &cubeTangentMesh );
+    cubeTangent.AddComponent< TransformComponent >();
+    cubeTangent.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 8, -80 } );
 
     GameObject rotatingCube;
     rotatingCube.AddComponent< MeshRendererComponent >();
@@ -420,9 +435,10 @@ int main()
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
-    /*skybox.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-        FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
-        FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
+    /*const char* path = "test_dxt1.dds";
+    skybox.Load( FileSystem::FileContents( path ), FileSystem::FileContents( path ),
+        FileSystem::FileContents( path ), FileSystem::FileContents( path ),
+        FileSystem::FileContents( path ), FileSystem::FileContents( path ),
         TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );*/
 #ifdef TEST_RENDER_TEXTURE_CUBE
     Material materialCubeRT;
@@ -455,6 +471,12 @@ int main()
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
+
+    Material materialTangent;
+    materialTangent.SetShader( &standardShader );
+    materialTangent.SetTexture( &normalTex, 1 );
+    materialTangent.SetTexture( &whiteTex, 0 );
+    cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
 #endif
     
     GameObject spheres[ 5 ];
@@ -615,6 +637,7 @@ int main()
 #endif
     scene.Add( &animatedGo );
     scene.Add( &cubePTN );
+    scene.Add( &cubeTangent );
     //scene.Add( &childCube );
     //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
@@ -714,6 +737,8 @@ int main()
         axis = Vec3( 1, 1, 1 ).Normalized();
         rotation.FromAxisAngle( axis, angle );
         rotatingCube.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
+
+        //cubeTangent.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
         axis = Vec3( 0, 1, 0 ).Normalized();
         rotation.FromAxisAngle( axis, angle );

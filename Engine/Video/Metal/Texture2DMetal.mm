@@ -244,7 +244,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     opaque = (channels == 3 || channels == 1);
     
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::Linear ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                        width:width
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
@@ -258,7 +258,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     [stagingTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];
 
     MTLTextureDescriptor* textureDescriptor2 =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::Linear ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                        width:width
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
@@ -354,16 +354,16 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         
         if (output.format == DDSLoader::Format::BC1)
         {
-            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
+            pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
         }
         else if (output.format == DDSLoader::Format::BC2)
         {
-            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
+            pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
             multiplier = 4;
         }
         else if (output.format == DDSLoader::Format::BC3)
         {
-            pixelFormat = colorSpace == ColorSpace::RGB ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
+            pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
             multiplier = 4;
         }
         else if (output.format == DDSLoader::Format::BC4U)
@@ -548,7 +548,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     opaque = (components == 3 || components == 1);
 
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::Linear ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                        width:width
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
@@ -571,7 +571,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     [stagingTexture replaceRegion:region mipmapLevel:0 withBytes:data bytesPerRow:bytesPerRow];
     
     MTLTextureDescriptor* textureDescriptor2 =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::RGB ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:colorSpace == ColorSpace::Linear ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB
                                                        width:width
                                                       height:height
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];

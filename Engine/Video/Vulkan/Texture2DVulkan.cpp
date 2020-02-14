@@ -76,7 +76,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     filter = TextureFilter::Linear;
     opaque = channels == 3;
 
-    CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
+    CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::Linear ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
 
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_OBJECT_TYPE_IMAGE_VIEW, debugName );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, debugName );
@@ -693,11 +693,11 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
 
     mipLevelCount = mipmaps == Mipmaps::Generate ? ddsOutput.dataOffsets.count : 1;
 
-    VkFormat format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+    VkFormat format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC1_RGB_UNORM_BLOCK : VK_FORMAT_BC1_RGB_SRGB_BLOCK;
 
     if (!opaque)
     {
-        format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+        format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
     }
 
     if (ddsOutput.format == DDSLoader::Format::BC1)
@@ -706,11 +706,11 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     }
     else if (ddsOutput.format == DDSLoader::Format::BC2)
     {
-        format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
+        format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC3)
     {
-        format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
+        format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
     }
     else if (ddsOutput.format == DDSLoader::Format::BC4U)
     {
@@ -765,7 +765,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
     opaque = (components == 3 || components == 1);
 
-    CreateVulkanObjects( data, 4, colorSpace == ColorSpace::RGB ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
+    CreateVulkanObjects( data, 4, colorSpace == ColorSpace::Linear ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
 
     stbi_image_free( data );
 }

@@ -298,21 +298,21 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         
             if (!opaque)
             {
-               format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+               format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
             }
 
             if (ddsOutput[ face ].format == DDSLoader::Format::BC1)
             {
-               format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+               format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC1_RGBA_UNORM_BLOCK : VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
             }
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC2)
             {
-                format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
+                format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
                 bytesPerPixel = 2;
             }
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC3)
             {
-                format = (colorSpace == ColorSpace::RGB) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
+                format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
                 bytesPerPixel = 2;
             }
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC4U)
