@@ -5,6 +5,7 @@ bl_info = {
     'blender': (2, 80, 0),
     'location': 'File > Export > Aether3D',
     'description': 'Exports selected meshes to the Aether3D Engine format (.ae3d)',
+    "wiki_url": "https://github.com/bioglaze/aether3d",
     'category': 'Import-Export'}
 
 import bpy
@@ -16,6 +17,8 @@ import mathutils
 import os
 import sys
 import struct
+
+from bpy_extras.io_utils import axis_conversion;
 
 class Vertex:
     co = mathutils.Vector()
@@ -301,7 +304,28 @@ class Aether3DExporter( bpy.types.Operator ):
             #mesh.generateTangents()
             self.meshes.append( mesh )
 
-
+        armatures = [Object for Object in context.selected_objects if Object.type in ("ARMATURE")]
+        global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
+        armOffs = 0
+        
+        for armature in armatures:
+            for bone in armature.data.bones:
+                print( "bone " + bone.name )
+                m = global_matrix @ bone.matrix_local
+                a = -1
+                
+                if bone.parent:
+                    for j, p in enumerate( armature.data.bones ):
+                            if p == bone.parent:
+                                a = j + armOffs
+                                break;
+                    pos = global_matrix @ bone.parent.matrix_local
+                    m = pos.inverted() @ m
+                pos = m.to_translation()
+                q = m.to_quaternion()
+                q.normalize()
+                # n = safestr(b.name)
+            
     def writeFile( self, context, FilePath ):
         """Writes selected meshes to .ae3d file."""
 
