@@ -11,5 +11,5 @@ endif
 
 all:
 	$(CCOMPILER) -c ../../Engine/ThirdParty/stb_image.c -o stb_image.o
-	$(COMPILER) $(WARNINGS) -std=c++11 -g -I../../Engine/ThirdParty SDF_Generator.cpp stb_image.o -o SDF_Generator
+	$(COMPILER) $(WARNINGS) -std=c++11 -g -I../../Engine/ThirdParty SDF_Generator.cpp stb_image.o -o ../../../aether3d_build/SDF_Generator
 

@@ -15,5 +15,5 @@ WARNINGS := -Weverything -Wno-old-style-cast -Wno-padded -Wno-c++98-compat -Wno-
 endif
 
 all:
-	$(COMPILER) $(WARNINGS) -std=c++11 CombineFiles.cpp -o CombineFiles
+	$(COMPILER) $(WARNINGS) -std=c++11 CombineFiles.cpp -o ../../../aether3d_build/CombineFiles
 
