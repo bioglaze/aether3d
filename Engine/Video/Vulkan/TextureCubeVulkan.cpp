@@ -230,16 +230,9 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             err = vkBindBufferMemory( GfxDeviceGlobal::device, buffers[ face ], deviceMemories[ face ], 0 );
             AE3D_CHECK_VULKAN( err, "vkBindBufferMemory in TextureCube" );
 
-            VkImageSubresource subRes = {};
-            subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            subRes.mipLevel = 0;
-            subRes.arrayLayer = 0;
-
             void* mapped;
             err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
             AE3D_CHECK_VULKAN( err, "vkMapMemory in TextureCube" );
-
-            const int bytesPerPixel = 4;
 
             if (MathUtil::IsPowerOfTwo( width ) && MathUtil::IsPowerOfTwo( height ))
             {
@@ -292,8 +285,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 height = GfxDeviceGlobal::properties.limits.maxImageDimensionCube;
             }
 
-            int bytesPerPixel = 1;
-
             mipLevelCount = mipmaps == Mipmaps::None ? 1 : ddsOutput[ face ].dataOffsets.count;
         
             if (!opaque)
@@ -308,12 +299,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC2)
             {
                 format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC2_UNORM_BLOCK : VK_FORMAT_BC2_SRGB_BLOCK;
-                bytesPerPixel = 2;
             }
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC3)
             {
                 format = (colorSpace == ColorSpace::Linear) ? VK_FORMAT_BC3_UNORM_BLOCK : VK_FORMAT_BC3_SRGB_BLOCK;
-                bytesPerPixel = 2;
             }
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC4U)
             {
@@ -326,12 +315,10 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC5U)
             {
                 format = VK_FORMAT_BC5_UNORM_BLOCK;
-                bytesPerPixel = 2;
             }
             else if (ddsOutput[ face ].format == DDSLoader::Format::BC5S)
             {
                 format = VK_FORMAT_BC5_SNORM_BLOCK;
-                bytesPerPixel = 2;
             }
             else
             {
@@ -368,11 +355,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
             err = vkBindBufferMemory( GfxDeviceGlobal::device, buffers[ face ], deviceMemories[ face ], 0 );
             AE3D_CHECK_VULKAN( err, "vkBindBufferMemory in TextureCube" );
-
-            VkImageSubresource subRes = {};
-            subRes.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            subRes.mipLevel = 0;
-            subRes.arrayLayer = 0;
 
             void* mapped;
             err = vkMapMemory( GfxDeviceGlobal::device, deviceMemories[ face ], 0, memReqs.size, 0, &mapped );
