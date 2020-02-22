@@ -262,6 +262,16 @@ void ae3d::MeshRendererComponent::SetMaterial( Material* material, unsigned subM
     }
 }
 
+void ae3d::MeshRendererComponent::EnableBoundingBoxDrawing( bool enable )
+{
+    isAabbDrawingEnabled = enable;
+}
+
+bool ae3d::MeshRendererComponent::IsBoundingBoxDrawingEnabled() const
+{
+    return isAabbDrawingEnabled;
+}
+
 void ae3d::MeshRendererComponent::SetMesh( Mesh* aMesh )
 {
     mesh = aMesh;

@@ -37,6 +37,12 @@ namespace ae3d
         /// \param aMesh Mesh.
         void SetMesh( Mesh* aMesh );
 
+        /// \return True, if bounding box should be drawn.
+        bool IsBoundingBoxDrawingEnabled() const;
+        
+        /// \param enable True, if AABB will be rendered. Defaults to false.
+        void EnableBoundingBoxDrawing( bool enable );
+        
         /// \param frame Animation frame. If too high or low, repeats from the beginning using modulo.
         void SetAnimationFrame( int frame ) { animFrame = frame; }
         
@@ -90,5 +96,7 @@ namespace ae3d
         bool isWireframe = false;
         bool isEnabled = true;
         bool castShadow = true;
+        bool isAabbDrawingEnabled = false;
+        int aabbLineHandle = 0;
     };
 }
