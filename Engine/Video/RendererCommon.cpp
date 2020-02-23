@@ -126,10 +126,37 @@ int ae3d::GfxDevice::CreateLineBuffer( const Vec3* lines, int lineCount, const V
     }
 
     GfxDeviceGlobal::lineBuffers.push_back( VertexBuffer() );
-    GfxDeviceGlobal::lineBuffers.back().Generate( faces.elements, faces.count, vertices.elements, vertices.count, VertexBuffer::Storage::GPU );
+    GfxDeviceGlobal::lineBuffers.back().GenerateDynamic( faces.count, vertices.count );
+    GfxDeviceGlobal::lineBuffers.back().UpdateDynamic( faces.elements, faces.count, vertices.elements, vertices.count );
     GfxDeviceGlobal::lineBuffers.back().SetDebugName( "line buffer" );
 
     return int( GfxDeviceGlobal::lineBuffers.size() ) - 1;
+}
+
+void ae3d::GfxDevice::UpdateLineBuffer( int lineHandle, const Vec3* lines, int lineCount, const Vec3& color )
+{
+    if (lineHandle == -1 || lineCount == 0 || !lines)
+    {
+        return;
+    }
+
+    Array< VertexBuffer::Face > faces( lineCount * 2 );
+    Array< VertexBuffer::VertexPTC > vertices( lineCount );
+    
+    for (int lineIndex = 0; lineIndex < lineCount; ++lineIndex)
+    {
+        vertices[ lineIndex ].position = lines[ lineIndex ];
+        vertices[ lineIndex ].color = Vec4( color, 1 );
+    }
+
+    // Not used, but needs to be set to something.
+    for (unsigned short faceIndex = 0; faceIndex < (unsigned short)(faces.count / 2); ++faceIndex)
+    {
+        faces[ faceIndex * 2 + 0 ].a = faceIndex;
+        faces[ faceIndex * 2 + 1 ].b = faceIndex + 1;
+    }
+
+    GfxDeviceGlobal::lineBuffers[ lineHandle ].UpdateDynamic( faces.elements, faces.count, vertices.elements, vertices.count );
 }
 
 void ae3d::LightTiler::SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color )

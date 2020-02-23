@@ -97,6 +97,6 @@ namespace ae3d
         bool isEnabled = true;
         bool castShadow = true;
         bool isAabbDrawingEnabled = false;
-        int aabbLineHandle = 0;
+        int aabbLineHandle = -1;
     };
 }

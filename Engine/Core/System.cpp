@@ -239,6 +239,11 @@ int ae3d::System::CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3
     return GfxDevice::CreateLineBuffer( lines, lineCount, color );
 }
 
+void ae3d::System::UpdateLineBuffer( int lineHandle, const Vec3* lines, int lineCount, const Vec3& color )
+{
+    GfxDevice::UpdateLineBuffer( lineHandle, lines, lineCount, color );
+}
+
 void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& projection )
 {
     Matrix44 viewProjection;

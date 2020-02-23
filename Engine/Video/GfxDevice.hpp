@@ -88,9 +88,10 @@ namespace ae3d
         void UnmapUIVertexBuffer();
         void Init( int width, int height );
         int CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color );
+        void UpdateLineBuffer( int lineHandle, const Vec3* lines, int lineCount, const Vec3& color );
 #if RENDERER_D3D12
         void ResetCommandList();
-        void  CreateNewUniformBuffer();
+        void CreateNewUniformBuffer();
         void* GetCurrentMappedConstantBuffer();
         void* GetCurrentConstantBuffer();
 #endif

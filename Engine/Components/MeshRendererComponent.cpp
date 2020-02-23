@@ -251,6 +251,25 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
         
         GfxDevice::Draw( subMeshes[ subMeshIndex ].vertexBuffer, 0, subMeshes[ subMeshIndex ].vertexBuffer.GetFaceCount() / 3,
                          *shader, blendMode, depthFunc, cullMode, isWireframe ? GfxDevice::FillMode::Wireframe : GfxDevice::FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+
+        if (isAabbDrawingEnabled)
+        {
+            Vec3 aabb[ 8 ];
+            MathUtil::GetCorners( mesh->GetAABBMin(), mesh->GetAABBMax(), aabb );
+    
+            Vec3 aabbMin, aabbMax;
+            MathUtil::GetMinMax( aabb, 8, aabbMin, aabbMax );
+
+            const int lineCount = 2;
+            Vec3 lines[ lineCount ] =
+            {
+                aabbMin * 1.1f,
+                aabbMax * 1.1f
+            };
+
+            GfxDevice::UpdateLineBuffer( aabbLineHandle, lines, lineCount, Vec3( 1, 0, 0 ) );
+            GfxDevice::DrawLines( aabbLineHandle, *shader );
+        }
     }
 }
 
@@ -265,6 +284,20 @@ void ae3d::MeshRendererComponent::SetMaterial( Material* material, unsigned subM
 void ae3d::MeshRendererComponent::EnableBoundingBoxDrawing( bool enable )
 {
     isAabbDrawingEnabled = enable;
+
+    if (enable && aabbLineHandle == -1)
+    {
+        constexpr unsigned LineCount = 40;
+        Vec3 lines[ LineCount ];
+    
+        for (unsigned i = 0; i < LineCount / 2; ++i)
+        {
+            lines[ i * 2 + 0 ] = Vec3( 0, 0, 0 );
+            lines[ i * 2 + 1 ] = Vec3( 0, 0, 0 );
+        }
+
+        aabbLineHandle = GfxDevice::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
+    }
 }
 
 bool ae3d::MeshRendererComponent::IsBoundingBoxDrawingEnabled() const

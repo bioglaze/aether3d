@@ -9,7 +9,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.8.1 Documentation
+   \mainpage Aether3D Game Engine v0.8.5 Documentation
 
    \section Introduction
 
@@ -32,7 +32,7 @@
    <li>Skinned animation.</li>
    <li>Scene serialization.</li>
    <li>Scene editor built using WYSIWYG rendering.</li>
-   <li>XBox controller support.</li>
+   <li>Xbox controller support.</li>
    <li>Wireframe rendering.</li>
    <li>Line rendering.</li>
    </ul>
@@ -44,7 +44,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.8.1.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    
@@ -118,6 +118,13 @@ namespace ae3d
         /// \param color Color.
         /// \return handle to the buffer. Used with DrawLines.
         int CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color );
+
+        /// Updates a line buffer.
+        /// \param lineHandle Line handle returned from CreateLineBuffer.
+        /// \param lines Lines.
+        /// \param lineCount Line count.
+        /// \param color Color.        
+        void UpdateLineBuffer( int lineHandle, const Vec3* lines, int lineCount, const Vec3& color );
         
         /// Draws a texture into the screen. Should be called after Scene::Render().
         /// \param texture Texture
