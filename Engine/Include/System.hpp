@@ -113,7 +113,7 @@ namespace ae3d
         void InitGamePad();
 
         /// Creates a buffer for line drawing.
-        /// \param lines Lines.
+        /// \param lines Lines. One pair is one segment, eg. index 0 to 1, 2 to 3, 4 to 5.
         /// \param lineCount Line count.
         /// \param color Color.
         /// \return handle to the buffer. Used with DrawLines.

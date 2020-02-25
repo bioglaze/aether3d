@@ -260,11 +260,38 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
             Vec3 aabbMin, aabbMax;
             MathUtil::GetMinMax( aabb, 8, aabbMin, aabbMax );
 
-            const int lineCount = 2;
+            const int lineCount = 24;
             Vec3 lines[ lineCount ] =
             {
-                aabbMin * 1.1f,
-                aabbMax * 1.1f
+                Vec3( aabbMin.x, aabbMin.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMin.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMin.y, aabbMax.z ) * 1.1f,
+                Vec3( aabbMin.x, aabbMin.y, aabbMax.z ) * 1.1f,
+
+                Vec3( aabbMin.x, aabbMax.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMax.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMax.y, aabbMax.z ) * 1.1f,
+                Vec3( aabbMin.x, aabbMax.y, aabbMax.z ) * 1.1f,
+
+                Vec3( aabbMin.x, aabbMax.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMin.x, aabbMax.y, aabbMax.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMax.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMax.y, aabbMax.z ) * 1.1f,
+
+                Vec3( aabbMin.x, aabbMin.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMin.x, aabbMin.y, aabbMax.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMin.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMin.y, aabbMax.z ) * 1.1f,
+
+                Vec3( aabbMin.x, aabbMin.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMin.x, aabbMax.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMin.y, aabbMin.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMax.y, aabbMin.z ) * 1.1f,
+
+                Vec3( aabbMin.x, aabbMin.y, aabbMax.z ) * 1.1f,
+                Vec3( aabbMin.x, aabbMax.y, aabbMax.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMin.y, aabbMax.z ) * 1.1f,
+                Vec3( aabbMax.x, aabbMax.y, aabbMax.z ) * 1.1f,
             };
 
             GfxDevice::UpdateLineBuffer( aabbLineHandle, lines, lineCount, Vec3( 1, 0, 0 ) );
