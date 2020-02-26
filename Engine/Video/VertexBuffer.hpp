@@ -203,6 +203,7 @@ namespace ae3d
         D3D12_INDEX_BUFFER_VIEW indexBufferView = {};
         long ibOffset = 0;
         int sizeBytes = 0;
+        char* mappedDynamic = nullptr;
 #endif
         int elementCount = 0;
         VertexFormat vertexFormat = VertexFormat::PTC;

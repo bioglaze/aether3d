@@ -314,7 +314,7 @@ void ae3d::MeshRendererComponent::EnableBoundingBoxDrawing( bool enable )
 
     if (enable && aabbLineHandle == -1)
     {
-        constexpr unsigned LineCount = 40;
+        constexpr unsigned LineCount = 24;
         Vec3 lines[ LineCount ];
     
         for (unsigned i = 0; i < LineCount / 2; ++i)

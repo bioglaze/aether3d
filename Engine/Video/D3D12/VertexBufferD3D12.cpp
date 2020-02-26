@@ -129,8 +129,91 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 }
 
-void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount,
-                                   Storage /*storage*/ )
+void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
+{
+    elementCount = faceCount * 3;
+
+    const int ibSize = elementCount * 2;
+    ibOffset = sizeof( VertexPTNTC ) * vertexCount;
+
+    D3D12_HEAP_PROPERTIES uploadProp = {};
+    uploadProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+    uploadProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    uploadProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    uploadProp.CreationNodeMask = 1;
+    uploadProp.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC bufferProp = {};
+    bufferProp.Alignment = 0;
+    bufferProp.DepthOrArraySize = 1;
+    bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    bufferProp.Flags = D3D12_RESOURCE_FLAG_NONE;
+    bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+    bufferProp.Height = 1;
+    bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    bufferProp.MipLevels = 1;
+    bufferProp.SampleDesc.Count = 1;
+    bufferProp.SampleDesc.Quality = 0;
+    bufferProp.Width = ibOffset + ibSize;
+
+    sizeBytes = ibOffset + ibSize;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &uploadProp,
+        D3D12_HEAP_FLAG_NONE,
+        &bufferProp,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS( &vb ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to create vertex buffer!\n" );
+        return;
+    }
+
+    vb->SetName( L"VertexBuffer" );
+    Global::vbs.push_back( vb );
+
+    mappedDynamic = nullptr;
+    hr = vb->Map( 0, nullptr, reinterpret_cast<void**>(&mappedDynamic) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to map vertex buffer!\n" );
+        return;
+    }
+
+    vertexBufferView.BufferLocation = vb->GetGPUVirtualAddress();
+    vertexBufferView.StrideInBytes = GetStride();
+    vertexBufferView.SizeInBytes = GetIBOffset();
+
+    indexBufferView.BufferLocation = vb->GetGPUVirtualAddress() + GetIBOffset();
+    indexBufferView.SizeInBytes = GetIBSize();
+    indexBufferView.Format = DXGI_FORMAT_R16_UINT;
+}
+
+void ae3d::VertexBuffer::UpdateDynamic( const Face* faces, int /*faceCount*/, const VertexPTC* vertices, int vertexCount )
+{
+    System::Assert( mappedDynamic != nullptr, "Must call GenerateDynamic before UpdateDynamic!" );
+
+    std::vector< VertexPTNTC > verticesPTNTC( vertexCount );
+
+    for (std::size_t vertexInd = 0; vertexInd < verticesPTNTC.size(); ++vertexInd)
+    {
+        verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
+        verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;
+        verticesPTNTC[ vertexInd ].v = vertices[ vertexInd ].v;
+        verticesPTNTC[ vertexInd ].normal = Vec3( 0, 0, 1 );
+        verticesPTNTC[ vertexInd ].tangent = Vec4( 1, 0, 0, 0 );
+        verticesPTNTC[ vertexInd ].color = vertices[ vertexInd ].color;
+    }
+
+    const int ibSize = elementCount * 2;
+    std::memcpy( mappedDynamic, verticesPTNTC.data(), vertexCount * sizeof( VertexPTNTC ) );
+    memcpy_s( mappedDynamic, ibOffset, vertices, ibOffset );
+    memcpy_s( mappedDynamic + ibOffset, ibSize, faces, ibSize );
+}
+
+void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount, Storage /*storage*/ )
 {
     vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
