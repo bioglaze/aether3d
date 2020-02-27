@@ -176,10 +176,15 @@ void ae3d::Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4*
 
 void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 {
-    out->x = mat.m[0] * vec.x + mat.m[ 4 ] * vec.y + mat.m[ 8] * vec.z + mat.m[12];
-    out->y = mat.m[1] * vec.x + mat.m[ 5 ] * vec.y + mat.m[ 9] * vec.z + mat.m[13];
-    out->z = mat.m[2] * vec.x + mat.m[ 6 ] * vec.y + mat.m[10] * vec.z + mat.m[14];
+    Vec3 res;
+    res.x = mat.m[0] * vec.x + mat.m[ 4 ] * vec.y + mat.m[ 8] * vec.z + mat.m[12];
+    res.y = mat.m[1] * vec.x + mat.m[ 5 ] * vec.y + mat.m[ 9] * vec.z + mat.m[13];
+    res.z = mat.m[2] * vec.x + mat.m[ 6 ] * vec.y + mat.m[10] * vec.z + mat.m[14];
     
+    out->x = res.x;
+    out->y = res.y;
+    out->z = res.z;
+
 #if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
 #endif
@@ -187,9 +192,15 @@ void Matrix44::TransformPoint( const Vec3& vec, const Matrix44& mat, Vec3* out )
 
 void Matrix44::TransformDirection( const Vec3& dir, const Matrix44& mat, Vec3* out )
 {
-    out->x = mat.m[0] * dir.x + mat.m[ 4 ] * dir.y + mat.m[ 8] * dir.z;
-    out->y = mat.m[1] * dir.x + mat.m[ 5 ] * dir.y + mat.m[ 9] * dir.z;
-    out->z = mat.m[2] * dir.x + mat.m[ 6 ] * dir.y + mat.m[10] * dir.z;
+    Vec3 res;
+
+    res.x = mat.m[0] * dir.x + mat.m[ 4 ] * dir.y + mat.m[ 8] * dir.z;
+    res.y = mat.m[1] * dir.x + mat.m[ 5 ] * dir.y + mat.m[ 9] * dir.z;
+    res.z = mat.m[2] * dir.x + mat.m[ 6 ] * dir.y + mat.m[10] * dir.z;
+
+    out->x = res.x;
+    out->y = res.y;
+    out->z = res.z;
 
 #if AE3D_CHECK_FOR_NAN
     ae3d::CheckNaN( mat );
