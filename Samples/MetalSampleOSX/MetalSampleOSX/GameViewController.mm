@@ -761,7 +761,7 @@ using namespace ae3d;
     lines[ 3 ] = Vec3( 10, 10, -0.5f );
     lineHandle = System::CreateLineBuffer( lines.data(), (int)lines.size(), Vec3( 1, 0, 0 ) );
     
-    coneLineHandle = CreateConeLines();
+    //coneLineHandle = CreateConeLines();
     
 #ifdef TEST_NUKLEAR_UI
     nk_font_atlas_init_default( &atlas );

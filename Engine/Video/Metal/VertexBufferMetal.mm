@@ -281,36 +281,21 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
                      options:MTLResourceCPUCacheModeDefaultCache];
     colorBuffer.label = @"Color buffer";
         
-    std::vector< float > tangents( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < tangents.size(); ++v)
-    {
-        tangents[ v ] = 1;
-    }
+    std::vector< float > tangents( vertexCount * 4, 1 );
     
     tangentBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:tangents.data()
                         length:4 * 4 * vertexCount
                        options:MTLResourceCPUCacheModeDefaultCache];
     tangentBuffer.label = @"Tangent buffer";
     
-    std::vector< int > bones( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < bones.size(); ++v)
-    {
-        bones[ v ] = 0;
-    }
+    std::vector< int > bones( vertexCount * 4, 0 );
     
     boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
                      length:4 * 4 * vertexCount
                     options:MTLResourceCPUCacheModeDefaultCache];
     boneBuffer.label = @"Bone buffer";
     
-    std::vector< float > weights( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < weights.size(); ++v)
-    {
-        weights[ v ] = 1;
-    }
+    std::vector< float > weights( vertexCount * 4, 1 );
     
     weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
                        length:4 * 4 * vertexCount
@@ -434,24 +419,14 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
                        options:MTLResourceCPUCacheModeDefaultCache];
     tangentBuffer.label = @"Tangent buffer";
     
-    std::vector< int > bones( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < bones.size(); ++v)
-    {
-        bones[ v ] = 0;
-    }
+    std::vector< int > bones( vertexCount * 4, 0 );
         
     boneBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:bones.data()
                      length:4 * 4 * vertexCount
                     options:MTLResourceCPUCacheModeDefaultCache];
     boneBuffer.label = @"Bone buffer";
     
-    std::vector< float > weights( vertexCount * 4 );
-    
-    for (std::size_t v = 0; v < weights.size(); ++v)
-    {
-        weights[ v ] = 1;
-    }
+    std::vector< float > weights( vertexCount * 4, 1 );
     
     weightBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:weights.data()
                        length:4 * 4 * vertexCount
@@ -620,4 +595,35 @@ void ae3d::VertexBuffer::Generate( const Face* faces, int faceCount, const Verte
     vertexBufferMemoryUsage += [normalBuffer allocatedSize];
     vertexBufferMemoryUsage += [texcoordBuffer allocatedSize];
     vertexBufferMemoryUsage += [colorBuffer allocatedSize];
+}
+
+void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
+{
+    vertexFormat = VertexFormat::PTC;
+    elementCount = faceCount * 3;
+
+    vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexFormat::PTC ) * vertexCount
+                              options:MTLResourceCPUCacheModeDefaultCache];
+    vertexBuffer.label = @"Dynamic Vertex buffer";
+    
+    indexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( Face ) * faceCount
+                 options:MTLResourceCPUCacheModeDefaultCache];
+    indexBuffer.label = @"Dynamic Index buffer";
+
+    std::vector< float > normals( vertexCount * 3, 0 );
+    
+    normalBuffer = [GfxDevice::GetMetalDevice() newBufferWithBytes:normals.data()
+                       length:3 * 4 * vertexCount
+                      options:MTLResourceCPUCacheModeDefaultCache];
+    normalBuffer.label = @"Dynamic Normal buffer";
+
+    vertexBufferMemoryUsage += [vertexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [indexBuffer allocatedSize];
+    vertexBufferMemoryUsage += [normalBuffer allocatedSize];
+}
+
+void ae3d::VertexBuffer::UpdateDynamic( const Face* faces, int faceCount, const VertexPTC* vertices, int vertexCount )
+{
+    memcpy( [vertexBuffer contents], vertices, sizeof( VertexPTC ) * vertexCount );
+    memcpy( [indexBuffer contents], faces, sizeof( Face ) * faceCount );
 }
