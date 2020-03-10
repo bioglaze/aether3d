@@ -8,6 +8,8 @@ bl_info = {
     "wiki_url": "https://github.com/bioglaze/aether3d",
     'category': 'Import-Export'}
 
+# Skeleton/animation code based on https://gitlab.com/bztsrc/model3d/tree/master/blender/
+
 import bpy
 import bpy.props
 import bpy.utils
@@ -28,6 +30,24 @@ class Vertex:
     bitangent = mathutils.Vector()
     color = mathutils.Vector()
 
+def uniquelist( l, e ):
+    try:
+        i = l.index( e )
+    except ValueError:
+        i = len( l )
+        l.append( e )
+    return i
+
+def vert( x, y, z, w ):
+    if x == -0.0:
+        x = 0.0
+    if y == -0.0:
+        y = 0.0
+    if z == -0.0:
+        z = 0.0
+    if w == -0.0:
+        w = 0.0
+    return x, y, z, w
 
 class Mesh:
     vertices = []
@@ -307,6 +327,9 @@ class Aether3DExporter( bpy.types.Operator ):
         armatures = [Object for Object in context.selected_objects if Object.type in ("ARMATURE")]
         global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
         armOffs = 0
+        bones = []
+        boneNames = []
+        verts = []
         
         for armature in armatures:
             for bone in armature.data.bones:
@@ -325,6 +348,26 @@ class Aether3DExporter( bpy.types.Operator ):
                 q = m.to_quaternion()
                 q.normalize()
                 # n = safestr(b.name)
+                try:
+                    boneNames.index( n )
+                    print( "bone name not unique: " + bone.name )
+                    break
+                except:
+                    pass
+
+                digits = 4
+                bones.append([ a, uniquelist( boneNames, bone.name ),
+                        uniquelist(verts, [vert(
+                            round( pos[0], digits),
+                            round( pos[1], digits),
+                            round( pos[2], digits), 1.0), 0, -1]),
+                        uniquelist(verts, [vert(
+                            round(q.x, digits),
+                            round(q.y, digits),
+                            round(q.z, digits),
+                            round(q.w, digits)), 0, -2])])
+            armoffs = len( bones )
+            print("armoffs: ", armoffs)
             
     def writeFile( self, context, FilePath ):
         """Writes selected meshes to .ae3d file."""
