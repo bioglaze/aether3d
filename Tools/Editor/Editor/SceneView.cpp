@@ -2,15 +2,19 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "SceneView.hpp"
 #include "Array.hpp"
+#include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
+#include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
+#include "PointLightComponent.hpp"
 #include "Texture2D.hpp"
 #include "TransformComponent.hpp"
 #include "Scene.hpp"
+#include "SpotLightComponent.hpp"
 #include "Shader.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
@@ -43,6 +47,8 @@ struct SceneView
     Scene scene;
     Shader unlitShader;
     TransformGizmo transformGizmo;
+    Texture2D goTex;
+    Texture2D audioTex;
     Texture2D lightTex;
     Texture2D cameraTex;
     Matrix44 lineView;
@@ -277,6 +283,8 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->cameraTex.Load( FileSystem::FileContents( "camera.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->lightTex.Load( FileSystem::FileContents( "light.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->goTex.Load( FileSystem::FileContents( "gameobject.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->audioTex.Load( FileSystem::FileContents( "audio_source.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     (*sv)->material.SetShader( &(*sv)->unlitShader );
     (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
@@ -580,6 +588,19 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraTransform->GetLocalPosition()).Normalized();
         const float viewDotLight = Vec3::Dot( viewDir, lightDir ) ;
         const float screenScale = 2;
+
+        Texture2D* sprite = &sv->goTex;
+
+        if (sv->gameObjects[ goIndex ]->GetComponent<SpotLightComponent>() || sv->gameObjects[ goIndex ]->GetComponent<DirectionalLightComponent>() ||
+            sv->gameObjects[ goIndex ]->GetComponent<PointLightComponent>())
+        {
+            sprite = &sv->lightTex;
+        }
+
+        if (sv->gameObjects[ goIndex ]->GetComponent<AudioSourceComponent>())
+        {
+            sprite = &sv->audioTex;
+        }
         
         if (viewDotLight <= 0 &&
             screenPoint.x > -(float)texWidth && screenPoint.y > -(float)texHeight &&
@@ -593,7 +614,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             float x = (int)screenPoint.x * screenScale;
             float y = (int)screenPoint.y * screenScale;
 #endif
-            ae3d::System::Draw( &sv->lightTex, x, y, texWidth, texHeight,
+            ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
     }
