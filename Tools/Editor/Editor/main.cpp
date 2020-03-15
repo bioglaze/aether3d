@@ -83,8 +83,8 @@ void GetOpenPath( char* path, const char* extension )
 
 int main()
 {
-    int width = 640 * 2;
-    int height = 480 * 2;
+    int width = 1920 / 1;
+    int height = 1080 / 1;
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, WindowCreateFlags::Empty );

@@ -601,7 +601,12 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         {
             sprite = &sv->audioTex;
         }
-        
+
+        if (sv->gameObjects[ goIndex ]->GetComponent<CameraComponent>())
+        {
+            sprite = &sv->cameraTex;
+        }
+
         if (viewDotLight <= 0 &&
             screenPoint.x > -(float)texWidth && screenPoint.y > -(float)texHeight &&
             screenPoint.x < screenWidth * screenScale && screenPoint.y < screenHeight * screenScale)
