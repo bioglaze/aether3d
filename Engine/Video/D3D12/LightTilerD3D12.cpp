@@ -349,7 +349,7 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )
 {
-    GfxDevice::CreateNewUniformBuffer();
+    GfxDevice::GetNewUniformBuffer();
 
     PerObjectUboStruct uniforms;
 

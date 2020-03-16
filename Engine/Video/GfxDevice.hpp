@@ -91,7 +91,7 @@ namespace ae3d
         void UpdateLineBuffer( int lineHandle, const Vec3* lines, int lineCount, const Vec3& color );
 #if RENDERER_D3D12
         void ResetCommandList();
-        void CreateNewUniformBuffer();
+        void GetNewUniformBuffer();
         void* GetCurrentMappedConstantBuffer();
         void* GetCurrentConstantBuffer();
 #endif

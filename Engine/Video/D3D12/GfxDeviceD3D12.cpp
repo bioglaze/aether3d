@@ -1124,7 +1124,7 @@ void ae3d::GfxDevice::SetPolygonOffset( bool enable, float, float )
     }
 }
 
-void ae3d::GfxDevice::CreateNewUniformBuffer()
+void ae3d::GfxDevice::GetNewUniformBuffer()
 {
     GfxDeviceGlobal::currentConstantBufferIndex = (GfxDeviceGlobal::currentConstantBufferIndex + 1) % GfxDeviceGlobal::mappedConstantBuffers.size();
 }

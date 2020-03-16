@@ -258,7 +258,7 @@ void ae3d::Shader::ReflectVariables()
 void ae3d::Shader::Use()
 {
     System::Assert( IsValid(), "Shader not loaded" );
-    GfxDevice::CreateNewUniformBuffer();
+    GfxDevice::GetNewUniformBuffer();
 }
 
 void ae3d::Shader::SetUniform( int offset, void* data, int dataBytes )
