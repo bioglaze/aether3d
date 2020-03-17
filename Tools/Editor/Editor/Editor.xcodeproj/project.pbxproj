@@ -35,6 +35,8 @@
 		ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8BB2070B3550049EEAE /* MetalKit.framework */; };
 		ABD2D48A23B8C72C009750E7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD2D48923B8C72C009750E7 /* AVFoundation.framework */; };
 		ABE82EA421DCD8F100072FB1 /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE82EA321DCD8F100072FB1 /* Bloom.metal */; };
+		ABF7FA2F2421402A00C20F52 /* default_white.png in Resources */ = {isa = PBXBuildFile; fileRef = ABF7FA2E2421402A00C20F52 /* default_white.png */; };
+		ABF7FA312421407B00C20F52 /* gameobject.png in Resources */ = {isa = PBXBuildFile; fileRef = ABF7FA302421407B00C20F52 /* gameobject.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -104,6 +106,8 @@
 		ABD0C8BB2070B3550049EEAE /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		ABD2D48923B8C72C009750E7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		ABE82EA321DCD8F100072FB1 /* Bloom.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Bloom.metal; path = ../../../../Engine/Assets/Bloom.metal; sourceTree = "<group>"; };
+		ABF7FA2E2421402A00C20F52 /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
+		ABF7FA302421407B00C20F52 /* gameobject.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gameobject.png; path = ../../../../../aether3d_build/Samples/gameobject.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +149,8 @@
 		AB010CD3206F70B40014ED08 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
+				ABF7FA302421407B00C20F52 /* gameobject.png */,
+				ABF7FA2E2421402A00C20F52 /* default_white.png */,
 				AB0B89BD20CD936400FF33FA /* audio_source.png */,
 				AB0B89BA20CD936300FF33FA /* camera.png */,
 				AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */,
@@ -294,8 +300,10 @@
 			files = (
 				AB0B89C020CD936400FF33FA /* light.png in Resources */,
 				ABAA98A420963B1300DC1F42 /* textured_cube.ae3d in Resources */,
+				ABF7FA312421407B00C20F52 /* gameobject.png in Resources */,
 				ABB36041208C4F83007133FD /* glider.png in Resources */,
 				AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */,
+				ABF7FA2F2421402A00C20F52 /* default_white.png in Resources */,
 				AB0B89BF20CD936400FF33FA /* cursor_translate.ae3d in Resources */,
 				AB0B89C120CD936400FF33FA /* audio_source.png in Resources */,
 				AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */,

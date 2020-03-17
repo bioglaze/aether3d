@@ -235,10 +235,9 @@ namespace
     float clearColor[] = { 0, 0, 0, 0 };
 }
 
-id <MTLBuffer> ae3d::GfxDevice::GetNewUniformBuffer()
+void ae3d::GfxDevice::GetNewUniformBuffer()
 {
     GfxDeviceGlobal::currentUboIndex = (GfxDeviceGlobal::currentUboIndex + 1) % UboCount;
-    return GfxDeviceGlobal::uniformBuffers[ GfxDeviceGlobal::currentUboIndex ];
 }
 
 id <MTLBuffer> ae3d::GfxDevice::GetCurrentUniformBuffer()

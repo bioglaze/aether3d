@@ -89,9 +89,9 @@ namespace ae3d
         void Init( int width, int height );
         int CreateLineBuffer( const Vec3* lines, int lineCount, const Vec3& color );
         void UpdateLineBuffer( int lineHandle, const Vec3* lines, int lineCount, const Vec3& color );
+        void GetNewUniformBuffer();
 #if RENDERER_D3D12
         void ResetCommandList();
-        void GetNewUniformBuffer();
         void* GetCurrentMappedConstantBuffer();
         void* GetCurrentConstantBuffer();
 #endif
@@ -102,7 +102,6 @@ namespace ae3d
         void DrawVertexBuffer( id<MTLBuffer> vertexBuffer, id<MTLBuffer> indexBuffer, int elementCount, int indexOffset );
         id <MTLDevice> GetMetalDevice();
         id <MTLLibrary> GetDefaultMetalShaderLibrary();
-        id <MTLBuffer> GetNewUniformBuffer();
         id <MTLBuffer> GetCurrentUniformBuffer();
         void PresentDrawable();
         void BeginFrame();
@@ -111,7 +110,6 @@ namespace ae3d
 #endif
 #if RENDERER_VULKAN
         void ResetPSOCache();
-        void GetNewUniformBuffer();
         void CreateUniformBuffers();
         std::uint8_t* GetCurrentUbo();
         void BeginRenderPassAndCommandBuffer();
