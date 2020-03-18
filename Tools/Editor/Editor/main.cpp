@@ -179,6 +179,8 @@ int main()
                     break;
                 default: break;
                 }
+
+                inspector.HandleKey( (char)event.keyCode );
             }
 
             if (event.type == WindowEventType::MouseMove)

@@ -100,6 +100,17 @@ static void InitKeyMap()
     WindowGlobal::keyMap[ 88 ] = ae3d::KeyCode::X;
     WindowGlobal::keyMap[ 89 ] = ae3d::KeyCode::Y;
     WindowGlobal::keyMap[ 90 ] = ae3d::KeyCode::Z;
+    
+    WindowGlobal::keyMap[ 48 ] = ae3d::KeyCode::N0;
+    WindowGlobal::keyMap[ 49 ] = ae3d::KeyCode::N1;
+    WindowGlobal::keyMap[ 50 ] = ae3d::KeyCode::N2;
+    WindowGlobal::keyMap[ 51 ] = ae3d::KeyCode::N3;
+    WindowGlobal::keyMap[ 52 ] = ae3d::KeyCode::N4;
+    WindowGlobal::keyMap[ 53 ] = ae3d::KeyCode::N5;
+    WindowGlobal::keyMap[ 54 ] = ae3d::KeyCode::N6;
+    WindowGlobal::keyMap[ 55 ] = ae3d::KeyCode::N7;
+    WindowGlobal::keyMap[ 56 ] = ae3d::KeyCode::N8;
+    WindowGlobal::keyMap[ 57 ] = ae3d::KeyCode::N9;
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

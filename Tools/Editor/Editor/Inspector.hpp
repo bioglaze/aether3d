@@ -17,5 +17,6 @@ class Inspector
     void Deinit();
     void HandleLeftMouseClick( int x, int y, int state );
     void HandleMouseMotion( int x, int y );
+    void HandleKey( char ch );
     void Render( unsigned width, unsigned height, ae3d::GameObject* gameObject, Command& outCommand, ae3d::GameObject** gameObjects, unsigned goCount, ae3d::Material* material );
 };
