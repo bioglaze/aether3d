@@ -73,6 +73,7 @@ static void InitKeyMap()
     WindowGlobal::keyMap[ 27 ] = ae3d::KeyCode::Escape;
     WindowGlobal::keyMap[ 32 ] = ae3d::KeyCode::Space;
     WindowGlobal::keyMap[ 46 ] = ae3d::KeyCode::Delete;
+    WindowGlobal::keyMap[ 8 ] = ae3d::KeyCode::Backspace;
 
     WindowGlobal::keyMap[ 65 ] = ae3d::KeyCode::A;
     WindowGlobal::keyMap[ 66 ] = ae3d::KeyCode::B;
@@ -111,6 +112,8 @@ static void InitKeyMap()
     WindowGlobal::keyMap[ 55 ] = ae3d::KeyCode::N7;
     WindowGlobal::keyMap[ 56 ] = ae3d::KeyCode::N8;
     WindowGlobal::keyMap[ 57 ] = ae3d::KeyCode::N9;
+    
+    WindowGlobal::keyMap[ 190 ] = ae3d::KeyCode::Dot;
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -126,6 +129,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             break;
         case WM_SYSKEYUP:
         case WM_KEYUP:
+            ae3d::System::Print("key: %d\n", (unsigned)wParam);
             ae3d::System::Assert( wParam < 256, "too high keycode" );
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyUp;

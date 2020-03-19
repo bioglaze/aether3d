@@ -163,10 +163,14 @@ void Inspector::HandleLeftMouseClick( int x, int y, int state )
     nk_input_button( &ctx, NK_BUTTON_LEFT, x, y, state );
 }
 
-void Inspector::HandleKey( char ch )
+void Inspector::HandleChar( char ch )
 {
     nk_input_char( &ctx, ch );
-    //nk_input_key( &ctx, NK_KEY_RIGHT, 1 );
+}
+
+void Inspector::HandleKey( int key, int state )
+{
+    nk_input_key( &ctx, (nk_keys)key, state );
 }
 
 void Inspector::HandleMouseMotion( int x, int y )

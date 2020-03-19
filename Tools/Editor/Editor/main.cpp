@@ -180,7 +180,18 @@ int main()
                 default: break;
                 }
 
-                inspector.HandleKey( (char)event.keyCode );
+                if (event.keyCode == KeyCode::Backspace) inspector.HandleKey( 6, event.type == WindowEventType::KeyDown ? 0 : 1 );
+                if (event.keyCode == KeyCode::Dot) inspector.HandleKey( 6, event.type == WindowEventType::KeyDown ? 0 : 1 );
+                if (event.keyCode == KeyCode::N0) inspector.HandleChar( 48 );
+                if (event.keyCode == KeyCode::N1) inspector.HandleChar( 49 );
+                if (event.keyCode == KeyCode::N2) inspector.HandleChar( 50 );
+                if (event.keyCode == KeyCode::N3) inspector.HandleChar( 51 );
+                if (event.keyCode == KeyCode::N4) inspector.HandleChar( 52 );
+                if (event.keyCode == KeyCode::N5) inspector.HandleChar( 53 );
+                if (event.keyCode == KeyCode::N6) inspector.HandleChar( 54 );
+                if (event.keyCode == KeyCode::N7) inspector.HandleChar( 55 );
+                if (event.keyCode == KeyCode::N8) inspector.HandleChar( 56 );
+                if (event.keyCode == KeyCode::N9) inspector.HandleChar( 57 );
             }
 
             if (event.type == WindowEventType::MouseMove)
