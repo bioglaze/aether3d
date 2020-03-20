@@ -8,6 +8,7 @@
 #import "System.hpp"
 #import "SceneView.hpp"
 #import "Vec3.hpp"
+#import "Window.hpp"
 
 NSViewController* myViewController;
 
@@ -68,6 +69,8 @@ struct InputEvent
     bool isActive;
     int x, y;
     int button;
+    int key;
+    bool isDown;
 };
 
 InputEvent inputEvent;
@@ -112,6 +115,9 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)keyDown:(NSEvent *)theEvent
 {
+    inputEvent.key = [theEvent keyCode];
+    inputEvent.isDown = true;
+    ae3d::System::Print("keyDown: %d\n", inputEvent.key);
     const float velocity = 0.3f;
     
     // Keycodes from: https://forums.macrumors.com/threads/nsevent-keycode-list.780577/
@@ -170,6 +176,9 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)keyUp:(NSEvent *)theEvent
 {
+    inputEvent.key = [theEvent keyCode];
+    inputEvent.isDown = false;
+    
     if ([theEvent keyCode] == 0x00) // A
     {
         moveDir.x = 0;
@@ -232,16 +241,42 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     
     if (inputEvent.button == 1 && inputEvent.isActive)
     {
-        svHandleLeftMouseDown( sceneView, inputEvent.x * 2, inputEvent.y * 2, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
-        inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
-        inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
+        const bool clickedOnInspector = inputEvent.x < 300;
+
+        if (clickedOnInspector)
+        {
+            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
+            inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
+        }
+        else
+        {
+            svHandleLeftMouseDown( sceneView, inputEvent.x * 2, inputEvent.y * 2, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+        }
     }
 
     if (inputEvent.button == 0 && inputEvent.isActive)
     {
-        inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
+        const bool clickedOnInspector = inputEvent.x < 300;
+
+        if (!clickedOnInspector)
+        {
+            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
+        }
     }
     
+    if (inputEvent.key == (int)ae3d::KeyCode::Backspace) inspector.HandleKey( 6, inputEvent.isDown ? 0 : 1 );
+    if (inputEvent.key == (int)ae3d::KeyCode::Dot) inspector.HandleKey( 6, inputEvent.isDown ? 0 : 1 );
+    if (inputEvent.key == 29) inspector.HandleChar( 48 ); // 0
+    if (inputEvent.key == 18) inspector.HandleChar( 49 ); // 1
+    if (inputEvent.key == 19) inspector.HandleChar( 50 ); // 2
+    if (inputEvent.key == 20) inspector.HandleChar( 51 ); // 3
+    if (inputEvent.key == 21) inspector.HandleChar( 52 ); // 4
+    if (inputEvent.key == 23) inspector.HandleChar( 53 ); // 5
+    if (inputEvent.key == 22) inspector.HandleChar( 54 ); // 6
+    if (inputEvent.key == 26) inspector.HandleChar( 55 ); // 7
+    if (inputEvent.key == 28) inspector.HandleChar( 56 ); // 8
+    if (inputEvent.key == 25) inspector.HandleChar( 57 ); // 9
+
     inputEvent.isActive = false;
     inputEvent.x = 0;
     inputEvent.y = 0;
