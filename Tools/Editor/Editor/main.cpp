@@ -180,6 +180,7 @@ int main()
                 default: break;
                 }
 
+                if (event.keyCode == KeyCode::Enter) inspector.HandleKey( 4, event.type == WindowEventType::KeyDown ? 0 : 1 );
                 if (event.keyCode == KeyCode::Backspace) inspector.HandleKey( 6, event.type == WindowEventType::KeyDown ? 0 : 1 );
                 if (event.keyCode == KeyCode::Dot) inspector.HandleKey( 6, event.type == WindowEventType::KeyDown ? 0 : 1 );
                 if (event.keyCode == KeyCode::N0) inspector.HandleChar( 48 );
