@@ -454,6 +454,14 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
     return nullptr;
 }
 
+void svUpdate( SceneView* sceneView )
+{
+    if (sceneView->selectedGameObjects.count > 0 && sceneView->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >())
+    {
+        sceneView->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( sceneView->selectedGameObjects[ 0 ]->GetComponent<TransformComponent>()->GetLocalPosition() );
+    }
+}
+
 void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, int height )
 {
     Array< CollisionInfo > ci;

@@ -120,6 +120,8 @@ int main()
         Window::PumpEvents();
         WindowEvent event;
 
+        svUpdate( sceneView );
+        
         inspector.BeginInput();
 
         while (Window::PollEvent( event ))

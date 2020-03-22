@@ -34,3 +34,4 @@ void svMoveSelection( SceneView* sceneView, const ae3d::Vec3& moveDir );
 ae3d::GameObject* svSelectObject( SceneView* sceneView, int screenX, int screenY, int width, int height );
 void svDeleteGameObject( SceneView* sceneView );
 void svFocusOnSelected( SceneView* sceneView );
+void svUpdate( SceneView* sceneView );
