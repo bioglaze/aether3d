@@ -131,6 +131,7 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
 
 void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
 {
+    vertexFormat = VertexFormat::PTNTC;
     elementCount = faceCount * 3;
 
     const int ibSize = elementCount * 2;
@@ -209,7 +210,6 @@ void ae3d::VertexBuffer::UpdateDynamic( const Face* faces, int /*faceCount*/, co
 
     const int ibSize = elementCount * 2;
     std::memcpy( mappedDynamic, verticesPTNTC.data(), vertexCount * sizeof( VertexPTNTC ) );
-    memcpy_s( mappedDynamic, ibOffset, vertices, ibOffset );
     memcpy_s( mappedDynamic + ibOffset, ibSize, faces, ibSize );
 }
 
