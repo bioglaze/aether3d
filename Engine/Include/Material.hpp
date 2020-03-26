@@ -58,8 +58,7 @@ namespace ae3d
         void SetF0( float f0 );
 
         /// \param texture Texture.
-        /// \param slot Slot in the shader.
-        void SetTexture( class TextureCube* texture, int slot );
+        void SetTexture( class TextureCube* texture );
 
         /// \param renderTexture Render texture.
         /// \param slot Slot in the shader.

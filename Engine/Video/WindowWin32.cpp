@@ -129,7 +129,6 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             break;
         case WM_SYSKEYUP:
         case WM_KEYUP:
-            ae3d::System::Print("key: %d\n", (unsigned)wParam);
             ae3d::System::Assert( wParam < 256, "too high keycode" );
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyUp;

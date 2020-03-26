@@ -23,6 +23,7 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
     extern ae3d::TextureBase* texture0;
     extern ae3d::TextureBase* texture1;
+    extern ae3d::TextureBase* textureCube;
 	extern PerObjectUboStruct perObjectUboStruct;
     extern ae3d::RenderTexture* currentRenderTarget;
 }
@@ -289,22 +290,11 @@ void ae3d::Shader::SetTexture( ae3d::Texture2D* texture, int textureUnit )
 
 void ae3d::Shader::SetTexture( ae3d::TextureCube* texture, int textureUnit )
 {
-    if (textureUnit == 0)
-    {
-        if( texture != nullptr )
-        {
-            GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
-        }
+    GfxDeviceGlobal::textureCube = texture;
 
-        GfxDeviceGlobal::texture0 = texture;
-    }
-    else if (textureUnit == 1)
+    if (texture != nullptr && textureUnit == 0)
     {
-        GfxDeviceGlobal::texture1 = texture;
-    }
-    else
-    {
-        System::Assert( false, "unhandled texture unit!" );
+        GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
     }
 }
 

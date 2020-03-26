@@ -236,7 +236,7 @@ int main()
     GameObject rotatingCube;
     rotatingCube.AddComponent< MeshRendererComponent >();
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    //rotatingCube.GetComponent< MeshRendererComponent >()->EnableBoundingBoxDrawing( true );
+    rotatingCube.GetComponent< MeshRendererComponent >()->EnableBoundingBoxDrawing( true );
     rotatingCube.AddComponent< TransformComponent >();
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { -2, 0, -108 } );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 1 );
@@ -459,7 +459,7 @@ int main()
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
-    //standardMaterial.SetTexture( &skybox, 12 );
+    standardMaterial.SetTexture( &skybox );
 
 #ifdef TEST_SPONZA
     Material pbrMaterial;

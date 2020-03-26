@@ -1336,6 +1336,7 @@ void ae3d::GfxDevice::ResetCommandList()
     GfxDeviceGlobal::cachedPSO = nullptr;
     GfxDeviceGlobal::texture0 = Texture2D::GetDefaultTexture();
     GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
+    GfxDeviceGlobal::textureCube = TextureCube::GetDefaultTexture();
 }
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )

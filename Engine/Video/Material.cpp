@@ -93,12 +93,9 @@ void ae3d::Material::SetTexture( Texture2D* texture, int slot )
     }
 }
 
-void ae3d::Material::SetTexture( TextureCube* texture, int slot )
+void ae3d::Material::SetTexture( TextureCube* texture )
 {
-    if (0 <= slot && slot < TEXTURE_SLOT_COUNT)
-    {
-        texCubeSlots[ slot ] = texture;
-    }
+    texCubeSlots[ 12 ] = texture;
 }
 
 void ae3d::Material::SetRenderTexture( RenderTexture* renderTexture, int slot )
