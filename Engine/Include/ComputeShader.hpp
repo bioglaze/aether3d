@@ -101,7 +101,7 @@ namespace ae3d
 #endif
 
     private:
-        static const int SLOT_COUNT = 12;
+        static const int SLOT_COUNT = 13;
         
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;

@@ -31,7 +31,7 @@ MTLRenderPassDescriptor* renderPassDescriptorApp = nullptr;
 MTLRenderPassDescriptor* renderPassDescriptorFBO = nullptr;
 id<MTLRenderCommandEncoder> renderEncoder;
 id<MTLCommandBuffer> commandBuffer;
-id<MTLTexture> textures[ 5 ];
+id<MTLTexture> textures[ 13 ];
 id<MTLTexture> msaaColorTarget;
 id<MTLTexture> msaaDepthTarget;
 
@@ -80,7 +80,7 @@ namespace GfxDeviceGlobal
     bool isRenderingToTexture = false;
     ae3d::GfxDevice::ClearFlags clearFlags = ae3d::GfxDevice::ClearFlags::Depth;
     std::unordered_map< std::uint64_t, id <MTLRenderPipelineState> > psoCache;
-    id<MTLSamplerState> samplerStates[ 5 ];
+    id<MTLSamplerState> samplerStates[ 13 ];
     id<MTLBuffer> uniformBuffers[ UboCount ];
     int currentUboIndex;
     ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
@@ -148,7 +148,7 @@ namespace GfxDeviceGlobal
             samplers[ samplerIndex ].pointClamp = [device newSamplerStateWithDescriptor:samplerDescriptor];
         }
 
-        for (int slot = 0; slot < 5; ++slot)
+        for (int slot = 0; slot < 13; ++slot)
         {
             samplerStates[ slot ] = samplers[ SamplerIndexByAnisotropy::One ].pointClamp;
         }
@@ -156,7 +156,7 @@ namespace GfxDeviceGlobal
     
     void SetSampler( int textureUnit, ae3d::TextureFilter filter, ae3d::TextureWrap wrap, ae3d::Anisotropy anisotropy )
     {
-        if (textureUnit > 4)
+        if (textureUnit > 12)
         {
             ae3d::System::Print( "Trying to set a sampler with too high index %d\n", textureUnit );
             return;
@@ -672,9 +672,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         }
     }
 
-    if (!textures[ 4 ])
+    if (!textures[ 12 ])
     {
-        textures[ 4 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
+        textures[ 12 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
     }
     
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
@@ -714,6 +714,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer() offset:0 atIndex:9];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer() offset:0 atIndex:10];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer() offset:0 atIndex:11];
+        [renderEncoder setFragmentTexture:textures[ 12 ] atIndex:12];
     }
 
     [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
@@ -724,7 +725,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     [renderEncoder setFragmentTexture:textures[ 2 ] atIndex:2];
     [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
     [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
-    
+
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {
         [renderEncoder setDepthStencilState:depthStateLessEqualWriteOff];

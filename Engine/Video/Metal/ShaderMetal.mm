@@ -7,7 +7,7 @@
 #include "RenderTexture.hpp"
 #include "System.hpp"
 
-extern id<MTLTexture> textures[ 5 ];
+extern id<MTLTexture> textures[ 13 ];
 
 namespace GfxDeviceGlobal
 {
@@ -166,7 +166,7 @@ void ae3d::Shader::SetTexture( TextureCube* texture, int textureUnit )
             textures[ 0 ] = texture->GetMetalTexture();
             GfxDeviceGlobal::perObjectUboStruct.tex0scaleOffset = texture->GetScaleOffset();
         }
-        else if (textureUnit < 5)
+        else if (textureUnit < 13)
         {
             textures[ textureUnit ] = texture->GetMetalTexture();
         }

@@ -351,7 +351,7 @@ using namespace ae3d;
     {
 #ifdef TEST_FORWARD_PLUS
         mat.second->SetShader( &standardShader );
-        mat.second->SetTexture( &skyTex, 4 );
+        mat.second->SetTexture( &skyTex );
 #else
         mat.second->SetShader( &shader );
 #endif
@@ -507,7 +507,7 @@ using namespace ae3d;
 #ifdef TEST_RENDER_TEXTURE_CUBE
     pbrMaterial.SetRenderTexture( &cubeRT, 4 );
 #else
-    pbrMaterial.SetTexture( &skyTex, 4 );
+    pbrMaterial.SetTexture( &skyTex );
 #endif
 
     pbrCube.AddComponent<ae3d::MeshRendererComponent>();
