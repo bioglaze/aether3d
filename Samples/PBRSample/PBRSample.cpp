@@ -27,9 +27,101 @@
 #include "VR.hpp"
 #include "Window.hpp"
 
+#define NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_DEFAULT_FONT
+#define NK_IMPLEMENTATION
+#if RENDERER_METAL
+#include "nuklear.h"
+#else
+#include "../NuklearTest/nuklear.h"
+#endif
+
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.1.zip
 
 using namespace ae3d;
+
+struct VertexPTC
+{
+    float position[ 3 ];
+    float uv[ 2 ];
+    float col[ 4 ];
+};
+
+nk_draw_null_texture nullTexture;
+Texture2D* uiTextures[ 1 ];
+
+void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height )
+{
+    nk_convert_config config = {};
+    static const nk_draw_vertex_layout_element vertex_layout[] = {
+        {NK_VERTEX_POSITION, NK_FORMAT_FLOAT, NK_OFFSETOF( VertexPTC, position )},
+        {NK_VERTEX_TEXCOORD, NK_FORMAT_FLOAT, NK_OFFSETOF( VertexPTC, uv )},
+        {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF( VertexPTC, col )},
+        {NK_VERTEX_LAYOUT_END}
+    };
+
+    config.vertex_layout = vertex_layout;
+    config.vertex_size = sizeof( VertexPTC );
+    config.vertex_alignment = NK_ALIGNOF( VertexPTC );
+    config.null = nullTexture;
+    config.circle_segment_count = 22;
+    config.curve_segment_count = 22;
+    config.arc_segment_count = 22;
+    config.global_alpha = 1.0f;
+    config.shape_AA = NK_ANTI_ALIASING_OFF;
+    config.line_AA = NK_ANTI_ALIASING_OFF;
+
+    const int MAX_VERTEX_MEMORY = 512 * 1024;
+    const int MAX_ELEMENT_MEMORY = 128 * 1024;
+
+    void* vertices;
+    void* elements;
+    System::MapUIVertexBuffer( MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY, &vertices, &elements );
+    memset( vertices, 0, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
+    memset( elements, 0, MAX_ELEMENT_MEMORY * 3 * 2 );
+
+    nk_buffer vbuf, ebuf;
+    nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY );
+    nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
+    nk_convert( ctx, uiCommands, &vbuf, &ebuf, &config );
+#if RENDERER_VULKAN
+    for (unsigned i = 0; i < MAX_VERTEX_MEMORY / (unsigned)sizeof( VertexPTC ); ++i)
+    {
+        VertexPTC* vert = &((VertexPTC*)vertices)[ i ];
+        vert->position[ 1 ] = height - vert->position[ 1 ];
+    }
+#endif
+
+    System::UnmapUIVertexBuffer();
+
+    const nk_draw_command* cmd = nullptr;
+    int offset = 0;
+
+    nk_draw_foreach( cmd, ctx, uiCommands )
+    {
+        if (cmd->elem_count == 0)
+        {
+            continue;
+        }
+
+        System::DrawUI( (int)(cmd->clip_rect.x),
+#if RENDERER_VULKAN
+        ( int )(cmd->clip_rect.y - cmd->clip_rect.h),
+#else
+            (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
+#endif
+            (int)(cmd->clip_rect.w),
+            (int)(cmd->clip_rect.h),
+            cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
+        offset += cmd->elem_count / 3;
+    }
+
+    nk_clear( ctx );
+}
+
 
 Scene scene;
 GameObject camera;
@@ -57,8 +149,16 @@ int main()
     
     System::EnableWindowsMemleakDetection();
     Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::MSAA4 );
-    Window::GetSize( width, height );
+    int realHeight = 0;
+    Window::GetSize( width, realHeight );
     
+#if RENDERER_VULKAN
+    int heightDelta = 0;
+#else
+    int heightDelta = (height - realHeight) / 2;
+#endif
+    height = realHeight;
+
     if (fullScreen)
     {
         originalWidth = width;
@@ -66,7 +166,6 @@ int main()
     }
 
     Window::SetTitle( "PBRSample" );
-    VR::Init();
     System::LoadBuiltinAssets();
     System::InitAudio();
     System::InitGamePad();
@@ -85,6 +184,31 @@ int main()
         
     RenderTexture camera2dTex;
     camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
+
+    nk_context ctx;
+    nk_font_atlas atlas;
+    int atlasWidth = 0;
+    int atlasHeight = 0;
+    Texture2D nkFontTexture;
+    nk_buffer cmds;
+
+    nk_font_atlas_init_default( &atlas );
+    nk_font_atlas_begin( &atlas );
+
+    nk_font* nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
+    const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
+
+#if RENDERER_VULKAN
+    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
+#else
+    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
+#endif
+    nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
+
+    uiTextures[ 0 /*nk_handle_id( nkFontTexture.GetID() ).id*/ ] = &nkFontTexture;
+
+    nk_init_default( &ctx, &nkFont->handle );
+    nk_buffer_init_default( &cmds );
 
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
@@ -237,6 +361,8 @@ int main()
         Vec3 axis( 0, 1, 0 );
         rotation.FromAxisAngle( axis, angle );
 
+        nk_input_begin( &ctx );
+
         while (Window::PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
@@ -337,6 +463,10 @@ int main()
                 lastMouseY = event.mouseY;
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
+  
+                int x = event.mouseX;
+                int y = height - event.mouseY + heightDelta;
+                nk_input_motion( &ctx, (int)x, (int)y );
             }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
             {           
@@ -358,6 +488,8 @@ int main()
             }
         }
 
+        nk_input_end( &ctx );
+
         camera.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
         camera.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
         camera.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
@@ -373,9 +505,91 @@ int main()
             System::ReloadChangedAssets();
             reload = false;
         }
+
+        static float value = 0.6f;
+
+        if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+        {
+            nk_layout_row_static( &ctx, 30, 80, 1 );
+
+            if (nk_button_label( &ctx, "button" ))
+            {
+                System::Print( "Pressed a button\n" );
+            }
+
+            nk_layout_row_dynamic( &ctx, 30, 2 );
+            enum { EASY, HARD };
+            static int op = EASY;
+            if (nk_option_label( &ctx, "easy", op == EASY )) op = EASY;
+            if (nk_option_label( &ctx, "hard", op == HARD )) op = HARD;
+            nk_check_label( &ctx, "check1", 0 );
+            nk_check_label( &ctx, "check2", 1 );
+            static size_t prog_value = 54;
+            nk_progress( &ctx, &prog_value, 100, NK_MODIFIABLE );
+
+            static char field_buffer[ 64 ];
+            static int field_len;
+            nk_edit_string( &ctx, NK_EDIT_FIELD, field_buffer, &field_len, 64, nk_filter_default );
+            static float pos;
+
+            nk_property_float( &ctx, "#X:", -1024.0f, &pos, 1024.0f, 1, 1 );
+
+            static const char *weapons[] = { "Fist","Pistol","Shotgun" };
+            static int current_weapon = 0;
+            current_weapon = nk_combo( &ctx, weapons, 3, current_weapon, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
+
+            nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
+            {
+                nk_layout_row_push( &ctx, 50 );
+                nk_label( &ctx, "Volume:", NK_TEXT_LEFT );
+                nk_layout_row_push( &ctx, 110 );
+                nk_slider_float( &ctx, 0, &value, 1.0f, 0.1f );
+            }
+            nk_layout_row_end( &ctx );
+
+            nk_layout_row_dynamic( &ctx, 250, 1 );
+            if (nk_group_begin( &ctx, "Standard", NK_WINDOW_BORDER ))
+            {
+                if (nk_tree_push( &ctx, NK_TREE_NODE, "Window", NK_MAXIMIZED ))
+                {
+                    static int selected[ 8 ];
+
+                    if (nk_tree_push( &ctx, NK_TREE_NODE, "Next", NK_MAXIMIZED ))
+                    {
+                        nk_layout_row_dynamic( &ctx, 20, 1 );
+
+                        for (int i = 0; i < 4; ++i)
+                        {
+                            nk_selectable_label( &ctx, (selected[ i ]) ? "Selected" : "Unselected", NK_TEXT_LEFT, &selected[ i ] );
+                        }
+
+                        nk_tree_pop( &ctx );
+                    }
+                    if (nk_tree_push( &ctx, NK_TREE_NODE, "Previous", NK_MAXIMIZED ))
+                    {
+                        nk_layout_row_dynamic( &ctx, 20, 1 );
+
+                        for (int i = 4; i < 8; ++i)
+                        {
+                            nk_selectable_label( &ctx, (selected[ i ]) ? "Selected" : "Unselected", NK_TEXT_LEFT, &selected[ i ] );
+                        }
+
+                        nk_tree_pop( &ctx );
+                    }
+
+                    nk_tree_pop( &ctx );
+                }
+
+                nk_group_end( &ctx );
+            }
+
+            nk_end( &ctx );
+        }
+
         scene.Render();
         cameraTex.ResolveTo( &resolvedTex );
         System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        DrawNuklear( &ctx, &cmds, width, height );
         scene.EndFrame();
         Window::SwapBuffers();
     }
