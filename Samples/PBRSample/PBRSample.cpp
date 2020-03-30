@@ -468,23 +468,19 @@ int main()
                 int y = height - event.mouseY + heightDelta;
                 nk_input_motion( &ctx, (int)x, (int)y );
             }
-            else if (event.type == WindowEventType::GamePadLeftThumbState)
-            {           
-                gamePadLeftThumbX = event.gamePadThumbX;
-                gamePadLeftThumbY = event.gamePadThumbY;
-            }
-            else if (event.type == WindowEventType::GamePadRightThumbState)
+            else if (event.type == WindowEventType::Mouse1Down)
             {
-                gamePadRightThumbX = event.gamePadThumbX;
-                gamePadRightThumbY = event.gamePadThumbY;
+                int x = event.mouseX;
+                int y = height - event.mouseY;
+
+                nk_input_button( &ctx, NK_BUTTON_LEFT, x, y, 1 );
             }
-            else if (event.type == WindowEventType::GamePadButtonY)
+            else if (event.type == WindowEventType::Mouse1Up)
             {
-                camera.GetComponent<TransformComponent>()->MoveUp( 0.1f );
-            }
-            else if (event.type == WindowEventType::GamePadButtonA)
-            {
-                camera.GetComponent<TransformComponent>()->MoveUp( -0.1f );
+                int x = event.mouseX;
+                int y = height - event.mouseY;
+
+                nk_input_button( &ctx, NK_BUTTON_LEFT, x, y, 0 );
             }
         }
 
@@ -512,11 +508,6 @@ int main()
         {
             nk_layout_row_static( &ctx, 30, 80, 1 );
 
-            if (nk_button_label( &ctx, "button" ))
-            {
-                System::Print( "Pressed a button\n" );
-            }
-
             nk_layout_row_dynamic( &ctx, 30, 2 );
             enum { EASY, HARD };
             static int op = EASY;
@@ -527,61 +518,22 @@ int main()
             static size_t prog_value = 54;
             nk_progress( &ctx, &prog_value, 100, NK_MODIFIABLE );
 
-            static char field_buffer[ 64 ];
-            static int field_len;
-            nk_edit_string( &ctx, NK_EDIT_FIELD, field_buffer, &field_len, 64, nk_filter_default );
             static float pos;
 
             nk_property_float( &ctx, "#X:", -1024.0f, &pos, 1024.0f, 1, 1 );
 
-            static const char *weapons[] = { "Fist","Pistol","Shotgun" };
+            static const char *weapons[] = { "Fist", "Pistol", "Shotgun" };
             static int current_weapon = 0;
             current_weapon = nk_combo( &ctx, weapons, 3, current_weapon, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
 
             nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {
-                nk_layout_row_push( &ctx, 50 );
-                nk_label( &ctx, "Volume:", NK_TEXT_LEFT );
+                nk_layout_row_push( &ctx, 60 );
+                nk_label( &ctx, "Roughness:", NK_TEXT_LEFT );
                 nk_layout_row_push( &ctx, 110 );
                 nk_slider_float( &ctx, 0, &value, 1.0f, 0.1f );
             }
             nk_layout_row_end( &ctx );
-
-            nk_layout_row_dynamic( &ctx, 250, 1 );
-            if (nk_group_begin( &ctx, "Standard", NK_WINDOW_BORDER ))
-            {
-                if (nk_tree_push( &ctx, NK_TREE_NODE, "Window", NK_MAXIMIZED ))
-                {
-                    static int selected[ 8 ];
-
-                    if (nk_tree_push( &ctx, NK_TREE_NODE, "Next", NK_MAXIMIZED ))
-                    {
-                        nk_layout_row_dynamic( &ctx, 20, 1 );
-
-                        for (int i = 0; i < 4; ++i)
-                        {
-                            nk_selectable_label( &ctx, (selected[ i ]) ? "Selected" : "Unselected", NK_TEXT_LEFT, &selected[ i ] );
-                        }
-
-                        nk_tree_pop( &ctx );
-                    }
-                    if (nk_tree_push( &ctx, NK_TREE_NODE, "Previous", NK_MAXIMIZED ))
-                    {
-                        nk_layout_row_dynamic( &ctx, 20, 1 );
-
-                        for (int i = 4; i < 8; ++i)
-                        {
-                            nk_selectable_label( &ctx, (selected[ i ]) ? "Selected" : "Unselected", NK_TEXT_LEFT, &selected[ i ] );
-                        }
-
-                        nk_tree_pop( &ctx );
-                    }
-
-                    nk_tree_pop( &ctx );
-                }
-
-                nk_group_end( &ctx );
-            }
 
             nk_end( &ctx );
         }
