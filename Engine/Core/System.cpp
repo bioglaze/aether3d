@@ -244,7 +244,7 @@ void ae3d::System::UpdateLineBuffer( int lineHandle, const Vec3* lines, int line
     GfxDevice::UpdateLineBuffer( lineHandle, lines, lineCount, color );
 }
 
-void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& projection )
+void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& projection, int xScreenSize, int yScreenSize )
 {
     Matrix44 viewProjection;
     Matrix44::Multiply( view, projection, viewProjection );
@@ -252,6 +252,13 @@ void ae3d::System::DrawLines( int handle, const Matrix44& view, const Matrix44& 
     renderer.builtinShaders.spriteRendererShader.SetTexture( Texture2D::GetDefaultTexture(), 0 );
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 1, 1, 1, 1 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip = viewProjection;
+
+    int viewport[ 4 ];
+    viewport[ 0 ] = 0;
+    viewport[ 1 ] = 0;
+    viewport[ 2 ] = xScreenSize;
+    viewport[ 3 ] = yScreenSize;
+    GfxDevice::SetViewport( viewport );
 
     GfxDevice::DrawLines( handle, renderer.builtinShaders.spriteRendererShader );
 }

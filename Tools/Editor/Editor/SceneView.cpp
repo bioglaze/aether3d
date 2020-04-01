@@ -631,6 +631,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
     }
-    
-    System::DrawLines( sv->lineHandle, camera->GetView(), camera->GetProjection() );
+
+    const float screenScale = 2;
+    System::DrawLines( sv->lineHandle, camera->GetView(), camera->GetProjection(), screenWidth * screenScale, screenHeight * screenScale );
 }

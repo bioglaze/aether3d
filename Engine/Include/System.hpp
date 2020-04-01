@@ -142,7 +142,9 @@ namespace ae3d
         /// \param handle Handle, created with CreateLineBuffer.
         /// \param view Camera's view matrix.
         /// \param projection Camera's projection matrix.
-        void DrawLines( int handle, const Matrix44& view, const Matrix44& projection );
+        /// \param xScreenSize Window width in pixels.
+        /// \param yScreenSize Window height in pixels.
+        void DrawLines( int handle, const Matrix44& view, const Matrix44& projection, int xScreenSize, int yScreenSize );
         
         /// \param scX Scissor x.
         /// \param scY Scissor y.
