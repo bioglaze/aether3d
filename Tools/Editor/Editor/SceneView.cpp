@@ -302,15 +302,24 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->scene.Add( (*sv)->gameObjects[ 1 ] );
 
     (*sv)->lineProjection.MakeProjection( 0, (float)width, (float)height, 0, 0, 1 );
-    constexpr unsigned LineCount = 40;
+    constexpr unsigned LineCount = 80;
     Vec3 lines[ LineCount ];
     
-    for (unsigned i = 0; i < LineCount / 2; ++i)
+    for (unsigned i = 0; i < LineCount / 4; ++i)
     {
         lines[ i * 2 + 0 ] = Vec3( (float)i, 0, -5 );
-        lines[ i * 2 + 1 ] = Vec3( (float)i, 0, -15 );
+        lines[ i * 2 + 1 ] = Vec3( (float)i, 0, -35 );
     }
-    
+
+    //lines[ 0 + 0 ] = Vec3( -5 + 25, 0, (float)-35 );
+    //lines[ 0 + 1 ] = Vec3( -35 + 25, 0, (float)-35 );
+
+    for (unsigned i = LineCount / 4; i < LineCount / 2; ++i)
+    {
+        lines[ i * 2 + 0 ] = Vec3( -5 + 45, 0, (float)i - 55 );
+        lines[ i * 2 + 1 ] = Vec3( -35 + 45, 0, (float)i - 55 );
+    }
+
     (*sv)->lineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
 
     // Test code
@@ -572,7 +581,12 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
     ae3d::CameraComponent* camera = sv->camera.GetComponent<CameraComponent>();
     const unsigned texWidth = sv->lightTex.GetWidth();
     const unsigned texHeight = sv->lightTex.GetHeight();
-    
+#if RENDERER_VULKAN
+    const float screenScale = 1;
+#else
+    const float screenScale = 2;
+#endif
+
     for (unsigned goIndex = 1; goIndex < sv->gameObjects.count; ++goIndex)
     {
         ae3d::TransformComponent* goTransform = sv->gameObjects[ goIndex ]->GetComponent<TransformComponent>();
@@ -595,8 +609,6 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         const Vec3 viewDir = cameraTransform->GetViewDirection();
         const Vec3 lightDir = (goTransform->GetLocalPosition() - cameraTransform->GetLocalPosition()).Normalized();
         const float viewDotLight = Vec3::Dot( viewDir, lightDir ) ;
-        const float screenScale = 2;
-
         Texture2D* sprite = &sv->goTex;
 
         if (sv->gameObjects[ goIndex ]->GetComponent<SpotLightComponent>() || sv->gameObjects[ goIndex ]->GetComponent<DirectionalLightComponent>() ||
@@ -632,6 +644,5 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         }
     }
 
-    const float screenScale = 2;
     System::DrawLines( sv->lineHandle, camera->GetView(), camera->GetProjection(), screenWidth * screenScale, screenHeight * screenScale );
 }
