@@ -8,6 +8,7 @@
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "Texture2D.hpp"
 #include "VulkanUtils.hpp"
 
@@ -190,6 +191,7 @@ void ae3d::ComputeShader::End()
 
     VkResult err = vkQueueSubmit( GfxDeviceGlobal::computeQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit compute" );
+    Statistics::IncQueueSubmitCalls();
 
     err = vkQueueWaitIdle( GfxDeviceGlobal::computeQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );

@@ -50,6 +50,8 @@ namespace Statistics
     int GetTotalAllocCalls();
     void IncPSOBindCalls();
     int GetPSOBindCalls();
+    void IncQueueSubmitCalls();
+    int GetQueueSubmitCalls();
     void SetDepthNormalsGpuTime( float timeMS );
     void SetShadowMapGpuTime( float timeMS );
     void SetLightCullerTimeGpuMS( float timeMS );

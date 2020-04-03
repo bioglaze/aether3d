@@ -157,6 +157,7 @@ namespace ae3d
                 str += "draw calls: " + std::to_string( ::Statistics::GetDrawCalls() ) + "\n";
                 str += "barrier calls: " + std::to_string( ::Statistics::GetBarrierCalls() ) + "\n";
                 str += "fence calls: " + std::to_string( ::Statistics::GetFenceCalls() ) + "\n";
+                str += "queue submit calls: " + std::to_string( ::Statistics::GetQueueSubmitCalls() ) + "\n";
                 str += "mem alloc calls: " + std::to_string( ::Statistics::GetAllocCalls() ) + " (frame), " + std::to_string( ::Statistics::GetTotalAllocCalls() ) + " (total)\n";
                 str += "triangles: " + std::to_string( ::Statistics::GetTriangleCount() ) + "\n";
 
@@ -515,6 +516,7 @@ namespace ae3d
 
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
         AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+        Statistics::IncQueueSubmitCalls();
     }
 
     void SubmitPostPresentBarrier()
@@ -556,6 +558,7 @@ namespace ae3d
 
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitPostInfo, VK_NULL_HANDLE );
         AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+        Statistics::IncQueueSubmitCalls();
 
         Statistics::EndFrameTimeProfiling();
     }
@@ -1283,6 +1286,7 @@ namespace ae3d
 
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
         AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+        Statistics::IncQueueSubmitCalls();
 
         err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
         AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
@@ -2117,6 +2121,7 @@ void SubmitQueue()
 
     VkResult err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+    Statistics::IncQueueSubmitCalls();
 }
 
 void ae3d::GfxDevice::Present()
@@ -2319,5 +2324,6 @@ void EndOffscreen()
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+    Statistics::IncQueueSubmitCalls();
 }
 

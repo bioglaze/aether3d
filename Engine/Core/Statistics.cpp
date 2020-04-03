@@ -14,6 +14,7 @@ namespace Statistics
     int totalAllocCalls = 0;
     int triangleCount = 0;
     int psoBindCount = 0;
+    int queueSubmitCalls = 0;
     float depthNormalsTimeMS = 0;
     float depthNormalsTimeGpuMS = 0;
     float shadowMapTimeMS = 0;
@@ -176,6 +177,16 @@ int Statistics::GetFenceCalls()
     return Statistics::fenceCalls;
 }
 
+void Statistics::IncQueueSubmitCalls()
+{
+    ++Statistics::queueSubmitCalls;
+}
+
+int Statistics::GetQueueSubmitCalls()
+{
+    return Statistics::queueSubmitCalls;
+}
+
 void Statistics::IncRenderTargetBinds()
 {
     ++Statistics::renderTargetBinds;
@@ -247,6 +258,7 @@ void Statistics::ResetFrameStatistics()
     allocCalls = 0;
     triangleCount = 0;
     psoBindCount = 0;
+    queueSubmitCalls = 0;
 
     startFrameTimePoint = std::chrono::steady_clock::now();
 }

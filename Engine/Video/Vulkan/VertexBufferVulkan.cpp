@@ -76,6 +76,7 @@ void CopyBuffer( VkBuffer source, VkBuffer& destination, int bufferSize )
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &copySubmitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "submit staging VB copy" );
+    Statistics::IncQueueSubmitCalls();
 
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "wait after staging VB copy" );
