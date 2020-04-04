@@ -266,7 +266,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     (*sv)->camera.AddComponent< TransformComponent >();
-    (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 0, 0 }, { 0, 0, 100 }, { 0, 1, 0 } );
+    (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
     (*sv)->camera.SetName( "EditorCamera" );
     
     (*sv)->scene.Add( &(*sv)->camera );
@@ -297,7 +297,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( &(*sv)->cubeMesh );
     (*sv)->gameObjects[ 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( &(*sv)->material, 0 );
     (*sv)->gameObjects[ 1 ]->AddComponent< TransformComponent >();
-    (*sv)->gameObjects[ 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -20 } );
+    (*sv)->gameObjects[ 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, 0 } );
     (*sv)->gameObjects[ 1 ]->SetName( "cube" );
     (*sv)->scene.Add( (*sv)->gameObjects[ 1 ] );
 
@@ -307,17 +307,14 @@ void svInit( SceneView** sv, int width, int height )
     
     for (unsigned i = 0; i < LineCount / 4; ++i)
     {
-        lines[ i * 2 + 0 ] = Vec3( (float)i, 0, -5 );
-        lines[ i * 2 + 1 ] = Vec3( (float)i, 0, -35 );
+        lines[ i * 2 + 0 ] = Vec3( (float)i - 10, 0, -16 + 24 );
+        lines[ i * 2 + 1 ] = Vec3( (float)i - 10, 0, -35 + 24 );
     }
-
-    //lines[ 0 + 0 ] = Vec3( -5 + 25, 0, (float)-35 );
-    //lines[ 0 + 1 ] = Vec3( -35 + 25, 0, (float)-35 );
 
     for (unsigned i = LineCount / 4; i < LineCount / 2; ++i)
     {
-        lines[ i * 2 + 0 ] = Vec3( -5 + 45, 0, (float)i - 55 );
-        lines[ i * 2 + 1 ] = Vec3( -35 + 45, 0, (float)i - 55 );
+        lines[ i * 2 + 0 ] = Vec3( -5 + 24 - 10, 0, (float)i - 55 + 24 );
+        lines[ i * 2 + 1 ] = Vec3( -24 + 24 - 10, 0, (float)i - 55 + 24 );
     }
 
     (*sv)->lineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
