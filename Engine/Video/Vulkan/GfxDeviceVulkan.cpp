@@ -399,6 +399,11 @@ namespace ae3d
         multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
         multisampleState.pSampleMask = nullptr;
         multisampleState.rasterizationSamples = GfxDeviceGlobal::msaaSampleBits;
+        
+        if (GfxDeviceGlobal::renderTexture0 && GfxDeviceGlobal::renderTexture0->GetSampleCount() == 1)
+        {
+            multisampleState.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+        }
 
         VkPipelineShaderStageCreateInfo shaderStages[ 2 ] = { shader.GetVertexInfo(), shader.GetFragmentInfo() };
 

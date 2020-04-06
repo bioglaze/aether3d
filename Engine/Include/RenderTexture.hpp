@@ -42,6 +42,9 @@ namespace ae3d
         void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
 
 #if RENDERER_VULKAN
+        /// \return Multisample count.
+        int GetSampleCount() const { return sampleCount; }
+
         /// \return frame buffer.
         VkFramebuffer GetFrameBuffer() { return frameBuffer; }
 
