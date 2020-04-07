@@ -602,7 +602,7 @@ void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
     vertexFormat = VertexFormat::PTC;
     elementCount = faceCount * 3;
 
-    vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexFormat::PTC ) * vertexCount
+    vertexBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( VertexPTC ) * vertexCount
                               options:MTLResourceCPUCacheModeDefaultCache];
     vertexBuffer.label = @"Dynamic Vertex buffer";
     
