@@ -211,6 +211,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             if( loadResult != DDSLoader::LoadResult::Success )
             {
                 ae3d::System::Print( "DDS Loader could not load %s", paths[ face ].c_str() );
+                *this = TextureCubeGlobal::defaultTexture;
                 return;
             }
 
@@ -243,6 +244,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
             {
                 const std::string reason( stbi_failure_reason() );
                 System::Print( "%s failed to load. stb_image's reason: %s\n", paths[ face ].c_str(), reason.c_str() );
+                *this = TextureCubeGlobal::defaultTexture;
                 return;
             }
             
