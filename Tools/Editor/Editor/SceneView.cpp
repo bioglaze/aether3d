@@ -35,6 +35,9 @@ struct TransformGizmo
     Material xAxisMaterial;
     Material yAxisMaterial;
     Material zAxisMaterial;
+    Texture2D redTex;
+    Texture2D greenTex;
+    Texture2D blueTex;
 
 	int selectedMesh = 0;
 };
@@ -51,7 +54,6 @@ struct SceneView
     Texture2D audioTex;
     Texture2D lightTex;
     Texture2D cameraTex;
-    Matrix44 lineView;
     Matrix44 lineProjection;
     int lineHandle = 0;
     int selectedGOIndex = 0;
@@ -276,6 +278,9 @@ void svInit( SceneView** sv, int width, int height )
                       FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
 
     (*sv)->gameObjects.Add( new GameObject() );
+    (*sv)->transformGizmo.redTex.Load( FileSystem::FileContents( "red.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->transformGizmo.greenTex.Load( FileSystem::FileContents( "green.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->transformGizmo.blueTex.Load( FileSystem::FileContents( "blue.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->transformGizmo.Init( &(*sv)->unlitShader, *(*sv)->gameObjects[ 0 ] );
 
     // Test content
@@ -318,11 +323,6 @@ void svInit( SceneView** sv, int width, int height )
     }
 
     (*sv)->lineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
-
-    // Test code
-    (*sv)->transformGizmo.xAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
-    (*sv)->transformGizmo.yAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
-    (*sv)->transformGizmo.zAxisMaterial.SetTexture( &(*sv)->gliderTex, 0 );
 }
 
 ae3d::Material* svGetMaterial( SceneView* sceneView )
@@ -546,7 +546,7 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     translateMesh.Load( FileSystem::FileContents( "cursor_translate.ae3d" ) );
     
     xAxisMaterial.SetShader( shader );
-    //xAxisMaterial.SetTexture( &translateTex, 0 );
+    xAxisMaterial.SetTexture( &redTex, 0 );
     xAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     float factor = -100;
     float units = 0;
@@ -555,11 +555,11 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     zAxisMaterial.SetDepthOffset( factor, units );
     
     yAxisMaterial.SetShader( shader );
-    //yAxisMaterial.SetTexture( &translateTex, 0 );
+    yAxisMaterial.SetTexture( &greenTex, 0 );
     yAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
     
     zAxisMaterial.SetShader( shader );
-    //zAxisMaterial.SetTexture( &translateTex, 0 );
+    zAxisMaterial.SetTexture( &blueTex, 0 );
     zAxisMaterial.SetDepthFunction( Material::DepthFunction::LessOrEqualWriteOn );
 
     go.AddComponent< MeshRendererComponent >();

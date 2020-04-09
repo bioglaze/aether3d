@@ -150,7 +150,14 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isRenderTexture = true;
     dataType = aDataType;
     handle = 1;
-    const bool isMultisampled = !debugName || strstr( debugName, "resolve" ) == nullptr;
+    // FIXME: This is a horrible hack :-(
+    bool isMultisampled = !debugName || strstr( debugName, "resolve" ) == nullptr;
+   
+    if (strstr( debugName, "shadow" ) != nullptr)
+    {
+        isMultisampled = false;
+    }
+
     sampleCount = isMultisampled ? (int)GfxDeviceGlobal::msaaSampleBits : 1;
     
     // Color
