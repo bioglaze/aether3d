@@ -493,16 +493,25 @@ bool svIsDraggingGizmo( SceneView* sv )
     return sv->transformGizmo.selectedMesh != -1;
 }
 
-void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
+void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY, bool allowOnlyHorizontal, bool allowOnlyVertical )
 {
     if (sv->transformGizmo.selectedMesh != -1)
     {
 #if RENDERER_VULKAN
-        const Vec3 delta{ deltaX / 20.0f, -deltaY / 20.0f, 0.0f };
+        Vec3 delta{ deltaX / 20.0f, -deltaY / 20.0f, 0.0f };
 #else
-        const Vec3 delta{ -deltaX / 20.0f, deltaY / 20.0f, 0.0f };
+        Vec3 delta{ -deltaX / 20.0f, deltaY / 20.0f, 0.0f };
 #endif
-        const Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();
+        if (allowOnlyHorizontal)
+        {
+            delta.y = 0;
+        }
+        if (allowOnlyVertical)
+        {
+            delta.x = 0;
+        }
+
+        Vec3 oldPos = sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition();
         sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( oldPos + delta );
 		
         for (unsigned i = 0; i < sv->selectedGameObjects.count; ++i)

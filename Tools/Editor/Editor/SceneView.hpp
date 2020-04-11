@@ -27,7 +27,7 @@ void svLoadScene( SceneView* sceneView, const ae3d::FileSystem::FileContentsData
 void svSaveScene( SceneView* sceneView, char* path );
 void svRotateCamera( SceneView* sceneView, float xDegrees, float yDegrees );
 void svMoveCamera( SceneView* sceneView, const ae3d::Vec3& moveDir );
-void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY );
+void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY, bool allowOnlyHorizontal, bool allowOnlyVertical );
 void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, int height );
 void svHandleLeftMouseUp( SceneView* sv );
 void svMoveSelection( SceneView* sceneView, const ae3d::Vec3& moveDir );

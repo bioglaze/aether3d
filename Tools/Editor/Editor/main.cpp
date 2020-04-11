@@ -112,6 +112,9 @@ int main()
     int deltaY = 0;
     bool isRightMouseDown = false;
     bool isMiddleMouseDown = false;
+    bool isMovementHorizontal = false;
+    bool isMovementVertical = false;
+    bool leftMouseBecameDown = false;
 
     ae3d::GameObject* selectedGO = nullptr;
 
@@ -205,8 +208,24 @@ int main()
                 deltaY = y - lastMouseY;
                 lastMouseX = x;
                 lastMouseY = y;
+
+                if ((deltaX > 4 || deltaY > 4) && leftMouseBecameDown && !isMovementHorizontal && !isMovementVertical)
+                {
+                    if (deltaX > deltaY)
+                    {
+                        isMovementHorizontal = true;
+                        isMovementVertical = false;
+                    }
+                    else
+                    {
+                        isMovementHorizontal = false;
+                        isMovementVertical = true;
+                    }
+                }
+
                 inspector.HandleMouseMotion( x, y );
-                svHandleMouseMotion( sceneView, deltaX, deltaY );
+                svHandleMouseMotion( sceneView, deltaX, deltaY, isMovementHorizontal, isMovementVertical );
+
             }
             else if (event.type == WindowEventType::Mouse1Down)
             {
@@ -220,6 +239,8 @@ int main()
                 {
                     svHandleLeftMouseDown( sceneView, x, y, width, height );
                 }
+
+                leftMouseBecameDown = true;
             }
             else if (event.type == WindowEventType::Mouse1Up)
             {
@@ -239,6 +260,10 @@ int main()
 
                     svHandleLeftMouseUp( sceneView );
                 }
+
+                leftMouseBecameDown = false;
+                isMovementHorizontal = false;
+                isMovementVertical = false;
             }
             else if (event.type == WindowEventType::Mouse2Up)
             {
