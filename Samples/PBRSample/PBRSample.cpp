@@ -220,7 +220,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
     //camera.GetComponent<CameraComponent>()->SetViewport( 0, 0, originalWidth / 2, originalHeight );
     camera.AddComponent<TransformComponent>();
-    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
+    camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -20 }, { 0, 0, 100 }, { 0, 1, 0 } );
     camera.SetName( "camera" );
     
     GameObject camera2d;
@@ -238,9 +238,6 @@ int main()
     Texture2D fontTex;
     fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
-    Texture2D normalTex;
-    normalTex.Load( FileSystem::FileContents( "textures/default_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
-
     Texture2D whiteTex;
     whiteTex.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     
@@ -256,14 +253,14 @@ int main()
     //statsContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
     statsContainer.SetLayer( 2 );
     
-    Mesh cubeMesh;
-    cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
+    Mesh helmetMesh;
+    helmetMesh.Load( FileSystem::FileContents( "DamagedHelmet/DamagedHelmet.ae3d" ) );
 
-    GameObject cube;
-    cube.AddComponent< MeshRendererComponent >();
-    cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube.AddComponent< TransformComponent >();
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 4, -80 } );
+    GameObject helmet;
+    helmet.AddComponent< MeshRendererComponent >();
+    helmet.GetComponent< MeshRendererComponent >()->SetMesh( &helmetMesh );
+    helmet.AddComponent< TransformComponent >();
+    helmet.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -30 } );
 
     Shader shader;
     shader.Load( "unlitVert", "unlitFrag",
@@ -282,20 +279,11 @@ int main()
 	downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
 #endif
     
-    Texture2D gliderTex;
-    gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    Texture2D albedoTex;
+    albedoTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_albedo.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
-    Material material;
-    material.SetShader( &shader );
-    material.SetTexture( &gliderTex, 0 );
-    material.SetBackFaceCulling( true );
-
-    cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-
-    Shader shaderCubeMap;
-    shaderCubeMap.Load( "unlitVert", "unlitFrag",
-                        FileSystem::FileContents( "unlit_cube_vert.obj" ), FileSystem::FileContents( "unlit_cube_frag.obj" ),
-                        FileSystem::FileContents( "unlit_cube_vert.spv" ), FileSystem::FileContents( "unlit_cube_frag.spv" ) );
+    Texture2D normalTex;
+    normalTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_normal.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
 
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
@@ -303,6 +291,17 @@ int main()
     pointLight.AddComponent<TransformComponent>();
     pointLight.GetComponent<TransformComponent>()->SetLocalPosition( { 2, 0, -98 } );
     
+    GameObject dirLight;
+    dirLight.AddComponent<DirectionalLightComponent>();
+#ifdef TEST_SHADOWS_DIR
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
+#else
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
+#endif
+    dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 1, 0.2f, 0.2f ) );
+    dirLight.AddComponent<TransformComponent>();
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
+
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
     
     TextureCube skybox;
@@ -322,14 +321,18 @@ int main()
 
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
-    standardMaterial.SetTexture( &gliderTex, 0 );
+    standardMaterial.SetTexture( &albedoTex, 0 );
+    standardMaterial.SetTexture( &normalTex, 1 );
     standardMaterial.SetTexture( &skybox );
     
+    helmet.GetComponent< MeshRendererComponent >()->SetMaterial( &standardMaterial, 0 );
+
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );
     scene.Add( &statsContainer );
-    //scene.Add( &dirLight );
+    scene.Add( &helmet );
+    scene.Add( &dirLight );
 
     bool quit = false;
     
@@ -346,6 +349,7 @@ int main()
     Vec3 moveDir;
 
     bool reload = false;
+    bool isMouseDown = false;
 
     while (Window::IsOpen() && !quit)
     {
@@ -457,9 +461,13 @@ int main()
                 const int mouseDeltaY = event.mouseY - lastMouseY;
                 lastMouseX = event.mouseX;
                 lastMouseY = event.mouseY;
-                camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
-                camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
-  
+
+                if (isMouseDown)
+                {
+                    camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( mouseDeltaX ) / 20 );
+                    camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
+                }
+
                 int x = event.mouseX;
                 int y = height - event.mouseY + heightDelta;
                 nk_input_motion( &ctx, (int)x, (int)y );
@@ -477,6 +485,14 @@ int main()
                 int y = height - event.mouseY;
 
                 nk_input_button( &ctx, NK_BUTTON_LEFT, x, y, 0 );
+            }
+            else if (event.type == WindowEventType::Mouse2Down)
+            {
+                isMouseDown = true;
+            }
+            else if (event.type == WindowEventType::Mouse2Up)
+            {
+                isMouseDown = false;
             }
         }
 
@@ -498,7 +514,7 @@ int main()
             reload = false;
         }
 
-        static float value = 0.6f;
+        static float f0 = 0.6f;
 
         if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
         {
@@ -525,15 +541,16 @@ int main()
             nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {
                 nk_layout_row_push( &ctx, 60 );
-                nk_label( &ctx, "Roughness:", NK_TEXT_LEFT );
+                nk_label( &ctx, "f0:", NK_TEXT_LEFT );
                 nk_layout_row_push( &ctx, 110 );
-                nk_slider_float( &ctx, 0, &value, 1.0f, 0.1f );
+                nk_slider_float( &ctx, 0, &f0, 1.0f, 0.1f );
             }
             nk_layout_row_end( &ctx );
 
             nk_end( &ctx );
         }
 
+        standardMaterial.SetF0( f0 );
         scene.Render();
         cameraTex.ResolveTo( &resolvedTex );
         System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
