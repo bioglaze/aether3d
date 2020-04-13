@@ -714,9 +714,9 @@ using namespace ae3d;
     //scene.Add( &standardCubeTopCenter );
     //scene.Add( &standardCubeSpotReceiver );
     //scene.Add( &standardCubeTL );
-    scene.Add( &pbrCube );
+    //scene.Add( &pbrCube );
 #endif
-    scene.Add( &bigCube );
+    //scene.Add( &bigCube );
     //scene.Add( &cubePTN2 );
     //scene.Add( &cubePTN );
     //scene.Add( &rtCube );

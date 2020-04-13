@@ -62,13 +62,15 @@ std::string GetSavePath()
     ae3d::Vec3 moveDir;
     ae3d::GameObject* selectedGO;
     bool isCmdDown;
+    bool isMovementHorizontal;
+    bool isMovementVertical;
 }
 
 struct InputEvent
 {
     bool isActive;
     int x, y;
-    int button;
+    int buttonState;
     int key;
     bool isDown;
 };
@@ -94,6 +96,8 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
     myViewController = self;
     isCmdDown = false;
+    isMovementHorizontal = false;
+    isMovementVertical = false;
     
     ae3d::System::InitMetal( _view.device, _view, (int)_view.sampleCount, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
@@ -207,7 +211,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    inputEvent.button = 1;
+    inputEvent.buttonState = 1;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
@@ -215,11 +219,20 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    selectedGO = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
-    inputEvent.button = 0;
+    isMovementVertical = false;
+    isMovementHorizontal = false;
+    
+    inputEvent.buttonState = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
+    
+    const bool clickedOnInspector = inputEvent.x < 300;
+
+    if (!clickedOnInspector)
+    {
+        selectedGO = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+    }
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
@@ -232,14 +245,28 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         svRotateCamera( sceneView, deltaX, deltaY );
     }
     
-    svHandleMouseMotion( sceneView, deltaX, deltaY );
+    if ((deltaX > 4 || deltaY > 4) && inputEvent.isDown && !isMovementHorizontal && !isMovementVertical)
+    {
+        if (deltaX > deltaY)
+        {
+            isMovementHorizontal = true;
+            isMovementVertical = false;
+        }
+        else
+        {
+            isMovementHorizontal = false;
+            isMovementVertical = true;
+        }
+    }
+
+    svHandleMouseMotion( sceneView, deltaX, deltaY, isMovementHorizontal, isMovementVertical );
 }
 
 - (void)_render
 {
     inspector.BeginInput();
     
-    if (inputEvent.button == 1 && inputEvent.isActive)
+    if (inputEvent.buttonState == 1 && inputEvent.isActive)
     {
         const bool clickedOnInspector = inputEvent.x < 300;
 
@@ -254,11 +281,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         }
     }
 
-    if (inputEvent.button == 0 && inputEvent.isActive)
+    if (inputEvent.buttonState == 0 && inputEvent.isActive)
     {
         const bool clickedOnInspector = inputEvent.x < 300;
 
-        if (!clickedOnInspector)
+        if (clickedOnInspector)
         {
             inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
         }
@@ -280,7 +307,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.isActive = false;
     inputEvent.x = 0;
     inputEvent.y = 0;
-    inputEvent.button = -1;
+    inputEvent.buttonState = -1;
     inspector.EndInput();
     
     if (_view.currentRenderPassDescriptor != nil && sceneView != nullptr)
