@@ -127,6 +127,9 @@ int main()
         
         inspector.BeginInput();
 
+        deltaX = 0;
+        deltaY = 0;
+
         while (Window::PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
