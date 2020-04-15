@@ -182,9 +182,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 {
     outCommand = Command::Empty;
 
-    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 500 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 700 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
-        nk_layout_row_static( &ctx, 30, 150, 1 );
+        nk_layout_row_static( &ctx, 40, 200, 1 );
 
         // Gameobject is selected.
 
@@ -199,6 +199,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         CameraComponent* camera = gameObject ? gameObject->GetComponent< CameraComponent >() : nullptr;
         PointLightComponent* pointLight = gameObject ? gameObject->GetComponent< PointLightComponent >() : nullptr;
         SpotLightComponent* spotLight = gameObject ? gameObject->GetComponent< SpotLightComponent >() : nullptr;
+        DirectionalLightComponent* dirLight = gameObject ? gameObject->GetComponent< DirectionalLightComponent >() : nullptr;
 
         if (gameObject != nullptr && transform != nullptr)
         {
@@ -285,6 +286,30 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             float& radius = pointLight->GetRadius();
             nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
+        }
+
+        if (gameObject != nullptr && dirLight == nullptr && nk_button_label( &ctx, "Add directional light" ))
+        {
+            gameObject->AddComponent< DirectionalLightComponent >();
+        }
+        else if (gameObject != nullptr && dirLight != nullptr && nk_button_label( &ctx, "Remove directional light" ))
+        {
+            gameObject->RemoveComponent< DirectionalLightComponent >();
+        }
+
+        if (gameObject != nullptr && dirLight != nullptr)
+        {
+            int shadow = dirLight->CastsShadow();
+            nk_checkbox_label( &ctx, "Casts shadow", &shadow );
+            
+            if (shadow == 1 && !dirLight->CastsShadow())
+            {
+                dirLight->SetCastShadow( true, 1024 );
+            }
+            else if (shadow == 0)
+            {
+                dirLight->SetCastShadow( false, 1024 );
+            }
         }
 
         if (gameObject != nullptr && spotLight == nullptr && nk_button_label( &ctx, "Add spot light" ))
