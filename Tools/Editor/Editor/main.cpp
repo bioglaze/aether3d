@@ -303,14 +303,6 @@ int main()
             {
                 svRotateCamera( sceneView, -float( event.gamePadThumbX ) / 10, float( event.gamePadThumbY ) / 10 );
             }
-            else if (event.type == WindowEventType::GamePadButtonY)
-            {
-                moveDir.y = 0.1f;
-            }
-            else if (event.type == WindowEventType::GamePadButtonA)
-            {
-                moveDir.y = -0.1f;
-            }
         }
 
         inspector.EndInput();
@@ -326,8 +318,8 @@ int main()
 
         if (isMiddleMouseDown)
         {
-            moveDir.x = deltaX / 20.0f;
-            moveDir.y = -deltaY / 20.0f;
+            moveDir.x = -deltaX / 20.0f;
+            moveDir.y = deltaY / 20.0f;
         }
         
         Inspector::Command inspectorCommand;

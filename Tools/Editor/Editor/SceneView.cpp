@@ -502,11 +502,11 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY, bool allowOnlyH
 #else
         Vec3 delta{ -deltaX / 20.0f, deltaY / 20.0f, 0.0f };
 #endif
-        if (allowOnlyHorizontal)
+        if (sv->transformGizmo.selectedMesh != 2)
         {
             delta.y = 0;
         }
-        if (allowOnlyVertical)
+        if (sv->transformGizmo.selectedMesh != 0)
         {
             delta.x = 0;
         }

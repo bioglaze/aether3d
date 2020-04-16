@@ -49,6 +49,7 @@ namespace WindowGlobal
 
     bool isOpen = false;
     bool isGamePadConnected = false;
+    int gamePadIndex = 0;
     HWND hwnd;
     ae3d::KeyCode keyMap[ 256 ];
 }
@@ -229,6 +230,12 @@ void PlatformInitGamePad()
         XINPUT_STATE controllerState;
 
         WindowGlobal::isGamePadConnected = XInputGetState_( 0, &controllerState ) == ERROR_SUCCESS;
+
+        if (!WindowGlobal::isGamePadConnected)
+        {
+            WindowGlobal::isGamePadConnected = XInputGetState_( 1, &controllerState ) == ERROR_SUCCESS;
+            WindowGlobal::gamePadIndex = 1;
+        }
     }
     else
     {
@@ -258,7 +265,7 @@ namespace ae3d
     {
         XINPUT_STATE controllerState;
 
-        if (XInputGetState_( 0, &controllerState ) == ERROR_SUCCESS)
+        if (XInputGetState_( WindowGlobal::gamePadIndex, &controllerState ) == ERROR_SUCCESS)
         {
             XINPUT_GAMEPAD* pad = &controllerState.Gamepad;
 
