@@ -38,6 +38,7 @@ void ae3d::Material::Apply()
         {
             shader->SetTexture( texCubeSlots[ slot ], slot );
         }
+
         if (rtSlots[ slot ])
         {
             shader->SetRenderTexture( rtSlots[ slot ], slot );

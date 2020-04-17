@@ -2028,6 +2028,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
 
     Statistics::IncTriangleCount( endIndex - startIndex );
     Statistics::IncDrawCalls();
+
+    GfxDeviceGlobal::boundViews[ 12 ] = TextureCube::GetDefaultTexture()->GetView();
 }
 
 void ae3d::GfxDevice::GetNewUniformBuffer()

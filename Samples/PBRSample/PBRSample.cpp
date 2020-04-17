@@ -27,6 +27,8 @@
 #include "VR.hpp"
 #include "Window.hpp"
 
+#define TEST_BLOOM
+
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
@@ -555,6 +557,40 @@ int main()
         cameraTex.ResolveTo( &resolvedTex );
         System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         DrawNuklear( &ctx, &cmds, width, height );
+
+#ifdef TEST_BLOOM
+        blurTex.SetLayout( TextureLayout::General );
+        downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+        downsampleAndThresholdShader.SetTexture2D( 11, &blurTex );
+        downsampleAndThresholdShader.Begin();
+        downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+        downsampleAndThresholdShader.End();
+
+        blurTex.SetLayout( TextureLayout::ShaderRead );
+
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 11, &bloomTex );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+
+        blurShader.Begin();
+
+        blurTex.SetLayout( TextureLayout::General );
+        bloomTex.SetLayout( TextureLayout::ShaderRead );
+        blurShader.SetTexture2D( 0, &bloomTex );
+        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+
+        blurTex.SetLayout( TextureLayout::ShaderRead );
+        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+        bloomTex.SetLayout( TextureLayout::General );
+#endif
+
         scene.EndFrame();
         Window::SwapBuffers();
     }

@@ -97,7 +97,7 @@ ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
         
         for (int i = 0; i < 32 * 32 * 4; ++i)
         {
-            imageData[ i + sizeof( TGAHeader ) ] = 0xFF;
+            imageData[ i + sizeof( TGAHeader ) ] = 0x00;
         }
 
         FileSystem::FileContentsData tgaData;
@@ -424,29 +424,6 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
     for (int face = 0; face < 6; ++face)
     {
-        /*VkImageCopy copyRegion = {};
-
-        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        copyRegion.srcSubresource.baseArrayLayer = 0;
-        copyRegion.srcSubresource.mipLevel = 0;
-        copyRegion.srcSubresource.layerCount = 1;
-        copyRegion.srcOffset = { 0, 0, 0 };
-
-        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        copyRegion.dstSubresource.baseArrayLayer = face;
-        copyRegion.dstSubresource.mipLevel = 0;
-        copyRegion.dstSubresource.layerCount = 1;
-        copyRegion.dstOffset = { 0, 0, 0 };
-
-        copyRegion.extent.width = width;
-        copyRegion.extent.height = height;
-        copyRegion.extent.depth = 1;
-
-        vkCmdCopyImage( GfxDeviceGlobal::texCmdBuffer,
-            images[ face ], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            1, &copyRegion );
-        */
         VkBufferImageCopy bufferCopyRegion = {};
         bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         bufferCopyRegion.imageSubresource.mipLevel = 0;

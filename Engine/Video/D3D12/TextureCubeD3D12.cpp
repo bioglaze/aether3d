@@ -67,7 +67,7 @@ ae3d::TextureCube* ae3d::TextureCube::GetDefaultTexture()
         
         for (int i = 0; i < 32 * 32 * 4; ++i)
         {
-            imageData[ i + sizeof( TGAHeader ) ] = 0xFF;
+            imageData[ i + sizeof( TGAHeader ) ] = 0x00;
         }
 
         FileSystem::FileContentsData tgaData;

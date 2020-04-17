@@ -1305,6 +1305,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     Statistics::IncTriangleCount( endFace - startFace );
     Statistics::IncDrawCalls();
+
+    GfxDeviceGlobal::textureCube = TextureCube::GetDefaultTexture();
 }
 
 void ae3d::GfxDevice::Init( int /*width*/, int /*height*/ )

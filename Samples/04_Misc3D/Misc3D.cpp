@@ -467,7 +467,7 @@ int main()
     pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
     //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
-    //pbrMaterial.SetTexture( &skybox, 12 );
+    pbrMaterial.SetTexture( &skybox );
     pbrMaterial.SetBackFaceCulling( true );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
