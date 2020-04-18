@@ -471,9 +471,22 @@ void ae3d::Window::PumpEvents()
                 const xcb_key_press_event_t* e = (xcb_key_press_event_t *)event;
                 const bool isDown = (response_type == XCB_KEY_PRESS);
                 const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
-
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
+
+                if (e->state == 1)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = KeyModifier::Shift;
+                }
+                else if (e->state == 4)
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = KeyModifier::Control;
+                }
+                else
+                {
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = KeyModifier::Empty;
+                }
+
                 const xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = (WindowGlobal::keyMap.find( keysym ) == WindowGlobal::keyMap.end() ) ? ae3d::KeyCode::N : WindowGlobal::keyMap[ keysym ];
                 break;

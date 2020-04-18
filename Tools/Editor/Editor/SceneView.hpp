@@ -17,6 +17,7 @@ struct SceneView;
 void svInit( SceneView** sceneView, int width, int height );
 bool svIsDraggingGizmo( SceneView* sv );
 void svAddGameObject( SceneView* sceneView );
+void svDuplicateGameObject( SceneView* sceneView );
 void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight );
 void svBeginRender( SceneView* sceneView );
 void svEndRender( SceneView* sceneView );
@@ -27,7 +28,7 @@ void svLoadScene( SceneView* sceneView, const ae3d::FileSystem::FileContentsData
 void svSaveScene( SceneView* sceneView, char* path );
 void svRotateCamera( SceneView* sceneView, float xDegrees, float yDegrees );
 void svMoveCamera( SceneView* sceneView, const ae3d::Vec3& moveDir );
-void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY, bool allowOnlyHorizontal, bool allowOnlyVertical );
+void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY );
 void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, int height );
 void svHandleLeftMouseUp( SceneView* sv );
 void svMoveSelection( SceneView* sceneView, const ae3d::Vec3& moveDir );

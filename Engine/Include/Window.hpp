@@ -40,6 +40,12 @@ namespace ae3d
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
         Left, Right, Up, Down, Space, Escape, Enter, Delete, Backspace, Dot, N0, N1, N2, N3, N4, N5, N6, N7, N8, N9, None
     };
+
+    /// Key modifiers.
+    enum class KeyModifier
+    {
+        Empty, Shift, Control
+    };
     
     /// Create flags.
     enum WindowCreateFlags : unsigned
@@ -59,6 +65,8 @@ namespace ae3d
         WindowEventType type = WindowEventType::None;
         /// Key code.
         KeyCode keyCode = KeyCode::None;
+        /// Key modifier.
+        KeyModifier keyModifier = KeyModifier::Empty;
         /// X coordinate in window. Origin: left.
         int mouseX = 0; 
         /// Y coordinate in window. Origin: bottom.

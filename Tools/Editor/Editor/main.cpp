@@ -112,9 +112,6 @@ int main()
     int deltaY = 0;
     bool isRightMouseDown = false;
     bool isMiddleMouseDown = false;
-    bool isMovementHorizontal = false;
-    bool isMovementVertical = false;
-    bool leftMouseBecameDown = false;
 
     ae3d::GameObject* selectedGO = nullptr;
 
@@ -158,7 +155,14 @@ int main()
                     moveDir.x = event.type == WindowEventType::KeyDown ? -velocity : 0;
                     break;
                 case KeyCode::D:
-                    moveDir.x = event.type == WindowEventType::KeyDown ? velocity : 0;
+                    if (event.keyModifier == KeyModifier::Control)
+                    {
+                        svDuplicateGameObject( sceneView );
+                    }
+                    else
+                    {
+                        moveDir.x = event.type == WindowEventType::KeyDown ? velocity : 0;
+                    }
                     break;
                 case KeyCode::W:
                     moveDir.z = event.type == WindowEventType::KeyDown ? -velocity : 0;
@@ -212,23 +216,8 @@ int main()
                 lastMouseX = x;
                 lastMouseY = y;
 
-                if ((deltaX > 4 || deltaY > 4) && leftMouseBecameDown && !isMovementHorizontal && !isMovementVertical)
-                {
-                    if (deltaX > deltaY)
-                    {
-                        isMovementHorizontal = true;
-                        isMovementVertical = false;
-                    }
-                    else
-                    {
-                        isMovementHorizontal = false;
-                        isMovementVertical = true;
-                    }
-                }
-
                 inspector.HandleMouseMotion( x, y );
-                svHandleMouseMotion( sceneView, deltaX, deltaY, isMovementHorizontal, isMovementVertical );
-
+                svHandleMouseMotion( sceneView, deltaX, deltaY );
             }
             else if (event.type == WindowEventType::Mouse1Down)
             {
@@ -242,8 +231,6 @@ int main()
                 {
                     svHandleLeftMouseDown( sceneView, x, y, width, height );
                 }
-
-                leftMouseBecameDown = true;
             }
             else if (event.type == WindowEventType::Mouse1Up)
             {
@@ -263,10 +250,6 @@ int main()
 
                     svHandleLeftMouseUp( sceneView );
                 }
-
-                leftMouseBecameDown = false;
-                isMovementHorizontal = false;
-                isMovementVertical = false;
             }
             else if (event.type == WindowEventType::Mouse2Up)
             {
@@ -318,8 +301,14 @@ int main()
 
         if (isMiddleMouseDown)
         {
+#if _MSC_VER
             moveDir.x = -deltaX / 20.0f;
             moveDir.y = deltaY / 20.0f;
+#else
+            // Tested on Vulkan on Linux, matches Unity.
+            moveDir.x = deltaX / 20.0f;
+            moveDir.y = -deltaY / 20.0f;
+#endif
         }
         
         Inspector::Command inspectorCommand;

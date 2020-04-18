@@ -1922,7 +1922,7 @@ void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
         return;
     }
 
-    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount() / 3, shader, BlendMode::Off, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
+    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount() / 3, shader, BlendMode::Off, DepthFunc::LessOrEqualWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
 }
 
 void ae3d::GfxDevice::SetViewport( int aViewport[ 4 ] )

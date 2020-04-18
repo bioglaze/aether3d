@@ -359,6 +359,25 @@ void svAddGameObject( SceneView* sv )
     sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
 }
 
+void svDuplicateGameObject( SceneView* sv )
+{
+    if (sv->selectedGameObjects[ 0 ])
+    {
+        sv->gameObjects.Add( new GameObject() );
+        sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( "GameObject" );
+        sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< TransformComponent >();
+
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >())
+        {
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< MeshRendererComponent >();
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMesh() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMaterial( 0 ), 0 );
+        }
+        
+        sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
+    }
+}
+
 void svBeginRender( SceneView* sv )
 {
     sv->scene.Render();
@@ -476,6 +495,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
+    ae3d::System::Print("mesh %d\n", sv->transformGizmo.selectedMesh);
 }
 
 void svHandleLeftMouseUp( SceneView* sv )
@@ -493,7 +513,7 @@ bool svIsDraggingGizmo( SceneView* sv )
     return sv->transformGizmo.selectedMesh != -1;
 }
 
-void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY, bool allowOnlyHorizontal, bool allowOnlyVertical )
+void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
     if (sv->transformGizmo.selectedMesh != -1)
     {
@@ -502,11 +522,20 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY, bool allowOnlyH
 #else
         Vec3 delta{ -deltaX / 20.0f, deltaY / 20.0f, 0.0f };
 #endif
-        if (sv->transformGizmo.selectedMesh != 2)
+        //ae3d::System::Print("move. mesh %d\n", sv->transformGizmo.selectedMesh);
+        // Mesh 0 is z, 1 is x, 2 is y.
+
+        if (sv->transformGizmo.selectedMesh == 0)
+        {
+            delta.x = 0;
+            delta.y = 0;
+            delta.z = deltaX / 20.0f;
+        }
+        else if (sv->transformGizmo.selectedMesh == 1)
         {
             delta.y = 0;
         }
-        if (sv->transformGizmo.selectedMesh != 0)
+        else if (sv->transformGizmo.selectedMesh == 2)
         {
             delta.x = 0;
         }
@@ -579,6 +608,10 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     go.AddComponent< TransformComponent >();
     go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
     go.SetName( "EditorGizmo" );
+
+    ae3d::System::Print("mesh 0: %s\n", translateMesh.GetSubMeshName( 0 ) );
+    ae3d::System::Print("mesh 1: %s\n", translateMesh.GetSubMeshName( 1 ) );
+    ae3d::System::Print("mesh 2: %s\n", translateMesh.GetSubMeshName( 2 ) );
 }
 
 void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
