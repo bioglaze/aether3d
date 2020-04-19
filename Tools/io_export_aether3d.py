@@ -19,6 +19,13 @@ import mathutils
 import os
 import sys
 import struct
+from bpy.props import (
+        BoolProperty,
+        FloatProperty,
+        StringProperty,
+        IntProperty,
+        EnumProperty,
+        )
 
 from bpy_extras.io_utils import axis_conversion;
 
@@ -174,6 +181,11 @@ class Aether3DExporter( bpy.types.Operator ):
     aabbMin = [ 99999999.0, 99999999.0, 99999999.0 ]
     aabbMax = [-99999999.0,-99999999.0,-99999999.0 ]
 
+    exportSkeleton: BoolProperty(
+            name="Write Armature",
+            description="Write out armature (bone hierarchy and skin)",
+            default=True,
+            )
 
     def generateAABB( self ):
         for m in self.meshes:
@@ -252,7 +264,7 @@ class Aether3DExporter( bpy.types.Operator ):
                         
     def readMeshes( self, context ):
         """Reads meshes."""
-        
+
         self.meshes = []
         objects = [Object for Object in context.selected_objects if Object.type in ("MESH")]
         object = {}
@@ -262,6 +274,9 @@ class Aether3DExporter( bpy.types.Operator ):
 
         override = self.get_override( 'VIEW_3D', 'WINDOW' )
 
+        # FIXME: This should be read from the export property.
+        exportSkeleton = True
+        
         for obj in objects:
             mesh = Mesh()
             mesh.vertices = []
@@ -276,6 +291,51 @@ class Aether3DExporter( bpy.types.Operator ):
             object[ OBJ.ROT ] = object[ OBJ.MAT ].to_quaternion()
             object[ OBJ.SCA ] = object[ OBJ.MAT ].to_scale()
             object[ OBJ.UVL ] = None
+
+            armatures = [Object for Object in context.selected_objects if Object.type in ("ARMATURE")]
+            global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
+            armOffs = 0
+            bones = []
+            boneNames = []
+            verts = []
+
+            for armature in armatures:
+                for bone in armature.data.bones:
+                    print( "bone " + bone.name )
+                    m = global_matrix @ bone.matrix_local
+                    a = -1
+                
+                    if bone.parent:
+                        for j, p in enumerate( armature.data.bones ):
+                            if p == bone.parent:
+                                a = j + armOffs
+                                break;
+                        pos = global_matrix @ bone.parent.matrix_local
+                        m = pos.inverted() @ m
+                    pos = m.to_translation()
+                    q = m.to_quaternion()
+                    q.normalize()
+                    # n = safestr(b.name)
+                    try:
+                        boneNames.index( n )
+                        print( "bone name not unique: " + bone.name )
+                        break
+                    except:
+                        pass
+
+                    digits = 4
+                    bones.append([ a, uniquelist( boneNames, bone.name ),
+                        uniquelist(verts, [vert(
+                            round( pos[0], digits),
+                            round( pos[1], digits),
+                            round( pos[2], digits), 1.0), 0, -1]),
+                        uniquelist(verts, [vert(
+                            round(q.x, digits),
+                            round(q.y, digits),
+                            round(q.z, digits),
+                            round(q.w, digits)), 0, -2])])
+                armoffs = len( bones )
+                print("armoffs: ", armoffs)
 
             for uvt in obj.data.uv_layers:
                 if uvt.active_render:
@@ -320,54 +380,16 @@ class Aether3DExporter( bpy.types.Operator ):
                     mesh.vertices[ u ].color = c.color
                     u = u + 1
 
+            print( "vertex groups: " + str( len( obj.vertex_groups ) ) )
+            if exportSkeleton and len( obj.vertex_groups ) > 0:
+                vg = obj.vertex_groups
+            else:
+                vg = []
+                
             mesh.generateAABB()
             #mesh.generateTangents()
             self.meshes.append( mesh )
 
-        armatures = [Object for Object in context.selected_objects if Object.type in ("ARMATURE")]
-        global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
-        armOffs = 0
-        bones = []
-        boneNames = []
-        verts = []
-        
-        for armature in armatures:
-            for bone in armature.data.bones:
-                print( "bone " + bone.name )
-                m = global_matrix @ bone.matrix_local
-                a = -1
-                
-                if bone.parent:
-                    for j, p in enumerate( armature.data.bones ):
-                            if p == bone.parent:
-                                a = j + armOffs
-                                break;
-                    pos = global_matrix @ bone.parent.matrix_local
-                    m = pos.inverted() @ m
-                pos = m.to_translation()
-                q = m.to_quaternion()
-                q.normalize()
-                # n = safestr(b.name)
-                try:
-                    boneNames.index( n )
-                    print( "bone name not unique: " + bone.name )
-                    break
-                except:
-                    pass
-
-                digits = 4
-                bones.append([ a, uniquelist( boneNames, bone.name ),
-                        uniquelist(verts, [vert(
-                            round( pos[0], digits),
-                            round( pos[1], digits),
-                            round( pos[2], digits), 1.0), 0, -1]),
-                        uniquelist(verts, [vert(
-                            round(q.x, digits),
-                            round(q.y, digits),
-                            round(q.z, digits),
-                            round(q.w, digits)), 0, -2])])
-            armoffs = len( bones )
-            print("armoffs: ", armoffs)
             
     def writeFile( self, context, FilePath ):
         """Writes selected meshes to .ae3d file."""
