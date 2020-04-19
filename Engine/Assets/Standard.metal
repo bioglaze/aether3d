@@ -248,7 +248,8 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     }
     
 	outColor.rgb = max( outColor.rgb, float3( uniforms.minAmbient, uniforms.minAmbient, uniforms.minAmbient ) );
-
+    outColor.rgb += (float3)cubeReflection.rgb;
+    
 #ifdef DEBUG_LIGHT_COUNT
     const int numLights = GetNumLightsInThisTile( tileIndex, uniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
 

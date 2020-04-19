@@ -90,6 +90,7 @@ namespace GfxDeviceGlobal
     MTLScissorRect scissor;
     unsigned frameIndex = 0;
     ae3d::VertexBuffer uiBuffer;
+    ae3d::VertexBuffer uiBuffer2;
     PerObjectUboStruct perObjectUboStruct;
     id <MTLRenderPipelineState> cachedPSO;
     
@@ -249,7 +250,7 @@ void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int e
 {
     int scissor[ 4 ] = { scX, scY, scWidth, scHeight };
     SetScissor( scissor );
-    Draw( GfxDeviceGlobal::uiBuffer, offset, offset + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
+    Draw( GfxDeviceGlobal::frameIndex % 2 == 0 ? GfxDeviceGlobal::uiBuffer : GfxDeviceGlobal::uiBuffer2, offset, offset + elemCount, renderer.builtinShaders.uiShader, BlendMode::AlphaBlend, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Triangles );
 }
 
 void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** outMappedVertices, void** outMappedIndices )
@@ -257,8 +258,16 @@ void ae3d::GfxDevice::MapUIVertexBuffer( int vertexSize, int indexSize, void** o
     System::Assert( [GfxDeviceGlobal::uiBuffer.GetVertexBuffer() contents] != nullptr, "vertices are null" );
     System::Assert( [GfxDeviceGlobal::uiBuffer.GetIndexBuffer() contents] != nullptr, "indices are null" );
     
-    *outMappedVertices = (void*)[GfxDeviceGlobal::uiBuffer.GetVertexBuffer() contents];
-    *outMappedIndices = (void*)[GfxDeviceGlobal::uiBuffer.GetIndexBuffer() contents];
+    if (GfxDeviceGlobal::frameIndex % 2 == 0)
+    {
+        *outMappedVertices = (void*)[GfxDeviceGlobal::uiBuffer.GetVertexBuffer() contents];
+        *outMappedIndices = (void*)[GfxDeviceGlobal::uiBuffer.GetIndexBuffer() contents];
+    }
+    else
+    {
+        *outMappedVertices = (void*)[GfxDeviceGlobal::uiBuffer2.GetVertexBuffer() contents];
+        *outMappedIndices = (void*)[GfxDeviceGlobal::uiBuffer2.GetIndexBuffer() contents];
+    }
 }
 
 void ae3d::GfxDevice::UnmapUIVertexBuffer()
@@ -377,6 +386,7 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
     Array< VertexBuffer::VertexPTC > vertices( uiVBSize );
     Array< VertexBuffer::Face > faces( uiIBSize );
     GfxDeviceGlobal::uiBuffer.Generate( faces.elements, int( faces.count ), vertices.elements, int( vertices.count ), VertexBuffer::Storage::CPU );
+    GfxDeviceGlobal::uiBuffer2.Generate( faces.elements, int( faces.count ), vertices.elements, int( vertices.count ), VertexBuffer::Storage::CPU );
 
     if (sampleCount == 1)
     {
@@ -657,7 +667,7 @@ void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
         return;
     }
     
-    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount(), shader, BlendMode::Off, DepthFunc::NoneWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
+    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount(), shader, BlendMode::Off, DepthFunc::LessOrEqualWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )
@@ -787,6 +797,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         [renderEncoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:vertexBuffer.GetFaceCount()];
     }
+    
+    textures[ 12 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
+    textures[ 2 ] = Texture2D::GetDefaultTexture()->GetMetalTexture();
 }
 
 void ae3d::GfxDevice::BeginLightCullerGpuQuery()
@@ -816,6 +829,8 @@ void ae3d::GfxDevice::PresentDrawable()
         [commandBuffer presentDrawable:view.currentDrawable];
         [commandBuffer commit];
     }
+    
+    ++GfxDeviceGlobal::frameIndex;
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )

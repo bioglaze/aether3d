@@ -33,7 +33,6 @@ static std::string GetOpenPath( const char* extension )
 
 void GetOpenPath( char* outPath, const char* extension )
 {
-    //static std::string path;
     std::string path = GetOpenPath( extension );
     strcpy( outPath, path.c_str() );
 }
@@ -62,8 +61,6 @@ std::string GetSavePath()
     ae3d::Vec3 moveDir;
     ae3d::GameObject* selectedGO;
     bool isCmdDown;
-    bool isMovementHorizontal;
-    bool isMovementVertical;
 }
 
 struct InputEvent
@@ -96,8 +93,6 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
     myViewController = self;
     isCmdDown = false;
-    isMovementHorizontal = false;
-    isMovementVertical = false;
     
     ae3d::System::InitMetal( _view.device, _view, (int)_view.sampleCount, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
     ae3d::System::LoadBuiltinAssets();
@@ -219,9 +214,6 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    isMovementVertical = false;
-    isMovementHorizontal = false;
-    
     inputEvent.buttonState = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
@@ -245,21 +237,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         svRotateCamera( sceneView, deltaX, deltaY );
     }
     
-    if ((deltaX > 4 || deltaY > 4) && inputEvent.isDown && !isMovementHorizontal && !isMovementVertical)
-    {
-        if (deltaX > deltaY)
-        {
-            isMovementHorizontal = true;
-            isMovementVertical = false;
-        }
-        else
-        {
-            isMovementHorizontal = false;
-            isMovementVertical = true;
-        }
-    }
-
-    svHandleMouseMotion( sceneView, deltaX, deltaY, isMovementHorizontal, isMovementVertical );
+    svHandleMouseMotion( sceneView, deltaX, deltaY );
 }
 
 - (void)_render
