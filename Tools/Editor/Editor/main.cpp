@@ -328,32 +328,10 @@ int main()
             break;
         case Inspector::Command::OpenScene:
         {
-#if _MSC_VER
-            OPENFILENAME ofn = {};
-            TCHAR szFile[ 260 ] = {};
-
-            ofn.lStructSize = sizeof( ofn );
-            ofn.hwndOwner = GetActiveWindow();
-            ofn.lpstrFile = szFile;
-            ofn.nMaxFile = sizeof( szFile );
-            ofn.lpstrFilter = "Scene\0*.SCENE\0All\0*.*\0";
-            ofn.nFilterIndex = 1;
-            ofn.lpstrFileTitle = nullptr;
-            ofn.nMaxFileTitle = 0;
-            ofn.lpstrInitialDir = nullptr;
-            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-            if (GetOpenFileName( &ofn ) != FALSE)
-            {
-                auto contents = FileSystem::FileContents( ofn.lpstrFile );
-                svLoadScene( sceneView, contents );
-            }
-#else
             char path[ 1024 ] = {};
             GetOpenPath( path, "scene" );
             auto contents = FileSystem::FileContents( path );
             svLoadScene( sceneView, contents );
-#endif
         }
         break;
         case Inspector::Command::SaveScene:

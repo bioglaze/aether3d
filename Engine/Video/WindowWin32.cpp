@@ -134,6 +134,20 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyUp;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
+
+            if ((GetKeyState( VK_CONTROL ) & 0x8000) != 0)
+            {
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = ae3d::KeyModifier::Control;
+            }
+            if ((GetKeyState( VK_SHIFT ) & 0x8000) != 0)
+            {
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = ae3d::KeyModifier::Shift;
+            }
+            if ((GetKeyState( VK_MENU ) & 0x8000) != 0) // alt
+            {
+                //WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = ae3d::KeyModifier::A;
+            }
+
             break;
 
         case WM_KEYDOWN:
@@ -143,6 +157,19 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyDown;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
+            
+            if ((GetKeyState( VK_CONTROL ) & 0x8000) != 0)
+            {
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = ae3d::KeyModifier::Control;
+            }
+            if ((GetKeyState( VK_SHIFT ) & 0x8000) != 0)
+            {
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = ae3d::KeyModifier::Shift;
+            }
+            if ((GetKeyState( VK_MENU ) & 0x8000) != 0) // alt
+            {
+                //WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = ae3d::KeyModifier::A;
+            }
         }
         break;
         case WM_SYSCOMMAND:
