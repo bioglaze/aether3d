@@ -443,7 +443,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
         }
 
         const Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
-        System::Print("screenX: %d, screenY: %d, screenPoint: %f, %f\n", screenX, screenY, screenPoint.x, screenPoint.y);
+        //System::Print("screenX: %d, screenY: %d, screenPoint: %f, %f\n", screenX, screenY, screenPoint.x, screenPoint.y);
         
         if (goTransform && screenX > screenPoint.x - texWidth / 2 && screenX < screenPoint.x + texWidth / 2 &&
                          screenY > screenPoint.y - texHeight / 2 && screenY < screenPoint.y + texHeight / 2)
@@ -495,7 +495,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
-    ae3d::System::Print("mesh %d\n", sv->transformGizmo.selectedMesh);
+    ae3d::System::Print("gizmo mesh %d\n", sv->transformGizmo.selectedMesh);
 }
 
 void svHandleLeftMouseUp( SceneView* sv )
@@ -608,10 +608,6 @@ void TransformGizmo::Init( Shader* shader, GameObject& go )
     go.AddComponent< TransformComponent >();
     go.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 10, -50 } );
     go.SetName( "EditorGizmo" );
-
-    ae3d::System::Print("mesh 0: %s\n", translateMesh.GetSubMeshName( 0 ) );
-    ae3d::System::Print("mesh 1: %s\n", translateMesh.GetSubMeshName( 1 ) );
-    ae3d::System::Print("mesh 2: %s\n", translateMesh.GetSubMeshName( 2 ) );
 }
 
 void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )

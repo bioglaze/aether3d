@@ -223,11 +223,14 @@ int main()
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
-                inspector.HandleLeftMouseClick( x, y, 1 );
 
                 const bool clickedOnInspector = x < 300;
 
-                if (!clickedOnInspector)
+                if (clickedOnInspector)
+                {
+                    inspector.HandleLeftMouseClick( x, y, 1 );
+                }
+                else
                 {
                     svHandleLeftMouseDown( sceneView, x, y, width, height );
                 }
@@ -237,11 +240,14 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
 
-                inspector.HandleLeftMouseClick( x, y, 0 );
 
                 const bool clickedOnInspector = x < 300;
 
-                if (!clickedOnInspector)
+                if (clickedOnInspector)
+                {
+                    inspector.HandleLeftMouseClick( x, y, 0 );
+                }
+                else
                 {
                     if (!svIsDraggingGizmo( sceneView ))
                     {
