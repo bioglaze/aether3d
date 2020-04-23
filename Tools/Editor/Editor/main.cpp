@@ -240,6 +240,7 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
 
+                svHandleLeftMouseUp( sceneView );
 
                 const bool clickedOnInspector = x < 300;
 

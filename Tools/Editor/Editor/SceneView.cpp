@@ -442,11 +442,12 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
             continue;
         }
 
-        const Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
-        //System::Print("screenX: %d, screenY: %d, screenPoint: %f, %f\n", screenX, screenY, screenPoint.x, screenPoint.y);
-        
-        if (goTransform && screenX > screenPoint.x - texWidth / 2 && screenX < screenPoint.x + texWidth / 2 &&
-                         screenY > screenPoint.y - texHeight / 2 && screenY < screenPoint.y + texHeight / 2)
+        Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
+        System::Print("screenX: %d, screenY: %d, sprite screenPoint: %f, %f, yMin: %.2f, yMax: %.2f\n", screenX, screenY, screenPoint.x, screenPoint.y * 2, screenPoint.y * 2, screenPoint.y * 2 + texHeight );
+        screenPoint.y -= 47/2;
+
+        if (goTransform && screenX > screenPoint.x && screenX < screenPoint.x + texWidth &&
+            screenY > screenPoint.y * 2 && screenY < screenPoint.y * 2 + texHeight*1)
         {
             System::Print("Hit game object sprite\n");
             sv->scene.Add( sv->gameObjects[ 0 ] );
@@ -495,7 +496,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
-    ae3d::System::Print("gizmo mesh %d\n", sv->transformGizmo.selectedMesh);
+    //ae3d::System::Print("gizmo mesh %d\n", sv->transformGizmo.selectedMesh);
 }
 
 void svHandleLeftMouseUp( SceneView* sv )
@@ -674,6 +675,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             float x = (int)screenPoint.x * screenScale;
             float y = (int)screenPoint.y * screenScale;
 #endif
+            printf( "draw: %.2f, %.2f to %.2f, %.2f\n", x, y, x + texWidth, y + texHeight );
             ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
