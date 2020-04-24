@@ -281,11 +281,18 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     if (inputEvent.key == 26) inspector.HandleChar( 55 ); // 7
     if (inputEvent.key == 28) inspector.HandleChar( 56 ); // 8
     if (inputEvent.key == 25) inspector.HandleChar( 57 ); // 9
-
+    if (inputEvent.key == 51)
+    {
+        svDeleteGameObject( sceneView );
+        selectedGO = nullptr;
+    }
+    
+    //printf("key: %d\n", inputEvent.key);
     inputEvent.isActive = false;
     inputEvent.x = 0;
     inputEvent.y = 0;
     inputEvent.buttonState = -1;
+    inputEvent.key = 0;
     inspector.EndInput();
     
     if (_view.currentRenderPassDescriptor != nil && sceneView != nullptr)

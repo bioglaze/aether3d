@@ -444,10 +444,15 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 
         Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
         System::Print("screenX: %d, screenY: %d, sprite screenPoint: %f, %f, yMin: %.2f, yMax: %.2f\n", screenX, screenY, screenPoint.x, screenPoint.y * 2, screenPoint.y * 2, screenPoint.y * 2 + texHeight );
-        screenPoint.y -= 47/2;
+#if RENDERER_VULKAN
+        float s = 1;
+        screenPoint.y -= 47 / 2;
+#else
+        float s = 2;
+#endif
 
-        if (goTransform && screenX > screenPoint.x && screenX < screenPoint.x + texWidth &&
-            screenY > screenPoint.y * 2 && screenY < screenPoint.y * 2 + texHeight*1)
+        if (goTransform && screenX > screenPoint.x && screenX < screenPoint.x + texWidth / s &&
+            screenY * s > screenPoint.y * 2 && screenY * s < screenPoint.y * 2 + texHeight)
         {
             System::Print("Hit game object sprite\n");
             sv->scene.Add( sv->gameObjects[ 0 ] );
@@ -675,7 +680,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             float x = (int)screenPoint.x * screenScale;
             float y = (int)screenPoint.y * screenScale;
 #endif
-            printf( "draw: %.2f, %.2f to %.2f, %.2f\n", x, y, x + texWidth, y + texHeight );
+            //printf( "draw: %.2f, %.2f to %.2f, %.2f\n", x, y, x + texWidth, y + texHeight );
             ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
         }
