@@ -107,16 +107,18 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     return YES;
 }
 
-- (void)flagsChanged:(NSEvent *)theEvent
+/*- (void)flagsChanged:(NSEvent *)theEvent
 {
-    isCmdDown = [theEvent keyCode] == 55;
-}
+    isCmdDown = [theEvent keyCode] == 55 && !isCmdDown;
+    printf("flags changed: %d.\n", isCmdDown);
+}*/
 
 - (void)keyDown:(NSEvent *)theEvent
 {
+    isCmdDown = [theEvent modifierFlags] & NSEventModifierFlagCommand;
+    
     inputEvent.key = [theEvent keyCode];
     inputEvent.isDown = true;
-    ae3d::System::Print("keyDown: %d\n", inputEvent.key);
     const float velocity = 0.3f;
     
     // Keycodes from: https://forums.macrumors.com/threads/nsevent-keycode-list.780577/
@@ -126,7 +128,14 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     }
     else if ([theEvent keyCode] == 0x02) // D
     {
-        moveDir.x = velocity;
+        if (isCmdDown)
+        {
+            svDuplicateGameObject( sceneView );
+        }
+        else
+        {
+            moveDir.x = velocity;
+        }
     }
     else if ([theEvent keyCode] == 0x0D) // W
     {
@@ -171,10 +180,18 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     {
         moveDir.y = velocity;
     }
+    else if ([theEvent keyCode] == 51 && isCmdDown) // Cmd+backspace
+    {
+        svDeleteGameObject( sceneView );
+        selectedGO = nullptr;
+        isCmdDown = false;
+    }
 }
 
 - (void)keyUp:(NSEvent *)theEvent
 {
+    isCmdDown = false;
+    
     inputEvent.key = [theEvent keyCode];
     inputEvent.isDown = false;
     
@@ -223,21 +240,33 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
     if (!clickedOnInspector)
     {
-        selectedGO = svSelectObject( sceneView, (int)theEvent.locationInWindow.x, (int)self.view.bounds.size.height - (int)theEvent.locationInWindow.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+        selectedGO = svSelectObject( sceneView, inputEvent.x, inputEvent.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
     }
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-    const float deltaX = -float( theEvent.deltaX ) / 20;
-    const float deltaY = -float( theEvent.deltaY ) / 20;
+    const float deltaX = -float( theEvent.deltaX ) / 10;
+    const float deltaY = -float( theEvent.deltaY ) / 10;
+
+    const bool clickedOnInspector = (int)theEvent.locationInWindow.x < (300 / 2);
+
+    if (clickedOnInspector)
+    {
+        return;
+    }
     
     if (!svIsTransformGizmoSelected( sceneView ))
     {
         svRotateCamera( sceneView, deltaX, deltaY );
     }
-    
+
     svHandleMouseMotion( sceneView, deltaX, deltaY );
+}
+
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+    printf("move %d, %d\n", (int)theEvent.locationInWindow.x, (int)theEvent.locationInWindow.y);
 }
 
 - (void)_render
@@ -250,12 +279,12 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
         if (clickedOnInspector)
         {
-            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
+            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
             inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
         }
         else
         {
-            svHandleLeftMouseDown( sceneView, inputEvent.x * 2, inputEvent.y * 2, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+            svHandleLeftMouseDown( sceneView, inputEvent.x, inputEvent.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
         }
     }
 
@@ -265,12 +294,13 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
         if (clickedOnInspector)
         {
-            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
+            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
         }
     }
-    
-    if (inputEvent.key == (int)ae3d::KeyCode::Backspace) inspector.HandleKey( 6, inputEvent.isDown ? 0 : 1 );
-    if (inputEvent.key == (int)ae3d::KeyCode::Dot) inspector.HandleKey( 6, inputEvent.isDown ? 0 : 1 );
+    printf("inputEvent.key: %d\n", inputEvent.key);
+    if (inputEvent.key == 51 /* backspace*/) inspector.HandleKey( 6, inputEvent.isDown ? 0 : 1 );
+    if (inputEvent.key == 36 /* Enter */) inspector.HandleKey( 4, inputEvent.isDown ? 0 : 1 );
+    if (inputEvent.key == 47) inspector.HandleChar( '.' ); // dot
     if (inputEvent.key == 29) inspector.HandleChar( 48 ); // 0
     if (inputEvent.key == 18) inspector.HandleChar( 49 ); // 1
     if (inputEvent.key == 19) inspector.HandleChar( 50 ); // 2
@@ -281,19 +311,15 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     if (inputEvent.key == 26) inspector.HandleChar( 55 ); // 7
     if (inputEvent.key == 28) inspector.HandleChar( 56 ); // 8
     if (inputEvent.key == 25) inspector.HandleChar( 57 ); // 9
-    if (inputEvent.key == 51)
-    {
-        svDeleteGameObject( sceneView );
-        selectedGO = nullptr;
-    }
     
-    //printf("key: %d\n", inputEvent.key);
     inputEvent.isActive = false;
     inputEvent.x = 0;
     inputEvent.y = 0;
     inputEvent.buttonState = -1;
     inputEvent.key = 0;
     inspector.EndInput();
+    
+    svUpdate( sceneView );
     
     if (_view.currentRenderPassDescriptor != nil && sceneView != nullptr)
     {

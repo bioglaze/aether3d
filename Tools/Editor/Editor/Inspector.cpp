@@ -117,7 +117,11 @@ static void DrawNuklear( int width, int height )
 #endif
                         (int)(cmd->clip_rect.w),
                         (int)(cmd->clip_rect.h),
+#if RENDERER_VULKAN
                         cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
+#else
+        cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height * 2 );
+#endif
 
         offset += cmd->elem_count / 3;
     }
@@ -132,7 +136,11 @@ void Inspector::Init()
 
     int atlasWidth = 0;
     int atlasHeight = 0;
+#if RENDERER_VULKAN
     nk_font* nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
+#else
+    nk_font* nkFont = nk_font_atlas_add_default( &atlas, 21.0f, nullptr );
+#endif
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
 #if RENDERER_VULKAN
@@ -182,9 +190,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 {
     outCommand = Command::Empty;
 
-    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 700 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
-        nk_layout_row_static( &ctx, 40, 200, 1 );
+        nk_layout_row_static( &ctx, 40, 250, 1 );
 
         // Gameobject is selected.
 

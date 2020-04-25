@@ -373,7 +373,7 @@ void svDuplicateGameObject( SceneView* sv )
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMesh() );
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMaterial( 0 ), 0 );
         }
-        
+
         sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
     }
 }
@@ -443,7 +443,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
         }
 
         Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
-        System::Print("screenX: %d, screenY: %d, sprite screenPoint: %f, %f, yMin: %.2f, yMax: %.2f\n", screenX, screenY, screenPoint.x, screenPoint.y * 2, screenPoint.y * 2, screenPoint.y * 2 + texHeight );
+        //System::Print("screenX: %d, screenY: %d, sprite screenPoint: %f, %f, yMin: %.2f, yMax: %.2f\n", screenX, screenY, screenPoint.x, screenPoint.y * 2, screenPoint.y * 2, screenPoint.y * 2 + texHeight );
 #if RENDERER_VULKAN
         float s = 1;
         screenPoint.y -= 47 / 2;
@@ -501,7 +501,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
-    //ae3d::System::Print("gizmo mesh %d\n", sv->transformGizmo.selectedMesh);
+    ae3d::System::Print("collision count: %d, gizmo mesh %d\n", ci.count, sv->transformGizmo.selectedMesh);
 }
 
 void svHandleLeftMouseUp( SceneView* sv )
