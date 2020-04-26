@@ -11,6 +11,7 @@ extern NSViewController* myViewController;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     [[ [myViewController view] window ] makeFirstResponder:myViewController];
+    [[ [myViewController view] window ] setAcceptsMouseMovedEvents:YES];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
