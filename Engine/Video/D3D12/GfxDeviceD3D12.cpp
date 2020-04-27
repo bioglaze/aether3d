@@ -1196,7 +1196,15 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
 	const UINT incrementSize = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 	cpuHandle.ptr += incrementSize;
-    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
+    
+    if (GfxDeviceGlobal::textureCube != TextureCube::GetDefaultTexture())
+    {
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::textureCube->GetGpuResource()->resource, GfxDeviceGlobal::textureCube->GetSRVDesc(), cpuHandle );
+    }
+    else
+    {
+        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
+    }
 
     cpuHandle.ptr += incrementSize;
 
@@ -1264,8 +1272,16 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav1, nullptr, &GfxDeviceGlobal::uav1Desc, cpuHandle );
 
-    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(),
-    GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
+    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = {};
+
+    if (GfxDeviceGlobal::textureCube != TextureCube::GetDefaultTexture())
+    {
+        samplerHandle = GetSampler( GfxDeviceGlobal::textureCube->GetMipmaps(), GfxDeviceGlobal::textureCube->GetWrap(), GfxDeviceGlobal::textureCube->GetFilter(), GfxDeviceGlobal::textureCube->GetAnisotropy() );
+    }
+    else
+    {
+        samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(), GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
+    }
 
     ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );

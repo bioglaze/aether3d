@@ -136,11 +136,7 @@ void Inspector::Init()
 
     int atlasWidth = 0;
     int atlasHeight = 0;
-#if RENDERER_VULKAN
-    nk_font* nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
-#else
     nk_font* nkFont = nk_font_atlas_add_default( &atlas, 21.0f, nullptr );
-#endif
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
 #if RENDERER_VULKAN
