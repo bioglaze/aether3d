@@ -236,7 +236,7 @@ int main()
     GameObject rotatingCube;
     rotatingCube.AddComponent< MeshRendererComponent >();
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    rotatingCube.GetComponent< MeshRendererComponent >()->EnableBoundingBoxDrawing( true );
+    //rotatingCube.GetComponent< MeshRendererComponent >()->EnableBoundingBoxDrawing( true );
     rotatingCube.AddComponent< TransformComponent >();
     rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( { -2, 0, -108 } );
     rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 1 );
@@ -435,7 +435,7 @@ int main()
     skybox.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
+                 TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
     /*const char* path = "test_dxt1.dds";
     skybox.Load( FileSystem::FileContents( path ), FileSystem::FileContents( path ),
         FileSystem::FileContents( path ), FileSystem::FileContents( path ),
@@ -551,7 +551,7 @@ int main()
     {
 #ifdef TEST_FORWARD_PLUS
         mat.second->SetShader( &standardShader );
-        //mat.second->SetTexture( &skybox, 12 );
+        mat.second->SetTexture( &skybox );
 #else
         mat.second->SetShader( &shader );
 #endif
@@ -639,7 +639,7 @@ int main()
     scene.Add( &animatedGo );
     scene.Add( &cubePTN );
     scene.Add( &cubeTangent );
-    //scene.Add( &childCube );
+    scene.Add( &childCube );
     //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
 
@@ -660,7 +660,7 @@ int main()
     scene.Add( &renderTextureContainer );
     scene.Add( &rtCamera );
 #endif
-    //scene.Add( &transCube1 );
+    scene.Add( &transCube1 );
 
     const int cubeCount = 10;
     GameObject cubes[ cubeCount ];
@@ -946,7 +946,12 @@ int main()
         downsampleAndThresholdShader.SetSRV( 2, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
         downsampleAndThresholdShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
+
+#ifdef TEST_MSAA
+        downsampleAndThresholdShader.SetRenderTexture( 0, &resolvedTex );
+#else
         downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+#endif
         downsampleAndThresholdShader.SetTexture2D( 11, &blurTex );
 #endif
         downsampleAndThresholdShader.Begin();
