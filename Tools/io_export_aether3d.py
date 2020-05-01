@@ -89,77 +89,6 @@ class Mesh:
                 self.aabbMax[2] = v.co[2]
 
 
-    def generateTangents( self ):
-        # Face tangents.
-        faceTangents = []
-        faceBitangents = []
-
-        for f in range( int( len( self.faces ) ) ):
-            uv1 = self.vertices[ self.faces[ f ][ 0 ] ].uv
-            uv2 = self.vertices[ self.faces[ f ][ 1 ] ].uv
-            uv3 = self.vertices[ self.faces[ f ][ 2 ] ].uv
-
-            deltaU1 = uv2[ 0 ] - uv1[ 0 ]
-            deltaU2 = uv3[ 0 ] - uv1[ 0 ]
-
-            deltaV1 = uv2[ 1 ] - uv1[ 1 ]
-            deltaV2 = uv3[ 1 ] - uv1[ 1 ]
-
-            area = deltaU1 * deltaV2 - deltaV1 * deltaU2;
-
-            pos1 = self.vertices[ self.faces[ f ][ 0 ] ].co
-            pos2 = self.vertices[ self.faces[ f ][ 1 ] ].co
-            pos3 = self.vertices[ self.faces[ f ][ 2 ] ].co
-
-            deltaPos1 = pos2 - pos1
-            deltaPos2 = pos3 - pos1
-
-            tangent = mathutils.Vector( [ 1.0, 0.0, 0.0, 0.0 ])
-            bitangent = mathutils.Vector( [ 0.0, 1.0, 0.0, 0.0 ])
-
-            if abs( area ) > 0.0001:
-                tangent   = (deltaPos1 * deltaV2 - deltaPos2 * deltaV1) / area;
-                bitangent = (deltaPos2 * deltaU1 - deltaPos1 * deltaU2) / area;
-                tangent = mathutils.Vector( [ tangent.x, tangent.y, tangent.z, 0.0 ] )
-                bitangent = mathutils.Vector( [ bitangent.x, bitangent.y, bitangent.z, 0.0 ] )
-
-            faceTangents.append( tangent )
-            faceBitangents.append( bitangent )
-
-        # Vertex tangents are averages of face tangents.
-
-        for v in range( int( len( self.vertices ) ) ): 
-            self.vertices[ v ].tangent = mathutils.Vector( [ 0.0, 0.0, 0.0, 0.0 ] )
-
-        for v in range( int( len( self.vertices ) ) ): 
-            tangent = mathutils.Vector( [ 0.0, 0.0, 0.0, 0.0 ] )
-            bitangent = mathutils.Vector( [ 0.0, 0.0, 0.0, 0.0 ] )
-
-            for f in range( int( len( self.faces ) ) ):
-                if self.faces[ f ][ 0 ] == v or self.faces[ f ][ 1 ] == v or self.faces[ f ][ 2 ] == v:
-                    tangent += faceTangents[ f ]
-                    bitangent += faceBitangents[ f ]
-
-            self.vertices[ v ].tangent = tangent
-            self.vertices[ v ].bitangent = bitangent
-
-        for v in range( int( len( self.vertices ) ) ): 
-            normal = self.vertices[ v ].normal.copy()
-            normal3 = mathutils.Vector( [ normal.x, normal.y, normal.z ] )
-
-            tangent = self.vertices[ v ].tangent.copy()
-            tangent3 = mathutils.Vector( [ tangent.x, tangent.y, tangent.z ] )
-            
-            # Gram-Schmidt orthonormalization.
-            tangent3 -= normal3 * normal3.dot( tangent3 )
-            self.vertices[ v ].tangent = mathutils.Vector( [ tangent3.x, tangent3.y, tangent3.z, 0.0 ])
-            self.vertices[ v ].tangent.normalize()
-
-            # Handedness.
-            cp = normal3.cross( tangent3 )
-            self.vertices[ v ].tangent[ 3 ] = 1.0 if cp.dot( self.vertices[v].bitangent ) >= 0.0 else -1.0;
-
-
 # object data dictionary keys
 class OBJ:
     MAT = 'm'  # possibly scaled object matrix
@@ -387,7 +316,6 @@ class Aether3DExporter( bpy.types.Operator ):
                 vg = []
                 
             mesh.generateAABB()
-            #mesh.generateTangents()
             self.meshes.append( mesh )
 
             
