@@ -169,7 +169,7 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* loc
         Build();
     }
     
-    for (auto& drawable : drawables)
+    for (const auto& drawable : drawables)
     {
         renderer.builtinShaders.spriteRendererShader.Use();
         GfxDeviceGlobal::perObjectUboStruct.localToClip.InitFrom( localToClip );
@@ -177,11 +177,11 @@ void RenderQueue::Render( ae3d::GfxDevice::BlendMode blendMode, const float* loc
 
         if (drawable.texture->IsRenderTexture())
         {
-            renderer.builtinShaders.spriteRendererShader.SetRenderTexture( static_cast< ae3d::RenderTexture* >(drawable.texture), 0 );
+            renderer.builtinShaders.spriteRendererShader.SetRenderTexture( static_cast< ae3d::RenderTexture* >( drawable.texture ), 0 );
         }
         else
         {
-            renderer.builtinShaders.spriteRendererShader.SetTexture( static_cast< ae3d::Texture2D* >(drawable.texture), 0 );
+            renderer.builtinShaders.spriteRendererShader.SetTexture( static_cast< ae3d::Texture2D* >( drawable.texture ), 0 );
         }
         
         ae3d::GfxDevice::Draw( vertexBuffer, drawable.bufferStart, drawable.bufferEnd, renderer.builtinShaders.spriteRendererShader, blendMode,

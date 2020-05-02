@@ -89,7 +89,8 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
         Matrix44::TransformPoint( aabbWorld[ v ], localToWorld, &aabbWorld[ v ] );
     }
     
-    Vec3 aabbMinWorld, aabbMaxWorld;
+    Vec3 aabbMinWorld;
+    Vec3 aabbMaxWorld;
     MathUtil::GetMinMax( aabbWorld, 8, aabbMinWorld, aabbMaxWorld );
     
     if (!cameraFrustum.BoxInFrustum( aabbMinWorld, aabbMaxWorld ))

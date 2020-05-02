@@ -21,7 +21,7 @@ void ae3d::FileWatcher::AddFile( const std::string& path, void(*updateFunc)(cons
         localtime_s( &timeinfo, &inode.st_mtime );
         tm* timeinfo2 = &timeinfo;
 #else
-        tm* timeinfo2 = std::localtime( &inode.st_mtime );
+        const tm* timeinfo2 = std::localtime( &inode.st_mtime );
 #endif
         pathToEntry[ path ].hour = timeinfo2->tm_hour;
         pathToEntry[ path ].minute = timeinfo2->tm_min;
@@ -42,7 +42,7 @@ void ae3d::FileWatcher::Poll()
             localtime_s( &timeinfo, &inode.st_mtime );
             tm* timeinfo2 = &timeinfo;
 #else
-            tm* timeinfo2 = std::localtime( &inode.st_mtime );
+            const tm* timeinfo2 = std::localtime( &inode.st_mtime );
 #endif
 
             if (timeinfo2->tm_hour != entry.second.hour || timeinfo2->tm_min != entry.second.minute || timeinfo2->tm_sec != entry.second.second)

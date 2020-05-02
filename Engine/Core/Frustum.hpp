@@ -96,9 +96,12 @@ private:
     
     Vec3 nearCenter; // Near clipping plane center coordinate.
     Vec3 farCenter;  // Far clipping plane center coordinate.
-    float zNear, zFar; // The same as in gluPerspective()
-    float nearWidth, nearHeight;
-    float farWidth, farHeight;
+    float zNear;
+    float zFar;
+    float nearWidth;
+    float nearHeight;
+    float farWidth;
+    float farHeight;
     
     /**
      3 points define a plane. The frustum has 6 planes.

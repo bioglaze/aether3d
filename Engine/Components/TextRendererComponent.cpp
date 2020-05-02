@@ -146,7 +146,7 @@ void ae3d::TextRendererComponent::SetShader( ShaderType aShaderType )
     m().shader = aShaderType == ShaderType::Sprite ? &renderer.builtinShaders.spriteRendererShader : &renderer.builtinShaders.sdfShader;
 }
 
-std::string GetSerialized( ae3d::TextRendererComponent* component )
+std::string GetSerialized( const ae3d::TextRendererComponent* component )
 {
     std::stringstream outStream;
     std::locale c_locale( "C" );

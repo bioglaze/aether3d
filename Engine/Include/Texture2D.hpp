@@ -58,7 +58,6 @@ namespace ae3d
         VkImageView& GetView() { return view; }
         VkImage& GetImage() { return image; }
         void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, VkImageUsageFlags usageFlags );
-        VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
 #else
         /// \param imageData Raw pixel data
         /// \param width Width in pixels
@@ -90,6 +89,7 @@ namespace ae3d
         VkImage image = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
         VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_GENERAL;
 #endif
     };
 }

@@ -228,9 +228,13 @@ class Aether3DExporter( bpy.types.Operator ):
             boneNames = []
             verts = []
 
+            mesh.jointCount = 0
+            mesh.boneNames = []
+            
             for armature in armatures:
                 for bone in armature.data.bones:
                     print( "bone " + bone.name )
+                    mesh.boneNames.append( bone.name )
                     m = global_matrix @ bone.matrix_local
                     a = -1
                 
@@ -264,6 +268,7 @@ class Aether3DExporter( bpy.types.Operator ):
                             round(q.z, digits),
                             round(q.w, digits)), 0, -2])])
                 armoffs = len( bones )
+                mesh.jointCount = armoffs
                 print("armoffs: ", armoffs)
 
             for uvt in obj.data.uv_layers:
@@ -440,7 +445,19 @@ class Aether3DExporter( bpy.types.Operator ):
                 f.write( component )
                 component = struct.pack( 'H', i[2] )
                 f.write( component )
-                
+
+            # Writes # of joints.
+            # nJoints = struct.pack( 'H', mesh.jointCount )
+            #nJoints = struct.pack( 'H', 0 )
+            #print( "writing file. Joints: " + str( nJoints ) )
+            #f.write( nJoints )
+
+            # Writes joints.
+            #for i in nJoints:
+            #    print( "writing joint name " + mesh.boneNames[ i ]  )
+                #component = struct.pack( 'H', i[0] )
+                #f.write( component )
+
         # Terminator
         terminator = 100
         o = struct.pack( 'b', int( terminator ) )

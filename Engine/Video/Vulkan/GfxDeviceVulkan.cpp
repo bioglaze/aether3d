@@ -161,7 +161,7 @@ namespace ae3d
                 str += "mem alloc calls: " + std::to_string( ::Statistics::GetAllocCalls() ) + " (frame), " + std::to_string( ::Statistics::GetTotalAllocCalls() ) + " (total)\n";
                 str += "triangles: " + std::to_string( ::Statistics::GetTriangleCount() ) + "\n";
 
-				std::strcpy( outStr, str.c_str() );
+				std::strncpy( outStr, str.c_str(), 512 );
             }
         }
     }

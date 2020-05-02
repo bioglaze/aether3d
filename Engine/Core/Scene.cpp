@@ -35,13 +35,13 @@ extern Renderer renderer;
 float GetVRFov();
 void BeginOffscreen();
 void EndOffscreen();
-std::string GetSerialized( ae3d::TextRendererComponent* component );
+std::string GetSerialized( const ae3d::TextRendererComponent* component );
 std::string GetSerialized( ae3d::CameraComponent* component );
 std::string GetSerialized( ae3d::AudioSourceComponent* component );
 std::string GetSerialized( ae3d::MeshRendererComponent* component );
-std::string GetSerialized( ae3d::DirectionalLightComponent* component );
+std::string GetSerialized( const ae3d::DirectionalLightComponent* component );
 std::string GetSerialized( ae3d::PointLightComponent* component );
-std::string GetSerialized( ae3d::SpotLightComponent* component );
+std::string GetSerialized( const ae3d::SpotLightComponent* component );
 std::string GetSerialized( ae3d::TransformComponent* component );
 
 namespace GfxDeviceGlobal

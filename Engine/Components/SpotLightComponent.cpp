@@ -47,14 +47,14 @@ void ae3d::SpotLightComponent::SetConeAngle( float degrees )
     }
 }
 
-std::string GetSerialized( ae3d::SpotLightComponent* component )
+std::string GetSerialized( const ae3d::SpotLightComponent* component )
 {
     std::string outStr = "spotlight\nshadow ";
-    outStr += std::to_string( (component->CastsShadow() ? 1 : 0) );
+    outStr += std::to_string( component->CastsShadow() ? 1 : 0 );
     outStr += "\nconeAngle ";
     outStr += std::to_string( component->GetConeAngle() );
     outStr += "\nenabled ";
-    outStr += std::to_string( (component->IsEnabled() ? 1 : 0) );
+    outStr += std::to_string( component->IsEnabled() ? 1 : 0 );
     outStr += "\nradius ";
     outStr += std::to_string( component->GetRadius() );
     outStr += "\ncolor ";
