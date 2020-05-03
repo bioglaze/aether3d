@@ -230,12 +230,14 @@ class Aether3DExporter( bpy.types.Operator ):
 
             mesh.jointCount = 0
             mesh.boneNames = []
+            mesh.invBindPoseMatrices = []
             
             for armature in armatures:
                 for bone in armature.data.bones:
                     print( "bone " + bone.name )
                     mesh.boneNames.append( bone.name )
                     m = global_matrix @ bone.matrix_local
+                    mesh.invBindPoseMatrices.append( m )
                     a = -1
                 
                     if bone.parent:
@@ -447,16 +449,26 @@ class Aether3DExporter( bpy.types.Operator ):
                 f.write( component )
 
             # Writes # of joints.
-            # nJoints = struct.pack( 'H', mesh.jointCount )
-            #nJoints = struct.pack( 'H', 0 )
-            #print( "writing file. Joints: " + str( nJoints ) )
-            #f.write( nJoints )
+            nJoints = struct.pack( 'H', mesh.jointCount )
+            f.write( nJoints )
 
             # Writes joints.
-            #for i in nJoints:
-            #    print( "writing joint name " + mesh.boneNames[ i ]  )
-                #component = struct.pack( 'H', i[0] )
-                #f.write( component )
+            for i in range( 0, mesh.jointCount ):
+                # TODO write bind pose inverse matrix
+
+                parentIndex = struct.pack( 'i', 0 )
+                f.write( parentIndex )
+                
+                # Writes joint name length.
+                jointNameLength = struct.pack( 'i', len( mesh.boneNames[ i ] ) )
+                f.write( jointNameLength )
+
+                # Writes name.
+                f.write( mesh.boneNames[ i ].encode() )
+
+                # Writes animation length
+                nAnim = struct.pack( 'i', 0 )
+                f.write( nAnim )
 
         # Terminator
         terminator = 100
