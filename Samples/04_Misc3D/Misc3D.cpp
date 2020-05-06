@@ -36,7 +36,7 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
@@ -990,8 +990,13 @@ int main()
         blurShader.End();
 
         blurTex.SetLayout( TextureLayout::ShaderRead );
+#if RENDERER_D3D12
+        System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &blurTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+#else
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+#endif
         bloomTex.SetLayout( TextureLayout::General );
 #endif
         scene.EndFrame();
