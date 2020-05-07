@@ -1,6 +1,14 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "Window.hpp"
+#define NOMINMAX
+#define NODRAWTEXT
+#define NOGDI
+#define NOBITMAP
+#define NOMCX
+#define NOHELP
+#define NOSERVICE
+#define NOKANJI
 #include <Windows.h>
 #include <xinput.h>
 #include "GfxDevice.hpp"
