@@ -14,6 +14,7 @@ struct PS_INPUT
     float3 tangentVS : TANGENT;
     float3 bitangentVS : BINORMAL;
     float3 normalVS : NORMAL;
+    float4 projCoord : TEXCOORD2;
 };
 
 layout( set = 0, binding = 1 ) Texture2D tex : register(t0);
@@ -21,11 +22,13 @@ layout( set = 0, binding = 2 ) SamplerState sLinear : register(s0);
 layout( set = 0, binding = 3 ) Buffer<float4> pointLightBufferCenterAndRadius : register(t1);
 layout( set = 0, binding = 4 ) RWBuffer<uint> perTileLightIndexBuffer : register(u1);
 layout( set = 0, binding = 5 ) Texture2D normalTex : register(t5);
+layout( set = 0, binding = 6 ) SamplerState sampler1 : register(s1);
 layout( set = 0, binding = 7 ) Buffer<float4> pointLightColors : register(t2);
 layout( set = 0, binding = 8 ) Buffer<float4> spotLightBufferCenterAndRadius : register(t3);
 layout( set = 0, binding = 9 ) Buffer<float4> spotLightParams : register(t4);
 layout( set = 0, binding = 10 ) Buffer<float4> spotLightColors : register(t6);
 layout( set = 0, binding = 12 ) TextureCube<float4> texCube : register(t7); 
+//layout( set = 0, binding = 5 ) Texture2D<float4> _ShadowMap : register(t1);
 
 #define TILE_RES 16
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
@@ -103,6 +106,25 @@ float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
     float factor = distanceSquare * lightInvRadius * lightInvRadius;
     float smoothFactor = max( 1.0f - factor * factor, 0.0f );
     return (smoothFactor * smoothFactor) / max( distanceSquare, 1e-4 );
+}
+
+float linstep( float low, float high, float v )
+{
+    return saturate( (v - low) / (high - low) );
+}
+
+float VSM( float depth, float4 projCoord )
+{
+    // TODO: Replace with shadow
+    float2 moments = normalTex.SampleLevel( sampler1, projCoord.xy / projCoord.w, 0 ).rg;
+
+    float variance = max( moments.y - moments.x * moments.x, -0.001f );
+
+    float delta = depth - moments.x;
+    float p = smoothstep( depth - 0.02f, depth, moments.x );
+    float pMax = linstep( minAmbient, 1.0f, variance / (variance + delta * delta) );
+
+    return saturate( max( p, pMax ) );
 }
 
 float4 main( PS_INPUT input ) : SV_Target
@@ -217,6 +239,16 @@ float4 main( PS_INPUT input ) : SV_Target
     
     accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
     accumDiffuseAndSpecular.rgb += texCube.Sample( sLinear, N ).rgb;
+
+    float depth = input.projCoord.z / input.projCoord.w;
+
+    if (lightType == 2)
+    {
+        depth = depth * 0.5f + 0.5f;
+    }
+
+    float shadow = max( 0.2f, VSM( depth, input.projCoord ) );
+    //accumDiffuseAndSpecular.rgb *= shadow;
 
     //return float4(accumDiffuseAndSpecular, 1 );
 #ifdef DEBUG_LIGHT_COUNT

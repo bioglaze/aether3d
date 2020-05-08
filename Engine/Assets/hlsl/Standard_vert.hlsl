@@ -23,6 +23,7 @@ struct PS_INPUT
     float3 tangentVS : TANGENT;
     float3 bitangentVS : BINORMAL;
     float3 normalVS : NORMAL;
+    float4 projCoord : TEXCOORD2;
 };
 
 PS_INPUT main( VS_INPUT input )
