@@ -454,7 +454,16 @@ class Aether3DExporter( bpy.types.Operator ):
 
             # Writes joints.
             for i in range( 0, mesh.jointCount ):
-                # TODO write bind pose inverse matrix
+                # TODO verify that this is the correct matrix by comparing with FBX converter.
+                for j in range( 0, 4 ):
+                    component = struct.pack( 'f', mesh.invBindPoseMatrices[ i ][ j ][ 0 ] )
+                    f.write( component )
+                    component = struct.pack( 'f', mesh.invBindPoseMatrices[ i ][ j ][ 1 ] )
+                    f.write( component )
+                    component = struct.pack( 'f', mesh.invBindPoseMatrices[ i ][ j ][ 2 ] )
+                    f.write( component )
+                    component = struct.pack( 'f', mesh.invBindPoseMatrices[ i ][ j ][ 3 ] )
+                    f.write( component )
 
                 parentIndex = struct.pack( 'i', 0 )
                 f.write( parentIndex )
@@ -470,6 +479,8 @@ class Aether3DExporter( bpy.types.Operator ):
                 nAnim = struct.pack( 'i', 0 )
                 f.write( nAnim )
 
+                # TODO write animation transforms.
+                
         # Terminator
         terminator = 100
         o = struct.pack( 'b', int( terminator ) )
