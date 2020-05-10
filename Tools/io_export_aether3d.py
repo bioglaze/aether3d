@@ -237,7 +237,6 @@ class Aether3DExporter( bpy.types.Operator ):
                     print( "bone " + bone.name )
                     mesh.boneNames.append( bone.name )
                     m = global_matrix @ bone.matrix_local
-                    mesh.invBindPoseMatrices.append( m )
                     a = -1
                 
                     if bone.parent:
@@ -250,6 +249,8 @@ class Aether3DExporter( bpy.types.Operator ):
                     pos = m.to_translation()
                     q = m.to_quaternion()
                     q.normalize()
+                    mesh.invBindPoseMatrices.append( m )
+
                     # n = safestr(b.name)
                     try:
                         boneNames.index( n )
@@ -324,6 +325,21 @@ class Aether3DExporter( bpy.types.Operator ):
                 
             mesh.generateAABB()
             self.meshes.append( mesh )
+
+        orig_frame = context.scene.frame_current
+        #mpf = 1000.0/use_fps # msec per frame
+        acts = []
+        if len(context.scene.timeline_markers) > 0:
+            print( "has animation, markers " + str( len(context.scene.timeline_markers ) ))
+        else:
+            print( "frame_start: " + str( context.scene.frame_start ) + ", " + str( context.scene.frame_end ) )
+            nf = context.scene.frame_end - context.scene.frame_start
+        for a in acts:
+            lf = 0
+            frames = []
+            lastpose = []
+            #for b in bones:
+            #    lastpose.append( [b[2], b[3] ])
 
             
     def writeFile( self, context, FilePath ):
@@ -454,6 +470,12 @@ class Aether3DExporter( bpy.types.Operator ):
 
             # Writes joints.
             for i in range( 0, mesh.jointCount ):
+                print( "bind pose for joint " + str( i ) )
+                print( str( mesh.invBindPoseMatrices[ i ][ 0 ] ) )
+                print( str( mesh.invBindPoseMatrices[ i ][ 1 ] ) )
+                print( str( mesh.invBindPoseMatrices[ i ][ 2 ] ) )
+                print( str( mesh.invBindPoseMatrices[ i ][ 3 ] ) )
+                
                 # TODO verify that this is the correct matrix by comparing with FBX converter.
                 for j in range( 0, 4 ):
                     component = struct.pack( 'f', mesh.invBindPoseMatrices[ i ][ j ][ 0 ] )
