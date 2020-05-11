@@ -174,6 +174,11 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     }
 }
 
+void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
+{
+    SetSRV( slot, texture->GetGpuResource()->resource, *texture->GetSRVDesc() );
+}
+
 void ae3d::ComputeShader::SetRenderTexture( unsigned slot, RenderTexture* renderTexture )
 {
     if (slot < SLOT_COUNT)

@@ -37,7 +37,7 @@
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -104,6 +104,12 @@ int main()
         originalWidth = width;
         originalHeight = height;
     }
+
+#ifdef RENDERER_D3D12
+    int postHeight = originalHeight;
+#else
+    int postHeight = height;
+#endif
 
     Window::SetTitle( "Misc3D" );
     VR::Init();
@@ -920,21 +926,18 @@ int main()
 #else
         if (reload)
         {
-            System::Print("reloading\n");
+            System::Print( "reloading\n" );
             System::ReloadChangedAssets();
             reload = false;
         }
         scene.Render();
-#if RENDERER_D3D12
-        System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &camera2dTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
-#elif defined( TEST_MSAA )
+#if defined( TEST_MSAA ) && defined( RENDERER_VULKAN )
         cameraTex.ResolveTo( &resolvedTex );
         System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         //System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 #else
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 #endif
 #ifdef TEST_BLOOM
         blurTex.SetLayout( TextureLayout::General );
@@ -960,13 +963,13 @@ int main()
 
         blurTex.SetLayout( TextureLayout::ShaderRead );
 
+        blurShader.SetTexture2D( 0, &blurTex );
+
 #if RENDERER_D3D12
-        blurShader.SetSRV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() );
         blurShader.SetSRV( 1, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
         blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
         blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
 #else
-        blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 11, &bloomTex );
 #endif
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
@@ -978,11 +981,11 @@ int main()
 
         blurTex.SetLayout( TextureLayout::General );
         bloomTex.SetLayout( TextureLayout::ShaderRead );
+        blurShader.SetTexture2D( 0, &bloomTex );
+
 #if RENDERER_D3D12
-        blurShader.SetSRV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetSRVDesc() );
         blurShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
-        blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 11, &blurTex );
 #endif
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
@@ -990,13 +993,8 @@ int main()
         blurShader.End();
 
         blurTex.SetLayout( TextureLayout::ShaderRead );
-#if RENDERER_D3D12
-        System::Draw( &cameraTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &blurTex, 0, 0, width, originalHeight, width, originalHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
-#else
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
-#endif
+        System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
         bloomTex.SetLayout( TextureLayout::General );
 #endif
         scene.EndFrame();

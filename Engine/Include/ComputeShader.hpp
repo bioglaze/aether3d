@@ -93,6 +93,7 @@ namespace ae3d
         void SetRenderTexture( unsigned slot, class RenderTexture* renderTexture );
         
 #if RENDERER_D3D12
+        void SetTexture2D( unsigned slot, Texture2D* texture );
         void SetCBV( unsigned slot, ID3D12Resource* buffer );
         void SetSRV( unsigned slot, ID3D12Resource* buffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
         void SetUAV( unsigned slot, ID3D12Resource* buffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc );
