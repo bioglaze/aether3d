@@ -1275,7 +1275,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav1, nullptr, &GfxDeviceGlobal::uav1Desc, cpuHandle );
 
-    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = {};
+    D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle;
 
     if (GfxDeviceGlobal::textureCube != TextureCube::GetDefaultTexture())
     {

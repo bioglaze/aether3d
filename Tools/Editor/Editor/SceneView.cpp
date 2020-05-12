@@ -451,7 +451,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
         float s = 2;
 #endif
 
-        if (goTransform && screenX > screenPoint.x && screenX < screenPoint.x + texWidth / s &&
+        if (screenX > screenPoint.x && screenX < screenPoint.x + texWidth / s &&
             screenY * s > screenPoint.y * 2 && screenY * s < screenPoint.y * 2 + texHeight)
         {
             System::Print("Hit game object sprite\n");

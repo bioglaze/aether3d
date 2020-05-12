@@ -27,7 +27,7 @@
 #include "VR.hpp"
 #include "Window.hpp"
 
-#define TEST_BLOOM
+//#define TEST_BLOOM
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
