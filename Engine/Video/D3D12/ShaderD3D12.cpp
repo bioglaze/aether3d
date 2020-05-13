@@ -328,6 +328,6 @@ void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* texture, int textureUn
 
     if (texture != nullptr)
     {
-        TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
+        TransitionResource( *texture->GetGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
     }
 }

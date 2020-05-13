@@ -16,7 +16,7 @@ namespace ae3d
 
     enum class TextureLayout
     {
-        General, ShaderRead
+        General, ShaderRead, ShaderReadWrite
     };
         
     /// 2D texture.

@@ -110,7 +110,7 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subRes
             UpdateSubresources( GfxDeviceGlobal::graphicsCommandList, gpuResource.resource, uploadBuffer, 0, 0, subResourceCount, subResources );
         }
 
-        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE );
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
 
         hr = GfxDeviceGlobal::graphicsCommandList->Close();
         AE3D_CHECK_D3D( hr, "command list close in InitializeTexture" );
@@ -120,9 +120,16 @@ void InitializeTexture( GpuResource& gpuResource, D3D12_SUBRESOURCE_DATA* subRes
     }
 }
 
-void ae3d::Texture2D::SetLayout( ae3d::TextureLayout /* layout */ )
+void ae3d::Texture2D::SetLayout( ae3d::TextureLayout layout )
 {
-
+    if (layout == TextureLayout::ShaderRead)
+    {
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
+    }
+    else if (layout == TextureLayout::ShaderReadWrite)
+    {
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS );
+    }
 }
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
