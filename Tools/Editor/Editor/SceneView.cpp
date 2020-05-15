@@ -361,7 +361,7 @@ void svAddGameObject( SceneView* sv )
 
 void svDuplicateGameObject( SceneView* sv )
 {
-    if (sv->selectedGameObjects[ 0 ])
+    if (sv->selectedGameObjects.count > 0 && sv->selectedGameObjects[ 0 ])
     {
         sv->gameObjects.Add( new GameObject() );
         sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( "GameObject" );
