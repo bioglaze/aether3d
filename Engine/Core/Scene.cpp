@@ -675,6 +675,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         auto transform = gameObject->GetComponent< TransformComponent >();
         auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
         auto dirLight = gameObject->GetComponent< DirectionalLightComponent >();
+        auto spotLight = gameObject->GetComponent< SpotLightComponent >();
         
         if (dirLight)
         {
@@ -692,7 +693,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
                 GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Dir;
             }
         }
-        else
+        else if (spotLight)
         {
             GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
         }
