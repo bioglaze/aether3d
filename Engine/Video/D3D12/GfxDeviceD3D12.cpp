@@ -1524,6 +1524,14 @@ void ae3d::GfxDevice::Present()
     {
         if (hr == DXGI_ERROR_DEVICE_REMOVED)
         {
+            ID3D12DeviceRemovedExtendedData* dred = nullptr;
+            hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &dred ) );
+            D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT dredAutoBreadcrumbsOutput;
+            D3D12_DRED_PAGE_FAULT_OUTPUT dredPageFaultOutput;
+            hr = dred->GetAutoBreadcrumbsOutput( &dredAutoBreadcrumbsOutput );
+            hr = dred->GetPageFaultAllocationOutput( &dredPageFaultOutput );
+            System::Print( "DRED output: Command list: %s, command queue: %s\n", dredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode->pCommandListDebugNameA, dredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode->pCommandQueueDebugNameA );
+
             ae3d::System::Assert( false, "Present failed. Reason: device removed." );
         }
         else if (hr == DXGI_ERROR_DEVICE_RESET)
