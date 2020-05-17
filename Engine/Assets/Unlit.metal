@@ -17,7 +17,7 @@ struct ColorInOut
     half4  color;
 };
 
-constexpr sampler shadowSampler( coord::normalized, address::clamp_to_zero, filter::linear );
+constexpr sampler shadowSampler( coord::normalized, address::clamp_to_zero, filter::linear, mip_filter::linear );
 
 float linstep( float low, float high, float v )
 {
@@ -78,7 +78,7 @@ fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
         depth = depth * 0.5f + 0.5f;
     }
     
-    float shadow = max( 0.2f, VSM( _ShadowMap, in.projCoord, depth ) );
+    float shadow = uniforms.lightType == 0 ? 1.0f : max( 0.2f, VSM( _ShadowMap, in.projCoord, depth ) );
     
     return sampledColor * float4( shadow, shadow, shadow, 1 );
 }
