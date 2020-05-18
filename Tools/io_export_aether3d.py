@@ -333,15 +333,59 @@ class Aether3DExporter( bpy.types.Operator ):
             print( "has animation, markers " + str( len(context.scene.timeline_markers ) ))
         else:
             print( "frame_start: " + str( context.scene.frame_start ) + ", " + str( context.scene.frame_end ) )
+            acts.append( ["Anim", context.scene.frame_start, context.scene.frame_end] )
             nf = context.scene.frame_end - context.scene.frame_start
+            
         for a in acts:
             lf = 0
             frames = []
             lastpose = []
-            #for b in bones:
-            #    lastpose.append( [b[2], b[3] ])
+            for b in bones:
+                lastpose.append( [b[ 2 ], b[ 3 ] ])
+            for frame in range( a[ 1 ], a[ 2 ] + 1 ):
+                context.scene.frame_set( frame, subframe = 0.0 )
+                changed = []
+                for ob_main in objects:
+                    if ob_main.type != "ARMATURE":
+                        continue
+                    for i, b in enumerate( ob_main.pose.bones ):
+                        print("exporting bone for frame " + str( frame ))
+                        m = global_matrix @ b.matrix
+                        if b.parent:
+                            p = global_matrix @ b.parent.matrix
+                            m = p.inverted() @ m
+                            p = m.to_translation()
+                            q = m.to_quaternion()
+                            q.normalize()
 
-            
+                            pos = uniquelist( verts, [vert(
+                                round( p[ 0] , digits ),
+                                round( p[ 1 ], digits ),
+                                round( p[ 2 ], digits ), 1.0 ), 0, -1 ] )
+                            ori = uniquelist( verts, [vert(
+                                round( q.x, digits ),
+                                round( q.y, digits ),
+                                round( q.z, digits ),
+                                round( q.w, digits ) ), 0, -2] )
+                            if lastpose[ i ][ 0 ] != pos or lastpose[ i ][ 1 ] != ori:
+                                changed.append( [i, pos, ori] )
+                                lastpose[ i ][ 0 ] = pos
+                                lastpose[ i ][ 1 ] = ori
+                    # do we have changed bones on this frame?
+                    if len( changed ) > 0:
+                        if len( frames ) < 1:
+                            a[ 1 ] = frame
+                        frames.append( [int( (frame - a[ 1 ]) * mpf ), changed] )
+                        lf = frame
+                        if len( changed ) > fi_m:
+                            fi_m = len( changed )
+                # if the action has at least one frame, save it
+                print( "frames: " + str( len( frames ) ) )
+                if len( frames ) > 0:
+                    actions.append( [uniquelist( strs, safestr( a[0]) ), int((lf-a[1]+1) * mpf), frames] )
+            context.scene.frame_set( orig_frame, subframe=0.0 )
+
+                            
     def writeFile( self, context, FilePath ):
         """Writes selected meshes to .ae3d file."""
 
