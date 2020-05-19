@@ -392,6 +392,7 @@ void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+    Statistics::IncQueueSubmitCalls();
 
     // FIXME: This is slow
     vkDeviceWaitIdle( GfxDeviceGlobal::device );

@@ -2153,6 +2153,7 @@ void ae3d::GfxDevice::Present()
 
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+    Statistics::IncQueueSubmitCalls();
 #endif
 
     SubmitPrePresentBarrier();
