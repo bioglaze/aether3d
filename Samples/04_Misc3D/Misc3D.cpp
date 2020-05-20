@@ -36,8 +36,8 @@
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
-#define TEST_BLOOM
+#define TEST_FORWARD_PLUS
+//#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 

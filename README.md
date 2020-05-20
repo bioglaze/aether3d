@@ -9,6 +9,7 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 ![Screenshot](/Engine/Assets/sample.jpg)
+![Screenshot](/Engine/Assets/editor.jpg)
 
 # Features
 

@@ -221,22 +221,31 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             gameObject->AddComponent< MeshRendererComponent >();
         }
-        else if (gameObject != nullptr && meshRenderer != nullptr && nk_button_label( &ctx, "Remove mesh renderer" ))
+        else if (gameObject != nullptr && meshRenderer != nullptr)
         {
-            gameObject->RemoveComponent< MeshRendererComponent >();
-        }
-
-        if (gameObject != nullptr && meshRenderer != nullptr && nk_button_label( &ctx, "Set mesh" ))
-        {
-            Mesh* mesh = new Mesh;
-            char path[ 1024 ] = {};
-            GetOpenPath( path, "ae3d" );
-
-            if (strlen(path) > 0)
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Mesh Renderer", NK_MAXIMIZED ))
             {
-                mesh->Load( FileSystem::FileContents( path ) );
-                gameObject->GetComponent< MeshRendererComponent >()->SetMesh( mesh );
-                gameObject->GetComponent< MeshRendererComponent >()->SetMaterial( material, 0 );
+
+                if (nk_button_label( &ctx, "Remove mesh renderer" ))
+                {
+                    gameObject->RemoveComponent< MeshRendererComponent >();
+                }
+
+                if (nk_button_label( &ctx, "Set mesh" ))
+                {
+                    Mesh* mesh = new Mesh;
+                    char path[ 1024 ] = {};
+                    GetOpenPath( path, "ae3d" );
+
+                    if (strlen( path ) > 0)
+                    {
+                        mesh->Load( FileSystem::FileContents( path ) );
+                        gameObject->GetComponent< MeshRendererComponent >()->SetMesh( mesh );
+                        gameObject->GetComponent< MeshRendererComponent >()->SetMaterial( material, 0 );
+                    }
+                }
+
+                nk_tree_pop( &ctx );
             }
         }
 
@@ -244,22 +253,24 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             gameObject->AddComponent< AudioSourceComponent >();
         }
-        else if (gameObject != nullptr && audioSource != nullptr && nk_button_label( &ctx, "Remove audio source" ))
+        else if (gameObject != nullptr && audioSource != nullptr)
         {
-            gameObject->RemoveComponent< AudioSourceComponent >();
-            audioSource = nullptr;
-        }
-
-        if (gameObject != nullptr && audioSource != nullptr && gameObject->GetComponent< AudioSourceComponent >()->GetClipId() == 0 && nk_button_label( &ctx, "Set audio clip" ))
-        {
-            char path[ 1024 ] = {};
-            GetOpenPath( path, "wav" );
-            
-            if (path[ 0 ] != '\0')
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Audio Source", NK_MAXIMIZED ))
             {
-                AudioClip* audioClip = new AudioClip;
-                audioClip->Load( FileSystem::FileContents( path ) );
-                gameObject->GetComponent< AudioSourceComponent >()->SetClipId( audioClip->GetId() );
+                if (gameObject->GetComponent< AudioSourceComponent >()->GetClipId() == 0 && nk_button_label( &ctx, "Set audio clip" ))
+                {
+                    char path[ 1024 ] = {};
+                    GetOpenPath( path, "wav" );
+
+                    if (path[ 0 ] != '\0')
+                    {
+                        AudioClip* audioClip = new AudioClip;
+                        audioClip->Load( FileSystem::FileContents( path ) );
+                        gameObject->GetComponent< AudioSourceComponent >()->SetClipId( audioClip->GetId() );
+                    }
+                }
+
+                nk_tree_pop( &ctx );
             }
         }
 
@@ -281,15 +292,21 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             gameObject->AddComponent< PointLightComponent >();
         }
-        else if (gameObject != nullptr && pointLight != nullptr && nk_button_label( &ctx, "Remove point light" ))
-        {
-            gameObject->RemoveComponent< PointLightComponent >();
-        }
 
         if (gameObject != nullptr && pointLight != nullptr)
         {
-            float& radius = pointLight->GetRadius();
-            nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Point Light", NK_MAXIMIZED ))
+            {
+                if (nk_button_label( &ctx, "Remove point light" ))
+                {
+                    gameObject->RemoveComponent< PointLightComponent >();
+                }
+
+                float& radius = pointLight->GetRadius();
+                nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
+
+                nk_tree_pop( &ctx );
+            }
         }
 
         if (gameObject != nullptr && dirLight == nullptr && nk_button_label( &ctx, "Add directional light" ))
