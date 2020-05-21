@@ -195,7 +195,7 @@ class Aether3DExporter( bpy.types.Operator ):
         """Reads meshes."""
 
         self.meshes = []
-        objects = [Object for Object in context.selected_objects if Object.type in ("MESH")]
+        objects = [Object for Object in context.selected_objects if Object.type in ("MESH", "ARMATURE")]
         object = {}
         
         if len( objects ) == 0:
@@ -205,8 +205,13 @@ class Aether3DExporter( bpy.types.Operator ):
 
         # FIXME: This should be read from the export property.
         exportSkeleton = True
+        actions = []
         
         for obj in objects:
+            print( "obj type: " + obj.type )
+            if obj.type == "ARMATURE":
+                continue
+            
             mesh = Mesh()
             mesh.vertices = []
             mesh.faces = []
@@ -340,12 +345,15 @@ class Aether3DExporter( bpy.types.Operator ):
             lf = 0
             frames = []
             lastpose = []
+            fi_m = 0
+            
             for b in bones:
                 lastpose.append( [b[ 2 ], b[ 3 ] ])
             for frame in range( a[ 1 ], a[ 2 ] + 1 ):
                 context.scene.frame_set( frame, subframe = 0.0 )
                 changed = []
                 for ob_main in objects:
+                    print( "ob_main.type: " + ob_main.type )
                     if ob_main.type != "ARMATURE":
                         continue
                     for i, b in enumerate( ob_main.pose.bones ):
@@ -375,6 +383,7 @@ class Aether3DExporter( bpy.types.Operator ):
                     if len( changed ) > 0:
                         if len( frames ) < 1:
                             a[ 1 ] = frame
+                        mpf = 1000.0 / 24
                         frames.append( [int( (frame - a[ 1 ]) * mpf ), changed] )
                         lf = frame
                         if len( changed ) > fi_m:
@@ -382,7 +391,7 @@ class Aether3DExporter( bpy.types.Operator ):
                 # if the action has at least one frame, save it
                 print( "frames: " + str( len( frames ) ) )
                 if len( frames ) > 0:
-                    actions.append( [uniquelist( strs, safestr( a[0]) ), int((lf-a[1]+1) * mpf), frames] )
+                    actions.append( [uniquelist( boneNames, a[ 0 ] ), int(( lf - a[ 1 ] + 1) * mpf), frames] )
             context.scene.frame_set( orig_frame, subframe=0.0 )
 
                             
