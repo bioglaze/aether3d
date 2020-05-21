@@ -233,6 +233,7 @@ int main()
                 else
                 {
                     svHandleLeftMouseDown( sceneView, x, y, width, height );
+                    selectedGO = nullptr;
                 }
             }
             else if (event.type == WindowEventType::Mouse1Up)

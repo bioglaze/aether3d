@@ -502,6 +502,11 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
     ae3d::System::Print("collision count: %d, gizmo mesh %d\n", ci.count, sv->transformGizmo.selectedMesh);
+
+    if (!isGizmo)
+    {
+        sv->selectedGameObjects.Allocate( 0 );
+    }
 }
 
 void svHandleLeftMouseUp( SceneView* sv )
