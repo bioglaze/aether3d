@@ -36,3 +36,4 @@ ae3d::GameObject* svSelectObject( SceneView* sceneView, int screenX, int screenY
 void svDeleteGameObject( SceneView* sceneView );
 void svFocusOnSelected( SceneView* sceneView );
 void svUpdate( SceneView* sceneView );
+void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int height );

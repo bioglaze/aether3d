@@ -233,6 +233,7 @@ int main()
                 else
                 {
                     svHandleLeftMouseDown( sceneView, x, y, width, height );
+                    
                     selectedGO = nullptr;
                 }
             }
@@ -297,6 +298,7 @@ int main()
         }
 
         inspector.EndInput();
+        svHighlightGizmo( sceneView, x, y, width, height );
 
         if (isRightMouseDown && event.type == WindowEventType::MouseMove)
         {

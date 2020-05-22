@@ -57,6 +57,7 @@ struct SceneView
     Matrix44 lineProjection;
     int lineHandle = 0;
     int selectedGOIndex = 0;
+    Material highlightMaterial;
 
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
@@ -295,6 +296,10 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
     (*sv)->material.SetBackFaceCulling( true );
 
+    (*sv)->highlightMaterial.SetShader( &(*sv)->unlitShader );
+    (*sv)->highlightMaterial.SetTexture( &(*sv)->lightTex, 0 );
+    (*sv)->highlightMaterial.SetBackFaceCulling( true );
+
     (*sv)->cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
     (*sv)->gameObjects.Add( new GameObject() );
@@ -493,6 +498,41 @@ void svUpdate( SceneView* sceneView )
     }
 }
 
+void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int height )
+{
+    Array< CollisionInfo > ci;
+
+    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
+
+    const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
+    const int selected = isGizmo ? ci[ 0 ].subMeshIndex : -1;
+
+    if (selected == 0)
+    {
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.xAxisMaterial, 1 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.yAxisMaterial, 2 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->highlightMaterial, 0 );
+    }
+    else if (selected == 1)
+    {
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->highlightMaterial, 1 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.yAxisMaterial, 2 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.zAxisMaterial, 0 );
+    }
+    else if (selected == 2)
+    {
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.xAxisMaterial, 1 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->highlightMaterial, 2 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.zAxisMaterial, 0 );
+    }
+    else
+    {
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.xAxisMaterial, 1 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.yAxisMaterial, 2 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.zAxisMaterial, 0 );
+    }
+}
+
 void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, int height )
 {
     Array< CollisionInfo > ci;
@@ -501,7 +541,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
-    ae3d::System::Print("collision count: %d, gizmo mesh %d\n", ci.count, sv->transformGizmo.selectedMesh);
+    //ae3d::System::Print("collision count: %d, gizmo mesh %d\n", ci.count, sv->transformGizmo.selectedMesh);
 
     if (!isGizmo)
     {
