@@ -186,7 +186,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 {
     outCommand = Command::Empty;
 
-    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 50, 300, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+    if (nk_begin( &ctx, "Inspector", nk_rect( 10, 50, 300, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
         nk_layout_row_static( &ctx, 40, 250, 1 );
 
@@ -225,7 +225,6 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             if (nk_tree_push( &ctx, NK_TREE_NODE, "Mesh Renderer", NK_MAXIMIZED ))
             {
-
                 if (nk_button_label( &ctx, "Remove mesh renderer" ))
                 {
                     gameObject->RemoveComponent< MeshRendererComponent >();
@@ -246,9 +245,10 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 }
 
                 nk_tree_pop( &ctx );
+                nk_spacing( &ctx, 1 );
             }
         }
-
+        
         if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "Add audio source" ))
         {
             gameObject->AddComponent< AudioSourceComponent >();
@@ -257,6 +257,11 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             if (nk_tree_push( &ctx, NK_TREE_NODE, "Audio Source", NK_MAXIMIZED ))
             {
+                if (nk_button_label( &ctx, "Remove audio source" ))
+                {
+                    gameObject->RemoveComponent< AudioSourceComponent >();
+                }
+
                 if (gameObject->GetComponent< AudioSourceComponent >()->GetClipId() == 0 && nk_button_label( &ctx, "Set audio clip" ))
                 {
                     char path[ 1024 ] = {};
@@ -271,6 +276,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 }
 
                 nk_tree_pop( &ctx );
+                nk_spacing( &ctx, 1 );
             }
         }
 
@@ -278,7 +284,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             gameObject->GetComponent< AudioSourceComponent >()->Play();
         }
-        
+                
         if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "Add camera" ))
         {
             gameObject->AddComponent< CameraComponent >();
@@ -306,6 +312,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
 
                 nk_tree_pop( &ctx );
+                nk_spacing( &ctx, 1 );
             }
         }
 
@@ -313,23 +320,29 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             gameObject->AddComponent< DirectionalLightComponent >();
         }
-        else if (gameObject != nullptr && dirLight != nullptr && nk_button_label( &ctx, "Remove directional light" ))
+        else if (gameObject != nullptr && dirLight != nullptr)
         {
-            gameObject->RemoveComponent< DirectionalLightComponent >();
-        }
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Directional Light", NK_MAXIMIZED ))
+            {
+                if (nk_button_label( &ctx, "Remove directional light" ))
+                {
+                    gameObject->RemoveComponent< DirectionalLightComponent >();
+                }
+                
+                int shadow = dirLight->CastsShadow();
+                nk_checkbox_label( &ctx, "Casts shadow", &shadow );
+                
+                if (shadow == 1 && !dirLight->CastsShadow())
+                {
+                    dirLight->SetCastShadow( true, 1024 );
+                }
+                else if (shadow == 0)
+                {
+                    dirLight->SetCastShadow( false, 1024 );
+                }
 
-        if (gameObject != nullptr && dirLight != nullptr)
-        {
-            int shadow = dirLight->CastsShadow();
-            nk_checkbox_label( &ctx, "Casts shadow", &shadow );
-            
-            if (shadow == 1 && !dirLight->CastsShadow())
-            {
-                dirLight->SetCastShadow( true, 1024 );
-            }
-            else if (shadow == 0)
-            {
-                dirLight->SetCastShadow( false, 1024 );
+                nk_tree_pop( &ctx );
+                nk_spacing( &ctx, 1 );
             }
         }
 
@@ -354,7 +367,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             outCommand = Command::CreateGO;
         }
-
+        
+        nk_spacing( &ctx, 1 );
+        
         if (gameObject == nullptr && nk_button_label( &ctx, "open scene" ))
         {
             outCommand = Command::OpenScene;

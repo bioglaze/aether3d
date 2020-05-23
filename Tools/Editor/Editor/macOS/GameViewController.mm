@@ -270,6 +270,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.mouseMoved = true;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
 }
 
 - (void)_render
@@ -322,6 +323,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         if (inputEvent.key == 26) inspector.HandleChar( 55 ); // 7
         if (inputEvent.key == 28) inspector.HandleChar( 56 ); // 8
         if (inputEvent.key == 25) inspector.HandleChar( 57 ); // 9
+    }
+
+    if (inputEvent.isActive)
+    {
+        svHighlightGizmo( sceneView, inputEvent.x, inputEvent.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
     }
     
     inputEvent.isActive = false;
