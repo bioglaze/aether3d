@@ -115,8 +115,16 @@ float linstep( float low, float high, float v )
 
 float VSM( float depth, float4 projCoord )
 {
+    float2 uv = projCoord.xy / projCoord.w;
+
+    // Spot light
+    if (lightType == 1 && (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1))
+    {
+        return 0;
+    }
+
     // TODO: Replace with shadow
-    float2 moments = normalTex.SampleLevel( sampler1, projCoord.xy / projCoord.w, 0 ).rg;
+    float2 moments = normalTex.SampleLevel( sampler1, uv, 0 ).rg;
 
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
 

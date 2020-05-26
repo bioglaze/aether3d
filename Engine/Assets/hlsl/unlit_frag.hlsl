@@ -27,7 +27,15 @@ layout(set=0, binding=12) TextureCube<float4> texCube : register(t2);
 
 float VSM( float depth, float4 projCoord )
 {
-    float2 moments = _ShadowMap.SampleLevel( sampler1, projCoord.xy / projCoord.w, 0 ).rg;
+    float2 uv = projCoord.xy / projCoord.w;
+    
+    // Spot light
+    if (lightType == 1 && (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1))
+    {
+        return 0;
+    }
+
+    float2 moments = _ShadowMap.SampleLevel( sampler1, uv, 0 ).rg;
 
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
 
@@ -42,6 +50,7 @@ float4 main( VSOutput vsOut ) : SV_Target
 {
     float depth = vsOut.projCoord.z / vsOut.projCoord.w;
 
+    // Directional light
     if (lightType == 2)
     {
         depth = depth * 0.5f + 0.5f;
