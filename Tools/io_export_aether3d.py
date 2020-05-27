@@ -236,6 +236,7 @@ class Aether3DExporter( bpy.types.Operator ):
             mesh.jointCount = 0
             mesh.boneNames = []
             mesh.invBindPoseMatrices = []
+            mesh.frameCount = 0
             
             for armature in armatures:
                 for bone in armature.data.bones:
@@ -390,6 +391,7 @@ class Aether3DExporter( bpy.types.Operator ):
                             fi_m = len( changed )
                 # if the action has at least one frame, save it
                 print( "frames: " + str( len( frames ) ) )
+                mesh.frameCount = len( frames )
                 if len( frames ) > 0:
                     actions.append( [uniquelist( boneNames, a[ 0 ] ), int(( lf - a[ 1 ] + 1) * mpf), frames] )
             context.scene.frame_set( orig_frame, subframe=0.0 )
@@ -452,8 +454,11 @@ class Aether3DExporter( bpy.types.Operator ):
             nVertices = struct.pack( 'H', len( mesh.vertices ) )
             f.write( nVertices )
 
-            # Writes vertex format. Currently hard-coded to PTNTC.
+            # Writes vertex format.
             vertexFormat = 0;
+            if mesh.jointCount > 0:
+                vertexFormat = 2
+            print( "VertexFormat: " + str( vertexFormat ) )
             vertexFormatPacked = struct.pack( 'b', vertexFormat )
             f.write( vertexFormatPacked )
             
@@ -504,6 +509,29 @@ class Aether3DExporter( bpy.types.Operator ):
                 component = struct.pack( 'f', v.color[ 3 ] )
                 f.write( component )
 
+                # TODO Write proper weights and bone indices.
+                
+                if vertexFormat == 2:
+                    # Writes weights.
+                    component = struct.pack( 'f', 1 )
+                    f.write( component )
+                    component = struct.pack( 'f', 0 )
+                    f.write( component )
+                    component = struct.pack( 'f', 0 )
+                    f.write( component )
+                    component = struct.pack( 'f', 0 )
+                    f.write( component )
+
+                    # Writes bones.
+                    component = struct.pack( 'i', 0 )
+                    f.write( component )
+                    component = struct.pack( 'i', 0 )
+                    f.write( component )
+                    component = struct.pack( 'i', 0 )
+                    f.write( component )
+                    component = struct.pack( 'i', 0 )
+                    f.write( component )
+
             # Writes # of faces.
             nFaces = struct.pack( 'H', int( len( mesh.faces ) ) )
             f.write( nFaces )
@@ -520,7 +548,8 @@ class Aether3DExporter( bpy.types.Operator ):
             # Writes # of joints.
             nJoints = struct.pack( 'H', mesh.jointCount )
             f.write( nJoints )
-
+            print( "write joint count: " + str( mesh.jointCount ) )
+            
             # Writes joints.
             for i in range( 0, mesh.jointCount ):
                 print( "bind pose for joint " + str( i ) )
@@ -555,7 +584,21 @@ class Aether3DExporter( bpy.types.Operator ):
                 f.write( nAnim )
 
                 # TODO write animation transforms.
-                
+                outFrameCount = struct.pack( 'i', mesh.frameCount )
+                f.write( outFrameCount )
+
+                for frame in range( 0, mesh.frameCount ):
+                    mat = mathutils.Matrix()
+                    for r in range( 0, 4 ):
+                        component = struct.pack( 'f', mat[ r ][ 0 ] )
+                        f.write( component )
+                        component = struct.pack( 'f', mat[ r ][ 1 ] )
+                        f.write( component )
+                        component = struct.pack( 'f', mat[ r ][ 2 ] )
+                        f.write( component )
+                        component = struct.pack( 'f', mat[ r ][ 3 ] )
+                        f.write( component )
+                    
         # Terminator
         terminator = 100
         o = struct.pack( 'b', int( terminator ) )
