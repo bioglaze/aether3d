@@ -350,15 +350,30 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             gameObject->AddComponent< SpotLightComponent >();
         }
-        else if (gameObject != nullptr && spotLight != nullptr && nk_button_label( &ctx, "Remove spot light" ))
+        else if (gameObject != nullptr && spotLight != nullptr)
         {
-            gameObject->RemoveComponent< SpotLightComponent >();
-        }
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Spot Light", NK_MAXIMIZED ))
+            {
+                if (nk_button_label( &ctx, "Remove spot light" ))
+                {
+                    gameObject->RemoveComponent< SpotLightComponent >();
+                }
 
-        if (gameObject != nullptr && spotLight != nullptr)
-        {
-            const char* str = "testing";
-            nk_label( &ctx, str, NK_TEXT_LEFT );
+                int shadow = spotLight->CastsShadow();
+                nk_checkbox_label( &ctx, "Casts shadow", &shadow );
+
+                if (shadow == 1 && !spotLight->CastsShadow())
+                {
+                    spotLight->SetCastShadow( true, 1024 );
+                }
+                else if (shadow == 0)
+                {
+                    spotLight->SetCastShadow( false, 1024 );
+                }
+
+                nk_tree_pop( &ctx );
+                nk_spacing( &ctx, 1 );
+            }
         }
         
         // Gameobject is not selected.
@@ -367,8 +382,6 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             outCommand = Command::CreateGO;
         }
-        
-        nk_spacing( &ctx, 1 );
         
         if (gameObject == nullptr && nk_button_label( &ctx, "open scene" ))
         {
@@ -394,10 +407,19 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
         if (gameObject == nullptr)
         {
-            nk_label( &ctx, "Hierarchy", NK_TEXT_LEFT );
-            static int currentGo = 0;
-            const unsigned itemCount = Min2( nameCount, goCount - 1 );
-            currentGo = nk_combo( &ctx, goNames, itemCount, currentGo, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Hierarchy", NK_MAXIMIZED ))
+            {
+                for (int i = 0; i < goCount - 1; ++i)
+                {
+                    if (nk_button_label( &ctx, goNames[ i ] ))
+                    {
+                        ae3d::System::Print("todo: select game object\n");
+                    }
+
+                }
+
+                nk_tree_pop( &ctx );
+            }
         }
         
         DrawNuklear( width, height );
