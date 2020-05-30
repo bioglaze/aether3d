@@ -35,6 +35,11 @@ float VSM( float depth, float4 projCoord )
         return 0;
     }
 
+    if (lightType == 1 && (depth < 0 || depth > 1))
+    {
+        return 0;
+    }
+
     float2 moments = _ShadowMap.SampleLevel( sampler1, uv, 0 ).rg;
 
     float variance = max( moments.y - moments.x * moments.x, -0.001f );

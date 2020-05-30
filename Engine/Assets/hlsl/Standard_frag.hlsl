@@ -123,6 +123,11 @@ float VSM( float depth, float4 projCoord )
         return 0;
     }
 
+    if (lightType == 1 && (depth < 0 || depth > 1))
+    {
+        return 0;
+    }
+
     // TODO: Replace with shadow
     float2 moments = normalTex.SampleLevel( sampler1, uv, 0 ).rg;
 

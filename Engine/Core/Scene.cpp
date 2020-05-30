@@ -693,7 +693,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
                 GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Dir;
             }
         }
-        else if (spotLight)
+        else if (spotLight && spotLight->CastsShadow())
         {
             GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
         }
