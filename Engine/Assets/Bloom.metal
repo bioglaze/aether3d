@@ -31,28 +31,14 @@ kernel void blur(texture2d<float, access::read> inputTexture [[texture(0)]],
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
-    float4 accumColor = float4( 0, 0, 0, 0 );
-    
-    // Box
-    const int radius = 13;
-    for (int x = 0; x < radius; ++x)
+    float weights[ 5 ] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+    float4 accumColor = inputTexture.read( uint2( gid.x, gid.y ) ) * weights[ 0 ];
+
+    for (int x = 1; x < 5; ++x)
     {
-        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z - radius / 2, x * uniforms.tilesXY.w - radius / 2 ) );
-        accumColor += color;
+        accumColor += inputTexture.read( uint2( gid.x + x * uniforms.tilesXY.z, gid.y + x * uniforms.tilesXY.w ) ) * weights[ x ];
+        accumColor += inputTexture.read( uint2( gid.x - x * uniforms.tilesXY.z, gid.y - x * uniforms.tilesXY.w ) ) * weights[ x ];
     }
-    
-    accumColor /= radius;
 
-    // Gaussian
-    /*constexpr float weights[ 9 ] = { 0.000229f, 0.005977f, 0.060598f,
-        0.241732f, 0.382928f, 0.241732f,
-        0.060598f, 0.005977f, 0.000229f };
-
-    for (int x = 0; x < 9; ++x)
-    {
-        const float4 color = inputTexture.read( gid + ushort2( x * uniforms.tilesXY.z - 5, x * uniforms.tilesXY.w - 5 ) ) * weights[ x ];
-        accumColor += color;
-    }*/
-    
-    resultTexture.write( float4(accumColor.rgb, 1), gid.xy );
+    resultTexture.write( accumColor, gid.xy );
 }

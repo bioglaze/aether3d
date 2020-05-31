@@ -286,6 +286,7 @@ using namespace ae3d;
     RenderTexture camera2dTex;
     Texture2D bloomTex;
     Texture2D blurTex;
+    Texture2D blurTex2;
     
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
@@ -679,6 +680,7 @@ using namespace ae3d;
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
     bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex" );
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
+    blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D
@@ -750,8 +752,8 @@ using namespace ae3d;
     transMaterial.SetTexture( &transTex, 0 );
 
     transMaterial.SetBackFaceCulling( true );
-    //transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );
-    //rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &transMaterial, 0 );
+    transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );
+    rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &transMaterial, 0 );
     
     lineProjection.MakeProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     std::vector< Vec3 > lines( 4 );
@@ -761,7 +763,7 @@ using namespace ae3d;
     lines[ 3 ] = Vec3( 10, 10, -0.5f );
     lineHandle = System::CreateLineBuffer( lines.data(), (int)lines.size(), Vec3( 1, 0, 0 ) );
     
-    //coneLineHandle = CreateConeLines();
+    coneLineHandle = CreateConeLines();
     
 #ifdef TEST_NUKLEAR_UI
     nk_font_atlas_init_default( &atlas );
@@ -884,12 +886,35 @@ using namespace ae3d;
         downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
         downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
         downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+        
         blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 1, &bloomTex );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
         
         blurShader.SetTexture2D( 0, &bloomTex );
+        blurShader.SetTexture2D( 1, &blurTex );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+
+        // Second blur
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 1, &blurTex2 );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+        
+        blurShader.SetTexture2D( 0, &blurTex2 );
+        blurShader.SetTexture2D( 1, &blurTex );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+
+        // Third blur
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 1, &blurTex2 );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+        
+        blurShader.SetTexture2D( 0, &blurTex2 );
         blurShader.SetTexture2D( 1, &blurTex );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
@@ -912,8 +937,8 @@ using namespace ae3d;
         Matrix44::Multiply( lineTransform, spotRot, lineTransform );
         lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
         Matrix44::Multiply( lineTransform, viewMat, viewMat );
-        /*System::DrawLines( coneLineHandle, viewMat,
-                          camera3d.GetComponent< CameraComponent >()->GetProjection() );*/
+        System::DrawLines( coneLineHandle, viewMat,
+                          camera3d.GetComponent< CameraComponent >()->GetProjection(), self.view.bounds.size.width, self.view.bounds.size.height );
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 16 ) );
 
 #ifdef TEST_NUKLEAR_UI
