@@ -15,16 +15,13 @@ groupshared uint helper[ 128 ];
 [numthreads( 8, 8, 1 )]
 void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThreadID, uint3 groupIdx : SV_GroupID )
 {
-    const float weights[ 9 ] = { 0.000229f, 0.005977f, 0.060598f,
-    0.241732f, 0.382928f, 0.241732f,
-    0.060598f, 0.005977f, 0.000229f };
+    float weights[ 5 ] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+    float4 accumColor = inputTexture.Load( uint3( globalIdx.x, globalIdx.y, 0 ) ) * weights[ 0 ];
 
-    float4 accumColor = float4( 0, 0, 0, 0 );
-
-    for (int x = 0; x < 9; ++x)
+    for (int x = 1; x < 5; ++x)
     {
-        const float4 color = inputTexture.Load( uint3( globalIdx.x + x * tilesXY.z, globalIdx.y + x * tilesXY.w, 0 ) ) * weights[ x ];
-        accumColor += color;
+        accumColor += inputTexture.Load( uint3(globalIdx.x + x * tilesXY.z, globalIdx.y + x * tilesXY.w, 0) ) * weights[ x ];
+        accumColor += inputTexture.Load( uint3( globalIdx.x - x * tilesXY.z, globalIdx.y - x * tilesXY.w, 0 ) ) * weights[ x ];
     }
 
     blurTex[ globalIdx.xy ] = accumColor;

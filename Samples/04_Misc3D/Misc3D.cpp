@@ -130,6 +130,9 @@ int main()
 	Texture2D blurTex;
 	blurTex.CreateUAV( width / 2, height / 2, "blurTex" );
 
+    Texture2D blurTex2;
+    blurTex2.CreateUAV( width / 2, height / 2, "blurTex2" );
+
     RenderTexture resolvedTex;
     resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve" );
         
@@ -370,7 +373,7 @@ int main()
 #endif
     dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 1, 1, 1 ) );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 1, 1, 1 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
@@ -997,6 +1000,76 @@ int main()
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
 
+#if RENDERER_VULKAN
+        // Second blur horizontal begin.
+        blurTex.SetLayout( TextureLayout::ShaderRead );
+        blurTex2.SetLayout( TextureLayout::General );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 11, &blurTex2 );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+        blurTex2.SetLayout( TextureLayout::ShaderRead );
+        // Second blur horizontal end.
+
+        // Second blur vertical begin.
+        blurTex.SetLayout( TextureLayout::General );
+        blurTex2.SetLayout( TextureLayout::ShaderRead );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.SetTexture2D( 0, &blurTex2 );
+        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+        // Second blur vertical end.
+
+        // Third blur horizontal begin.
+        blurTex.SetLayout( TextureLayout::ShaderRead );
+        blurTex2.SetLayout( TextureLayout::General );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 11, &blurTex2 );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+        blurTex2.SetLayout( TextureLayout::ShaderRead );
+        // Third blur horizontal end.
+
+        // Third blur vertical begin.
+        blurTex.SetLayout( TextureLayout::General );
+        blurTex2.SetLayout( TextureLayout::ShaderRead );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.SetTexture2D( 0, &blurTex2 );
+        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+        // Third blur vertical end.
+
+        // Fourth blur horizontal begin.
+        blurTex.SetLayout( TextureLayout::ShaderRead );
+        blurTex2.SetLayout( TextureLayout::General );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.SetTexture2D( 0, &blurTex );
+        blurShader.SetTexture2D( 11, &blurTex2 );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+        blurTex2.SetLayout( TextureLayout::ShaderRead );
+        // Fourth blur horizontal end.
+
+        // Fourth blur vertical begin.
+        blurTex.SetLayout( TextureLayout::General );
+        blurTex2.SetLayout( TextureLayout::ShaderRead );
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.SetTexture2D( 0, &blurTex2 );
+        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 16, height / 16, 1 );
+        blurShader.End();
+        // Fourth blur vertical end.
+#endif
         blurTex.SetLayout( TextureLayout::ShaderRead );
         System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );

@@ -643,8 +643,8 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
 
     vkDeviceWaitIdle( GfxDeviceGlobal::device );
-    vkFreeMemory( GfxDeviceGlobal::device, stagingMemory, nullptr );
     vkDestroyBuffer( GfxDeviceGlobal::device, stagingBuffer, nullptr );
+    vkFreeMemory( GfxDeviceGlobal::device, stagingMemory, nullptr );
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
