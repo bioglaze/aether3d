@@ -186,9 +186,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 {
     outCommand = Command::Empty;
 
-    if (nk_begin( &ctx, "Inspector", nk_rect( 10, 50, 300, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+    if (nk_begin( &ctx, "Inspector", nk_rect( 10, 50, 450, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {
-        nk_layout_row_static( &ctx, 40, 250, 1 );
+        nk_layout_row_static( &ctx, 40, 450, 1 );
 
         // Gameobject is selected.
 
@@ -208,11 +208,11 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         if (gameObject != nullptr && transform != nullptr)
         {
             Vec3& pos = transform->GetLocalPosition();
-            
+            nk_layout_row_dynamic( &ctx, 40, 3 );
             nk_property_float( &ctx, "#X:", -1024.0f, &pos.x, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Y:", -1024.0f, &pos.y, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
-
+            nk_layout_row_static( &ctx, 40, 140, 1 );
             float& scale = transform->GetLocalScale();
             nk_property_float( &ctx, "#Scale:", 0.1f, &scale, 1024.0f, 1, 1 );
         }

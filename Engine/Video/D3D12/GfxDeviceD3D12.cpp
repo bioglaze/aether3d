@@ -4,7 +4,13 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <d3dx12.h>
+#define USE_RGP_MARKERS 0
+#if USE_RGP_MARKERS
+#define _PIX3_H_
+#include <AmdDxExt/AmdPix3.h>
+#else
 #include <pix3.h>
+#endif
 #include <vector>
 #include <string>
 #include <sstream>
@@ -1141,12 +1147,23 @@ void* ae3d::GfxDevice::GetCurrentConstantBuffer()
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
-	PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
+#if USE_RGP_MARKERS
+    wchar_t wtext[ 20 ];
+    mbstowcs( wtext, name, strlen( name ) + 1 );
+    LPWSTR ptr = wtext;
+    RgpPushMarker( GfxDeviceGlobal::graphicsCommandList, ptr );
+#else
+    PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
+#endif
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
-	PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
+#if USE_RGP_MARKERS
+    RgpPopMarker( GfxDeviceGlobal::graphicsCommandList );
+#else
+    PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
+#endif
 }
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
