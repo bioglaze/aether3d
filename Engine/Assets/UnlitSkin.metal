@@ -6,7 +6,7 @@ using namespace metal;
 #include "MetalCommon.h"
 
 float linstep( float low, float high, float v );
-float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth );
+float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth, int lightType );
 
 struct ColorInOut
 {
@@ -50,13 +50,14 @@ vertex ColorInOut unlit_skin_vertex(Vertex vert [[stage_in]],
 fragment float4 unlit_skin_fragment( ColorInOut in [[stage_in]],
                                texture2d<float, access::sample> textureMap [[texture(0)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
-                               sampler sampler0 [[sampler(0)]] )
+                               sampler sampler0 [[sampler(0)]],
+                               constant Uniforms& uniforms [[ buffer(5) ]] )
 {
     float4 sampledColor = textureMap.sample( sampler0, in.texCoords ) * in.tintColor;
 
     float depth = in.projCoord.z / in.projCoord.w;
     depth = depth * 0.5f + 0.5f;
-    float shadow = max( 0.2f, VSM( _ShadowMap, in.projCoord, depth ) );
+    float shadow = max( 0.2f, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
     
     return sampledColor * float4( shadow, shadow, shadow, 1 );
 }

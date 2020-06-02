@@ -5,9 +5,6 @@ using namespace metal;
 
 #include "MetalCommon.h"
 
-float linstep( float low, float high, float v );
-float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth );
-
 struct ColorInOut
 {
     float4 position [[position]];
@@ -24,11 +21,17 @@ float linstep( float low, float high, float v )
     return clamp( (v - low) / (high - low), 0.0f, 1.0f );
 }
 
-float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth )
+float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth, int lightType )
 {
     float2 uv = (projCoord.xy / projCoord.w) * 0.5f + 0.5f;
     uv.y = 1.0f - uv.y;
     
+    // Spot light
+    if (lightType == 1 && (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1 || depth < 0 || depth > 1))
+    {
+        return 0;
+    }
+
     float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
     
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
@@ -78,7 +81,7 @@ fragment float4 unlit_fragment( ColorInOut in [[stage_in]],
         depth = depth * 0.5f + 0.5f;
     }
     
-    float shadow = uniforms.lightType == 0 ? 1.0f : max( 0.2f, VSM( _ShadowMap, in.projCoord, depth ) );
+    float shadow = uniforms.lightType == 0 ? 1.0f : max( 0.2f, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
     
     return sampledColor * float4( shadow, shadow, shadow, 1 );
 }
