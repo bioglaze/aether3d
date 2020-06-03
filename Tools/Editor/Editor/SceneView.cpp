@@ -107,6 +107,8 @@ enum class CollisionTest
     Triangles
 };
 
+CollisionTest colTest = CollisionTest::Triangles;
+
 float Max2( float a, float b )
 {
     return a < b ? b : a;
@@ -201,6 +203,59 @@ float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const Vec3*
     return -1;
 }
 
+static void GetMinMax( const Vec3* aPoints, int count, Vec3& outMin, Vec3& outMax )
+{
+    outMin = aPoints[ 0 ];
+    outMax = aPoints[ 0 ];
+
+    for (int i = 1, s = count; i < s; ++i)
+    {
+        const Vec3& point = aPoints[ i ];
+
+        if (point.x < outMin.x)
+        {
+            outMin.x = point.x;
+        }
+
+        if (point.y < outMin.y)
+        {
+            outMin.y = point.y;
+        }
+
+        if (point.z < outMin.z)
+        {
+            outMin.z = point.z;
+        }
+
+        if (point.x > outMax.x)
+        {
+            outMax.x = point.x;
+        }
+
+        if (point.y > outMax.y)
+        {
+            outMax.y = point.y;
+        }
+
+        if (point.z > outMax.z)
+        {
+            outMax.z = point.z;
+        }
+    }
+}
+
+static void GetCorners( const Vec3& min, const Vec3& max, Vec3 outCorners[ 8 ] )
+{
+    outCorners[ 0 ] = Vec3( min.x, min.y, min.z );
+    outCorners[ 1 ] = Vec3( max.x, min.y, min.z );
+    outCorners[ 2 ] = Vec3( min.x, max.y, min.z );
+    outCorners[ 3 ] = Vec3( min.x, min.y, max.z );
+    outCorners[ 4 ] = Vec3( max.x, max.y, min.z );
+    outCorners[ 5 ] = Vec3( min.x, max.y, max.z );
+    outCorners[ 6 ] = Vec3( max.x, max.y, max.z );
+    outCorners[ 7 ] = Vec3( max.x, min.y, max.z );
+}
+
 void GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest, Array< CollisionInfo >& outColliders )
 {
     Vec3 rayOrigin, rayTarget;
@@ -219,8 +274,15 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
 
         auto meshLocalToWorld = go->GetComponent< TransformComponent >() ? go->GetComponent< TransformComponent >()->GetLocalMatrix() : Matrix44::identity;
         Vec3 oMin, oMax;
-        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMin(), meshLocalToWorld, &oMin );
-        Matrix44::TransformPoint( meshRenderer->GetMesh()->GetAABBMax(), meshLocalToWorld, &oMax );
+        Vec3 oAABB[ 8 ];
+        GetCorners( meshRenderer->GetMesh()->GetAABBMin(), meshRenderer->GetMesh()->GetAABBMax(), oAABB );
+
+        for (int i = 0; i < 8; ++i)
+        {
+            Matrix44::TransformPoint( oAABB[ i ], meshLocalToWorld, &oAABB[ i ] );
+        }
+
+        GetMinMax( oAABB, 8, oMin, oMax );
 
         const float meshDistance = IntersectRayAABB( rayOrigin, rayTarget, oMin, oMax );
 
@@ -235,8 +297,16 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
             for (unsigned subMeshIndex = 0; subMeshIndex < meshRenderer->GetMesh()->GetSubMeshCount(); ++subMeshIndex)
             {
                 Vec3 subMeshMin, subMeshMax;
-                Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMin( subMeshIndex ), meshLocalToWorld, &subMeshMin );
-                Matrix44::TransformPoint( meshRenderer->GetMesh()->GetSubMeshAABBMax( subMeshIndex ), meshLocalToWorld, &subMeshMax );
+                Vec3 mAABB[ 8 ];
+
+                GetCorners( meshRenderer->GetMesh()->GetSubMeshAABBMin( subMeshIndex ), meshRenderer->GetMesh()->GetSubMeshAABBMax( subMeshIndex ), mAABB );
+
+                for (int i = 0; i < 8; ++i)
+                {
+                    Matrix44::TransformPoint( mAABB[ i ], meshLocalToWorld, &mAABB[ i ] );
+                }
+
+                GetMinMax( mAABB, 8, subMeshMin, subMeshMax );
 
                 Array< Vec3 > triangles;
                 meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex, triangles );
@@ -406,15 +476,22 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
         System::Print( "Could not parse scene file!\n" );
         return;
     }
-                    
-    /*gameObjects.clear();
-                    
-      for (auto& go : gos)
-      {
-      gameObjects.push_back( std::make_shared< ae3d::GameObject >() );
-      *gameObjects.back() = go;
-      scene.Add( gameObjects.back().get() );
-      }*/
+    
+    for (auto& mat : materials)
+    {
+        mat.second->SetShader( &sv->unlitShader );
+    }
+
+    ae3d::GameObject* gizmo = sv->gameObjects[ 0 ];
+
+    sv->gameObjects.Allocate( 1 );
+    sv->gameObjects[ 0 ] = gizmo;
+
+    for (auto& go : gos)
+    {
+        sv->gameObjects.Add( &go );
+        sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
+    }
 }
 
 void svSaveScene( SceneView* sv, char* path )
@@ -448,13 +525,14 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
         }
 
         Vec3 screenPoint = camera->GetScreenPoint( goTransform->GetLocalPosition(), (float)width, (float)height );
-        //System::Print("screenX: %d, screenY: %d, sprite screenPoint: %f, %f, yMin: %.2f, yMax: %.2f\n", screenX, screenY, screenPoint.x, screenPoint.y * 2, screenPoint.y * 2, screenPoint.y * 2 + texHeight );
 #if RENDERER_VULKAN
         float s = 1;
-        screenPoint.y -= 47 / 2;
+        screenPoint.y = height - screenPoint.y;
+        //screenPoint.y += 10; // Tested on windows by having the sprite just below the window title bar.
 #else
         float s = 2;
 #endif
+        System::Print( "screenX: %d, screenY: %d, screenY * 2: %d, height: %d, sprite screenPoint: %f, %f, yMin: %.2f, yMax: %.2f\n", screenX, screenY, screenY * 2, height, screenPoint.x, screenPoint.y * 2, screenPoint.y * 2, screenPoint.y * 2 + texHeight );
 
         if (screenX > screenPoint.x && screenX < screenPoint.x + texWidth / s &&
             screenY * s > screenPoint.y * 2 && screenY * s < screenPoint.y * 2 + texHeight)
@@ -471,7 +549,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 
     // Checks if the mouse hit a mesh and selects the object.
     Array< CollisionInfo > ci;
-    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
+    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     if (ci.count > 0 && ci[ 0 ].go != sv->gameObjects[ 0 ])
     {
@@ -502,7 +580,7 @@ void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int h
 {
     Array< CollisionInfo > ci;
 
-    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
+    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     const int selected = isGizmo ? ci[ 0 ].subMeshIndex : -1;
@@ -537,7 +615,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 {
     Array< CollisionInfo > ci;
 
-    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, CollisionTest::Triangles, ci );
+    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
@@ -626,7 +704,7 @@ void svFocusOnSelected( SceneView* sv )
         GameObject* go = sv->selectedGameObjects[ 0 ];
         TransformComponent* tc = go->GetComponent< TransformComponent >();
         Vec3 goPos = tc->GetWorldPosition();
-        sv->camera.GetComponent<TransformComponent>()->LookAt( goPos, goPos + Vec3( 0, 0, 5 ), Vec3( 0, 1, 0 ) );
+        sv->camera.GetComponent<TransformComponent>()->SetLocalPosition( goPos + Vec3( 0, 0, 5 ) );
     }
 }
 
