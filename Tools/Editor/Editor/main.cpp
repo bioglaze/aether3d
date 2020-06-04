@@ -143,9 +143,6 @@ int main()
 
                 switch( keyCode )
                 {
-                case KeyCode::Escape:
-                    quit = true;
-                    break;
                 case KeyCode::Q:
                     moveDir.y = event.type == WindowEventType::KeyDown ? -velocity : 0;
                     break;

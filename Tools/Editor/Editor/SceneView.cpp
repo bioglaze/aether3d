@@ -496,6 +496,8 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
 
 void svSaveScene( SceneView* sv, char* path )
 {
+    sv->scene.Remove( &sv->camera );
+
     const std::string sceneStr = sv->scene.GetSerialized();
     FILE* f = fopen( path, "wb" );
     if (!f)
@@ -506,6 +508,8 @@ void svSaveScene( SceneView* sv, char* path )
     
     fprintf( f, "%s\n", sceneStr.c_str() );
     fclose( f );
+
+    sv->scene.Add( &sv->camera );
 }
 
 GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, int height )
