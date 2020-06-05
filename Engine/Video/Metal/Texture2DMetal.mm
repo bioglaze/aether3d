@@ -65,15 +65,22 @@ struct PVRv3Header
     uint32_t metadataLength;
 };
 
-struct ASTCHeader
+struct KTXHeader
 {
-    uint32_t magic;
-    uint8_t blockDimX;
-    uint8_t blockDimY;
-    uint8_t blockDimZ;
-    uint8_t xSize[ 3 ];
-    uint8_t ySize[ 3 ];
-    uint8_t zSize[ 3 ];
+    uint8_t identifier[ 12 ];
+    uint32_t endianness;
+    uint32_t glType;
+    uint32_t glTypeSize;
+    uint32_t glFormat;
+    uint32_t glInternalFormat;
+    uint32_t glBaseInternalFormat;
+    uint32_t width;
+    uint32_t height;
+    uint32_t depth;
+    uint32_t arrayElementCount;
+    uint32_t faceCount;
+    uint32_t mipmapCount;
+    uint32_t keyValueDataLength;
 };
 
 namespace
@@ -82,83 +89,155 @@ namespace
 }
 
 #if TARGET_OS_IPHONE
-MTLPixelFormat GetASTCPixelFormat( uint32_t blockWidth, uint32_t blockHeight )
+enum KTXInternalFormat
 {
-    MTLPixelFormat pixelFormat = MTLPixelFormatInvalid;
-    
-    if (blockWidth == 4 && blockHeight == 4)
-    {
-        pixelFormat = MTLPixelFormatASTC_4x4_LDR;
-    }
-    else if (blockWidth == 5)
-    {
-        if( blockHeight == 4)
-        {
-            pixelFormat = MTLPixelFormatASTC_5x4_LDR;
-        }
-        else if (blockHeight == 5)
-        {
-            pixelFormat = MTLPixelFormatASTC_5x5_LDR;
-        }
-    }
-    else if (blockWidth == 6)
-    {
-        if( blockHeight == 5)
-        {
-            pixelFormat = MTLPixelFormatASTC_6x5_LDR;
-        }
-        else if (blockHeight == 6)
-        {
-            pixelFormat = MTLPixelFormatASTC_6x6_LDR;
-        }
-    }
-    else if (blockWidth == 8)
-    {
-        if( blockHeight == 5)
-        {
-            pixelFormat = MTLPixelFormatASTC_8x5_LDR;
-        }
-        else if (blockHeight == 6)
-        {
-            pixelFormat = MTLPixelFormatASTC_8x6_LDR;
-        }
-        else if (blockHeight == 8)
-        {
-            pixelFormat = MTLPixelFormatASTC_8x8_LDR;
-        }
-    }
-    else if (blockWidth == 10)
-    {
-        if( blockHeight == 5)
-        {
-            pixelFormat = MTLPixelFormatASTC_10x5_LDR;
-        }
-        else if (blockHeight == 6)
-        {
-            pixelFormat = MTLPixelFormatASTC_10x6_LDR;
-        }
-        else if (blockHeight == 8)
-        {
-            pixelFormat = MTLPixelFormatASTC_10x8_LDR;
-        }
-        else if (blockHeight == 10)
-        {
-            pixelFormat = MTLPixelFormatASTC_10x10_LDR;
-        }
-    }
-    else if (blockWidth == 12)
-    {
-        if (blockHeight == 10)
-        {
-            pixelFormat = MTLPixelFormatASTC_12x10_LDR;
-        }
-        else if (blockHeight == 12)
-        {
-            pixelFormat = MTLPixelFormatASTC_12x12_LDR;
-        }
-    }
+    KTXInternalFormatASTC_4x4   = 37808,
+    KTXInternalFormatASTC_5x4   = 37809,
+    KTXInternalFormatASTC_5x5   = 37810,
+    KTXInternalFormatASTC_6x5   = 37811,
+    KTXInternalFormatASTC_6x6   = 37812,
+    KTXInternalFormatASTC_8x5   = 37813,
+    KTXInternalFormatASTC_8x6   = 37814,
+    KTXInternalFormatASTC_8x8   = 37815,
+    KTXInternalFormatASTC_10x5  = 37816,
+    KTXInternalFormatASTC_10x6  = 37817,
+    KTXInternalFormatASTC_10x8  = 37818,
+    KTXInternalFormatASTC_10x10 = 37819,
+    KTXInternalFormatASTC_12x10 = 37820,
+    KTXInternalFormatASTC_12x12 = 37821,
 
-    return pixelFormat;
+    KTXInternalFormatASTC_4x4_sRGB   = 37840,
+    KTXInternalFormatASTC_5x4_sRGB   = 37841,
+    KTXInternalFormatASTC_5x5_sRGB   = 37842,
+    KTXInternalFormatASTC_6x5_sRGB   = 37843,
+    KTXInternalFormatASTC_6x6_sRGB   = 37844,
+    KTXInternalFormatASTC_8x5_sRGB   = 37845,
+    KTXInternalFormatASTC_8x6_sRGB   = 37846,
+    KTXInternalFormatASTC_8x8_sRGB   = 37847,
+    KTXInternalFormatASTC_10x5_sRGB  = 37848,
+    KTXInternalFormatASTC_10x6_sRGB  = 37849,
+    KTXInternalFormatASTC_10x8_sRGB  = 37850,
+    KTXInternalFormatASTC_10x10_sRGB = 37851,
+    KTXInternalFormatASTC_12x10_sRGB = 37852,
+    KTXInternalFormatASTC_12x12_sRGB = 37853
+};
+
+void GetASTCBlockDimension( MTLPixelFormat pixelFormat, unsigned& outBlockWidth, unsigned& outBlockHeight )
+{
+    switch (pixelFormat)
+    {
+        case MTLPixelFormatASTC_4x4_LDR:
+        case MTLPixelFormatASTC_4x4_sRGB:
+            outBlockHeight = 4;
+            outBlockWidth = 4;
+            break;
+        case MTLPixelFormatASTC_5x4_LDR:
+        case MTLPixelFormatASTC_5x4_sRGB:
+            outBlockHeight = 5;
+            outBlockWidth = 4;
+            break;
+        case MTLPixelFormatASTC_5x5_LDR:
+        case MTLPixelFormatASTC_5x5_sRGB:
+            outBlockHeight = 5;
+            outBlockWidth = 5;
+            break;
+        case MTLPixelFormatASTC_6x5_LDR:
+        case MTLPixelFormatASTC_6x5_sRGB:
+            outBlockHeight = 6;
+            outBlockWidth = 5;
+            break;
+        case MTLPixelFormatASTC_6x6_LDR:
+        case MTLPixelFormatASTC_6x6_sRGB:
+            outBlockHeight = 6;
+            outBlockWidth = 6;
+            break;
+        case MTLPixelFormatASTC_8x5_LDR:
+        case MTLPixelFormatASTC_8x5_sRGB:
+            outBlockHeight = 8;
+            outBlockWidth = 5;
+            break;
+        case MTLPixelFormatASTC_8x6_LDR:
+        case MTLPixelFormatASTC_8x6_sRGB:
+            outBlockHeight = 8;
+            outBlockWidth = 6;
+            break;
+        case MTLPixelFormatASTC_8x8_LDR:
+        case MTLPixelFormatASTC_8x8_sRGB:
+            outBlockWidth = 8;
+            outBlockHeight = 8;
+            break;
+        case MTLPixelFormatASTC_10x5_LDR:
+        case MTLPixelFormatASTC_10x5_sRGB:
+            outBlockHeight = 10;
+            outBlockWidth = 5;
+            break;
+        case MTLPixelFormatASTC_10x6_LDR:
+        case MTLPixelFormatASTC_10x6_sRGB:
+            outBlockHeight = 10;
+            outBlockWidth = 6;
+            break;
+        case MTLPixelFormatASTC_10x8_LDR:
+        case MTLPixelFormatASTC_10x8_sRGB:
+            outBlockHeight = 10;
+            outBlockWidth = 8;
+            break;
+        case MTLPixelFormatASTC_10x10_LDR:
+        case MTLPixelFormatASTC_10x10_sRGB:
+            outBlockHeight = 10;
+            outBlockWidth = 10;
+            break;
+        case MTLPixelFormatASTC_12x10_LDR:
+        case MTLPixelFormatASTC_12x10_sRGB:
+            outBlockHeight = 12;
+            outBlockWidth = 10;
+            break;
+        case MTLPixelFormatASTC_12x12_LDR:
+        case MTLPixelFormatASTC_12x12_sRGB:
+            outBlockHeight = 12;
+            outBlockWidth = 12;
+            break;
+        default:
+            outBlockHeight = 0;
+            outBlockWidth = 0;
+            break;
+    }
+}
+
+MTLPixelFormat GetPixelFormatFromKTXFormat( KTXInternalFormat internalFormat )
+{
+    switch (internalFormat)
+    {
+        case KTXInternalFormatASTC_4x4: return MTLPixelFormatASTC_4x4_LDR;
+        case KTXInternalFormatASTC_5x4: return MTLPixelFormatASTC_5x4_LDR;
+        case KTXInternalFormatASTC_5x5: return MTLPixelFormatASTC_5x5_LDR;
+        case KTXInternalFormatASTC_6x5: return MTLPixelFormatASTC_6x5_LDR;
+        case KTXInternalFormatASTC_6x6: return MTLPixelFormatASTC_6x6_LDR;
+        case KTXInternalFormatASTC_8x5: return MTLPixelFormatASTC_8x5_LDR;
+        case KTXInternalFormatASTC_8x6: return MTLPixelFormatASTC_8x6_LDR;
+        case KTXInternalFormatASTC_8x8: return MTLPixelFormatASTC_8x8_LDR;
+        case KTXInternalFormatASTC_10x5: return MTLPixelFormatASTC_10x5_LDR;
+        case KTXInternalFormatASTC_10x6: return MTLPixelFormatASTC_10x6_LDR;
+        case KTXInternalFormatASTC_10x8: return MTLPixelFormatASTC_10x8_LDR;
+        case KTXInternalFormatASTC_10x10: return MTLPixelFormatASTC_10x10_LDR;
+        case KTXInternalFormatASTC_12x10: return MTLPixelFormatASTC_12x10_LDR;
+        case KTXInternalFormatASTC_12x12: return MTLPixelFormatASTC_12x12_LDR;
+        case KTXInternalFormatASTC_4x4_sRGB: return MTLPixelFormatASTC_4x4_sRGB;
+        case KTXInternalFormatASTC_5x4_sRGB: return MTLPixelFormatASTC_5x4_sRGB;
+        case KTXInternalFormatASTC_5x5_sRGB: return MTLPixelFormatASTC_5x5_sRGB;
+        case KTXInternalFormatASTC_6x5_sRGB: return MTLPixelFormatASTC_6x5_sRGB;
+        case KTXInternalFormatASTC_6x6_sRGB: return MTLPixelFormatASTC_6x6_sRGB;
+        case KTXInternalFormatASTC_8x5_sRGB: return MTLPixelFormatASTC_8x5_sRGB;
+        case KTXInternalFormatASTC_8x6_sRGB: return MTLPixelFormatASTC_8x6_sRGB;
+        case KTXInternalFormatASTC_8x8_sRGB: return MTLPixelFormatASTC_8x8_sRGB;
+        case KTXInternalFormatASTC_10x5_sRGB: return MTLPixelFormatASTC_10x5_sRGB;
+        case KTXInternalFormatASTC_10x6_sRGB: return MTLPixelFormatASTC_10x6_sRGB;
+        case KTXInternalFormatASTC_10x8_sRGB: return MTLPixelFormatASTC_10x8_sRGB;
+        case KTXInternalFormatASTC_10x10_sRGB: return MTLPixelFormatASTC_10x10_sRGB;
+        case KTXInternalFormatASTC_12x10_sRGB: return MTLPixelFormatASTC_12x10_sRGB;
+        case KTXInternalFormatASTC_12x12_sRGB: return MTLPixelFormatASTC_12x12_sRGB;
+        default:
+            return MTLPixelFormatInvalid;
+    }
 }
 #endif
 
@@ -312,7 +391,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     
     const bool isPVR = fileContents.path.find( ".pvr" ) != std::string::npos || fileContents.path.find( ".PVR" ) != std::string::npos;
     const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
-    const bool isASTC = fileContents.path.find( ".astc" ) != std::string::npos || fileContents.path.find( ".ASTC" ) != std::string::npos;
+    const bool isASTC = fileContents.path.find( ".ktx" ) != std::string::npos || fileContents.path.find( ".ktx" ) != std::string::npos;
 
     if (HasStbExtension( fileContents.path ))
     {
@@ -458,50 +537,32 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
 #if TARGET_OS_IPHONE
         NSString* astcNSString = [NSString stringWithUTF8String: fileContents.path.c_str()];
         NSData* fileData = [NSData dataWithContentsOfFile:astcNSString];
-        ASTCHeader* astcHeader = (ASTCHeader*) [fileData bytes];
-        PVRv2Header* pvrHeader = (PVRv2Header*) [fileData bytes];
+        KTXHeader* ktxHeader = (KTXHeader*) [fileData bytes];
 
-        const uint32_t astcMagic = 0x5CA1AB13;
-        // PVR
-        if (astcHeader->magic == 52)
-        {
-            //System::Print("pvr width: %d, height %d\n", pvrHeader->width, pvrHeader->height);
-            
-            width = pvrHeader->width;
-            height = pvrHeader->height;
-            mipLevelCount = 1;
+        char* format = (char *)(ktxHeader->identifier + 1);
+        const bool isValid = strncmp( format, "KTX 11", 6 ) == 0;
 
-            uint32_t flags = CFSwapInt32LittleToHost( pvrHeader->flags );
-            const uint32_t PVR_TEXTURE_FLAG_TYPE_MASK = 0xFF;
-            uint32_t formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
-            
-            if (formatFlags == PVRType::kPVRTextureFlagTypePVRTC_4 ||
-                formatFlags == PVRType::kPVRTextureFlagTypePVRTC_2)
-            {
-                ae3d::System::Print("type 4 or 2\n");
-            }
-            ae3d::System::Assert(false, "wrong magic");
-            return;
-        }
-        else if (astcHeader->magic != astcMagic)
+        if (!isValid)
         {
-            ae3d::System::Print( "Warning! '%s' is not a supported ASTC file. Supported are created by texturetool as PVR and something else.\n", fileContents.path.c_str() );
-            return;
+            ae3d::System::Print( "%s doesn't have a valid KTX header!\n", fileContents.path.c_str() );
         }
         
-        const uint32_t w  = (astcHeader->xSize[ 2 ] << 16) + (astcHeader->xSize[ 1 ] << 8) + astcHeader->xSize[ 0 ];
-        const uint32_t h = (astcHeader->ySize[ 2 ] << 16) + (astcHeader->ySize[ 1 ] << 8) + astcHeader->ySize[ 0 ];
-        
-        const uint32_t widthInBlocks =  (w + astcHeader->blockDimX - 1) / astcHeader->blockDimX;
-        const uint32_t blockSize = 4 * 4;
-        uint8_t* bytes = (uint8_t*)([fileData bytes]) + sizeof( ASTCHeader );
-        const uint32_t bytesPerRow = widthInBlocks * blockSize;
-
-        width = w;
-        height = h;
+        width = ktxHeader->width;
+        height = ktxHeader->height;
         mipLevelCount = 1;
-        const MTLPixelFormat pixelFormat = GetASTCPixelFormat( astcHeader->blockDimX, astcHeader->blockDimY );
+        MTLPixelFormat pixelFormat = GetPixelFormatFromKTXFormat( (KTXInternalFormat)ktxHeader->glInternalFormat );
         
+        if (pixelFormat == MTLPixelFormatInvalid)
+        {
+            ae3d::System::Print( "%s doesn't contain ASTC compressed pixel data!\n", fileContents.path.c_str() );
+        }
+        
+        unsigned blockWidth, blockHeight;
+        GetASTCBlockDimension( pixelFormat, blockWidth, blockHeight );
+        const unsigned blockSize = 16;
+        int multiplier = (blockSize / blockWidth);
+
+        mipLevelCount = 1;
         MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                                                               width:width
                                                                                              height:height
@@ -520,7 +581,9 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         }
 
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
-        [metalTexture replaceRegion:region mipmapLevel:0 withBytes:bytes bytesPerRow:bytesPerRow];
+        unsigned offset = sizeof( KTXHeader ) + ktxHeader->keyValueDataLength + 4;
+
+        [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&fileContents.data[ offset ] bytesPerRow:width * multiplier];
 #else
      ae3d::System::Print( ".astc loading not supported on macOS. Tried to load %s\n", fileContents.path.c_str() );
 #endif
