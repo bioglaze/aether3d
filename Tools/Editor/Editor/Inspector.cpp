@@ -260,9 +260,10 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 if (nk_button_label( &ctx, "Remove audio source" ))
                 {
                     gameObject->RemoveComponent< AudioSourceComponent >();
+                    audioSource = nullptr;
                 }
 
-                if (gameObject->GetComponent< AudioSourceComponent >()->GetClipId() == 0 && nk_button_label( &ctx, "Set audio clip" ))
+                if (audioSource && audioSource->GetClipId() == 0 && nk_button_label( &ctx, "Set audio clip" ))
                 {
                     char path[ 1024 ] = {};
                     GetOpenPath( path, "wav" );
@@ -275,14 +276,14 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     }
                 }
 
+                if (audioSource && audioSource->GetClipId() != 0 && nk_button_label( &ctx, "Play" ))
+                {
+                    audioSource->Play();
+                }
+
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
-        }
-
-        if (gameObject != nullptr && audioSource != nullptr && gameObject->GetComponent< AudioSourceComponent >()->GetClipId() != 0 && nk_button_label( &ctx, "Play audio clip" ))
-        {
-            gameObject->GetComponent< AudioSourceComponent >()->Play();
         }
                 
         if (gameObject != nullptr && camera == nullptr && nk_button_label( &ctx, "Add camera" ))
@@ -292,6 +293,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         else if (gameObject != nullptr && camera != nullptr && nk_button_label( &ctx, "Remove camera" ))
         {
             gameObject->RemoveComponent< CameraComponent >();
+            camera = nullptr;
         }
 
         if (gameObject != nullptr && pointLight == nullptr && nk_button_label( &ctx, "Add point light" ))
@@ -306,11 +308,15 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 if (nk_button_label( &ctx, "Remove point light" ))
                 {
                     gameObject->RemoveComponent< PointLightComponent >();
+                    pointLight = nullptr;
                 }
 
-                float& radius = pointLight->GetRadius();
-                nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
-
+                if (pointLight)
+                {
+                    float& radius = pointLight->GetRadius();
+                    nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
+                }
+                
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
@@ -327,20 +333,24 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 if (nk_button_label( &ctx, "Remove directional light" ))
                 {
                     gameObject->RemoveComponent< DirectionalLightComponent >();
-                }
-                
-                int shadow = dirLight->CastsShadow();
-                nk_checkbox_label( &ctx, "Casts shadow", &shadow );
-                
-                if (shadow == 1 && !dirLight->CastsShadow())
-                {
-                    dirLight->SetCastShadow( true, 1024 );
-                }
-                else if (shadow == 0)
-                {
-                    dirLight->SetCastShadow( false, 1024 );
+                    dirLight = nullptr;
                 }
 
+                if (dirLight)
+                {
+                    int shadow = dirLight->CastsShadow();
+                    nk_checkbox_label( &ctx, "Casts shadow", &shadow );
+                
+                    if (shadow == 1 && !dirLight->CastsShadow())
+                    {
+                        dirLight->SetCastShadow( true, 1024 );
+                    }
+                    else if (shadow == 0)
+                    {
+                        dirLight->SetCastShadow( false, 1024 );
+                    }
+                }
+                
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
@@ -357,20 +367,24 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 if (nk_button_label( &ctx, "Remove spot light" ))
                 {
                     gameObject->RemoveComponent< SpotLightComponent >();
+                    spotLight = nullptr;
                 }
 
-                int shadow = spotLight->CastsShadow();
-                nk_checkbox_label( &ctx, "Casts shadow", &shadow );
-
-                if (shadow == 1 && !spotLight->CastsShadow())
+                if (spotLight)
                 {
-                    spotLight->SetCastShadow( true, 1024 );
-                }
-                else if (shadow == 0)
-                {
-                    spotLight->SetCastShadow( false, 1024 );
-                }
+                    int shadow = spotLight->CastsShadow();
+                    nk_checkbox_label( &ctx, "Casts shadow", &shadow );
 
+                    if (shadow == 1 && !spotLight->CastsShadow())
+                    {
+                        spotLight->SetCastShadow( true, 1024 );
+                    }
+                    else if (shadow == 0)
+                    {
+                        spotLight->SetCastShadow( false, 1024 );
+                    }
+                }
+                
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
@@ -409,7 +423,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         {
             if (nk_tree_push( &ctx, NK_TREE_NODE, "Hierarchy", NK_MAXIMIZED ))
             {
-                for (int i = 0; i < goCount - 1; ++i)
+                for (unsigned i = 0; i < goCount - 1; ++i)
                 {
                     if (nk_button_label( &ctx, goNames[ i ] ))
                     {

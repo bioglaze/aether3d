@@ -749,6 +749,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     {
         const std::string reason( stbi_failure_reason() );
         System::Print( "%s failed to load. stb_image's reason: %s\n", fileContents.path.c_str(), reason.c_str() );
+        GetDefaultTexture();
+        *this = Texture2DGlobal::defaultTexture;
         return;
     }
 
