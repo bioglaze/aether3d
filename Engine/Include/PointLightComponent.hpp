@@ -20,7 +20,7 @@ namespace ae3d
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
         /// \return Color
-        const Vec3& GetColor() const { return color; }
+        Vec3& GetColor() { return color; }
 
         /// \param aColor Color in range 0-1.
         void SetColor( const Vec3& aColor ) { color = aColor; }

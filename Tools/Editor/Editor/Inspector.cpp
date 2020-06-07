@@ -187,7 +187,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
     outCommand = Command::Empty;
 
     if (nk_begin( &ctx, "Inspector", nk_rect( 10, 50, 450, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
-    {
+    {        
         nk_layout_row_static( &ctx, 40, 450, 1 );
 
         // Gameobject is selected.
@@ -316,7 +316,14 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     float& radius = pointLight->GetRadius();
                     nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
                 }
-                
+
+                Vec3& color = pointLight->GetColor();
+                nk_layout_row_dynamic( &ctx, 40, 3 );
+                nk_property_float( &ctx, "#Red:", -1024.0f, &color.x, 1024.0f, 1, 1 );
+                nk_property_float( &ctx, "#Green:", -1024.0f, &color.y, 1024.0f, 1, 1 );
+                nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
+                nk_layout_row_static( &ctx, 40, 450, 1 );
+
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
