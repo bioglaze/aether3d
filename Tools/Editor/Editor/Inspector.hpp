@@ -16,6 +16,7 @@ class Inspector
     void EndInput();
     void Deinit();
     void HandleLeftMouseClick( int x, int y, int state );
+    void HandleMouseScroll( int y );
     void HandleMouseMotion( int x, int y );
     void HandleKey( int key, int state );
     void HandleChar( char ch );

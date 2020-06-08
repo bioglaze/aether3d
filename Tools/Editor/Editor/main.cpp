@@ -287,6 +287,10 @@ int main()
                 moveDir.x = 0;
                 moveDir.y = 0;
             }
+            else if (event.type == WindowEventType::MouseWheelScrollDown || event.type == WindowEventType::MouseWheelScrollUp)
+            {
+                inspector.HandleMouseScroll( event.mouseY );
+            }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
             {
                 gamepadMoveDir.z = -event.gamePadThumbY;

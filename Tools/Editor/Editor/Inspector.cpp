@@ -162,6 +162,11 @@ void Inspector::EndInput()
     nk_input_end( &ctx );
 }
 
+void Inspector::HandleMouseScroll( int y )
+{
+    nk_input_scroll( &ctx, nk_vec2( 0, y ) );
+}
+
 void Inspector::HandleLeftMouseClick( int x, int y, int state )
 {
     nk_input_button( &ctx, NK_BUTTON_LEFT, x, y, state );
