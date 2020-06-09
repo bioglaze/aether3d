@@ -80,6 +80,33 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     info.path = clipData.path;
     AudioGlobal::clips.Add( info );
 
+    const bool isOgg = clipData.path.find( ".ogg" ) != std::string::npos;
+    
+    if (isOgg)
+    {
+        short* decoded = nullptr;
+        int channels = 0;
+        int samplerate = 0;
+        const int len = stb_vorbis_decode_memory( clipData.data.data(), static_cast< int >( clipData.data.size() ), &channels, &samplerate, &decoded );
+        
+        if (len == 0)
+        {
+            ae3d::System::Print( "AudioSystem: Could not open %s\n", clipData.path.c_str() );
+            return clipId;
+        }
+
+        int error;
+        stb_vorbis* vorbis = stb_vorbis_open_memory( clipData.data.data(), static_cast< int >( clipData.data.size() ), &error, nullptr );
+        const stb_vorbis_info vinfo = stb_vorbis_get_info( vorbis );
+        AVAudioFormat* format = [ [AVAudioFormat alloc] initStandardFormatWithSampleRate:vinfo.sample_rate channels:vinfo.channels];
+
+        AudioGlobal::clips[ clipId - 1 ].buffer = [ [AVAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:1];
+        
+         // TODO: Fill buffer with "encoded"
+        
+        return clipId;
+    }
+    
     NSString* path = [NSString stringWithUTF8String: clipData.path.c_str()];
 
     NSURL* url = [ NSURL fileURLWithPath:path];
