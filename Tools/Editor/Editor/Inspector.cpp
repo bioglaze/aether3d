@@ -329,6 +329,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
                 nk_layout_row_static( &ctx, 40, 450, 1 );
 
+                //nk_colorf color2;
+                //nk_color_pick( &ctx, &color2, NK_RGB );
+                
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }

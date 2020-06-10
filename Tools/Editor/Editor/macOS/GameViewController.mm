@@ -11,6 +11,7 @@
 #import "Window.hpp"
 
 NSViewController* myViewController;
+const int InspectorWidth = 250;
 
 static std::string GetOpenPath( const char* extension )
 {
@@ -237,7 +238,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
     
-    const bool clickedOnInspector = inputEvent.x < 300;
+    const bool clickedOnInspector = inputEvent.x < InspectorWidth;
 
     if (!clickedOnInspector)
     {
@@ -250,7 +251,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     const float deltaX = -float( theEvent.deltaX ) / 10;
     const float deltaY = -float( theEvent.deltaY ) / 10;
 
-    const bool clickedOnInspector = (int)theEvent.locationInWindow.x < (300 / 2);
+    const bool clickedOnInspector = (int)theEvent.locationInWindow.x < (InspectorWidth / 2);
 
     if (clickedOnInspector)
     {
@@ -273,6 +274,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.isActive = true;
 }
 
+- (void)scrollWheel:(NSEvent *)event
+{
+    ae3d::System::Print("y: %f\n", event.deltaY);
+}
+
 - (void)_render
 {
     inspector.BeginInput();
@@ -285,7 +291,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     
     if (inputEvent.buttonState == 1 && inputEvent.isActive)
     {
-        const bool clickedOnInspector = inputEvent.x < 300;
+        const bool clickedOnInspector = inputEvent.x < InspectorWidth;
 
         if (clickedOnInspector)
         {
@@ -300,7 +306,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
     if (inputEvent.buttonState == 0 && inputEvent.isActive)
     {
-        const bool clickedOnInspector = inputEvent.x < 300;
+        const bool clickedOnInspector = inputEvent.x < InspectorWidth;
 
         if (clickedOnInspector)
         {
