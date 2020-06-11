@@ -221,6 +221,22 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     {
         moveDir.y = 0;
     }
+    else if ([theEvent keyCode] == 123) // left
+    {
+        svMoveSelection( sceneView, { -1, 0, 0 } );
+    }
+    else if ([theEvent keyCode] == 124) // right
+    {
+        svMoveSelection( sceneView, { 1, 0, 0 } );
+    }
+    else if ([theEvent keyCode] == 126) // up
+    {
+        svMoveSelection( sceneView, { 0, 1, 0 } );
+    }
+    else if ([theEvent keyCode] == 125) // down
+    {
+        svMoveSelection( sceneView, { 0, -1, 0 } );
+    }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
