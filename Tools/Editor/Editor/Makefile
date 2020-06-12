@@ -9,6 +9,7 @@ LINKER := -lOpenAL32 -lOpenGL32 -lgdi32
 LIB_PATH := -L../../../Engine/ThirdParty/lib -I$(VULKAN_SDK)\Include
 endif
 
+SANITIZERS := -fsanitize=address,undefined
 WARNINGS := -g -Wpedantic -Wall -Wextra
 
 all:

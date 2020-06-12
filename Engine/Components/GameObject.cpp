@@ -37,54 +37,63 @@ GameObject& ae3d::GameObject::operator=( const GameObject& go )
     {
         AddComponent< TransformComponent >();
         *GetComponent< TransformComponent >() = *go.GetComponent< TransformComponent >();
+        GetComponent< TransformComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< MeshRendererComponent >())
     {
         AddComponent< MeshRendererComponent >();
         *GetComponent< MeshRendererComponent >() = *go.GetComponent< MeshRendererComponent >();
+        GetComponent< MeshRendererComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< CameraComponent >())
     {
         AddComponent< CameraComponent >();
         *GetComponent< CameraComponent >() = *go.GetComponent< CameraComponent >();
+        GetComponent< CameraComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< DirectionalLightComponent >())
     {
         AddComponent< DirectionalLightComponent >();
         *GetComponent< DirectionalLightComponent >() = *go.GetComponent< DirectionalLightComponent >();
+        GetComponent< DirectionalLightComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< AudioSourceComponent >())
     {
         AddComponent< AudioSourceComponent >();
         *GetComponent< AudioSourceComponent >() = *go.GetComponent< AudioSourceComponent >();
+        GetComponent< AudioSourceComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< SpriteRendererComponent >())
     {
         AddComponent< SpriteRendererComponent >();
         *GetComponent< SpriteRendererComponent >() = *go.GetComponent< SpriteRendererComponent >();
+        GetComponent< SpriteRendererComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< TextRendererComponent >())
     {
         AddComponent< TextRendererComponent >();
         *GetComponent< TextRendererComponent >() = *go.GetComponent< TextRendererComponent >();
+        GetComponent< TextRendererComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< SpotLightComponent >())
     {
         AddComponent< SpotLightComponent >();
         *GetComponent< SpotLightComponent >() = *go.GetComponent< SpotLightComponent >();
+        GetComponent< SpotLightComponent >()->gameObject = this;
     }
 
     if (go.GetComponent< PointLightComponent >())
     {
         AddComponent< PointLightComponent >();
         *GetComponent< PointLightComponent >() = *go.GetComponent< PointLightComponent >();
+        GetComponent< PointLightComponent >()->gameObject = this;
     }
 
     return *this;

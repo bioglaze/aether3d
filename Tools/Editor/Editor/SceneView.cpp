@@ -463,9 +463,11 @@ void svEndRender( SceneView* sv )
     sv->scene.EndFrame();
 }
 
+std::vector< ae3d::GameObject > gos;
+
 void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& contents )
 {
-    std::vector< ae3d::GameObject > gos;
+    gos.clear();
     std::map< std::string, class Texture2D* > texture2Ds;
     std::map< std::string, class Material* > materials;
     Array< class Mesh* > meshes;
