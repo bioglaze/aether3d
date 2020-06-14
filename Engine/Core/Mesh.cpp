@@ -187,7 +187,7 @@ void ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIndex, Array< Vec
     }
     else if (!subMesh.verticesPTN.empty())
     {
-        for (int faceIndex = 0; faceIndex < faceCount; ++faceIndex)
+        for (int faceIndex = 0; faceIndex < faceCount / 3; ++faceIndex)
         {
             const auto& face = subMesh.indices[ faceIndex ];
             outTriangles[ faceIndex * 3 + 0 ] = subMesh.verticesPTN.at( face.a ).position;

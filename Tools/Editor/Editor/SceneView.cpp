@@ -505,6 +505,7 @@ void svSaveScene( SceneView* sv, char* path )
     if (!f)
     {
         System::Print( "Could not open file for saving: %s\n", path );
+        sv->scene.Add( &sv->camera );
         return;
     }
     
@@ -538,10 +539,9 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 #else
         float s = 2;
 #endif
-        System::Print( "screenX: %d, screenY: %d, screenY * 2: %d, height: %d, sprite screenPoint: %f, %f, yMin: %.2f, yMax: %.2f\n", screenX, screenY, screenY * 2, height, screenPoint.x, screenPoint.y * 2, screenPoint.y * 2, screenPoint.y * 2 + texHeight );
-
+        //System::Print("screenX: %d, screenPoint.x: %f, max screenPoint.x: %f, screenY * s: %f, screenPoint.y * 2: %f, screenPoint.y * 2 + texHeight: %f\n", screenX, screenPoint.x, screenPoint.x + texWidth / s, screenY * s, screenPoint.y * 2, screenPoint.y * 2 + texHeight);
         if (screenX > screenPoint.x && screenX < screenPoint.x + texWidth / s &&
-            screenY * s > screenPoint.y * 2 && screenY * s < screenPoint.y * 2 + texHeight)
+            screenY * s > screenPoint.y * s && screenY * s < screenPoint.y * s + texHeight)
         {
             System::Print("Hit game object sprite\n");
             sv->scene.Add( sv->gameObjects[ 0 ] );
