@@ -486,6 +486,11 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
 
     ae3d::GameObject* gizmo = sv->gameObjects[ 0 ];
 
+    for (unsigned i = 0; i < sv->gameObjects.count; ++i)
+    {
+        sv->scene.Remove( sv->gameObjects[ i ] );
+    }
+    
     sv->gameObjects.Allocate( 1 );
     sv->gameObjects[ 0 ] = gizmo;
 
