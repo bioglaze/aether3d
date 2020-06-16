@@ -1375,7 +1375,10 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outMeshes[ outMeshes.count - 1 ]->Load( FileSystem::FileContents( meshFile.c_str() ) );
 			meshRenderer->SetMesh( outMeshes[ outMeshes.count - 1 ] );
 
-            meshRenderer->SetMaterial( tempMaterial, 0 );
+            for (unsigned i = 0; i < mesh->GetSubMeshCount(); ++i)
+            {
+                meshRenderer->SetMaterial( tempMaterial, i );
+            }
         }
         else if (token == "spriterenderer")
         {
