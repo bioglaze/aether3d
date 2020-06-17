@@ -441,6 +441,7 @@ void svDuplicateGameObject( SceneView* sv )
         sv->gameObjects.Add( new GameObject() );
         sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( "GameObject" );
         sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< TransformComponent >();
+        sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition() );
 
         if (sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >())
         {
@@ -504,6 +505,11 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
 void svSaveScene( SceneView* sv, char* path )
 {
     sv->scene.Remove( &sv->camera );
+    
+    if (sv->gameObjects.count > 0 && sv->gameObjects[ 0 ] != nullptr)
+    {
+        sv->scene.Remove( sv->gameObjects[ 0 ] );
+    }
 
     const std::string sceneStr = sv->scene.GetSerialized();
     FILE* f = fopen( path, "wb" );
