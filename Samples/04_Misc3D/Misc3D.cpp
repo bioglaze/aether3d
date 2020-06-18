@@ -34,9 +34,9 @@
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
-//#define TEST_SHADOWS_SPOT
+#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-#define TEST_FORWARD_PLUS
+//#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
@@ -386,8 +386,10 @@ int main()
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
     spotLight.AddComponent<TransformComponent>();
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -95 }, { 0, -1, 0 }, { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -95 }, { 0, 0, -195 }, { 0, 1, 0 } );
     //spotLight.GetComponent<TransformComponent>()->SetParent( lightParent.GetComponent< TransformComponent >() );
+    //cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -95 } );
+    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -195 } );
 
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
@@ -651,6 +653,7 @@ int main()
     scene.Add( &childCube );
     //scene.Add( &copiedCube );
     scene.Add( &rotatingCube );
+    scene.Add( &cube );
 
 #ifdef TEST_FORWARD_PLUS
     for (int i = 0; i < 5; ++i)
