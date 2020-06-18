@@ -924,7 +924,6 @@ using namespace ae3d;
 #endif
 
         //scene2.Render();
-        //System::DrawLines( lineHandle, lineView, lineProjection );
         Matrix44 viewMat = camera3d.GetComponent< CameraComponent >()->GetView();
         Matrix44 lineTransform;
         lineTransform.MakeIdentity();
@@ -932,13 +931,12 @@ using namespace ae3d;
         Matrix44 spotRot;
         spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalRotation().GetMatrix( spotRot );
         
-        //lineTransform.Scale( spotLight->GetConeAngle(), spotLight->GetConeAngle(), spotLight->GetConeAngle() );
-        lineTransform.Scale( 2, 2, 2 );
+        lineTransform.Scale( 4, 4, 18 );
         Matrix44::Multiply( lineTransform, spotRot, lineTransform );
         lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
         Matrix44::Multiply( lineTransform, viewMat, viewMat );
         System::DrawLines( coneLineHandle, viewMat,
-                          camera3d.GetComponent< CameraComponent >()->GetProjection(), self.view.bounds.size.width, self.view.bounds.size.height );
+                          camera3d.GetComponent< CameraComponent >()->GetProjection(), self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 16 ) );
 
 #ifdef TEST_NUKLEAR_UI
