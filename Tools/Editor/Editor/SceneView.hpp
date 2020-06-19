@@ -33,6 +33,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 void svHandleLeftMouseUp( SceneView* sv );
 void svMoveSelection( SceneView* sceneView, const ae3d::Vec3& moveDir );
 ae3d::GameObject* svSelectObject( SceneView* sceneView, int screenX, int screenY, int width, int height );
+ae3d::GameObject* svSelectGameObjectIndex( SceneView* sceneView, int index );
 void svDeleteGameObject( SceneView* sceneView );
 void svFocusOnSelected( SceneView* sceneView );
 void svUpdate( SceneView* sceneView );

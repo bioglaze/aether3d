@@ -532,6 +532,18 @@ void svSaveScene( SceneView* sv, char* path )
     sv->scene.Add( &sv->camera );
 }
 
+ae3d::GameObject* svSelectGameObjectIndex( SceneView* sv, int index )
+{
+    sv->selectedGameObjects.Allocate( 0 );
+    sv->selectedGameObjects.Add( sv->gameObjects[ index ] );
+    sv->selectedGOIndex = index;
+
+    sv->scene.Add( sv->gameObjects[ 0 ] );
+    sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( sv->gameObjects[ index ]->GetComponent<TransformComponent>()->GetLocalPosition() );
+
+    return sv->gameObjects[ index ];
+}
+
 GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, int height )
 {
     ae3d::CameraComponent* camera = sv->camera.GetComponent<CameraComponent>();

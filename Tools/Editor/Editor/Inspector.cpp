@@ -187,10 +187,11 @@ void Inspector::HandleMouseMotion( int x, int y )
     nk_input_motion( &ctx, x, y );
 }
 
-void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, unsigned goCount, ae3d::Material* material )
+void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, unsigned goCount, ae3d::Material* material, int& outSelectedGameObject )
 {
     outCommand = Command::Empty;
-
+    outSelectedGameObject = -1;
+    
     if (nk_begin( &ctx, "Inspector", nk_rect( 10, 50, 450, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {        
         nk_layout_row_static( &ctx, 40, 450, 1 );
@@ -219,7 +220,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
             nk_layout_row_static( &ctx, 40, 140, 1 );
             float& scale = transform->GetLocalScale();
-            nk_property_float( &ctx, "#Scale:", 0.1f, &scale, 1024.0f, 1, 1 );
+            nk_property_float( &ctx, "#Scale:", 0.001f, &scale, 1024.0f, 1, 1 );
             nk_layout_row_static( &ctx, 40, 450, 1 );
         }
         
@@ -246,7 +247,11 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     {
                         mesh->Load( FileSystem::FileContents( path ) );
                         gameObject->GetComponent< MeshRendererComponent >()->SetMesh( mesh );
-                        gameObject->GetComponent< MeshRendererComponent >()->SetMaterial( material, 0 );
+
+                        for (unsigned i = 0; i < mesh->GetSubMeshCount(); ++i)
+                        {
+                            gameObject->GetComponent< MeshRendererComponent >()->SetMaterial( material, i );
+                        }
                     }
                 }
 
@@ -443,9 +448,8 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 {
                     if (nk_button_label( &ctx, goNames[ i ] ))
                     {
-                        ae3d::System::Print("todo: select game object\n");
+                        outSelectedGameObject = i + 1;
                     }
-
                 }
 
                 nk_tree_pop( &ctx );

@@ -335,9 +335,15 @@ int main()
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
         GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
-        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount, svGetMaterial( sceneView ) );
+        int inspectorSelectedGameObject = 0;
+        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount, svGetMaterial( sceneView ), inspectorSelectedGameObject );
         svEndRender( sceneView );
 
+        if (inspectorSelectedGameObject >= 0)
+        {
+            selectedGO = svSelectGameObjectIndex( sceneView, inspectorSelectedGameObject );
+        }
+        
         switch (inspectorCommand)
         {
         case Inspector::Command::CreateGO:

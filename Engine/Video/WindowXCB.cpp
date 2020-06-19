@@ -489,7 +489,6 @@ void ae3d::Window::PumpEvents()
                 }
 
                 const xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
-                printf("key %d\n", keysym);
 
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = (WindowGlobal::keyMap.find( keysym ) == WindowGlobal::keyMap.end() ) ? ae3d::KeyCode::N : WindowGlobal::keyMap[ keysym ];
                 break;
