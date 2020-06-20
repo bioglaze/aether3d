@@ -484,6 +484,11 @@ namespace ae3d
         return true;
     }
 
+    bool Window::IsWayland()
+    {
+        return false;
+    }
+
     void Window::PumpEvents()
     {
         MSG msg;

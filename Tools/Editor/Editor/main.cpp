@@ -104,7 +104,6 @@ int main()
     inspector.Init();
     
     Vec3 moveDir;
-    Vec3 gamepadMoveDir;
     constexpr float velocity = 0.2f;
 
     int lastMouseX = 0;
@@ -127,7 +126,7 @@ int main()
 
         deltaX = 0;
         deltaY = 0;
-
+        
         while (Window::PollEvent( event ))
         {
             if (event.type == WindowEventType::Close)
@@ -293,16 +292,14 @@ int main()
             }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
             {
-                gamepadMoveDir.z = -event.gamePadThumbY;
-                gamepadMoveDir.x = event.gamePadThumbX;
+                moveDir.z = -event.gamePadThumbY;
+                moveDir.x = event.gamePadThumbX;
             }
             else if (event.type == WindowEventType::GamePadRightThumbState)
             {
                 svRotateCamera( sceneView, -float( event.gamePadThumbX ) / 10, float( event.gamePadThumbY ) / 10 );
             }
         }
-
-        moveDir += gamepadMoveDir;
 
         inspector.EndInput();
         svHighlightGizmo( sceneView, x, y, width, height );
@@ -312,7 +309,14 @@ int main()
 #if _MSC_VER
             svRotateCamera( sceneView, -float( deltaX ) / 20, -float( deltaY ) / 20 );
 #else
-            svRotateCamera( sceneView, float( deltaX ) / 20, float( deltaY ) / 20 );
+            if (Window::IsWayland())
+            {
+                svRotateCamera( sceneView, -float( deltaX ) / 20, -float( deltaY ) / 20 );
+            }
+            else
+            {
+                svRotateCamera( sceneView, float( deltaX ) / 20, float( deltaY ) / 20 );
+            }
 #endif
         }
 
@@ -322,9 +326,16 @@ int main()
             moveDir.x = -deltaX / 20.0f;
             moveDir.y = deltaY / 20.0f;
 #else
-            // Tested on Vulkan on Linux, matches Unity.
-            moveDir.x = deltaX / 20.0f;
-            moveDir.y = -deltaY / 20.0f;
+            if (Window::IsWayland())
+            {
+                moveDir.x = -deltaX / 20.0f;
+                moveDir.y = deltaY / 20.0f;
+            }
+            else
+            {
+                moveDir.x = deltaX / 20.0f;
+                moveDir.y = -deltaY / 20.0f;
+            }
 #endif
         }
         

@@ -80,6 +80,9 @@ namespace ae3d
     /// Window
     namespace Window
     {
+        /// \return true, if the system is running on Wayland.
+        bool IsWayland();
+        
         /**
           Creates a window and rendering context.
 

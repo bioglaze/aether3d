@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "GfxDevice.hpp"
 
@@ -64,6 +65,7 @@ namespace
 
 namespace WindowGlobal
 {
+    bool isWayland = false;
     bool isOpen = false;
     const int eventStackSize = 15;
     ae3d::WindowEvent eventStack[eventStackSize];
@@ -226,7 +228,8 @@ void LoadAtoms()
 static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
     WindowGlobal::presentInterval = (flags & ae3d::WindowCreateFlags::No_vsync) ? 0 : 1;
-
+    WindowGlobal::isWayland = strstr( getenv( "XDG_SESSION_TYPE" ), "wayland" ) != 0;
+    
     int visualID = screen->root_visual;
     
     xcb_colormap_t colormap = xcb_generate_id( connection );
@@ -299,6 +302,11 @@ static int CreateWindowAndContext( Display* display, xcb_connection_t* connectio
     }
     
     return 0;
+}
+
+bool ae3d::Window::IsWayland()
+{
+    return WindowGlobal::isWayland;
 }
 
 bool ae3d::Window::IsOpen()
