@@ -104,6 +104,7 @@ int main()
     inspector.Init();
     
     Vec3 moveDir;
+    Vec3 gamepadMoveDir;
     constexpr float velocity = 0.2f;
 
     int lastMouseX = 0;
@@ -292,14 +293,19 @@ int main()
             }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
             {
-                moveDir.z = -event.gamePadThumbY;
-                moveDir.x = event.gamePadThumbX;
+                gamepadMoveDir.z = -event.gamePadThumbY;
+                gamepadMoveDir.x = event.gamePadThumbX;
+#ifndef _MSC_VER
+                moveDir = {};
+#endif
             }
             else if (event.type == WindowEventType::GamePadRightThumbState)
             {
                 svRotateCamera( sceneView, -float( event.gamePadThumbX ) / 10, float( event.gamePadThumbY ) / 10 );
             }
         }
+
+        moveDir += gamepadMoveDir;
 
         inspector.EndInput();
         svHighlightGizmo( sceneView, x, y, width, height );
