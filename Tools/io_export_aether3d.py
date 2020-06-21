@@ -156,21 +156,17 @@ class Aether3DExporter( bpy.types.Operator ):
 
     def get_vertex_pnt( self, obj_prop, mesh, face, face_vi ):
         # position
-        co = obj_prop[ OBJ.LOC ] + mathutils.Vector( obj_prop[ OBJ.ROT ] @ mathutils.Vector([ \
-                                                                                        mesh.vertices[ face.vertices[ face_vi ] ].co[ 0 ] * obj_prop[ OBJ.SCA ][ 0 ], \
-                                                                                        mesh.vertices[ face.vertices[ face_vi ] ].co[ 1 ] * obj_prop[ OBJ.SCA ][ 1 ], \
-                                                                                        mesh.vertices[ face.vertices[ face_vi ] ].co[ 2 ] * obj_prop[ OBJ.SCA ][ 2 ] \
-                                                                                        ]))
+        co = mesh.vertices[ face.vertices[ face_vi ] ].co
         # print( "groups: " + str( len( mesh.vertices[ face.vertices[ face_vi ] ].groups ) ) )
         
         # normal
         if face.use_smooth:
             if mesh.use_auto_smooth:
-                no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ get_autosmooth_normal( mesh, face, face.vertices[ face_vi ] ))
+                no = get_autosmooth_normal( mesh, face, face.vertices[ face_vi ] )
             else:
-                no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ mesh.vertices[ face.vertices[ face_vi ] ].normal )
+                no = mesh.vertices[ face.vertices[ face_vi ] ].normal
         else:
-                no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ face.normal )
+                no = face.normal
 
         color = ( 1.0, 1.0, 1.0, 1.0 )
         
@@ -219,18 +215,16 @@ class Aether3DExporter( bpy.types.Operator ):
             mesh.faces = []
             mesh.name = obj.name
 
+            global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
+
+            obj.data.transform( global_matrix @ obj.matrix_world )
 
             obj.data.calc_loop_triangles()
             obj.data.calc_tangents()
             
-            object[ OBJ.MAT ] = obj.matrix_world.copy() @ mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
-            object[ OBJ.LOC ] = object[ OBJ.MAT ].to_translation()
-            object[ OBJ.ROT ] = object[ OBJ.MAT ].to_quaternion()
-            object[ OBJ.SCA ] = object[ OBJ.MAT ].to_scale()
             object[ OBJ.UVL ] = None
 
             armatures = [Object for Object in context.selected_objects if Object.type in ("ARMATURE")]
-            global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
             armOffs = 0
             boneNames = []
             verts = []
