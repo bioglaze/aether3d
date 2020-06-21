@@ -161,6 +161,8 @@ class Aether3DExporter( bpy.types.Operator ):
                                                                                         mesh.vertices[ face.vertices[ face_vi ] ].co[ 1 ] * obj_prop[ OBJ.SCA ][ 1 ], \
                                                                                         mesh.vertices[ face.vertices[ face_vi ] ].co[ 2 ] * obj_prop[ OBJ.SCA ][ 2 ] \
                                                                                         ]))
+        # print( "groups: " + str( len( mesh.vertices[ face.vertices[ face_vi ] ].groups ) ) )
+        
         # normal
         if face.use_smooth:
             if mesh.use_auto_smooth:
@@ -171,7 +173,7 @@ class Aether3DExporter( bpy.types.Operator ):
                 no = mathutils.Vector( obj_prop[ OBJ.ROT ] @ face.normal )
 
         color = ( 1.0, 1.0, 1.0, 1.0 )
-
+        
         outVertex = Vertex()
         outVertex.co = co
         outVertex.normal = no
@@ -206,9 +208,9 @@ class Aether3DExporter( bpy.types.Operator ):
         # FIXME: This should be read from the export property.
         exportSkeleton = True
         actions = []
+        bones = []
         
         for obj in objects:
-            print( "obj type: " + obj.type )
             if obj.type == "ARMATURE":
                 continue
             
@@ -216,7 +218,8 @@ class Aether3DExporter( bpy.types.Operator ):
             mesh.vertices = []
             mesh.faces = []
             mesh.name = obj.name
-            
+
+
             obj.data.calc_loop_triangles()
             obj.data.calc_tangents()
             
@@ -229,7 +232,6 @@ class Aether3DExporter( bpy.types.Operator ):
             armatures = [Object for Object in context.selected_objects if Object.type in ("ARMATURE")]
             global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
             armOffs = 0
-            bones = []
             boneNames = []
             verts = []
 
@@ -458,7 +460,7 @@ class Aether3DExporter( bpy.types.Operator ):
             vertexFormat = 0;
             if mesh.jointCount > 0:
                 vertexFormat = 2
-            print( "VertexFormat: " + str( vertexFormat ) )
+
             vertexFormatPacked = struct.pack( 'b', vertexFormat )
             f.write( vertexFormatPacked )
             
@@ -545,6 +547,9 @@ class Aether3DExporter( bpy.types.Operator ):
                 component = struct.pack( 'H', i[2] )
                 f.write( component )
 
+            if vertexFormat == 0:
+                continue
+            
             # Writes # of joints.
             nJoints = struct.pack( 'H', mesh.jointCount )
             f.write( nJoints )
