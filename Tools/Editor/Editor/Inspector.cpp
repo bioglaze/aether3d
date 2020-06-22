@@ -45,6 +45,8 @@ Texture2D* uiTextures[ 1 ];
 nk_context ctx;
 nk_font_atlas atlas;
 Texture2D nkFontTexture;
+char gameObjectNameField[ 64 ];
+int gameObjectNameFieldLength;
 
 static unsigned Min2( unsigned a, unsigned b )
 {
@@ -131,6 +133,8 @@ static void DrawNuklear( int width, int height )
 
 void Inspector::Init()
 {    
+    textEditActive = false;
+
     nk_font_atlas_init_default( &atlas );
     nk_font_atlas_begin( &atlas );
 
@@ -187,13 +191,20 @@ void Inspector::HandleMouseMotion( int x, int y )
     nk_input_motion( &ctx, x, y );
 }
 
+bool Inspector::IsTextEditActive()
+{
+    return textEditActive;
+}
+
 void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, unsigned goCount, ae3d::Material* material, int& outSelectedGameObject )
 {
     outCommand = Command::Empty;
     outSelectedGameObject = -1;
     
     if (nk_begin( &ctx, "Inspector", nk_rect( 10, 50, 450, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
-    {        
+    {      
+        textEditActive = ctx.current->edit.active;
+
         nk_layout_row_static( &ctx, 40, 450, 1 );
 
         // Gameobject is selected.
@@ -201,6 +212,8 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         if (gameObject != nullptr)
         {
             nk_label( &ctx, gameObject->GetName(), NK_TEXT_LEFT );
+            //nk_edit_string( &ctx, NK_EDIT_FIELD, gameObjectNameField, &gameObjectNameFieldLength, 64, nk_filter_default );
+            //gameObject->SetName( gameObjectNameField );
         }
 
         TransformComponent* transform = gameObject ? gameObject->GetComponent< TransformComponent >() : nullptr;

@@ -12,6 +12,7 @@ class Inspector
     enum class Command { Empty, CreateGO, OpenScene, SaveScene };
 
     void Init();
+    bool IsTextEditActive();
     void BeginInput();
     void EndInput();
     void Deinit();
@@ -21,4 +22,7 @@ class Inspector
     void HandleKey( int key, int state );
     void HandleChar( char ch );
     void Render( unsigned width, unsigned height, ae3d::GameObject* gameObject, Command& outCommand, ae3d::GameObject** gameObjects, unsigned goCount, ae3d::Material* material, int& outSelectedGameObject );
+
+private:
+    bool textEditActive;
 };
