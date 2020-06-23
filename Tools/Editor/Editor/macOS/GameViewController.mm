@@ -121,7 +121,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.isDown = true;
     inputEvent.isActive = true;
     const float velocity = 0.3f;
-    
+
     // Keycodes from: https://forums.macrumors.com/threads/nsevent-keycode-list.780577/
     if ([theEvent keyCode] == 0x00) // A
     {
@@ -141,6 +141,10 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     else if ([theEvent keyCode] == 0x0D) // W
     {
         moveDir.z = -velocity;
+    }
+    else if ([theEvent keyCode] == 3) // F
+    {
+        svFocusOnSelected( sceneView );
     }
     else if ([theEvent keyCode] == 0x01 && isCmdDown) // Cmd+S
     {
@@ -375,10 +379,16 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
         ae3d::GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
-        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount, svGetMaterial( sceneView ) );
+        int inspectorGOIndex = 0;
+        inspector.Render( width, height, selectedGO, inspectorCommand, gameObjects, goCount, svGetMaterial( sceneView ), inspectorGOIndex );
         svEndRender( sceneView );
         ae3d::System::EndFrame();
         
+        if (inspectorGOIndex >= 0)
+        {
+            selectedGO = svSelectGameObjectIndex( sceneView, inspectorGOIndex );
+        }
+
         switch (inspectorCommand)
         {
             case Inspector::Command::CreateGO:

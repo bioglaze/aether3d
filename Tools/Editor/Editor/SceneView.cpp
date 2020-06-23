@@ -277,9 +277,9 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
         Vec3 oAABB[ 8 ];
         GetCorners( meshRenderer->GetMesh()->GetAABBMin(), meshRenderer->GetMesh()->GetAABBMax(), oAABB );
 
-        for (int i = 0; i < 8; ++i)
+        for (int v = 0; v < 8; ++v)
         {
-            Matrix44::TransformPoint( oAABB[ i ], meshLocalToWorld, &oAABB[ i ] );
+            Matrix44::TransformPoint( oAABB[ v ], meshLocalToWorld, &oAABB[ v ] );
         }
 
         GetMinMax( oAABB, 8, oMin, oMax );
@@ -301,9 +301,9 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
 
                 GetCorners( meshRenderer->GetMesh()->GetSubMeshAABBMin( subMeshIndex ), meshRenderer->GetMesh()->GetSubMeshAABBMax( subMeshIndex ), mAABB );
 
-                for (int i = 0; i < 8; ++i)
+                for (int v = 0; v < 8; ++v)
                 {
-                    Matrix44::TransformPoint( mAABB[ i ], meshLocalToWorld, &mAABB[ i ] );
+                    Matrix44::TransformPoint( mAABB[ v ], meshLocalToWorld, &mAABB[ v ] );
                 }
 
                 GetMinMax( mAABB, 8, subMeshMin, subMeshMax );
@@ -311,9 +311,9 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
                 Array< Vec3 > triangles;
                 meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex, triangles );
                 
-                for (int i = 0; i < triangles.count; ++i)
+                for (int v = 0; v < triangles.count; ++v)
                 {
-                    Matrix44::TransformPoint( triangles[ i ], meshLocalToWorld, &triangles[ i ] );
+                    Matrix44::TransformPoint( triangles[ v ], meshLocalToWorld, &triangles[ v ] );
                 }
 
                 const float subMeshDistance = collisionTest == CollisionTest::AABB ? IntersectRayAABB( rayOrigin, rayTarget, subMeshMin, subMeshMax )
