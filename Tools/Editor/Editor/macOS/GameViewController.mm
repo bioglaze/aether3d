@@ -200,7 +200,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.key = [theEvent keyCode];
     inputEvent.isDown = false;
     inputEvent.isActive = true;
-    
+    printf( "key: %d\n", inputEvent.key );
     if ([theEvent keyCode] == 0x00) // A
     {
         moveDir.x = 0;
@@ -334,7 +334,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         }
     }
     //printf("inputEvent.key: %d\n", inputEvent.key);
-    if (!inputEvent.isDown && inputEvent.isActive && inputEvent.key != 0)
+    if (!inputEvent.isDown && inputEvent.isActive)
     {
         if (inputEvent.key == 51 /* backspace*/) inspector.HandleKey( 6, inputEvent.isDown ? 0 : 1 );
         if (inputEvent.key == 36 /* Enter */) inspector.HandleKey( 4, inputEvent.isDown ? 0 : 1 );
@@ -349,6 +349,29 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         if (inputEvent.key == 26) inspector.HandleChar( 55 ); // 7
         if (inputEvent.key == 28) inspector.HandleChar( 56 ); // 8
         if (inputEvent.key == 25) inspector.HandleChar( 57 ); // 9
+        
+        if (inspector.IsTextEditActive())
+        {
+            if (inputEvent.key == 12) inspector.HandleChar( 'q' );
+            if (inputEvent.key == 13) inspector.HandleChar( 'w' );
+            if (inputEvent.key == 14) inspector.HandleChar( 'e' );
+            if (inputEvent.key == 15) inspector.HandleChar( 'r' );
+            if (inputEvent.key == 17) inspector.HandleChar( 't' );
+            if (inputEvent.key == 16) inspector.HandleChar( 'y' );
+            if (inputEvent.key == 32) inspector.HandleChar( 'u' );
+            if (inputEvent.key == 34) inspector.HandleChar( 'i' );
+            if (inputEvent.key == 31) inspector.HandleChar( 'o' );
+            if (inputEvent.key == 35) inspector.HandleChar( 'p' );
+            if (inputEvent.key == 0) inspector.HandleChar( 'a' );
+            if (inputEvent.key == 1) inspector.HandleChar( 's' );
+            if (inputEvent.key == 2) inspector.HandleChar( 'd' );
+            if (inputEvent.key == 3) inspector.HandleChar( 'f' );
+            if (inputEvent.key == 5) inspector.HandleChar( 'g' );
+            if (inputEvent.key == 4) inspector.HandleChar( 'h' );
+            if (inputEvent.key == 38) inspector.HandleChar( 'j' );
+            if (inputEvent.key == 40) inspector.HandleChar( 'k' );
+            if (inputEvent.key == 37) inspector.HandleChar( 'l' );
+        }
     }
 
     if (inputEvent.isActive)
