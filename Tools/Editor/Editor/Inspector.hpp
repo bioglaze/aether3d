@@ -13,6 +13,7 @@ class Inspector
 
     void Init();
     bool IsTextEditActive();
+    void SetTextEditText( const char* str );
     void BeginInput();
     void EndInput();
     void Deinit();

@@ -196,6 +196,11 @@ bool Inspector::IsTextEditActive()
     return textEditActive;
 }
 
+void Inspector::SetTextEditText( const char* str )
+{
+    strncpy( gameObjectNameField, str, 64 );
+}
+
 void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject, Command& outCommand, GameObject** gameObjects, unsigned goCount, ae3d::Material* material, int& outSelectedGameObject )
 {
     outCommand = Command::Empty;
@@ -211,9 +216,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
         if (gameObject != nullptr)
         {
-            nk_label( &ctx, gameObject->GetName(), NK_TEXT_LEFT );
-            //nk_edit_string( &ctx, NK_EDIT_FIELD, gameObjectNameField, &gameObjectNameFieldLength, 64, nk_filter_default );
-            //gameObject->SetName( gameObjectNameField );
+            //nk_label( &ctx, gameObject->GetName(), NK_TEXT_LEFT );
+            nk_edit_string( &ctx, NK_EDIT_FIELD, gameObjectNameField, &gameObjectNameFieldLength, 64, nk_filter_default );
+            gameObject->SetName( gameObjectNameField );
         }
 
         TransformComponent* transform = gameObject ? gameObject->GetComponent< TransformComponent >() : nullptr;

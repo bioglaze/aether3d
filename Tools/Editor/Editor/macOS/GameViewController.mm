@@ -122,6 +122,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.isActive = true;
     const float velocity = 0.3f;
 
+    if (inspector.IsTextEditActive())
+    {
+        return;
+    }
+
     // Keycodes from: https://forums.macrumors.com/threads/nsevent-keycode-list.780577/
     if ([theEvent keyCode] == 0x00) // A
     {
@@ -201,6 +206,12 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.isDown = false;
     inputEvent.isActive = true;
     printf( "key: %d\n", inputEvent.key );
+    
+    if (inspector.IsTextEditActive())
+    {
+        return;
+    }
+    
     if ([theEvent keyCode] == 0x00) // A
     {
         moveDir.x = 0;
@@ -263,6 +274,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     if (!clickedOnInspector)
     {
         selectedGO = svSelectObject( sceneView, inputEvent.x, inputEvent.y, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+        
+        if (selectedGO)
+        {
+            inspector.SetTextEditText( selectedGO->GetName() );
+        }
     }
 }
 
@@ -371,6 +387,14 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
             if (inputEvent.key == 38) inspector.HandleChar( 'j' );
             if (inputEvent.key == 40) inspector.HandleChar( 'k' );
             if (inputEvent.key == 37) inspector.HandleChar( 'l' );
+            if (inputEvent.key == 6) inspector.HandleChar( 'z' );
+            if (inputEvent.key == 7) inspector.HandleChar( 'x' );
+            if (inputEvent.key == 8) inspector.HandleChar( 'c' );
+            if (inputEvent.key == 9) inspector.HandleChar( 'v' );
+            if (inputEvent.key == 11) inspector.HandleChar( 'b' );
+            if (inputEvent.key == 45) inspector.HandleChar( 'n' );
+            if (inputEvent.key == 46) inspector.HandleChar( 'm' );
+            if (inputEvent.key == 49) inspector.HandleChar( ' ' );
         }
     }
 
