@@ -139,57 +139,61 @@ int main()
             
             if (event.type == WindowEventType::KeyDown || event.type == WindowEventType::KeyUp)
             {
-                KeyCode keyCode = event.keyCode;
-
-                switch( keyCode )
+                if (!inspector.IsTextEditActive())
                 {
-                case KeyCode::Q:
-                    moveDir.y = event.type == WindowEventType::KeyDown ? -velocity : 0;
-                    break;
-                case KeyCode::E:
-                    moveDir.y = event.type == WindowEventType::KeyDown ? velocity : 0;
-                    break;
-                case KeyCode::A:
-                    moveDir.x = event.type == WindowEventType::KeyDown ? -velocity : 0;
-                    break;
-                case KeyCode::D:
-                    if (event.keyModifier == KeyModifier::Control)
+
+                    KeyCode keyCode = event.keyCode;
+
+                    switch (keyCode)
                     {
-                        svDuplicateGameObject( sceneView );
+                    case KeyCode::Q:
+                        moveDir.y = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                        break;
+                    case KeyCode::E:
+                        moveDir.y = event.type == WindowEventType::KeyDown ? velocity : 0;
+                        break;
+                    case KeyCode::A:
+                        moveDir.x = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                        break;
+                    case KeyCode::D:
+                        if (event.keyModifier == KeyModifier::Control)
+                        {
+                            svDuplicateGameObject( sceneView );
+                        }
+                        else
+                        {
+                            moveDir.x = event.type == WindowEventType::KeyDown ? velocity : 0;
+                        }
+                        break;
+                    case KeyCode::W:
+                        moveDir.z = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                        break;
+                    case KeyCode::S:
+                        moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
+                        break;
+                    case KeyCode::Left:
+                        svMoveSelection( sceneView, { -1, 0, 0 } );
+                        break;
+                    case KeyCode::F:
+                        svFocusOnSelected( sceneView );
+                        break;
+                    case KeyCode::Right:
+                        svMoveSelection( sceneView, { 1, 0, 0 } );
+                        break;
+                    case KeyCode::Up:
+                        svMoveSelection( sceneView, { 0, 1, 0 } );
+                        break;
+                    case KeyCode::Down:
+                        svMoveSelection( sceneView, { 0, -1, 0 } );
+                        break;
+                    case KeyCode::Delete:
+                        svDeleteGameObject( sceneView );
+                        selectedGO = nullptr;
+                        break;
+                    default: break;
                     }
-                    else
-                    {
-                        moveDir.x = event.type == WindowEventType::KeyDown ? velocity : 0;
-                    }
-                    break;
-                case KeyCode::W:
-                    moveDir.z = event.type == WindowEventType::KeyDown ? -velocity : 0;
-                    break;
-                case KeyCode::S:
-                    moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
-                    break;
-                case KeyCode::Left:
-                    svMoveSelection( sceneView, { -1, 0, 0 } );
-                    break;
-                case KeyCode::F:
-                    svFocusOnSelected( sceneView );
-                    break;
-                case KeyCode::Right:
-                    svMoveSelection( sceneView, { 1, 0, 0 } );
-                    break;
-                case KeyCode::Up:
-                    svMoveSelection( sceneView, { 0, 1, 0 } );
-                    break;
-                case KeyCode::Down:
-                    svMoveSelection( sceneView, { 0, -1, 0 } );
-                    break;
-                case KeyCode::Delete:
-                    svDeleteGameObject( sceneView );
-                    selectedGO = nullptr;
-                    break;
-                default: break;
                 }
-                
+
                 if (event.keyCode == KeyCode::Enter) inspector.HandleKey( 4, event.type == WindowEventType::KeyDown ? 0 : 1 );
                 if (event.keyCode == KeyCode::Backspace) inspector.HandleKey( 6, event.type == WindowEventType::KeyDown ? 0 : 1 );
                 if (event.type == WindowEventType::KeyDown)
@@ -205,6 +209,37 @@ int main()
                     if (event.keyCode == KeyCode::N7) inspector.HandleChar( 55 );
                     if (event.keyCode == KeyCode::N8) inspector.HandleChar( 56 );
                     if (event.keyCode == KeyCode::N9) inspector.HandleChar( 57 );
+
+                    if (inspector.IsTextEditActive())
+                    {
+                        if (event.keyCode == KeyCode::Q) inspector.HandleChar( 'q' );
+                        if (event.keyCode == KeyCode::W) inspector.HandleChar( 'w' );
+                        if (event.keyCode == KeyCode::E) inspector.HandleChar( 'e' );
+                        if (event.keyCode == KeyCode::R) inspector.HandleChar( 'r' );
+                        if (event.keyCode == KeyCode::T) inspector.HandleChar( 't' );
+                        if (event.keyCode == KeyCode::Y) inspector.HandleChar( 'y' );
+                        if (event.keyCode == KeyCode::U) inspector.HandleChar( 'u' );
+                        if (event.keyCode == KeyCode::I) inspector.HandleChar( 'i' );
+                        if (event.keyCode == KeyCode::O) inspector.HandleChar( 'o' );
+                        if (event.keyCode == KeyCode::P) inspector.HandleChar( 'p' );
+                        if (event.keyCode == KeyCode::A) inspector.HandleChar( 'a' );
+                        if (event.keyCode == KeyCode::S) inspector.HandleChar( 's' );
+                        if (event.keyCode == KeyCode::D) inspector.HandleChar( 'd' );
+                        if (event.keyCode == KeyCode::F) inspector.HandleChar( 'f' );
+                        if (event.keyCode == KeyCode::G) inspector.HandleChar( 'g' );
+                        if (event.keyCode == KeyCode::H) inspector.HandleChar( 'h' );
+                        if (event.keyCode == KeyCode::J) inspector.HandleChar( 'j' );
+                        if (event.keyCode == KeyCode::K) inspector.HandleChar( 'k' );
+                        if (event.keyCode == KeyCode::L) inspector.HandleChar( 'l' );
+                        if (event.keyCode == KeyCode::Z) inspector.HandleChar( 'z' );
+                        if (event.keyCode == KeyCode::X) inspector.HandleChar( 'x' );
+                        if (event.keyCode == KeyCode::C) inspector.HandleChar( 'c' );
+                        if (event.keyCode == KeyCode::V) inspector.HandleChar( 'v' );
+                        if (event.keyCode == KeyCode::B) inspector.HandleChar( 'b' );
+                        if (event.keyCode == KeyCode::N) inspector.HandleChar( 'n' );
+                        if (event.keyCode == KeyCode::M) inspector.HandleChar( 'm' );
+                        if (event.keyCode == KeyCode::Space) inspector.HandleChar( ' ' );
+                    }
                 }
             }
 
