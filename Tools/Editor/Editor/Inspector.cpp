@@ -48,11 +48,6 @@ Texture2D nkFontTexture;
 char gameObjectNameField[ 64 ];
 int gameObjectNameFieldLength;
 
-static unsigned Min2( unsigned a, unsigned b )
-{
-    return a < b ? a : b;
-}
-
 static void DrawNuklear( int width, int height )
 {
     nk_convert_config config = {};

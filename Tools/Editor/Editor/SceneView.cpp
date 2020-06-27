@@ -109,14 +109,14 @@ enum class CollisionTest
 
 CollisionTest colTest = CollisionTest::Triangles;
 
-float Max2( float a, float b )
+static float Min2( float a, float b )
 {
     return a < b ? b : a;
 }
 
-float Min2( float a, float b )
+static float Max2( float a, float b )
 {
-    return a < b ? a : b;
+    return a < b ? b : a;
 }
 
 bool AlmostEquals( float f, float v )
@@ -256,13 +256,15 @@ static void GetCorners( const Vec3& min, const Vec3& max, Vec3 outCorners[ 8 ] )
     outCorners[ 7 ] = Vec3( max.x, min.y, max.z );
 }
 
-void GetColliders( GameObject& camera, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest, Array< CollisionInfo >& outColliders )
+void GetColliders( GameObject& camera, bool includeGizmo, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest, Array< CollisionInfo >& outColliders )
 {
     Vec3 rayOrigin, rayTarget;
     ScreenPointToRay( screenX, screenY, (float)width, (float)height, camera, rayOrigin, rayTarget );
     
     // Collects meshes that collide with the ray.
-    for (unsigned i = 0; i < gameObjects.count; ++i)
+    const unsigned startIndex = includeGizmo ? 0 : 1;
+    
+    for (unsigned i = startIndex; i < gameObjects.count; ++i)
     {
         GameObject* go = gameObjects[ i ];
         auto meshRenderer = go->GetComponent< MeshRendererComponent >();
@@ -291,7 +293,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
             CollisionInfo collisionInfo;
             collisionInfo.go = go;
             collisionInfo.meshDistance = 99999;
-            collisionInfo.subMeshIndex = 0;
+            collisionInfo.subMeshIndex = -1;
             collisionInfo.gameObjectIndex = i;
 
             for (unsigned subMeshIndex = 0; subMeshIndex < meshRenderer->GetMesh()->GetSubMeshCount(); ++subMeshIndex)
@@ -311,7 +313,7 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
                 Array< Vec3 > triangles;
                 meshRenderer->GetMesh()->GetSubMeshFlattenedTriangles( subMeshIndex, triangles );
                 
-                for (int v = 0; v < triangles.count; ++v)
+                for (unsigned v = 0; v < triangles.count; ++v)
                 {
                     Matrix44::TransformPoint( triangles[ v ], meshLocalToWorld, &triangles[ v ] );
                 }
@@ -327,7 +329,10 @@ void GetColliders( GameObject& camera, int screenX, int screenY, int width, int 
                 }
             }
 
-            outColliders.Add( collisionInfo );
+            if (collisionInfo.subMeshIndex != -1)
+            {
+                outColliders.Add( collisionInfo );
+            }
         }
     }
 
@@ -584,7 +589,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 
     // Checks if the mouse hit a mesh and selects the object.
     Array< CollisionInfo > ci;
-    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
+    GetColliders( sv->camera, sv->selectedGameObjects.count != 0, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     if (ci.count > 0 && ci[ 0 ].go != sv->gameObjects[ 0 ])
     {
@@ -615,7 +620,7 @@ void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int h
 {
     Array< CollisionInfo > ci;
 
-    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
+    GetColliders( sv->camera, sv->selectedGameObjects.count != 0, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     const int selected = isGizmo ? ci[ 0 ].subMeshIndex : -1;
@@ -650,7 +655,7 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 {
     Array< CollisionInfo > ci;
 
-    GetColliders( sv->camera, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
+    GetColliders( sv->camera, sv->selectedGameObjects.count != 0, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
@@ -840,7 +845,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
 #endif
             //printf( "draw: %.2f, %.2f to %.2f, %.2f\n", x, y, x + texWidth, y + texHeight );
             ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
-                                screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+                                screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, opacity ), ae3d::System::BlendMode::Off );
         }
     }
 
