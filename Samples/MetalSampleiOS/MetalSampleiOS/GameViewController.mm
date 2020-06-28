@@ -150,7 +150,7 @@ int gTouchCount = 0;
     
     fontTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
-    astcTex.Load( ae3d::FileSystem::FileContents( "granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
+    //astcTex.Load( ae3d::FileSystem::FileContents( "granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
 
     skyTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
                 ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
@@ -176,8 +176,8 @@ int gTouchCount = 0;
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
-    //standardMaterial.SetTexture( "textureMap", &gliderTex );
-    standardMaterial.SetTexture( &astcTex, 0 );
+    standardMaterial.SetTexture( &gliderTex, 0 );
+    //standardMaterial.SetTexture( &astcTex, 0 );
     
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
