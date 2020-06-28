@@ -260,6 +260,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
+    inputEvent.key = -1;
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
@@ -268,6 +269,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
+    inputEvent.key = -1;
     
     const bool clickedOnInspector = inputEvent.x < InspectorWidth;
 
@@ -308,6 +310,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
+    inputEvent.key = -1;
 }
 
 - (void)scrollWheel:(NSEvent *)event

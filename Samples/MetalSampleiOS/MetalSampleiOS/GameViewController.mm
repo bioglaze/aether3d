@@ -265,7 +265,7 @@ int gTouchCount = 0;
     {
         //mat.second->SetShader( &shader );
         mat.second->SetShader( &standardShader );
-        mat.second->SetTexture( &skyTex, 4 );
+        mat.second->SetTexture( &skyTex );
     }
     
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
