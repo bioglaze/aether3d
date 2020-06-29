@@ -284,10 +284,11 @@ using namespace ae3d;
     RenderTexture cubeRT;
     RenderTexture cameraTex;
     RenderTexture camera2dTex;
+#ifdef TEST_BLOOM
     Texture2D bloomTex;
     Texture2D blurTex;
     Texture2D blurTex2;
-    
+#endif
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
@@ -678,9 +679,11 @@ using namespace ae3d;
 #endif
 
     rtTex.Create2D( 512, 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture" );
+#ifdef TEST_BLOOM
     bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex" );
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
+#endif
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D

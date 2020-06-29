@@ -97,7 +97,7 @@
 		ABD3AB301C29D7F700E78933 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
 		ABD3AB311C29D7F700E78933 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
-		ABFE40671D8D1DE000195AD2 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; };
+		ABFE40671D8D1DE000195AD2 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -495,7 +495,7 @@
 					RENDERER_METAL,
 				);
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;
@@ -511,7 +511,7 @@
 				FRAMEWORK_SEARCH_PATHS = /Users/glaze/Desktop;
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;

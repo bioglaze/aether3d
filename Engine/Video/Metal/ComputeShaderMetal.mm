@@ -102,9 +102,12 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     for (std::size_t i = 0; i < SLOT_COUNT; ++i)
     {
         [commandEncoder setBuffer:uniforms[ i ] offset:0 atIndex:i];
-        [commandEncoder setTexture:(renderTextures[ i ] ? renderTextures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
         
-        if (!renderTextures[ i ])
+        if (renderTextures[ i ])
+        {
+            [commandEncoder setTexture:( renderTextures[ i ]->GetMetalTexture() ) atIndex:i];
+        }
+        else
         {
             [commandEncoder setTexture:(textures[ i ] ? textures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
         }

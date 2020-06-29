@@ -10,7 +10,7 @@ using namespace metal;
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 #define MAX_NUM_LIGHTS_PER_TILE 544
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
-#define USE_MINMAX_Z 1
+#define USE_MINMAX_Z 0
 
 static float4 ConvertClipToView( float4 p, matrix_float4x4 clipToView )
 {
