@@ -68,10 +68,12 @@ struct InputEvent
 {
     bool isActive;
     int x, y;
+    float wheelY;
     int buttonState;
     int key;
     bool isDown;
     bool mouseMoved;
+    bool mouseWheel;
 };
 
 InputEvent inputEvent;
@@ -87,6 +89,8 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.isActive = false;
     inputEvent.mouseMoved = false;
     inputEvent.isDown = false;
+    inputEvent.mouseWheel = false;
+    inputEvent.wheelY = 0;
     
     [super viewDidLoad];
     
@@ -120,6 +124,8 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.key = [theEvent keyCode];
     inputEvent.isDown = true;
     inputEvent.isActive = true;
+    inputEvent.mouseWheel = false;
+    
     const float velocity = 0.3f;
 
     if (inspector.IsTextEditActive())
@@ -205,7 +211,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.key = [theEvent keyCode];
     inputEvent.isDown = false;
     inputEvent.isActive = true;
-    printf( "key: %d\n", inputEvent.key );
+    //printf( "key: %d\n", inputEvent.key );
     
     if (inspector.IsTextEditActive())
     {
@@ -261,6 +267,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
     inputEvent.key = -1;
+    inputEvent.mouseWheel = false;
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
@@ -270,6 +277,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
     inputEvent.key = -1;
+    inputEvent.mouseWheel = false;
     
     const bool clickedOnInspector = inputEvent.x < InspectorWidth;
 
@@ -311,11 +319,14 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
     inputEvent.key = -1;
+    inputEvent.mouseWheel = false;
 }
 
 - (void)scrollWheel:(NSEvent *)event
 {
     ae3d::System::Print("y: %f\n", event.deltaY);
+    inputEvent.mouseWheel = true;
+    inputEvent.wheelY = event.deltaY;
 }
 
 - (void)_render
@@ -326,6 +337,11 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     {
         inputEvent.mouseMoved = false;
         inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
+    }
+    
+    if (inputEvent.mouseWheel)
+    {
+        moveDir.z = inputEvent.wheelY;
     }
     
     if (inputEvent.buttonState == 1 && inputEvent.isActive)
