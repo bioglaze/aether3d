@@ -699,9 +699,22 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
             delta.x = 0;
             delta.y = 0;
             delta.z = deltaX / 20.0f;
+            float sign = Vec3::Dot( sv->camera.GetComponent< ae3d::TransformComponent >()->GetViewDirection(), Vec3( 1, 0, 0 ) );
+
+            if (sign > 0)
+            {
+                delta.z = -delta.z;
+            }
         }
         else if (sv->transformGizmo.selectedMesh == 1)
         {
+            float sign = Vec3::Dot( sv->camera.GetComponent< ae3d::TransformComponent >()->GetViewDirection(), Vec3( 0, 1, 0 ) );
+
+            if (sign > 0)
+            {
+                delta.x = -delta.x;
+            }
+
             delta.y = 0;
         }
         else if (sv->transformGizmo.selectedMesh == 2)
