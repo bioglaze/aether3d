@@ -102,7 +102,7 @@ namespace ae3d
 #endif
 
     private:
-        static const int SLOT_COUNT = 13;
+        static const int SLOT_COUNT = 15;
         
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;
@@ -121,6 +121,7 @@ namespace ae3d
         ID3D12Resource* textureBuffers[ SLOT_COUNT ];
         ID3D12Resource* uavBuffers[ SLOT_COUNT ];
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDescs[ SLOT_COUNT ];
+        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDescs[ SLOT_COUNT ];
 #endif
     };
 }

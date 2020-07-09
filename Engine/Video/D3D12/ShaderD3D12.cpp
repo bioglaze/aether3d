@@ -23,6 +23,7 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
     extern ae3d::TextureBase* texture0;
     extern ae3d::TextureBase* texture1;
+    extern ae3d::TextureBase* texture3;
     extern ae3d::TextureBase* textureCube;
 	extern PerObjectUboStruct perObjectUboStruct;
     extern ae3d::RenderTexture* currentRenderTarget;
@@ -320,6 +321,10 @@ void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* texture, int textureUn
     else if (textureUnit == 1)
     {
         GfxDeviceGlobal::texture1 = texture;
+    }
+    else if (textureUnit == 3)
+    {
+        GfxDeviceGlobal::texture3 = texture;
     }
     else
     {

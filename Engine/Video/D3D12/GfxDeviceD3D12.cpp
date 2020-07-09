@@ -35,7 +35,7 @@ void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
-constexpr int RESOURCE_BINDING_COUNT = 10;
+constexpr int RESOURCE_BINDING_COUNT = 13;
 
 namespace WindowGlobal
 {
@@ -181,8 +181,11 @@ namespace GfxDeviceGlobal
     std::vector< PSOEntry > psoCache;
     ae3d::TextureBase* texture0 = nullptr;
     ae3d::TextureBase* texture1 = nullptr;
+    ae3d::TextureBase* texture3 = nullptr;
     ae3d::TextureBase* textureCube = nullptr;
+    ID3D12Resource* uav0 = nullptr;
     ID3D12Resource* uav1 = nullptr;
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uav0Desc = {};
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc = {};
     std::vector< ae3d::VertexBuffer > lineBuffers;
     std::vector< ID3D12Resource* > constantBuffers;
@@ -536,11 +539,12 @@ void CreateSamplers()
 void CreateRootSignature()
 {
     // Graphics
+    CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
+
     {
-        CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0 );
-        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 1 );
+        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 10, 0 );
+        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0 );
 		ae3d::System::Assert( descRange1[ 0 ].NumDescriptors + descRange1[ 1 ].NumDescriptors + descRange1[ 2 ].NumDescriptors == RESOURCE_BINDING_COUNT, "Resource count mismatch!" );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
@@ -572,11 +576,6 @@ void CreateRootSignature()
 
     // Tile Culler
     {
-        CD3DX12_DESCRIPTOR_RANGE descRange1[ 3 ];
-        descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
-        descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0 );
-        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0 );
-
         CD3DX12_ROOT_PARAMETER rootParam[ 1 ];
         rootParam[ 0 ].InitAsDescriptorTable( 3, descRange1 );
 
@@ -1050,7 +1049,7 @@ void ae3d::CreateRenderer( int samples )
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        desc.NumDescriptors = 10;
+        desc.NumDescriptors = 13;
         desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         desc.NodeMask = 0;
 
@@ -1062,6 +1061,7 @@ void ae3d::CreateRenderer( int samples )
     GfxDeviceGlobal::lightTiler.Init();
     GfxDeviceGlobal::texture0 = Texture2D::GetDefaultTexture();
     GfxDeviceGlobal::texture1 = Texture2D::GetDefaultTexture();
+    GfxDeviceGlobal::texture3 = Texture2D::GetDefaultTexture();
     GfxDeviceGlobal::textureCube = TextureCube::GetDefaultTexture();
 }
 
@@ -1206,92 +1206,58 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DescriptorHeapManager::GetCbvSrvUavCpuHandle( index );
 
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Buffer.FirstElement = 0;
+    srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+    srvDesc.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
+    srvDesc.Buffer.StructureByteStride = 0;
+    
+    const UINT incrementSize = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = GfxDeviceGlobal::constantBuffers[ GfxDeviceGlobal::currentConstantBufferIndex ]->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = AE3D_CB_SIZE;
     GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
 
-	const UINT incrementSize = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-	cpuHandle.ptr += incrementSize;
-    
-    if (shader.GetVertexShaderPath().find( "Standard" ) != std::string::npos)
-    {
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
-        cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture3->GetGpuResource()->resource, GfxDeviceGlobal::texture3->GetSRVDesc(), cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::textureCube->GetGpuResource()->resource, GfxDeviceGlobal::textureCube->GetSRVDesc(), cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer(), &srvDesc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(), &srvDesc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
 
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-        srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srvDesc.Buffer.FirstElement = 0;
-        srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-        srvDesc.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
-        srvDesc.Buffer.StructureByteStride = 0;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
-
-		cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer(), &srvDesc, cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer(), &srvDesc, cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(), &srvDesc, cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer(), &srvDesc, cpuHandle ); // t6
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::textureCube->GetGpuResource()->resource, GfxDeviceGlobal::textureCube->GetSRVDesc(), cpuHandle ); // t7
-
-        const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
-        const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
-        const unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
-
-        GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
-        GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
-        GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
-        GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
-    }
-    else
-    {
-        if (GfxDeviceGlobal::textureCube != TextureCube::GetDefaultTexture())
-        {
-            GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::textureCube->GetGpuResource()->resource, GfxDeviceGlobal::textureCube->GetSRVDesc(), cpuHandle );
-        }
-        else
-        {
-            GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture0->GetGpuResource()->resource, GfxDeviceGlobal::texture0->GetSRVDesc(), cpuHandle );
-        }
-
-        cpuHandle.ptr += incrementSize;
-
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::texture1->GetGpuResource()->resource, GfxDeviceGlobal::texture1->GetSRVDesc(), cpuHandle );
-
-        cpuHandle.ptr += incrementSize;
-        GfxDeviceGlobal::device->CreateShaderResourceView( GfxDeviceGlobal::textureCube->GetGpuResource()->resource, GfxDeviceGlobal::textureCube->GetSRVDesc(), cpuHandle ); // t7
-    }
-
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav0, nullptr, &GfxDeviceGlobal::uav0Desc, cpuHandle );
     cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav1, nullptr, &GfxDeviceGlobal::uav1Desc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
+ 
+    const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
+    const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
+    const unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
 
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
+    GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
+ 
     D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle;
 
     if (GfxDeviceGlobal::textureCube != TextureCube::GetDefaultTexture())
@@ -1302,6 +1268,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     {
         samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(), GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
     }
+
+    samplerHandle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER );
+    samplerHandle = GetSampler( GfxDeviceGlobal::texture0->GetMipmaps(), GfxDeviceGlobal::texture0->GetWrap(), GfxDeviceGlobal::texture0->GetFilter(), GfxDeviceGlobal::texture0->GetAnisotropy() );
 
     ID3D12DescriptorHeap* descHeaps[] = { DescriptorHeapManager::GetCbvSrvUavHeap(), DescriptorHeapManager::GetSamplerHeap() };
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 2, &descHeaps[ 0 ] );

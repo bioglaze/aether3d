@@ -17,19 +17,6 @@ struct PS_INPUT
     float4 projCoord : TEXCOORD2;
 };
 
-layout( set = 0, binding = 1 ) Texture2D tex : register(t0);
-layout( set = 0, binding = 2 ) SamplerState sLinear : register(s0);
-layout( set = 0, binding = 3 ) Buffer<float4> pointLightBufferCenterAndRadius : register(t1);
-layout( set = 0, binding = 4 ) RWBuffer<uint> perTileLightIndexBuffer : register(u1);
-layout( set = 0, binding = 5 ) Texture2D normalTex : register(t5);
-layout( set = 0, binding = 6 ) SamplerState sampler1 : register(s1);
-layout( set = 0, binding = 7 ) Buffer<float4> pointLightColors : register(t2);
-layout( set = 0, binding = 8 ) Buffer<float4> spotLightBufferCenterAndRadius : register(t3);
-layout( set = 0, binding = 9 ) Buffer<float4> spotLightParams : register(t4);
-layout( set = 0, binding = 10 ) Buffer<float4> spotLightColors : register(t6);
-layout( set = 0, binding = 12 ) TextureCube<float4> texCube : register(t7); 
-//layout( set = 0, binding = 5 ) Texture2D<float4> _ShadowMap : register(t1);
-
 #define TILE_RES 16
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
 //#define DEBUG_LIGHT_COUNT
@@ -128,8 +115,7 @@ float VSM( float depth, float4 projCoord )
         return 0;
     }
 
-    // TODO: Replace with shadow
-    float2 moments = normalTex.SampleLevel( sampler1, uv, 0 ).rg;
+    float2 moments = shadowTex.SampleLevel( sampler1, uv, 0 ).rg;
 
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
 
@@ -251,7 +237,7 @@ float4 main( PS_INPUT input ) : SV_Target
     }
     
     accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
-    accumDiffuseAndSpecular.rgb += texCube.Sample( sLinear, N ).rgb;
+    //accumDiffuseAndSpecular.rgb += texCube.Sample( sLinear, N ).rgb;
 
     float depth = input.projCoord.z / input.projCoord.w;
 

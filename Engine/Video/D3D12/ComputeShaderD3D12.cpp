@@ -20,10 +20,8 @@ namespace GfxDeviceGlobal
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern ID3D12RootSignature* rootSignatureTileCuller;
     extern ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 3 ];
-    extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
     extern ID3D12PipelineState* cachedPSO;
 	extern PerObjectUboStruct perObjectUboStruct;
-    extern ID3D12Resource* uav1;
 }
 
 namespace Global
@@ -83,37 +81,50 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 
     SetCBV( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
 
-    D3D12_CPU_DESCRIPTOR_HANDLE handle = GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetCPUDescriptorHandleForHeapStart();
+
+    const UINT incrementSize = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = uniformBuffers[ 0 ]->GetGPUVirtualAddress();
     cbvDesc.SizeInBytes = AE3D_CB_SIZE;
-    GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, handle );
+    GfxDeviceGlobal::device->CreateConstantBufferView( &cbvDesc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
 
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 0 ], &srvDescs[ 0 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 1 ], &srvDescs[ 1 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 2 ], &srvDescs[ 2 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 3 ], &srvDescs[ 3 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 4 ], &srvDescs[ 4 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 5 ], &srvDescs[ 5 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 6 ], &srvDescs[ 6 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 7 ], &srvDescs[ 7 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 8 ], &srvDescs[ 8 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 9 ], &srvDescs[ 9 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
 
-    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 0 ], &srvDescs[ 0 ], handle );
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 0 ], nullptr, &uavDescs[ 0 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 1 ], nullptr, &uavDescs[ 1 ], cpuHandle );
+    cpuHandle.ptr += incrementSize;
 
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-
-    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 1 ], &srvDescs[ 1 ], handle );
-
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-
-    GfxDeviceGlobal::device->CreateShaderResourceView( textureBuffers[ 2 ], &srvDescs[ 2 ], handle );
-
-    handle.ptr += GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
-
-    GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 0 ], nullptr, &GfxDeviceGlobal::uav1Desc, handle );
-
-    GpuResource depthNormals = {};
+    /*GpuResource depthNormals = {};
     depthNormals.resource = textureBuffers[ 1 ];
     depthNormals.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
     if (depthNormals.resource != nullptr)
     {
         TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
-    }
+    }*/
 
     GfxDeviceGlobal::cachedPSO = pso;
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( pso );
@@ -122,10 +133,10 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 
-    if (depthNormals.resource != nullptr)
+    /*if (depthNormals.resource != nullptr)
     {
         TransitionResource( depthNormals, D3D12_RESOURCE_STATE_RENDER_TARGET );
-    }
+    }*/
 }
 
 void ae3d::ComputeShader::Load( const char* source )
@@ -221,8 +232,7 @@ void ae3d::ComputeShader::SetUAV( unsigned slot, ID3D12Resource* buffer, const D
     if (slot < SLOT_COUNT)
     {
         uavBuffers[ slot ] = buffer;
-        GfxDeviceGlobal::uav1Desc = uavDesc;
-        GfxDeviceGlobal::uav1 = buffer;
+        uavDescs[ slot ] = uavDesc;
     }
     else
     {

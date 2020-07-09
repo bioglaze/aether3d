@@ -20,7 +20,9 @@ namespace GfxDeviceGlobal
     extern unsigned backBufferWidth;
     extern unsigned backBufferHeight;
     extern ID3D12Device* device;
+    extern ID3D12Resource* uav0;
     extern ID3D12Resource* uav1;
+    extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav0Desc;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
 }
 
@@ -73,6 +75,14 @@ void ae3d::LightTiler::Init()
         }
 
         perTileLightIndexBuffer->SetName( L"LightTiler light index buffer" );
+        GfxDeviceGlobal::uav0 = perTileLightIndexBuffer;
+        GfxDeviceGlobal::uav0Desc.Format = DXGI_FORMAT_UNKNOWN;
+        GfxDeviceGlobal::uav0Desc.Buffer.NumElements = maxNumLightsPerTile * numTiles;
+        GfxDeviceGlobal::uav0Desc.Buffer.StructureByteStride = 4;
+        GfxDeviceGlobal::uav0Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+        GfxDeviceGlobal::uav0Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+
+        // FIXME temp, create from texture
         GfxDeviceGlobal::uav1 = perTileLightIndexBuffer;
         GfxDeviceGlobal::uav1Desc.Format = DXGI_FORMAT_UNKNOWN;
         GfxDeviceGlobal::uav1Desc.Buffer.NumElements = maxNumLightsPerTile * numTiles;
@@ -372,8 +382,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     srvDesc0.Buffer.NumElements = 2048;
     srvDesc0.Buffer.StructureByteStride = 0;
 
-    shader.SetSRV( 0, pointLightCenterAndRadiusBuffer, srvDesc0 );
-
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
     srvDesc1.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
     srvDesc1.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
@@ -383,20 +391,20 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     srvDesc1.Texture2D.PlaneSlice = 0;
     srvDesc1.Texture2D.ResourceMinLODClamp = 0.0f;
 
-    shader.SetSRV( 1, depthNormalTarget.GetGpuResource()->resource, srvDesc1 );
+    shader.SetSRV( 0, depthNormalTarget.GetGpuResource()->resource, srvDesc1 );
+    shader.SetSRV( 1, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
+    shader.SetSRV( 2, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
+    shader.SetSRV( 3, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
+    shader.SetSRV( 4, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
+    shader.SetSRV( 5, pointLightCenterAndRadiusBuffer, srvDesc0 );
+    shader.SetSRV( 6, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
+    shader.SetSRV( 7, spotLightCenterAndRadiusBuffer, srvDesc0 );
+    shader.SetSRV( 8, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
+    shader.SetSRV( 9, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2 = {};
-    srvDesc2.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-    srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc2.Buffer.FirstElement = 0;
-    srvDesc2.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    srvDesc2.Buffer.NumElements = 2048;
-    srvDesc2.Buffer.StructureByteStride = 0;
 
-    shader.SetSRV( 2, spotLightCenterAndRadiusBuffer, srvDesc2 );
-
-    shader.SetUAV( 0, perTileLightIndexBuffer, GfxDeviceGlobal::uav1Desc );
+    shader.SetUAV( 0, perTileLightIndexBuffer, GfxDeviceGlobal::uav0Desc );
+    shader.SetUAV( 1, perTileLightIndexBuffer, GfxDeviceGlobal::uav0Desc ); // Unused, but something must be bound.
 
     shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
 }

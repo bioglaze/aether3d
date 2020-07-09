@@ -122,14 +122,14 @@ namespace GfxDeviceGlobal
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
-    VkImageView boundViews[ 13 ];
+    VkImageView boundViews[ 15 ];
     VkSampler boundSamplers[ 2 ];
     Array< VkBuffer > pendingFreeVBs;
     Array< Ubo > ubos;
-	unsigned currentUbo = 0;
+    unsigned currentUbo = 0;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
-	unsigned backBufferWidth;
-	unsigned backBufferHeight;
+    unsigned backBufferWidth;
+    unsigned backBufferHeight;
     ae3d::LightTiler lightTiler;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
@@ -1304,22 +1304,24 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 1550;
 
-        const std::uint32_t typeCount = 13;
+        const std::uint32_t typeCount = 15;
         const VkDescriptorPoolSize typeCounts[ typeCount ] =
         {
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_SAMPLER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_SAMPLER, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
-            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
-            { VK_DESCRIPTOR_TYPE_SAMPLER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
-            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT }
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT }
         };
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
@@ -1347,257 +1349,267 @@ namespace ae3d
         }
     }
 
-    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1, const VkImageView& view11, const VkImageView& view12 )
+    VkDescriptorSet AllocateDescriptorSet( const VkDescriptorBufferInfo& uboDesc, const VkImageView& view0, VkSampler sampler0, const VkImageView& view1, VkSampler sampler1, const VkImageView& view2, const VkImageView& view3, const VkImageView& view4, const VkImageView& view14 )
     {
         VkDescriptorSet outDescriptorSet = GfxDeviceGlobal::descriptorSets[ GfxDeviceGlobal::descriptorSetIndex ];
         GfxDeviceGlobal::descriptorSetIndex = (GfxDeviceGlobal::descriptorSetIndex + 1) % GfxDeviceGlobal::descriptorSets.count;
-
-        // Binding 0 : Uniform buffer
-        VkWriteDescriptorSet uboSet = {};
-        uboSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        uboSet.dstSet = outDescriptorSet;
-        uboSet.descriptorCount = 1;
-        uboSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboSet.pBufferInfo = &uboDesc;
-        uboSet.dstBinding = 0;
 
         VkDescriptorImageInfo sampler0Desc = {};
         sampler0Desc.sampler = sampler0;
         sampler0Desc.imageView = view0;
         sampler0Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
+        VkWriteDescriptorSet sets[ 15 ] = {};
+
+        // Binding 0 : Image
+        sets[ 0 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 0 ].dstSet = outDescriptorSet;
+        sets[ 0 ].descriptorCount = 1;
+        sets[ 0 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        sets[ 0 ].pImageInfo = &sampler0Desc;
+        sets[ 0 ].dstBinding = 0;
+
         // Binding 1 : Image
-        VkWriteDescriptorSet imageSet = {};
-        imageSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        imageSet.dstSet = outDescriptorSet;
-        imageSet.descriptorCount = 1;
-        imageSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        imageSet.pImageInfo = &sampler0Desc;
-        imageSet.dstBinding = 1;
+        sets[ 1 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 1 ].dstSet = outDescriptorSet;
+        sets[ 1 ].descriptorCount = 1;
+        sets[ 1 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        sets[ 1 ].pImageInfo = &sampler0Desc;
+        sets[ 1 ].dstBinding = 1;
+
+        VkDescriptorImageInfo sampler2Desc = {};
+        sampler2Desc.sampler = sampler1;
+        sampler2Desc.imageView = view2;
+        sampler2Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        // Binding 2 : Image
+        sets[ 2 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 2 ].dstSet = outDescriptorSet;
+        sets[ 2 ].descriptorCount = 1;
+        sets[ 2 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        sets[ 2 ].pImageInfo = &sampler2Desc;
+        sets[ 2 ].dstBinding = 2;
+
+        VkDescriptorImageInfo sampler3Desc = {};
+        sampler3Desc.sampler = sampler1;
+        sampler3Desc.imageView = view3;
+        sampler3Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        // Binding 3 : Image
+        sets[ 3 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 3 ].dstSet = outDescriptorSet;
+        sets[ 3 ].descriptorCount = 1;
+        sets[ 3 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        sets[ 3 ].pImageInfo = &sampler3Desc;
+        sets[ 3 ].dstBinding = 3;
+
+        VkDescriptorImageInfo sampler4Desc = {};
+        sampler4Desc.sampler = sampler0;
+        sampler4Desc.imageView = view4;
+        sampler4Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        // Binding 4 : Image
+        sets[ 4 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 4 ].dstSet = outDescriptorSet;
+        sets[ 4 ].descriptorCount = 1;
+        sets[ 4 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        sets[ 4 ].pImageInfo = &sampler4Desc;
+        sets[ 4 ].dstBinding = 4;
+
+        // Binding 5 : Sampler
+        sets[ 5 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 5 ].dstSet = outDescriptorSet;
+        sets[ 5 ].descriptorCount = 1;
+        sets[ 5 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+        sets[ 5 ].pImageInfo = &sampler0Desc;
+        sets[ 5 ].dstBinding = 5;
 
         VkDescriptorImageInfo sampler1Desc = {};
         sampler1Desc.sampler = sampler1;
         sampler1Desc.imageView = view1;
         sampler1Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        // Binding 2 : Sampler
-        VkWriteDescriptorSet samplerSet = {};
-        samplerSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        samplerSet.dstSet = outDescriptorSet;
-        samplerSet.descriptorCount = 1;
-        samplerSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-        samplerSet.pImageInfo = &sampler0Desc;
-        samplerSet.dstBinding = 2;
-
-        // Binding 3 : Buffer
-        VkWriteDescriptorSet bufferSet = {};
-        bufferSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        bufferSet.dstSet = outDescriptorSet;
-        bufferSet.descriptorCount = 1;
-        bufferSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        bufferSet.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightBufferView();
-        bufferSet.dstBinding = 3;
-
-        // Binding 4 : Buffer (UAV)
-        VkWriteDescriptorSet bufferSetUAV = {};
-        bufferSetUAV.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        bufferSetUAV.dstSet = outDescriptorSet;
-        bufferSetUAV.descriptorCount = 1;
-        bufferSetUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-        bufferSetUAV.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetLightIndexBufferView();
-        bufferSetUAV.dstBinding = 4;
-
-        // Binding 5 : Image
-        VkWriteDescriptorSet imageSet2 = {};
-        imageSet2.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        imageSet2.dstSet = outDescriptorSet;
-        imageSet2.descriptorCount = 1;
-        imageSet2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        imageSet2.pImageInfo = &sampler1Desc;
-        imageSet2.dstBinding = 5;
-
         // Binding 6 : Sampler
-        VkWriteDescriptorSet samplerSet2 = {};
-        samplerSet2.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        samplerSet2.dstSet = outDescriptorSet;
-        samplerSet2.descriptorCount = 1;
-        samplerSet2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-        samplerSet2.pImageInfo = &sampler1Desc;
-        samplerSet2.dstBinding = 6;
+        sets[ 6 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 6 ].dstSet = outDescriptorSet;
+        sets[ 6 ].descriptorCount = 1;
+        sets[ 6 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+        sets[ 6 ].pImageInfo = &sampler1Desc;
+        sets[ 6 ].dstBinding = 6;
 
         // Binding 7 : Buffer
-        VkWriteDescriptorSet bufferSet2 = {};
-        bufferSet2.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        bufferSet2.dstSet = outDescriptorSet;
-        bufferSet2.descriptorCount = 1;
-        bufferSet2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        bufferSet2.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightColorBufferView();
-        bufferSet2.dstBinding = 7;
+        sets[ 7 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 7 ].dstSet = outDescriptorSet;
+        sets[ 7 ].descriptorCount = 1;
+        sets[ 7 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        sets[ 7 ].pBufferInfo = &uboDesc;
+        sets[ 7 ].dstBinding = 7;
 
         // Binding 8 : Buffer
-        VkWriteDescriptorSet bufferSet3 = {};
-        bufferSet3.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        bufferSet3.dstSet = outDescriptorSet;
-        bufferSet3.descriptorCount = 1;
-        bufferSet3.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        bufferSet3.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightBufferView();
-        bufferSet3.dstBinding = 8;
+        sets[ 8 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 8 ].dstSet = outDescriptorSet;
+        sets[ 8 ].descriptorCount = 1;
+        sets[ 8 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        sets[ 8 ].pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightBufferView();
+        sets[ 8 ].dstBinding = 8;
 
-        // Binding 9 : Buffer
-        VkWriteDescriptorSet bufferSet4 = {};
-        bufferSet4.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        bufferSet4.dstSet = outDescriptorSet;
-        bufferSet4.descriptorCount = 1;
-        bufferSet4.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        bufferSet4.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightParamsView();
-        bufferSet4.dstBinding = 9;
+        // Binding 9 : Buffer (UAV)
+        sets[ 9 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 9 ].dstSet = outDescriptorSet;
+        sets[ 9 ].descriptorCount = 1;
+        sets[ 9 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+        sets[ 9 ].pTexelBufferView = GfxDeviceGlobal::lightTiler.GetLightIndexBufferView();
+        sets[ 9 ].dstBinding = 9;
 
-		// Binding 10 : Buffer
-		VkWriteDescriptorSet bufferSet5 = {};
-		bufferSet5.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		bufferSet5.dstSet = outDescriptorSet;
-		bufferSet5.descriptorCount = 1;
-		bufferSet5.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-		bufferSet5.pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightColorBufferView();
-		bufferSet5.dstBinding = 10;
+        // Binding 10 : Buffer
+        sets[ 10 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 10 ].dstSet = outDescriptorSet;
+        sets[ 10 ].descriptorCount = 1;
+        sets[ 10 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        sets[ 10 ].pTexelBufferView = GfxDeviceGlobal::lightTiler.GetPointLightColorBufferView();
+        sets[ 10 ].dstBinding = 10;
 
-        VkDescriptorImageInfo sampler11Desc = {};
-        sampler11Desc.sampler = sampler1;
-        sampler11Desc.imageView = view11;
-        sampler11Desc.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        // Binding 11 : Buffer
+        sets[ 11 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 11 ].dstSet = outDescriptorSet;
+        sets[ 11 ].descriptorCount = 1;
+        sets[ 11 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        sets[ 11 ].pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightBufferView();
+        sets[ 11 ].dstBinding = 11;
 
-        // Binding 11 : Writable texture
-        VkWriteDescriptorSet rwImageSet = {};
-        rwImageSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        rwImageSet.dstSet = outDescriptorSet;
-        rwImageSet.descriptorCount = 1;
-        rwImageSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        rwImageSet.pImageInfo = &sampler11Desc;
-        rwImageSet.dstBinding = 11;
+		// Binding 12 : Buffer
+        sets[ 12 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 12 ].dstSet = outDescriptorSet;
+        sets[ 12 ].descriptorCount = 1;
+        sets[ 12 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        sets[ 12 ].pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightParamsView();
+        sets[ 12 ].dstBinding = 12;
 
-        // Binding 12 : Image
-        VkDescriptorImageInfo sampler3Desc = {};
-        sampler3Desc.sampler = sampler1;
-        sampler3Desc.imageView = view12;
-        sampler3Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        // Binding 13 : Buffer
+        sets[ 13 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 13 ].dstSet = outDescriptorSet;
+        sets[ 13 ].descriptorCount = 1;
+        sets[ 13 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        sets[ 13 ].pTexelBufferView = GfxDeviceGlobal::lightTiler.GetSpotLightColorBufferView();
+        sets[ 13 ].dstBinding = 13;
 
-        VkWriteDescriptorSet imageSet3 = {};
-        imageSet3.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        imageSet3.dstSet = outDescriptorSet;
-        imageSet3.descriptorCount = 1;
-        imageSet3.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        imageSet3.pImageInfo = &sampler3Desc;
-        imageSet3.dstBinding = 12;
+        VkDescriptorImageInfo sampler14Desc = {};
+        sampler14Desc.sampler = sampler1;
+        sampler14Desc.imageView = view14;
+        sampler14Desc.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
-        const int setCount = 13;
-        VkWriteDescriptorSet sets[ setCount ] = { uboSet, samplerSet, imageSet, bufferSet, bufferSetUAV, imageSet2, samplerSet2, bufferSet2, bufferSet3, bufferSet4, bufferSet5, rwImageSet, imageSet3 };
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
+        // Binding 14 : Writable texture
+        sets[ 14 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 14 ].dstSet = outDescriptorSet;
+        sets[ 14 ].descriptorCount = 1;
+        sets[ 14 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        sets[ 14 ].pImageInfo = &sampler14Desc;
+        sets[ 14 ].dstBinding = 14;
+
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 15, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
 
     void CreateDescriptorSetLayout()
     {
-        // Binding 0 : Uniform buffer
-        VkDescriptorSetLayoutBinding layoutBindingUBO = {};
-        layoutBindingUBO.binding = 0;
-        layoutBindingUBO.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layoutBindingUBO.descriptorCount = 1;
-        layoutBindingUBO.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        constexpr int bindingCount = 15;
+        VkDescriptorSetLayoutBinding layoutBindings[ bindingCount ] = {};
+
+        // Binding 0 : Image
+        layoutBindings[ 0 ].binding = 0;
+        layoutBindings[ 0 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindings[ 0 ].descriptorCount = 1;
+        layoutBindings[ 0 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
         // Binding 1 : Image
-        VkDescriptorSetLayoutBinding layoutBindingImage = {};
-        layoutBindingImage.binding = 1;
-        layoutBindingImage.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        layoutBindingImage.descriptorCount = 1;
-        layoutBindingImage.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindings[ 1 ].binding = 1;
+        layoutBindings[ 1 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindings[ 1 ].descriptorCount = 1;
+        layoutBindings[ 1 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        // Binding 2 : Sampler
-        VkDescriptorSetLayoutBinding layoutBindingSampler = {};
-        layoutBindingSampler.binding = 2;
-        layoutBindingSampler.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-        layoutBindingSampler.descriptorCount = 1;
-        layoutBindingSampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        // Binding 2 : Image
+        layoutBindings[ 2 ].binding = 2;
+        layoutBindings[ 2 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindings[ 2 ].descriptorCount = 1;
+        layoutBindings[ 2 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        // Binding 3 : Buffer
-        VkDescriptorSetLayoutBinding layoutBindingBuffer = {};
-        layoutBindingBuffer.binding = 3;
-        layoutBindingBuffer.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        layoutBindingBuffer.descriptorCount = 1;
-        layoutBindingBuffer.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        // Binding 3 : Image
+        layoutBindings[ 3 ].binding = 3;
+        layoutBindings[ 3 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindings[ 3 ].descriptorCount = 1;
+        layoutBindings[ 3 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        // Binding 4 : Buffer (UAV)
-        VkDescriptorSetLayoutBinding layoutBindingBufferUAV = {};
-        layoutBindingBufferUAV.binding = 4;
-        layoutBindingBufferUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-        layoutBindingBufferUAV.descriptorCount = 1;
-        layoutBindingBufferUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        // Binding 4 : Image
+        layoutBindings[ 4 ].binding = 4;
+        layoutBindings[ 4 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        layoutBindings[ 4 ].descriptorCount = 1;
+        layoutBindings[ 4 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        // Binding 5 : Image
-        VkDescriptorSetLayoutBinding layoutBindingImage2 = {};
-        layoutBindingImage2.binding = 5;
-        layoutBindingImage2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        layoutBindingImage2.descriptorCount = 1;
-        layoutBindingImage2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        // Binding 5 : Sampler
+        layoutBindings[ 5 ].binding = 5;
+        layoutBindings[ 5 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+        layoutBindings[ 5 ].descriptorCount = 1;
+        layoutBindings[ 5 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
         // Binding 6 : Sampler
-        VkDescriptorSetLayoutBinding layoutBindingSampler2 = {};
-        layoutBindingSampler2.binding = 6;
-        layoutBindingSampler2.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-        layoutBindingSampler2.descriptorCount = 1;
-        layoutBindingSampler2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindings[ 6 ].binding = 6;
+        layoutBindings[ 6 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+        layoutBindings[ 6 ].descriptorCount = 1;
+        layoutBindings[ 6 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        // Binding 7 : Buffer
-        VkDescriptorSetLayoutBinding layoutBindingBuffer2 = {};
-        layoutBindingBuffer2.binding = 7;
-        layoutBindingBuffer2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        layoutBindingBuffer2.descriptorCount = 1;
-        layoutBindingBuffer2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        // Binding 7 : Uniform buffer
+        layoutBindings[ 7 ].binding = 7;
+        layoutBindings[ 7 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBindings[ 7 ].descriptorCount = 1;
+        layoutBindings[ 7 ].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
         // Binding 8 : Buffer
-        VkDescriptorSetLayoutBinding layoutBindingBuffer3 = {};
-        layoutBindingBuffer3.binding = 8;
-        layoutBindingBuffer3.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        layoutBindingBuffer3.descriptorCount = 1;
-        layoutBindingBuffer3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        layoutBindings[ 8 ].binding = 8;
+        layoutBindings[ 8 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindings[ 8 ].descriptorCount = 1;
+        layoutBindings[ 8 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        // Binding 9 : Buffer
-        VkDescriptorSetLayoutBinding layoutBindingBuffer4 = {};
-        layoutBindingBuffer4.binding = 9;
-        layoutBindingBuffer4.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        layoutBindingBuffer4.descriptorCount = 1;
-        layoutBindingBuffer4.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        // Binding 9 : RWBuffer
+        layoutBindings[ 9 ].binding = 9;
+        layoutBindings[ 9 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+        layoutBindings[ 9 ].descriptorCount = 1;
+        layoutBindings[ 9 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-		// Binding 10 : Buffer
-		VkDescriptorSetLayoutBinding layoutBindingBuffer5 = {};
-		layoutBindingBuffer5.binding = 10;
-		layoutBindingBuffer5.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-		layoutBindingBuffer5.descriptorCount = 1;
-		layoutBindingBuffer5.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        // Binding 10 : Buffer
+        layoutBindings[ 10 ].binding = 10;
+        layoutBindings[ 10 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindings[ 10 ].descriptorCount = 1;
+        layoutBindings[ 10 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        // Binding 11 : Writable texture
-        VkDescriptorSetLayoutBinding layoutBindingUAV = {};
-        layoutBindingUAV.binding = 11;
-        layoutBindingUAV.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        layoutBindingUAV.descriptorCount = 1;
-        layoutBindingUAV.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        // Binding 11 : Buffer
+        layoutBindings[ 11 ].binding = 11;
+        layoutBindings[ 11 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindings[ 11 ].descriptorCount = 1;
+        layoutBindings[ 11 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        // Binding 12 : Image
-        VkDescriptorSetLayoutBinding layoutBindingImage3 = {};
-        layoutBindingImage3.binding = 12;
-        layoutBindingImage3.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        layoutBindingImage3.descriptorCount = 1;
-        layoutBindingImage3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+        // Binding 12 : Buffer
+        layoutBindings[ 12 ].binding = 12;
+        layoutBindings[ 12 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindings[ 12 ].descriptorCount = 1;
+        layoutBindings[ 12 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
-        constexpr int bindingCount = 13;
-        const VkDescriptorSetLayoutBinding bindings[ bindingCount ] = { layoutBindingUBO, layoutBindingImage, layoutBindingSampler, layoutBindingBuffer,
-                                                                        layoutBindingBufferUAV, layoutBindingImage2, layoutBindingSampler2, layoutBindingBuffer2,
-                                                                        layoutBindingBuffer3, layoutBindingBuffer4, layoutBindingBuffer5, layoutBindingUAV, layoutBindingImage3 };
+        // Binding 13 : Buffer
+        layoutBindings[ 13 ].binding = 13;
+        layoutBindings[ 13 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        layoutBindings[ 13 ].descriptorCount = 1;
+        layoutBindings[ 13 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        // Binding 14 : Writable texture
+        layoutBindings[ 14 ].binding = 14;
+        layoutBindings[ 14 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        layoutBindings[ 14 ].descriptorCount = 1;
+        layoutBindings[ 14 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         descriptorLayout.bindingCount = bindingCount;
-        descriptorLayout.pBindings = bindings;
+        descriptorLayout.pBindings = layoutBindings;
 
         VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorLayout, nullptr, &GfxDeviceGlobal::descriptorSetLayout );
         AE3D_CHECK_VULKAN( err, "vkCreateDescriptorSetLayout" );
@@ -1710,7 +1722,7 @@ namespace ae3d
 void BindComputeDescriptorSet()
 {
     VkDescriptorSet descriptorSet = ae3d::AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ],
-                                                                 GfxDeviceGlobal::boundViews[ 1 ], GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ], GfxDeviceGlobal::boundViews[ 12 ] );
+                                                                 GfxDeviceGlobal::boundViews[ 1 ], GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 2 ], GfxDeviceGlobal::boundViews[ 3 ], GfxDeviceGlobal::boundViews[ 4 ], GfxDeviceGlobal::boundViews[ 14 ] );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -2006,7 +2018,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     UploadPerObjectUbo();
 
     VkDescriptorSet descriptorSet = AllocateDescriptorSet( GfxDeviceGlobal::ubos[ GfxDeviceGlobal::currentUbo ].uboDesc, GfxDeviceGlobal::boundViews[ 0 ], GfxDeviceGlobal::boundSamplers[ 0 ], GfxDeviceGlobal::boundViews[ 1 ],
-                                                           GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 11 ], GfxDeviceGlobal::boundViews[ 12 ] );
+                                                           GfxDeviceGlobal::boundSamplers[ 1 ], GfxDeviceGlobal::boundViews[ 2 ], GfxDeviceGlobal::boundViews[ 3 ], GfxDeviceGlobal::boundViews[ 4 ], GfxDeviceGlobal::boundViews[ 14 ] );
 
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
@@ -2029,7 +2041,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     Statistics::IncTriangleCount( endIndex - startIndex );
     Statistics::IncDrawCalls();
 
-    GfxDeviceGlobal::boundViews[ 12 ] = TextureCube::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 4 ] = TextureCube::GetDefaultTexture()->GetView();
 }
 
 void ae3d::GfxDevice::GetNewUniformBuffer()
@@ -2106,8 +2118,11 @@ void ae3d::GfxDevice::BeginFrame()
 
     GfxDeviceGlobal::boundViews[ 0 ] = Texture2D::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::boundViews[ 1 ] = Texture2D::GetDefaultTexture()->GetView();
-    GfxDeviceGlobal::boundViews[ 11 ] = Texture2D::GetDefaultTextureUAV()->GetView();
-    GfxDeviceGlobal::boundViews[ 12 ] = TextureCube::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 2 ] = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 3 ] = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 4 ] = TextureCube::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 11 ] = Texture2D::GetDefaultTexture()->GetView();
+    GfxDeviceGlobal::boundViews[ 14 ] = Texture2D::GetDefaultTextureUAV()->GetView();
     GfxDeviceGlobal::boundSamplers[ 0 ] = Texture2D::GetDefaultTexture()->GetSampler();
     GfxDeviceGlobal::boundSamplers[ 1 ] = GfxDeviceGlobal::boundSamplers[ 0 ];
 }

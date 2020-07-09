@@ -90,7 +90,7 @@ void ae3d::Renderer::RenderSkybox( TextureCube* skyTexture, const CameraComponen
     Matrix44::Multiply( camera.GetView(), camera.GetProjection(), localToClip );
     
     builtinShaders.skyboxShader.Use();
-    builtinShaders.skyboxShader.SetTexture( skyTexture, 0 );
+    builtinShaders.skyboxShader.SetTexture( skyTexture, 4 );
     GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
 #if AE3D_OPENVR
     GfxDeviceGlobal::perObjectUboStruct.isVR = 1;

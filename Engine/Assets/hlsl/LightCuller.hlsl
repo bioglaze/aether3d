@@ -6,11 +6,6 @@
 
 #include "ubo.h"
 
-layout(set=0, binding=1) Texture2D<float4> depthTexture : register(t1);
-layout(set=0, binding=3) Buffer<float4> pointLightBufferCenterAndRadius : register(t0);
-layout(set=0, binding=4) RWBuffer<uint> perTileLightIndexBufferOut : register(u0);
-layout(set=0, binding=8) Buffer<float4> spotLightBufferCenterAndRadius : register(t2);
-
 #define USE_MINMAX_Z 0
 #define TILE_RES 16
 #define NUM_THREADS_X TILE_RES
@@ -72,7 +67,7 @@ float GetSignedDistanceFromPlane( float3 p, float3 eqn )
 
 void CalculateMinMaxDepthInLds( uint3 globalThreadIdx, uint depthBufferSampleIdx )
 {
-    float viewPosZ = depthTexture.Load( uint3( globalThreadIdx.x, globalThreadIdx.y, 0 ) ).x;
+    float viewPosZ = tex.Load( uint3( globalThreadIdx.x, globalThreadIdx.y, 0 ) ).x;
     
     uint z = asuint( viewPosZ );
 
@@ -226,21 +221,21 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
         for (uint i = localIdxFlattened; i < uNumPointLightsInThisTile; i += NUM_THREADS_PER_TILE)
         {
-            perTileLightIndexBufferOut[ startOffset + i ] = ldsLightIdx[ i ];
+            perTileLightIndexBuffer[ startOffset + i ] = ldsLightIdx[ i ];
         }
 
         for (uint j = (localIdxFlattened + uNumPointLightsInThisTile); j < ldsLightIdxCounter; j += NUM_THREADS_PER_TILE)
         {
-            perTileLightIndexBufferOut[ startOffset + j + 1 ] = ldsLightIdx[ j ];
+            perTileLightIndexBuffer[ startOffset + j + 1 ] = ldsLightIdx[ j ];
         }
 
         if (localIdxFlattened == 0)
         {
             // mark the end of each per-tile list with a sentinel (point lights)
-            perTileLightIndexBufferOut[ startOffset + uNumPointLightsInThisTile ] = LIGHT_INDEX_BUFFER_SENTINEL;
+            perTileLightIndexBuffer[ startOffset + uNumPointLightsInThisTile ] = LIGHT_INDEX_BUFFER_SENTINEL;
 
             // mark the end of each per-tile list with a sentinel (spot lights)
-            perTileLightIndexBufferOut[ startOffset + ldsLightIdxCounter + 1 ] = LIGHT_INDEX_BUFFER_SENTINEL;
+            perTileLightIndexBuffer[ startOffset + ldsLightIdxCounter + 1 ] = LIGHT_INDEX_BUFFER_SENTINEL;
         }
     }
 }

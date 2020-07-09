@@ -34,9 +34,9 @@
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
-#define TEST_SHADOWS_SPOT
+//#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
@@ -952,9 +952,11 @@ int main()
         GpuResource nullResource = {};
 
         downsampleAndThresholdShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
-        downsampleAndThresholdShader.SetSRV( 1, nullResource.resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+        downsampleAndThresholdShader.SetSRV( 1, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+        //downsampleAndThresholdShader.SetSRV( 1, nullResource.resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
         downsampleAndThresholdShader.SetSRV( 2, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
+        downsampleAndThresholdShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() ); // Unused, but must exist.
+        downsampleAndThresholdShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
         blurTex.SetLayout( TextureLayout::General );
 
@@ -963,7 +965,7 @@ int main()
 #else
         downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
 #endif
-        downsampleAndThresholdShader.SetTexture2D( 11, &blurTex );
+        downsampleAndThresholdShader.SetTexture2D( 14, &blurTex );
 #endif
         downsampleAndThresholdShader.Begin();
         downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
@@ -978,9 +980,10 @@ int main()
 
         blurShader.SetSRV( 1, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
         blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
+        blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() ); // Unused, but must exist
+        blurShader.SetUAV( 1, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
 #else
-        blurShader.SetTexture2D( 11, &bloomTex );
+        blurShader.SetTexture2D( 14, &bloomTex );
 #endif
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.Begin();
@@ -995,9 +998,9 @@ int main()
 
 #if RENDERER_D3D12
         blurTex.SetLayout( TextureLayout::ShaderReadWrite );
-        blurShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
+        blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
-        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.SetTexture2D( 14, &blurTex );
 #endif
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         blurShader.Dispatch( width / 16, height / 16, 1 );
@@ -1009,7 +1012,7 @@ int main()
         blurTex2.SetLayout( TextureLayout::General );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 11, &blurTex2 );
+        blurShader.SetTexture2D( 14, &blurTex2 );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
@@ -1021,7 +1024,7 @@ int main()
         blurTex2.SetLayout( TextureLayout::ShaderRead );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.SetTexture2D( 14, &blurTex );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
@@ -1032,7 +1035,7 @@ int main()
         blurTex2.SetLayout( TextureLayout::General );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 11, &blurTex2 );
+        blurShader.SetTexture2D( 14, &blurTex2 );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
@@ -1044,7 +1047,7 @@ int main()
         blurTex2.SetLayout( TextureLayout::ShaderRead );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.SetTexture2D( 14, &blurTex );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
@@ -1055,7 +1058,7 @@ int main()
         blurTex2.SetLayout( TextureLayout::General );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 11, &blurTex2 );
+        blurShader.SetTexture2D( 14, &blurTex2 );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
@@ -1067,7 +1070,7 @@ int main()
         blurTex2.SetLayout( TextureLayout::ShaderRead );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 11, &blurTex );
+        blurShader.SetTexture2D( 14, &blurTex );
         blurShader.Begin();
         blurShader.Dispatch( width / 16, height / 16, 1 );
         blurShader.End();
@@ -1075,7 +1078,11 @@ int main()
 #endif
         blurTex.SetLayout( TextureLayout::ShaderRead );
         System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+#if RENDERER_D3D12
+        System::Draw( &bloomTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+#elif RENDERER_VULKAN
         System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+#endif
         bloomTex.SetLayout( TextureLayout::General );
 #endif
         scene.EndFrame();

@@ -47,9 +47,9 @@ void ae3d::Material::Apply()
 
     if (sTexRT)
     {
-        int texUnit = 1;
-
 #if RENDERER_METAL
+        int texUnit = 1;
+        
         if (sTexRT->IsCube())
         {
             shader->SetRenderTexture( sTexRT, 2 );
@@ -59,9 +59,8 @@ void ae3d::Material::Apply()
             shader->SetRenderTexture( sTexRT, texUnit );
         }
 #else
-        shader->SetRenderTexture( sTexRT, texUnit );
+        shader->SetRenderTexture( sTexRT, 3 );
 #endif
-        ++texUnit;
     }
 
     if (depthUnits > 0.0001f || depthUnits < -0.0001f || depthFactor > 0.0001f || depthFactor < -0.0001f)

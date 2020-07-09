@@ -203,9 +203,19 @@ void ae3d::Shader::SetTexture( Texture2D* texture, int textureUnit )
         GfxDeviceGlobal::boundViews[ 1 ] = texture->GetView();
         GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
+    else if (textureUnit == 2)
+    {
+        GfxDeviceGlobal::boundViews[ 2 ] = texture->GetView();
+        GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler(); // TODO: Add sampler2 to shader.
+    }
+    else if (textureUnit == 3)
+    {
+        GfxDeviceGlobal::boundViews[ 3 ] = texture->GetView();
+        GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler(); // TODO: Add sampler3 to shader.
+    }
     else
     {
-        System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
+        System::Print( "Shader tries to set a texture2d to too high unit %d\n", textureUnit );
     }
 }
 
@@ -226,14 +236,14 @@ void ae3d::Shader::SetTexture( TextureCube* texture, int textureUnit )
         GfxDeviceGlobal::boundViews[ 1 ] = texture->GetView();
         GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
-    else if (textureUnit == 12)
+    else if (textureUnit == 4)
     {
-        GfxDeviceGlobal::boundViews[ 12 ] = texture->GetView();
+        GfxDeviceGlobal::boundViews[ 4 ] = texture->GetView();
         //GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
     else
     {
-        System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
+        System::Print( "Shader tries to set a textureCube to too high unit %d\n", textureUnit );
     }
 }
 
@@ -260,8 +270,18 @@ void ae3d::Shader::SetRenderTexture( RenderTexture* texture, int textureUnit )
         GfxDeviceGlobal::boundViews[ 1 ] = texture->GetColorView();
         GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler();
     }
+    else if (textureUnit == 2)
+    {
+        GfxDeviceGlobal::boundViews[ 2 ] = texture->GetColorView();
+        GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler(); // TODO: Add sampler2 to shader.
+    }
+    else if (textureUnit == 3)
+    {
+        GfxDeviceGlobal::boundViews[ 3 ] = texture->GetColorView();
+        GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler(); // TODO: Add sampler3 to shader.
+    }
     else
     {
-        System::Print( "Shader tries to set a texture to too high unit %d\n", textureUnit );
+        System::Print( "Shader tries to set a render texture to too high unit %d\n", textureUnit );
     }
 }
