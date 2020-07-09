@@ -36,7 +36,7 @@ vertex ColorInOut skybox_vertex( Vertex vert [[stage_in]],
 }
 
 fragment half4 skybox_fragment( ColorInOut in [[stage_in]],
-                                texturecube<float, access::sample> texture [[texture(0)]] )
+                                texturecube<float, access::sample> texture [[texture(4)]] )
 {
     half4 sampledColor = half4( texture.sample( samp, in.texCoords ) );
     return half4(sampledColor);
