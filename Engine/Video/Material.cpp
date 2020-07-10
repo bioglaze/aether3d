@@ -95,7 +95,7 @@ void ae3d::Material::SetTexture( Texture2D* texture, int slot )
 
 void ae3d::Material::SetTexture( TextureCube* texture )
 {
-    texCubeSlots[ 12 ] = texture;
+    texCubeSlots[ 4 ] = texture;
 }
 
 void ae3d::Material::SetRenderTexture( RenderTexture* renderTexture, int slot )

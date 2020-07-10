@@ -1359,6 +1359,11 @@ namespace ae3d
         sampler0Desc.imageView = view0;
         sampler0Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
+        VkDescriptorImageInfo sampler1Desc = {};
+        sampler1Desc.sampler = sampler1;
+        sampler1Desc.imageView = view1;
+        sampler1Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
         VkWriteDescriptorSet sets[ 15 ] = {};
 
         // Binding 0 : Image
@@ -1374,7 +1379,7 @@ namespace ae3d
         sets[ 1 ].dstSet = outDescriptorSet;
         sets[ 1 ].descriptorCount = 1;
         sets[ 1 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        sets[ 1 ].pImageInfo = &sampler0Desc;
+        sets[ 1 ].pImageInfo = &sampler1Desc;
         sets[ 1 ].dstBinding = 1;
 
         VkDescriptorImageInfo sampler2Desc = {};
@@ -1423,11 +1428,6 @@ namespace ae3d
         sets[ 5 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
         sets[ 5 ].pImageInfo = &sampler0Desc;
         sets[ 5 ].dstBinding = 5;
-
-        VkDescriptorImageInfo sampler1Desc = {};
-        sampler1Desc.sampler = sampler1;
-        sampler1Desc.imageView = view1;
-        sampler1Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         // Binding 6 : Sampler
         sets[ 6 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
