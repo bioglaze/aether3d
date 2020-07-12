@@ -393,7 +393,7 @@ using namespace ae3d;
     //camera3d.GetComponent<ae3d::CameraComponent>()->SetViewport( 0, 0, 640, 480 );
 #ifdef TEST_FORWARD_PLUS
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2,
-                                                                                      ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
+                                                                                      ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest,  "depthnormals" );
 #endif
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
@@ -516,7 +516,7 @@ using namespace ae3d;
     pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &pbrMaterial, 0 );
     pbrCube.AddComponent<ae3d::TransformComponent>();
-    pbrCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 0, -8 ) );
+    pbrCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( { -10, 0, -85 } );
     pbrCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
 
     wireframeGo.AddComponent<ae3d::MeshRendererComponent>();
@@ -938,8 +938,8 @@ using namespace ae3d;
         Matrix44::Multiply( lineTransform, spotRot, lineTransform );
         lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
         Matrix44::Multiply( lineTransform, viewMat, viewMat );
-        System::DrawLines( coneLineHandle, viewMat,
-                          camera3d.GetComponent< CameraComponent >()->GetProjection(), self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
+        //System::DrawLines( coneLineHandle, viewMat,
+        //                  camera3d.GetComponent< CameraComponent >()->GetProjection(), self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
         rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 16 ) );
 
 #ifdef TEST_NUKLEAR_UI

@@ -31,6 +31,7 @@ struct StandardVertex
     float4 color [[attribute(2)]];
 };
 
+#ifdef DEBUG_LIGHT_COUNT
 static int GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, const device uint* perTileLightIndexBuffer )
 {
     int numLightsInThisTile = 0;
@@ -60,6 +61,7 @@ static int GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, con
 
     return numLightsInThisTile;
 }
+#endif
 
 static int GetTileIndex( float2 ScreenPos, int windowWidth )
 {
@@ -137,7 +139,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> _ShadowMap [[texture(1)]],
                                texture2d<float, access::sample> normalMap [[texture(2)]],
                                texture2d<float, access::sample> specularMap [[texture(3)]],
-                               texturecube<float, access::sample> cubeMap [[texture(12)]],
+                               texturecube<float, access::sample> cubeMap [[texture(4)]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
                                const device float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
@@ -271,6 +273,15 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     }
 #endif
     
-    return albedoColor * half4( outColor );// * cubeReflection;
+    float depth = in.projCoord.z / in.projCoord.w;
+
+    if (uniforms.lightType == 2)
+    {
+        depth = depth * 0.5f + 0.5f;
+    }
+
+    float shadow = uniforms.lightType == 0 ? 1.0f : max( 0.2f, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
+
+    return albedoColor * half4( outColor ) * half4( shadow, shadow, shadow, 1 );// * cubeReflection;
     //return cubeReflection;
 }

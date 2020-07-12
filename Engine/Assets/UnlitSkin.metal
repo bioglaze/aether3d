@@ -5,7 +5,7 @@ using namespace metal;
 
 #include "MetalCommon.h"
 
-float linstep( float low, float high, float v );
+//float linstep( float low, float high, float v );
 float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, float depth, int lightType );
 
 struct ColorInOut
