@@ -188,6 +188,7 @@ void Inspector::HandleMouseMotion( int x, int y )
 
 bool Inspector::IsTextEditActive()
 {
+    // TODO: Try nk_item_is_any_active( &ctx )
     return textEditActive;
 }
 

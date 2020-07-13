@@ -4,6 +4,8 @@
 #define register(a) blank
 #endif
 
+#include "ubo.h"
+
 struct VSOutput
 {
     float4 pos : SV_POSITION;
@@ -11,10 +13,7 @@ struct VSOutput
     float4 color : COLOR;
 };
 
-layout(set=0, binding=1) TextureCube<float4> tex : register(t0);
-layout(set=0, binding=2) SamplerState sLinear : register(s0);
-
 float4 main( VSOutput vsOut ) : SV_Target
 {
-    return tex.Sample( sLinear, vsOut.uv );
+    return texCube.Sample( sLinear, vsOut.uv );
 }
