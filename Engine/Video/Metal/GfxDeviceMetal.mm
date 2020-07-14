@@ -682,9 +682,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         }
     }
 
-    if (!textures[ 12 ])
+    if (!textures[ 4 ])
     {
-        textures[ 12 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
+        textures[ 4 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
     }
     
     RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
@@ -724,17 +724,27 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer() offset:0 atIndex:9];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer() offset:0 atIndex:10];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer() offset:0 atIndex:11];
-        [renderEncoder setFragmentTexture:textures[ 12 ] atIndex:12];
+        [renderEncoder setFragmentTexture:textures[ 2 ] atIndex:2];
+        [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
+        [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
     }
-
-    [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
-    [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
-    [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
+    
+    static CullMode cachedCullMode = CullMode::Off;
+    if (cullMode != cachedCullMode)
+    {
+        cachedCullMode = cullMode;
+        [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
+    }
+    
+    static FillMode cachedTriangleFillMode = FillMode::Solid;
+    if (fillMode != cachedTriangleFillMode)
+    {
+        cachedTriangleFillMode = fillMode;
+        [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
+    }
+    
     [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
     [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
-    [renderEncoder setFragmentTexture:textures[ 2 ] atIndex:2];
-    [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
-    [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
 
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {
@@ -852,6 +862,7 @@ void ae3d::GfxDevice::BeginBackBufferEncoding()
     {
         renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"BackBufferRenderEncoder";
+        [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
     }
     else
     {
@@ -910,6 +921,7 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
 
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptorFBO];
     renderEncoder.label = @"FboRenderEncoder";
+    [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
 
     GfxDeviceGlobal::currentRenderTargetDataType = renderTexture->GetDataType();
     GfxDeviceGlobal::cachedPSO = nil;
