@@ -726,9 +726,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer() offset:0 atIndex:11];
         [renderEncoder setFragmentTexture:textures[ 2 ] atIndex:2];
         [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
-        [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
     }
-    
+
     static CullMode cachedCullMode = CullMode::Off;
     if (cullMode != cachedCullMode)
     {
@@ -745,6 +744,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     
     [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
     [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
+    [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
 
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {
