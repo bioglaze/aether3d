@@ -197,7 +197,7 @@ namespace ae3d
         outResult += ((unsigned)depthFunc) * 2;
         outResult += ((unsigned)cullMode) * 4;
         outResult += ((unsigned)fillMode) * 8;
-        outResult += ((ptrdiff_t)&renderPass) * 16;
+        outResult += ((ptrdiff_t)renderPass) * 16;
         outResult += ((unsigned)topology) * 32;
 
         return outResult;

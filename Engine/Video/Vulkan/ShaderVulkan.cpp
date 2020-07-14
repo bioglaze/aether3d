@@ -280,6 +280,18 @@ void ae3d::Shader::SetRenderTexture( RenderTexture* texture, int textureUnit )
         GfxDeviceGlobal::boundViews[ 3 ] = texture->GetColorView();
         GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler(); // TODO: Add sampler3 to shader.
     }
+    else if (textureUnit == 4)
+    {
+        if (!texture->IsCube())
+        {
+            System::Print( "Shader::SetRenderTexture: Texture set to slot 4 must be a cube map!\n" );
+        }
+        else
+        {
+            GfxDeviceGlobal::boundViews[ 4 ] = texture->GetColorView();
+            GfxDeviceGlobal::boundSamplers[ 1 ] = texture->GetSampler(); // TODO: Add sampler4 to shader.
+        }
+    }
     else
     {
         System::Print( "Shader tries to set a render texture to too high unit %d\n", textureUnit );
