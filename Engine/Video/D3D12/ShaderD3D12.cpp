@@ -326,6 +326,16 @@ void ae3d::Shader::SetRenderTexture( ae3d::RenderTexture* texture, int textureUn
     {
         GfxDeviceGlobal::texture3 = texture;
     }
+    else if (textureUnit == 4)
+    {
+        if (!texture->IsCube())
+        {
+            System::Print( "Shader::SetRenderTexture: texture in slot 4 must be a cube map!\n" );
+            return;
+        }
+
+        GfxDeviceGlobal::textureCube = texture;
+    }
     else
     {
         System::Assert( false, "unhandled texture unit!" );

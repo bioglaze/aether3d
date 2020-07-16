@@ -328,6 +328,7 @@ void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
             for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
             {
                 transform->LookAt( cameraPos, cameraPos + directions[ cubeMapFace ], ups[ cubeMapFace ] );
+                TransformComponent::UpdateLocalMatrices(); // FIXME: Ideally we just want to update camera transform's global matrix.
                 RenderWithCamera( rtCamera, cubeMapFace, "Cube Map RT" );
             }
         }
