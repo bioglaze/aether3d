@@ -97,6 +97,25 @@ void ae3d::TransformComponent::OffsetRotate( const Vec3& axis, float angleDeg )
     localRotation = newRotation;
 }
 
+void ae3d::TransformComponent::UpdateLocalAndGlobalMatrix()
+{
+    SolveLocalMatrix();
+
+    Matrix44 transform = localMatrix;
+    Quaternion worldRotation = localRotation;
+        
+    while (parent != -1)
+    {
+        Matrix44::Multiply( transform, transformComponents[ parent ].GetLocalMatrix(), transform );
+        worldRotation = worldRotation * transformComponents[ parent ].localRotation;
+        parent = transformComponents[ parent ].parent;
+    }
+
+    localToWorldMatrix = transform;
+    Matrix44::TransformPoint( Vec3( 0, 0, 0 ), transform, &globalPosition );
+    globalRotation = worldRotation;
+}
+
 void ae3d::TransformComponent::UpdateLocalMatrices()
 {
     for (unsigned componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex)

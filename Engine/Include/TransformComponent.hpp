@@ -94,6 +94,9 @@ namespace ae3d
         /// \return Parent transform or null if there is no parent.
         TransformComponent* GetParent() const;
 
+        /// Updates local and global matrix.
+        void UpdateLocalAndGlobalMatrix();
+        
     private:
         friend class GameObject;
         friend class Scene;
