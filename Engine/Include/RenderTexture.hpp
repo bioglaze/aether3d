@@ -48,6 +48,9 @@ namespace ae3d
         /// \return frame buffer.
         VkFramebuffer GetFrameBuffer() { return frameBuffer; }
 
+        /// \return frame buffer for a cube map face.
+        VkFramebuffer GetFrameBufferFace( unsigned face ) { return frameBufferFaces[ face ]; }
+
         /// \return color view.
         VkImageView GetColorView() { return color.view; }
 
@@ -70,12 +73,14 @@ namespace ae3d
         void CreateRenderPass();
 
         VkFramebuffer frameBuffer = VK_NULL_HANDLE;
-
+        VkFramebuffer frameBufferFaces[ 6 ];
+        
         struct FrameBufferAttachment
         {
             VkImage image;
             VkDeviceMemory mem;
-            VkImageView view;
+            VkImageView views[ 6 ]; // 2D views into cube faces.
+            VkImageView view; // 2D or cube view depending on texture type.
         };
 
 		FrameBufferAttachment color = {};

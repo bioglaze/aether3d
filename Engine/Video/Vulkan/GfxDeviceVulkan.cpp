@@ -2282,11 +2282,19 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     vkDestroyInstance( GfxDeviceGlobal::instance, nullptr );
 }
 
-void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned /*cubeMapFace*/ )
+void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
     GfxDeviceGlobal::currentCmdBuffer = target ? GfxDeviceGlobal::offscreenCmdBuffer : GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
     GfxDeviceGlobal::renderTexture0 = target;
-    GfxDeviceGlobal::frameBuffer0 = target ? target->GetFrameBuffer() : VK_NULL_HANDLE;
+
+    if (target && target->IsCube())
+    {
+        GfxDeviceGlobal::frameBuffer0 = target->GetFrameBufferFace( cubeMapFace );
+    }
+    else
+    {
+        GfxDeviceGlobal::frameBuffer0 = target ? target->GetFrameBuffer() : VK_NULL_HANDLE;
+    }
 }
 
 void BeginOffscreen()

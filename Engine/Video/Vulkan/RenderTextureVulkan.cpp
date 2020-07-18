@@ -390,23 +390,43 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
-    VkImageViewCreateInfo colorImageView = {};
-    colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    colorImageView.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
-    colorImageView.format = colorFormat;
-    colorImageView.flags = 0;
-    colorImageView.subresourceRange = {};
-    colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    colorImageView.subresourceRange.baseMipLevel = 0;
-    colorImageView.subresourceRange.levelCount = 1;
-    colorImageView.subresourceRange.baseArrayLayer = 0;
-    colorImageView.subresourceRange.layerCount = 6;
-
-    colorImageView.image = color.image;
-    err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageView, nullptr, &color.view );
-    AE3D_CHECK_VULKAN( err, "render texture cube color image view" );
+    VkImageViewCreateInfo colorImageCubeView = {};
+    colorImageCubeView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    colorImageCubeView.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+    colorImageCubeView.format = colorFormat;
+    colorImageCubeView.flags = 0;
+    colorImageCubeView.subresourceRange = {};
+    colorImageCubeView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    colorImageCubeView.subresourceRange.baseMipLevel = 0;
+    colorImageCubeView.subresourceRange.levelCount = 1;
+    colorImageCubeView.subresourceRange.baseArrayLayer = 0;
+    colorImageCubeView.subresourceRange.layerCount = 6;    
+    colorImageCubeView.image = color.image;
+    err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageCubeView, nullptr, &color.view );
+    AE3D_CHECK_VULKAN( err, "render texture cube color image cube view" );
     RenderTextureGlobal::imageViewsToReleaseAtExit.push_back( color.view );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.view, VK_OBJECT_TYPE_IMAGE_VIEW, "render texture cube color view" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.view, VK_OBJECT_TYPE_IMAGE_VIEW, "render texture cube color cube view" );
+
+    for (int i = 0; i < 6; ++i)
+    {
+        VkImageViewCreateInfo colorImageView = {};
+        colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        colorImageView.format = colorFormat;
+        colorImageView.flags = 0;
+        colorImageView.subresourceRange = {};
+        colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        colorImageView.subresourceRange.baseMipLevel = 0;
+        colorImageView.subresourceRange.levelCount = 1;
+        colorImageView.subresourceRange.baseArrayLayer = i;
+        colorImageView.subresourceRange.layerCount = 1;
+        colorImageView.image = color.image;
+        
+        err = vkCreateImageView( GfxDeviceGlobal::device, &colorImageView, nullptr, &color.views[ i ] );
+        AE3D_CHECK_VULKAN( err, "render texture cube color image 2D view" );
+        RenderTextureGlobal::imageViewsToReleaseAtExit.push_back( color.views[ i ] );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.views[ i ], VK_OBJECT_TYPE_IMAGE_VIEW, "render texture cube color 2D view" );
+    }
 
     // Depth/Stencil
 
@@ -414,18 +434,6 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     VkImageCreateInfo depthImage = colorImage;
     depthImage.format = depthFormat;
     depthImage.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-
-    VkImageViewCreateInfo depthStencilView = {};
-    depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
-    depthStencilView.format = depthFormat;
-    depthStencilView.flags = 0;
-    depthStencilView.subresourceRange = {};
-    depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-    depthStencilView.subresourceRange.baseMipLevel = 0;
-    depthStencilView.subresourceRange.levelCount = 1;
-    depthStencilView.subresourceRange.baseArrayLayer = 0;
-    depthStencilView.subresourceRange.layerCount = 6;
 
     err = vkCreateImage( GfxDeviceGlobal::device, &depthImage, nullptr, &depth.image );
     AE3D_CHECK_VULKAN( err, "render texture cube depth image" );
@@ -454,6 +462,17 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
+    VkImageViewCreateInfo depthStencilView = {};
+    depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+    depthStencilView.format = depthFormat;
+    depthStencilView.flags = 0;
+    depthStencilView.subresourceRange = {};
+    depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    depthStencilView.subresourceRange.baseMipLevel = 0;
+    depthStencilView.subresourceRange.levelCount = 1;
+    depthStencilView.subresourceRange.baseArrayLayer = 0;
+    depthStencilView.subresourceRange.layerCount = 6;
     depthStencilView.image = depth.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &depth.view );
     AE3D_CHECK_VULKAN( err, "render texture cube depth view" );
@@ -481,6 +500,27 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     RenderTextureGlobal::fbsToReleaseAtExit.push_back( frameBuffer );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)frameBuffer, VK_OBJECT_TYPE_FRAMEBUFFER, "render texture cube framebuffer" );
 
+    for (int i = 0; i < 6; ++i)
+    {
+        VkImageView faceAttachments[ 2 ];
+        faceAttachments[ 0 ] = color.views[ i ];
+        faceAttachments[ 1 ] = depth.view;
+
+        VkFramebufferCreateInfo faceFbufCreateInfo = {};
+        faceFbufCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        faceFbufCreateInfo.renderPass = renderPass;
+        faceFbufCreateInfo.attachmentCount = 2;
+        faceFbufCreateInfo.pAttachments = faceAttachments;
+        faceFbufCreateInfo.width = width;
+        faceFbufCreateInfo.height = height;
+        faceFbufCreateInfo.layers = 1;
+
+        err = vkCreateFramebuffer( GfxDeviceGlobal::device, &faceFbufCreateInfo, nullptr, &frameBufferFaces[ i ] );
+        AE3D_CHECK_VULKAN( err, "rendertexture framebuffer" );
+        RenderTextureGlobal::fbsToReleaseAtExit.push_back( frameBufferFaces[ i ] );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)frameBufferFaces[ i ], VK_OBJECT_TYPE_FRAMEBUFFER, "render texture cube framebuffer face" );
+    }
+    
     CreateSampler( filter, wrap, sampler, mipLevelCount );
 }
 
