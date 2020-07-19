@@ -419,7 +419,7 @@ void ae3d::Window::PumpEvents()
                 }
                 else if (be->detail == 4)
                 {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollUp;  
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollUp;
                 }
                 else if (be->detail == 5)
                 {
@@ -459,11 +459,13 @@ void ae3d::Window::PumpEvents()
                 }
                 else if (be->detail == 4)
                 {
-                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollUp;  
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollUp;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseWheel = -1;
                 }
                 else if (be->detail == 5)
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::MouseWheelScrollDown;
+                    WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseWheel = 1;
                 }
                 else
                 {

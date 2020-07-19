@@ -75,6 +75,8 @@ namespace ae3d
         float gamePadThumbX = 0;
         /// Gamepad's thumb y in range [-1, 1]. Event type indicates left or right thumb.
         float gamePadThumbY = 0;
+        // Mouse wheel.
+        int mouseWheel = 0;
     };
 
     /// Window
