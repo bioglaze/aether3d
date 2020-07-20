@@ -98,7 +98,7 @@
 /// NK_INCLUDE_FIXED_TYPES          | If defined it will include header `<stdint.h>` for fixed sized types otherwise nuklear tries to select the correct type. If that fails it will throw a compiler error and you have to select the correct types yourself.
 /// NK_INCLUDE_DEFAULT_ALLOCATOR    | If defined it will include header `<stdlib.h>` and provide additional functions to use this library without caring for memory allocation control and therefore ease memory management.
 /// NK_INCLUDE_STANDARD_IO          | If defined it will include header `<stdio.h>` and provide additional functions depending on file loading.
-/// NK_INCLUDE_STANDARD_VARARGS     | If defined it will include header <stdio.h> and provide additional functions depending on file loading.
+/// NK_INCLUDE_STANDARD_VARARGS     | If defined it will include header <stdarg.h> and provide additional functions depending on file loading.
 /// NK_INCLUDE_VERTEX_BUFFER_OUTPUT | Defining this adds a vertex draw command list backend to this library, which allows you to convert queue commands into vertex draw commands. This is mainly if you need a hardware accessible format for OpenGL, DirectX, Vulkan, Metal,...
 /// NK_INCLUDE_FONT_BAKING          | Defining this adds `stb_truetype` and `stb_rect_pack` implementation to this library and provides font baking and rendering. If you already have font handling or do not want to use this font handler you don't have to define it.
 /// NK_INCLUDE_DEFAULT_FONT         | Defining this adds the default font: ProggyClean.ttf into this library which can be loaded into a font atlas and allows using this library without having a truetype font
@@ -304,6 +304,7 @@ extern "C" {
 #define NK_CLAMP(i,v,x) (NK_MAX(NK_MIN(v,x), i))
 
 #ifdef NK_INCLUDE_STANDARD_VARARGS
+  #include <stdarg.h>
   #if defined(_MSC_VER) && (_MSC_VER >= 1600) /* VS 2010 and above */
     #include <sal.h>
     #define NK_PRINTF_FORMAT_STRING _Printf_format_string_
@@ -18954,6 +18955,7 @@ NK_LIB void
 nk_pool_init(struct nk_pool *pool, struct nk_allocator *alloc,
     unsigned int capacity)
 {
+    NK_ASSERT(capacity >= 1);
     nk_zero(pool, sizeof(*pool));
     pool->alloc = *alloc;
     pool->capacity = capacity;
@@ -18979,7 +18981,8 @@ nk_pool_init_fixed(struct nk_pool *pool, void *memory, nk_size size)
     nk_zero(pool, sizeof(*pool));
     NK_ASSERT(size >= sizeof(struct nk_page));
     if (size < sizeof(struct nk_page)) return;
-    pool->capacity = (unsigned)(size - sizeof(struct nk_page)) / sizeof(struct nk_page_element);
+    /* first nk_page_element is embedded in nk_page, additional elements follow in adjacent space */
+    pool->capacity = 1 + (unsigned)(size - sizeof(struct nk_page)) / sizeof(struct nk_page_element);
     pool->pages = (struct nk_page*)memory;
     pool->type = NK_BUFFER_FIXED;
     pool->size = size;
@@ -18997,7 +19000,7 @@ nk_pool_alloc(struct nk_pool *pool)
             return 0;
         } else {
             nk_size size = sizeof(struct nk_page);
-            size += NK_POOL_DEFAULT_CAPACITY * sizeof(union nk_page_data);
+            size += (pool->capacity - 1) * sizeof(struct nk_page_element);
             page = (struct nk_page*)pool->alloc.alloc(pool->alloc.userdata,0, size);
             page->next = pool->pages;
             pool->pages = page;
@@ -20983,13 +20986,15 @@ nk_menubar_end(struct nk_context *ctx)
     if (layout->flags & NK_WINDOW_HIDDEN || layout->flags & NK_WINDOW_MINIMIZED)
         return;
 
-    layout->menu.h = layout->at_y - layout->menu.y;
-    layout->bounds.y += layout->menu.h + ctx->style.window.spacing.y + layout->row.height;
-    layout->bounds.h -= layout->menu.h + ctx->style.window.spacing.y + layout->row.height;
+    layout->menu.h  = layout->at_y - layout->menu.y;
+    layout->menu.h += layout->row.height + ctx->style.window.spacing.y;
+
+    layout->bounds.y += layout->menu.h;
+    layout->bounds.h -= layout->menu.h;
 
     *layout->offset_x = layout->menu.offset.x;
     *layout->offset_y = layout->menu.offset.y;
-    layout->at_y = layout->bounds.y - layout->row.height;
+    layout->at_y      = layout->bounds.y - layout->row.height;
 
     layout->clip.y = layout->bounds.y;
     layout->clip.h = layout->bounds.h;
@@ -26532,7 +26537,10 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
     if (!prev_state && edit->active) {
         const enum nk_text_edit_type type = (flags & NK_EDIT_MULTILINE) ?
             NK_TEXT_EDIT_MULTI_LINE: NK_TEXT_EDIT_SINGLE_LINE;
+        /* keep scroll position when re-activating edit widget */
+        struct nk_vec2 oldscrollbar = edit->scrollbar;
         nk_textedit_clear_state(edit, type, filter);
+        edit->scrollbar = oldscrollbar;
         if (flags & NK_EDIT_AUTO_SELECT)
             select_all = nk_true;
         if (flags & NK_EDIT_GOTO_END_ON_ACTIVATE) {
@@ -26664,8 +26672,8 @@ nk_do_edit(nk_flags *state, struct nk_command_buffer *out,
 
     /* draw background frame */
     if (background->type == NK_STYLE_ITEM_COLOR) {
-        nk_stroke_rect(out, bounds, style->rounding, style->border, style->border_color);
         nk_fill_rect(out, bounds, style->rounding, background->data.color);
+        nk_stroke_rect(out, bounds, style->rounding, style->border, style->border_color);
     } else nk_draw_image(out, bounds, &background->data.image, nk_white);}
 
     area.w = NK_MAX(0, area.w - style->cursor_size);
@@ -28256,13 +28264,18 @@ nk_combo_begin_text(struct nk_context *ctx, const char *selected, int len,
         struct nk_rect label;
         struct nk_rect button;
         struct nk_rect content;
+        int draw_button_symbol;
 
         enum nk_symbol_type sym;
         if (ctx->last_widget_state & NK_WIDGET_STATE_HOVER)
             sym = style->combo.sym_hover;
         else if (is_clicked)
             sym = style->combo.sym_active;
-        else sym = style->combo.sym_normal;
+        else 
+            sym = style->combo.sym_normal;
+
+        /* represents whether or not the combo's button symbol should be drawn */
+        draw_button_symbol = sym != NK_SYMBOL_NONE;
 
         /* calculate button */
         button.w = header.h - 2 * style->combo.button_padding.y;
@@ -28279,14 +28292,18 @@ nk_combo_begin_text(struct nk_context *ctx, const char *selected, int len,
         text.padding = nk_vec2(0,0);
         label.x = header.x + style->combo.content_padding.x;
         label.y = header.y + style->combo.content_padding.y;
-        label.w = button.x - (style->combo.content_padding.x + style->combo.spacing.x) - label.x;;
         label.h = header.h - 2 * style->combo.content_padding.y;
+        if (draw_button_symbol)
+            label.w = button.x - (style->combo.content_padding.x + style->combo.spacing.x) - label.x;
+        else
+            label.w = header.w - 2 * style->combo.content_padding.x;
         nk_widget_text(&win->buffer, label, selected, len, &text,
             NK_TEXT_LEFT, ctx->style.font);
 
         /* draw open/close button */
-        nk_draw_button_symbol(&win->buffer, &button, &content, ctx->last_widget_state,
-            &ctx->style.combo.button, sym, style->font);
+        if (draw_button_symbol)
+            nk_draw_button_symbol(&win->buffer, &button, &content, ctx->last_widget_state,
+                &ctx->style.combo.button, sym, style->font);
     }
     return nk_combo_begin(ctx, win, size, is_clicked, header);
 }
@@ -28340,6 +28357,7 @@ nk_combo_begin_color(struct nk_context *ctx, struct nk_color color, struct nk_ve
         struct nk_rect content;
         struct nk_rect button;
         struct nk_rect bounds;
+        int draw_button_symbol;
 
         enum nk_symbol_type sym;
         if (ctx->last_widget_state & NK_WIDGET_STATE_HOVER)
@@ -28347,6 +28365,9 @@ nk_combo_begin_color(struct nk_context *ctx, struct nk_color color, struct nk_ve
         else if (is_clicked)
             sym = style->combo.sym_active;
         else sym = style->combo.sym_normal;
+
+        /* represents whether or not the combo's button symbol should be drawn */
+        draw_button_symbol = sym != NK_SYMBOL_NONE;
 
         /* calculate button */
         button.w = header.h - 2 * style->combo.button_padding.y;
@@ -28363,12 +28384,16 @@ nk_combo_begin_color(struct nk_context *ctx, struct nk_color color, struct nk_ve
         bounds.h = header.h - 4 * style->combo.content_padding.y;
         bounds.y = header.y + 2 * style->combo.content_padding.y;
         bounds.x = header.x + 2 * style->combo.content_padding.x;
-        bounds.w = (button.x - (style->combo.content_padding.x + style->combo.spacing.x)) - bounds.x;
+        if (draw_button_symbol)
+            bounds.w = (button.x - (style->combo.content_padding.x + style->combo.spacing.x)) - bounds.x;
+        else
+            bounds.w = header.w - 4 * style->combo.content_padding.x;
         nk_fill_rect(&win->buffer, bounds, 0, color);
 
         /* draw open/close button */
-        nk_draw_button_symbol(&win->buffer, &button, &content, ctx->last_widget_state,
-            &ctx->style.combo.button, sym, style->font);
+        if (draw_button_symbol)
+            nk_draw_button_symbol(&win->buffer, &button, &content, ctx->last_widget_state,
+                &ctx->style.combo.button, sym, style->font);
     }
     return nk_combo_begin(ctx, win, size, is_clicked, header);
 }
@@ -28600,6 +28625,7 @@ nk_combo_begin_image(struct nk_context *ctx, struct nk_image img, struct nk_vec2
         struct nk_rect bounds = {0,0,0,0};
         struct nk_rect content;
         struct nk_rect button;
+        int draw_button_symbol;
 
         enum nk_symbol_type sym;
         if (ctx->last_widget_state & NK_WIDGET_STATE_HOVER)
@@ -28607,6 +28633,9 @@ nk_combo_begin_image(struct nk_context *ctx, struct nk_image img, struct nk_vec2
         else if (is_clicked)
             sym = style->combo.sym_active;
         else sym = style->combo.sym_normal;
+
+        /* represents whether or not the combo's button symbol should be drawn */
+        draw_button_symbol = sym != NK_SYMBOL_NONE;
 
         /* calculate button */
         button.w = header.h - 2 * style->combo.button_padding.y;
@@ -28623,12 +28652,16 @@ nk_combo_begin_image(struct nk_context *ctx, struct nk_image img, struct nk_vec2
         bounds.h = header.h - 2 * style->combo.content_padding.y;
         bounds.y = header.y + style->combo.content_padding.y;
         bounds.x = header.x + style->combo.content_padding.x;
-        bounds.w = (button.x - style->combo.content_padding.y) - bounds.x;
+        if (draw_button_symbol)
+            bounds.w = (button.x - style->combo.content_padding.y) - bounds.x;
+        else
+            bounds.w = header.w - 2 * style->combo.content_padding.x;
         nk_draw_image(&win->buffer, bounds, &img, nk_white);
 
         /* draw open/close button */
-        nk_draw_button_symbol(&win->buffer, &bounds, &content, ctx->last_widget_state,
-            &ctx->style.combo.button, sym, style->font);
+        if (draw_button_symbol)
+            nk_draw_button_symbol(&win->buffer, &bounds, &content, ctx->last_widget_state,
+                &ctx->style.combo.button, sym, style->font);
     }
     return nk_combo_begin(ctx, win, size, is_clicked, header);
 }
@@ -28685,6 +28718,7 @@ nk_combo_begin_image_text(struct nk_context *ctx, const char *selected, int len,
         struct nk_rect button;
         struct nk_rect label;
         struct nk_rect image;
+        int draw_button_symbol;
 
         enum nk_symbol_type sym;
         if (ctx->last_widget_state & NK_WIDGET_STATE_HOVER)
@@ -28692,6 +28726,9 @@ nk_combo_begin_image_text(struct nk_context *ctx, const char *selected, int len,
         else if (is_clicked)
             sym = style->combo.sym_active;
         else sym = style->combo.sym_normal;
+
+        /* represents whether or not the combo's button symbol should be drawn */
+        draw_button_symbol = sym != NK_SYMBOL_NONE;
 
         /* calculate button */
         button.w = header.h - 2 * style->combo.button_padding.y;
@@ -28703,8 +28740,9 @@ nk_combo_begin_image_text(struct nk_context *ctx, const char *selected, int len,
         content.y = button.y + style->combo.button.padding.y;
         content.w = button.w - 2 * style->combo.button.padding.x;
         content.h = button.h - 2 * style->combo.button.padding.y;
-        nk_draw_button_symbol(&win->buffer, &button, &content, ctx->last_widget_state,
-            &ctx->style.combo.button, sym, style->font);
+        if (draw_button_symbol)
+            nk_draw_button_symbol(&win->buffer, &button, &content, ctx->last_widget_state,
+                &ctx->style.combo.button, sym, style->font);
 
         /* draw image */
         image.x = header.x + style->combo.content_padding.x;
@@ -28717,8 +28755,11 @@ nk_combo_begin_image_text(struct nk_context *ctx, const char *selected, int len,
         text.padding = nk_vec2(0,0);
         label.x = image.x + image.w + style->combo.spacing.x + style->combo.content_padding.x;
         label.y = header.y + style->combo.content_padding.y;
-        label.w = (button.x - style->combo.content_padding.x) - label.x;
         label.h = header.h - 2 * style->combo.content_padding.y;
+        if (draw_button_symbol)
+            label.w = (button.x - style->combo.content_padding.x) - label.x;
+        else
+            label.w = (header.x + header.w - style->combo.content_padding.x) - label.x;
         nk_widget_text(&win->buffer, label, selected, len, &text, NK_TEXT_LEFT, style->font);
     }
     return nk_combo_begin(ctx, win, size, is_clicked, header);
@@ -29091,6 +29132,12 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 ///    - [yy]: Minor version with non-breaking API and library changes
 ///    - [zz]: Bug fix version with no direct changes to API
 ///
+/// - 2020/06/13 (4.03.1) - Fix nk_pool allocation sizes.
+/// - 2020/06/04 (4.03.0) - Made nk_combo header symbols optional.
+/// - 2020/05/27 (4.02.5) - Fix nk_do_edit: Keep scroll position when re-activating edit widget.
+/// - 2020/05/09 (4.02.4) - Fix nk_menubar height calculation bug
+/// - 2020/05/08 (4.02.3) - Fix missing stdarg.h with NK_INCLUDE_STANDARD_VARARGS
+/// - 2020/04/30 (4.02.2) - Fix nk_edit border drawing bug
 /// - 2020/04/09 (4.02.1) - Removed unused nk_sqrt function to fix compiler warnings
 ///                       - Fixed compiler warnings if you bring your own methods for
 ///                        nk_cos/nk_sin/nk_strtod/nk_memset/nk_memcopy/nk_dtoa
