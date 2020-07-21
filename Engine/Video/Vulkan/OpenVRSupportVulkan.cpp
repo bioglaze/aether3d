@@ -103,9 +103,6 @@ namespace Global
     int rightHandIndex = -1;
     VkPipeline companionPSO;
     VkVertexInputAttributeDescription inputCompanion;
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkPipelineLayout pipelineLayout;
-    VkVertexInputAttributeDescription attributeDescriptions[ 3 ];
 }
 
 float GetVRFov()
@@ -347,58 +344,6 @@ void ConvertSteamVRMatrixToMatrix4( const vr::HmdMatrix34_t &steamMatrix, Matrix
     outMatrix.Transpose( outMatrix );
 }
 
-void SetupDescriptors()
-{
-    VkDescriptorSetLayoutBinding layoutBindings[ 3 ] = {};
-    layoutBindings[ 0 ].binding = 0;
-    layoutBindings[ 0 ].descriptorCount = 1;
-    layoutBindings[ 0 ].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    layoutBindings[ 0 ].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    layoutBindings[ 1 ].binding = 1;
-    layoutBindings[ 1 ].descriptorCount = 1;
-    layoutBindings[ 1 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    layoutBindings[ 1 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    layoutBindings[ 2 ].binding = 2;
-    layoutBindings[ 2 ].descriptorCount = 1;
-    layoutBindings[ 2 ].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-    layoutBindings[ 2 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-    descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorSetLayoutCreateInfo.pNext = nullptr;
-    descriptorSetLayoutCreateInfo.bindingCount = 3;
-    descriptorSetLayoutCreateInfo.pBindings = &layoutBindings[ 0 ];
-    VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorSetLayoutCreateInfo, nullptr, &Global::descriptorSetLayout );
-    AE3D_CHECK_VULKAN( err, "Unable to create descriptor set layout" );
-
-    VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
-    pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutCreateInfo.pNext = nullptr;
-    pipelineLayoutCreateInfo.setLayoutCount = 1;
-    pipelineLayoutCreateInfo.pSetLayouts = &Global::descriptorSetLayout;
-    pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
-    pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
-    err = vkCreatePipelineLayout( GfxDeviceGlobal::device, &pipelineLayoutCreateInfo, nullptr, &Global::pipelineLayout );
-    AE3D_CHECK_VULKAN( err, "Unable to create pipeline layout" );
-
-    Global::attributeDescriptions[ 0 ].binding = 0;
-    Global::attributeDescriptions[ 0 ].location = 0;
-    Global::attributeDescriptions[ 0 ].format = VK_FORMAT_R32G32_SFLOAT;
-    Global::attributeDescriptions[ 0 ].offset = 0;
-
-    Global::attributeDescriptions[ 1 ].binding = 1;
-    Global::attributeDescriptions[ 1 ].location = 0;
-    Global::attributeDescriptions[ 1 ].format = VK_FORMAT_R32G32_SFLOAT;
-    Global::attributeDescriptions[ 1 ].offset = sizeof( float ) * 2;
-
-    Global::attributeDescriptions[ 2 ].binding = 0;
-    Global::attributeDescriptions[ 2 ].location = 0;
-    Global::attributeDescriptions[ 2 ].format = VK_FORMAT_UNDEFINED;
-    Global::attributeDescriptions[ 2 ].offset = 0;
-}
-
 Vec3 ae3d::VR::GetRightHandPosition()
 {
     return Global::rightControllerPosition;
@@ -437,8 +382,6 @@ void ae3d::VR::Init()
     bool res = CreateFrameBuffer( Global::width, Global::height, Global::leftEyeDesc, "left eye" );
     res = CreateFrameBuffer( Global::width, Global::height, Global::rightEyeDesc, "right eye" );
 
-    SetupDescriptors();
-
     vr::HmdMatrix34_t matEye = Global::hmd->GetEyeToHeadTransform( vr::Eye_Left );
     ConvertSteamVRMatrixToMatrix4( matEye, Global::eyePosLeft );
         
@@ -450,6 +393,16 @@ void ae3d::VR::Init()
         System::Assert( false, "Unable to init VR compositor!\n" );
         return;
     }
+
+    const int instanceExtensionStringBytes = vr::VRCompositor()->GetVulkanInstanceExtensionsRequired( nullptr, 0 );
+    char* instanceExtensions = new char[ instanceExtensionStringBytes ];
+    vr::VRCompositor()->GetVulkanInstanceExtensionsRequired( instanceExtensions, instanceExtensionStringBytes );
+    System::Print( "OpenVR required instance extensions: %s\n", instanceExtensions );
+
+    const int deviceExtensionStringBytes = vr::VRCompositor()->GetVulkanDeviceExtensionsRequired( GfxDeviceGlobal::physicalDevice, nullptr, 0 );
+    char* deviceExtensions = new char[ deviceExtensionStringBytes ];
+    vr::VRCompositor()->GetVulkanDeviceExtensionsRequired( GfxDeviceGlobal::physicalDevice, deviceExtensions, deviceExtensionStringBytes );
+    System::Print( "OpenVR required device extensions: %s\n", deviceExtensions );
 }
 
 void ae3d::VR::Deinit()
