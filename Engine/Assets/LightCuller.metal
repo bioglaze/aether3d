@@ -48,8 +48,8 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
 #if USE_MINMAX_Z
     threadgroup atomic_uint ldsZMax;
     threadgroup atomic_uint ldsZMin;
-#endif
     ushort2 globalIdx = gid;
+#endif
     ushort2 localIdx = tid;
     ushort2 groupIdx = dtid;
 

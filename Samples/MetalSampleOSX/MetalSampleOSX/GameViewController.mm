@@ -40,7 +40,7 @@
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
-//#define TEST_RENDER_TEXTURE_CUBE
+#define TEST_RENDER_TEXTURE_CUBE
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -756,7 +756,7 @@ using namespace ae3d;
 
     transMaterial.SetBackFaceCulling( true );
     transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );
-    rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &transMaterial, 0 );
+    //rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &transMaterial, 0 );
     
     lineProjection.MakeProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     std::vector< Vec3 > lines( 4 );

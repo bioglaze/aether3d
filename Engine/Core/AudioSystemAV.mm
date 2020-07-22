@@ -102,7 +102,7 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
 
         AudioGlobal::clips[ clipId - 1 ].buffer = [ [AVAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:1];
         
-         // TODO: Fill buffer with "encoded"
+         // TODO: Fill buffer with "decoded"
         
         return clipId;
     }
