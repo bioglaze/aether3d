@@ -206,7 +206,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
     {      
         textEditActive = ctx.current->edit.active;
 
-        nk_layout_row_static( &ctx, 40, 450, 1 );
+        nk_layout_row_static( &ctx, 40, 430, 1 );
 
         // Gameobject is selected.
 

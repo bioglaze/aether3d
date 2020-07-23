@@ -322,24 +322,25 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     inputEvent.mouseWheel = false;
 }
 
-- (void)scrollWheel:(NSEvent *)event
+- (void)scrollWheel:(NSEvent *)theEvent
 {
-    ae3d::System::Print("y: %f\n", event.deltaY);
     inputEvent.mouseWheel = true;
-    inputEvent.wheelY = event.deltaY;
+    inputEvent.wheelY = theEvent.deltaY;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
 }
 
 - (void)_render
 {
     inspector.BeginInput();
-    
+        
     if (inputEvent.mouseMoved)
     {
         inputEvent.mouseMoved = false;
         inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
     }
     
-    if (inputEvent.mouseWheel)
+    if (inputEvent.mouseWheel && inputEvent.x > InspectorWidth)
     {
         moveDir.z = inputEvent.wheelY;
     }
