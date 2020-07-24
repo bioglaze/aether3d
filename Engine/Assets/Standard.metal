@@ -136,9 +136,9 @@ float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
 //[[early_fragment_tests]]
 fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
-                               texture2d<float, access::sample> _ShadowMap [[texture(1)]],
-                               texture2d<float, access::sample> normalMap [[texture(2)]],
-                               texture2d<float, access::sample> specularMap [[texture(3)]],
+                               texture2d<float, access::sample> normalMap [[texture(1)]],
+                               texture2d<float, access::sample> specularMap [[texture(2)]],
+                               texture2d<float, access::sample> _ShadowMap [[texture(3)]],
                                texturecube<float, access::sample> cubeMap [[texture(4)]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
                                const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
@@ -156,7 +156,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     //const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
     const float3 normalVS = tangentSpaceTransform( in.tangentVS_u.xyz, in.bitangentVS_v.xyz, in.normalVS, normalTS.xyz );
-    const float3 surfaceToDirectionalLightVS = -uniforms.lightDirection.xyz;
+    const float3 surfaceToDirectionalLightVS = uniforms.lightDirection.xyz;
 
     const float3 N = normalize( normalVS );
     const float3 V = normalize( in.positionVS.xyz );
@@ -187,7 +187,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
     float4 outColor = uniforms.lightColor;
-    outColor = ambient * float4( albedoColor ) + outColor * float4( albedoColor ) + max( 0.0f, dotNL );
+    outColor = max( ambient, outColor * float4( albedoColor ) + max( 0.0f, dotNL ) );
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
@@ -250,7 +250,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     }
     
 	outColor.rgb = max( outColor.rgb, float3( uniforms.minAmbient, uniforms.minAmbient, uniforms.minAmbient ) );
-    outColor.rgb += (float3)cubeReflection.rgb;
+    //outColor.rgb += (float3)cubeReflection.rgb;
     
 #ifdef DEBUG_LIGHT_COUNT
     const int numLights = GetNumLightsInThisTile( tileIndex, uniforms.maxNumLightsPerTile, perTileLightIndexBuffer );
