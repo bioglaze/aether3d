@@ -283,11 +283,30 @@ namespace ae3d
         
         /**
          http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-         \return Euler angles in degrees.
+         Input should be normalized before calling this.
+         \return Euler angles in degrees. x = bank, y = attitude, z = heading.
          */
         Vec3 GetEuler() const
         {
             Vec3 out;
+            const float test = x * y + z * w;
+            
+            if (test > 4.99f) // Singularity at north pole.
+            {
+                out.z = 2 * atan2f( x, w );
+                out.y = 3.14159265f / 2.0f;
+                out.x = 0;
+                return out / (3.14159265358979f / 180.0f);
+            }
+            
+            if (test < -4.99f) // Singularity at south pole.
+            {
+                out.z = -2 * atan2f( x, w );
+                out.y = -3.14159265f / 2.0f;
+                out.x = 0;
+                return out / (3.14159265358979f / 180.0f);
+            }
+
             out.z = atan2f( 2 * y * w - 2 * x * z, 1 - 2 * y * y - 2 * z * z );
             out.y = asinf( 2 * x * y + 2 * z * w );
             out.x = atan2f( 2 * x * w - 2 * y * z, 1 - 2 * x * x - 2 * z * z );
