@@ -16,11 +16,12 @@ struct VSOutput
 
 VSOutput main( float3 pos : POSITION, float2 uv : TEXCOORD, float3 nor : NORMAL, float4 tangent : TANGENT, float4 color : COLOR, float4 boneWeights : WEIGHTS, uint4 boneIndex : BONES )
 {
-    float4 position2 = mul( boneMatrices[ boneIndex.x ], float4( pos, 1.0 ) ) * boneWeights.x;
-    position2 += mul( boneMatrices[ boneIndex.y ], float4( pos, 1.0 ) ) * boneWeights.y;
-    position2 += mul( boneMatrices[ boneIndex.z ], float4( pos, 1.0 ) ) * boneWeights.z;
-    position2 += mul( boneMatrices[ boneIndex.w ], float4( pos, 1.0 ) ) * boneWeights.w;
-
+    matrix boneTransform = boneMatrices[ boneIndex.x ] * boneWeights.x + 
+                           boneMatrices[ boneIndex.y ] * boneWeights.y +
+                           boneMatrices[ boneIndex.z ] * boneWeights.z +
+                           boneMatrices[ boneIndex.w ] * boneWeights.w;
+    const float4 position2 = mul( boneTransform, float4( pos, 1.0f ) );
+    
     VSOutput vsOut;
     vsOut.pos = mul( localToClip, position2 );
 
