@@ -115,7 +115,7 @@ float VSM( float depth, float4 projCoord )
         return 0;
     }
 
-    float2 moments = shadowTex.SampleLevel( sampler1, uv, 0 ).rg;
+    float2 moments = shadowTex.SampleLevel( sLinear, uv, 0 ).rg;
 
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
 
@@ -142,16 +142,16 @@ float4 main( PS_INPUT input ) : SV_Target
 
     const float3 N = normalize( normalVS );
     const float3 V = normalize( input.positionVS_u.xyz );
-    const float3 L = lightDirection.xyz;
+    const float3 L = -lightDirection.xyz;
     const float3 H = normalize( L + V );
 
-    const float dotNH = saturate( dot( N, H ) );
-    const float dotLH = saturate( dot( L, H ) );
     const float dotNV = abs( dot( N, V ) ) + 1e-5f;
     const float dotNL = saturate( dot( N, -surfaceToLightVS ) );
+    const float dotLH = saturate( dot( L, H ) );
+    const float dotNH = saturate( dot( N, H ) );
 
     float3 f0v = float3(f0, f0, f0);
-    float roughness = 0.9f;
+    float roughness = 0.5f;
     float a = roughness * roughness;
     float D = D_GGX( dotNH, a );
     float3 F = F_Schlick( dotLH, f0v );
