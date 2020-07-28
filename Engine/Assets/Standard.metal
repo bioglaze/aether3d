@@ -180,14 +180,11 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 Fr = (D * v) * F;
     const float3 Fd = Fd_Lambert();
 
-    float4 ambient = float4( 0.1f, 0.1f, 0.1f, 1.0f );
-
     const int tileIndex = GetTileIndex( in.position.xy, uniforms.windowWidth );
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
-    float4 outColor = uniforms.lightColor;
-    outColor = max( ambient, outColor * float4( albedoColor ) + max( 0.0f, dotNL ) );
+    float4 outColor = float4( uniforms.lightColor.rgb * Fd * dotNL, 1 );
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {

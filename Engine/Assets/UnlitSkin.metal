@@ -32,12 +32,13 @@ vertex ColorInOut unlit_skin_vertex(Vertex vert [[stage_in]],
 {
     ColorInOut out;
 
-    float4 in_position = float4( vert.position, 1.0 );
+    matrix_float4x4 boneTransform = uniforms.boneMatrices[ vert.boneIndex.x ] * vert.boneWeights.x +
+                                    uniforms.boneMatrices[ vert.boneIndex.y ] * vert.boneWeights.y +
+                                    uniforms.boneMatrices[ vert.boneIndex.z ] * vert.boneWeights.z +
+                                    uniforms.boneMatrices[ vert.boneIndex.w ] * vert.boneWeights.w;
     
-    float4 position2 = uniforms.boneMatrices[ vert.boneIndex.x ] * in_position * vert.boneWeights.x;
-    position2 += uniforms.boneMatrices[ vert.boneIndex.y ] * in_position * vert.boneWeights.y;
-    position2 += uniforms.boneMatrices[ vert.boneIndex.z ] * in_position * vert.boneWeights.z;
-    position2 += uniforms.boneMatrices[ vert.boneIndex.w ] * in_position * vert.boneWeights.w;
+    float4 in_position = float4( vert.position, 1.0 );
+    float4 position2 = boneTransform * in_position;
     out.position = uniforms.localToClip * position2;
 
     out.color = half4( vert.color );
