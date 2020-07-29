@@ -31,9 +31,9 @@
 
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_MSAA
-#define TEST_RENDER_TEXTURE_CUBE
+//#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
-//#define TEST_SHADOWS_DIR
+#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
@@ -882,6 +882,21 @@ int main()
             {
                 camera.GetComponent<TransformComponent>()->MoveUp( -0.1f );
             }
+        }
+
+        if (!Window::IsKeyDown( KeyCode::W ) && !Window::IsKeyDown( KeyCode::S ))
+        {
+            moveDir.z = 0;
+        }
+
+        if (!Window::IsKeyDown( KeyCode::A ) && !Window::IsKeyDown( KeyCode::D ))
+        {
+            moveDir.x = 0;
+        }
+
+        if (!Window::IsKeyDown( KeyCode::Q ) && !Window::IsKeyDown( KeyCode::E ))
+        {
+            moveDir.y = 0;
         }
 
         camera.GetComponent<TransformComponent>()->MoveUp( moveDir.y );

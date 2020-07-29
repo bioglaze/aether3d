@@ -101,6 +101,9 @@ namespace ae3d
         /// \return True if window is open.
         bool IsOpen();
 
+        /// \return True, if key is down.
+        bool IsKeyDown( KeyCode keyCode );
+
         /// Reads events from windowing system to be used in PollEvent depending on platform.
         void PumpEvents();
 

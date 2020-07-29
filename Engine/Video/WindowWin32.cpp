@@ -384,6 +384,19 @@ namespace ae3d
         }
     }
 
+    bool Window::IsKeyDown( KeyCode keyCode )
+    {
+        for (int i = 0; i < 256; ++i)
+        {
+            if (WindowGlobal::keyMap[ i ] == keyCode)
+            {
+                return (GetKeyState( i ) & 0x8000) != 0;
+            }
+        }
+
+        return false;
+    }
+
     void Window::Create(int width, int height, WindowCreateFlags flags)
     {
         SetEnvironmentVariable( "DISABLE_VK_LAYER_VALVE_steam_overlay_1", "1" );
