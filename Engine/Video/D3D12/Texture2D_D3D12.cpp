@@ -47,7 +47,8 @@ namespace Texture2DGlobal
     std::vector< ID3D12Resource* > textures;
     std::vector< ID3D12Resource* > uploadBuffers;
     ae3d::Texture2D defaultTexture;
-    
+    int tex2dMemoryUsage = 0;
+
     std::map< std::string, ae3d::Texture2D > hashToCachedTexture;
 #if DEBUG
     std::map< std::string, std::size_t > pathToCachedTextureSizeInBytes;
@@ -427,6 +428,8 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+    const D3D12_RESOURCE_ALLOCATION_INFO info = GfxDeviceGlobal::device->GetResourceAllocationInfo( 0, 1, &descTex );
+    Texture2DGlobal::tex2dMemoryUsage += info.SizeInBytes;
 
     wchar_t wstr[ 128 ];
     std::mbstowcs( wstr, aPath, 128 );
@@ -494,6 +497,8 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+    const D3D12_RESOURCE_ALLOCATION_INFO info = GfxDeviceGlobal::device->GetResourceAllocationInfo( 0, 1, &descTex );
+    Texture2DGlobal::tex2dMemoryUsage += info.SizeInBytes;
 
     wchar_t wstr[ 128 ];
     std::mbstowcs( wstr, fileContents.path.c_str(), 128 );
