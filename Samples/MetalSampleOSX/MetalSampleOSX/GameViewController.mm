@@ -40,7 +40,7 @@
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
-#define TEST_RENDER_TEXTURE_CUBE
+//#define TEST_RENDER_TEXTURE_CUBE
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -334,6 +334,7 @@ using namespace ae3d;
     ae3d::System::InitAudio();
 
     audioClip.Load( FileSystem::FileContents( "explosion.wav" ) );
+    //audioClip.Load( FileSystem::FileContents( "example.ogg" ) );
     
     audioContainer.AddComponent<AudioSourceComponent>();
     audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
@@ -402,7 +403,7 @@ using namespace ae3d;
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
     
-    fontTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
+    fontTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
     // TODO: SDF texture
     fontTexSDF.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
     gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
@@ -490,6 +491,7 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
+    standardMaterial.SetTexture( &pbrNormalTex, 1 );
     
     skyboxShader.Load( "skybox_vertex", "skybox_fragment",
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
@@ -504,7 +506,7 @@ using namespace ae3d;
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
 
     pbrMaterial.SetShader( &standardShader );
-    pbrMaterial.SetTexture( &pbrNormalTex, 2 );
+    pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
 #ifdef TEST_RENDER_TEXTURE_CUBE
     pbrMaterial.SetRenderTexture( &cubeRT, 4 );
@@ -711,6 +713,8 @@ using namespace ae3d;
     cameraCubeRT.AddComponent<TransformComponent>();
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
+    scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
+    
 #ifdef TEST_FORWARD_PLUS
     //scene.Add( &standardCubeBR );
     //scene.Add( &standardCubeBL );

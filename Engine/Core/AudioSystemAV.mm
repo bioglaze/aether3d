@@ -100,9 +100,33 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
         const stb_vorbis_info vinfo = stb_vorbis_get_info( vorbis );
         AVAudioFormat* format = [ [AVAudioFormat alloc] initStandardFormatWithSampleRate:vinfo.sample_rate channels:vinfo.channels];
 
-        AudioGlobal::clips[ clipId - 1 ].buffer = [ [AVAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:1];
+        // TODO: Fix frameCapacity and memcpy sizes!
+
+        AudioGlobal::clips[ clipId - 1 ].buffer = [ [AVAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:vinfo.max_frame_size];
         
-         // TODO: Fill buffer with "decoded"
+        int16_t* bufferPointer16 = (int16_t *)[AudioGlobal::clips[ clipId - 1 ].buffer int16ChannelData];
+        int32_t* bufferPointer32 = (int32_t *)[AudioGlobal::clips[ clipId - 1 ].buffer int32ChannelData];
+        float* bufferPointerFloat = (float *)[AudioGlobal::clips[ clipId - 1 ].buffer floatChannelData];
+        int frameLength = [AudioGlobal::clips[ clipId - 1 ].buffer frameLength];
+        ae3d::System::Print("max_frame_size: %d, frameLength: %d\n", vinfo.max_frame_size, frameLength);
+
+        if (bufferPointer16)
+        {
+            memcpy( bufferPointer16, decoded, len / 2 );
+        }
+        else if (bufferPointer32)
+        {
+            memcpy( bufferPointer32, decoded, len );
+        }
+        else if (bufferPointerFloat)
+        {
+            int channel = 0;
+            memcpy( &bufferPointerFloat[ channel ], decoded, vinfo.max_frame_size );
+        }
+        else
+        {
+            ae3d::System::Print( "Audio data in %s is neither float, int16 nor int32\n", clipData.pathWithoutBundle.c_str() );
+        }
         
         return clipId;
     }
