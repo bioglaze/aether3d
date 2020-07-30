@@ -23,89 +23,89 @@ namespace debug
     PFN_vkCmdEndDebugUtilsLabelEXT CmdEndDebugUtilsLabelEXT;
     VkDebugUtilsMessengerEXT dbgMessenger = VK_NULL_HANDLE;
 
-	static const char* getObjectType( VkObjectType type )
-	{
-		switch( type )
-		{
-		case VK_OBJECT_TYPE_QUERY_POOL: return "VK_OBJECT_TYPE_QUERY_POOL";
-		case VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION: return "VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION";
-		case VK_OBJECT_TYPE_SEMAPHORE: return "VK_OBJECT_TYPE_SEMAPHORE";
-		case VK_OBJECT_TYPE_SHADER_MODULE: return "VK_OBJECT_TYPE_SHADER_MODULE";
-		case VK_OBJECT_TYPE_SWAPCHAIN_KHR: return "VK_OBJECT_TYPE_SWAPCHAIN_KHR";
-		case VK_OBJECT_TYPE_SAMPLER: return "VK_OBJECT_TYPE_SAMPLER";
-		case VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT: return "VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT";
-		case VK_OBJECT_TYPE_IMAGE: return "VK_OBJECT_TYPE_IMAGE";
-		case VK_OBJECT_TYPE_UNKNOWN: return "VK_OBJECT_TYPE_UNKNOWN";
-		case VK_OBJECT_TYPE_DESCRIPTOR_POOL: return "VK_OBJECT_TYPE_DESCRIPTOR_POOL";
-		case VK_OBJECT_TYPE_COMMAND_BUFFER: return "VK_OBJECT_TYPE_COMMAND_BUFFER";
-		case VK_OBJECT_TYPE_BUFFER: return "VK_OBJECT_TYPE_BUFFER";
-		case VK_OBJECT_TYPE_SURFACE_KHR: return "VK_OBJECT_TYPE_SURFACE_KHR";
-		case VK_OBJECT_TYPE_INSTANCE: return "VK_OBJECT_TYPE_INSTANCE";
-		case VK_OBJECT_TYPE_VALIDATION_CACHE_EXT: return "VK_OBJECT_TYPE_VALIDATION_CACHE_EXT";
-		case VK_OBJECT_TYPE_IMAGE_VIEW: return "VK_OBJECT_TYPE_IMAGE_VIEW";
-		case VK_OBJECT_TYPE_DESCRIPTOR_SET: return "VK_OBJECT_TYPE_DESCRIPTOR_SET";
-		case VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT: return "VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT";
-		case VK_OBJECT_TYPE_COMMAND_POOL: return "VK_OBJECT_TYPE_COMMAND_POOL";
-		case VK_OBJECT_TYPE_PHYSICAL_DEVICE: return "VK_OBJECT_TYPE_PHYSICAL_DEVICE";
-		case VK_OBJECT_TYPE_DISPLAY_KHR: return "VK_OBJECT_TYPE_DISPLAY_KHR";
-		case VK_OBJECT_TYPE_BUFFER_VIEW: return "VK_OBJECT_TYPE_BUFFER_VIEW";
-		case VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT: return "VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT";
-		case VK_OBJECT_TYPE_FRAMEBUFFER: return "VK_OBJECT_TYPE_FRAMEBUFFER";
-		case VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE: return "VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE";
-		case VK_OBJECT_TYPE_PIPELINE_CACHE: return "VK_OBJECT_TYPE_PIPELINE_CACHE";
-		case VK_OBJECT_TYPE_PIPELINE_LAYOUT: return "VK_OBJECT_TYPE_PIPELINE_LAYOUT";
-		case VK_OBJECT_TYPE_DEVICE_MEMORY: return "VK_OBJECT_TYPE_DEVICE_MEMORY";
-		case VK_OBJECT_TYPE_FENCE: return "VK_OBJECT_TYPE_FENCE";
-		case VK_OBJECT_TYPE_QUEUE: return "VK_OBJECT_TYPE_QUEUE";
-		case VK_OBJECT_TYPE_DEVICE: return "VK_OBJECT_TYPE_DEVICE";
-		case VK_OBJECT_TYPE_RENDER_PASS: return "VK_OBJECT_TYPE_RENDER_PASS";
-		case VK_OBJECT_TYPE_DISPLAY_MODE_KHR: return "VK_OBJECT_TYPE_DISPLAY_MODE_KHR";
-		case VK_OBJECT_TYPE_EVENT: return "VK_OBJECT_TYPE_EVENT";
-		case VK_OBJECT_TYPE_PIPELINE: return "VK_OBJECT_TYPE_PIPELINE";
-		default:
-			return "unhandled type";
-		}
-	}
+    static const char* getObjectType( VkObjectType type )
+    {
+        switch( type )
+        {
+        case VK_OBJECT_TYPE_QUERY_POOL: return "VK_OBJECT_TYPE_QUERY_POOL";
+        case VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION: return "VK_OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION";
+        case VK_OBJECT_TYPE_SEMAPHORE: return "VK_OBJECT_TYPE_SEMAPHORE";
+        case VK_OBJECT_TYPE_SHADER_MODULE: return "VK_OBJECT_TYPE_SHADER_MODULE";
+        case VK_OBJECT_TYPE_SWAPCHAIN_KHR: return "VK_OBJECT_TYPE_SWAPCHAIN_KHR";
+        case VK_OBJECT_TYPE_SAMPLER: return "VK_OBJECT_TYPE_SAMPLER";
+        case VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT: return "VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT";
+        case VK_OBJECT_TYPE_IMAGE: return "VK_OBJECT_TYPE_IMAGE";
+        case VK_OBJECT_TYPE_UNKNOWN: return "VK_OBJECT_TYPE_UNKNOWN";
+        case VK_OBJECT_TYPE_DESCRIPTOR_POOL: return "VK_OBJECT_TYPE_DESCRIPTOR_POOL";
+        case VK_OBJECT_TYPE_COMMAND_BUFFER: return "VK_OBJECT_TYPE_COMMAND_BUFFER";
+        case VK_OBJECT_TYPE_BUFFER: return "VK_OBJECT_TYPE_BUFFER";
+        case VK_OBJECT_TYPE_SURFACE_KHR: return "VK_OBJECT_TYPE_SURFACE_KHR";
+        case VK_OBJECT_TYPE_INSTANCE: return "VK_OBJECT_TYPE_INSTANCE";
+        case VK_OBJECT_TYPE_VALIDATION_CACHE_EXT: return "VK_OBJECT_TYPE_VALIDATION_CACHE_EXT";
+        case VK_OBJECT_TYPE_IMAGE_VIEW: return "VK_OBJECT_TYPE_IMAGE_VIEW";
+        case VK_OBJECT_TYPE_DESCRIPTOR_SET: return "VK_OBJECT_TYPE_DESCRIPTOR_SET";
+        case VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT: return "VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT";
+        case VK_OBJECT_TYPE_COMMAND_POOL: return "VK_OBJECT_TYPE_COMMAND_POOL";
+        case VK_OBJECT_TYPE_PHYSICAL_DEVICE: return "VK_OBJECT_TYPE_PHYSICAL_DEVICE";
+        case VK_OBJECT_TYPE_DISPLAY_KHR: return "VK_OBJECT_TYPE_DISPLAY_KHR";
+        case VK_OBJECT_TYPE_BUFFER_VIEW: return "VK_OBJECT_TYPE_BUFFER_VIEW";
+        case VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT: return "VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT";
+        case VK_OBJECT_TYPE_FRAMEBUFFER: return "VK_OBJECT_TYPE_FRAMEBUFFER";
+        case VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE: return "VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE";
+        case VK_OBJECT_TYPE_PIPELINE_CACHE: return "VK_OBJECT_TYPE_PIPELINE_CACHE";
+        case VK_OBJECT_TYPE_PIPELINE_LAYOUT: return "VK_OBJECT_TYPE_PIPELINE_LAYOUT";
+        case VK_OBJECT_TYPE_DEVICE_MEMORY: return "VK_OBJECT_TYPE_DEVICE_MEMORY";
+        case VK_OBJECT_TYPE_FENCE: return "VK_OBJECT_TYPE_FENCE";
+        case VK_OBJECT_TYPE_QUEUE: return "VK_OBJECT_TYPE_QUEUE";
+        case VK_OBJECT_TYPE_DEVICE: return "VK_OBJECT_TYPE_DEVICE";
+        case VK_OBJECT_TYPE_RENDER_PASS: return "VK_OBJECT_TYPE_RENDER_PASS";
+        case VK_OBJECT_TYPE_DISPLAY_MODE_KHR: return "VK_OBJECT_TYPE_DISPLAY_MODE_KHR";
+        case VK_OBJECT_TYPE_EVENT: return "VK_OBJECT_TYPE_EVENT";
+        case VK_OBJECT_TYPE_PIPELINE: return "VK_OBJECT_TYPE_PIPELINE";
+        default:
+            return "unhandled type";
+        }
+    }
 
-	VKAPI_ATTR VkBool32 VKAPI_CALL dbgFunc( VkDebugUtilsMessageSeverityFlagBitsEXT msgSeverity, VkDebugUtilsMessageTypeFlagsEXT msgType,
-		const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* /*userData*/ )
-	{
-		if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
-		{
-			ae3d::System::Print( "ERROR: %s\n", callbackData->pMessage );
-		}
-		else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
-		{
+    VKAPI_ATTR VkBool32 VKAPI_CALL dbgFunc( VkDebugUtilsMessageSeverityFlagBitsEXT msgSeverity, VkDebugUtilsMessageTypeFlagsEXT msgType,
+                                            const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* /*userData*/ )
+    {
+        if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        {
+            ae3d::System::Print( "ERROR: %s\n", callbackData->pMessage );
+        }
+        else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        {
             ae3d::System::Print( "WARNING: %s\n", callbackData->pMessage );
-		}
-		else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
-		{
+        }
+        else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+        {
             ae3d::System::Print( "INFO: %s\n", callbackData->pMessage );
-		}
-		else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
-		{
+        }
+        else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+        {
             ae3d::System::Print( "VERBOSE: %s\n", callbackData->pMessage );
-		}
+        }
 
-		if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
-		{
+        if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
+        {
             ae3d::System::Print( "GENERAL: %s\n", callbackData->pMessage );
-		}
-		else if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
-		{
+        }
+        else if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
+        {
             ae3d::System::Print( "PERF: %s\n", callbackData->pMessage );
-		}
+        }
 
-		if( callbackData->objectCount > 0 )
-		{
+        if( callbackData->objectCount > 0 )
+        {
             ae3d::System::Print( "Objects: %u\n", callbackData->objectCount );
 
-			for( uint32_t i = 0; i < callbackData->objectCount; ++i )
-			{
-				const char* name = callbackData->pObjects[ i ].pObjectName ? callbackData->pObjects[ i ].pObjectName : "unnamed";
+            for( uint32_t i = 0; i < callbackData->objectCount; ++i )
+            {
+                const char* name = callbackData->pObjects[ i ].pObjectName ? callbackData->pObjects[ i ].pObjectName : "unnamed";
                 ae3d::System::Print( "Object %u: name: %s, type: %s\n", i, name, getObjectType( callbackData->pObjects[ i ].objectType ) );
-			}
-		}
+            }
+        }
 
         if( !(msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) )
         {
@@ -115,40 +115,40 @@ namespace debug
             ae3d::System::Assert( false, "Vulkan error!" );
         }
         
-		return VK_FALSE;
-	}
+        return VK_FALSE;
+    }
 
     void Setup( VkInstance instance )
     {
-		PFN_vkCreateDebugUtilsMessengerEXT dbgCreateDebugUtilsMessenger = ( PFN_vkCreateDebugUtilsMessengerEXT )vkGetInstanceProcAddr( instance, "vkCreateDebugUtilsMessengerEXT" );
+        PFN_vkCreateDebugUtilsMessengerEXT dbgCreateDebugUtilsMessenger = ( PFN_vkCreateDebugUtilsMessengerEXT )vkGetInstanceProcAddr( instance, "vkCreateDebugUtilsMessengerEXT" );
         CmdBeginDebugUtilsLabelEXT = ( PFN_vkCmdBeginDebugUtilsLabelEXT )vkGetInstanceProcAddr( instance, "vkCmdBeginDebugUtilsLabelEXT" );
         CmdEndDebugUtilsLabelEXT = ( PFN_vkCmdEndDebugUtilsLabelEXT )vkGetInstanceProcAddr( instance, "vkCmdEndDebugUtilsLabelEXT" );
 
-		VkDebugUtilsMessengerCreateInfoEXT dbg_messenger_create_info = {};
-		dbg_messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		dbg_messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-		dbg_messenger_create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-		dbg_messenger_create_info.pfnUserCallback = dbgFunc;
-		VkResult err = dbgCreateDebugUtilsMessenger( instance, &dbg_messenger_create_info, nullptr, &dbgMessenger );
-		AE3D_CHECK_VULKAN( err, "Unable to create debug report callback" );
+        VkDebugUtilsMessengerCreateInfoEXT dbg_messenger_create_info = {};
+        dbg_messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        dbg_messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        dbg_messenger_create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        dbg_messenger_create_info.pfnUserCallback = dbgFunc;
+        VkResult err = dbgCreateDebugUtilsMessenger( instance, &dbg_messenger_create_info, nullptr, &dbgMessenger );
+        AE3D_CHECK_VULKAN( err, "Unable to create debug report callback" );
     }
 
     void SetupDevice( VkDevice device )
     {
-		setDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)vkGetDeviceProcAddr( device, "vkSetDebugUtilsObjectNameEXT" );
+        setDebugUtilsObjectNameEXT = (PFN_vkSetDebugUtilsObjectNameEXT)vkGetDeviceProcAddr( device, "vkSetDebugUtilsObjectNameEXT" );
     }
 
     void SetObjectName( VkDevice device, std::uint64_t object, VkObjectType objectType, const char* name )
     {
         if (setDebugUtilsObjectNameEXT && hasMarker)
         {
-			VkDebugUtilsObjectNameInfoEXT nameInfo = {};
-			nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			nameInfo.objectType = objectType;
-			nameInfo.objectHandle = object;
-			nameInfo.pObjectName = name;
-			setDebugUtilsObjectNameEXT( device, &nameInfo );
-		}
+            VkDebugUtilsObjectNameInfoEXT nameInfo = {};
+            nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+            nameInfo.objectType = objectType;
+            nameInfo.objectHandle = object;
+            nameInfo.pObjectName = name;
+            setDebugUtilsObjectNameEXT( device, &nameInfo );
+        }
     }
 
     void BeginRegion( VkCommandBuffer cmdbuffer, const char* pMarkerName, float r, float g, float b )
@@ -272,13 +272,13 @@ namespace ae3d
         instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
 
 #if 0
-    const VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT, VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT };
-    VkValidationFeaturesEXT features = {};
-    features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    features.enabledValidationFeatureCount = 3;
-    features.pEnabledValidationFeatures = enables;
+        const VkValidationFeatureEnableEXT enables[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT, VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT };
+        VkValidationFeaturesEXT features = {};
+        features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+        features.enabledValidationFeatureCount = 3;
+        features.pEnabledValidationFeatures = enables;
 
-    instanceCreateInfo.pNext = &features;
+        instanceCreateInfo.pNext = &features;
 #endif
 
         VkResult result = vkCreateInstance( &instanceCreateInfo, nullptr, outInstance );

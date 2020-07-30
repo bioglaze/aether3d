@@ -188,7 +188,8 @@ class Aether3DExporter( bpy.types.Operator ):
                         return override
         #error message if the area or region wasn't found
         raise RuntimeError("Wasn't able to find", region_type," in area ", area_type, "\n Make sure it's open while executing script.")
-                        
+
+    
     def readMeshes( self, context ):
         """Reads meshes."""
 
@@ -280,12 +281,38 @@ class Aether3DExporter( bpy.types.Operator ):
                 if uvt.active_render:
                     object[ OBJ.UVL ] = uvt.data
 
+            print( "vertex groups: " + str( len( obj.vertex_groups ) ) )
+            if exportSkeleton and len( obj.vertex_groups ) > 0:
+                vg = obj.vertex_groups
+            else:
+                vg = []
+
             f = 0
             
             for face in obj.data.loop_triangles:
                 for vertex_id in (0, 1, 2):
-                    vertex_pnt = self.get_vertex_pnt(object, obj.data, face, vertex_id)
+                    vertex_pnt = self.get_vertex_pnt( object, obj.data, face, vertex_id )
                     mesh.vertices.append( vertex_pnt )
+                    
+                    v = obj.data.vertices[ face.vertices[ vertex_id ] ]
+                    
+                    if len( vg ) > 0 and len( v.groups ) > 0:
+                        skin = []
+                        w = 0.0
+
+                        for g in v.groups:
+                            n = vg[ g.group ].name;
+                            ni = boneNames.index( n )
+
+                            skin.append([ni, round(g.weight, 2)])
+                            w = w + round(g.weight, 2)
+                            print("group name " + n + ", weight: " + str( w ) )
+                            
+                        if w != 1.0:
+                            for g,s in enumerate( skin ):
+                                skin[ g ][ 1 ] = round( skin[ g ][ 1 ] / w, 2)
+                        #s = uniquelist( skins, skin )
+
                 tri = [ f * 3 + 0, f * 3 + 1, f * 3 + 2 ]
                 mesh.faces.append( tri )
                 f = f + 1
@@ -295,8 +322,13 @@ class Aether3DExporter( bpy.types.Operator ):
                     for vertex_id in (0, 2, 3):
                         vertex_pnt = self.get_vertex_pnt(object, obj.data, face, vertex_id)
                         mesh.vertices.append( vertex_pnt )
-                        tri = [ f * 3 + 0, f * 3 + 1, f * 3 + 2 ]
 
+                        v = obj.data.vertices[ face.vertices[ vertex_id ] ]
+                    
+                        if len( vg ) > 0 and len( v.groups ) > 0:
+                            print("second triangle todo: read skin weights")
+
+                    tri = [ f * 3 + 0, f * 3 + 1, f * 3 + 2 ]
                     mesh.faces.append( tri )
                     f = f + 1
 
@@ -318,12 +350,6 @@ class Aether3DExporter( bpy.types.Operator ):
                 for c in cc.data:
                     mesh.vertices[ u ].color = c.color
                     u = u + 1
-
-            print( "vertex groups: " + str( len( obj.vertex_groups ) ) )
-            if exportSkeleton and len( obj.vertex_groups ) > 0:
-                vg = obj.vertex_groups
-            else:
-                vg = []
                 
             mesh.generateAABB()
             self.meshes.append( mesh )
@@ -350,11 +376,11 @@ class Aether3DExporter( bpy.types.Operator ):
                 context.scene.frame_set( frame, subframe = 0.0 )
                 changed = []
                 for ob_main in objects:
-                    print( "ob_main.type: " + ob_main.type )
+                    #print( "ob_main.type: " + ob_main.type )
                     if ob_main.type != "ARMATURE":
                         continue
                     for i, b in enumerate( ob_main.pose.bones ):
-                        print("exporting bone for frame " + str( frame ))
+                        #print("exporting bone for frame " + str( frame ))
                         m = global_matrix @ b.matrix
                         if b.parent:
                             p = global_matrix @ b.parent.matrix
@@ -386,7 +412,7 @@ class Aether3DExporter( bpy.types.Operator ):
                         if len( changed ) > fi_m:
                             fi_m = len( changed )
                 # if the action has at least one frame, save it
-                print( "frames: " + str( len( frames ) ) )
+                #print( "frames: " + str( len( frames ) ) )
                 mesh.frameCount = len( frames )
                 if len( frames ) > 0:
                     actions.append( [uniquelist( boneNames, a[ 0 ] ), int(( lf - a[ 1 ] + 1) * mpf), frames] )
