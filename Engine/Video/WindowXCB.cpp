@@ -679,6 +679,19 @@ void ae3d::Window::PumpEvents()
     }
 }
 
+bool ae3d::Window::IsKeyDown( KeyCode keyCode )
+{
+    for (int i = 0; i < 15; ++i)
+    {
+        if (WindowGlobal::eventStack[ i ].type == ae3d::WindowEventType::KeyDown && WindowGlobal::eventStack[ i ].keyCode == keyCode)
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 void ae3d::Window::SwapBuffers()
 {
     GfxDevice::Present();
