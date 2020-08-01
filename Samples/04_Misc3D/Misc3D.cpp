@@ -224,9 +224,6 @@ int main()
     Mesh cubeTangentMesh;
     cubeTangentMesh.Load( FileSystem::FileContents( "tangent_test.ae3d" ) );
 
-    Mesh sphereMesh;
-    sphereMesh.Load( FileSystem::FileContents( "sphere.ae3d" ) );
-
     Mesh cubeMeshScaledUV;
     //cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
 
@@ -491,25 +488,6 @@ int main()
     cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
 #endif
     
-    GameObject spheres[ 5 ];
-    Material sphereMaterials[ 5 ];
-    
-    for (int i = 0; i < 5; ++i)
-    {
-        sphereMaterials[ i ].SetShader( &standardShader );
-        sphereMaterials[ i ].SetTexture( &pbrNormalTex2, 1 );
-        sphereMaterials[ i ].SetTexture( &pbrDiffuseTex, 0 );
-        sphereMaterials[ i ].SetBackFaceCulling( true );
-        sphereMaterials[ i ].SetF0( 1.0f / (i+1) );
-
-        spheres[ i ].AddComponent< MeshRendererComponent >();
-        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &sphereMesh );
-        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &sphereMaterials[ i ], 0 );
-        //spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
-        spheres[ i ].AddComponent< TransformComponent >();
-        spheres[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { float( i ) * 3, 6, -88 } );
-    }
-
     GameObject standardCubeTopCenter;
     standardCubeTopCenter.SetName( "standardCubeTopCenter" );
     standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
@@ -655,12 +633,6 @@ int main()
     scene.Add( &rotatingCube );
     scene.Add( &cube );
 
-#ifdef TEST_FORWARD_PLUS
-    for (int i = 0; i < 5; ++i)
-    {
-        scene.Add( &spheres[ i ]);
-    }
-#endif    
 #ifdef TEST_SHADOWS_POINT
     scene.Add( &pointLight );
 #endif

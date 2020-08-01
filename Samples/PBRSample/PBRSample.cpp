@@ -329,12 +329,38 @@ int main()
     
     helmet.GetComponent< MeshRendererComponent >()->SetMaterial( &standardMaterial, 0 );
 
+    Mesh sphereMesh;
+    sphereMesh.Load( FileSystem::FileContents( "sphere.ae3d" ) );
+
+    GameObject spheres[ 5 ];
+    Material sphereMaterials[ 5 ];
+    
+    for (int i = 0; i < 5; ++i)
+    {
+        sphereMaterials[ i ].SetShader( &standardShader );
+        sphereMaterials[ i ].SetTexture( &albedoTex, 0 );
+        sphereMaterials[ i ].SetTexture( &normalTex, 1 );
+        sphereMaterials[ i ].SetBackFaceCulling( true );
+        sphereMaterials[ i ].SetF0( 1.0f / (i+1) );
+
+        spheres[ i ].AddComponent< MeshRendererComponent >();
+        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &sphereMesh );
+        spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &sphereMaterials[ i ], 0 );
+        spheres[ i ].AddComponent< TransformComponent >();
+        spheres[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { float( i ) * 3, 6, -88 } );
+    }
+
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
     scene.Add( &camera2d );
     scene.Add( &statsContainer );
     scene.Add( &helmet );
     scene.Add( &dirLight );
+
+    for (int i = 0; i < 5; ++i)
+    {
+        scene.Add( &spheres[ i ]);
+    }
 
     bool quit = false;
     
