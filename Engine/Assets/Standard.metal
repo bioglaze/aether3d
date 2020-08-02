@@ -277,7 +277,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         depth = depth * 0.5f + 0.5f;
     }
 
-    float shadow = uniforms.lightType == 0 ? 1.0f : max( 0.2f, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
+    float shadow = uniforms.lightType == 0 ? 1.0f : max( uniforms.minAmbient, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
 
     return albedoColor * half4( outColor ) * half4( shadow, shadow, shadow, 1 );// * cubeReflection;
     //return cubeReflection;

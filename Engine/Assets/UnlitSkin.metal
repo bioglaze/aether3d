@@ -58,7 +58,7 @@ fragment float4 unlit_skin_fragment( ColorInOut in [[stage_in]],
 
     float depth = in.projCoord.z / in.projCoord.w;
     depth = depth * 0.5f + 0.5f;
-    float shadow = max( 0.2f, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
+    float shadow = max( uniforms.minAmbient, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
     
     return sampledColor * float4( shadow, shadow, shadow, 1 );
 }
