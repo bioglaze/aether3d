@@ -55,7 +55,7 @@ float4 main( VSOutput vsOut ) : SV_Target
         depth = depth * 0.5f + 0.5f;
     }
 
-    float shadow = lightType == 0 ? 1.0f : max( 0.2f, VSM( depth, vsOut.projCoord ) );
+    float shadow = lightType == 0 ? 1.0f : max( minAmbient, VSM( depth, vsOut.projCoord ) );
     float4 texColor = tex.Sample( sLinear, vsOut.uv );
     float4 outColor = texColor * shadow;
     outColor.a = texColor.a;

@@ -246,7 +246,7 @@ float4 main( PS_INPUT input ) : SV_Target
         depth = depth * 0.5f + 0.5f;
     }
 
-    float shadow = max( 0.2f, VSM( depth, input.projCoord ) );
+    float shadow = max( minAmbient, VSM( depth, input.projCoord ) );
     //accumDiffuseAndSpecular.rgb *= shadow;
 
     //return float4(accumDiffuseAndSpecular, 1 );
