@@ -42,6 +42,12 @@ static float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, 
         return 0;
     }
 
+    // Directional light
+    if (lightType == 2 && (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1 || depth < 0 || depth > 1))
+    {
+        return 1;
+    }
+
     float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
     
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
