@@ -364,9 +364,9 @@ int main()
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
 #ifdef TEST_SHADOWS_DIR
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 512 );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 2048 );
 #else
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 512 );
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 2048 );
 #endif
     dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 1, 1, 1 ) );
     dirLight.AddComponent<TransformComponent>();
