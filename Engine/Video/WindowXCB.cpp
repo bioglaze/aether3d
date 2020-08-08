@@ -97,6 +97,8 @@ namespace WindowGlobal
     float lastLeftThumbY = 0;
     float lastRightThumbX = 0;
     float lastRightThumbY = 0;
+    bool keyDown[ 256 ] = {};
+    
     std::map< xcb_keysym_t, ae3d::KeyCode > keyMap =
     {
         { XK_a, ae3d::KeyCode::A },
@@ -501,6 +503,8 @@ void ae3d::Window::PumpEvents()
                 const xcb_keysym_t keysym = xcb_key_symbols_get_keysym(WindowGlobal::key_symbols, e->detail, 0);
 
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = (WindowGlobal::keyMap.find( keysym ) == WindowGlobal::keyMap.end() ) ? ae3d::KeyCode::N : WindowGlobal::keyMap[ keysym ];
+                WindowGlobal::keyDown[ (int)WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode ] = isDown;
+                
                 break;
             }
             case XCB_MOTION_NOTIFY:
@@ -681,15 +685,7 @@ void ae3d::Window::PumpEvents()
 
 bool ae3d::Window::IsKeyDown( KeyCode keyCode )
 {
-    for (int i = 0; i < 15; ++i)
-    {
-        if (WindowGlobal::eventStack[ i ].type == ae3d::WindowEventType::KeyDown && WindowGlobal::eventStack[ i ].keyCode == keyCode)
-        {
-            return true;
-        }
-    }
-    
-    return false;
+    return WindowGlobal::keyDown[ (int)keyCode ];
 }
 
 void ae3d::Window::SwapBuffers()
