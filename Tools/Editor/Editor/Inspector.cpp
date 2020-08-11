@@ -235,13 +235,13 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             nk_property_float( &ctx, "#Y:", -1024.0f, &pos.y, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
 
-            nk_label( &ctx, "Rotation", NK_TEXT_LEFT );
+            /*nk_label( &ctx, "Rotation", NK_TEXT_LEFT );
             Quaternion& rot = transform->GetLocalRotation();
             Vec3 euler = rot.GetEuler();
             nk_layout_row_dynamic( &ctx, 40, 3 );
             nk_property_float( &ctx, "#X:", -1024.0f, &euler.x, 1024.0f, 1, 1 );
             nk_property_float( &ctx, "#Y:", -1024.0f, &euler.y, 1024.0f, 1, 1 );
-            nk_property_float( &ctx, "#Z:", -1024.0f, &euler.z, 1024.0f, 1, 1 );
+            nk_property_float( &ctx, "#Z:", -1024.0f, &euler.z, 1024.0f, 1, 1 );*/
             //rot = Quaternion::FromEuler( euler );
 
             nk_layout_row_static( &ctx, 40, 140, 1 );
