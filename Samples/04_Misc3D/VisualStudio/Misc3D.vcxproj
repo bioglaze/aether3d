@@ -470,9 +470,6 @@
     <ClInclude Include="..\..\..\Engine\Include\VR.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Window.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets" Condition="Exists('packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets')" />
