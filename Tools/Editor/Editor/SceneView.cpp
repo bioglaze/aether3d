@@ -79,7 +79,7 @@ void ScreenPointToRay( int screenX, int screenY, float screenWidth, float screen
     Matrix44 view;
     camera.GetComponent< TransformComponent >()->GetLocalRotation().GetMatrix( view );
     Matrix44 translation;
-    translation.Translate( -camera.GetComponent< TransformComponent >()->GetLocalPosition() );
+    translation.SetTranslation( -camera.GetComponent< TransformComponent >()->GetLocalPosition() );
     Matrix44::Multiply( translation, view, view );
 
     Matrix44 invView;
