@@ -9,7 +9,7 @@
 #define _PIX3_H_
 #include <AmdDxExt/AmdPix3.h>
 #else
-#include <pix3.h>
+//#include <pix3.h>
 #endif
 #include <vector>
 #include <string>
@@ -1153,7 +1153,7 @@ void ae3d::GfxDevice::PushGroupMarker( const char* name )
     LPWSTR ptr = wtext;
     RgpPushMarker( GfxDeviceGlobal::graphicsCommandList, ptr );
 #else
-    PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
+    //PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
 #endif
 }
 
@@ -1162,7 +1162,7 @@ void ae3d::GfxDevice::PopGroupMarker()
 #if USE_RGP_MARKERS
     RgpPopMarker( GfxDeviceGlobal::graphicsCommandList );
 #else
-    PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
+    //PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
 #endif
 }
 
