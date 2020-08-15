@@ -457,6 +457,11 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         // Hierarchy
         constexpr unsigned nameCount = 100;
         static const char* goNames[ nameCount ] = {};
+        
+        for (unsigned i = 0; i < nameCount; ++i)
+        {
+            goNames[ i ] = "";
+        }
 
         for (unsigned i = 1; i < goCount; ++i)
         {
