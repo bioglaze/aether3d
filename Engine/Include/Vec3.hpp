@@ -419,6 +419,23 @@ namespace ae3d
         }
 
         /**
+           Subtraction operator.
+
+           \param v Vector tu be subtracted from this vector.
+           \return v subtracted from this vector.
+         */
+        Vec4 operator-( const Vec4& v )
+        {
+            Vec4 res;
+            res.x = x - v.x;
+            res.y = y - v.y;
+            res.z = z - v.z;
+            res.w = w - v.w;
+
+            return res;
+        }
+        
+        /**
          Operator addition and assign.
 
          \param v Vector that is to be added to this vector.
