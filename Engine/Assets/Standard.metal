@@ -184,7 +184,10 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
-    float4 outColor = float4( uniforms.lightColor.rgb * Fd * dotNL, 1 );
+    //float3 color = Fd + Fr;
+    //float4 outColor = float4( color + uniforms.lightColor.rgb * dotNL, 1 );
+
+    float4 outColor = float4( uniforms.lightColor.rgb * dotNL, 1 );
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
@@ -217,9 +220,9 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
             const float3 Fr = (D * v) * F;
             const float3 Fd = Fd_Lambert();
 
-            float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
-            //outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
-            outColor.rgb += pointLightBufferColors[ lightIndex ].rgb * attenuation * Fd * 4;
+            const float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
+            const float3 color = Fd + Fr;
+            outColor.rgb += (color * pointLightBufferColors[ lightIndex ].rgb) * attenuation * dotNL;
         }
     }
     
