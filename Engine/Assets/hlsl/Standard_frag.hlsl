@@ -160,7 +160,7 @@ float4 main( PS_INPUT input ) : SV_Target
     float3 Fd = Fd_Lambert();
 
     //accumDiffuseAndSpecular *= Fr * Fd * dotNL;
-    accumDiffuseAndSpecular *= Fd * dotNL;
+    accumDiffuseAndSpecular *= dotNL;
 
     //[loop] // Point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
@@ -188,7 +188,7 @@ float4 main( PS_INPUT input ) : SV_Target
         const float lightDistance = length( vecToLightWS );
 
         float3 f0v = float3( f0, f0, f0 );
-        float roughness = 0.2f;
+        float roughness = 0.5f;
         float a = roughness * roughness;
         float D = D_GGX( dotNH, a );
         float3 F = F_Schlick( dotLH, f0v );
@@ -199,9 +199,8 @@ float4 main( PS_INPUT input ) : SV_Target
         if (lightDistance < radius)
         {
             const float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
-
-            accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation * 2;
-            //accumDiffuseAndSpecular.rgb += pointLightColors[ lightIndex ].rgb * attenuation * Fr * Fd * dotNL;
+            const float3 color = Fd + Fr;
+            accumDiffuseAndSpecular.rgb += (color * pointLightColors[ lightIndex ].rgb) * attenuation * dotNL;
         }
     }
 
@@ -224,16 +223,34 @@ float4 main( PS_INPUT input ) : SV_Target
         const float spotAngle = dot( -spotLightDir.xyz, vecToLight );
         const float cosineOfConeAngle = abs( spotParams.w );
 
+        const float3 vecToLightVS = (mul( localToView, float4( vecToLight, 1.0f ) ) );
+        const float3 lightDirVS = normalize( vecToLightVS );
+
+        const float3 L = normalize( vecToLightVS );
+        const float3 H = normalize( L + V );
+
+        const float dotNV = abs( dot( N, V ) ) + 1e-5f; 
+        const float dotNL = saturate( dot( N, lightDirVS ) );
+        const float dotVH = saturate( dot( V, H ) );
+        const float dotLH = saturate( dot( L, H ) );
+        const float dotNH = saturate( dot( N, H ) );
+
+        float3 f0v = float3( f0, f0, f0 );
+        float roughness = 0.5f;
+        float a = roughness * roughness;
+        float D = D_GGX( dotNH, a );
+        float3 F = F_Schlick( dotLH, f0v );
+        float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
+        float3 Fr = (D * v) * F;
+        float3 Fd = Fd_Lambert();
+
         // Falloff
         const float dist = distance( input.positionWS_v.xyz, centerAndRadius.xyz );
-        const float a = dist / centerAndRadius.w + 1.0f;
-        const float att = 1.0f / (a * a);
+        const float fa = dist / centerAndRadius.w + 1.0f;
+        const float attenuation = 1;//1.0f / (fa * fa);
         const float3 color = spotLightColors[ lightIndex ].rgb;
-        //const float3 color = float3( 1, 0, 0 );
-        accumDiffuseAndSpecular += spotAngle > cosineOfConeAngle ? color : float3( 0, 0, 0 );
-
-        //accumDiffuseAndSpecular += LightColorDiffuse + LightColorSpecular;
-        //accumDiffuseAndSpecular = float3( 0, 1, 0 );
+        const float3 shadedColor = Fd + Fr;
+        accumDiffuseAndSpecular.rgb += spotAngle > cosineOfConeAngle ? ((shadedColor * color) * attenuation * dotNL) : float3( 0, 0, 0 );
     }
     
     accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
