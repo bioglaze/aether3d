@@ -243,10 +243,24 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float spotAngle = dot( -params.xyz, vecToLight );
         const float cosineOfConeAngle = abs( params.w );
         
-        const float3 color = spotLightBufferColors[ lightIndex ].rgb;// * att;// * specularTex;
+        const float3 vecToLightVS = (uniforms.localToView * float4( vecToLight, 0 )).xyz;
+        const float3 L = normalize( -vecToLightVS );
+        const float3 H = normalize( L + V );
         
-        const float3 accumDiffuseAndSpecular = spotAngle > cosineOfConeAngle ? color : float3( 0.0, 0.0, 0.0 );
-        outColor.rgb += accumDiffuseAndSpecular;
+        const float dotNL = saturate( dot( N, -L ) );
+        const float dotLH = saturate( dot( L, H ) );
+        const float dotNH = saturate( dot( N, H ) );
+
+        const float roughness = 0.5f;
+        const float a = roughness * roughness;
+        const float D = D_GGX( dotNH, a );
+        const float3 F = F_Schlick( dotLH, f0 );
+        const float v = V_SmithGGXCorrelated( dotNV, dotNL, a );
+        const float3 Fr = (D * v) * F;
+        const float3 Fd = Fd_Lambert();
+
+        const float3 shadedColor = Fd + Fr;
+        outColor.rgb += spotAngle > cosineOfConeAngle ? (shadedColor * spotLightBufferColors[ lightIndex ].rgb) * dotNL : float3( 0.0, 0.0, 0.0 );
     }
     
 	outColor.rgb = max( outColor.rgb, float3( uniforms.minAmbient, uniforms.minAmbient, uniforms.minAmbient ) );
