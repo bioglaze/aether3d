@@ -325,6 +325,7 @@ int main()
             else if (event.type == WindowEventType::MouseWheelScrollDown || event.type == WindowEventType::MouseWheelScrollUp)
             {
                 inspector.HandleMouseScroll( event.mouseY );
+                moveDir += Vec3( 0, 0, event.mouseWheel );
             }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
             {
@@ -341,7 +342,7 @@ int main()
         }
 
         moveDir += gamepadMoveDir;
-
+        
         inspector.EndInput();
         svHighlightGizmo( sceneView, x, y, width, height );
 
@@ -383,6 +384,12 @@ int main()
         Inspector::Command inspectorCommand;
 
         svMoveCamera( sceneView, moveDir );
+
+        if (event.type == WindowEventType::MouseWheelScrollDown || event.type == WindowEventType::MouseWheelScrollUp)
+        {
+            moveDir = {};
+        }
+
         svBeginRender( sceneView );
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
