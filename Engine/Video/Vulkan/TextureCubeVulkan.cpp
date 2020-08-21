@@ -436,6 +436,23 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, buffers[ face ], image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
     }
 
+    err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.waitSemaphoreCount = 0;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in TextureCube" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+
+    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
+
     VkImageSubresourceRange range = {};
     range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     range.baseMipLevel = 0;
@@ -455,38 +472,21 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     imageMemoryBarrier.subresourceRange = range;
 
     vkCmdPipelineBarrier(
-                         GfxDeviceGlobal::texCmdBuffer,
-                         VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                         0,
-                         0, nullptr,
-                         0, nullptr,
-                         1, &imageMemoryBarrier );
+        GfxDeviceGlobal::texCmdBuffer,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &imageMemoryBarrier );
 
     if (mipLevelCount > 1)
     {
         for (int mipLevel = 0; mipLevel < mipLevelCount; ++mipLevel)
         {
-            SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6, mipLevel, 1 );            
+            SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6, mipLevel, 1 );
         }
     }
-
-    err = vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
-    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer in TextureCube" );
-
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.waitSemaphoreCount = 0;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
-
-    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
-    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in TextureCube" );
-
-    vkDeviceWaitIdle( GfxDeviceGlobal::device );
-
-    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
-    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in TextureCube" );
 
     if (!isSomeFaceDDS && mipLevelCount > 1)
     {

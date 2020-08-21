@@ -289,6 +289,21 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
         vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffers[ mipLevel ], image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
     }
 
+    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+
+    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
+
     imageMemoryBarrier = {};
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -299,7 +314,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
     imageMemoryBarrier.image = image;
     imageMemoryBarrier.subresourceRange = range;
-    
+
     vkCmdPipelineBarrier(
         GfxDeviceGlobal::texCmdBuffer,
         VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
@@ -315,17 +330,16 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     vkCmdPipelineBarrier(
-            GfxDeviceGlobal::texCmdBuffer,
-            VK_PIPELINE_STAGE_TRANSFER_BIT,
-            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-            0,
-            0, nullptr,
-            0, nullptr,
-            1, &imageMemoryBarrier );
+        GfxDeviceGlobal::texCmdBuffer,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &imageMemoryBarrier );
 
     vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
 
-    VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
@@ -551,6 +565,21 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     vkCmdCopyBufferToImage( GfxDeviceGlobal::texCmdBuffer, stagingBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion );
 
+    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+
+    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
+
     imageMemoryBarrier = {};
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -570,21 +599,6 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
         0, nullptr,
         0, nullptr,
         1, &imageMemoryBarrier );
-
-    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
-
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
-
-    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
-    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
-
-    vkDeviceWaitIdle( GfxDeviceGlobal::device );
-
-    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
-    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
 
     for (int i = 1; i < mipLevelCount; ++i)
     {
@@ -621,7 +635,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     vkCmdPipelineBarrier(
             GfxDeviceGlobal::texCmdBuffer,
-            VK_PIPELINE_STAGE_TRANSFER_BIT,
+           VK_PIPELINE_STAGE_TRANSFER_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
             0, nullptr,
