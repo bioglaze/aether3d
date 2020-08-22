@@ -76,7 +76,14 @@ namespace debug
         }
         else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
         {
-            ae3d::System::Print( "WARNING: %s\n", callbackData->pMessage );
+            if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
+            {
+                ae3d::System::Print( "PERF WARNING: %s\n", callbackData->pMessage );
+            }
+            else
+            {
+                ae3d::System::Print( "WARNING: %s\n", callbackData->pMessage );
+            }
         }
         else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
         {
@@ -91,11 +98,7 @@ namespace debug
         {
             ae3d::System::Print( "GENERAL: %s\n", callbackData->pMessage );
         }
-        else if (msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
-        {
-            ae3d::System::Print( "PERF: %s\n", callbackData->pMessage );
-        }
-
+        
         if( callbackData->objectCount > 0 )
         {
             ae3d::System::Print( "Objects: %u\n", callbackData->objectCount );
