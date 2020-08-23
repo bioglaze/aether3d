@@ -580,25 +580,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
 
-    imageMemoryBarrier = {};
-    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    imageMemoryBarrier.srcAccessMask = 0;
-    imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-    imageMemoryBarrier.image = image;
-    imageMemoryBarrier.subresourceRange = range;
-
-    vkCmdPipelineBarrier(
-        GfxDeviceGlobal::texCmdBuffer,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-        VK_PIPELINE_STAGE_TRANSFER_BIT,
-        0,
-        0, nullptr,
-        0, nullptr,
-        1, &imageMemoryBarrier );
+    SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, 0, 1 );
 
     for (int i = 1; i < mipLevelCount; ++i)
     {
@@ -620,13 +602,29 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
         imageBlit.dstOffsets[ 0 ] = { 0, 0, 0 };
         imageBlit.dstOffsets[ 1 ] = { mipWidth, mipHeight, 1 };
 
-        vkCmdBlitImage( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_GENERAL, image,
-            VK_IMAGE_LAYOUT_GENERAL, 1, &imageBlit, VK_FILTER_LINEAR );
+        SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, i, 1 );
+        vkCmdBlitImage( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlit, VK_FILTER_LINEAR );
+    }
+
+    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+
+    err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
+
+    for (int i = 1; i < mipLevelCount; ++i)
+    {
+        SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 1, i, 1 );
     }
 
     imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+    imageMemoryBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
     imageMemoryBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageMemoryBarrier.image = image;
     imageMemoryBarrier.subresourceRange = range;
@@ -635,7 +633,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     vkCmdPipelineBarrier(
             GfxDeviceGlobal::texCmdBuffer,
-           VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
             0, nullptr,
