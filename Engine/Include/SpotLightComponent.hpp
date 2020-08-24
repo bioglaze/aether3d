@@ -23,6 +23,9 @@ namespace ae3d
         /// \return Color
         const Vec3& GetColor() const { return color; }
 
+        /// \return Color
+        Vec3& GetColor() { return color; }
+
         /// \return True, if the light casts a shadow.
         bool CastsShadow() const { return castsShadow; }
         

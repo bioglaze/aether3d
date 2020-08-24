@@ -352,17 +352,17 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 {
                     float& radius = pointLight->GetRadius();
                     nk_property_float( &ctx, "#Radius:", 0.0f, &radius, 1024.0f, 1, 1 );
+                    
+                    Vec3& color = pointLight->GetColor();
+                    nk_layout_row_dynamic( &ctx, 40, 3 );
+                    nk_property_float( &ctx, "#Red:", -1024.0f, &color.x, 1024.0f, 1, 1 );
+                    nk_property_float( &ctx, "#Green:", -1024.0f, &color.y, 1024.0f, 1, 1 );
+                    nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
+                    nk_layout_row_static( &ctx, 40, 450, 1 );
+
+                    //nk_colorf color2;
+                    //nk_color_pick( &ctx, &color2, NK_RGB );
                 }
-
-                Vec3& color = pointLight->GetColor();
-                nk_layout_row_dynamic( &ctx, 40, 3 );
-                nk_property_float( &ctx, "#Red:", -1024.0f, &color.x, 1024.0f, 1, 1 );
-                nk_property_float( &ctx, "#Green:", -1024.0f, &color.y, 1024.0f, 1, 1 );
-                nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
-                nk_layout_row_static( &ctx, 40, 450, 1 );
-
-                //nk_colorf color2;
-                //nk_color_pick( &ctx, &color2, NK_RGB );
                 
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
@@ -396,6 +396,13 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     {
                         dirLight->SetCastShadow( false, 1024 );
                     }
+                    
+                    Vec3& color = dirLight->GetColor();
+                    nk_layout_row_dynamic( &ctx, 40, 3 );
+                    nk_property_float( &ctx, "#Red:", -1024.0f, &color.x, 1024.0f, 1, 1 );
+                    nk_property_float( &ctx, "#Green:", -1024.0f, &color.y, 1024.0f, 1, 1 );
+                    nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
+                    nk_layout_row_static( &ctx, 40, 450, 1 );
                 }
                 
                 nk_tree_pop( &ctx );
@@ -430,6 +437,13 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     {
                         spotLight->SetCastShadow( false, 1024 );
                     }
+                    
+                    Vec3& color = spotLight->GetColor();
+                    nk_layout_row_dynamic( &ctx, 40, 3 );
+                    nk_property_float( &ctx, "#Red:", -1024.0f, &color.x, 1024.0f, 1, 1 );
+                    nk_property_float( &ctx, "#Green:", -1024.0f, &color.y, 1024.0f, 1, 1 );
+                    nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
+                    nk_layout_row_static( &ctx, 40, 450, 1 );
                 }
                 
                 nk_tree_pop( &ctx );

@@ -20,6 +20,9 @@ namespace ae3d
         /// \return Color
         const Vec3& GetColor() const { return color; }
 
+        /// \return Color
+        Vec3& GetColor() { return color; }
+
         /// \param aColor Color in range 0-1.
         void SetColor( const Vec3& aColor ) { color = aColor; }
 
