@@ -47,7 +47,7 @@ std::string GetSerialized( ae3d::PointLightComponent* component )
     outStream << "pointlight\n";
     outStream << "shadow " << (component->CastsShadow() ? 1 : 0) << "\n";
     outStream << "radius " << component->GetRadius() << "\n";
-    outStream << "enabled" << component->IsEnabled() << "\n";
+    outStream << "pointlight_enabled " << component->IsEnabled() << "\n";
     outStream << "color " << color.x << " " << color.y << " " << color.z << "\n\n";
 
     return outStream.str();

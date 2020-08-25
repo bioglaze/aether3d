@@ -53,7 +53,7 @@ std::string GetSerialized( const ae3d::SpotLightComponent* component )
     outStr += std::to_string( component->CastsShadow() ? 1 : 0 );
     outStr += "\nconeAngle ";
     outStr += std::to_string( component->GetConeAngle() );
-    outStr += "\nenabled ";
+    outStr += "\nspotlight_enabled ";
     outStr += std::to_string( component->IsEnabled() ? 1 : 0 );
     outStr += "\nradius ";
     outStr += std::to_string( component->GetRadius() );

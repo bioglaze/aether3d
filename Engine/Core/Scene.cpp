@@ -1040,7 +1040,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found name but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"name\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1052,7 +1052,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found layer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"layer\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1064,7 +1064,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found layer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1076,7 +1076,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found meshrenderer_enabled but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"meshrenderer_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1087,7 +1087,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             if (meshRenderer == nullptr)
             {
-                System::Print( "Failed to parse %s at line %d: found meshrenderer_enabled but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"meshrenderer_enabled\" but the game object doesn't have a mesh renderer component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1097,7 +1097,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found transform_enabled but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"transform_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1108,7 +1108,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             if (transform == nullptr)
             {
-                System::Print( "Failed to parse %s at line %d: found transform_enabled but the game object doesn't have a transform component.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"transform_enabled\" but the game object doesn't have a transform component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1118,7 +1118,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (outGameObjects.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found camera_enabled but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"camera_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1129,7 +1129,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             if (camera == nullptr)
             {
-                System::Print( "Failed to parse %s at line %d: found camera_enabled but the game object doesn't have a camera component.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found \"camera_enabled\" but the game object doesn't have a camera component.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
 
@@ -1175,6 +1175,69 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             currentLightType = CurrentLightType::Point;
             GameObject& go  = outGameObjects.back();
             go.AddComponent< PointLightComponent >();            
+        }
+        else if (token == "dirlight_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found \"dirlight_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto dirLight = outGameObjects.back().GetComponent< DirectionalLightComponent >();
+
+            if (dirLight == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found \"dirlight_enabled\" but the game object doesn't have a directional light component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            dirLight->SetEnabled( enabled != 0 );
+        }
+        else if (token == "spotlight_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found \"spotlight_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto spotLight = outGameObjects.back().GetComponent< SpotLightComponent >();
+
+            if (spotLight == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found \"spotlight_enabled\" but the game object doesn't have a spot light component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            spotLight->SetEnabled( enabled != 0 );
+        }
+        else if (token == "pointlight_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found \"pointlight_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto pointLight = outGameObjects.back().GetComponent< PointLightComponent >();
+
+            if (pointLight == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found \"spotlight_enabled\" but the game object doesn't have a spot light component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            pointLight->SetEnabled( enabled != 0 );
         }
         else if (token == "shadow")
         {
