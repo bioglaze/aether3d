@@ -1659,7 +1659,15 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             float coneAngleDegrees;
             lineStream >> coneAngleDegrees;
-            outGameObjects.back().GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
+
+            if (currentLightType == CurrentLightType::Spot)
+            {
+                outGameObjects.back().GetComponent< SpotLightComponent >()->SetConeAngle( coneAngleDegrees );
+            }
+            else
+            {
+                System::Print( "Found 'coneangle' at line %d but no spotlight is defined before this line.\n", lineNo );
+            }
         }
         else if (token == "radius")
         {
@@ -1696,6 +1704,10 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             else if (currentLightType == CurrentLightType::Point)
             {
                 outGameObjects.back().GetComponent< PointLightComponent >()->SetColor( color );
+            }
+            else
+            {
+                System::Print( "Found \"color\" at line %d but there is no light before this line!\n", lineNo );
             }
         }
         else if (token == "shaders")
