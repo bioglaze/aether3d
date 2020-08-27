@@ -4,7 +4,7 @@
 
 This codebase will evolve into the next generation [Aether3D](http://twiren.kapsi.fi/aether3d.html). More info: http://bioglaze.blogspot.fi/2014/12/planning-aether3d-rewrite-for-2015.html
 
-Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.8.1
+Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.8.5
 
 Author: [Timo Wirén](http://twiren.kapsi.fi)
 
@@ -78,14 +78,14 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
-  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.8.1.zip) and extract it into aether3d_build/Samples after building.
+  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 
   - Open the project in Engine\VisualStudio_* in Visual Studio and build it. For MinGW you can use Engine\Makefile_Vulkan.
   - Build and run Samples\01_OpenWindow. On MinGW the command is `make`
   - Vulkan users: built-in shader sources are located in aether3d_build\Samples that comes with sample asset archive. If you modify them, you can build and deploy them by running compile_deploy_vulkan_shaders.cmd in Engine/Assets. 
-  - FBX converter tries to find FBX SDK 2019.5 in its default install location (English language localization)
+  - FBX converter tries to find FBX SDK 2020.1.1 in its default install location (English language localization)
   
 ### OpenVR
   - Copy OpenVR headers into Engine\ThirdParty\headers
@@ -97,7 +97,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
   - Open the project Engine/Aether3D_OSX_Metal in Xcode and build it.
   - Open the project Samples/MetalSampleOSX and run it. 
-  - FBX converter tries to find FBX SDK 2019.5 in its default install location.
+  - FBX converter tries to find FBX SDK 2020.1.1 in its default install location.
 
 ## Linux
 

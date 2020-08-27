@@ -41,7 +41,7 @@
 #include "../NuklearTest/nuklear.h"
 #endif
 
-// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.1.zip
+// Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip
 
 using namespace ae3d;
 

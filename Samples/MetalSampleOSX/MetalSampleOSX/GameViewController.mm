@@ -1,5 +1,5 @@
 // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.8.1.zip
+// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"
@@ -111,7 +111,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
         {NK_VERTEX_COLOR, NK_FORMAT_R32G32B32A32_FLOAT, NK_OFFSETOF(struct VertexPTC, col)},
         {NK_VERTEX_LAYOUT_END}
     };
-    
+
     NK_MEMSET( &config, 0, sizeof( config ) );
     config.vertex_layout = vertex_layout;
     config.vertex_size = sizeof( VertexPTC );
@@ -123,28 +123,28 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     config.global_alpha = 1.0f;
     config.shape_AA = NK_ANTI_ALIASING_OFF;
     config.line_AA = NK_ANTI_ALIASING_OFF;
-    
+
     void* vertices = nullptr;
     void* elements = nullptr;
     ae3d::System::MapUIVertexBuffer( MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY, &vertices, &elements );
-    
+
     nk_buffer vbuf, ebuf;
     nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY );
     nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY );
     nk_convert( ctx, uiCommands, &vbuf, &ebuf, &config );
-    
+
     ae3d::System::UnmapUIVertexBuffer();
-    
+
     const nk_draw_command* cmd = nullptr;
     int offset = 0;
-    
+
     nk_draw_foreach( cmd, ctx, uiCommands )
     {
         if (cmd->elem_count == 0)
         {
             continue;
         }
-        
+
         ae3d::System::DrawUI( (int)(cmd->clip_rect.x),
                        (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
                        (int)(cmd->clip_rect.w),
@@ -152,7 +152,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
                        cmd->elem_count, &uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
         offset += cmd->elem_count / 3;
     }
-    
+
     nk_clear( ctx );
 }
 #endif
@@ -160,45 +160,45 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
 int CreateConeLines()
 {
     std::vector< ae3d::Vec3 > lines;
-    
+
     const int angleStep = 10;
-    
+
     for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
         const float x = cosf( angleDeg * 3.14159f / 180.0f );
         const float y = sinf( angleDeg * 3.14159f / 180.0f );
-        
+
         const float x2 = cosf( (angleDeg + angleStep) * 3.14159f / 180.0f );
         const float y2 = sinf( (angleDeg + angleStep) * 3.14159f / 180.0f );
-        
+
         lines.push_back( ae3d::Vec3( x, y, 0 ) );
         lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
     }
-    
+
     for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
         const float x = cosf( angleDeg * 3.14159f / 180.0f ) * 2;
         const float y = sinf( angleDeg * 3.14159f / 180.0f ) * 2;
-        
+
         const float x2 = cosf( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
         const float y2 = sinf( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
-        
+
         lines.push_back( ae3d::Vec3( x, y, 1 ) );
         lines.push_back( ae3d::Vec3( x2, y2, 1 ) );
     }
-    
+
     for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
     {
         const float x = cosf( angleDeg * 3.14159f / 180.0f ) * 2;
         const float y = sinf( angleDeg * 3.14159f / 180.0f ) * 2;
-        
+
         const float x2 = cosf( (angleDeg) * 3.14159f / 180.0f );
         const float y2 = sinf( (angleDeg) * 3.14159f / 180.0f );
-        
+
         lines.push_back( ae3d::Vec3( x, y, 1 ) );
         lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
     }
-    
+
     return ae3d::System::CreateLineBuffer( lines.data(), (int)lines.size(), ae3d::Vec3( 1, 1, 1 ) );
 }
 
@@ -207,7 +207,7 @@ using namespace ae3d;
 @implementation GameViewController
 {
     MTKView* _view;
-    
+
     GameObject camera2d;
     GameObject camera3d;
     GameObject rotatingCube;
@@ -241,28 +241,28 @@ using namespace ae3d;
     AudioClip audioClip;
 
     Scene scene;
-    
+
     Font font;
     Font fontSDF;
-    
+
     Mesh cubeMesh;
     Mesh cubeMeshPTN;
     Mesh animatedMesh;
-    
+
     Material cubeMaterial;
     Material skinMaterial;
     Material rtCubeMaterial;
     Material transMaterial;
     Material standardMaterial;
     Material pbrMaterial;
-    
+
     Shader shader;
     Shader skinShader;
     Shader skyboxShader;
     Shader standardShader;
     ComputeShader downSampleAndThresholdShader;
     ComputeShader blurShader;
-    
+
     Texture2D atlasTex;
     Texture2D fontTex;
     Texture2D fontTexSDF;
@@ -277,7 +277,7 @@ using namespace ae3d;
     Texture2D pbrNormalTex;
     Texture2D pbrRoughnessTex;
     Texture2D playerTex;
-    
+
     TextureCube skyTex;
 
     RenderTexture rtTex;
@@ -294,16 +294,16 @@ using namespace ae3d;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
     Vec3 moveDir;
-    
+
     Matrix44 lineView;
     Matrix44 lineProjection;
     int lineHandle;
     int coneLineHandle;
-    
+
     Scene scene2;
     GameObject bigCubeInScene2;
     GameObject pointLights[ POINT_LIGHT_COUNT ];
-    
+
 #ifdef TEST_NUKLEAR_UI
     nk_context ctx;
     nk_font_atlas atlas;
@@ -324,9 +324,9 @@ using namespace ae3d;
     _view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     _view.sampleCount = MULTISAMPLE_COUNT;
     _view.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
-    
+
     myViewController = self;
-    
+
     [self _reshape];
 
     ae3d::System::InitMetal( _view.device, _view, MULTISAMPLE_COUNT, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY );
@@ -335,7 +335,7 @@ using namespace ae3d;
 
     audioClip.Load( FileSystem::FileContents( "explosion.wav" ) );
     //audioClip.Load( FileSystem::FileContents( "example.ogg" ) );
-    
+
     audioContainer.AddComponent<AudioSourceComponent>();
     audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     //audioContainer.GetComponent<AudioSourceComponent>()->Play();
@@ -402,7 +402,7 @@ using namespace ae3d;
     scene.Add( &camera2d );
     scene.Add( &camera3d );
     scene2.Add( &camera3d );
-    
+
     fontTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
     // TODO: SDF texture
     fontTexSDF.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
@@ -419,13 +419,13 @@ using namespace ae3d;
                 ae3d::FileSystem::FileContents( "bottom.jpg" ), ae3d::FileSystem::FileContents( "top.jpg" ),
                 ae3d::FileSystem::FileContents( "front.jpg" ), ae3d::FileSystem::FileContents( "back.jpg" ),
                 ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB );
-    
+
     /*skyTex.Load( FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
                 FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
                 FileSystem::FileContents( "test_dxt1.dds" ), FileSystem::FileContents( "test_dxt1.dds" ),
                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );*/
     scene.SetSkybox( &skyTex );
-    
+
     pbrDiffuseTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
     pbrNormalTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
     pbrRoughnessTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
@@ -458,7 +458,7 @@ using namespace ae3d;
     sprite->SetTexture( &bc3Tex, Vec3( 120, 300, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     sprite->SetTexture( &gliderTex, Vec3( 220, 120, -0.5f ), Vec3( (float)gliderTex.GetWidth(), (float)gliderTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     //sprite->SetTexture( &atlasTex, Vec3( 300, 120, -0.5f ), Vec3( (float)atlasTex.GetWidth(), (float)atlasTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
-    
+
     spriteContainer.AddComponent<TransformComponent>();
     //spriteContainer.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 20, 0, 0 ) );
     spriteContainer.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 5, 5, 0 ) );
@@ -474,7 +474,7 @@ using namespace ae3d;
 
     downSampleAndThresholdShader.Load( "downsampleAndThreshold", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     blurShader.Load( "blur", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
-    
+
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
@@ -485,14 +485,14 @@ using namespace ae3d;
     rtCubeMaterial.SetShader( &skyboxShader );
     rtCubeMaterial.SetRenderTexture( &cubeRT, 0 );
     rtCubeMaterial.SetBackFaceCulling( false );
-    
+
     standardShader.Load( "standard_vertex", "standard_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
     standardMaterial.SetTexture( &pbrNormalTex, 1 );
-    
+
     skyboxShader.Load( "skybox_vertex", "skybox_fragment",
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
@@ -649,7 +649,7 @@ using namespace ae3d;
     spotLight.AddComponent<ae3d::TransformComponent>();
     //spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -70 }, { 0, 0, 1 }, { 0, 1, 0 } );
-    
+
     pointLight.AddComponent<ae3d::PointLightComponent>();
 #ifdef TEST_SHADOWS_POINT
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( true, 1024 );
@@ -662,7 +662,7 @@ using namespace ae3d;
     // Inits point lights for Forward+
     {
         int pointLightIndex = 0;
-        
+
         for (int row = 0; row < 50; ++row)
         {
             for (int col = 0; col < 40; ++col)
@@ -672,7 +672,7 @@ using namespace ae3d;
                 pointLights[ pointLightIndex ].GetComponent<ae3d::PointLightComponent>()->SetColor( { (Random100() % 100 ) / 100.0f, (Random100() % 100) / 100.0f, (Random100() % 100) / 100.0f } );
                 pointLights[ pointLightIndex ].AddComponent<ae3d::TransformComponent>();
                 pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -150 + (float)row * 5, -18, -150 + (float)col * 4 ) );
-                
+
                 scene.Add( &pointLights[ pointLightIndex ] );
                 ++pointLightIndex;
             }
@@ -686,13 +686,13 @@ using namespace ae3d;
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
 #endif
-    
+
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
 #endif
     renderTextureContainer.SetLayer( 2 );
-    
+
     rtCamera.AddComponent<ae3d::CameraComponent>();
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, 4.0f / 3.0f, 1, 200 );
     rtCamera.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
@@ -714,7 +714,7 @@ using namespace ae3d;
     cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
 
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
-    
+
 #ifdef TEST_FORWARD_PLUS
     //scene.Add( &standardCubeBR );
     //scene.Add( &standardCubeBL );
@@ -754,14 +754,14 @@ using namespace ae3d;
 #endif
     transTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None,
                   ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
-    
+
     transMaterial.SetShader( &shader );
     transMaterial.SetTexture( &transTex, 0 );
 
     transMaterial.SetBackFaceCulling( true );
     transMaterial.SetBlendingMode( ae3d::Material::BlendingMode::Alpha );
     //rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &transMaterial, 0 );
-    
+
     lineProjection.MakeProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     std::vector< Vec3 > lines( 4 );
     lines[ 0 ] = Vec3( 10, 10, -0.5f );
@@ -769,19 +769,19 @@ using namespace ae3d;
     lines[ 2 ] = Vec3( 50, 50, -0.5f );
     lines[ 3 ] = Vec3( 10, 10, -0.5f );
     lineHandle = System::CreateLineBuffer( lines.data(), (int)lines.size(), Vec3( 1, 0, 0 ) );
-    
+
     coneLineHandle = CreateConeLines();
-    
+
 #ifdef TEST_NUKLEAR_UI
     nk_font_atlas_init_default( &atlas );
     nk_font_atlas_begin( &atlas );
-    
+
     nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
-    
+
     uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
-    
+
     nk_init_default( &ctx, &nkFont->handle );
     nk_buffer_init_default( &cmds );
 #endif
@@ -790,7 +790,7 @@ using namespace ae3d;
 - (void)keyDown:(NSEvent *)theEvent
 {
     const float velocity = 0.3f;
-    
+
     // Keycodes from: https://forums.macrumors.com/threads/nsevent-keycode-list.780577/
     if ([theEvent keyCode] == 0x00) // A
     {
@@ -849,7 +849,7 @@ using namespace ae3d;
 - (void)mouseDown:(NSEvent *)theEvent
 {
     camera3d.GetComponent<ae3d::TransformComponent>()->MoveForward( -1 );
-    
+
     inputEvent.button = 1;
     inputEvent.x = (int)theEvent.locationInWindow.x;
     inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
@@ -878,10 +878,10 @@ using namespace ae3d;
 - (void)_render
 {
     [self _update];
-    
+
     const int width = self.view.bounds.size.width * 2;
     const int height = self.view.bounds.size.height * 2;
-    
+
     //if (_view.currentRenderPassDescriptor != nil)
     {
         ae3d::System::SetCurrentDrawableMetal( _view );
@@ -893,12 +893,12 @@ using namespace ae3d;
         downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
         downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
         downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
-        
+
         blurShader.SetTexture2D( 0, &blurTex );
         blurShader.SetTexture2D( 1, &bloomTex );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-        
+
         blurShader.SetTexture2D( 0, &bloomTex );
         blurShader.SetTexture2D( 1, &blurTex );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
@@ -909,7 +909,7 @@ using namespace ae3d;
         blurShader.SetTexture2D( 1, &blurTex2 );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-        
+
         blurShader.SetTexture2D( 0, &blurTex2 );
         blurShader.SetTexture2D( 1, &blurTex );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
@@ -920,7 +920,7 @@ using namespace ae3d;
         blurShader.SetTexture2D( 1, &blurTex2 );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-        
+
         blurShader.SetTexture2D( 0, &blurTex2 );
         blurShader.SetTexture2D( 1, &blurTex );
         blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
@@ -934,10 +934,10 @@ using namespace ae3d;
         Matrix44 viewMat = camera3d.GetComponent< CameraComponent >()->GetView();
         Matrix44 lineTransform;
         lineTransform.MakeIdentity();
-        
+
         Matrix44 spotRot;
         spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalRotation().GetMatrix( spotRot );
-        
+
         lineTransform.Scale( 4, 4, 18 );
         Matrix44::Multiply( lineTransform, spotRot, lineTransform );
         lineTransform.Translate( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() );
@@ -962,27 +962,27 @@ using namespace ae3d;
         inputEvent.x = 0;
         inputEvent.y = 0;
         inputEvent.button = -1;
-        
+
         nk_input_end( &ctx );
 
         enum { EASY, HARD };
         static int op = EASY;
         static float value = 0.6f;
-        
+
         if (nk_begin( &ctx, "Demo", nk_rect( 0, 0, 300, 400 ), NK_WINDOW_BORDER ))
         {
             nk_layout_row_static( &ctx, 30, 80, 1 );
-            
+
             if (nk_button_label( &ctx, "button" ))
             {
                 System::Print("Pressed a button\n");
             }
-            
+
             /* fixed widget window ratio width */
             nk_layout_row_dynamic( &ctx, 30, 2 );
             if (nk_option_label( &ctx, "easy", op == EASY )) op = EASY;
             if (nk_option_label( &ctx, "hard", op == HARD )) op = HARD;
-            
+
             /* custom widget pixel width */
             nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {
@@ -1009,15 +1009,15 @@ using namespace ae3d;
 {
     static int angle = 0;
     ++angle;
-    
+
     ae3d::Quaternion rotation;
     rotation = ae3d::Quaternion::FromEuler( ae3d::Vec3( angle, angle, angle ) );
     rotatingCube.GetComponent< ae3d::TransformComponent >()->SetLocalRotation( rotation );
-    
+
     char statStr[ 512 ] = {};
     ae3d::System::Statistics::GetStatistics( statStr );
     text.GetComponent<ae3d::TextRendererComponent>()->SetText( statStr );
-    
+
     static int animationFrame = 0;
     ++animationFrame;
     animatedGo.GetComponent< MeshRendererComponent >()->SetAnimationFrame( animationFrame );
@@ -1029,29 +1029,29 @@ using namespace ae3d;
     }
 
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9.8f, 0, -85 ) );
-    
+
     standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
     standardCubeSpotReceiver.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -90 ) );
-    
+
     camera3d.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
     camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
     camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
-    
+
 #ifdef TEST_FORWARD_PLUS
     static float y = -14;
     y += 0.1f;
-    
+
     if (y > 30)
     {
         y = -14;
     }
-    
+
     for (unsigned pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
     {
         const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
         const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         const float zOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-        
+
         pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + zOffset ) );
     }
 #endif
