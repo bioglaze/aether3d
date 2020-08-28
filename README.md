@@ -73,7 +73,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # API documentation
 
-[link](http://twiren.kapsi.fi/doc_v0.8.1/html/)
+[link](http://twiren.kapsi.fi/doc_v0.8.5/html/)
 
 # Build
 
