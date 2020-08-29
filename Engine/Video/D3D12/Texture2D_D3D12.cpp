@@ -131,6 +131,10 @@ void ae3d::Texture2D::SetLayout( ae3d::TextureLayout layout )
     {
         TransitionResource( gpuResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS );
     }
+    else if (layout == TextureLayout::General)
+    {
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COMMON );
+    }
 }
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
@@ -429,7 +433,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
     const D3D12_RESOURCE_ALLOCATION_INFO info = GfxDeviceGlobal::device->GetResourceAllocationInfo( 0, 1, &descTex );
-    Texture2DGlobal::tex2dMemoryUsage += info.SizeInBytes;
+    Texture2DGlobal::tex2dMemoryUsage += (int)info.SizeInBytes;
 
     wchar_t wstr[ 128 ];
     std::mbstowcs( wstr, aPath, 128 );
@@ -498,7 +502,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
     const D3D12_RESOURCE_ALLOCATION_INFO info = GfxDeviceGlobal::device->GetResourceAllocationInfo( 0, 1, &descTex );
-    Texture2DGlobal::tex2dMemoryUsage += info.SizeInBytes;
+    Texture2DGlobal::tex2dMemoryUsage += (int)info.SizeInBytes;
 
     wchar_t wstr[ 128 ];
     std::mbstowcs( wstr, fileContents.path.c_str(), 128 );
