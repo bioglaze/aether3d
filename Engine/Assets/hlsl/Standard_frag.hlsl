@@ -159,8 +159,10 @@ float4 main( PS_INPUT input ) : SV_Target
     float3 Fr = (D * v) * F;
     float3 Fd = Fd_Lambert();
 
-    //accumDiffuseAndSpecular *= Fr * Fd * dotNL;
-    accumDiffuseAndSpecular *= dotNL;
+    //accumDiffuseAndSpecular *= dotNL;
+
+    const float3 dirColor = Fd + Fr;
+    accumDiffuseAndSpecular.rgb *= dirColor * dotNL;
 
     //[loop] // Point lights
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)

@@ -284,6 +284,9 @@ int main()
     Texture2D albedoTex;
     albedoTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_albedo.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
+    Texture2D albedoTex2;
+    albedoTex2.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+
     Texture2D normalTex;
     normalTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_normal.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
 
@@ -338,7 +341,7 @@ int main()
     for (int i = 0; i < 5; ++i)
     {
         sphereMaterials[ i ].SetShader( &standardShader );
-        sphereMaterials[ i ].SetTexture( &albedoTex, 0 );
+        sphereMaterials[ i ].SetTexture( &albedoTex2, 0 );
         sphereMaterials[ i ].SetTexture( &normalTex, 1 );
         sphereMaterials[ i ].SetBackFaceCulling( true );
         sphereMaterials[ i ].SetF0( 1.0f / (i+1) );
@@ -579,6 +582,7 @@ int main()
         }
 
         standardMaterial.SetF0( f0 );
+        
         scene.Render();
         cameraTex.ResolveTo( &resolvedTex );
         System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
