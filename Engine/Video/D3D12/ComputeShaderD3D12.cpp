@@ -117,26 +117,12 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 1 ], nullptr, &uavDescs[ 1 ], cpuHandle );
     cpuHandle.ptr += incrementSize;
 
-    /*GpuResource depthNormals = {};
-    depthNormals.resource = textureBuffers[ 1 ];
-    depthNormals.usageState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
-    if (depthNormals.resource != nullptr)
-    {
-        TransitionResource( depthNormals, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE );
-    }*/
-
     GfxDeviceGlobal::cachedPSO = pso;
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( pso );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ] );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
-
-    /*if (depthNormals.resource != nullptr)
-    {
-        TransitionResource( depthNormals, D3D12_RESOURCE_STATE_RENDER_TARGET );
-    }*/
 }
 
 void ae3d::ComputeShader::Load( const char* source )
