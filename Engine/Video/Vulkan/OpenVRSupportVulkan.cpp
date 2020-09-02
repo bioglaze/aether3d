@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <cmath>
 #include <openvr.h>
 #include <vulkan/vulkan.h>
 #include "CameraComponent.hpp"
