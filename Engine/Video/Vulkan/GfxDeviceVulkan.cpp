@@ -2,9 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "GfxDevice.hpp"
 #include <cstdint>
-#include <cstring>
 #include <map>
-#include <vector> 
+#include <vector>
+#include <cstring>
 #include <string>
 #include <vulkan/vulkan.h>
 #include "Array.hpp"
@@ -108,7 +108,6 @@ namespace GfxDeviceGlobal
     VkPhysicalDeviceFeatures deviceFeatures;
     VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE;
     VkSemaphore renderCompleteSemaphore = VK_NULL_HANDLE;
-    VkSemaphore offscreenSemaphore = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
     VkQueryPool queryPool = VK_NULL_HANDLE;
     float timings[ 3 ];
@@ -136,7 +135,6 @@ namespace GfxDeviceGlobal
     ae3d::VertexBuffer::VertexPTC uiVertices[ UI_VERTICE_COUNT ];
     ae3d::VertexBuffer::Face uiFaces[ UI_FACE_COUNT ];
     std::vector< ae3d::VertexBuffer > lineBuffers;
-    bool usedOffscreen = false;
 }
 
 namespace ae3d
@@ -151,9 +149,10 @@ namespace ae3d
                 str = "frame time: " + std::to_string( ::Statistics::GetFrameTimeMS() ) + " ms\n";
                 str += "present time CPU: " + std::to_string( ::Statistics::GetPresentTimeMS() ) + " ms\n";                
                 str += "shadow pass time CPU: " + std::to_string( ::Statistics::GetShadowMapTimeMS() ) + " ms\n";
-                str += "shadow pass time GPU: unimplemented\n";//std::to_string( ::Statistics::GetShadowMapTimeGpuMS() ) + " ms\n";
+                str += "shadow pass time GPU: " + std::to_string( ::Statistics::GetShadowMapTimeGpuMS() ) + " ms\n";
                 str += "depth pass time CPU: " + std::to_string( ::Statistics::GetDepthNormalsTimeMS() ) + " ms\n";
                 str += "depth pass time GPU: " + std::to_string( ::Statistics::GetDepthNormalsTimeGpuMS() ) + " ms\n";
+                str += "primary pass time GPU: " + std::to_string( ::Statistics::GetPrimaryPassTimeGpuMS() ) + " ms\n";
                 str += "draw calls: " + std::to_string( ::Statistics::GetDrawCalls() ) + "\n";
                 str += "barrier calls: " + std::to_string( ::Statistics::GetBarrierCalls() ) + "\n";
                 str += "fence calls: " + std::to_string( ::Statistics::GetFenceCalls() ) + "\n";
@@ -1597,9 +1596,6 @@ namespace ae3d
 
         err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::renderCompleteSemaphore );
         AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
-
-        err = vkCreateSemaphore( GfxDeviceGlobal::device, &semaphoreCreateInfo, nullptr, &GfxDeviceGlobal::offscreenSemaphore );
-        AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
     }
     
     void CreateRenderer( int samples )
@@ -2153,19 +2149,6 @@ void ae3d::GfxDevice::Present()
 
     AE3D_CHECK_VULKAN( err, "queuePresent" );
 
-    if (GfxDeviceGlobal::usedOffscreen)
-    {
-        GfxDeviceGlobal::usedOffscreen = false;
-
-        std::uint64_t timestamps[ 2 ] = {};
-		err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 2, sizeof( std::uint64_t ) * 2, timestamps, sizeof( std::uint64_t ), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
-		//AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
-
-        GfxDeviceGlobal::timings[ 0 ] = (timestamps[ 1 ] - timestamps[ 0 ]) / 1000.0f;
-
-        Statistics::SetDepthNormalsGpuTime( GfxDeviceGlobal::timings[ 0 ] );
-    }
-
     // FIXME: This slows down rendering
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
@@ -2236,7 +2219,6 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::renderCompleteSemaphore, nullptr );
     vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::presentCompleteSemaphore, nullptr );
-    vkDestroySemaphore( GfxDeviceGlobal::device, GfxDeviceGlobal::offscreenSemaphore, nullptr );
     vkDestroyPipelineLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineLayout, nullptr );
     vkDestroyPipelineCache( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, nullptr );
     vkDestroySwapchainKHR( GfxDeviceGlobal::device, GfxDeviceGlobal::swapChain, nullptr );
@@ -2293,11 +2275,9 @@ void BeginOffscreen()
     renderPassBeginInfo.framebuffer = GfxDeviceGlobal::frameBuffer0;
 
     vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
-
-    GfxDeviceGlobal::usedOffscreen = true;
 }
 
-void EndOffscreen()
+void EndOffscreen( int profilerIndex )
 {
     vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 1 );
     vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
@@ -2311,7 +2291,7 @@ void EndOffscreen()
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pWaitDstStageMask = &pipelineStages;
     submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitSemaphores = nullptr;//&GfxDeviceGlobal::offscreenSemaphore;
+    submitInfo.pWaitSemaphores = nullptr;
     submitInfo.signalSemaphoreCount = 0;
     submitInfo.pSignalSemaphores = nullptr;
     submitInfo.commandBufferCount = 1;
@@ -2320,5 +2300,24 @@ void EndOffscreen()
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
     Statistics::IncQueueSubmitCalls();
+
+    std::uint64_t timestamps[ 2 ] = {};
+    err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 2, sizeof( std::uint64_t ) * 2, timestamps, sizeof( std::uint64_t ), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
+    //AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
+
+    GfxDeviceGlobal::timings[ 0 ] = (timestamps[ 1 ] - timestamps[ 0 ]) / 1000.0f;
+
+    if (profilerIndex == 0)
+    {
+        Statistics::SetDepthNormalsGpuTime( GfxDeviceGlobal::timings[ 0 ] );
+    }
+    else if (profilerIndex == 1)
+    {
+        Statistics::SetShadowMapGpuTime( GfxDeviceGlobal::timings[ 0 ] );
+    }
+    else if (profilerIndex == 2)
+    {
+        Statistics::SetPrimaryPassGpuTime( GfxDeviceGlobal::timings[ 0 ] );
+    }
 }
 

@@ -48,7 +48,7 @@
 
    \subsection win1 Windows/Visual Studio
    
-   You'll need Visual Studio 2017 or newer. Build Engine/VisualStudio_D3D12 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
+   You'll need Visual Studio 2019 or newer. 2017 also works if you change platform toolset and Windows SDK version. Build Engine/VisualStudio_D3D12 or Engine/VisualStudio_Vulkan. This creates the library in aether3d_build.
    You can then build and run Samples/01_OpenWindow. The created executable will be placed in aether3d_build/Samples.
    You'll need OpenAL32.dll from OpenAL Soft either in your system directory or in the directory used to run samples/editor.
  

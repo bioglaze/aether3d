@@ -18,6 +18,7 @@ namespace Statistics
     float GetDepthNormalsTimeGpuMS();
     float GetSceneAABBTimeMS();
     float GetLightCullerTimeGpuMS();
+    float GetPrimaryPassTimeGpuMS();
 
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
@@ -54,5 +55,6 @@ namespace Statistics
     int GetQueueSubmitCalls();
     void SetDepthNormalsGpuTime( float timeMS );
     void SetShadowMapGpuTime( float timeMS );
-    void SetLightCullerTimeGpuMS( float timeMS );
+    void SetLightCullerGpuTime( float timeMS );
+    void SetPrimaryPassGpuTime( float timeMS );
 }

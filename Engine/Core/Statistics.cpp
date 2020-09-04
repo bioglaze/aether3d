@@ -23,8 +23,10 @@ namespace Statistics
     float presentTimeMS = 0;
     float sceneAABBTimeMS = 0;
     float lightCullerTimeGpuMS = 0;
+    float primaryPassTimeGpuMS = 0;
     std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
+    std::chrono::time_point< std::chrono::steady_clock > startPrimaryPassTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startDepthNormalsTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startPresentTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startSceneAABBPoint;
@@ -55,7 +57,17 @@ void Statistics::SetShadowMapGpuTime( float timeMS )
     shadowMapTimeGpuMS = timeMS;
 }
 
-void Statistics::SetLightCullerTimeGpuMS( float timeMS )
+void Statistics::SetPrimaryPassGpuTime( float timeMS )
+{
+    primaryPassTimeGpuMS = timeMS;
+}
+
+float Statistics::GetPrimaryPassTimeGpuMS()
+{
+    return primaryPassTimeGpuMS;
+}
+
+void Statistics::SetLightCullerGpuTime( float timeMS )
 {
     lightCullerTimeGpuMS = timeMS;
 }
