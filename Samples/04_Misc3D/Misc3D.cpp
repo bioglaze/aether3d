@@ -347,8 +347,6 @@ int main()
     GameObject copiedCube = cube;
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
     copiedCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-
-    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &materialSkin, 0 );
     
     Shader shaderCubeMap;
     shaderCubeMap.Load( "unlitVert", "unlitFrag",
@@ -464,10 +462,22 @@ int main()
         ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
         ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
 
+    Shader standardSkinShader;
+    standardSkinShader.Load( "standard_skin_vertex", "standard_fragment",
+        ae3d::FileSystem::FileContents( "Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
+
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
+    standardMaterial.SetTexture( &gliderTex, 1 );
     standardMaterial.SetTexture( &skybox );
+
+    Material standardSkinMaterial;
+    standardSkinMaterial.SetShader( &standardSkinShader );
+    standardSkinMaterial.SetTexture( &playerTex, 0 );
+    standardSkinMaterial.SetTexture( &playerTex, 1 );
+    standardSkinMaterial.SetTexture( &skybox );
 
 #ifdef TEST_SPONZA
     Material pbrMaterial;
@@ -487,7 +497,7 @@ int main()
     materialTangent.SetTexture( &whiteTex, 0 );
     cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
 #endif
-    
+
     GameObject standardCubeTopCenter;
     standardCubeTopCenter.SetName( "standardCubeTopCenter" );
     standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
@@ -522,6 +532,12 @@ int main()
             }
         }
     }
+#endif
+
+#ifdef TEST_FORWARD_PLUS
+    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &standardSkinMaterial, 0 );
+#else
+    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &materialSkin, 0 );
 #endif
 
     std::vector< GameObject > sponzaGameObjects;
