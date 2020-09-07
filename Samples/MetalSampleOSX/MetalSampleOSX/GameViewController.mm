@@ -35,7 +35,7 @@
 
 //#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
-#define TEST_SHADOWS_DIR
+//#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 //#define TEST_NUKLEAR_UI
@@ -251,6 +251,7 @@ using namespace ae3d;
 
     Material cubeMaterial;
     Material skinMaterial;
+    Material skinStandardMaterial;
     Material rtCubeMaterial;
     Material transMaterial;
     Material standardMaterial;
@@ -260,6 +261,7 @@ using namespace ae3d;
     Shader skinShader;
     Shader skyboxShader;
     Shader standardShader;
+    Shader standardSkinShader;
     ComputeShader downSampleAndThresholdShader;
     ComputeShader blurShader;
 
@@ -482,6 +484,10 @@ using namespace ae3d;
     skinMaterial.SetShader( &skinShader );
     skinMaterial.SetTexture( &playerTex, 0 );
 
+    skinStandardMaterial.SetShader( &standardSkinShader );
+    skinStandardMaterial.SetTexture( &playerTex, 0 );
+    skinStandardMaterial.SetTexture( &playerTex, 1 );
+    
     rtCubeMaterial.SetShader( &skyboxShader );
     rtCubeMaterial.SetRenderTexture( &cubeRT, 0 );
     rtCubeMaterial.SetBackFaceCulling( false );
@@ -489,6 +495,11 @@ using namespace ae3d;
     standardShader.Load( "standard_vertex", "standard_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
+
+    standardSkinShader.Load( "standard_skin_vertex", "standard_fragment",
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
+
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
     standardMaterial.SetTexture( &pbrNormalTex, 1 );
@@ -625,7 +636,11 @@ using namespace ae3d;
 
     animatedGo.AddComponent< MeshRendererComponent >();
     animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
+#ifdef TEST_FORWARD_PLUS
+    animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &skinStandardMaterial, 0 );
+#else
     animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &skinMaterial, 0 );
+#endif
     animatedGo.AddComponent< TransformComponent >();
     animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, -12, -85 } );
     animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 0, 0 } ) );

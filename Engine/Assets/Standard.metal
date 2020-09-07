@@ -31,6 +31,17 @@ struct StandardVertex
     float4 color [[attribute(2)]];
 };
 
+struct StandardVertexSkin
+{
+    float3 position [[attribute(0)]];
+    float2 texcoord [[attribute(1)]];
+    float3 normal [[attribute(3)]];
+    float4 tangent [[attribute(4)]];
+    float4 color [[attribute(2)]];
+    int4 boneIndex [[attribute(5)]];
+    float4 boneWeights [[attribute(6)]];
+};
+
 #ifdef DEBUG_LIGHT_COUNT
 static int GetNumLightsInThisTile( uint tileIndex, uint maxNumLightsPerTile, const device uint* perTileLightIndexBuffer )
 {
@@ -83,6 +94,36 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     StandardColorInOut out;
     
     float4 in_position = float4( vert.position, 1.0 );
+    out.position = uniforms.localToClip * in_position;
+    out.positionVS = (uniforms.localToView * in_position).xyz;
+    out.positionWS = (uniforms.localToWorld * in_position).xyz;
+    
+    out.color = half4( vert.color );
+    out.projCoord = uniforms.localToShadowClip * in_position;
+    
+    out.tangentVS_u.xyz = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
+    out.tangentVS_u.w = vert.texcoord.x;
+    float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
+    out.bitangentVS_v.xyz = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
+    out.bitangentVS_v.w = vert.texcoord.y;
+    out.normalVS = (uniforms.localToView * float4( vert.normal, 0 )).xyz;
+    
+    return out;
+}
+
+vertex StandardColorInOut standard_skin_vertex( StandardVertexSkin vert [[stage_in]],
+                               constant Uniforms& uniforms [[ buffer(5) ]],
+                               unsigned int vid [[ vertex_id ]] )
+{
+    StandardColorInOut out;
+
+    matrix_float4x4 boneTransform = uniforms.boneMatrices[ vert.boneIndex.x ] * vert.boneWeights.x +
+                                    uniforms.boneMatrices[ vert.boneIndex.y ] * vert.boneWeights.y +
+                                    uniforms.boneMatrices[ vert.boneIndex.z ] * vert.boneWeights.z +
+                                    uniforms.boneMatrices[ vert.boneIndex.w ] * vert.boneWeights.w;
+    
+    float4 in_position = boneTransform * float4( vert.position, 1.0 );
+
     out.position = uniforms.localToClip * in_position;
     out.positionVS = (uniforms.localToView * in_position).xyz;
     out.positionWS = (uniforms.localToWorld * in_position).xyz;
