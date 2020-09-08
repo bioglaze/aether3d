@@ -197,7 +197,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_D3D12_d.lib;d3dcompiler.lib;dxgi.lib;d3d12.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>WinPixEventRuntime.lib;libOpenAL32.dll.a;Aether3D_D3D12_d.lib;d3dcompiler.lib;dxgi.lib;d3d12.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -221,7 +221,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\..\aether3d_build;..\..\..\Engine\ThirdParty\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOpenAL32.dll.a;Aether3D_D3D12_r.lib;d3dcompiler.lib;dxgi.lib;d3d12.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>WinPixEventRuntime.lib;libOpenAL32.dll.a;Aether3D_D3D12_r.lib;d3dcompiler.lib;dxgi.lib;d3d12.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>

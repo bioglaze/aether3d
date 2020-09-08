@@ -9,7 +9,7 @@
 #define _PIX3_H_
 #include <AmdDxExt/AmdPix3.h>
 #else
-//#include <pix3.h>
+#include <WinPixEventRuntime/pix3.h>
 #endif
 #include <vector>
 #include <string>
@@ -1106,7 +1106,7 @@ void ae3d::GfxDevice::EndLightCullerGpuQuery()
     GfxDeviceGlobal::timerQuery.End( GfxDeviceGlobal::timerQuery.lightCullerProfilerIndex );
     const float timeMS = (float)GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.lightCullerProfilerIndex ].timeSamples[ GfxDeviceGlobal::timerQuery.profiles[ GfxDeviceGlobal::timerQuery.lightCullerProfilerIndex ].currSample ];
 
-    Statistics::SetLightCullerTimeGpuMS( timeMS );
+    Statistics::SetLightCullerGpuTime( timeMS );
 }
 
 void ae3d::GfxDevice::BeginShadowMapGpuQuery()
@@ -1153,7 +1153,7 @@ void ae3d::GfxDevice::PushGroupMarker( const char* name )
     LPWSTR ptr = wtext;
     RgpPushMarker( GfxDeviceGlobal::graphicsCommandList, ptr );
 #else
-    //PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
+    PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
 #endif
 }
 
@@ -1162,7 +1162,7 @@ void ae3d::GfxDevice::PopGroupMarker()
 #if USE_RGP_MARKERS
     RgpPopMarker( GfxDeviceGlobal::graphicsCommandList );
 #else
-    //PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
+    PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
 #endif
 }
 
