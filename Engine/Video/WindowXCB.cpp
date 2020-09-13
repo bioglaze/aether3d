@@ -4,8 +4,6 @@
 #include <xcb/xcb_keysyms.h>
 #include <xcb/xcb_ewmh.h>
 #include <X11/keysym.h>
-#include <X11/XF86keysym.h>
-#include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
 #include <fcntl.h>
 #include <unistd.h>

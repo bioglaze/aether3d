@@ -221,7 +221,11 @@ class Aether3DExporter( bpy.types.Operator ):
             obj.data.transform( global_matrix @ obj.matrix_world )
 
             obj.data.calc_loop_triangles()
-            obj.data.calc_tangents()
+            
+            if len( obj.data.uv_layers ) > 0:
+                obj.data.calc_tangents()
+            else:
+                print( "Mesh ", mesh.name, " doesn't have a UV map, not calculating tangents!" )
             
             object[ OBJ.UVL ] = None
 
@@ -353,6 +357,9 @@ class Aether3DExporter( bpy.types.Operator ):
                 
             mesh.generateAABB()
             self.meshes.append( mesh )
+
+            if len( mesh.vertices ) > 65535:
+                raise RuntimeError( "Mesh", obj.data.name, " has over 65535 vertices, not supported!" )
 
         orig_frame = context.scene.frame_current
         #mpf = 1000.0/use_fps # msec per frame
@@ -495,8 +502,12 @@ class Aether3DExporter( bpy.types.Operator ):
                 f.write( component )
                 
                 # Texture coordinate.
-                s = v.uv[ 0 ]
-                t = v.uv[ 1 ]
+                s = 0.0
+                t = 0.0
+                
+                if len( v.uv ) > 1:
+                    s = v.uv[ 0 ]
+                    t = v.uv[ 1 ]
     
                 component = struct.pack( 'f', s )
                 f.write( component )
