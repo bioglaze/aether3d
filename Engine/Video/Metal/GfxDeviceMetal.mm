@@ -17,7 +17,7 @@
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
 
-constexpr int UboCount = 1400;
+constexpr int UboCount = 2400;
 id <MTLDevice> device;
 id <MTLCommandQueue> commandQueue;
 id <MTLLibrary> defaultLibrary;
