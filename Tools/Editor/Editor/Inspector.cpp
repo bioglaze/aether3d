@@ -471,10 +471,11 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         // Hierarchy
         constexpr unsigned nameCount = 100;
         static const char* goNames[ nameCount ] = {};
-        
+        static int selected[ nameCount ] = {};
+
         for (unsigned i = 0; i < nameCount; ++i)
         {
-            goNames[ i ] = "";
+            goNames[ i ] = " ";
         }
 
         for (unsigned i = 1; i < goCount; ++i)
@@ -491,9 +492,13 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             {
                 for (unsigned i = 0; i < goCount - 1; ++i)
                 {
-                    if (nk_button_label( &ctx, goNames[ i ] ))
+                    const char* name = std::strcmp( goNames[ i ], "" ) != 0 ? goNames[ i ] : "unnamed";
+                    nk_selectable_label( &ctx, name, NK_TEXT_LEFT, &selected[ i ] );
+
+                    if (selected[ i ] != 0)
                     {
                         outSelectedGameObject = i + 1;
+                        selected[ i ] = 0;
                     }
                 }
 
