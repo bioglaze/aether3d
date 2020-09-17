@@ -18,4 +18,5 @@ glslangValidator -D -V -S vert -e main hlsl/Standard_skin_vert.hlsl -o ../../../
 glslangValidator -D -V -S frag -e main hlsl/Standard_frag.hlsl -o ../../../aether3d_build/Samples/Standard_frag.spv
 glslangValidator -D -V -S comp -e CSMain hlsl/Bloom.hlsl -o ../../../aether3d_build/Samples/Bloom.spv
 glslangValidator -D -V -S comp -e CSMain hlsl/Blur.hlsl -o ../../../aether3d_build/Samples/Blur.spv
+glslangValidator -D -V -S comp -e CSMain hlsl/ssao.hlsl -o ../../../aether3d_build/Samples/ssao.spv
 

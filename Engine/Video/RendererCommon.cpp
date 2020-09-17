@@ -23,11 +23,29 @@ namespace GfxDeviceGlobal
 namespace MathUtil
 {
     int Max( int x, int y );
+    float Lerp( float start, float end, float amount );
+    float Random( float aMin, float aMax );
 }
 
 void ae3d::Renderer::GenerateTextures()
 {
     whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+}
+
+void ae3d::Renderer::GenerateSSAOKernel( int count, ae3d::Vec3* outKernel )
+{
+    for (int i = 0; i < count; ++i)
+    {
+        outKernel[ i ] = Vec3(
+            MathUtil::Random( -1.0f, 1.0f ),
+            MathUtil::Random( -1.0f, 1.0f ),
+            MathUtil::Random( 0.0f, 1.0f )
+            ).Normalized();
+
+        // Distributes the samples so that there are more near the origin.
+        float scale = (float)i / (float)count;
+        outKernel[ i ] *= MathUtil::Lerp( 0.1f, 1.0f, scale * scale );
+    }
 }
 
 void ae3d::Renderer::GenerateSkybox()

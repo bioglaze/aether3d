@@ -31,6 +31,8 @@ struct PerObjectUboStruct
     ae3d::Vec4 tilesXY = ae3d::Vec4( 0, 0, 0, 0 );
     ae3d::Matrix44 boneMatrices[ 80 ];
     int isVR = 0;
+    int kernelSize;
+    ae3d::Vec3 kernelOffsets[ 128 ];
 };
 
 namespace ae3d

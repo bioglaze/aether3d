@@ -1,6 +1,8 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "Vec3.hpp"
+#include <random>
+#include <ctime>
 
 using namespace ae3d;
 
@@ -57,6 +59,18 @@ namespace MathUtil
         outCorners[ 5 ] = Vec3( min.x, max.y, max.z );
         outCorners[ 6 ] = Vec3( max.x, max.y, max.z );
         outCorners[ 7 ] = Vec3( max.x, min.y, max.z );
+    }
+
+    float Lerp( float start, float end, float amount )
+    {
+        return start + (end - start) * amount;
+    }
+
+    float Random( float aMin, float aMax )
+    {
+        static std::mt19937 mt( static_cast<unsigned int>( std::time( nullptr ) ) );
+        std::uniform_real_distribution<float> ud( aMin, aMax );
+        return ud( mt );
     }
 
     float Floor( float f )

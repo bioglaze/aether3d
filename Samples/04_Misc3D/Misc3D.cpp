@@ -38,6 +38,7 @@
 //#define TEST_SHADOWS_POINT
 //#define TEST_FORWARD_PLUS
 //#define TEST_BLOOM
+//#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 //#define TEST_SPONZA
 
@@ -143,9 +144,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
-#ifdef TEST_FORWARD_PLUS
     camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
-#endif
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
 #ifndef AE3D_OPENVR
@@ -309,6 +308,14 @@ int main()
 
 	ComputeShader downsampleAndThresholdShader;
 	downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
+#endif
+
+#ifdef TEST_SSAO
+    ComputeShader ssaoShader;
+	ssaoShader.Load( "ssao", FileSystem::FileContents( "ssao.obj" ), FileSystem::FileContents( "ssao.spv" ) );
+
+    Texture2D ssaoTex;
+    ssaoTex.CreateUAV( width, height, "ssaoTex" );
 #endif
     
     Texture2D gliderTex;
@@ -1125,9 +1132,24 @@ int main()
         System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
         bloomTex.SetLayout( TextureLayout::General );
+#endif // Bloom
+
+#ifdef TEST_SSAO
+        ssaoTex.SetLayout( TextureLayout::General );
+        ssaoShader.SetRenderTexture( 0, &cameraTex );
+        ssaoShader.SetRenderTexture( 1, &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
+        ssaoShader.SetTexture2D( 14, &ssaoTex );
+        ssaoShader.Begin();
+        ssaoShader.Dispatch( width / 8, height / 8, 1 );
+        ssaoShader.End();
+        ssaoTex.SetLayout( TextureLayout::ShaderRead );
+
+        System::Draw( &ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
 #endif
+
         scene.EndFrame();
 #endif
+        
         Window::SwapBuffers();
     }
 

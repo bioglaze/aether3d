@@ -27,6 +27,8 @@ layout( set = 0, binding = 7 ) cbuffer cbPerFrame : register(b0)
     float4 tilesXY;
     matrix boneMatrices[ 80 ];
     int isVR;
+    int kernelSize;
+    float3 kernelOffsets[ 128 ];
 };
 layout( set = 0, binding = 8 ) Buffer<float4> pointLightBufferCenterAndRadius : register(t5);
 layout( set = 0, binding = 9 ) RWBuffer<uint> perTileLightIndexBuffer : register(u0);

@@ -1600,6 +1600,8 @@ namespace ae3d
     
     void CreateRenderer( int samples )
     {
+        renderer.GenerateSSAOKernel( 128, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+        
         GfxDeviceGlobal::msaaSampleBits = GetSampleBits( samples );
         CreateInstance( &GfxDeviceGlobal::instance );
         
@@ -2017,7 +2019,7 @@ void ae3d::GfxDevice::CreateUniformBuffers()
     {
         auto& ubo = GfxDeviceGlobal::ubos[ uboIndex ];
 
-        const VkDeviceSize uboSize = 256 * 3 + 80 * 64;
+        const VkDeviceSize uboSize = 256 * 3 + 80 * 64 + 128 * 16;
         static_assert( uboSize >= sizeof( PerObjectUboStruct ), "UBO size must be larger than UBO struct" );
 
         VkBufferCreateInfo bufferInfo = {};
