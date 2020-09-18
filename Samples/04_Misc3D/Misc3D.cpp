@@ -1139,6 +1139,7 @@ int main()
         ssaoShader.SetRenderTexture( 0, &cameraTex );
         ssaoShader.SetRenderTexture( 1, &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
         ssaoShader.SetTexture2D( 14, &ssaoTex );
+        ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
         ssaoShader.Begin();
         ssaoShader.Dispatch( width / 8, height / 8, 1 );
         ssaoShader.End();

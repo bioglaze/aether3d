@@ -38,6 +38,10 @@ namespace ae3d
         /// \param groupCountZ Z count
         void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ );
 
+        /// Sets projection matrix and its inverse into the uniform structure.
+        /// \param projection Projection matrix.
+        void SetProjectionMatrix( const struct Matrix44& projection );
+        
         /// Sets a uniform.
         /// \param uniform Uniform.
         /// \param x X

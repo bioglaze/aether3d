@@ -128,6 +128,12 @@ void ae3d::ComputeShader::LoadSPIRV( const ae3d::FileSystem::FileContentsData& c
     }
 }
 
+void ae3d::ComputeShader::SetProjectionMatrix( const struct Matrix44& projection )
+{
+    GfxDeviceGlobal::perObjectUboStruct.viewToClip = projection;
+    Matrix44::Invert( GfxDeviceGlobal::perObjectUboStruct.viewToClip, GfxDeviceGlobal::perObjectUboStruct.clipToView );
+}
+
 void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
 {
     if( uniform == UniformName::TilesZW )

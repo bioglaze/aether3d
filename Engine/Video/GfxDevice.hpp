@@ -16,6 +16,7 @@ struct PerObjectUboStruct
     ae3d::Matrix44 localToWorld;
     ae3d::Matrix44 localToShadowClip;
     ae3d::Matrix44 clipToView;
+    ae3d::Matrix44 viewToClip;
     ae3d::Vec4 lightPosition;
     ae3d::Vec4 lightDirection;
     ae3d::Vec4 lightColor = ae3d::Vec4( 1, 1, 1, 1 );

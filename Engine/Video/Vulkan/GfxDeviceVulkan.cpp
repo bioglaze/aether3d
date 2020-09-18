@@ -1600,7 +1600,8 @@ namespace ae3d
     
     void CreateRenderer( int samples )
     {
-        renderer.GenerateSSAOKernel( 128, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+        renderer.GenerateSSAOKernel( 64, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+        GfxDeviceGlobal::perObjectUboStruct.kernelSize = 64;
         
         GfxDeviceGlobal::msaaSampleBits = GetSampleBits( samples );
         CreateInstance( &GfxDeviceGlobal::instance );

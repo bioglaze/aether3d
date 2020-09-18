@@ -8,29 +8,35 @@
 
 float ssao( int sampleCount, uint2 globalIdx )
 {
-    float acc = 0;
-
     float4 depthNormals = normalTex.Load( uint3( globalIdx.x, globalIdx.y, 0 ) );
     
-    if (deptNormals.x >= 1)
+    if (depthNormals.x >= 1)
     {
         return 1;
     }
 
-    float4 projWorldPos = clipToView * float4( globalIdx.x, globalIdx,y, depthNormals.x * 2 - 1, 1 );
+    float4 projWorldPos = clipToView * float4( globalIdx.x, globalIdx.y, depthNormals.x * 2 - 1, 1 );
     float3 worldPos = projWorldPos.xyz / projWorldPos.w;
 
     int num = sampleCount;
     
     for (int i = 0; i < sampleCount; ++i )
     {
-        vec3 p = worldPos + kernelOffsets[ i ] * 10;
-        // float4( kernelOffsets[ i ], 0 )
-        acc += depthNormals.x;
+        float3 p = worldPos + kernelOffsets[ i ] * 10;
+        float4 proj = viewToClip * float4( p, 1 );
+        proj.xy /= proj.w;
+        proj.z = (proj.z - 0.005f) / proj.w;
+        proj.xyz = proj.xyz * 0.5f + 0.5f;
+        float depth = normalTex.Load( uint3( proj.xy * float2( 1920, 1080 ), 0 ) ).x;
+
+        if (depth < proj.z)
+        {
+            --num;
+        }
     }
 
     float ao = float( num ) / float( sampleCount );
-    return acc;
+    return ao;
 }
 
 [numthreads( 8, 8, 1 )]

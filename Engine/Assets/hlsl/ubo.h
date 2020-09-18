@@ -12,6 +12,7 @@ layout( set = 0, binding = 7 ) cbuffer cbPerFrame : register(b0)
     matrix localToWorld;
     matrix localToShadowClip;
     matrix clipToView;
+    matrix viewToClip;
     float4 lightPosition;
     float4 lightDirection;
     float4 lightColor;
