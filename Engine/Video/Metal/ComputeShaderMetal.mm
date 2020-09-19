@@ -63,6 +63,12 @@ void ae3d::ComputeShader::SetTexture2D( unsigned slotIndex, Texture2D* texture )
     }
 }
 
+void ae3d::ComputeShader::SetProjectionMatrix( const struct Matrix44& projection )
+{
+    GfxDeviceGlobal::perObjectUboStruct.viewToClip = projection;
+    Matrix44::Invert( GfxDeviceGlobal::perObjectUboStruct.viewToClip, GfxDeviceGlobal::perObjectUboStruct.clipToView );
+}
+
 void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
 {
     if( uniform == UniformName::TilesZW )

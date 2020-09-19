@@ -18,6 +18,7 @@
 		AB4ADC2A1D8EB2800032CBDD /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB4ADC291D8EB2800032CBDD /* Standard.metal */; };
 		AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */; };
 		AB5C3EBE24D1550000B17AF7 /* example.ogg in Resources */ = {isa = PBXBuildFile; fileRef = AB5C3EBD24D1550000B17AF7 /* example.ogg */; };
+		AB5DB101251630020050A421 /* SSAO.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB5DB100251630020050A421 /* SSAO.metal */; };
 		AB657725200FD3BD0089CB54 /* MetalCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = AB657724200FD3BD0089CB54 /* MetalCommon.h */; };
 		AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7839E31C70CA950065EF51 /* DepthNormals.metal */; };
 		AB8DDA4F22985D0F00630045 /* explosion.wav in Resources */ = {isa = PBXBuildFile; fileRef = AB8DDA4E22985D0F00630045 /* explosion.wav */; };
@@ -80,6 +81,7 @@
 		AB4ADC291D8EB2800032CBDD /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
 		AB5C3EBD24D1550000B17AF7 /* example.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.ogg; path = ../../../../aether3d_build/Samples/example.ogg; sourceTree = "<group>"; };
+		AB5DB100251630020050A421 /* SSAO.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SSAO.metal; path = ../../../Engine/Assets/SSAO.metal; sourceTree = "<group>"; };
 		AB657724200FD3BD0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
 		AB8DDA4E22985D0F00630045 /* explosion.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = explosion.wav; path = ../../../../aether3d_build/Samples/explosion.wav; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB5DB100251630020050A421 /* SSAO.metal */,
 				AB5C3EBD24D1550000B17AF7 /* example.ogg */,
 				ABAB8392235F526200783FA7 /* player.png */,
 				AB8DDA4E22985D0F00630045 /* explosion.wav */,
@@ -434,6 +437,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB5DB101251630020050A421 /* SSAO.metal in Sources */,
 				ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */,
 				AB2BB1402160FA8100454B1E /* Bloom.metal in Sources */,
 				AB657725200FD3BD0089CB54 /* MetalCommon.h in Sources */,

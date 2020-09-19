@@ -41,6 +41,7 @@
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
+#define TEST_SSAO
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -264,7 +265,8 @@ using namespace ae3d;
     Shader standardSkinShader;
     ComputeShader downSampleAndThresholdShader;
     ComputeShader blurShader;
-
+    ComputeShader ssaoShader;
+    
     Texture2D atlasTex;
     Texture2D fontTex;
     Texture2D fontTexSDF;
@@ -286,6 +288,7 @@ using namespace ae3d;
     RenderTexture cubeRT;
     RenderTexture cameraTex;
     RenderTexture camera2dTex;
+    Texture2D ssaoTex;
 #ifdef TEST_BLOOM
     Texture2D bloomTex;
     Texture2D blurTex;
@@ -394,10 +397,8 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &cameraTex );
     //camera3d.GetComponent<ae3d::CameraComponent>()->SetViewport( 0, 0, 640, 480 );
-#ifdef TEST_FORWARD_PLUS
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2,
                                                                                       ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest,  "depthnormals" );
-#endif
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
@@ -476,7 +477,8 @@ using namespace ae3d;
 
     downSampleAndThresholdShader.Load( "downsampleAndThreshold", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     blurShader.Load( "blur", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
-
+    ssaoShader.Load( "ssao", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+    
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
@@ -701,7 +703,8 @@ using namespace ae3d;
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
 #endif
-
+    ssaoTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "ssaoTex" );
+    
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D
     renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
@@ -944,7 +947,15 @@ using namespace ae3d;
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
 #endif
+#ifdef TEST_SSAO
+        ssaoShader.SetRenderTexture( 0, &cameraTex );
+        ssaoShader.SetRenderTexture( 1, &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
+        ssaoShader.SetTexture2D( 2, &ssaoTex );
+        ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
+        ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1 );
 
+        System::Draw( &ssaoTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+#endif
         //scene2.Render();
         Matrix44 viewMat = camera3d.GetComponent< CameraComponent >()->GetView();
         Matrix44 lineTransform;

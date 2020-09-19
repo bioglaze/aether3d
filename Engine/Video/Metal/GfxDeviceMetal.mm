@@ -343,6 +343,9 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
         sampleCount = 1;
     }
     
+    renderer.GenerateSSAOKernel( 64, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+    GfxDeviceGlobal::perObjectUboStruct.kernelSize = 64;
+
     device = metalDevice;
 
     commandQueue = [device newCommandQueue];

@@ -7,6 +7,7 @@ struct Uniforms
     matrix_float4x4 localToWorld;
     matrix_float4x4 localToShadowClip;
     matrix_float4x4 clipToView;
+    matrix_float4x4 viewToClip;
     float4 lightPosition;
     float4 lightDirection;
     float4 lightColor;
@@ -22,6 +23,8 @@ struct Uniforms
     float4 tilesXY;
     matrix_float4x4 boneMatrices[ 80 ];
     int isVR;
+    int kernelSize;
+    float3 kernelOffsets[ 128 ];
 };
 
 static float linstep( float low, float high, float v )
