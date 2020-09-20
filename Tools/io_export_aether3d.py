@@ -137,7 +137,7 @@ class Aether3DExporter( bpy.types.Operator ):
                 self.aabbMax[2] = m.aabbMax[2]
 
 
-    def get_autosmooth_normal(mesh, fop, mesh_vi):
+    def get_autosmooth_normal( self, mesh, fop, mesh_vi ):
         """check if smoothing has to be applied and return the depending normal"""
         ##  is at least one neighbourface smooth, the we return the vertex
         ##  normal(smooth applied), else the face normal will be returned
@@ -162,7 +162,7 @@ class Aether3DExporter( bpy.types.Operator ):
         # normal
         if face.use_smooth:
             if mesh.use_auto_smooth:
-                no = get_autosmooth_normal( mesh, face, face.vertices[ face_vi ] )
+                no = self.get_autosmooth_normal( mesh, face, face.vertices[ face_vi ] )
             else:
                 no = mesh.vertices[ face.vertices[ face_vi ] ].normal
         else:
@@ -206,7 +206,7 @@ class Aether3DExporter( bpy.types.Operator ):
         exportSkeleton = True
         actions = []
         bones = []
-        
+
         for obj in objects:
             if obj.type == "ARMATURE":
                 continue
