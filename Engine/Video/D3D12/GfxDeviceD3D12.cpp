@@ -3,6 +3,7 @@
 #include "GfxDevice.hpp"
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#define D3DX12_NO_STATE_OBJECT_HELPERS
 #include <d3dx12.h>
 #define USE_RGP_MARKERS 0
 #if USE_RGP_MARKERS
@@ -29,7 +30,7 @@
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
 
-int AE3D_CB_SIZE = (D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT * 3 + 80 * 64);
+int AE3D_CB_SIZE = 256 * 3 + 80 * 64 + 128 * 16;
 
 void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp

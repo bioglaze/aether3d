@@ -142,7 +142,7 @@ void ae3d::Shader::Load( const char* vertexSource, const char* fragmentSource )
     Global::shaders.push_back( blobShaderVertex );
     Global::shaders.push_back( blobShaderPixel );
 
-    ReflectVariables();
+    //ReflectVariables();
 }
 
 void ae3d::Shader::Load( const char* /*metalVertexShaderName*/, const char* /*metalFragmentShaderName*/,
@@ -170,7 +170,7 @@ void ae3d::Shader::Load( const char* /*metalVertexShaderName*/, const char* /*me
         Global::shaders.push_back( blobShaderVertex );
         Global::shaders.push_back( blobShaderPixel );
 
-        ReflectVariables();
+        //ReflectVariables();
     }
     else
     {

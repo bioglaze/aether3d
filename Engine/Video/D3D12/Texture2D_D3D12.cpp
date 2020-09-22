@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <d3d12.h>
+#define D3DX12_NO_STATE_OBJECT_HELPERS
 #include <d3dx12.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.c"

@@ -3,6 +3,7 @@
 #include "TextureCube.hpp"
 #include <string>
 #include <vector>
+#define D3DX12_NO_STATE_OBJECT_HELPERS
 #include <d3dx12.h>
 #include "stb_image.c"
 #include "DescriptorHeapManager.hpp"
