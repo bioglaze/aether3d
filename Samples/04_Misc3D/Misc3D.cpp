@@ -134,6 +134,26 @@ int main()
     Texture2D blurTex2;
     blurTex2.CreateUAV( width / 2, height / 2, "blurTex2" );
 
+    Texture2D noiseTex;
+
+    constexpr int noiseDim = 64;
+    Vec4 noiseData[ noiseDim * noiseDim ];
+
+    for (int i = 0; i < noiseDim * noiseDim; ++i)
+    {
+        Vec3 dir = Vec3( (Random100() / 100.0f) * 2 - 1, (Random100() / 100.0f) * 2 - 1, 0 ).Normalized();
+        noiseData[ i ].x = dir.x;
+        noiseData[ i ].y = dir.y;
+        noiseData[ i ].z = dir.z;
+        noiseData[ i ].w = 0;
+    }
+
+#if RENDERER_VULKAN    
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT );
+#else
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData" );    
+#endif
+    
     RenderTexture resolvedTex;
     resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve" );
         
@@ -223,9 +243,6 @@ int main()
     Mesh cubeTangentMesh;
     cubeTangentMesh.Load( FileSystem::FileContents( "tangent_test.ae3d" ) );
 
-    Mesh cubeMeshScaledUV;
-    //cubeMeshScaledUV.Load( FileSystem::FileContents( "cube_scaled_uv.ae3d" ) );
-
     GameObject cube;
     cube.AddComponent< MeshRendererComponent >();
     cube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
@@ -253,13 +270,6 @@ int main()
     childCube.GetComponent< TransformComponent >()->SetLocalPosition( { 3, 0, 0 } );
     childCube.GetComponent< TransformComponent >()->SetParent( rotatingCube.GetComponent< TransformComponent >() );
 
-    GameObject cubeScaledUV;
-    cubeScaledUV.AddComponent< MeshRendererComponent >();
-    cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshScaledUV );
-    cubeScaledUV.AddComponent< TransformComponent >();
-    cubeScaledUV.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -84 } );
-    cubeScaledUV.SetName( "cubeScaledUV" );
-
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
@@ -268,13 +278,6 @@ int main()
 
     Mesh animatedMesh;
     animatedMesh.Load( FileSystem::FileContents( "human_anim_test2.ae3d" ) );
-
-    GameObject cubePTN;
-    cubePTN.AddComponent< MeshRendererComponent >();
-    cubePTN.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMeshPTN );
-    cubePTN.AddComponent< TransformComponent >();
-    cubePTN.GetComponent< TransformComponent >()->SetLocalPosition( { 0, -2, -105 } );
-    cubePTN.SetName( "cubePTN" );
 
 #ifdef TEST_RENDER_TEXTURE_CUBE
     GameObject rtCube;
@@ -302,21 +305,18 @@ int main()
     shaderSkin.Load( "unlitVert", "unlitFrag",
                 FileSystem::FileContents( "unlit_skin_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                 FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
-#ifdef TEST_BLOOM
+
     ComputeShader blurShader;
 	blurShader.Load( "blur", FileSystem::FileContents( "Blur.obj" ), FileSystem::FileContents( "Blur.spv" ) );
 
 	ComputeShader downsampleAndThresholdShader;
 	downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
-#endif
 
-#ifdef TEST_SSAO
     ComputeShader ssaoShader;
 	ssaoShader.Load( "ssao", FileSystem::FileContents( "ssao.obj" ), FileSystem::FileContents( "ssao.spv" ) );
 
     Texture2D ssaoTex;
     ssaoTex.CreateUAV( width, height, "ssaoTex" );
-#endif
     
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
@@ -346,10 +346,8 @@ int main()
 
     cube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    cubePTN.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
 
     childCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    cubeScaledUV.GetComponent< MeshRendererComponent >()->SetMaterial( &materialClamp, 0 );
 
     GameObject copiedCube = cube;
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
@@ -390,8 +388,6 @@ int main()
     spotLight.AddComponent<TransformComponent>();
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -95 }, { 0, 0, -195 }, { 0, 1, 0 } );
     //spotLight.GetComponent<TransformComponent>()->SetParent( lightParent.GetComponent< TransformComponent >() );
-    //cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -95 } );
-    cube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -195 } );
 
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
@@ -403,44 +399,6 @@ int main()
     pointLight.GetComponent<PointLightComponent>()->SetRadius( 1 );
     pointLight.AddComponent<TransformComponent>();
     pointLight.GetComponent<TransformComponent>()->SetLocalPosition( { 2, 0, -98 } );
-    
-#ifdef TEST_SHADOWS_POINT
-    GameObject cube1;
-    cube1.AddComponent< MeshRendererComponent >();
-    cube1.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube1.AddComponent< TransformComponent >();
-    cube1.GetComponent< TransformComponent >()->SetLocalPosition( { -20, 7, -80 } );
-    cube1.GetComponent< TransformComponent >()->SetLocalScale( 5 );
-    
-    GameObject cube2;
-    cube2.AddComponent< MeshRendererComponent >();
-    cube2.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube2.AddComponent< TransformComponent >();
-    cube2.GetComponent< TransformComponent >()->SetLocalPosition( { -30, 17, -80 } );
-    cube2.GetComponent< TransformComponent >()->SetLocalScale( 5 );
-
-    GameObject cube3;
-    cube3.AddComponent< MeshRendererComponent >();
-    cube3.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube3.AddComponent< TransformComponent >();
-    cube3.GetComponent< TransformComponent >()->SetLocalPosition( { -30, 7, -70 } );
-    cube3.GetComponent< TransformComponent >()->SetLocalScale( 5 );
-
-    GameObject cube4;
-    cube4.AddComponent< MeshRendererComponent >();
-    cube4.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    cube4.AddComponent< TransformComponent >();
-    cube4.GetComponent< TransformComponent >()->SetLocalPosition( { -30, 7, -70 } );
-    cube4.GetComponent< TransformComponent >()->SetLocalScale( 5 );
-
-    GameObject smallCube1;
-    smallCube1.AddComponent< MeshRendererComponent >();
-    smallCube1.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-    smallCube1.AddComponent< TransformComponent >();
-    smallCube1.GetComponent< TransformComponent >()->SetLocalPosition( { -25, 2, -80 } );
-    smallCube1.GetComponent< TransformComponent >()->SetLocalScale( 1 );
-
-#endif
 
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
     
@@ -489,8 +447,8 @@ int main()
 #ifdef TEST_SPONZA
     Material pbrMaterial;
     pbrMaterial.SetShader( &standardShader );
-    pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
+    pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
     pbrMaterial.SetTexture( &skybox );
     pbrMaterial.SetBackFaceCulling( true );
@@ -634,22 +592,8 @@ int main()
     scene.Add( &rtCube );
     scene.Add( &cameraCubeRT );
 #endif
-    //scene.Add( &cubeScaledUV );
     scene.Add( &lightParent );
-#ifdef TEST_SHADOWS_POINT
-    cube1.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    cube2.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    cube3.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    cube4.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    smallCube1.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-    scene.Add( &cube1 );
-    scene.Add( &cube2 );
-    scene.Add( &cube3 );
-    scene.Add( &cube4 );
-    scene.Add( &smallCube1 );
-#endif
     scene.Add( &animatedGo );
-    scene.Add( &cubePTN );
     scene.Add( &cubeTangent );
     scene.Add( &childCube );
     //scene.Add( &copiedCube );
@@ -668,49 +612,14 @@ int main()
     scene.Add( &rtCamera );
 #endif
     scene.Add( &transCube1 );
-
-    const int cubeCount = 10;
-    GameObject cubes[ cubeCount ];
-
-    for (int i = 0; i < cubeCount; ++i)
-    {
-        cubes[ i ].AddComponent< MeshRendererComponent >();
-        cubes[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
-        cubes[ i ].AddComponent< TransformComponent >();
-        cubes[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { i * 4.5f - 4, 0, -100 } );
-        cubes[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
-
-        //scene.Add( &cubes[ i ] );
-    }
-
-    cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, -10, -100 } );
-    cubes[ 4 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-
-    cubes[ 5 ].GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, -110 } );
-    cubes[ 5 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-
-    cubes[ 6 ].GetComponent< TransformComponent >()->SetLocalPosition( { -12, -10, -100 } );
-    cubes[ 6 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-
-    cubes[ 7 ].GetComponent< TransformComponent >()->SetLocalPosition( { 12, -10, -100 } );
-    cubes[ 7 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-
-    cubes[ 8 ].GetComponent< TransformComponent >()->SetLocalPosition( { -12, 0, -110 } );
-    cubes[ 8 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-
-    cubes[ 9 ].GetComponent< TransformComponent >()->SetLocalPosition( { 12, 0, -110 } );
-    cubes[ 9 ].GetComponent< TransformComponent >()->SetLocalScale( 6 );
-
-    cubes[ 3 ].GetComponent< TransformComponent >()->SetLocalPosition( { 4, 0, 0 } );
-    cubes[ 3 ].GetComponent< TransformComponent >()->SetParent( cubes[ 2 ].GetComponent< TransformComponent >() );
     
     AudioClip audioClip;
     audioClip.Load( FileSystem::FileContents( "sine340.wav" ) );
     
-    cubes[ 4 ].AddComponent<AudioSourceComponent>();
-    cubes[ 4 ].GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
-    cubes[ 4 ].GetComponent<AudioSourceComponent>()->Set3D( true );
-    //cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
+    cube.AddComponent<AudioSourceComponent>();
+    cube.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
+    cube.GetComponent<AudioSourceComponent>()->Set3D( true );
+    //cube.GetComponent<AudioSourceComponent>()->Play();
 
     bool quit = false;
     
@@ -737,7 +646,7 @@ int main()
         Quaternion rotation;
         Vec3 axis( 0, 1, 0 );
         rotation.FromAxisAngle( axis, angle );
-        cubes[ 2 ].GetComponent< TransformComponent >()->SetLocalRotation( rotation );
+        cube.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
         lightParent.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
         //spotLight.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
@@ -771,8 +680,7 @@ int main()
                 else if (keyCode == KeyCode::Space)
                 {
                     VR::RecenterTracking();
-                    cubes[ 4 ].GetComponent<AudioSourceComponent>()->Play();
-                    cubes[ 3 ].SetEnabled( false );
+                    cube.SetEnabled( false );
                 }
                 else if (keyCode == KeyCode::W)
                 {
