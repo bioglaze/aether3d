@@ -40,7 +40,7 @@
 //#define TEST_BLOOM
 //#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-//#define TEST_SPONZA
+#define TEST_SPONZA
 
 using namespace ae3d;
 
@@ -144,15 +144,16 @@ int main()
         Vec3 dir = Vec3( (Random100() / 100.0f) * 2 - 1, (Random100() / 100.0f) * 2 - 1, 0 ).Normalized();
         noiseData[ i ].x = dir.x;
         noiseData[ i ].y = dir.y;
-        noiseData[ i ].z = dir.z;
+        noiseData[ i ].z = 0;
         noiseData[ i ].w = 0;
     }
 
 #if RENDERER_VULKAN    
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT );
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, true );
 #else
     noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData" );    
 #endif
+    noiseTex.SetLayout( TextureLayout::ShaderRead );
     
     RenderTexture resolvedTex;
     resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve" );
@@ -636,7 +637,8 @@ int main()
     Vec3 moveDir;
 
     bool reload = false;
-
+    bool ssao = true;
+    
     while (Window::IsOpen() && !quit)
     {
         Window::PumpEvents();
@@ -681,6 +683,7 @@ int main()
                 {
                     VR::RecenterTracking();
                     cube.SetEnabled( false );
+                    ssao = !ssao;
                 }
                 else if (keyCode == KeyCode::W)
                 {
@@ -1043,17 +1046,21 @@ int main()
 #endif // Bloom
 
 #ifdef TEST_SSAO
-        ssaoTex.SetLayout( TextureLayout::General );
-        ssaoShader.SetRenderTexture( 0, &cameraTex );
-        ssaoShader.SetRenderTexture( 1, &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
-        ssaoShader.SetTexture2D( 14, &ssaoTex );
-        ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
-        ssaoShader.Begin();
-        ssaoShader.Dispatch( width / 8, height / 8, 1 );
-        ssaoShader.End();
-        ssaoTex.SetLayout( TextureLayout::ShaderRead );
+        if (ssao)
+        {
+            ssaoTex.SetLayout( TextureLayout::General );
+            ssaoShader.SetRenderTexture( 0, &cameraTex );
+            ssaoShader.SetRenderTexture( 1, &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
+            ssaoShader.SetTexture2D( 2, &noiseTex );
+            ssaoShader.SetTexture2D( 14, &ssaoTex );
+            ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
+            ssaoShader.Begin();
+            ssaoShader.Dispatch( width / 8, height / 8, 1 );
+            ssaoShader.End();
+            ssaoTex.SetLayout( TextureLayout::ShaderRead );
 
-        System::Draw( &ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        }
 #endif
 
         scene.EndFrame();

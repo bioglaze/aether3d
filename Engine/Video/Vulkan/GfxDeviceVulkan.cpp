@@ -123,6 +123,7 @@ namespace GfxDeviceGlobal
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
     VkImageView boundViews[ 15 ];
     VkSampler boundSamplers[ 2 ];
+    VkSampler linearRepeat;
     Array< VkBuffer > pendingFreeVBs;
     Array< Ubo > ubos;
     unsigned currentUbo = 0;
@@ -978,6 +979,27 @@ namespace ae3d
         }
 
         System::Assert( depthFormatFound, "No suitable depth format found" );
+
+        VkSamplerCreateInfo samplerInfo = {};
+        samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        samplerInfo.magFilter = VK_FILTER_LINEAR;
+        samplerInfo.minFilter = samplerInfo.magFilter;
+        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerInfo.addressModeV = samplerInfo.addressModeU;
+        samplerInfo.addressModeW = samplerInfo.addressModeU;
+        samplerInfo.mipLodBias = 0;
+        samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
+        samplerInfo.minLod = 0;
+        samplerInfo.maxLod = 1.0f;
+        samplerInfo.maxAnisotropy = 1;
+        samplerInfo.anisotropyEnable = VK_FALSE;
+        samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+        VkResult err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &GfxDeviceGlobal::linearRepeat );
+        AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
+        //Texture2DGlobal::samplersToReleaseAtExit.push_back( GfxDeviceGlobal::linearRepeat );
+
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::linearRepeat, VK_OBJECT_TYPE_SAMPLER, "linearRepeat" );
     }
 
     void CreateFramebufferNonMSAA()
@@ -1600,8 +1622,8 @@ namespace ae3d
     
     void CreateRenderer( int samples )
     {
-        renderer.GenerateSSAOKernel( 64, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
-        GfxDeviceGlobal::perObjectUboStruct.kernelSize = 64;
+        renderer.GenerateSSAOKernel( 32, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+        GfxDeviceGlobal::perObjectUboStruct.kernelSize = 32;
         
         GfxDeviceGlobal::msaaSampleBits = GetSampleBits( samples );
         CreateInstance( &GfxDeviceGlobal::instance );
@@ -2087,7 +2109,7 @@ void ae3d::GfxDevice::BeginFrame()
     GfxDeviceGlobal::boundViews[ 11 ] = Texture2D::GetDefaultTexture()->GetView();
     GfxDeviceGlobal::boundViews[ 14 ] = Texture2D::GetDefaultTextureUAV()->GetView();
     GfxDeviceGlobal::boundSamplers[ 0 ] = Texture2D::GetDefaultTexture()->GetSampler();
-    GfxDeviceGlobal::boundSamplers[ 1 ] = GfxDeviceGlobal::boundSamplers[ 0 ];
+    GfxDeviceGlobal::boundSamplers[ 1 ] = GfxDeviceGlobal::linearRepeat;
 }
 
 void SubmitQueue()

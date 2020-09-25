@@ -33,7 +33,9 @@ struct PerObjectUboStruct
     ae3d::Matrix44 boneMatrices[ 80 ];
     int isVR = 0;
     int kernelSize;
-    ae3d::Vec3 kernelOffsets[ 128 ];
+    int pad0;
+    int pad1;
+    ae3d::Vec4 kernelOffsets[ 64 ];
 };
 
 namespace ae3d

@@ -9,7 +9,7 @@ namespace ae3d
 {
     class TextureCube;
     class CameraComponent;
-    struct Vec3;
+    struct Vec4;
     
     struct BuiltinShaders
     {
@@ -37,7 +37,7 @@ namespace ae3d
         void GenerateQuadBuffer();
         void GenerateSkybox();
         void GenerateTextures();
-        void GenerateSSAOKernel( int count, Vec3* outKernel );
+        void GenerateSSAOKernel( int count, Vec4* outKernel );
         void RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera );
 
         Texture2D& GetWhiteTexture() { return whiteTexture; }

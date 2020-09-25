@@ -57,7 +57,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkImageView& GetView() { return view; }
         VkImage& GetImage() { return image; }
-        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, VkImageUsageFlags usageFlags );
+        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, VkImageUsageFlags usageFlags, bool isFloat );
 #else
         /// \param imageData Raw pixel data
         /// \param width Width in pixels

@@ -24,7 +24,9 @@ struct Uniforms
     matrix_float4x4 boneMatrices[ 80 ];
     int isVR;
     int kernelSize;
-    float3 kernelOffsets[ 128 ];
+    int pad0;
+    int pad1;
+    float4 kernelOffsets[ 64 ];
 };
 
 static float linstep( float low, float high, float v )

@@ -68,7 +68,7 @@ void ae3d::Texture2D::DestroyTextures()
     }
 }
 
-void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName, VkImageUsageFlags usageFlags )
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName, VkImageUsageFlags usageFlags, bool isFloat )
 {
     width = aWidth;
     height = aHeight;
@@ -76,8 +76,15 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     filter = TextureFilter::Linear;
     opaque = channels == 3;
 
-    CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::Linear ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
-
+    if (isFloat)
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 4 * 4, VK_FORMAT_R32G32B32A32_SFLOAT, usageFlags );
+    }
+    else
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::Linear ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
+    }
+    
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_OBJECT_TYPE_IMAGE_VIEW, debugName );
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, debugName );
 }
@@ -379,7 +386,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
 
 void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName )
 {
-    LoadFromData( nullptr, aWidth, aHeight, 4, debugName, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT );
+    LoadFromData( nullptr, aWidth, aHeight, 4, debugName, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, false );
 }
 
 void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
@@ -793,7 +800,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
             imageData[ i ] = 0xFF;
         }
 
-        Texture2DGlobal::defaultTexture.LoadFromData( imageData, 32, 32, 4, "default texture 2d", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
+        Texture2DGlobal::defaultTexture.LoadFromData( imageData, 32, 32, 4, "default texture 2d", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, false );
     }
 
     return &Texture2DGlobal::defaultTexture;
@@ -811,7 +818,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTextureUAV()
         }
 
         Texture2DGlobal::defaultTextureUAV.LoadFromData( imageData, 32, 32, 4, "default texture 2d UAV",
-                                                         VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT );
+                                                         VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, false );
     }
 
     return &Texture2DGlobal::defaultTextureUAV;

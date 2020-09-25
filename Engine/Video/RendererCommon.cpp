@@ -32,19 +32,23 @@ void ae3d::Renderer::GenerateTextures()
     whiteTexture.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 }
 
-void ae3d::Renderer::GenerateSSAOKernel( int count, ae3d::Vec3* outKernel )
+void ae3d::Renderer::GenerateSSAOKernel( int count, ae3d::Vec4* outKernel )
 {
     for (int i = 0; i < count; ++i)
     {
-        outKernel[ i ] = Vec3(
+        Vec3 v = Vec3(
             MathUtil::Random( -1.0f, 1.0f ),
             MathUtil::Random( -1.0f, 1.0f ),
             MathUtil::Random( 0.0f, 1.0f )
             ).Normalized();
-
         // Distributes the samples so that there are more near the origin.
         float scale = (float)i / (float)count;
-        outKernel[ i ] *= MathUtil::Lerp( 0.1f, 1.0f, scale * scale );
+        v *= MathUtil::Lerp( 0.1f, 1.0f, scale * scale );
+
+        outKernel[ i ].x = v.x;
+        outKernel[ i ].y = v.y;
+        outKernel[ i ].z = v.z;
+        outKernel[ i ].w = 1;
     }
 }
 
