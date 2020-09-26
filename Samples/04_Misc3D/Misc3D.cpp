@@ -40,7 +40,7 @@
 //#define TEST_BLOOM
 //#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#define TEST_SPONZA
+//#define TEST_SPONZA
 
 using namespace ae3d;
 
@@ -1049,10 +1049,27 @@ int main()
         if (ssao)
         {
             ssaoTex.SetLayout( TextureLayout::General );
+#if RENDERER_D3D12
+            GpuResource nullResource = {};
+            ssaoShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
+            ssaoShader.SetSRV( 1, camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetGpuResource()->resource, *camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetSRVDesc() );
+            ssaoShader.SetSRV( 2, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
+            //blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoShader.SetUAV( 0, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() ); // Unused, but must exist
+            ssaoShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
+#else
             ssaoShader.SetRenderTexture( 0, &cameraTex );
             ssaoShader.SetRenderTexture( 1, &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
             ssaoShader.SetTexture2D( 2, &noiseTex );
             ssaoShader.SetTexture2D( 14, &ssaoTex );
+#endif
             ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
             ssaoShader.Begin();
             ssaoShader.Dispatch( width / 8, height / 8, 1 );

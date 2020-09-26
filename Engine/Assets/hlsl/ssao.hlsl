@@ -54,7 +54,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
 #else
 
-float ssao( float3x3 kernelBasis, float3 originPos, float radius, int kernelSize )
+float ssao( float3x3 kernelBasis, float3 originPos, float radius, int kernelSize, uint3 globalIdx )
 {
     float occlusion = 0.0f;
 
@@ -67,9 +67,15 @@ float ssao( float3x3 kernelBasis, float3 originPos, float radius, int kernelSize
         float4 offset = mul( viewToClip, float4( samplePos, 1.0f ) );
         offset.xy /= offset.w; // only need xy
         offset.xy = offset.xy * 0.5f + 0.5f; // scale/bias to texcoords
-        offset.y = 1 - offset.y;
+#if !VULKAN
 
-        float sampleDepth = -normalTex.Sample( sLinear, offset.xy ).r;
+#else
+        offset.y = 1 - offset.y;
+#endif
+        //float sampleDepth = -normalTex.Sample( sLinear, offset.xy ).r;
+        int depthWidth, depthHeight;
+        normalTex.GetDimensions( depthWidth, depthHeight );
+        float sampleDepth = -normalTex.Load( uint3( offset.xy * float2( depthWidth, depthHeight ), 0 ), 0 ).r;
 
         float rangeCheck = smoothstep( 0.0f, 1.0f, radius / abs( originPos.z - sampleDepth ) );
         occlusion += rangeCheck * step( sampleDepth, samplePos.z );
@@ -93,7 +99,8 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
     float2 uv = float2( globalIdx.xy ) / float2( depthWidth, depthHeight );
     // get view space origin:
-    float originDepth = -normalTex.Sample( sLinear, uv ).r;
+    //float originDepth = -normalTex.Sample( sLinear, uv ).r;
+    float originDepth = -normalTex.Load( uint3( globalIdx.xy, 0 ), 0 ).r;
     float uTanHalfFov = tan( 45.0f * 0.5f * (3.14159f / 180.0f) );
     float uAspectRatio = depthWidth / (float)depthHeight;
     float2 xy = uv * 2 - 1;
@@ -103,7 +110,8 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float3 originPos = viewDirection * originDepth;
 
     // get view space normal:
-    float3 normal = -normalize( normalTex.Sample( sLinear, uv ).gba );
+    //float3 normal = -normalize( normalTex.Sample( sLinear, uv ).gba );
+    float3 normal = -normalize( normalTex.Load( uint3( globalIdx.xy, 0 ), 0 ).gba );
 
     // construct kernel basis matrix:
     //float3 rvec = normalize( specularTex.Sample( sampler1, noiseTexCoords ).rgb );
@@ -112,7 +120,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float3 bitangent = cross( tangent, normal );
     float3x3 kernelBasis = float3x3( tangent, bitangent, normal );
 
-    float s = ssao( kernelBasis, originPos, 2.2f, 32 );
+    float s = ssao( kernelBasis, originPos, 2.2f, 32, globalIdx );
     float4 color = tex.Load( uint3( globalIdx.x, globalIdx.y, 0 ) );
 
     rwTexture[ globalIdx.xy ] = color * s;

@@ -60,6 +60,12 @@ void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
     }
 }
 
+void ae3d::ComputeShader::SetProjectionMatrix( const struct Matrix44& projection )
+{
+    GfxDeviceGlobal::perObjectUboStruct.viewToClip = projection;
+    Matrix44::Invert( GfxDeviceGlobal::perObjectUboStruct.viewToClip, GfxDeviceGlobal::perObjectUboStruct.clipToView );
+}
+
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
 {
     static int heapIndex = 0;
