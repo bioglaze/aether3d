@@ -343,8 +343,10 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
         sampleCount = 1;
     }
     
-    renderer.GenerateSSAOKernel( 64, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
-    GfxDeviceGlobal::perObjectUboStruct.kernelSize = 64;
+    renderer.GenerateSSAOKernel( 32, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+    GfxDeviceGlobal::perObjectUboStruct.kernelSize = 32;
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = aView.bounds.size.width * 2;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = aView.bounds.size.height * 2;
 
     device = metalDevice;
 

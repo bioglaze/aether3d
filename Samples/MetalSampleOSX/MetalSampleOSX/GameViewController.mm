@@ -41,7 +41,7 @@
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
-#define TEST_SSAO
+//#define TEST_SSAO
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -225,13 +225,6 @@ using namespace ae3d;
     GameObject renderTextureContainer;
     GameObject cubePTN; // vertex format: position, texcoord, normal
     GameObject cubePTN2;
-    GameObject standardCubeBL; // bottom left
-    GameObject standardCubeTL;
-    GameObject standardCubeTL2;
-    GameObject standardCubeTopCenter;
-    GameObject standardCubeSpotReceiver;
-    GameObject standardCubeBR;
-    GameObject standardCubeTR;
     GameObject spriteContainer;
     GameObject cameraCubeRT;
     GameObject animatedGo;
@@ -281,6 +274,11 @@ using namespace ae3d;
     Texture2D pbrNormalTex;
     Texture2D pbrRoughnessTex;
     Texture2D playerTex;
+    Texture2D noiseTex;
+    Texture2D ssaoTex;
+    Texture2D bloomTex;
+    Texture2D blurTex;
+    Texture2D blurTex2;
 
     TextureCube skyTex;
 
@@ -288,12 +286,7 @@ using namespace ae3d;
     RenderTexture cubeRT;
     RenderTexture cameraTex;
     RenderTexture camera2dTex;
-    Texture2D ssaoTex;
-#ifdef TEST_BLOOM
-    Texture2D bloomTex;
-    Texture2D blurTex;
-    Texture2D blurTex2;
-#endif
+    
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
@@ -370,6 +363,20 @@ using namespace ae3d;
         scene.Add( &sponzaGameObjects[ i ] );
     }
 #endif
+
+    constexpr int noiseDim = 64;
+    Vec4 noiseData[ noiseDim * noiseDim ];
+
+    for (int i = 0; i < noiseDim * noiseDim; ++i)
+    {
+        Vec3 dir = Vec3( (Random100() / 100.0f) * 2 - 1, (Random100() / 100.0f) * 2 - 1, 0 ).Normalized();
+        noiseData[ i ].x = dir.x;
+        noiseData[ i ].y = dir.y;
+        noiseData[ i ].z = 0;
+        noiseData[ i ].w = 0;
+    }
+
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData" );
 
     cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, RenderTexture::DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
     ae3d::System::Print( "width: %f, height: %f\n", self.view.bounds.size.width, self.view.bounds.size.height );
@@ -549,49 +556,6 @@ using namespace ae3d;
     rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { -5, 2, -85 } );
     rtCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
 
-    standardCubeBL.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeBL.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeBL.AddComponent<ae3d::TransformComponent>();
-    standardCubeBL.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -4, -4, -10 ) );
-
-    standardCubeTL.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeTL.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeTL.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeTL.AddComponent<ae3d::TransformComponent>();
-    standardCubeTL.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -4, 4, -10 ) );
-
-    standardCubeTL2.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeTL2.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeTL2.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeTL2.AddComponent<ae3d::TransformComponent>();
-    standardCubeTL2.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -2, 4, -10 ) );
-
-    standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
-    //standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
-
-    standardCubeSpotReceiver.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeSpotReceiver.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeSpotReceiver.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeSpotReceiver.AddComponent<ae3d::TransformComponent>();
-    standardCubeSpotReceiver.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
-
-    standardCubeTR.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeTR.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeTR.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeTR.AddComponent<ae3d::TransformComponent>();
-    standardCubeTR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 4, 4, -10 ) );
-
-    standardCubeBR.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeBR.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeBR.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeBR.AddComponent<ae3d::TransformComponent>();
-    standardCubeBR.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 6, -4, -10 ) );
-
     cubeMeshPTN.Load( ae3d::FileSystem::FileContents( "textured_cube_ptn.ae3d" ) );
     cubePTN.AddComponent<ae3d::MeshRendererComponent>();
     cubePTN.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMeshPTN );
@@ -703,7 +667,7 @@ using namespace ae3d;
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
 #endif
-    ssaoTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "ssaoTex" );
+    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex" );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D
@@ -734,16 +698,8 @@ using namespace ae3d;
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
 
 #ifdef TEST_FORWARD_PLUS
-    //scene.Add( &standardCubeBR );
-    //scene.Add( &standardCubeBL );
-    //scene.Add( &standardCubeTR );
-    //scene.Add( &standardCubeTL2 );
-    //scene.Add( &standardCubeTopCenter );
-    //scene.Add( &standardCubeSpotReceiver );
-    //scene.Add( &standardCubeTL );
     scene.Add( &pbrCube );
 #endif
-    //scene.Add( &bigCube );
     //scene.Add( &cubePTN2 );
     //scene.Add( &cubePTN );
     //scene.Add( &rtCube );
@@ -752,8 +708,6 @@ using namespace ae3d;
     scene.Add( &spriteContainer );
     scene.Add( &textSDF );
     scene.Add( &text );
-    //scene.Add( &bigCube2 );
-    //scene.Add( &bigCube3 );
     scene.Add( &animatedGo );
 #ifdef TEST_SHADOWS_POINT
     scene.Add( &pointLight );
@@ -1055,9 +1009,6 @@ using namespace ae3d;
     }
 
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9.8f, 0, -85 ) );
-
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -85 ) );
-    standardCubeSpotReceiver.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -10, 0, -90 ) );
 
     camera3d.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
     camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
