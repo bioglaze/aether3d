@@ -3,6 +3,7 @@ REM SET COMPILER=dxc
 
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /Fo ..\..\..\aether3d_build\Samples\depthnormals_frag.obj hlsl\depthnormals_frag.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\depthnormals_vert.obj hlsl\depthnormals_vert.hlsl
+%COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\depthnormals_skin_vert.obj hlsl\depthnormals_skin_vert.hlsl
 
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /Fo ..\..\..\aether3d_build\Samples\moments_frag.obj hlsl\moments_frag.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\moments_vert.obj hlsl\moments_vert.hlsl

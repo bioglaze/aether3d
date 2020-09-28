@@ -11,6 +11,7 @@
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\skybox_vert.hlsl -o ..\..\..\aether3d_build\Samples\skybox_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\skybox_frag.hlsl -o ..\..\..\aether3d_build\Samples\skybox_frag.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\depthnormals_vert.hlsl -o ..\..\..\aether3d_build\Samples\depthnormals_vert.spv
+%VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\depthnormals_skin_vert.hlsl -o ..\..\..\aether3d_build\Samples\depthnormals_skin_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\depthnormals_frag.hlsl -o ..\..\..\aether3d_build\Samples\depthnormals_frag.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\LightCuller.hlsl -o ..\..\..\aether3d_build\Samples\LightCuller.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\Standard_vert.hlsl -o ..\..\..\aether3d_build\Samples\Standard_vert.spv
