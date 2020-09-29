@@ -808,9 +808,9 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
         auto meshRenderer = gameObjects[ j ]->GetComponent< MeshRendererComponent >();
 
         meshRenderer->Cull( frustum, meshLocalToWorld );
-        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Opaque );
+        meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader, &renderer.builtinShaders.depthNormalsSkinShader, MeshRendererComponent::RenderType::Opaque );
         meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.depthNormalsShader,
-                             &renderer.builtinShaders.depthNormalsShader, MeshRendererComponent::RenderType::Transparent );
+                             &renderer.builtinShaders.depthNormalsSkinShader, MeshRendererComponent::RenderType::Transparent );
     }
 
     GfxDevice::PopGroupMarker();

@@ -21,6 +21,7 @@ namespace ae3d
         Shader momentsShader;
         Shader momentsSkinShader;
         Shader depthNormalsShader;
+        Shader depthNormalsSkinShader;
         Shader uiShader;
         ComputeShader lightCullShader;
     };

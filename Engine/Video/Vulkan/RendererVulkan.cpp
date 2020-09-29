@@ -11,5 +11,6 @@ void ae3d::BuiltinShaders::Load()
     momentsShader.LoadSPIRV( FileSystem::FileContents( "moments_vert.spv" ), FileSystem::FileContents( "moments_frag.spv" ) );
     momentsSkinShader.LoadSPIRV( FileSystem::FileContents( "moments_skin_vert.spv" ), FileSystem::FileContents( "moments_frag.spv" ) );
     depthNormalsShader.LoadSPIRV( FileSystem::FileContents( "depthnormals_vert.spv" ), FileSystem::FileContents( "depthnormals_frag.spv" ) );
+    depthNormalsSkinShader.LoadSPIRV( FileSystem::FileContents( "depthnormals_skin_vert.spv" ), FileSystem::FileContents( "depthnormals_frag.spv" ) );
     uiShader.LoadSPIRV( FileSystem::FileContents( "sprite_vert.spv" ), FileSystem::FileContents( "sprite_frag.spv" ) );
 }

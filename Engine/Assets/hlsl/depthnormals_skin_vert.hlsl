@@ -13,7 +13,7 @@ struct VSOutput
 
 #include "ubo.h"
 
-VSOutput main( float3 pos : POSITION, float3 normal : NORMAL, float4 boneWeights : WEIGHTS, uint4 boneIndex : BONES )
+VSOutput main( float3 pos : POSITION, float2 uv : TEXCOORD, float3 normal : NORMAL, float4 tangent : TANGENT, float4 color : COLOR, float4 boneWeights : WEIGHTS, uint4 boneIndex : BONES )
 {
     VSOutput vsOut;
     float4 position2 = mul( boneMatrices[ boneIndex.x ], float4( pos, 1.0f ) ) * boneWeights.x;

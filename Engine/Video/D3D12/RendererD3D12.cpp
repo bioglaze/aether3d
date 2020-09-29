@@ -12,6 +12,7 @@ void ae3d::BuiltinShaders::Load()
     momentsShader.Load( "", "", FileSystem::FileContents( "moments_vert.obj" ), FileSystem::FileContents( "moments_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
     momentsSkinShader.Load( "", "", FileSystem::FileContents( "moments_skin_vert.obj" ), FileSystem::FileContents( "moments_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
     depthNormalsShader.Load( "", "", FileSystem::FileContents( "depthnormals_vert.obj" ), FileSystem::FileContents( "depthnormals_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    depthNormalsSkinShader.Load( "", "", FileSystem::FileContents( "depthnormals_skin_vert.obj" ), FileSystem::FileContents( "depthnormals_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
     uiShader.Load( "", "", FileSystem::FileContents( "sprite_vert.obj" ), FileSystem::FileContents( "sprite_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
 
     lightCullShader.Load( "", FileSystem::FileContents( "LightCuller.obj" ), FileSystem::FileContents( "" ) );
