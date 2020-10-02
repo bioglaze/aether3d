@@ -122,21 +122,23 @@ vertex StandardColorInOut standard_skin_vertex( StandardVertexSkin vert [[stage_
                                     uniforms.boneMatrices[ vert.boneIndex.z ] * vert.boneWeights.z +
                                     uniforms.boneMatrices[ vert.boneIndex.w ] * vert.boneWeights.w;
     
-    float4 in_position = boneTransform * float4( vert.position, 1.0 );
-
-    out.position = uniforms.localToClip * in_position;
-    out.positionVS = (uniforms.localToView * in_position).xyz;
-    out.positionWS = (uniforms.localToWorld * in_position).xyz;
+    float4 skinnedPposition = boneTransform * float4( vert.position, 1.0f );
+    float4 skinnedNormal = boneTransform * float4( vert.normal, 0.0f );
+    float4 skinnedTangent = boneTransform * float4( vert.tangent.xyz, 0.0f );
+    
+    out.position = uniforms.localToClip * skinnedPposition;
+    out.positionVS = (uniforms.localToView * skinnedPposition).xyz;
+    out.positionWS = (uniforms.localToWorld * skinnedPposition).xyz;
     
     out.color = half4( vert.color );
-    out.projCoord = uniforms.localToShadowClip * in_position;
+    out.projCoord = uniforms.localToShadowClip * skinnedPposition;
     
-    out.tangentVS_u.xyz = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
+    out.tangentVS_u.xyz = (uniforms.localToView * float4( skinnedTangent.xyz, 0 )).xyz;
     out.tangentVS_u.w = vert.texcoord.x;
-    float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
+    float3 ct = cross( skinnedNormal.xyz, skinnedTangent.xyz ) * vert.tangent.w;
     out.bitangentVS_v.xyz = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
     out.bitangentVS_v.w = vert.texcoord.y;
-    out.normalVS = (uniforms.localToView * float4( vert.normal, 0 )).xyz;
+    out.normalVS = (uniforms.localToView * skinnedNormal).xyz;
     
     return out;
 }
