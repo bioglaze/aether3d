@@ -4,13 +4,13 @@
 
 template< typename T > struct Array
 {
-    Array() {}
+    Array() noexcept {}
     
     explicit Array( unsigned elementCount ) { Allocate( elementCount );  }
 
     Array( const Array<T>& other ) { *this = other; }
 
-    ~Array()
+    ~Array() noexcept
     {
         delete[] elements;
         elements = nullptr;
