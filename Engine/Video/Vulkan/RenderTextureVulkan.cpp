@@ -96,17 +96,17 @@ void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
     SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
         GetColorImage(),
         VK_IMAGE_ASPECT_COLOR_BIT,
-        layout,
+        color.layout,
         aLayout,
         1, 0, 1 );
 
-    layout = aLayout;
+    color.layout = aLayout;
 }
 
 void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
 {    
     GfxDevice::EndRenderPass();
-    layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // Ending render pass sets layout to this, so track it.
+    color.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // Ending render pass sets layout to this, so track it.
 
     SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
     target->SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
@@ -134,7 +134,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     GfxDevice::BeginRenderPass();
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -150,14 +150,6 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isRenderTexture = true;
     dataType = aDataType;
     handle = 1;
-    // FIXME: This is a horrible hack :-(
-    bool isMultisampled = !debugName || strstr( debugName, "resolve" ) == nullptr;
-   
-    if (strstr( debugName, "shadow" ) != nullptr)
-    {
-        isMultisampled = false;
-    }
-
     sampleCount = isMultisampled ? (int)GfxDeviceGlobal::msaaSampleBits : 1;
     
     // Color

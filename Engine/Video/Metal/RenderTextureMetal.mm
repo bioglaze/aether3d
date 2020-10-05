@@ -2,7 +2,7 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool /* isMultisampled */ )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {

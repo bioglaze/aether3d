@@ -33,7 +33,7 @@ void ae3d::SpotLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     {
         someLightCastsShadow = true;
         cachedShadowMapSize = mapSize;
-        shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "spotlight shadow" );
+        shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "spotlight shadow", false );
     }
 }
 

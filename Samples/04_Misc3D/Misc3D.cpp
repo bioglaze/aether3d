@@ -29,8 +29,8 @@
 
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip
 
+#define TEST_MSAA
 //#define TEST_RENDER_TEXTURE_2D
-//#define TEST_MSAA
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
@@ -40,7 +40,7 @@
 //#define TEST_BLOOM
 //#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-//#define TEST_SPONZA
+#define TEST_SPONZA
 
 using namespace ae3d;
 
@@ -123,7 +123,11 @@ int main()
 #endif
 
     RenderTexture cameraTex;
-    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+#ifdef TEST_MSAA
+    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", true );
+#else
+    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", false );
+#endif
 
     Texture2D bloomTex;
     bloomTex.CreateUAV( width / 2, height / 2, "bloomTex" );
@@ -156,16 +160,16 @@ int main()
     noiseTex.SetLayout( TextureLayout::ShaderRead );
     
     RenderTexture resolvedTex;
-    resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve" );
+    resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
         
     RenderTexture camera2dTex;
-    camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
+    camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
 
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
-    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
 #ifndef AE3D_OPENVR
@@ -537,7 +541,7 @@ int main()
     
     RenderTexture rtTex;
     const auto dataType = camera2d.GetComponent<CameraComponent>()->GetTargetTexture() != nullptr ? RenderTexture::DataType::Float : RenderTexture::DataType::UByte;
-    rtTex.Create2D( 512, 512, dataType, TextureWrap::Clamp, TextureFilter::Linear, "rtTex" );
+    rtTex.Create2D( 512, 512, dataType, TextureWrap::Clamp, TextureFilter::Linear, "rtTex", false );
     
     GameObject renderTextureContainer;
     renderTextureContainer.SetName( "renderTextureContainer" );

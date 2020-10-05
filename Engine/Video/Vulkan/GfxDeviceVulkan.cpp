@@ -1202,6 +1202,8 @@ namespace ae3d
 
         VkResult err = vkCreateRenderPass( GfxDeviceGlobal::device, &renderPassInfo, nullptr, &GfxDeviceGlobal::renderPass );
         AE3D_CHECK_VULKAN( err, "vkCreateRenderPass" );
+
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::renderPass, VK_OBJECT_TYPE_RENDER_PASS, "renderPass MSAA" );
     }
 
     void CreateDepthStencil()
