@@ -173,7 +173,7 @@ int main()
     System::InitGamePad();
 
     RenderTexture cameraTex;
-    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", true );
 
     Texture2D bloomTex;
     bloomTex.CreateUAV( width / 2, height / 2, "bloomTex" );
@@ -182,10 +182,10 @@ int main()
 	blurTex.CreateUAV( width / 2, height / 2, "blurTex" );
 
     RenderTexture resolvedTex;
-    resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve" );
+    resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
         
     RenderTexture camera2dTex;
-    camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex" );
+    camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
 
     nk_context ctx;
     nk_font_atlas atlas;
@@ -201,7 +201,7 @@ int main()
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
 #if RENDERER_VULKAN
-    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
+    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, false );
 #else
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
 #endif
@@ -216,7 +216,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
-    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals" );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
     camera.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
@@ -350,7 +350,7 @@ int main()
         spheres[ i ].GetComponent< MeshRendererComponent >()->SetMesh( &sphereMesh );
         spheres[ i ].GetComponent< MeshRendererComponent >()->SetMaterial( &sphereMaterials[ i ], 0 );
         spheres[ i ].AddComponent< TransformComponent >();
-        spheres[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { float( i ) * 3, 6, -88 } );
+        spheres[ i ].GetComponent< TransformComponent >()->SetLocalPosition( { float( i ) * 3, 2, -28 } );
     }
 
     scene.SetSkybox( &skybox );
