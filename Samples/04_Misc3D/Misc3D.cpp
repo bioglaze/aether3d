@@ -29,14 +29,14 @@
 
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip
 
-#define TEST_MSAA
+constexpr bool TestMSAA = false;
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
-//#define TEST_FORWARD_PLUS
+constexpr bool TestForwardPlus = false;
 //#define TEST_BLOOM
 //#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
@@ -93,11 +93,15 @@ int main()
     }
     
     System::EnableWindowsMemleakDetection();
-#ifdef TEST_MSAA
-    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::MSAA4 );
-#else
-    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
-#endif
+    if (TestMSAA)
+    {
+        Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::MSAA4 );
+    }
+    else
+    {
+        Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
+    }
+
     Window::GetSize( width, height );
     
     if (fullScreen)
@@ -123,11 +127,7 @@ int main()
 #endif
 
     RenderTexture cameraTex;
-#ifdef TEST_MSAA
-    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", true );
-#else
-    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", false );
-#endif
+    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA );
 
     Texture2D bloomTex;
     bloomTex.CreateUAV( width / 2, height / 2, "bloomTex" );
@@ -426,7 +426,6 @@ int main()
     rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
 #endif
 
-#ifdef TEST_FORWARD_PLUS
     Shader standardShader;
     standardShader.Load( "standard_vertex", "standard_fragment",
         ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
@@ -449,43 +448,46 @@ int main()
     standardSkinMaterial.SetTexture( &playerTex, 1 );
     standardSkinMaterial.SetTexture( &skybox );
 
-#ifdef TEST_SPONZA
-    Material pbrMaterial;
-    pbrMaterial.SetShader( &standardShader );
-    pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
-    pbrMaterial.SetTexture( &pbrNormalTex, 1 );
-    //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
-    pbrMaterial.SetTexture( &skybox );
-    pbrMaterial.SetBackFaceCulling( true );
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
-    rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
-    rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
+    constexpr int PointLightCount = 50 * 40;
 
+    Material pbrMaterial;
     Material materialTangent;
-    materialTangent.SetShader( &standardShader );
-    materialTangent.SetTexture( &normalTex, 1 );
-    materialTangent.SetTexture( &whiteTex, 0 );
-    cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
+    GameObject standardCubeTopCenter;
+    GameObject pointLights[ PointLightCount ];
+
+#ifdef TEST_SPONZA
+    if (TestForwardPlus)
+    {
+        pbrMaterial.SetShader( &standardShader );
+        pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
+        pbrMaterial.SetTexture( &pbrNormalTex, 1 );
+        //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
+        pbrMaterial.SetTexture( &skybox );
+        pbrMaterial.SetBackFaceCulling( true );
+        rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
+        rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
+        rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
+
+        materialTangent.SetShader( &standardShader );
+        materialTangent.SetTexture( &normalTex, 1 );
+        materialTangent.SetTexture( &whiteTex, 0 );
+        cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
+    }
 #endif
 
-    GameObject standardCubeTopCenter;
-    standardCubeTopCenter.SetName( "standardCubeTopCenter" );
-    standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
-    standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 5, -120 ) );
-    standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
-    scene.Add( &standardCubeTopCenter );
-
-    const int POINT_LIGHT_COUNT = 50 * 40;
-    
-    GameObject pointLights[ POINT_LIGHT_COUNT ];
-    
-    // Inits point lights for Forward+
+    if (TestForwardPlus)
     {
-        int pointLightIndex = 0;
-        
+        standardCubeTopCenter.SetName( "standardCubeTopCenter" );
+        standardCubeTopCenter.AddComponent<ae3d::MeshRendererComponent>();
+        standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
+        standardCubeTopCenter.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &standardMaterial, 0 );
+        standardCubeTopCenter.AddComponent<ae3d::TransformComponent>();
+        standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 5, -120 ) );
+        standardCubeTopCenter.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
+        scene.Add( &standardCubeTopCenter );
+    
+        // Inits point lights for Forward+
+        int pointLightIndex = 0;        
 
         for (int row = 0; row < 50; ++row)
         {
@@ -501,15 +503,14 @@ int main()
                 ++pointLightIndex;
             }
         }
+
+        animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &standardSkinMaterial, 0 );
     }
-#endif
-
-#ifdef TEST_FORWARD_PLUS
-    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &standardSkinMaterial, 0 );
-#else
-    animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &materialSkin, 0 );
-#endif
-
+    else
+    {
+        animatedGo.GetComponent< MeshRendererComponent >()->SetMaterial( &materialSkin, 0 );
+    }
+    
     std::vector< GameObject > sponzaGameObjects;
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
@@ -524,12 +525,15 @@ int main()
 
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
-#ifdef TEST_FORWARD_PLUS
-        mat.second->SetShader( &standardShader );
-        mat.second->SetTexture( &skybox );
-#else
-        mat.second->SetShader( &shader );
-#endif
+        if (TestForwardPlus)
+        {
+            mat.second->SetShader( &standardShader );
+            mat.second->SetTexture( &skybox );
+        }
+        else
+        {
+            mat.second->SetShader( &shader );
+        }
     }
     
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
@@ -589,9 +593,12 @@ int main()
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
-#if !defined( AE3D_OPENVR ) && !defined( TEST_MSAA )
-    scene.Add( &camera2d );
-    scene.Add( &statsContainer );
+#if !defined( AE3D_OPENVR )
+    if (!TestMSAA)
+    {
+        scene.Add( &camera2d );
+        scene.Add( &statsContainer );
+    }
 #endif
 #ifdef TEST_RENDER_TEXTURE_CUBE
     scene.Add( &rtCube );
@@ -829,24 +836,25 @@ int main()
             statsContainer.GetComponent<TextRendererComponent>()->SetText( statStr );
         }
         
-#ifdef TEST_FORWARD_PLUS
-        static float y = -14;
-        y += 0.1f;
-
-        if (y > 30)
+        if (TestForwardPlus)
         {
-            y = -14;
-        }
+            static float y = -14;
+            y += 0.1f;
 
-        for (int pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
-        {
-            const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
-            const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-            const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+            if (y > 30)
+            {
+                y = -14;
+            }
+
+            for (int pointLightIndex = 0; pointLightIndex < PointLightCount; ++pointLightIndex)
+            {
+                const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
+                const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+                const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
             
-            pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+                pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
+            }
         }
-#endif
 #if defined( AE3D_OPENVR )
         VR::CalcEyePose();
         
@@ -862,10 +870,18 @@ int main()
             reload = false;
         }
         scene.Render();
-#if defined( TEST_MSAA ) && defined( RENDERER_VULKAN )
-        cameraTex.ResolveTo( &resolvedTex );
-        System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        //System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+#if defined( RENDERER_VULKAN )
+        if (TestMSAA)
+        {
+            cameraTex.ResolveTo( &resolvedTex );
+            System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            //System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        }
+        else
+        {
+            System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        }
 #else
         System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
@@ -892,11 +908,15 @@ int main()
 #else
         blurTex.SetLayout( TextureLayout::General );
 
-#ifdef TEST_MSAA
-        downsampleAndThresholdShader.SetRenderTexture( 0, &resolvedTex );
-#else
-        downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
-#endif
+        if (TestMSAA)
+        {
+            downsampleAndThresholdShader.SetRenderTexture( 0, &resolvedTex );
+        }        
+        else
+        {
+            downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+        }
+
         downsampleAndThresholdShader.SetTexture2D( 14, &blurTex );
 #endif
         downsampleAndThresholdShader.Begin();
