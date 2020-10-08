@@ -27,6 +27,7 @@ struct Uniforms
     int pad0;
     int pad1;
     float4 kernelOffsets[ 64 ];
+    float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };
 
 static float linstep( float low, float high, float v )

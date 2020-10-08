@@ -659,6 +659,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     GfxDeviceGlobal::perObjectUboStruct.lightColor = Vec4( 0, 0, 0, 1 );
     GfxDeviceGlobal::perObjectUboStruct.minAmbient = ambientColor.x;
     GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Empty;
+    GfxDeviceGlobal::perObjectUboStruct.cameraParams = Vec4( camera->GetFovDegrees() * 3.14159265f / 180.0f, camera->GetAspect(), camera->GetNear(), camera->GetFar() );
     
     for (auto gameObject : gameObjects)
     {
@@ -795,6 +796,8 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
 #endif
     GfxDevice::PushGroupMarker( "DepthNormal" );
 
+    GfxDeviceGlobal::perObjectUboStruct.cameraParams = Vec4( camera->GetFovDegrees() * 3.14159265f / 180.0f, camera->GetAspect(), camera->GetNear(), camera->GetFar() );
+
     for (auto j : gameObjectsWithMeshRenderer)
     {
         auto transform = gameObjects[ j ]->GetComponent< TransformComponent >();
@@ -877,7 +880,9 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     
     const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();
     frustum.Update( cameraTransform->GetWorldPosition(), viewDir );
-    
+
+    GfxDeviceGlobal::perObjectUboStruct.cameraParams = Vec4( camera->GetFovDegrees() * 3.14159265f / 180.0f, camera->GetAspect(), camera->GetNear(), camera->GetFar() );
+
     std::vector< unsigned > gameObjectsWithMeshRenderer;
     gameObjectsWithMeshRenderer.reserve( gameObjects.size() );
     int gameObjectIndex = -1;

@@ -31,6 +31,7 @@ layout( set = 0, binding = 7 ) cbuffer cbPerFrame : register(b0)
     int kernelSize;
     float2 padding;
     float4 kernelOffsets[ 64 ];
+    float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };
 layout( set = 0, binding = 8 ) Buffer<float4> pointLightBufferCenterAndRadius : register(t5);
 layout( set = 0, binding = 9 ) RWBuffer<uint> perTileLightIndexBuffer : register(u0);
