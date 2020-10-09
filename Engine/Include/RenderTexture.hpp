@@ -8,15 +8,6 @@ namespace ae3d
     class RenderTexture : public TextureBase
     {
   public:
-        /// Data type.
-        enum class DataType
-        {
-            UByte,
-            Float,
-            Float16,
-            R32G32
-        };
-
         /// Destroys graphics API objects.
         static void DestroyTextures();
 

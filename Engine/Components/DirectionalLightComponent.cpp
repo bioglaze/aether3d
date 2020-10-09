@@ -32,7 +32,7 @@ void ae3d::DirectionalLightComponent::SetCastShadow( bool enable, int shadowMapS
     if (castsShadow)
     {
         someLightCastsShadow = true;
-        shadowMap.Create2D( mapSize, mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "dirlight shadow", false );
+        shadowMap.Create2D( mapSize, mapSize, DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "dirlight shadow", false );
     }
 }
 

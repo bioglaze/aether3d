@@ -33,12 +33,12 @@ constexpr bool TestMSAA = false;
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
-//#define TEST_SHADOWS_DIR
+constexpr bool TestShadowsDir = false;
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
 constexpr bool TestForwardPlus = false;
-//#define TEST_BLOOM
-//#define TEST_SSAO
+constexpr bool TestBloom = false;
+#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -127,7 +127,7 @@ int main()
 #endif
 
     RenderTexture cameraTex;
-    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA );
+    cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA );
 
     Texture2D bloomTex;
     bloomTex.CreateUAV( width / 2, height / 2, "bloomTex" );
@@ -160,16 +160,16 @@ int main()
     noiseTex.SetLayout( TextureLayout::ShaderRead );
     
     RenderTexture resolvedTex;
-    resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
+    resolvedTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
         
     RenderTexture camera2dTex;
-    camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
+    camera2dTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
 
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
-    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
 #ifndef AE3D_OPENVR
@@ -182,7 +182,7 @@ int main()
 
 #ifdef TEST_RENDER_TEXTURE_CUBE
     RenderTexture cubeRT;
-    cubeRT.CreateCube( 512, ae3d::RenderTexture::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
+    cubeRT.CreateCube( 512, ae3d::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
     
     GameObject cameraCubeRT;
     cameraCubeRT.AddComponent<CameraComponent>();
@@ -371,11 +371,14 @@ int main()
 
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
-#ifdef TEST_SHADOWS_DIR
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 2048 );
-#else
-    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 2048 );
-#endif
+    if (TestShadowsDir)
+    {
+        dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 2048 );
+    }
+    else
+    {
+        dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 2048 );
+    }
     dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 1, 1, 1 ) );
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 1, 1, 1 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
@@ -544,7 +547,7 @@ int main()
     // Sponza ends
     
     RenderTexture rtTex;
-    const auto dataType = camera2d.GetComponent<CameraComponent>()->GetTargetTexture() != nullptr ? RenderTexture::DataType::Float : RenderTexture::DataType::UByte;
+    const auto dataType = camera2d.GetComponent<CameraComponent>()->GetTargetTexture() != nullptr ? ae3d::DataType::Float : ae3d::DataType::UByte;
     rtTex.Create2D( 512, 512, dataType, TextureWrap::Clamp, TextureFilter::Linear, "rtTex", false );
     
     GameObject renderTextureContainer;
@@ -615,9 +618,7 @@ int main()
 #ifdef TEST_SHADOWS_POINT
     scene.Add( &pointLight );
 #endif
-    //#ifdef TEST_SHADOWS_DIR
     scene.Add( &dirLight );
-    //#endif
     scene.Add( &spotLight );
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );
@@ -666,7 +667,7 @@ int main()
 
         axis = Vec3( 1, 1, 1 ).Normalized();
         rotation.FromAxisAngle( axis, angle );
-        rotatingCube.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
+        //rotatingCube.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
         //cubeTangent.GetComponent< TransformComponent >()->SetLocalRotation( rotation );
 
@@ -886,188 +887,187 @@ int main()
         System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 #endif
-#ifdef TEST_BLOOM
-#if RENDERER_D3D12
-        blurTex.SetLayout( TextureLayout::ShaderReadWrite );
-
-        GpuResource nullResource = {};
-
-        downsampleAndThresholdShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
-        downsampleAndThresholdShader.SetSRV( 1, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        //downsampleAndThresholdShader.SetSRV( 1, nullResource.resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 2, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        downsampleAndThresholdShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() ); // Unused, but must exist.
-        downsampleAndThresholdShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
-#else
-        blurTex.SetLayout( TextureLayout::General );
-
-        if (TestMSAA)
+        if (TestBloom)
         {
-            downsampleAndThresholdShader.SetRenderTexture( 0, &resolvedTex );
-        }        
-        else
-        {
-            downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
-        }
+#if RENDERER_D3D12
+            blurTex.SetLayout( TextureLayout::ShaderReadWrite );
 
-        downsampleAndThresholdShader.SetTexture2D( 14, &blurTex );
+            GpuResource nullResource = {};
+
+            downsampleAndThresholdShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
+            downsampleAndThresholdShader.SetSRV( 1, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            //downsampleAndThresholdShader.SetSRV( 1, nullResource.resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 2, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            downsampleAndThresholdShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() ); // Unused, but must exist.
+            downsampleAndThresholdShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
+#else
+            blurTex.SetLayout( TextureLayout::General );
+
+            if (TestMSAA)
+            {
+                downsampleAndThresholdShader.SetRenderTexture( 0, &resolvedTex );
+            }
+            else
+            {
+                downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+            }
+            
+            downsampleAndThresholdShader.SetTexture2D( 14, &blurTex );
 #endif
-        downsampleAndThresholdShader.Begin();
-        downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
-        downsampleAndThresholdShader.End();
+            downsampleAndThresholdShader.Begin();
+            downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+            downsampleAndThresholdShader.End();
 
-        blurTex.SetLayout( TextureLayout::ShaderRead );
+            blurTex.SetLayout( TextureLayout::ShaderRead );
 
-        blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( 0, &blurTex );
 
 #if RENDERER_D3D12
-        bloomTex.SetLayout( TextureLayout::ShaderReadWrite );
+            bloomTex.SetLayout( TextureLayout::ShaderReadWrite );
 
-        blurShader.SetSRV( 1, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 2, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-        //blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-        blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() ); // Unused, but must exist
-        blurShader.SetUAV( 1, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
+            blurShader.SetSRV( 1, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 2, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
+            //blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() ); // Unused, but must exist
+            blurShader.SetUAV( 1, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
 #else
-        blurShader.SetTexture2D( 14, &bloomTex );
+            blurShader.SetTexture2D( 14, &bloomTex );
 #endif
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
 
-        blurShader.Begin();
+            blurShader.Begin();
 
-        blurTex.SetLayout( TextureLayout::General );
-        bloomTex.SetLayout( TextureLayout::ShaderRead );
-        blurShader.SetTexture2D( 0, &bloomTex );
+            blurTex.SetLayout( TextureLayout::General );
+            bloomTex.SetLayout( TextureLayout::ShaderRead );
+            blurShader.SetTexture2D( 0, &bloomTex );
 
 #if RENDERER_D3D12
-        blurTex.SetLayout( TextureLayout::ShaderReadWrite );
-        blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
+            blurTex.SetLayout( TextureLayout::ShaderReadWrite );
+            blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
-        blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.SetTexture2D( 14, &blurTex );
 #endif
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
 
 #if RENDERER_VULKAN
-        // Second blur horizontal begin.
-        blurTex.SetLayout( TextureLayout::ShaderRead );
-        blurTex2.SetLayout( TextureLayout::General );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 14, &blurTex2 );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
-        blurTex2.SetLayout( TextureLayout::ShaderRead );
-        // Second blur horizontal end.
+            // Second blur horizontal begin.
+            blurTex.SetLayout( TextureLayout::ShaderRead );
+            blurTex2.SetLayout( TextureLayout::General );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( 14, &blurTex2 );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
+            blurTex2.SetLayout( TextureLayout::ShaderRead );
+            // Second blur horizontal end.
 
-        // Second blur vertical begin.
-        blurTex.SetLayout( TextureLayout::General );
-        blurTex2.SetLayout( TextureLayout::ShaderRead );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 14, &blurTex );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
-        // Second blur vertical end.
+            // Second blur vertical begin.
+            blurTex.SetLayout( TextureLayout::General );
+            blurTex2.SetLayout( TextureLayout::ShaderRead );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.SetTexture2D( 0, &blurTex2 );
+            blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
+            // Second blur vertical end.
 
-        // Third blur horizontal begin.
-        blurTex.SetLayout( TextureLayout::ShaderRead );
-        blurTex2.SetLayout( TextureLayout::General );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 14, &blurTex2 );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
-        blurTex2.SetLayout( TextureLayout::ShaderRead );
-        // Third blur horizontal end.
+            // Third blur horizontal begin.
+            blurTex.SetLayout( TextureLayout::ShaderRead );
+            blurTex2.SetLayout( TextureLayout::General );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( 14, &blurTex2 );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
+            blurTex2.SetLayout( TextureLayout::ShaderRead );
+            // Third blur horizontal end.
 
-        // Third blur vertical begin.
-        blurTex.SetLayout( TextureLayout::General );
-        blurTex2.SetLayout( TextureLayout::ShaderRead );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 14, &blurTex );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
-        // Third blur vertical end.
+            // Third blur vertical begin.
+            blurTex.SetLayout( TextureLayout::General );
+            blurTex2.SetLayout( TextureLayout::ShaderRead );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.SetTexture2D( 0, &blurTex2 );
+            blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
+            // Third blur vertical end.
 
-        // Fourth blur horizontal begin.
-        blurTex.SetLayout( TextureLayout::ShaderRead );
-        blurTex2.SetLayout( TextureLayout::General );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 14, &blurTex2 );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
-        blurTex2.SetLayout( TextureLayout::ShaderRead );
-        // Fourth blur horizontal end.
+            // Fourth blur horizontal begin.
+            blurTex.SetLayout( TextureLayout::ShaderRead );
+            blurTex2.SetLayout( TextureLayout::General );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( 14, &blurTex2 );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
+            blurTex2.SetLayout( TextureLayout::ShaderRead );
+            // Fourth blur horizontal end.
 
-        // Fourth blur vertical begin.
-        blurTex.SetLayout( TextureLayout::General );
-        blurTex2.SetLayout( TextureLayout::ShaderRead );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 14, &blurTex );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
-        // Fourth blur vertical end.
+            // Fourth blur vertical begin.
+            blurTex.SetLayout( TextureLayout::General );
+            blurTex2.SetLayout( TextureLayout::ShaderRead );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.SetTexture2D( 0, &blurTex2 );
+            blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.End();
+            // Fourth blur vertical end.
 #endif
 #if RENDERER_D3D12
-        // Second blur horizontal begin.
-        /*blurTex.SetLayout( TextureLayout::ShaderRead );
-        blurTex2.SetLayout( TextureLayout::ShaderReadWrite );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetUAV( 1, blurTex2.GetGpuResource()->resource, *blurTex2.GetUAVDesc() );
+            // Second blur horizontal begin.
+            /*blurTex.SetLayout( TextureLayout::ShaderRead );
+              blurTex2.SetLayout( TextureLayout::ShaderReadWrite );
+              blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+              blurShader.SetTexture2D( 0, &blurTex );
+              blurShader.SetUAV( 1, blurTex2.GetGpuResource()->resource, *blurTex2.GetUAVDesc() );
 
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();*/
-        //blurTex2.SetLayout( TextureLayout::ShaderRead );
-        // Second blur horizontal end.
+              blurShader.Begin();
+              blurShader.Dispatch( width / 16, height / 16, 1 );
+              blurShader.End();*/
+            //blurTex2.SetLayout( TextureLayout::ShaderRead );
+            // Second blur horizontal end.
 
-        // Second blur vertical begin.
-        /*blurTex.SetLayout( TextureLayout::ShaderReadWrite );
-        blurTex2.SetLayout( TextureLayout::ShaderRead );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();*/
-        // Second blur vertical end.
-
-
+            // Second blur vertical begin.
+            /*blurTex.SetLayout( TextureLayout::ShaderReadWrite );
+              blurTex2.SetLayout( TextureLayout::ShaderRead );
+              blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+              blurShader.SetTexture2D( 0, &blurTex2 );
+              blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
+              blurShader.Begin();
+              blurShader.Dispatch( width / 16, height / 16, 1 );
+              blurShader.End();*/
+            // Second blur vertical end.
 #endif
-        blurTex.SetLayout( TextureLayout::ShaderRead );
-        System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
-        bloomTex.SetLayout( TextureLayout::General );
-#endif // Bloom
+            blurTex.SetLayout( TextureLayout::ShaderRead );
+            System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+            bloomTex.SetLayout( TextureLayout::General );
+        }
 
 #ifdef TEST_SSAO
         if (ssao)

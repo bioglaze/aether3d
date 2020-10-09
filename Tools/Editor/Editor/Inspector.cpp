@@ -139,7 +139,7 @@ void Inspector::Init()
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
 #if RENDERER_VULKAN
-    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT );
+    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, false );
 #else
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
 #endif
@@ -492,7 +492,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             {
                 for (unsigned i = 0; i < goCount - 1; ++i)
                 {
-                    const char* name = std::strcmp( goNames[ i ], "" ) != 0 ? goNames[ i ] : "unnamed";
+                    const char* name = strcmp( goNames[ i ], "" ) != 0 ? goNames[ i ] : "unnamed";
                     nk_selectable_label( &ctx, name, NK_TEXT_LEFT, &selected[ i ] );
 
                     if (selected[ i ] != 0)

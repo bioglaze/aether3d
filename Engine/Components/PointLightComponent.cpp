@@ -32,7 +32,7 @@ void ae3d::PointLightComponent::SetCastShadow( bool enable, int shadowMapSize )
     {
         someLightCastsShadow = true;
         cachedShadowMapSize = mapSize;
-        shadowMap.CreateCube( mapSize, RenderTexture::DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "pointlight shadow" );
+        shadowMap.CreateCube( mapSize, DataType::R32G32, TextureWrap::Clamp, TextureFilter::Linear, "pointlight shadow" );
     }
 }
 

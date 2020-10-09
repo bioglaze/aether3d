@@ -173,7 +173,7 @@ int main()
     System::InitGamePad();
 
     RenderTexture cameraTex;
-    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", true );
+    cameraTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", true );
 
     Texture2D bloomTex;
     bloomTex.CreateUAV( width / 2, height / 2, "bloomTex" );
@@ -182,10 +182,10 @@ int main()
 	blurTex.CreateUAV( width / 2, height / 2, "blurTex" );
 
     RenderTexture resolvedTex;
-    resolvedTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
+    resolvedTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
         
     RenderTexture camera2dTex;
-    camera2dTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
+    camera2dTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
 
     nk_context ctx;
     nk_font_atlas atlas;
@@ -216,7 +216,7 @@ int main()
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
-    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::RenderTexture::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
     camera.GetComponent<CameraComponent>()->SetTargetTexture( &cameraTex );
