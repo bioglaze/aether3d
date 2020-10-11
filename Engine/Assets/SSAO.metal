@@ -19,12 +19,20 @@ float ssao_internal( float3x3 kernelBasis, float3 originPos, float radius, int k
         float4 offset = uniforms.viewToClip * float4( samplePos, 1.0f );
         offset.xy /= offset.w; // only need xy
         offset.xy = offset.xy * 0.5f + 0.5f; // scale/bias to texcoords
-        //float sampleDepth = -normalTex.Sample( sLinear, offset.xy ).r;
+
         int depthWidth = uniforms.windowWidth, depthHeight = uniforms.windowHeight;
         float sampleDepth = -depthNormalsTexture.read( uint2( offset.xy * float2( depthWidth, depthHeight ) ), 0 ).r;
 
-        float rangeCheck = smoothstep( 0.0f, 1.0f, radius / abs( originPos.z - sampleDepth ) );
-        occlusion += rangeCheck * step( sampleDepth, samplePos.z );
+        const float diff = abs( originPos.z - sampleDepth );
+        if (diff < 0.0001f)
+        {
+            occlusion += (sampleDepth < (samplePos.z - 0.025f) ? 1.0f : 0.0f);
+            continue;
+        }
+        
+        float rangeCheck = smoothstep( 0.0f, 1.0f, radius / diff );
+        //occlusion += rangeCheck * step( sampleDepth, samplePos.z );
+        occlusion += (sampleDepth < (samplePos.z - 0.025f) ? 1.0f : 0.0f) * rangeCheck;
     }
 
     occlusion = 1.0f - (occlusion / float( kernelSize ));
@@ -35,6 +43,7 @@ float ssao_internal( float3x3 kernelBasis, float3 originPos, float radius, int k
 kernel void ssao( texture2d<float, access::read> colorTexture [[texture(0)]],
                   texture2d<float, access::read> depthNormalsTexture [[texture(1)]],
                   texture2d<float, access::write> outTexture [[texture(2)]],
+                  texture2d<float, access::read> noiseTexture [[texture(3)]],
                   constant Uniforms& uniforms [[ buffer(0) ]],
                   ushort2 globalIdx [[thread_position_in_grid]],
                   ushort2 tid [[thread_position_in_threadgroup]],
@@ -61,17 +70,16 @@ kernel void ssao( texture2d<float, access::read> colorTexture [[texture(0)]],
     float3 originPos = viewDirection * originDepth;
     
     // get view space normal:
-    //float3 normal = -normalize( normalTex.Sample( sLinear, uv ).gba );
     float3 normal = -normalize( depthNormalsTexture.read( uint2( globalIdx.xy ), 0 ).gba );
     
     // construct kernel basis matrix:
-    //float3 rvec = normalize( specularTex.Sample( sampler1, noiseTexCoords ).rgb );
+    //float3 rvec = normalize( noiseTexture.read( uint2( globalIdx.x % 64, globalIdx.y % 64 ), 0 ).rgb );
     float3 rvec = float3( 0, 1, 0 );
     float3 tangent = normalize( rvec - normal * dot( rvec, normal ) );
     float3 bitangent = cross( tangent, normal );
     float3x3 kernelBasis = float3x3( tangent, bitangent, normal );
     
-    float s = ssao_internal( kernelBasis, originPos, 1.2f, 32, globalIdx, uniforms, depthNormalsTexture );
+    float s = ssao_internal( kernelBasis, originPos, 0.5f, 32, globalIdx, uniforms, depthNormalsTexture );
     
     outTexture.write( color * s, globalIdx.xy );
 }

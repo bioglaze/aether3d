@@ -83,7 +83,7 @@ namespace GfxDeviceGlobal
     id<MTLSamplerState> samplerStates[ 13 ];
     id<MTLBuffer> uniformBuffers[ UboCount ];
     int currentUboIndex;
-    ae3d::RenderTexture::DataType currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
+    ae3d::DataType currentRenderTargetDataType = ae3d::DataType::UByte;
     ae3d::LightTiler lightTiler;
     std::vector< ae3d::VertexBuffer > lineBuffers;
     int viewport[ 4 ];
@@ -447,7 +447,7 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 }
 
 std::uint64_t GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
-                       ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
+                       ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::DataType pixelFormat,
                        MTLPixelFormat depthFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
     std::uint64_t outResult = (ptrdiff_t)&shader.vertexProgram;
@@ -464,7 +464,7 @@ std::uint64_t GetPSOHash( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blend
 }
 
 id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-                                    ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::RenderTexture::DataType pixelFormat,
+                                    ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::DataType pixelFormat,
                                    MTLPixelFormat depthFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
     const std::uint64_t psoHash = GetPSOHash( shader, blendMode, /* unused on Metal*/ ae3d::GfxDevice::DepthFunc::LessOrEqualWriteOn, vertexFormat, pixelFormat, depthFormat, sampleCount, topology );
@@ -481,15 +481,15 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
 #endif
         MTLPixelFormat format = MTLPixelFormatBGRA8Unorm_sRGB;
 
-        if (pixelFormat == ae3d::RenderTexture::DataType::R32G32)
+        if (pixelFormat == ae3d::DataType::R32G32)
         {
             format = MTLPixelFormatRG32Float;
         }
-        else if (pixelFormat == ae3d::RenderTexture::DataType::Float)
+        else if (pixelFormat == ae3d::DataType::Float)
         {
             format = MTLPixelFormatRGBA32Float;
         }
-        else if (pixelFormat == ae3d::RenderTexture::DataType::Float16)
+        else if (pixelFormat == ae3d::DataType::Float16)
         {
             format = MTLPixelFormatRGBA16Float;
         }
@@ -692,7 +692,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         textures[ 4 ] = TextureCube::GetDefaultTexture()->GetMetalTexture();
     }
     
-    RenderTexture::DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
+    DataType pixelFormat = GfxDeviceGlobal::currentRenderTargetDataType;
 
     const int sampleCount = GfxDeviceGlobal::isRenderingToTexture ? 1 : GfxDeviceGlobal::sampleCount;
     MTLPixelFormat depthFormat = MTLPixelFormatDepth32Float;
@@ -874,7 +874,7 @@ void ae3d::GfxDevice::BeginBackBufferEncoding()
         renderEncoder = nil;
     }
     
-    GfxDeviceGlobal::currentRenderTargetDataType = ae3d::RenderTexture::DataType::UByte;
+    GfxDeviceGlobal::currentRenderTargetDataType = ae3d::DataType::UByte;
 }
 
 void ae3d::GfxDevice::EndBackBufferEncoding()

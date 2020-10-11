@@ -41,7 +41,7 @@
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
-//#define TEST_SSAO
+#define TEST_SSAO
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -904,6 +904,7 @@ using namespace ae3d;
 #ifdef TEST_SSAO
         ssaoShader.SetRenderTexture( 0, &cameraTex );
         ssaoShader.SetRenderTexture( 1, &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
+        ssaoShader.SetTexture2D( 3, &noiseTex );
         ssaoShader.SetTexture2D( 2, &ssaoTex );
         ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
         ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1 );
