@@ -41,6 +41,8 @@ void ae3d::Renderer::GenerateSSAOKernel( int count, ae3d::Vec4* outKernel )
             MathUtil::Random( -1.0f, 1.0f ),
             MathUtil::Random( 0.0f, 1.0f )
             ).Normalized();
+        float ran = MathUtil::Random( 0.0f, 1.0f );
+        v *= ran;
         // Distributes the samples so that there are more near the origin.
         float scale = (float)i / (float)count;
         v *= MathUtil::Lerp( 0.1f, 1.0f, scale * scale );

@@ -145,7 +145,11 @@ int main()
 
     for (int i = 0; i < noiseDim * noiseDim; ++i)
     {
-        Vec3 dir = Vec3( (Random100() / 100.0f) * 2 - 1, (Random100() / 100.0f) * 2 - 1, 0 ).Normalized();
+        //Vec3 dir = Vec3( (Random100() / 100.0f) * 2 - 1, (Random100() / 100.0f) * 2 - 1, 0 ).Normalized();
+        Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 ).Normalized();
+        dir.x = abs(dir.x) * 2 - 1;
+        dir.y = abs(dir.y) * 2 - 1;
+        System::Print("dir: %f, %f\n", dir.x, dir.y);
         noiseData[ i ].x = dir.x;
         noiseData[ i ].y = dir.y;
         noiseData[ i ].z = 0;
