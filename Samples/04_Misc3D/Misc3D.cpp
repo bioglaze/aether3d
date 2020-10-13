@@ -30,7 +30,7 @@
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip
 
 constexpr bool TestMSAA = false;
-//#define TEST_RENDER_TEXTURE_2D
+constexpr bool TestRenderTexture2D = false;
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 constexpr bool TestShadowsDir = false;
@@ -145,11 +145,9 @@ int main()
 
     for (int i = 0; i < noiseDim * noiseDim; ++i)
     {
-        //Vec3 dir = Vec3( (Random100() / 100.0f) * 2 - 1, (Random100() / 100.0f) * 2 - 1, 0 ).Normalized();
         Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 ).Normalized();
         dir.x = abs(dir.x) * 2 - 1;
         dir.y = abs(dir.y) * 2 - 1;
-        System::Print("dir: %f, %f\n", dir.x, dir.y);
         noiseData[ i ].x = dir.x;
         noiseData[ i ].y = dir.y;
         noiseData[ i ].z = 0;
@@ -557,9 +555,12 @@ int main()
     GameObject renderTextureContainer;
     renderTextureContainer.SetName( "renderTextureContainer" );
     renderTextureContainer.AddComponent<SpriteRendererComponent>();
-#ifdef TEST_RENDER_TEXTURE_2D
-    renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( 512, 512, 1 ), Vec4( 1, 1, 1, 1 ) );
-#endif
+
+    if (TestRenderTexture2D)
+    {
+        renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &rtTex, Vec3( 150, 250, -0.6f ), Vec3( 512, 512, 1 ), Vec4( 1, 1, 1, 1 ) );
+    }
+
     //renderTextureContainer.GetComponent<SpriteRendererComponent>()->SetTexture( &camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture(), Vec3( 150, 250, -0.6f ), Vec3( 256, 256, 1 ), Vec4( 1, 1, 1, 1 ) );
     renderTextureContainer.SetLayer( 2 );
 
@@ -624,11 +625,14 @@ int main()
 #endif
     scene.Add( &dirLight );
     scene.Add( &spotLight );
-#ifdef TEST_RENDER_TEXTURE_2D
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
-#endif
-    scene.Add( &transCube1 );
+
+    if( TestRenderTexture2D )
+    {
+        scene.Add( &renderTextureContainer );
+        scene.Add( &rtCamera );
+    }
+    
+	scene.Add( &transCube1 );
     
     AudioClip audioClip;
     audioClip.Load( FileSystem::FileContents( "sine340.wav" ) );
@@ -1081,8 +1085,7 @@ int main()
             GpuResource nullResource = {};
             ssaoShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
             ssaoShader.SetSRV( 1, camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetGpuResource()->resource, *camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetSRVDesc() );
-            ssaoShader.SetSRV( 2, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-            //blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
+			ssaoShader.SetSRV( 2, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
             ssaoShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
             ssaoShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
             ssaoShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
