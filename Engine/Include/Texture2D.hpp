@@ -35,7 +35,8 @@ namespace ae3d
         /// \param width Width in pixels.
         /// \param height height in pixels.
         /// \param debugName Debug name.
-        void CreateUAV( int width, int height, const char* debugName );
+		/// \param dataType Pixel format.
+        void CreateUAV( int width, int height, const char* debugName, DataType format );
         
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
         /// \param wrap Wrap mode.
@@ -57,14 +58,14 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkImageView& GetView() { return view; }
         VkImage& GetImage() { return image; }
-        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, VkImageUsageFlags usageFlags, bool isFloat );
+        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, VkImageUsageFlags usageFlags, DataType format );
 #else
         /// \param imageData Raw pixel data
         /// \param width Width in pixels
         /// \param height Height in pixels
         /// \param channels Channels in the image, must be 3 or 4
         /// \param debugName Null-terminated string of texture's debug name that is visible in graphics debugging tools
-        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName );
+        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, DataType format );
 #endif
         /// Destroys all textures. Called internally at exit.
         static void DestroyTextures();

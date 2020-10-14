@@ -205,13 +205,13 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
-void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName )
+void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format )
 {
-    LoadFromData( nullptr, aWidth, aHeight, 4, debugName );
+    LoadFromData( nullptr, aWidth, aHeight, 4, debugName, format );
 
     uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    uavDesc.Format = format == DataType::Float ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
     uavDesc.Texture2D.MipSlice = 0;
     uavDesc.Texture2D.PlaneSlice = 0;
@@ -219,7 +219,7 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName 
     GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResource.resource, nullptr, &uavDesc, uav );
 }
 
-void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName )
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName, DataType format )
 {
     width = aWidth;
     height = aHeight;
@@ -232,7 +232,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     descTex.Height = static_cast< UINT >(height);
     descTex.DepthOrArraySize = 1;
     descTex.MipLevels = 1;
-    descTex.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    descTex.Format = format == DataType::Float ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -262,7 +262,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     texResource.SlicePitch = texResource.RowPitch * height;
     InitializeTexture( gpuResource, &texResource, 1 );
 
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.Format = descTex.Format;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;

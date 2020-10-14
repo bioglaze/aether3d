@@ -130,13 +130,13 @@ int main()
     cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA );
 
     Texture2D bloomTex;
-    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex" );
+    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte );
 
 	Texture2D blurTex;
-	blurTex.CreateUAV( width / 2, height / 2, "blurTex" );
+	blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte );
 
     Texture2D blurTex2;
-    blurTex2.CreateUAV( width / 2, height / 2, "blurTex2" );
+    blurTex2.CreateUAV( width / 2, height / 2, "blurTex2", DataType::UByte );
 
     Texture2D noiseTex;
 
@@ -155,9 +155,9 @@ int main()
     }
 
 #if RENDERER_VULKAN    
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, true );
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::Float );
 #else
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData" );    
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", DataType::Float );    
 #endif
     noiseTex.SetLayout( TextureLayout::ShaderRead );
     
@@ -323,7 +323,7 @@ int main()
 	ssaoShader.Load( "ssao", FileSystem::FileContents( "ssao.obj" ), FileSystem::FileContents( "ssao.spv" ) );
 
     Texture2D ssaoTex;
-    ssaoTex.CreateUAV( width, height, "ssaoTex" );
+    ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte );
     
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
