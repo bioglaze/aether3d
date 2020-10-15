@@ -41,7 +41,7 @@
 //#define TEST_NUKLEAR_UI
 //#define TEST_RENDER_TEXTURE_2D
 //#define TEST_RENDER_TEXTURE_CUBE
-#define TEST_SSAO
+//#define TEST_SSAO
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -376,7 +376,7 @@ using namespace ae3d;
         noiseData[ i ].w = 0;
     }
 
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData" );
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );
 
     cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", MULTISAMPLE_COUNT > 1 );
     ae3d::System::Print( "width: %f, height: %f\n", self.view.bounds.size.width, self.view.bounds.size.height );
@@ -667,7 +667,7 @@ using namespace ae3d;
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
 #endif
-    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex" );
+    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", DataType::UByte );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D
@@ -751,7 +751,7 @@ using namespace ae3d;
     nkFont = nk_font_atlas_add_default( &atlas, 13.0f, nullptr );
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
-    uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font" );
+    uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", DataType::UByte );
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
 
     nk_init_default( &ctx, &nkFont->handle );

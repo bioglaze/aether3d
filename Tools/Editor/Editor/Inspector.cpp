@@ -141,7 +141,7 @@ void Inspector::Init()
 #if RENDERER_VULKAN
     nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, DataType::UByte );
 #else
-    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, 4, "Nuklear font", DataType::UByte );
+    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", DataType::UByte );
 #endif
 
     nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );

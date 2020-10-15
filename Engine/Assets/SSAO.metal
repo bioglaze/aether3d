@@ -31,7 +31,6 @@ float ssao_internal( float3x3 kernelBasis, float3 originPos, float radius, int k
         }
         
         float rangeCheck = smoothstep( 0.0f, 1.0f, radius / diff );
-        //occlusion += rangeCheck * step( sampleDepth, samplePos.z );
         occlusion += (sampleDepth < (samplePos.z - 0.025f) ? 1.0f : 0.0f) * rangeCheck;
     }
 
@@ -59,7 +58,6 @@ kernel void ssao( texture2d<float, access::read> colorTexture [[texture(0)]],
 
     float2 uv = float2( globalIdx.xy ) / float2( depthWidth, depthHeight );
     // get view space origin:
-    //float originDepth = -normalTex.Sample( sLinear, uv ).r;
     float originDepth = -depthNormalsTexture.read( uint2( globalIdx.xy ), 0 ).r;
     float uTanHalfFov = tan( 45.0f * 0.5f * (3.14159f / 180.0f) );
     float uAspectRatio = depthWidth / (float)depthHeight;
@@ -73,8 +71,7 @@ kernel void ssao( texture2d<float, access::read> colorTexture [[texture(0)]],
     float3 normal = -normalize( depthNormalsTexture.read( uint2( globalIdx.xy ), 0 ).gba );
     
     // construct kernel basis matrix:
-    //float3 rvec = normalize( noiseTexture.read( uint2( globalIdx.x % 64, globalIdx.y % 64 ), 0 ).rgb );
-    float3 rvec = float3( 0, 1, 0 );
+    float3 rvec = normalize( noiseTexture.read( uint2( globalIdx.x % 64, globalIdx.y % 64 ), 0 ).rgb );
     float3 tangent = normalize( rvec - normal * dot( rvec, normal ) );
     float3 bitangent = cross( tangent, normal );
     float3x3 kernelBasis = float3x3( tangent, bitangent, normal );

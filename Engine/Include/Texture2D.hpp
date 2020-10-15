@@ -63,9 +63,8 @@ namespace ae3d
         /// \param imageData Raw pixel data
         /// \param width Width in pixels
         /// \param height Height in pixels
-        /// \param channels Channels in the image, must be 3 or 4
         /// \param debugName Null-terminated string of texture's debug name that is visible in graphics debugging tools
-        void LoadFromData( const void* imageData, int width, int height, int channels, const char* debugName, DataType format );
+        void LoadFromData( const void* imageData, int width, int height, const char* debugName, DataType format );
 #endif
         /// Destroys all textures. Called internally at exit.
         static void DestroyTextures();
