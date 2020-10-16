@@ -155,9 +155,9 @@ int main()
     }
 
 #if RENDERER_VULKAN    
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::Float );
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::Float );
 #else
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, 4, "noiseData", DataType::Float );    
+    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );    
 #endif
     noiseTex.SetLayout( TextureLayout::ShaderRead );
     

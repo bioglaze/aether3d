@@ -207,7 +207,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 
 void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format )
 {
-    LoadFromData( nullptr, aWidth, aHeight, 4, debugName, format );
+    LoadFromData( nullptr, aWidth, aHeight, debugName, format );
 
     uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
@@ -219,7 +219,7 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName,
     GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResource.resource, nullptr, &uavDesc, uav );
 }
 
-void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, int channels, const char* debugName, DataType format )
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, const char* debugName, DataType format )
 {
     width = aWidth;
     height = aHeight;
@@ -256,9 +256,31 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
     Texture2DGlobal::textures.push_back( gpuResource.resource );
 
+	int rowPitch = 0;
+	if( format == DataType::Float)
+	{
+		rowPitch = width * 4 * sizeof( float );
+	}
+	else if( format == DataType::R32G32 )
+	{
+		rowPitch = width * 2 * sizeof( float );
+	}
+	else if( format == DataType::Float16 )
+	{
+		rowPitch = width * 4 * sizeof( float ) / 2;
+	}
+	else if( format == DataType::UByte )
+	{
+		rowPitch = width * 4;
+	}
+	else
+	{
+		System::Assert( false, "unhandled format!" );
+	}
+
     D3D12_SUBRESOURCE_DATA texResource = {};
     texResource.pData = imageData;
-    texResource.RowPitch = width * channels;
+    texResource.RowPitch = rowPitch;
     texResource.SlicePitch = texResource.RowPitch * height;
     InitializeTexture( gpuResource, &texResource, 1 );
 
