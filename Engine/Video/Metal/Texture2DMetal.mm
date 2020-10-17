@@ -255,7 +255,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
                                                           height:defaultTexture.height
                                                        mipmapped:NO];
         id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
-        stagingTexture.label = @"texture loaded from data";
+        stagingTexture.label = @"default texture2d";
         
         MTLTextureDescriptor* textureDescriptor2 =
         [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm_sRGB
@@ -316,14 +316,19 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName,
     {
         pixelFormat = MTLPixelFormatRG32Float;
     }
+    else if (format == DataType::R32F)
+    {
+        pixelFormat = MTLPixelFormatR32Float;
+    }
 
     MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA32Float
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                        width:width
                                                       height:height
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
-
+    textureDescriptor.storageMode = MTLStorageModePrivate;
+    
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     metalTexture.label = [NSString stringWithUTF8String:debugName];
     tex2dMemoryUsage += [metalTexture allocatedSize];
@@ -355,7 +360,14 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
         pixelFormat = MTLPixelFormatRG32Float;
         bytesPerRow = width * 2 * sizeof( float );
     }
+    else if (format == DataType::R32F)
+    {
+        pixelFormat = MTLPixelFormatR32Float;
+        bytesPerRow = width * 1 * sizeof( float );
+    }
 
+    NSString* debugNameStr = [NSString stringWithUTF8String:debugName ];
+    
     MTLTextureDescriptor* textureDescriptor =
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                        width:width
@@ -363,7 +375,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
                                                    mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
     textureDescriptor.usage = MTLTextureUsageShaderRead;
     id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
-    stagingTexture.label = @"texture loaded from data";
+    stagingTexture.label = debugNameStr;
         
     MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
     [stagingTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];

@@ -32,6 +32,10 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     {
         format = MTLPixelFormatRGBA16Float;
     }
+    else if (dataType == DataType::R32F)
+    {
+        format = MTLPixelFormatR32Float;
+    }
 
     MTLTextureDescriptor* textureDescriptor =
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:format
@@ -58,7 +62,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     depthDesc.textureType = MTLTextureType2D;
     depthDesc.sampleCount = 1;
     depthDesc.resourceOptions = MTLResourceStorageModePrivate;
-    depthDesc.usage = MTLTextureUsageUnknown;
+    depthDesc.usage = MTLTextureUsageRenderTarget;
 
     metalDepthTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:depthDesc];
     metalDepthTexture.label = @"Render Texture depth";
@@ -88,6 +92,10 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     else if (dataType == DataType::Float16)
     {
         format = MTLPixelFormatRGBA16Float;
+    }
+    else if (dataType == DataType::R32F)
+    {
+        format = MTLPixelFormatR32Float;
     }
 
     MTLTextureDescriptor* textureDescriptor =

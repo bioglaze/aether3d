@@ -33,8 +33,8 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-//#define TEST_FORWARD_PLUS
-//#define TEST_BLOOM
+#define TEST_FORWARD_PLUS
+const bool TestBloom = false;
 //#define TEST_SHADOWS_DIR
 //#define TEST_SHADOWS_SPOT
 //#define TEST_SHADOWS_POINT
@@ -662,12 +662,10 @@ using namespace ae3d;
 #endif
 
     rtTex.Create2D( 512, 512, ae3d::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture", false );
-#ifdef TEST_BLOOM
-    bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex" );
-    blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
-    blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex" );
-#endif
-    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", DataType::UByte );
+    bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", DataType::Float );
+    blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", DataType::Float );
+    blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", DataType::Float );
+    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", DataType::Float );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
 #ifdef TEST_RENDER_TEXTURE_2D
@@ -714,7 +712,7 @@ using namespace ae3d;
 #endif
     scene.Add( &spotLight );
 //#ifdef TEST_SHADOWS_DIR
-    scene.Add( &dirLight );
+    //scene.Add( &dirLight );
 //#endif
 #ifdef TEST_RENDER_TEXTURE_2D
     scene.Add( &renderTextureContainer );
@@ -861,46 +859,48 @@ using namespace ae3d;
         scene.Render();
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
-#ifdef TEST_BLOOM
-        downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
-        downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
-        downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
-
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 1, &bloomTex );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-
-        blurShader.SetTexture2D( 0, &bloomTex );
-        blurShader.SetTexture2D( 1, &blurTex );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-
-        // Second blur
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 1, &blurTex2 );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-
-        blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 1, &blurTex );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-
-        // Third blur
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 1, &blurTex2 );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-
-        blurShader.SetTexture2D( 0, &blurTex2 );
-        blurShader.SetTexture2D( 1, &blurTex );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
-
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
-#endif
+        
+        if (TestBloom)
+        {
+            downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+            downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
+            downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+            
+            blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( 1, &bloomTex );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            
+            blurShader.SetTexture2D( 0, &bloomTex );
+            blurShader.SetTexture2D( 1, &blurTex );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            
+            // Second blur
+            blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( 1, &blurTex2 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            
+            blurShader.SetTexture2D( 0, &blurTex2 );
+            blurShader.SetTexture2D( 1, &blurTex );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            
+            // Third blur
+            blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( 1, &blurTex2 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            
+            blurShader.SetTexture2D( 0, &blurTex2 );
+            blurShader.SetTexture2D( 1, &blurTex );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            
+            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
+        }
 #ifdef TEST_SSAO
         ssaoShader.SetRenderTexture( 0, &cameraTex );
         ssaoShader.SetRenderTexture( 1, &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
@@ -1030,7 +1030,7 @@ using namespace ae3d;
         const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
         const float zOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
 
-        pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + zOffset ) );
+        //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + zOffset ) );
     }
 #endif
 }

@@ -67,7 +67,8 @@ namespace ae3d
         UByte,
         Float,
         Float16,
-        R32G32
+        R32G32,
+        R32F
     };
 
     std::string GetCacheHash( const std::string& path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, ae3d::Anisotropy anisotropy );
