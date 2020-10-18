@@ -90,7 +90,7 @@ void ae3d::ComputeShader::SetUniformBuffer( unsigned slotIndex, id< MTLBuffer > 
     }
 }
 
-void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
+void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName )
 {
     MTLSize threadgroupCounts = MTLSizeMake( 16, 16, 1 );
     MTLSize threadgroups = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
@@ -99,10 +99,11 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     UploadPerObjectUbo();
     GfxDevice::GetNewUniformBuffer();
     id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
-    commandBuffer.label = @"ComputeCommand";
+    commandBuffer.label = [NSString stringWithUTF8String:debugName ];
     
     id<MTLComputeCommandEncoder> commandEncoder = [commandBuffer computeCommandEncoder];
-
+    commandEncoder.label = commandBuffer.label;
+    
     [commandEncoder setComputePipelineState:pipeline];
 
     for (std::size_t i = 0; i < SLOT_COUNT; ++i)

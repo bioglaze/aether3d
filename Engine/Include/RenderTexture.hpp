@@ -33,6 +33,12 @@ namespace ae3d
         /// \param debugName Debug name that is visible in graphics debugging tools.
         void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
 
+        /// \param nam New name.
+        void SetName( const std::string& nam ) { name = nam; }
+        
+        /// \return Name.
+        const char* GetName() const { return name.c_str(); };
+        
 #if RENDERER_VULKAN
         /// \return Multisample count.
         int GetSampleCount() const { return sampleCount; }
@@ -83,5 +89,6 @@ namespace ae3d
         int sampleCount = 1;
 #endif
         DataType dataType = DataType::UByte;
+        std::string name;
     };
 }

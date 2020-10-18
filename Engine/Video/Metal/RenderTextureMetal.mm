@@ -53,7 +53,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     
     NSString* debugNameStr = [NSString stringWithUTF8String:debugName ];
     metalTexture.label = debugNameStr;
-
+    name = debugName;
+    
     MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
                                                                                          width:width
                                                                                         height:height
@@ -78,7 +79,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     handle = 1;
     isRenderTexture = true;
     dataType = aDataType;
-
+    name = debugName;
+    
     MTLPixelFormat format = MTLPixelFormatBGRA8Unorm_sRGB;
 
     if (dataType == DataType::R32G32)

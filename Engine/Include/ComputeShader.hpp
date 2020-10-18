@@ -36,7 +36,7 @@ namespace ae3d
         /// \param groupCountX X count
         /// \param groupCountY Y count
         /// \param groupCountZ Z count
-        void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ );
+        void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName );
 
         /// Sets projection matrix and its inverse into the uniform structure.
         /// \param projection Projection matrix.

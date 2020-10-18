@@ -925,7 +925,7 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
     renderPassDescriptorFBO.depthAttachment.clearDepth = 1.0;
 
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptorFBO];
-    renderEncoder.label = @"FboRenderEncoder";
+    renderEncoder.label = [NSString stringWithUTF8String:renderTexture->GetName()];
     [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
 
     GfxDeviceGlobal::currentRenderTargetDataType = renderTexture->GetDataType();
