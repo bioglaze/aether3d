@@ -930,7 +930,7 @@ int main()
             downsampleAndThresholdShader.SetTexture2D( 14, &blurTex );
 #endif
             downsampleAndThresholdShader.Begin();
-            downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+            downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
             downsampleAndThresholdShader.End();
 
             blurTex.SetLayout( TextureLayout::ShaderRead );
@@ -957,7 +957,7 @@ int main()
 #endif
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
             blurShader.Begin();
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
 
             blurShader.Begin();
@@ -973,7 +973,7 @@ int main()
             blurShader.SetTexture2D( 14, &blurTex );
 #endif
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
 
 #if RENDERER_VULKAN
@@ -984,7 +984,7 @@ int main()
             blurShader.SetTexture2D( 0, &blurTex );
             blurShader.SetTexture2D( 14, &blurTex2 );
             blurShader.Begin();
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
             blurTex2.SetLayout( TextureLayout::ShaderRead );
             // Second blur horizontal end.
@@ -996,7 +996,7 @@ int main()
             blurShader.SetTexture2D( 0, &blurTex2 );
             blurShader.SetTexture2D( 14, &blurTex );
             blurShader.Begin();
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
             // Second blur vertical end.
 
@@ -1007,7 +1007,7 @@ int main()
             blurShader.SetTexture2D( 0, &blurTex );
             blurShader.SetTexture2D( 14, &blurTex2 );
             blurShader.Begin();
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
             blurTex2.SetLayout( TextureLayout::ShaderRead );
             // Third blur horizontal end.
@@ -1019,7 +1019,7 @@ int main()
             blurShader.SetTexture2D( 0, &blurTex2 );
             blurShader.SetTexture2D( 14, &blurTex );
             blurShader.Begin();
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
             // Third blur vertical end.
 
@@ -1030,7 +1030,7 @@ int main()
             blurShader.SetTexture2D( 0, &blurTex );
             blurShader.SetTexture2D( 14, &blurTex2 );
             blurShader.Begin();
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
             blurTex2.SetLayout( TextureLayout::ShaderRead );
             // Fourth blur horizontal end.
@@ -1042,7 +1042,7 @@ int main()
             blurShader.SetTexture2D( 0, &blurTex2 );
             blurShader.SetTexture2D( 14, &blurTex );
             blurShader.Begin();
-            blurShader.Dispatch( width / 16, height / 16, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
             // Fourth blur vertical end.
 #endif
@@ -1055,7 +1055,7 @@ int main()
               blurShader.SetUAV( 1, blurTex2.GetGpuResource()->resource, *blurTex2.GetUAVDesc() );
 
               blurShader.Begin();
-              blurShader.Dispatch( width / 16, height / 16, 1 );
+              blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
               blurShader.End();*/
             //blurTex2.SetLayout( TextureLayout::ShaderRead );
             // Second blur horizontal end.
@@ -1067,7 +1067,7 @@ int main()
               blurShader.SetTexture2D( 0, &blurTex2 );
               blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
               blurShader.Begin();
-              blurShader.Dispatch( width / 16, height / 16, 1 );
+              blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
               blurShader.End();*/
             // Second blur vertical end.
 #endif
@@ -1103,7 +1103,7 @@ int main()
 #endif
             ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
             ssaoShader.Begin();
-            ssaoShader.Dispatch( width / 8, height / 8, 1 );
+            ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
             ssaoShader.End();
             ssaoTex.SetLayout( TextureLayout::ShaderRead );
 

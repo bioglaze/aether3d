@@ -203,7 +203,7 @@ void ae3d::ComputeShader::End()
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 }
 
-void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
+void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName )
 {
     System::Assert( GfxDeviceGlobal::computeCmdBuffer != VK_NULL_HANDLE, "Uninitialized compute command buffer" );
 

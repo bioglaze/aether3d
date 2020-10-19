@@ -406,7 +406,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     shader.SetUAV( 0, perTileLightIndexBuffer, GfxDeviceGlobal::uav0Desc );
     shader.SetUAV( 1, perTileLightIndexBuffer, GfxDeviceGlobal::uav0Desc ); // Unused, but something must be bound.
 
-    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
+    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1, "LightCuller" );
 }
 
 unsigned ae3d::LightTiler::GetNumTilesX() const

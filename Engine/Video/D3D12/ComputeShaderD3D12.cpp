@@ -66,7 +66,7 @@ void ae3d::ComputeShader::SetProjectionMatrix( const struct Matrix44& projection
     Matrix44::Invert( GfxDeviceGlobal::perObjectUboStruct.viewToClip, GfxDeviceGlobal::perObjectUboStruct.clipToView );
 }
 
-void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ )
+void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName )
 {
     static int heapIndex = 0;
     heapIndex = (heapIndex + 1) % 3;

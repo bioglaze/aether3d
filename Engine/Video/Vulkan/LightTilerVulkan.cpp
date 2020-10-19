@@ -346,7 +346,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
                                     VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0, 0,
                                      nullptr, 1, &lightIndexToCompute, 0, nullptr );
     
-    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1 );
+    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1, "LightCuller" );
 
     VkBufferMemoryBarrier lightIndexToFrag = {};
     lightIndexToFrag.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
