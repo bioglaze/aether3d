@@ -162,9 +162,17 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     {
         colorFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
     }
+    else if (dataType == DataType::Float16)
+    {
+        colorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+    }
     else if (dataType == DataType::R32G32)
     {
         colorFormat = VK_FORMAT_R32G32_SFLOAT;
+    }
+    else if (dataType == DataType::R32F)
+    {
+        colorFormat = VK_FORMAT_R32_SFLOAT;
     }
     else
     {
@@ -330,9 +338,17 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     {
         colorFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
     }
+    else if (dataType == DataType::Float16)
+    {
+        colorFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+    }
     else if (dataType == DataType::R32G32)
     {
         colorFormat = VK_FORMAT_R32G32_SFLOAT;
+    }
+    else if (dataType == DataType::R32F)
+    {
+        colorFormat = VK_FORMAT_R32_SFLOAT;
     }
     else
     {

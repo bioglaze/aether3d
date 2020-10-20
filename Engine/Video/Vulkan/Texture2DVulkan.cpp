@@ -80,15 +80,19 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     {
         CreateVulkanObjects( const_cast< void* >( imageData ), 4 * 4, VK_FORMAT_R32G32B32A32_SFLOAT, usageFlags );
     }
-	else if( format == ae3d::DataType::Float16 )
-	{
-		CreateVulkanObjects( const_cast< void* >( imageData ), 4 * 2, VK_FORMAT_R16G16B16A16_SFLOAT, usageFlags );
-	}
-	else if( format == ae3d::DataType::R32G32 )
-	{
-		CreateVulkanObjects( const_cast< void* >( imageData ), 2 * 4, VK_FORMAT_R32G32_SFLOAT, usageFlags );
-	}
-	else
+    else if( format == ae3d::DataType::Float16 )
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 4 * 2, VK_FORMAT_R16G16B16A16_SFLOAT, usageFlags );
+    }
+    else if( format == ae3d::DataType::R32G32 )
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 2 * 4, VK_FORMAT_R32G32_SFLOAT, usageFlags );
+    }
+    else if( format == ae3d::DataType::R32F )
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 1 * 4, VK_FORMAT_R32_SFLOAT, usageFlags );
+    }
+    else
     {
         CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::Linear ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
     }

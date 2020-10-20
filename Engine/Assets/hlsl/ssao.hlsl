@@ -26,7 +26,7 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
 #endif
         int depthWidth, depthHeight;
         normalTex.GetDimensions( depthWidth, depthHeight );
-        float sampleDepth = -normalTex.Load( uint3( offset.xy * float2( depthWidth, depthHeight ), 0 ) ).r;
+        float sampleDepth = -normalTex.Load( int3( offset.xy * float2( depthWidth, depthHeight ), 0 ) ).r;
 
         float diff = abs( originPosVS.z - sampleDepth );
         if (diff < 0.0001f)
@@ -58,7 +58,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
     float2 uv = (float2( globalIdx.xy ) + 0.5f) / float2( depthWidth, depthHeight );
     // get view space origin:
-    float originDepth = -normalTex.Load( uint3( globalIdx.xy, 0 ) ).r;
+    float originDepth = -normalTex.Load( int3( globalIdx.xy, 0 ) ).r;
     float uTanHalfFov = tan( cameraParams.x * 0.5f );
     float uAspectRatio = depthWidth / (float)depthHeight;
     float2 xy = uv * 2 - 1;
@@ -68,17 +68,17 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float3 originPosVS = viewDirection * originDepth;
 
     // get view space normal:
-    float3 normal = -normalize( normalTex.Load( uint3( globalIdx.xy, 0 ) ).gba );
+    float3 normal = -normalize( normalTex.Load( int3( globalIdx.xy, 0 ) ).gba );
 
     // construct kernel basis matrix:
-    float3 rvec = normalize( specularTex.Load( uint3( globalIdx.x % noiseWidth, globalIdx.y % noiseHeight, 0 ) ).rgb );
+    float3 rvec = normalize( specularTex.Load( int3( globalIdx.x % noiseWidth, globalIdx.y % noiseHeight, 0 ) ).rgb );
     //float3 rvec = normalize( specularTex.Sample( sampler1, noiseTexCoords ).rgb );
     float3 tangent = normalize( rvec - normal * dot( rvec, normal ) );
     float3 bitangent = cross( tangent, normal );
     float3x3 tangentToView = transpose( float3x3( tangent, bitangent, normal ) );
 
-    float s = ssao( tangentToView, originPosVS, 0.5f, 32, globalIdx );
-    float4 color = tex.Load( uint3( globalIdx.x, globalIdx.y, 0 ) );
+    float s = ssao( tangentToView, originPosVS, 0.5f, 16, globalIdx );
+    float4 color = tex.Load( int3( globalIdx.x, globalIdx.y, 0 ) );
 
     rwTexture[ globalIdx.xy ] = color * s;
 }

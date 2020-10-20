@@ -1065,8 +1065,8 @@ void ae3d::CreateRenderer( int samples )
     GfxDeviceGlobal::texture3 = Texture2D::GetDefaultTexture();
     GfxDeviceGlobal::textureCube = TextureCube::GetDefaultTexture();
 
-    renderer.GenerateSSAOKernel( 32, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
-    GfxDeviceGlobal::perObjectUboStruct.kernelSize = 32;
+    renderer.GenerateSSAOKernel( 16, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+    GfxDeviceGlobal::perObjectUboStruct.kernelSize = 16;
 }
 
 void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, int offset )
