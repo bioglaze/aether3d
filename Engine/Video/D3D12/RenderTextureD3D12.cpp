@@ -7,6 +7,8 @@
 #include "Macros.hpp"
 #include "System.hpp"
 
+DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format );
+
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
@@ -41,24 +43,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     dataType = aDataType;
     isCube = false;
     handle = 1;
-
-    if (dataType == DataType::UByte)
-    {
-        dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-    }
-    else if (dataType == DataType::Float)
-    {
-        dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    }
-    else if (dataType == DataType::R32G32)
-    {
-        dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
-    }
-    else
-    {
-        dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-        System::Print( "unhandled data type for render texture 2d\n" );
-    }
+	dxgiFormat = FormatToDXGIFormat( dataType );
 
     D3D12_CLEAR_VALUE clearValue = {};
     clearValue.Format = dxgiFormat;
@@ -164,24 +149,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     isRenderTexture = true;
     dataType = aDataType;
     isCube = true;
- 
-    if (dataType == DataType::UByte)
-    {
-        dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-    }
-    else if (dataType == DataType::Float)
-    {
-        dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    }
-    else if (dataType == DataType::R32G32)
-    {
-        dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
-    }
-    else
-    {
-        dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-        System::Print( "unhandled data type for render texture cube\n" );
-    }
+	dxgiFormat = FormatToDXGIFormat( dataType );
 
     // Base resources
     {

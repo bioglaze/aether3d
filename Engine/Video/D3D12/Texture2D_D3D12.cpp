@@ -205,13 +205,45 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &Texture2DGlobal::defaultTexture;
 }
 
+DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format )
+{
+	DXGI_FORMAT dxgiFormat = DXGI_FORMAT_UNKNOWN;
+
+	if( format == ae3d::DataType::Float )
+	{
+		dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	}
+	else if( format == ae3d::DataType::Float16 )
+	{
+		dxgiFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	}
+	else if( format == ae3d::DataType::R32F )
+	{
+		dxgiFormat = DXGI_FORMAT_R32_FLOAT;
+	}
+	else if( format == ae3d::DataType::R32G32 )
+	{
+		dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
+	}
+	else if( format == ae3d::DataType::UByte )
+	{
+		dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	}
+	else
+	{
+		ae3d::System::Assert( false, "unhandled format!" );
+	}
+
+	return dxgiFormat;
+}
+
 void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format )
 {
     LoadFromData( nullptr, aWidth, aHeight, debugName, format );
 
     uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
-    uavDesc.Format = format == DataType::Float ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
+    uavDesc.Format = FormatToDXGIFormat( format );
     uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
     uavDesc.Texture2D.MipSlice = 0;
     uavDesc.Texture2D.PlaneSlice = 0;
@@ -232,7 +264,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     descTex.Height = static_cast< UINT >(height);
     descTex.DepthOrArraySize = 1;
     descTex.MipLevels = 1;
-    descTex.Format = format == DataType::Float ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
+    descTex.Format = FormatToDXGIFormat( format );
     descTex.SampleDesc.Count = 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -272,6 +304,10 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
 	else if( format == DataType::UByte )
 	{
 		rowPitch = width * 4;
+	}
+	else if( format == DataType::R32F )
+	{
+		rowPitch = width * 1 * sizeof( float );
 	}
 	else
 	{
