@@ -343,8 +343,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
         sampleCount = 1;
     }
     
-    renderer.GenerateSSAOKernel( 32, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
-    GfxDeviceGlobal::perObjectUboStruct.kernelSize = 32;
+    renderer.GenerateSSAOKernel( 16, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
+    GfxDeviceGlobal::perObjectUboStruct.kernelSize = 16;
     GfxDeviceGlobal::perObjectUboStruct.windowWidth = aView.bounds.size.width * 2;
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = aView.bounds.size.height * 2;
 
@@ -355,8 +355,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
 
     renderPassDescriptorFBO = [MTLRenderPassDescriptor renderPassDescriptor];
 
-    GfxDeviceGlobal::backBufferWidth = aView.bounds.size.width;
-    GfxDeviceGlobal::backBufferHeight = aView.bounds.size.height;
+    GfxDeviceGlobal::backBufferWidth = aView.bounds.size.width * 2;
+    GfxDeviceGlobal::backBufferHeight = aView.bounds.size.height * 2;
     GfxDeviceGlobal::sampleCount = sampleCount;
     
     for (std::size_t uboIndex = 0; uboIndex < UboCount; ++uboIndex)
@@ -399,8 +399,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
     }
     
     MTLTextureDescriptor* desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:aView.colorPixelFormat
-                                                                                        width:GfxDeviceGlobal::backBufferWidth * 2
-                                                                                       height:GfxDeviceGlobal::backBufferHeight * 2
+                                                                                        width:GfxDeviceGlobal::backBufferWidth
+                                                                                       height:GfxDeviceGlobal::backBufferHeight
                                                                                     mipmapped:NO];
         
     desc.textureType = MTLTextureType2DMultisample;
@@ -412,8 +412,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
     msaaColorTarget.label = @"MSAA Color Target";
     
     MTLTextureDescriptor* depthDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatDepth32Float
-                                                                                    width:GfxDeviceGlobal::backBufferWidth * 2
-                                                                                   height:GfxDeviceGlobal::backBufferHeight * 2
+                                                                                    width:GfxDeviceGlobal::backBufferWidth
+                                                                                   height:GfxDeviceGlobal::backBufferHeight
                                                                                 mipmapped:NO];
 
     depthDesc.textureType = MTLTextureType2DMultisample;

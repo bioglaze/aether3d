@@ -23,13 +23,9 @@ unsigned ae3d::CameraComponent::New()
 
     cameraComponents[ nextFreeCameraComponent ].viewport[ 0 ] = 0;
     cameraComponents[ nextFreeCameraComponent ].viewport[ 1 ] = 0;
-#if RENDERER_METAL
-    cameraComponents[ nextFreeCameraComponent ].viewport[ 2 ] = GfxDeviceGlobal::backBufferWidth * 2;
-    cameraComponents[ nextFreeCameraComponent ].viewport[ 3 ] = GfxDeviceGlobal::backBufferHeight * 2;
-#else
     cameraComponents[ nextFreeCameraComponent ].viewport[ 2 ] = GfxDeviceGlobal::backBufferWidth;
     cameraComponents[ nextFreeCameraComponent ].viewport[ 3 ] = GfxDeviceGlobal::backBufferHeight;
-#endif
+
     return nextFreeCameraComponent++;
 }
 
