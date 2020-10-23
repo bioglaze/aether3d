@@ -22,6 +22,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Bitmap and Signed Distance Field font rendering using BMFont fonts.
   - Skinned animation for meshes imported from FBX.
   - Variance shadow mapping.
+  - SSAO
   - Bloom
   - Audio support for .wav and .ogg.
   - Hot-reloading of assets.

@@ -9,7 +9,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.8.5 Documentation
+   \mainpage Aether3D Game Engine v0.8.6 Documentation
 
    \section Introduction
 
@@ -28,6 +28,8 @@
    <li>Custom mesh format, converters included for .obj, .fbx and Blender.</li>
    <li>Shadow mapping from a directional or spot light</li>
    <li>VR support. Tested on HTC Vive.</li>
+   <li>SSAO</li>
+   <li>Bloom</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
    <li>Skinned animation.</li>
    <li>Scene serialization.</li>
@@ -198,7 +200,7 @@ namespace ae3d
 
         namespace Statistics
         {
-			/// \param outStr Caller must allocate at least X bytes for the output.
+			/// \param outStr Caller must allocate at least 512 bytes for the output.
             void GetStatistics( char* outStr );
             int GetDrawCallCount();
             int GetShaderBindCount();
