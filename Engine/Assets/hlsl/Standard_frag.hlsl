@@ -95,6 +95,11 @@ float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
     return (smoothFactor * smoothFactor) / max( distanceSquare, 1e-4 );
 }
 
+float pointLightAttenuation( float d, float r )
+{
+    return 2.0f / ( d * d + r * r + d * sqrt( d * d + r * r ) );
+}
+
 float linstep( float low, float high, float v )
 {
     return saturate( (v - low) / (high - low) );
@@ -200,7 +205,7 @@ float4 main( PS_INPUT input ) : SV_Target
         
         if (lightDistance < radius)
         {
-            const float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
+            const float attenuation = pointLightAttenuation( length( vecToLightWS ), 1.0f / radius );
             const float3 color = Fd + Fr;
             accumDiffuseAndSpecular.rgb += (color * pointLightColors[ lightIndex ].rgb) * attenuation * dotNL;
         }

@@ -176,6 +176,11 @@ float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
     return (smoothFactor * smoothFactor) / max( distanceSquare, 1e-4 );
 }
 
+float pointLightAttenuation( float d, float r )
+{
+    return 2.0f / ( d * d + r * r + d * sqrt( d * d + r * r ) );
+}
+
 //[[early_fragment_tests]]
 fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
@@ -263,7 +268,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
             const float3 Fr = (D * v) * F;
             const float3 Fd = Fd_Lambert();
 
-            const float attenuation = getSquareFalloffAttenuation( vecToLightWS, 1.0f / radius );
+            const float attenuation = pointLightAttenuation( length( vecToLightWS ), 1.0f / radius );
             const float3 color = Fd + Fr;
             outColor.rgb += (color * pointLightBufferColors[ lightIndex ].rgb) * attenuation * dotNL;
         }
