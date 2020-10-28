@@ -428,7 +428,8 @@ void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
     Statistics::IncQueueSubmitCalls();
 
     // FIXME: This is slow
-    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+	err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+	AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 }
 
 void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkFormat format, VkImageUsageFlags usageFlags )
