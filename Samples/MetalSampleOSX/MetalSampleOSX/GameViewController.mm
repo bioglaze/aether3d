@@ -33,15 +33,15 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-#define TEST_FORWARD_PLUS
+const bool TestForwardPlus = false;
 const bool TestBloom = false;
-//#define TEST_SHADOWS_DIR
-//#define TEST_SHADOWS_SPOT
-//#define TEST_SHADOWS_POINT
+const bool TestSSAO = false;
+const bool TestShadowsDir = false;
+const bool TestShadowsSpot = false;
+const bool TestShadowsPoint = false;
+const bool TestRenderTexture2D = false;
+const bool TestRenderTextureCube = false;
 //#define TEST_NUKLEAR_UI
-//#define TEST_RENDER_TEXTURE_2D
-//#define TEST_RENDER_TEXTURE_CUBE
-//#define TEST_SSAO
 
 const int POINT_LIGHT_COUNT = 50 * 40;
 const int MULTISAMPLE_COUNT = 1;
@@ -350,12 +350,15 @@ using namespace ae3d;
 
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
-#ifdef TEST_FORWARD_PLUS
-        mat.second->SetShader( &standardShader );
-        mat.second->SetTexture( &skyTex );
-#else
-        mat.second->SetShader( &shader );
-#endif
+        if (TestForwardPlus)
+        {
+            mat.second->SetShader( &standardShader );
+            mat.second->SetTexture( &skyTex );
+        }
+        else
+        {
+            mat.second->SetShader( &shader );
+        }
     }
 
     for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
@@ -528,11 +531,14 @@ using namespace ae3d;
     pbrMaterial.SetShader( &standardShader );
     pbrMaterial.SetTexture( &pbrNormalTex, 1 );
     pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
-#ifdef TEST_RENDER_TEXTURE_CUBE
-    pbrMaterial.SetRenderTexture( &cubeRT, 4 );
-#else
-    pbrMaterial.SetTexture( &skyTex );
-#endif
+    if (TestRenderTextureCube)
+    {
+        pbrMaterial.SetRenderTexture( &cubeRT, 4 );
+    }
+    else
+    {
+        pbrMaterial.SetTexture( &skyTex );
+    }
 
     pbrCube.AddComponent<ae3d::MeshRendererComponent>();
     pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -602,28 +608,29 @@ using namespace ae3d;
 
     animatedGo.AddComponent< MeshRendererComponent >();
     animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
-#ifdef TEST_FORWARD_PLUS
-    animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &skinStandardMaterial, 0 );
-#else
-    animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( &skinMaterial, 0 );
-#endif
+
+    animatedGo.GetComponent< MeshRendererComponent>()->SetMaterial( TestForwardPlus ? &skinStandardMaterial : &skinMaterial, 0 );
     animatedGo.AddComponent< TransformComponent >();
     animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { -10, -12, -85 } );
     animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 0, 0 } ) );
     animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.01f );
 
     dirLight.AddComponent<ae3d::DirectionalLightComponent>();
-#ifdef TEST_SHADOWS_DIR
-    dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 1024 );
-#endif
+
+    if (TestShadowsDir)
+    {
+        dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetCastShadow( true, 1024 );
+    }
+
     dirLight.GetComponent<ae3d::DirectionalLightComponent>()->SetColor( { 1, 1, 1 } );
     dirLight.AddComponent<ae3d::TransformComponent>();
     dirLight.GetComponent<ae3d::TransformComponent>()->LookAt( { 0, 0, 0 }, ae3d::Vec3( 0, -1, 0 ), { 0, 1, 0 } );
 
     spotLight.AddComponent<ae3d::SpotLightComponent>();
-#ifdef TEST_SHADOWS_SPOT
-    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
-#endif
+    if (TestShadowsSpot)
+    {
+        spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
+    }
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetColor( Vec3( 1, 0, 0 ) );
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetRadius( 2 );
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetConeAngle( 30 );
@@ -632,15 +639,17 @@ using namespace ae3d;
     spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -70 }, { 0, 0, 1 }, { 0, 1, 0 } );
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
-#ifdef TEST_SHADOWS_POINT
-    pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( true, 1024 );
-#endif
+    if (TestShadowsPoint)
+    {
+        pointLight.GetComponent<ae3d::PointLightComponent>()->SetCastShadow( true, 1024 );
+    }
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 10.2f );
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -80, 0, -85 ) );
 
-#ifdef TEST_FORWARD_PLUS
+
     // Inits point lights for Forward+
+    if (TestForwardPlus)
     {
         int pointLightIndex = 0;
 
@@ -659,7 +668,7 @@ using namespace ae3d;
             }
         }
     }
-#endif
+
 
     rtTex.Create2D( 512, 512, ae3d::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture", false );
     bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", DataType::Float );
@@ -668,9 +677,10 @@ using namespace ae3d;
     ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", DataType::Float );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
-#ifdef TEST_RENDER_TEXTURE_2D
-    renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
-#endif
+    if (TestRenderTexture2D)
+    {
+        renderTextureContainer.GetComponent<ae3d::SpriteRendererComponent>()->SetTexture( &rtTex, ae3d::Vec3( 250, 150, -0.6f ), ae3d::Vec3( 256, 256, 1 ), ae3d::Vec4( 1, 1, 1, 1 ) );
+    }
     renderTextureContainer.SetLayer( 2 );
 
     rtCamera.AddComponent<ae3d::CameraComponent>();
@@ -695,9 +705,10 @@ using namespace ae3d;
 
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
 
-#ifdef TEST_FORWARD_PLUS
-    scene.Add( &pbrCube );
-#endif
+    if (TestForwardPlus)
+    {
+        scene.Add( &pbrCube );
+    }
     //scene.Add( &cubePTN2 );
     //scene.Add( &cubePTN );
     //scene.Add( &rtCube );
@@ -706,22 +717,27 @@ using namespace ae3d;
     scene.Add( &spriteContainer );
     scene.Add( &textSDF );
     scene.Add( &text );
-    scene.Add( &animatedGo );
-#ifdef TEST_SHADOWS_POINT
-    scene.Add( &pointLight );
-#endif
+    //scene.Add( &animatedGo );
+
+    if (TestShadowsPoint)
+    {
+        scene.Add( &pointLight );
+    }
     scene.Add( &spotLight );
-//#ifdef TEST_SHADOWS_DIR
-    //scene.Add( &dirLight );
-//#endif
-#ifdef TEST_RENDER_TEXTURE_2D
-    scene.Add( &renderTextureContainer );
-    scene.Add( &rtCamera );
-#endif
-#ifdef TEST_RENDER_TEXTURE_CUBE
-    scene.Add( &renderTextureContainer );
-    scene.Add( &cameraCubeRT );
-#endif
+    scene.Add( &dirLight );
+
+    if (TestRenderTexture2D)
+    {
+        scene.Add( &renderTextureContainer );
+        scene.Add( &rtCamera );
+    }
+
+    if (TestRenderTextureCube)
+    {
+        scene.Add( &renderTextureContainer );
+        scene.Add( &cameraCubeRT );
+    }
+
     transTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::None,
                   ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
 
@@ -864,53 +880,56 @@ using namespace ae3d;
         {
             downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
             downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
-            downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
+            downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downSampleAndThreshold" );
             
             blurShader.SetTexture2D( 0, &blurTex );
             blurShader.SetTexture2D( 1, &bloomTex );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             blurShader.SetTexture2D( 0, &bloomTex );
             blurShader.SetTexture2D( 1, &blurTex );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             // Second blur
             blurShader.SetTexture2D( 0, &blurTex );
             blurShader.SetTexture2D( 1, &blurTex2 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             blurShader.SetTexture2D( 0, &blurTex2 );
             blurShader.SetTexture2D( 1, &blurTex );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             // Third blur
             blurShader.SetTexture2D( 0, &blurTex );
             blurShader.SetTexture2D( 1, &blurTex2 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             blurShader.SetTexture2D( 0, &blurTex2 );
             blurShader.SetTexture2D( 1, &blurTex );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
         }
-#ifdef TEST_SSAO
-        ssaoShader.SetRenderTexture( 0, &cameraTex );
-        ssaoShader.SetRenderTexture( 1, &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
-        ssaoShader.SetTexture2D( 3, &noiseTex );
-        ssaoShader.SetTexture2D( 2, &ssaoTex );
-        ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
-        ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1 );
 
-        System::Draw( &ssaoTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-#endif
+        if (TestSSAO)
+        {
+            ssaoShader.SetRenderTexture( 0, &cameraTex );
+            ssaoShader.SetRenderTexture( 1, &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
+            ssaoShader.SetTexture2D( 3, &noiseTex );
+            ssaoShader.SetTexture2D( 2, &ssaoTex );
+            ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
+            ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO" );
+            
+            System::Draw( &ssaoTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        }
+        
         //scene2.Render();
         Matrix44 viewMat = camera3d.GetComponent< CameraComponent >()->GetView();
         Matrix44 lineTransform;
@@ -1015,24 +1034,25 @@ using namespace ae3d;
     camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
     camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
 
-#ifdef TEST_FORWARD_PLUS
-    static float y = -14;
-    y += 0.1f;
-
-    if (y > 30)
+    if (TestForwardPlus)
     {
-        y = -14;
+        static float y = -14;
+        y += 0.1f;
+        
+        if (y > 30)
+        {
+            y = -14;
+        }
+        
+        for (unsigned pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
+        {
+            const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
+            const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+            const float zOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
+            
+            pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + zOffset ) );
+        }
     }
-
-    for (unsigned pointLightIndex = 0; pointLightIndex < POINT_LIGHT_COUNT; ++pointLightIndex)
-    {
-        const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
-        const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-        const float zOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-
-        //pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + zOffset ) );
-    }
-#endif
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size
