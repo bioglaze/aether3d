@@ -268,7 +268,11 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
         {
             isSomeFaceDDS = true;
             auto fileContents = FileSystem::FileContents( paths[ face ].c_str() );
+#if VK_USE_PLATFORM_ANDROID_KHR
+            const DDSLoader::LoadResult loadResult = DDSLoader::LoaddResult::FileNotFound;
+#else
             const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput[ face ] );
+#endif
 
             if (loadResult != DDSLoader::LoadResult::Success)
             {

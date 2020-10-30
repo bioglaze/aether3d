@@ -704,8 +704,11 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
 {
     DDSLoader::Output ddsOutput;
     auto fileContents = FileSystem::FileContents( aPath );
+#if VK_USE_PLATFORM_ANDROID_KHR
+    const DDSLoader::LoadResult loadResult = DDSLoader::LoaddResult::FileNotFound;
+#else
     const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput );
-
+#endif
     if (loadResult != DDSLoader::LoadResult::Success)
     {
         ae3d::System::Print( "DDS Loader could not load %s", aPath );
