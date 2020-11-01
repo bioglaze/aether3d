@@ -104,7 +104,7 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     out.tangentVS_u.xyz = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
     out.tangentVS_u.w = vert.texcoord.x;
     float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
-    out.bitangentVS_v.xyz = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
+    out.bitangentVS_v.xyz = ( uniforms.localToView * float4( ct, 0 ) ).xyz;
     out.bitangentVS_v.w = vert.texcoord.y;
     out.normalVS = (uniforms.localToView * float4( vert.normal, 0 )).xyz;
     
@@ -217,7 +217,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float dotNL = saturate( dot( N, -surfaceToDirectionalLightVS ) );
     const float dotLH = saturate( dot( L, H ) );
     const float dotNH = saturate( dot( N, H ) );
-    
+
     const float3 f0 = float3( uniforms.f0, uniforms.f0, uniforms.f0 );
     
     const float roughness = 0.5f;
@@ -232,10 +232,11 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     int index = uniforms.maxNumLightsPerTile * tileIndex;
     int nextLightIndex = perTileLightIndexBuffer[ index ];
 
-    //float3 color = Fd + Fr;
+    float3 color = Fd + Fr;
     //float4 outColor = float4( color + uniforms.lightColor.rgb * dotNL, 1 );
 
-    float4 outColor = float4( uniforms.lightColor.rgb * dotNL, 1 );
+    float4 outColor = float4( (uniforms.lightColor.rgb * color) * dotNL, 1 );
+    
     
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
