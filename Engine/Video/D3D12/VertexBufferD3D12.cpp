@@ -62,7 +62,7 @@ void ae3d::VertexBuffer::SetDebugName( const char* name )
 {
     if (vb)
     {
-        wchar_t wname[ 128 ];
+		wchar_t wname[ 128 ] = {};
         std::mbstowcs( wname, name, 128 );
         vb->SetName( wname );
     }

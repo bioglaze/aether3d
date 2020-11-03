@@ -162,7 +162,7 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
 
     if (dataHLSL.path.find( ".obj" ) != std::string::npos)
     {
-        wchar_t wstr[ 256 ];
+		wchar_t wstr[ 256 ] = {};
         std::mbstowcs( wstr, dataHLSL.path.c_str(), 256 );
 
         HRESULT hr = D3DReadFileToBlob( wstr, &blobShader );

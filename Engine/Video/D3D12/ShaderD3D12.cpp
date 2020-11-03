@@ -75,7 +75,7 @@ void ShaderReload( const std::string& path )
 
             if (entry.vertexPath.find( ".obj" ) != std::string::npos && entry.fragmentPath.find( ".obj" ) != std::string::npos)
             {
-                wchar_t wstr[ 256 ];
+				wchar_t wstr[ 256 ] = {};
                 std::mbstowcs( wstr, entry.vertexPath.c_str(), 256 );
 
                 HRESULT hr = D3DReadFileToBlob( wstr, &entry.shader->blobShaderVertex );
@@ -157,7 +157,7 @@ void ae3d::Shader::Load( const char* /*metalVertexShaderName*/, const char* /*me
 
     if (vertexPath.find( ".obj" ) != std::string::npos && fragmentPath.find( ".obj" ) != std::string::npos)
     {
-        wchar_t wstr[ 256 ];
+		wchar_t wstr[ 256 ] = {};
         std::mbstowcs( wstr, vertexPath.c_str(), 256 );
 
         HRESULT hr = D3DReadFileToBlob( wstr, &blobShaderVertex );

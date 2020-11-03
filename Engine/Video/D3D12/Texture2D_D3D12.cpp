@@ -253,36 +253,36 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName,
 
 void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, const char* debugName, DataType format )
 {
-    width = aWidth;
-    height = aHeight;
-    wrap = TextureWrap::Repeat;
-    filter = TextureFilter::Linear;
+	width = aWidth;
+	height = aHeight;
+	wrap = TextureWrap::Repeat;
+	filter = TextureFilter::Linear;
 
-    D3D12_RESOURCE_DESC descTex = {};
-    descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    descTex.Width = width;
-    descTex.Height = static_cast< UINT >(height);
-    descTex.DepthOrArraySize = 1;
-    descTex.MipLevels = 1;
-    descTex.Format = FormatToDXGIFormat( format );
-    descTex.SampleDesc.Count = 1;
-    descTex.SampleDesc.Quality = 0;
-    descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    // FIXME: This is a hack
-    descTex.Flags = imageData ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	D3D12_RESOURCE_DESC descTex = {};
+	descTex.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	descTex.Width = width;
+	descTex.Height = static_cast< UINT >( height );
+	descTex.DepthOrArraySize = 1;
+	descTex.MipLevels = 1;
+	descTex.Format = FormatToDXGIFormat( format );
+	descTex.SampleDesc.Count = 1;
+	descTex.SampleDesc.Quality = 0;
+	descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	// FIXME: This is a hack
+	descTex.Flags = imageData ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
-    D3D12_HEAP_PROPERTIES heapProps = {};
-    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-    heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-    heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-    heapProps.CreationNodeMask = 1;
-    heapProps.VisibleNodeMask = 1;
+	D3D12_HEAP_PROPERTIES heapProps = {};
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
 
-    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
-        D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
-    AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
+	HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
+																   D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
+	AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
-    wchar_t wstr[ 128 ];
+	wchar_t wstr[ 128 ] = {};
     std::mbstowcs( wstr, debugName, 128 );
     gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
@@ -494,7 +494,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     const D3D12_RESOURCE_ALLOCATION_INFO info = GfxDeviceGlobal::device->GetResourceAllocationInfo( 0, 1, &descTex );
     Texture2DGlobal::tex2dMemoryUsage += (int)info.SizeInBytes;
 
-    wchar_t wstr[ 128 ];
+	wchar_t wstr[ 128 ] = {};
     std::mbstowcs( wstr, aPath, 128 );
     gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
@@ -563,7 +563,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     const D3D12_RESOURCE_ALLOCATION_INFO info = GfxDeviceGlobal::device->GetResourceAllocationInfo( 0, 1, &descTex );
     Texture2DGlobal::tex2dMemoryUsage += (int)info.SizeInBytes;
 
-    wchar_t wstr[ 128 ];
+	wchar_t wstr[ 128 ] = {};
     std::mbstowcs( wstr, fileContents.path.c_str(), 128 );
     gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;

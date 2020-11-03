@@ -185,7 +185,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource( &heapProps, D3D12_HEAP_FLAG_NONE, &descTex,
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
-    wchar_t wstr[ 128 ];
+	wchar_t wstr[ 128 ] = {};
     std::mbstowcs( wstr, posX.path.c_str(), 128 );
     gpuResource.resource->SetName( wstr );
     gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;
