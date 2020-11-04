@@ -29,16 +29,17 @@
 
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip
 
+// sponza_372
 constexpr bool TestMSAA = false;
 constexpr bool TestRenderTexture2D = false;
 //#define TEST_RENDER_TEXTURE_CUBE
 //#define TEST_VERTEX_LAYOUTS
 constexpr bool TestShadowsDir = false;
-//#define TEST_SHADOWS_SPOT
-//#define TEST_SHADOWS_POINT
+constexpr bool TestShadowsSpot = false;
+constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
-#define TEST_SSAO
+//#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -373,25 +374,14 @@ int main()
 
     GameObject dirLight;
     dirLight.AddComponent<DirectionalLightComponent>();
-    if (TestShadowsDir)
-    {
-        dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( true, 2048 );
-    }
-    else
-    {
-        dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( false, 2048 );
-    }
+    dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( TestShadowsDir, 2048 );
     dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 1, 1, 1 ) );
     dirLight.AddComponent<TransformComponent>();
     dirLight.GetComponent<TransformComponent>()->LookAt( { 1, 1, 1 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
-#ifdef TEST_SHADOWS_SPOT
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( true, 1024 );
-#else
-    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( false, 1024 );
-#endif
+    spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( TestShadowsSpot, 1024 );
     spotLight.GetComponent<SpotLightComponent>()->SetRadius( 2 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
@@ -401,11 +391,7 @@ int main()
 
     GameObject pointLight;
     pointLight.AddComponent<PointLightComponent>();
-#ifdef TEST_SHADOWS_POINT
-    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( true, 1024 );
-#else
-    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( false, 1024 );
-#endif
+    pointLight.GetComponent<PointLightComponent>()->SetCastShadow( TestShadowsPoint, 1024 );
     pointLight.GetComponent<PointLightComponent>()->SetRadius( 1 );
     pointLight.AddComponent<TransformComponent>();
     pointLight.GetComponent<TransformComponent>()->SetLocalPosition( { 2, 0, -98 } );
@@ -620,9 +606,10 @@ int main()
     scene.Add( &rotatingCube );
     scene.Add( &cube );
 
-#ifdef TEST_SHADOWS_POINT
-    scene.Add( &pointLight );
-#endif
+    if (TestShadowsPoint)
+    {
+        scene.Add( &pointLight );
+    }
     scene.Add( &dirLight );
     scene.Add( &spotLight );
 
