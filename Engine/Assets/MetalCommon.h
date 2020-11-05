@@ -26,7 +26,7 @@ struct Uniforms
     int kernelSize;
     int pad0;
     int pad1;
-    float4 kernelOffsets[ 64 ];
+    float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };
 

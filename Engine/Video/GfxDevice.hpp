@@ -35,7 +35,7 @@ struct PerObjectUboStruct
     int kernelSize;
     int pad0;
     int pad1;
-    ae3d::Vec4 kernelOffsets[ 64 ];
+    ae3d::Vec4 kernelOffsets[ 16 ];
     ae3d::Vec4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };
 
