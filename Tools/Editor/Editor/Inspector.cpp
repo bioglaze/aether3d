@@ -41,10 +41,9 @@ struct VertexPTC
 };
 
 nk_draw_null_texture nullTexture;
-Texture2D* uiTextures[ 1 ];
+Texture2D uiTextures[ 10 ]; // index 0 is font.
 nk_context ctx;
 nk_font_atlas atlas;
-Texture2D nkFontTexture;
 char gameObjectNameField[ 64 ];
 int gameObjectNameFieldLength;
 
@@ -115,9 +114,9 @@ static void DrawNuklear( int width, int height )
                         (int)(cmd->clip_rect.w),
                         (int)(cmd->clip_rect.h),
 #if RENDERER_VULKAN
-                        cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height );
+                        cmd->elem_count, &uiTextures[ cmd->texture.id ], offset, width, height );
 #else
-        cmd->elem_count, uiTextures[ 0/*cmd->texture.id*/ ], offset, width, height * 2 );
+        cmd->elem_count, &uiTextures[ cmd->texture.id ], offset, width, height * 2 );
 #endif
 
         offset += cmd->elem_count / 3;
@@ -139,14 +138,12 @@ void Inspector::Init()
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
 #if RENDERER_VULKAN
-    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, DataType::UByte );
+    uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, DataType::UByte );
 #else
-    nkFontTexture.LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", DataType::UByte );
+    uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", DataType::UByte );
 #endif
 
-    nk_font_atlas_end( &atlas, nk_handle_id( nkFontTexture.GetID() ), &nullTexture );
-    
-    uiTextures[ 0 ] = &nkFontTexture;
+    nk_font_atlas_end( &atlas, nk_handle_id( uiTextures[ 0 ].GetID() ), &nullTexture );
     
     nk_init_default( &ctx, &nkFont->handle );
 }
