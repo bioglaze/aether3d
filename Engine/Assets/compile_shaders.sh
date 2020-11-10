@@ -17,6 +17,7 @@ glslangValidator -D -V -S comp -e CSMain hlsl/LightCuller.hlsl -o ../../../aethe
 glslangValidator -D -V -S vert -e main hlsl/Standard_vert.hlsl -o ../../../aether3d_build/Samples/Standard_vert.spv
 glslangValidator -D -V -S vert -e main hlsl/Standard_skin_vert.hlsl -o ../../../aether3d_build/Samples/Standard_skin_vert.spv
 glslangValidator -D -V -S frag -e main hlsl/Standard_frag.hlsl -o ../../../aether3d_build/Samples/Standard_frag.spv
+glslangValidator -D -DENABLE_SHADOWS -V -S frag -e main hlsl/Standard_frag.hlsl -o ../../../aether3d_build/Samples/Standard_frag_shadow.spv
 glslangValidator -D -V -S comp -e CSMain hlsl/Bloom.hlsl -o ../../../aether3d_build/Samples/Bloom.spv
 glslangValidator -D -V -S comp -e CSMain hlsl/Blur.hlsl -o ../../../aether3d_build/Samples/Blur.spv
 glslangValidator -D -V -S comp -e CSMain hlsl/ssao.hlsl -o ../../../aether3d_build/Samples/ssao.spv

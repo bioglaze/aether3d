@@ -37,7 +37,7 @@ constexpr bool TestRenderTexture2D = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = false;
+constexpr bool TestForwardPlus = true;
 constexpr bool TestBloom = false;
 //#define TEST_SSAO
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
@@ -422,8 +422,18 @@ int main()
         ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
         ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
 
+    Shader standardShadowShader;
+    standardShadowShader.Load( "standard_vertex", "standard_fragment_shadow",
+        ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag_shadow.obj" ),
+        ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag_shadow.spv" ) );
+
     Shader standardSkinShader;
     standardSkinShader.Load( "standard_skin_vertex", "standard_fragment",
+        ae3d::FileSystem::FileContents( "Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
+
+    Shader standardSkinShadowShader;
+    standardSkinShadowShader.Load( "standard_skin_vertex", "standard_fragment",
         ae3d::FileSystem::FileContents( "Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
         ae3d::FileSystem::FileContents( "Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
 
@@ -434,7 +444,7 @@ int main()
     standardMaterial.SetTexture( &skybox );
 
     Material standardSkinMaterial;
-    standardSkinMaterial.SetShader( &standardSkinShader );
+    standardSkinMaterial.SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardSkinShadowShader : &standardSkinShader );
     standardSkinMaterial.SetTexture( &playerTex, 0 );
     standardSkinMaterial.SetTexture( &playerTex, 1 );
     standardSkinMaterial.SetTexture( &skybox );
@@ -449,7 +459,7 @@ int main()
 #ifdef TEST_SPONZA
     if (TestForwardPlus)
     {
-        pbrMaterial.SetShader( &standardShader );
+        pbrMaterial.SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardShadowShader : &standardShader );
         pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
         pbrMaterial.SetTexture( &pbrNormalTex, 1 );
         //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
@@ -459,7 +469,7 @@ int main()
         rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
         rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
 
-        materialTangent.SetShader( &standardShader );
+        materialTangent.SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardShadowShader : &standardShader );
         materialTangent.SetTexture( &normalTex, 1 );
         materialTangent.SetTexture( &whiteTex, 0 );
         cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
@@ -518,7 +528,7 @@ int main()
     {
         if (TestForwardPlus)
         {
-            mat.second->SetShader( &standardShader );
+            mat.second->SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardShadowShader : &standardShader );
             mat.second->SetTexture( &skybox );
         }
         else

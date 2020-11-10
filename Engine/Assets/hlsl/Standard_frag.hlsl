@@ -263,10 +263,11 @@ float4 main( PS_INPUT input ) : SV_Target
     accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
     //accumDiffuseAndSpecular.rgb += texCube.Sample( sLinear, N ).rgb;
 
+#ifdef ENABLE_SHADOWS
     float depth = input.projCoord.z / input.projCoord.w;
-
     float shadow = max( minAmbient, VSM( depth, input.projCoord ) );
-    //accumDiffuseAndSpecular.rgb *= shadow;
+    accumDiffuseAndSpecular.rgb *= shadow;
+#endif
 
     //return float4(accumDiffuseAndSpecular, 1 );
 #ifdef DEBUG_LIGHT_COUNT
