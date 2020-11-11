@@ -32,14 +32,14 @@
 // sponza_372
 constexpr bool TestMSAA = false;
 constexpr bool TestRenderTexture2D = false;
-//#define TEST_RENDER_TEXTURE_CUBE
+constexpr bool TestRenderTextureCube = false;
 //#define TEST_VERTEX_LAYOUTS
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = true;
+constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
-//#define TEST_SSAO
+constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -66,7 +66,7 @@ pcg32_random_t rng;
 
 int Random100()
 {
-    return pcg32_random_r( &rng );
+    return pcg32_random_r( &rng ) % 100;
 }
 
 Scene scene;
@@ -183,21 +183,23 @@ int main()
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
     camera.SetName( "camera" );
 
-#ifdef TEST_RENDER_TEXTURE_CUBE
     RenderTexture cubeRT;
-    cubeRT.CreateCube( 512, ae3d::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
-    
     GameObject cameraCubeRT;
-    cameraCubeRT.AddComponent<CameraComponent>();
-    cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
-    cameraCubeRT.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
-    cameraCubeRT.GetComponent<CameraComponent>()->SetProjection( 45, 1, 1, 400 );
-    cameraCubeRT.GetComponent<CameraComponent>()->SetTargetTexture( &cubeRT );
-    cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
-    cameraCubeRT.AddComponent<TransformComponent>();
-    cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
-    cameraCubeRT.SetName( "cameraCubeRT" );
-#endif
+    
+    if (TestRenderTextureCube)
+    {
+        cubeRT.CreateCube( 512, ae3d::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
+
+        cameraCubeRT.AddComponent<CameraComponent>();
+        cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
+        cameraCubeRT.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+        cameraCubeRT.GetComponent<CameraComponent>()->SetProjection( 45, 1, 1, 400 );
+        cameraCubeRT.GetComponent<CameraComponent>()->SetTargetTexture( &cubeRT );
+        cameraCubeRT.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+        cameraCubeRT.AddComponent<TransformComponent>();
+        cameraCubeRT.GetComponent<TransformComponent>()->LookAt( { 5, 0, -70 }, { 0, 0, -100 }, { 0, 1, 0 } );
+        cameraCubeRT.SetName( "cameraCubeRT" );
+    }
     
     GameObject camera2d;
     camera2d.AddComponent<CameraComponent>();
@@ -287,13 +289,15 @@ int main()
     Mesh animatedMesh;
     animatedMesh.Load( FileSystem::FileContents( "human_anim_test2.ae3d" ) );
 
-#ifdef TEST_RENDER_TEXTURE_CUBE
     GameObject rtCube;
-    rtCube.AddComponent< MeshRendererComponent >();
-    rtCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
-    rtCube.AddComponent< TransformComponent >();
-    rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { 5, 0, -70 } );
-#endif
+
+    if (TestRenderTextureCube)
+    {
+        rtCube.AddComponent< MeshRendererComponent >();
+        rtCube.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh2 );
+        rtCube.AddComponent< TransformComponent >();
+        rtCube.GetComponent< TransformComponent >()->SetLocalPosition( { 5, 0, -70 } );
+    }
     
     GameObject animatedGo;
     animatedGo.AddComponent< MeshRendererComponent >();
@@ -408,14 +412,16 @@ int main()
         FileSystem::FileContents( path ), FileSystem::FileContents( path ),
         FileSystem::FileContents( path ), FileSystem::FileContents( path ),
         TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB );*/
-#ifdef TEST_RENDER_TEXTURE_CUBE
     Material materialCubeRT;
-    materialCubeRT.SetShader( &shaderCubeMap );
-    materialCubeRT.SetRenderTexture( &cubeRT, 4 );
-    materialCubeRT.SetBackFaceCulling( true );
+    
+    if (TestRenderTextureCube)
+    {
+        materialCubeRT.SetShader( &shaderCubeMap );
+        materialCubeRT.SetRenderTexture( &cubeRT, 4 );
+        materialCubeRT.SetBackFaceCulling( true );
 
-    rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
-#endif
+        rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
+    }
 
     Shader standardShader;
     standardShader.Load( "standard_vertex", "standard_fragment",
@@ -604,10 +610,11 @@ int main()
         scene.Add( &statsContainer );
     }
 #endif
-#ifdef TEST_RENDER_TEXTURE_CUBE
-    scene.Add( &rtCube );
-    scene.Add( &cameraCubeRT );
-#endif
+    if (TestRenderTextureCube)
+    {
+        scene.Add( &rtCube );
+        scene.Add( &cameraCubeRT );
+    }
     scene.Add( &lightParent );
     scene.Add( &animatedGo );
     scene.Add( &cubeTangent );
@@ -1074,8 +1081,7 @@ int main()
             bloomTex.SetLayout( TextureLayout::General );
         }
 
-#ifdef TEST_SSAO
-        if (ssao)
+        if (TestSSAO && ssao)
         {
             ssaoTex.SetLayout( TextureLayout::General );
 #if RENDERER_D3D12
@@ -1106,7 +1112,6 @@ int main()
 
             System::Draw( &ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         }
-#endif
 
         scene.EndFrame();
 #endif
