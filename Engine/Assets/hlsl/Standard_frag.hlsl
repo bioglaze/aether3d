@@ -95,6 +95,11 @@ float getSquareFalloffAttenuation( float3 posToLight, float lightInvRadius )
     return (smoothFactor * smoothFactor) / max( distanceSquare, 1e-4 );
 }
 
+float quadraticAttenuation( float d, float kc, float kl, float kq )
+{
+    return 1.0f / (kc + kl * d + kq * d * d );
+}
+
 float pointLightAttenuation( float d, float r )
 {
     return 2.0f / ( d * d + r * r + d * sqrt( d * d + r * r ) );
