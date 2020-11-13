@@ -1,3 +1,4 @@
+#include <chrono>
 #include <string>
 #include <stdint.h>
 #include "Array.hpp"
@@ -29,7 +30,6 @@
 
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.5.zip
 
-// sponza_372
 constexpr bool TestMSAA = false;
 constexpr bool TestRenderTexture2D = false;
 constexpr bool TestRenderTextureCube = false;
@@ -38,7 +38,7 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = false;
+constexpr bool TestBloom = true;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
@@ -901,6 +901,8 @@ int main()
 #endif
         if (TestBloom)
         {
+            auto beginTime = std::chrono::steady_clock::now();
+
 #if RENDERER_D3D12
             blurTex.SetLayout( TextureLayout::ShaderReadWrite );
 
@@ -1078,7 +1080,14 @@ int main()
             blurTex.SetLayout( TextureLayout::ShaderRead );
             System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+            System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+
             bloomTex.SetLayout( TextureLayout::General );
+
+            auto endTime = std::chrono::steady_clock::now();
+            auto tDiff = std::chrono::duration<double, std::milli>( endTime - beginTime ).count();
+            float bloomMS_CPU = static_cast< float >(tDiff);
+            //System::Print( "Bloom CPU time: %.2f ms\n", bloomMS_CPU );
         }
 
         if (TestSSAO && ssao)
