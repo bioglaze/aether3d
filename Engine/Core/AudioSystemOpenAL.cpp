@@ -146,6 +146,17 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
     }
     
     ifs.read( (char*)&wav.subchunk1Size, 4 );
+    if (wav.subchunk1Size == 18)
+    {
+        ae3d::System::Print( "%s is a non-PCM wave format, not supported!!\n", clipData.path.c_str() );
+        return;
+    }
+    else if (wav.subchunk1Size == 40)
+    {
+        ae3d::System::Print( "%s is an extensible wave format, not supported!!\n", clipData.path.c_str() );
+        return;
+    }
+    
     if (wav.subchunk1Size != 16)
     {
         ae3d::System::Print( "%s does not contain PCM audio data!\n", clipData.path.c_str() );

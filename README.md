@@ -15,6 +15,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
   - Windows, macOS, iOS and Linux support.
   - Vulkan, D3D12 and Metal renderers.
+  - Physically-based rendering.
   - Forward+ light culling.
   - Component-based game object system.
   - VR support in Vulkan backend. Tested on HTC Vive.
@@ -36,7 +37,6 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # Planned Features
 
-  - Physically-based rendering
   - Particles
   - Tone mapping
   - DoF
@@ -49,7 +49,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
     Window::Create( width, height, WindowCreateFlags::Fullscreen );
 	
     RenderTexture cameraTex;
-    cameraTex.Create2D( width, height, RenderTexture::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex" );
+    cameraTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", false );
 
     GameObject camera;
     camera.AddComponent<CameraComponent>();
@@ -114,8 +114,8 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Open Samples/MetalSampleiOS and build and run it.
 
 # Tested GPUs
-  - AMD Radeon R9 Nano on Ubuntu 18.04 and Windows 10
-  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS High Sierra
+  - AMD Radeon R9 Nano on Ubuntu 20.04 and Windows 10
+  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS Mojave
   - NVIDIA GTX 1080 on Windows 10
   - NVIDIA RTX 2060 on Windows 10
   - Intel Skylake HD530 on Ubuntu 18.04
