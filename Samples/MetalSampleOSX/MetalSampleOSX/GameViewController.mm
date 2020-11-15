@@ -8,6 +8,7 @@
 #include <map>
 #include <math.h>
 #include <stdint.h>
+#include <chrono>
 
 #import "Array.hpp"
 #import "AudioSourceComponent.hpp"
@@ -878,6 +879,8 @@ using namespace ae3d;
         
         if (TestBloom)
         {
+            auto beginTime = std::chrono::steady_clock::now();
+            
             downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
             downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
             downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downSampleAndThreshold" );
@@ -916,6 +919,11 @@ using namespace ae3d;
             
             System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
+            
+            auto endTime = std::chrono::steady_clock::now();
+            auto tDiff = std::chrono::duration<double, std::milli>( endTime - beginTime ).count();
+            float bloomMS_CPU = static_cast< float >(tDiff);
+            System::Print( "Bloom CPU time: %.2f ms\n", bloomMS_CPU );
         }
 
         if (TestSSAO)
