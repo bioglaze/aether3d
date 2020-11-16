@@ -9,7 +9,6 @@ Not expected to be a valuable tool before 1.0 unless for learning purposes. Curr
 Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 ![Screenshot](/Engine/Assets/sample.jpg)
-![Screenshot](/Engine/Assets/editor.jpg)
 
 # Features
 
@@ -115,7 +114,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # Tested GPUs
   - AMD Radeon R9 Nano on Ubuntu 20.04 and Windows 10
-  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS Mojave
+  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS Catalina
   - NVIDIA GTX 1080 on Windows 10
   - NVIDIA RTX 2060 on Windows 10
   - Intel Skylake HD530 on Ubuntu 18.04
