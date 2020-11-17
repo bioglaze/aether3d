@@ -4,6 +4,7 @@
 #include "Array.hpp"
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
+#include "ComputeShader.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
@@ -22,6 +23,30 @@
 #include <vector>
 #include <math.h>
 #include <stdio.h>
+
+// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
+// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+struct pcg32_random_t
+{
+    uint64_t state;
+    uint64_t inc;
+};
+
+uint32_t pcg32_random_r( pcg32_random_t* rng )
+{
+    uint64_t oldstate = rng->state;
+    rng->state = oldstate * 6364136223846793005ULL + (rng->inc | 1);
+    uint32_t xorshifted = uint32_t( ((oldstate >> 18u) ^ oldstate) >> 27u );
+    int32_t rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
+pcg32_random_t rng;
+
+int Random100()
+{
+    return pcg32_random_r( &rng ) % 100;
+}
 
 using namespace ae3d;
 
@@ -49,15 +74,24 @@ struct SceneView
     GameObject camera;
     Scene scene;
     Shader unlitShader;
+    ComputeShader blurShader;
+    ComputeShader downsampleAndThresholdShader;
+    ComputeShader ssaoShader;
     TransformGizmo transformGizmo;
     Texture2D goTex;
     Texture2D audioTex;
     Texture2D lightTex;
     Texture2D cameraTex;
+    Texture2D ssaoTex;
+    Texture2D bloomTex;
+    Texture2D blurTex;
+    Texture2D blurTex2;
+    Texture2D noiseTex;
     Matrix44 lineProjection;
     int lineHandle = 0;
     int selectedGOIndex = 0;
     Material highlightMaterial;
+    RenderTexture cameraTarget;
 
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
@@ -344,20 +378,52 @@ void svInit( SceneView** sv, int width, int height )
 {
     *sv = new SceneView();
     
+    (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
+    (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte );
+    (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte );
+    (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::UByte );
+    (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte );
+
+    constexpr int noiseDim = 64;
+    Vec4 noiseData[ noiseDim * noiseDim ];
+
+    for (int i = 0; i < noiseDim * noiseDim; ++i)
+    {
+        Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 ).Normalized();
+        dir.x = abs( dir.x ) * 2 - 1;
+        dir.y = abs( dir.y ) * 2 - 1;
+        noiseData[ i ].x = dir.x;
+        noiseData[ i ].y = dir.y;
+        noiseData[ i ].z = 0;
+        noiseData[ i ].w = 0;
+    }
+
+#if RENDERER_VULKAN    
+    (*sv)->noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::Float );
+#else
+    (*sv)->noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );
+#endif
+
     (*sv)->camera.AddComponent< CameraComponent >();
     (*sv)->camera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     (*sv)->camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+    (*sv)->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    (*sv)->camera.GetComponent<CameraComponent>()->SetTargetTexture( &(*sv)->cameraTarget );
     (*sv)->camera.AddComponent< TransformComponent >();
     (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
     (*sv)->camera.SetName( "EditorCamera" );
-    
+
     (*sv)->scene.Add( &(*sv)->camera );
 
     (*sv)->unlitShader.Load( "unlit_vertex", "unlit_fragment",
                       FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
                       FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+
+    (*sv)->blurShader.Load( "blur", FileSystem::FileContents( "Blur.obj" ), FileSystem::FileContents( "Blur.spv" ) );
+    (*sv)->downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
+    (*sv)->ssaoShader.Load( "ssao", FileSystem::FileContents( "ssao.obj" ), FileSystem::FileContents( "ssao.spv" ) );
 
     (*sv)->gameObjects.Add( new GameObject() );
     (*sv)->transformGizmo.redTex.Load( FileSystem::FileContents( "red.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
@@ -468,6 +534,25 @@ void svDuplicateGameObject( SceneView* sv )
 void svBeginRender( SceneView* sv )
 {
     sv->scene.Render();
+    System::Draw( &sv->cameraTarget, 0, 0, sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+    if (false)
+    {
+        int width = sv->ssaoTex.GetWidth();
+        int height = sv->ssaoTex.GetHeight();
+
+        sv->ssaoTex.SetLayout( TextureLayout::General );
+        sv->ssaoShader.SetRenderTexture( 0, &sv->cameraTarget );
+        sv->ssaoShader.SetRenderTexture( 1, &sv->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
+        sv->ssaoShader.SetTexture2D( 2, &sv->noiseTex );
+        sv->ssaoShader.SetTexture2D( 14, &sv->ssaoTex );
+        sv->ssaoShader.SetProjectionMatrix( sv->camera.GetComponent<CameraComponent>()->GetProjection() );
+        sv->ssaoShader.Begin();
+        sv->ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
+        sv->ssaoShader.End();
+        sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
+
+        System::Draw( &sv->ssaoTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+    }
 }
 
 void svEndRender( SceneView* sv )
