@@ -90,6 +90,14 @@ void ae3d::ComputeShader::SetUniformBuffer( unsigned slotIndex, id< MTLBuffer > 
     }
 }
 
+void ae3d::ComputeShder::Begin()
+{
+}
+
+void ae3d::ComputeShder::End()
+{
+}
+
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName )
 {
     MTLSize threadgroupCounts = MTLSizeMake( 16, 16, 1 );

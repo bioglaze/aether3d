@@ -419,6 +419,11 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     }
 }
 
+void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
+{
+    // Not needed on Metal.
+}
+
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     if (!fileContents.isLoaded)

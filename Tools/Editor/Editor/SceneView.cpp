@@ -383,7 +383,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::UByte );
     (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::Float );
-
+    
     constexpr int noiseDim = 64;
     Vec4 noiseData[ noiseDim * noiseDim ];
 
@@ -400,6 +400,7 @@ void svInit( SceneView** sv, int width, int height )
 
 #if RENDERER_VULKAN    
     (*sv)->noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::Float );
+    (*sv)->noiseTex.SetLayout( TextureLayout::ShaderRead );
 #else
     (*sv)->noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );
 #endif
@@ -534,30 +535,33 @@ void svDuplicateGameObject( SceneView* sv )
 void svBeginRender( SceneView* sv )
 {
     sv->scene.Render();
-    System::Draw( &sv->cameraTarget, 0, 0, sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+
     if (false)
     {
         int width = sv->ssaoTex.GetWidth();
         int height = sv->ssaoTex.GetHeight();
 
+        sv->ssaoTex.SetLayout( TextureLayout::General );
         sv->ssaoShader.SetProjectionMatrix( sv->camera.GetComponent<CameraComponent>()->GetProjection() );
         sv->ssaoShader.SetRenderTexture( 0, &sv->cameraTarget );
         sv->ssaoShader.SetRenderTexture( 1, &sv->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
 #if RENDERER_VULKAN
-        sv->ssaoTex.SetLayout( TextureLayout::General );
         sv->ssaoShader.SetTexture2D( 2, &sv->noiseTex );
         sv->ssaoShader.SetTexture2D( 14, &sv->ssaoTex );
-        sv->ssaoShader.Begin();
 #else
         sv->ssaoShader.SetTexture2D( 3, &sv->noiseTex );
         sv->ssaoShader.SetTexture2D( 2, &sv->ssaoTex );
 #endif
+        sv->ssaoShader.Begin();
         sv->ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
-#if RENDERER_VULKAN
         sv->ssaoShader.End();
         sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
-#endif
+
         System::Draw( &sv->ssaoTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+    }
+    else
+    {
+        System::Draw( &sv->cameraTarget, 0, 0, sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
     }
 }
 
