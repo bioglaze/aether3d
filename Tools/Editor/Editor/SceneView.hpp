@@ -14,12 +14,24 @@ namespace ae3d
 
 struct SceneView;
 
+enum class SSAO
+{
+   Enabled,
+   Disabled,
+};
+
+enum class Bloom
+{
+   Enabled,
+   Disabled,
+};
+
 void svInit( SceneView** sceneView, int width, int height );
 bool svIsDraggingGizmo( SceneView* sv );
 void svAddGameObject( SceneView* sceneView );
 void svDuplicateGameObject( SceneView* sceneView );
 void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight );
-void svBeginRender( SceneView* sceneView );
+void svBeginRender( SceneView* sceneView, SSAO ssao, Bloom bloom );
 void svEndRender( SceneView* sceneView );
 ae3d::Material* svGetMaterial( SceneView* sceneView );
 bool svIsTransformGizmoSelected( SceneView* sceneView );

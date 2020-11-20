@@ -23,7 +23,11 @@ class Inspector
     void HandleKey( int key, int state );
     void HandleChar( char ch );
     void Render( unsigned width, unsigned height, ae3d::GameObject* gameObject, Command& outCommand, ae3d::GameObject** gameObjects, unsigned goCount, ae3d::Material* material, int& outSelectedGameObject );
-
+    bool IsSSAOEnabled() { return ssao; }
+    bool IsBloomEnabled() { return bloom; }
+    
 private:
     bool textEditActive;
+    bool ssao;
+    bool bloom;
 };

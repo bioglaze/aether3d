@@ -532,11 +532,11 @@ void svDuplicateGameObject( SceneView* sv )
     }
 }
 
-void svBeginRender( SceneView* sv )
+void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
 {
     sv->scene.Render();
 
-    if (false)
+    if (ssao == SSAO::Enabled)
     {
         int width = sv->ssaoTex.GetWidth();
         int height = sv->ssaoTex.GetHeight();
@@ -562,6 +562,46 @@ void svBeginRender( SceneView* sv )
     else
     {
         System::Draw( &sv->cameraTarget, 0, 0, sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+    }
+
+    if (bloom == Bloom::Enabled)
+    {
+        const int width = sv->cameraTarget.GetWidth();
+        const int height = sv->cameraTarget.GetHeight();
+        
+        sv->blurTex.SetLayout( TextureLayout::General );
+        sv->downsampleAndThresholdShader.SetRenderTexture( 0, &sv->cameraTarget );
+        sv->downsampleAndThresholdShader.SetTexture2D( 14, &sv->blurTex );
+        sv->downsampleAndThresholdShader.Begin();
+        sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
+        sv->downsampleAndThresholdShader.End();
+
+        sv->blurTex.SetLayout( TextureLayout::ShaderRead );
+
+        sv->blurShader.SetTexture2D( 0, &sv->blurTex );
+        sv->blurShader.SetTexture2D( 14, &sv->bloomTex );
+        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        sv->blurShader.Begin();
+        sv->blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
+        sv->blurShader.End();
+
+        sv->blurShader.Begin();
+
+        sv->blurTex.SetLayout( TextureLayout::General );
+        sv->bloomTex.SetLayout( TextureLayout::ShaderRead );
+        sv->blurShader.SetTexture2D( 0, &sv->bloomTex );
+        sv->blurShader.SetTexture2D( 14, &sv->blurTex );
+        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        sv->blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
+        sv->blurShader.End();
+
+        sv->blurTex.SetLayout( TextureLayout::ShaderRead );
+        int postWidth = width;
+        int postHeight = height;
+        System::Draw( &sv->cameraTarget, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &sv->blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+
+        sv->bloomTex.SetLayout( TextureLayout::General );
     }
 }
 

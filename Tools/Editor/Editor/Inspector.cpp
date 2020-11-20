@@ -126,7 +126,9 @@ static void DrawNuklear( int width, int height )
 }
 
 void Inspector::Init()
-{    
+{
+    ssao = false;
+    bloom = false;
     textEditActive = false;
 
     nk_font_atlas_init_default( &atlas );
@@ -465,6 +467,17 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             outCommand = Command::SaveScene;
         }
 
+        if (gameObject == nullptr)
+        {
+            static int ssa;
+            nk_checkbox_label( &ctx, "SSAO", &ssa );
+            ssao = ssa != 0;
+
+            static int blo;
+            nk_checkbox_label( &ctx, "Bloom", &blo );
+            bloom = blo != 0;
+        }
+        
         // Hierarchy
         constexpr unsigned nameCount = 100;
         static const char* goNames[ nameCount ] = {};
