@@ -379,9 +379,9 @@ void svInit( SceneView** sv, int width, int height )
     *sv = new SceneView();
     
     (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
-    (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte );
-    (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte );
-    (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::UByte );
+    (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float );
+    (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float );
+    (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float );
     (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::Float );
     
     constexpr int noiseDim = 64;
@@ -561,7 +561,9 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
     }
     else
     {
-        System::Draw( &sv->cameraTarget, 0, 0, sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), sv->cameraTarget.GetWidth(), sv->cameraTarget.GetHeight(), Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        const int width = sv->cameraTarget.GetWidth();
+        const int height = sv->cameraTarget.GetHeight();
+        System::Draw( &sv->cameraTarget, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
     }
 
     if (bloom == Bloom::Enabled)
@@ -571,7 +573,11 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
         
         sv->blurTex.SetLayout( TextureLayout::General );
         sv->downsampleAndThresholdShader.SetRenderTexture( 0, &sv->cameraTarget );
+#if RENDERER_VULKAN
         sv->downsampleAndThresholdShader.SetTexture2D( 14, &sv->blurTex );
+#else
+        sv->downsampleAndThresholdShader.SetTexture2D( 1, &sv->blurTex );
+#endif
         sv->downsampleAndThresholdShader.Begin();
         sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
         sv->downsampleAndThresholdShader.End();
@@ -579,24 +585,32 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
         sv->blurTex.SetLayout( TextureLayout::ShaderRead );
 
         sv->blurShader.SetTexture2D( 0, &sv->blurTex );
+#if RENDERER_VULKAN
+        const int blurDiv = 16;
         sv->blurShader.SetTexture2D( 14, &sv->bloomTex );
+#else
+        const int blurDiv = 32;
+        sv->blurShader.SetTexture2D( 1, &sv->bloomTex );
+#endif
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         sv->blurShader.Begin();
-        sv->blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
+        sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
         sv->blurShader.End();
 
         sv->blurShader.Begin();
 
         sv->blurTex.SetLayout( TextureLayout::General );
         sv->bloomTex.SetLayout( TextureLayout::ShaderRead );
-        sv->blurShader.SetTexture2D( 0, &sv->bloomTex );
-        sv->blurShader.SetTexture2D( 14, &sv->blurTex );
+#if RENDERER_VULKAN
+        sv->blurShader.SetTexture2D( 14, &sv->bloomTex );
+#else
+        sv->blurShader.SetTexture2D( 1, &sv->bloomTex );
+#endif
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        sv->blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
+        sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
         sv->blurShader.End();
 
         sv->blurTex.SetLayout( TextureLayout::ShaderRead );
-        int postWidth = width;
         int postHeight = height;
         System::Draw( &sv->cameraTarget, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &sv->blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
