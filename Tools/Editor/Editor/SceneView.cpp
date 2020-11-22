@@ -389,7 +389,7 @@ void svInit( SceneView** sv, int width, int height )
 
     for (int i = 0; i < noiseDim * noiseDim; ++i)
     {
-        Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 ).Normalized();
+        Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 );
         dir.x = abs( dir.x ) * 2 - 1;
         dir.y = abs( dir.y ) * 2 - 1;
         noiseData[ i ].x = dir.x;
@@ -601,10 +601,11 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
 
         sv->blurTex.SetLayout( TextureLayout::General );
         sv->bloomTex.SetLayout( TextureLayout::ShaderRead );
+        sv->blurShader.SetTexture2D( 0, &sv->bloomTex );
 #if RENDERER_VULKAN
-        sv->blurShader.SetTexture2D( 14, &sv->bloomTex );
+        sv->blurShader.SetTexture2D( 14, &sv->blurTex );
 #else
-        sv->blurShader.SetTexture2D( 1, &sv->bloomTex );
+        sv->blurShader.SetTexture2D( 1, &sv->blurTex );
 #endif
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
