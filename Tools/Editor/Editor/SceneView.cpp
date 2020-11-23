@@ -832,6 +832,11 @@ bool svIsDraggingGizmo( SceneView* sv )
     return sv->transformGizmo.selectedMesh != -1;
 }
 
+float svGetCameraSign( SceneView* sv )
+{
+    return Vec3::Dot( sv->camera.GetComponent< ae3d::TransformComponent >()->GetViewDirection(), Vec3( 0, 0, 1 ) );
+}
+
 void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 {
     if (sv->transformGizmo.selectedMesh != -1)

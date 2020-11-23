@@ -38,7 +38,7 @@ namespace ae3d
     enum class KeyCode
     {
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-        Left, Right, Up, Down, Space, Escape, Enter, Delete, Backspace, Dot, N0, N1, N2, N3, N4, N5, N6, N7, N8, N9, None
+        Left, Right, Up, Down, Space, Escape, Enter, Delete, Backspace, Dot, N0, N1, N2, N3, N4, N5, N6, N7, N8, N9, Empty
     };
 
     /// Key modifiers.
@@ -64,7 +64,7 @@ namespace ae3d
         /// Event type.
         WindowEventType type = WindowEventType::None;
         /// Key code.
-        KeyCode keyCode = KeyCode::None;
+        KeyCode keyCode = KeyCode::Empty;
         /// Key modifier.
         KeyModifier keyModifier = KeyModifier::Empty;
         /// X coordinate in window. Origin: left.

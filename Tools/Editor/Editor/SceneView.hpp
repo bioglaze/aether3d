@@ -26,6 +26,7 @@ enum class Bloom
    Disabled,
 };
 
+float svGetCameraSign( SceneView* sv );
 void svInit( SceneView** sceneView, int width, int height );
 bool svIsDraggingGizmo( SceneView* sv );
 void svAddGameObject( SceneView* sceneView );

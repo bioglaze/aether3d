@@ -171,14 +171,22 @@ int main()
                     case KeyCode::S:
                         moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
                         break;
-                    case KeyCode::Left:
-                        svMoveSelection( sceneView, { -1, 0, 0 } );
-                        break;
                     case KeyCode::F:
                         svFocusOnSelected( sceneView );
                         break;
+                    case KeyCode::Left:
+                        {
+                            float sign = svGetCameraSign( sceneView );
+                            float sign2 = sign > 0 ? 1 : -1;
+                            svMoveSelection( sceneView, { -1 * sign2, 0, 0 } );
+                        }
+                        break;
                     case KeyCode::Right:
-                        svMoveSelection( sceneView, { 1, 0, 0 } );
+                        {
+                            float sign = svGetCameraSign( sceneView );
+                            float sign2 = sign > 0 ? 1 : -1;
+                            svMoveSelection( sceneView, { 1 * sign2, 0, 0 } );
+                        }
                         break;
                     case KeyCode::Up:
                         svMoveSelection( sceneView, { 0, 1, 0 } );
