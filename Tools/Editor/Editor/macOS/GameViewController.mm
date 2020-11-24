@@ -244,11 +244,15 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     }
     else if ([theEvent keyCode] == 123) // left
     {
-        svMoveSelection( sceneView, { -1, 0, 0 } );
+        float sign = svGetCameraSign( sceneView );
+        float sign2 = sign > 0 ? 1 : -1;
+        svMoveSelection( sceneView, { -1 * sign2, 0, 0 } );
     }
     else if ([theEvent keyCode] == 124) // right
     {
-        svMoveSelection( sceneView, { 1, 0, 0 } );
+        float sign = svGetCameraSign( sceneView );
+        float sign2 = sign > 0 ? 1 : -1;
+        svMoveSelection( sceneView, { 1 * sign2, 0, 0 } );
     }
     else if ([theEvent keyCode] == 126) // up
     {

@@ -26,6 +26,13 @@ enum class Bloom
    Disabled,
 };
 
+enum class CollisionFilter
+{
+    All,
+    ExcludeGizmo,
+    OnlyGizmo,
+};
+
 float svGetCameraSign( SceneView* sv );
 void svInit( SceneView** sceneView, int width, int height );
 bool svIsDraggingGizmo( SceneView* sv );

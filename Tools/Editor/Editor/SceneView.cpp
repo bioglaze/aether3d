@@ -290,15 +290,17 @@ static void GetCorners( const Vec3& min, const Vec3& max, Vec3 outCorners[ 8 ] )
     outCorners[ 7 ] = Vec3( max.x, min.y, max.z );
 }
 
-void GetColliders( GameObject& camera, bool includeGizmo, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest, Array< CollisionInfo >& outColliders )
+void GetColliders( GameObject& camera, CollisionFilter filter, int screenX, int screenY, int width, int height, float maxDistance, Array< GameObject* >& gameObjects, CollisionTest collisionTest, Array< CollisionInfo >& outColliders )
 {
     Vec3 rayOrigin, rayTarget;
     ScreenPointToRay( screenX, screenY, (float)width, (float)height, camera, rayOrigin, rayTarget );
     
     // Collects meshes that collide with the ray.
+    const bool includeGizmo = (filter == CollisionFilter::All || filter == CollisionFilter::OnlyGizmo);
     const unsigned startIndex = includeGizmo ? 0 : 1;
+    const unsigned endIndex = filter == CollisionFilter::OnlyGizmo ? 1 : gameObjects.count;
     
-    for (unsigned i = startIndex; i < gameObjects.count; ++i)
+    for (unsigned i = startIndex; i < endIndex; ++i)
     {
         GameObject* go = gameObjects[ i ];
         auto meshRenderer = go->GetComponent< MeshRendererComponent >();
@@ -739,7 +741,8 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 
     // Checks if the mouse hit a mesh and selects the object.
     Array< CollisionInfo > ci;
-    GetColliders( sv->camera, sv->selectedGameObjects.count != 0, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
+    const CollisionFilter filter = (sv->selectedGameObjects.count != 0) ? CollisionFilter::All : CollisionFilter::ExcludeGizmo;
+    GetColliders( sv->camera, filter, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     if (ci.count > 0 && ci[ 0 ].go != sv->gameObjects[ 0 ])
     {
@@ -768,9 +771,13 @@ void svUpdate( SceneView* sceneView )
 
 void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int height )
 {
+    if (sv->selectedGameObjects.count == 0)
+    {
+        return;
+    }
+    
     Array< CollisionInfo > ci;
-
-    GetColliders( sv->camera, sv->selectedGameObjects.count != 0, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
+    GetColliders( sv->camera, CollisionFilter::OnlyGizmo, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     const int selected = isGizmo ? ci[ 0 ].subMeshIndex : -1;
@@ -804,8 +811,8 @@ void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int h
 void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, int height )
 {
     Array< CollisionInfo > ci;
-
-    GetColliders( sv->camera, sv->selectedGameObjects.count != 0, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
+    CollisionFilter filter = (sv->selectedGameObjects.count != 0) ? CollisionFilter::All : CollisionFilter::ExcludeGizmo;
+    GetColliders( sv->camera, filter, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
