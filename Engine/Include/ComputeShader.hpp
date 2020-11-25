@@ -36,6 +36,7 @@ namespace ae3d
         /// \param groupCountX X count
         /// \param groupCountY Y count
         /// \param groupCountZ Z count
+        /// \param debugName Debug group name that is shown in some profilers.
         void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName );
 
         /// Sets projection matrix and its inverse into the uniform structure.
@@ -82,7 +83,7 @@ namespace ae3d
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
 
         /// Sets a uniform buffer.
-        /// \param slotIndex slot index
+        /// \param slot slot index
         /// \param buffer Uniform buffer
         void SetUniformBuffer( unsigned slot, id< MTLBuffer > buffer );
 

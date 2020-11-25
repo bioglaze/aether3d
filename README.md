@@ -1,7 +1,5 @@
 # Aether3D Game Engine
 
-Not expected to be a valuable tool before 1.0 unless for learning purposes. Current version: 0.8.5
-
 Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 ![Screenshot](/Engine/Assets/sample.jpg)

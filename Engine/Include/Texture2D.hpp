@@ -35,10 +35,10 @@ namespace ae3d
         /// \param width Width in pixels.
         /// \param height height in pixels.
         /// \param debugName Debug name.
-		/// \param dataType Pixel format.
+        /// \param format Pixel format.
         void CreateUAV( int width, int height, const char* debugName, DataType format );
         
-        /// \param textureData Texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
+        /// \param textureData Texture image data. File format must be dds, png, tga, jpg or bmp.
         /// \param wrap Wrap mode.
         /// \param filter Filter mode.
         /// \param mipmaps Mipmaps. If set to Generate and the image already contains mipmaps, they are used, otherwise mipchain is generated.
@@ -46,7 +46,7 @@ namespace ae3d
         /// \param anisotropy Anisotropy. Value range is 1-16 depending on support. On Metal the value is bucketed into 1, 2, 4, 8 and 16.
         void Load( const FileSystem::FileContentsData& textureData, TextureWrap wrap, TextureFilter filter, Mipmaps mipmaps, ColorSpace colorSpace, Anisotropy anisotropy );
         
-        /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg, bmp or bmp.
+        /// \param atlasTextureData Atlas texture image data. File format must be dds, png, tga, jpg or bmp.
         /// \param atlasMetaData Atlas metadata. Format is Ogre/CEGUI. Example atlas tool: Texture Packer.
         /// \param textureName Name of the texture in atlas.
         /// \param wrap Wrap mode.
@@ -64,6 +64,7 @@ namespace ae3d
         /// \param width Width in pixels
         /// \param height Height in pixels
         /// \param debugName Null-terminated string of texture's debug name that is visible in graphics debugging tools
+        /// \param format Pixel format.
         void LoadFromData( const void* imageData, int width, int height, const char* debugName, DataType format );
 #endif
         /// Destroys all textures. Called internally at exit.
