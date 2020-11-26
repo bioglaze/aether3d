@@ -201,7 +201,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
     outCommand = Command::Empty;
     outSelectedGameObject = -1;
     
-    if (nk_begin( &ctx, "Inspector", nk_rect( 10, 50, 450, 800 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+    if (nk_begin( &ctx, "Inspector", nk_rect( 0, 0, 450, 1100 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
     {      
         textEditActive = ctx.current->edit.active;
 
@@ -243,7 +243,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             nk_property_float( &ctx, "#Z:", -1024.0f, &euler.z, 1024.0f, 1, 1 );*/
             //rot = Quaternion::FromEuler( euler );
 
-            nk_layout_row_static( &ctx, 40, 140, 1 );
+            nk_layout_row_static( &ctx, 40, 200, 1 );
             float& scale = transform->GetLocalScale();
             nk_property_float( &ctx, "#Scale:", 0.001f, &scale, 1024.0f, 1, 1 );
             nk_layout_row_static( &ctx, 40, 450, 1 );
@@ -282,6 +282,11 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
+            }
+
+            if (nk_button_label( &ctx, "X" ))
+            {
+                gameObject->RemoveComponent< MeshRendererComponent >();
             }
         }
         

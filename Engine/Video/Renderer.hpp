@@ -13,6 +13,7 @@ namespace ae3d
     
     struct BuiltinShaders
     {
+        // Loads shader binaries from running directory's 'shaders' subfolder.
         void Load();
         
         Shader spriteRendererShader;

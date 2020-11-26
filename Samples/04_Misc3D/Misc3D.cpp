@@ -37,7 +37,7 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = false;
+constexpr bool TestForwardPlus = true;
 constexpr bool TestBloom = true;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
@@ -310,22 +310,27 @@ int main()
 
     Shader shader;
     shader.Load( "unlitVert", "unlitFrag",
-                 FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
-                 FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+                 FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
+                 FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
 
     Shader shaderSkin;
     shaderSkin.Load( "unlitVert", "unlitFrag",
-                FileSystem::FileContents( "unlit_skin_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
-                FileSystem::FileContents( "unlit_skin_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+                FileSystem::FileContents( "shaders/unlit_skin_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
+                FileSystem::FileContents( "shaders/unlit_skin_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
 
     ComputeShader blurShader;
-	blurShader.Load( "blur", FileSystem::FileContents( "Blur.obj" ), FileSystem::FileContents( "Blur.spv" ) );
+	blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
 
 	ComputeShader downsampleAndThresholdShader;
-	downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "Bloom.obj" ), FileSystem::FileContents( "Bloom.spv" ) );
+	downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
 
     ComputeShader ssaoShader;
-	ssaoShader.Load( "ssao", FileSystem::FileContents( "ssao.obj" ), FileSystem::FileContents( "ssao.spv" ) );
+	ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
+
+    Shader shaderCubeMap;
+    shaderCubeMap.Load( "unlitVert", "unlitFrag",
+                        FileSystem::FileContents( "shaders/unlit_cube_vert.obj" ), FileSystem::FileContents( "shaders/unlit_cube_frag.obj" ),
+                        FileSystem::FileContents( "shaders/unlit_cube_vert.spv" ), FileSystem::FileContents( "shaders/unlit_cube_frag.spv" ) );
 
     Texture2D ssaoTex;
     ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte );
@@ -365,11 +370,6 @@ int main()
     copiedCube.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 6, -80 } );
     copiedCube.GetComponent< MeshRendererComponent >()->SetMaterial( &material, 0 );
     
-    Shader shaderCubeMap;
-    shaderCubeMap.Load( "unlitVert", "unlitFrag",
-                        FileSystem::FileContents( "unlit_cube_vert.obj" ), FileSystem::FileContents( "unlit_cube_frag.obj" ),
-                        FileSystem::FileContents( "unlit_cube_vert.spv" ), FileSystem::FileContents( "unlit_cube_frag.spv" ) );
-
     GameObject lightParent;
     //lightParent.AddComponent< MeshRendererComponent >();
     //lightParent.GetComponent< MeshRendererComponent >()->SetMesh( &cubeMesh );
@@ -381,7 +381,7 @@ int main()
     dirLight.GetComponent<DirectionalLightComponent>()->SetCastShadow( TestShadowsDir, 2048 );
     dirLight.GetComponent<DirectionalLightComponent>()->SetColor( Vec3( 1, 1, 1 ) );
     dirLight.AddComponent<TransformComponent>();
-    dirLight.GetComponent<TransformComponent>()->LookAt( { 1, 1, 1 }, Vec3( 0, -1, 0 ).Normalized(), { 0, 1, 0 } );
+    dirLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, Vec3( 0.2f, -1, 0.05f ).Normalized(), { 0, 1, 0 } );
 
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
@@ -425,23 +425,23 @@ int main()
 
     Shader standardShader;
     standardShader.Load( "standard_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
-        ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
 
     Shader standardShadowShader;
     standardShadowShader.Load( "standard_vertex", "standard_fragment_shadow",
-        ae3d::FileSystem::FileContents( "Standard_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag_shadow.obj" ),
-        ae3d::FileSystem::FileContents( "Standard_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag_shadow.spv" ) );
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.spv" ) );
 
     Shader standardSkinShader;
     standardSkinShader.Load( "standard_skin_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
-        ae3d::FileSystem::FileContents( "Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
 
     Shader standardSkinShadowShader;
     standardSkinShadowShader.Load( "standard_skin_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "Standard_frag.obj" ),
-        ae3d::FileSystem::FileContents( "Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "Standard_frag.spv" ) );
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
 
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );

@@ -1689,9 +1689,7 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateQueryPool" );
 
         GfxDeviceGlobal::uiVertexBuffer.GenerateDynamic( UI_FACE_COUNT, UI_VERTICE_COUNT );
-
-        renderer.builtinShaders.lightCullShader.LoadSPIRV( FileSystem::FileContents( "LightCuller.spv" ) );
-
+        
         GfxDeviceGlobal::lightTiler.Init();
 
         VkCommandBufferAllocateInfo cmdBufInfo = {};
