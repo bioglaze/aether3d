@@ -221,6 +221,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = delta < 0 ? ae3d::WindowEventType::MouseWheelScrollDown : ae3d::WindowEventType::MouseWheelScrollUp;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseX = LOWORD(lParam);
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseY = WindowGlobal::windowHeightWithoutTitleBar - HIWORD( lParam );
+			WindowGlobal::eventStack[ WindowGlobal::eventIndex ].mouseWheel = delta < 0 ? -1 : 1;
         }
             break;
         case WM_MOUSEMOVE:
