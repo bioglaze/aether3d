@@ -44,15 +44,15 @@ int main()
 
     // This texture has 7 mipmaps.
     Texture2D bc1Tex;
-    bc1Tex.Load( FileSystem::FileContents( "test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
+    bc1Tex.Load( FileSystem::FileContents( "textures/test_dxt1.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
 
     // This texture has 1 mipmap.
     Texture2D bc2Tex;
-    bc2Tex.Load( FileSystem::FileContents( "test_dxt3.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+    bc2Tex.Load( FileSystem::FileContents( "textures/test_dxt3.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
 
     // This texture has 1 mipmap.
     Texture2D bc3Tex;
-    bc3Tex.Load( FileSystem::FileContents( "test_dxt5.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
+    bc3Tex.Load( FileSystem::FileContents( "textures/test_dxt5.dds" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
 
     Texture2D notLoadedTex;
 

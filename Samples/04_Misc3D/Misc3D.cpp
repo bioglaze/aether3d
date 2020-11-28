@@ -230,9 +230,9 @@ int main()
     Texture2D pbrRoughnessTex;
     pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrNormalTex2;
-    pbrNormalTex2.Load( FileSystem::FileContents( "grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+    pbrNormalTex2.Load( FileSystem::FileContents( "textures/grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrSpecularTex;
-    pbrSpecularTex.Load( FileSystem::FileContents( "spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+    pbrSpecularTex.Load( FileSystem::FileContents( "textures/spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
 #endif
     
     Font font;
@@ -339,13 +339,13 @@ int main()
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D asphaltTex;
-    asphaltTex.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    asphaltTex.Load( FileSystem::FileContents( "textures/asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D gliderClampTex;
     gliderClampTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D playerTex;
-    playerTex.Load( FileSystem::FileContents( "player.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    playerTex.Load( FileSystem::FileContents( "textures/player.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Material materialClamp;
     materialClamp.SetShader( &shader );
@@ -407,7 +407,7 @@ int main()
                  FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                  FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
                  TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
-    /*const char* path = "test_dxt1.dds";
+    /*const char* path = "textures/test_dxt1.dds";
     skybox.Load( FileSystem::FileContents( path ), FileSystem::FileContents( path ),
         FileSystem::FileContents( path ), FileSystem::FileContents( path ),
         FileSystem::FileContents( path ), FileSystem::FileContents( path ),

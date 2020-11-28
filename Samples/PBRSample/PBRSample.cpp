@@ -286,7 +286,7 @@ int main()
     albedoTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_albedo.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D albedoTex2;
-    albedoTex2.Load( FileSystem::FileContents( "asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    albedoTex2.Load( FileSystem::FileContents( "textures/asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D normalTex;
     normalTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_normal.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
