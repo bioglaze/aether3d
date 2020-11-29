@@ -429,18 +429,18 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
 
     (*sv)->gameObjects.Add( new GameObject() );
-    (*sv)->transformGizmo.redTex.Load( FileSystem::FileContents( "red.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
-    (*sv)->transformGizmo.greenTex.Load( FileSystem::FileContents( "green.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
-    (*sv)->transformGizmo.blueTex.Load( FileSystem::FileContents( "blue.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->transformGizmo.redTex.Load( FileSystem::FileContents( "textures/red.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->transformGizmo.greenTex.Load( FileSystem::FileContents( "textures/green.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->transformGizmo.blueTex.Load( FileSystem::FileContents( "textures/blue.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->transformGizmo.Init( &(*sv)->unlitShader, *(*sv)->gameObjects[ 0 ] );
 
     // Test content
     
     (*sv)->gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
-    (*sv)->cameraTex.Load( FileSystem::FileContents( "camera.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
-    (*sv)->lightTex.Load( FileSystem::FileContents( "light.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
-    (*sv)->goTex.Load( FileSystem::FileContents( "gameobject.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
-    (*sv)->audioTex.Load( FileSystem::FileContents( "audio_source.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->cameraTex.Load( FileSystem::FileContents( "textures/camera.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->lightTex.Load( FileSystem::FileContents( "textures/light.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->goTex.Load( FileSystem::FileContents( "textures/gameobject.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->audioTex.Load( FileSystem::FileContents( "textures/audio_source.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     (*sv)->material.SetShader( &(*sv)->unlitShader );
     (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
@@ -572,6 +572,7 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
     {
         const int width = sv->cameraTarget.GetWidth();
         const int height = sv->cameraTarget.GetHeight();
+
         
         sv->blurTex.SetLayout( TextureLayout::General );
         sv->downsampleAndThresholdShader.SetRenderTexture( 0, &sv->cameraTarget );
@@ -615,7 +616,14 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
 
         sv->blurTex.SetLayout( TextureLayout::ShaderRead );
         int postHeight = height;
-        System::Draw( &sv->cameraTarget, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        if (ssao == SSAO::Enabled)
+        {
+            System::Draw( &sv->ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        }
+        else
+        {
+            System::Draw( &sv->cameraTarget, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        }
         System::Draw( &sv->blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
 
         sv->bloomTex.SetLayout( TextureLayout::General );
