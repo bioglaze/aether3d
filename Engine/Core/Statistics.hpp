@@ -20,6 +20,9 @@ namespace Statistics
     float GetLightCullerTimeGpuMS();
     float GetPrimaryPassTimeGpuMS();
 
+    float GetBloomCpuTimeMS();
+    float GetBloomGpuTimeMS();
+    
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
 
@@ -29,7 +32,8 @@ namespace Statistics
     void BeginPresentTimeProfiling();
     void EndPresentTimeProfiling();
     float GetPresentTimeMS();
-    
+
+    void SetBloomTime( float cpuMs, float gpuMs );
     void IncTriangleCount( int triangles );
     int GetTriangleCount();
     void IncCreateConstantBufferCalls();

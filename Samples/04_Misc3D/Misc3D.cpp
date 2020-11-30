@@ -1087,6 +1087,7 @@ int main()
             auto endTime = std::chrono::steady_clock::now();
             auto tDiff = std::chrono::duration<double, std::milli>( endTime - beginTime ).count();
             float bloomMS_CPU = static_cast< float >(tDiff);
+            System::Statistics::SetBloomTime( bloomMS_CPU, 0 );
             //System::Print( "Bloom CPU time: %.2f ms\n", bloomMS_CPU );
         }
 

@@ -268,6 +268,11 @@ void ae3d::System::ReloadChangedAssets()
     fileWatcher.Poll();
 }
 
+void ae3d::System::Statistics::SetBloomTime( float cpuMs, float gpuMs )
+{
+    ::Statistics::SetBloomTime( cpuMs, gpuMs );
+}
+
 int ae3d::System::Statistics::GetDrawCallCount()
 {
     return ::Statistics::GetDrawCalls();

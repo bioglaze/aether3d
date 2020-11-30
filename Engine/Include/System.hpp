@@ -208,6 +208,7 @@ namespace ae3d
             int GetBarrierCallCount();
             int GetFenceCallCount();
             void GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes );
+            void SetBloomTime( float cpuMs, float gpuMs );
         }
     }
 }

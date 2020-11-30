@@ -24,6 +24,8 @@ namespace Statistics
     float sceneAABBTimeMS = 0;
     float lightCullerTimeGpuMS = 0;
     float primaryPassTimeGpuMS = 0;
+    float bloomCpuTimeMs = 0;
+    float bloomGpuTimeMs = 0;
     std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startPrimaryPassTimePoint;
@@ -42,6 +44,16 @@ int Statistics::GetTriangleCount()
     return triangleCount;
 }
 
+float Statistics::GetBloomCpuTimeMS()
+{
+    return bloomCpuTimeMs;
+}
+
+float Statistics::GetBloomGpuTimeMS()
+{
+    return bloomGpuTimeMs;
+}
+
 float Statistics::GetPresentTimeMS()
 {
     return presentTimeMS;
@@ -50,6 +62,12 @@ float Statistics::GetPresentTimeMS()
 void Statistics::SetDepthNormalsGpuTime( float timeMS )
 {
     depthNormalsTimeGpuMS = timeMS;
+}
+
+void Statistics::SetBloomTime( float cpuMs, float gpuMs )
+{
+    bloomCpuTimeMs = cpuMs;
+    bloomGpuTimeMs = gpuMs;
 }
 
 void Statistics::SetShadowMapGpuTime( float timeMS )
