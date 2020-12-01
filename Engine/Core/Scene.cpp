@@ -1020,8 +1020,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
     // FIXME: These ensure that the mesh is rendered. A proper fix would be to serialize materials.
     static Shader tempShader;
     tempShader.Load( "unlit_vertex", "unlit_fragment",
-        FileSystem::FileContents( "unlit_vert.obj" ), FileSystem::FileContents( "unlit_frag.obj" ),
-        FileSystem::FileContents( "unlit_vert.spv" ), FileSystem::FileContents( "unlit_frag.spv" ) );
+        FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
+        FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
 
     Material* tempMaterial = new Material();
     tempMaterial->SetShader( &tempShader );

@@ -6,14 +6,14 @@ ae3d::Renderer renderer;
 
 void ae3d::BuiltinShaders::Load()
 {
-    spriteRendererShader.Load( "", "", FileSystem::FileContents( "sprite_vert.obj" ), FileSystem::FileContents( "sprite_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
-    sdfShader.Load( "", "", FileSystem::FileContents( "sdf_vert.obj" ), FileSystem::FileContents( "sdf_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
-    skyboxShader.Load( "", "", FileSystem::FileContents( "skybox_vert.obj" ), FileSystem::FileContents( "skybox_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
-    momentsShader.Load( "", "", FileSystem::FileContents( "moments_vert.obj" ), FileSystem::FileContents( "moments_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
-    momentsSkinShader.Load( "", "", FileSystem::FileContents( "moments_skin_vert.obj" ), FileSystem::FileContents( "moments_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
-    depthNormalsShader.Load( "", "", FileSystem::FileContents( "depthnormals_vert.obj" ), FileSystem::FileContents( "depthnormals_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
-    depthNormalsSkinShader.Load( "", "", FileSystem::FileContents( "depthnormals_skin_vert.obj" ), FileSystem::FileContents( "depthnormals_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
-    uiShader.Load( "", "", FileSystem::FileContents( "sprite_vert.obj" ), FileSystem::FileContents( "sprite_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    spriteRendererShader.Load( "", "", FileSystem::FileContents( "shaders/sprite_vert.obj" ), FileSystem::FileContents( "shaders/sprite_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    sdfShader.Load( "", "", FileSystem::FileContents( "shaders/sdf_vert.obj" ), FileSystem::FileContents( "shaders/sdf_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    skyboxShader.Load( "", "", FileSystem::FileContents( "shaders/skybox_vert.obj" ), FileSystem::FileContents( "shaders/skybox_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    momentsShader.Load( "", "", FileSystem::FileContents( "shaders/moments_vert.obj" ), FileSystem::FileContents( "shaders/moments_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    momentsSkinShader.Load( "", "", FileSystem::FileContents( "shaders/moments_skin_vert.obj" ), FileSystem::FileContents( "shaders/moments_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    depthNormalsShader.Load( "", "", FileSystem::FileContents( "shaders/depthnormals_vert.obj" ), FileSystem::FileContents( "shaders/depthnormals_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    depthNormalsSkinShader.Load( "", "", FileSystem::FileContents( "shaders/depthnormals_skin_vert.obj" ), FileSystem::FileContents( "shaders/depthnormals_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
+    uiShader.Load( "", "", FileSystem::FileContents( "shaders/sprite_vert.obj" ), FileSystem::FileContents( "shaders/sprite_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
 
-    lightCullShader.Load( "", FileSystem::FileContents( "LightCuller.obj" ), FileSystem::FileContents( "" ) );
+    lightCullShader.Load( "", FileSystem::FileContents( "shaders/LightCuller.obj" ), FileSystem::FileContents( "" ) );
 }

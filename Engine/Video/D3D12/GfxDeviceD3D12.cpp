@@ -61,6 +61,7 @@ namespace ae3d
                 stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
                 stm << "depth pass time GPU: " << ::Statistics::GetDepthNormalsTimeGpuMS() << "ms\n";
                 stm << "light culler time GPU: " << ::Statistics::GetLightCullerTimeGpuMS() << "ms\n";
+                stm << "bloom time CPU: " << ::Statistics::GetBloomCpuTimeMS() << "ms\n";
                 stm << "draw calls: " << ::Statistics::GetDrawCalls() << "\n";
                 stm << "barrier calls: " << ::Statistics::GetBarrierCalls() << "\n";
                 stm << "triangles: " << ::Statistics::GetTriangleCount() << "\n";
