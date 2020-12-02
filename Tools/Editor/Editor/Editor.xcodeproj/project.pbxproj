@@ -12,10 +12,8 @@
 		AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB010CE0206F70B40014ED08 /* Assets.xcassets */; };
 		AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB010CE2206F70B40014ED08 /* Main.storyboard */; };
 		AB010CE7206F70B40014ED08 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AB010CE6206F70B40014ED08 /* main.m */; };
-		AB0B89BE20CD936400FF33FA /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BA20CD936300FF33FA /* camera.png */; };
 		AB0B89BF20CD936400FF33FA /* cursor_translate.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */; };
-		AB0B89C020CD936400FF33FA /* light.png in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BC20CD936300FF33FA /* light.png */; };
-		AB0B89C120CD936400FF33FA /* audio_source.png in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BD20CD936400FF33FA /* audio_source.png */; };
+		AB5A0F4B25780A660001B8DC /* textures in Resources */ = {isa = PBXBuildFile; fileRef = AB5A0F4A25780A660001B8DC /* textures */; };
 		AB5DB103251635AA0050A421 /* SSAO.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB5DB102251635AA0050A421 /* SSAO.metal */; };
 		ABAA98A420963B1300DC1F42 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */; };
 		ABAA98B020963B4C00DC1F42 /* Standard.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98A520963B4B00DC1F42 /* Standard.metal */; };
@@ -35,12 +33,7 @@
 		ABD0C8B72070B2BE0049EEAE /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */; };
 		ABD0C8BC2070B3550049EEAE /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD0C8BB2070B3550049EEAE /* MetalKit.framework */; };
 		ABD2D48A23B8C72C009750E7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD2D48923B8C72C009750E7 /* AVFoundation.framework */; };
-		ABE11ECA2444AC3100C39D99 /* blue.png in Resources */ = {isa = PBXBuildFile; fileRef = ABE11EC72444AC3100C39D99 /* blue.png */; };
-		ABE11ECB2444AC3100C39D99 /* green.png in Resources */ = {isa = PBXBuildFile; fileRef = ABE11EC82444AC3100C39D99 /* green.png */; };
-		ABE11ECC2444AC3100C39D99 /* red.png in Resources */ = {isa = PBXBuildFile; fileRef = ABE11EC92444AC3100C39D99 /* red.png */; };
 		ABE82EA421DCD8F100072FB1 /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE82EA321DCD8F100072FB1 /* Bloom.metal */; };
-		ABF7FA2F2421402A00C20F52 /* default_white.png in Resources */ = {isa = PBXBuildFile; fileRef = ABF7FA2E2421402A00C20F52 /* default_white.png */; };
-		ABF7FA312421407B00C20F52 /* gameobject.png in Resources */ = {isa = PBXBuildFile; fileRef = ABF7FA302421407B00C20F52 /* gameobject.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,11 +47,9 @@
 		AB010CE5206F70B40014ED08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB010CE6206F70B40014ED08 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AB010CE8206F70B40014ED08 /* Editor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Editor.entitlements; sourceTree = "<group>"; };
-		AB0B89BA20CD936300FF33FA /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = camera.png; path = ../../../../../aether3d_build/Samples/camera.png; sourceTree = "<group>"; };
 		AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = cursor_translate.ae3d; path = ../../../../../aether3d_build/Samples/cursor_translate.ae3d; sourceTree = "<group>"; };
-		AB0B89BC20CD936300FF33FA /* light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = light.png; path = ../../../../../aether3d_build/Samples/light.png; sourceTree = "<group>"; };
-		AB0B89BD20CD936400FF33FA /* audio_source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = audio_source.png; path = ../../../../../aether3d_build/Samples/audio_source.png; sourceTree = "<group>"; };
 		AB1786F02128B05900659048 /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../../../../Engine/Include/Array.hpp; sourceTree = "<group>"; };
+		AB5A0F4A25780A660001B8DC /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
 		AB5DB102251635AA0050A421 /* SSAO.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SSAO.metal; path = ../../../../Engine/Assets/SSAO.metal; sourceTree = "<group>"; };
 		ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
 		ABAA98A520963B4B00DC1F42 /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
@@ -110,12 +101,7 @@
 		ABD0C8B62070B2BE0049EEAE /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
 		ABD0C8BB2070B3550049EEAE /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		ABD2D48923B8C72C009750E7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		ABE11EC72444AC3100C39D99 /* blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = blue.png; path = ../../../../../aether3d_build/Samples/blue.png; sourceTree = "<group>"; };
-		ABE11EC82444AC3100C39D99 /* green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = green.png; path = ../../../../../aether3d_build/Samples/green.png; sourceTree = "<group>"; };
-		ABE11EC92444AC3100C39D99 /* red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = red.png; path = ../../../../../aether3d_build/Samples/red.png; sourceTree = "<group>"; };
 		ABE82EA321DCD8F100072FB1 /* Bloom.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Bloom.metal; path = ../../../../Engine/Assets/Bloom.metal; sourceTree = "<group>"; };
-		ABF7FA2E2421402A00C20F52 /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
-		ABF7FA302421407B00C20F52 /* gameobject.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gameobject.png; path = ../../../../../aether3d_build/Samples/gameobject.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,15 +143,8 @@
 		AB010CD3206F70B40014ED08 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
-				ABE11EC72444AC3100C39D99 /* blue.png */,
-				ABE11EC82444AC3100C39D99 /* green.png */,
-				ABE11EC92444AC3100C39D99 /* red.png */,
-				ABF7FA302421407B00C20F52 /* gameobject.png */,
-				ABF7FA2E2421402A00C20F52 /* default_white.png */,
-				AB0B89BD20CD936400FF33FA /* audio_source.png */,
-				AB0B89BA20CD936300FF33FA /* camera.png */,
+				AB5A0F4A25780A660001B8DC /* textures */,
 				AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */,
-				AB0B89BC20CD936300FF33FA /* light.png */,
 				ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */,
 				ABB3603F208C4F83007133FD /* glider.png */,
 				AB010CD4206F70B40014ED08 /* AppDelegate.h */,
@@ -310,19 +289,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AB0B89C020CD936400FF33FA /* light.png in Resources */,
+				AB5A0F4B25780A660001B8DC /* textures in Resources */,
 				ABAA98A420963B1300DC1F42 /* textured_cube.ae3d in Resources */,
-				ABF7FA312421407B00C20F52 /* gameobject.png in Resources */,
 				ABB36041208C4F83007133FD /* glider.png in Resources */,
-				ABE11ECC2444AC3100C39D99 /* red.png in Resources */,
 				AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */,
-				ABF7FA2F2421402A00C20F52 /* default_white.png in Resources */,
 				AB0B89BF20CD936400FF33FA /* cursor_translate.ae3d in Resources */,
-				ABE11ECA2444AC3100C39D99 /* blue.png in Resources */,
-				AB0B89C120CD936400FF33FA /* audio_source.png in Resources */,
-				ABE11ECB2444AC3100C39D99 /* green.png in Resources */,
 				AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */,
-				AB0B89BE20CD936400FF33FA /* camera.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

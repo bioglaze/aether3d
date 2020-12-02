@@ -283,11 +283,6 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
-
-            if (nk_button_label( &ctx, "X" ))
-            {
-                gameObject->RemoveComponent< MeshRendererComponent >();
-            }
         }
         
         if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "Add audio source" ))
