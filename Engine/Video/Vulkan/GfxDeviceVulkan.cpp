@@ -158,7 +158,8 @@ namespace ae3d
                 //str += "bloom GPU: " + std::to_string( ::Statistics::GetBloomGpuTimeMS() ) + " ms\n";
                 str += "draw calls: " + std::to_string( ::Statistics::GetDrawCalls() ) + "\n";
                 str += "barrier calls: " + std::to_string( ::Statistics::GetBarrierCalls() ) + "\n";
-                str += "fence calls: " + std::to_string( ::Statistics::GetFenceCalls() ) + "\n";
+				str += "fence calls: " + std::to_string( ::Statistics::GetFenceCalls() ) + "\n";
+				str += "pso changes: " + std::to_string( ::Statistics::GetPSOBindCalls() ) + "\n";
                 str += "queue submit calls: " + std::to_string( ::Statistics::GetQueueSubmitCalls() ) + "\n";
                 str += "mem alloc calls: " + std::to_string( ::Statistics::GetAllocCalls() ) + " (frame), " + std::to_string( ::Statistics::GetTotalAllocCalls() ) + " (total)\n";
                 str += "triangles: " + std::to_string( ::Statistics::GetTriangleCount() ) + "\n";
@@ -2011,6 +2012,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
 
     vkCmdBindPipeline( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::psoCache[ psoHash ] );
+	Statistics::IncPSOBindCalls();
 
     VkDeviceSize offsets[ 1 ] = { 0 };
     vkCmdBindVertexBuffers( GfxDeviceGlobal::currentCmdBuffer, VertexBuffer::VERTEX_BUFFER_BIND_ID, 1, vertexBuffer.GetVertexBuffer(), offsets );

@@ -7,6 +7,7 @@
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "TextureBase.hpp"
 #include "Texture2D.hpp"
 
@@ -124,6 +125,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     cpuHandle.ptr += incrementSize;
 
     GfxDeviceGlobal::cachedPSO = pso;
+    Statistics::IncPSOBindCalls();
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( pso );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ] );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
