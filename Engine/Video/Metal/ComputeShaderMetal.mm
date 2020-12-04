@@ -39,7 +39,7 @@ void ae3d::ComputeShader::Load( const char* metalShaderName, const FileSystem::F
     }
 }
 
-void ae3d::ComputeShader::SetRenderTexture( unsigned slotIndex, RenderTexture* renderTexture )
+void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsigned slotIndex )
 {
     if (slotIndex < SLOT_COUNT)
     {
@@ -51,7 +51,7 @@ void ae3d::ComputeShader::SetRenderTexture( unsigned slotIndex, RenderTexture* r
     }
 }
 
-void ae3d::ComputeShader::SetTexture2D( unsigned slotIndex, Texture2D* texture )
+void ae3d::ComputeShader::SetTexture2D( Texture2D* texture, unsigned slotIndex )
 {
     if (slotIndex < SLOT_COUNT)
     {

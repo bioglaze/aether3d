@@ -62,7 +62,7 @@ unsigned ae3d::LightTiler::GetNumTilesY() const
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewToClip, const Matrix44& worldToView, RenderTexture& depthNormalTarget )
 {
-    shader.SetRenderTexture( 0, &depthNormalTarget );
+    shader.SetRenderTexture( &depthNormalTarget, 0 );
 
     Matrix44::Invert( viewToClip, GfxDeviceGlobal::perObjectUboStruct.clipToView );
 

@@ -926,14 +926,14 @@ int main()
 
             if (TestMSAA)
             {
-                downsampleAndThresholdShader.SetRenderTexture( 0, &resolvedTex );
+                downsampleAndThresholdShader.SetRenderTexture( &resolvedTex, 0 );
             }
             else
             {
-                downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
+                downsampleAndThresholdShader.SetRenderTexture( &cameraTex, 0 );
             }
             
-            downsampleAndThresholdShader.SetTexture2D( 14, &blurTex );
+            downsampleAndThresholdShader.SetTexture2D( &blurTex, 14 );
 #endif
             downsampleAndThresholdShader.Begin();
             downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
@@ -941,7 +941,7 @@ int main()
 
             blurTex.SetLayout( TextureLayout::ShaderRead );
 
-            blurShader.SetTexture2D( 0, &blurTex );
+            blurShader.SetTexture2D( &blurTex, 0 );
 
 #if RENDERER_D3D12
             bloomTex.SetLayout( TextureLayout::ShaderReadWrite );
@@ -959,7 +959,7 @@ int main()
             blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() ); // Unused, but must exist
             blurShader.SetUAV( 1, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
 #else
-            blurShader.SetTexture2D( 14, &bloomTex );
+            blurShader.SetTexture2D( &bloomTex, 14 );
 #endif
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
             blurShader.Begin();
@@ -970,13 +970,13 @@ int main()
 
             blurTex.SetLayout( TextureLayout::General );
             bloomTex.SetLayout( TextureLayout::ShaderRead );
-            blurShader.SetTexture2D( 0, &bloomTex );
+            blurShader.SetTexture2D( &bloomTex, 0 );
 
 #if RENDERER_D3D12
             blurTex.SetLayout( TextureLayout::ShaderReadWrite );
             blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
-            blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.SetTexture2D( &blurTex, 14 );
 #endif
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
             blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
@@ -987,8 +987,8 @@ int main()
             blurTex.SetLayout( TextureLayout::ShaderRead );
             blurTex2.SetLayout( TextureLayout::General );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.SetTexture2D( 0, &blurTex );
-            blurShader.SetTexture2D( 14, &blurTex2 );
+            blurShader.SetTexture2D( &blurTex, 0 );
+            blurShader.SetTexture2D( &blurTex2, 14 );
             blurShader.Begin();
             blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
@@ -999,8 +999,8 @@ int main()
             blurTex.SetLayout( TextureLayout::General );
             blurTex2.SetLayout( TextureLayout::ShaderRead );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.SetTexture2D( 0, &blurTex2 );
-            blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.SetTexture2D( &blurTex2, 0 );
+            blurShader.SetTexture2D( &blurTex, 14 );
             blurShader.Begin();
             blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
@@ -1010,8 +1010,8 @@ int main()
             blurTex.SetLayout( TextureLayout::ShaderRead );
             blurTex2.SetLayout( TextureLayout::General );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.SetTexture2D( 0, &blurTex );
-            blurShader.SetTexture2D( 14, &blurTex2 );
+            blurShader.SetTexture2D( &blurTex, 0 );
+            blurShader.SetTexture2D( &blurTex2, 14 );
             blurShader.Begin();
             blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
@@ -1022,8 +1022,8 @@ int main()
             blurTex.SetLayout( TextureLayout::General );
             blurTex2.SetLayout( TextureLayout::ShaderRead );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.SetTexture2D( 0, &blurTex2 );
-            blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.SetTexture2D( &blurTex2, 0 );
+            blurShader.SetTexture2D( &blurTex, 14 );
             blurShader.Begin();
             blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
@@ -1033,8 +1033,8 @@ int main()
             blurTex.SetLayout( TextureLayout::ShaderRead );
             blurTex2.SetLayout( TextureLayout::General );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.SetTexture2D( 0, &blurTex );
-            blurShader.SetTexture2D( 14, &blurTex2 );
+            blurShader.SetTexture2D( &blurTex, 0 );
+            blurShader.SetTexture2D( &blurTex2, 14 );
             blurShader.Begin();
             blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
@@ -1045,8 +1045,8 @@ int main()
             blurTex.SetLayout( TextureLayout::General );
             blurTex2.SetLayout( TextureLayout::ShaderRead );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.SetTexture2D( 0, &blurTex2 );
-            blurShader.SetTexture2D( 14, &blurTex );
+            blurShader.SetTexture2D( &blurTex2, 0 );
+            blurShader.SetTexture2D( &blurTex, 14 );
             blurShader.Begin();
             blurShader.Dispatch( width / 16, height / 16, 1, "blur" );
             blurShader.End();
@@ -1109,10 +1109,10 @@ int main()
             ssaoShader.SetUAV( 0, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() ); // Unused, but must exist
             ssaoShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
 #else
-            ssaoShader.SetRenderTexture( 0, &cameraTex );
-            ssaoShader.SetRenderTexture( 1, &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture() );
-            ssaoShader.SetTexture2D( 2, &noiseTex );
-            ssaoShader.SetTexture2D( 14, &ssaoTex );
+            ssaoShader.SetRenderTexture( &cameraTex, 0 );
+            ssaoShader.SetRenderTexture( &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
+            ssaoShader.SetTexture2D( &noiseTex, 2 );
+            ssaoShader.SetTexture2D( &ssaoTex, 14 );
 #endif
             ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
             ssaoShader.Begin();

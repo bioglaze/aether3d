@@ -881,39 +881,39 @@ using namespace ae3d;
         {
             auto beginTime = std::chrono::steady_clock::now();
             
-            downSampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
-            downSampleAndThresholdShader.SetTexture2D( 1, &blurTex );
+            downSampleAndThresholdShader.SetRenderTexture( &cameraTex, 0 );
+            downSampleAndThresholdShader.SetTexture2D( &blurTex, 1 );
             downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downSampleAndThreshold" );
             
-            blurShader.SetTexture2D( 0, &blurTex );
-            blurShader.SetTexture2D( 1, &bloomTex );
+            blurShader.SetTexture2D( &blurTex, 0 );
+            blurShader.SetTexture2D( &bloomTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
             blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
-            blurShader.SetTexture2D( 0, &bloomTex );
-            blurShader.SetTexture2D( 1, &blurTex );
+            blurShader.SetTexture2D( &bloomTex, 0 );
+            blurShader.SetTexture2D( &blurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
             blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             // Second blur
-            blurShader.SetTexture2D( 0, &blurTex );
-            blurShader.SetTexture2D( 1, &blurTex2 );
+            blurShader.SetTexture2D( &blurTex, 0 );
+            blurShader.SetTexture2D( &blurTex2, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
             blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
-            blurShader.SetTexture2D( 0, &blurTex2 );
-            blurShader.SetTexture2D( 1, &blurTex );
+            blurShader.SetTexture2D( &blurTex2, 0 );
+            blurShader.SetTexture2D( &blurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
             blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
             // Third blur
-            blurShader.SetTexture2D( 0, &blurTex );
-            blurShader.SetTexture2D( 1, &blurTex2 );
+            blurShader.SetTexture2D( &blurTex, 0 );
+            blurShader.SetTexture2D( &blurTex2, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
             blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
-            blurShader.SetTexture2D( 0, &blurTex2 );
-            blurShader.SetTexture2D( 1, &blurTex );
+            blurShader.SetTexture2D( &blurTex2, 0 );
+            blurShader.SetTexture2D( &blurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
             blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
             
@@ -928,10 +928,10 @@ using namespace ae3d;
 
         if (TestSSAO)
         {
-            ssaoShader.SetRenderTexture( 0, &cameraTex );
-            ssaoShader.SetRenderTexture( 1, &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
-            ssaoShader.SetTexture2D( 3, &noiseTex );
-            ssaoShader.SetTexture2D( 2, &ssaoTex );
+            ssaoShader.SetRenderTexture( &cameraTex, 0 );
+            ssaoShader.SetRenderTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), 1 );
+            ssaoShader.SetTexture2D( &noiseTex, 3 );
+            ssaoShader.SetTexture2D( &ssaoTex, 2 );
             ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
             ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO" );
             

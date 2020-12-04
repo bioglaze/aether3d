@@ -143,7 +143,7 @@ void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
     }
 }
 
-void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* renderTexture )
+void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, unsigned slot )
 {
     if (slot < SLOT_COUNT)
     {
@@ -158,7 +158,7 @@ void ae3d::ComputeShader::SetRenderTexture( unsigned slot, class RenderTexture* 
     }
 }
 
-void ae3d::ComputeShader::SetTexture2D( unsigned slot, Texture2D* texture )
+void ae3d::ComputeShader::SetTexture2D( Texture2D* texture, unsigned slot )
 {
     if (slot < SLOT_COUNT)
     {

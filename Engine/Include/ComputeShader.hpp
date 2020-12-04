@@ -67,10 +67,6 @@ namespace ae3d
         /// \return PSO
         VkPipeline GetPSO() const { return pso; }
 
-        /// Sets a texture.
-        /// \param slot slot index
-        /// \param texture texture.
-        void SetTexture2D( unsigned slot, Texture2D* texture );
 #endif
         /// \param metalShaderName Vertex shader name for Metal renderer. Must be referenced by the application's Xcode project.
         /// \param dataHLSL HLSL shader file contents.
@@ -78,27 +74,26 @@ namespace ae3d
         void Load( const char* metalShaderName,
                    const FileSystem::FileContentsData& dataHLSL,
                    const FileSystem::FileContentsData& dataSPIRV );
+
+        /// Sets a texture.
+        /// \param texture texture.
+        /// \param slot slot index. Range is 0-14.
+        void SetTexture2D( Texture2D* texture, unsigned slot );
         
 #if RENDERER_METAL
         void LoadFromLibrary( const char* vertexShaderName, const char* fragmentShaderName );
 
         /// Sets a uniform buffer.
-        /// \param slot slot index
+        /// \param slot slot index. Range is 0-14.
         /// \param buffer Uniform buffer
         void SetUniformBuffer( unsigned slot, id< MTLBuffer > buffer );
-
-        /// Sets a texture.
-        /// \param slot slot index
-        /// \param texture texture.
-        void SetTexture2D( unsigned slot, Texture2D* texture );
 #endif
         /// Sets a render texture into a slot.
-        /// \param slot slot index.
         /// \param renderTexture render texture.
-        void SetRenderTexture( unsigned slot, class RenderTexture* renderTexture );
+        /// \param slot slot index. Range is 0-14.
+        void SetRenderTexture( class RenderTexture* renderTexture, unsigned slot );
         
 #if RENDERER_D3D12
-        void SetTexture2D( unsigned slot, Texture2D* texture );
         void SetCBV( unsigned slot, ID3D12Resource* buffer );
         void SetSRV( unsigned slot, ID3D12Resource* buffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
         void SetUAV( unsigned slot, ID3D12Resource* buffer, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc );
