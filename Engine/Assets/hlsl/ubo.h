@@ -29,7 +29,7 @@ layout( set = 0, binding = 7 ) cbuffer cbPerFrame : register(b0)
     matrix boneMatrices[ 80 ];
     int isVR;
     int kernelSize;
-    float2 padding;
+    float2 bloomParams;
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };

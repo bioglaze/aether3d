@@ -24,8 +24,7 @@ struct Uniforms
     matrix_float4x4 boneMatrices[ 80 ];
     int isVR;
     int kernelSize;
-    int pad0;
-    int pad1;
+    float2 bloomParams;
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };

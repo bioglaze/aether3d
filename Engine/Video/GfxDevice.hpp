@@ -33,8 +33,8 @@ struct PerObjectUboStruct
     ae3d::Matrix44 boneMatrices[ 80 ];
     int isVR = 0;
     int kernelSize;
-    int pad0;
-    int pad1;
+    float bloomThreshold = 0.8f;
+    float bloomParam;
     ae3d::Vec4 kernelOffsets[ 16 ];
     ae3d::Vec4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };
