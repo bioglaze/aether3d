@@ -131,13 +131,13 @@ int main()
     cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA );
 
     Texture2D bloomTex;
-    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte );
+    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte, nullptr );
 
 	Texture2D blurTex;
-	blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte );
+	blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte, nullptr );
 
     Texture2D blurTex2;
-    blurTex2.CreateUAV( width / 2, height / 2, "blurTex2", DataType::UByte );
+    blurTex2.CreateUAV( width / 2, height / 2, "blurTex2", DataType::UByte, nullptr );
 
     Texture2D noiseTex;
 
@@ -333,7 +333,7 @@ int main()
                         FileSystem::FileContents( "shaders/unlit_cube_vert.spv" ), FileSystem::FileContents( "shaders/unlit_cube_frag.spv" ) );
 
     Texture2D ssaoTex;
-    ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte );
+    ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte, nullptr );
     
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );

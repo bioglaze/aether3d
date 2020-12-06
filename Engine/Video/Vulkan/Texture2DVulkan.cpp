@@ -396,9 +396,39 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)sampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }
 
-void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format )
+void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format, const void* imageData )
 {
-    LoadFromData( nullptr, aWidth, aHeight, debugName, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, format );
+    width = aWidth;
+    height = aHeight;
+    wrap = TextureWrap::Repeat;
+    filter = TextureFilter::Linear;
+    opaque = true;
+
+    const unsigned usageFlags = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+    
+    if (format == ae3d::DataType::Float)
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 4 * 4, VK_FORMAT_R32G32B32A32_SFLOAT, usageFlags );
+    }
+    else if( format == ae3d::DataType::Float16 )
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 4 * 2, VK_FORMAT_R16G16B16A16_SFLOAT, usageFlags );
+    }
+    else if( format == ae3d::DataType::R32G32 )
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 2 * 4, VK_FORMAT_R32G32_SFLOAT, usageFlags );
+    }
+    else if( format == ae3d::DataType::R32F )
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 1 * 4, VK_FORMAT_R32_SFLOAT, usageFlags );
+    }
+    else
+    {
+        CreateVulkanObjects( const_cast< void* >( imageData ), 4, colorSpace == ColorSpace::Linear ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R8G8B8A8_SRGB, usageFlags );
+    }
+    
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)view, VK_OBJECT_TYPE_IMAGE_VIEW, debugName );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)image, VK_OBJECT_TYPE_IMAGE, debugName );
 }
 
 void ae3d::Texture2D::SetLayout( TextureLayout aLayout )

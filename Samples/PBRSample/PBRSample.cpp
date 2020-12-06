@@ -177,10 +177,10 @@ int main()
     cameraTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", true );
 
     Texture2D bloomTex;
-    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte );
+    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte, nullptr );
 
 	Texture2D blurTex;
-	blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte );
+	blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte, nullptr );
 
     RenderTexture resolvedTex;
     resolvedTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );

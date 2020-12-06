@@ -237,9 +237,9 @@ DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format )
 	return dxgiFormat;
 }
 
-void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format )
+void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format, const void* imageData )
 {
-    LoadFromData( nullptr, aWidth, aHeight, debugName, format );
+    LoadFromData( imageData, aWidth, aHeight, debugName, format );
 
     uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 

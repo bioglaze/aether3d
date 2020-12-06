@@ -672,10 +672,10 @@ using namespace ae3d;
 
 
     rtTex.Create2D( 512, 512, ae3d::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture", false );
-    bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", DataType::Float );
-    blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", DataType::Float );
-    blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", DataType::Float );
-    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", DataType::Float );
+    bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", DataType::Float, nullptr );
+    blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", DataType::Float, nullptr );
+    blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", DataType::Float, nullptr );
+    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", DataType::Float, nullptr );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     if (TestRenderTexture2D)

@@ -36,7 +36,8 @@ namespace ae3d
         /// \param height height in pixels.
         /// \param debugName Debug name.
         /// \param format Pixel format.
-        void CreateUAV( int width, int height, const char* debugName, DataType format );
+        /// \param imageData Pixel data, can be null.
+        void CreateUAV( int width, int height, const char* debugName, DataType format, const void* imageData );
         
         /// \param textureData Texture image data. File format must be dds, png, tga, jpg or bmp.
         /// \param wrap Wrap mode.

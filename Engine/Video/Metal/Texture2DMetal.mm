@@ -294,8 +294,10 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &defaultTexture;
 }
 
-void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format )
+void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format, const void* imageData )
 {
+    assert( !imageData );
+    
     width = aWidth;
     height = aHeight;
     wrap = TextureWrap::Repeat;

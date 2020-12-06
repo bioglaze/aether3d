@@ -381,10 +381,10 @@ void svInit( SceneView** sv, int width, int height )
     *sv = new SceneView();
     
     (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
-    (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float );
-    (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float );
-    (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float );
-    (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::Float );
+    (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
+    (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
+    (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );
+    (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::Float, nullptr );
     
     constexpr int noiseDim = 64;
     Vec4 noiseData[ noiseDim * noiseDim ];
