@@ -130,6 +130,7 @@ void Inspector::Init()
     ssao = false;
     bloom = false;
     textEditActive = false;
+    bloomThreshold = 1;
 
     nk_font_atlas_init_default( &atlas );
     nk_font_atlas_begin( &atlas );
@@ -476,6 +477,10 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             static int blo;
             nk_checkbox_label( &ctx, "Bloom", &blo );
             bloom = blo != 0;
+
+            nk_label( &ctx, "Bloom threshold:", NK_TEXT_LEFT );
+
+            nk_slider_float( &ctx, 0, &bloomThreshold, 1.0f, 0.1f );
         }
         
         // Hierarchy

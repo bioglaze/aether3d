@@ -39,7 +39,7 @@ bool svIsDraggingGizmo( SceneView* sv );
 void svAddGameObject( SceneView* sceneView );
 void svDuplicateGameObject( SceneView* sceneView );
 void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight );
-void svBeginRender( SceneView* sceneView, SSAO ssao, Bloom bloom );
+void svBeginRender( SceneView* sceneView, SSAO ssao, Bloom bloom, float bloomThreshold );
 void svEndRender( SceneView* sceneView );
 ae3d::Material* svGetMaterial( SceneView* sceneView );
 bool svIsTransformGizmoSelected( SceneView* sceneView );

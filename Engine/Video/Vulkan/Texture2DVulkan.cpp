@@ -359,10 +359,6 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
 
     vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
 
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
-
     err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
 

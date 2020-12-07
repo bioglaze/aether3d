@@ -398,7 +398,7 @@ int main()
             moveDir = {};
         }
 
-        svBeginRender( sceneView, inspector.IsSSAOEnabled() ? SSAO::Enabled : SSAO::Disabled, inspector.IsBloomEnabled() ? Bloom::Enabled : Bloom::Disabled );
+        svBeginRender( sceneView, inspector.IsSSAOEnabled() ? SSAO::Enabled : SSAO::Disabled, inspector.IsBloomEnabled() ? Bloom::Enabled : Bloom::Disabled, inspector.GetBloomThreshold() );
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
         GameObject** gameObjects = svGetGameObjects( sceneView, goCount );

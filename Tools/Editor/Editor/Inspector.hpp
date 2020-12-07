@@ -25,8 +25,10 @@ class Inspector
     void Render( unsigned width, unsigned height, ae3d::GameObject* gameObject, Command& outCommand, ae3d::GameObject** gameObjects, unsigned goCount, ae3d::Material* material, int& outSelectedGameObject );
     bool IsSSAOEnabled() const { return ssao; }
     bool IsBloomEnabled() const { return bloom; }
-    
+    float GetBloomThreshold() const { return bloomThreshold; }
+
 private:
+    float bloomThreshold;
     bool textEditActive;
     bool ssao;
     bool bloom;

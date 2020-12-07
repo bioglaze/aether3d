@@ -534,7 +534,7 @@ void svDuplicateGameObject( SceneView* sv )
     }
 }
 
-void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
+void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold )
 {
     sv->scene.Render();
 
@@ -573,14 +573,16 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
         const int width = sv->cameraTarget.GetWidth();
         const int height = sv->cameraTarget.GetHeight();
 
-        
+#if RENDERER_VULKAN
+        const unsigned slot = 14;
+#else
+        const unsigned slot = 1;
+#endif
+
         sv->blurTex.SetLayout( TextureLayout::General );
         sv->downsampleAndThresholdShader.SetRenderTexture( &sv->cameraTarget, 0 );
-#if RENDERER_VULKAN
-        sv->downsampleAndThresholdShader.SetTexture2D( &sv->blurTex, 14 );
-#else
-        sv->downsampleAndThresholdShader.SetTexture2D( &sv->blurTex, 1 );
-#endif
+        sv->downsampleAndThresholdShader.SetTexture2D( &sv->blurTex, slot );
+        sv->downsampleAndThresholdShader.SetUniform( ae3d::ComputeShader::UniformName::BloomThreshold, bloomThreshold, 0 );
         sv->downsampleAndThresholdShader.Begin();
         sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
         sv->downsampleAndThresholdShader.End();
@@ -590,11 +592,11 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
         sv->blurShader.SetTexture2D( &sv->blurTex, 0 );
 #if RENDERER_VULKAN
         const int blurDiv = 16;
-        sv->blurShader.SetTexture2D( &sv->bloomTex, 14 );
 #else
         const int blurDiv = 32;
-        sv->blurShader.SetTexture2D( &sv->bloomTex, 1 );
 #endif
+        sv->blurShader.SetTexture2D( &sv->bloomTex, slot );
+
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
         sv->blurShader.Begin();
         sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
@@ -605,11 +607,7 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom )
         sv->blurTex.SetLayout( TextureLayout::General );
         sv->bloomTex.SetLayout( TextureLayout::ShaderRead );
         sv->blurShader.SetTexture2D( &sv->bloomTex, 0 );
-#if RENDERER_VULKAN
-        sv->blurShader.SetTexture2D( &sv->blurTex, 14 );
-#else
-        sv->blurShader.SetTexture2D( &sv->blurTex, 1 );
-#endif
+        sv->blurShader.SetTexture2D( &sv->blurTex, slot );
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
         sv->blurShader.End();

@@ -59,6 +59,10 @@ void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
         GfxDeviceGlobal::perObjectUboStruct.tilesXY.z = x;
         GfxDeviceGlobal::perObjectUboStruct.tilesXY.w = y;
     }
+    else if (uniform == UniformName::BloomThreshold)
+    {
+        GfxDeviceGlobal::perObjectUboStruct.bloomThreshold = x;
+    }
 }
 
 void ae3d::ComputeShader::SetProjectionMatrix( const struct Matrix44& projection )
