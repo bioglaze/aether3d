@@ -38,7 +38,7 @@ namespace ae3d
     enum class KeyCode
     {
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-        Left, Right, Up, Down, Space, Escape, Enter, Delete, Backspace, Dot, N0, N1, N2, N3, N4, N5, N6, N7, N8, N9, Empty
+        Left, Right, Up, Down, Space, Escape, Enter, Delete, Backspace, Dot, N0, N1, N2, N3, N4, N5, N6, N7, N8, N9, PageUp, PageDown, Empty
     };
 
     /// Key modifiers.

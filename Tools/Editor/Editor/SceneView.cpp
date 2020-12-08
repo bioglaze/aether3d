@@ -575,8 +575,10 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
 
 #if RENDERER_VULKAN
         const unsigned slot = 14;
+        const int blurDiv = 16;
 #else
         const unsigned slot = 1;
+        const int blurDiv = 32;
 #endif
 
         sv->blurTex.SetLayout( TextureLayout::General );
@@ -590,11 +592,6 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
         sv->blurTex.SetLayout( TextureLayout::ShaderRead );
 
         sv->blurShader.SetTexture2D( &sv->blurTex, 0 );
-#if RENDERER_VULKAN
-        const int blurDiv = 16;
-#else
-        const int blurDiv = 32;
-#endif
         sv->blurShader.SetTexture2D( &sv->bloomTex, slot );
 
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
