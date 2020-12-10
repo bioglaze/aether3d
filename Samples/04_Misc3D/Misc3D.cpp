@@ -37,7 +37,7 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = true;
+constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = true;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples

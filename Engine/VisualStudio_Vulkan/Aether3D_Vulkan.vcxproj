@@ -161,6 +161,7 @@
     <ClCompile Include="..\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Components\DirectionalLightComponent.cpp" />
     <ClCompile Include="..\Components\GameObject.cpp" />
+    <ClCompile Include="..\Components\LineRendererComponent.cpp" />
     <ClCompile Include="..\Components\MeshRendererComponent.cpp" />
     <ClCompile Include="..\Components\PointLightComponent.cpp" />
     <ClCompile Include="..\Components\SpotLightComponent.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="..\Include\FileSystem.hpp" />
     <ClInclude Include="..\Include\Font.hpp" />
     <ClInclude Include="..\Include\GameObject.hpp" />
+    <ClInclude Include="..\Include\LineRendererComponent.hpp" />
     <ClInclude Include="..\Include\Macros.hpp" />
     <ClInclude Include="..\Include\Material.hpp" />
     <ClInclude Include="..\Include\Matrix.hpp" />

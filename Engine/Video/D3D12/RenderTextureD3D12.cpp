@@ -71,7 +71,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         D3D12_RESOURCE_STATE_COPY_DEST, &clearValue, IID_PPV_ARGS( &gpuResource.resource ) );
     AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
-    wchar_t wstr[ 128 ];
+	wchar_t wstr[ 128 ] = {};
     std::mbstowcs( wstr, debugName, 128 );
 
     gpuResource.resource->SetName( wstr );
@@ -179,7 +179,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
             D3D12_RESOURCE_STATE_COPY_DEST, &clearValue, IID_PPV_ARGS( &gpuResource.resource ) );
         AE3D_CHECK_D3D( hr, "Unable to create texture resource" );
 
-        wchar_t wstr[ 128 ];
+		wchar_t wstr[ 128 ] = {};
         std::mbstowcs( wstr, debugName, 128 );
         gpuResource.resource->SetName( wstr );
         gpuResource.usageState = D3D12_RESOURCE_STATE_COPY_DEST;

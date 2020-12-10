@@ -96,5 +96,8 @@
     <ClInclude Include="..\..\..\Engine\Include\Array.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\LineRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

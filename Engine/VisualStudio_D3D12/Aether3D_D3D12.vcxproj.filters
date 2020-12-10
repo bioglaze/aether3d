@@ -141,6 +141,9 @@
     <ClCompile Include="..\Video\D3D12\LightTilerD3D12.cpp">
       <Filter>Video</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\LineRendererComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Core\AudioSystem.hpp">
@@ -267,6 +270,9 @@
       <Filter>Video</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\Array.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\LineRendererComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

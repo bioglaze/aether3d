@@ -146,6 +146,7 @@
     <ClInclude Include="..\..\..\Engine\Include\FileSystem.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Font.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\GameObject.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\LineRendererComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Macros.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Material.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />
