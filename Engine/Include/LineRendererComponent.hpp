@@ -19,11 +19,11 @@ namespace ae3d
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
         /// \return Line handle.
-        int GetLineHandle( int handle ) const { return lineHandle; }
+        int GetLineHandle() const { return lineHandle; }
 
         /// \param handle Line handle. Use System::CreateLineBuffer() to generate the handle.
         void SetLineHandle( int handle ) { lineHandle = handle; }
-
+        
     private:
         friend class GameObject;
         friend class Scene;
@@ -36,9 +36,6 @@ namespace ae3d
         
         /* \return Component at index or null if index is invalid. */
         static LineRendererComponent* Get( unsigned index );
-
-        /* \param localToClip Transforms coordinates to clip space. */
-        void Render( const float* localToClip );
                 
         GameObject* gameObject = nullptr;
         int lineHandle = 0;

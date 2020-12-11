@@ -1,4 +1,5 @@
 #include "LineRendererComponent.hpp"
+#include "System.hpp"
 
 ae3d::LineRendererComponent::LineRendererComponent()
 {

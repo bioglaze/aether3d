@@ -15,6 +15,7 @@
 #include "GameObject.hpp"
 #include "GfxDevice.hpp"
 #include "LightTiler.hpp"
+#include "LineRendererComponent.hpp"
 #include "Matrix.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
@@ -671,7 +672,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         }
         
         auto transform = gameObject->GetComponent< TransformComponent >();
-        auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
         auto dirLight = gameObject->GetComponent< DirectionalLightComponent >();
         auto spotLight = gameObject->GetComponent< SpotLightComponent >();
         
@@ -695,7 +695,9 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         {
             GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
         }
-        
+
+        auto spriteRenderer = gameObject->GetComponent< SpriteRendererComponent >();
+
         if (spriteRenderer)
         {
             Matrix44 localToClip;
@@ -710,6 +712,19 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
             Matrix44 localToClip;
             Matrix44::Multiply( transform ? transform->GetLocalToWorldMatrix() : Matrix44::identity, camera->GetProjection(), localToClip );
             textRenderer->Render( localToClip.m );
+        }
+
+        auto lineRenderer = gameObject->GetComponent< LineRendererComponent >();
+
+        if (lineRenderer && lineRenderer->isEnabled)
+        {
+#if RENDERER_VULKAN
+            const float screenScale = 1;
+#else
+            const float screenScale = 2;
+#endif
+
+            System::DrawLines( lineRenderer->lineHandle, camera->GetView(), camera->GetProjection(), camera->orthoParams.right * screenScale, camera->orthoParams.down * screenScale );
         }
         
         auto meshRenderer = gameObject->GetComponent< MeshRendererComponent >();
