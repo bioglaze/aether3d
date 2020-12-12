@@ -30,6 +30,7 @@
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "Texture2D.hpp"
+#include "Window.hpp"
 
 using namespace ae3d;
 extern Renderer renderer;
@@ -724,7 +725,9 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
             const float screenScale = 2;
 #endif
 
-            System::DrawLines( lineRenderer->lineHandle, camera->GetView(), camera->GetProjection(), camera->orthoParams.right * screenScale, camera->orthoParams.down * screenScale );
+            int width = 0, height = 0;
+            Window::GetSize( width, height );
+            System::DrawLines( lineRenderer->lineHandle, camera->GetView(), camera->GetProjection(), width * screenScale, height * screenScale );
         }
         
         auto meshRenderer = gameObject->GetComponent< MeshRendererComponent >();

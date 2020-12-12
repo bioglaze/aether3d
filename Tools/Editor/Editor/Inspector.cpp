@@ -149,6 +149,15 @@ void Inspector::Init()
     nk_font_atlas_end( &atlas, nk_handle_id( uiTextures[ 0 ].GetID() ), &nullTexture );
     
     nk_init_default( &ctx, &nkFont->handle );
+    //ctx.style.text.color = nk_rgb(255, 255, 255);
+    //ctx.style.tab.text = nk_rgb(195,5,5); // Tree title
+
+    //ctx.style.property.label_normal = nk_rgb(195,5,5);
+    //ctx.style.property.normal = nk_style_item_color( nk_rgb(216,6,6) );
+    
+    //ctx.style.selectable.normal = nk_style_item_color(nk_rgb(2,2,2)); // Tree view items
+    ctx.style.selectable.hover = nk_style_item_color( nk_rgb( 56, 56, 56) );
+    //ctx.style.selectable.pressed = nk_style_item_color(nk_rgb(206,206,206));
 }
 
 void Inspector::BeginInput()
@@ -231,8 +240,14 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
             Vec3& pos = transform->GetLocalPosition();
             nk_layout_row_dynamic( &ctx, 40, 3 );
+
+            //ctx.style.property.normal = nk_style_item_color( nk_rgb(216,6,6) );
             nk_property_float( &ctx, "#X:", -1024.0f, &pos.x, 1024.0f, 1, 1 );
+
+            //ctx.style.property.normal = nk_style_item_color( nk_rgb(6,216,6) );    
             nk_property_float( &ctx, "#Y:", -1024.0f, &pos.y, 1024.0f, 1, 1 );
+
+            //ctx.style.property.normal = nk_style_item_color( nk_rgb(6,6,216) );
             nk_property_float( &ctx, "#Z:", -1024.0f, &pos.z, 1024.0f, 1, 1 );
 
             /*nk_label( &ctx, "Rotation", NK_TEXT_LEFT );

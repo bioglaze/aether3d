@@ -198,6 +198,11 @@ int main()
                         svDeleteGameObject( sceneView );
                         selectedGO = nullptr;
                         break;
+                    case KeyCode::Escape:
+                        selectedGO = svSelectObject( sceneView, -1, -1, width, height );
+
+                        //selectedGO = nullptr;
+                        break;
                     default: break;
                     }
                 }

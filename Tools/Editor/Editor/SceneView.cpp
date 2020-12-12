@@ -8,6 +8,7 @@
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
+#include "LineRendererComponent.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
@@ -417,6 +418,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->camera.AddComponent< TransformComponent >();
     (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
     (*sv)->camera.SetName( "EditorCamera" );
+    (*sv)->camera.AddComponent< LineRendererComponent >();
 
     (*sv)->scene.Add( &(*sv)->camera );
 
@@ -478,6 +480,8 @@ void svInit( SceneView** sv, int width, int height )
     }
 
     (*sv)->lineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
+
+    (*sv)->camera.GetComponent< LineRendererComponent >()->SetLineHandle( (*sv)->lineHandle );
 }
 
 ae3d::Material* svGetMaterial( SceneView* sceneView )
@@ -909,7 +913,6 @@ void svDeleteGameObject( SceneView* sv )
     {
         sv->scene.Remove( sv->selectedGameObjects[ 0 ] );
         sv->selectedGameObjects.Allocate( 0 );
-        //sv->transformGizmo.selectedMesh = -1;
         sv->scene.Remove( sv->gameObjects[ 0 ] );
         sv->gameObjects.Remove( sv->selectedGOIndex );
     }
@@ -1027,5 +1030,5 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         }
     }
 
-    System::DrawLines( sv->lineHandle, camera->GetView(), camera->GetProjection(), screenWidth * screenScale, screenHeight * screenScale );
+    //System::DrawLines( sv->lineHandle, camera->GetView(), camera->GetProjection(), screenWidth * screenScale, screenHeight * screenScale );
 }
