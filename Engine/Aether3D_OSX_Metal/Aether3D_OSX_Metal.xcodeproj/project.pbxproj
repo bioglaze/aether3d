@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		AB1786EF2128AFD200659048 /* Array.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB1786EE2128AFD200659048 /* Array.hpp */; };
+		AB467FAF2584CE59005835A7 /* LineRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB467FAE2584CE59005835A7 /* LineRendererComponent.hpp */; };
+		AB467FB22584CE76005835A7 /* LineRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB467FB12584CE76005835A7 /* LineRendererComponent.cpp */; };
 		AB61DA531DAD62F80068A5FE /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB61DA521DAD62F80068A5FE /* MathUtil.cpp */; };
 		AB6E12D01C11D79B0020A929 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */; };
 		AB6E12D11C11D79B0020A929 /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C81C11D79B0020A929 /* CameraComponent.cpp */; };
@@ -88,6 +90,8 @@
 
 /* Begin PBXFileReference section */
 		AB1786EE2128AFD200659048 /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../Include/Array.hpp; sourceTree = "<group>"; };
+		AB467FAE2584CE59005835A7 /* LineRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = LineRendererComponent.hpp; path = ../Include/LineRendererComponent.hpp; sourceTree = "<group>"; };
+		AB467FB12584CE76005835A7 /* LineRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LineRendererComponent.cpp; path = ../Components/LineRendererComponent.cpp; sourceTree = "<group>"; };
 		AB61DA521DAD62F80068A5FE /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../Core/MathUtil.cpp; sourceTree = "<group>"; };
 		AB6E12BA1C11D7450020A929 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAether3D_OSX_Metal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
@@ -208,6 +212,7 @@
 				AB6E12C81C11D79B0020A929 /* CameraComponent.cpp */,
 				AB6E12C91C11D79B0020A929 /* DirectionalLightComponent.cpp */,
 				AB6E12CA1C11D79B0020A929 /* GameObject.cpp */,
+				AB467FB12584CE76005835A7 /* LineRendererComponent.cpp */,
 				AB6E12CB1C11D79B0020A929 /* MeshRendererComponent.cpp */,
 				AB8E83F81CEBAE9A00A8E9E8 /* PointLightComponent.cpp */,
 				AB6E12CC1C11D79B0020A929 /* SpotLightComponent.cpp */,
@@ -280,6 +285,7 @@
 				AB6E130C1C11D8020020A929 /* FileSystem.hpp */,
 				AB6E130D1C11D8020020A929 /* Font.hpp */,
 				AB6E130E1C11D8020020A929 /* GameObject.hpp */,
+				AB467FAE2584CE59005835A7 /* LineRendererComponent.hpp */,
 				AB6E130F1C11D8020020A929 /* Macros.hpp */,
 				AB6E13101C11D8020020A929 /* Material.hpp */,
 				AB6E13111C11D8020020A929 /* Matrix.hpp */,
@@ -357,6 +363,7 @@
 				AB6E12F21C11D7B00020A929 /* Frustum.hpp in Headers */,
 				AB8E83F71CEBAE7600A8E9E8 /* PointLightComponent.hpp in Headers */,
 				AB6E13361C11D8020020A929 /* Texture2D.hpp in Headers */,
+				AB467FAF2584CE59005835A7 /* LineRendererComponent.hpp in Headers */,
 				AB6E132A1C11D8020020A929 /* Material.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -437,6 +444,7 @@
 				AB6E12D41C11D79B0020A929 /* MeshRendererComponent.cpp in Sources */,
 				AB6E13051C11D7C50020A929 /* Texture2DMetal.mm in Sources */,
 				AB6E12D81C11D79B0020A929 /* TransformComponent.cpp in Sources */,
+				AB467FB22584CE76005835A7 /* LineRendererComponent.cpp in Sources */,
 				AB6E12D21C11D79B0020A929 /* DirectionalLightComponent.cpp in Sources */,
 				AB7C8AC01D74C8CB0066EC28 /* DDSLoader.cpp in Sources */,
 				AB6E12D61C11D79B0020A929 /* SpriteRendererComponent.cpp in Sources */,

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace ae3d
 {
     /// Renders lines. Use this component to get proper depth testing relative to other objects in a scene.

@@ -13,6 +13,7 @@
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
+#include "Window.hpp"
 
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
@@ -334,6 +335,12 @@ void ae3d::GfxDevice::PushGroupMarker( const char* name )
 void ae3d::GfxDevice::PopGroupMarker()
 {
     [renderEncoder popDebugGroup];
+}
+
+void ae3d::Window::GetSize( int& outWidth, int& outHeight )
+{
+    outWidth = GfxDeviceGlobal::backBufferWidth / 2;
+    outHeight = GfxDeviceGlobal::backBufferHeight / 2;
 }
 
 void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int sampleCount, int uiVBSize, int uiIBSize )
@@ -672,7 +679,7 @@ void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )
         return;
     }
     
-    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount(), shader, BlendMode::Off, DepthFunc::LessOrEqualWriteOff, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
+    Draw( GfxDeviceGlobal::lineBuffers[ handle ], 0, GfxDeviceGlobal::lineBuffers[ handle ].GetFaceCount(), shader, BlendMode::Off, DepthFunc::LessOrEqualWriteOn, CullMode::Off, FillMode::Solid, GfxDevice::PrimitiveTopology::Lines );
 }
 
 void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endIndex, Shader& shader, BlendMode blendMode, DepthFunc depthFunc, CullMode cullMode, FillMode fillMode, PrimitiveTopology topology )

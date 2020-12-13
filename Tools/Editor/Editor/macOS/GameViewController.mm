@@ -11,7 +11,7 @@
 #import "Window.hpp"
 
 NSViewController* myViewController;
-const int InspectorWidth = 250;
+const int InspectorWidth = 450;
 
 static std::string GetOpenPath( const char* extension )
 {
@@ -262,6 +262,10 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     {
         svMoveSelection( sceneView, { 0, -1, 0 } );
     }
+    else if ([theEvent keyCode] == 53) // Esc
+    {
+        selectedGO = svSelectObject( sceneView, -1, -1, (int)self.view.bounds.size.width, (int)self.view.bounds.size.height );
+    }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -300,6 +304,13 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 {
     const float deltaX = -float( theEvent.deltaX ) / 10;
     const float deltaY = -float( theEvent.deltaY ) / 10;
+
+    inputEvent.mouseMoved = true;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
+    inputEvent.key = -1;
+    inputEvent.mouseWheel = false;
 
     const bool clickedOnInspector = (int)theEvent.locationInWindow.x < (InspectorWidth / 2);
 
@@ -446,7 +457,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         svMoveCamera( sceneView, moveDir );
-        svBeginRender( sceneView, inspector.IsSSAOEnabled() ? SSAO::Enabled : SSAO::Disabled, inspector.IsBloomEnabled() ? Bloom::Enabled : Bloom::Disabled );
+        svBeginRender( sceneView, inspector.IsSSAOEnabled() ? SSAO::Enabled : SSAO::Disabled, inspector.IsBloomEnabled() ? Bloom::Enabled : Bloom::Disabled, inspector.GetBloomThreshold() );
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
         ae3d::GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
