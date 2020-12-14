@@ -194,14 +194,18 @@ int main()
                     case KeyCode::Down:
                         svMoveSelection( sceneView, { 0, -1, 0 } );
                         break;
+                    case KeyCode::PageUp:
+                        svMoveSelection( sceneView, { 0, 0, 1 } );
+                        break;
+                    case KeyCode::PageDown:
+                        svMoveSelection( sceneView, { 0, 0, -1 } );
+                        break;
                     case KeyCode::Delete:
                         svDeleteGameObject( sceneView );
                         selectedGO = nullptr;
                         break;
                     case KeyCode::Escape:
                         selectedGO = svSelectObject( sceneView, -1, -1, width, height );
-
-                        //selectedGO = nullptr;
                         break;
                     default: break;
                     }
@@ -225,6 +229,8 @@ int main()
 
                     if (inspector.IsTextEditActive())
                     {
+                        if (event.keyCode == KeyCode::Left) inspector.HandleKey( 12, 1 ); // NK_KEY_LEFT
+                        if (event.keyCode == KeyCode::Right) inspector.HandleKey( 13, 1 ); // NK_KEY_RIGHT
                         if (event.keyCode == KeyCode::Q) inspector.HandleChar( 'q' );
                         if (event.keyCode == KeyCode::W) inspector.HandleChar( 'w' );
                         if (event.keyCode == KeyCode::E) inspector.HandleChar( 'e' );

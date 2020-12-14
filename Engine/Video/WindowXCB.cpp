@@ -145,6 +145,8 @@ namespace WindowGlobal
         { XK_8, ae3d::KeyCode::N8 },
         { XK_9, ae3d::KeyCode::N9 },
         { 46, ae3d::KeyCode::Dot },
+        { 65365, ae3d::KeyCode::PageUp },
+        { 65366, ae3d::KeyCode::PageDown }        
     };
 }
 
