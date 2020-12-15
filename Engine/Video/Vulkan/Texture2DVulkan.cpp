@@ -210,7 +210,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
 
         vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffers[ mipIndex ], &memReqs );
 
-        memAllocInfo.allocationSize = memReqs.size;
+        memAllocInfo.allocationSize = (memReqs.size + GfxDeviceGlobal::properties.limits.nonCoherentAtomSize - 1) & ~(GfxDeviceGlobal::properties.limits.nonCoherentAtomSize - 1);;
         memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
 
 		err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipIndex ] );
@@ -522,7 +522,7 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
 
     vkGetBufferMemoryRequirements( GfxDeviceGlobal::device, stagingBuffer, &memReqs );
 
-    memAllocInfo.allocationSize = memReqs.size;
+    memAllocInfo.allocationSize = (memReqs.size + GfxDeviceGlobal::properties.limits.nonCoherentAtomSize - 1) & ~(GfxDeviceGlobal::properties.limits.nonCoherentAtomSize - 1);;
     memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
     VkDeviceMemory stagingMemory = VK_NULL_HANDLE;
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory );
