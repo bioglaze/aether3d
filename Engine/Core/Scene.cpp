@@ -30,7 +30,17 @@
 #include "TextRendererComponent.hpp"
 #include "TransformComponent.hpp"
 #include "Texture2D.hpp"
+#if !TARGET_OS_IPHONE
 #include "Window.hpp"
+#else
+namespace ae3d
+{
+    namespace Window
+    {
+        void GetSize( int& outWidth, int& outHeight );
+    }
+}
+#endif
 
 using namespace ae3d;
 extern Renderer renderer;

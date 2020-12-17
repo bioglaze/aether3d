@@ -13,7 +13,17 @@
 #include "Texture2D.hpp"
 #include "TextureCube.hpp"
 #include "VertexBuffer.hpp"
+#if !TARGET_OS_IPHONE
 #include "Window.hpp"
+#else
+namespace ae3d
+{
+    namespace Window
+    {
+        void GetSize( int& outWidth, int& outHeight );
+    }
+}
+#endif
 
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;

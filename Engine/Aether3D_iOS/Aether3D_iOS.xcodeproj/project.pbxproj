@@ -68,6 +68,8 @@
 		AB4BA30B20022E1E00B6C58E /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4BA30A20022E1E00B6C58E /* Matrix.cpp */; };
 		AB521D111BC045BC004CDF06 /* TextureCube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB61DA551DAD633F0068A5FE /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB61DA541DAD633F0068A5FE /* MathUtil.cpp */; };
+		AB843070258BBDEE00A38233 /* LineRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB84306F258BBDEE00A38233 /* LineRendererComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB843073258BBE0300A38233 /* LineRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB843072258BBE0300A38233 /* LineRendererComponent.cpp */; };
 		AB8E83FF1CEBAEEF00A8E9E8 /* PointLightComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB8E83FE1CEBAEEF00A8E9E8 /* PointLightComponent.cpp */; };
 		AB8E84011CEBAF0100A8E9E8 /* PointLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB8E84001CEBAF0100A8E9E8 /* PointLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB921DB31CC21B34008F5750 /* ComputeShader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB921DB21CC21B34008F5750 /* ComputeShader.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -151,6 +153,8 @@
 		AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
 		AB4BA30A20022E1E00B6C58E /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../../Core/Matrix.cpp; sourceTree = "<group>"; };
 		AB61DA541DAD633F0068A5FE /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../../Core/MathUtil.cpp; sourceTree = "<group>"; };
+		AB84306F258BBDEE00A38233 /* LineRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = LineRendererComponent.hpp; path = ../../Include/LineRendererComponent.hpp; sourceTree = "<group>"; };
+		AB843072258BBE0300A38233 /* LineRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LineRendererComponent.cpp; path = ../../Components/LineRendererComponent.cpp; sourceTree = "<group>"; };
 		AB8E83FE1CEBAEEF00A8E9E8 /* PointLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointLightComponent.cpp; path = ../../Components/PointLightComponent.cpp; sourceTree = "<group>"; };
 		AB8E84001CEBAF0100A8E9E8 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../../Include/PointLightComponent.hpp; sourceTree = "<group>"; };
 		AB921DB21CC21B34008F5750 /* ComputeShader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ComputeShader.hpp; path = ../../Include/ComputeShader.hpp; sourceTree = "<group>"; };
@@ -235,6 +239,7 @@
 				4449E8441B14B423009A869C /* FileSystem.hpp */,
 				4449E8451B14B423009A869C /* Font.hpp */,
 				4449E8461B14B423009A869C /* GameObject.hpp */,
+				AB84306F258BBDEE00A38233 /* LineRendererComponent.hpp */,
 				AB190E331B57DE85005ECE49 /* Material.hpp */,
 				4449E8471B14B423009A869C /* Macros.hpp */,
 				4449E8481B14B423009A869C /* Matrix.hpp */,
@@ -290,6 +295,7 @@
 				ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */,
 				4449E87A1B14B46C009A869C /* CameraComponent.cpp */,
 				4449E87B1B14B46C009A869C /* GameObject.cpp */,
+				AB843072258BBE0300A38233 /* LineRendererComponent.cpp */,
 				AB922E5A1B405030000F3488 /* MeshRendererComponent.cpp */,
 				AB8E83FE1CEBAEEF00A8E9E8 /* PointLightComponent.cpp */,
 				4449E87C1B14B46C009A869C /* SpriteRendererComponent.cpp */,
@@ -372,6 +378,7 @@
 				AB922E561B404FFB000F3488 /* Mesh.hpp in Headers */,
 				4449E8611B14B423009A869C /* TransformComponent.hpp in Headers */,
 				4449E85A1B14B423009A869C /* Quaternion.hpp in Headers */,
+				AB843070258BBDEE00A38233 /* LineRendererComponent.hpp in Headers */,
 				4449E85F1B14B423009A869C /* TextRendererComponent.hpp in Headers */,
 				4449E8561B14B423009A869C /* Font.hpp in Headers */,
 				ABF549B61DF3368C00EFF25D /* Statistics.hpp in Headers */,
@@ -471,6 +478,7 @@
 				4449E8751B14B44E009A869C /* MatrixNEON.cpp in Sources */,
 				4449E8811B14B46C009A869C /* GameObject.cpp in Sources */,
 				AB190E321B57DE73005ECE49 /* Material.cpp in Sources */,
+				AB843073258BBE0300A38233 /* LineRendererComponent.cpp in Sources */,
 				4449E8761B14B44E009A869C /* Scene.cpp in Sources */,
 				4449E8971B14B4B5009A869C /* RendererMetal.mm in Sources */,
 				4449E8821B14B46C009A869C /* SpriteRendererComponent.cpp in Sources */,
