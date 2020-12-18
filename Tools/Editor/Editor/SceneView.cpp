@@ -401,12 +401,8 @@ void svInit( SceneView** sv, int width, int height )
         noiseData[ i ].w = 0;
     }
 
-#if RENDERER_VULKAN    
-    (*sv)->noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::Float );
+    (*sv)->noiseTex.CreateUAV( noiseDim, noiseDim, "noiseData", DataType::Float, noiseData );
     (*sv)->noiseTex.SetLayout( TextureLayout::ShaderRead );
-#else
-    (*sv)->noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );
-#endif
 
     (*sv)->camera.AddComponent< CameraComponent >();
     (*sv)->camera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
@@ -823,7 +819,6 @@ void svHandleLeftMouseDown( SceneView* sv, int screenX, int screenY, int width, 
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
     sv->transformGizmo.selectedMesh = isGizmo ? ci[ 0 ].subMeshIndex : -1;
-    //ae3d::System::Print("collision count: %d, gizmo mesh %d\n", ci.count, sv->transformGizmo.selectedMesh);
 
     if (!isGizmo)
     {
@@ -860,10 +855,7 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 #else
         Vec3 delta{ -deltaX / 20.0f, deltaY / 20.0f, 0.0f };
 #endif
-        //ae3d::System::Print("move. mesh %d\n", sv->transformGizmo.selectedMesh);
-        // Mesh 0 is z, 1 is x, 2 is y.
-
-        if (sv->transformGizmo.selectedMesh == 0)
+        if (sv->transformGizmo.selectedMesh == 0) // z
         {
             delta.x = 0;
             delta.y = 0;
@@ -875,7 +867,7 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
                 delta.z = -delta.z;
             }
         }
-        else if (sv->transformGizmo.selectedMesh == 1)
+        else if (sv->transformGizmo.selectedMesh == 1) // x
         {
             float sign = Vec3::Dot( sv->camera.GetComponent< ae3d::TransformComponent >()->GetViewDirection(), Vec3( 0, 0, 1 ) );
 
@@ -886,7 +878,7 @@ void svHandleMouseMotion( SceneView* sv, int deltaX, int deltaY )
 
             delta.y = 0;
         }
-        else if (sv->transformGizmo.selectedMesh == 2)
+        else if (sv->transformGizmo.selectedMesh == 2) // y
         {
             delta.x = 0;
         }
@@ -1024,11 +1016,8 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             float x = (int)screenPoint.x * screenScale;
             float y = (int)screenPoint.y * screenScale;
 #endif
-            //printf( "draw: %.2f, %.2f to %.2f, %.2f\n", x, y, x + texWidth, y + texHeight );
             ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, opacity ), ae3d::System::BlendMode::Off );
         }
     }
-
-    //System::DrawLines( sv->lineHandle, camera->GetView(), camera->GetProjection(), screenWidth * screenScale, screenHeight * screenScale );
 }
