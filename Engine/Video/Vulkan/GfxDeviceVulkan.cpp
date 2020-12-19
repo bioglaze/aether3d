@@ -43,6 +43,11 @@ PFN_vkGetShaderInfoAMD getShaderInfoAMD;
 constexpr unsigned UI_VERTICE_COUNT = 512 * 1024;
 constexpr unsigned UI_FACE_COUNT = 128 * 1024;
 
+namespace Texture2DGlobal
+{
+    extern std::vector< VkSampler > samplersToReleaseAtExit;
+}
+
 struct Ubo
 {
     VkBuffer ubo = VK_NULL_HANDLE;
@@ -1000,7 +1005,7 @@ namespace ae3d
         samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
         VkResult err = vkCreateSampler( GfxDeviceGlobal::device, &samplerInfo, nullptr, &GfxDeviceGlobal::linearRepeat );
         AE3D_CHECK_VULKAN( err, "vkCreateSampler" );
-        //Texture2DGlobal::samplersToReleaseAtExit.push_back( GfxDeviceGlobal::linearRepeat );
+        Texture2DGlobal::samplersToReleaseAtExit.push_back( GfxDeviceGlobal::linearRepeat );
 
         debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::linearRepeat, VK_OBJECT_TYPE_SAMPLER, "linearRepeat" );
     }
