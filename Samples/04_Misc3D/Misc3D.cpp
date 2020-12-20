@@ -38,8 +38,8 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = true;
-constexpr bool TestSSAO = false;
+constexpr bool TestBloom = false;
+constexpr bool TestSSAO = true;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -133,8 +133,11 @@ int main()
     Texture2D bloomTex;
     bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte, nullptr );
 
-	Texture2D blurTex;
-	blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte, nullptr );
+    Texture2D ssaoBlurTex;
+    ssaoBlurTex.CreateUAV( width, height, "ssaoBlurTex", DataType::UByte, nullptr );
+
+    Texture2D blurTex;
+    blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte, nullptr );
 
     Texture2D blurTex2;
     blurTex2.CreateUAV( width / 2, height / 2, "blurTex2", DataType::UByte, nullptr );
@@ -1120,6 +1123,27 @@ int main()
             ssaoShader.End();
             ssaoTex.SetLayout( TextureLayout::ShaderRead );
 
+            ssaoBlurTex.SetLayout( TextureLayout::General );
+
+            blurShader.SetTexture2D( &ssaoTex, 0 );
+            blurShader.SetTexture2D( &ssaoBlurTex, 14 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+            blurShader.End();
+
+            blurShader.Begin();
+
+            ssaoTex.SetLayout( TextureLayout::General );
+            ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
+            blurShader.SetTexture2D( &ssaoBlurTex, 0 );
+            blurShader.SetTexture2D( &ssaoTex, 14 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+            blurShader.End();
+
+            ssaoTex.SetLayout( TextureLayout::ShaderRead );
+            
             System::Draw( &ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         }
 
