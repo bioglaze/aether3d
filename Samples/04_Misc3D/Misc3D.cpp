@@ -1126,7 +1126,23 @@ int main()
             ssaoBlurTex.SetLayout( TextureLayout::General );
 
             blurShader.SetTexture2D( &ssaoTex, 0 );
+#if RENDERER_D3D12
+            blurShader.SetSRV( 1, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 2, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            blurShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
+            blurShader.SetUAV( 0, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
+            blurShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
+#else
             blurShader.SetTexture2D( &ssaoBlurTex, 14 );
+#endif
+
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
             blurShader.Begin();
             blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
@@ -1137,7 +1153,12 @@ int main()
             ssaoTex.SetLayout( TextureLayout::General );
             ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
             blurShader.SetTexture2D( &ssaoBlurTex, 0 );
+#if RENDERER_D3D12
+            ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
+            blurShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
+#else
             blurShader.SetTexture2D( &ssaoTex, 14 );
+#endif
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
             blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
             blurShader.End();
