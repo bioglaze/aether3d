@@ -35,7 +35,7 @@
 #import "Window.hpp"
 
 const bool TestForwardPlus = false;
-const bool TestBloom = false;
+const bool TestBloom = true;
 const bool TestSSAO = false;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
@@ -467,10 +467,10 @@ using namespace ae3d;
 
     spriteContainer.AddComponent<ae3d::SpriteRendererComponent>();
     auto sprite = spriteContainer.GetComponent<SpriteRendererComponent>();
-    sprite->SetTexture( &bc1Tex, Vec3( 120, 100, -0.6f ), Vec3( (float)bc1Tex.GetWidth(), (float)bc1Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
-    sprite->SetTexture( &bc2Tex, Vec3( 120, 200, -0.5f ), Vec3( (float)bc2Tex.GetWidth(), (float)bc2Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
-    sprite->SetTexture( &bc3Tex, Vec3( 120, 300, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
-    sprite->SetTexture( &gliderTex, Vec3( 220, 120, -0.5f ), Vec3( (float)gliderTex.GetWidth(), (float)gliderTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    sprite->SetTexture( &bc1Tex, Vec3( 20, 220, -0.6f ), Vec3( (float)bc1Tex.GetWidth(), (float)bc1Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    sprite->SetTexture( &bc2Tex, Vec3( 20, 320, -0.5f ), Vec3( (float)bc2Tex.GetWidth(), (float)bc2Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    sprite->SetTexture( &bc3Tex, Vec3( 20, 420, -0.5f ), Vec3( (float)bc3Tex.GetWidth(), (float)bc3Tex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
+    sprite->SetTexture( &gliderTex, Vec3( 120, 320, -0.5f ), Vec3( (float)gliderTex.GetWidth(), (float)gliderTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
     //sprite->SetTexture( &atlasTex, Vec3( 300, 120, -0.5f ), Vec3( (float)atlasTex.GetWidth(), (float)atlasTex.GetHeight(), 1 ), Vec4( 1, 1, 1, 1 ) );
 
     spriteContainer.AddComponent<TransformComponent>();
@@ -916,14 +916,17 @@ using namespace ae3d;
             blurShader.SetTexture2D( &blurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
             blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
-            
-            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-            System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
-            
+                        
             auto endTime = std::chrono::steady_clock::now();
             auto tDiff = std::chrono::duration<double, std::milli>( endTime - beginTime ).count();
             float bloomMS_CPU = static_cast< float >(tDiff);
-            System::Print( "Bloom CPU time: %.2f ms\n", bloomMS_CPU );
+            System::Statistics::SetBloomTime( bloomMS_CPU, 0 );
+
+            //System::Print( "Bloom CPU time: %.2f ms\n", bloomMS_CPU );
+
+            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
+            System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
 
         if (TestSSAO)

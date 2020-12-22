@@ -294,10 +294,35 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
     return &defaultTexture;
 }
 
+static void GetFormatAndBytesPerRow( ae3d::DataType format, int width, MTLPixelFormat& outPixelFormat, int& outBytesPerRow )
+{
+    outPixelFormat = MTLPixelFormatRGBA8Unorm_sRGB;
+    outBytesPerRow = width * 4;
+    
+    if (format == ae3d::DataType::Float)
+    {
+        outPixelFormat = MTLPixelFormatRGBA32Float;
+        outBytesPerRow = width * 4 * sizeof( float );
+    }
+    else if (format == ae3d::DataType::Float16)
+    {
+        outPixelFormat = MTLPixelFormatRGBA16Float;
+        outBytesPerRow = width * 4 * sizeof( float ) / 2;
+    }
+    else if (format == ae3d::DataType::R32G32)
+    {
+        outPixelFormat = MTLPixelFormatRG32Float;
+        outBytesPerRow = width * 2 * sizeof( float );
+    }
+    else if (format == ae3d::DataType::R32F)
+    {
+        outPixelFormat = MTLPixelFormatR32Float;
+        outBytesPerRow = width * 1 * sizeof( float );
+    }
+}
+
 void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format, const void* imageData )
 {
-    assert( !imageData );
-    
     width = aWidth;
     height = aHeight;
     wrap = TextureWrap::Repeat;
@@ -305,35 +330,66 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName,
     opaque = true;
 
     MTLPixelFormat pixelFormat = MTLPixelFormatRGBA8Unorm_sRGB;
+    int bytesPerRow = width * 4;
     
-    if (format == DataType::Float)
-    {
-        pixelFormat = MTLPixelFormatRGBA32Float;
-    }
-    else if (format == DataType::Float16)
-    {
-        pixelFormat = MTLPixelFormatRGBA16Float;
-    }
-    else if (format == DataType::R32G32)
-    {
-        pixelFormat = MTLPixelFormatRG32Float;
-    }
-    else if (format == DataType::R32F)
-    {
-        pixelFormat = MTLPixelFormatR32Float;
-    }
+    GetFormatAndBytesPerRow( format, width, pixelFormat, bytesPerRow );
 
-    MTLTextureDescriptor* textureDescriptor =
-    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
-                                                       width:width
-                                                      height:height
-                                                   mipmapped:NO];
-    textureDescriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
-    textureDescriptor.storageMode = MTLStorageModePrivate;
+    if (!imageData)
+    {
+        MTLTextureDescriptor* textureDescriptor =
+        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
+                                                           width:width
+                                                          height:height
+                                                       mipmapped:NO];
+        textureDescriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+        textureDescriptor.storageMode = MTLStorageModePrivate;
     
-    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
-    metalTexture.label = [NSString stringWithUTF8String:debugName];
-    tex2dMemoryUsage += [metalTexture allocatedSize];
+        metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+        metalTexture.label = [NSString stringWithUTF8String:debugName];
+        tex2dMemoryUsage += [metalTexture allocatedSize];
+    }
+    else
+    {
+        MTLTextureDescriptor* textureDescriptor =
+        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
+                                                           width:width
+                                                          height:height
+                                                       mipmapped:NO];
+        textureDescriptor.usage = MTLTextureUsageShaderRead;
+        id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+        stagingTexture.label = [NSString stringWithUTF8String:debugName];
+            
+        MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
+        [stagingTexture replaceRegion:region mipmapLevel:0 withBytes:imageData bytesPerRow:bytesPerRow];
+
+        MTLTextureDescriptor* textureDescriptor2 =
+        [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
+                                                           width:width
+                                                          height:height
+                                                       mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+        textureDescriptor2.usage = MTLTextureUsageShaderRead;
+        textureDescriptor2.storageMode = MTLStorageModePrivate;
+        metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor2];
+        metalTexture.label = stagingTexture.label;
+        tex2dMemoryUsage += [metalTexture allocatedSize];
+        
+        id <MTLCommandBuffer> cmd_buffer =     [commandQueue commandBuffer];
+        cmd_buffer.label = @"BlitCommandBuffer";
+        id <MTLBlitCommandEncoder> blit_encoder = [cmd_buffer blitCommandEncoder];
+        [blit_encoder copyFromTexture:stagingTexture
+                          sourceSlice:0
+                          sourceLevel:0
+                         sourceOrigin:MTLOriginMake( 0, 0, 0 )
+                           sourceSize:MTLSizeMake( width, height, 1 )
+                            toTexture:metalTexture
+                     destinationSlice:0
+                     destinationLevel:0
+                    destinationOrigin:MTLOriginMake( 0, 0, 0 ) ];
+        [blit_encoder endEncoding];
+        [cmd_buffer commit];
+        [cmd_buffer waitUntilCompleted];
+
+    }
 }
 
 void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, const char* debugName, DataType format )
@@ -343,30 +399,10 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     wrap = TextureWrap::Repeat;
     filter = TextureFilter::Linear;
     opaque = true;
-    int bytesPerRow = width * 4;
-
-    MTLPixelFormat pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB;
     
-    if (format == DataType::Float)
-    {
-        pixelFormat = MTLPixelFormatRGBA32Float;
-        bytesPerRow = width * 4 * sizeof( float );
-    }
-    else if (format == DataType::Float16)
-    {
-        pixelFormat = MTLPixelFormatRGBA16Float;
-        bytesPerRow = width * 4 * sizeof( float ) / 2;
-    }
-    else if (format == DataType::R32G32)
-    {
-        pixelFormat = MTLPixelFormatRG32Float;
-        bytesPerRow = width * 2 * sizeof( float );
-    }
-    else if (format == DataType::R32F)
-    {
-        pixelFormat = MTLPixelFormatR32Float;
-        bytesPerRow = width * 1 * sizeof( float );
-    }
+    int bytesPerRow = width * 4;
+    MTLPixelFormat pixelFormat = colorSpace == ColorSpace::Linear ? MTLPixelFormatRGBA8Unorm : MTLPixelFormatRGBA8Unorm_sRGB;
+    GetFormatAndBytesPerRow( format, width, pixelFormat, bytesPerRow );
 
     NSString* debugNameStr = [NSString stringWithUTF8String:debugName ];
     

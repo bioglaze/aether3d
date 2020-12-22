@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		AB1C9A141F0A607200948D46 /* human_anim_test2.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */; };
-		AB2345001DEABFB8004C4DEE /* default_white.png in Resources */ = {isa = PBXBuildFile; fileRef = AB2344FF1DEABFB8004C4DEE /* default_white.png */; };
 		AB2BB1402160FA8100454B1E /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB2BB13F2160FA8100454B1E /* Bloom.metal */; };
 		AB2CA8251C1332A900D4D7C4 /* libAether3D_OSX_Metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */; };
 		AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */; };
@@ -62,7 +61,6 @@
 
 /* Begin PBXFileReference section */
 		AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = human_anim_test2.ae3d; path = ../../../../aether3d_build/Samples/human_anim_test2.ae3d; sourceTree = "<group>"; };
-		AB2344FF1DEABFB8004C4DEE /* default_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_white.png; path = ../../../../aether3d_build/Samples/default_white.png; sourceTree = "<group>"; };
 		AB2BB13F2160FA8100454B1E /* Bloom.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Bloom.metal; path = ../../../Engine/Assets/Bloom.metal; sourceTree = "<group>"; };
 		AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
 		AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
@@ -219,7 +217,6 @@
 				ABCBC06B1E052CAA000F0B6D /* new_sponza.ae3d */,
 				ABCBC06C1E052CAA000F0B6D /* sponza.scene */,
 				ABCBC0691E052C82000F0B6D /* textures */,
-				AB2344FF1DEABFB8004C4DEE /* default_white.png */,
 				AB9D9A221C96E993009DF897 /* back.jpg */,
 				AB9D9A231C96E993009DF897 /* bottom.jpg */,
 				AB9D9A241C96E993009DF897 /* front.jpg */,
@@ -386,7 +383,6 @@
 				AB4D85A11C6D177100326F5C /* textured_cube_ptn.ae3d in Resources */,
 				AB2CA8271C134ADE00D4D7C4 /* textured_cube.ae3d in Resources */,
 				ABC1CC7F2067CE6F003D0A2D /* atlas_cegui.xml in Resources */,
-				AB2345001DEABFB8004C4DEE /* default_white.png in Resources */,
 				AB2CA8291C13664600D4D7C4 /* glider.png in Resources */,
 				ABCBC06D1E052CAA000F0B6D /* new_sponza.ae3d in Resources */,
 				AB8DDA4F22985D0F00630045 /* explosion.wav in Resources */,

@@ -225,6 +225,9 @@ namespace ae3d
                 str += "depth pass time: ";
                 str += std::to_string( ::Statistics::GetDepthNormalsTimeMS() );
                 str += "\n";
+                str += "bloom time CPU: ";
+                str += std::to_string( ::Statistics::GetBloomCpuTimeMS());
+                str += "\n";
                 str += "draw calls: ";
                 str += std::to_string( ::Statistics::GetDrawCalls() );
                 str += "\n";
