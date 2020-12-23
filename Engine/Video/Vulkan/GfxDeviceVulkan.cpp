@@ -1254,6 +1254,8 @@ namespace ae3d
         mem_alloc.allocationSize = memReqs.size;
         mem_alloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &mem_alloc, nullptr, &GfxDeviceGlobal::depthStencil.mem );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)GfxDeviceGlobal::depthStencil.mem, VK_OBJECT_TYPE_DEVICE_MEMORY, "GfxDeviceGlobal::depthStencil.mem" );
+
         Statistics::IncTotalAllocCalls();
         AE3D_CHECK_VULKAN( err, "depth stencil memory" );
 

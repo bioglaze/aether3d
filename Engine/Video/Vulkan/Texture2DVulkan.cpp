@@ -528,6 +528,8 @@ void ae3d::Texture2D::CreateVulkanObjects( void* data, int bytesPerPixel, VkForm
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
 
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "texture2d staging memory" );
+
     err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffer, stagingMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
 

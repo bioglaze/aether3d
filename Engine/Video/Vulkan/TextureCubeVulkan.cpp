@@ -535,6 +535,9 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 memAllocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
                 err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipLevel ] );
                 AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+
+                debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)stagingMemory[ mipLevel ], VK_OBJECT_TYPE_DEVICE_MEMORY, "stagingDDSCube" );
+
                 TextureCubeGlobal::memoryToReleaseAtExit.push_back( stagingMemory[ mipLevel ] );
 
                 err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers[ mipLevel ], stagingMemory[ mipLevel ], 0 );

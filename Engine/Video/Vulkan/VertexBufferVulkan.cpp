@@ -103,6 +103,9 @@ void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkB
     memAlloc.memoryTypeIndex = ae3d::GetMemoryType( memReqs.memoryTypeBits, memoryFlags );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &memory );
     AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
+
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)memory, VK_OBJECT_TYPE_DEVICE_MEMORY, debugName );
+
     Statistics::IncAllocCalls();
     Statistics::IncTotalAllocCalls();
 

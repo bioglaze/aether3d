@@ -157,6 +157,7 @@ void ae3d::LightTiler::Init()
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &pointLightColorMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory pointLightColorMemory" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pointLightColorMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "pointLightColorMemory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, pointLightColorBuffer, pointLightColorMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory pointLightColorBuffer" );
@@ -196,6 +197,8 @@ void ae3d::LightTiler::Init()
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightCenterAndRadiusMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory spotLightCenterAndRadiusMemory" );
 
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightCenterAndRadiusMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "spotLightCenterAndRadiusMemory" );
+
         err = vkBindBufferMemory( GfxDeviceGlobal::device, spotLightCenterAndRadiusBuffer, spotLightCenterAndRadiusMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory spotLightCenterAndRadiusBuffer" );
 
@@ -233,6 +236,8 @@ void ae3d::LightTiler::Init()
         allocInfo.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT );
         err = vkAllocateMemory( GfxDeviceGlobal::device, &allocInfo, nullptr, &spotLightParamsMemory );
         AE3D_CHECK_VULKAN( err, "vkAllocateMemory spotLightParamsMemory" );
+
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)spotLightParamsMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "spotLightParamsMemory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, spotLightParamsBuffer, spotLightParamsMemory, 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory spotLightParamsBuffer" );
