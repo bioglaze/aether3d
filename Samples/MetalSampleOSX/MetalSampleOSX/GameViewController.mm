@@ -877,6 +877,18 @@ using namespace ae3d;
         System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         
+        if (TestSSAO)
+        {
+            ssaoShader.SetRenderTexture( &cameraTex, 0 );
+            ssaoShader.SetRenderTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), 1 );
+            ssaoShader.SetTexture2D( &noiseTex, 3 );
+            ssaoShader.SetTexture2D( &ssaoTex, 2 );
+            ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
+            ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO" );
+            
+            System::Draw( &ssaoTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        }
+
         if (TestBloom)
         {
             auto beginTime = std::chrono::steady_clock::now();
@@ -924,21 +936,18 @@ using namespace ae3d;
 
             //System::Print( "Bloom CPU time: %.2f ms\n", bloomMS_CPU );
 
-            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            if (TestSSAO)
+            {
+                System::Draw( &ssaoTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            }
+            else
+            {
+                System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            }
+
+            //System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
             System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
-        }
-
-        if (TestSSAO)
-        {
-            ssaoShader.SetRenderTexture( &cameraTex, 0 );
-            ssaoShader.SetRenderTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), 1 );
-            ssaoShader.SetTexture2D( &noiseTex, 3 );
-            ssaoShader.SetTexture2D( &ssaoTex, 2 );
-            ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
-            ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO" );
-            
-            System::Draw( &ssaoTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         }
         
         //scene2.Render();
