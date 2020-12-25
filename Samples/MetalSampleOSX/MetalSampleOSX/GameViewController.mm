@@ -35,8 +35,8 @@
 #import "Window.hpp"
 
 const bool TestForwardPlus = false;
-const bool TestBloom = true;
-const bool TestSSAO = false;
+const bool TestBloom = false;
+const bool TestSSAO = true;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
@@ -70,7 +70,7 @@ pcg32_random_t rng;
 
 int Random100()
 {
-    return pcg32_random_r( &rng );
+    return pcg32_random_r( &rng ) % 100;
 }
 
 NSViewController* myViewController;
@@ -280,7 +280,8 @@ using namespace ae3d;
     Texture2D bloomTex;
     Texture2D blurTex;
     Texture2D blurTex2;
-
+    Texture2D ssaoBlurTex;
+    
     TextureCube skyTex;
 
     RenderTexture rtTex;
@@ -676,6 +677,7 @@ using namespace ae3d;
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", DataType::Float, nullptr );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", DataType::Float, nullptr );
     ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", DataType::Float, nullptr );
+    ssaoBlurTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoBlurTex", DataType::Float, nullptr );
     
     renderTextureContainer.AddComponent<ae3d::SpriteRendererComponent>();
     if (TestRenderTexture2D)
@@ -886,6 +888,16 @@ using namespace ae3d;
             ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
             ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO" );
             
+            blurShader.SetTexture2D( &ssaoTex, 0 );
+            blurShader.SetTexture2D( &ssaoBlurTex, 1 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurX" );
+            
+            blurShader.SetTexture2D( &ssaoBlurTex, 0 );
+            blurShader.SetTexture2D( &ssaoTex, 1 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurY" );
+
             System::Draw( &ssaoTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         }
 
