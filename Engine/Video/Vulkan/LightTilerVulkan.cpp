@@ -387,6 +387,9 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit compute" );
     Statistics::IncQueueSubmitCalls();
 
+    System::BeginTimer();
     err = vkQueueWaitIdle( GfxDeviceGlobal::computeQueue );
+    Statistics::IncQueueWaitTime( System::EndTimer() );
+
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 }

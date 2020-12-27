@@ -10,6 +10,7 @@
 #endif
 #include <stdarg.h>
 #include <assert.h>
+#include <chrono>
 #include "AudioSystem.hpp"
 #include "GfxDevice.hpp"
 #include "FileWatcher.hpp"
@@ -29,6 +30,7 @@ namespace GfxDeviceGlobal
 }
 
 void PlatformInitGamePad();
+std::chrono::time_point<std::chrono::steady_clock> tStart;
 
 using namespace ae3d;
 
@@ -69,6 +71,18 @@ void ae3d::System::EndFrame()
 }
 
 #endif
+
+void ae3d::System::BeginTimer()
+{
+    tStart = std::chrono::steady_clock::now();
+}
+
+float ae3d::System::EndTimer()
+{
+    auto tEnd = std::chrono::steady_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - tStart ).count();
+    return (float)tDiff;
+}
 
 void ae3d::System::Deinit()
 {

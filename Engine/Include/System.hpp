@@ -114,6 +114,11 @@ namespace ae3d
         /// Inits the gamepad.
         void InitGamePad();
 
+        void BeginTimer();
+
+        /// \return Time in ms since BeginTimer().
+        float EndTimer();
+        
         /// Creates a buffer for line drawing.
         /// \param lines Lines. One pair is one segment, eg. index 0 to 1, 2 to 3, 4 to 5.
         /// \param lineCount Line count.

@@ -78,7 +78,10 @@ void CopyBuffer( VkBuffer source, VkBuffer& destination, int bufferSize )
     AE3D_CHECK_VULKAN( err, "submit staging VB copy" );
     Statistics::IncQueueSubmitCalls();
 
+    ae3d::System::BeginTimer();
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    Statistics::IncQueueWaitTime( ae3d::System::EndTimer() );
+
     AE3D_CHECK_VULKAN( err, "wait after staging VB copy" );
 
     vkFreeCommandBuffers( GfxDeviceGlobal::device, cmdBufInfo.commandPool, 1, &copyCommandBuffer );

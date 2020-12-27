@@ -33,6 +33,8 @@ namespace Statistics
     void EndPresentTimeProfiling();
     float GetPresentTimeMS();
 
+    void IncQueueWaitTime( float ms );
+    float GetQueueWaitTimeMS();
     void SetBloomTime( float cpuMs, float gpuMs );
     void IncTriangleCount( int triangles );
     int GetTriangleCount();

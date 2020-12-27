@@ -454,7 +454,10 @@ void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
     Statistics::IncQueueSubmitCalls();
 
     // FIXME: This is slow
+    System::BeginTimer();
 	err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    Statistics::IncQueueWaitTime( System::EndTimer() );
+
 	AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 }
 

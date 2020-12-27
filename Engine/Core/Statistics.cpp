@@ -26,6 +26,7 @@ namespace Statistics
     float primaryPassTimeGpuMS = 0;
     float bloomCpuTimeMs = 0;
     float bloomGpuTimeMs = 0;
+    float queueWaitTimeMs = 0;
     std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startPrimaryPassTimePoint;
@@ -83,6 +84,16 @@ void Statistics::SetPrimaryPassGpuTime( float timeMS )
 float Statistics::GetPrimaryPassTimeGpuMS()
 {
     return primaryPassTimeGpuMS;
+}
+
+float Statistics::GetQueueWaitTimeMS()
+{
+    return queueWaitTimeMs;
+}
+
+void Statistics::IncQueueWaitTime( float ms )
+{
+    queueWaitTimeMs += ms;
 }
 
 void Statistics::SetLightCullerGpuTime( float timeMS )
@@ -289,7 +300,8 @@ void Statistics::ResetFrameStatistics()
     triangleCount = 0;
     psoBindCount = 0;
     queueSubmitCalls = 0;
-
+    queueWaitTimeMs = 0;
+    
     startFrameTimePoint = std::chrono::steady_clock::now();
 }
 

@@ -161,6 +161,7 @@ namespace ae3d
                 str += "primary pass time GPU: " + std::to_string( ::Statistics::GetPrimaryPassTimeGpuMS() ) + " ms\n";
                 str += "bloom CPU: " + std::to_string( ::Statistics::GetBloomCpuTimeMS() ) + " ms\n";
                 //str += "bloom GPU: " + std::to_string( ::Statistics::GetBloomGpuTimeMS() ) + " ms\n";
+                str += "queue wait: " + std::to_string( ::Statistics::GetQueueWaitTimeMS() ) + " ms \n";
                 str += "draw calls: " + std::to_string( ::Statistics::GetDrawCalls() ) + "\n";
                 str += "barrier calls: " + std::to_string( ::Statistics::GetBarrierCalls() ) + "\n";
 				str += "fence calls: " + std::to_string( ::Statistics::GetFenceCalls() ) + "\n";
@@ -2186,7 +2187,10 @@ void ae3d::GfxDevice::Present()
     AE3D_CHECK_VULKAN( err, "queuePresent" );
 
     // FIXME: This slows down rendering
+    
+    System::BeginTimer();
     err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    Statistics::IncQueueWaitTime( System::EndTimer() );
     AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 
     for (unsigned i = 0; i < GfxDeviceGlobal::pendingFreeVBs.count; ++i)
@@ -2284,7 +2288,9 @@ void BeginOffscreen()
     ae3d::System::Assert( GfxDeviceGlobal::renderTexture0 != nullptr, "Render texture must be set when beginning offscreen rendering" );
     
     // FIXME: Use fence instead of queue wait.
+    ae3d::System::BeginTimer();
     vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    Statistics::IncQueueWaitTime( ae3d::System::EndTimer() );
 
     VkCommandBufferBeginInfo cmdBufInfo = {};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
