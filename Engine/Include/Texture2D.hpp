@@ -59,15 +59,14 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkImageView& GetView() { return view; }
         VkImage& GetImage() { return image; }
-        void LoadFromData( const void* imageData, int width, int height, const char* debugName, VkImageUsageFlags usageFlags, DataType format );
-#else
+#endif
         /// \param imageData Raw pixel data
         /// \param width Width in pixels
         /// \param height Height in pixels
         /// \param debugName Null-terminated string of texture's debug name that is visible in graphics debugging tools
         /// \param format Pixel format.
         void LoadFromData( const void* imageData, int width, int height, const char* debugName, DataType format );
-#endif
+
         /// Destroys all textures. Called internally at exit.
         static void DestroyTextures();
 

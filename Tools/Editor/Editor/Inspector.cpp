@@ -140,11 +140,7 @@ void Inspector::Init()
     nk_font* nkFont = nk_font_atlas_add_default( &atlas, 21.0f, nullptr );
     const void* image = nk_font_atlas_bake( &atlas, &atlasWidth, &atlasHeight, NK_FONT_ATLAS_RGBA32 );
 
-#if RENDERER_VULKAN
-    uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, DataType::UByte );
-#else
     uiTextures[ 0 ].LoadFromData( image, atlasWidth, atlasHeight, "Nuklear font", DataType::UByte );
-#endif
 
     nk_font_atlas_end( &atlas, nk_handle_id( uiTextures[ 0 ].GetID() ), &nullTexture );
     

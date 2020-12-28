@@ -68,7 +68,7 @@ void ae3d::Texture2D::DestroyTextures()
     }
 }
 
-void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, const char* debugName, VkImageUsageFlags usageFlags, DataType format )
+void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeight, const char* debugName, DataType format )
 {
     width = aWidth;
     height = aHeight;
@@ -76,6 +76,8 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     filter = TextureFilter::Linear;
     opaque = true;
 
+    const VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    
     if (format == ae3d::DataType::Float)
     {
         CreateVulkanObjects( const_cast< void* >( imageData ), 4 * 4, VK_FORMAT_R32G32B32A32_SFLOAT, usageFlags );
@@ -847,7 +849,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
             imageData[ i ] = 0xFF;
         }
 
-        Texture2DGlobal::defaultTexture.LoadFromData( imageData, 32, 32, "default texture 2d", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, DataType::UByte );
+        Texture2DGlobal::defaultTexture.LoadFromData( imageData, 32, 32, "default texture 2d", DataType::UByte );
     }
 
     return &Texture2DGlobal::defaultTexture;
@@ -864,8 +866,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTextureUAV()
             imageData[ i ] = 0xFF;
         }
 
-        Texture2DGlobal::defaultTextureUAV.LoadFromData( imageData, 32, 32, "default texture 2d UAV",
-                                                         VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::UByte );
+        Texture2DGlobal::defaultTextureUAV.CreateUAV( 32, 32, "default 2D UAV", DataType::UByte, imageData );
     }
 
     return &Texture2DGlobal::defaultTextureUAV;

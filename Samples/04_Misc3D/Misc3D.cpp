@@ -158,11 +158,7 @@ int main()
         noiseData[ i ].w = 0;
     }
 
-#if RENDERER_VULKAN    
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT, DataType::Float );
-#else
-    noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );    
-#endif
+    noiseTex.CreateUAV( noiseDim, noiseDim, "noiseData", DataType::Float, noiseData );
     noiseTex.SetLayout( TextureLayout::ShaderRead );
     
     RenderTexture resolvedTex;
