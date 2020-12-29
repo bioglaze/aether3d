@@ -9,6 +9,8 @@
 float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernelSize, uint3 globalIdx )
 {
     float occlusion = 0.0f;
+    int depthWidth, depthHeight;
+    normalTex.GetDimensions( depthWidth, depthHeight );
 
     for (int i = 0; i < kernelSize; ++i)
     {
@@ -24,8 +26,6 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
 #else
         offset.y = 1 - offset.y;
 #endif
-        int depthWidth, depthHeight;
-        normalTex.GetDimensions( depthWidth, depthHeight );
         float sampleDepth = -normalTex.Load( int3( offset.xy * float2( depthWidth, depthHeight ), 0 ) ).r;
 
         float diff = abs( originPosVS.z - sampleDepth );
