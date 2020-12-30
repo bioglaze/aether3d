@@ -385,13 +385,13 @@ void ae3d::Window::SetTitle( const char* title )
                         title );
 
     xcb_change_property(WindowGlobal::connection,
-                        XCB_PROP_MODE_REPLACE,
-                        WindowGlobal::window,
-                        XCB_ATOM_WM_ICON_NAME,
-                        XCB_ATOM_STRING,
-                        8,
-                        strlen( title ),
-                        title );
+                    XCB_PROP_MODE_REPLACE,
+                    WindowGlobal::window,
+                    XCB_ATOM_WM_CLASS,
+                    XCB_ATOM_STRING,
+                    8,
+                    sizeof("aether3d""\0""Aether3D"),
+                    "aether3d\0Aether3D" );
 }
 
 void ae3d::Window::GetSize( int& outWidth, int& outHeight )
