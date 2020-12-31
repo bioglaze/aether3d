@@ -27,6 +27,8 @@ namespace Statistics
     float bloomCpuTimeMs = 0;
     float bloomGpuTimeMs = 0;
     float queueWaitTimeMs = 0;
+    float frustumCullTimeMS = 0;
+
     std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startPrimaryPassTimePoint;
@@ -111,6 +113,11 @@ void Statistics::EndPresentTimeProfiling()
     auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startPresentTimePoint ).count();
     Statistics::presentTimeMS = static_cast< float >(tDiff);
+}
+
+void Statistics::IncFrustumCullTime( float ms )
+{
+    frustumCullTimeMS += ms;
 }
 
 void Statistics::BeginLightCullerProfiling()
@@ -301,6 +308,7 @@ void Statistics::ResetFrameStatistics()
     psoBindCount = 0;
     queueSubmitCalls = 0;
     queueWaitTimeMs = 0;
+    frustumCullTimeMS = 0;
     
     startFrameTimePoint = std::chrono::steady_clock::now();
 }
@@ -313,6 +321,11 @@ float Statistics::GetLightCullerTimeGpuMS()
 float Statistics::GetSceneAABBTimeMS()
 {
     return sceneAABBTimeMS;
+}
+
+float Statistics::GetFrustumCullTimeMS()
+{
+    return frustumCullTimeMS;
 }
 
 void Statistics::BeginSceneAABB()

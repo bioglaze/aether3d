@@ -162,6 +162,7 @@ namespace ae3d
                 str += "bloom CPU: " + std::to_string( ::Statistics::GetBloomCpuTimeMS() ) + " ms\n";
                 //str += "bloom GPU: " + std::to_string( ::Statistics::GetBloomGpuTimeMS() ) + " ms\n";
                 str += "queue wait: " + std::to_string( ::Statistics::GetQueueWaitTimeMS() ) + " ms \n";
+                str += "frustum cull: " + std::to_string( ::Statistics::GetFrustumCullTimeMS() ) + " ms \n";
                 str += "draw calls: " + std::to_string( ::Statistics::GetDrawCalls() ) + "\n";
                 str += "barrier calls: " + std::to_string( ::Statistics::GetBarrierCalls() ) + "\n";
 				str += "fence calls: " + std::to_string( ::Statistics::GetFenceCalls() ) + "\n";

@@ -9,6 +9,7 @@
 #include "Mesh.hpp"
 #include "Material.hpp"
 #include "Shader.hpp"
+#include "Statistics.hpp"
 #include "System.hpp"
 #include "SubMesh.hpp"
 #include "VertexBuffer.hpp"
@@ -74,6 +75,8 @@ std::string GetSerialized( ae3d::MeshRendererComponent* component )
 
 void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld )
 {
+    System::BeginTimer();
+    
     if (!mesh)
     {
         return;
@@ -130,6 +133,8 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
             isSubMeshCulled[ subMeshIndex ] = true;
         }
     }
+    
+    Statistics::IncFrustumCullTime( System::EndTimer() );
 }
 
 void ae3d::MeshRendererComponent::ApplySkin( unsigned subMeshIndex )
