@@ -36,7 +36,7 @@
 
 const bool TestForwardPlus = false;
 const bool TestBloom = false;
-const bool TestSSAO = false;
+const bool TestSSAO = true;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
@@ -260,6 +260,7 @@ using namespace ae3d;
     ComputeShader downSampleAndThresholdShader;
     ComputeShader blurShader;
     ComputeShader ssaoShader;
+    ComputeShader composeShader;
     
     Texture2D atlasTex;
     Texture2D fontTex;
@@ -490,6 +491,7 @@ using namespace ae3d;
     downSampleAndThresholdShader.Load( "downsampleAndThreshold", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     blurShader.Load( "blur", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     ssaoShader.Load( "ssao", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+    composeShader.Load( "compose", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
     
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
@@ -881,7 +883,6 @@ using namespace ae3d;
         
         if (TestSSAO)
         {
-            ssaoShader.SetRenderTexture( &cameraTex, 0 );
             ssaoShader.SetRenderTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), 1 );
             ssaoShader.SetTexture2D( &noiseTex, 3 );
             ssaoShader.SetTexture2D( &ssaoTex, 2 );
@@ -898,7 +899,12 @@ using namespace ae3d;
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
             blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurY" );
 
-            System::Draw( &ssaoTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            composeShader.SetRenderTexture( &cameraTex, 0 );
+            composeShader.SetTexture2D( &ssaoBlurTex, 1 );
+            composeShader.SetTexture2D( &ssaoTex, 2 );
+            composeShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "Compose" );
+
+            System::Draw( &ssaoBlurTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         }
 
         if (TestBloom)

@@ -78,12 +78,14 @@ struct SceneView
     ComputeShader blurShader;
     ComputeShader downsampleAndThresholdShader;
     ComputeShader ssaoShader;
+    ComputeShader composeShader;
     TransformGizmo transformGizmo;
     Texture2D goTex;
     Texture2D audioTex;
     Texture2D lightTex;
     Texture2D cameraTex;
     Texture2D ssaoTex;
+    Texture2D composeTex;
     Texture2D bloomTex;
     Texture2D blurTex;
     Texture2D blurTex2;
@@ -386,6 +388,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );
     (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::Float, nullptr );
+    (*sv)->composeTex.CreateUAV( width, height, "composeTex", DataType::Float, nullptr );
     
     constexpr int noiseDim = 64;
     Vec4 noiseData[ noiseDim * noiseDim ];
@@ -407,7 +410,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->camera.AddComponent< CameraComponent >();
     (*sv)->camera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     (*sv)->camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
-    (*sv)->camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.1f, 0.1f, 0.1f ) );
+    (*sv)->camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.01f, 0.01f, 0.01f ) );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     (*sv)->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
     (*sv)->camera.GetComponent<CameraComponent>()->SetTargetTexture( &(*sv)->cameraTarget );
@@ -425,7 +428,8 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
     (*sv)->downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
     (*sv)->ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
-
+    (*sv)->composeShader.Load( "compose", FileSystem::FileContents( "shaders/compose.obj" ), FileSystem::FileContents( "shaders/compose.spv" ) );
+    
     (*sv)->gameObjects.Add( new GameObject() );
     (*sv)->transformGizmo.redTex.Load( FileSystem::FileContents( "textures/red.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->transformGizmo.greenTex.Load( FileSystem::FileContents( "textures/green.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
@@ -545,7 +549,6 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
 
         sv->ssaoTex.SetLayout( TextureLayout::General );
         sv->ssaoShader.SetProjectionMatrix( sv->camera.GetComponent<CameraComponent>()->GetProjection() );
-        sv->ssaoShader.SetRenderTexture( &sv->cameraTarget, 0 );
         sv->ssaoShader.SetRenderTexture( &sv->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
 #if RENDERER_VULKAN
         sv->ssaoShader.SetTexture2D( &sv->noiseTex, 2 );
@@ -559,7 +562,12 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
         sv->ssaoShader.End();
         sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
 
-        System::Draw( &sv->ssaoTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        sv->composeShader.SetRenderTexture( &sv->cameraTarget, 0 );
+        sv->composeShader.SetTexture2D( &sv->composeTex, 1 );
+        sv->composeShader.SetTexture2D( &sv->ssaoTex, 2 );
+        sv->composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
+
+        System::Draw( &sv->composeTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
     }
     else
     {

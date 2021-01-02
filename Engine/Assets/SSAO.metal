@@ -104,7 +104,20 @@ uint2 ThreadGroupTilingX(
     return SwizzledvThreadID.xy;
 }
 
-kernel void ssao( texture2d<float, access::read> colorTexture [[texture(0)]],
+kernel void compose(texture2d<float, access::read> inputTexture [[texture(0)]],
+                    texture2d<float, access::write> resultTexture [[texture(1)]],
+                    texture2d<float, access::read> ssaoTexture [[texture(2)]],
+                  constant Uniforms& uniforms [[ buffer(0) ]],
+                  ushort2 gid [[thread_position_in_grid]],
+                  ushort2 tid [[thread_position_in_threadgroup]],
+                  ushort2 dtid [[threadgroup_position_in_grid]])
+{
+    float4 color = inputTexture.read( uint2( gid.x, gid.y ) ) * ssaoTexture.read( uint2( gid.x, gid.y ) );
+
+    resultTexture.write( color, gid.xy );
+}
+
+kernel void ssao(
                   texture2d<float, access::read> depthNormalsTexture [[texture(1)]],
                   texture2d<float, access::write> outTexture [[texture(2)]],
                   texture2d<float, access::read> noiseTexture [[texture(3)]],
@@ -115,7 +128,6 @@ kernel void ssao( texture2d<float, access::read> colorTexture [[texture(0)]],
 {
     ushort2 gid = (ushort2)ThreadGroupTilingX( uint2( uniforms.windowWidth / 16, uniforms.windowHeight / 16 ), uint2( 16, 16 ), 8, (uint2)tid, (uint2)dtid );
     //ushort2 gid = globalIdx.xy;
-    const float4 color = colorTexture.read( gid );
     
     float depthWidth = uniforms.windowWidth;
     float depthHeight = uniforms.windowHeight;
@@ -141,5 +153,6 @@ kernel void ssao( texture2d<float, access::read> colorTexture [[texture(0)]],
     
     float s = ssaoInternal( kernelBasis, originPos, 0.5f, uniforms, depthNormalsTexture );
     
+    const float4 color = float4( 1, 1, 1, 1 );
     outTexture.write( color * s, gid );
 }
