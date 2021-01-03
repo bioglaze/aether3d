@@ -318,13 +318,16 @@ int main()
                 FileSystem::FileContents( "shaders/unlit_skin_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
 
     ComputeShader blurShader;
-	blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
+    blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
 
-	ComputeShader downsampleAndThresholdShader;
-	downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
+    ComputeShader downsampleAndThresholdShader;
+    downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
 
     ComputeShader ssaoShader;
-	ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
+    ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
+
+    ComputeShader composeShader;
+    composeShader.Load( "compose", FileSystem::FileContents( "shaders/compose.obj" ), FileSystem::FileContents( "shaders/compose.spv" ) );
 
     Shader shaderCubeMap;
     shaderCubeMap.Load( "unlitVert", "unlitFrag",
@@ -1160,8 +1163,18 @@ int main()
             blurShader.End();
 
             ssaoTex.SetLayout( TextureLayout::ShaderRead );
-            
-            System::Draw( &ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            ssaoBlurTex.SetLayout( TextureLayout::General );
+
+            composeShader.Begin();
+            composeShader.SetRenderTexture( &cameraTex, 0 );
+            composeShader.SetTexture2D( &ssaoBlurTex, 14 );
+            composeShader.SetTexture2D( &ssaoTex, 2 );
+            composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
+            composeShader.End();
+
+            ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
+
+            System::Draw( &ssaoBlurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
 

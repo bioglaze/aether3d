@@ -562,10 +562,18 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
         sv->ssaoShader.End();
         sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
 
+        sv->composeShader.Begin();
+        sv->composeTex.SetLayout( TextureLayout::General );
         sv->composeShader.SetRenderTexture( &sv->cameraTarget, 0 );
+#if RENDERER_VULKAN
+        sv->composeShader.SetTexture2D( &sv->composeTex, 14 );
+#else
         sv->composeShader.SetTexture2D( &sv->composeTex, 1 );
+#endif
         sv->composeShader.SetTexture2D( &sv->ssaoTex, 2 );
         sv->composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
+        sv->composeShader.End();
+        sv->composeTex.SetLayout( TextureLayout::ShaderRead );
 
         System::Draw( &sv->composeTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
     }

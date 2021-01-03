@@ -21,4 +21,4 @@ glslangValidator -D -DENABLE_SHADOWS -V -S frag -e main hlsl/Standard_frag.hlsl 
 glslangValidator -D -V -S comp -e CSMain hlsl/Bloom.hlsl -o ../../../aether3d_build/Samples/shaders/Bloom.spv
 glslangValidator -D -V -S comp -e CSMain hlsl/Blur.hlsl -o ../../../aether3d_build/Samples/shaders/Blur.spv
 glslangValidator -D -V -S comp -e CSMain hlsl/ssao.hlsl -o ../../../aether3d_build/Samples/shaders/ssao.spv
-
+glslangValidator -D -V -S comp -e CSMain hlsl/compose.hlsl -o ../../../aether3d_build/Samples/shaders/compose.spv

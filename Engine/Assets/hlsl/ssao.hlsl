@@ -78,7 +78,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float3x3 tangentToView = transpose( float3x3( tangent, bitangent, normal ) );
 
     float s = ssao( tangentToView, originPosVS, 0.5f, 16, globalIdx );
-    float4 color = tex.Load( int3( globalIdx.x, globalIdx.y, 0 ) );
+    float4 color = float4( 1, 1, 1, 1 );
 
     rwTexture[ globalIdx.xy ] = color * s;
 }
