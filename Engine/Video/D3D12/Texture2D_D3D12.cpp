@@ -239,6 +239,7 @@ DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format )
 
 void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName, DataType format, const void* imageData )
 {
+    createUAV = true;
     LoadFromData( imageData, aWidth, aHeight, debugName, format );
 
     uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
@@ -268,8 +269,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
 	descTex.SampleDesc.Count = 1;
 	descTex.SampleDesc.Quality = 0;
 	descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	// FIXME: This is a hack
-	descTex.Flags = imageData ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	descTex.Flags = createUAV ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
 
 	D3D12_HEAP_PROPERTIES heapProps = {};
 	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;

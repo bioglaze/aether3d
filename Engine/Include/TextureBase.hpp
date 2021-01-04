@@ -177,6 +177,7 @@ namespace ae3d
         D3D12_CPU_DESCRIPTOR_HANDLE cubeRtvs[ 6 ] = {};
         D3D12_CPU_DESCRIPTOR_HANDLE cubeDsvs[ 6 ] = {};
         DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		bool createUAV = false;
 #endif
         /// Is the texture opaque.
         bool opaque = true;
