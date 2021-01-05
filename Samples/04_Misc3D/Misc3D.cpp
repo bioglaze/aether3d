@@ -33,7 +33,6 @@
 constexpr bool TestMSAA = false;
 constexpr bool TestRenderTexture2D = false;
 constexpr bool TestRenderTextureCube = false;
-//#define TEST_VERTEX_LAYOUTS
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
@@ -1166,8 +1165,25 @@ int main()
             ssaoBlurTex.SetLayout( TextureLayout::General );
 
             composeShader.Begin();
-            composeShader.SetRenderTexture( &cameraTex, 0 );
+#if RENDERER_D3D12
+            composeShader.SetSRV( 0, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 1, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 2, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            composeShader.SetUAV( 0, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() ); // Unused
+            composeShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
+
+            composeShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
+#else
             composeShader.SetTexture2D( &ssaoBlurTex, 14 );
+#endif
+            composeShader.SetRenderTexture( &cameraTex, 0 );
             composeShader.SetTexture2D( &ssaoTex, 2 );
             composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
             composeShader.End();
