@@ -87,6 +87,7 @@ struct SceneView
     Texture2D ssaoTex;
     Texture2D composeTex;
     Texture2D bloomTex;
+    Texture2D ssaoBlurTex;
     Texture2D blurTex;
     Texture2D blurTex2;
     Texture2D noiseTex;
@@ -388,6 +389,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );
     (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::Float, nullptr );
+    (*sv)->ssaoBlurTex.CreateUAV( width, height, "ssaoBlurTex", DataType::Float, nullptr );
     (*sv)->composeTex.CreateUAV( width, height, "composeTex", DataType::Float, nullptr );
     
     constexpr int noiseDim = 64;
@@ -561,6 +563,36 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
         sv->ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
         sv->ssaoShader.End();
         sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
+
+        sv->ssaoBlurTex.SetLayout( TextureLayout::General );
+        sv->blurShader.SetTexture2D( &sv->ssaoTex, 0 );
+#if RENDERER_VULKAN
+        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 14 );
+#else
+        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 2 );
+#endif
+
+        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        sv->blurShader.Begin();
+        sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+        sv->blurShader.End();
+
+        sv->blurShader.Begin();
+
+        sv->ssaoTex.SetLayout( TextureLayout::General );
+        sv->ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
+        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 0 );
+#if RENDERER_VULKAN
+        sv->blurShader.SetTexture2D( &sv->ssaoTex, 14 );
+#else
+        sv->blurShader.SetTexture2D( &sv->ssaoTex, 2 );
+#endif
+        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+        sv->blurShader.End();
+
+        sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
+        sv->ssaoBlurTex.SetLayout( TextureLayout::General );
 
         sv->composeShader.Begin();
         sv->composeTex.SetLayout( TextureLayout::General );

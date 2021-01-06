@@ -491,7 +491,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
             nk_label( &ctx, "Bloom threshold:", NK_TEXT_LEFT );
 
-            nk_slider_float( &ctx, 0, &bloomThreshold, 1.0f, 0.1f );
+            nk_slider_float( &ctx, 0, &bloomThreshold, 1.0f, 0.05f );
         }
         
         // Hierarchy
