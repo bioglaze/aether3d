@@ -136,6 +136,14 @@ void ae3d::Texture2D::SetLayout( ae3d::TextureLayout layout )
     {
         TransitionResource( gpuResource, D3D12_RESOURCE_STATE_COMMON );
     }
+    else if (layout == TextureLayout::UAVBarrier)
+    {
+        D3D12_RESOURCE_BARRIER barrierDesc = {};
+        barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+        barrierDesc.UAV.pResource = gpuResource.resource;
+
+        GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
+    }
 }
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
