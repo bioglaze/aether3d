@@ -167,7 +167,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             WindowGlobal::IncEventIndex();
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = ae3d::WindowEventType::KeyDown;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyCode = WindowGlobal::keyMap[ (unsigned)wParam ];
-            ae3d::System::Print( "%d\n", wParam  );
+            //ae3d::System::Print( "%d\n", wParam  );
             if ((GetKeyState( VK_CONTROL ) & 0x8000) != 0)
             {
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = ae3d::KeyModifier::Control;

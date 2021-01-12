@@ -162,8 +162,10 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     for (int slotIndex = 0; slotIndex < SLOT_COUNT; ++slotIndex)
     {
         uniformBuffers[ slotIndex ] = nullptr;
-        textureBuffers[ slotIndex ] = nullptr;
-        uavBuffers[ slotIndex ] = nullptr;
+        textureBuffers[ slotIndex ] = Texture2D::GetDefaultTexture()->GetGpuResource()->resource;
+        uavBuffers[ slotIndex ] = Texture2D::GetDefaultTextureUAV()->GetGpuResource()->resource;
+        srvDescs[ slotIndex ] = *Texture2D::GetDefaultTexture()->GetSRVDesc();
+        uavDescs[ slotIndex ] = *Texture2D::GetDefaultTexture()->GetUAVDesc();
     }
 
     if (dataHLSL.path.find( ".obj" ) != std::string::npos)

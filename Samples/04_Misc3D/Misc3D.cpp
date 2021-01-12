@@ -37,8 +37,8 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = false;
-constexpr bool TestSSAO = true;
+constexpr bool TestBloom = true;
+constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -907,20 +907,7 @@ int main()
 #if RENDERER_D3D12
             blurTex.SetLayout( TextureLayout::ShaderReadWrite );
 
-            GpuResource nullResource = {};
-
             downsampleAndThresholdShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
-            downsampleAndThresholdShader.SetSRV( 1, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            //downsampleAndThresholdShader.SetSRV( 1, nullResource.resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 2, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            downsampleAndThresholdShader.SetUAV( 0, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() ); // Unused, but must exist.
             downsampleAndThresholdShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
             blurTex.SetLayout( TextureLayout::General );
@@ -946,18 +933,6 @@ int main()
 
 #if RENDERER_D3D12
             bloomTex.SetLayout( TextureLayout::ShaderReadWrite );
-
-            blurShader.SetSRV( 1, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 2, nullResource.resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-            //blurShader.SetSRV( 2, blurTex.GetGpuResource()->resource, *blurTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetUAV( 0, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() ); // Unused, but must exist
             blurShader.SetUAV( 1, bloomTex.GetGpuResource()->resource, *bloomTex.GetUAVDesc() );
 #else
             blurShader.SetTexture2D( &bloomTex, 14 );

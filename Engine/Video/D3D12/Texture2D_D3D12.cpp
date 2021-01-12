@@ -163,7 +163,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         descTex.SampleDesc.Count = 1;
         descTex.SampleDesc.Quality = 0;
         descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-        descTex.Flags = D3D12_RESOURCE_FLAG_NONE;
+        descTex.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
         D3D12_HEAP_PROPERTIES heapProps = {};
         heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -208,9 +208,23 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         Texture2DGlobal::defaultTexture.handle = static_cast< unsigned >(Texture2DGlobal::defaultTexture.srv.ptr);
 
         GfxDeviceGlobal::device->CreateShaderResourceView( Texture2DGlobal::defaultTexture.gpuResource.resource, &Texture2DGlobal::defaultTexture.srvDesc, Texture2DGlobal::defaultTexture.srv );
+
+        Texture2DGlobal::defaultTexture.uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+        Texture2DGlobal::defaultTexture.uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        Texture2DGlobal::defaultTexture.uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        Texture2DGlobal::defaultTexture.uavDesc.Texture2D.MipSlice = 0;
+        Texture2DGlobal::defaultTexture.uavDesc.Texture2D.PlaneSlice = 0;
+
+        GfxDeviceGlobal::device->CreateUnorderedAccessView( Texture2DGlobal::defaultTexture.gpuResource.resource, nullptr, &Texture2DGlobal::defaultTexture.uavDesc, Texture2DGlobal::defaultTexture.uav );
     }
     
     return &Texture2DGlobal::defaultTexture;
+}
+
+ae3d::Texture2D* ae3d::Texture2D::GetDefaultTextureUAV()
+{
+    return GetDefaultTexture();
 }
 
 DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format )
