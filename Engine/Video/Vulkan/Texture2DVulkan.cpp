@@ -440,7 +440,7 @@ void ae3d::Texture2D::SetLayout( TextureLayout aLayout )
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
 
     auto oldLayout = layout;
-    layout = aLayout == TextureLayout::General ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    layout = (aLayout == TextureLayout::General || aLayout == TextureLayout::ShaderReadWrite) ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     SetImageLayout( GfxDeviceGlobal::texCmdBuffer, image, VK_IMAGE_ASPECT_COLOR_BIT, oldLayout, layout, 1, 0, 1 );
 

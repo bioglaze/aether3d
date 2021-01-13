@@ -37,8 +37,8 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = true;
-constexpr bool TestSSAO = false;
+constexpr bool TestBloom = false;
+constexpr bool TestSSAO = true;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -1071,7 +1071,6 @@ int main()
         {
             ssaoTex.SetLayout( TextureLayout::General );
 #if RENDERER_D3D12
-            GpuResource nullResource = {};
             ssaoShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
             ssaoShader.SetSRV( 1, camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetGpuResource()->resource, *camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetSRVDesc() );
 			ssaoShader.SetSRV( 2, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
@@ -1100,7 +1099,7 @@ int main()
 
             blurShader.SetTexture2D( &ssaoTex, 0 );
 #if RENDERER_D3D12
-            blurShader.SetSRV( 1, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
+            /*blurShader.SetSRV( 1, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
             blurShader.SetSRV( 2, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
             blurShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
             blurShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
@@ -1109,6 +1108,7 @@ int main()
             blurShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
             blurShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
             blurShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
+            */
             ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
             blurShader.SetUAV( 0, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
             blurShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
@@ -1137,23 +1137,11 @@ int main()
             blurShader.End();
 
             ssaoTex.SetLayout( TextureLayout::ShaderRead );
-            ssaoBlurTex.SetLayout( TextureLayout::General );
+            ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
 
             composeShader.Begin();
 #if RENDERER_D3D12
-            composeShader.SetSRV( 0, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 1, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 2, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            composeShader.SetUAV( 0, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() ); // Unused
             composeShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
-
             composeShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
 #else
             composeShader.SetTexture2D( &ssaoBlurTex, 14 );
@@ -1162,9 +1150,10 @@ int main()
             composeShader.SetTexture2D( &ssaoTex, 2 );
             composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
             composeShader.End();
-
+#if !RENDERER_D3D12
+            // If this is executed on D3D12, the debug layer doesn't complain, but Pix says the state doesn't match what's expected.
             ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
-
+#endif
             System::Draw( &ssaoBlurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
