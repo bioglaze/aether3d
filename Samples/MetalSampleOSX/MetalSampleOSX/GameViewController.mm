@@ -36,7 +36,7 @@
 
 const bool TestForwardPlus = false;
 const bool TestBloom = false;
-const bool TestSSAO = true;
+const bool TestSSAO = false;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
@@ -77,9 +77,10 @@ NSViewController* myViewController;
 
 struct InputEvent
 {
-    bool isActive;
     int x, y;
     int button;
+    bool isActive;
+    bool mouseMoved;
 };
 InputEvent inputEvent;
 
@@ -843,7 +844,7 @@ using namespace ae3d;
 
     inputEvent.button = 1;
     inputEvent.x = (int)theEvent.locationInWindow.x;
-    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
 }
 
@@ -851,7 +852,15 @@ using namespace ae3d;
 {
     inputEvent.button = 0;
     inputEvent.x = (int)theEvent.locationInWindow.x;
-    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
+}
+
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+    inputEvent.mouseMoved = true;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = self.view.bounds.size.height - (int)theEvent.locationInWindow.y;
     inputEvent.isActive = true;
 }
 
@@ -859,6 +868,11 @@ using namespace ae3d;
 {
     camera3d.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 0, 1, 0 ), -float( theEvent.deltaX ) / 20 );
     camera3d.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), -float( theEvent.deltaY ) / 20 );
+    
+    inputEvent.mouseMoved = true;
+    inputEvent.x = (int)theEvent.locationInWindow.x;
+    inputEvent.y = /*self.view.bounds.size.height -*/ (int)theEvent.locationInWindow.y;
+    inputEvent.isActive = true;
 }
 
 - (BOOL)acceptsFirstResponder
@@ -986,15 +1000,24 @@ using namespace ae3d;
 
 #ifdef TEST_NUKLEAR_UI
         nk_input_begin( &ctx );
+        
+        if (inputEvent.mouseMoved)
+        {
+            inputEvent.mouseMoved = false;
+            nk_input_motion( &ctx, inputEvent.x, inputEvent.y );
+            //inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
+        }
+
         if (inputEvent.button == 1 && inputEvent.isActive)
         {
-            nk_input_button( &ctx, NK_BUTTON_LEFT, inputEvent.x, inputEvent.y, 1 );
-            nk_input_motion( &ctx, inputEvent.x, inputEvent.y );
+            ae3d::System::Print( "%d, %d\n", inputEvent.x, inputEvent.y );
+            nk_input_button( &ctx, NK_BUTTON_LEFT, inputEvent.x*2, inputEvent.y*2, 1 );
+            //nk_input_motion( &ctx, inputEvent.x, inputEvent.y );
         }
         if (inputEvent.button == 0 && inputEvent.isActive)
         {
-            nk_input_button( &ctx, NK_BUTTON_LEFT, inputEvent.x, inputEvent.y, 0 );
-            nk_input_motion( &ctx, inputEvent.x, inputEvent.y );
+            nk_input_button( &ctx, NK_BUTTON_LEFT, inputEvent.x*2, inputEvent.y*2, 0 );
+            //nk_input_motion( &ctx, inputEvent.x, inputEvent.y );
         }
         inputEvent.isActive = false;
         inputEvent.x = 0;

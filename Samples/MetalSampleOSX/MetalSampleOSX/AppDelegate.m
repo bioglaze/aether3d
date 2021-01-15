@@ -13,6 +13,7 @@ extern NSViewController* myViewController;
     [_window setTitle: @"Aether3D Metal Sample"];
     [_window center];
     [_window makeFirstResponder:myViewController];
+    [[ [myViewController view] window ] setAcceptsMouseMovedEvents:YES];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
