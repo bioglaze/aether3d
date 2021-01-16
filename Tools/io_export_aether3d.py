@@ -507,7 +507,7 @@ class Aether3DExporter( bpy.types.Operator ):
                 
                 if len( v.uv ) > 1:
                     s = v.uv[ 0 ]
-                    t = v.uv[ 1 ]
+                    t = 1 - v.uv[ 1 ]
     
                 component = struct.pack( 'f', s )
                 f.write( component )
