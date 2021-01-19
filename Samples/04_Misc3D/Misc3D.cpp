@@ -38,7 +38,7 @@ constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
-constexpr bool TestSSAO = true;
+constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #define TEST_SPONZA
 
@@ -1054,10 +1054,24 @@ int main()
             // Second blur vertical end.
 #endif
             blurTex.SetLayout( TextureLayout::ShaderRead );
-            System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-            System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
-            System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 
+            if (TestMSAA)
+            {
+                System::Draw( &resolvedTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            }
+            else
+            {
+                System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            }
+            
+            System::Draw( &blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+
+            // FIXME: This should also work with MSAA. Currently the texture layout is wrong on Vulkan.
+            if (!TestMSAA)
+            {
+                System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+            }
+            
             bloomTex.SetLayout( TextureLayout::General );
 
             auto endTime = std::chrono::steady_clock::now();
@@ -1099,16 +1113,6 @@ int main()
 
             blurShader.SetTexture2D( &ssaoTex, 0 );
 #if RENDERER_D3D12
-            /*blurShader.SetSRV( 1, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 2, noiseTex.GetGpuResource()->resource, *noiseTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 3, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 4, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 5, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 6, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 7, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 8, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            blurShader.SetSRV( 9, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() ); // Unused, but must exist
-            */
             ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
             blurShader.SetUAV( 0, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
             blurShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );

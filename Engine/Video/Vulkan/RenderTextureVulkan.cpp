@@ -23,6 +23,7 @@ namespace GfxDeviceGlobal
     extern VkFormat depthFormat;
     extern VkCommandBuffer currentCmdBuffer;
     extern VkSampleCountFlagBits msaaSampleBits;
+    extern VkQueue graphicsQueue;
 }
 
 namespace RenderTextureGlobal
@@ -131,7 +132,24 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
     target->SetColorImageLayout( VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
 
-    GfxDevice::BeginRenderPass();
+    VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
+    AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::currentCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
+    Statistics::IncQueueSubmitCalls();
+
+    System::BeginTimer();
+    err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    Statistics::IncQueueWaitTime( System::EndTimer() );
+    AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
+
+    GfxDevice::BeginRenderPassAndCommandBuffer();
 }
 
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled )
