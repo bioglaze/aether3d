@@ -36,7 +36,10 @@ PS_INPUT main( VS_INPUT input )
     output.positionWS_v = float4( mul( localToWorld, position ).xyz, input.uv.y );
     output.normalVS = mul( localToView, float4(input.normal, 0) ).xyz;
     output.tangentVS = mul( localToView, float4(input.tangent.xyz, 0) ).xyz;
-    float3 ct = cross( input.normal, input.tangent.xyz ) * input.tangent.w;
+    //float3 ct = cross( input.normal, input.tangent.xyz ) * input.tangent.w;
+    // FIXME: This is not what MikkTSpace does, it does the above version! But the renderer is not yet
+    //        fully MikkTSpace compatible, and this is needed to get light direction working correctly.
+    float3 ct = cross( input.tangent.xyz, input.normal ) * input.tangent.w;
     output.bitangentVS.xyz = mul( localToView, float4( ct, 0 ) ).xyz;
 
     return output;
