@@ -130,7 +130,7 @@ void Inspector::Init()
     ssao = false;
     bloom = false;
     textEditActive = false;
-    bloomThreshold = 1;
+    bloomThreshold = 0.5f;
 
     nk_font_atlas_init_default( &atlas );
     nk_font_atlas_begin( &atlas );
