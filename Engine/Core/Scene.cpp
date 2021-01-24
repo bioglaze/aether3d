@@ -902,12 +902,10 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     if (camera->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
     {
         frustum.SetProjection( camera->GetFovDegrees(), camera->GetAspect(), camera->GetNear(), camera->GetFar() );
-        GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
     }
     else
     {
         frustum.SetProjection( camera->GetLeft(), camera->GetRight(), camera->GetBottom(), camera->GetTop(), camera->GetNear(), camera->GetFar() );
-        GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Dir;
     }
     
     const Vec3 viewDir = Vec3( view.m[2], view.m[6], view.m[10] ).Normalized();

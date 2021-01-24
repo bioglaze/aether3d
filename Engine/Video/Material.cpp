@@ -59,7 +59,14 @@ void ae3d::Material::Apply()
             shader->SetRenderTexture( sTexRT, texUnit );
         }
 #else
-        shader->SetRenderTexture( sTexRT, 3 );
+        if (sTexRT->IsCube())
+        {
+            shader->SetRenderTexture( sTexRT, 4 );
+        }
+        else
+        {
+            shader->SetRenderTexture( sTexRT, 3 );
+        }
 #endif
     }
 
