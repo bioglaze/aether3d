@@ -103,7 +103,9 @@ vertex StandardColorInOut standard_vertex( StandardVertex vert [[stage_in]],
     
     out.tangentVS_u.xyz = (uniforms.localToView * float4( vert.tangent.xyz, 0 )).xyz;
     out.tangentVS_u.w = vert.texcoord.x;
-    float3 ct = cross( vert.normal, vert.tangent.xyz ) * vert.tangent.w;
+    // FIXME: This is not what MikkTSpace does, it should be cross( normal, tangent )! But the renderer is not yet
+    //        fully MikkTSpace compatible, and this is needed to get light direction working correctly.
+    float3 ct = cross( vert.tangent.xyz, vert.normal ) * vert.tangent.w;
     out.bitangentVS_v.xyz = ( uniforms.localToView * float4( ct, 0 ) ).xyz;
     out.bitangentVS_v.w = vert.texcoord.y;
     out.normalVS = (uniforms.localToView * float4( vert.normal, 0 )).xyz;
