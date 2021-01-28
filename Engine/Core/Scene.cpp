@@ -444,7 +444,9 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                     for (int cubeMapFace = 0; cubeMapFace < 6; ++cubeMapFace)
                     {
                         lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
+                        lightTransform->UpdateLocalAndGlobalMatrix();
                         SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                        SceneGlobal::shadowCamera.GetComponent< TransformComponent >()->UpdateLocalAndGlobalMatrix();
                         RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
                     }
                     
