@@ -455,6 +455,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     nk_property_float( &ctx, "#Green:", -1024.0f, &color.y, 1024.0f, 1, 1 );
                     nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
                     nk_layout_row_static( &ctx, 40, 450, 1 );
+
+                    float& coneAngleDegrees = spotLight->GetConeAngle();
+                    nk_property_float( &ctx, "#Cone angle:", -180.0f, &coneAngleDegrees, 180.0f, 45, 1 );
                 }
                 
                 nk_tree_pop( &ctx );

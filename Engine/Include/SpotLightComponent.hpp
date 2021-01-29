@@ -44,7 +44,10 @@ namespace ae3d
 
         /// \return Cone angle in degrees.
         float GetConeAngle() const { return coneAngle; }
-        
+
+        /// \return Cone angle in degrees.
+        float& GetConeAngle() { return coneAngle; }
+
         /// \param degrees Angle in degrees.
         void SetConeAngle( float degrees );
 

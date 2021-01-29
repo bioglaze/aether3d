@@ -88,12 +88,12 @@ namespace SceneGlobal
 
 bool someLightCastsShadow = false;
 
-void SetupCameraForSpotShadowCasting( const Vec3& lightPosition, const Vec3& lightDirection, ae3d::CameraComponent& outCamera,
+void SetupCameraForSpotShadowCasting( const Vec3& lightPosition, const Vec3& lightDirection, float coneAngleDegrees, ae3d::CameraComponent& outCamera,
                                      ae3d::TransformComponent& outCameraTransform )
 {
     outCameraTransform.LookAt( lightPosition, lightPosition - lightDirection * 200, Vec3( 0, 1, 0 ) );
     outCamera.SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
-    outCamera.SetProjection( 45, 1, 0.1f, 200 );
+    outCamera.SetProjection( coneAngleDegrees, 1, 0.1f, 200 );
 }
 
 void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const Frustum& eyeFrustum, const Vec3& sceneAABBmin, const Vec3& sceneAABBmax,
@@ -431,7 +431,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                 else if (spotLight)
                 {
                     SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
-                    SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                    SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), go->GetComponent<SpotLightComponent>()->GetConeAngle(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                     GfxDeviceGlobal::perObjectUboStruct.lightType = PerObjectUboStruct::LightType::Spot;
                     RenderShadowsWithCamera( &SceneGlobal::shadowCamera, 0 );
                     Material::SetGlobalRenderTexture( &go->GetComponent<SpotLightComponent>()->shadowMap );
@@ -445,7 +445,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                     {
                         lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
                         lightTransform->UpdateLocalAndGlobalMatrix();
-                        SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                        SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), 45, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                         SceneGlobal::shadowCamera.GetComponent< TransformComponent >()->UpdateLocalAndGlobalMatrix();
                         RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
                     }
