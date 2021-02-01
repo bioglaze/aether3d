@@ -85,6 +85,8 @@ static void InitKeyMap()
     WindowGlobal::keyMap[ 32 ] = ae3d::KeyCode::Space;
     WindowGlobal::keyMap[ 46 ] = ae3d::KeyCode::Delete;
     WindowGlobal::keyMap[ 8 ] = ae3d::KeyCode::Backspace;
+    WindowGlobal::keyMap[ 189 ] = ae3d::KeyCode::Minus;
+    WindowGlobal::keyMap[ 187 ] = ae3d::KeyCode::Plus;
 
     WindowGlobal::keyMap[ 65 ] = ae3d::KeyCode::A;
     WindowGlobal::keyMap[ 66 ] = ae3d::KeyCode::B;
