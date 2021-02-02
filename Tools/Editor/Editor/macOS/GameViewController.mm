@@ -384,7 +384,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
             inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
         }
     }
-    printf("inputEvent.key: %d\n", inputEvent.key);
+    //printf("inputEvent.key: %d\n", inputEvent.key);
     if (!inputEvent.isDown && inputEvent.isActive)
     {
         if (inputEvent.key == 51 /* backspace*/) inspector.HandleKey( 6, inputEvent.isDown ? 0 : 1 );
@@ -432,6 +432,8 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
             if (inputEvent.key == 45) inspector.HandleChar( 'n' );
             if (inputEvent.key == 46) inspector.HandleChar( 'm' );
             if (inputEvent.key == 49) inspector.HandleChar( ' ' );
+            if (inputEvent.key == 27) inspector.HandleChar( '+' );
+            if (inputEvent.key == 44) inspector.HandleChar( '-' );
         }
     }
 
