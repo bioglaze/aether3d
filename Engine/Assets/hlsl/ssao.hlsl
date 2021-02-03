@@ -1,9 +1,3 @@
-#if !VULKAN
-#define layout(a,b)  
-#else
-#define register(a) blank
-#endif
-
 #include "ubo.h"
 
 float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernelSize, uint3 globalIdx )

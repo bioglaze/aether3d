@@ -1,9 +1,3 @@
-#if !VULKAN
-#define layout(a,b)  
-#else
-#define register(a) blank
-#endif
-
 #include "ubo.h"
 
 struct PS_INPUT

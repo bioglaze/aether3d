@@ -1,7 +1,3 @@
-#if !VULKAN
-#define layout(a,b)  
-#endif
-
 struct VSOutput
 {
     float4 pos : SV_Position;

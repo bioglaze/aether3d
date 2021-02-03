@@ -1,9 +1,3 @@
-#if !VULKAN
-#define layout(a,b)  
-#else
-#define register(a) blank
-#endif
-
 struct VSOutput
 {
     float4 pos : SV_POSITION;

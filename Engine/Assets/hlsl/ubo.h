@@ -1,3 +1,9 @@
+#if !VULKAN
+#define layout(a,b)  
+#else
+#define register(a) blank
+#endif
+
 layout( set = 0, binding = 0 ) Texture2D tex : register(t0);
 layout( set = 0, binding = 1 ) Texture2D normalTex : register(t1);
 layout( set = 0, binding = 2 ) Texture2D specularTex : register(t2);
