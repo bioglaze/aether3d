@@ -434,6 +434,11 @@ int main()
         ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.obj" ),
         ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.spv" ) );
 
+    Shader standardShadowPointShader;
+    standardShadowShader.Load( "standard_vertex", "standard_fragment_shadow_point",
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow_point.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow_point.spv" ) );
+
     Shader standardSkinShader;
     standardSkinShader.Load( "standard_skin_vertex", "standard_fragment",
         ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),

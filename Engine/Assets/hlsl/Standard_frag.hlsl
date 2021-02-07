@@ -119,8 +119,13 @@ float VSM( float depth, float4 projCoord )
         return 0;
     }
 
+#ifdef ENABLE_SHADOWS_POINT
+    // TODO: Sample cube shadow map.
     float2 moments = shadowTex.SampleLevel( sLinear, uv, 0 ).rg;
-
+#else
+    float2 moments = shadowTex.SampleLevel( sLinear, uv, 0 ).rg;
+#endif
+    
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
 
     float delta = depth - moments.x;
@@ -262,7 +267,7 @@ float4 main( PS_INPUT input ) : SV_Target
     accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
     //accumDiffuseAndSpecular.rgb += texCube.Sample( sLinear, N ).rgb;
 
-#ifdef ENABLE_SHADOWS
+#if defined( ENABLE_SHADOWS ) || defined( ENABLE_SHADOWS_POINT )
     float depth = input.projCoord.z / input.projCoord.w;
     float shadow = max( minAmbient, VSM( depth, input.projCoord ) );
     accumDiffuseAndSpecular.rgb *= shadow;

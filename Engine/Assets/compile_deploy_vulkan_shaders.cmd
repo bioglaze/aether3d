@@ -18,6 +18,7 @@
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S vert -e main hlsl\Standard_skin_vert.hlsl -o ..\..\..\aether3d_build\Samples\shaders\Standard_skin_vert.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S frag -e main hlsl\Standard_frag.hlsl -o ..\..\..\aether3d_build\Samples\shaders\Standard_frag.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -DENABLE_SHADOWS -V -S frag -e main hlsl\Standard_frag.hlsl -o ..\..\..\aether3d_build\Samples\shaders\Standard_frag_shadow.spv
+%VULKAN_SDK%\bin\glslangvalidator.exe -D -DENABLE_SHADOWS_POINT -V -S frag -e main hlsl\Standard_frag.hlsl -o ..\..\..\aether3d_build\Samples\shaders\Standard_frag_shadow_point.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\Bloom.hlsl -o ..\..\..\aether3d_build\Samples\shaders\Bloom.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\Blur.hlsl -o ..\..\..\aether3d_build\Samples\shaders\Blur.spv
 %VULKAN_SDK%\bin\glslangvalidator.exe -D -V -S comp -e CSMain hlsl\ssao.hlsl -o ..\..\..\aether3d_build\Samples\shaders\ssao.spv

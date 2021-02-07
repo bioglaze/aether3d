@@ -20,6 +20,7 @@ REM SET COMPILER=dxc
 
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /Fo ..\..\..\aether3d_build\Samples\shaders\Standard_frag.obj hlsl\Standard_frag.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /DENABLE_SHADOWS /Fo ..\..\..\aether3d_build\Samples\shaders\Standard_frag_shadow.obj hlsl\Standard_frag.hlsl
+%COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /DENABLE_SHADOWS_POINT /Fo ..\..\..\aether3d_build\Samples\shaders\Standard_frag_shadow_point.obj hlsl\Standard_frag.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\shaders\Standard_vert.obj hlsl\Standard_vert.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T vs_5_1 /Fo ..\..\..\aether3d_build\Samples\shaders\Standard_skin_vert.obj hlsl\Standard_skin_vert.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 /Zi /T ps_5_1 /Fo ..\..\..\aether3d_build\Samples\shaders\unlit_cube_frag.obj hlsl\unlit_cube_frag.hlsl
