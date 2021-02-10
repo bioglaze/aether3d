@@ -120,8 +120,7 @@ float VSM( float depth, float4 projCoord )
     }
 
 #ifdef ENABLE_SHADOWS_POINT
-    // TODO: Sample cube shadow map.
-    float2 moments = shadowTex.SampleLevel( sLinear, uv, 0 ).rg;
+    float2 moments = texCube.SampleLevel( sLinear, projCoord.xyz, 0 ).rg;
 #else
     float2 moments = shadowTex.SampleLevel( sLinear, uv, 0 ).rg;
 #endif

@@ -471,7 +471,11 @@ int main()
 #ifdef TEST_SPONZA
     if (TestForwardPlus)
     {
-        pbrMaterial.SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardShadowShader : &standardShader );
+        pbrMaterial.SetShader( (TestShadowsDir || TestShadowsSpot) ? &standardShadowShader : &standardShader );
+        if (TestShadowsPoint)
+        {
+            pbrMaterial.SetShader( &standardShadowPointShader );
+        }
         pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
         pbrMaterial.SetTexture( &pbrNormalTex, 1 );
         //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
@@ -481,7 +485,12 @@ int main()
         rotatingCube.GetComponent< TransformComponent >()->SetLocalScale( 2 );
         rotatingCube.GetComponent< MeshRendererComponent >()->SetMaterial( &pbrMaterial, 0 );
 
-        materialTangent.SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardShadowShader : &standardShader );
+        materialTangent.SetShader( (TestShadowsDir || TestShadowsSpot) ? &standardShadowShader : &standardShader );
+        if (TestShadowsPoint)
+        {
+            materialTangent.SetShader( &standardShadowPointShader );
+        }
+
         materialTangent.SetTexture( &normalTex, 1 );
         materialTangent.SetTexture( &whiteTex, 0 );
         cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
