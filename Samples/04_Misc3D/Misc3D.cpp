@@ -682,7 +682,7 @@ int main()
     {
         Window::PumpEvents();
         WindowEvent event;
-        
+
         ++angle;
         Quaternion rotation;
         Vec3 axis( 0, 1, 0 );
@@ -711,9 +711,9 @@ int main()
             else if (event.type == WindowEventType::KeyDown)
             {
                 KeyCode keyCode = event.keyCode;
-                
+
                 const float velocity = 0.3f;
-                
+
                 if (keyCode == KeyCode::Escape)
                 {
                     quit = true;
@@ -810,7 +810,7 @@ int main()
                 camera.GetComponent<TransformComponent>()->OffsetRotate( Vec3( 1, 0, 0 ), float( mouseDeltaY ) / 20 );
             }
             else if (event.type == WindowEventType::GamePadLeftThumbState)
-            {           
+            {
                 gamePadLeftThumbX = event.gamePadThumbX;
                 gamePadLeftThumbY = event.gamePadThumbY;
             }
@@ -863,7 +863,7 @@ int main()
             System::Statistics::GetStatistics( statStr );
             statsContainer.GetComponent<TextRendererComponent>()->SetText( statStr );
         }
-        
+
         if (TestForwardPlus)
         {
             static float y = -14;
@@ -879,13 +879,13 @@ int main()
                 const Vec3 oldPos = pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->GetLocalPosition();
                 const float xOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
                 const float yOffset = (Random100() % 10) / 20.0f - (Random100() % 10) / 20.0f;
-            
+
                 pointLights[ pointLightIndex ].GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( oldPos.x + xOffset, -18, oldPos.z + yOffset ) );
             }
         }
 #if defined( AE3D_OPENVR )
         VR::CalcEyePose();
-        
+
         cube.GetComponent< TransformComponent >()->SetLocalPosition( camera.GetComponent< TransformComponent >()->GetWorldPosition() + VR::GetLeftHandPosition() );
         Vec3 pos = VR::GetLeftHandPosition();
         //System::Print( "left hand pos: %f, %f, %f\n", pos.x, pos.y, pos.z );
@@ -911,8 +911,11 @@ int main()
             System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
 #else
-        System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        if (!TestSSAO && !TestBloom)
+        {
+            System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        }
 #endif
         if (TestBloom)
         {
@@ -1102,6 +1105,7 @@ int main()
             ssaoShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
             ssaoShader.SetSRV( 1, camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetGpuResource()->resource, *camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetSRVDesc() );
             ssaoShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
+            ssaoShader.SetTexture2D( &noiseTex, 2 );
 #else
             ssaoShader.SetRenderTexture( &cameraTex, 0 );
             ssaoShader.SetRenderTexture( &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
@@ -1123,7 +1127,6 @@ int main()
 #else
             blurShader.SetTexture2D( &ssaoBlurTex, 14 );
 #endif
-
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
             blurShader.Begin();
             blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
@@ -1133,7 +1136,10 @@ int main()
 
             ssaoTex.SetLayout( TextureLayout::General );
             ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
-            blurShader.SetTexture2D( &ssaoBlurTex, 0 );
+            
+            // To repro SSAO D3D12 sync issue, Disable the following block:
+#if 1
+            blurShader.SetTexture2D( &ssaoBlurTex, 0 ); 
 #if RENDERER_D3D12
             ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
             blurShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
@@ -1146,6 +1152,7 @@ int main()
 
             ssaoTex.SetLayout( TextureLayout::ShaderRead );
             ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
+#endif
 
             composeShader.Begin();
 #if RENDERER_D3D12
