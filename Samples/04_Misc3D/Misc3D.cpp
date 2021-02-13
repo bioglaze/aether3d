@@ -40,7 +40,7 @@ constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#define TEST_SPONZA
+constexpr bool TestSponza = true;
 
 using namespace ae3d;
 
@@ -220,18 +220,20 @@ int main()
     Texture2D whiteTex;
     whiteTex.Load( FileSystem::FileContents( "textures/default_white.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
-#ifdef TEST_SPONZA
     Texture2D pbrDiffuseTex;
-    pbrDiffuseTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     Texture2D pbrNormalTex;
-    pbrNormalTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrRoughnessTex;
-    pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrNormalTex2;
-    pbrNormalTex2.Load( FileSystem::FileContents( "textures/grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     Texture2D pbrSpecularTex;
-    pbrSpecularTex.Load( FileSystem::FileContents( "textures/spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
-#endif
+
+    if (TestSponza)
+    {
+        pbrDiffuseTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+        pbrNormalTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+        pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+        pbrNormalTex2.Load( FileSystem::FileContents( "textures/grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+        pbrSpecularTex.Load( FileSystem::FileContents( "textures/spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+    }
     
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
@@ -468,8 +470,7 @@ int main()
     GameObject standardCubeTopCenter;
     GameObject pointLights[ PointLightCount ];
 
-#ifdef TEST_SPONZA
-    if (TestForwardPlus)
+    if (TestForwardPlus && TestSponza)
     {
         pbrMaterial.SetShader( (TestShadowsDir || TestShadowsSpot) ? &standardShadowShader : &standardShader );
         if (TestShadowsPoint)
@@ -495,7 +496,6 @@ int main()
         materialTangent.SetTexture( &whiteTex, 0 );
         cubeTangent.GetComponent< MeshRendererComponent >()->SetMaterial( &materialTangent, 0 );
     }
-#endif
 
     if (TestForwardPlus)
     {
@@ -537,33 +537,34 @@ int main()
     std::map< std::string, Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, Texture2D* > sponzaTextureNameToTexture;
     Array< Mesh* > sponzaMeshes;
-#ifdef TEST_SPONZA
-    auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
-                                  sponzaMaterialNameToMaterial, sponzaMeshes );
-    if (res != Scene::DeserializeResult::Success)
-    {
-        System::Print( "Could not parse Sponza\n" );
-    }
 
-    for (auto& mat : sponzaMaterialNameToMaterial)
+    if (TestSponza)
     {
-        if (TestForwardPlus)
+        auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
+                                      sponzaMaterialNameToMaterial, sponzaMeshes );
+        if (res != Scene::DeserializeResult::Success)
         {
-            mat.second->SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardShadowShader : &standardShader );
-            mat.second->SetTexture( &skybox );
+            System::Print( "Could not parse Sponza\n" );
         }
-        else
+
+        for (auto& mat : sponzaMaterialNameToMaterial)
         {
-            mat.second->SetShader( &shader );
+            if (TestForwardPlus)
+            {
+                mat.second->SetShader( (TestShadowsDir || TestShadowsSpot || TestShadowsPoint) ? &standardShadowShader : &standardShader );
+                mat.second->SetTexture( &skybox );
+            }
+            else
+            {
+                mat.second->SetShader( &shader );
+            }
         }
-    }
     
-    for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
-    {
-        scene.Add( &sponzaGameObjects[ i ] );
+        for (std::size_t i = 0; i < sponzaGameObjects.size(); ++i)
+        {
+            scene.Add( &sponzaGameObjects[ i ] );
+        }
     }
-#endif
-    // Sponza ends
     
     RenderTexture rtTex;
     const auto dataType = camera2d.GetComponent<CameraComponent>()->GetTargetTexture() != nullptr ? ae3d::DataType::Float : ae3d::DataType::UByte;
