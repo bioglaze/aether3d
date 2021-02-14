@@ -63,3 +63,19 @@ static float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, 
     
     return clamp( max( p, pMax ), 0.0f, 1.0f );
 }
+
+static float VSMPoint( texturecube<float, access::sample> shadowMap, float4 projCoord, float depth, int lightType )
+{
+    float3 uv = (projCoord.xyz / projCoord.w) * 0.5f + 0.5f;
+    uv.y = 1.0f - uv.y;
+    
+    float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
+    
+    float variance = max( moments.y - moments.x * moments.x, -0.001f );
+
+    float delta = depth - moments.x;
+    float p = smoothstep( depth - 0.02f, depth, moments.x );
+    float pMax = linstep( 0.2f, 1.0f, variance / (variance + delta * delta) );
+    
+    return clamp( max( p, pMax ), 0.0f, 1.0f );
+}

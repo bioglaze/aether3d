@@ -5,6 +5,7 @@
 #import "Aether3D_iOS/Array.hpp"
 #import "Aether3D_iOS/AudioClip.hpp"
 #import "Aether3D_iOS/AudioSourceComponent.hpp"
+#import "Aether3D_iOS/ComputeShader.hpp"
 #import "Aether3D_iOS/CameraComponent.hpp"
 #import "Aether3D_iOS/DirectionalLightComponent.hpp"
 #import "Aether3D_iOS/GameObject.hpp"
@@ -22,11 +23,14 @@
 #import "Aether3D_iOS/TextureCube.hpp"
 #import "Aether3D_iOS/TransformComponent.hpp"
 #import "Aether3D_iOS/TextRendererComponent.hpp"
+#import "Aether3D_iOS/Vec3.hpp"
 
 const int POINT_LIGHT_COUNT = (50 * 40 + 48);
 #define MULTISAMPLE_COUNT 1
 #define MAX_UI_VERTEX_MEMORY (512 * 1024)
 #define MAX_UI_ELEMENT_MEMORY (128 * 1024)
+const bool TestBloom = false;
+const bool TestSSAO = false;
 
 // *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
 // Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
@@ -88,10 +92,23 @@ int gTouchCount = 0;
     ae3d::Material standardMaterial;
     ae3d::Shader shader;
     ae3d::Shader standardShader;
+    ae3d::ComputeShader downSampleAndThresholdShader;
+    ae3d::ComputeShader blurShader;
+    ae3d::ComputeShader ssaoShader;
+    ae3d::ComputeShader composeShader;
     ae3d::Texture2D fontTex;
     ae3d::Texture2D gliderTex;
     ae3d::Texture2D astcTex;
+    ae3d::Texture2D noiseTex;
+    ae3d::Texture2D ssaoTex;
+    ae3d::Texture2D bloomTex;
+    ae3d::Texture2D blurTex;
+    ae3d::Texture2D blurTex2;
+    ae3d::Texture2D ssaoBlurTex;
+    ae3d::RenderTexture cameraTex;
+    ae3d::RenderTexture camera2dTex;
     ae3d::TextureCube skyTex;
+    
     std::vector< ae3d::GameObject > sponzaGameObjects;
     std::map< std::string, ae3d::Material* > sponzaMaterialNameToMaterial;
     std::map< std::string, ae3d::Texture2D* > sponzaTextureNameToTexture;
@@ -122,6 +139,9 @@ int gTouchCount = 0;
     audioContainer.AddComponent<ae3d::AudioSourceComponent>();
     audioContainer.GetComponent<ae3d::AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     audioContainer.GetComponent<ae3d::AudioSourceComponent>()->Play();
+
+    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::DataType::Float16, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "cameraTex", MULTISAMPLE_COUNT > 1 );
+    camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::DataType::Float16, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "camera2dTex", false );
 
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
@@ -175,6 +195,12 @@ int gTouchCount = 0;
     standardShader.Load( "standard_vertex", "standard_fragment",
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ),
                         ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ));
+
+    downSampleAndThresholdShader.Load( "downsampleAndThreshold", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+    blurShader.Load( "blur", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+    ssaoShader.Load( "ssao", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+    composeShader.Load( "compose", ae3d::FileSystem::FileContents( "" ), ae3d::FileSystem::FileContents( "" ) );
+
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
     //standardMaterial.SetTexture( &astcTex, 0 );
@@ -336,6 +362,69 @@ int gTouchCount = 0;
     ae3d::System::SetCurrentDrawableMetal( _view );
     ae3d::System::BeginFrame();
     scene.Render();
+    
+    if (TestBloom)
+    {
+        //auto beginTime = std::chrono::steady_clock::now();
+        
+        downSampleAndThresholdShader.SetRenderTexture( &cameraTex, 0 );
+        downSampleAndThresholdShader.SetTexture2D( &blurTex, 1 );
+        downSampleAndThresholdShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "downSampleAndThreshold" );
+        
+        blurShader.SetTexture2D( &blurTex, 0 );
+        blurShader.SetTexture2D( &bloomTex, 1 );
+        blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        
+        blurShader.SetTexture2D( &bloomTex, 0 );
+        blurShader.SetTexture2D( &blurTex, 1 );
+        blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        
+        // Second blur
+        blurShader.SetTexture2D( &blurTex, 0 );
+        blurShader.SetTexture2D( &blurTex2, 1 );
+        blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        
+        blurShader.SetTexture2D( &blurTex2, 0 );
+        blurShader.SetTexture2D( &blurTex, 1 );
+        blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        
+        // Third blur
+        blurShader.SetTexture2D( &blurTex, 0 );
+        blurShader.SetTexture2D( &blurTex2, 1 );
+        blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        
+        blurShader.SetTexture2D( &blurTex2, 0 );
+        blurShader.SetTexture2D( &blurTex, 1 );
+        blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+                    
+        /*auto endTime = std::chrono::steady_clock::now();
+        auto tDiff = std::chrono::duration<double, std::milli>( endTime - beginTime ).count();
+        float bloomMS_CPU = static_cast< float >(tDiff);
+        System::Statistics::SetBloomTime( bloomMS_CPU, 0 );*/
+
+        const int width = self.view.bounds.size.width;
+        const int height = self.view.bounds.size.height;
+        
+        if (TestSSAO)
+        {
+            ae3d::System::Draw( &ssaoTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+        }
+        else
+        {
+            ae3d::System::Draw( &cameraTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+        }
+
+        //System::Draw( &cameraTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+        ae3d::System::Draw( &blurTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Additive );
+        ae3d::System::Draw( &camera2dTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Alpha );
+    }
+
     scene.EndFrame();
     ae3d::System::EndFrame();
 }
