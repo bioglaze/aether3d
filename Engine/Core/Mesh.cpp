@@ -345,7 +345,7 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
         }
         else
         {
-            System::Print( "Mesh %s submesh %s has invalid vertex format %d. Only 0 and 1 are valid!\n", meshData.path.c_str(), subMesh.name.c_str(), vertexFormat );
+            System::Print( "Mesh %s submesh %s has invalid vertex format %d. Only 0, 1 and 2 are valid!\n", meshData.path.c_str(), subMesh.name.c_str(), vertexFormat );
             return LoadResult::Corrupted;
         }
 
