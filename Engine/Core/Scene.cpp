@@ -739,7 +739,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
 
             int width = 0, height = 0;
             Window::GetSize( width, height );
-            System::DrawLines( lineRenderer->lineHandle, camera->GetView(), camera->GetProjection(), width * screenScale, height * screenScale );
+            System::DrawLines( lineRenderer->lineHandle, camera->GetView(), camera->GetProjection(), (int)(width * screenScale), (int)(height * screenScale) );
         }
         
         auto meshRenderer = gameObject->GetComponent< MeshRendererComponent >();

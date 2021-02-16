@@ -66,7 +66,7 @@ namespace ae3d
         static void TransformDirection( const Vec3& dir, const Matrix44& mat, Vec3* out );
         
         /** \brief Constructor. Inits to identity. */
-        Matrix44()
+        Matrix44() noexcept
         {
             MakeIdentity();
         }

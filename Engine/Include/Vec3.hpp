@@ -24,7 +24,7 @@ namespace ae3d
            \param v2 Another vector.
            \return Cross product of this vector and v.
            */
-        static Vec3 Cross( const Vec3& v1, const Vec3& v2 )
+        static Vec3 Cross( const Vec3& v1, const Vec3& v2 ) noexcept
         {
             return Vec3( v1.y * v2.z - v1.z * v2.y,
                          v1.z * v2.x - v1.x * v2.z,
@@ -40,7 +40,7 @@ namespace ae3d
            \return Vector that has v1's and v2's minimum components.
            \see Max2()
         */
-        static Vec3 Min2( const Vec3& v1, const Vec3& v2 )
+        static Vec3 Min2( const Vec3& v1, const Vec3& v2 ) noexcept
         {
             return Vec3( v1.x < v2.x ? v1.x : v2.x,
                          v1.y < v2.y ? v1.y : v2.y,
@@ -55,7 +55,7 @@ namespace ae3d
            \param v2 Other vector.
            \return Vector that has v1's and v2's maximum components.
         */
-        static Vec3 Max2( const Vec3& v1, const Vec3& v2 )
+        static Vec3 Max2( const Vec3& v1, const Vec3& v2 ) noexcept
         {
             return Vec3( v1.x > v2.x ? v1.x : v2.x,
                          v1.y > v2.y ? v1.y : v2.y,
@@ -96,7 +96,7 @@ namespace ae3d
          \param v2 Other vector.
          \return Dot product of vectors v1 and v2.
          */
-        static float Dot( const Vec3& v1, const Vec3& v2 )
+        static float Dot( const Vec3& v1, const Vec3& v2 ) noexcept
         {
             return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
         }
@@ -137,7 +137,7 @@ namespace ae3d
            \param f Scalar value.
            \return a vector that has its values divided by f.
            */
-        Vec3 operator/( float f ) const
+        Vec3 operator/( float f ) const noexcept
         {
             const float inv = 1.0f / f;
             return Vec3(x * inv, y * inv, z * inv);
@@ -149,7 +149,7 @@ namespace ae3d
            \param v Vector value.
            \return a vector that has its values divided by v.
            */
-        Vec3 operator/( const Vec3& v ) const
+        Vec3 operator/( const Vec3& v ) const noexcept
         {
             return Vec3( x / v.x, y / v.y, z / v.z );
         }
@@ -159,7 +159,7 @@ namespace ae3d
 
            \return a vector that has negative values.
            */
-        Vec3 operator-() const
+        Vec3 operator-() const noexcept
         {
             return Vec3( -x, -y, -z );
         }
@@ -170,7 +170,7 @@ namespace ae3d
            \param v a vector that is to be subtracted from this vector.
            \return result of the subtraction.
            */
-        Vec3 operator-( const Vec3& v ) const
+        Vec3 operator-( const Vec3& v ) const noexcept
         {
             return Vec3( x - v.x, y - v.y, z - v.z );
         }
@@ -181,7 +181,7 @@ namespace ae3d
            \param v a vector that is to be added to this vector.
            \return A vector that is the sum of this vector and v.
            */
-        Vec3 operator+( const Vec3& v ) const
+        Vec3 operator+( const Vec3& v ) const noexcept
         {
             return Vec3( x + v.x, y + v.y, z + v.z );
         }
@@ -192,7 +192,7 @@ namespace ae3d
            \param f a value that is to be added to this vector.
            \return A vector that is the sum of this vector and c.
            */
-        Vec3 operator+( float f ) const
+        Vec3 operator+( float f ) const noexcept
         {
             return Vec3( x + f, y + f, z + f );
         }
@@ -203,7 +203,7 @@ namespace ae3d
            \param v Vector that is to be subtracted from this vector.
            \return Reference to this vector.
            */
-        Vec3& operator-=( const Vec3& v )
+        Vec3& operator-=( const Vec3& v ) noexcept
         {
             x -= v.x;
             y -= v.y;
@@ -218,7 +218,7 @@ namespace ae3d
          \param v Vector that is to be added to this vector.
          \return Reference to this vector.
          */
-        Vec3& operator+=( const Vec3& v )
+        Vec3& operator+=( const Vec3& v ) noexcept
         {
             x += v.x;
             y += v.y;
@@ -233,7 +233,7 @@ namespace ae3d
            \param f A value that is to be multiplied with this vector.
            \return Reference to this vector.
            */
-        Vec3& operator*=( float f )
+        Vec3& operator*=( float f ) noexcept
         {
             x *= f;
             y *= f;
@@ -248,7 +248,7 @@ namespace ae3d
            \param f A value that is to be divided with this vector.
            \return Reference to this vector.
         */
-        Vec3& operator/=( float f )
+        Vec3& operator/=( float f ) noexcept
         {
             const float inv = 1.0f / f;
 
@@ -265,7 +265,7 @@ namespace ae3d
            \param v A value that is to be multiplied with this vector.
            \return Reference to this vector.
            */
-        Vec3& operator*=( const Vec3& v )
+        Vec3& operator*=( const Vec3& v ) noexcept
         {
             x *= v.x;
             y *= v.y;
@@ -280,7 +280,7 @@ namespace ae3d
            \param v a vector that is assigned to this vector.
            \return Reference to this vector.
            */
-        Vec3& operator=( const Vec3& v ) { x = v.x; y = v.y; z = v.z; return *this; }
+        Vec3& operator=( const Vec3& v ) noexcept { x = v.x; y = v.y; z = v.z; return *this; }
 
         /**
            Multiplication operator.
@@ -299,7 +299,7 @@ namespace ae3d
            \param f A value that is multiplied with this vector.
            \return This vector multiplied by f.
            */
-        Vec3 operator*( float f ) const
+        Vec3 operator*( float f ) const noexcept
         {
             return Vec3( x * f, y * f, z * f );
         }
@@ -331,7 +331,7 @@ namespace ae3d
         /// Compares this vector with another vector.
         /// \param v2 Another vector.
         /// \return True if vectors are almost equal.
-        bool IsAlmost( const Vec3& v2 ) const
+        bool IsAlmost( const Vec3& v2 ) const noexcept
         {
             const float epsilon = 0.0001f;
             return fabsf( x - v2.x ) < epsilon &&
