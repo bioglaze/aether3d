@@ -84,6 +84,12 @@
    \subsection SDF_Generator
 
    Generates a signed-distance field from a texture, useful for high-quality font rendering.
+
+   \subsection Performance
+
+   For archival/informative purposes, here's some performance info:
+
+   Sponza scene with directional light shadows is 16.6 ms on GeForce 780 GTX on Ubuntu.
 */
 namespace ae3d
 {
