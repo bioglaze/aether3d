@@ -162,6 +162,7 @@ int gTouchCount = 0;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetClearFlag( ae3d::CameraComponent::ClearFlag::DepthAndColor );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
     camera3d.GetComponent<ae3d::CameraComponent>()->SetRenderOrder( 1 );
+    camera3d.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &cameraTex );
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthNormals", false );
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.SetName( "camera3d" );
@@ -289,8 +290,8 @@ int gTouchCount = 0;
     
     for (auto& mat : sponzaMaterialNameToMaterial)
     {
-        //mat.second->SetShader( &shader );
-        mat.second->SetShader( &standardShader );
+        mat.second->SetShader( &shader );
+        //mat.second->SetShader( &standardShader );
         mat.second->SetTexture( &skyTex );
     }
     
@@ -363,6 +364,14 @@ int gTouchCount = 0;
     ae3d::System::BeginFrame();
     scene.Render();
     
+    if (!TestBloom && !TestSSAO)
+    {
+        const int width = self.view.bounds.size.width * 2;
+        const int height = self.view.bounds.size.height * 2;
+        ae3d::System::Draw( &cameraTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+        ae3d::System::Draw( &camera2dTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Alpha );
+    }
+    
     if (TestBloom)
     {
         //auto beginTime = std::chrono::steady_clock::now();
@@ -408,8 +417,8 @@ int gTouchCount = 0;
         float bloomMS_CPU = static_cast< float >(tDiff);
         System::Statistics::SetBloomTime( bloomMS_CPU, 0 );*/
 
-        const int width = self.view.bounds.size.width;
-        const int height = self.view.bounds.size.height;
+        const int width = self.view.bounds.size.width * 2;
+        const int height = self.view.bounds.size.height * 2;
         
         if (TestSSAO)
         {

@@ -34,7 +34,7 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-const bool TestForwardPlus = false;
+const bool TestForwardPlus = true;
 const bool TestBloom = false;
 const bool TestSSAO = false;
 const bool TestShadowsDir = false;
@@ -257,6 +257,8 @@ using namespace ae3d;
     Shader skinShader;
     Shader skyboxShader;
     Shader standardShader;
+    Shader standardShadowShader;
+    Shader standardShadowPointShader;
     Shader standardSkinShader;
     ComputeShader downSampleAndThresholdShader;
     ComputeShader blurShader;
@@ -356,7 +358,11 @@ using namespace ae3d;
     {
         if (TestForwardPlus)
         {
-            mat.second->SetShader( &standardShader );
+            mat.second->SetShader( (TestShadowsDir || TestShadowsSpot) ? &standardShadowShader : &standardShader );
+            if (TestShadowsPoint)
+            {
+                mat.second->SetShader( &standardShadowPointShader );
+            }
             mat.second->SetTexture( &skyTex );
         }
         else
@@ -510,6 +516,14 @@ using namespace ae3d;
     rtCubeMaterial.SetBackFaceCulling( false );
 
     standardShader.Load( "standard_vertex", "standard_fragment",
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
+
+    standardShadowShader.Load( "standard_vertex", "standard_shadow_fragment",
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
+                ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
+
+    standardShadowPointShader.Load( "standard_vertex", "standard_shadow_point_fragment",
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
                 ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ));
 

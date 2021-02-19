@@ -183,6 +183,61 @@ float pointLightAttenuation( float d, float r )
     return 2.0f / ( d * d + r * r + d * sqrt( d * d + r * r ) );
 }
 
+fragment half4 standard_shadow_point_fragment( StandardColorInOut in [[stage_in]],
+                               texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
+                               texture2d<float, access::sample> normalMap [[texture(1)]],
+                               texture2d<float, access::sample> specularMap [[texture(2)]],
+                               texture2d<float, access::sample> _ShadowMap [[texture(3)]],
+                               texturecube<float, access::sample> cubeMap [[texture(4)]],
+                               constant Uniforms& uniforms [[ buffer(5) ]],
+                               const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
+                               const device float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
+                               const device float4* spotLightBufferCenterAndRadius [[ buffer(8) ]],
+                               const device float4* pointLightBufferColors [[ buffer(9) ]],
+                               const device float4* spotLightParams [[ buffer(10) ]],
+                               const device float4* spotLightBufferColors [[ buffer(11) ]],
+                               sampler sampler0 [[sampler(0)]] )
+{
+    const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
+    const half4 albedoColor = half4( albedoSmoothnessMap.sample( sampler0, uv ) );
+    
+    float depth = in.projCoord.z / in.projCoord.w;
+
+    float shadow = uniforms.lightType == 0 ? 1.0f : max( uniforms.minAmbient, VSMPoint( cubeMap, in.projCoord, depth, uniforms.lightType ) );
+
+    return albedoColor * half4( shadow, shadow, shadow, 1 );// * cubeReflection;
+}
+
+fragment half4 standard_shadow_fragment( StandardColorInOut in [[stage_in]],
+                               texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
+                               texture2d<float, access::sample> normalMap [[texture(1)]],
+                               texture2d<float, access::sample> specularMap [[texture(2)]],
+                               texture2d<float, access::sample> _ShadowMap [[texture(3)]],
+                               texturecube<float, access::sample> cubeMap [[texture(4)]],
+                               constant Uniforms& uniforms [[ buffer(5) ]],
+                               const device uint* perTileLightIndexBuffer [[ buffer(6) ]],
+                               const device float4* pointLightBufferCenterAndRadius [[ buffer(7) ]],
+                               const device float4* spotLightBufferCenterAndRadius [[ buffer(8) ]],
+                               const device float4* pointLightBufferColors [[ buffer(9) ]],
+                               const device float4* spotLightParams [[ buffer(10) ]],
+                               const device float4* spotLightBufferColors [[ buffer(11) ]],
+                               sampler sampler0 [[sampler(0)]] )
+{
+    const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
+    const half4 albedoColor = half4( albedoSmoothnessMap.sample( sampler0, uv ) );
+    
+    float depth = in.projCoord.z / in.projCoord.w;
+
+    if (uniforms.lightType == 2)
+    {
+        depth = depth * 0.5f + 0.5f;
+    }
+
+    float shadow = uniforms.lightType == 0 ? 1.0f : max( uniforms.minAmbient, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
+
+    return albedoColor * half4( shadow, shadow, shadow, 1 );// * cubeReflection;
+}
+
 //[[early_fragment_tests]]
 fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
@@ -337,16 +392,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         outColor = float4( 1, 0, 0, 1 );
     }
 #endif
-    
-    float depth = in.projCoord.z / in.projCoord.w;
 
-    if (uniforms.lightType == 2)
-    {
-        depth = depth * 0.5f + 0.5f;
-    }
-
-    float shadow = uniforms.lightType == 0 ? 1.0f : max( uniforms.minAmbient, VSM( _ShadowMap, in.projCoord, depth, uniforms.lightType ) );
-
-    return albedoColor * half4( outColor ) * half4( shadow, shadow, shadow, 1 );// * cubeReflection;
+    return albedoColor * half4( outColor );// * cubeReflection;
     //return cubeReflection;
 }
