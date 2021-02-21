@@ -838,6 +838,11 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     stbi_image_free( data );
 }
 
+void ae3d::Texture2D::SetLayouts( Texture2D textures[], TextureLayout layouts[], int count )
+{
+    System::Print( "Texture2D::SetLayouts is unimplemented on Vulkan!\n" );
+}
+
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (Texture2DGlobal::defaultTexture.view == VK_NULL_HANDLE)

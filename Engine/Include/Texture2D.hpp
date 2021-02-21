@@ -29,6 +29,12 @@ namespace ae3d
         /// Gets a default texture UAV (read-write) that is always available after System::LoadBuiltinAssets().
         static Texture2D* GetDefaultTextureUAV();
 
+        /// Sets layouts of multiple textures at once.
+        /// \param textures Textures.
+        /// \param layouts Target layouts.
+        /// \param count Count. Must be equal or less than textures and layouts array item count.
+        static void SetLayouts( Texture2D textures[], TextureLayout layouts[], int count );
+        
         /// \param layout Layout.
         void SetLayout( TextureLayout layout );
         

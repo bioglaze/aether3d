@@ -964,6 +964,9 @@ int main()
 
             blurTex.SetLayout( TextureLayout::General );
             bloomTex.SetLayout( TextureLayout::ShaderRead );
+            Texture2D textures[] = { blurTex, bloomTex };
+            TextureLayout layouts[] = { TextureLayout::General, TextureLayout::ShaderRead };
+            //Texture2D::SetLayouts( textures, layouts, 2 );
             blurShader.SetTexture2D( &bloomTex, 0 );
 
 #if RENDERER_D3D12
