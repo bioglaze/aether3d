@@ -1768,7 +1768,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             std::string hlslVert = vertexShaderName + std::string( ".obj" );
             std::string hlslFrag = fragmentShaderName + std::string( ".obj" );
             std::string spvVert = vertexShaderName + std::string( "_vert.spv" );
-            std::string spvFrag = fragmentShaderName + std::string( "_frag.fsh" );
+            std::string spvFrag = fragmentShaderName + std::string( "_frag.spv" );
             
             Shader* shader = new Shader();
             shader->Load( vertexShaderName.c_str(), fragmentShaderName.c_str(),
