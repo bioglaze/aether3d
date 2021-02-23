@@ -90,14 +90,14 @@ void ReadMtl( const std::string& path )
             std::string materialName;
             stm >> materialName;
             std::cout << "material " << materialName << std::endl;
-            std::cout << "shaders cook_torrance cook_torrance" << std::endl;
+            std::cout << "shaders Standard Standard" << std::endl;
             std::cout << "param_float roughness 0.2" << std::endl;
             std::cout << "param_vec3 materialSpecular 0.2 0.2 0.2" << std::endl;
 
             ofs << "material " << materialName << std::endl;
-            ofs << "shaders cook_torrance cook_torrance" << std::endl;
-            ofs << "param_float roughness 0.2" << std::endl;
-            ofs << "param_vec3 materialSpecular 0.2 0.2 0.2" << std::endl;
+            ofs << "shaders Standard Standard" << std::endl;
+            //ofs << "param_float roughness 0.2" << std::endl;
+            //ofs << "param_vec3 materialSpecular 0.2 0.2 0.2" << std::endl;
         }
         else if (token == "map_Kd")
         {
