@@ -116,8 +116,12 @@ int main()
 
     ae3d::GameObject* selectedGO = nullptr;
 
+    bool mouseMoveHandled = false;
+    
     while (Window::IsOpen() && !quit)
     {
+        mouseMoveHandled = false;
+        
         Window::PumpEvents();
         WindowEvent event;
 
@@ -264,7 +268,7 @@ int main()
                 }
             }
 
-            if (event.type == WindowEventType::MouseMove)
+            if (event.type == WindowEventType::MouseMove && !mouseMoveHandled)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
@@ -272,7 +276,7 @@ int main()
                 deltaY = y - lastMouseY;
                 lastMouseX = x;
                 lastMouseY = y;
-
+                mouseMoveHandled = true;
                 inspector.HandleMouseMotion( x, y );
                 svHandleMouseMotion( sceneView, deltaX, deltaY );
             }
@@ -369,40 +373,16 @@ int main()
 
         if (isRightMouseDown && event.type == WindowEventType::MouseMove)
         {
-#if _MSC_VER
             svRotateCamera( sceneView, -float( deltaX ) / 20, -float( deltaY ) / 20 );
-#else
-            if (Window::IsWayland())
-            {
-                svRotateCamera( sceneView, -float( deltaX ) / 20, -float( deltaY ) / 20 );
-            }
-            else
-            {
-                svRotateCamera( sceneView, float( deltaX ) / 20, float( deltaY ) / 20 );
-            }
-#endif
         }
 
         if (isMiddleMouseDown)
         {
-#if _MSC_VER
             moveDir.x = -deltaX / 20.0f;
             moveDir.y = deltaY / 20.0f;
-#else
-            if (Window::IsWayland())
-            {
-                moveDir.x = -deltaX / 20.0f;
-                moveDir.y = deltaY / 20.0f;
-            }
-            else
-            {
-                moveDir.x = deltaX / 20.0f;
-                moveDir.y = -deltaY / 20.0f;
-            }
-#endif
         }
         
-        Inspector::Command inspectorCommand;
+        Inspector::Command inspectorCommand{};
 
         svMoveCamera( sceneView, moveDir );
 
