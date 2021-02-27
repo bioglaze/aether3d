@@ -85,6 +85,11 @@
 
    Generates a signed-distance field from a texture, useful for high-quality font rendering.
 
+   \subsection OBJ_Converter
+
+   Converts .obj files to Aether3D's .ae3d format. When you export .objs from a modelling software, be sure to triangulate faces and also export texture coordinates.
+   Materials and their bindings to submeshes can be read using read_mtl. Their output can be used in .scene files.
+
    \subsection Performance
 
    For archival/informative purposes, here's some performance info:
