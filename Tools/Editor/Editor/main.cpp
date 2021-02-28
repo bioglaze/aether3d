@@ -106,6 +106,7 @@ int main()
     Vec3 moveDir;
     Vec3 gamepadMoveDir;
     constexpr float velocity = 0.2f;
+    constexpr int inspectorWidth = 450;    
 
     int lastMouseX = 0;
     int lastMouseY = 0;
@@ -117,7 +118,7 @@ int main()
     ae3d::GameObject* selectedGO = nullptr;
 
     bool mouseMoveHandled = false;
-    
+
     while (Window::IsOpen() && !quit)
     {
         mouseMoveHandled = false;
@@ -285,7 +286,7 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
 
-                const bool clickedOnInspector = x < 450;
+                const bool clickedOnInspector = x < inspectorWidth;
 
                 if (clickedOnInspector)
                 {
@@ -333,11 +334,15 @@ int main()
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
-                isRightMouseDown = true;
+                const bool clickedOnInspector = x < inspectorWidth;
+
+                isRightMouseDown = !clickedOnInspector;
             }
             else if (event.type == WindowEventType::MouseMiddleDown)
             {
-                isMiddleMouseDown = true;
+                const bool clickedOnInspector = x < inspectorWidth;
+
+                isMiddleMouseDown = !clickedOnInspector;
             }
             else if (event.type == WindowEventType::MouseMiddleUp)
             {
