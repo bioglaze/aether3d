@@ -122,6 +122,7 @@ static void DrawNuklear( int width, int height )
         offset += cmd->elem_count / 3;
     }
 
+    nk_buffer_free( &uiCommands );
     nk_clear( &ctx );
 }
 
@@ -208,7 +209,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
     outSelectedGameObject = -1;
     
     if (nk_begin( &ctx, "Inspector", nk_rect( 0, 0, 450, 1100 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
-    {      
+    {
         textEditActive = ctx.current->edit.active;
 
         nk_layout_row_static( &ctx, 40, 430, 1 );
@@ -536,6 +537,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         }
         
         DrawNuklear( width, height );
+
         nk_end( &ctx );
     }
 }
