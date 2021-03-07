@@ -44,6 +44,7 @@ nk_draw_null_texture nullTexture;
 Texture2D uiTextures[ 10 ]; // index 0 is font.
 nk_context ctx;
 nk_font_atlas atlas;
+nk_buffer uiCommands;
 char gameObjectNameField[ 64 ];
 int gameObjectNameFieldLength;
 
@@ -77,8 +78,7 @@ static void DrawNuklear( int width, int height )
     memset( vertices, 0, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
     memset( elements, 0, MAX_ELEMENT_MEMORY * 3 * 2 );
     
-    nk_buffer vbuf, ebuf, uiCommands;
-    nk_buffer_init_default( &uiCommands );
+    nk_buffer vbuf, ebuf;
     nk_buffer_init_fixed( &vbuf, vertices, MAX_VERTEX_MEMORY * sizeof( VertexPTC ) );
     nk_buffer_init_fixed( &ebuf, elements, MAX_ELEMENT_MEMORY * 3 * 2 );
 
@@ -122,7 +122,6 @@ static void DrawNuklear( int width, int height )
         offset += cmd->elem_count / 3;
     }
 
-    nk_buffer_free( &uiCommands );
     nk_clear( &ctx );
 }
 
@@ -146,6 +145,7 @@ void Inspector::Init()
     nk_font_atlas_end( &atlas, nk_handle_id( uiTextures[ 0 ].GetID() ), &nullTexture );
     
     nk_init_default( &ctx, &nkFont->handle );
+    nk_buffer_init_default( &uiCommands );
     //ctx.style.text.color = nk_rgb(255, 255, 255);
     //ctx.style.tab.text = nk_rgb(195,5,5); // Tree title
 
@@ -545,5 +545,6 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 void Inspector::Deinit()
 {
     nk_font_atlas_clear( &atlas );
+    nk_buffer_free( &uiCommands );
     nk_free( &ctx );
 }
