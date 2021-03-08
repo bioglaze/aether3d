@@ -38,7 +38,7 @@ constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
-constexpr bool TestSSAO = false;
+constexpr bool TestSSAO = true;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 constexpr bool TestSponza = true;
 
@@ -1144,16 +1144,14 @@ int main()
 
                 blurShader.Begin();
 
-                ssaoTex.SetLayout( TextureLayout::General );
                 ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
 
-                // To repro SSAO D3D12 sync issue, Disable the following block:
-#if 1
                 blurShader.SetTexture2D( &ssaoBlurTex, 0 );
 #if RENDERER_D3D12
                 ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
                 blurShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
 #else
+                ssaoTex.SetLayout( TextureLayout::General );
                 blurShader.SetTexture2D( &ssaoTex, 14 );
 #endif
                 blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
@@ -1162,7 +1160,6 @@ int main()
 
                 ssaoTex.SetLayout( TextureLayout::ShaderRead );
                 ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
-#endif
             }
             composeShader.Begin();
 #if RENDERER_D3D12
