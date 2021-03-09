@@ -1172,6 +1172,7 @@ int main()
             composeShader.SetTexture2D( &ssaoTex, 2 );
             composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
             composeShader.End();
+            ssaoBlurTex.SetLayout( TextureLayout::UAVBarrier );
 #if !RENDERER_D3D12
             // If this is executed on D3D12, the debug layer doesn't complain, but Pix says the state doesn't match what's expected.
             ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
