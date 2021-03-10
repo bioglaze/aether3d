@@ -29,7 +29,7 @@ const int POINT_LIGHT_COUNT = (50 * 40 + 48);
 #define MULTISAMPLE_COUNT 1
 #define MAX_UI_VERTEX_MEMORY (512 * 1024)
 #define MAX_UI_ELEMENT_MEMORY (128 * 1024)
-const bool TestBloom = false;
+const bool TestBloom = true;
 const bool TestSSAO = false;
 
 // *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
@@ -142,7 +142,10 @@ int gTouchCount = 0;
 
     cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::DataType::Float16, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "cameraTex", MULTISAMPLE_COUNT > 1 );
     camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, ae3d::DataType::Float16, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "camera2dTex", false );
-
+    blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", ae3d::DataType::Float, nullptr );
+    blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", ae3d::DataType::Float, nullptr );
+    bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", ae3d::DataType::Float, nullptr );
+    
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjectionType( ae3d::CameraComponent::ProjectionType::Orthographic );
