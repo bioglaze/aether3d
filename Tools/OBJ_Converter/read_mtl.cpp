@@ -91,8 +91,8 @@ void ReadMtl( const std::string& path )
             stm >> materialName;
             std::cout << "material " << materialName << std::endl;
             std::cout << "shaders Standard Standard" << std::endl;
-            std::cout << "param_float roughness 0.2" << std::endl;
-            std::cout << "param_vec3 materialSpecular 0.2 0.2 0.2" << std::endl;
+            //std::cout << "param_float roughness 0.2" << std::endl;
+            //std::cout << "param_vec3 materialSpecular 0.2 0.2 0.2" << std::endl;
 
             ofs << "material " << materialName << std::endl;
             ofs << "shaders Standard Standard" << std::endl;

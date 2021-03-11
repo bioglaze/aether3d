@@ -422,7 +422,7 @@ void Mesh::OptimizeFaces()
                         bestScore = faceScore;
                         bestFace = fface;
 
-                        assert( bestScore <= maxValenceScore );
+                        //assert( bestScore <= maxValenceScore );
                         if (bestScore >= maxValenceScore)
                         {
                             break;
