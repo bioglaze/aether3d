@@ -14,6 +14,7 @@ namespace GfxDeviceGlobal
 {
     extern VkDevice device;
     extern Array< VkBuffer > pendingFreeVBs;
+    extern Array< VkDeviceMemory > pendingFreeMemory;
     extern VkCommandPool cmdPool;
     extern VkQueue graphicsQueue;
 }
@@ -150,8 +151,8 @@ void MarkForFreeing( VkBuffer vertexBuffer, VkDeviceMemory vertexMem, VkBuffer i
         }
     }
 
-    vkFreeMemory( GfxDeviceGlobal::device, vertexMem, nullptr );
-    vkFreeMemory( GfxDeviceGlobal::device, indexMem, nullptr );
+    GfxDeviceGlobal::pendingFreeMemory.Add( vertexMem );
+    GfxDeviceGlobal::pendingFreeMemory.Add( indexMem );
     GfxDeviceGlobal::pendingFreeVBs.Add( vertexBuffer );
     GfxDeviceGlobal::pendingFreeVBs.Add( indexBuffer );
 }

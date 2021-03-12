@@ -130,6 +130,7 @@ namespace GfxDeviceGlobal
     VkSampler boundSamplers[ 2 ];
     VkSampler linearRepeat;
     Array< VkBuffer > pendingFreeVBs;
+    Array< VkDeviceMemory > pendingFreeMemory;
     Array< Ubo > ubos;
     unsigned currentUbo = 0;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
@@ -1301,7 +1302,7 @@ namespace ae3d
 
     void CreateDescriptorPool()
     {
-        const int AE3D_DESCRIPTOR_SETS_COUNT = 1550;
+        const int AE3D_DESCRIPTOR_SETS_COUNT = 5550;
 
         const std::uint32_t typeCount = 15;
         const VkDescriptorPoolSize typeCounts[ typeCount ] =
@@ -2200,6 +2201,13 @@ void ae3d::GfxDevice::Present()
     }
 
     GfxDeviceGlobal::pendingFreeVBs.Allocate( 0 );
+
+    for (unsigned i = 0; i < GfxDeviceGlobal::pendingFreeMemory.count; ++i)
+    {
+        vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::pendingFreeMemory[ i ], nullptr );
+    }
+    
+    GfxDeviceGlobal::pendingFreeMemory.Allocate( 0 );
     Statistics::EndPresentTimeProfiling();
 }
 
