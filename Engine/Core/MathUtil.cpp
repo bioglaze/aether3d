@@ -63,7 +63,7 @@ namespace MathUtil
 
     float Lerp( float start, float end, float amount )
     {
-        return start + (end - start) * amount;
+        return (1.0f - amount) * start + amount * end;
     }
 
     float Random( float aMin, float aMax )
