@@ -177,7 +177,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         static const unsigned VERTEX_BUFFER_BIND_ID = 0;
 
-        VkPipelineVertexInputStateCreateInfo* GetInputState() { return &inputStateCreateInfo; }
+        VkPipelineVertexInputStateCreateInfo* GetInputState() { CreateInputState( bindingDescriptions.stride ); return &inputStateCreateInfo; }
         VkBuffer* GetVertexBuffer() { return &vertexBuffer; }
         VkBuffer* GetIndexBuffer() { return &indexBuffer; }
 
