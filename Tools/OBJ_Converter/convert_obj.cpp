@@ -33,23 +33,30 @@ void ConvertIndices()
     for (std::size_t f = 0; f < gMeshes.back().face.size(); ++f)
     {
         auto& face = gMeshes.back().face[ f ];
+
+        if (vertGlobalLocal[ face.vInd[ 0 ] ] > 65535 ||
+            vertGlobalLocal[ face.vInd[ 1 ] ] > 65535 ||
+            vertGlobalLocal[ face.vInd[ 2 ] ] > 65535)
+        {
+            std::cerr << "More than 65535 vertices in a mesh, overflow!" << std::endl;
+        }
         
-        face.vInd[ 0 ] = (unsigned short)vertGlobalLocal[ face.vInd[ 0 ] ];
-        face.vInd[ 1 ] = (unsigned short)vertGlobalLocal[ face.vInd[ 1 ] ];
-        face.vInd[ 2 ] = (unsigned short)vertGlobalLocal[ face.vInd[ 2 ] ];
+        face.vInd[ 0 ] = vertGlobalLocal[ face.vInd[ 0 ] ];
+        face.vInd[ 1 ] = vertGlobalLocal[ face.vInd[ 1 ] ];
+        face.vInd[ 2 ] = vertGlobalLocal[ face.vInd[ 2 ] ];
         
         if (hasVNormals)
         {
-            face.vnInd[ 0 ] = (unsigned short)normGlobalLocal[ face.vnInd[ 0 ] ];
-            face.vnInd[ 1 ] = (unsigned short)normGlobalLocal[ face.vnInd[ 1 ] ];
-            face.vnInd[ 2 ] = (unsigned short)normGlobalLocal[ face.vnInd[ 2 ] ];
+            face.vnInd[ 0 ] = normGlobalLocal[ face.vnInd[ 0 ] ];
+            face.vnInd[ 1 ] = normGlobalLocal[ face.vnInd[ 1 ] ];
+            face.vnInd[ 2 ] = normGlobalLocal[ face.vnInd[ 2 ] ];
         }
         
         if (hasTextureCoords)
         {
-            face.uvInd[ 0 ] = (unsigned short)tcoordGlobalLocal[ face.uvInd[ 0 ] ];
-            face.uvInd[ 1 ] = (unsigned short)tcoordGlobalLocal[ face.uvInd[ 1 ] ];
-            face.uvInd[ 2 ] = (unsigned short)tcoordGlobalLocal[ face.uvInd[ 2 ] ];
+            face.uvInd[ 0 ] = tcoordGlobalLocal[ face.uvInd[ 0 ] ];
+            face.uvInd[ 1 ] = tcoordGlobalLocal[ face.uvInd[ 1 ] ];
+            face.uvInd[ 2 ] = tcoordGlobalLocal[ face.uvInd[ 2 ] ];
         }
     }
 }
@@ -201,7 +208,8 @@ void LoadObj( const std::string& path )
                 gMeshes.back().vertex.push_back( vertex[va-1] );
                 vertGlobalLocal[ va - 1 ] = (int)gMeshes.back().vertex.size() - 1;
             }
-            face.vInd[0] = static_cast< unsigned short >( va - 1 );
+            
+            face.vInd[ 0 ] = va - 1;
             // Reads '/' if any.
             stm >> slash;
 
@@ -211,7 +219,7 @@ void LoadObj( const std::string& path )
                 stm.unget();
 
                 stm >> vb;
-                face.vInd[1] = static_cast< unsigned short >( vb - 1 );
+                face.vInd[1] = vb - 1;
 
                 // Didn't find the index in index conversion map, so add it.
                 if (vertGlobalLocal.find(vb-1) == vertGlobalLocal.end())
@@ -221,15 +229,15 @@ void LoadObj( const std::string& path )
                 }
                 
                 stm >> vc;
-                face.vInd[2] = static_cast< unsigned short >( vc - 1 );
+                face.vInd[ 2 ] = vc - 1;
 
-                if (vertGlobalLocal.find(vc-1) == vertGlobalLocal.end())
+                if (vertGlobalLocal.find( vc - 1) == vertGlobalLocal.end())
                 {
                     gMeshes.back().vertex.push_back( vertex[vc-1] );
                     vertGlobalLocal[ vc - 1 ] = (int)gMeshes.back().vertex.size() - 1;
                 }
  
-                gMeshes.back().face.push_back(face);
+                gMeshes.back().face.push_back( face );
                 continue;
             }
             
@@ -252,7 +260,7 @@ void LoadObj( const std::string& path )
                     tcoordGlobalLocal[ ta - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                 }
                 
-                face.uvInd[0] = static_cast< unsigned short >( ta - 1 );
+                face.uvInd[ 0 ] = ta - 1;
             }
             else
             {
@@ -282,7 +290,7 @@ void LoadObj( const std::string& path )
                         normGlobalLocal[ na - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                     }
                     
-                    face.vnInd[0] = static_cast< unsigned short >( na - 1 );
+                    face.vnInd[ 0 ] = na - 1;
                 }
                 else
                 {
@@ -303,7 +311,7 @@ void LoadObj( const std::string& path )
                 vertGlobalLocal[ vb - 1 ] = (int)gMeshes.back().vertex.size() - 1;
             }
 
-            face.vInd[1] = static_cast< unsigned short >( vb - 1 );
+            face.vInd[ 1 ] = vb - 1;
 
             // Texture coordinate index of this vertex.
             if (hasTextureCoords)
@@ -323,7 +331,7 @@ void LoadObj( const std::string& path )
                     tcoordGlobalLocal[ tb - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                 }
 
-                face.uvInd[1] = static_cast< unsigned short >( tb - 1 );
+                face.uvInd[ 1 ] = tb - 1;
             }
             // Eats '/' if face has normals but not texture coords.
             if (!hasTextureCoords && hasVNormals)
@@ -348,7 +356,7 @@ void LoadObj( const std::string& path )
                     normGlobalLocal[ nb - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                 }
 
-                face.vnInd[1] = static_cast< unsigned short >( nb - 1 );
+                face.vnInd[ 1 ] = nb - 1;
             }
 
             // Reads the third vertex.
@@ -365,7 +373,7 @@ void LoadObj( const std::string& path )
                 vertGlobalLocal[ vc - 1 ] = (int)gMeshes.back().vertex.size() - 1;
             }
 
-            face.vInd[2] = static_cast< unsigned short >( vc - 1 );
+            face.vInd[ 2 ] = vc - 1;
             
             // Texture coordinate index of this vertex.
             if (hasTextureCoords)
@@ -385,7 +393,7 @@ void LoadObj( const std::string& path )
                     tcoordGlobalLocal[ tc - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                 }
 
-                face.uvInd[2] = static_cast< unsigned short >( tc - 1 );
+                face.uvInd[ 2 ] = tc - 1;
             }
             // Eats '/' if face has normals but not texture coords.
             if (!hasTextureCoords && hasVNormals)
@@ -410,9 +418,9 @@ void LoadObj( const std::string& path )
                     normGlobalLocal[ nc - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                 }
 
-                face.vnInd[2] = static_cast< unsigned short >( nc - 1 );
+                face.vnInd[ 2 ] = nc - 1;
             }
-            gMeshes.back().face.push_back(face);
+            gMeshes.back().face.push_back( face );
 
             // Reads the fourth vertex, if it exists.
             stm >> vd;
@@ -431,7 +439,7 @@ void LoadObj( const std::string& path )
                     vertGlobalLocal[ vd - 1 ] = (int)gMeshes.back().vertex.size() - 1;
                 }
                 Face face2;
-                face2.vInd[1] = static_cast< unsigned short >( vd - 1 );
+                face2.vInd[ 1 ] = vd - 1;
 
                 face2.vInd[0] = face.vInd[2];
                 face2.uvInd[0] = face.uvInd[2];
@@ -459,8 +467,7 @@ void LoadObj( const std::string& path )
                         tcoordGlobalLocal[ td - 1 ] = (int)gMeshes.back().tcoord.size() - 1;
                     }
 
-                    face2.uvInd[1] = static_cast< unsigned short >( td - 1 );
-
+                    face2.uvInd[ 1 ] = td - 1;
                 }
                 // Eats '/' if the mesh has normals but not texture coords.
                 if (!hasTextureCoords && hasVNormals)
@@ -485,7 +492,7 @@ void LoadObj( const std::string& path )
                         normGlobalLocal[ nd - 1 ] = (int)gMeshes.back().vnormal.size() - 1;
                     }
 
-                    face2.vnInd[1] = static_cast< unsigned short >( nd - 1 );
+                    face2.vnInd[ 1 ] = nd - 1;
                 }
                 gMeshes.back().face.push_back( face2 );
             }

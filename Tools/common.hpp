@@ -57,11 +57,11 @@ struct Face
         tInd[ 0 ] = tInd[ 1 ] = tInd[ 2 ] = 0;
     }
 
-    unsigned short vInd[ 3 ];
-    unsigned short uvInd[ 3 ];
-    unsigned short vnInd[ 3 ];
-    unsigned short colInd[ 3 ];
-    unsigned short tInd[ 3 ];
+    unsigned int vInd[ 3 ];
+    unsigned int uvInd[ 3 ];
+    unsigned int vnInd[ 3 ];
+    unsigned int colInd[ 3 ];
+    unsigned int tInd[ 3 ];
 };
 
 // Defines a face used in a vertex array.
@@ -836,7 +836,7 @@ void Mesh::Interleave()
             }
             
             interleavedVertices.push_back( newVertex );
-
+            
             newFace.a = (unsigned short)(interleavedVertices.size() - 1);
         }
 
