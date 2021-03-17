@@ -92,7 +92,8 @@ struct SceneView
     Texture2D blurTex2;
     Texture2D noiseTex;
     Matrix44 lineProjection;
-    int lineHandle = 0;
+    int gridLineHandle = 0;
+    int lightLineHandle = 0;
     int selectedGOIndex = 0;
     Material highlightMaterial;
     RenderTexture cameraTarget;
@@ -380,6 +381,51 @@ void GetColliders( GameObject& camera, CollisionFilter filter, int screenX, int 
     //std::sort( std::begin( outColliders ), std::end( outColliders ), sortFunction );
 }
 
+static int CreateConeLines()
+{
+    std::vector< ae3d::Vec3 > lines;
+
+    const int angleStep = 10;
+
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = cosf( angleDeg * 3.14159f / 180.0f );
+        const float y = sinf( angleDeg * 3.14159f / 180.0f );
+
+        const float x2 = cosf( (angleDeg + angleStep) * 3.14159f / 180.0f );
+        const float y2 = sinf( (angleDeg + angleStep) * 3.14159f / 180.0f );
+
+        lines.push_back( ae3d::Vec3( x, y, 0 ) );
+        lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
+    }
+
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = cosf( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = sinf( angleDeg * 3.14159f / 180.0f ) * 2;
+
+        const float x2 = cosf( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+        const float y2 = sinf( (angleDeg + angleStep) * 3.14159f / 180.0f ) * 2;
+
+        lines.push_back( ae3d::Vec3( x, y, 1 ) );
+        lines.push_back( ae3d::Vec3( x2, y2, 1 ) );
+    }
+
+    for (int angleDeg = 0; angleDeg < 360; angleDeg += angleStep)
+    {
+        const float x = cosf( angleDeg * 3.14159f / 180.0f ) * 2;
+        const float y = sinf( angleDeg * 3.14159f / 180.0f ) * 2;
+
+        const float x2 = cosf( (angleDeg) * 3.14159f / 180.0f );
+        const float y2 = sinf( (angleDeg) * 3.14159f / 180.0f );
+
+        lines.push_back( ae3d::Vec3( x, y, 1 ) );
+        lines.push_back( ae3d::Vec3( x2, y2, 0 ) );
+    }
+
+    return ae3d::System::CreateLineBuffer( lines.data(), (int)lines.size(), ae3d::Vec3( 1, 1, 1 ) );
+}
+
 void svInit( SceneView** sv, int width, int height )
 {
     *sv = new SceneView();
@@ -481,9 +527,10 @@ void svInit( SceneView** sv, int width, int height )
         lines[ i * 2 + 1 ] = Vec3( -24 + 24 - 10, 0, (float)i - 55 + 24 );
     }
 
-    (*sv)->lineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
-
-    (*sv)->camera.GetComponent< LineRendererComponent >()->SetLineHandle( (*sv)->lineHandle );
+    (*sv)->gridLineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
+    (*sv)->lightLineHandle = CreateConeLines();
+    
+    (*sv)->camera.GetComponent< LineRendererComponent >()->SetLineHandle( (*sv)->gridLineHandle );
 }
 
 ae3d::Material* svGetMaterial( SceneView* sceneView )
@@ -1067,5 +1114,17 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
                                 screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, opacity ), ae3d::System::BlendMode::Off );
         }
+    }
+
+
+    ae3d::SpotLightComponent* spotLight = sv->gameObjects[ sv->selectedGOIndex ]->GetComponent<SpotLightComponent>();
+    ae3d::DirectionalLightComponent* dirLight = sv->gameObjects[ sv->selectedGOIndex ]->GetComponent<DirectionalLightComponent>();
+
+    if (sv->selectedGOIndex != 0 && (spotLight || dirLight) )
+    {
+        ae3d::TransformComponent* transform = sv->gameObjects[ sv->selectedGOIndex ]->GetComponent<TransformComponent>();
+        ae3d::Matrix44 viewMat = camera->GetView();
+        ae3d::Matrix44::Multiply( transform->GetLocalMatrix(), viewMat, viewMat );
+        ae3d::System::DrawLines( sv->lightLineHandle, viewMat, camera->GetProjection(), screenWidth, screenHeight );
     }
 }
