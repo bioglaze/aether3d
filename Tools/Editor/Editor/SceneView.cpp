@@ -1123,8 +1123,13 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
     if (sv->selectedGOIndex != 0 && (spotLight || dirLight) )
     {
         ae3d::TransformComponent* transform = sv->gameObjects[ sv->selectedGOIndex ]->GetComponent<TransformComponent>();
+        const float oldScale = transform->GetLocalScale();
+        transform->SetLocalScale( 1 );
+        transform->UpdateLocalAndGlobalMatrix();
         ae3d::Matrix44 viewMat = camera->GetView();
         ae3d::Matrix44::Multiply( transform->GetLocalMatrix(), viewMat, viewMat );
         ae3d::System::DrawLines( sv->lightLineHandle, viewMat, camera->GetProjection(), screenWidth, screenHeight );
+        transform->SetLocalScale( oldScale );
+        transform->UpdateLocalAndGlobalMatrix();
     }
 }
