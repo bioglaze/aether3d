@@ -75,6 +75,7 @@ struct SceneView
     GameObject camera;
     Scene scene;
     Shader unlitShader;
+    Shader standardShader;
     ComputeShader blurShader;
     ComputeShader downsampleAndThresholdShader;
     ComputeShader ssaoShader;
@@ -473,6 +474,10 @@ void svInit( SceneView** sv, int width, int height )
                       FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
                       FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
 
+    (*sv)->standardShader.Load( "standard_vertex", "standard_fragment",
+                      FileSystem::FileContents( "shaders/Standard_vert.obj" ), FileSystem::FileContents( "shaders/Standard_frag.obj" ),
+                      FileSystem::FileContents( "shaders/Standard_vert.spv" ), FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
+
     (*sv)->blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
     (*sv)->downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
     (*sv)->ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
@@ -492,7 +497,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->goTex.Load( FileSystem::FileContents( "textures/gameobject.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->audioTex.Load( FileSystem::FileContents( "textures/audio_source.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
-    (*sv)->material.SetShader( &(*sv)->unlitShader );
+    (*sv)->material.SetShader( &(*sv)->standardShader );
     (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
     (*sv)->material.SetBackFaceCulling( true );
 
