@@ -40,7 +40,7 @@ int main()
     camera.AddComponent<TransformComponent>();
 
     Texture2D spriteTex;
-    spriteTex.Load( FileSystem::FileContents("glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+    spriteTex.Load( FileSystem::FileContents("textures/glider.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
 
     // This texture has 7 mipmaps.
     Texture2D bc1Tex;
@@ -57,7 +57,7 @@ int main()
     Texture2D notLoadedTex;
 
     Texture2D spriteTexFromAtlas;
-    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "marble", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::Linear, Anisotropy::k1 );
+    spriteTexFromAtlas.LoadFromAtlas( FileSystem::FileContents( "textures/atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "marble", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::Linear, Anisotropy::k1 );
 
     GameObject spriteContainer;
     spriteContainer.AddComponent<SpriteRendererComponent>();
@@ -83,14 +83,14 @@ int main()
     audioContainer.GetComponent<AudioSourceComponent>()->Play();
     
     Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents("font.png"), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
+    fontTex.Load( FileSystem::FileContents( "textures/font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
 
     Font font;
-    font.LoadBMFont( &fontTex, FileSystem::FileContents("font_txt.fnt"));
+    font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ));
 
     Texture2D fontTexSDF;
-    //fontTexSDF.Load( FileSystem::FileContents( "font_sdf.tga" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
-    fontTexSDF.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
+    //fontTexSDF.Load( FileSystem::FileContents( "textures/font_sdf.tga" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, 1 );
+    fontTexSDF.Load( FileSystem::FileContents( "textures/font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::Linear, Anisotropy::k1 );
 
     Font sdfFont;
     sdfFont.LoadBMFont( &fontTexSDF, FileSystem::FileContents( "font_txt.fnt" ) );

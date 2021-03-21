@@ -491,7 +491,7 @@ void svInit( SceneView** sv, int width, int height )
 
     // Test content
     
-    (*sv)->gliderTex.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->gliderTex.Load( FileSystem::FileContents( "textures/glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->cameraTex.Load( FileSystem::FileContents( "textures/camera.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->lightTex.Load( FileSystem::FileContents( "textures/light.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->goTex.Load( FileSystem::FileContents( "textures/gameobject.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );

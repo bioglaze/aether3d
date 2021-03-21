@@ -236,10 +236,10 @@ int main()
     camera2d.SetName( "camera2d" );
     
     Texture2D fontTex;
-    fontTex.Load( FileSystem::FileContents( "font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+    fontTex.Load( FileSystem::FileContents( "textures/font.png" ), TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D whiteTex;
-    whiteTex.Load( FileSystem::FileContents( "default_white.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    whiteTex.Load( FileSystem::FileContents( "textures/default_white.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );

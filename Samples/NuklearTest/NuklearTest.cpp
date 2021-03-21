@@ -127,7 +127,7 @@ int main()
     scene.Add( &camera );
 
     Texture2D gliderTexture;
-    gliderTexture.Load( FileSystem::FileContents( "glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
+    gliderTexture.Load( FileSystem::FileContents( "textures/glider.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
 
     bool quit = false;
 
