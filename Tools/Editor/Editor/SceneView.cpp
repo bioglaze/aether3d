@@ -580,12 +580,36 @@ void svDuplicateGameObject( SceneView* sv )
         sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( "GameObject" );
         sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< TransformComponent >();
         sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition() );
+        sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< TransformComponent >()->SetLocalRotation( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalRotation() );
+        sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< TransformComponent >()->SetLocalScale( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalScale() );
 
         if (sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >())
         {
             sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< MeshRendererComponent >();
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMesh() );
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMaterial( 0 ), 0 );
+        }
+
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< DirectionalLightComponent >())
+        {
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< DirectionalLightComponent >();
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< DirectionalLightComponent >()->SetColor( sv->selectedGameObjects[ 0 ]->GetComponent< DirectionalLightComponent >()->GetColor() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< DirectionalLightComponent >()->SetCastShadow( sv->selectedGameObjects[ 0 ]->GetComponent< DirectionalLightComponent >()->CastsShadow(), 2048 );
+        }
+
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >())
+        {
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< SpotLightComponent >();
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< SpotLightComponent >()->SetColor( sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >()->GetColor() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< SpotLightComponent >()->SetCastShadow( sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >()->CastsShadow(), 2048 );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< SpotLightComponent >()->SetConeAngle( sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >()->GetConeAngle() );
+        }
+
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >())
+        {
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< PointLightComponent >();
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetColor( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->GetColor() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetCastShadow( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->CastsShadow(), 2048 );
         }
 
         sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
@@ -1125,7 +1149,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
     ae3d::SpotLightComponent* spotLight = sv->gameObjects[ sv->selectedGOIndex ]->GetComponent<SpotLightComponent>();
     ae3d::DirectionalLightComponent* dirLight = sv->gameObjects[ sv->selectedGOIndex ]->GetComponent<DirectionalLightComponent>();
 
-    if (sv->selectedGOIndex != 0 && (spotLight || dirLight) )
+    if (sv->selectedGameObjects.count > 0 && (spotLight || dirLight) )
     {
         ae3d::TransformComponent* transform = sv->gameObjects[ sv->selectedGOIndex ]->GetComponent<TransformComponent>();
         const float oldScale = transform->GetLocalScale();
