@@ -26,7 +26,6 @@
 		ABAA98B820963B4C00DC1F42 /* UnlitSkin.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98AE20963B4C00DC1F42 /* UnlitSkin.metal */; };
 		ABAA98B920963B4C00DC1F42 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABAA98AF20963B4C00DC1F42 /* DepthNormals.metal */; };
 		ABB3603D208C4F05007133FD /* SceneView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABB3603C208C4F05007133FD /* SceneView.cpp */; };
-		ABB36041208C4F83007133FD /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABB3603F208C4F83007133FD /* glider.png */; };
 		ABB36043208C5244007133FD /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB36042208C5244007133FD /* Metal.framework */; };
 		ABB36045208C529B007133FD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABB36044208C529B007133FD /* AppKit.framework */; };
 		ABBDD28920B7296B00AA93C7 /* Inspector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABBDD28820B7296B00AA93C7 /* Inspector.cpp */; };
@@ -64,7 +63,6 @@
 		ABAA98AF20963B4C00DC1F42 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
 		ABB3603B208C4F05007133FD /* SceneView.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SceneView.hpp; sourceTree = SOURCE_ROOT; };
 		ABB3603C208C4F05007133FD /* SceneView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneView.cpp; sourceTree = SOURCE_ROOT; };
-		ABB3603F208C4F83007133FD /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		ABB36042208C5244007133FD /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		ABB36044208C529B007133FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		ABBDD28720B7296B00AA93C7 /* Inspector.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Inspector.hpp; sourceTree = SOURCE_ROOT; };
@@ -146,7 +144,6 @@
 				AB5A0F4A25780A660001B8DC /* textures */,
 				AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */,
 				ABAA98A320963B1300DC1F42 /* textured_cube.ae3d */,
-				ABB3603F208C4F83007133FD /* glider.png */,
 				AB010CD4206F70B40014ED08 /* AppDelegate.h */,
 				AB010CD5206F70B40014ED08 /* AppDelegate.m */,
 				AB010CDA206F70B40014ED08 /* GameViewController.h */,
@@ -291,7 +288,6 @@
 			files = (
 				AB5A0F4B25780A660001B8DC /* textures in Resources */,
 				ABAA98A420963B1300DC1F42 /* textured_cube.ae3d in Resources */,
-				ABB36041208C4F83007133FD /* glider.png in Resources */,
 				AB010CE1206F70B40014ED08 /* Assets.xcassets in Resources */,
 				AB0B89BF20CD936400FF33FA /* cursor_translate.ae3d in Resources */,
 				AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */,

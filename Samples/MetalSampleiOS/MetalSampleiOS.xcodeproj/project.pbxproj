@@ -33,8 +33,6 @@
 		ABD3AB2D1C29D79F00E78933 /* SpriteShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB281C29D79F00E78933 /* SpriteShader.metal */; };
 		ABD3AB2E1C29D79F00E78933 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABD3AB291C29D79F00E78933 /* Unlit.metal */; };
 		ABD3AB331C29D7F700E78933 /* font_txt.fnt in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB2F1C29D7F700E78933 /* font_txt.fnt */; };
-		ABD3AB341C29D7F700E78933 /* font.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB301C29D7F700E78933 /* font.png */; };
-		ABD3AB351C29D7F700E78933 /* glider.png in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB311C29D7F700E78933 /* glider.png */; };
 		ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */; };
 		ABFE40681D8D1DE000195AD2 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFE40671D8D1DE000195AD2 /* LightCuller.metal */; };
 /* End PBXBuildFile section */
@@ -96,8 +94,6 @@
 		ABD3AB281C29D79F00E78933 /* SpriteShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SpriteShader.metal; path = ../../../Engine/Assets/SpriteShader.metal; sourceTree = "<group>"; };
 		ABD3AB291C29D79F00E78933 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
 		ABD3AB2F1C29D7F700E78933 /* font_txt.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = font_txt.fnt; path = ../../../../aether3d_build/Samples/font_txt.fnt; sourceTree = "<group>"; };
-		ABD3AB301C29D7F700E78933 /* font.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font.png; path = ../../../../aether3d_build/Samples/font.png; sourceTree = "<group>"; };
-		ABD3AB311C29D7F700E78933 /* glider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = glider.png; path = ../../../../aether3d_build/Samples/glider.png; sourceTree = "<group>"; };
 		ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube.ae3d; path = ../../../../aether3d_build/Samples/textured_cube.ae3d; sourceTree = "<group>"; };
 		ABFE40671D8D1DE000195AD2 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 /* End PBXFileReference section */
@@ -167,8 +163,6 @@
 				AB6DECD41EC82B350019358C /* new_sponza.ae3d */,
 				AB6DECD51EC82B350019358C /* sponza.scene */,
 				ABD3AB2F1C29D7F700E78933 /* font_txt.fnt */,
-				ABD3AB301C29D7F700E78933 /* font.png */,
-				ABD3AB311C29D7F700E78933 /* glider.png */,
 				ABD3AB321C29D7F700E78933 /* textured_cube.ae3d */,
 				ABA29F441C19E1F90098E21D /* main.m */,
 			);
@@ -297,11 +291,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABD3AB331C29D7F700E78933 /* font_txt.fnt in Resources */,
-				ABD3AB341C29D7F700E78933 /* font.png in Resources */,
 				ABA29F561C19E1F90098E21D /* LaunchScreen.storyboard in Resources */,
 				ABA29F531C19E1F90098E21D /* Assets.xcassets in Resources */,
 				AB6DECD61EC82B350019358C /* textures in Resources */,
-				ABD3AB351C29D7F700E78933 /* glider.png in Resources */,
 				ABD3AB361C29D7F700E78933 /* textured_cube.ae3d in Resources */,
 				AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */,
 				ABA29F511C19E1F90098E21D /* Main.storyboard in Resources */,
@@ -427,7 +419,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				MTL_FAST_MATH = NO;
 				MTL_OPTIMIZATION_LEVEL = 0;
@@ -479,7 +471,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				MTL_FAST_MATH = NO;
 				MTL_OPTIMIZATION_LEVEL = 0;
@@ -499,7 +491,7 @@
 					RENDERER_METAL,
 				);
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;
@@ -515,7 +507,7 @@
 				FRAMEWORK_SEARCH_PATHS = /Users/glaze/Desktop;
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				INFOPLIST_FILE = MetalSampleiOS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;

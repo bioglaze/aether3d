@@ -75,6 +75,7 @@
 		AB6E134B1C11D8BC0020A929 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E13491C11D8BC0020A929 /* stb_image.c */; };
 		AB6E134C1C11D8BD0020A929 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */; };
 		AB6E134E1C11D93E0020A929 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6E134D1C11D93E0020A929 /* Metal.framework */; };
+		AB727C1A25F34A0200D7A2DA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB727C1925F34A0200D7A2DA /* AudioToolbox.framework */; };
 		AB7C8AC01D74C8CB0066EC28 /* DDSLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB7C8ABE1D74C8CB0066EC28 /* DDSLoader.cpp */; };
 		AB7C8AC11D74C8CB0066EC28 /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB7C8ABF1D74C8CB0066EC28 /* DDSLoader.hpp */; };
 		AB8E83F71CEBAE7600A8E9E8 /* PointLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */; };
@@ -158,6 +159,7 @@
 		AB6E13491C11D8BC0020A929 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_image.c; path = ../ThirdParty/stb_image.c; sourceTree = "<group>"; };
 		AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stb_vorbis.c; path = ../ThirdParty/stb_vorbis.c; sourceTree = "<group>"; };
 		AB6E134D1C11D93E0020A929 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		AB727C1925F34A0200D7A2DA /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		AB7C8ABE1D74C8CB0066EC28 /* DDSLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DDSLoader.cpp; path = ../Video/DDSLoader.cpp; sourceTree = "<group>"; };
 		AB7C8ABF1D74C8CB0066EC28 /* DDSLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DDSLoader.hpp; path = ../Video/DDSLoader.hpp; sourceTree = "<group>"; };
 		AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PointLightComponent.hpp; path = ../Include/PointLightComponent.hpp; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB727C1A25F34A0200D7A2DA /* AudioToolbox.framework in Frameworks */,
 				AB6E134E1C11D93E0020A929 /* Metal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -194,6 +197,7 @@
 				AB6E12D91C11D7A50020A929 /* Core */,
 				AB6E12C61C11D7890020A929 /* Components */,
 				AB6E12BB1C11D7450020A929 /* Products */,
+				AB727C1825F34A0200D7A2DA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -317,6 +321,14 @@
 				AB6E134A1C11D8BC0020A929 /* stb_vorbis.c */,
 			);
 			name = ThirdParty;
+			sourceTree = "<group>";
+		};
+		AB727C1825F34A0200D7A2DA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AB727C1925F34A0200D7A2DA /* AudioToolbox.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

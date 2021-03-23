@@ -172,13 +172,13 @@ int gTouchCount = 0;
     camera3d.GetComponent< ae3d::TransformComponent >()->LookAt( { 3, -5, -85 }, { 120, -5, -85 }, { 0, 1, 0 } );
     scene.Add( &camera3d );
     
-    fontTex.Load( ae3d::FileSystem::FileContents( "font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
-    gliderTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
+    fontTex.Load( ae3d::FileSystem::FileContents( "textures/font.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
+    gliderTex.Load( ae3d::FileSystem::FileContents( "textures/glider.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
     //astcTex.Load( ae3d::FileSystem::FileContents( "granite.astc" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Nearest, ae3d::Mipmaps::None, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
 
-    skyTex.Load( ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
-                ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
-                ae3d::FileSystem::FileContents( "glider.png" ), ae3d::FileSystem::FileContents( "glider.png" ),
+    skyTex.Load( ae3d::FileSystem::FileContents( "textures/glider.png" ), ae3d::FileSystem::FileContents( "textures/glider.png" ),
+                ae3d::FileSystem::FileContents( "textures/glider.png" ), ae3d::FileSystem::FileContents( "textures/glider.png" ),
+                ae3d::FileSystem::FileContents( "textures/glider.png" ), ae3d::FileSystem::FileContents( "textures/glider.png" ),
                 ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB );
 
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "font_txt.fnt" ) );
