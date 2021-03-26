@@ -906,8 +906,12 @@ using namespace ae3d;
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         scene.Render();
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        
+        if (!TestSSAO && !TestBloom)
+        {
+            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        }
         
         if (TestSSAO)
         {
@@ -933,6 +937,7 @@ using namespace ae3d;
             composeShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "Compose" );
 
             System::Draw( &ssaoBlurTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
 
         if (TestBloom)
