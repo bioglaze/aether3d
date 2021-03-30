@@ -1636,6 +1636,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             currentMaterialName = materialName;
             
             outMaterials[ materialName ] = new Material();
+            outMaterials[ materialName ]->SetTexture( Texture2D::GetDefaultTexture(), 0 );
+            outMaterials[ materialName ]->SetTexture( Texture2D::GetDefaultTexture(), 1 ); // This should really be a normal map.
         }
         else if (token == "mesh_material")
         {
