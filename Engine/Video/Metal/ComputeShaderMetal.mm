@@ -128,7 +128,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
         }
         else
         {
-            [commandEncoder setTexture:(textures[ i ] ? textures[ i ]->GetMetalTexture() : nullptr) atIndex:i];
+            [commandEncoder setTexture:(textures[ i ] ? textures[ i ]->GetMetalTexture() : Texture2D::GetDefaultTexture()->GetMetalTexture() ) atIndex:i];
         }
     }
 
