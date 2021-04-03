@@ -34,8 +34,8 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-const bool TestForwardPlus = false;
-const bool TestBloom = false;
+const bool TestForwardPlus = true;
+const bool TestBloom = true;
 const bool TestSSAO = false;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
@@ -231,7 +231,6 @@ using namespace ae3d;
     GameObject cameraCubeRT;
     GameObject animatedGo;
     GameObject wireframeGo;
-    GameObject pbrCube;
     GameObject audioGo;
     GameObject audioContainer;
     AudioClip audioClip;
@@ -251,7 +250,6 @@ using namespace ae3d;
     Material rtCubeMaterial;
     Material transMaterial;
     Material standardMaterial;
-    Material pbrMaterial;
 
     Shader shader;
     Shader skinShader;
@@ -275,9 +273,6 @@ using namespace ae3d;
     Texture2D bc3Tex;
     Texture2D bc4Tex;
     Texture2D bc5Tex;
-    Texture2D pbrDiffuseTex;
-    Texture2D pbrNormalTex;
-    Texture2D pbrRoughnessTex;
     Texture2D playerTex;
     Texture2D noiseTex;
     Texture2D ssaoTex;
@@ -337,7 +332,7 @@ using namespace ae3d;
     ae3d::System::LoadBuiltinAssets();
     ae3d::System::InitAudio();
 
-    audioClip.Load( FileSystem::FileContents( "explosion.wav" ) );
+    audioClip.Load( FileSystem::FileContents( "sine340.wav" ) );
     //audioClip.Load( FileSystem::FileContents( "example.ogg" ) );
 
     audioContainer.AddComponent<AudioSourceComponent>();
@@ -449,10 +444,6 @@ using namespace ae3d;
                 TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );*/
     scene.SetSkybox( &skyTex );
 
-    pbrDiffuseTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
-    pbrNormalTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
-    pbrRoughnessTex.Load( ae3d::FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::Linear, ae3d::Anisotropy::k1 );
-
     font.LoadBMFont( &fontTex, ae3d::FileSystem::FileContents( "font_txt.fnt" ) );
     fontSDF.LoadBMFont( &fontTexSDF, ae3d::FileSystem::FileContents( "font_txt.fnt" ) );
     atlasTex.LoadFromAtlas( FileSystem::FileContents( "textures/atlas_cegui.png" ), FileSystem::FileContents( "atlas_cegui.xml" ), "granite", TextureWrap::Repeat, TextureFilter::Nearest, ColorSpace::Linear, Anisotropy::k1 );
@@ -533,7 +524,7 @@ using namespace ae3d;
 
     standardMaterial.SetShader( &standardShader );
     standardMaterial.SetTexture( &gliderTex, 0 );
-    standardMaterial.SetTexture( &pbrNormalTex, 1 );
+    standardMaterial.SetTexture( &gliderTex, 1 ); // This should be a normal map.
 
     skyboxShader.Load( "skybox_vertex", "skybox_fragment",
                         ae3d::FileSystem::FileContents(""), ae3d::FileSystem::FileContents( "" ),
@@ -546,25 +537,6 @@ using namespace ae3d;
     rotatingCube.AddComponent<ae3d::TransformComponent>();
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -8 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
-
-    pbrMaterial.SetShader( &standardShader );
-    pbrMaterial.SetTexture( &pbrNormalTex, 1 );
-    pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
-    if (TestRenderTextureCube)
-    {
-        pbrMaterial.SetRenderTexture( &cubeRT, 4 );
-    }
-    else
-    {
-        pbrMaterial.SetTexture( &skyTex );
-    }
-
-    pbrCube.AddComponent<ae3d::MeshRendererComponent>();
-    pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
-    pbrCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &pbrMaterial, 0 );
-    pbrCube.AddComponent<ae3d::TransformComponent>();
-    pbrCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( { -10, 0, -85 } );
-    pbrCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 2 );
 
     wireframeGo.AddComponent<ae3d::MeshRendererComponent>();
     wireframeGo.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
@@ -725,10 +697,6 @@ using namespace ae3d;
 
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
 
-    if (TestForwardPlus)
-    {
-        scene.Add( &pbrCube );
-    }
     //scene.Add( &cubePTN2 );
     //scene.Add( &cubePTN );
     //scene.Add( &rtCube );
