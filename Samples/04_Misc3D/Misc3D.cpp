@@ -220,17 +220,11 @@ int main()
     Texture2D whiteTex;
     whiteTex.Load( FileSystem::FileContents( "textures/default_white.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
-    Texture2D pbrDiffuseTex;
-    Texture2D pbrNormalTex;
-    Texture2D pbrRoughnessTex;
     Texture2D pbrNormalTex2;
     Texture2D pbrSpecularTex;
 
     if (TestSponza)
     {
-        pbrDiffuseTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_d.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
-        pbrNormalTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_n.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
-        pbrRoughnessTex.Load( FileSystem::FileContents( "textures/pbr_metal_texture/metal_plate_rough.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
         pbrNormalTex2.Load( FileSystem::FileContents( "textures/grass_n_bc5.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
         pbrSpecularTex.Load( FileSystem::FileContents( "textures/spnza_bricks_a_spec_bc4.dds" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
     }
@@ -477,9 +471,9 @@ int main()
         {
             pbrMaterial.SetShader( &standardShadowPointShader );
         }
-        pbrMaterial.SetTexture( &pbrDiffuseTex, 0 );
-        pbrMaterial.SetTexture( &pbrNormalTex, 1 );
-        //pbrMaterial.SetTexture( &pbrSpecularTex, 0 );
+        pbrMaterial.SetTexture( &gliderTex, 0 );
+        pbrMaterial.SetTexture( &gliderTex, 1 );
+        //pbrMaterial.SetTexture( &gliderTex, 0 );
         pbrMaterial.SetTexture( &skybox );
         pbrMaterial.SetBackFaceCulling( true );
         rotatingCube.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 6, -94 ) );
