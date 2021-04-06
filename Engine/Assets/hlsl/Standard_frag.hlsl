@@ -255,12 +255,16 @@ float4 main( PS_INPUT input ) : SV_Target
         float3 Fd = Fd_Lambert();
 
         // Falloff
-        const float dist = distance( input.positionWS_v.xyz, centerAndRadius.xyz );
-        const float fa = dist / centerAndRadius.w + 1.0f;
-        const float attenuation = 1;//1.0f / (fa * fa);
+        float cutOff = 0.91f;
+        float outerCutOff = 0.82f;
+        float theta     = spotAngle;
+        float epsilon   = cutOff - outerCutOff;
+        float attenuation = saturate( (theta - outerCutOff) / epsilon);
+        
         const float3 color = spotLightColors[ lightIndex ].rgb;
         const float3 shadedColor = Fd + Fr;
-        accumDiffuseAndSpecular.rgb += spotAngle > cosineOfConeAngle ? ((shadedColor * color) * attenuation * dotNL) : float3( 0, 0, 0 );
+        //accumDiffuseAndSpecular.rgb += spotAngle > cosineOfConeAngle ? ((shadedColor * color) * attenuation * dotNL) : float3( 0, 0, 0 );
+        accumDiffuseAndSpecular.rgb += ((shadedColor * color) * attenuation * dotNL);
     }
     
     accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
