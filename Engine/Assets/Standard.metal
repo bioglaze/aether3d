@@ -365,8 +365,14 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float3 Fr = (D * v) * F;
         const float3 Fd = Fd_Lambert();
 
+        float cutOff = 0.91f;
+        float outerCutOff = 0.82f;
+        float theta     = spotAngle;
+        float epsilon   = cutOff - outerCutOff;
+        float attenuation = saturate( (theta - outerCutOff) / epsilon);
+
         const float3 shadedColor = Fd + Fr;
-        outColor.rgb += spotAngle > cosineOfConeAngle ? (shadedColor * spotLightBufferColors[ lightIndex ].rgb) * dotNL : float3( 0.0, 0.0, 0.0 );
+        outColor.rgb += (shadedColor * spotLightBufferColors[ lightIndex ].rgb) * (dotNL * attenuation);
     }
     
 	outColor.rgb = max( outColor.rgb, float3( uniforms.minAmbient, uniforms.minAmbient, uniforms.minAmbient ) );
