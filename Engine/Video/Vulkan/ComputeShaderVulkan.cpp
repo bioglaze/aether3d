@@ -213,10 +213,14 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
 {
     System::Assert( GfxDeviceGlobal::computeCmdBuffer != VK_NULL_HANDLE, "Uninitialized compute command buffer" );
 
+    debug::BeginRegion( GfxDeviceGlobal::computeCmdBuffer, debugName, 0, 1, 0 );
+    
     BindComputeDescriptorSet();
     UploadPerObjectUbo();
 
     vkCmdBindPipeline( GfxDeviceGlobal::computeCmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pso );
     vkCmdDispatch( GfxDeviceGlobal::computeCmdBuffer, groupCountX, groupCountY, groupCountZ );
     Statistics::IncPSOBindCalls();
+
+    debug::EndRegion( GfxDeviceGlobal::computeCmdBuffer );
 }
