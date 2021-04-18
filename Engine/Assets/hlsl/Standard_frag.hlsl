@@ -255,8 +255,8 @@ float4 main( PS_INPUT input ) : SV_Target
         float3 Fd = Fd_Lambert();
 
         // Falloff
-        float cutOff = 0.91f;
-        float outerCutOff = 0.82f;
+        float cutOff = cosineOfConeAngle;
+        float outerCutOff = cutOff - 0.1f;
         float theta     = spotAngle;
         float epsilon   = cutOff - outerCutOff;
         float attenuation = saturate( (theta - outerCutOff) / epsilon);

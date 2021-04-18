@@ -365,8 +365,9 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         const float3 Fr = (D * v) * F;
         const float3 Fd = Fd_Lambert();
 
-        float cutOff = 0.91f;
-        float outerCutOff = 0.82f;
+        float cutOff = cosineOfConeAngle;
+        float outerCutOff = cutOff - 0.1f;
+
         float theta     = spotAngle;
         float epsilon   = cutOff - outerCutOff;
         float attenuation = saturate( (theta - outerCutOff) / epsilon);
