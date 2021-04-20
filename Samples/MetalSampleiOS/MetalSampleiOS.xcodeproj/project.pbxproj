@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB6D89BF262DE56000BBD725 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6D89BE262DE56000BBD725 /* CoreMotion.framework */; };
 		AB6DECD61EC82B350019358C /* textures in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD11EC82B350019358C /* textures */; };
 		AB6DECD91EC82B350019358C /* new_sponza.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD41EC82B350019358C /* new_sponza.ae3d */; };
 		AB6DECDA1EC82B350019358C /* sponza.scene in Resources */ = {isa = PBXBuildFile; fileRef = AB6DECD51EC82B350019358C /* sponza.scene */; };
@@ -63,6 +64,7 @@
 
 /* Begin PBXFileReference section */
 		AB657726200FD4BA0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
+		AB6D89BE262DE56000BBD725 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		AB6DECD11EC82B350019358C /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
 		AB6DECD41EC82B350019358C /* new_sponza.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = new_sponza.ae3d; path = ../../../../aether3d_build/Samples/new_sponza.ae3d; sourceTree = "<group>"; };
 		AB6DECD51EC82B350019358C /* sponza.scene */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sponza.scene; path = ../../../../aether3d_build/Samples/sponza.scene; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 				AB9C9F8F23D20240007F9B6B /* Aether3D_iOS.framework in Frameworks */,
 				AB9C9F8B23D20213007F9B6B /* AVFoundation.framework in Frameworks */,
 				AB9C9F8D23D2021E007F9B6B /* MetalKit.framework in Frameworks */,
+				AB6D89BF262DE56000BBD725 /* CoreMotion.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,6 +203,7 @@
 		ABD3FFDC219713A700625539 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AB6D89BE262DE56000BBD725 /* CoreMotion.framework */,
 				AB9C9F8E23D20240007F9B6B /* Aether3D_iOS.framework */,
 				AB9C9F8C23D2021E007F9B6B /* MetalKit.framework */,
 				AB9C9F8A23D20213007F9B6B /* AVFoundation.framework */,

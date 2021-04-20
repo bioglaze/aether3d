@@ -1,6 +1,7 @@
 #include <vector>
 #include <map>
 #import "GameViewController.h"
+#import <CoreMotion/CoreMotion.h>
 
 #import "Aether3D_iOS/Array.hpp"
 #import "Aether3D_iOS/AudioClip.hpp"
@@ -115,11 +116,21 @@ int gTouchCount = 0;
     Array< ae3d::Mesh* > sponzaMeshes;
     int touchBeginX;
     int touchBeginY;
+    CMMotionManager* motionManager;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    motionManager = [[CMMotionManager alloc] init];
+
+    if (motionManager.deviceMotionAvailable)
+    {
+        motionManager.deviceMotionUpdateInterval = 1.0 / 60.0;
+        [motionManager startDeviceMotionUpdates];
+        NSLog(@"Device Motion Manager Started");
+    }
     
     touchBeginX = 0;
     touchBeginY = 0;
@@ -447,6 +458,10 @@ int gTouchCount = 0;
 
 - (void)_update
 {
+    CMAttitude* attitude = motionManager.deviceMotion.attitude;
+    
+    //ae3d::System::Print( "roll: %f, pitch: %f, yaw: %f\n", attitude.roll, attitude.pitch, attitude.yaw );
+    
     static int angle = 0;
     ++angle;
     
