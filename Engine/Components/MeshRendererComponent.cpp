@@ -75,12 +75,12 @@ std::string GetSerialized( ae3d::MeshRendererComponent* component )
 
 void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, const struct Matrix44& localToWorld )
 {
-    System::BeginTimer();
-    
     if (!mesh)
     {
         return;
     }
+
+    System::BeginTimer();
 
     isCulled = false;
     
@@ -99,6 +99,7 @@ void ae3d::MeshRendererComponent::Cull( const class Frustum& cameraFrustum, cons
     if (!cameraFrustum.BoxInFrustum( aabbMinWorld, aabbMaxWorld ))
     {
         isCulled = true;
+        Statistics::IncFrustumCullTime( System::EndTimer() );
         return;
     }
 
