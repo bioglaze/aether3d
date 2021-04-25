@@ -37,10 +37,10 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = false;
+constexpr bool TestBloom = true;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-constexpr bool TestSponza = false;
+constexpr bool TestSponza = true;
 
 using namespace ae3d;
 
@@ -955,8 +955,9 @@ int main()
             blurShader.End();
 
             blurShader.Begin();
-
+#if RENDERER_VULKAN
             blurTex.SetLayout( TextureLayout::General );
+#endif
             bloomTex.SetLayout( TextureLayout::ShaderRead );
             Texture2D textures[] = { blurTex, bloomTex };
             TextureLayout layouts[] = { TextureLayout::General, TextureLayout::ShaderRead };
