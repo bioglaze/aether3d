@@ -1635,13 +1635,18 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkCreateSemaphore" );
     }
     
-    void CreateRenderer( int samples )
+    void CreateRenderer( int samples, bool apiValidation )
     {
         renderer.GenerateSSAOKernel( 16, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
         GfxDeviceGlobal::perObjectUboStruct.kernelSize = 16;
         
         GfxDeviceGlobal::msaaSampleBits = GetSampleBits( samples );
         CreateInstance( &GfxDeviceGlobal::instance );
+
+        if (apiValidation)
+        {
+            debug::enabled = true;
+        }
         
         if (debug::enabled)
         {

@@ -34,7 +34,7 @@ static x_input_set_state* XInputSetState_ = XInputSetStateStub;
 
 namespace ae3d
 {
-    void CreateRenderer( int samples );
+    void CreateRenderer( int samples, bool apiValidation );
 }
 
 namespace WindowGlobal
@@ -471,7 +471,7 @@ namespace ae3d
             samples = 16;
         }
 
-        CreateRenderer( samples );
+        CreateRenderer( samples, (flags & ae3d::WindowCreateFlags::ApiValidation) != 0 ? true : false );
         WindowGlobal::isOpen = true;
         RECT rect = {};
         GetClientRect( WindowGlobal::hwnd, &rect );

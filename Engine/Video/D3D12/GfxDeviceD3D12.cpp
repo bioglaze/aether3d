@@ -315,7 +315,7 @@ void TimerQuery::UpdateProfile( std::uint64_t index, std::uint64_t* queryData )
 
 namespace ae3d
 {
-    void CreateRenderer( int samples );
+    void CreateRenderer( int samples, bool apiValidation );
 }
 
 void UploadPerObjectUbo()
@@ -935,7 +935,7 @@ void CreateConstantBuffers()
     }
 }
 
-void ae3d::CreateRenderer( int samples )
+void ae3d::CreateRenderer( int samples, bool apiValidation )
 {
     if (samples > 0 && samples < 17)
     {

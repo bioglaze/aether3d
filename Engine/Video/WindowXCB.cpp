@@ -38,7 +38,7 @@ struct GamePad
 
 namespace ae3d
 {
-    void CreateRenderer( int samples );
+    void CreateRenderer( int samples, bool apiValidation );
 }
 
 namespace
@@ -370,7 +370,7 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
         samples = 16;
     }
 
-    ae3d::CreateRenderer( samples );
+    ae3d::CreateRenderer( samples, (flags & ae3d::WindowCreateFlags::ApiValidation) != 0 ? true : false );
     SetTitle( "Aether3D Game Engine" );
     WindowGlobal::isOpen = true;
 }
