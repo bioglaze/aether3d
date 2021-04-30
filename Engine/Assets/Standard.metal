@@ -240,7 +240,7 @@ fragment half4 standard_shadow_fragment( StandardColorInOut in [[stage_in]],
 
 //[[early_fragment_tests]]
 fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
-                               texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
+                               texture2d<float, access::sample> albedoMap [[texture(0)]],
                                texture2d<float, access::sample> normalMap [[texture(1)]],
                                texture2d<float, access::sample> specularMap [[texture(2)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(3)]],
@@ -255,8 +255,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                sampler sampler0 [[sampler(0)]] )
 {
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
-    const half4 albedoColor = half4( albedoSmoothnessMap.sample( sampler0, uv ) );
-    //const float smoothness = albedoColor.a;
+    const half4 albedoColor = half4( albedoMap.sample( sampler0, uv ) );
     const float4 normalTS = float4( normalMap.sample( sampler0, uv ).rgb * 2.0f - 1.0f, 0.0f );
     //const float4 specular = float4( specularMap.sample( sampler0, uv ) );
     
