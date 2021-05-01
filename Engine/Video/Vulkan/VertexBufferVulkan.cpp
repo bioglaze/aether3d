@@ -25,6 +25,8 @@ namespace VertexBufferGlobal
     std::vector< VkDeviceMemory > memoryToReleaseAtExit;
 }
 
+ae3d::VertexBuffer::Buffer ae3d::VertexBuffer::globalStagingBuffer;
+
 void ae3d::VertexBuffer::DestroyBuffers()
 {
     for (std::size_t bufferIndex = 0; bufferIndex < VertexBufferGlobal::buffersToReleaseAtExit.size(); ++bufferIndex)
@@ -169,22 +171,22 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
     }
 
     // Vertex buffer
-    const bool shouldCreateVertexBuffer = stagingBuffers.vertices.size != vertexBufferSize;
+    const bool shouldCreateStagingBuffer = globalStagingBuffer.size < vertexBufferSize || globalStagingBuffer.size < indexBufferSize;
 
-    if (shouldCreateVertexBuffer)
+    if (shouldCreateStagingBuffer)
     {
-        stagingBuffers.vertices.size = vertexBufferSize;
-        CreateBuffer( stagingBuffers.vertices.buffer, vertexBufferSize, stagingBuffers.vertices.memory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "staging vertex buffer" );
-        VertexBufferGlobal::buffersToReleaseAtExit.push_back( stagingBuffers.vertices.buffer );
-        VertexBufferGlobal::memoryToReleaseAtExit.push_back( stagingBuffers.vertices.memory );
+        globalStagingBuffer.size = vertexBufferSize > indexBufferSize ? vertexBufferSize : indexBufferSize;
+        CreateBuffer( globalStagingBuffer.buffer, globalStagingBuffer.size, globalStagingBuffer.memory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "global staging buffer" );
+        //VertexBufferGlobal::buffersToReleaseAtExit.push_back( stagingBuffers.vertices.buffer );
+        //VertexBufferGlobal::memoryToReleaseAtExit.push_back( stagingBuffers.vertices.memory );
     }
     
     void* bufferData = nullptr;
-    VkResult err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory, 0, vertexBufferSize, 0, &bufferData );
+    VkResult err = vkMapMemory( GfxDeviceGlobal::device, globalStagingBuffer.memory, 0, vertexBufferSize, 0, &bufferData );
     AE3D_CHECK_VULKAN( err, "map vertex memory" );
 
     std::memcpy( bufferData, vertexData, vertexBufferSize );
-    vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.vertices.memory );
+    vkUnmapMemory( GfxDeviceGlobal::device, globalStagingBuffer.memory );
 
     {
         CreateBuffer( vertexBuffer, vertexBufferSize, vertexMem, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "vertex buffer" );
@@ -192,24 +194,13 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         VertexBufferGlobal::memoryToReleaseAtExit.push_back( vertexMem );
     }
     
-    CopyBuffer( stagingBuffers.vertices.buffer, vertexBuffer, vertexBufferSize );
-
-    // Index buffer
-    const bool shouldCreateIndexBuffer = stagingBuffers.indices.size != indexBufferSize;
+    CopyBuffer( globalStagingBuffer.buffer, vertexBuffer, vertexBufferSize );
     
-    if (shouldCreateIndexBuffer)
-    {
-        stagingBuffers.indices.size = indexBufferSize;
-        CreateBuffer( stagingBuffers.indices.buffer, indexBufferSize, stagingBuffers.indices.memory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "staging index buffer" );
-        VertexBufferGlobal::buffersToReleaseAtExit.push_back( stagingBuffers.indices.buffer );
-        VertexBufferGlobal::memoryToReleaseAtExit.push_back( stagingBuffers.indices.memory );
-    }
-    
-    err = vkMapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory, 0, indexBufferSize, 0, &bufferData );
+    err = vkMapMemory( GfxDeviceGlobal::device, globalStagingBuffer.memory, 0, indexBufferSize, 0, &bufferData );
     AE3D_CHECK_VULKAN( err, "map staging index memory" );
 
     std::memcpy( bufferData, indexData, indexBufferSize );
-    vkUnmapMemory( GfxDeviceGlobal::device, stagingBuffers.indices.memory );
+    vkUnmapMemory( GfxDeviceGlobal::device, globalStagingBuffer.memory );
 
     {
         CreateBuffer( indexBuffer, indexBufferSize, indexMem, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "index buffer" );
@@ -217,7 +208,7 @@ void ae3d::VertexBuffer::GenerateVertexBuffer( const void* vertexData, int verte
         VertexBufferGlobal::memoryToReleaseAtExit.push_back( indexMem );
     }
     
-    CopyBuffer( stagingBuffers.indices.buffer, indexBuffer, indexBufferSize );
+    CopyBuffer( globalStagingBuffer.buffer, indexBuffer, indexBufferSize );
 
     CreateInputState( vertexStride );
 }

@@ -238,6 +238,8 @@ namespace ae3d
             Buffer indices;
         } stagingBuffers;
 
+        static Buffer globalStagingBuffer;
+        
         Array< VertexPTNTC > verticesPTNTC; // For dynamic buffer.
 #endif
     };
