@@ -68,6 +68,8 @@ void sceneRenderFunc( int eye )
 
 int main()
 {
+    constexpr bool testBloom = false;
+
     bool fullScreen = false;
 
     int originalWidth = 2560 / 1;
@@ -113,6 +115,9 @@ int main()
     RenderTexture resolvedTex;
     resolvedTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
 
+    Texture2D bloomTex;
+    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte, nullptr );
+
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
@@ -152,6 +157,9 @@ int main()
     Texture2D whiteTex;
     whiteTex.Load( FileSystem::FileContents( "textures/default_white.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     
+    Texture2D blurTex;
+    blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte, nullptr );
+
     Font font;
     font.LoadBMFont( &fontTex, FileSystem::FileContents( "font_txt.fnt" ) );
 
@@ -177,6 +185,12 @@ int main()
                 FileSystem::FileContents( "shaders/unlit_skin_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
                 FileSystem::FileContents( "shaders/unlit_skin_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
     
+    ComputeShader downsampleAndThresholdShader;
+    downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
+
+    ComputeShader blurShader;
+    blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
+
     Texture2D albedoTex2;
     albedoTex2.Load( FileSystem::FileContents( "textures/asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
@@ -469,38 +483,39 @@ int main()
         System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
         System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
 
-#ifdef TEST_BLOOM
-        blurTex.SetLayout( TextureLayout::General );
-        downsampleAndThresholdShader.SetRenderTexture( 0, &cameraTex );
-        downsampleAndThresholdShader.SetTexture2D( 11, &blurTex );
-        downsampleAndThresholdShader.Begin();
-        downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1 );
-        downsampleAndThresholdShader.End();
+        if (testBloom)
+        {
+            blurTex.SetLayout( TextureLayout::General );
+            downsampleAndThresholdShader.SetRenderTexture( &resolvedTex, 0 );
+            downsampleAndThresholdShader.SetTexture2D( &blurTex, 14 );
+            downsampleAndThresholdShader.Begin();
+            downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsample/threshold" );
+            downsampleAndThresholdShader.End();
 
-        blurTex.SetLayout( TextureLayout::ShaderRead );
+            blurTex.SetLayout( TextureLayout::ShaderRead );
 
-        blurShader.SetTexture2D( 0, &blurTex );
-        blurShader.SetTexture2D( 11, &bloomTex );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Begin();
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
+            blurShader.SetTexture2D( &blurTex, 0 );
+            blurShader.SetTexture2D( &bloomTex, 14 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Begin();
+            blurShader.Dispatch( width / 16, height / 16, 1, "bloom blur" );
+            blurShader.End();
 
-        blurShader.Begin();
+            blurShader.Begin();
 
-        blurTex.SetLayout( TextureLayout::General );
-        bloomTex.SetLayout( TextureLayout::ShaderRead );
-        blurShader.SetTexture2D( 0, &bloomTex );
-        blurShader.SetTexture2D( 11, &blurTex );
-        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( width / 16, height / 16, 1 );
-        blurShader.End();
+            blurTex.SetLayout( TextureLayout::General );
+            bloomTex.SetLayout( TextureLayout::ShaderRead );
+            blurShader.SetTexture2D( &bloomTex, 0 );
+            blurShader.SetTexture2D( &blurTex, 14 );
+            blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( width / 16, height / 16, 1, "bloom blur" );
+            blurShader.End();
 
-        blurTex.SetLayout( TextureLayout::ShaderRead );
-        System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
-        bloomTex.SetLayout( TextureLayout::General );
-#endif
+            blurTex.SetLayout( TextureLayout::ShaderRead );
+            System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+            bloomTex.SetLayout( TextureLayout::General );
+        }
 
         scene.EndFrame();
         Window::SwapBuffers();
