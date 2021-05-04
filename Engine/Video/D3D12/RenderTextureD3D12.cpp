@@ -12,6 +12,7 @@ DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format );
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
+    extern ID3D12GraphicsCommandList* graphicsCommandList;
 }
 
 namespace RenderTextureGlobal
@@ -253,4 +254,9 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
             GfxDeviceGlobal::device->CreateDepthStencilView( gpuResourceDepth.resource, &descDsv, cubeDsvs[ i ] );
         }
     }
+}
+
+void ae3d::RenderTexture::ResolveTo( ae3d::RenderTexture* target )
+{
+    GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( target->GetGpuResource()->resource, 0, gpuResource.resource, 0, FormatToDXGIFormat( dataType ) );
 }
