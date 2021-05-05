@@ -84,7 +84,7 @@ int main()
     }
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::MSAA4 );
+    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
     int realHeight = 0;
     Window::GetSize( width, realHeight );
     
@@ -479,9 +479,12 @@ int main()
         }
         
         scene.Render();
-        cameraTex.ResolveTo( &resolvedTex );
-        System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        //cameraTex.ResolveTo( &resolvedTex );
+        if (!testBloom)
+        {
+            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+        }
 
         if (testBloom)
         {
@@ -512,7 +515,7 @@ int main()
             blurShader.End();
 
             blurTex.SetLayout( TextureLayout::ShaderRead );
-            System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
             bloomTex.SetLayout( TextureLayout::General );
         }
