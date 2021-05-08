@@ -881,7 +881,7 @@ void CreateDepthStencil()
 
 void CreateConstantBuffers()
 {
-    GfxDeviceGlobal::constantBuffers.resize( 10000 );
+    GfxDeviceGlobal::constantBuffers.resize( 20000 );
     GfxDeviceGlobal::mappedConstantBuffers.resize( GfxDeviceGlobal::constantBuffers.size() );
     ae3d::System::Assert( DescriptorHeapManager::numDescriptors >= GfxDeviceGlobal::constantBuffers.size(), "There are more constant buffers than descriptors" );
 
