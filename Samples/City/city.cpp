@@ -69,7 +69,8 @@ void sceneRenderFunc( int eye )
 int main()
 {
     constexpr bool testBloom = false;
-
+    constexpr bool testMSAA = false;
+    
     bool fullScreen = false;
 
     int originalWidth = 2560 / 1;
@@ -84,7 +85,16 @@ int main()
     }
     
     System::EnableWindowsMemleakDetection();
-    Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
+
+    if (testMSAA)
+    {
+        Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::MSAA4 );
+    }
+    else
+    {
+        Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::Empty );
+    }
+    
     int realHeight = 0;
     Window::GetSize( width, realHeight );
     
@@ -479,7 +489,11 @@ int main()
         }
         
         scene.Render();
-        //cameraTex.ResolveTo( &resolvedTex );
+
+        if (testMSAA)
+        {
+            cameraTex.ResolveTo( &resolvedTex );
+        }
         if (!testBloom)
         {
             System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
@@ -489,7 +503,7 @@ int main()
         if (testBloom)
         {
             blurTex.SetLayout( TextureLayout::General );
-            downsampleAndThresholdShader.SetRenderTexture( &resolvedTex, 0 );
+            downsampleAndThresholdShader.SetRenderTexture( testMSAA ? &resolvedTex : &cameraTex, 0 );
             downsampleAndThresholdShader.SetTexture2D( &blurTex, 14 );
             downsampleAndThresholdShader.Begin();
             downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsample/threshold" );
@@ -517,6 +531,7 @@ int main()
             blurTex.SetLayout( TextureLayout::ShaderRead );
             System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &blurTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+            System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
             bloomTex.SetLayout( TextureLayout::General );
         }
 
