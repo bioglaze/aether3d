@@ -95,6 +95,7 @@
    For archival/informative purposes, here's some performance info:
 
    Sponza scene with directional light shadows is 16.6 ms on GeForce 780 GTX on Ubuntu.
+   City scene with 2000 point lights, 3000 draw calls, 0.6 M triangles is 16.6 ms on GeForce 780 GTX on Vulkan.
 */
 namespace ae3d
 {

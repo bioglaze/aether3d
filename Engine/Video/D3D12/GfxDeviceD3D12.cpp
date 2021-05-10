@@ -807,21 +807,7 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     pso->SetName( L"PSO Graphics" );
 
     const std::uint64_t hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount, topology );
-    bool hashFound = false;
-
-    for (std::size_t psoIndex = 0; psoIndex < GfxDeviceGlobal::psoCache.size(); ++psoIndex)
-    {
-        if (GfxDeviceGlobal::psoCache[ psoIndex ].hash == hash)
-        {
-            GfxDeviceGlobal::psoCache[ psoIndex ].pso = pso;
-            hashFound = true;
-        }
-    }
-
-    if (!hashFound)
-    {
-        GfxDeviceGlobal::psoCache.push_back( { hash, pso } );
-    }
+    GfxDeviceGlobal::psoCache.push_back( { hash, pso } );
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Anisotropy anisotropy )
@@ -1193,18 +1179,21 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     const std::uint64_t psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
     bool foundHash = false;
+    int hashIndex = 0;
 
     for (std::size_t psoIndex = 0; psoIndex < GfxDeviceGlobal::psoCache.size(); ++psoIndex)
     {
         if (GfxDeviceGlobal::psoCache[ psoIndex ].hash == psoHash)
         {
             foundHash = true;
+            hashIndex = psoIndex;
         }
     }
 
     if (!foundHash)
     {
         CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
+        hashIndex = GfxDeviceGlobal::psoCache.size() - 1;
     }
 
     const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * RESOURCE_BINDING_COUNT) % GfxDeviceGlobal::constantBuffers.size();
@@ -1282,14 +1271,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavGpuHandle( index ) );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
 
-    ID3D12PipelineState* pso = nullptr;
-    for (std::size_t psoIndex = 0; psoIndex < GfxDeviceGlobal::psoCache.size(); ++psoIndex)
-    {
-        if (GfxDeviceGlobal::psoCache[ psoIndex ].hash == psoHash)
-        {
-            pso = GfxDeviceGlobal::psoCache[ psoIndex ].pso;
-        }
-    }
+    ID3D12PipelineState* pso = GfxDeviceGlobal::psoCache[ hashIndex ].pso;
 
     if (GfxDeviceGlobal::cachedPSO != pso)
     {
