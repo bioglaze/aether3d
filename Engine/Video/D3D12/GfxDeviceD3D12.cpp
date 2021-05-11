@@ -56,6 +56,7 @@ namespace ae3d
             {
                 std::stringstream stm;
                 stm << "frame time: " << ::Statistics::GetFrameTimeMS() << "ms\n";
+                stm << "present time: " << ::Statistics::GetPresentTimeMS() << "ms\n";
                 stm << "shadow pass time CPU: " << ::Statistics::GetShadowMapTimeMS() << "ms\n";
                 stm << "shadow pass time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << "ms\n";
                 stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
@@ -1491,7 +1492,9 @@ void ae3d::GfxDevice::Present()
     ID3D12CommandList* ppCommandLists[] = { GfxDeviceGlobal::graphicsCommandList };
     GfxDeviceGlobal::commandQueue->ExecuteCommandLists( 1, &ppCommandLists[ 0 ] );
 
+    Statistics::BeginPresentTimeProfiling();
     hr = GfxDeviceGlobal::swapChain->Present( WindowGlobal::presentInterval, 0 );
+    Statistics::EndPresentTimeProfiling();
 
     if (FAILED( hr ))
     {
