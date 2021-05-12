@@ -930,9 +930,12 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     }
 
 #ifdef DEBUG
+    apiValidation = true;
+#endif
+
     ID3D12Debug* debugController;
     HRESULT dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &debugController ) );
-    if (dhr == S_OK)
+    if (dhr == S_OK && apiValidation)
     {
         debugController->EnableDebugLayer();
 #if 0
@@ -953,20 +956,16 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
 
     ID3D12DeviceRemovedExtendedDataSettings* dredSettings = nullptr;
     dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &dredSettings ) );
-    if (dhr == S_OK)
+    if (dhr == S_OK && apiValidation)
     {
         dredSettings->SetAutoBreadcrumbsEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
         dredSettings->SetPageFaultEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
     }
-#endif
 
     IDXGIFactory2* factory = nullptr;
 
-#if DEBUG
-    UINT factoryFlags = DXGI_CREATE_FACTORY_DEBUG;
-#else
-    UINT factoryFlags = 0;
-#endif
+    const UINT factoryFlags = apiValidation ? DXGI_CREATE_FACTORY_DEBUG : 0;
+    
     HRESULT hr = CreateDXGIFactory2( factoryFlags, IID_PPV_ARGS( &factory ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 factory" );
 
