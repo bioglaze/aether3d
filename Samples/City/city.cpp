@@ -182,9 +182,6 @@ int main()
     //statsContainer.GetComponent<TransformComponent>()->SetLocalScale( 0.5f );
     statsContainer.SetLayer( 2 );
     
-    Mesh cityMesh;
-    cityMesh.Load( FileSystem::FileContents( "city2021.ae3d" ) );
-
     Shader shader;
     shader.Load( "unlitVert", "unlitFrag",
                  FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
