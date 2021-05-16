@@ -1,10 +1,8 @@
 #include "ubo.h"
 
-float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernelSize, uint3 globalIdx )
+float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernelSize, uint3 globalIdx, float2 depthTexDim )
 {
     float occlusion = 0.0f;
-    int depthWidth, depthHeight;
-    normalTex.GetDimensions( depthWidth, depthHeight );
 
     for (int i = 0; i < kernelSize; ++i)
     {
@@ -20,7 +18,7 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
 #else
         offset.y = 1 - offset.y;
 #endif
-        float sampleDepth = -normalTex.Load( int3( offset.xy * float2( depthWidth, depthHeight ), 0 ) ).r;
+        float sampleDepth = -normalTex.Load( int3( offset.xy * depthTexDim, 0 ) ).r;
 
         float diff = abs( originPosVS.z - sampleDepth );
         if (diff < 0.0001f)
@@ -71,7 +69,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float3 bitangent = cross( tangent, normal );
     float3x3 tangentToView = transpose( float3x3( tangent, bitangent, normal ) );
 
-    float s = ssao( tangentToView, originPosVS, 0.5f, 16, globalIdx );
+    float s = ssao( tangentToView, originPosVS, 0.5f, 16, globalIdx, float2( depthWidth, depthHeight ) );
     float4 color = float4( 1, 1, 1, 1 );
 
     rwTexture[ globalIdx.xy ] = color * s;
