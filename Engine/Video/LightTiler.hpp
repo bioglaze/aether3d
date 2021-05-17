@@ -16,6 +16,8 @@ namespace ae3d
     class LightTiler
     {
     public:
+        static const int MaxLights = 2048;
+
         void Init();
         void SetPointLightParameters( int bufferIndex, const Vec3& position, float radius, const Vec4& color );
         void SetSpotLightParameters( int bufferIndex, Vec3& position, float radius, const Vec4& color, const Vec3& direction, float coneAngle, float falloffRadius );
@@ -58,7 +60,7 @@ namespace ae3d
 #endif
         unsigned GetNumTilesX() const;
         unsigned GetNumTilesY() const;
-
+        
     private:
         
 #if RENDERER_METAL
@@ -108,7 +110,6 @@ namespace ae3d
         VkBufferView perTileLightIndexBufferView = VK_NULL_HANDLE;
 #endif
         static const int TileRes = 16;
-        static const int MaxLights = 2048;
         static const unsigned MaxLightsPerTile = 544;
         Vec4 pointLightCenterAndRadius[ MaxLights ];
         Vec4 pointLightColors[ MaxLights ];

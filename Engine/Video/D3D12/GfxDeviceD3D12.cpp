@@ -1179,7 +1179,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
 
     const std::uint64_t psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, GfxDeviceGlobal::currentRenderTarget ? 1 : GfxDeviceGlobal::sampleCount, topology );
     bool foundHash = false;
-    int hashIndex = 0;
+    size_t hashIndex = 0;
 
     for (std::size_t psoIndex = 0; psoIndex < GfxDeviceGlobal::psoCache.size(); ++psoIndex)
     {
@@ -1206,7 +1206,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Buffer.FirstElement = 0;
     srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    srvDesc.Buffer.NumElements = 2048; // FIXME: Sync with LightTiler
+    srvDesc.Buffer.NumElements = LightTiler::MaxLights;
     srvDesc.Buffer.StructureByteStride = 0;
     
     const UINT incrementSize = GfxDeviceGlobal::device->GetDescriptorHandleIncrementSize( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
