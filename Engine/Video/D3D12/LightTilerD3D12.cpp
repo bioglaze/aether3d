@@ -379,7 +379,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     srvDesc0.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc0.Buffer.FirstElement = 0;
     srvDesc0.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    srvDesc0.Buffer.NumElements = 2048;
+    srvDesc0.Buffer.NumElements = MaxLights;
     srvDesc0.Buffer.StructureByteStride = 0;
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc1 = {};
