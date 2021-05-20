@@ -33,6 +33,10 @@ namespace Statistics
     void EndPresentTimeProfiling();
     float GetPresentTimeMS();
 
+    void BeginWaitForPreviousFrameProfiling();
+    void EndWaitForPreviousFrameProfiling();
+    float GetWaitForPreviousFrameProfiling();
+
     float GetFrustumCullTimeMS();
     void IncFrustumCullTime( float ms );
     void IncQueueWaitTime( float ms );

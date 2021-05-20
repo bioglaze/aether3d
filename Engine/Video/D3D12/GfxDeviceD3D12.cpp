@@ -57,6 +57,7 @@ namespace ae3d
                 std::stringstream stm;
                 stm << "frame time: " << ::Statistics::GetFrameTimeMS() << "ms\n";
                 stm << "present time: " << ::Statistics::GetPresentTimeMS() << "ms\n";
+                stm << "wait previous frame time: " << ::Statistics::GetWaitForPreviousFrameProfiling() << "ms\n";
                 stm << "shadow pass time CPU: " << ::Statistics::GetShadowMapTimeMS() << "ms\n";
                 stm << "shadow pass time GPU: " << ::Statistics::GetShadowMapTimeGpuMS() << "ms\n";
                 stm << "depth pass time CPU: " << ::Statistics::GetDepthNormalsTimeMS() << "ms\n";
@@ -336,7 +337,9 @@ void WaitForPreviousFrame()
     {
         hr = GfxDeviceGlobal::fence->SetEventOnCompletion( fenceValue, GfxDeviceGlobal::fenceEvent );
         AE3D_CHECK_D3D( hr, "fence event" );
+        Statistics::BeginWaitForPreviousFrameProfiling();
         WaitForSingleObject( GfxDeviceGlobal::fenceEvent, INFINITE );
+        Statistics::EndWaitForPreviousFrameProfiling();
     }
 }
 

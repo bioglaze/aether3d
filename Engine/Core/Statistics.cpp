@@ -28,6 +28,7 @@ namespace Statistics
     float bloomGpuTimeMs = 0;
     float queueWaitTimeMs = 0;
     float frustumCullTimeMS = 0;
+    float waitForPreviousFrameTimeMS = 0;
 
     std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
@@ -35,6 +36,12 @@ namespace Statistics
     std::chrono::time_point< std::chrono::steady_clock > startDepthNormalsTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startPresentTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startSceneAABBPoint;
+    std::chrono::time_point< std::chrono::steady_clock > startWaitForPreviousFrameTimePoint;
+}
+
+float Statistics::GetWaitForPreviousFrameProfiling()
+{
+    return waitForPreviousFrameTimeMS;
 }
 
 void Statistics::IncTriangleCount( int triangles )
@@ -168,6 +175,19 @@ void Statistics::EndFrameTimeProfiling()
     auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startFrameTimePoint ).count();
     Statistics::frameTimeMS = static_cast< float >(tDiff);
+}
+
+void Statistics::BeginWaitForPreviousFrameProfiling()
+{
+    Statistics::startWaitForPreviousFrameTimePoint = std::chrono::steady_clock::now();
+}
+
+void Statistics::EndWaitForPreviousFrameProfiling()
+{
+    auto tEnd = std::chrono::steady_clock::now();
+    auto tDiff = std::chrono::duration<double, std::milli>( tEnd - Statistics::startWaitForPreviousFrameTimePoint ).count();
+
+    Statistics::waitForPreviousFrameTimeMS = static_cast<float>( tDiff );
 }
 
 void Statistics::IncPSOBindCalls()
@@ -309,7 +329,8 @@ void Statistics::ResetFrameStatistics()
     queueSubmitCalls = 0;
     queueWaitTimeMs = 0;
     frustumCullTimeMS = 0;
-    
+    waitForPreviousFrameTimeMS = 0;
+
     startFrameTimePoint = std::chrono::steady_clock::now();
 }
 
