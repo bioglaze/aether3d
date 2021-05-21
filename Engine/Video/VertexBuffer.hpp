@@ -92,7 +92,7 @@ namespace ae3d
         unsigned GetIBSize() const;
 
         /// \return Vertex buffer resource.
-        ID3D12Resource* GetVBResource() { return vb; }
+        ID3D12Resource* GetVBResource() { return vbUpload; }
 
         /// \return Index buffer offset from the beginning of the vb.
         long GetIBOffset() const { return ibOffset; }
@@ -198,7 +198,7 @@ namespace ae3d
 #if RENDERER_D3D12
         void UploadVB( void* faces, void* vertices, unsigned ibSize );
         // Index buffer is stored in the vertex buffer after vertex data.
-        ID3D12Resource* vb = nullptr;
+        ID3D12Resource* vbUpload = nullptr;
         D3D12_VERTEX_BUFFER_VIEW vertexBufferView = {};
         D3D12_INDEX_BUFFER_VIEW indexBufferView = {};
         long ibOffset = 0;

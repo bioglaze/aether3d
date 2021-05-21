@@ -12,7 +12,9 @@
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
-    extern ID3D12GraphicsCommandList* graphicsCommandList;
+    extern ID3D12GraphicsCommandList* commandList;
+    extern ID3D12CommandAllocator* commandListAllocator;
+    extern ID3D12CommandQueue* commandQueue;
 }
 
 namespace Global
@@ -60,11 +62,11 @@ unsigned ae3d::VertexBuffer::GetStride() const
 
 void ae3d::VertexBuffer::SetDebugName( const char* name )
 {
-    if (vb)
+    if (vbUpload)
     {
 		wchar_t wname[ 128 ] = {};
         std::mbstowcs( wname, name, 128 );
-        vb->SetName( wname );
+        vbUpload->SetName( wname );
     }
 }
 
@@ -98,33 +100,33 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
         &bufferProp,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS( &vb ) );
+        IID_PPV_ARGS( &vbUpload ) );
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Unable to create vertex buffer!\n" );
         return;
     }
 
-    vb->SetName( L"VertexBuffer" );
-    Global::vbs.push_back( vb );
+    vbUpload->SetName( L"UploadVertexBuffer" );
+    Global::vbs.push_back( vbUpload );
 
     char* vbUploadPtr = nullptr;
-    hr = vb->Map( 0, nullptr, reinterpret_cast<void**>(&vbUploadPtr) );
+    hr = vbUpload->Map( 0, nullptr, reinterpret_cast<void**>(&vbUploadPtr) );
     if (FAILED( hr ))
     {
-        ae3d::System::Assert( false, "Unable to map vertex buffer!\n" );
+        ae3d::System::Assert( false, "Unable to map upload vertex buffer!\n" );
         return;
     }
 
     memcpy_s( vbUploadPtr, ibOffset, vertices, ibOffset );
     memcpy_s( vbUploadPtr + ibOffset, ibSize, faces, ibSize );
-    vb->Unmap( 0, nullptr );
+    vbUpload->Unmap( 0, nullptr );
 
-    vertexBufferView.BufferLocation = vb->GetGPUVirtualAddress();
+    vertexBufferView.BufferLocation = vbUpload->GetGPUVirtualAddress();
     vertexBufferView.StrideInBytes = GetStride();
     vertexBufferView.SizeInBytes = GetIBOffset();
 
-    indexBufferView.BufferLocation = vb->GetGPUVirtualAddress() + GetIBOffset();
+    indexBufferView.BufferLocation = vbUpload->GetGPUVirtualAddress() + GetIBOffset();
     indexBufferView.SizeInBytes = GetIBSize();
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 }
@@ -165,29 +167,29 @@ void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
         &bufferProp,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS( &vb ) );
+        IID_PPV_ARGS( &vbUpload ) );
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Unable to create vertex buffer!\n" );
         return;
     }
 
-    vb->SetName( L"VertexBuffer" );
-    Global::vbs.push_back( vb );
+    vbUpload->SetName( L"VertexBuffer" );
+    Global::vbs.push_back( vbUpload );
 
     mappedDynamic = nullptr;
-    hr = vb->Map( 0, nullptr, reinterpret_cast<void**>(&mappedDynamic) );
+    hr = vbUpload->Map( 0, nullptr, reinterpret_cast<void**>(&mappedDynamic) );
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Unable to map vertex buffer!\n" );
         return;
     }
 
-    vertexBufferView.BufferLocation = vb->GetGPUVirtualAddress();
+    vertexBufferView.BufferLocation = vbUpload->GetGPUVirtualAddress();
     vertexBufferView.StrideInBytes = GetStride();
     vertexBufferView.SizeInBytes = GetIBOffset();
 
-    indexBufferView.BufferLocation = vb->GetGPUVirtualAddress() + GetIBOffset();
+    indexBufferView.BufferLocation = vbUpload->GetGPUVirtualAddress() + GetIBOffset();
     indexBufferView.SizeInBytes = GetIBSize();
     indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 }
