@@ -37,7 +37,7 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = true;
+constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 constexpr bool TestSponza = true;
@@ -916,14 +916,12 @@ int main()
         {
             auto beginTime = std::chrono::steady_clock::now();
 
-#if RENDERER_D3D12
             blurTex.SetLayout( TextureLayout::ShaderReadWrite );
 
+#if RENDERER_D3D12
             downsampleAndThresholdShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
             downsampleAndThresholdShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
-            blurTex.SetLayout( TextureLayout::General );
-
             if (TestMSAA)
             {
                 downsampleAndThresholdShader.SetRenderTexture( &resolvedTex, 0 );
@@ -955,17 +953,14 @@ int main()
             blurShader.End();
 
             blurShader.Begin();
-#if RENDERER_VULKAN
-            blurTex.SetLayout( TextureLayout::General );
-#endif
             bloomTex.SetLayout( TextureLayout::ShaderRead );
-            Texture2D textures[] = { blurTex, bloomTex };
-            TextureLayout layouts[] = { TextureLayout::General, TextureLayout::ShaderRead };
+            blurTex.SetLayout( TextureLayout::ShaderReadWrite );
+            //Texture2D textures[] = { blurTex, bloomTex };
+            //TextureLayout layouts[] = { TextureLayout::ShaderReadWrite, TextureLayout::ShaderRead };
             //Texture2D::SetLayouts( textures, layouts, 2 );
             blurShader.SetTexture2D( &bloomTex, 0 );
 
 #if RENDERER_D3D12
-            blurTex.SetLayout( TextureLayout::ShaderReadWrite );
             blurShader.SetUAV( 1, blurTex.GetGpuResource()->resource, *blurTex.GetUAVDesc() );
 #else
             blurShader.SetTexture2D( &blurTex, 14 );
@@ -1142,11 +1137,10 @@ int main()
                 ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
 
                 blurShader.SetTexture2D( &ssaoBlurTex, 0 );
-#if RENDERER_D3D12
                 ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
+#if RENDERER_D3D12
                 blurShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
 #else
-                ssaoTex.SetLayout( TextureLayout::General );
                 blurShader.SetTexture2D( &ssaoTex, 14 );
 #endif
                 blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
