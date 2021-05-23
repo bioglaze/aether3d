@@ -65,6 +65,7 @@ namespace ae3d
 #if RENDERER_VULKAN
         VkImageView& GetView() { return view; }
         VkImage& GetImage() { return image; }
+        VkImageLayout& GetLayout() { return layout; }
 #endif
         /// \param imageData Raw pixel data
         /// \param width Width in pixels

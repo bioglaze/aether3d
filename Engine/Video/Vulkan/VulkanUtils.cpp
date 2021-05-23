@@ -282,11 +282,10 @@ namespace ae3d
         AE3D_CHECK_VULKAN( result, "instance" );
     }
 
-    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
-        VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount )
+    void SetupImageBarrier( VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
+                            VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount,
+                            VkImageMemoryBarrier& outBarrier, VkPipelineStageFlags& outSrcStageFlags, VkPipelineStageFlags& outDstStageFlags )
     {
-        System::Assert( cmdbuffer != VK_NULL_HANDLE, "command buffer not initialized" );
-
         VkImageMemoryBarrier imageMemoryBarrier = {};
         imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         imageMemoryBarrier.pNext = nullptr;
@@ -422,6 +421,21 @@ namespace ae3d
         {
             srcStageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
         }
+
+        outBarrier = imageMemoryBarrier;
+        outSrcStageFlags = srcStageFlags;
+        outDstStageFlags = destStageFlags;
+    }
+    
+    void SetImageLayout( VkCommandBuffer cmdbuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout,
+        VkImageLayout newImageLayout, unsigned layerCount, unsigned mipLevel, unsigned mipLevelCount )
+    {
+        System::Assert( cmdbuffer != VK_NULL_HANDLE, "command buffer not initialized" );
+
+        VkImageMemoryBarrier barrier{};
+        VkPipelineStageFlags srcStageFlags{};
+        VkPipelineStageFlags destStageFlags{};
+        SetupImageBarrier( image, aspectMask, oldImageLayout, newImageLayout, layerCount, mipLevel, mipLevelCount, barrier, srcStageFlags, destStageFlags );
         
         vkCmdPipelineBarrier(
             cmdbuffer,
@@ -430,7 +444,7 @@ namespace ae3d
             0,
             0, nullptr,
             0, nullptr,
-            1, &imageMemoryBarrier );
+            1, &barrier );
 
         Statistics::IncBarrierCalls();
     }
