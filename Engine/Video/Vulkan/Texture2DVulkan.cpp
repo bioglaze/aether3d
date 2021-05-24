@@ -838,9 +838,62 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
     stbi_image_free( data );
 }
 
-void ae3d::Texture2D::SetLayouts( Texture2D textures[], TextureLayout layouts[], int count )
+void ae3d::Texture2D::SetLayouts( Texture2D* textures[], TextureLayout layouts[], int count )
 {
-    System::Print( "Texture2D::SetLayouts is unimplemented on Vulkan!\n" );
+    System::Assert( count < 5, "Barrier count too high! Increase barrier count in Texture2D::SetLayouts" );
+
+    VkImageMemoryBarrier barriers[ 5 ];
+    VkPipelineStageFlags srcStageFlags{};
+    VkPipelineStageFlags destStageFlags{};
+    
+    for (int i = 0; i < count; ++i)
+    {
+        VkImageLayout layout = (layouts[ i ] == TextureLayout::General || layouts[ i ] == TextureLayout::ShaderReadWrite) ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        VkPipelineStageFlags srcFlags;
+        VkPipelineStageFlags dstFlags;
+        SetupImageBarrier( textures[ i ]->GetImage(), VK_IMAGE_ASPECT_COLOR_BIT, textures[ i ]->GetLayout(), layout, 1, 0, 1, barriers[ i ], srcFlags, dstFlags );
+        srcStageFlags |= srcFlags;
+        destStageFlags |= dstFlags;
+        textures[ i ]->GetLayout() = layout;
+    }
+
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufInfo.pInheritanceInfo = nullptr;
+    cmdBufInfo.flags = 0;
+
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::texCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in Texture2D" );
+
+    vkCmdPipelineBarrier(
+            GfxDeviceGlobal::texCmdBuffer,
+            srcStageFlags,
+            destStageFlags,
+            0,
+            0, nullptr,
+            0, nullptr,
+            count, &barriers[ 0 ] );
+
+    Statistics::IncBarrierCalls();
+
+    vkEndCommandBuffer( GfxDeviceGlobal::texCmdBuffer );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::texCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+    Statistics::IncQueueSubmitCalls();
+
+    // FIXME: This is slow
+    System::BeginTimer();
+	err = vkQueueWaitIdle( GfxDeviceGlobal::graphicsQueue );
+    Statistics::IncQueueWaitTime( System::EndTimer() );
+
+	AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
 }
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()

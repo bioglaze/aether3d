@@ -33,7 +33,7 @@ namespace ae3d
         /// \param textures Textures.
         /// \param layouts Target layouts.
         /// \param count Count. Must be equal or less than textures and layouts array item count.
-        static void SetLayouts( Texture2D textures[], TextureLayout layouts[], int count );
+        static void SetLayouts( Texture2D* textures[], TextureLayout layouts[], int count );
         
         /// \param layout Layout.
         void SetLayout( TextureLayout layout );
