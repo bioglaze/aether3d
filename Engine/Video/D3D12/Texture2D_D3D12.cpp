@@ -15,6 +15,7 @@
 #include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 
 extern ae3d::FileWatcher fileWatcher;
 bool HasStbExtension( const std::string& path ); // Defined in TextureCommon.cpp
@@ -144,6 +145,48 @@ void ae3d::Texture2D::SetLayout( ae3d::TextureLayout layout )
 
         GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
     }
+}
+
+void ae3d::Texture2D::SetLayouts( Texture2D* texture2ds[], TextureLayout layouts[], int count )
+{
+    ae3d::System::Assert( count < 5, "Count too large!" );
+
+    int realCount = 0;
+    D3D12_RESOURCE_BARRIER barriers[ 5 ] = {};
+
+    for (int i = 0; i < count; ++i)
+    {
+        D3D12_RESOURCE_STATES oldState = texture2ds[ i ]->GetGpuResource()->usageState;
+        D3D12_RESOURCE_STATES newState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+        
+        if (layouts[ i ] == TextureLayout::ShaderReadWrite)
+        {
+            newState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        }
+        else if (layouts[ i ] == TextureLayout::General)
+        {
+            newState = D3D12_RESOURCE_STATE_COMMON;
+        }
+
+        if (oldState == newState)
+        {
+            continue;
+        }
+
+        texture2ds[ i ]->GetGpuResource()->usageState = newState;
+
+        barriers[ realCount ].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barriers[ realCount ].Transition.pResource = texture2ds[ i ]->GetGpuResource()->resource;
+        barriers[ realCount ].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        barriers[ realCount ].Transition.StateBefore = oldState;
+        barriers[ realCount ].Transition.StateAfter = newState;
+        barriers[ realCount ].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        
+        ++realCount;
+    }
+
+    Statistics::IncBarrierCalls();
+    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( realCount, &barriers[ 0 ] );
 }
 
 ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
