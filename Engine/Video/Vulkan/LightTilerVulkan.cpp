@@ -332,11 +332,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     GfxDeviceGlobal::boundViews[ 0 ] = depthNormalTarget.GetColorView();
     GfxDeviceGlobal::boundSamplers[ 0 ] = depthNormalTarget.GetSampler();
     
-    VkCommandBufferBeginInfo cmdBufInfo = {};
-    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::computeCmdBuffer, &cmdBufInfo );
-    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
+    shader.Begin();
 
     const unsigned numTiles = GetNumTilesX() * GetNumTilesY();
     const unsigned maxNumLightsPerTile = GetMaxNumLightsPerTile();
@@ -369,27 +365,5 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
                                     VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
                                      nullptr, 1, &lightIndexToFrag, 0, nullptr );
     
-    vkEndCommandBuffer( GfxDeviceGlobal::computeCmdBuffer );
-
-    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pWaitDstStageMask = &pipelineStages;
-    submitInfo.waitSemaphoreCount = 0;
-    submitInfo.pWaitSemaphores = nullptr;
-    submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores = nullptr;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &GfxDeviceGlobal::computeCmdBuffer;
-
-    err = vkQueueSubmit( GfxDeviceGlobal::computeQueue, 1, &submitInfo, VK_NULL_HANDLE );
-    AE3D_CHECK_VULKAN( err, "vkQueueSubmit compute" );
-    Statistics::IncQueueSubmitCalls();
-
-    System::BeginTimer();
-    err = vkQueueWaitIdle( GfxDeviceGlobal::computeQueue );
-    Statistics::IncQueueWaitTime( System::EndTimer() );
-
-    AE3D_CHECK_VULKAN( err, "vkQueueWaitIdle" );
+    shader.End();
 }
