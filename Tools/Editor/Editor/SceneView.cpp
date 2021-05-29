@@ -645,7 +645,7 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
 #if RENDERER_VULKAN
         sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 14 );
 #else
-        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 2 );
+        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 1 );
 #endif
 
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
@@ -661,7 +661,7 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
 #if RENDERER_VULKAN
         sv->blurShader.SetTexture2D( &sv->ssaoTex, 14 );
 #else
-        sv->blurShader.SetTexture2D( &sv->ssaoTex, 2 );
+        sv->blurShader.SetTexture2D( &sv->ssaoTex, 1 );
 #endif
         sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
         sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
