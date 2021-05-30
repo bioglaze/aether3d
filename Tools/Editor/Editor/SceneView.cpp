@@ -73,6 +73,8 @@ struct SceneView
     Array< GameObject* > gameObjects;
     Array< GameObject* > selectedGameObjects;
     GameObject camera;
+    GameObject selectionCamera; // For outline rendering.
+    GameObject selectionGO; // For outline rendering.
     Scene scene;
     Shader unlitShader;
     Shader standardShader;
@@ -98,6 +100,7 @@ struct SceneView
     int selectedGOIndex = 0;
     Material highlightMaterial;
     RenderTexture cameraTarget;
+    RenderTexture selectionTarget;
 
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
@@ -432,6 +435,7 @@ void svInit( SceneView** sv, int width, int height )
     *sv = new SceneView();
     
     (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
+    (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::R32F, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false );
     (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );
@@ -469,6 +473,20 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->camera.AddComponent< LineRendererComponent >();
 
     (*sv)->scene.Add( &(*sv)->camera );
+
+    (*sv)->selectionCamera.AddComponent< CameraComponent >();
+    (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+    (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.01f, 0.01f, 0.01f ) );
+    (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
+    (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetLayerMask( 2 );
+    //(*sv)->selectionCamera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    (*sv)->selectionCamera.GetComponent<CameraComponent>()->SetTargetTexture( &(*sv)->selectionTarget );
+    (*sv)->selectionCamera.AddComponent< TransformComponent >();
+    (*sv)->selectionCamera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
+    (*sv)->selectionCamera.SetName( "Selection Outline Camera" );
+
+    (*sv)->scene.Add( &(*sv)->selectionCamera );
 
     (*sv)->unlitShader.Load( "unlit_vertex", "unlit_fragment",
                       FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
@@ -536,6 +554,15 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->lightLineHandle = CreateConeLines();
     
     (*sv)->camera.GetComponent< LineRendererComponent >()->SetLineHandle( (*sv)->gridLineHandle );
+
+    (*sv)->selectionGO.AddComponent< MeshRendererComponent >();
+    (*sv)->selectionGO.GetComponent< MeshRendererComponent >()->SetMesh( &(*sv)->cubeMesh );
+    (*sv)->selectionGO.GetComponent< MeshRendererComponent >()->SetMaterial( &(*sv)->highlightMaterial, 0 );
+    (*sv)->selectionGO.AddComponent< TransformComponent >();
+    (*sv)->selectionGO.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, 0 } );
+    (*sv)->selectionGO.SetName( "Selection Outline" );
+    (*sv)->selectionGO.SetLayer( 2 );
+    (*sv)->scene.Add( &(*sv)->selectionGO );
 }
 
 ae3d::Material* svGetMaterial( SceneView* sceneView )
@@ -616,136 +643,167 @@ void svDuplicateGameObject( SceneView* sv )
     }
 }
 
+static void RenderSSAO( SceneView* sv )
+{
+    int width = sv->ssaoTex.GetWidth();
+    int height = sv->ssaoTex.GetHeight();
+
+    sv->ssaoTex.SetLayout( TextureLayout::General );
+    sv->ssaoShader.SetProjectionMatrix( sv->camera.GetComponent<CameraComponent>()->GetProjection() );
+    sv->ssaoShader.SetRenderTexture( &sv->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
+#if RENDERER_VULKAN
+    sv->ssaoShader.SetTexture2D( &sv->noiseTex, 2 );
+    sv->ssaoShader.SetTexture2D( &sv->ssaoTex, 14 );
+#else
+    sv->ssaoShader.SetTexture2D( &sv->noiseTex, 3 );
+    sv->ssaoShader.SetTexture2D( &sv->ssaoTex, 2 );
+#endif
+    sv->ssaoShader.Begin();
+    sv->ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
+    sv->ssaoShader.End();
+    sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
+
+    sv->ssaoBlurTex.SetLayout( TextureLayout::General );
+    sv->blurShader.SetTexture2D( &sv->ssaoTex, 0 );
+#if RENDERER_VULKAN
+    sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 14 );
+#else
+    sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 1 );
+#endif
+
+    sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+    sv->blurShader.Begin();
+    sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+    sv->blurShader.End();
+
+    sv->blurShader.Begin();
+
+    sv->ssaoTex.SetLayout( TextureLayout::General );
+    sv->ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
+    sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 0 );
+#if RENDERER_VULKAN
+    sv->blurShader.SetTexture2D( &sv->ssaoTex, 14 );
+#else
+    sv->blurShader.SetTexture2D( &sv->ssaoTex, 1 );
+#endif
+    sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+    sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+    sv->blurShader.End();
+
+    sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
+    sv->ssaoBlurTex.SetLayout( TextureLayout::General );
+
+    sv->composeShader.Begin();
+    sv->composeTex.SetLayout( TextureLayout::General );
+    sv->composeShader.SetRenderTexture( &sv->cameraTarget, 0 );
+#if RENDERER_VULKAN
+    sv->composeShader.SetTexture2D( &sv->composeTex, 14 );
+#else
+    sv->composeShader.SetTexture2D( &sv->composeTex, 1 );
+#endif
+    sv->composeShader.SetTexture2D( &sv->ssaoTex, 2 );
+    sv->composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
+    sv->composeShader.End();
+    sv->composeTex.SetLayout( TextureLayout::ShaderRead );
+
+    System::Draw( &sv->composeTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+}
+
+static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold )
+{
+    const int width = sv->cameraTarget.GetWidth();
+    const int height = sv->cameraTarget.GetHeight();
+
+#if RENDERER_VULKAN
+    const unsigned slot = 14;
+    const int blurDiv = 16;
+#else
+    const unsigned slot = 1;
+    const int blurDiv = 32;
+#endif
+
+    sv->blurTex.SetLayout( TextureLayout::General );
+    sv->downsampleAndThresholdShader.SetRenderTexture( &sv->cameraTarget, 0 );
+    sv->downsampleAndThresholdShader.SetTexture2D( &sv->blurTex, slot );
+    sv->downsampleAndThresholdShader.SetUniform( ae3d::ComputeShader::UniformName::BloomThreshold, bloomThreshold, 0 );
+    sv->downsampleAndThresholdShader.Begin();
+    sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
+    sv->downsampleAndThresholdShader.End();
+
+    sv->blurTex.SetLayout( TextureLayout::ShaderRead );
+
+    sv->blurShader.SetTexture2D( &sv->blurTex, 0 );
+    sv->blurShader.SetTexture2D( &sv->bloomTex, slot );
+
+    sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+    sv->blurShader.Begin();
+    sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
+    sv->blurShader.End();
+
+    sv->blurShader.Begin();
+
+    sv->blurTex.SetLayout( TextureLayout::General );
+    sv->bloomTex.SetLayout( TextureLayout::ShaderRead );
+    sv->blurShader.SetTexture2D( &sv->bloomTex, 0 );
+    sv->blurShader.SetTexture2D( &sv->blurTex, slot );
+    sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+    sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
+    sv->blurShader.End();
+
+    sv->blurTex.SetLayout( TextureLayout::ShaderRead );
+    int postHeight = height;
+    if (ssao == SSAO::Enabled)
+    {
+        System::Draw( &sv->ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+    }
+    else
+    {
+        System::Draw( &sv->cameraTarget, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+    }
+    System::Draw( &sv->blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+
+    sv->bloomTex.SetLayout( TextureLayout::General );
+}
+
+static void UpdateSelectionHighlight( SceneView* sv )
+{
+    sv->selectionGO.SetEnabled( sv->selectedGameObjects.count > 0 && sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >() );
+    sv->selectionCamera.GetComponent< TransformComponent >()->SetLocalPosition( sv->camera.GetComponent< TransformComponent >()->GetLocalPosition() );
+    sv->selectionCamera.GetComponent< TransformComponent >()->SetLocalRotation( sv->camera.GetComponent< TransformComponent >()->GetLocalRotation() );
+
+    if (sv->selectedGameObjects.count > 0)
+    {
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >())
+        {
+            sv->selectionGO.GetComponent< MeshRendererComponent >()->SetMesh( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMesh() );
+        }
+
+        sv->selectionGO.GetComponent< TransformComponent >()->SetLocalPosition( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition() );
+        sv->selectionGO.GetComponent< TransformComponent >()->SetLocalRotation( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalRotation() );
+    }
+}
+
 void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold )
 {
+    UpdateSelectionHighlight( sv );
+
     sv->scene.Render();
 
     if (ssao == SSAO::Enabled)
     {
-        int width = sv->ssaoTex.GetWidth();
-        int height = sv->ssaoTex.GetHeight();
-
-        sv->ssaoTex.SetLayout( TextureLayout::General );
-        sv->ssaoShader.SetProjectionMatrix( sv->camera.GetComponent<CameraComponent>()->GetProjection() );
-        sv->ssaoShader.SetRenderTexture( &sv->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
-#if RENDERER_VULKAN
-        sv->ssaoShader.SetTexture2D( &sv->noiseTex, 2 );
-        sv->ssaoShader.SetTexture2D( &sv->ssaoTex, 14 );
-#else
-        sv->ssaoShader.SetTexture2D( &sv->noiseTex, 3 );
-        sv->ssaoShader.SetTexture2D( &sv->ssaoTex, 2 );
-#endif
-        sv->ssaoShader.Begin();
-        sv->ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
-        sv->ssaoShader.End();
-        sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
-
-        sv->ssaoBlurTex.SetLayout( TextureLayout::General );
-        sv->blurShader.SetTexture2D( &sv->ssaoTex, 0 );
-#if RENDERER_VULKAN
-        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 14 );
-#else
-        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 1 );
-#endif
-
-        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        sv->blurShader.Begin();
-        sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
-        sv->blurShader.End();
-
-        sv->blurShader.Begin();
-
-        sv->ssaoTex.SetLayout( TextureLayout::General );
-        sv->ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
-        sv->blurShader.SetTexture2D( &sv->ssaoBlurTex, 0 );
-#if RENDERER_VULKAN
-        sv->blurShader.SetTexture2D( &sv->ssaoTex, 14 );
-#else
-        sv->blurShader.SetTexture2D( &sv->ssaoTex, 1 );
-#endif
-        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
-        sv->blurShader.End();
-
-        sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
-        sv->ssaoBlurTex.SetLayout( TextureLayout::General );
-
-        sv->composeShader.Begin();
-        sv->composeTex.SetLayout( TextureLayout::General );
-        sv->composeShader.SetRenderTexture( &sv->cameraTarget, 0 );
-#if RENDERER_VULKAN
-        sv->composeShader.SetTexture2D( &sv->composeTex, 14 );
-#else
-        sv->composeShader.SetTexture2D( &sv->composeTex, 1 );
-#endif
-        sv->composeShader.SetTexture2D( &sv->ssaoTex, 2 );
-        sv->composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
-        sv->composeShader.End();
-        sv->composeTex.SetLayout( TextureLayout::ShaderRead );
-
-        System::Draw( &sv->composeTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        RenderSSAO( sv );
     }
     else
     {
         const int width = sv->cameraTarget.GetWidth();
         const int height = sv->cameraTarget.GetHeight();
         System::Draw( &sv->cameraTarget, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+        System::Draw( &sv->selectionTarget, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
     }
 
     if (bloom == Bloom::Enabled)
     {
-        const int width = sv->cameraTarget.GetWidth();
-        const int height = sv->cameraTarget.GetHeight();
-
-#if RENDERER_VULKAN
-        const unsigned slot = 14;
-        const int blurDiv = 16;
-#else
-        const unsigned slot = 1;
-        const int blurDiv = 32;
-#endif
-
-        sv->blurTex.SetLayout( TextureLayout::General );
-        sv->downsampleAndThresholdShader.SetRenderTexture( &sv->cameraTarget, 0 );
-        sv->downsampleAndThresholdShader.SetTexture2D( &sv->blurTex, slot );
-        sv->downsampleAndThresholdShader.SetUniform( ae3d::ComputeShader::UniformName::BloomThreshold, bloomThreshold, 0 );
-        sv->downsampleAndThresholdShader.Begin();
-        sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
-        sv->downsampleAndThresholdShader.End();
-
-        sv->blurTex.SetLayout( TextureLayout::ShaderRead );
-
-        sv->blurShader.SetTexture2D( &sv->blurTex, 0 );
-        sv->blurShader.SetTexture2D( &sv->bloomTex, slot );
-
-        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-        sv->blurShader.Begin();
-        sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
-        sv->blurShader.End();
-
-        sv->blurShader.Begin();
-
-        sv->blurTex.SetLayout( TextureLayout::General );
-        sv->bloomTex.SetLayout( TextureLayout::ShaderRead );
-        sv->blurShader.SetTexture2D( &sv->bloomTex, 0 );
-        sv->blurShader.SetTexture2D( &sv->blurTex, slot );
-        sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-        sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
-        sv->blurShader.End();
-
-        sv->blurTex.SetLayout( TextureLayout::ShaderRead );
-        int postHeight = height;
-        if (ssao == SSAO::Enabled)
-        {
-            System::Draw( &sv->ssaoTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        }
-        else
-        {
-            System::Draw( &sv->cameraTarget, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        }
-        System::Draw( &sv->blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
-
-        sv->bloomTex.SetLayout( TextureLayout::General );
+        RenderBloom( sv, ssao, bloomThreshold );
     }
 }
 
@@ -795,6 +853,8 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
 void svSaveScene( SceneView* sv, char* path )
 {
     sv->scene.Remove( &sv->camera );
+    sv->scene.Remove( &sv->selectionCamera );
+    sv->scene.Remove( &sv->selectionGO );
     
     if (sv->gameObjects.count > 0 && sv->gameObjects[ 0 ] != nullptr)
     {
@@ -814,6 +874,8 @@ void svSaveScene( SceneView* sv, char* path )
     fclose( f );
 
     sv->scene.Add( &sv->camera );
+    sv->scene.Add( &sv->selectionCamera );
+    sv->scene.Add( &sv->selectionGO );
 }
 
 ae3d::GameObject* svSelectGameObjectIndex( SceneView* sv, int index )
