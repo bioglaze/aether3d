@@ -98,7 +98,8 @@ struct SceneView
     int gridLineHandle = 0;
     int lightLineHandle = 0;
     int selectedGOIndex = 0;
-    Material highlightMaterial;
+    Material gizmoHighlightMaterial;
+    Material selectionHighlightMaterial;
     RenderTexture cameraTarget;
     RenderTexture selectionTarget;
 
@@ -519,9 +520,12 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
     (*sv)->material.SetBackFaceCulling( true );
 
-    (*sv)->highlightMaterial.SetShader( &(*sv)->unlitShader );
-    (*sv)->highlightMaterial.SetTexture( &(*sv)->lightTex, 0 );
-    (*sv)->highlightMaterial.SetBackFaceCulling( true );
+    (*sv)->gizmoHighlightMaterial.SetShader( &(*sv)->unlitShader );
+    (*sv)->gizmoHighlightMaterial.SetTexture( &(*sv)->lightTex, 0 );
+    (*sv)->gizmoHighlightMaterial.SetBackFaceCulling( true );
+
+    (*sv)->selectionHighlightMaterial.SetShader( &(*sv)->unlitShader );
+    (*sv)->selectionHighlightMaterial.SetBackFaceCulling( true );
 
     (*sv)->cubeMesh.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
@@ -557,7 +561,7 @@ void svInit( SceneView** sv, int width, int height )
 
     (*sv)->selectionGO.AddComponent< MeshRendererComponent >();
     (*sv)->selectionGO.GetComponent< MeshRendererComponent >()->SetMesh( &(*sv)->cubeMesh );
-    (*sv)->selectionGO.GetComponent< MeshRendererComponent >()->SetMaterial( &(*sv)->highlightMaterial, 0 );
+    (*sv)->selectionGO.GetComponent< MeshRendererComponent >()->SetMaterial( &(*sv)->selectionHighlightMaterial, 0 );
     (*sv)->selectionGO.AddComponent< TransformComponent >();
     (*sv)->selectionGO.GetComponent< TransformComponent >()->SetLocalPosition( { 0, 0, 0 } );
     (*sv)->selectionGO.SetName( "Selection Outline" );
@@ -785,8 +789,6 @@ static void UpdateSelectionHighlight( SceneView* sv )
 
 void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold )
 {
-    UpdateSelectionHighlight( sv );
-
     sv->scene.Render();
 
     if (ssao == SSAO::Enabled)
@@ -848,6 +850,9 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
         sv->gameObjects.Add( &go );
         sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
     }
+
+    sv->scene.Add( &sv->selectionCamera );
+    sv->scene.Add( &sv->selectionGO );
 }
 
 void svSaveScene( SceneView* sv, char* path )
@@ -956,6 +961,8 @@ void svUpdate( SceneView* sceneView )
     {
         sceneView->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( sceneView->selectedGameObjects[ 0 ]->GetComponent<TransformComponent>()->GetLocalPosition() );
     }
+
+    UpdateSelectionHighlight( sceneView );
 }
 
 void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int height )
@@ -975,18 +982,18 @@ void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int h
     {
         sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.xAxisMaterial, 1 );
         sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.yAxisMaterial, 2 );
-        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->highlightMaterial, 0 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->gizmoHighlightMaterial, 0 );
     }
     else if (selected == 1)
     {
-        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->highlightMaterial, 1 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->gizmoHighlightMaterial, 1 );
         sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.yAxisMaterial, 2 );
         sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.zAxisMaterial, 0 );
     }
     else if (selected == 2)
     {
         sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.xAxisMaterial, 1 );
-        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->highlightMaterial, 2 );
+        sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->gizmoHighlightMaterial, 2 );
         sv->gameObjects[ 0 ]->GetComponent< ae3d::MeshRendererComponent >()->SetMaterial( &sv->transformGizmo.zAxisMaterial, 0 );
     }
     else
@@ -1203,7 +1210,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             float y = (int)screenPoint.y * screenScale;
 #endif
             ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
-                                screenWidth * screenScale, screenHeight * screenScale, Vec4( 1, 1, 1, opacity ), ae3d::System::BlendMode::Off );
+                                (int)(screenWidth * screenScale), (int)(screenHeight * screenScale), Vec4( 1, 1, 1, opacity ), ae3d::System::BlendMode::Off );
         }
     }
 
