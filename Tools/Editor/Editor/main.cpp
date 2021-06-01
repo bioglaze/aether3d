@@ -218,6 +218,7 @@ int main()
 
                 if (event.keyCode == KeyCode::Enter) inspector.HandleKey( 4, event.type == WindowEventType::KeyDown ? 0 : 1 );
                 if (event.keyCode == KeyCode::Backspace) inspector.HandleKey( 6, event.type == WindowEventType::KeyDown ? 0 : 1 );
+                if (event.keyCode == KeyCode::Delete) inspector.HandleKey( 3, event.type == WindowEventType::KeyDown ? 0 : 1 );
                 if (event.type == WindowEventType::KeyDown)
                 {
                     if (event.keyCode == KeyCode::Minus) inspector.HandleChar( '-' );

@@ -382,6 +382,8 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
             uint16_t jointCount = 0;
             is.read( (char*)&jointCount, sizeof( jointCount ) );
 
+            System::Assert( jointCount < 80, "Joint array in PerObjectUboStruct is too small!" );
+
             subMesh.joints.resize( jointCount );
             
             for (size_t j = 0; j < subMesh.joints.size(); ++j)

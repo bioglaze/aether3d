@@ -784,6 +784,7 @@ static void UpdateSelectionHighlight( SceneView* sv )
 
         sv->selectionGO.GetComponent< TransformComponent >()->SetLocalPosition( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition() );
         sv->selectionGO.GetComponent< TransformComponent >()->SetLocalRotation( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalRotation() );
+        sv->selectionGO.GetComponent< TransformComponent >()->SetLocalScale( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalScale() );
     }
 }
 
