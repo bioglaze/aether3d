@@ -939,7 +939,7 @@ namespace ae3d
         
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.elements );
 
-        debug::hasMarker = debug::enabled;
+        debug::hasMarker = true;
 
         vkGetPhysicalDeviceFeatures( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::deviceFeatures );
 
@@ -1648,17 +1648,11 @@ namespace ae3d
             debug::enabled = true;
         }
         
-        if (debug::enabled)
-        {
-            debug::Setup( GfxDeviceGlobal::instance );
-        }
+        debug::Setup( GfxDeviceGlobal::instance );
 
         CreateDevice();
 
-        if (debug::enabled)
-        {
-            debug::SetupDevice( GfxDeviceGlobal::device );
-        }
+        debug::SetupDevice( GfxDeviceGlobal::device );
 
         LoadFunctionPointers();
         InitSwapChain();

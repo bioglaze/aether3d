@@ -127,6 +127,11 @@ namespace debug
         CmdBeginDebugUtilsLabelEXT = ( PFN_vkCmdBeginDebugUtilsLabelEXT )vkGetInstanceProcAddr( instance, "vkCmdBeginDebugUtilsLabelEXT" );
         CmdEndDebugUtilsLabelEXT = ( PFN_vkCmdEndDebugUtilsLabelEXT )vkGetInstanceProcAddr( instance, "vkCmdEndDebugUtilsLabelEXT" );
 
+        if (!debug::enabled)
+        {
+            return;
+        }
+
         VkDebugUtilsMessengerCreateInfoEXT dbg_messenger_create_info = {};
         dbg_messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
         dbg_messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
@@ -264,7 +269,7 @@ namespace ae3d
 #if AE3D_OPENVR
         instanceCreateInfo.enabledExtensionCount = debug::enabled ? 4 : 3;
 #else
-        instanceCreateInfo.enabledExtensionCount = debug::enabled ? 3 : 2;
+        instanceCreateInfo.enabledExtensionCount = 3;
 #endif
         instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
 
