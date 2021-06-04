@@ -765,6 +765,7 @@ static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold )
         System::Draw( &sv->cameraTarget, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
     }
     System::Draw( &sv->blurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 0.5f ), System::BlendMode::Additive );
+    System::Draw( &sv->selectionTarget, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
 
     sv->bloomTex.SetLayout( TextureLayout::General );
 }

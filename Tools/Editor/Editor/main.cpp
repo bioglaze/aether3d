@@ -318,6 +318,11 @@ int main()
                     if (!svIsDraggingGizmo( sceneView ))
                     {
                         selectedGO = svSelectObject( sceneView, x, y, width, height );
+
+                        if (selectedGO)
+                        {
+                            inspector.SetTextEditText( selectedGO->GetName() );
+                        }
                     }
 
                     svHandleLeftMouseUp( sceneView );
