@@ -35,5 +35,6 @@ SET COMPILER=dxc.exe
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\Blur.obj /E CSMain hlsl\Blur.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\ssao.obj /E CSMain hlsl\ssao.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\compose.obj /E CSMain hlsl\compose.hlsl
+%COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\outline.obj /E CSMain hlsl\outline.hlsl
 
 pause

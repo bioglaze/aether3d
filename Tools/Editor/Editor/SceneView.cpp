@@ -78,6 +78,7 @@ struct SceneView
     Scene scene;
     Shader unlitShader;
     Shader standardShader;
+    ComputeShader outlineShader;
     ComputeShader blurShader;
     ComputeShader downsampleAndThresholdShader;
     ComputeShader ssaoShader;
@@ -94,6 +95,7 @@ struct SceneView
     Texture2D blurTex;
     Texture2D blurTex2;
     Texture2D noiseTex;
+    Texture2D outlineTex;
     Matrix44 lineProjection;
     int gridLineHandle = 0;
     int lightLineHandle = 0;
@@ -443,6 +445,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::Float, nullptr );
     (*sv)->ssaoBlurTex.CreateUAV( width, height, "ssaoBlurTex", DataType::Float, nullptr );
     (*sv)->composeTex.CreateUAV( width, height, "composeTex", DataType::Float, nullptr );
+    (*sv)->outlineTex.CreateUAV( width, height, "outlineTex", DataType::Float, nullptr );
     
     constexpr int noiseDim = 64;
     Vec4 noiseData[ noiseDim * noiseDim ];
@@ -501,6 +504,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
     (*sv)->ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
     (*sv)->composeShader.Load( "compose", FileSystem::FileContents( "shaders/compose.obj" ), FileSystem::FileContents( "shaders/compose.spv" ) );
+    (*sv)->outlineShader.Load( "outline", FileSystem::FileContents( "shaders/outline.obj" ), FileSystem::FileContents( "shaders/outline.spv" ) );
     
     (*sv)->gameObjects.Add( new GameObject() );
     (*sv)->transformGizmo.redTex.Load( FileSystem::FileContents( "textures/red.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
@@ -802,7 +806,20 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
         const int width = sv->cameraTarget.GetWidth();
         const int height = sv->cameraTarget.GetHeight();
         System::Draw( &sv->cameraTarget, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-        System::Draw( &sv->selectionTarget, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
+
+        if (sv->selectedGameObjects.count > 0)
+        {
+            sv->outlineTex.SetLayout( TextureLayout::ShaderReadWrite );
+            sv->outlineShader.SetRenderTexture( &sv->selectionTarget, 0 );
+            sv->outlineShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+            sv->outlineShader.SetTexture2D( &sv->outlineTex, 14 );
+            sv->outlineShader.Begin();
+            sv->outlineShader.Dispatch( width / 8, height / 8, 1, "Selection Outline" );
+            sv->outlineShader.End();
+            sv->outlineTex.SetLayout( TextureLayout::ShaderRead );
+        
+            System::Draw( &sv->outlineTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Additive );
+        }
     }
 
     if (bloom == Bloom::Enabled)

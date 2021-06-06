@@ -23,9 +23,7 @@
 %VULKAN_SDK%\bin\dxc.exe -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl\Blur.hlsl -Fo ..\..\..\aether3d_build\Samples\shaders\Blur.spv
 %VULKAN_SDK%\bin\dxc.exe -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl\ssao.hlsl -Fo ..\..\..\aether3d_build\Samples\shaders\ssao.spv
 %VULKAN_SDK%\bin\dxc.exe -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl\compose.hlsl -Fo ..\..\..\aether3d_build\Samples\shaders\compose.spv
-
-@REM %VULKAN_SDK%\Bin\spirv-opt hlsl\sprite_vert.spv --inline-entry-points-exhaustive --convert-local-access-chains --eliminate-local-single-block --eliminate-local-single-store --eliminate-insert-extract --eliminate-dead-code-aggressive --eliminate-dead-branches --merge-blocks --eliminate-local-single-block --eliminate-local-single-store --eliminate-local-multi-store --eliminate-insert-extract --eliminate-dead-code-aggressive --eliminate-common-uniform -o ..\..\..\aether3d_build\Samples\sprite_vert_opt.spv
-@REM %VULKAN_SDK%\Bin\spirv-remap --strip all --dce all -i hlsl\sprite_vert_opt.spv -o ..\..\..\aether3d_build\Samples\
+%VULKAN_SDK%\bin\dxc.exe -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl\outline.hlsl -Fo ..\..\..\aether3d_build\Samples\shaders\outline.spv
 
 pause
 

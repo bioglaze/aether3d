@@ -23,4 +23,4 @@ dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/Bloom.hls
 dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/Blur.hlsl -Fo ../../../aether3d_build/Samples/shaders/Blur.spv
 dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/ssao.hlsl -Fo ../../../aether3d_build/Samples/shaders/ssao.spv
 dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/compose.hlsl -Fo ../../../aether3d_build/Samples/shaders/compose.spv
-
+dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/outline.hlsl -Fo ../../../aether3d_build/Samples/shaders/outline.spv
