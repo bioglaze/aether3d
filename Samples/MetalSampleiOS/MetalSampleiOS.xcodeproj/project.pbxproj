@@ -14,6 +14,7 @@
 		AB7177D725E02BFE005402E4 /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7177D425E02BFE005402E4 /* Bloom.metal */; };
 		AB7177D825E02BFE005402E4 /* SSAO.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7177D525E02BFE005402E4 /* SSAO.metal */; };
 		AB7177D925E02BFE005402E4 /* UnlitSkin.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7177D625E02BFE005402E4 /* UnlitSkin.metal */; };
+		AB93F886266E501700DF3C86 /* outline.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB93F885266E501700DF3C86 /* outline.metal */; };
 		AB9B3F7C1CB57BB40037EDA1 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */; };
 		AB9C9F8623D1F8EE007F9B6B /* sine340.wav in Resources */ = {isa = PBXBuildFile; fileRef = AB9C9F8523D1F8EE007F9B6B /* sine340.wav */; };
 		AB9C9F8B23D20213007F9B6B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB9C9F8A23D20213007F9B6B /* AVFoundation.framework */; };
@@ -71,6 +72,7 @@
 		AB7177D425E02BFE005402E4 /* Bloom.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Bloom.metal; path = ../../../Engine/Assets/Bloom.metal; sourceTree = "<group>"; };
 		AB7177D525E02BFE005402E4 /* SSAO.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SSAO.metal; path = ../../../Engine/Assets/SSAO.metal; sourceTree = "<group>"; };
 		AB7177D625E02BFE005402E4 /* UnlitSkin.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = UnlitSkin.metal; path = ../../../Engine/Assets/UnlitSkin.metal; sourceTree = "<group>"; };
+		AB93F885266E501700DF3C86 /* outline.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = outline.metal; path = ../../../Engine/Assets/outline.metal; sourceTree = "<group>"; };
 		AB9B3F7B1CB57BB40037EDA1 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
 		AB9C9F8523D1F8EE007F9B6B /* sine340.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = sine340.wav; path = ../../../../aether3d_build/Samples/sine340.wav; sourceTree = "<group>"; };
 		AB9C9F8A23D20213007F9B6B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -184,6 +186,7 @@
 		ABD3AB241C29D78900E78933 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				AB93F885266E501700DF3C86 /* outline.metal */,
 				AB7177D425E02BFE005402E4 /* Bloom.metal */,
 				AB7177D525E02BFE005402E4 /* SSAO.metal */,
 				AB7177D625E02BFE005402E4 /* UnlitSkin.metal */,
@@ -324,6 +327,7 @@
 				AB7177D725E02BFE005402E4 /* Bloom.metal in Sources */,
 				ABA29F481C19E1F90098E21D /* AppDelegate.m in Sources */,
 				AB7177D925E02BFE005402E4 /* UnlitSkin.metal in Sources */,
+				AB93F886266E501700DF3C86 /* outline.metal in Sources */,
 				ABD3AB2A1C29D79F00E78933 /* Moments.metal in Sources */,
 				AB9CA0011D8ECA760049A3AF /* Standard.metal in Sources */,
 				ABA29F4B1C19E1F90098E21D /* GameViewController.mm in Sources */,

@@ -438,7 +438,7 @@ void svInit( SceneView** sv, int width, int height )
     *sv = new SceneView();
     
     (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
-    (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::R32F, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false );
+    (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false );
     (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );
@@ -812,7 +812,11 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
             sv->outlineTex.SetLayout( TextureLayout::ShaderReadWrite );
             sv->outlineShader.SetRenderTexture( &sv->selectionTarget, 0 );
             sv->outlineShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+#if RENDERER_VULKAN
             sv->outlineShader.SetTexture2D( &sv->outlineTex, 14 );
+#else
+            sv->outlineShader.SetTexture2D( &sv->outlineTex, 1 );
+#endif
             sv->outlineShader.Begin();
             sv->outlineShader.Dispatch( width / 8, height / 8, 1, "Selection Outline" );
             sv->outlineShader.End();

@@ -18,6 +18,7 @@
 		AB657725200FD3BD0089CB54 /* MetalCommon.h in Sources */ = {isa = PBXBuildFile; fileRef = AB657724200FD3BD0089CB54 /* MetalCommon.h */; };
 		AB7839E41C70CA950065EF51 /* DepthNormals.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB7839E31C70CA950065EF51 /* DepthNormals.metal */; };
 		AB9330F11F744513004E4640 /* UnlitSkin.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB9330F01F744513004E4640 /* UnlitSkin.metal */; };
+		AB93F881266E4FF300DF3C86 /* outline.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB93F880266E4FF300DF3C86 /* outline.metal */; };
 		AB9D9A291C96E993009DF897 /* back.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A221C96E993009DF897 /* back.jpg */; };
 		AB9D9A2A1C96E993009DF897 /* bottom.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A231C96E993009DF897 /* bottom.jpg */; };
 		AB9D9A2B1C96E993009DF897 /* front.jpg in Resources */ = {isa = PBXBuildFile; fileRef = AB9D9A241C96E993009DF897 /* front.jpg */; };
@@ -71,6 +72,7 @@
 		AB657724200FD3BD0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
 		AB7839E31C70CA950065EF51 /* DepthNormals.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = DepthNormals.metal; path = ../../../Engine/Assets/DepthNormals.metal; sourceTree = "<group>"; };
 		AB9330F01F744513004E4640 /* UnlitSkin.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = UnlitSkin.metal; path = ../../../Engine/Assets/UnlitSkin.metal; sourceTree = "<group>"; };
+		AB93F880266E4FF300DF3C86 /* outline.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = outline.metal; path = ../../../Engine/Assets/outline.metal; sourceTree = "<group>"; };
 		AB9D9A221C96E993009DF897 /* back.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = back.jpg; path = ../../../../aether3d_build/Samples/skybox/back.jpg; sourceTree = "<group>"; };
 		AB9D9A231C96E993009DF897 /* bottom.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bottom.jpg; path = ../../../../aether3d_build/Samples/skybox/bottom.jpg; sourceTree = "<group>"; };
 		AB9D9A241C96E993009DF897 /* front.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = front.jpg; path = ../../../../aether3d_build/Samples/skybox/front.jpg; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB93F880266E4FF300DF3C86 /* outline.metal */,
 				ABAB408C26174EFB00BFE12C /* sine340.wav */,
 				AB5DB100251630020050A421 /* SSAO.metal */,
 				AB5C3EBD24D1550000B17AF7 /* example.ogg */,
@@ -411,6 +414,7 @@
 				ABE04FC51C1217F00025C436 /* SDF.metal in Sources */,
 				AB9330F11F744513004E4640 /* UnlitSkin.metal in Sources */,
 				ABE04FC61C1217F00025C436 /* Skybox.metal in Sources */,
+				AB93F881266E4FF300DF3C86 /* outline.metal in Sources */,
 				ABFD71AC1D81E55B003770D4 /* LightCuller.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -585,6 +589,7 @@
 				INFOPLIST_FILE = MetalSampleOSX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = ../../../aether3d_build;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleOSX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

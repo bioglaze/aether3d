@@ -651,6 +651,7 @@
 					../Include,
 					../ThirdParty,
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = buildProdPath;
 			};
