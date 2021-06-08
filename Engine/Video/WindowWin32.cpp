@@ -127,6 +127,8 @@ static void InitKeyMap()
     WindowGlobal::keyMap[ 57 ] = ae3d::KeyCode::N9;
         
     WindowGlobal::keyMap[ 190 ] = ae3d::KeyCode::Dot;
+    WindowGlobal::keyMap[ 36 ] = ae3d::KeyCode::Home;
+    WindowGlobal::keyMap[ 35 ] = ae3d::KeyCode::End;
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
