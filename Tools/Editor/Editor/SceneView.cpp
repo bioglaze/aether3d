@@ -1249,7 +1249,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         transform->UpdateLocalAndGlobalMatrix();
         ae3d::Matrix44 viewMat = camera->GetView();
         ae3d::Matrix44::Multiply( transform->GetLocalMatrix(), viewMat, viewMat );
-        ae3d::System::DrawLines( sv->lightLineHandle, viewMat, camera->GetProjection(), screenWidth, screenHeight );
+        ae3d::System::DrawLines( sv->lightLineHandle, viewMat, camera->GetProjection(), screenWidth * screenScale, screenHeight * screenScale );
         transform->SetLocalScale( oldScale );
         transform->UpdateLocalAndGlobalMatrix();
     }
