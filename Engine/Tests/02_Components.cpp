@@ -213,13 +213,13 @@ void TestMissingFiles()
     mesh.Load( FileSystem::FileContents( "notfound.ae3d" ) );
 
     Texture2D tex2d;
-    tex2d.Load( FileSystem::FileContents("notfound.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::RGB, Anisotropy::k1 );
+    tex2d.Load( FileSystem::FileContents("notfound.png"), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
 
     TextureCube texCube;
     texCube.Load( FileSystem::FileContents( "skybox/left.jpg" ), FileSystem::FileContents( "skybox/right.jpg" ),
                 FileSystem::FileContents( "skybox/bottom.jpg" ), FileSystem::FileContents( "skybox/top.jpg" ),
                 FileSystem::FileContents( "skybox/front.jpg" ), FileSystem::FileContents( "skybox/back.jpg" ),
-                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::RGB );
+                TextureWrap::Clamp, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB );
     
     Font font;
     font.LoadBMFont( &tex2d, FileSystem::FileContents("not_found.fnt") );
