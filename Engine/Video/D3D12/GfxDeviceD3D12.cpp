@@ -10,6 +10,7 @@
 #define _PIX3_H_
 #include <AmdDxExt/AmdPix3.h>
 #else
+#define USE_PIX
 #include <WinPixEventRuntime/pix3.h>
 #endif
 #include <vector>
@@ -951,18 +952,14 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
         }
 #endif
         debugController->Release();
-    }
-    else
-    {
-        OutputDebugStringA( "Failed to create debug layer!\n" );
-    }
 
-    ID3D12DeviceRemovedExtendedDataSettings* dredSettings = nullptr;
-    dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &dredSettings ) );
-    if (dhr == S_OK && apiValidation)
-    {
-        dredSettings->SetAutoBreadcrumbsEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
-        dredSettings->SetPageFaultEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
+        ID3D12DeviceRemovedExtendedDataSettings* dredSettings = nullptr;
+        dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &dredSettings ) );
+        if (dhr == S_OK && apiValidation)
+        {
+            dredSettings->SetAutoBreadcrumbsEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
+            dredSettings->SetPageFaultEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
+        }
     }
 
     IDXGIFactory2* factory = nullptr;
@@ -975,11 +972,13 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     hr = D3D12CreateDevice( GfxDeviceGlobal::adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
     GfxDeviceGlobal::device->SetName( L"D3D12 device" );
-#ifdef DEBUG
-    hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
-    AE3D_CHECK_D3D( hr, "Infoqueue failed" );
-    GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
-#endif
+
+    if (apiValidation)
+    {
+        hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
+        AE3D_CHECK_D3D( hr, "Infoqueue failed" );
+        GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
+    }
 
     hr = GfxDeviceGlobal::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( &GfxDeviceGlobal::commandListAllocator ) );
     AE3D_CHECK_D3D( hr, "Failed to create command allocator" );
