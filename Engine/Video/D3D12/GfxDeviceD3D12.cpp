@@ -194,7 +194,7 @@ namespace GfxDeviceGlobal
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc = {};
     std::vector< ae3d::VertexBuffer > lineBuffers;
     std::vector< ID3D12Resource* > constantBuffers;
-    std::vector< ID3D12Resource* > mappedConstantBuffers;
+    std::vector< void* > mappedConstantBuffers;
     int currentConstantBufferIndex = 0;
     unsigned frameIndex = 0;
     ae3d::LightTiler lightTiler;
