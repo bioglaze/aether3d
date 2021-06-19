@@ -2306,9 +2306,11 @@ void BeginOffscreen()
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
+#ifndef DISABLE_TIMESTAMPS
     vkCmdResetQueryPool( GfxDeviceGlobal::offscreenCmdBuffer, GfxDeviceGlobal::queryPool, 0, 2 );
     vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 0 );
-
+#endif
+    
     VkClearValue clearValues[ 2 ];
     clearValues[ 0 ].color = GfxDeviceGlobal::clearColor;
     clearValues[ 1 ].depthStencil = { 1.0f, 0 };
@@ -2329,9 +2331,11 @@ void BeginOffscreen()
 
 void EndOffscreen( int profilerIndex )
 {
+#ifndef DISABLE_TIMESTAMPS    
     vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 1 );
     vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
-
+#endif
+    
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
 
@@ -2351,11 +2355,13 @@ void EndOffscreen( int profilerIndex )
     AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
     Statistics::IncQueueSubmitCalls();
 
+#ifndef DISABLE_TIMESTAMPS
     std::uint64_t timestamps[ 2 ] = {};
     err = vkGetQueryPoolResults( GfxDeviceGlobal::device, GfxDeviceGlobal::queryPool, 0, 2, sizeof( std::uint64_t ) * 2, timestamps, sizeof( std::uint64_t ), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT );
     //AE3D_CHECK_VULKAN( err, "vkGetQueryPoolResults" );
-
     GfxDeviceGlobal::timings[ 0 ] = (timestamps[ 1 ] - timestamps[ 0 ]) / 1000.0f;
+#endif
+    
 
     if (profilerIndex == 0)
     {
