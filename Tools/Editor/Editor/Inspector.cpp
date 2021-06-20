@@ -84,7 +84,8 @@ static void DrawNuklear( int width, int height )
 
     const auto res = nk_convert( &ctx, &uiCommands, &vbuf, &ebuf, &config );
     System::Assert( res == NK_CONVERT_SUCCESS, "buffer conversion failed!" );
-    
+
+    // FIXME: textfield scissoring is broken on Vulkan. It works (but is upside-down ) if the following stuff is commented out and System::DrawUI below first Vulkan part is defined out.
 #if RENDERER_VULKAN
     for (int i = 0; i < MAX_VERTEX_MEMORY / (int)sizeof( VertexPTC ); ++i)
     {
@@ -116,7 +117,7 @@ static void DrawNuklear( int width, int height )
 #if RENDERER_VULKAN
                         cmd->elem_count, &uiTextures[ cmd->texture.id ], offset, width, height );
 #else
-        cmd->elem_count, &uiTextures[ cmd->texture.id ], offset, width, height * 2 );
+                        cmd->elem_count, &uiTextures[ cmd->texture.id ], offset, width, height * 2 );
 #endif
 
         offset += cmd->elem_count / 3;
@@ -372,7 +373,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     nk_property_float( &ctx, "#Blue:", -1024.0f, &color.z, 1024.0f, 1, 1 );
                     nk_layout_row_static( &ctx, 40, 450, 1 );
 
-                    //nk_colorf color2;
+                    //static nk_colorf color2;
                     //nk_color_pick( &ctx, &color2, NK_RGB );
                 }
                 
