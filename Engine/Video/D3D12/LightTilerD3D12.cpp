@@ -286,9 +286,11 @@ void ae3d::LightTiler::UpdateLightBuffers()
 {
     const std::size_t byteSize = MaxLights * 4 * sizeof( float );
 
+    D3D12_RANGE emptyRange{};
+
     {
         char* pointLightPtr = nullptr;
-        HRESULT hr = pointLightCenterAndRadiusBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&pointLightPtr) );
+        HRESULT hr = pointLightCenterAndRadiusBuffer->Map( 0, &emptyRange, reinterpret_cast<void**>(&pointLightPtr) );
 
         if (FAILED( hr ))
         {
@@ -302,7 +304,7 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
     {
         char* pointLightPtr = nullptr;
-        HRESULT hr = pointLightColorBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&pointLightPtr) );
+        HRESULT hr = pointLightColorBuffer->Map( 0, &emptyRange, reinterpret_cast<void**>(&pointLightPtr) );
 
         if (FAILED( hr ))
         {
@@ -316,7 +318,7 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
     {
         char* spotLightPtr = nullptr;
-        HRESULT hr = spotLightCenterAndRadiusBuffer->Map( 0, nullptr, reinterpret_cast<void**>(&spotLightPtr) );
+        HRESULT hr = spotLightCenterAndRadiusBuffer->Map( 0, &emptyRange, reinterpret_cast<void**>(&spotLightPtr) );
 
         if (FAILED( hr ))
         {
@@ -330,7 +332,7 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
     {
         char* spotLightPtr = nullptr;
-        HRESULT hr = spotLightColorBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &spotLightPtr ) );
+        HRESULT hr = spotLightColorBuffer->Map( 0, &emptyRange, reinterpret_cast<void**>( &spotLightPtr ) );
 
         if ( FAILED( hr ) )
         {
@@ -344,7 +346,7 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
     {
         char* spotLightPtr = nullptr;
-        HRESULT hr = spotLightParamsBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &spotLightPtr ) );
+        HRESULT hr = spotLightParamsBuffer->Map( 0, &emptyRange, reinterpret_cast<void**>( &spotLightPtr ) );
 
         if ( FAILED( hr ) )
         {
