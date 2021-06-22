@@ -110,8 +110,9 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
     vbUpload->SetName( L"UploadVertexBuffer" );
     Global::vbs.push_back( vbUpload );
 
+    D3D12_RANGE emptyRange{};
     char* vbUploadPtr = nullptr;
-    hr = vbUpload->Map( 0, nullptr, reinterpret_cast<void**>(&vbUploadPtr) );
+    hr = vbUpload->Map( 0, &emptyRange, reinterpret_cast<void**>(&vbUploadPtr) );
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Unable to map upload vertex buffer!\n" );
@@ -178,7 +179,8 @@ void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
     Global::vbs.push_back( vbUpload );
 
     mappedDynamic = nullptr;
-    hr = vbUpload->Map( 0, nullptr, reinterpret_cast<void**>(&mappedDynamic) );
+    D3D12_RANGE emptyRange{};
+    hr = vbUpload->Map( 0, &emptyRange, reinterpret_cast<void**>(&mappedDynamic) );
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Unable to map vertex buffer!\n" );
