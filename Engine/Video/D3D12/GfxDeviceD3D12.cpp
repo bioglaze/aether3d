@@ -918,7 +918,8 @@ void CreateConstantBuffers()
 
         GfxDeviceGlobal::constantBuffers[ bufferIndex ] = constantBuffer;
 
-        hr = constantBuffer->Map( 0, nullptr, reinterpret_cast<void**>( &GfxDeviceGlobal::mappedConstantBuffers[ bufferIndex ] ) );
+        D3D12_RANGE emptyRange{};
+        hr = constantBuffer->Map( 0, &emptyRange, reinterpret_cast<void**>( &GfxDeviceGlobal::mappedConstantBuffers[ bufferIndex ] ) );
         if (FAILED( hr ))
         {
             ae3d::System::Print( "Unable to map shader constant buffer!" );
