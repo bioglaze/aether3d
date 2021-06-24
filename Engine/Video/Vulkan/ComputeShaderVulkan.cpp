@@ -145,6 +145,10 @@ void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
     {
         GfxDeviceGlobal::perObjectUboStruct.bloomThreshold = x;
     }
+    else if (uniform == UniformName::BloomIntensity)
+    {
+        GfxDeviceGlobal::perObjectUboStruct.bloomIntensity = x;
+    }
 }
 
 void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, unsigned slot )

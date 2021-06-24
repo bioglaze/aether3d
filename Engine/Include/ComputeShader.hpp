@@ -24,7 +24,7 @@ namespace ae3d
     {
     public:
         /// Uniform. These correspond to variables in shader include file ubo.h and MetalCommon.h.
-		enum class UniformName { TilesZW, BloomThreshold };
+		enum class UniformName { TilesZW, BloomThreshold, BloomIntensity };
 
         /// Call before Dispatch.
         void Begin();

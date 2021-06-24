@@ -34,7 +34,7 @@ struct PerObjectUboStruct
     int isVR = 0;
     int kernelSize;
     float bloomThreshold = 0.8f;
-    float bloomParam;
+    float bloomIntensity = 1;
     ae3d::Vec4 kernelOffsets[ 16 ];
     ae3d::Vec4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
 };
