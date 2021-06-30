@@ -26,9 +26,11 @@ class Inspector
     bool IsSSAOEnabled() const { return ssao; }
     bool IsBloomEnabled() const { return bloom; }
     float GetBloomThreshold() const { return bloomThreshold; }
+    float GetBloomIntensity() const { return bloomIntensity; }
 
 private:
     float bloomThreshold;
+    float bloomIntensity;
     bool textEditActive;
     bool ssao;
     bool bloom;

@@ -717,7 +717,7 @@ static void RenderSSAO( SceneView* sv )
     System::Draw( &sv->composeTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
 }
 
-static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold )
+static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold, float bloomIntensity )
 {
     const int width = sv->cameraTarget.GetWidth();
     const int height = sv->cameraTarget.GetHeight();
@@ -734,6 +734,7 @@ static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold )
     sv->downsampleAndThresholdShader.SetRenderTexture( &sv->cameraTarget, 0 );
     sv->downsampleAndThresholdShader.SetTexture2D( &sv->blurTex, slot );
     sv->downsampleAndThresholdShader.SetUniform( ae3d::ComputeShader::UniformName::BloomThreshold, bloomThreshold, 0 );
+    sv->downsampleAndThresholdShader.SetUniform( ae3d::ComputeShader::UniformName::BloomIntensity, bloomIntensity, 0 );
     sv->downsampleAndThresholdShader.Begin();
     sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
     sv->downsampleAndThresholdShader.End();
@@ -793,7 +794,7 @@ static void UpdateSelectionHighlight( SceneView* sv )
     }
 }
 
-void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold )
+void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold, float bloomIntensity )
 {
     sv->scene.Render();
 
@@ -828,7 +829,7 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold 
 
     if (bloom == Bloom::Enabled)
     {
-        RenderBloom( sv, ssao, bloomThreshold );
+        RenderBloom( sv, ssao, bloomThreshold, bloomIntensity );
     }
 }
 
