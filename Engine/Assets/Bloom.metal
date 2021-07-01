@@ -20,7 +20,7 @@ kernel void downsampleAndThreshold(texture2d<float, access::read> colorTexture [
     const float4 color = colorTexture.read( gid );
     const float luminance = dot( color.rgb, float3( 0.2126f, 0.7152f, 0.0722f ) );
     const float luminanceThreshold = uniforms.bloomParams.x;
-    const float4 finalColor = luminance > luminanceThreshold ? color : float4( 0, 0, 0, 0 );
+    const float4 finalColor = luminance > luminanceThreshold ? color * uniforms.bloomParams.y : float4( 0, 0, 0, 0 );
     downsampledBrightTexture.write( finalColor, gid.xy / 2 );
 }
 

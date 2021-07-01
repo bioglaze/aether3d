@@ -80,6 +80,10 @@ void ae3d::ComputeShader::SetUniform( UniformName uniform, float x, float y )
     {
         GfxDeviceGlobal::perObjectUboStruct.bloomThreshold = x;
     }
+    else if (uniform == UniformName::BloomIntensity)
+    {
+        GfxDeviceGlobal::perObjectUboStruct.bloomIntensity = x;
+    }
 }
 
 void ae3d::ComputeShader::SetUniformBuffer( unsigned slotIndex, id< MTLBuffer > buffer )

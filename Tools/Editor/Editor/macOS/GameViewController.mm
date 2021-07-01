@@ -461,7 +461,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
         ae3d::System::SetCurrentDrawableMetal( _view );
         ae3d::System::BeginFrame();
         svMoveCamera( sceneView, moveDir );
-        svBeginRender( sceneView, inspector.IsSSAOEnabled() ? SSAO::Enabled : SSAO::Disabled, inspector.IsBloomEnabled() ? Bloom::Enabled : Bloom::Disabled, inspector.GetBloomThreshold() );
+        svBeginRender( sceneView, inspector.IsSSAOEnabled() ? SSAO::Enabled : SSAO::Disabled, inspector.IsBloomEnabled() ? Bloom::Enabled : Bloom::Disabled, inspector.GetBloomThreshold(), inspector.GetBloomIntensity() );
         svDrawSprites( sceneView, width, height );
         int goCount = 0;
         ae3d::GameObject** gameObjects = svGetGameObjects( sceneView, goCount );
