@@ -85,7 +85,6 @@ static void DrawNuklear( int width, int height )
     const auto res = nk_convert( &ctx, &uiCommands, &vbuf, &ebuf, &config );
     System::Assert( res == NK_CONVERT_SUCCESS, "buffer conversion failed!" );
 
-    // FIXME: textfield scissoring is broken on Vulkan. It works (but is upside-down ) if the following stuff is commented out and System::DrawUI below first Vulkan part is defined out.
 #if RENDERER_VULKAN
     for (int i = 0; i < MAX_VERTEX_MEMORY / (int)sizeof( VertexPTC ); ++i)
     {
@@ -108,7 +107,7 @@ static void DrawNuklear( int width, int height )
 
         System::DrawUI( (int)(cmd->clip_rect.x),
 #if RENDERER_VULKAN
-                        (int)(cmd->clip_rect.y - cmd->clip_rect.h),
+                        (int)(cmd->clip_rect.y - cmd->clip_rect.h) + 30, // FIXME: + 30 fixes a scissoring issue with textfield.
 #else
                         (int)((height - (int)(cmd->clip_rect.y + cmd->clip_rect.h))),
 #endif
