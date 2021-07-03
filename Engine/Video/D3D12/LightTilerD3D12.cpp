@@ -9,6 +9,7 @@
 #include "Matrix.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
+#include "Statistics.hpp"
 #include "Vec3.hpp"
 
 extern int AE3D_CB_SIZE;
@@ -284,6 +285,8 @@ void ae3d::LightTiler::Init()
 
 void ae3d::LightTiler::UpdateLightBuffers()
 {
+    Statistics::BeginLightUpdateProfiling();
+
     const std::size_t byteSize = MaxLights * 4 * sizeof( float );
 
     D3D12_RANGE emptyRange{};
@@ -357,6 +360,8 @@ void ae3d::LightTiler::UpdateLightBuffers()
         memcpy_s( spotLightPtr, byteSize, &spotLightParams[ 0 ], byteSize );
         spotLightParamsBuffer->Unmap( 0, nullptr );
     }
+
+    Statistics::EndLightUpdateProfiling();
 }
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )

@@ -29,7 +29,9 @@ namespace Statistics
     float queueWaitTimeMs = 0;
     float frustumCullTimeMS = 0;
     float waitForPreviousFrameTimeMS = 0;
+    float lightUpdateTimeMS = 0;
 
+    std::chrono::time_point< std::chrono::steady_clock > startLightUpdateTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startPrimaryPassTimePoint;
@@ -37,6 +39,23 @@ namespace Statistics
     std::chrono::time_point< std::chrono::steady_clock > startPresentTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startSceneAABBPoint;
     std::chrono::time_point< std::chrono::steady_clock > startWaitForPreviousFrameTimePoint;
+}
+
+void Statistics::BeginLightUpdateProfiling()
+{
+    startLightUpdateTimePoint = std::chrono::steady_clock::now();
+}
+
+void Statistics::EndLightUpdateProfiling()
+{
+    auto tEnd = std::chrono::steady_clock::now();
+    auto tDiff = std::chrono::duration< double, std::milli >( tEnd - Statistics::startLightUpdateTimePoint ).count();
+    lightUpdateTimeMS = static_cast< float >( tDiff );
+}
+
+float Statistics::GetLightUpdateTimeMS()
+{
+    return lightUpdateTimeMS;
 }
 
 float Statistics::GetWaitForPreviousFrameProfiling()
@@ -330,6 +349,7 @@ void Statistics::ResetFrameStatistics()
     queueWaitTimeMs = 0;
     frustumCullTimeMS = 0;
     waitForPreviousFrameTimeMS = 0;
+    lightUpdateTimeMS = 0;
 
     startFrameTimePoint = std::chrono::steady_clock::now();
 }

@@ -26,6 +26,10 @@ namespace Statistics
     void BeginFrameTimeProfiling();
     void EndFrameTimeProfiling();
 
+    void BeginLightUpdateProfiling();
+    void EndLightUpdateProfiling();
+    float GetLightUpdateTimeMS();
+
     void BeginSceneAABB();
     void EndSceneAABB();
     
