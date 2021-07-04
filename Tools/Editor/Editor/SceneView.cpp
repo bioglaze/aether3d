@@ -78,6 +78,7 @@ struct SceneView
     Scene scene;
     Shader unlitShader;
     Shader standardShader;
+    Shader objectIdShader;
     ComputeShader outlineShader;
     ComputeShader blurShader;
     ComputeShader downsampleAndThresholdShader;
@@ -104,7 +105,8 @@ struct SceneView
     Material selectionHighlightMaterial;
     RenderTexture cameraTarget;
     RenderTexture selectionTarget;
-
+    RenderTexture objectIdTarget;
+    
     // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
     Material material;
@@ -439,6 +441,7 @@ void svInit( SceneView** sv, int width, int height )
     
     (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
     (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false );
+    (*sv)->objectIdTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "objectIdTarget", false );
     (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );
@@ -469,8 +472,8 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.01f, 0.01f, 0.01f ) );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
-    (*sv)->camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
-    (*sv)->camera.GetComponent<CameraComponent>()->SetTargetTexture( &(*sv)->cameraTarget );
+    (*sv)->camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    (*sv)->camera.GetComponent< CameraComponent >()->SetTargetTexture( &(*sv)->cameraTarget );
     (*sv)->camera.AddComponent< TransformComponent >();
     (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
     (*sv)->camera.SetName( "EditorCamera" );
@@ -484,8 +487,8 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.01f, 0.01f, 0.01f ) );
     (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetLayerMask( 2 );
-    //(*sv)->selectionCamera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
-    (*sv)->selectionCamera.GetComponent<CameraComponent>()->SetTargetTexture( &(*sv)->selectionTarget );
+    //(*sv)->selectionCamera.GetComponent< CameraComponent >()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetTargetTexture( &(*sv)->selectionTarget );
     (*sv)->selectionCamera.AddComponent< TransformComponent >();
     (*sv)->selectionCamera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
     (*sv)->selectionCamera.SetName( "Selection Outline Camera" );
@@ -495,6 +498,10 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->unlitShader.Load( "unlit_vertex", "unlit_fragment",
                       FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
                       FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
+
+    (*sv)->objectIdShader.Load( "unlit_vertex", "objectid_fragment",
+                      FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/objectid_frag.obj" ),
+                      FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/objectid_frag.spv" ) );
 
     (*sv)->standardShader.Load( "standard_vertex", "standard_fragment",
                       FileSystem::FileContents( "shaders/Standard_vert.obj" ), FileSystem::FileContents( "shaders/Standard_frag.obj" ),
@@ -947,7 +954,6 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
         if (screenX > screenPoint.x && screenX < screenPoint.x + texWidth / s &&
             screenY * s > screenPoint.y * s && screenY * s < screenPoint.y * s + texHeight)
         {
-            System::Print("Hit game object sprite\n");
             sv->scene.Add( sv->gameObjects[ 0 ] );
             sv->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( sv->gameObjects[ goIndex ]->GetComponent<TransformComponent>()->GetLocalPosition() );
 
@@ -957,6 +963,29 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
         }
     }
 
+    // Checks if the mouse hit the gizmo.
+    {
+        /*float* objectIdTargetMapped = sv->objectIdTarget->Map();
+
+        if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 ] > 0.1f )
+        {
+            sv->selectedGOIndex = 0;
+            sv->transformGizmo.selectedMesh = 0;
+        }
+        else if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 + 1 ] > 0.1f )
+        {
+            sv->selectedGOIndex = 0;
+            sv->transformGizmo.selectedMesh = 1;
+        }
+        else if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 + 2 ] > 0.1f )
+        {
+            sv->selectedGOIndex = 0;
+            sv->transformGizmo.selectedMesh = 2;
+        }
+
+        sv->objectIdTarget->Unmap();*/
+    }
+    
     // Checks if the mouse hit a mesh and selects the object.
     Array< CollisionInfo > ci;
     const CollisionFilter filter = (sv->selectedGameObjects.count != 0) ? CollisionFilter::All : CollisionFilter::ExcludeGizmo;
