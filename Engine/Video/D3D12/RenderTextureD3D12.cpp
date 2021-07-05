@@ -28,7 +28,7 @@ void ae3d::RenderTexture::DestroyTextures()
     }
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool /* isMultisampled */ )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -56,7 +56,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     descTex.DepthOrArraySize = 1;
     descTex.MipLevels = 1;
     descTex.Format = dxgiFormat;
-    descTex.SampleDesc.Count = 1;
+    descTex.SampleDesc.Count = isMultisampled ? 4 : 1;
     descTex.SampleDesc.Quality = 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     descTex.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
@@ -84,7 +84,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
         D3D12_RENDER_TARGET_VIEW_DESC descRtv = {};
         descRtv.Format = dxgiFormat;
-        descRtv.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+        descRtv.ViewDimension = isMultisampled ? D3D12_RTV_DIMENSION_TEXTURE2DMS : D3D12_RTV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateRenderTargetView( gpuResource.resource, &descRtv, rtv );
     }
 
@@ -93,7 +93,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         descDepth.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         descDepth.Width = width;
         descDepth.Height = height;
-        descDepth.DepthOrArraySize = 1;
+        descDepth.DepthOrArraySize = isMultisampled ? 4 : 1;
         descDepth.MipLevels = 1;
         descDepth.Format = DXGI_FORMAT_D32_FLOAT;
         descDepth.SampleDesc.Count = 1;
@@ -121,7 +121,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         RenderTextureGlobal::renderTextures.push_back( gpuResourceDepth.resource );
 
         srvDesc.Format = dxgiFormat;
-        srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.ViewDimension = isMultisampled ? D3D12_SRV_DIMENSION_TEXTURE2DMS : D3D12_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srvDesc.Texture2D.MipLevels = 1;
         srvDesc.Texture2D.MostDetailedMip = 0;
@@ -132,7 +132,6 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         handle = static_cast< unsigned >(srv.ptr);
 
         GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
-
     }
 }
 

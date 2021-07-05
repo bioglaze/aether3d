@@ -117,7 +117,7 @@ int main()
     System::InitGamePad();
 
     RenderTexture cameraTex;
-    cameraTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", true );
+    cameraTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", testMSAA );
         
     RenderTexture camera2dTex;
     camera2dTex.Create2D( width, height, DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
@@ -493,7 +493,7 @@ int main()
         }
         if (!testBloom)
         {
-            System::Draw( &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( testMSAA ? &resolvedTex : &cameraTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
 
