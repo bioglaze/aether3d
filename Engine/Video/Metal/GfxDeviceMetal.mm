@@ -218,27 +218,24 @@ namespace ae3d
             {
                 std::string str( "frame time: " );
                 str += std::to_string( ::Statistics::GetFrameTimeMS() );
-                str += "\n";
-                str += "shadow map time: ";
+                str += "\nshadow map time: ";
                 str += std::to_string( ::Statistics::GetShadowMapTimeMS() );
-                str += "\n";
-                str += "depth pass time: ";
+                str += "\ndepth pass time: ";
                 str += std::to_string( ::Statistics::GetDepthNormalsTimeMS() );
-                str += "\n";
-                str += "bloom time CPU: ";
+                str += "\nbloom time CPU: ";
                 str += std::to_string( ::Statistics::GetBloomCpuTimeMS());
-                str += "\n";
-                str += "draw calls: ";
+                str += "\ndraw calls: ";
                 str += std::to_string( ::Statistics::GetDrawCalls() );
-                str += "\n";
-                str += "scene AABB: ";
+                str += "\nscene AABB: ";
                 str += std::to_string( ::Statistics::GetSceneAABBTimeMS() );
                 str += "\nfrustum cull: ";
                 str += std::to_string( ::Statistics::GetFrustumCullTimeMS() );
                 str += "\nmemory: ";
                 str += std::to_string([device currentAllocatedSize] / (1024 * 1024));
-                str += " MiB\n";
-                str += "textures: ";
+                str += " MiB";
+                str += "\nlight update time: ";
+                str += std::to_string( ::Statistics::GetLightUpdateTimeMS() );
+                str += "\ntextures: ";
                 str += std::to_string(tex2dMemoryUsage / (1024 * 1024));
                 str += " MiB\n";
                 std::strcpy( outStr, str.c_str() );
@@ -731,7 +728,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     
     [renderEncoder setVertexBuffer:vertexBuffer.GetVertexBuffer() offset:0 atIndex:0];
     [renderEncoder setVertexBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
-    [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
     
     MTLViewport viewport;
     viewport.originX = GfxDeviceGlobal::viewport[ 0 ];
@@ -742,19 +738,31 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     viewport.zfar = 1;
     [renderEncoder setViewport:viewport];
     
-    if (shader.GetMetalVertexShaderName() == "standard_vertex")
+    const bool isStandard = shader.GetMetalVertexShaderName() == "standard_vertex";
+    
+    if (isStandard)
     {
-        [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
+        id< MTLBuffer > buffers[] = { GetCurrentUniformBuffer(), GfxDeviceGlobal::lightTiler.GetPerTileLightIndexBuffer(),
+            GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer(), GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer(),
+            GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer(), GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer(),
+            GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer()
+        };
+        NSRange range = { 5, 7 };
+        NSUInteger offsets[] = { 0, 0, 0, 0, 0, 0, 0 };
+        [renderEncoder setFragmentBuffers:buffers offsets:offsets withRange:range];
+        /*[renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPerTileLightIndexBuffer() offset:0 atIndex:6];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer() offset:0 atIndex:7];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer() offset:0 atIndex:8];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer() offset:0 atIndex:9];
         [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer() offset:0 atIndex:10];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer() offset:0 atIndex:11];
-        [renderEncoder setFragmentTexture:textures[ 2 ] atIndex:2];
-        [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
+        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer() offset:0 atIndex:11];*/
     }
-
+    else
+    {
+        [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
+    }
+    
     static CullMode cachedCullMode = CullMode::Off;
     if (cullMode != cachedCullMode)
     {
@@ -769,10 +777,18 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
     }
     
-    [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
-    [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
-    [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
-
+    if (isStandard)
+    {
+        NSRange range = { 0, 5 };
+        [renderEncoder setFragmentTextures:textures withRange:range ];
+    }
+    else
+    {
+        [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
+        [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
+        [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
+    }
+    
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {
         [renderEncoder setDepthStencilState:depthStateLessEqualWriteOff];
@@ -791,11 +807,13 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         [renderEncoder setDepthStencilState:depthStateLessEqualWriteOn];
     }
     
-    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 0 ] atIndex:0];
+    NSRange range = { 0, 5 };
+    [renderEncoder setFragmentSamplerStates:GfxDeviceGlobal::samplerStates withRange:range ];
+    /*[renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 0 ] atIndex:0];
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 1 ] atIndex:1];
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 2 ] atIndex:2];
     [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 3 ] atIndex:3];
-    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 4 ] atIndex:4];
+    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 4 ] atIndex:4];*/
     
     if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
     {

@@ -2,6 +2,7 @@
 #include "ComputeShader.hpp"
 #include "GfxDevice.hpp"
 #include "Matrix.hpp"
+#include "Statistics.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
@@ -83,6 +84,8 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
 
 void ae3d::LightTiler::UpdateLightBuffers()
 {
+    Statistics::BeginLightUpdateProfiling();
+    
     const int copySize = MaxLights * 4 * sizeof( float );
     
     uint8_t* bufferPointer = (uint8_t *)[pointLightCenterAndRadiusBuffer contents];
@@ -107,5 +110,5 @@ void ae3d::LightTiler::UpdateLightBuffers()
     [spotLightParamsBuffer didModifyRange:NSMakeRange( 0, copySize )];
     [spotLightColorBuffer didModifyRange:NSMakeRange( 0, copySize )];
 #endif
+    Statistics::EndLightUpdateProfiling();
 }
-
