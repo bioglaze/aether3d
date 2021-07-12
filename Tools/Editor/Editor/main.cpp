@@ -36,7 +36,7 @@ void GetOpenPath( char* path, const char* extension )
     }
     else if (strstr( extension, "wav" ))
     {
-        ofn.lpstrFilter = "Audio\0*.wav;obj\0All\0*.*\0";
+        ofn.lpstrFilter = "Audio\0*.wav;*.ogg\0All\0*.*\0";
     }
 
     ofn.nFilterIndex = 1;
