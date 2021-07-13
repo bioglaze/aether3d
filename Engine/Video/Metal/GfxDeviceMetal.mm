@@ -750,13 +750,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         NSRange range = { 5, 7 };
         NSUInteger offsets[] = { 0, 0, 0, 0, 0, 0, 0 };
         [renderEncoder setFragmentBuffers:buffers offsets:offsets withRange:range];
-        /*[renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPerTileLightIndexBuffer() offset:0 atIndex:6];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightCenterAndRadiusBuffer() offset:0 atIndex:7];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightCenterAndRadiusBuffer() offset:0 atIndex:8];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetPointLightColorBuffer() offset:0 atIndex:9];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightParamsBuffer() offset:0 atIndex:10];
-        [renderEncoder setFragmentBuffer:GfxDeviceGlobal::lightTiler.GetSpotLightColorBuffer() offset:0 atIndex:11];*/
     }
     else
     {
@@ -809,11 +802,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     
     NSRange range = { 0, 5 };
     [renderEncoder setFragmentSamplerStates:GfxDeviceGlobal::samplerStates withRange:range ];
-    /*[renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 0 ] atIndex:0];
-    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 1 ] atIndex:1];
-    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 2 ] atIndex:2];
-    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 3 ] atIndex:3];
-    [renderEncoder setFragmentSamplerState:GfxDeviceGlobal::samplerStates[ 4 ] atIndex:4];*/
     
     if (vertexBuffer.GetVertexFormat() == VertexBuffer::VertexFormat::PTNTC)
     {
