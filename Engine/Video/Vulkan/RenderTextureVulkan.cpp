@@ -104,6 +104,22 @@ void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
     color.layout = aLayout;
 }
 
+void* ae3d::RenderTexture::Map()
+{
+    System::Assert( color.mem != nullptr, "Map(): color.mem must be initialized!" );
+    
+    void* pixels = nullptr;
+    VkResult err = vkMapMemory( GfxDeviceGlobal::device, color.mem, 0, VK_WHOLE_SIZE, 0, &pixels );
+    AE3D_CHECK_VULKAN( err, "vkMapMemory" );
+
+    return pixels;
+}
+
+void ae3d::RenderTexture::Unmap()
+{
+    vkUnmapMemory( GfxDeviceGlobal::device, color.mem );
+}
+
 void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
 {    
     GfxDevice::EndRenderPass();

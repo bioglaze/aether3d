@@ -40,6 +40,11 @@ namespace ae3d
         const char* GetName() const { return name.c_str(); };
         
 #if RENDERER_VULKAN
+        /// \return Pixel data for reading. Call Unmap when done reading it.
+        void* Map();
+
+        void Unmap();
+        
         /// \return Multisample count.
         int GetSampleCount() const { return sampleCount; }
 
