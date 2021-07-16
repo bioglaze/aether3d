@@ -2,6 +2,52 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
+void ae3d::RenderTexture::MakeCpuReadable()
+{
+    if (metalTexture == nil)
+    {
+        System::Print("Can't call MakeCpuReadable before creating the texture!\n");
+        System::Assert( false, "Create the texture first!" );
+        return;
+    }
+    
+    MTLPixelFormat format = MTLPixelFormatBGRA8Unorm_sRGB;
+
+    if (dataType == DataType::R32G32)
+    {
+        format = MTLPixelFormatRG32Float;
+    }
+    else if (dataType == DataType::Float)
+    {
+        format = MTLPixelFormatRGBA32Float;
+    }
+    else if (dataType == DataType::Float16)
+    {
+        format = MTLPixelFormatRGBA16Float;
+    }
+    else if (dataType == DataType::R32F)
+    {
+        format = MTLPixelFormatR32Float;
+    }
+
+    MTLTextureDescriptor* textureDescriptor =
+    [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:format
+                                                       width:width
+                                                      height:height
+                                                   mipmapped:NO];
+    textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+    textureDescriptor.storageMode = MTLStorageModeManaged;
+    NSString* label = metalTexture.label;
+    metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
+
+    if (metalTexture == nullptr)
+    {
+        System::Print( "Failed to create a render texture 2D!\n" );
+    }
+    
+    metalTexture.label = label;
+}
+
 void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool /* isMultisampled */ )
 {
     if (aWidth <= 0 || aHeight <= 0)

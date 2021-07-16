@@ -107,7 +107,6 @@ struct SceneView
     RenderTexture selectionTarget;
     RenderTexture objectIdTarget;
     
-    // TODO: Test content, remove when stuff works.
     Texture2D gliderTex;
     Material material;
     Mesh cubeMesh;
@@ -442,6 +441,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
     (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false );
     (*sv)->objectIdTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "objectIdTarget", false );
+    (*sv)->objectIdTarget.MakeCpuReadable();
     (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );

@@ -33,6 +33,9 @@ namespace ae3d
         /// \param debugName Debug name that is visible in graphics debugging tools.
         void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
 
+        // Slow. Enables reading pixels with Map()/Unmap(). Use only for special stuff like picking buffer in Editor.
+        void MakeCpuReadable();
+        
         /// \param nam New name.
         void SetName( const std::string& nam ) { name = nam; }
         
