@@ -186,7 +186,7 @@ float pointLightAttenuation( float d, float r )
 fragment half4 standard_shadow_point_fragment( StandardColorInOut in [[stage_in]],
                                texture2d<float, access::sample> albedoSmoothnessMap [[texture(0)]],
                                texture2d<float, access::sample> normalMap [[texture(1)]],
-                               texture2d<float, access::sample> specularMap [[texture(2)]],
+                               texturecube<float, access::sample> specularMap [[texture(2)]],
                                texture2d<float, access::sample> _ShadowMap [[texture(3)]],
                                texturecube<float, access::sample> cubeMap [[texture(4)]],
                                constant Uniforms& uniforms [[ buffer(5) ]],
@@ -203,7 +203,7 @@ fragment half4 standard_shadow_point_fragment( StandardColorInOut in [[stage_in]
     
     float depth = in.projCoord.z / in.projCoord.w;
 
-    float shadow = uniforms.lightType == 0 ? 1.0f : max( uniforms.minAmbient, VSMPoint( cubeMap, in.projCoord, depth, uniforms.lightType ) );
+    float shadow = uniforms.lightType == 0 ? 1.0f : max( uniforms.minAmbient, VSMPoint( specularMap, in.projCoord, depth, uniforms.lightType ) );
 
     return albedoColor * half4( shadow, shadow, shadow, 1 );// * cubeReflection;
 }
