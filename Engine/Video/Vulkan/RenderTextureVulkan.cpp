@@ -92,6 +92,13 @@ static void CreateSampler( ae3d::TextureFilter filter, ae3d::TextureWrap wrap, V
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)outSampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }
 
+void ae3d::RenderTexture::MakeCpuReadable()
+{
+    System::Assert( width > 0 && height > 0, "MakeCpuReadable must be called after Create2D()!" );
+    
+    Create2D( width, height, dataType, wrap, filter, "CPU-readable render texture", sampleCount > 1 );
+}
+
 void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
 {
     SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
@@ -252,9 +259,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAlloc.allocationSize = memReqs.size;
 
-    memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+    // The check makes it possible to call this method twice. The second call is made in MakeCpuReadable(). It's a hack, but saves some code.
+    memAlloc.memoryTypeIndex = GetMemoryType( memReqs.memoryTypeBits, colorImageView.image == VK_NULL_HANDLE ? VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT : VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT );
     err = vkAllocateMemory( GfxDeviceGlobal::device, &memAlloc, nullptr, &color.mem );
     AE3D_CHECK_VULKAN( err, "render texture 2d color image memory" );
+    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)color.mem, VK_OBJECT_TYPE_DEVICE_MEMORY, debugName );
     RenderTextureGlobal::memoryToReleaseAtExit.push_back( color.mem );
     Statistics::IncAllocCalls();
     Statistics::IncTotalAllocCalls();
