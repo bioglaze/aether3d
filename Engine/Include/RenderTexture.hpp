@@ -83,7 +83,7 @@ namespace ae3d
         
         struct FrameBufferAttachment
         {
-            VkImage image;
+            VkImage image = VK_NULL_HANDLE;
             VkDeviceMemory mem;
             VkImageView views[ 6 ]; // 2D views into cube faces.
             VkImageView view; // 2D or cube view depending on texture type.
