@@ -75,6 +75,7 @@ struct SceneView
     GameObject camera;
     GameObject selectionCamera; // For outline rendering.
     GameObject selectionGO; // For outline rendering.
+    GameObject objectIdCamera;
     Scene scene;
     Shader unlitShader;
     Shader standardShader;
@@ -495,6 +496,19 @@ void svInit( SceneView** sv, int width, int height )
 
     (*sv)->scene.Add( &(*sv)->selectionCamera );
 
+    (*sv)->objectIdCamera.AddComponent< CameraComponent >();
+    (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
+    (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
+    (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.01f, 0.01f, 0.01f ) );
+    (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::Depth );
+    //(*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetLayerMask( 2 );
+    //(*sv)->objectIdCamera.GetComponent< CameraComponent >()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetTargetTexture( &(*sv)->objectIdTarget );
+    (*sv)->objectIdCamera.AddComponent< TransformComponent >();
+    (*sv)->objectIdCamera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
+    (*sv)->objectIdCamera.SetName( "Object ID Camera" );
+    (*sv)->scene.Add( &(*sv)->objectIdCamera );
+
     (*sv)->unlitShader.Load( "unlit_vertex", "unlit_fragment",
                       FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
                       FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
@@ -807,6 +821,9 @@ static void UpdateSelectionHighlight( SceneView* sv )
 
 void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold, float bloomIntensity )
 {
+    sv->objectIdCamera.GetComponent< TransformComponent >()->SetLocalPosition( sv->camera.GetComponent< TransformComponent >()->GetLocalPosition() );
+    sv->objectIdCamera.GetComponent< TransformComponent >()->SetLocalRotation( sv->camera.GetComponent< TransformComponent >()->GetLocalRotation() );
+
     sv->scene.Render();
 
     if (ssao == SSAO::Enabled)
@@ -1033,7 +1050,28 @@ void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int h
     GetColliders( sv->camera, CollisionFilter::OnlyGizmo, screenX, screenY, width, height, 200, sv->gameObjects, colTest, ci );
 
     const bool isGizmo = (ci.count == 0) ? false : (ci[ 0 ].go == sv->gameObjects[ 0 ]);
-    const int selected = isGizmo ? ci[ 0 ].subMeshIndex : -1;
+    int selected = isGizmo ? ci[ 0 ].subMeshIndex : -1;
+
+    // Checks if the mouse hit the gizmo.
+    {
+        /*float* objectIdTargetMapped = (float*)sv->objectIdTarget.Map();
+
+        ae3d::System::Print( "Color: %f, %f, %f\n", objectIdTargetMapped[ screenY * height * 4 + screenX * 4 ], objectIdTargetMapped[ screenY * height * 4 + screenX * 4 + 1 ], objectIdTargetMapped[ screenY * height * 4 + screenX * 4 + 2 ] );
+        if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 ] > 0.1f )
+        {
+            selected = 0;
+        }
+        else if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 + 1 ] > 0.1f )
+        {
+            selected = 1;
+        }
+        else if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 + 2 ] > 0.1f )
+        {
+            selected = 2;
+        }
+
+        sv->objectIdTarget.Unmap();*/
+    }
 
     if (selected == 0)
     {
