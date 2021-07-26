@@ -2,6 +2,21 @@
 #include "GfxDevice.hpp"
 #include "System.hpp"
 
+void* ae3d::RenderTexture::Map()
+{
+    // TODO: Fix region.
+    // TODO: CPU-readable texture should probably set allowGPUOptimizedContents to false.
+    MTLRegion region = {};
+    void* bytes;
+    [metalTexture getBytes:&bytes bytesPerRow:width * height * 4 fromRegion:region mipmapLevel:0];
+    return bytes;
+}
+
+void ae3d::RenderTexture::Unmap()
+{
+    
+}
+
 void ae3d::RenderTexture::MakeCpuReadable()
 {
     if (metalTexture == nil)
@@ -36,7 +51,11 @@ void ae3d::RenderTexture::MakeCpuReadable()
                                                       height:height
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+#if !TARGET_OS_IPHONE
     textureDescriptor.storageMode = MTLStorageModeManaged;
+#else
+    textureDescriptor.storageMode = MTLStorageModeShared;
+#endif
     NSString* label = metalTexture.label;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
 

@@ -42,12 +42,13 @@ namespace ae3d
         /// \return Name.
         const char* GetName() const { return name.c_str(); };
         
-#if RENDERER_VULKAN
+        /// Must call MakeCpuReadable() once before mapping.
         /// \return Pixel data for reading. Call Unmap when done reading it.
         void* Map();
 
         void Unmap();
-        
+
+#if RENDERER_VULKAN
         /// \return Multisample count.
         int GetSampleCount() const { return sampleCount; }
 
