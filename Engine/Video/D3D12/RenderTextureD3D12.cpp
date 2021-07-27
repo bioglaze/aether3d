@@ -96,7 +96,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         descDepth.DepthOrArraySize = isMultisampled ? 4 : 1;
         descDepth.MipLevels = 1;
         descDepth.Format = DXGI_FORMAT_D32_FLOAT;
-        descDepth.SampleDesc.Count = 1;
+        descDepth.SampleDesc.Count = isMultisampled ? 4 : 1;
         descDepth.SampleDesc.Quality = 0;
         descDepth.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         descDepth.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
@@ -116,7 +116,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
         D3D12_DEPTH_STENCIL_VIEW_DESC descDsv = {};
         descDsv.Format = DXGI_FORMAT_D32_FLOAT;
-        descDsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+        descDsv.ViewDimension = isMultisampled ? D3D12_DSV_DIMENSION_TEXTURE2DMS : D3D12_DSV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateDepthStencilView( gpuResourceDepth.resource, &descDsv, dsv );
         RenderTextureGlobal::renderTextures.push_back( gpuResourceDepth.resource );
 
