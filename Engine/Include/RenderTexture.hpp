@@ -95,6 +95,8 @@ namespace ae3d
 		FrameBufferAttachment depth = {};
         VkFormat colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
         VkRenderPass renderPass = VK_NULL_HANDLE;
+        VkBuffer pixelBuffer = VK_NULL_HANDLE;
+        VkDeviceMemory pixelBufferMemory;
         int sampleCount = 1;
 #endif
         DataType dataType = DataType::UByte;

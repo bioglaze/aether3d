@@ -36,6 +36,8 @@ namespace RenderTextureGlobal
     std::vector< VkRenderPass > renderPassesToReleaseAtExit;
 }
 
+void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryFlags, const char* debugName );
+
 void ae3d::RenderTexture::DestroyTextures()
 {
     for (std::size_t samplerIndex = 0; samplerIndex < RenderTextureGlobal::samplersToReleaseAtExit.size(); ++samplerIndex)
@@ -357,6 +359,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)frameBuffer, VK_OBJECT_TYPE_FRAMEBUFFER, "render texture 2d framebuffer" );
 
     CreateSampler( filter, wrap, sampler, 1 );
+
+    if (isCpuAccess)
+    {
+        CreateBuffer( pixelBuffer, (int)memAlloc.allocationSize, pixelBufferMemory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "render texture pixel buffer" );
+    }
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
