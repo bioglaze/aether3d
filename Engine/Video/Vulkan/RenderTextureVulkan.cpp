@@ -116,9 +116,38 @@ void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
 void* ae3d::RenderTexture::Map()
 {
     System::Assert( color.mem != nullptr, "Map(): color.mem must be initialized!" );
+    System::Assert( pixelBuffer, "Map(): pixelBuffer must be initialized! Did you forget to call MakeCpuReadable?" );
     
+    VkBufferImageCopy region{};
+    region.bufferRowLength = width;
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.layerCount = 1;
+    region.imageExtent = { (unsigned)width, (unsigned)height, 1 };
+
+    VkCommandBufferBeginInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufInfo.pInheritanceInfo = nullptr;
+    cmdBufInfo.flags = 0;
+
+    VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
+    AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in RenderTexture::Map()" );
+
+    vkCmdCopyImageToBuffer( GfxDeviceGlobal::currentCmdBuffer, color.image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, pixelBuffer, 1, &region );
+
+    vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
+
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &GfxDeviceGlobal::currentCmdBuffer;
+
+    err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE );
+    AE3D_CHECK_VULKAN( err, "vkQueueSubmit in Texture2D" );
+
+    vkDeviceWaitIdle( GfxDeviceGlobal::device );
+
     void* pixels = nullptr;
-    VkResult err = vkMapMemory( GfxDeviceGlobal::device, color.mem, 0, VK_WHOLE_SIZE, 0, &pixels );
+    err = vkMapMemory( GfxDeviceGlobal::device, color.mem, 0, VK_WHOLE_SIZE, 0, &pixels );
     AE3D_CHECK_VULKAN( err, "vkMapMemory" );
 
     return pixels;
@@ -362,7 +391,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
     if (isCpuAccess)
     {
-        CreateBuffer( pixelBuffer, (int)memAlloc.allocationSize, pixelBufferMemory, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "render texture pixel buffer" );
+        CreateBuffer( pixelBuffer, width * height * 4 * sizeof( float ), pixelBufferMemory, VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, "render texture pixel buffer");
     }
 }
 

@@ -986,7 +986,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 
     // Checks if the mouse hit the gizmo.
     {
-        /*float* objectIdTargetMapped = sv->objectIdTarget->Map();
+        /*float* objectIdTargetMapped = sv->objectIdTarget.Map();
 
         if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 ] > 0.1f )
         {
@@ -1004,7 +1004,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
             sv->transformGizmo.selectedMesh = 2;
         }
 
-        sv->objectIdTarget->Unmap();*/
+        sv->objectIdTarget.Unmap();*/
     }
     
     // Checks if the mouse hit a mesh and selects the object.
