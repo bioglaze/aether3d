@@ -132,7 +132,12 @@ void* ae3d::RenderTexture::Map()
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in RenderTexture::Map()" );
 
-    vkCmdCopyImageToBuffer( GfxDeviceGlobal::currentCmdBuffer, color.image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, pixelBuffer, 1, &region );
+    // FIXME: Why do we have to set color.layout here manually, it indicates a tracking bug somewhere else, maybe after the render pass?
+    color.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    
+    SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL );
+    vkCmdCopyImageToBuffer( GfxDeviceGlobal::currentCmdBuffer, color.image, VK_IMAGE_LAYOUT_GENERAL, pixelBuffer, 1, &region );
+    SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 
     vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
 
@@ -148,6 +153,7 @@ void* ae3d::RenderTexture::Map()
 
     void* pixels = nullptr;
     err = vkMapMemory( GfxDeviceGlobal::device, color.mem, 0, VK_WHOLE_SIZE, 0, &pixels );
+    //err = vkMapMemory( GfxDeviceGlobal::device, pixelBufferMemory, 0, VK_WHOLE_SIZE, 0, &pixels );
     AE3D_CHECK_VULKAN( err, "vkMapMemory" );
 
     return pixels;
@@ -156,6 +162,7 @@ void* ae3d::RenderTexture::Map()
 void ae3d::RenderTexture::Unmap()
 {
     vkUnmapMemory( GfxDeviceGlobal::device, color.mem );
+    //vkUnmapMemory( GfxDeviceGlobal::device, pixelBufferMemory );
 }
 
 void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
