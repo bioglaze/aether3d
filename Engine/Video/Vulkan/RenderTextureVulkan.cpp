@@ -139,6 +139,15 @@ void* ae3d::RenderTexture::Map()
     vkCmdCopyImageToBuffer( GfxDeviceGlobal::currentCmdBuffer, color.image, VK_IMAGE_LAYOUT_GENERAL, pixelBuffer, 1, &region );
     SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 
+    VkBufferMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    barrier.srcAccessMask = VK_ACCESS_HOST_READ_BIT;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.size = VK_WHOLE_SIZE;
+    barrier.buffer = pixelBuffer;
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    vkCmdPipelineBarrier( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_DEPENDENCY_BY_REGION_BIT, 0, nullptr, 1, &barrier, 0, nullptr );
     vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
 
     VkSubmitInfo submitInfo = {};
@@ -152,8 +161,8 @@ void* ae3d::RenderTexture::Map()
     vkDeviceWaitIdle( GfxDeviceGlobal::device );
 
     void* pixels = nullptr;
-    err = vkMapMemory( GfxDeviceGlobal::device, color.mem, 0, VK_WHOLE_SIZE, 0, &pixels );
-    //err = vkMapMemory( GfxDeviceGlobal::device, pixelBufferMemory, 0, VK_WHOLE_SIZE, 0, &pixels );
+    //err = vkMapMemory( GfxDeviceGlobal::device, color.mem, 0, VK_WHOLE_SIZE, 0, &pixels );
+    err = vkMapMemory( GfxDeviceGlobal::device, pixelBufferMemory, 0, VK_WHOLE_SIZE, 0, &pixels );
     AE3D_CHECK_VULKAN( err, "vkMapMemory" );
 
     return pixels;
@@ -161,8 +170,8 @@ void* ae3d::RenderTexture::Map()
 
 void ae3d::RenderTexture::Unmap()
 {
-    vkUnmapMemory( GfxDeviceGlobal::device, color.mem );
-    //vkUnmapMemory( GfxDeviceGlobal::device, pixelBufferMemory );
+    //vkUnmapMemory( GfxDeviceGlobal::device, color.mem );
+    vkUnmapMemory( GfxDeviceGlobal::device, pixelBufferMemory );
 }
 
 void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
