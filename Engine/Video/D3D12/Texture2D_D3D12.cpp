@@ -399,6 +399,42 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
 }
 
+int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool hasMips )
+{
+    int bytesPerPixel = 2;
+
+    if (format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB || format == DXGI_FORMAT_R8G8B8A8_UNORM)
+    {
+        bytesPerPixel = 4;
+    }
+    else if (format == DXGI_FORMAT_BC1_UNORM || format == DXGI_FORMAT_BC1_UNORM_SRGB)
+    {
+        bytesPerPixel = 2;
+    }
+    else if (format == DXGI_FORMAT_BC2_UNORM || format == DXGI_FORMAT_BC2_UNORM_SRGB)
+    {
+        bytesPerPixel = 4;
+    }
+    else if (format == DXGI_FORMAT_BC3_UNORM || format == DXGI_FORMAT_BC3_UNORM_SRGB)
+    {
+        bytesPerPixel = 4;
+    }
+    else if (format == DXGI_FORMAT_BC4_UNORM || format == DXGI_FORMAT_BC4_SNORM)
+    {
+        bytesPerPixel = 2;
+    }
+    else if (format == DXGI_FORMAT_BC5_UNORM || format == DXGI_FORMAT_BC5_SNORM)
+    {
+        bytesPerPixel = 4;
+    }
+    else
+    {
+        ae3d::System::Assert( false, "Unhandled DDS format!" );
+    }
+
+    return width * height * bytesPerPixel * (hasMips ? 1.0f : 1.33333f);
+}
+
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )
 {
     filter = aFilter;
@@ -475,8 +511,8 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     }
 
 #if DEBUG
-    Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = static_cast< std::size_t >(width * height * 4 * (mipmaps == Mipmaps::Generate ? 1.0f : 1.33333f));
-    //Texture2DGlobal::PrintMemoryUsage();
+    Texture2DGlobal::pathToCachedTextureSizeInBytes[ fileContents.path ] = (size_t)GetTextureMemoryUsageBytes( width, height, dxgiFormat, mipLevelCount > 1 );
+    Texture2DGlobal::PrintMemoryUsage();
 #endif
 }
 
