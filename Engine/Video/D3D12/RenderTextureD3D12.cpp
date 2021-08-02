@@ -1,6 +1,7 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "RenderTexture.hpp"
+#include <map>
 #include <vector>
 #include "DescriptorHeapManager.hpp"
 #include "GfxDevice.hpp"
@@ -8,6 +9,7 @@
 #include "System.hpp"
 
 DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format );
+int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool hasMips );
 
 namespace GfxDeviceGlobal
 {
@@ -18,6 +20,23 @@ namespace GfxDeviceGlobal
 namespace RenderTextureGlobal
 {
     std::vector< ID3D12Resource* > renderTextures;
+
+#if DEBUG
+    std::map< std::string, std::size_t > pathToCachedTextureSizeInBytes;
+
+    void PrintMemoryUsage()
+    {
+        std::size_t total = 0;
+
+        for (const auto& path : pathToCachedTextureSizeInBytes)
+        {
+            ae3d::System::Print( "%s: %d B\n", path.first.c_str(), path.second );
+            total += path.second;
+        }
+
+        ae3d::System::Print( "Total render texture usage: %d KiB\n", total / 1024 );
+    }
+#endif
 }
 
 void ae3d::RenderTexture::DestroyTextures()
@@ -133,6 +152,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 
         GfxDeviceGlobal::device->CreateShaderResourceView( gpuResource.resource, &srvDesc, srv );
     }
+
+#if DEBUG
+    RenderTextureGlobal::pathToCachedTextureSizeInBytes[ debugName ] = (size_t)GetTextureMemoryUsageBytes( width, height, dxgiFormat, mipLevelCount > 1 );
+    //RenderTextureGlobal::PrintMemoryUsage();
+#endif
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )
