@@ -20,6 +20,7 @@ namespace GfxDeviceGlobal
 namespace Global
 {
     std::vector< ID3D12Resource* > vbs;
+    unsigned totalBufferMemoryUsageBytes = 0;
 }
 
 void ae3d::VertexBuffer::DestroyBuffers()
@@ -109,6 +110,7 @@ void ae3d::VertexBuffer::UploadVB( void* faces, void* vertices, unsigned ibSize 
 
     vbUpload->SetName( L"UploadVertexBuffer" );
     Global::vbs.push_back( vbUpload );
+    Global::totalBufferMemoryUsageBytes += sizeBytes;
 
     D3D12_RANGE emptyRange{};
     char* vbUploadPtr = nullptr;
@@ -177,6 +179,7 @@ void ae3d::VertexBuffer::GenerateDynamic( int faceCount, int vertexCount )
 
     vbUpload->SetName( L"VertexBuffer" );
     Global::vbs.push_back( vbUpload );
+    Global::totalBufferMemoryUsageBytes += sizeBytes;
 
     mappedDynamic = nullptr;
     D3D12_RANGE emptyRange{};
