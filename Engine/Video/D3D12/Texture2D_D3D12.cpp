@@ -65,7 +65,7 @@ namespace Texture2DGlobal
             total += path.second;
         }
         
-        ae3d::System::Print( "Total texture usage: %d KiB\n", total / 1024 );
+        ae3d::System::Print( "Total texture 2D usage: %d KiB\n", total / 1024 );
     }
 #endif
 }
@@ -406,6 +406,10 @@ int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool 
     if (format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB || format == DXGI_FORMAT_R8G8B8A8_UNORM)
     {
         bytesPerPixel = 4;
+    }
+    else if (format == DXGI_FORMAT_R32G32B32A32_FLOAT)
+    {
+        bytesPerPixel = 4 * 3;
     }
     else if (format == DXGI_FORMAT_BC1_UNORM || format == DXGI_FORMAT_BC1_UNORM_SRGB)
     {
