@@ -4,10 +4,11 @@
 #include <cstring>
 #include <cstdint>
 #include <stdio.h>
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "System.hpp"
 #include "Statistics.hpp"
-#include "GfxDevice.hpp"
+#include "VertexBuffer.hpp"
 
 namespace debug
 {
@@ -199,7 +200,7 @@ namespace ae3d
     std::uint64_t GetPSOHash( ae3d::VertexBuffer& vertexBuffer, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
         ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, VkRenderPass renderPass, ae3d::GfxDevice::PrimitiveTopology topology )
     {
-        std::uint64_t outResult = (ptrdiff_t)&vertexBuffer;
+        std::uint64_t outResult = (std::uint64_t)vertexBuffer.GetVertexFormat();
         outResult += (ptrdiff_t)&shader;
         outResult += (unsigned)blendMode;
         outResult += ((unsigned)depthFunc) * 2;

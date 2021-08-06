@@ -142,6 +142,7 @@ namespace GfxDeviceGlobal
     ae3d::VertexBuffer::VertexPTC uiVertices[ UI_VERTICE_COUNT ];
     ae3d::VertexBuffer::Face uiFaces[ UI_FACE_COUNT ];
     std::vector< ae3d::VertexBuffer > lineBuffers;
+    VkPipeline cachedPSO;
 }
 
 namespace ae3d
@@ -2020,8 +2021,14 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     vkCmdBindDescriptorSets( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                              GfxDeviceGlobal::pipelineLayout, 0, 1, &descriptorSet, 0, nullptr );
 
-    vkCmdBindPipeline( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GfxDeviceGlobal::psoCache[ psoHash ] );
-	Statistics::IncPSOBindCalls();
+    VkPipeline pso = GfxDeviceGlobal::psoCache[ psoHash ];
+    
+    if (GfxDeviceGlobal::cachedPSO != pso)
+    {
+        GfxDeviceGlobal::cachedPSO = pso;
+        vkCmdBindPipeline( GfxDeviceGlobal::currentCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pso );
+        Statistics::IncPSOBindCalls();
+    }
 
     VkDeviceSize offsets[ 1 ] = { 0 };
     vkCmdBindVertexBuffers( GfxDeviceGlobal::currentCmdBuffer, VertexBuffer::VERTEX_BUFFER_BIND_ID, 1, vertexBuffer.GetVertexBuffer(), offsets );
@@ -2111,7 +2118,8 @@ void ae3d::GfxDevice::BeginFrame()
     AE3D_CHECK_VULKAN( err, "acquireNextImage" );
 
     GfxDeviceGlobal::currentCmdBuffer = GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
-
+    GfxDeviceGlobal::cachedPSO = VK_NULL_HANDLE;
+    
     SubmitPostPresentBarrier();
 
     GfxDeviceGlobal::boundViews[ 0 ] = Texture2D::GetDefaultTexture()->GetView();
@@ -2279,6 +2287,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
 void ae3d::GfxDevice::SetRenderTarget( RenderTexture* target, unsigned cubeMapFace )
 {
     GfxDeviceGlobal::currentCmdBuffer = target ? GfxDeviceGlobal::offscreenCmdBuffer : GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ];
+    GfxDeviceGlobal::cachedPSO = VK_NULL_HANDLE;
     GfxDeviceGlobal::renderTexture0 = target;
 
     if (target && target->IsCube())
