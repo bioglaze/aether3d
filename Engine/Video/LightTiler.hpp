@@ -23,6 +23,7 @@ namespace ae3d
         void SetSpotLightParameters( int bufferIndex, Vec3& position, float radius, const Vec4& color, const Vec3& direction, float coneAngle, float falloffRadius );
         void UpdateLightBuffers();
         void CullLights( class ComputeShader& shader, const struct Matrix44& projection, const Matrix44& view,  class RenderTexture& depthNormalTarget );
+        void ClearLightCount() { activePointLights = activeSpotLights = 0; }
         
 #if RENDERER_METAL
         id< MTLBuffer > GetPerTileLightIndexBuffer() const { return perTileLightIndexBuffer; }

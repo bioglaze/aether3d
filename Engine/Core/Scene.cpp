@@ -256,6 +256,8 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
 
             RenderDepthAndNormals( cameraComponent, view, gameObjectsWithMeshRenderer, 0, frustum );
 
+            GfxDeviceGlobal::lightTiler.ClearLightCount();
+
             int goWithPointLightIndex = 0;
             int goWithSpotLightIndex = 0;
             
