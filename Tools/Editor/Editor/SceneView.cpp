@@ -78,6 +78,7 @@ struct SceneView
     GameObject objectIdCamera;
     Scene scene;
     Shader unlitShader;
+    Shader spriteShader;
     Shader standardShader;
     Shader objectIdShader;
     ComputeShader outlineShader;
@@ -513,6 +514,10 @@ void svInit( SceneView** sv, int width, int height )
                       FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
                       FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
 
+    (*sv)->spriteShader.Load( "sprite_vertex", "sprite_fragment",
+                      FileSystem::FileContents( "shaders/sprite_vert.obj" ), FileSystem::FileContents( "shaders/sprite_frag.obj" ),
+                      FileSystem::FileContents( "shaders/sprite_vert.spv" ), FileSystem::FileContents( "shaders/sprite_frag.spv" ) );
+
     (*sv)->objectIdShader.Load( "unlit_vertex", "objectid_fragment",
                       FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/objectid_frag.obj" ),
                       FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/objectid_frag.spv" ) );
@@ -531,7 +536,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->transformGizmo.redTex.Load( FileSystem::FileContents( "textures/red.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->transformGizmo.greenTex.Load( FileSystem::FileContents( "textures/green.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->transformGizmo.blueTex.Load( FileSystem::FileContents( "textures/blue.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
-    (*sv)->transformGizmo.Init( &(*sv)->unlitShader, *(*sv)->gameObjects[ 0 ] );
+    (*sv)->transformGizmo.Init( &(*sv)->spriteShader, *(*sv)->gameObjects[ 0 ] );
 
     // Test content
     
