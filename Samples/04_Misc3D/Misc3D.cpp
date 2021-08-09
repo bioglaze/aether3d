@@ -13,6 +13,7 @@
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
+#include "ParticleSystemComponent.hpp"
 #include "PointLightComponent.hpp"
 #include "RenderTexture.hpp"
 #include "SpriteRendererComponent.hpp"
@@ -37,7 +38,8 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = true;
+constexpr bool TestParticleSystem = false;
+constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 constexpr bool TestSponza = true;

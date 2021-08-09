@@ -68,6 +68,7 @@ endif
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/AudioSourceComponent.cpp -o $(OUTPUT_DIR)/AudioSourceComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/MeshRendererComponent.cpp -o $(OUTPUT_DIR)/MeshRendererComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/TextRendererComponent.cpp -o $(OUTPUT_DIR)/TextRendererComponent.o
+	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/ParticleSystemComponent.cpp -o $(OUTPUT_DIR)/ParticleSystemComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/GameObject.cpp -o $(OUTPUT_DIR)/GameObject.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/CameraComponent.cpp -o $(OUTPUT_DIR)/CameraComponent.o
 	$(COMPILER) $(INCLUDES) $(WARNINGS) $(STD_LIB) $(DEFINES) -c Components/LineRendererComponent.cpp -o $(OUTPUT_DIR)/LineRendererComponent.o
