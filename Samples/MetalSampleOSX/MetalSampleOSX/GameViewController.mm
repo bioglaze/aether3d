@@ -35,7 +35,7 @@
 #import "Window.hpp"
 
 const bool TestForwardPlus = true;
-const bool TestBloom = true;
+const bool TestBloom = false;
 const bool TestSSAO = false;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;

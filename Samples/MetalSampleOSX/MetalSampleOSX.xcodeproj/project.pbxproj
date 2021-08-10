@@ -67,6 +67,7 @@
 		AB4812622585ECF100C96EFB /* LineRendererComponent.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = LineRendererComponent.hpp; path = ../../Engine/Include/LineRendererComponent.hpp; sourceTree = "<group>"; };
 		AB4ADC291D8EB2800032CBDD /* Standard.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Standard.metal; path = ../../../Engine/Assets/Standard.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 		AB4D85A01C6D177100326F5C /* textured_cube_ptn.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = textured_cube_ptn.ae3d; path = ../../../../aether3d_build/Samples/textured_cube_ptn.ae3d; sourceTree = "<group>"; };
+		AB539BB226C2ED43001391A2 /* ParticleSystemComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ParticleSystemComponent.hpp; path = ../../Engine/Include/ParticleSystemComponent.hpp; sourceTree = "<group>"; };
 		AB5C3EBD24D1550000B17AF7 /* example.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; name = example.ogg; path = ../../../../aether3d_build/Samples/example.ogg; sourceTree = "<group>"; };
 		AB5DB100251630020050A421 /* SSAO.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SSAO.metal; path = ../../../Engine/Assets/SSAO.metal; sourceTree = "<group>"; };
 		AB657724200FD3BD0089CB54 /* MetalCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MetalCommon.h; path = ../../../Engine/Assets/MetalCommon.h; sourceTree = "<group>"; };
@@ -265,6 +266,7 @@
 				ABE04FAD1C1217A40025C436 /* Matrix.hpp */,
 				ABE04FAE1C1217A40025C436 /* Mesh.hpp */,
 				ABE04FAF1C1217A40025C436 /* MeshRendererComponent.hpp */,
+				AB539BB226C2ED43001391A2 /* ParticleSystemComponent.hpp */,
 				AB36166A1D945400001149E0 /* PointLightComponent.hpp */,
 				ABE04FB01C1217A40025C436 /* Quaternion.hpp */,
 				ABE04FB11C1217A40025C436 /* RenderTexture.hpp */,
@@ -564,6 +566,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = RENDERER_METAL;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_SHADOW = YES;

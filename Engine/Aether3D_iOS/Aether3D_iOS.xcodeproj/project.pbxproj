@@ -67,6 +67,8 @@
 		AB3E80131C00B5FE0077D8BD /* SpotLightComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB4BA30B20022E1E00B6C58E /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB4BA30A20022E1E00B6C58E /* Matrix.cpp */; };
 		AB521D111BC045BC004CDF06 /* TextureCube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4482ABC71B3AEEC300C38C79 /* TextureCube.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB539BAF26C2EC9F001391A2 /* ParticleSystemComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB539BAE26C2EC9F001391A2 /* ParticleSystemComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB539BB126C2ECB7001391A2 /* ParticleSystemComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB539BB026C2ECB7001391A2 /* ParticleSystemComponent.cpp */; };
 		AB61DA551DAD633F0068A5FE /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB61DA541DAD633F0068A5FE /* MathUtil.cpp */; };
 		AB843070258BBDEE00A38233 /* LineRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB84306F258BBDEE00A38233 /* LineRendererComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB843073258BBE0300A38233 /* LineRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB843072258BBE0300A38233 /* LineRendererComponent.cpp */; };
@@ -152,6 +154,8 @@
 		AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpotLightComponent.cpp; path = ../../Components/SpotLightComponent.cpp; sourceTree = "<group>"; };
 		AB3E80121C00B5FE0077D8BD /* SpotLightComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SpotLightComponent.hpp; path = ../../Include/SpotLightComponent.hpp; sourceTree = "<group>"; };
 		AB4BA30A20022E1E00B6C58E /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ../../Core/Matrix.cpp; sourceTree = "<group>"; };
+		AB539BAE26C2EC9F001391A2 /* ParticleSystemComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ParticleSystemComponent.hpp; path = ../../Include/ParticleSystemComponent.hpp; sourceTree = "<group>"; };
+		AB539BB026C2ECB7001391A2 /* ParticleSystemComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleSystemComponent.cpp; path = ../../Components/ParticleSystemComponent.cpp; sourceTree = "<group>"; };
 		AB61DA541DAD633F0068A5FE /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../../Core/MathUtil.cpp; sourceTree = "<group>"; };
 		AB84306F258BBDEE00A38233 /* LineRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = LineRendererComponent.hpp; path = ../../Include/LineRendererComponent.hpp; sourceTree = "<group>"; };
 		AB843072258BBE0300A38233 /* LineRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LineRendererComponent.cpp; path = ../../Components/LineRendererComponent.cpp; sourceTree = "<group>"; };
@@ -245,6 +249,7 @@
 				4449E8481B14B423009A869C /* Matrix.hpp */,
 				AB922E541B404FFB000F3488 /* Mesh.hpp */,
 				AB922E551B404FFB000F3488 /* MeshRendererComponent.hpp */,
+				AB539BAE26C2EC9F001391A2 /* ParticleSystemComponent.hpp */,
 				AB8E84001CEBAF0100A8E9E8 /* PointLightComponent.hpp */,
 				4449E8491B14B423009A869C /* Quaternion.hpp */,
 				ABF341E51B1A277B0017797C /* RenderTexture.hpp */,
@@ -297,6 +302,7 @@
 				4449E87B1B14B46C009A869C /* GameObject.cpp */,
 				AB843072258BBE0300A38233 /* LineRendererComponent.cpp */,
 				AB922E5A1B405030000F3488 /* MeshRendererComponent.cpp */,
+				AB539BB026C2ECB7001391A2 /* ParticleSystemComponent.cpp */,
 				AB8E83FE1CEBAEEF00A8E9E8 /* PointLightComponent.cpp */,
 				4449E87C1B14B46C009A869C /* SpriteRendererComponent.cpp */,
 				AB3E80101C00B5E80077D8BD /* SpotLightComponent.cpp */,
@@ -377,6 +383,7 @@
 				4449E8591B14B423009A869C /* Matrix.hpp in Headers */,
 				AB922E561B404FFB000F3488 /* Mesh.hpp in Headers */,
 				4449E8611B14B423009A869C /* TransformComponent.hpp in Headers */,
+				AB539BAF26C2EC9F001391A2 /* ParticleSystemComponent.hpp in Headers */,
 				4449E85A1B14B423009A869C /* Quaternion.hpp in Headers */,
 				AB843070258BBDEE00A38233 /* LineRendererComponent.hpp in Headers */,
 				4449E85F1B14B423009A869C /* TextRendererComponent.hpp in Headers */,
@@ -486,6 +493,7 @@
 				4449E8721B14B44E009A869C /* FileWatcher.cpp in Sources */,
 				ABF549B51DF3368C00EFF25D /* Statistics.cpp in Sources */,
 				4449E8801B14B46C009A869C /* CameraComponent.cpp in Sources */,
+				AB539BB126C2ECB7001391A2 /* ParticleSystemComponent.cpp in Sources */,
 				4449E8991B14B4B5009A869C /* Texture2DMetal.mm in Sources */,
 				4449E88B1B14B48E009A869C /* stb_vorbis.c in Sources */,
 				ABB79F981BA9B7A5002A1B5F /* DirectionalLightComponent.cpp in Sources */,

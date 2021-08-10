@@ -10,6 +10,8 @@
 		AB1786EF2128AFD200659048 /* Array.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB1786EE2128AFD200659048 /* Array.hpp */; };
 		AB467FAF2584CE59005835A7 /* LineRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB467FAE2584CE59005835A7 /* LineRendererComponent.hpp */; };
 		AB467FB22584CE76005835A7 /* LineRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB467FB12584CE76005835A7 /* LineRendererComponent.cpp */; };
+		AB539BAB26C2EC4C001391A2 /* ParticleSystemComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB539BAA26C2EC4B001391A2 /* ParticleSystemComponent.cpp */; };
+		AB539BAD26C2EC63001391A2 /* ParticleSystemComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB539BAC26C2EC63001391A2 /* ParticleSystemComponent.hpp */; };
 		AB61DA531DAD62F80068A5FE /* MathUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB61DA521DAD62F80068A5FE /* MathUtil.cpp */; };
 		AB6E12D01C11D79B0020A929 /* AudioSourceComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */; };
 		AB6E12D11C11D79B0020A929 /* CameraComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB6E12C81C11D79B0020A929 /* CameraComponent.cpp */; };
@@ -93,6 +95,8 @@
 		AB1786EE2128AFD200659048 /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../Include/Array.hpp; sourceTree = "<group>"; };
 		AB467FAE2584CE59005835A7 /* LineRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = LineRendererComponent.hpp; path = ../Include/LineRendererComponent.hpp; sourceTree = "<group>"; };
 		AB467FB12584CE76005835A7 /* LineRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LineRendererComponent.cpp; path = ../Components/LineRendererComponent.cpp; sourceTree = "<group>"; };
+		AB539BAA26C2EC4B001391A2 /* ParticleSystemComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleSystemComponent.cpp; path = ../Components/ParticleSystemComponent.cpp; sourceTree = "<group>"; };
+		AB539BAC26C2EC63001391A2 /* ParticleSystemComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ParticleSystemComponent.hpp; path = ../Include/ParticleSystemComponent.hpp; sourceTree = "<group>"; };
 		AB61DA521DAD62F80068A5FE /* MathUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtil.cpp; path = ../Core/MathUtil.cpp; sourceTree = "<group>"; };
 		AB6E12BA1C11D7450020A929 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAether3D_OSX_Metal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB6E12C71C11D79B0020A929 /* AudioSourceComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSourceComponent.cpp; path = ../Components/AudioSourceComponent.cpp; sourceTree = "<group>"; };
@@ -218,6 +222,7 @@
 				AB6E12CA1C11D79B0020A929 /* GameObject.cpp */,
 				AB467FB12584CE76005835A7 /* LineRendererComponent.cpp */,
 				AB6E12CB1C11D79B0020A929 /* MeshRendererComponent.cpp */,
+				AB539BAA26C2EC4B001391A2 /* ParticleSystemComponent.cpp */,
 				AB8E83F81CEBAE9A00A8E9E8 /* PointLightComponent.cpp */,
 				AB6E12CC1C11D79B0020A929 /* SpotLightComponent.cpp */,
 				AB6E12CD1C11D79B0020A929 /* SpriteRendererComponent.cpp */,
@@ -295,6 +300,7 @@
 				AB6E13111C11D8020020A929 /* Matrix.hpp */,
 				AB6E13121C11D8020020A929 /* Mesh.hpp */,
 				AB6E13131C11D8020020A929 /* MeshRendererComponent.hpp */,
+				AB539BAC26C2EC63001391A2 /* ParticleSystemComponent.hpp */,
 				AB8E83F61CEBAE7600A8E9E8 /* PointLightComponent.hpp */,
 				AB6E13141C11D8020020A929 /* Quaternion.hpp */,
 				AB6E13151C11D8020020A929 /* RenderTexture.hpp */,
@@ -343,6 +349,7 @@
 				AB6E13261C11D8020020A929 /* FileSystem.hpp in Headers */,
 				AB6E13221C11D8020020A929 /* AudioClip.hpp in Headers */,
 				AB6E13371C11D8020020A929 /* TextureBase.hpp in Headers */,
+				AB539BAD26C2EC63001391A2 /* ParticleSystemComponent.hpp in Headers */,
 				AB6E132D1C11D8020020A929 /* MeshRendererComponent.hpp in Headers */,
 				AB6E132B1C11D8020020A929 /* Matrix.hpp in Headers */,
 				AB921DB11CC21AF4008F5750 /* ComputeShader.hpp in Headers */,
@@ -437,6 +444,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB539BAB26C2EC4C001391A2 /* ParticleSystemComponent.cpp in Sources */,
 				ABFD71AA1D81B73A003770D4 /* LightTilerMetal.mm in Sources */,
 				AB6E12EE1C11D7B00020A929 /* FileWatcher.cpp in Sources */,
 				AB6E12F11C11D7B00020A929 /* Frustum.cpp in Sources */,
