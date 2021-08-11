@@ -329,6 +329,7 @@
     <ClInclude Include="..\..\..\Engine\Include\Matrix.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Mesh.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\MeshRendererComponent.hpp" />
+    <ClInclude Include="..\..\..\Engine\Include\ParticleSystemComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\PointLightComponent.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\Quaternion.hpp" />
     <ClInclude Include="..\..\..\Engine\Include\RenderTexture.hpp" />

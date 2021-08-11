@@ -163,6 +163,7 @@
     <ClCompile Include="..\Components\GameObject.cpp" />
     <ClCompile Include="..\Components\LineRendererComponent.cpp" />
     <ClCompile Include="..\Components\MeshRendererComponent.cpp" />
+    <ClCompile Include="..\Components\ParticleSystemComponent.cpp" />
     <ClCompile Include="..\Components\PointLightComponent.cpp" />
     <ClCompile Include="..\Components\SpotLightComponent.cpp" />
     <ClCompile Include="..\Components\SpriteRendererComponent.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="..\Include\Matrix.hpp" />
     <ClInclude Include="..\Include\Mesh.hpp" />
     <ClInclude Include="..\Include\MeshRendererComponent.hpp" />
+    <ClInclude Include="..\Include\ParticleSystemComponent.hpp" />
     <ClInclude Include="..\Include\PointLightComponent.hpp" />
     <ClInclude Include="..\Include\Quaternion.hpp" />
     <ClInclude Include="..\Include\RenderTexture.hpp" />

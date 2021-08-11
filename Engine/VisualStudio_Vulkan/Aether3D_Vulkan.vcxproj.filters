@@ -150,6 +150,9 @@
     <ClCompile Include="..\Components\LineRendererComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Components\ParticleSystemComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\AudioClip.hpp">
@@ -276,6 +279,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\LineRendererComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\ParticleSystemComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

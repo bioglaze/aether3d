@@ -107,5 +107,8 @@
     <ClInclude Include="..\..\..\Engine\Include\LineRendererComponent.hpp">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Include\ParticleSystemComponent.hpp">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
