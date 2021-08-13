@@ -14,6 +14,15 @@ namespace ae3d
     private:
         friend class GameObject;
 
+        /** \return Component's type code. Must be unique for each component type. */
+        static int Type() { return 11; }
+        
+        /** \return Component handle that uniquely identifies the instance. */
+        static unsigned New();
+        
+        /** \return Component at index or null if index is invalid. */
+        static ParticleSystemComponent* Get( unsigned index );
+
         GameObject* gameObject = nullptr;
         int maxParticles = 100;
     };
