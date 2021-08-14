@@ -22,6 +22,7 @@
 #import "MeshRendererComponent.hpp"
 #import "Material.hpp"
 #import "Mesh.hpp"
+#import "ParticleSystemComponent.hpp"
 #import "PointLightComponent.hpp"
 #import "Shader.hpp"
 #import "System.hpp"
@@ -233,6 +234,7 @@ using namespace ae3d;
     GameObject wireframeGo;
     GameObject audioGo;
     GameObject audioContainer;
+    GameObject particleGo;
     AudioClip audioClip;
 
     Scene scene;
@@ -638,7 +640,6 @@ using namespace ae3d;
     pointLight.AddComponent<ae3d::TransformComponent>();
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -80, 0, -85 ) );
 
-
     // Inits point lights for Forward+
     if (TestForwardPlus)
     {
@@ -697,6 +698,13 @@ using namespace ae3d;
 
     scene.SetAmbient( { 0.1f, 0.1f, 0.1f } );
 
+    particleGo.SetName( "ParticleSystem" );
+    particleGo.AddComponent< ParticleSystemComponent >();
+    particleGo.GetComponent< ParticleSystemComponent>()->SetMaxParticles( 10 );
+    particleGo.AddComponent< TransformComponent >();
+    particleGo.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 0, -70 ) );
+    scene.Add( &particleGo );
+    
     //scene.Add( &cubePTN2 );
     //scene.Add( &cubePTN );
     //scene.Add( &rtCube );
