@@ -612,6 +612,14 @@ int main()
     transCube1.GetComponent< MeshRendererComponent >()->SetMaterial( &transMaterial, 0 );
     transCube1.AddComponent< TransformComponent >();
     transCube1.GetComponent< TransformComponent >()->SetLocalPosition( { 2, 0, -70 } );
+
+    GameObject particleGo;
+    particleGo.AddComponent< ParticleSystemComponent >();
+    particleGo.GetComponent< ParticleSystemComponent >()->SetMaxParticles( 10 );
+    particleGo.AddComponent< TransformComponent >();
+    particleGo.GetComponent< TransformComponent >()->SetLocalPosition( { 20, 40, 0 } );
+
+    scene.Add( &particleGo );
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
