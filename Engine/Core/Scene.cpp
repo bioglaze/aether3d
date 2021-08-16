@@ -20,6 +20,7 @@
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
+#include "ParticleSystemComponent.hpp"
 #include "PointLightComponent.hpp"
 #include "RenderTexture.hpp"
 #include "Renderer.hpp"
@@ -489,6 +490,7 @@ void ae3d::Scene::Render()
 #endif
     Statistics::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();
+    ParticleSystemComponent::Simulate();
     
     std::vector< GameObject* > rtCameras;
     rtCameras.reserve( gameObjects.size() / 4 );

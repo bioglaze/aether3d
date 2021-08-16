@@ -10,6 +10,8 @@ namespace ae3d
 
         int GetMaxParticles() const { return maxParticles; }
         void SetMaxParticles( int count ) { maxParticles = count; }
+
+        static void Simulate();
         
     private:
         friend class GameObject;

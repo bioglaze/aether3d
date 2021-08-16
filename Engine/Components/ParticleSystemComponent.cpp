@@ -18,3 +18,8 @@ ae3d::ParticleSystemComponent* ae3d::ParticleSystemComponent::Get( unsigned inde
 {
     return &particleSystemComponents[ index ];
 }
+
+void ae3d::ParticleSystemComponent::Simulate()
+{
+
+}
