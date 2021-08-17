@@ -25,6 +25,7 @@ namespace ae3d
         Shader depthNormalsSkinShader;
         Shader uiShader;
         ComputeShader lightCullShader;
+        ComputeShader particleSimulationShader;
     };
 
     /// High-level rendering stuff.

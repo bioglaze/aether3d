@@ -16,4 +16,5 @@ void ae3d::BuiltinShaders::Load()
     uiShader.Load( "", "", FileSystem::FileContents( "shaders/sprite_vert.obj" ), FileSystem::FileContents( "shaders/sprite_frag.obj" ), FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
 
     lightCullShader.Load( "", FileSystem::FileContents( "shaders/LightCuller.obj" ), FileSystem::FileContents( "" ) );
+    particleSimulationShader.Load( "", FileSystem::FileContents( "shaders/particle.obj" ), FileSystem::FileContents( "" ) );
 }

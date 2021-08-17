@@ -1,5 +1,12 @@
 #include "ParticleSystemComponent.hpp"
 #include "Array.hpp"
+#include "Vec3.hpp"
+
+// Must be kept in sync with ParticleSystemRenderer.cpp
+struct Particle
+{
+    ae3d::Vec4 position;
+};
 
 Array< ae3d::ParticleSystemComponent > particleSystemComponents;
 unsigned nextFreeParticleSystemComponent = 0;

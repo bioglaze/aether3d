@@ -14,4 +14,5 @@ void ae3d::BuiltinShaders::Load()
     depthNormalsSkinShader.LoadSPIRV( FileSystem::FileContents( "shaders/depthnormals_skin_vert.spv" ), FileSystem::FileContents( "shaders/depthnormals_frag.spv" ) );
     uiShader.LoadSPIRV( FileSystem::FileContents( "shaders/sprite_vert.spv" ), FileSystem::FileContents( "shaders/sprite_frag.spv" ) );
     lightCullShader.LoadSPIRV( FileSystem::FileContents( "shaders/LightCuller.spv" ) );
+    particleSimulationShader.LoadSPIRV( FileSystem::FileContents( "shaders/particle.spv" ) );
 }
