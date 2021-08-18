@@ -1,12 +1,8 @@
 #include "ParticleSystemComponent.hpp"
 #include "Array.hpp"
+#include "ComputeShader.hpp"
+#include "System.hpp"
 #include "Vec3.hpp"
-
-// Must be kept in sync with ParticleSystemRenderer.cpp
-struct Particle
-{
-    ae3d::Vec4 position;
-};
 
 Array< ae3d::ParticleSystemComponent > particleSystemComponents;
 unsigned nextFreeParticleSystemComponent = 0;
@@ -26,7 +22,17 @@ ae3d::ParticleSystemComponent* ae3d::ParticleSystemComponent::Get( unsigned inde
     return &particleSystemComponents[ index ];
 }
 
-void ae3d::ParticleSystemComponent::Simulate()
+void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 {
+    simulationShader.Begin();
 
+#if RENDERER_D3D12
+    //simulationShader.SetUAV( 0, particleBuffer, particleBufferDesc );
+#endif
+#if RENDERER_VULKAN
+    simulationShader
+#endif
+
+    simulationShader.Dispatch( 1, 1, 1, "Particle Simulation" );
+    simulationShader.End();
 }

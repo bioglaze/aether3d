@@ -490,7 +490,7 @@ void ae3d::Scene::Render()
 #endif
     Statistics::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();
-    ParticleSystemComponent::Simulate();
+    ParticleSystemComponent::Simulate( renderer.builtinShaders.particleSimulationShader );
     
     std::vector< GameObject* > rtCameras;
     rtCameras.reserve( gameObjects.size() / 4 );

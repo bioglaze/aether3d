@@ -39,6 +39,12 @@ float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
 constexpr int RESOURCE_BINDING_COUNT = 13;
 
+// Must be kept in sync with ParticleSystemRenderer.cpp
+struct Particle
+{
+    ae3d::Vec4 position;
+};
+
 namespace WindowGlobal
 {
     extern HWND hwnd;
@@ -217,6 +223,7 @@ namespace GfxDeviceGlobal
     std::vector< ae3d::VertexBuffer::VertexPTC > uiVertices( 512 * 1024 );
     std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
     ID3D12PipelineState* cachedPSO = nullptr;
+    ID3D12Resource* particleBuffer;
 }
 
 void ClearPSOCache()
@@ -871,6 +878,49 @@ void CreateDepthStencil()
     GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &descDsv, DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
+void CreateParticleBuffer()
+{
+    const unsigned maxParticles = 50;
+
+    D3D12_HEAP_PROPERTIES heapProp = {};
+    heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+    heapProp.CreationNodeMask = 1;
+    heapProp.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC bufferProp = {};
+    bufferProp.Alignment = 0;
+    bufferProp.DepthOrArraySize = 1;
+    bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    bufferProp.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+    bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+    bufferProp.Height = 1;
+    bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    bufferProp.MipLevels = 1;
+    bufferProp.SampleDesc.Count = 1;
+    bufferProp.SampleDesc.Quality = 0;
+    bufferProp.Width = maxParticles * sizeof( Particle );
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &heapProp,
+        D3D12_HEAP_FLAG_NONE,
+        &bufferProp,
+        D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+        nullptr,
+        IID_PPV_ARGS( &GfxDeviceGlobal::particleBuffer ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to create particle buffer!" );
+        return;
+    }
+
+    GfxDeviceGlobal::particleBuffer->SetName( L"Particle Buffer" );
+    //GfxDeviceGlobal::uav0Desc.Format = DXGI_FORMAT_UNKNOWN;
+    //GfxDeviceGlobal::uav0Desc.Buffer.NumElements = maxParticles;
+    //GfxDeviceGlobal::uav0Desc.Buffer.StructureByteStride = 4;
+    //GfxDeviceGlobal::uav0Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+    //GfxDeviceGlobal::uav0Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+}
+
 void CreateConstantBuffers()
 {
     GfxDeviceGlobal::constantBuffers.resize( 20000 );
@@ -1035,6 +1085,7 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     CreateDepthStencil();
     CreateSamplers();
     CreateConstantBuffers();
+    CreateParticleBuffer();
 
     // Compute heap
     for (int i = 0; i < 3; ++i)
