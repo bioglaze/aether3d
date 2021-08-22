@@ -29,9 +29,6 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 #if RENDERER_D3D12
     //simulationShader.SetUAV( 0, particleBuffer, particleBufferDesc );
 #endif
-#if RENDERER_VULKAN
-    //simulationShader.SetBuffer( 0, particleBufferView );
-#endif
 
     simulationShader.Dispatch( 1, 1, 1, "Particle Simulation" );
     simulationShader.End();

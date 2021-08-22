@@ -1,3 +1,9 @@
+// Must be kept in sync with ParticleSystemComponent.cpp
+struct Particle
+{
+    float4 position;
+};
+
 #if !VULKAN
 Texture2D tex : register(t0);
 Texture2D normalTex : register(t1);
@@ -41,6 +47,7 @@ Buffer<float4> spotLightBufferCenterAndRadius : register(t7);
 Buffer<float4> spotLightParams : register(t8);
 Buffer<float4> spotLightColors : register(t9);
 RWTexture2D<float4> rwTexture : register(u1);
+RWStructuredBuffer< Particle > particles : register(u2);
 
 #else
 
@@ -86,4 +93,5 @@ RWTexture2D<float4> rwTexture : register(u1);
 [[vk::binding( 12 )]] Buffer<float4> spotLightParams;
 [[vk::binding( 13 )]] Buffer<float4> spotLightColors;
 [[vk::binding( 14 )]] RWTexture2D<float4> rwTexture;
+[[vk::binding( 15 )]] RWStructuredBuffer< Particle > particles;
 #endif

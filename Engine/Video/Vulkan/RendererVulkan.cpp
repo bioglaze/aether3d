@@ -19,7 +19,6 @@ namespace GfxDeviceGlobal
 ae3d::Renderer renderer;
 
 VkBuffer particleBuffer;
-VkBufferView particleBufferView;
 VkDeviceMemory particleMemory;
 
 void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryFlags, const char* debugName );
@@ -38,15 +37,4 @@ void ae3d::BuiltinShaders::Load()
     particleSimulationShader.LoadSPIRV( FileSystem::FileContents( "shaders/particle.spv" ) );
 
     CreateBuffer( particleBuffer, 50 * sizeof( Particle ), particleMemory, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "particle buffer" );
-
-    VkBufferViewCreateInfo bufferViewInfo = {};
-    bufferViewInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
-    bufferViewInfo.flags = 0;
-    bufferViewInfo.buffer = particleBuffer;
-    bufferViewInfo.range = VK_WHOLE_SIZE;
-    bufferViewInfo.format = VK_FORMAT_UNDEFINED;
-
-    VkResult err = vkCreateBufferView( GfxDeviceGlobal::device, &bufferViewInfo, nullptr, &particleBufferView );
-    AE3D_CHECK_VULKAN( err, "particle buffer view" );
-    debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)particleBufferView, VK_OBJECT_TYPE_BUFFER_VIEW, "particleBufferView" );
 }

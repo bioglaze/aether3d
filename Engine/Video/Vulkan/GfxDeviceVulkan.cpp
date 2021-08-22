@@ -48,6 +48,8 @@ namespace Texture2DGlobal
     extern std::vector< VkSampler > samplersToReleaseAtExit;
 }
 
+extern VkBuffer particleBuffer;
+
 struct Ubo
 {
     VkBuffer ubo = VK_NULL_HANDLE;
@@ -1365,7 +1367,8 @@ namespace ae3d
         sampler1Desc.imageView = view1;
         sampler1Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        VkWriteDescriptorSet sets[ 15 ] = {};
+        const unsigned setCount = 16;
+        VkWriteDescriptorSet sets[ setCount ] = {};
 
         // Binding 0 : Image
         sets[ 0 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1507,14 +1510,26 @@ namespace ae3d
         sets[ 14 ].pImageInfo = &sampler14Desc;
         sets[ 14 ].dstBinding = 14;
 
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, 15, sets, 0, nullptr );
+        VkDescriptorBufferInfo bufferDesc = {};
+        bufferDesc.buffer = particleBuffer;
+        bufferDesc.range = VK_WHOLE_SIZE;
+
+        // Binding 15 : Particle buffer.
+        sets[ 15 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 15 ].dstSet = outDescriptorSet;
+        sets[ 15 ].descriptorCount = 1;
+        sets[ 15 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        sets[ 15 ].pBufferInfo = &bufferDesc;
+        sets[ 15 ].dstBinding = 15;
+
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
 
     void CreateDescriptorSetLayout()
     {
-        constexpr int bindingCount = 15;
+        constexpr int bindingCount = 16;
         VkDescriptorSetLayoutBinding layoutBindings[ bindingCount ] = {};
 
         // Binding 0 : Image
@@ -1606,6 +1621,12 @@ namespace ae3d
         layoutBindings[ 14 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
         layoutBindings[ 14 ].descriptorCount = 1;
         layoutBindings[ 14 ].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+
+        // Binding 15 : Particle
+        layoutBindings[ 15 ].binding = 15;
+        layoutBindings[ 15 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindings[ 15 ].descriptorCount = 1;
+        layoutBindings[ 15 ].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
