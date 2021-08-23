@@ -436,7 +436,7 @@ int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool 
         ae3d::System::Assert( false, "Unhandled DDS format!" );
     }
 
-    return width * height * bytesPerPixel * (hasMips ? 1.0f : 1.33333f);
+    return (int)(width * height * bytesPerPixel * (hasMips ? 1.0f : 1.33333f));
 }
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )

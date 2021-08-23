@@ -4,6 +4,14 @@
 #include "System.hpp"
 #include "Vec3.hpp"
 
+#ifdef RENDERER_D3D12
+namespace GfxDeviceGlobal
+{
+    extern ID3D12Resource* particleBuffer;
+    extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav2Desc;
+}
+#endif
+
 Array< ae3d::ParticleSystemComponent > particleSystemComponents;
 unsigned nextFreeParticleSystemComponent = 0;
 
@@ -27,7 +35,7 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
     simulationShader.Begin();
 
 #if RENDERER_D3D12
-    //simulationShader.SetUAV( 0, particleBuffer, particleBufferDesc );
+    simulationShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
 #endif
 
     simulationShader.Dispatch( 1, 1, 1, "Particle Simulation" );

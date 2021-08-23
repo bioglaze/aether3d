@@ -131,6 +131,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 1 ], nullptr, &uavDescs[ 1 ], cpuHandle );
     cpuHandle.ptr += incrementSize;
+    //GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 2 ], nullptr, &uavDescs[ 2 ], cpuHandle );
+    //cpuHandle.ptr += incrementSize;
 
     GfxDeviceGlobal::cachedPSO = pso;
     Statistics::IncPSOBindCalls();
@@ -167,7 +169,7 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
     {
         uniformBuffers[ slotIndex ] = nullptr;
         textureBuffers[ slotIndex ] = Texture2D::GetDefaultTexture()->GetGpuResource()->resource;
-        uavBuffers[ slotIndex ] = Texture2D::GetDefaultTextureUAV()->GetGpuResource()->resource;
+        uavBuffers[ slotIndex ] = Texture2D::GetDefaultTextureUAV()->GetGpuResource()->resource; // FIXME: texture/buffer confusion?
         srvDescs[ slotIndex ] = *Texture2D::GetDefaultTexture()->GetSRVDesc();
         uavDescs[ slotIndex ] = *Texture2D::GetDefaultTexture()->GetUAVDesc();
     }

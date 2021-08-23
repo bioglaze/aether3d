@@ -37,7 +37,7 @@ void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
-constexpr int RESOURCE_BINDING_COUNT = 13;
+constexpr int RESOURCE_BINDING_COUNT = 14;
 
 // Must be kept in sync with ParticleSystemRenderer.cpp
 struct Particle
@@ -197,8 +197,10 @@ namespace GfxDeviceGlobal
     ae3d::TextureBase* textureCube = nullptr;
     ID3D12Resource* uav0 = nullptr;
     ID3D12Resource* uav1 = nullptr;
+    ID3D12Resource* uav2 = nullptr;
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav0Desc = {};
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc = {};
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uav2Desc = {};
     std::vector< ae3d::VertexBuffer > lineBuffers;
     std::vector< ID3D12Resource* > constantBuffers;
     std::vector< void* > mappedConstantBuffers;
@@ -559,7 +561,7 @@ void CreateRootSignature()
     {
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
         descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 10, 0 );
-        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0 );
+        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 3, 0 );
 		ae3d::System::Assert( descRange1[ 0 ].NumDescriptors + descRange1[ 1 ].NumDescriptors + descRange1[ 2 ].NumDescriptors == RESOURCE_BINDING_COUNT, "Resource count mismatch!" );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
@@ -914,11 +916,11 @@ void CreateParticleBuffer()
     }
 
     GfxDeviceGlobal::particleBuffer->SetName( L"Particle Buffer" );
-    //GfxDeviceGlobal::uav0Desc.Format = DXGI_FORMAT_UNKNOWN;
-    //GfxDeviceGlobal::uav0Desc.Buffer.NumElements = maxParticles;
-    //GfxDeviceGlobal::uav0Desc.Buffer.StructureByteStride = 4;
-    //GfxDeviceGlobal::uav0Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-    //GfxDeviceGlobal::uav0Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+    GfxDeviceGlobal::uav2Desc.Format = DXGI_FORMAT_UNKNOWN;
+    GfxDeviceGlobal::uav2Desc.Buffer.NumElements = maxParticles;
+    GfxDeviceGlobal::uav2Desc.Buffer.StructureByteStride = 4 * sizeof( float ); // sizeof( Particle )
+    GfxDeviceGlobal::uav2Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+    GfxDeviceGlobal::uav2Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 }
 
 void CreateConstantBuffers()
@@ -1297,7 +1299,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav1, nullptr, &GfxDeviceGlobal::uav1Desc, cpuHandle );
     cpuHandle.ptr += incrementSize;
- 
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav2, nullptr, &GfxDeviceGlobal::uav2Desc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
+
     const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
     const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
     const unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
