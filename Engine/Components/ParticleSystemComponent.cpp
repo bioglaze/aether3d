@@ -11,6 +11,9 @@ namespace GfxDeviceGlobal
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav2Desc;
 }
 #endif
+#if RENDERER_METAL
+extern id< MTLBuffer > particleBuffer;
+#endif
 
 Array< ae3d::ParticleSystemComponent > particleSystemComponents;
 unsigned nextFreeParticleSystemComponent = 0;
@@ -37,7 +40,9 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 #if RENDERER_D3D12
     simulationShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
 #endif
-
+#if RENDERER_METAL
+    simulationShader.SetUniformBuffer( 0, particleBuffer );
+#endif
     simulationShader.Dispatch( 1, 1, 1, "Particle Simulation" );
     simulationShader.End();
 }

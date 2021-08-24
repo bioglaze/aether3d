@@ -11,7 +11,7 @@ struct Particle
 };
 
 kernel void particle_simulation(
-                  device Particle* particleBufferOut [[ buffer(2) ]],
+                  device Particle* particleBufferOut [[ buffer(0) ]],
                   ushort2 gid [[thread_position_in_grid]],
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
