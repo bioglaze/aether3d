@@ -42,6 +42,7 @@ PFN_vkGetShaderInfoAMD getShaderInfoAMD;
 
 constexpr unsigned UI_VERTICE_COUNT = 512 * 1024;
 constexpr unsigned UI_FACE_COUNT = 128 * 1024;
+constexpr std::uint32_t descriptorSlotCount = 16;
 
 namespace Texture2DGlobal
 {
@@ -1307,8 +1308,7 @@ namespace ae3d
     {
         const int AE3D_DESCRIPTOR_SETS_COUNT = 5550;
 
-        const std::uint32_t typeCount = 15;
-        const VkDescriptorPoolSize typeCounts[ typeCount ] =
+        const VkDescriptorPoolSize typeCounts[ descriptorSlotCount ] =
         {
             { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
@@ -1324,12 +1324,13 @@ namespace ae3d
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT }
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT }
         };
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        descriptorPoolInfo.poolSizeCount = typeCount;
+        descriptorPoolInfo.poolSizeCount = descriptorSlotCount;
         descriptorPoolInfo.pPoolSizes = typeCounts;
         descriptorPoolInfo.maxSets = AE3D_DESCRIPTOR_SETS_COUNT;
         descriptorPoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
@@ -1367,8 +1368,7 @@ namespace ae3d
         sampler1Desc.imageView = view1;
         sampler1Desc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        const unsigned setCount = 16;
-        VkWriteDescriptorSet sets[ setCount ] = {};
+        VkWriteDescriptorSet sets[ descriptorSlotCount ] = {};
 
         // Binding 0 : Image
         sets[ 0 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1522,15 +1522,14 @@ namespace ae3d
         sets[ 15 ].pBufferInfo = &bufferDesc;
         sets[ 15 ].dstBinding = 15;
 
-        vkUpdateDescriptorSets( GfxDeviceGlobal::device, setCount, sets, 0, nullptr );
+        vkUpdateDescriptorSets( GfxDeviceGlobal::device, descriptorSlotCount, sets, 0, nullptr );
 
         return outDescriptorSet;
     }
 
     void CreateDescriptorSetLayout()
     {
-        constexpr int bindingCount = 16;
-        VkDescriptorSetLayoutBinding layoutBindings[ bindingCount ] = {};
+        VkDescriptorSetLayoutBinding layoutBindings[ descriptorSlotCount ] = {};
 
         // Binding 0 : Image
         layoutBindings[ 0 ].binding = 0;
@@ -1630,7 +1629,7 @@ namespace ae3d
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        descriptorLayout.bindingCount = bindingCount;
+        descriptorLayout.bindingCount = descriptorSlotCount;
         descriptorLayout.pBindings = layoutBindings;
 
         VkResult err = vkCreateDescriptorSetLayout( GfxDeviceGlobal::device, &descriptorLayout, nullptr, &GfxDeviceGlobal::descriptorSetLayout );

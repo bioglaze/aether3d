@@ -9,6 +9,7 @@
 #include "GameObject.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
+#include "ParticleSystemComponent.hpp"
 #include "PointLightComponent.hpp"
 #include "SpotLightComponent.hpp"
 #include "System.hpp"
@@ -231,6 +232,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         PointLightComponent* pointLight = gameObject ? gameObject->GetComponent< PointLightComponent >() : nullptr;
         SpotLightComponent* spotLight = gameObject ? gameObject->GetComponent< SpotLightComponent >() : nullptr;
         DirectionalLightComponent* dirLight = gameObject ? gameObject->GetComponent< DirectionalLightComponent >() : nullptr;
+        ParticleSystemComponent* particleSystem = gameObject ? gameObject->GetComponent< ParticleSystemComponent >() : nullptr;
 
         if (gameObject != nullptr && transform != nullptr)
         {
@@ -299,6 +301,24 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             }
         }
         
+        if (gameObject != nullptr && particleSystem == nullptr && nk_button_label( &ctx, "Add particle system" ))
+        {
+            gameObject->AddComponent< ParticleSystemComponent >();
+        }
+        else if (gameObject != nullptr && particleSystem != nullptr)
+        {
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Particle System", NK_MAXIMIZED ))
+            {
+                if (nk_button_label( &ctx, "Remove particle system" ))
+                {
+                    gameObject->RemoveComponent< ParticleSystemComponent >();
+                }
+
+                nk_tree_pop( &ctx );
+                nk_spacing( &ctx, 1 );
+            }
+        }
+
         if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "Add audio source" ))
         {
             gameObject->AddComponent< AudioSourceComponent >();
