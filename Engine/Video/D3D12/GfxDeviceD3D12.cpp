@@ -1094,7 +1094,7 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        desc.NumDescriptors = 13;
+        desc.NumDescriptors = ComputeShader::SLOT_COUNT;
         desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         desc.NodeMask = 0;
 

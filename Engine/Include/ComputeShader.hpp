@@ -100,9 +100,9 @@ namespace ae3d
         ID3DBlob* blobShader = nullptr;
         ID3D12PipelineState* pso = nullptr;
 #endif
+        static const int SLOT_COUNT = 15;
 
     private:
-        static const int SLOT_COUNT = 15;
         
 #if RENDERER_VULKAN
         VkPipelineShaderStageCreateInfo info;
