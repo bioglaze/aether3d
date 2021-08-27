@@ -48,9 +48,10 @@ namespace ae3d
 
         void Unmap();
 
-#if RENDERER_VULKAN
         /// \return Multisample count.
         int GetSampleCount() const { return sampleCount; }
+
+#if RENDERER_VULKAN
 
         /// \return frame buffer.
         VkFramebuffer GetFrameBuffer() { return frameBuffer; }
@@ -97,8 +98,8 @@ namespace ae3d
         VkRenderPass renderPass = VK_NULL_HANDLE;
         VkBuffer pixelBuffer = VK_NULL_HANDLE;
         VkDeviceMemory pixelBufferMemory;
-        int sampleCount = 1;
 #endif
+        int sampleCount = 1;
         DataType dataType = DataType::UByte;
         std::string name;
     };

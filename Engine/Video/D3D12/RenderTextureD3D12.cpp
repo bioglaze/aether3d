@@ -64,6 +64,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isCube = false;
     handle = 1;
 	dxgiFormat = FormatToDXGIFormat( dataType );
+    sampleCount = isMultisampled ? 4 : 1;
 
     D3D12_CLEAR_VALUE clearValue = {};
     clearValue.Format = dxgiFormat;
@@ -76,7 +77,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     descTex.MipLevels = 1;
     descTex.Format = dxgiFormat;
     descTex.SampleDesc.Count = isMultisampled ? 4 : 1;
-    descTex.SampleDesc.Quality = 0;
+    descTex.SampleDesc.Quality = isMultisampled ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     descTex.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
@@ -116,7 +117,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         descDepth.MipLevels = 1;
         descDepth.Format = DXGI_FORMAT_D32_FLOAT;
         descDepth.SampleDesc.Count = isMultisampled ? 4 : 1;
-        descDepth.SampleDesc.Quality = 0;
+        descDepth.SampleDesc.Quality = isMultisampled ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
         descDepth.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         descDepth.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 
