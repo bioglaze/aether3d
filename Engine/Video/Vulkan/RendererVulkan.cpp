@@ -36,5 +36,5 @@ void ae3d::BuiltinShaders::Load()
     lightCullShader.LoadSPIRV( FileSystem::FileContents( "shaders/LightCuller.spv" ) );
     particleSimulationShader.LoadSPIRV( FileSystem::FileContents( "shaders/particle.spv" ) );
 
-    CreateBuffer( particleBuffer, 50 * sizeof( Particle ), particleMemory, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "particle buffer" );
+    CreateBuffer( particleBuffer, 1000000 * sizeof( Particle ), particleMemory, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "particle buffer" );
 }

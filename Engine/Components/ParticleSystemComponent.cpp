@@ -46,3 +46,10 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
     simulationShader.Dispatch( 1, 1, 1, "Particle Simulation" );
     simulationShader.End();
 }
+
+void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, int width, int height )
+{
+    drawShader.Begin();
+    drawShader.Dispatch( width / 8, height / 8, 1, "Particle Draw" );
+    drawShader.End();
+}

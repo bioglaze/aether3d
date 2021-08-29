@@ -12,6 +12,8 @@ namespace ae3d
         void SetMaxParticles( int count ) { maxParticles = count; }
 
         static void Simulate( class ComputeShader& simulationShader );
+
+        static void Draw( ComputeShader& drawShader, int width, int height );
         
     private:
         friend class GameObject;
