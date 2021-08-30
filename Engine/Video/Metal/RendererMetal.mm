@@ -25,7 +25,7 @@ void ae3d::BuiltinShaders::Load()
     particleSimulationShader.Load( "particle_simulation", FileSystem::FileContents(""), FileSystem::FileContents("") );
     uiShader.LoadFromLibrary( "sprite_vertex", "sprite_fragment" );
     
-    const unsigned maxParticleCount = 50;
+    const unsigned maxParticleCount = 1000000;
     particleBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( Particle ) * maxParticleCount
                               options:MTLResourceCPUCacheModeDefaultCache];
     particleBuffer.label = @"Particle buffer";
