@@ -11,6 +11,13 @@ namespace ae3d
     class CameraComponent;
     struct Vec4;
     
+    struct Particle
+    {
+        ae3d::Vec4 position;
+        ae3d::Vec4 color;
+        ae3d::Vec4 clipPosition;
+    };
+
     struct BuiltinShaders
     {
         // Loads shader binaries from running directory's 'shaders' subfolder.
@@ -26,6 +33,7 @@ namespace ae3d
         Shader uiShader;
         ComputeShader lightCullShader;
         ComputeShader particleSimulationShader;
+        ComputeShader particleDrawShader;
     };
 
     /// High-level rendering stuff.

@@ -17,4 +17,5 @@ void ae3d::BuiltinShaders::Load()
 
     lightCullShader.Load( "", FileSystem::FileContents( "shaders/LightCuller.obj" ), FileSystem::FileContents( "" ) );
     particleSimulationShader.Load( "", FileSystem::FileContents( "shaders/particle.obj" ), FileSystem::FileContents( "" ) );
+    particleDrawShader.Load( "", FileSystem::FileContents( "shaders/particle_draw.obj" ), FileSystem::FileContents( "" ) );
 }

@@ -39,12 +39,6 @@ float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
 constexpr int RESOURCE_BINDING_COUNT = 14;
 
-// Must be kept in sync with ParticleSystemRenderer.cpp
-struct Particle
-{
-    ae3d::Vec4 position;
-};
-
 namespace WindowGlobal
 {
     extern HWND hwnd;
@@ -882,7 +876,7 @@ void CreateDepthStencil()
 
 void CreateParticleBuffer()
 {
-    const unsigned maxParticles = 50;
+    const unsigned maxParticles = 1000000;
 
     D3D12_HEAP_PROPERTIES heapProp = {};
     heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -900,7 +894,7 @@ void CreateParticleBuffer()
     bufferProp.MipLevels = 1;
     bufferProp.SampleDesc.Count = 1;
     bufferProp.SampleDesc.Quality = 0;
-    bufferProp.Width = maxParticles * sizeof( Particle );
+    bufferProp.Width = maxParticles * sizeof( ae3d::Particle );
 
     HRESULT hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &heapProp,

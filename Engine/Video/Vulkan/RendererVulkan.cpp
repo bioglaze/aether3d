@@ -6,11 +6,6 @@
 #include <vulkan/vulkan.h>
 #include "VulkanUtils.hpp"
 
-struct Particle
-{
-    ae3d::Vec4 position;
-};
-
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
@@ -35,6 +30,7 @@ void ae3d::BuiltinShaders::Load()
     uiShader.LoadSPIRV( FileSystem::FileContents( "shaders/sprite_vert.spv" ), FileSystem::FileContents( "shaders/sprite_frag.spv" ) );
     lightCullShader.LoadSPIRV( FileSystem::FileContents( "shaders/LightCuller.spv" ) );
     particleSimulationShader.LoadSPIRV( FileSystem::FileContents( "shaders/particle.spv" ) );
+    particleDrawShader.LoadSPIRV( FileSystem::FileContents( "shaders/particle_draw.spv" ) );
 
     CreateBuffer( particleBuffer, 1000000 * sizeof( Particle ), particleMemory, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "particle buffer" );
 }

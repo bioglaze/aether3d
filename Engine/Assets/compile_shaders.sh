@@ -25,4 +25,5 @@ dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/ssao.hlsl
 dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/compose.hlsl -Fo ../../../aether3d_build/Samples/shaders/compose.spv
 dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/outline.hlsl -Fo ../../../aether3d_build/Samples/shaders/outline.spv
 dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/particle.hlsl -Fo ../../../aether3d_build/Samples/shaders/particle.spv
+dxc -DVULKAN -Ges -spirv -E CSMain -all-resources-bound -T cs_6_0 hlsl/particle_draw.hlsl -Fo ../../../aether3d_build/Samples/shaders/particle_draw.spv
 
