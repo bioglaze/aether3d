@@ -3,11 +3,6 @@
 #include "GfxDevice.hpp"
 #include "Vec3.hpp"
 
-struct Particle
-{
-    ae3d::Vec4 color;
-};
-
 ae3d::Renderer renderer;
 
 id< MTLBuffer > particleBuffer;
@@ -23,6 +18,7 @@ void ae3d::BuiltinShaders::Load()
     depthNormalsSkinShader.LoadFromLibrary( "depthnormals_skin_vertex", "depthnormals_fragment" );
     lightCullShader.Load( "light_culler", FileSystem::FileContents(""), FileSystem::FileContents("") );
     particleSimulationShader.Load( "particle_simulation", FileSystem::FileContents(""), FileSystem::FileContents("") );
+    particleDrawShader.Load( "particle_draw", FileSystem::FileContents(""), FileSystem::FileContents("") );
     uiShader.LoadFromLibrary( "sprite_vertex", "sprite_fragment" );
     
     const unsigned maxParticleCount = 1000000;
