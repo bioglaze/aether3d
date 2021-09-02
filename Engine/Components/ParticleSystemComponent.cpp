@@ -50,6 +50,8 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, int width, int height )
 {
     drawShader.Begin();
+    //drawShader.SetProjectionMatrix();
+    //drawShader.SetRenderTexture();
     drawShader.Dispatch( width / 8, height / 8, 1, "Particle Draw" );
     drawShader.End();
 }
