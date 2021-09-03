@@ -802,7 +802,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     if (camera->GetTargetTexture() && camera->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
     {
         Matrix44::Multiply( camera->GetView(), camera->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
-        ParticleSystemComponent::Draw( renderer.builtinShaders.particleDrawShader, camera->GetTargetTexture()->GetWidth(), camera->GetTargetTexture()->GetHeight() );
+        ParticleSystemComponent::Draw( renderer.builtinShaders.particleDrawShader, *camera->GetTargetTexture() );
     }
 
     GfxDevice::PopGroupMarker();

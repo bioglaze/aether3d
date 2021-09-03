@@ -1,6 +1,7 @@
 #include "ParticleSystemComponent.hpp"
 #include "Array.hpp"
 #include "ComputeShader.hpp"
+#include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
 
@@ -47,11 +48,10 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
     simulationShader.End();
 }
 
-void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, int width, int height )
+void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTexture& target )
 {
     drawShader.Begin();
-    //drawShader.SetProjectionMatrix();
-    //drawShader.SetRenderTexture();
-    drawShader.Dispatch( width / 8, height / 8, 1, "Particle Draw" );
+    drawShader.SetRenderTexture( &target, 0 );
+    drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw" );
     drawShader.End();
 }

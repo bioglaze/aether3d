@@ -13,7 +13,7 @@ namespace ae3d
 
         static void Simulate( class ComputeShader& simulationShader );
 
-        static void Draw( ComputeShader& drawShader, int width, int height );
+        static void Draw( ComputeShader& drawShader, class RenderTexture& target );
         
     private:
         friend class GameObject;
