@@ -155,10 +155,7 @@ void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, 
 {
     if (slot < SLOT_COUNT)
     {
-        if (slot < 2)
-        {
-            GfxDeviceGlobal::boundViews[ slot ] = renderTexture->GetColorView();
-        }
+        GfxDeviceGlobal::boundViews[ slot ] = renderTexture->GetColorView();
     }
     else
     {
