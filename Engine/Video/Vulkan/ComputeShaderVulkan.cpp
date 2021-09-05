@@ -25,7 +25,7 @@ namespace GfxDeviceGlobal
     extern VkPipelineLayout pipelineLayout;
     extern VkPipelineCache pipelineCache;
     extern PerObjectUboStruct perObjectUboStruct;
-    extern VkImageView boundViews[ 15 ];
+    extern VkImageView boundViews[ ae3d::ComputeShader::SLOT_COUNT ];
 }
 
 namespace ComputeShaderGlobal

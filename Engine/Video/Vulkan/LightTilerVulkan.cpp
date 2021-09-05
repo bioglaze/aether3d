@@ -28,7 +28,7 @@ namespace GfxDeviceGlobal
     extern VkCommandBuffer computeCmdBuffer;
     extern VkDescriptorSetLayout descriptorSetLayout;
     extern VkQueue computeQueue;
-    extern VkImageView boundViews[ 2 ];
+    extern VkImageView boundViews[ ae3d::ComputeShader::SLOT_COUNT ];
     extern VkSampler boundSamplers[ 2 ];
 }
 

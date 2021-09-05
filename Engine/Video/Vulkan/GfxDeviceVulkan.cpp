@@ -129,7 +129,7 @@ namespace GfxDeviceGlobal
     std::uint32_t currentBuffer = 0;
     ae3d::RenderTexture* renderTexture0 = nullptr;
     VkFramebuffer frameBuffer0 = VK_NULL_HANDLE;
-    VkImageView boundViews[ 15 ];
+    VkImageView boundViews[ ae3d::ComputeShader::SLOT_COUNT ];
     VkSampler boundSamplers[ 2 ];
     VkSampler linearRepeat;
     Array< VkBuffer > pendingFreeVBs;
