@@ -448,6 +448,7 @@ namespace ae3d
         VkResult err = vkCreateGraphicsPipelines( GfxDeviceGlobal::device, GfxDeviceGlobal::pipelineCache, 1, &pipelineCreateInfo,
                                                   nullptr, &pso );
         AE3D_CHECK_VULKAN( err, "vkCreateGraphicsPipelines" );
+        debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)pso, VK_OBJECT_TYPE_PIPELINE, "graphics pipeline" );
 
         GfxDeviceGlobal::psoCache[ hash ] = pso;
     }

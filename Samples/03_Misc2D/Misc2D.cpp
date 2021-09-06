@@ -128,7 +128,7 @@ int main()
     statsContainer.GetComponent<TransformComponent>()->SetParent( statsParent.GetComponent<TransformComponent>() );
 
     RenderTexture rtTex;
-    rtTex.Create2D( 512, 512, DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear, "render texture", false );
+    rtTex.Create2D( 512, 512, DataType::UByte, TextureWrap::Clamp, TextureFilter::Linear, "render texture", false, ae3d::RenderTexture::UavFlag::Disabled );
     
     GameObject renderTextureContainer;
     renderTextureContainer.AddComponent<SpriteRendererComponent>();

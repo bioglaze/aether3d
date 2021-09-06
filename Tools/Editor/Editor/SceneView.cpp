@@ -440,9 +440,9 @@ void svInit( SceneView** sv, int width, int height )
 {
     *sv = new SceneView();
     
-    (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false );
-    (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false );
-    (*sv)->objectIdTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "objectIdTarget", false );
+    (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false, ae3d::RenderTexture::UavFlag::Disabled );
+    (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false, ae3d::RenderTexture::UavFlag::Disabled );
+    (*sv)->objectIdTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "objectIdTarget", false, ae3d::RenderTexture::UavFlag::Disabled );
     (*sv)->objectIdTarget.MakeCpuReadable();
     (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
@@ -474,7 +474,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->camera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.01f, 0.01f, 0.01f ) );
     (*sv)->camera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
-    (*sv)->camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    (*sv)->camera.GetComponent< CameraComponent >()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false, ae3d::RenderTexture::UavFlag::Disabled );
     (*sv)->camera.GetComponent< CameraComponent >()->SetTargetTexture( &(*sv)->cameraTarget );
     (*sv)->camera.AddComponent< TransformComponent >();
     (*sv)->camera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );

@@ -38,7 +38,7 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestParticleSystem = false;
+constexpr bool TestParticleSystem = true;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
@@ -129,7 +129,7 @@ int main()
 #endif
 
     RenderTexture cameraTex;
-    cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA );
+    cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA, ae3d::RenderTexture::UavFlag::Enabled );
 
     Texture2D bloomTex;
     bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte, nullptr );
@@ -163,16 +163,16 @@ int main()
     noiseTex.SetLayout( TextureLayout::ShaderRead );
     
     RenderTexture resolvedTex;
-    resolvedTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false );
+    resolvedTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false, ae3d::RenderTexture::UavFlag::Disabled );
         
     RenderTexture camera2dTex;
-    camera2dTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
+    camera2dTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false, ae3d::RenderTexture::UavFlag::Disabled );
 
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
     camera.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
     camera.GetComponent<CameraComponent>()->SetProjection( 45, (float)originalWidth / (float)originalHeight, 0.1f, 200 );
-    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().Create2D( originalWidth, originalHeight, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false, ae3d::RenderTexture::UavFlag::Disabled );
     camera.GetComponent<CameraComponent>()->SetClearFlag( CameraComponent::ClearFlag::DepthAndColor );
     camera.GetComponent<CameraComponent>()->SetRenderOrder( 1 );
 #ifndef AE3D_OPENVR
@@ -564,7 +564,7 @@ int main()
     
     RenderTexture rtTex;
     const auto dataType = camera2d.GetComponent<CameraComponent>()->GetTargetTexture() != nullptr ? ae3d::DataType::Float : ae3d::DataType::UByte;
-    rtTex.Create2D( 512, 512, dataType, TextureWrap::Clamp, TextureFilter::Linear, "rtTex", false );
+    rtTex.Create2D( 512, 512, dataType, TextureWrap::Clamp, TextureFilter::Linear, "rtTex", false, ae3d::RenderTexture::UavFlag::Disabled );
     
     GameObject renderTextureContainer;
     renderTextureContainer.SetName( "renderTextureContainer" );

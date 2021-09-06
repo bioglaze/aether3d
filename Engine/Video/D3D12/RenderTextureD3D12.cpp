@@ -47,7 +47,7 @@ void ae3d::RenderTexture::DestroyTextures()
     }
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled, RenderTexture::UavFlag uavFlag )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -80,6 +80,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     descTex.SampleDesc.Quality = isMultisampled ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
     descTex.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     descTex.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    if (uavFlag == UavFlag::Enabled)
+    {
+        descTex.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+    }
 
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;

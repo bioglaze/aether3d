@@ -8,6 +8,9 @@ namespace ae3d
     class RenderTexture : public TextureBase
     {
   public:
+        /// Is the texture readable/writable in a shader?
+        enum class UavFlag { Disabled, Enabled };
+
         /// Destroys graphics API objects.
         static void DestroyTextures();
 
@@ -24,7 +27,7 @@ namespace ae3d
         /// \param filter Filtering mode.
         /// \param debugName Debug name that is visible in graphics debugging tools.
         /// \param isMultisampled True, if the texture is multisampled.
-        void Create2D( int width, int height, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName, bool isMultisampled );
+        void Create2D( int width, int height, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName, bool isMultisampled, UavFlag uavFlag );
 
         /// \param dimension Dimension.
         /// \param dataType Data type.

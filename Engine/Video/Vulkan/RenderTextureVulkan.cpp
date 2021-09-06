@@ -98,7 +98,7 @@ void ae3d::RenderTexture::MakeCpuReadable()
 {
     System::Assert( width > 0 && height > 0, "MakeCpuReadable must be called after Create2D()!" );
     
-    Create2D( width, height, dataType, wrap, filter, "CPU-readable render texture", sampleCount > 1 );
+    Create2D( width, height, dataType, wrap, filter, "CPU-readable render texture", sampleCount > 1, RenderTexture::UavFlag::Disabled );
 }
 
 void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
@@ -222,7 +222,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     GfxDevice::BeginRenderPassAndCommandBuffer();
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled, UavFlag uavFlag )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -281,6 +281,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     colorImage.tiling = VK_IMAGE_TILING_OPTIMAL;
     colorImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     colorImage.flags = 0;
+
+    if (uavFlag == UavFlag::Enabled)
+    {
+        colorImage.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
+    }
 
     VkImageViewCreateInfo colorImageView = {};
     colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
