@@ -67,7 +67,7 @@ void ae3d::RenderTexture::MakeCpuReadable()
     metalTexture.label = label;
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool /* isMultisampled */ )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool /* isMultisampled */, RenderTexture::UavFlag uavFlag )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -108,6 +108,12 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
                                                       height:height
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+    
+    if (uavFlag == RenderTexture::UavFlag::Enabled)
+    {
+        textureDescriptor.usage |= MTLTextureUsageShaderWrite;
+    }
+    
     textureDescriptor.storageMode = MTLStorageModePrivate;
     metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
 

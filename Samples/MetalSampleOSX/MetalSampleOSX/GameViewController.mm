@@ -388,9 +388,9 @@ using namespace ae3d;
 
     noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );
 
-    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", MULTISAMPLE_COUNT > 1 );
+    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", MULTISAMPLE_COUNT > 1, ae3d::RenderTexture::UavFlag::Enabled );
     ae3d::System::Print( "width: %f, height: %f\n", self.view.bounds.size.width, self.view.bounds.size.height );
-    camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false );
+    camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false, ae3d::RenderTexture::UavFlag::Disabled );
 
     camera2d.SetName( "Camera2D" );
     camera2d.AddComponent<ae3d::CameraComponent>();
@@ -415,7 +415,7 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->SetTargetTexture( &cameraTex );
     //camera3d.GetComponent<ae3d::CameraComponent>()->SetViewport( 0, 0, 640, 480 );
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2,
-                                                                                       DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest,  "depthnormals", false );
+                                                                                       DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest,  "depthnormals", false, ae3d::RenderTexture::UavFlag::Disabled );
     camera3d.AddComponent<ae3d::TransformComponent>();
     camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
@@ -662,7 +662,7 @@ using namespace ae3d;
     }
 
 
-    rtTex.Create2D( 512, 512, ae3d::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture", false );
+    rtTex.Create2D( 512, 512, ae3d::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture", false, ae3d::RenderTexture::UavFlag::Disabled );
     bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", DataType::Float, nullptr );
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", DataType::Float, nullptr );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", DataType::Float, nullptr );
