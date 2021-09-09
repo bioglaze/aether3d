@@ -42,7 +42,7 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
     simulationShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
 #endif
 #if RENDERER_METAL
-    simulationShader.SetUniformBuffer( 0, particleBuffer );
+    simulationShader.SetUniformBuffer( 1, particleBuffer );
 #endif
     simulationShader.Dispatch( 1, 1, 1, "Particle Simulation" );
     simulationShader.End();

@@ -24,7 +24,7 @@ kernel void particle_simulation(
 }
 
 kernel void particle_draw(
-                  device Particle* particleBuffer [[ buffer(0) ]],
+                  device Particle* particleBuffer [[ buffer(1) ]],
                   texture2d<float, access::write> outTexture [[texture(0)]],
                   ushort2 gid [[thread_position_in_grid]],
                   ushort2 tid [[thread_position_in_threadgroup]],
