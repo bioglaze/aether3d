@@ -799,12 +799,6 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         ++i;
     }
 
-    if (camera->GetTargetTexture() && camera->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective && !camera->GetTargetTexture()->IsCube())
-    {
-        Matrix44::Multiply( camera->GetView(), camera->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
-        ParticleSystemComponent::Draw( renderer.builtinShaders.particleDrawShader, *camera->GetTargetTexture() );
-    }
-
     GfxDevice::PopGroupMarker();
 
 #if RENDERER_METAL
@@ -825,6 +819,12 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
         }
     }
 #endif
+    
+    if (camera->GetTargetTexture() && camera->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective && !camera->GetTargetTexture()->IsCube())
+    {
+        Matrix44::Multiply( camera->GetView(), camera->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
+        ParticleSystemComponent::Draw( renderer.builtinShaders.particleDrawShader, *camera->GetTargetTexture() );
+    }
 }
 
 void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44& worldToView, std::vector< unsigned > gameObjectsWithMeshRenderer,
