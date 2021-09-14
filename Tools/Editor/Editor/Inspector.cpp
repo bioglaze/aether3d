@@ -106,6 +106,7 @@ static void DrawNuklear( int width, int height )
             continue;
         }
 
+        System::Assert( cmd->texture.id < 10, "Too high texture index!" );
         System::DrawUI( (int)(cmd->clip_rect.x),
 #if RENDERER_VULKAN
                         (int)(cmd->clip_rect.y - cmd->clip_rect.h) + 30, // FIXME: + 30 fixes a scissoring issue with textfield.
@@ -312,6 +313,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 if (nk_button_label( &ctx, "Remove particle system" ))
                 {
                     gameObject->RemoveComponent< ParticleSystemComponent >();
+                    particleSystem = nullptr;
                 }
 
                 nk_tree_pop( &ctx );
