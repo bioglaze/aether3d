@@ -41,6 +41,7 @@ cbuffer cbPerFrame : register(b0)
     float2 bloomParams;
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
+    int particleCount;
 };
 Buffer<float4> pointLightBufferCenterAndRadius : register(t5);
 RWBuffer<uint> perTileLightIndexBuffer : register(u0);
