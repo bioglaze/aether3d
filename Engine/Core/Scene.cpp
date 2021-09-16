@@ -490,6 +490,8 @@ void ae3d::Scene::Render()
 #endif
     Statistics::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();
+
+    GfxDeviceGlobal::perObjectUboStruct.particleCount = 10;
     ParticleSystemComponent::Simulate( renderer.builtinShaders.particleSimulationShader );
     
     std::vector< GameObject* > rtCameras;
