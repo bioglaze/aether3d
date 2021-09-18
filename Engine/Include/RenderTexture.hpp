@@ -104,6 +104,7 @@ namespace ae3d
 #endif
         int sampleCount = 1;
         DataType dataType = DataType::UByte;
+        UavFlag uavFlag = UavFlag::Disabled;
         std::string name;
     };
 }
