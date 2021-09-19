@@ -13,6 +13,7 @@
 		AB010CE4206F70B40014ED08 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB010CE2206F70B40014ED08 /* Main.storyboard */; };
 		AB010CE7206F70B40014ED08 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AB010CE6206F70B40014ED08 /* main.m */; };
 		AB0B89BF20CD936400FF33FA /* cursor_translate.ae3d in Resources */ = {isa = PBXBuildFile; fileRef = AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */; };
+		AB277ADC26F4D9D4007A7086 /* particle.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB277ADB26F4D9D4007A7086 /* particle.metal */; };
 		AB5A0F4B25780A660001B8DC /* textures in Resources */ = {isa = PBXBuildFile; fileRef = AB5A0F4A25780A660001B8DC /* textures */; };
 		AB5DB103251635AA0050A421 /* SSAO.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB5DB102251635AA0050A421 /* SSAO.metal */; };
 		AB93F87E266E4C5E00DF3C86 /* outline.metal in Sources */ = {isa = PBXBuildFile; fileRef = AB93F87D266E4C5E00DF3C86 /* outline.metal */; };
@@ -49,6 +50,7 @@
 		AB010CE8206F70B40014ED08 /* Editor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Editor.entitlements; sourceTree = "<group>"; };
 		AB0B89BB20CD936300FF33FA /* cursor_translate.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = cursor_translate.ae3d; path = ../../../../../aether3d_build/Samples/cursor_translate.ae3d; sourceTree = "<group>"; };
 		AB1786F02128B05900659048 /* Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Array.hpp; path = ../../../../Engine/Include/Array.hpp; sourceTree = "<group>"; };
+		AB277ADB26F4D9D4007A7086 /* particle.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = particle.metal; path = ../../../../Engine/Assets/particle.metal; sourceTree = "<group>"; };
 		AB5A0F4A25780A660001B8DC /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = ../../../../../aether3d_build/Samples/textures; sourceTree = "<group>"; };
 		AB5DB102251635AA0050A421 /* SSAO.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SSAO.metal; path = ../../../../Engine/Assets/SSAO.metal; sourceTree = "<group>"; };
 		AB93F87D266E4C5E00DF3C86 /* outline.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = outline.metal; path = ../../../../Engine/Assets/outline.metal; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 		ABE44D0D2077C7A100DF1BAF /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				AB277ADB26F4D9D4007A7086 /* particle.metal */,
 				AB93F87D266E4C5E00DF3C86 /* outline.metal */,
 				ABE82EA321DCD8F100072FB1 /* Bloom.metal */,
 				ABAA98AF20963B4C00DC1F42 /* DepthNormals.metal */,
@@ -317,6 +320,7 @@
 				ABAA98B620963B4C00DC1F42 /* LightCuller.metal in Sources */,
 				ABAA98B920963B4C00DC1F42 /* DepthNormals.metal in Sources */,
 				ABAA98B520963B4C00DC1F42 /* Unlit.metal in Sources */,
+				AB277ADC26F4D9D4007A7086 /* particle.metal in Sources */,
 				ABB3603D208C4F05007133FD /* SceneView.cpp in Sources */,
 				ABAA98B120963B4C00DC1F42 /* Moments.metal in Sources */,
 				ABAA98B820963B4C00DC1F42 /* UnlitSkin.metal in Sources */,

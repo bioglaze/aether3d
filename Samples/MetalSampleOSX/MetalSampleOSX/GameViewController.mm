@@ -35,7 +35,7 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-const bool TestForwardPlus = true;
+const bool TestForwardPlus = false;
 const bool TestBloom = false;
 const bool TestSSAO = false;
 const bool TestShadowsDir = false;

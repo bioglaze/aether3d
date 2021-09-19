@@ -440,9 +440,9 @@ void svInit( SceneView** sv, int width, int height )
 {
     *sv = new SceneView();
     
-    (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false, ae3d::RenderTexture::UavFlag::Disabled );
-    (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false, ae3d::RenderTexture::UavFlag::Disabled );
-    (*sv)->objectIdTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "objectIdTarget", false, ae3d::RenderTexture::UavFlag::Disabled );
+    (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false, ae3d::RenderTexture::UavFlag::Enabled );
+    (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false, ae3d::RenderTexture::UavFlag::Enabled );
+    (*sv)->objectIdTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "objectIdTarget", false, ae3d::RenderTexture::UavFlag::Enabled );
     (*sv)->objectIdTarget.MakeCpuReadable();
     (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
