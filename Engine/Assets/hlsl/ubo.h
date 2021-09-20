@@ -88,6 +88,7 @@ RWStructuredBuffer< Particle > particles : register(u2);
     float2 bloomParams;
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
+    int particleCount;
 };
 [[vk::binding( 8 )]] Buffer<float4> pointLightBufferCenterAndRadius;
 [[vk::binding( 9 )]] RWBuffer<uint> perTileLightIndexBuffer;
