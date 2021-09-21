@@ -10,6 +10,7 @@
 
 DXGI_FORMAT FormatToDXGIFormat( ae3d::DataType format );
 int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool hasMips );
+void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
 
 namespace GfxDeviceGlobal
 {
@@ -287,5 +288,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
 
 void ae3d::RenderTexture::ResolveTo( ae3d::RenderTexture* target )
 {
+    TransitionResource( gpuResource, D3D12_RESOURCE_STATE_RESOLVE_SOURCE );
+    TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RESOLVE_DEST );
     GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( target->GetGpuResource()->resource, 0, gpuResource.resource, 0, FormatToDXGIFormat( dataType ) );
 }
