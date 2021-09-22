@@ -98,7 +98,7 @@ void ae3d::RenderTexture::MakeCpuReadable()
 {
     System::Assert( width > 0 && height > 0, "MakeCpuReadable must be called after Create2D()!" );
     
-    Create2D( width, height, dataType, wrap, filter, "CPU-readable render texture", sampleCount > 1, RenderTexture::UavFlag::Disabled );
+    Create2D( width, height, dataType, wrap, filter, "CPU-readable render texture", sampleCount > 1, uavFlag );
 }
 
 void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
@@ -222,7 +222,7 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     GfxDevice::BeginRenderPassAndCommandBuffer();
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled, UavFlag uavFlag )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled, UavFlag aUavFlag )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -239,7 +239,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     dataType = aDataType;
     handle = 1;
     sampleCount = isMultisampled ? (int)GfxDeviceGlobal::msaaSampleBits : 1;
-    
+    uavFlag = aUavFlag;
+
     // Color
 
     if (dataType == DataType::UByte)

@@ -48,7 +48,7 @@ void ae3d::RenderTexture::DestroyTextures()
     }
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled, RenderTexture::UavFlag uavFlag )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled, RenderTexture::UavFlag aUavFlag )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -66,6 +66,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     handle = 1;
 	dxgiFormat = FormatToDXGIFormat( dataType );
     sampleCount = isMultisampled ? 4 : 1;
+    uavFlag = aUavFlag;
 
     D3D12_CLEAR_VALUE clearValue = {};
     clearValue.Format = dxgiFormat;
