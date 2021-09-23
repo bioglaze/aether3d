@@ -1309,7 +1309,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
             float x = (int)screenPoint.x * screenScale;
             float y = (int)screenPoint.y * screenScale;
 #endif
-            ae3d::System::Draw( sprite, x, y, texWidth, texHeight,
+            ae3d::System::Draw( sprite, (int)x, (int)y, texWidth, texHeight,
                                 (int)(screenWidth * screenScale), (int)(screenHeight * screenScale), Vec4( 1, 1, 1, opacity ), ae3d::System::BlendMode::Off );
         }
     }
@@ -1326,7 +1326,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         transform->UpdateLocalAndGlobalMatrix();
         ae3d::Matrix44 viewMat = camera->GetView();
         ae3d::Matrix44::Multiply( transform->GetLocalMatrix(), viewMat, viewMat );
-        ae3d::System::DrawLines( sv->lightLineHandle, viewMat, camera->GetProjection(), screenWidth * screenScale, screenHeight * screenScale );
+        ae3d::System::DrawLines( sv->lightLineHandle, viewMat, camera->GetProjection(), (int)(screenWidth * screenScale), (int)(screenHeight * screenScale) );
         transform->SetLocalScale( oldScale );
         transform->UpdateLocalAndGlobalMatrix();
     }
