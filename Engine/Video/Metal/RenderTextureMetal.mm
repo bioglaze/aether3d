@@ -17,7 +17,7 @@ void ae3d::RenderTexture::Unmap()
     
 }
 
-void ae3d::RenderTexture::MakeCpuReadable()
+void ae3d::RenderTexture::MakeCpuReadable( const char* debugName )
 {
     if (metalTexture == nil)
     {

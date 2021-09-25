@@ -94,11 +94,11 @@ static void CreateSampler( ae3d::TextureFilter filter, ae3d::TextureWrap wrap, V
     debug::SetObjectName( GfxDeviceGlobal::device, (std::uint64_t)outSampler, VK_OBJECT_TYPE_SAMPLER, "sampler" );
 }
 
-void ae3d::RenderTexture::MakeCpuReadable()
+void ae3d::RenderTexture::MakeCpuReadable( const char* debugName )
 {
     System::Assert( width > 0 && height > 0, "MakeCpuReadable must be called after Create2D()!" );
     
-    Create2D( width, height, dataType, wrap, filter, "CPU-readable render texture", sampleCount > 1, uavFlag );
+    Create2D( width, height, dataType, wrap, filter, debugName, sampleCount > 1, uavFlag );
 }
 
 void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
