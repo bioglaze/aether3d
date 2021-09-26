@@ -443,7 +443,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->cameraTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTarget", false, ae3d::RenderTexture::UavFlag::Enabled );
     (*sv)->selectionTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "selectionTarget", false, ae3d::RenderTexture::UavFlag::Enabled );
     (*sv)->objectIdTarget.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "objectIdTarget", false, ae3d::RenderTexture::UavFlag::Enabled );
-    (*sv)->objectIdTarget.MakeCpuReadable();
+    (*sv)->objectIdTarget.MakeCpuReadable( "objectIdTarget" );
     (*sv)->bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::Float, nullptr );
     (*sv)->blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::Float, nullptr );
     (*sv)->blurTex2.CreateUAV( width / 2, height / 2, "blur2Tex", DataType::Float, nullptr );
@@ -519,8 +519,8 @@ void svInit( SceneView** sv, int width, int height )
                       FileSystem::FileContents( "shaders/sprite_vert.spv" ), FileSystem::FileContents( "shaders/sprite_frag.spv" ) );
 
     (*sv)->objectIdShader.Load( "unlit_vertex", "objectid_fragment",
-                      FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/objectid_frag.obj" ),
-                      FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/objectid_frag.spv" ) );
+                      FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ), // TODO: Create an object-id shader.
+                      FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
 
     (*sv)->standardShader.Load( "standard_vertex", "standard_fragment",
                       FileSystem::FileContents( "shaders/Standard_vert.obj" ), FileSystem::FileContents( "shaders/Standard_frag.obj" ),
