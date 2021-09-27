@@ -37,6 +37,7 @@ namespace ae3d
         void CreateCube( int dimension, DataType dataType, TextureWrap wrap, TextureFilter filter, const char* debugName );
 
         /// Slow. Enables reading pixels with Map()/Unmap(). Use only for special stuff like picking buffer in Editor.
+        /// NOTE: Not all GPUs support this! This was tested successfully on AMD and failed on NVIDIA.
         /// \param debugName Debug name that is visible in graphics debugging tools.
         void MakeCpuReadable( const char* debugName );
         
