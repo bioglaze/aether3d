@@ -165,6 +165,18 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     RenderTextureGlobal::pathToCachedTextureSizeInBytes[ debugName ] = (size_t)GetTextureMemoryUsageBytes( width, height, dxgiFormat, mipLevelCount > 1 );
     //RenderTextureGlobal::PrintMemoryUsage();
 #endif
+
+    if (uavFlag == UavFlag::Enabled)
+    {
+        uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+        uavDesc.Format = dxgiFormat;
+        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        uavDesc.Texture2D.MipSlice = 0;
+        uavDesc.Texture2D.PlaneSlice = 0;
+
+        GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResource.resource, nullptr, &uavDesc, uav );
+    }
 }
 
 void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName )

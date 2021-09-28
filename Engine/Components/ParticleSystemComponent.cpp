@@ -51,6 +51,10 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTexture& target )
 {
     drawShader.Begin();
+#if RENDERER_D3D12
+    drawShader.SetUAV( 1, target.GetGpuResource()->resource, *target.GetUAVDesc() );
+    drawShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
+#endif
 #if RENDERER_VULKAN
     //drawShader.SetRenderTexture( &target, 14 );
 #else
