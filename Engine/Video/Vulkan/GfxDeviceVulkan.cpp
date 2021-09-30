@@ -50,6 +50,7 @@ namespace Texture2DGlobal
 }
 
 extern VkBuffer particleBuffer;
+extern VkDeviceMemory particleMemory;
 
 struct Ubo
 {
@@ -2259,6 +2260,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     vkDestroyImage( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.image, nullptr );
     vkDestroyImageView( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.view, nullptr );
     vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::depthStencil.mem, nullptr );
+    vkDestroyBuffer( GfxDeviceGlobal::device, particleBuffer, nullptr );
+    vkFreeMemory( GfxDeviceGlobal::device, particleMemory, nullptr );
 
     vkDestroyDescriptorSetLayout( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorSetLayout, nullptr );
     vkDestroyDescriptorPool( GfxDeviceGlobal::device, GfxDeviceGlobal::descriptorPool, nullptr );
