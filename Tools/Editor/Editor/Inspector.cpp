@@ -15,6 +15,7 @@
 #include "System.hpp"
 #include "Texture2D.hpp"
 #include "TransformComponent.hpp"
+#include "TextRendererComponent.hpp"
 #include <string.h>
 #include <stdio.h>
 
@@ -234,6 +235,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         SpotLightComponent* spotLight = gameObject ? gameObject->GetComponent< SpotLightComponent >() : nullptr;
         DirectionalLightComponent* dirLight = gameObject ? gameObject->GetComponent< DirectionalLightComponent >() : nullptr;
         ParticleSystemComponent* particleSystem = gameObject ? gameObject->GetComponent< ParticleSystemComponent >() : nullptr;
+        TextRendererComponent* textRenderer = gameObject ? gameObject->GetComponent< TextRendererComponent >() : nullptr;
 
         if (gameObject != nullptr && transform != nullptr)
         {
@@ -314,6 +316,27 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 {
                     gameObject->RemoveComponent< ParticleSystemComponent >();
                     particleSystem = nullptr;
+                }
+
+                nk_tree_pop( &ctx );
+                nk_spacing( &ctx, 1 );
+            }
+        }
+
+        if (gameObject != nullptr && textRenderer == nullptr && nk_button_label( &ctx, "Add text renderer" ))
+        {
+            gameObject->AddComponent< TextRendererComponent >();
+        }
+        else if (gameObject != nullptr && textRenderer != nullptr)
+        {
+            textRenderer->SetText( "something something" );
+            
+            if (nk_tree_push( &ctx, NK_TREE_NODE, "Text Renderer", NK_MAXIMIZED ))
+            {
+                if (nk_button_label( &ctx, "Remove text renderer" ))
+                {
+                    gameObject->RemoveComponent< TextRendererComponent >();
+                    textRenderer = nullptr;
                 }
 
                 nk_tree_pop( &ctx );
