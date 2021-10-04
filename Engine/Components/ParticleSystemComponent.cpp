@@ -10,6 +10,7 @@ namespace GfxDeviceGlobal
 {
     extern ID3D12Resource* particleBuffer;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav2Desc;
+    extern ID3D12GraphicsCommandList* graphicsCommandList;
 }
 #endif
 #if RENDERER_METAL
@@ -52,6 +53,12 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 {
     drawShader.Begin();
 #if RENDERER_D3D12
+    D3D12_RESOURCE_BARRIER barrierDesc = {};
+    barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+    barrierDesc.UAV.pResource = target.GetGpuResource()->resource;
+
+    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
+
     drawShader.SetUAV( 1, target.GetGpuResource()->resource, *target.GetUAVDesc() );
     drawShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
 #endif
