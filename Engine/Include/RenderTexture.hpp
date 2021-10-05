@@ -77,7 +77,7 @@ namespace ae3d
         VkImageLayout GetColorImageLayout() const { return color.layout; }
 
         /// \param aLayout New color image layout.
-        void SetColorImageLayout( VkImageLayout aLayout );
+        void SetColorImageLayout( VkImageLayout aLayout, VkCommandBuffer cmdBuffer );
 #endif
 
   private:

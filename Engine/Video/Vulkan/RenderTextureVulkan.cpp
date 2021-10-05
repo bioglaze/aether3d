@@ -101,9 +101,9 @@ void ae3d::RenderTexture::MakeCpuReadable( const char* debugName )
     Create2D( width, height, dataType, wrap, filter, debugName, sampleCount > 1, uavFlag );
 }
 
-void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout )
+void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout, VkCommandBuffer cmdBuffer )
 {
-    SetImageLayout( GfxDeviceGlobal::currentCmdBuffer,
+    SetImageLayout( cmdBuffer,
         GetColorImage(),
         VK_IMAGE_ASPECT_COLOR_BIT,
         color.layout,
@@ -135,9 +135,9 @@ void* ae3d::RenderTexture::Map()
     // FIXME: Why do we have to set color.layout here manually, it indicates a tracking bug somewhere else, maybe after the render pass?
     color.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     
-    SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL );
+    SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::currentCmdBuffer );
     vkCmdCopyImageToBuffer( GfxDeviceGlobal::currentCmdBuffer, color.image, VK_IMAGE_LAYOUT_GENERAL, pixelBuffer, 1, &region );
-    SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+    SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, GfxDeviceGlobal::currentCmdBuffer );
 
     VkBufferMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -179,8 +179,8 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
     GfxDevice::EndRenderPass();
     color.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // Ending render pass sets layout to this, so track it.
 
-    SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL );
-    target->SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL );
+    SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, GfxDeviceGlobal::currentCmdBuffer );
+    target->SetColorImageLayout( VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, GfxDeviceGlobal::currentCmdBuffer );
 
     VkImageResolve regions = {};
     regions.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -199,8 +199,8 @@ void ae3d::RenderTexture::ResolveTo( RenderTexture* target )
                        1,
                        &regions );
 
-    SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
-    target->SetColorImageLayout( VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+    SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, GfxDeviceGlobal::currentCmdBuffer );
+    target->SetColorImageLayout( VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, GfxDeviceGlobal::currentCmdBuffer );
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
