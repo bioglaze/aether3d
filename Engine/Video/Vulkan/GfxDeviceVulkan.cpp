@@ -959,6 +959,7 @@ namespace ae3d
         enabledFeatures.samplerAnisotropy = GfxDeviceGlobal::deviceFeatures.samplerAnisotropy;
         enabledFeatures.fragmentStoresAndAtomics = GfxDeviceGlobal::deviceFeatures.fragmentStoresAndAtomics;
         enabledFeatures.vertexPipelineStoresAndAtomics = GfxDeviceGlobal::deviceFeatures.vertexPipelineStoresAndAtomics;
+        enabledFeatures.shaderStorageImageMultisample = GfxDeviceGlobal::deviceFeatures.shaderStorageImageMultisample;
         
         if (debug::enabled)
         {

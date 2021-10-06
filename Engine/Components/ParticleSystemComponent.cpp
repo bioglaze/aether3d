@@ -71,7 +71,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     drawShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
 #endif
 #if RENDERER_VULKAN
-    target.SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::computeCmdBuffer );
+    //target.SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::computeCmdBuffer );
     //drawShader.SetRenderTexture( &target, 14 );
 #else
     drawShader.SetRenderTexture( &target, 0 );
