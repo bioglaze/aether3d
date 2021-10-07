@@ -97,7 +97,9 @@ namespace ae3d
             VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         };
 
+    public:
 		FrameBufferAttachment color = {};
+    private:
 		FrameBufferAttachment depth = {};
         VkFormat colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
         VkRenderPass renderPass = VK_NULL_HANDLE;

@@ -2363,7 +2363,7 @@ void BeginOffscreen()
     vkCmdBeginRenderPass( GfxDeviceGlobal::offscreenCmdBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
 }
 
-void EndOffscreen( int profilerIndex )
+void EndOffscreen( int profilerIndex, ae3d::RenderTexture* target )
 {
 #ifndef DISABLE_TIMESTAMPS    
     vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 1 );
@@ -2396,7 +2396,6 @@ void EndOffscreen( int profilerIndex )
     GfxDeviceGlobal::timings[ 0 ] = (timestamps[ 1 ] - timestamps[ 0 ]) / 1000.0f;
 #endif
     
-
     if (profilerIndex == 0)
     {
         Statistics::SetDepthNormalsGpuTime( GfxDeviceGlobal::timings[ 0 ] );
@@ -2408,6 +2407,11 @@ void EndOffscreen( int profilerIndex )
     else if (profilerIndex == 2)
     {
         Statistics::SetPrimaryPassGpuTime( GfxDeviceGlobal::timings[ 0 ] );
+    }
+
+    if (target)
+    {
+        target->color.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     }
 }
 

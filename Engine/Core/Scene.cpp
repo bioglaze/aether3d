@@ -47,7 +47,7 @@ using namespace ae3d;
 extern Renderer renderer;
 float GetVRFov();
 void BeginOffscreen();
-void EndOffscreen( int profilerIndex );
+void EndOffscreen( int profilerIndex, ae3d::RenderTexture* target );
 std::string GetSerialized( const ae3d::TextRendererComponent* component );
 std::string GetSerialized( ae3d::CameraComponent* component );
 std::string GetSerialized( ae3d::AudioSourceComponent* component );
@@ -815,11 +815,11 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     {
         if (camera->GetProjectionType() == CameraComponent::ProjectionType::Perspective)
         {
-            EndOffscreen( 2 );
+            EndOffscreen( 2, camera->GetTargetTexture() );
         }
         else
         {
-            EndOffscreen( 3 );
+            EndOffscreen( 3, camera->GetTargetTexture() );
         }
     }
 #endif
@@ -872,7 +872,7 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
     
     GfxDevice::SetRenderTarget( nullptr, 0 );
 #if RENDERER_VULKAN
-    EndOffscreen( 0 );
+    EndOffscreen( 0, camera->GetTargetTexture() );
 #endif
 }
 
@@ -984,7 +984,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
     GfxDevice::SetRenderTarget( nullptr, 0 );
 #endif
 #if RENDERER_VULKAN
-    EndOffscreen( 1 );
+    EndOffscreen( 1, camera->GetTargetTexture() );
 #endif
 }
 
