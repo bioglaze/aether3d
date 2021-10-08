@@ -132,9 +132,6 @@ void* ae3d::RenderTexture::Map()
     VkResult err = vkBeginCommandBuffer( GfxDeviceGlobal::currentCmdBuffer, &cmdBufInfo );
     AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer in RenderTexture::Map()" );
 
-    // FIXME: Why do we have to set color.layout here manually, it indicates a tracking bug somewhere else, maybe after the render pass?
-    color.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    
     SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::currentCmdBuffer );
     vkCmdCopyImageToBuffer( GfxDeviceGlobal::currentCmdBuffer, color.image, VK_IMAGE_LAYOUT_GENERAL, pixelBuffer, 1, &region );
     SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, GfxDeviceGlobal::currentCmdBuffer );
