@@ -25,12 +25,12 @@ kernel void particle_simulation(
 
 kernel void particle_draw(
                   device Particle* particleBuffer [[ buffer(1) ]],
-                  texture2d<float, access::write> outTexture [[texture(0)]],
+                  texture2d<float, access::read_write> outTexture [[texture(0)]],
                   ushort2 gid [[thread_position_in_grid]],
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
-    float4 color = float4( 0, 0, 0, 1 );
+    float4 color = outTexture.read( gid );
     
     for (uint i = 0; i < 10; ++i)
     {
