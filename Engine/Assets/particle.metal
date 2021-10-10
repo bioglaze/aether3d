@@ -13,13 +13,16 @@ struct Particle
 };
 
 kernel void particle_simulation(
+                  constant Uniforms& uniforms [[ buffer(0) ]],
                   device Particle* particleBufferOut [[ buffer(1) ]],
                   ushort2 gid [[thread_position_in_grid]],
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
     Particle p;
-    p.position = float4( 10, 0, 0, 1 );
+    p.position = float4( 0, 0, 0, 1 );
+    p.clipPosition = uniforms.viewToClip * p.position;
+    p.color = float4( 1, 0, 0, 1 );
     particleBufferOut[ gid.x ] = p;
 }
 
