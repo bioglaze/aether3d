@@ -27,6 +27,12 @@ namespace ae3d
         /// \param enabled True if the component should be rendered, false otherwise.
         void SetEnabled( bool enabled ) { isEnabled = enabled; }
 
+        /// \return True, if this camera will render particles.
+        bool ShouldRenderParticles() const noexcept { return shouldRenderParticles; }
+        
+        /// \param enable True, if this camera will render particles.
+        void SetShouldRenderParticles( bool enable ) { shouldRenderParticles = enable; }
+        
         /// \return Projection matrix.
         const Matrix44& GetProjection() const { return viewToClip; }
 
@@ -178,5 +184,6 @@ namespace ae3d
         GameObject* gameObject = nullptr;
         int viewport[ 4 ];
         bool isEnabled = true;
+        bool shouldRenderParticles = true;
     };
 }

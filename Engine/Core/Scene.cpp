@@ -334,9 +334,12 @@ void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
 
         if (transform && !rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
         {
-            Matrix44::Multiply( rtCamera->GetComponent< CameraComponent >()->GetView(), rtCamera->GetComponent< CameraComponent >()->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
-            ParticleSystemComponent::Simulate( renderer.builtinShaders.particleSimulationShader );
-
+            if (rtCamera->GetComponent< CameraComponent >()->ShouldRenderParticles())
+            {
+                Matrix44::Multiply( rtCamera->GetComponent< CameraComponent >()->GetView(), rtCamera->GetComponent< CameraComponent >()->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
+                ParticleSystemComponent::Simulate( renderer.builtinShaders.particleSimulationShader );
+            }
+            
             RenderWithCamera( rtCamera, 0, rtCamera->GetName() );
         }
         else if (transform && rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
@@ -824,7 +827,7 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     }
 #endif
     
-    if (camera->GetTargetTexture() && camera->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective && !camera->GetTargetTexture()->IsCube())
+    if (camera->GetTargetTexture() && camera->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective && !camera->GetTargetTexture()->IsCube() && camera->ShouldRenderParticles())
     {
         ParticleSystemComponent::Draw( renderer.builtinShaders.particleDrawShader, *camera->GetTargetTexture() );
     }
