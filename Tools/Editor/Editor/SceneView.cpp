@@ -491,6 +491,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetLayerMask( 2 );
     //(*sv)->selectionCamera.GetComponent< CameraComponent >()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
     (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetTargetTexture( &(*sv)->selectionTarget );
+    (*sv)->selectionCamera.GetComponent< CameraComponent >()->SetShouldRenderParticles( false );
     (*sv)->selectionCamera.AddComponent< TransformComponent >();
     (*sv)->selectionCamera.GetComponent< TransformComponent >()->LookAt( { 0, 2, 20 }, { 0, 0, 100 }, { 0, 1, 0 } );
     (*sv)->selectionCamera.SetName( "Selection Outline Camera" );
@@ -502,6 +503,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetProjection( 45, (float)width / (float)height, 1, 400 );
     (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetClearColor( Vec3( 0.01f, 0.01f, 0.01f ) );
     (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetClearFlag( CameraComponent::ClearFlag::Depth );
+    (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetShouldRenderParticles( false );
     //(*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetLayerMask( 2 );
     //(*sv)->objectIdCamera.GetComponent< CameraComponent >()->GetDepthNormalsTexture().Create2D( width, height, ae3d::DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest, "depthnormals", false );
     (*sv)->objectIdCamera.GetComponent< CameraComponent >()->SetTargetTexture( &(*sv)->objectIdTarget );
@@ -991,7 +993,7 @@ GameObject* svSelectObject( SceneView* sv, int screenX, int screenY, int width, 
 
     // Checks if the mouse hit the gizmo.
     {
-        /*float* objectIdTargetMapped = sv->objectIdTarget.Map();
+        /*float* objectIdTargetMapped = (float*)sv->objectIdTarget.Map();
 
         if (objectIdTargetMapped[ screenY * height * 4 + screenX * 4 ] > 0.1f )
         {
