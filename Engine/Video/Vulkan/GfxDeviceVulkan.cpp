@@ -2367,8 +2367,8 @@ void EndOffscreen( int profilerIndex, ae3d::RenderTexture* target )
 {
 #ifndef DISABLE_TIMESTAMPS    
     vkCmdWriteTimestamp( GfxDeviceGlobal::offscreenCmdBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, GfxDeviceGlobal::queryPool, 1 );
-    vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
 #endif
+    vkCmdEndRenderPass( GfxDeviceGlobal::offscreenCmdBuffer );
     
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::offscreenCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
