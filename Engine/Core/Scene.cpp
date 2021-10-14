@@ -334,7 +334,7 @@ void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
 
         if (transform && !rtCamera->GetComponent< CameraComponent >()->GetTargetTexture()->IsCube())
         {
-            if (rtCamera->GetComponent< CameraComponent >()->ShouldRenderParticles())
+            if (rtCamera->GetComponent< CameraComponent >()->ShouldRenderParticles() && rtCamera->GetComponent< CameraComponent >()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
             {
                 Matrix44::Multiply( rtCamera->GetComponent< CameraComponent >()->GetView(), rtCamera->GetComponent< CameraComponent >()->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
                 ParticleSystemComponent::Simulate( renderer.builtinShaders.particleSimulationShader );
