@@ -71,8 +71,8 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     drawShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
 #endif
 #if RENDERER_VULKAN
-    //target.SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::computeCmdBuffer );
-    //drawShader.SetRenderTexture( &target, 14 );
+    target.SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::computeCmdBuffer );
+    drawShader.SetRenderTexture( &target, 14 );
 #else
     drawShader.SetRenderTexture( &target, 0 );
 #endif
@@ -81,5 +81,11 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 #endif
 
     drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw" );
+
+#if RENDERER_VULKAN
+    //target.SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, GfxDeviceGlobal::computeCmdBuffer );
+    target.SetColorImageLayout( VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, GfxDeviceGlobal::computeCmdBuffer );
+#endif
+
     drawShader.End();
 }
