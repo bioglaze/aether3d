@@ -27,6 +27,7 @@ kernel void particle_simulation(
 }
 
 kernel void particle_draw(
+                  constant Uniforms& uniforms [[ buffer(0) ]],
                   device Particle* particleBuffer [[ buffer(1) ]],
                   texture2d<float, access::read_write> outTexture [[texture(0)]],
                   ushort2 gid [[thread_position_in_grid]],
@@ -37,7 +38,8 @@ kernel void particle_draw(
     
     for (uint i = 0; i < 10; ++i)
     {
-        if (particleBuffer[ i ].clipPosition.x == gid.x && particleBuffer[ i ].clipPosition.y == gid.y)
+        if ((uint)particleBuffer[ i ].clipPosition.x + uniforms.windowWidth / 2 == gid.x && (uint)particleBuffer[ i ].clipPosition.y + uniforms.windowHeight / 2 == gid.y)
+
         {
             color += particleBuffer[ i ].color;
         }
