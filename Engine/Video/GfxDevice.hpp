@@ -38,6 +38,7 @@ struct PerObjectUboStruct
     ae3d::Vec4 kernelOffsets[ 16 ];
     ae3d::Vec4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
     int particleCount;
+    float timeStamp; // In seconds.
 };
 
 namespace ae3d

@@ -28,6 +28,7 @@ struct Uniforms
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
     int particleCount;
+    float timeStamp; // In seconds.
 };
 
 static float linstep( float low, float high, float v )

@@ -42,6 +42,7 @@ cbuffer cbPerFrame : register(b0)
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
     int particleCount;
+    float timeStamp; // In seconds
 };
 Buffer<float4> pointLightBufferCenterAndRadius : register(t5);
 RWBuffer<uint> perTileLightIndexBuffer : register(u0);
@@ -89,6 +90,7 @@ RWStructuredBuffer< Particle > particles : register(u2);
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
     int particleCount;
+    float timeStamp; // In seconds.
 };
 [[vk::binding( 8 )]] Buffer<float4> pointLightBufferCenterAndRadius;
 [[vk::binding( 9 )]] RWBuffer<uint> perTileLightIndexBuffer;
