@@ -31,6 +31,7 @@ namespace GfxDeviceGlobal
 
 void PlatformInitGamePad();
 std::chrono::time_point<std::chrono::steady_clock> tStart;
+long double startTimeStamp;
 
 using namespace ae3d;
 
@@ -82,6 +83,13 @@ float ae3d::System::EndTimer()
     auto tEnd = std::chrono::steady_clock::now();
     auto tDiff = std::chrono::duration<double, std::milli>( tEnd - tStart ).count();
     return (float)tDiff;
+}
+
+float ae3d::System::SecondsSinceStartup()
+{
+    long double t = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
+    
+    return (float)((t - startTimeStamp) / 1000.0);
 }
 
 void ae3d::System::Deinit()
@@ -152,6 +160,8 @@ void ae3d::System::LoadBuiltinAssets()
     renderer.GenerateQuadBuffer();
     renderer.GenerateSkybox();
     renderer.GenerateTextures();
+    
+    startTimeStamp = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
 }
 
 void ae3d::System::Print( const char* format, ... )

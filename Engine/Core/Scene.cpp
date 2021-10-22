@@ -486,11 +486,6 @@ void BubbleSort( GameObject** gos, int count )
     }
 }
 
-static long double curtime()
-{
-    return std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
-}
-
 void ae3d::Scene::Render()
 {
 #if RENDERER_VULKAN && !AE3D_OPENVR
@@ -503,10 +498,9 @@ void ae3d::Scene::Render()
     Statistics::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();
 
-    //long double millis = curtime();
     GfxDeviceGlobal::perObjectUboStruct.particleCount = 10;
-    GfxDeviceGlobal::perObjectUboStruct.timeStamp = 0;
-    //printf("time: %Lf\n", millis );
+    GfxDeviceGlobal::perObjectUboStruct.timeStamp = (float)System::SecondsSinceStartup();
+    //printf("time: %f\n", GfxDeviceGlobal::perObjectUboStruct.timeStamp );
 
     std::vector< GameObject* > rtCameras;
     rtCameras.reserve( gameObjects.size() / 4 );
