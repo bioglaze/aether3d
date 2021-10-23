@@ -29,12 +29,13 @@ kernel void particle_simulation(
 kernel void particle_draw(
                   constant Uniforms& uniforms [[ buffer(0) ]],
                   device Particle* particleBuffer [[ buffer(1) ]],
-                  texture2d<float, access::read_write> outTexture [[texture(0)]],
+                  texture2d<float, access::read> inTexture [[texture(0)]],
+                  texture2d<float, access::write> outTexture [[texture(1)]],
                   ushort2 gid [[thread_position_in_grid]],
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
-    float4 color = outTexture.read( gid );
+    float4 color = inTexture.read( gid );
     
     for (uint i = 0; i < 10; ++i)
     {
