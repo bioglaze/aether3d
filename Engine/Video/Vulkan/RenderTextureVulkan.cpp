@@ -237,6 +237,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     handle = 1;
     sampleCount = isMultisampled ? (int)GfxDeviceGlobal::msaaSampleBits : 1;
     uavFlag = aUavFlag;
+    isCreated = true;
 
     // Color
 
@@ -429,6 +430,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     isRenderTexture = true;
     dataType = aDataType;
     handle = 1;
+    isCreated = true;
 
     if (dataType == DataType::UByte)
     {

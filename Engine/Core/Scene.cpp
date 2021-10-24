@@ -430,7 +430,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                     lightTransform = go->GetComponent<TransformComponent>();
                 }
                 
-                if (dirLight)
+                if (dirLight && go->GetComponent<DirectionalLightComponent>()->shadowMap.IsCreated())
                 {
                     SceneGlobal::shadowCamera.GetComponent< CameraComponent >()->SetTargetTexture( &go->GetComponent<DirectionalLightComponent>()->shadowMap );
                     SetupCameraForDirectionalShadowCasting( lightTransform->GetViewDirection(), eyeFrustum, aabbMin, aabbMax, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );

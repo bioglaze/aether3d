@@ -89,7 +89,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     isRenderTexture = true;
     dataType = aDataType;
     uavFlag = aUavFlag;
-    
+    isCreated = true;
+
     MTLPixelFormat format = MTLPixelFormatBGRA8Unorm_sRGB;
 
     if (dataType == DataType::R32G32)
@@ -158,7 +159,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     isRenderTexture = true;
     dataType = aDataType;
     name = debugName;
-    
+    isCreated = true;
+
     MTLPixelFormat format = MTLPixelFormatBGRA8Unorm_sRGB;
 
     if (dataType == DataType::R32G32)

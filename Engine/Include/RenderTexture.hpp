@@ -17,6 +17,9 @@ namespace ae3d
         /// \return Data type.
         DataType GetDataType() const { return dataType; }
 
+        /// \return True, if the render texture has been created with Create2D or CreateCube.
+        bool IsCreated() const noexcept { return isCreated; }
+
         /// \param target Target to resolve to.
         void ResolveTo( RenderTexture* target );
         
@@ -110,5 +113,6 @@ namespace ae3d
         DataType dataType = DataType::UByte;
         UavFlag uavFlag = UavFlag::Disabled;
         std::string name;
+        bool isCreated = false;
     };
 }

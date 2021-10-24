@@ -67,6 +67,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
 	dxgiFormat = FormatToDXGIFormat( dataType );
     sampleCount = isMultisampled ? 4 : 1;
     uavFlag = aUavFlag;
+    isCreated = true;
 
     D3D12_CLEAR_VALUE clearValue = {};
     clearValue.Format = dxgiFormat;
@@ -194,6 +195,7 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
     dataType = aDataType;
     isCube = true;
 	dxgiFormat = FormatToDXGIFormat( dataType );
+    isCreated = true;
 
     // Base resources
     {
