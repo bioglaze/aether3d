@@ -323,7 +323,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
             }
         }
 
-        if (gameObject != nullptr && textRenderer == nullptr && nk_button_label( &ctx, "Add text renderer" ))
+        /*if (gameObject != nullptr && textRenderer == nullptr && nk_button_label( &ctx, "Add text renderer" ))
         {
             gameObject->AddComponent< TextRendererComponent >();
         }
@@ -342,7 +342,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
-        }
+            }*/
 
         if (gameObject != nullptr && audioSource == nullptr && nk_button_label( &ctx, "Add audio source" ))
         {
