@@ -499,7 +499,7 @@ void ae3d::Scene::Render()
     TransformComponent::UpdateLocalMatrices();
 
     GfxDeviceGlobal::perObjectUboStruct.particleCount = 10;
-    GfxDeviceGlobal::perObjectUboStruct.timeStamp = (float)System::SecondsSinceStartup();
+    GfxDeviceGlobal::perObjectUboStruct.timeStamp = System::SecondsSinceStartup();
     //printf("time: %f\n", GfxDeviceGlobal::perObjectUboStruct.timeStamp );
 
     std::vector< GameObject* > rtCameras;
