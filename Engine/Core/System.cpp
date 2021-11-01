@@ -87,7 +87,7 @@ float ae3d::System::EndTimer()
 
 float ae3d::System::SecondsSinceStartup()
 {
-    long double t = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
+    auto t = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
     
     return (float)((t - startTimeStamp) / 1000.0);
 }
@@ -161,7 +161,7 @@ void ae3d::System::LoadBuiltinAssets()
     renderer.GenerateSkybox();
     renderer.GenerateTextures();
     
-    startTimeStamp = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
+    startTimeStamp = (long double)std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now().time_since_epoch() ).count();
 }
 
 void ae3d::System::Print( const char* format, ... )
