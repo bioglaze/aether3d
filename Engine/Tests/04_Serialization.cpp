@@ -28,7 +28,7 @@ int main()
     Array< Mesh* > meshes;
     Scene scene;
     
-    auto res = scene.Deserialize( FileSystem::FileContents( "scene.scene" ), gameObjects, textureNameToTexture,
+    auto res = scene.Deserialize( FileSystem::FileContents( "serialization_test.scene" ), gameObjects, textureNameToTexture,
                                  materialNameToMaterial, meshes );
 
     if (res != Scene::DeserializeResult::Success)
