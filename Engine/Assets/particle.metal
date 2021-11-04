@@ -39,10 +39,16 @@ kernel void particle_draw(
     
     for (uint i = 0; i < 10; ++i)
     {
-        if ((uint)particleBuffer[ i ].clipPosition.x + uniforms.windowWidth / 2 == gid.x && (uint)particleBuffer[ i ].clipPosition.y + uniforms.windowHeight / 2 == gid.y)
+        //if ((uint)particleBuffer[ i ].clipPosition.x + uniforms.windowWidth / 2 == gid.x && (uint)particleBuffer[ i ].clipPosition.y + uniforms.windowHeight / 2 == gid.y)
 
         {
-            color += particleBuffer[ i ].color;
+            //color += particleBuffer[ i ].color;
+        }
+        float dist = distance( particleBuffer[ i ].clipPosition.xy + float2( uniforms.windowWidth, uniforms.windowHeight ) / 2, (float2)gid.xy );
+        const float radius = 5;
+        if (dist < radius)
+        {
+            color = particleBuffer[ i ].color;
         }
     }
 
