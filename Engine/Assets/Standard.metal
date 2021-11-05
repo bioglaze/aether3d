@@ -6,6 +6,7 @@
 #define LIGHT_INDEX_BUFFER_SENTINEL 0x7fffffff
 //#define DEBUG_LIGHT_COUNT
 //#define DEBUG_ALBEDO
+//#define DEBUG_FAST
 
 using namespace metal;
 
@@ -255,6 +256,11 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
                                const device float4* spotLightBufferColors [[ buffer(11) ]],
                                sampler sampler0 [[sampler(0)]] )
 {
+#ifdef DEBUG_FAST
+    const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
+    const half4 albedoColor = half4( albedoMap.sample( sampler0, uv ) );
+    return albedoColor;
+#else
     const float2 uv = float2( in.tangentVS_u.w, in.bitangentVS_v.w );
     const half4 albedoColor = half4( albedoMap.sample( sampler0, uv ) );
     const float4 normalTS = float4( normalMap.sample( sampler0, uv ).rgb * 2.0f - 1.0f, 0.0f );
@@ -406,4 +412,5 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     return albedoColor * half4( outColor );// * cubeReflection;
 #endif
     //return cubeReflection;
+#endif // DEBUG_FAST
 }
