@@ -893,6 +893,9 @@ void ae3d::GfxDevice::BeginBackBufferEncoding()
     
     if (renderPassDescriptor != nil)
     {
+        commandBuffer = [commandQueue commandBuffer];
+        commandBuffer.label = @"Backbuffer";
+
         renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"BackBufferRenderEncoder";
         [renderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
@@ -915,6 +918,7 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
     if (GfxDeviceGlobal::isRenderingToTexture)
     {
         [renderEncoder endEncoding];
+        [commandBuffer commit];
     }
     
     GfxDeviceGlobal::isRenderingToTexture = renderTexture != nullptr;
@@ -951,6 +955,9 @@ void ae3d::GfxDevice::SetRenderTarget( ae3d::RenderTexture* renderTexture, unsig
     renderPassDescriptorFBO.depthAttachment.texture = depthTexture;
     renderPassDescriptorFBO.depthAttachment.loadAction = depthLoadAction;
     renderPassDescriptorFBO.depthAttachment.clearDepth = 1.0;
+
+    commandBuffer = [commandQueue commandBuffer];
+    commandBuffer.label = @"RenderTarget";
 
     renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptorFBO];
     renderEncoder.label = [NSString stringWithUTF8String:renderTexture->GetName()];
