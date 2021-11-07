@@ -45,6 +45,11 @@ ae3d::ParticleSystemComponent* ae3d::ParticleSystemComponent::Get( unsigned inde
 
 void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 {
+    if (particleSystemComponents.count == 0)
+    {
+        return;
+    }
+    
     simulationShader.Begin();
 
 #if RENDERER_D3D12
@@ -59,6 +64,11 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 
 void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTexture& target )
 {
+    if (particleSystemComponents.count == 0)
+    {
+        return;
+    }
+
     drawShader.Begin();
 #if RENDERER_D3D12
     D3D12_RESOURCE_BARRIER barrierDesc = {};
