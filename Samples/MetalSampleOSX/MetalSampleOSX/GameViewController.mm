@@ -417,7 +417,7 @@ using namespace ae3d;
     camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture().Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2,
                                                                                        DataType::Float, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Nearest,  "depthnormals", false, ae3d::RenderTexture::UavFlag::Disabled );
     camera3d.AddComponent<ae3d::TransformComponent>();
-    camera3d.GetComponent<TransformComponent>()->LookAt( { 20, 0, -85 }, { 120, 0, -85 }, { 0, 1, 0 } );
+    camera3d.GetComponent<TransformComponent>()->LookAt( { 0, 0, 0 }, { 120, 0, -85 }, { 0, 1, 0 } );
 
     scene.Add( &camera2d );
     scene.Add( &camera3d );
@@ -537,7 +537,7 @@ using namespace ae3d;
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     rotatingCube.AddComponent<ae3d::TransformComponent>();
-    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 2, 0, -8 ) );
+    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, 0 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
 
     wireframeGo.AddComponent<ae3d::MeshRendererComponent>();
@@ -662,7 +662,7 @@ using namespace ae3d;
     }
 
 
-    rtTex.Create2D( 512, 512, ae3d::DataType::UByte, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture", false, ae3d::RenderTexture::UavFlag::Disabled );
+    rtTex.Create2D( 512, 512, ae3d::DataType::Float16, ae3d::TextureWrap::Clamp, ae3d::TextureFilter::Linear, "render texture", false, ae3d::RenderTexture::UavFlag::Enabled );
     bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", DataType::Float, nullptr );
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", DataType::Float, nullptr );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", DataType::Float, nullptr );
@@ -991,7 +991,7 @@ using namespace ae3d;
         Matrix44::Multiply( lineTransform, viewMat, viewMat );
         //System::DrawLines( coneLineHandle, viewMat,
         //                  camera3d.GetComponent< CameraComponent >()->GetProjection(), self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
-        rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 2, 16 ) );
+        //rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( spotLight.GetComponent<ae3d::TransformComponent>()->GetLocalPosition() + Vec3( 0, 0, 0 ) );
 
 #ifdef TEST_NUKLEAR_UI
         nk_input_begin( &ctx );
