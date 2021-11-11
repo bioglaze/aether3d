@@ -12,6 +12,12 @@ struct Particle
     float4 clipPosition;
 };
 
+float rand_1_05( float2 uv )
+{
+    float2 nois = (fract( sin( dot( uv, float2( 12.9898, 78.233) * 2.0 ) ) * 43758.5453 ) );
+    return abs( nois.x + nois.y ) * 0.5;
+}
+
 kernel void particle_simulation(
                   constant Uniforms& uniforms [[ buffer(0) ]],
                   device Particle* particleBufferOut [[ buffer(1) ]],
@@ -19,11 +25,13 @@ kernel void particle_simulation(
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
-    Particle p;
-    p.position = float4( 0, 0, 0, 1 );
-    p.clipPosition = uniforms.viewToClip * p.position;
-    p.color = float4( 1, 0, 0, 1 );
-    particleBufferOut[ gid.x ] = p;
+    float2 uv = (float2)gid.xy;
+    float x = rand_1_05( uv );
+    float4 position = float4( gid.x * x * 8, sin( uniforms.timeStamp ) * 8, 0, 1 );
+    particleBufferOut[ gid.x ].position = position;
+    particleBufferOut[ gid.x ].color = float4( 1, 0, 0, 1 );
+    particleBufferOut[ gid.x ].clipPosition = position;//mul( viewToClip, position );
+
 }
 
 kernel void particle_draw(
@@ -39,12 +47,13 @@ kernel void particle_draw(
     
     for (uint i = 0; i < 10; ++i)
     {
-        //if ((uint)particleBuffer[ i ].clipPosition.x + uniforms.windowWidth / 2 == gid.x && (uint)particleBuffer[ i ].clipPosition.y + uniforms.windowHeight / 2 == gid.y)
+        float4 clipPos = uniforms.viewToClip * particleBuffer[ i ].position;
+        clipPos.y = - clipPos.y;
+        float3 ndc = clipPos.xyz / clipPos.w;
+        float3 unscaledWindowCoords = 0.5f * ndc + float3( 0.5f, 0.5f, 0.5f );
+        float3 windowCoords = float3( uniforms.windowWidth * unscaledWindowCoords.x, uniforms.windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z );
 
-        {
-            //color += particleBuffer[ i ].color;
-        }
-        float dist = distance( particleBuffer[ i ].clipPosition.xy + float2( uniforms.windowWidth, uniforms.windowHeight ) / 2, (float2)gid.xy );
+        float dist = distance( windowCoords.xy, (float2)gid.xy );
         const float radius = 5;
         if (dist < radius)
         {
