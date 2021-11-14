@@ -76,8 +76,17 @@ namespace ae3d
         /// \return Color image.
         VkImage GetColorImage() { return color.image; }
 
+        /// \return Depth image.
+        VkImage GetDepthImage() { return depth.image; }
+
         /// \return Color image layout.
         VkImageLayout GetColorImageLayout() const { return color.layout; }
+
+        /// \return Depth image layout.
+        VkImageLayout GetDepthImageLayout() const { return depth.layout; }
+
+        /// \param aLayout New depth image layout.
+        void SetDepthImageLayout( VkImageLayout aLayout, VkCommandBuffer cmdBuffer );
 
         /// \param aLayout New color image layout.
         void SetColorImageLayout( VkImageLayout aLayout, VkCommandBuffer cmdBuffer );

@@ -113,6 +113,18 @@ void ae3d::RenderTexture::SetColorImageLayout( VkImageLayout aLayout, VkCommandB
     color.layout = aLayout;
 }
 
+void ae3d::RenderTexture::SetDepthImageLayout( VkImageLayout aLayout, VkCommandBuffer cmdBuffer )
+{
+    SetImageLayout( cmdBuffer,
+        GetDepthImage(),
+        VK_IMAGE_ASPECT_DEPTH_BIT,
+        depth.layout,
+        aLayout,
+        1, 0, 1 );
+
+    depth.layout = aLayout;
+}
+
 void* ae3d::RenderTexture::Map()
 {
     System::Assert( color.mem != nullptr, "Map(): color.mem must be initialized!" );
