@@ -51,6 +51,18 @@ void ae3d::ComputeShader::SetRenderTexture( RenderTexture* renderTexture, unsign
     }
 }
 
+void ae3d::ComputeShader::SetRenderTextureDepth( RenderTexture* renderTexture, unsigned slotIndex )
+{
+    if (slotIndex < SLOT_COUNT)
+    {
+        renderTextureDepths[ slotIndex ] = renderTexture;
+    }
+    else
+    {
+        System::Print( "ComputeShader: Too high slot count %u in SetRenderTextureDepth!\n", slotIndex );
+    }
+}
+
 void ae3d::ComputeShader::SetTexture2D( Texture2D* texture, unsigned slotIndex )
 {
     if (slotIndex < SLOT_COUNT)
@@ -125,8 +137,12 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     for (std::size_t i = 0; i < SLOT_COUNT; ++i)
     {
         [commandEncoder setBuffer:uniforms[ i ] offset:0 atIndex:i];
-        
-        if (renderTextures[ i ])
+
+        if (renderTextureDepths[ i ])
+        {
+            [commandEncoder setTexture:( renderTextureDepths[ i ]->GetMetalDepthTexture() ) atIndex:i];
+        }
+        else if (renderTextures[ i ])
         {
             [commandEncoder setTexture:( renderTextures[ i ]->GetMetalTexture() ) atIndex:i];
         }

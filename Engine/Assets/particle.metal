@@ -39,11 +39,13 @@ kernel void particle_draw(
                   device Particle* particleBuffer [[ buffer(1) ]],
                   texture2d<float, access::read> inTexture [[texture(0)]],
                   texture2d<float, access::write> outTexture [[texture(1)]],
+                  texture2d<float, access::read> inTextureDepth [[texture(2)]],
                   ushort2 gid [[thread_position_in_grid]],
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
     float4 color = inTexture.read( gid );
+    float depth = inTextureDepth.read( gid ).r;
     
     for (uint i = 0; i < 10; ++i)
     {
@@ -55,7 +57,7 @@ kernel void particle_draw(
 
         float dist = distance( windowCoords.xy, (float2)gid.xy );
         const float radius = 5;
-        if (dist < radius)
+        if (dist < radius /*&& clipPos.z < depth*/)
         {
             color = particleBuffer[ i ].color;
         }

@@ -92,7 +92,12 @@ namespace ae3d
         /// \param renderTexture render texture.
         /// \param slot slot index. Range is 0-14.
         void SetRenderTexture( class RenderTexture* renderTexture, unsigned slot );
-        
+
+        /// Sets a render texture depth into a slot.
+        /// \param renderTextureDepth render texture depth.
+        /// \param slot slot index. Range is 0-14.
+        void SetRenderTextureDepth( class RenderTexture* renderTexture, unsigned slot );
+
 #if RENDERER_D3D12
         void SetCBV( unsigned slot, ID3D12Resource* buffer );
         void SetSRV( unsigned slot, ID3D12Resource* buffer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
@@ -116,6 +121,7 @@ namespace ae3d
         Texture2D* textures[ SLOT_COUNT ];
 #endif
         RenderTexture* renderTextures[ SLOT_COUNT ];
+        RenderTexture* renderTextureDepths[ SLOT_COUNT ];
 #if RENDERER_D3D12
         ID3D12Resource* uniformBuffers[ SLOT_COUNT ];
         ID3D12Resource* textureBuffers[ SLOT_COUNT ];

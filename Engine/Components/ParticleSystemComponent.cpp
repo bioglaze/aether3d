@@ -93,6 +93,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 #if RENDERER_METAL
     drawShader.SetUniformBuffer( 1, particleBuffer );
     drawShader.SetRenderTexture( &target, 1 );
+    drawShader.SetRenderTextureDepth( &target, 2 );
 #endif
 
     drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw" );

@@ -9,7 +9,7 @@ namespace ae3d
     {
   public:
         /// Is the texture readable/writable in a shader?
-        enum class UavFlag { Disabled, Enabled };
+        enum class UavFlag { Disabled, Enabled, EnabledAlsoDepth };
 
         /// Destroys graphics API objects.
         static void DestroyTextures();

@@ -117,7 +117,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
     
-    if (uavFlag == RenderTexture::UavFlag::Enabled)
+    if (uavFlag == RenderTexture::UavFlag::Enabled || uavFlag == RenderTexture::UavFlag::EnabledAlsoDepth)
     {
         textureDescriptor.usage |= MTLTextureUsageShaderWrite;
     }
@@ -144,6 +144,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     depthDesc.resourceOptions = MTLResourceStorageModePrivate;
     depthDesc.usage = MTLTextureUsageRenderTarget;
 
+    if (uavFlag == RenderTexture::UavFlag::EnabledAlsoDepth)
+    {
+        depthDesc.usage |= MTLTextureUsageShaderRead;
+    }
+    
     metalDepthTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:depthDesc];
     metalDepthTexture.label = @"Render Texture depth";
 }

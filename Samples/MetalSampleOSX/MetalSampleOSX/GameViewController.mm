@@ -388,7 +388,7 @@ using namespace ae3d;
 
     noiseTex.LoadFromData( noiseData, noiseDim, noiseDim, "noiseData", DataType::Float );
 
-    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", MULTISAMPLE_COUNT > 1, ae3d::RenderTexture::UavFlag::Enabled );
+    cameraTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", MULTISAMPLE_COUNT > 1, ae3d::RenderTexture::UavFlag::EnabledAlsoDepth );
     ae3d::System::Print( "width: %f, height: %f\n", self.view.bounds.size.width, self.view.bounds.size.height );
     camera2dTex.Create2D( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, DataType::Float16, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false, ae3d::RenderTexture::UavFlag::Disabled );
 
