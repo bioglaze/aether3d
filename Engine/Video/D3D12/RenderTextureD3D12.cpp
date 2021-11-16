@@ -116,6 +116,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         GfxDeviceGlobal::device->CreateRenderTargetView( gpuResource.resource, &descRtv, rtv );
     }
 
+    const DXGI_FORMAT depthFormat = DXGI_FORMAT_D32_FLOAT;
+
     {
         D3D12_RESOURCE_DESC descDepth = {};
         descDepth.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -123,7 +125,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         descDepth.Height = height;
         descDepth.DepthOrArraySize = isMultisampled ? 4 : 1;
         descDepth.MipLevels = 1;
-        descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+        descDepth.Format = depthFormat;
         descDepth.SampleDesc.Count = isMultisampled ? 4 : 1;
         descDepth.SampleDesc.Quality = isMultisampled ? DXGI_STANDARD_MULTISAMPLE_QUALITY_PATTERN : 0;
         descDepth.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
@@ -143,7 +145,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         dsv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
 
         D3D12_DEPTH_STENCIL_VIEW_DESC descDsv = {};
-        descDsv.Format = DXGI_FORMAT_D32_FLOAT;
+        descDsv.Format = depthFormat;
         descDsv.ViewDimension = isMultisampled ? D3D12_DSV_DIMENSION_TEXTURE2DMS : D3D12_DSV_DIMENSION_TEXTURE2D;
         GfxDeviceGlobal::device->CreateDepthStencilView( gpuResourceDepth.resource, &descDsv, dsv );
         RenderTextureGlobal::renderTextures.push_back( gpuResourceDepth.resource );
@@ -167,7 +169,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     //RenderTextureGlobal::PrintMemoryUsage();
 #endif
 
-    if (uavFlag == UavFlag::Enabled)
+    if (uavFlag == UavFlag::Enabled || uavFlag == UavFlag::EnabledAlsoDepth)
     {
         uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
@@ -177,6 +179,18 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         uavDesc.Texture2D.PlaneSlice = 0;
 
         GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResource.resource, nullptr, &uavDesc, uav );
+    }
+
+    if (uavFlag == UavFlag::EnabledAlsoDepth)
+    {
+        uavDepth = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
+
+        uavDescDepth.Format = depthFormat;
+        uavDescDepth.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        uavDescDepth.Texture2D.MipSlice = 0;
+        uavDescDepth.Texture2D.PlaneSlice = 0;
+
+        GfxDeviceGlobal::device->CreateUnorderedAccessView( gpuResourceDepth.resource, nullptr, &uavDescDepth, uavDepth );    
     }
 }
 
