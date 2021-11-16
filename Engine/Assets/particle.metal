@@ -27,7 +27,7 @@ kernel void particle_simulation(
 {
     float2 uv = (float2)gid.xy;
     float x = rand_1_05( uv );
-    float4 position = float4( gid.x * x * 8, sin( uniforms.timeStamp ) * 8, 0, 1 );
+    float4 position = float4( gid.x * x * 8, sin( 1.0f/*uniforms.timeStamp*/ ) * 8, 0, 1 );
     particleBufferOut[ gid.x ].position = position;
     particleBufferOut[ gid.x ].color = float4( 1, 0, 0, 1 );
     particleBufferOut[ gid.x ].clipPosition = position;//mul( viewToClip, position );
@@ -57,7 +57,7 @@ kernel void particle_draw(
 
         float dist = distance( windowCoords.xy, (float2)gid.xy );
         const float radius = 5;
-        if (dist < radius /*&& clipPos.z < depth*/)
+        if (dist < radius && clipPos.z / clipPos.w < depth)
         {
             color = particleBuffer[ i ].color;
         }
