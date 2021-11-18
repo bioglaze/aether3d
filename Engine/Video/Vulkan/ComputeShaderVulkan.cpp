@@ -163,6 +163,18 @@ void ae3d::ComputeShader::SetRenderTexture( class RenderTexture* renderTexture, 
     }
 }
 
+void ae3d::ComputeShader::SetRenderTextureDepth( class RenderTexture* renderTexture, unsigned slot )
+{
+    if (slot < SLOT_COUNT)
+    {
+        GfxDeviceGlobal::boundViews[ slot ] = renderTexture->GetColorView();
+    }
+    else
+    {
+        System::Print( "ComputeShader:SetRenderTextureDepth: Too high slot!\n" );
+    }
+}
+
 void ae3d::ComputeShader::SetTexture2D( Texture2D* texture, unsigned slot )
 {
     if (slot < SLOT_COUNT)

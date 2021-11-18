@@ -293,7 +293,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     colorImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     colorImage.flags = 0;
 
-    if (uavFlag == UavFlag::Enabled)
+    if (uavFlag == UavFlag::Enabled || uavFlag == UavFlag::EnabledAlsoDepth)
     {
         colorImage.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
     }
@@ -356,6 +356,11 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     VkImageCreateInfo depthImage = colorImage;
     depthImage.format = depthFormat;
     depthImage.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    
+    if (uavFlag == UavFlag::EnabledAlsoDepth)
+    {
+        depthImage.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
+    }
 
     VkImageViewCreateInfo depthStencilView = {};
     depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
