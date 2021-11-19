@@ -24,6 +24,7 @@ namespace GfxDeviceGlobal
     extern VkCommandBuffer currentCmdBuffer;
     extern VkSampleCountFlagBits msaaSampleBits;
     extern VkQueue graphicsQueue;
+    extern VkPhysicalDevice physicalDevice;
 }
 
 namespace RenderTextureGlobal
@@ -359,20 +360,18 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     
     if (uavFlag == UavFlag::EnabledAlsoDepth)
     {
-        depthImage.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
-    }
+        VkFormatProperties formatProps;
+        vkGetPhysicalDeviceFormatProperties( GfxDeviceGlobal::physicalDevice, depthFormat, &formatProps );
 
-    VkImageViewCreateInfo depthStencilView = {};
-    depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    depthStencilView.format = depthFormat;
-    depthStencilView.flags = 0;
-    depthStencilView.subresourceRange = {};
-    depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-    depthStencilView.subresourceRange.baseMipLevel = 0;
-    depthStencilView.subresourceRange.levelCount = 1;
-    depthStencilView.subresourceRange.baseArrayLayer = 0;
-    depthStencilView.subresourceRange.layerCount = 1;
+        if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT)
+        {
+           depthImage.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
+        }
+        else
+        {
+            System::Print( "Device doesn't support UAV for depth textures!\n");
+        }
+    }
 
     err = vkCreateImage( GfxDeviceGlobal::device, &depthImage, nullptr, &depth.image );
     AE3D_CHECK_VULKAN( err, "render texture 2d depth image" );
@@ -396,6 +395,18 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
+
+    VkImageViewCreateInfo depthStencilView = {};
+    depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    depthStencilView.format = depthFormat;
+    depthStencilView.flags = 0;
+    depthStencilView.subresourceRange = {};
+    depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    depthStencilView.subresourceRange.baseMipLevel = 0;
+    depthStencilView.subresourceRange.levelCount = 1;
+    depthStencilView.subresourceRange.baseArrayLayer = 0;
+    depthStencilView.subresourceRange.layerCount = 1;
 
     depthStencilView.image = depth.image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &depthStencilView, nullptr, &depth.view );
