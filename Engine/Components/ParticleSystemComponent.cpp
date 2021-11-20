@@ -60,7 +60,7 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 #if RENDERER_METAL
     simulationShader.SetUniformBuffer( 1, particleBuffer );
 #endif
-    simulationShader.Dispatch( 1, 1, 1, "Particle Simulation" );
+    simulationShader.Dispatch( 1000 / 64, 1, 1, "Particle Simulation" );
     simulationShader.End();
 }
 
