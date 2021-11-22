@@ -28,15 +28,20 @@ kernel void particle_simulation(
     float2 uv = (float2)gid.xy;
     float x = rand_1_05( uv );
     float4 position = float4( gid.x * x * 8, sin( 1.0f/*uniforms.timeStamp*/ ) * 8, 0, 1 );
+    float4 clipPos = uniforms.viewToClip * position;
+    clipPos.y = - clipPos.y;
+    float3 ndc = clipPos.xyz / clipPos.w;
+    float3 unscaledWindowCoords = 0.5f * ndc + float3( 0.5f, 0.5f, 0.5f );
+    float3 windowCoords = float3( uniforms.windowWidth * unscaledWindowCoords.x, uniforms.windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z );
+
     particleBufferOut[ gid.x ].position = position;
     particleBufferOut[ gid.x ].color = float4( 1, 0, 0, 1 );
-    particleBufferOut[ gid.x ].clipPosition = position;//mul( viewToClip, position );
-
+    particleBufferOut[ gid.x ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, clipPos.w );
 }
 
 kernel void particle_draw(
                   constant Uniforms& uniforms [[ buffer(0) ]],
-                  device Particle* particleBuffer [[ buffer(1) ]],
+                  device Particle* particles [[ buffer(1) ]],
                   texture2d<float, access::read> inTexture [[texture(0)]],
                   texture2d<float, access::write> outTexture [[texture(1)]],
                   texture2d<float, access::read> inTextureDepth [[texture(2)]],
@@ -49,17 +54,11 @@ kernel void particle_draw(
     
     for (uint i = 0; i < 10; ++i)
     {
-        float4 clipPos = uniforms.viewToClip * particleBuffer[ i ].position;
-        clipPos.y = - clipPos.y;
-        float3 ndc = clipPos.xyz / clipPos.w;
-        float3 unscaledWindowCoords = 0.5f * ndc + float3( 0.5f, 0.5f, 0.5f );
-        float3 windowCoords = float3( uniforms.windowWidth * unscaledWindowCoords.x, uniforms.windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z );
-
-        float dist = distance( windowCoords.xy, (float2)gid.xy );
+        float dist = distance( particles[ i ].clipPosition.xy, (float2)gid.xy );
         const float radius = 5;
-        if (dist < radius && clipPos.z / clipPos.w < depth)
+        if (dist < radius && particles[ i ].clipPosition.z / particles[ i ].clipPosition.w < depth)
         {
-            color = particleBuffer[ i ].color;
+            color = particles[ i ].color;
         }
     }
 
