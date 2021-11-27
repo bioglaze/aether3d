@@ -9,6 +9,8 @@
 namespace GfxDeviceGlobal
 {
     extern VkDevice device;
+    extern unsigned backBufferWidth;
+    extern unsigned backBufferHeight;
 }
 
 ae3d::Renderer renderer;
@@ -16,7 +18,20 @@ ae3d::Renderer renderer;
 VkBuffer particleBuffer;
 VkDeviceMemory particleMemory;
 
+VkBuffer particleTileBuffer;
+VkDeviceMemory particleTileMemory;
+
 void CreateBuffer( VkBuffer& buffer, int bufferSize, VkDeviceMemory& memory, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryFlags, const char* debugName );
+
+static unsigned GetNumTilesX()
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferWidth + 16 - 1) / (float)16);
+}
+
+static unsigned GetNumTilesY()
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferHeight + 16 - 1) / (float)16);
+}
 
 void ae3d::BuiltinShaders::Load()
 {
@@ -33,4 +48,7 @@ void ae3d::BuiltinShaders::Load()
     particleDrawShader.LoadSPIRV( FileSystem::FileContents( "shaders/particle_draw.spv" ) );
 
     CreateBuffer( particleBuffer, 1000000 * sizeof( Particle ), particleMemory, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "particle buffer" );
+    const unsigned particleTileCount = GetNumTilesX() * GetNumTilesY();
+    const unsigned maxParticlesPerTile = 1000;
+    CreateBuffer( particleTileBuffer, maxParticlesPerTile * particleTileCount * sizeof( unsigned ), particleTileMemory, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, "particle tile buffer" );
 }

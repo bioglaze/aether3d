@@ -52,6 +52,7 @@ Buffer<float4> spotLightParams : register(t8);
 Buffer<float4> spotLightColors : register(t9);
 RWTexture2D<float4> rwTexture : register(u1);
 RWStructuredBuffer< Particle > particles : register(u2);
+RWBuffer<uint> perTileParticleIndexBuffer : register(u3);
 
 #else
 
@@ -100,4 +101,5 @@ RWStructuredBuffer< Particle > particles : register(u2);
 [[vk::binding( 13 )]] Buffer<float4> spotLightColors;
 [[vk::binding( 14 )]] RWTexture2D<float4> rwTexture;
 [[vk::binding( 15 )]] RWStructuredBuffer< Particle > particles;
+[[vk::binding( 16 )]] RWBuffer<uint> perTileParticleIndexBuffer;
 #endif

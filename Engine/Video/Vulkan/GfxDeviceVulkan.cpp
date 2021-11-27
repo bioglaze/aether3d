@@ -42,7 +42,7 @@ PFN_vkGetShaderInfoAMD getShaderInfoAMD;
 
 constexpr unsigned UI_VERTICE_COUNT = 512 * 1024;
 constexpr unsigned UI_FACE_COUNT = 128 * 1024;
-constexpr std::uint32_t descriptorSlotCount = 16;
+constexpr std::uint32_t descriptorSlotCount = 17;
 
 namespace Texture2DGlobal
 {
@@ -51,6 +51,9 @@ namespace Texture2DGlobal
 
 extern VkBuffer particleBuffer;
 extern VkDeviceMemory particleMemory;
+
+extern VkBuffer particleTileBuffer;
+extern VkDeviceMemory particleTileMemory;
 
 struct Ubo
 {
@@ -1328,6 +1331,7 @@ namespace ae3d
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT }
         };
 
@@ -1525,6 +1529,18 @@ namespace ae3d
         sets[ 15 ].pBufferInfo = &bufferDesc;
         sets[ 15 ].dstBinding = 15;
 
+        VkDescriptorBufferInfo particleTileBufferDesc = {};
+        particleTileBufferDesc.buffer = particleTileBuffer;
+        particleTileBufferDesc.range = VK_WHOLE_SIZE;
+
+        // Binding 16 : Particle tile buffer.
+        sets[ 16 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        sets[ 16 ].dstSet = outDescriptorSet;
+        sets[ 16 ].descriptorCount = 1;
+        sets[ 16 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        sets[ 16 ].pBufferInfo = &particleTileBufferDesc;
+        sets[ 16 ].dstBinding = 16;
+
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, descriptorSlotCount, sets, 0, nullptr );
 
         return outDescriptorSet;
@@ -1629,6 +1645,12 @@ namespace ae3d
         layoutBindings[ 15 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
         layoutBindings[ 15 ].descriptorCount = 1;
         layoutBindings[ 15 ].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+
+        // Binding 16 : Particle tile buffer
+        layoutBindings[ 16 ].binding = 16;
+        layoutBindings[ 16 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindings[ 16 ].descriptorCount = 1;
+        layoutBindings[ 16 ].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 
         VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
         descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

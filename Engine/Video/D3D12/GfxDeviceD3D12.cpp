@@ -192,9 +192,11 @@ namespace GfxDeviceGlobal
     ID3D12Resource* uav0 = nullptr;
     ID3D12Resource* uav1 = nullptr;
     ID3D12Resource* uav2 = nullptr;
+    ID3D12Resource* uav3 = nullptr;
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav0Desc = {};
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc = {};
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav2Desc = {};
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uav3Desc = {};
     std::vector< ae3d::VertexBuffer > lineBuffers;
     std::vector< ID3D12Resource* > constantBuffers;
     std::vector< void* > mappedConstantBuffers;
@@ -220,6 +222,7 @@ namespace GfxDeviceGlobal
     std::vector< ae3d::VertexBuffer::Face > uiFaces( 512 * 1024 );
     ID3D12PipelineState* cachedPSO = nullptr;
     ID3D12Resource* particleBuffer;
+    ID3D12Resource* particleTileBuffer;
 }
 
 void ClearPSOCache()
@@ -912,9 +915,45 @@ void CreateParticleBuffer()
     GfxDeviceGlobal::particleBuffer->SetName( L"Particle Buffer" );
     GfxDeviceGlobal::uav2Desc.Format = DXGI_FORMAT_UNKNOWN;
     GfxDeviceGlobal::uav2Desc.Buffer.NumElements = maxParticles;
-    GfxDeviceGlobal::uav2Desc.Buffer.StructureByteStride = 4 * sizeof( float ); // sizeof( Particle )
+    GfxDeviceGlobal::uav2Desc.Buffer.StructureByteStride = 12 * sizeof( float ); // sizeof( Particle )
     GfxDeviceGlobal::uav2Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
     GfxDeviceGlobal::uav2Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+
+    // Particle tile buffer
+    heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
+    heapProp.CreationNodeMask = 1;
+    heapProp.VisibleNodeMask = 1;
+
+    bufferProp.Alignment = 0;
+    bufferProp.DepthOrArraySize = 1;
+    bufferProp.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    bufferProp.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+    bufferProp.Format = DXGI_FORMAT_UNKNOWN;
+    bufferProp.Height = 1;
+    bufferProp.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    bufferProp.MipLevels = 1;
+    bufferProp.SampleDesc.Count = 1;
+    bufferProp.SampleDesc.Quality = 0;
+    bufferProp.Width = 1000 * sizeof( unsigned int );
+
+    hr = GfxDeviceGlobal::device->CreateCommittedResource(
+        &heapProp,
+        D3D12_HEAP_FLAG_NONE,
+        &bufferProp,
+        D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+        nullptr,
+        IID_PPV_ARGS( &GfxDeviceGlobal::particleTileBuffer ) );
+    if (FAILED( hr ))
+    {
+        ae3d::System::Assert( false, "Unable to create particle tile buffer!" );
+    }
+
+    GfxDeviceGlobal::particleTileBuffer->SetName( L"Particle Tile Buffer" );
+    GfxDeviceGlobal::uav3Desc.Format = DXGI_FORMAT_UNKNOWN;
+    GfxDeviceGlobal::uav3Desc.Buffer.NumElements = 1000;
+    GfxDeviceGlobal::uav3Desc.Buffer.StructureByteStride = sizeof( unsigned );
+    GfxDeviceGlobal::uav3Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+    GfxDeviceGlobal::uav3Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 }
 
 void CreateConstantBuffers()
@@ -1295,6 +1334,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav1, nullptr, &GfxDeviceGlobal::uav1Desc, cpuHandle );
     cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav2, nullptr, &GfxDeviceGlobal::uav2Desc, cpuHandle );
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( GfxDeviceGlobal::uav3, nullptr, &GfxDeviceGlobal::uav3Desc, cpuHandle );
     cpuHandle.ptr += incrementSize;
 
     const unsigned activePointLights = GfxDeviceGlobal::lightTiler.GetPointLightCount();
