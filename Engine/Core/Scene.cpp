@@ -339,6 +339,7 @@ void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
             {
                 Matrix44::Multiply( rtCamera->GetComponent< CameraComponent >()->GetView(), rtCamera->GetComponent< CameraComponent >()->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
                 ParticleSystemComponent::Simulate( renderer.builtinShaders.particleSimulationShader );
+                ParticleSystemComponent::Cull( renderer.builtinShaders.particleCullShader );
             }
             
             RenderWithCamera( rtCamera, 0, rtCamera->GetName() );
@@ -498,7 +499,7 @@ void ae3d::Scene::Render()
     Statistics::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();
 
-    GfxDeviceGlobal::perObjectUboStruct.particleCount = 1000;
+    GfxDeviceGlobal::perObjectUboStruct.particleCount = 65535;
     GfxDeviceGlobal::perObjectUboStruct.timeStamp = System::SecondsSinceStartup();
     //printf("time: %f\n", GfxDeviceGlobal::perObjectUboStruct.timeStamp );
 

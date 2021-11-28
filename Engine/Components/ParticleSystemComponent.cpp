@@ -1,6 +1,7 @@
 #include "ParticleSystemComponent.hpp"
 #include "Array.hpp"
 #include "ComputeShader.hpp"
+#include "GfxDevice.hpp"
 #include "RenderTexture.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
@@ -11,6 +12,9 @@ namespace GfxDeviceGlobal
     extern ID3D12Resource* particleBuffer;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav2Desc;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
+    extern PerObjectUboStruct perObjectUboStruct;
+    extern unsigned backBufferWidth;
+    extern unsigned backBufferHeight;
 }
 
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
@@ -25,8 +29,26 @@ extern id< MTLBuffer > particleBuffer;
 namespace GfxDeviceGlobal
 {
     extern VkCommandBuffer computeCmdBuffer;
+    extern unsigned backBufferWidth;
+    extern unsigned backBufferHeight;
+    extern PerObjectUboStruct perObjectUboStruct;
 }
+
+extern VkBuffer particleTileBuffer;
+
 #endif
+
+static unsigned GetNumTilesX()
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferWidth + 16 - 1) / (float)16);
+}
+
+static unsigned GetNumTilesY()
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferHeight + 16 - 1) / (float)16);
+}
+
+static const unsigned TileRes = 16;
 
 Array< ae3d::ParticleSystemComponent > particleSystemComponents;
 unsigned nextFreeParticleSystemComponent = 0;
@@ -62,8 +84,30 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 #if RENDERER_METAL
     simulationShader.SetUniformBuffer( 1, particleBuffer );
 #endif
-    simulationShader.Dispatch( 1000 / 64, 1, 1, "Particle Simulation" );
+    simulationShader.Dispatch( GfxDeviceGlobal::perObjectUboStruct.particleCount, 1, 1, "Particle Simulation" );
     simulationShader.End();
+}
+
+void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
+{
+    if (particleSystemComponents.count == 0)
+    {
+        return;
+    }
+
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+    cullShader.Begin();
+
+#if RENDERER_D3D12
+    UploadPerObjectUbo();
+    cullShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
+#endif
+#if RENDERER_METAL
+    cullShader.SetUniformBuffer( 1, particleBuffer );
+#endif
+    cullShader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1, "Particle Cull" );
+    cullShader.End();
 }
 
 void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTexture& target )
@@ -73,6 +117,8 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
         return;
     }
 
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
     drawShader.Begin();
 #if RENDERER_D3D12
     D3D12_RESOURCE_BARRIER barrierDesc = {};
@@ -92,6 +138,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 #if RENDERER_VULKAN
     target.SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::computeCmdBuffer );
     drawShader.SetRenderTexture( &target, 14 );
+
 #else
     drawShader.SetRenderTexture( &target, 0 );
 #endif
@@ -104,7 +151,6 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw" );
 
 #if RENDERER_VULKAN
-    //target.SetColorImageLayout( VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, GfxDeviceGlobal::computeCmdBuffer );
     target.SetColorImageLayout( VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, GfxDeviceGlobal::computeCmdBuffer );
 #endif
 

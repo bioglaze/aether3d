@@ -54,6 +54,7 @@ extern VkDeviceMemory particleMemory;
 
 extern VkBuffer particleTileBuffer;
 extern VkDeviceMemory particleTileMemory;
+extern VkBufferView particleTileBufferView;
 
 struct Ubo
 {
@@ -1332,7 +1333,7 @@ namespace ae3d
             { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, AE3D_DESCRIPTOR_SETS_COUNT },
             { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT }
+            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, AE3D_DESCRIPTOR_SETS_COUNT }
         };
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
@@ -1537,8 +1538,8 @@ namespace ae3d
         sets[ 16 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         sets[ 16 ].dstSet = outDescriptorSet;
         sets[ 16 ].descriptorCount = 1;
-        sets[ 16 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        sets[ 16 ].pBufferInfo = &particleTileBufferDesc;
+        sets[ 16 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+        sets[ 16 ].pTexelBufferView = &particleTileBufferView;
         sets[ 16 ].dstBinding = 16;
 
         vkUpdateDescriptorSets( GfxDeviceGlobal::device, descriptorSlotCount, sets, 0, nullptr );
@@ -1648,7 +1649,7 @@ namespace ae3d
 
         // Binding 16 : Particle tile buffer
         layoutBindings[ 16 ].binding = 16;
-        layoutBindings[ 16 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindings[ 16 ].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
         layoutBindings[ 16 ].descriptorCount = 1;
         layoutBindings[ 16 ].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 

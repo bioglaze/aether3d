@@ -36,6 +36,7 @@ SET COMPILER=dxc.exe
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\ssao.obj /E CSMain hlsl\ssao.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\compose.obj /E CSMain hlsl\compose.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\outline.obj /E CSMain hlsl\outline.hlsl
-%COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\particle.obj /E CSMain hlsl\particle.hlsl
+%COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\particle_cull.obj /E CSMain hlsl\particle_cull.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\particle_draw.obj /E CSMain hlsl\particle_draw.hlsl
+%COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T cs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\particle_simulate.obj /E CSMain hlsl\particle_simulate.hlsl
 pause

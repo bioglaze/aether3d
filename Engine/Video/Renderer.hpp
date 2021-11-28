@@ -33,6 +33,7 @@ namespace ae3d
         Shader uiShader;
         ComputeShader lightCullShader;
         ComputeShader particleSimulationShader;
+        ComputeShader particleCullShader;
         ComputeShader particleDrawShader;
     };
 

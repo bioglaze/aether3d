@@ -12,6 +12,7 @@ namespace ae3d
         void SetMaxParticles( int count ) { maxParticles = count; }
 
         static void Simulate( class ComputeShader& simulationShader );
+        static void Cull( class ComputeShader& cullShader );
 
         static void Draw( ComputeShader& drawShader, class RenderTexture& target );
         
