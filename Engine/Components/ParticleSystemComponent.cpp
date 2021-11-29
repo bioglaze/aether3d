@@ -10,7 +10,9 @@
 namespace GfxDeviceGlobal
 {
     extern ID3D12Resource* particleBuffer;
+    extern ID3D12Resource* particleTileBuffer;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav2Desc;
+    extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav3Desc;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern PerObjectUboStruct perObjectUboStruct;
     extern unsigned backBufferWidth;
@@ -102,6 +104,7 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 #if RENDERER_D3D12
     UploadPerObjectUbo();
     cullShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
+    cullShader.SetUAV( 3, GfxDeviceGlobal::particleTileBuffer, GfxDeviceGlobal::uav3Desc );
 #endif
 #if RENDERER_METAL
     cullShader.SetUniformBuffer( 1, particleBuffer );
@@ -121,6 +124,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
     drawShader.Begin();
 #if RENDERER_D3D12
+    UploadPerObjectUbo();
     D3D12_RESOURCE_BARRIER barrierDesc = {};
     barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
     barrierDesc.UAV.pResource = target.GetGpuResource()->resource;
@@ -130,15 +134,18 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     barrierDesc.UAV.pResource = GfxDeviceGlobal::particleBuffer;
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
 
+    barrierDesc.UAV.pResource = GfxDeviceGlobal::particleTileBuffer;
+    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
+
     TransitionResource( *target.GetGpuResource(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS );
 
     drawShader.SetUAV( 1, target.GetGpuResource()->resource, *target.GetUAVDesc() );
     drawShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
+    drawShader.SetUAV( 3, GfxDeviceGlobal::particleTileBuffer, GfxDeviceGlobal::uav3Desc );
 #endif
 #if RENDERER_VULKAN
     target.SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::computeCmdBuffer );
     drawShader.SetRenderTexture( &target, 14 );
-
 #else
     drawShader.SetRenderTexture( &target, 0 );
 #endif

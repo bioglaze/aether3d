@@ -37,7 +37,7 @@ void DestroyShaders(); // Defined in ShaderD3D12.cpp
 void DestroyComputeShaders(); // Defined in ComputeShaderD3D12.cpp
 float GetFloatAnisotropy( ae3d::Anisotropy anisotropy );
 extern ae3d::Renderer renderer;
-constexpr int RESOURCE_BINDING_COUNT = 14;
+constexpr int RESOURCE_BINDING_COUNT = 15;
 
 namespace WindowGlobal
 {
@@ -558,7 +558,7 @@ void CreateRootSignature()
     {
         descRange1[ 0 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0 );
         descRange1[ 1 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 10, 0 );
-        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 3, 0 );
+        descRange1[ 2 ].Init( D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0 );
 		ae3d::System::Assert( descRange1[ 0 ].NumDescriptors + descRange1[ 1 ].NumDescriptors + descRange1[ 2 ].NumDescriptors == RESOURCE_BINDING_COUNT, "Resource count mismatch!" );
 
         CD3DX12_DESCRIPTOR_RANGE descRange2[ 1 ];
@@ -877,6 +877,16 @@ void CreateDepthStencil()
     GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &descDsv, DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
+static unsigned GetNumTilesX()
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferWidth + 16 - 1) / (float)16);
+}
+
+static unsigned GetNumTilesY()
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferHeight + 16 - 1) / (float)16);
+}
+
 void CreateParticleBuffer()
 {
     const unsigned maxParticles = 1000000;
@@ -915,7 +925,7 @@ void CreateParticleBuffer()
     GfxDeviceGlobal::particleBuffer->SetName( L"Particle Buffer" );
     GfxDeviceGlobal::uav2Desc.Format = DXGI_FORMAT_UNKNOWN;
     GfxDeviceGlobal::uav2Desc.Buffer.NumElements = maxParticles;
-    GfxDeviceGlobal::uav2Desc.Buffer.StructureByteStride = 12 * sizeof( float ); // sizeof( Particle )
+    GfxDeviceGlobal::uav2Desc.Buffer.StructureByteStride = 12 * sizeof( float ); // FIXME: sizeof( Particle )
     GfxDeviceGlobal::uav2Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
     GfxDeviceGlobal::uav2Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 
@@ -923,6 +933,9 @@ void CreateParticleBuffer()
     heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
     heapProp.CreationNodeMask = 1;
     heapProp.VisibleNodeMask = 1;
+
+    const unsigned particleTileCount = GetNumTilesX() * GetNumTilesY();
+    const unsigned maxParticlesPerTile = 1000;
 
     bufferProp.Alignment = 0;
     bufferProp.DepthOrArraySize = 1;
@@ -934,7 +947,7 @@ void CreateParticleBuffer()
     bufferProp.MipLevels = 1;
     bufferProp.SampleDesc.Count = 1;
     bufferProp.SampleDesc.Quality = 0;
-    bufferProp.Width = 1000 * sizeof( unsigned int );
+    bufferProp.Width = maxParticlesPerTile * particleTileCount * sizeof( unsigned );
 
     hr = GfxDeviceGlobal::device->CreateCommittedResource(
         &heapProp,
@@ -950,7 +963,7 @@ void CreateParticleBuffer()
 
     GfxDeviceGlobal::particleTileBuffer->SetName( L"Particle Tile Buffer" );
     GfxDeviceGlobal::uav3Desc.Format = DXGI_FORMAT_UNKNOWN;
-    GfxDeviceGlobal::uav3Desc.Buffer.NumElements = 1000;
+    GfxDeviceGlobal::uav3Desc.Buffer.NumElements = bufferProp.Width / sizeof( unsigned );
     GfxDeviceGlobal::uav3Desc.Buffer.StructureByteStride = sizeof( unsigned );
     GfxDeviceGlobal::uav3Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
     GfxDeviceGlobal::uav3Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;

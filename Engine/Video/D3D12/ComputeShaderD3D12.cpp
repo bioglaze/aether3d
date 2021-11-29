@@ -132,7 +132,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 1 ], nullptr, &uavDescs[ 1 ], cpuHandle );
     cpuHandle.ptr += incrementSize;
     GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 2 ], nullptr, &uavDescs[ 2 ], cpuHandle );
-    //cpuHandle.ptr += incrementSize;
+    cpuHandle.ptr += incrementSize;
+    GfxDeviceGlobal::device->CreateUnorderedAccessView( uavBuffers[ 3 ], nullptr, &uavDescs[ 3 ], cpuHandle );
 
     GfxDeviceGlobal::cachedPSO = pso;
     Statistics::IncPSOBindCalls();
