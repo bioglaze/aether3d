@@ -431,6 +431,10 @@ int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool 
     {
         bytesPerPixel = 4;
     }
+    else if (format == DXGI_FORMAT_R32G32_FLOAT)
+    {
+        bytesPerPixel = 4 * 2; // TODO: verify
+    }
     else
     {
         ae3d::System::Assert( false, "Unhandled DDS format!" );
