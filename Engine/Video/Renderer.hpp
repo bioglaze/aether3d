@@ -52,6 +52,9 @@ namespace ae3d
         void GenerateSSAOKernel( int count, Vec4* outKernel );
         void RenderSkybox( TextureCube* skyTexture, const CameraComponent& camera );
 
+        unsigned GetNumParticleTilesX() const;
+        unsigned GetNumParticleTilesY() const;
+
         Texture2D& GetWhiteTexture() { return whiteTexture; }
 
         BuiltinShaders builtinShaders;

@@ -1,6 +1,6 @@
 #include "ubo.h"
 
-#define TILE_RES 16
+#define TILE_RES 32
 #define PARTICLE_INDEX_BUFFER_SENTINEL 0x7fffffff
 #define MAX_PARTICLES_PER_TILE 1000
 

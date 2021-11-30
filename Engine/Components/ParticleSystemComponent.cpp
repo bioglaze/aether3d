@@ -3,8 +3,11 @@
 #include "ComputeShader.hpp"
 #include "GfxDevice.hpp"
 #include "RenderTexture.hpp"
+#include "Renderer.hpp"
 #include "System.hpp"
 #include "Vec3.hpp"
+
+extern ae3d::Renderer renderer;
 
 #ifdef RENDERER_D3D12
 namespace GfxDeviceGlobal
@@ -40,17 +43,7 @@ extern VkBuffer particleTileBuffer;
 
 #endif
 
-static unsigned GetNumTilesX()
-{
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + 16 - 1) / (float)16);
-}
-
-static unsigned GetNumTilesY()
-{
-    return (unsigned)((GfxDeviceGlobal::backBufferHeight + 16 - 1) / (float)16);
-}
-
-static const unsigned TileRes = 16;
+static const unsigned TileRes = 32;
 
 Array< ae3d::ParticleSystemComponent > particleSystemComponents;
 unsigned nextFreeParticleSystemComponent = 0;
@@ -86,7 +79,7 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 #if RENDERER_METAL
     simulationShader.SetUniformBuffer( 1, particleBuffer );
 #endif
-    simulationShader.Dispatch( GfxDeviceGlobal::perObjectUboStruct.particleCount, 1, 1, "Particle Simulation" );
+    simulationShader.Dispatch( GfxDeviceGlobal::perObjectUboStruct.particleCount / 64, 1, 1, "Particle Simulation" );
     simulationShader.End();
 }
 
@@ -109,7 +102,7 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 #if RENDERER_METAL
     cullShader.SetUniformBuffer( 1, particleBuffer );
 #endif
-    cullShader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1, "Particle Cull" );
+    cullShader.Dispatch( renderer.GetNumParticleTilesX(), renderer.GetNumParticleTilesY(), 1, "Particle Cull" );
     cullShader.End();
 }
 
@@ -125,7 +118,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     drawShader.Begin();
 #if RENDERER_D3D12
     UploadPerObjectUbo();
-    D3D12_RESOURCE_BARRIER barrierDesc = {};
+    /*D3D12_RESOURCE_BARRIER barrierDesc = {};
     barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
     barrierDesc.UAV.pResource = target.GetGpuResource()->resource;
 
@@ -135,7 +128,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
 
     barrierDesc.UAV.pResource = GfxDeviceGlobal::particleTileBuffer;
-    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
+    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );*/
 
     TransitionResource( *target.GetGpuResource(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS );
 

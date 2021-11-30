@@ -17,6 +17,7 @@ namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
     extern std::vector< ae3d::VertexBuffer > lineBuffers;
+    extern unsigned backBufferWidth;
     extern unsigned backBufferHeight;
 }
 
@@ -30,6 +31,16 @@ namespace MathUtil
 void ae3d::Renderer::GenerateTextures()
 {
     whiteTexture.Load( FileSystem::FileContents( "textures/default_white.png" ), TextureWrap::Repeat, TextureFilter::Nearest, Mipmaps::None, ColorSpace::SRGB, Anisotropy::k1 );
+}
+
+unsigned ae3d::Renderer::GetNumParticleTilesX() const
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferWidth + 32 - 1) / (float)32);
+}
+
+unsigned ae3d::Renderer::GetNumParticleTilesY() const
+{
+    return (unsigned)((GfxDeviceGlobal::backBufferHeight + 32 - 1) / (float)32);
 }
 
 void ae3d::Renderer::GenerateSSAOKernel( int count, ae3d::Vec4* outKernel )

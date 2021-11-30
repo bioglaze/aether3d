@@ -877,16 +877,6 @@ void CreateDepthStencil()
     GfxDeviceGlobal::device->CreateDepthStencilView( GfxDeviceGlobal::depthTexture, &descDsv, DescriptorHeapManager::GetDSVHeap()->GetCPUDescriptorHandleForHeapStart() );
 }
 
-static unsigned GetNumTilesX()
-{
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + 16 - 1) / (float)16);
-}
-
-static unsigned GetNumTilesY()
-{
-    return (unsigned)((GfxDeviceGlobal::backBufferHeight + 16 - 1) / (float)16);
-}
-
 void CreateParticleBuffer()
 {
     const unsigned maxParticles = 1000000;
@@ -934,7 +924,7 @@ void CreateParticleBuffer()
     heapProp.CreationNodeMask = 1;
     heapProp.VisibleNodeMask = 1;
 
-    const unsigned particleTileCount = GetNumTilesX() * GetNumTilesY();
+    const unsigned particleTileCount = renderer.GetNumParticleTilesX() * renderer.GetNumParticleTilesY();
     const unsigned maxParticlesPerTile = 1000;
 
     bufferProp.Alignment = 0;

@@ -6,7 +6,7 @@ float rand_1_05( float2 uv )
     return abs( nois.x + nois.y ) * 0.5;
 }
 
-[numthreads( 1, 1, 1 )]
+[numthreads( 64, 1, 1 )]
 void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThreadID, uint3 groupIdx : SV_GroupID )
 {
     const uint i = globalIdx.x;
