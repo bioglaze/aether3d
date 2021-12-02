@@ -915,7 +915,7 @@ void CreateParticleBuffer()
     GfxDeviceGlobal::particleBuffer->SetName( L"Particle Buffer" );
     GfxDeviceGlobal::uav2Desc.Format = DXGI_FORMAT_UNKNOWN;
     GfxDeviceGlobal::uav2Desc.Buffer.NumElements = maxParticles;
-    GfxDeviceGlobal::uav2Desc.Buffer.StructureByteStride = 12 * sizeof( float ); // FIXME: sizeof( Particle )
+    GfxDeviceGlobal::uav2Desc.Buffer.StructureByteStride = sizeof( ae3d::Particle );
     GfxDeviceGlobal::uav2Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
     GfxDeviceGlobal::uav2Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 

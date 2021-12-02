@@ -1530,10 +1530,6 @@ namespace ae3d
         sets[ 15 ].pBufferInfo = &bufferDesc;
         sets[ 15 ].dstBinding = 15;
 
-        VkDescriptorBufferInfo particleTileBufferDesc = {};
-        particleTileBufferDesc.buffer = particleTileBuffer;
-        particleTileBufferDesc.range = VK_WHOLE_SIZE;
-
         // Binding 16 : Particle tile buffer.
         sets[ 16 ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         sets[ 16 ].dstSet = outDescriptorSet;
