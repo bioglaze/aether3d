@@ -28,6 +28,13 @@ void UploadPerObjectUbo();
 
 #if RENDERER_METAL
 extern id< MTLBuffer > particleBuffer;
+
+namespace GfxDeviceGlobal
+{
+    extern PerObjectUboStruct perObjectUboStruct;
+    extern unsigned backBufferWidth;
+    extern unsigned backBufferHeight;
+}
 #endif
 
 #if RENDERER_VULKAN
