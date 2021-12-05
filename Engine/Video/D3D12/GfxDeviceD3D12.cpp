@@ -19,6 +19,7 @@
 #include <cmath>
 #include "ComputeShader.hpp"
 #include "DescriptorHeapManager.hpp"
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "LightTiler.hpp"
 #include "RenderTexture.hpp"
@@ -74,6 +75,12 @@ namespace ae3d
 				std::strcpy( outStr, stm.str().c_str() );
 	    }
         }
+    }
+
+    namespace GfxDevice
+    {
+        unsigned backBufferWidth;
+        unsigned backBufferHeight;
     }
 }
 
@@ -164,8 +171,6 @@ namespace GfxDeviceGlobal
     } samplers[ 4 ];
  
     const unsigned BufferCount = 2;
-    unsigned backBufferWidth = 640;
-    unsigned backBufferHeight = 400;
 
     ID3D12Device* device = nullptr;
     IDXGISwapChain3* swapChain = nullptr;
@@ -422,8 +427,8 @@ void CreateBackBuffer()
         GfxDeviceGlobal::renderTargets[ i ]->SetName( L"SwapChain_Buffer" );
         GfxDeviceGlobal::rtvResources[ i ].usageState = D3D12_RESOURCE_STATE_COMMON;
         GfxDeviceGlobal::rtvResources[ i ].resource = GfxDeviceGlobal::renderTargets[ i ];
-        GfxDeviceGlobal::backBufferWidth = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Width );
-        GfxDeviceGlobal::backBufferHeight = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Height );
+        ae3d::GfxDevice::backBufferWidth = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Width );
+        ae3d::GfxDevice::backBufferHeight = int( GfxDeviceGlobal::renderTargets[ i ]->GetDesc().Height );
     }
 
     for (auto i = 0u; i < GfxDeviceGlobal::BufferCount; ++i)
@@ -454,8 +459,8 @@ void CreateMSAA()
 
     D3D12_RESOURCE_DESC rtDesc = {};
     rtDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    rtDesc.Width = GfxDeviceGlobal::backBufferWidth;
-    rtDesc.Height = GfxDeviceGlobal::backBufferHeight;
+    rtDesc.Width = ae3d::GfxDevice::backBufferWidth;
+    rtDesc.Height = ae3d::GfxDevice::backBufferHeight;
     rtDesc.DepthOrArraySize = 1;
     rtDesc.MipLevels = 1;
     rtDesc.Format = clearValue.Format;
@@ -478,8 +483,8 @@ void CreateMSAA()
     heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
 
     rtDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    rtDesc.Width = GfxDeviceGlobal::backBufferWidth;
-    rtDesc.Height = GfxDeviceGlobal::backBufferHeight;
+    rtDesc.Width = ae3d::GfxDevice::backBufferWidth;
+    rtDesc.Height = ae3d::GfxDevice::backBufferHeight;
     rtDesc.DepthOrArraySize = 1;
     rtDesc.MipLevels = 1;
     rtDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -849,7 +854,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::Texture
 void CreateDepthStencil()
 {
     auto descResource = CD3DX12_RESOURCE_DESC::Tex2D(
-        DXGI_FORMAT_R32_TYPELESS, GfxDeviceGlobal::backBufferWidth, GfxDeviceGlobal::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE,
+        DXGI_FORMAT_R32_TYPELESS, ae3d::GfxDevice::backBufferWidth, ae3d::GfxDevice::backBufferHeight, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE,
         D3D12_TEXTURE_LAYOUT_UNKNOWN, 0 );
 
     auto prop = CD3DX12_HEAP_PROPERTIES( D3D12_HEAP_TYPE_DEFAULT );
@@ -953,7 +958,7 @@ void CreateParticleBuffer()
 
     GfxDeviceGlobal::particleTileBuffer->SetName( L"Particle Tile Buffer" );
     GfxDeviceGlobal::uav3Desc.Format = DXGI_FORMAT_UNKNOWN;
-    GfxDeviceGlobal::uav3Desc.Buffer.NumElements = bufferProp.Width / sizeof( unsigned );
+    GfxDeviceGlobal::uav3Desc.Buffer.NumElements = (UINT)(bufferProp.Width / sizeof( unsigned ));
     GfxDeviceGlobal::uav3Desc.Buffer.StructureByteStride = sizeof( unsigned );
     GfxDeviceGlobal::uav3Desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
     GfxDeviceGlobal::uav3Desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
@@ -1345,8 +1350,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
     const unsigned numLights = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
 
-    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
-    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDevice::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDevice::backBufferHeight;
     GfxDeviceGlobal::perObjectUboStruct.numLights = numLights;
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
  
@@ -1502,8 +1507,8 @@ void ae3d::GfxDevice::ClearScreen( unsigned clearFlags )
 
     TransitionResource( *resource, D3D12_RESOURCE_STATE_RENDER_TARGET );
     
-    FLOAT vpWidth = static_cast< FLOAT >( GfxDeviceGlobal::backBufferWidth );
-    FLOAT vpHeight = static_cast< FLOAT >( GfxDeviceGlobal::backBufferHeight );
+    FLOAT vpWidth = static_cast< FLOAT >( backBufferWidth );
+    FLOAT vpHeight = static_cast< FLOAT >( backBufferHeight );
 
     if (GfxDeviceGlobal::currentRenderTarget)
     {

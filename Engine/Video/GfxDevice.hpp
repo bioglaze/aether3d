@@ -152,5 +152,8 @@ namespace ae3d
 
         void Present();
         void ReleaseGPUObjects();
+
+        extern unsigned backBufferWidth;
+        extern unsigned backBufferHeight;
     }
 }

@@ -18,8 +18,6 @@ using namespace ae3d;
 
 namespace GfxDeviceGlobal
 {
-    extern unsigned backBufferWidth;
-    extern unsigned backBufferHeight;
     extern ID3D12Device* device;
     extern ID3D12Resource* uav0;
     extern ID3D12Resource* uav1;
@@ -420,10 +418,10 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDevice::backBufferWidth + TileRes - 1) / (float)TileRes);
 }
 
 unsigned ae3d::LightTiler::GetNumTilesY() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferHeight + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDevice::backBufferHeight + TileRes - 1) / (float)TileRes);
 }

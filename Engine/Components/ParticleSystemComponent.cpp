@@ -18,8 +18,6 @@ namespace GfxDeviceGlobal
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav3Desc;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern PerObjectUboStruct perObjectUboStruct;
-    extern unsigned backBufferWidth;
-    extern unsigned backBufferHeight;
 }
 
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
@@ -32,8 +30,6 @@ extern id< MTLBuffer > particleBuffer;
 namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
-    extern unsigned backBufferWidth;
-    extern unsigned backBufferHeight;
 }
 #endif
 
@@ -41,8 +37,6 @@ namespace GfxDeviceGlobal
 namespace GfxDeviceGlobal
 {
     extern VkCommandBuffer computeCmdBuffer;
-    extern unsigned backBufferWidth;
-    extern unsigned backBufferHeight;
     extern PerObjectUboStruct perObjectUboStruct;
 }
 
@@ -97,8 +91,8 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
         return;
     }
 
-    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
-    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDevice::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDevice::backBufferHeight;
     cullShader.Begin();
 
 #if RENDERER_D3D12
@@ -120,8 +114,8 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
         return;
     }
 
-    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
-    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDevice::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDevice::backBufferHeight;
     drawShader.Begin();
 #if RENDERER_D3D12
     UploadPerObjectUbo();

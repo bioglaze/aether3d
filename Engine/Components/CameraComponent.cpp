@@ -1,18 +1,13 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "CameraComponent.hpp"
+#include "GfxDevice.hpp"
 #include <locale>
 #include <sstream>
 
 static constexpr int MaxComponents = 20;
 ae3d::CameraComponent cameraComponents[ MaxComponents ];
 unsigned nextFreeCameraComponent = 0;
-
-namespace GfxDeviceGlobal
-{
-    extern unsigned backBufferWidth;
-    extern unsigned backBufferHeight;
-}
 
 unsigned ae3d::CameraComponent::New()
 {
@@ -23,8 +18,8 @@ unsigned ae3d::CameraComponent::New()
 
     cameraComponents[ nextFreeCameraComponent ].viewport[ 0 ] = 0;
     cameraComponents[ nextFreeCameraComponent ].viewport[ 1 ] = 0;
-    cameraComponents[ nextFreeCameraComponent ].viewport[ 2 ] = GfxDeviceGlobal::backBufferWidth;
-    cameraComponents[ nextFreeCameraComponent ].viewport[ 3 ] = GfxDeviceGlobal::backBufferHeight;
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 2 ] = GfxDevice::backBufferWidth;
+    cameraComponents[ nextFreeCameraComponent ].viewport[ 3 ] = GfxDevice::backBufferHeight;
 
     return nextFreeCameraComponent++;
 }

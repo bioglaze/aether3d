@@ -17,8 +17,6 @@ namespace GfxDeviceGlobal
 {
     extern PerObjectUboStruct perObjectUboStruct;
     extern std::vector< ae3d::VertexBuffer > lineBuffers;
-    extern unsigned backBufferWidth;
-    extern unsigned backBufferHeight;
 }
 
 namespace MathUtil
@@ -35,12 +33,12 @@ void ae3d::Renderer::GenerateTextures()
 
 unsigned ae3d::Renderer::GetNumParticleTilesX() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + 32 - 1) / (float)32);
+    return (unsigned)((GfxDevice::backBufferWidth + 32 - 1) / (float)32);
 }
 
 unsigned ae3d::Renderer::GetNumParticleTilesY() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferHeight + 32 - 1) / (float)32);
+    return (unsigned)((GfxDevice::backBufferHeight + 32 - 1) / (float)32);
 }
 
 void ae3d::Renderer::GenerateSSAOKernel( int count, ae3d::Vec4* outKernel )
@@ -224,7 +222,7 @@ unsigned ae3d::LightTiler::GetMaxNumLightsPerTile() const
     constexpr unsigned AdjustmentMultipier = 32;
 
     // I haven't tested at greater than 1080p, so cap it
-    const unsigned uHeight = (GfxDeviceGlobal::backBufferHeight > 1080) ? 1080 : GfxDeviceGlobal::backBufferHeight;
+    const unsigned uHeight = (GfxDevice::backBufferHeight > 1080) ? 1080 : GfxDevice::backBufferHeight;
 
     // adjust max lights per tile down as height increases
     return (MaxLightsPerTile - (AdjustmentMultipier * (uHeight / 120)));

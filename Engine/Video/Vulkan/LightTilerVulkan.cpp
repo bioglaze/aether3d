@@ -4,12 +4,12 @@
 #include "LightTiler.hpp"
 #include <cstring>
 #include "ComputeShader.hpp"
+#include "GfxDevice.hpp"
 #include "Macros.hpp"
 #include "RenderTexture.hpp"
 #include "Renderer.hpp"
 #include "Statistics.hpp"
 #include "System.hpp"
-#include "GfxDevice.hpp"
 #include "VulkanUtils.hpp"
 
 extern ae3d::Renderer renderer;
@@ -21,8 +21,6 @@ namespace MathUtil
 
 namespace GfxDeviceGlobal
 {
-    extern unsigned backBufferWidth;
-    extern unsigned backBufferHeight;
     extern VkDevice device;
     extern PerObjectUboStruct perObjectUboStruct;
     extern VkCommandBuffer computeCmdBuffer;
@@ -309,12 +307,12 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDevice::backBufferWidth + TileRes - 1) / (float)TileRes);
 }
 
 unsigned ae3d::LightTiler::GetNumTilesY() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferHeight + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDevice::backBufferHeight + TileRes - 1) / (float)TileRes);
 }
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )

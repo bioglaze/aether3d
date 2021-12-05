@@ -64,6 +64,15 @@ struct Ubo
     std::uint8_t* uboData = nullptr;
 };
 
+namespace ae3d
+{
+    namespace GfxDevice
+    {
+        unsigned backBufferWidth;
+        unsigned backBufferHeight;
+    }
+}
+
 namespace GfxDeviceGlobal
 {
     struct SwapchainBuffer
@@ -142,8 +151,6 @@ namespace GfxDeviceGlobal
     Array< Ubo > ubos;
     unsigned currentUbo = 0;
     VkSampleCountFlagBits msaaSampleBits = VK_SAMPLE_COUNT_1_BIT;
-    unsigned backBufferWidth;
-    unsigned backBufferHeight;
     ae3d::LightTiler lightTiler;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
@@ -766,8 +773,8 @@ namespace ae3d
             WindowGlobal::windowHeight = surfCaps.currentExtent.height;
         }
 
-        GfxDeviceGlobal::backBufferWidth = WindowGlobal::windowWidth;
-        GfxDeviceGlobal::backBufferHeight = WindowGlobal::windowHeight;
+        GfxDevice::backBufferWidth = WindowGlobal::windowWidth;
+        GfxDevice::backBufferHeight = WindowGlobal::windowHeight;
 
         std::uint32_t desiredNumberOfSwapchainImages = surfCaps.minImageCount + 1;
 
@@ -1775,8 +1782,8 @@ void UploadPerObjectUbo()
 
 void ae3d::GfxDevice::Init( int width, int height )
 {
-    GfxDeviceGlobal::backBufferWidth = width;
-    GfxDeviceGlobal::backBufferHeight = height;
+    GfxDevice::backBufferWidth = width;
+    GfxDevice::backBufferHeight = height;
 }
 
 void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, int offset )
@@ -2048,8 +2055,8 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     const unsigned activeSpotLights = GfxDeviceGlobal::lightTiler.GetSpotLightCount();
     const unsigned lightCount = ((activeSpotLights & 0xFFFFu) << 16) | (activePointLights & 0xFFFFu);
 
-    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDeviceGlobal::backBufferWidth;
-    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDeviceGlobal::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDevice::backBufferWidth;
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDevice::backBufferHeight;
     GfxDeviceGlobal::perObjectUboStruct.numLights = lightCount;
     GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GfxDeviceGlobal::lightTiler.GetMaxNumLightsPerTile();
     GfxDeviceGlobal::perObjectUboStruct.tilesXY.x = (float)GfxDeviceGlobal::lightTiler.GetNumTilesX();
