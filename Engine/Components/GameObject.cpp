@@ -4,7 +4,9 @@
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "DirectionalLightComponent.hpp"
+#include "LineRendererComponent.hpp"
 #include "MeshRendererComponent.hpp"
+#include "ParticleSystemComponent.hpp"
 #include "PointLightComponent.hpp"
 #include "SpriteRendererComponent.hpp"
 #include "SpotLightComponent.hpp"
@@ -94,6 +96,20 @@ GameObject& ae3d::GameObject::operator=( const GameObject& go )
         AddComponent< PointLightComponent >();
         *GetComponent< PointLightComponent >() = *go.GetComponent< PointLightComponent >();
         GetComponent< PointLightComponent >()->gameObject = this;
+    }
+
+    if (go.GetComponent< LineRendererComponent >())
+    {
+        AddComponent< LineRendererComponent >();
+        *GetComponent< LineRendererComponent >() = *go.GetComponent< LineRendererComponent >();
+        GetComponent< LineRendererComponent >()->gameObject = this;
+    }
+
+    if (go.GetComponent< ParticleSystemComponent >())
+    {
+        AddComponent< ParticleSystemComponent >();
+        *GetComponent< ParticleSystemComponent >() = *go.GetComponent< ParticleSystemComponent >();
+        GetComponent< ParticleSystemComponent >()->gameObject = this;
     }
 
     return *this;
