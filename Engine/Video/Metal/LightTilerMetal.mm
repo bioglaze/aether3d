@@ -9,8 +9,6 @@
 
 namespace GfxDeviceGlobal
 {
-    extern int backBufferWidth;
-    extern int backBufferHeight;
     extern PerObjectUboStruct perObjectUboStruct;
 }
 
@@ -53,12 +51,12 @@ void ae3d::LightTiler::Init()
 
 unsigned ae3d::LightTiler::GetNumTilesX() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferWidth + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDevice::backBufferWidth + TileRes - 1) / (float)TileRes);
 }
 
 unsigned ae3d::LightTiler::GetNumTilesY() const
 {
-    return (unsigned)((GfxDeviceGlobal::backBufferHeight + TileRes - 1) / (float)TileRes);
+    return (unsigned)((GfxDevice::backBufferHeight + TileRes - 1) / (float)TileRes);
 }
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewToClip, const Matrix44& worldToView, RenderTexture& depthNormalTarget )
