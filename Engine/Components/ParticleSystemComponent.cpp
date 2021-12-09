@@ -26,6 +26,7 @@ void UploadPerObjectUbo();
 
 #if RENDERER_METAL
 extern id< MTLBuffer > particleBuffer;
+extern id< MTLBuffer > particleTileBuffer;
 
 namespace GfxDeviceGlobal
 {
@@ -102,6 +103,7 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 #endif
 #if RENDERER_METAL
     cullShader.SetUniformBuffer( 1, particleBuffer );
+    cullShader.SetUniformBuffer( 2, particleTileBuffer );
 #endif
     cullShader.Dispatch( renderer.GetNumParticleTilesX(), renderer.GetNumParticleTilesY(), 1, "Particle Cull" );
     cullShader.End();

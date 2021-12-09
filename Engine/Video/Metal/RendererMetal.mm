@@ -6,6 +6,7 @@
 ae3d::Renderer renderer;
 
 id< MTLBuffer > particleBuffer;
+id< MTLBuffer > particleTileBuffer;
 
 void ae3d::BuiltinShaders::Load()
 {
@@ -25,4 +26,11 @@ void ae3d::BuiltinShaders::Load()
     particleBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( Particle ) * maxParticleCount
                               options:MTLResourceCPUCacheModeDefaultCache];
     particleBuffer.label = @"Particle buffer";
+    
+    const unsigned tileCount = renderer.GetNumParticleTilesX() * renderer.GetNumParticleTilesY();
+    const unsigned maxParticlesPerTile = 1000;
+
+    particleTileBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:maxParticlesPerTile * tileCount * sizeof( unsigned )
+                  options:MTLResourceStorageModePrivate];
+    particleTileBuffer.label = @"particleTileBuffer";
 }
