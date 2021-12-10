@@ -20,6 +20,7 @@ void ae3d::BuiltinShaders::Load()
     lightCullShader.Load( "light_culler", FileSystem::FileContents(""), FileSystem::FileContents("") );
     particleSimulationShader.Load( "particle_simulation", FileSystem::FileContents(""), FileSystem::FileContents("") );
     particleDrawShader.Load( "particle_draw", FileSystem::FileContents(""), FileSystem::FileContents("") );
+    particleCullShader.Load( "particle_cull", FileSystem::FileContents( "" ), FileSystem::FileContents( "" ) );
     uiShader.LoadFromLibrary( "sprite_vertex", "sprite_fragment" );
     
     const unsigned maxParticleCount = 1000000;
