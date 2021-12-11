@@ -16,6 +16,8 @@ namespace ae3d
 
         static void Draw( ComputeShader& drawShader, class RenderTexture& target );
         
+        static bool IsAnyAlive();
+
     private:
         friend class GameObject;
 

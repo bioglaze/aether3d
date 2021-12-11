@@ -12,6 +12,7 @@
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "MeshRendererComponent.hpp"
+#include "ParticleSystemComponent.hpp"
 #include "PointLightComponent.hpp"
 #include "Texture2D.hpp"
 #include "TransformComponent.hpp"
@@ -677,6 +678,17 @@ void svDuplicateGameObject( SceneView* sv )
             sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< PointLightComponent >();
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetColor( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->GetColor() );
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetCastShadow( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->CastsShadow(), 2048 );
+        }
+
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< AudioSourceComponent >())
+        {
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< AudioSourceComponent >();
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< AudioSourceComponent >()->SetClipId( sv->gameObjects[ 0 ]->GetComponent< AudioSourceComponent >()->GetClipId() );
+        }
+
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< ParticleSystemComponent >())
+        {
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< ParticleSystemComponent >();
         }
 
         sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );

@@ -65,6 +65,19 @@ ae3d::ParticleSystemComponent* ae3d::ParticleSystemComponent::Get( unsigned inde
     return &particleSystemComponents[ index ];
 }
 
+bool ae3d::ParticleSystemComponent::IsAnyAlive()
+{
+    for (unsigned i = 0; i < particleSystemComponents.count; ++i)
+    {
+        if (particleSystemComponents[ i ].gameObject != nullptr)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 {
     if (particleSystemComponents.count == 0)
