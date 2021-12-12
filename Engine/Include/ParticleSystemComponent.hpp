@@ -16,8 +16,6 @@ namespace ae3d
 
         static void Draw( ComputeShader& drawShader, class RenderTexture& target );
         
-        static bool IsAnyAlive();
-
     private:
         friend class GameObject;
 
@@ -29,6 +27,8 @@ namespace ae3d
         
         /** \return Component at index or null if index is invalid. */
         static ParticleSystemComponent* Get( unsigned index );
+
+        static bool IsAnyAlive();
 
         GameObject* gameObject = nullptr;
         int maxParticles = 100;

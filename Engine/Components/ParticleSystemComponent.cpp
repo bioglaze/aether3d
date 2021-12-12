@@ -80,7 +80,7 @@ bool ae3d::ParticleSystemComponent::IsAnyAlive()
 
 void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 {
-    if (particleSystemComponents.count == 0)
+    if (!ParticleSystemComponent::IsAnyAlive())
     {
         return;
     }
@@ -100,7 +100,7 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 
 void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 {
-    if (particleSystemComponents.count == 0)
+    if (!ParticleSystemComponent::IsAnyAlive())
     {
         return;
     }
@@ -124,7 +124,7 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 
 void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTexture& target )
 {
-    if (particleSystemComponents.count == 0)
+    if (!ParticleSystemComponent::IsAnyAlive())
     {
         return;
     }
