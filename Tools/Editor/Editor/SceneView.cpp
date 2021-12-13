@@ -683,7 +683,7 @@ void svDuplicateGameObject( SceneView* sv )
         if (sv->selectedGameObjects[ 0 ]->GetComponent< AudioSourceComponent >())
         {
             sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< AudioSourceComponent >();
-            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< AudioSourceComponent >()->SetClipId( sv->gameObjects[ 0 ]->GetComponent< AudioSourceComponent >()->GetClipId() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< AudioSourceComponent >()->SetClipId( sv->selectedGameObjects[ 0 ]->GetComponent< AudioSourceComponent >()->GetClipId() );
         }
 
         if (sv->selectedGameObjects[ 0 ]->GetComponent< ParticleSystemComponent >())
