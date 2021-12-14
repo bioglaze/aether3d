@@ -59,6 +59,9 @@ namespace ae3d
         /// Copy constructor.
         GameObject( const GameObject& other );
 
+        /// Destructor.
+        ~GameObject();
+        
         /// \param go Other game object.
         GameObject& operator=( const GameObject& go );
 

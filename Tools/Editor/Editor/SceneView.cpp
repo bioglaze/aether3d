@@ -1213,6 +1213,7 @@ void svDeleteGameObject( SceneView* sv )
         sv->scene.Remove( sv->selectedGameObjects[ 0 ] );
         sv->selectedGameObjects.Allocate( 0 );
         sv->scene.Remove( sv->gameObjects[ 0 ] );
+        delete sv->gameObjects[ sv->selectedGOIndex ];
         sv->gameObjects.Remove( sv->selectedGOIndex );
     }
 }

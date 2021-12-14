@@ -25,6 +25,14 @@ ae3d::GameObject::GameObject( const GameObject& other )
     *this = other;
 }
 
+ae3d::GameObject::~GameObject()
+{
+    if (GetComponent< ParticleSystemComponent >())
+    {
+        GetComponent< ParticleSystemComponent >()->gameObject = nullptr;
+    }
+}
+
 GameObject& ae3d::GameObject::operator=( const GameObject& go )
 {
     name = go.name;
