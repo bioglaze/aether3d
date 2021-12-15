@@ -2305,6 +2305,9 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::msaaTarget.colorMem, nullptr );
     }
 
+    vkDestroyBufferView( GfxDeviceGlobal::device, particleTileBufferView, nullptr );
+    vkDestroyBuffer( GfxDeviceGlobal::device, particleTileBuffer, nullptr );
+
     for (unsigned i = 0; i < GfxDeviceGlobal::ubos.count; ++i)
     {
         vkFreeMemory( GfxDeviceGlobal::device, GfxDeviceGlobal::ubos[ i ].uboMemory, nullptr );
