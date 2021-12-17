@@ -6,6 +6,11 @@ float rand_1_05( float2 uv )
     return abs( nois.x + nois.y ) * 0.5;
 }
 
+bool3 greaterThan( float3 a, float3 b )
+{
+    return bool3( a.x > b.x, a.y > b.y, a.z > b.z );
+}
+
 [numthreads( 64, 1, 1 )]
 void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThreadID, uint3 groupIdx : SV_GroupID )
 {
@@ -22,6 +27,12 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 #if !VULKAN
     clipPos.y = -clipPos.y;
 #endif
+    if (any( greaterThan( abs( clipPos.xyz ), float3( abs( clipPos.www ) ) ) ))
+    {
+        particles[ i ].clipPosition = float4( 0, 0, 0, 666 );
+        return;
+    }
+    
     float3 ndc = clipPos.xyz / clipPos.w;
     float3 unscaledWindowCoords = 0.5f * ndc + float3(0.5f, 0.5f, 0.5f);
     float3 windowCoords = float3(windowWidth * unscaledWindowCoords.x, windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z);

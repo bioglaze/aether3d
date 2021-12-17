@@ -36,6 +36,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         uint il = localIdxFlattened + i;
 
         if (il < particleCount &&
+            particles[ il ].clipPosition.w != 666 && 
             particles[ il ].clipPosition.x > globalIdx.x && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES &&
             particles[ il ].clipPosition.y > globalIdx.y && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES)
         {
