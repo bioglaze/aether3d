@@ -19,6 +19,14 @@ namespace GfxDeviceGlobal
     extern std::vector< ae3d::VertexBuffer > lineBuffers;
 }
 
+namespace ae3d
+{
+    namespace GfxDevice
+    {
+        int particleTileRes = 32;
+    }
+}
+    
 namespace MathUtil
 {
     int Max( int x, int y );
@@ -33,12 +41,12 @@ void ae3d::Renderer::GenerateTextures()
 
 unsigned ae3d::Renderer::GetNumParticleTilesX() const
 {
-    return (unsigned)((GfxDevice::backBufferWidth + 32 - 1) / (float)32);
+    return (unsigned)((GfxDevice::backBufferWidth + ae3d::GfxDevice::particleTileRes - 1) / (float)ae3d::GfxDevice::particleTileRes);
 }
 
 unsigned ae3d::Renderer::GetNumParticleTilesY() const
 {
-    return (unsigned)((GfxDevice::backBufferHeight + 32 - 1) / (float)32);
+    return (unsigned)((GfxDevice::backBufferHeight + ae3d::GfxDevice::particleTileRes - 1) / (float)ae3d::GfxDevice::particleTileRes);
 }
 
 void ae3d::Renderer::GenerateSSAOKernel( int count, ae3d::Vec4* outKernel )

@@ -45,8 +45,6 @@ extern VkBuffer particleTileBuffer;
 
 #endif
 
-static const unsigned TileRes = 32;
-
 Array< ae3d::ParticleSystemComponent > particleSystemComponents;
 unsigned nextFreeParticleSystemComponent = 0;
 

@@ -155,5 +155,6 @@ namespace ae3d
 
         extern unsigned backBufferWidth;
         extern unsigned backBufferHeight;
+        extern int particleTileRes;
     }
 }
