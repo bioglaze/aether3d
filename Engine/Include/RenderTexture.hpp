@@ -70,6 +70,9 @@ namespace ae3d
         /// \return color view.
         VkImageView GetColorView() { return color.view; }
 
+        /// \return depth view.
+        VkImageView GetDepthView() { return depth.view; }
+
         /// \return render pass.
         VkRenderPass GetRenderPass() { return renderPass; }
 

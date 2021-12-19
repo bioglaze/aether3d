@@ -366,6 +366,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT)
         {
            depthImage.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
+           depthImage.usage |= VK_IMAGE_USAGE_SAMPLED_BIT;
         }
         else
         {
