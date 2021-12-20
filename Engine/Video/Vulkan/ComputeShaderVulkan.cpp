@@ -167,7 +167,7 @@ void ae3d::ComputeShader::SetRenderTextureDepth( class RenderTexture* renderText
 {
     if (slot < SLOT_COUNT)
     {
-        GfxDeviceGlobal::boundViews[ slot ] = renderTexture->GetColorView();
+        GfxDeviceGlobal::boundViews[ slot ] = renderTexture->GetDepthView();
     }
     else
     {

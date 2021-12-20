@@ -340,9 +340,9 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     AllocateSetupCommandBuffer();
 
     SetImageLayout( GfxDeviceGlobal::setupCmdBuffer,
-        color.image,
-        VK_IMAGE_ASPECT_COLOR_BIT,
-        VK_IMAGE_LAYOUT_UNDEFINED,
+                    color.image,
+                    VK_IMAGE_ASPECT_COLOR_BIT,
+                    VK_IMAGE_LAYOUT_UNDEFINED,
                     VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
     
     colorImageView.image = color.image;
@@ -357,6 +357,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
     VkImageCreateInfo depthImage = colorImage;
     depthImage.format = depthFormat;
     depthImage.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    depthImage.usage |= VK_IMAGE_USAGE_SAMPLED_BIT; // FIXME: This is not optimal. Better to expose this flag to texture creation.
     
     if (uavFlag == UavFlag::EnabledAlsoDepth)
     {
@@ -366,7 +367,6 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT)
         {
            depthImage.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
-           depthImage.usage |= VK_IMAGE_USAGE_SAMPLED_BIT;
         }
         else
         {
