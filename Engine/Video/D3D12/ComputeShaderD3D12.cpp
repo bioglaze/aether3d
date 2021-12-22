@@ -77,6 +77,8 @@ void ae3d::ComputeShader::SetProjectionMatrix( const struct Matrix44& projection
 
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName )
 {
+    GfxDevice::PushGroupMarker( debugName );
+
     static int heapIndex = 0;
     heapIndex = (heapIndex + 1) % 3;
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
@@ -142,6 +144,8 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
+
+    GfxDevice::PopGroupMarker();
 }
 
 void ae3d::ComputeShader::Load( const char* source )
