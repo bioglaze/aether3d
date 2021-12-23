@@ -81,6 +81,7 @@ namespace ae3d
     {
         unsigned backBufferWidth;
         unsigned backBufferHeight;
+        const int computeHeapCount = 8;
     }
 }
 
@@ -219,7 +220,7 @@ namespace GfxDeviceGlobal
     ID3D12Resource* msaaDepth = nullptr;
     D3D12_CPU_DESCRIPTOR_HANDLE msaaColorHandle = {};
     D3D12_CPU_DESCRIPTOR_HANDLE msaaDepthHandle = {};
-    ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 3 ] = {};
+    ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ ae3d::GfxDevice::computeHeapCount ] = {};
     TimerQuery timerQuery;
     PerObjectUboStruct perObjectUboStruct;
     ae3d::VertexBuffer uiVertexBuffer;
@@ -1131,7 +1132,7 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     CreateParticleBuffer();
 
     // Compute heap
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < ae3d::GfxDevice::computeHeapCount; ++i)
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -1475,9 +1476,11 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeaps[ 0 ] );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeaps[ 1 ] );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeaps[ 2 ] );
+
+    for (int i = 0; i < GfxDevice::computeHeapCount; ++i)
+    {
+        AE3D_SAFE_RELEASE( GfxDeviceGlobal::computeCbvSrvUavHeaps[ i ] );
+    }
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryBuffer );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::timerQuery.queryHeap );

@@ -20,7 +20,7 @@ namespace GfxDeviceGlobal
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern ID3D12RootSignature* rootSignatureTileCuller;
-    extern ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 3 ];
+    extern ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 4 ];
     extern ID3D12PipelineState* cachedPSO;
 	extern PerObjectUboStruct perObjectUboStruct;
 }
@@ -80,7 +80,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     GfxDevice::PushGroupMarker( debugName );
 
     static int heapIndex = 0;
-    heapIndex = (heapIndex + 1) % 3;
+    heapIndex = (heapIndex + 1) % ae3d::GfxDevice::computeHeapCount;
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
     System::Assert( GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ] != nullptr, "heap not initialized" );
 

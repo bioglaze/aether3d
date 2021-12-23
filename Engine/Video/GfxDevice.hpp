@@ -102,6 +102,7 @@ namespace ae3d
         void ResetCommandList();
         void* GetCurrentMappedConstantBuffer();
         void* GetCurrentConstantBuffer();
+        extern const int computeHeapCount; // This must be at least as big as dispatches in-flight.
 #endif
 #if RENDERER_METAL
         static const int UNIFORM_BUFFER_SIZE = sizeof( PerObjectUboStruct ) + 16 * 4 + 448;
