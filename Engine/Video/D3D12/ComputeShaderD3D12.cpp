@@ -14,13 +14,14 @@
 extern int AE3D_CB_SIZE;
 
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
+void UploadPerObjectUbo();
 
 namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
     extern ID3D12RootSignature* rootSignatureTileCuller;
-    extern ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 4 ];
+    extern ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 8 ];
     extern ID3D12PipelineState* cachedPSO;
 	extern PerObjectUboStruct perObjectUboStruct;
 }
@@ -78,6 +79,9 @@ void ae3d::ComputeShader::SetProjectionMatrix( const struct Matrix44& projection
 void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName )
 {
     GfxDevice::PushGroupMarker( debugName );
+
+    GfxDevice::GetNewUniformBuffer();
+    UploadPerObjectUbo();
 
     static int heapIndex = 0;
     heapIndex = (heapIndex + 1) % ae3d::GfxDevice::computeHeapCount;

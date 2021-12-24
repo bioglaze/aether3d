@@ -23,6 +23,7 @@ namespace GfxDeviceGlobal
     extern ID3D12Resource* uav1;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav0Desc;
     extern D3D12_UNORDERED_ACCESS_VIEW_DESC uav1Desc;
+    extern PerObjectUboStruct perObjectUboStruct;
 }
 
 void ae3d::LightTiler::DestroyBuffers()
@@ -364,19 +365,13 @@ void ae3d::LightTiler::UpdateLightBuffers()
 
 void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projection, const Matrix44& localToView, RenderTexture& depthNormalTarget )
 {
-    GfxDevice::GetNewUniformBuffer();
+    Matrix44::Invert( projection, GfxDeviceGlobal::perObjectUboStruct.clipToView );
 
-    PerObjectUboStruct uniforms;
-
-    Matrix44::Invert( projection, uniforms.clipToView );
-
-    uniforms.localToView = localToView;
-    uniforms.windowWidth = depthNormalTarget.GetWidth();
-    uniforms.windowHeight = depthNormalTarget.GetHeight();
-    uniforms.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
-    uniforms.maxNumLightsPerTile = GetMaxNumLightsPerTile();
-
-    memcpy_s( ae3d::GfxDevice::GetCurrentMappedConstantBuffer(), AE3D_CB_SIZE, &uniforms, sizeof( PerObjectUboStruct ) );
+    GfxDeviceGlobal::perObjectUboStruct.localToView = localToView;
+    GfxDeviceGlobal::perObjectUboStruct.windowWidth = depthNormalTarget.GetWidth();
+    GfxDeviceGlobal::perObjectUboStruct.windowHeight = depthNormalTarget.GetHeight();
+    GfxDeviceGlobal::perObjectUboStruct.numLights = (((unsigned)activeSpotLights & 0xFFFFu) << 16) | ((unsigned)activePointLights & 0xFFFFu);
+    GfxDeviceGlobal::perObjectUboStruct.maxNumLightsPerTile = GetMaxNumLightsPerTile();
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc0 = {};
     srvDesc0.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -406,7 +401,6 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& projec
     shader.SetSRV( 7, spotLightCenterAndRadiusBuffer, srvDesc0 );
     shader.SetSRV( 8, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
     shader.SetSRV( 9, depthNormalTarget.GetGpuResource()->resource, srvDesc1 ); // Unused, but something must be bound.
-
 
     shader.SetUAV( 0, perTileLightIndexBuffer, GfxDeviceGlobal::uav0Desc );
     shader.SetUAV( 1, perTileLightIndexBuffer, GfxDeviceGlobal::uav0Desc ); // Unused, but something must be bound.
