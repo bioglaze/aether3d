@@ -38,7 +38,6 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestParticleSystem = true;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
@@ -129,6 +128,7 @@ int main()
 #endif
 
     RenderTexture cameraTex;
+    // FIXME: UAV can't be enabled on MSAA textures, so should only enable it on the resolved texture.
     cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA, ae3d::RenderTexture::UavFlag::Enabled );
 
     Texture2D bloomTex;
@@ -903,11 +903,11 @@ int main()
             reload = false;
         }
         scene.Render();
-#if defined( RENDERER_VULKAN )
+        
         if (TestMSAA)
         {
             cameraTex.ResolveTo( &resolvedTex );
-            System::Draw( &resolvedTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            System::Draw( &resolvedTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             //System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
         else
@@ -915,13 +915,7 @@ int main()
             System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
-#else
-        if (!TestSSAO && !TestBloom)
-        {
-            System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-            System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
-        }
-#endif
+
         if (TestBloom)
         {
             auto beginTime = std::chrono::steady_clock::now();
