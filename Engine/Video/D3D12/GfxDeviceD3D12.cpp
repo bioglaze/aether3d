@@ -187,7 +187,7 @@ namespace GfxDeviceGlobal
     ID3D12Resource* depthTexture = nullptr;
     ID3D12CommandAllocator* commandListAllocator = nullptr;
     ID3D12RootSignature* rootSignatureGraphics = nullptr;
-    ID3D12RootSignature* rootSignatureTileCuller = nullptr;
+    ID3D12RootSignature* rootSignatureCompute = nullptr;
     ID3D12InfoQueue* infoQueue = nullptr;
     float clearColor[ 4 ] = { 0, 0, 0, 0 };
     std::vector< PSOEntry > psoCache;
@@ -594,7 +594,7 @@ void CreateRootSignature()
         GfxDeviceGlobal::rootSignatureGraphics->SetName( L"Graphics Root Signature" );
     }
 
-    // Tile Culler
+    // Compute
     {
         CD3DX12_ROOT_PARAMETER rootParam[ 1 ];
         rootParam[ 0 ].InitAsDescriptorTable( 3, descRange1 );
@@ -615,9 +615,9 @@ void CreateRootSignature()
         HRESULT hr = D3D12SerializeRootSignature( &descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob );
         AE3D_CHECK_D3D( hr, "Failed to serialize root signature" );
 
-        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignatureTileCuller ) );
+        hr = GfxDeviceGlobal::device->CreateRootSignature( 0, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS( &GfxDeviceGlobal::rootSignatureCompute ) );
         AE3D_CHECK_D3D( hr, "Failed to create root signature" );
-        GfxDeviceGlobal::rootSignatureTileCuller->SetName( L"Tile Culler Root Signature" );
+        GfxDeviceGlobal::rootSignatureCompute->SetName( L"Compute Root Signature" );
     }
 }
 
@@ -1471,7 +1471,7 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     GfxDeviceGlobal::swapChain->SetFullscreenState( FALSE, nullptr );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::swapChain );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignatureGraphics );
-    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignatureTileCuller );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::rootSignatureCompute );
 
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );

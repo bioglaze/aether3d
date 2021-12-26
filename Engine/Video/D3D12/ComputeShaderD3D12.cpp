@@ -20,7 +20,7 @@ namespace GfxDeviceGlobal
 {
     extern ID3D12Device* device;
     extern ID3D12GraphicsCommandList* graphicsCommandList;
-    extern ID3D12RootSignature* rootSignatureTileCuller;
+    extern ID3D12RootSignature* rootSignatureCompute;
     extern ID3D12DescriptorHeap* computeCbvSrvUavHeaps[ 8 ];
     extern ID3D12PipelineState* cachedPSO;
 	extern PerObjectUboStruct perObjectUboStruct;
@@ -92,7 +92,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     {
         D3D12_COMPUTE_PIPELINE_STATE_DESC descPso = {};
         descPso.CS = { reinterpret_cast<BYTE*>(blobShader->GetBufferPointer()), blobShader->GetBufferSize() };
-        descPso.pRootSignature = GfxDeviceGlobal::rootSignatureTileCuller;
+        descPso.pRootSignature = GfxDeviceGlobal::rootSignatureCompute;
 
         HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &pso ) );
         AE3D_CHECK_D3D( hr, "Failed to create compute PSO" );
@@ -145,7 +145,7 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     Statistics::IncPSOBindCalls();
     GfxDeviceGlobal::graphicsCommandList->SetPipelineState( pso );
     GfxDeviceGlobal::graphicsCommandList->SetDescriptorHeaps( 1, &GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ] );
-    GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureTileCuller );
+    GfxDeviceGlobal::graphicsCommandList->SetComputeRootSignature( GfxDeviceGlobal::rootSignatureCompute );
     GfxDeviceGlobal::graphicsCommandList->SetComputeRootDescriptorTable( 0, GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetGPUDescriptorHandleForHeapStart() );
     GfxDeviceGlobal::graphicsCommandList->Dispatch( groupCountX, groupCountY, groupCountZ );
 
