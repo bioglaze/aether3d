@@ -73,6 +73,11 @@ namespace ae3d
 
     std::string GetCacheHash( const std::string& path, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Mipmaps mipmaps, ae3d::ColorSpace colorSpace, ae3d::Anisotropy anisotropy );
 
+    enum class TextureLayout
+    {
+        General, ShaderRead, ShaderReadWrite, UAVBarrier
+    };
+
     /// Base class for textures.
     class TextureBase
     {

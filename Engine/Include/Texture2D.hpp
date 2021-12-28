@@ -13,11 +13,6 @@ namespace ae3d
     {
         struct FileContentsData;
     }
-
-    enum class TextureLayout
-    {
-        General, ShaderRead, ShaderReadWrite, UAVBarrier
-    };
         
     /// 2D texture.
     class Texture2D : public TextureBase

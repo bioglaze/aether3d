@@ -321,3 +321,15 @@ void ae3d::RenderTexture::ResolveTo( ae3d::RenderTexture* target )
     TransitionResource( *target->GetGpuResource(), D3D12_RESOURCE_STATE_RESOLVE_DEST );
     GfxDeviceGlobal::graphicsCommandList->ResolveSubresource( target->GetGpuResource()->resource, 0, gpuResource.resource, 0, FormatToDXGIFormat( dataType ) );
 }
+
+void ae3d::RenderTexture::SetLayout( TextureLayout layout )
+{
+    if (layout == TextureLayout::General)
+    {
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+    }
+    else
+    {
+        System::Assert( false, "Unhandled layout!" );
+    }
+}

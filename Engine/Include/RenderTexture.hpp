@@ -47,6 +47,9 @@ namespace ae3d
         /// \param nam New name.
         void SetName( const std::string& nam ) { name = nam; }
         
+        /// \param layout Layout.
+        void SetLayout( TextureLayout layout );
+
         /// \return Name.
         const char* GetName() const { return name.c_str(); };
         

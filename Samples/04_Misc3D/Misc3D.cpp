@@ -39,7 +39,7 @@ constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
-constexpr bool TestSSAO = false;
+constexpr bool TestSSAO = true;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 constexpr bool TestSponza = true;
 
@@ -1104,13 +1104,15 @@ int main()
 
         if (TestSSAO && ssao)
         {
-            ssaoTex.SetLayout( TextureLayout::General );
 #if RENDERER_D3D12
+            ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
+            camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().SetLayout( TextureLayout::General );
             ssaoShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
             ssaoShader.SetSRV( 1, camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetGpuResource()->resource, *camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetSRVDesc() );
             ssaoShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
             ssaoShader.SetTexture2D( &noiseTex, 2 );
 #else
+            ssaoTex.SetLayout( TextureLayout::General );
             ssaoShader.SetRenderTexture( &cameraTex, 0 );
             ssaoShader.SetRenderTexture( &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
             ssaoShader.SetTexture2D( &noiseTex, 2 );
@@ -1162,6 +1164,7 @@ int main()
             }
             composeShader.Begin();
 #if RENDERER_D3D12
+            ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
             composeShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
             composeShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
 #else
@@ -1172,10 +1175,8 @@ int main()
             composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
             composeShader.End();
             ssaoBlurTex.SetLayout( TextureLayout::UAVBarrier );
-#if !RENDERER_D3D12
-            // If this is executed on D3D12, the debug layer doesn't complain, but Pix says the state doesn't match what's expected.
             ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
-#endif
+
             System::Draw( &ssaoBlurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
