@@ -128,7 +128,7 @@ int main()
 #endif
 
     RenderTexture cameraTex;
-    // FIXME: UAV can't be enabled on MSAA textures, so should only enable it on the resolved texture.
+    // FIXME: UAV can't be enabled on MSAA textures (at least on D3D12), so should only enable it on the resolved texture.
     cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA, ae3d::RenderTexture::UavFlag::Enabled );
 
     Texture2D bloomTex;
@@ -1170,7 +1170,15 @@ int main()
 #else
             composeShader.SetTexture2D( &ssaoBlurTex, 14 );
 #endif
-            composeShader.SetRenderTexture( &cameraTex, 0 );
+            if (TestMSAA)
+            {
+                composeShader.SetRenderTexture( &resolvedTex, 0 );
+            }
+            else
+            {
+                composeShader.SetRenderTexture( &cameraTex, 0 );
+            }
+
             composeShader.SetTexture2D( &ssaoTex, 2 );
             composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
             composeShader.End();
@@ -1178,7 +1186,12 @@ int main()
             ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
 
             System::Draw( &ssaoBlurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-            System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+            
+            // FIXME: This should also work with MSAA. Currently the texture layout is wrong on Vulkan.
+            if (!TestMSAA)
+            {
+                System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+            }
         }
 
         scene.EndFrame();
