@@ -397,6 +397,8 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
+    depth.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
     VkImageViewCreateInfo depthStencilView = {};
     depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -601,6 +603,8 @@ void ae3d::RenderTexture::CreateCube( int aDimension, DataType aDataType, Textur
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
+    depth.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    
     VkImageViewCreateInfo depthStencilView = {};
     depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
