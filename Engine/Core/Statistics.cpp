@@ -30,7 +30,9 @@ namespace Statistics
     float frustumCullTimeMS = 0;
     float waitForPreviousFrameTimeMS = 0;
     float lightUpdateTimeMS = 0;
-
+    float acquireNextImageTimeMS = 0;
+    
+    std::chrono::time_point< std::chrono::steady_clock > startAcquireNextImageTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startLightUpdateTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startFrameTimePoint;
     std::chrono::time_point< std::chrono::steady_clock > startShadowMapTimePoint;
@@ -56,6 +58,23 @@ void Statistics::EndLightUpdateProfiling()
 float Statistics::GetLightUpdateTimeMS()
 {
     return lightUpdateTimeMS;
+}
+
+void Statistics::BeginAcquireNextImageProfiling()
+{
+    startAcquireNextImageTimePoint = std::chrono::steady_clock::now();
+}
+
+void Statistics::EndAcquireNextImageProfiling()
+{
+    auto tEnd = std::chrono::steady_clock::now();
+    auto tDiff = std::chrono::duration< double, std::milli >( tEnd - Statistics::startAcquireNextImageTimePoint ).count();
+    acquireNextImageTimeMS = static_cast< float >( tDiff );
+}
+
+float Statistics::GetAcquireNextImageTimeMS()
+{
+    return acquireNextImageTimeMS;
 }
 
 float Statistics::GetWaitForPreviousFrameProfiling()

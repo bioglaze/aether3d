@@ -11,6 +11,10 @@ namespace Statistics
     void BeginDepthNormalsProfiling();
     void EndDepthNormalsProfiling();
 
+    void BeginAcquireNextImageProfiling();
+    void EndAcquireNextImageProfiling();
+    float GetAcquireNextImageTimeMS();
+    
     float GetFrameTimeMS();
     float GetShadowMapTimeMS();
     float GetShadowMapTimeGpuMS();
