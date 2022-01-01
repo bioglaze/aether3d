@@ -240,7 +240,8 @@ namespace ae3d
 #if AE3D_OPENVR
             VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
 #endif
-            VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+            VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+            VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
         };
 
 #if VK_USE_PLATFORM_ANDROID_KHR
@@ -270,7 +271,7 @@ namespace ae3d
 #if AE3D_OPENVR
         instanceCreateInfo.enabledExtensionCount = debug::enabled ? 4 : 3;
 #else
-        instanceCreateInfo.enabledExtensionCount = 3;
+        instanceCreateInfo.enabledExtensionCount = 4;
 #endif
         instanceCreateInfo.ppEnabledExtensionNames = enabledExtensions;
 

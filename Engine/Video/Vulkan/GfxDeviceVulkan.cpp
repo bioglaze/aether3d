@@ -948,6 +948,7 @@ namespace ae3d
 
         std::vector< const char* > deviceExtensions;
         deviceExtensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
+        deviceExtensions.push_back( VK_EXT_MEMORY_BUDGET_EXTENSION_NAME );
 
         std::uint32_t deviceExtensionCount;
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, nullptr );
@@ -1966,6 +1967,7 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
 {
+    // TODO: Use VK_EXT_memory_budget
     outUsedMBytes = 0;
     outBudgetMBytes = 0;
 }
