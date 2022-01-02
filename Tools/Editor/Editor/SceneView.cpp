@@ -691,6 +691,22 @@ void svDuplicateGameObject( SceneView* sv )
             sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< ParticleSystemComponent >();
         }
 
+        if (sv->selectedGameObjects[ 0 ]->GetComponent< CameraComponent >())
+        {
+            CameraComponent* oldCamera = sv->selectedGameObjects[ 0 ]->GetComponent< CameraComponent >();
+
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< CameraComponent >();
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetClearColor( oldCamera->GetClearColor() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetClearFlag( oldCamera->GetClearFlag() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetEnabled( oldCamera->IsEnabled() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetLayerMask( oldCamera->GetLayerMask() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetProjection( oldCamera->GetProjection() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetProjectionType( oldCamera->GetProjectionType() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetRenderOrder( oldCamera->GetRenderOrder() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< CameraComponent >()->SetViewport( oldCamera->GetViewport()[ 0 ], oldCamera->GetViewport()[ 1 ], oldCamera->GetViewport()[ 2 ], oldCamera->GetViewport()[ 3 ] );
+            // FIXME incomplete.
+        }
+
         sv->scene.Add( sv->gameObjects[ sv->gameObjects.count - 1 ] );
     }
 }
