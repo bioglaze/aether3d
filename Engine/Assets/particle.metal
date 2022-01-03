@@ -32,7 +32,8 @@ kernel void particle_simulation(
 {
     float2 uv = (float2)gid.xy;
     float x = rand_1_05( uv );
-    float4 position = float4( gid.x * x * 8, sin( 1.0f/*uniforms.timeStamp*/ ) * 8, 0, 1 );
+    float4 position = float4( x * 8 * sin( gid.x * 20 + uniforms.timeStamp ), gid.x % 20, x * 8 * cos( gid.x * 20 + uniforms.timeStamp ), 1 );
+
     float4 clipPos = uniforms.viewToClip * position;
     clipPos.y = - clipPos.y;
     float3 ndc = clipPos.xyz / clipPos.w;
@@ -40,7 +41,7 @@ kernel void particle_simulation(
     float3 windowCoords = float3( uniforms.windowWidth * unscaledWindowCoords.x, uniforms.windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z );
 
     particleBufferOut[ gid.x ].position = position;
-    particleBufferOut[ gid.x ].color = float4( 1, 0, 0, 1 );
+    particleBufferOut[ gid.x ].color = float4( 1, 1, 1, 1 );
     particleBufferOut[ gid.x ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, clipPos.w );
 }
 
@@ -74,11 +75,11 @@ kernel void particle_cull(
 
     threadgroup_barrier( mem_flags::mem_threadgroup );
 
-    for (uint i = 0; i < uniforms.particleCount; i += NUM_THREADS_PER_TILE)
+    for (uint i = 0; i < (uint)uniforms.particleCount; i += NUM_THREADS_PER_TILE)
     {
         uint il = localIdxFlattened + i;
 
-        if (il < uniforms.particleCount &&
+        if (il < (uint)uniforms.particleCount &&
             particles[ il ].clipPosition.x > globalIdx.x && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES &&
             particles[ il ].clipPosition.y > globalIdx.y && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES)
         {
