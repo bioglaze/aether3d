@@ -88,18 +88,6 @@ void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, 
     System::Assert( GfxDeviceGlobal::graphicsCommandList != nullptr, "graphics command list not initialized" );
     System::Assert( GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ] != nullptr, "heap not initialized" );
 
-    if (!pso)
-    {
-        D3D12_COMPUTE_PIPELINE_STATE_DESC descPso = {};
-        descPso.CS = { reinterpret_cast<BYTE*>(blobShader->GetBufferPointer()), blobShader->GetBufferSize() };
-        descPso.pRootSignature = GfxDeviceGlobal::rootSignatureCompute;
-
-        HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &pso ) );
-        AE3D_CHECK_D3D( hr, "Failed to create compute PSO" );
-        pso->SetName( L"PSO" );
-        Global::psos.push_back( pso );
-    }
-
     SetCBV( 0, (ID3D12Resource*)GfxDevice::GetCurrentConstantBuffer() );
 
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = GfxDeviceGlobal::computeCbvSrvUavHeaps[ heapIndex ]->GetCPUDescriptorHandleForHeapStart();
@@ -198,6 +186,15 @@ void ae3d::ComputeShader::Load( const char* /*metalShaderName*/, const FileSyste
         const std::string dataStr = std::string( std::begin( dataHLSL.data ), std::end( dataHLSL.data ) );
         Load( dataStr.c_str() );
     }
+
+    D3D12_COMPUTE_PIPELINE_STATE_DESC descPso = {};
+    descPso.CS = { reinterpret_cast<BYTE*>(blobShader->GetBufferPointer()), blobShader->GetBufferSize() };
+    descPso.pRootSignature = GfxDeviceGlobal::rootSignatureCompute;
+
+    HRESULT hr = GfxDeviceGlobal::device->CreateComputePipelineState( &descPso, IID_PPV_ARGS( &pso ) );
+    AE3D_CHECK_D3D( hr, "Failed to create compute PSO" );
+    pso->SetName( L"Compute PSO" );
+    Global::psos.push_back( pso );
 }
 
 void ae3d::ComputeShader::SetTexture2D( Texture2D* texture, unsigned slot )
