@@ -1065,6 +1065,22 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     HRESULT hr = CreateDXGIFactory2( factoryFlags, IID_PPV_ARGS( &factory ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 factory" );
 
+    IDXGIAdapter1* hardwareAdapter = nullptr;
+    
+    for (UINT adapterIndex = 0; factory->EnumAdapters1( adapterIndex, &hardwareAdapter ) == S_OK; ++adapterIndex)
+    {
+        DXGI_ADAPTER_DESC1 desc;
+        hardwareAdapter->GetDesc1( &desc );
+
+        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+        {
+            continue;
+        }
+
+        // FIXME: Should try creating a device before assiging the adapter. Also the cast is maybe not allowed to do this way. Maybe it needs to use QueryInterface().
+        GfxDeviceGlobal::adapter = (IDXGIAdapter3*)hardwareAdapter;
+    }
+
     hr = D3D12CreateDevice( GfxDeviceGlobal::adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
     GfxDeviceGlobal::device->SetName( L"D3D12 device" );

@@ -39,7 +39,7 @@ constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
-constexpr bool TestSSAO = true;
+constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 constexpr bool TestSponza = true;
 
@@ -1197,6 +1197,10 @@ int main()
         scene.EndFrame();
 #endif
         
+        /*unsigned used = 0, budget = 0;
+        System::Statistics::GetGpuMemoryUsage( used, budget );
+        System::Print("used: %u, budget: %u\n", used, budget);*/
+
         Window::SwapBuffers();
     }
 
