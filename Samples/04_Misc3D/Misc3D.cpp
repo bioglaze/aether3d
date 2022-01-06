@@ -96,7 +96,7 @@ int main()
     System::EnableWindowsMemleakDetection();
     if (TestMSAA)
     {
-        Window::Create( width, height, fullScreen ? WindowCreateFlags::Fullscreen : WindowCreateFlags::MSAA4 );
+        Window::Create( width, height, fullScreen ? (WindowCreateFlags)(WindowCreateFlags::Fullscreen | WindowCreateFlags::MSAA4) : WindowCreateFlags::MSAA4 );
     }
     else
     {
