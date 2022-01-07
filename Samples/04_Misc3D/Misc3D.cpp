@@ -910,7 +910,7 @@ int main()
             System::Draw( &resolvedTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             //System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
         }
-        else
+        else if (!(TestSSAO && ssao) && !TestBloom)
         {
             System::Draw( &cameraTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
