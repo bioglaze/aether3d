@@ -21,7 +21,6 @@ namespace GfxDeviceGlobal
 }
 
 void TransitionResource( GpuResource& gpuResource, D3D12_RESOURCE_STATES newState );
-void UploadPerObjectUbo();
 #endif
 
 #if RENDERER_METAL
@@ -86,7 +85,6 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
     simulationShader.Begin();
 
 #if RENDERER_D3D12
-    UploadPerObjectUbo();
     simulationShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
 #endif
 #if RENDERER_METAL
@@ -108,7 +106,6 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
     cullShader.Begin();
 
 #if RENDERER_D3D12
-    UploadPerObjectUbo();
     cullShader.SetUAV( 2, GfxDeviceGlobal::particleBuffer, GfxDeviceGlobal::uav2Desc );
     cullShader.SetUAV( 3, GfxDeviceGlobal::particleTileBuffer, GfxDeviceGlobal::uav3Desc );
 #endif
@@ -131,19 +128,6 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDevice::backBufferHeight;
     drawShader.Begin();
 #if RENDERER_D3D12
-    UploadPerObjectUbo();
-    /*D3D12_RESOURCE_BARRIER barrierDesc = {};
-    barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-    barrierDesc.UAV.pResource = target.GetGpuResource()->resource;
-
-    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
-    
-    barrierDesc.UAV.pResource = GfxDeviceGlobal::particleBuffer;
-    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );
-
-    barrierDesc.UAV.pResource = GfxDeviceGlobal::particleTileBuffer;
-    GfxDeviceGlobal::graphicsCommandList->ResourceBarrier( 1, &barrierDesc );*/
-
     TransitionResource( *target.GetGpuResource(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS );
 
     drawShader.SetUAV( 1, target.GetGpuResource()->resource, *target.GetUAVDesc() );
