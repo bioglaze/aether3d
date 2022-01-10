@@ -32,7 +32,7 @@
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.6.zip
 
 constexpr bool TestMSAA = false;
-constexpr bool TestRenderTexture2D = false;
+constexpr bool TestRenderTexture2D = true;
 constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
@@ -588,9 +588,10 @@ int main()
     rtCamera.GetComponent<CameraComponent>()->SetTargetTexture( &rtTex );
     rtCamera.GetComponent<CameraComponent>()->SetLayerMask( 0x1 );
     rtCamera.GetComponent<CameraComponent>()->SetRenderOrder( 0 );
+    rtCamera.GetComponent<CameraComponent>()->SetShouldRenderParticles( false );
     rtCamera.AddComponent<TransformComponent>();
     //rtCamera.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, -70 ) );
-    
+
     GameObject rtCameraParent;
     rtCameraParent.AddComponent<TransformComponent>();
     rtCameraParent.GetComponent<TransformComponent>()->SetLocalPosition( Vec3( 0, 0, -70 ) );
