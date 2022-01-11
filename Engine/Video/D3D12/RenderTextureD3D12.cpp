@@ -328,6 +328,10 @@ void ae3d::RenderTexture::SetLayout( TextureLayout layout )
     {
         TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
     }
+    else if (layout == TextureLayout::ShaderRead)
+    {
+        TransitionResource( gpuResource, D3D12_RESOURCE_STATE_GENERIC_READ );
+    }
     else
     {
         System::Assert( false, "Unhandled layout!" );

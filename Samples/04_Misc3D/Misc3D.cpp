@@ -32,7 +32,7 @@
 // Assets for this sample (extract into aether3d_build/Samples): http://twiren.kapsi.fi/files/aether3d_sample_v0.8.6.zip
 
 constexpr bool TestMSAA = false;
-constexpr bool TestRenderTexture2D = true;
+constexpr bool TestRenderTexture2D = false;
 constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
@@ -1166,6 +1166,7 @@ int main()
             composeShader.Begin();
 #if RENDERER_D3D12
             ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
+            cameraTex.SetLayout( TextureLayout::ShaderRead );
             composeShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
             composeShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
 #else
