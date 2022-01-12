@@ -118,7 +118,8 @@ void ae3d::RenderTexture::SetDepthImageLayout( VkImageLayout aLayout, VkCommandB
 {
     SetImageLayout( cmdBuffer,
         GetDepthImage(),
-        VK_IMAGE_ASPECT_DEPTH_BIT,
+        // FIXME: Maybe this should check that the format has both depth and stencil. GfxDevice has a non-stencil depth format as a fallback in CreateDevice.
+        VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
         depth.layout,
         aLayout,
         1, 0, 1 );

@@ -412,6 +412,10 @@ namespace ae3d
             destStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
         }
 
+        if (imageMemoryBarrier.srcAccessMask == VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT)
+        {
+            srcStageFlags = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        }
         if (imageMemoryBarrier.srcAccessMask & VK_ACCESS_TRANSFER_WRITE_BIT)
         {
             srcStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
