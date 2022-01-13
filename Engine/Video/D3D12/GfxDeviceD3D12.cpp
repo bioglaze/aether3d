@@ -1051,7 +1051,7 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
 
         ID3D12DeviceRemovedExtendedDataSettings* dredSettings = nullptr;
         dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &dredSettings ) );
-        if (dhr == S_OK && apiValidation)
+        if (dhr == S_OK)
         {
             dredSettings->SetAutoBreadcrumbsEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
             dredSettings->SetPageFaultEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
@@ -1077,8 +1077,8 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
             continue;
         }
 
-        // FIXME: Should try creating a device before assiging the adapter. Also the cast is maybe not allowed to do this way. Maybe it needs to use QueryInterface().
-        GfxDeviceGlobal::adapter = (IDXGIAdapter3*)hardwareAdapter;
+        hr = hardwareAdapter->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::adapter ) );
+        AE3D_CHECK_D3D( hr, "Failed to get IDXGIAdapter3" );
     }
 
     hr = D3D12CreateDevice( GfxDeviceGlobal::adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS( &GfxDeviceGlobal::device ) );
