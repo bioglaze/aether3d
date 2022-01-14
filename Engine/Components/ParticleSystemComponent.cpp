@@ -136,9 +136,11 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 #endif
 #if RENDERER_VULKAN
     target.SetColorImageLayout( VK_IMAGE_LAYOUT_GENERAL, GfxDeviceGlobal::computeCmdBuffer );
+    //target.SetDepthImageLayout( VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, GfxDeviceGlobal::computeCmdBuffer );
     drawShader.End(); // Fixes a synchronization validation error for target texture.
     drawShader.Begin();
     drawShader.SetRenderTexture( &target, 14 );
+    //drawShader.SetRenderTextureDepth( &target, 0 );
 #else
     drawShader.SetRenderTexture( &target, 0 );
 #endif

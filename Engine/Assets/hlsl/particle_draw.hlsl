@@ -20,7 +20,8 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     uint nextParticleIndex = perTileParticleIndexBuffer[ index ];
 
     float4 color = rwTexture[ globalIdx.xy ];
-    
+    float depth = tex[ globalIdx.xy ].r;
+
     while (nextParticleIndex != PARTICLE_INDEX_BUFFER_SENTINEL)
     {
         uint particleIndex = nextParticleIndex;
@@ -30,7 +31,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         float dist = distance( particles[ particleIndex ].clipPosition.xy, globalIdx.xy );
         const float radius = particles[ particleIndex ].clipPosition.z;
         
-        if (dist < radius)
+        if (dist < radius /* && particles[particleIndex].clipPosition.z / particles[particleIndex].clipPosition.w < depth*/)
         {
             color = particles[ particleIndex ].color;
         }
