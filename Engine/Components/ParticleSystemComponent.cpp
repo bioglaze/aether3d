@@ -146,6 +146,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 #endif
 #if RENDERER_METAL
     drawShader.SetUniformBuffer( 1, particleBuffer );
+    drawShader.SetUniformBuffer( 2, particleTileBuffer );
     drawShader.SetRenderTexture( &target, 1 );
     drawShader.SetRenderTextureDepth( &target, 2 );
 #endif

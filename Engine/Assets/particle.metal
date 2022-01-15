@@ -93,20 +93,29 @@ kernel void particle_cull(
     uint startOffset = MAX_NUM_PARTICLES_PER_TILE * tileIdxFlattened;
     uint particleCountInTile = atomic_load_explicit( &ldsParticleIdxCounter, memory_order::memory_order_relaxed );
     
-     for (uint k = localIdxFlattened; k < particleCountInTile; k += NUM_THREADS_PER_TILE)
-     {
-         perTileParticleIndexBuffer[ startOffset + k ] = ldsParticlesIdx[ k ];
-     }
+    for (uint k = localIdxFlattened; k < particleCountInTile; k += NUM_THREADS_PER_TILE)
+    {
+        perTileParticleIndexBuffer[ startOffset + k ] = ldsParticlesIdx[ k ];
+    }
 
-     if (localIdxFlattened == 0)
-     {
-         perTileParticleIndexBuffer[ startOffset + particleCountInTile ] = PARTICLE_INDEX_BUFFER_SENTINEL;
-     }
+    if (localIdxFlattened == 0)
+    {
+        perTileParticleIndexBuffer[ startOffset + particleCountInTile ] = PARTICLE_INDEX_BUFFER_SENTINEL;
+    }
+}
+
+uint GetTileIndex( float2 screenPos, uint windowWidth )
+{
+    const float tileRes = (float)TILE_RES;
+    uint numCellsX = (windowWidth + TILE_RES - 1) / TILE_RES;
+    uint tileIdx = floor( screenPos.x / tileRes ) + floor( screenPos.y / tileRes ) * numCellsX;
+    return tileIdx;
 }
 
 kernel void particle_draw(
                   constant Uniforms& uniforms [[ buffer(0) ]],
                   device Particle* particles [[ buffer(1) ]],
+                  device uint* perTileParticleIndexBuffer [[ buffer(2) ]],
                   texture2d<float, access::read> inTexture [[texture(0)]],
                   texture2d<float, access::write> outTexture [[texture(1)]],
                   texture2d<float, access::read> inTextureDepth [[texture(2)]],
@@ -114,16 +123,26 @@ kernel void particle_draw(
                   ushort2 tid [[thread_position_in_threadgroup]],
                   ushort2 dtid [[threadgroup_position_in_grid]])
 {
+    const int tileIndex = GetTileIndex( float2( gid.xy ), uniforms.windowWidth );
+    int index = MAX_NUM_PARTICLES_PER_TILE * tileIndex;
+    int nextParticleIndex = perTileParticleIndexBuffer[ index ];
+
     float4 color = inTexture.read( gid );
     float depth = inTextureDepth.read( gid ).r;
     
-    for (uint i = 0; i < (uint)min( uniforms.particleCount, 300 ); ++i)
+    for (uint particleIndex = 0; particleIndex < (uint)min( uniforms.particleCount, 300 ); ++particleIndex)
     {
-        float dist = distance( particles[ i ].clipPosition.xy, (float2)gid.xy );
+    /*while (nextParticleIndex != PARTICLE_INDEX_BUFFER_SENTINEL)
+    {
+        uint particleIndex = nextParticleIndex;
+        ++index;
+        nextParticleIndex = perTileParticleIndexBuffer[ index ];*/
+
+        float dist = distance( particles[ particleIndex ].clipPosition.xy, (float2)gid.xy );
         const float radius = 5;
-        if (dist < radius && particles[ i ].clipPosition.z / particles[ i ].clipPosition.w < depth)
+        if (dist < radius && particles[ particleIndex ].clipPosition.z / particles[ particleIndex ].clipPosition.w < depth)
         {
-            color = particles[ i ].color;
+            color = particles[ particleIndex ].color;
         }
     }
 
