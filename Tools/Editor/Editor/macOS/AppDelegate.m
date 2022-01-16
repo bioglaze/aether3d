@@ -5,6 +5,7 @@
 @end
 
 extern NSViewController* myViewController;
+extern float backingScale;
 
 @implementation AppDelegate
 
@@ -12,6 +13,7 @@ extern NSViewController* myViewController;
 {
     [[ [myViewController view] window ] makeFirstResponder:myViewController];
     [[ [myViewController view] window ] setAcceptsMouseMovedEvents:YES];
+    backingScale = [[ [myViewController view] window ] backingScaleFactor];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification

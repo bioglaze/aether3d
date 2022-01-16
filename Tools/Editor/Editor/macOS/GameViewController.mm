@@ -2,8 +2,8 @@
 #include <string>
 #include <string.h>
 #import "GameViewController.h"
-#include "GameObject.hpp"
-#include "FileSystem.hpp"
+#import "GameObject.hpp"
+#import "FileSystem.hpp"
 #import "Inspector.hpp"
 #import "System.hpp"
 #import "SceneView.hpp"
@@ -12,6 +12,7 @@
 
 NSViewController* myViewController;
 const int InspectorWidth = 450;
+float backingScale = 2.0f; // 2.0 on Retina
 
 static std::string GetOpenPath( const char* extension )
 {
@@ -108,7 +109,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
     ae3d::System::LoadBuiltinAssets();
     ae3d::System::InitAudio();
     
-    svInit( &sceneView, self.view.bounds.size.width * 2, self.view.bounds.size.height * 2 );
+    svInit( &sceneView, self.view.bounds.size.width * backingScale, self.view.bounds.size.height * backingScale );
     inspector.Init();
 }
 
