@@ -727,7 +727,11 @@ static void RenderSSAO( SceneView* sv )
     sv->ssaoShader.SetTexture2D( &sv->ssaoTex, 2 );
 #endif
     sv->ssaoShader.Begin();
+#if RENDERER_METAL
+    sv->ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO", 16, 16 );
+#else
     sv->ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
+#endif
     sv->ssaoShader.End();
     sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
 
@@ -741,7 +745,11 @@ static void RenderSSAO( SceneView* sv )
 
     sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
     sv->blurShader.Begin();
+#if RENDERER_METAL
+    sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur", 16, 16 );
+#else
     sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+#endif
     sv->blurShader.End();
 
     sv->blurShader.Begin();
@@ -755,7 +763,11 @@ static void RenderSSAO( SceneView* sv )
     sv->blurShader.SetTexture2D( &sv->ssaoTex, 1 );
 #endif
     sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+#if RENDERER_METAL
+    sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur", 16, 16 );
+#else
     sv->blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+#endif
     sv->blurShader.End();
 
     sv->ssaoTex.SetLayout( TextureLayout::ShaderRead );
@@ -770,7 +782,11 @@ static void RenderSSAO( SceneView* sv )
     sv->composeShader.SetTexture2D( &sv->composeTex, 1 );
 #endif
     sv->composeShader.SetTexture2D( &sv->ssaoTex, 2 );
+#if RENDERER_METAL
+    sv->composeShader.Dispatch( width / 8, height / 8, 1, "Compose", 16, 16 );
+#else
     sv->composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
+#endif
     sv->composeShader.End();
     sv->composeTex.SetLayout( TextureLayout::ShaderRead );
 
@@ -796,7 +812,11 @@ static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold, float b
     sv->downsampleAndThresholdShader.SetUniform( ae3d::ComputeShader::UniformName::BloomThreshold, bloomThreshold, 0 );
     sv->downsampleAndThresholdShader.SetUniform( ae3d::ComputeShader::UniformName::BloomIntensity, bloomIntensity, 0 );
     sv->downsampleAndThresholdShader.Begin();
+#if RENDERER_METAL
+    sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold", 16, 16 );
+#else
     sv->downsampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downsampleAndThreshold" );
+#endif
     sv->downsampleAndThresholdShader.End();
 
     sv->blurTex.SetLayout( TextureLayout::ShaderRead );
@@ -806,7 +826,11 @@ static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold, float b
 
     sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
     sv->blurShader.Begin();
+#if RENDERER_METAL
+    sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur", 16, 16 );
+#else
     sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
+#endif
     sv->blurShader.End();
 
     sv->blurShader.Begin();
@@ -816,7 +840,11 @@ static void RenderBloom( SceneView* sv, SSAO ssao, float bloomThreshold, float b
     sv->blurShader.SetTexture2D( &sv->bloomTex, 0 );
     sv->blurShader.SetTexture2D( &sv->blurTex, slot );
     sv->blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+#if RENDERER_METAL
+    sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur", 16, 16 );
+#else
     sv->blurShader.Dispatch( width / blurDiv, height / blurDiv, 1, "blur" );
+#endif
     sv->blurShader.End();
 
     sv->blurTex.SetLayout( TextureLayout::ShaderRead );
@@ -882,7 +910,11 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold,
             sv->outlineShader.SetTexture2D( &sv->outlineTex, 1 );
 #endif
             sv->outlineShader.Begin();
+#if RENDERER_METAL
+            sv->outlineShader.Dispatch( width / 8, height / 8, 1, "Selection Outline", 16, 16 );
+#else
             sv->outlineShader.Dispatch( width / 8, height / 8, 1, "Selection Outline" );
+#endif
             sv->outlineShader.End();
             sv->outlineTex.SetLayout( TextureLayout::ShaderRead );
         

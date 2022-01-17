@@ -118,9 +118,9 @@ void ae3d::ComputeShader::End()
 {
 }
 
-void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName )
+void ae3d::ComputeShader::Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName, unsigned threadsPerGroupX, unsigned threadsPerGroupY )
 {
-    MTLSize threadgroupCounts = MTLSizeMake( 16, 16, 1 );
+    MTLSize threadgroupCounts = MTLSizeMake( threadsPerGroupX, threadsPerGroupY, 1 );
     MTLSize threadgroups = MTLSizeMake( groupCountX, groupCountY, groupCountZ );
 
     SetUniformBuffer( 0, GfxDevice::GetCurrentUniformBuffer() );

@@ -32,13 +32,6 @@ namespace ae3d
         /// Call after Dispatch.
         void End();
         
-        /// Dispatches the shader.
-        /// \param groupCountX X count
-        /// \param groupCountY Y count
-        /// \param groupCountZ Z count
-        /// \param debugName Debug group name that is shown in some profilers.
-        void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName );
-
         /// Sets projection matrix and its inverse into the uniform structure.
         /// \param projection Projection matrix.
         void SetProjectionMatrix( const struct Matrix44& projection );
@@ -87,6 +80,22 @@ namespace ae3d
         /// \param slot slot index. Range is 0-14.
         /// \param buffer Uniform buffer
         void SetUniformBuffer( unsigned slot, id< MTLBuffer > buffer );
+        
+        /// Dispatches the shader.
+        /// \param groupCountX X count
+        /// \param groupCountY Y count
+        /// \param groupCountZ Z count
+        /// \param threadsPerGroupX X count. On Vulkan/D3D12 this is in HLSL code [numthreads()]
+        /// \param threadsPerGroupY Y count. On Vulkan/D3D12 this is in HLSL code [numthreads()]
+        /// \param debugName Debug group name that is shown in some profilers.
+        void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName, unsigned threadsPerGroupX, unsigned threadsPerGroupY );
+#else
+        /// Dispatches the shader.
+        /// \param groupCountX X count
+        /// \param groupCountY Y count
+        /// \param groupCountZ Z count
+        /// \param debugName Debug group name that is shown in some profilers.
+        void Dispatch( unsigned groupCountX, unsigned groupCountY, unsigned groupCountZ, const char* debugName );
 #endif
         /// Sets a render texture into a slot.
         /// \param renderTexture render texture.

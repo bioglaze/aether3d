@@ -895,22 +895,22 @@ using namespace ae3d;
             ssaoShader.SetTexture2D( &noiseTex, 3 );
             ssaoShader.SetTexture2D( &ssaoTex, 2 );
             ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
-            ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO" );
+            ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO", 16, 16 );
             
             blurShader.SetTexture2D( &ssaoTex, 0 );
             blurShader.SetTexture2D( &ssaoBlurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurX" );
+            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurX", 16, 16 );
             
             blurShader.SetTexture2D( &ssaoBlurTex, 0 );
             blurShader.SetTexture2D( &ssaoTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurY" );
+            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurY", 16, 16 );
 
             composeShader.SetRenderTexture( &cameraTex, 0 );
             composeShader.SetTexture2D( &ssaoBlurTex, 1 );
             composeShader.SetTexture2D( &ssaoTex, 2 );
-            composeShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "Compose" );
+            composeShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "Compose", 16, 16 );
 
             System::Draw( &ssaoBlurTex, 0, 0, width, height + 16, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
             System::Draw( &camera2dTex, 0, 0, width, height, width, height, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
@@ -922,39 +922,39 @@ using namespace ae3d;
             
             downSampleAndThresholdShader.SetRenderTexture( &cameraTex, 0 );
             downSampleAndThresholdShader.SetTexture2D( &blurTex, 1 );
-            downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downSampleAndThreshold" );
+            downSampleAndThresholdShader.Dispatch( width / 16, height / 16, 1, "downSampleAndThreshold", 16, 16 );
             
             blurShader.SetTexture2D( &blurTex, 0 );
             blurShader.SetTexture2D( &bloomTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
             
             blurShader.SetTexture2D( &bloomTex, 0 );
             blurShader.SetTexture2D( &blurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
             
             // Second blur
             blurShader.SetTexture2D( &blurTex, 0 );
             blurShader.SetTexture2D( &blurTex2, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
             
             blurShader.SetTexture2D( &blurTex2, 0 );
             blurShader.SetTexture2D( &blurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
             
             // Third blur
             blurShader.SetTexture2D( &blurTex, 0 );
             blurShader.SetTexture2D( &blurTex2, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
             
             blurShader.SetTexture2D( &blurTex2, 0 );
             blurShader.SetTexture2D( &blurTex, 1 );
             blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+            blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
                         
             auto endTime = std::chrono::steady_clock::now();
             auto tDiff = std::chrono::duration<double, std::milli>( endTime - beginTime ).count();

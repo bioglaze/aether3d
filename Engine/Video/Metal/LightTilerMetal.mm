@@ -77,7 +77,7 @@ void ae3d::LightTiler::CullLights( ComputeShader& shader, const Matrix44& viewTo
     shader.SetUniformBuffer( 2, perTileLightIndexBuffer);
     shader.SetUniformBuffer( 3, spotLightCenterAndRadiusBuffer );
     
-    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1, "CullLights" );
+    shader.Dispatch( GetNumTilesX(), GetNumTilesY(), 1, "CullLights", 16, 16 );
 }
 
 void ae3d::LightTiler::UpdateLightBuffers()

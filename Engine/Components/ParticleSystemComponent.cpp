@@ -89,8 +89,10 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 #endif
 #if RENDERER_METAL
     simulationShader.SetUniformBuffer( 1, particleBuffer );
-#endif
+    simulationShader.Dispatch( GfxDeviceGlobal::perObjectUboStruct.particleCount / 64, 1, 1, "Particle Simulation", 64, 1 );
+#else
     simulationShader.Dispatch( GfxDeviceGlobal::perObjectUboStruct.particleCount / 64, 1, 1, "Particle Simulation" );
+#endif
     simulationShader.End();
 }
 
@@ -112,8 +114,10 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 #if RENDERER_METAL
     cullShader.SetUniformBuffer( 1, particleBuffer );
     cullShader.SetUniformBuffer( 2, particleTileBuffer );
-#endif
+    cullShader.Dispatch( renderer.GetNumParticleTilesX(), renderer.GetNumParticleTilesY(), 1, "Particle Cull", 32, 32 );
+#else
     cullShader.Dispatch( renderer.GetNumParticleTilesX(), renderer.GetNumParticleTilesY(), 1, "Particle Cull" );
+#endif
     cullShader.End();
 }
 
@@ -149,9 +153,10 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     drawShader.SetUniformBuffer( 2, particleTileBuffer );
     drawShader.SetRenderTexture( &target, 1 );
     drawShader.SetRenderTextureDepth( &target, 2 );
-#endif
-
+    drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw", 16, 16 );
+#else
     drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw" );
+#endif
 
 #if RENDERER_VULKAN
     drawShader.End(); // Fixes a synchronization validation error for target texture.
