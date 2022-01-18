@@ -144,10 +144,9 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         
         dsv = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_DSV );
 
-        D3D12_DEPTH_STENCIL_VIEW_DESC descDsv = {};
-        descDsv.Format = depthFormat;
-        descDsv.ViewDimension = isMultisampled ? D3D12_DSV_DIMENSION_TEXTURE2DMS : D3D12_DSV_DIMENSION_TEXTURE2D;
-        GfxDeviceGlobal::device->CreateDepthStencilView( gpuResourceDepth.resource, &descDsv, dsv );
+        dsvDesc.Format = depthFormat;
+        dsvDesc.ViewDimension = isMultisampled ? D3D12_DSV_DIMENSION_TEXTURE2DMS : D3D12_DSV_DIMENSION_TEXTURE2D;
+        GfxDeviceGlobal::device->CreateDepthStencilView( gpuResourceDepth.resource, &dsvDesc, dsv );
         RenderTextureGlobal::renderTextures.push_back( gpuResourceDepth.resource );
 
         srvDesc.Format = dxgiFormat;
