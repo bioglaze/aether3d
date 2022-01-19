@@ -392,39 +392,39 @@ int gTouchCount = 0;
         
         downSampleAndThresholdShader.SetRenderTexture( &cameraTex, 0 );
         downSampleAndThresholdShader.SetTexture2D( &blurTex, 1 );
-        downSampleAndThresholdShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "downSampleAndThreshold" );
+        downSampleAndThresholdShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "downSampleAndThreshold", 16, 16 );
         
         blurShader.SetTexture2D( &blurTex, 0 );
         blurShader.SetTexture2D( &bloomTex, 1 );
         blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
         
         blurShader.SetTexture2D( &bloomTex, 0 );
         blurShader.SetTexture2D( &blurTex, 1 );
         blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
         
         // Second blur
         blurShader.SetTexture2D( &blurTex, 0 );
         blurShader.SetTexture2D( &blurTex2, 1 );
         blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
         
         blurShader.SetTexture2D( &blurTex2, 0 );
         blurShader.SetTexture2D( &blurTex, 1 );
         blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
         
         // Third blur
         blurShader.SetTexture2D( &blurTex, 0 );
         blurShader.SetTexture2D( &blurTex2, 1 );
         blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 1, 0 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
         
         blurShader.SetTexture2D( &blurTex2, 0 );
         blurShader.SetTexture2D( &blurTex, 1 );
         blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 0, 1 );
-        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur" );
+        blurShader.Dispatch( self.view.bounds.size.width / 16, self.view.bounds.size.height / 16, 1, "blur", 16, 16 );
                     
         /*auto endTime = std::chrono::steady_clock::now();
         auto tDiff = std::chrono::duration<double, std::milli>( endTime - beginTime ).count();
