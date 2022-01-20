@@ -130,13 +130,11 @@ kernel void particle_draw(
     float4 color = inTexture.read( gid );
     float depth = inTextureDepth.read( gid ).r;
     
-    for (uint particleIndex = 0; particleIndex < (uint)min( uniforms.particleCount, 300 ); ++particleIndex)
-    {
-    /*while (nextParticleIndex != PARTICLE_INDEX_BUFFER_SENTINEL)
+    while (nextParticleIndex != PARTICLE_INDEX_BUFFER_SENTINEL)
     {
         uint particleIndex = nextParticleIndex;
         ++index;
-        nextParticleIndex = perTileParticleIndexBuffer[ index ];*/
+        nextParticleIndex = perTileParticleIndexBuffer[ index ];
 
         float dist = distance( particles[ particleIndex ].clipPosition.xy, (float2)gid.xy );
         const float radius = 5;
