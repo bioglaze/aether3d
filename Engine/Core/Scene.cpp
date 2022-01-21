@@ -499,7 +499,7 @@ void ae3d::Scene::Render()
     Statistics::ResetFrameStatistics();
     TransformComponent::UpdateLocalMatrices();
 
-    GfxDeviceGlobal::perObjectUboStruct.particleCount = 65535 * 2;
+    GfxDeviceGlobal::perObjectUboStruct.particleCount = 1000;//65535 * 2;
     GfxDeviceGlobal::perObjectUboStruct.timeStamp = System::SecondsSinceStartup();
     //printf("time: %f\n", GfxDeviceGlobal::perObjectUboStruct.timeStamp );
 
