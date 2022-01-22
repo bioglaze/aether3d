@@ -153,9 +153,8 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
     drawShader.SetUniformBuffer( 2, particleTileBuffer );
     drawShader.SetRenderTexture( &target, 1 );
     drawShader.SetRenderTextureDepth( &target, 2 );
-    drawShader.Dispatch( target.GetWidth() / GfxDevice::particleTileRes, target.GetHeight() / GfxDevice::particleTileRes, 1, "Particle Draw", 32, 32 );
+    drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw", 8, 8 );
 #else
-    // FIXME: This should probably be / particleTileRes
     drawShader.Dispatch( target.GetWidth() / 8, target.GetHeight() / 8, 1, "Particle Draw" );
 #endif
 
