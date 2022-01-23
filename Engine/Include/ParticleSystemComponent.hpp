@@ -11,6 +11,23 @@ namespace ae3d
         int GetMaxParticles() const { return maxParticles; }
         void SetMaxParticles( int count ) { maxParticles = count; }
 
+        void GetColor( float& outR, float& outG, float& outB )
+        {
+            outR = red;
+            outG = green;
+            outB = blue;
+        }
+        
+        /// \param r Red in range 0-1.
+        /// \param g Green in range 0-1.
+        /// \param b Blue in range 0-1.
+        void SetColor( float r, float g, float b )
+        {
+            red = r;
+            green = g;
+            blue = b;
+        }
+        
         static void Simulate( class ComputeShader& simulationShader );
         static void Cull( class ComputeShader& cullShader );
 
@@ -32,5 +49,8 @@ namespace ae3d
 
         GameObject* gameObject = nullptr;
         int maxParticles = 100;
+        float red = 1.0f;
+        float green = 1.0f;
+        float blue = 1.0f;
     };
 }
