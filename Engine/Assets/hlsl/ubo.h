@@ -41,6 +41,7 @@ cbuffer cbPerFrame : register(b0)
     float2 bloomParams;
     float4 kernelOffsets[ 16 ];
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
+    float4 particleColor;
     int particleCount;
     float timeStamp; // In seconds
 };
