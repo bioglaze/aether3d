@@ -28,10 +28,10 @@ namespace ae3d
             blue = b;
         }
         
-        static void Simulate( class ComputeShader& simulationShader );
-        static void Cull( class ComputeShader& cullShader );
+        void Simulate( class ComputeShader& simulationShader );
+        void Cull( class ComputeShader& cullShader );
 
-        static void Draw( ComputeShader& drawShader, class RenderTexture& target );
+        void Draw( ComputeShader& drawShader, class RenderTexture& target );
         
     private:
         friend class GameObject;

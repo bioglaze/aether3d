@@ -338,8 +338,22 @@ void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
             if (rtCamera->GetComponent< CameraComponent >()->ShouldRenderParticles() && rtCamera->GetComponent< CameraComponent >()->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective)
             {
                 Matrix44::Multiply( rtCamera->GetComponent< CameraComponent >()->GetView(), rtCamera->GetComponent< CameraComponent >()->GetProjection(), GfxDeviceGlobal::perObjectUboStruct.viewToClip );
-                ParticleSystemComponent::Simulate( renderer.builtinShaders.particleSimulationShader );
-                ParticleSystemComponent::Cull( renderer.builtinShaders.particleCullShader );
+                
+                for (auto go : gameObjects)
+                {
+                    if (!go || !go->IsEnabled())
+                    {
+                        continue;
+                    }
+
+                    ParticleSystemComponent* particleSystem = go->GetComponent< ParticleSystemComponent >();
+                    
+                    if (particleSystem)
+                    {
+                        particleSystem->Simulate( renderer.builtinShaders.particleSimulationShader );
+                        particleSystem->Cull( renderer.builtinShaders.particleCullShader );
+                    }
+                }
             }
             
             RenderWithCamera( rtCamera, 0, rtCamera->GetName() );
@@ -833,7 +847,20 @@ void ae3d::Scene::RenderWithCamera( GameObject* cameraGo, int cubeMapFace, const
     
     if (camera->GetTargetTexture() && camera->GetProjectionType() == ae3d::CameraComponent::ProjectionType::Perspective && !camera->GetTargetTexture()->IsCube() && camera->ShouldRenderParticles())
     {
-        ParticleSystemComponent::Draw( renderer.builtinShaders.particleDrawShader, *camera->GetTargetTexture() );
+        for (auto go : gameObjects)
+        {
+            if (!go || !go->IsEnabled())
+            {
+                continue;
+            }
+
+            ParticleSystemComponent* particleSystem = go->GetComponent< ParticleSystemComponent >();
+            
+            if (particleSystem)
+            {
+                particleSystem->Draw( renderer.builtinShaders.particleDrawShader, *camera->GetTargetTexture() );
+            }
+        }
     }
 }
 
