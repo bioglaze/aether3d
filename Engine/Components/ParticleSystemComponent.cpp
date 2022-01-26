@@ -75,12 +75,27 @@ bool ae3d::ParticleSystemComponent::IsAnyAlive()
     return false;
 }
 
+void ae3d::ParticleSystemComponent::SetMaxParticles( int count )
+{
+    if (count < 100000)
+    {
+        maxParticles = count;
+    }
+    else
+    {
+        System::Print( "Too many particles in SetMaxParticles! Tried to set %d, max is 100000.\n", count );
+        maxParticles = 99999;
+    }
+}
+
 void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 {
     if (!ParticleSystemComponent::IsAnyAlive())
     {
         return;
     }
+    
+    GfxDeviceGlobal::perObjectUboStruct.particleCount = maxParticles;
     
     simulationShader.Begin();
 
@@ -105,6 +120,7 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 
     GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDevice::backBufferWidth;
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDevice::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.particleCount = maxParticles;
     cullShader.Begin();
 
 #if RENDERER_D3D12
@@ -130,6 +146,7 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 
     GfxDeviceGlobal::perObjectUboStruct.windowWidth = GfxDevice::backBufferWidth;
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = GfxDevice::backBufferHeight;
+    GfxDeviceGlobal::perObjectUboStruct.particleCount = maxParticles;
     drawShader.Begin();
 #if RENDERER_D3D12
     TransitionResource( *target.GetGpuResource(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS );

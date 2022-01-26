@@ -700,7 +700,8 @@ using namespace ae3d;
 
     particleGo.SetName( "ParticleSystem" );
     particleGo.AddComponent< ParticleSystemComponent >();
-    particleGo.GetComponent< ParticleSystemComponent>()->SetMaxParticles( 10 );
+    particleGo.GetComponent< ParticleSystemComponent>()->SetMaxParticles( 1000 );
+    particleGo.GetComponent< ParticleSystemComponent>()->SetColor( 1.0f, 0.0f, 0.0f );
     particleGo.AddComponent< TransformComponent >();
     particleGo.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 0, -70 ) );
     scene.Add( &particleGo );

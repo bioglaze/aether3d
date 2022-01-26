@@ -9,7 +9,7 @@ namespace ae3d
         class GameObject* GetGameObject() const { return gameObject; }
 
         int GetMaxParticles() const { return maxParticles; }
-        void SetMaxParticles( int count ) { maxParticles = count; }
+        void SetMaxParticles( int count );
 
         void GetColor( float& outR, float& outG, float& outB )
         {
@@ -48,7 +48,7 @@ namespace ae3d
         static bool IsAnyAlive();
 
         GameObject* gameObject = nullptr;
-        int maxParticles = 100;
+        int maxParticles = 1000;
         float red = 1.0f;
         float green = 1.0f;
         float blue = 1.0f;

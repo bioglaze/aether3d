@@ -507,7 +507,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;
-				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS2;
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -523,7 +523,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks ~/Desktop";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;
-				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS2;
+				PRODUCT_BUNDLE_IDENTIFIER = timowiren.MetalSampleiOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
