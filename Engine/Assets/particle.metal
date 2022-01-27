@@ -41,7 +41,7 @@ kernel void particle_simulation(
     float3 windowCoords = float3( uniforms.windowWidth * unscaledWindowCoords.x, uniforms.windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z );
 
     particleBufferOut[ gid.x ].position = position;
-    particleBufferOut[ gid.x ].color = float4( 1, 1, 1, 1 );
+    particleBufferOut[ gid.x ].color = uniforms.particleColor;
     particleBufferOut[ gid.x ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, clipPos.w );
 }
 
