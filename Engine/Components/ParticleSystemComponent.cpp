@@ -99,6 +99,7 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
     GfxDeviceGlobal::perObjectUboStruct.particleColor.x = red;
     GfxDeviceGlobal::perObjectUboStruct.particleColor.y = green;
     GfxDeviceGlobal::perObjectUboStruct.particleColor.z = blue;
+    GfxDeviceGlobal::perObjectUboStruct.particleColor.w = 1;
     
     simulationShader.Begin();
 
