@@ -19,7 +19,7 @@ struct Particle
 
 float rand_1_05( float2 uv )
 {
-    float2 nois = (fract( sin( dot( uv, float2( 12.9898, 78.233) * 2.0 ) ) * 43758.5453 ) );
+    float2 nois = (fract( sin( dot( uv, float2( 12.9898, 78.233 ) * 2.0 ) ) * 43758.5453 ) );
     return abs( nois.x + nois.y ) * 0.5;
 }
 
@@ -80,8 +80,8 @@ kernel void particle_cull(
         uint il = localIdxFlattened + i;
 
         if (il < (uint)uniforms.particleCount &&
-            particles[ il ].clipPosition.x > globalIdx.x && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES &&
-            particles[ il ].clipPosition.y > globalIdx.y && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES)
+            particles[ il ].clipPosition.x > globalIdx.x - 10 - TILE_RES && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES + 10 &&
+            particles[ il ].clipPosition.y > globalIdx.y - 10 - TILE_RES && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES + 10)
         {
             uint dstIdx = atomic_fetch_add_explicit( &ldsParticleIdxCounter, 1, memory_order::memory_order_relaxed );
             ldsParticlesIdx[ dstIdx ] = il;
