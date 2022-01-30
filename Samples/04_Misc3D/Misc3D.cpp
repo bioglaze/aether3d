@@ -616,7 +616,8 @@ int main()
 
     GameObject particleGo;
     particleGo.AddComponent< ParticleSystemComponent >();
-    particleGo.GetComponent< ParticleSystemComponent >()->SetMaxParticles( 10 );
+    particleGo.GetComponent< ParticleSystemComponent >()->SetMaxParticles( 10000 );
+    particleGo.GetComponent< ParticleSystemComponent >()->SetColor( 1, 0, 0 );
     particleGo.AddComponent< TransformComponent >();
     particleGo.GetComponent< TransformComponent >()->SetLocalPosition( { 20, 40, 0 } );
 

@@ -19,8 +19,9 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float ra = rand_1_05( uv );
     float x = 1;
     float4 position = float4(x * 8 * sin( globalIdx.x * 20 + timeStamp ), globalIdx.x % 20, x * 8 * cos( globalIdx.x * 20 + timeStamp ), 1);
+
     particles[ i ].position = position;
-    particles[ i ].color = float4(1, 1, 1, 1);
+    particles[ i ].color = particleColor;
 
     float4 clipPos = mul( viewToClip, position );
 
