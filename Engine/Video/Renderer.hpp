@@ -13,7 +13,7 @@ namespace ae3d
     
     struct Particle
     {
-        ae3d::Vec4 position;
+        ae3d::Vec4 positionAndSize;
         ae3d::Vec4 color;
         ae3d::Vec4 clipPosition;
     };

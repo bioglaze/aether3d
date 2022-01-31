@@ -18,9 +18,9 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float2 uv = globalIdx.xy;
     float ra = rand_1_05( uv );
     float x = 1;
-    float4 position = float4(x * 8 * sin( globalIdx.x * 20 + timeStamp ), globalIdx.x % 20, x * 8 * cos( globalIdx.x * 20 + timeStamp ), 1);
+    float4 position = float4(x * 8 * sin( globalIdx.x * 20 + timeStamp ), globalIdx.x % 20, x * 8 * cos( globalIdx.x * 20 + timeStamp ), 5 );
 
-    particles[ i ].position = position;
+    particles[ i ].positionAndSize = position;
     particles[ i ].color = particleColor;
 
     float4 clipPos = mul( viewToClip, position );
@@ -38,5 +38,5 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float3 unscaledWindowCoords = 0.5f * ndc + float3(0.5f, 0.5f, 0.5f);
     float3 windowCoords = float3(windowWidth * unscaledWindowCoords.x, windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z);
 
-    particles[ i ].clipPosition = float4(windowCoords.x, windowCoords.y, 5, 1);
+    particles[ i ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, 1 );
 }

@@ -1,7 +1,7 @@
 // Must be kept in sync with ParticleSystemComponent.cpp
 struct Particle
 {
-    float4 position;
+    float4 positionAndSize;
     float4 color;
     float4 clipPosition; // Screen-space position.
 };

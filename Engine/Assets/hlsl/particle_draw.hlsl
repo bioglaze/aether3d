@@ -29,7 +29,7 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         nextParticleIndex = perTileParticleIndexBuffer[ index ];
 
         float dist = distance( particles[ particleIndex ].clipPosition.xy, globalIdx.xy );
-        const float radius = particles[ particleIndex ].clipPosition.z;
+        const float radius = particles[ particleIndex ].positionAndSize.w;
         
         if (dist < radius /* && particles[particleIndex].clipPosition.z / particles[particleIndex].clipPosition.w < depth*/)
         {

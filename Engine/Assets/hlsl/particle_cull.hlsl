@@ -34,11 +34,12 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     for (uint i = 0; i < particleCount; i += NUM_THREADS_PER_TILE)
     {
         uint il = localIdxFlattened + i;
+        const float sizePad = particles[ il ].positionAndSize.w * 2;
 
         if (il < particleCount &&
             particles[ il ].clipPosition.w != 666 && 
-            particles[ il ].clipPosition.x > globalIdx.x - 10 - TILE_RES && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES + 10 &&
-            particles[ il ].clipPosition.y > globalIdx.y - 10 - TILE_RES && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES + 10)
+            particles[ il ].clipPosition.x > globalIdx.x - sizePad - TILE_RES && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES + sizePad &&
+            particles[ il ].clipPosition.y > globalIdx.y - sizePad - TILE_RES && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES + sizePad)
         {
             uint dstIdx = 0;
             InterlockedAdd( ldsParticleIdxCounter, 1, dstIdx );
