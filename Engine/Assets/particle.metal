@@ -12,7 +12,7 @@ using namespace metal;
 
 struct Particle
 {
-    float4 position;
+    float4 positionAndSize;
     float4 color;
     float4 clipPosition;
 };
@@ -32,15 +32,16 @@ kernel void particle_simulation(
 {
     float2 uv = (float2)gid.xy;
     float x = rand_1_05( uv );
-    float4 position = float4( x * 8 * sin( gid.x * 20 + uniforms.timeStamp ), gid.x % 20, x * 8 * cos( gid.x * 20 + uniforms.timeStamp ), 1 );
-
+    float4 position = float4( x * 8 * sin( gid.x * 20 + uniforms.timeStamp ), gid.x % 20, x * 8 * cos( gid.x * 20 + uniforms.timeStamp ), 5 );
+    //position = uniforms.localToWorld * position;
+    
     float4 clipPos = uniforms.viewToClip * position;
     clipPos.y = - clipPos.y;
     float3 ndc = clipPos.xyz / clipPos.w;
     float3 unscaledWindowCoords = 0.5f * ndc + float3( 0.5f, 0.5f, 0.5f );
     float3 windowCoords = float3( uniforms.windowWidth * unscaledWindowCoords.x, uniforms.windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z );
 
-    particleBufferOut[ gid.x ].position = position;
+    particleBufferOut[ gid.x ].positionAndSize = position;
     particleBufferOut[ gid.x ].color = uniforms.particleColor;
     particleBufferOut[ gid.x ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, clipPos.w );
 }
@@ -78,10 +79,11 @@ kernel void particle_cull(
     for (uint i = 0; i < (uint)uniforms.particleCount; i += NUM_THREADS_PER_TILE)
     {
         uint il = localIdxFlattened + i;
-
+        const float sizePad = particles[ il ].positionAndSize.w * 2;
+        
         if (il < (uint)uniforms.particleCount &&
-            particles[ il ].clipPosition.x > globalIdx.x - 10 - TILE_RES && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES + 10 &&
-            particles[ il ].clipPosition.y > globalIdx.y - 10 - TILE_RES && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES + 10)
+            particles[ il ].clipPosition.x > globalIdx.x - sizePad - TILE_RES && particles[ il ].clipPosition.x < globalIdx.x + TILE_RES + sizePad &&
+            particles[ il ].clipPosition.y > globalIdx.y - sizePad - TILE_RES && particles[ il ].clipPosition.y < globalIdx.y + TILE_RES + sizePad)
         {
             uint dstIdx = atomic_fetch_add_explicit( &ldsParticleIdxCounter, 1, memory_order::memory_order_relaxed );
             ldsParticlesIdx[ dstIdx ] = il;
@@ -137,7 +139,7 @@ kernel void particle_draw(
         nextParticleIndex = perTileParticleIndexBuffer[ index ];
 
         float dist = distance( particles[ particleIndex ].clipPosition.xy, (float2)gid.xy );
-        const float radius = 5;
+        const float radius = particles[ particleIndex ].positionAndSize.w;
         if (dist < radius && particles[ particleIndex ].clipPosition.z / particles[ particleIndex ].clipPosition.w < depth)
         {
             color = particles[ particleIndex ].color;
