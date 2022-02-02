@@ -911,7 +911,7 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold,
 #endif
             sv->outlineShader.Begin();
 #if RENDERER_METAL
-            sv->outlineShader.Dispatch( width / 8, height / 8, 1, "Selection Outline", 16, 16 );
+            sv->outlineShader.Dispatch( width / 8, height / 8, 1, "Selection Outline", 8, 8 );
 #else
             sv->outlineShader.Dispatch( width / 8, height / 8, 1, "Selection Outline" );
 #endif
