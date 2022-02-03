@@ -25,7 +25,7 @@ void ae3d::BuiltinShaders::Load()
     
     const unsigned maxParticleCount = 1000000;
     particleBuffer = [GfxDevice::GetMetalDevice() newBufferWithLength:sizeof( Particle ) * maxParticleCount
-                              options:MTLResourceCPUCacheModeDefaultCache];
+                              options:MTLResourceStorageModePrivate];
     particleBuffer.label = @"Particle buffer";
     
     const unsigned tileCount = renderer.GetNumParticleTilesX() * renderer.GetNumParticleTilesY();
