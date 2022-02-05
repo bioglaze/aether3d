@@ -32,7 +32,7 @@ kernel void particle_simulation(
 {
     float2 uv = (float2)gid.xy;
     float x = rand_1_05( uv );
-    float4 position = float4( x * 8 * sin( gid.x * 20 + uniforms.timeStamp ), gid.x % 20, x * 8 * cos( gid.x * 20 + uniforms.timeStamp ), 5 );
+    float4 position = float4( x * 8 * sin( gid.x * 20 + uniforms.timeStamp ), gid.x % 20, x * 8 * cos( gid.x * 20 + uniforms.timeStamp ), 1 );
     //position = uniforms.localToWorld * position;
     
     float4 clipPos = uniforms.viewToClip * position;
@@ -42,6 +42,7 @@ kernel void particle_simulation(
     float3 windowCoords = float3( uniforms.windowWidth * unscaledWindowCoords.x, uniforms.windowHeight * unscaledWindowCoords.y, unscaledWindowCoords.z );
 
     particleBufferOut[ gid.x ].positionAndSize = position;
+    particleBufferOut[ gid.x ].positionAndSize.w = 5;
     particleBufferOut[ gid.x ].color = uniforms.particleColor;
     particleBufferOut[ gid.x ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, clipPos.w );
 }
