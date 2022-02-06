@@ -80,6 +80,7 @@ void ae3d::Material::Apply()
     }
 
     GfxDeviceGlobal::perObjectUboStruct.f0 = f0;
+    GfxDeviceGlobal::perObjectUboStruct.roughness = roughness;
 }
 
 void ae3d::Material::SetShader( Shader* aShader )

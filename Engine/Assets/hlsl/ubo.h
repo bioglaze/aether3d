@@ -44,6 +44,7 @@ cbuffer cbPerFrame : register(b0)
     float4 particleColor;
     int particleCount;
     float timeStamp; // In seconds
+    float roughness;
 };
 Buffer<float4> pointLightBufferCenterAndRadius : register(t5);
 RWBuffer<uint> perTileLightIndexBuffer : register(u0);
@@ -94,6 +95,7 @@ RWBuffer<uint> perTileParticleIndexBuffer : register(u3);
     float4 particleColor;
     int particleCount;
     float timeStamp; // In seconds.
+    float roughness;
 };
 [[vk::binding( 8 )]] Buffer<float4> pointLightBufferCenterAndRadius;
 [[vk::binding( 9 )]] RWBuffer<uint> perTileLightIndexBuffer;

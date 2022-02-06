@@ -19,6 +19,8 @@ namespace ae3d
         /// \return shader.
         class Shader* GetShader() { return shader; }
 
+        float GetRoughness() const { return roughness; }
+        
         /// \return True if the shader exists and has been compiled and linked successfully.
         bool IsValidShader() const;
         
@@ -57,6 +59,9 @@ namespace ae3d
         /// \param f0 Reflectance at grazing angle.
         void SetF0( float f0 );
 
+        /// \param rough Roughness. Defaults to 0.5f. Range is usually 0-1.
+        void SetRoughness( float rough ) { roughness = rough; }
+        
         /// \param texture Texture.
         void SetTexture( class TextureCube* texture );
 
@@ -77,6 +82,7 @@ namespace ae3d
         float depthFactor = 0;
         float depthUnits = 0;
         float f0 = 0.5f;
+        float roughness = 0.5f;
         bool cullBackFaces = true;
     };
 }

@@ -30,6 +30,7 @@ struct Uniforms
     float4 particleColor;
     int particleCount;
     float timeStamp; // In seconds.
+    float roughness;
 };
 
 static float linstep( float low, float high, float v )

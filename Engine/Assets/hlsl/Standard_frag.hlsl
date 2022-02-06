@@ -159,7 +159,6 @@ float4 main( PS_INPUT input ) : SV_Target
     const float dotNH = saturate( dot( N, H ) );
 
     float3 f0v = float3(f0, f0, f0);
-    float roughness = 0.5f;
     float a = roughness * roughness;
     float D = D_GGX( dotNH, a );
     float3 F = F_Schlick( dotLH, f0v );
@@ -198,7 +197,6 @@ float4 main( PS_INPUT input ) : SV_Target
         const float lightDistance = length( vecToLightWS );
 
         float3 f0v = float3( f0, f0, f0 );
-        float roughness = 0.5f;
         float a = roughness * roughness;
         float D = D_GGX( dotNH, a );
         float3 F = F_Schlick( dotLH, f0v );
@@ -246,7 +244,6 @@ float4 main( PS_INPUT input ) : SV_Target
         const float dotNH = saturate( dot( N, H ) );
 
         float3 f0v = float3( f0, f0, f0 );
-        float roughness = 0.5f;
         float a = roughness * roughness;
         float D = D_GGX( dotNH, a );
         float3 F = F_Schlick( dotLH, f0v );

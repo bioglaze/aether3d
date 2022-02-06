@@ -40,6 +40,7 @@ struct PerObjectUboStruct
     ae3d::Vec4 particleColor;
     int particleCount;
     float timeStamp; // In seconds.
+    float roughness;
 };
 
 namespace ae3d
