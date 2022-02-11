@@ -92,6 +92,7 @@ struct SceneView
     Texture2D audioTex;
     Texture2D lightTex;
     Texture2D cameraTex;
+    Texture2D particleTex;
     Texture2D ssaoTex;
     Texture2D composeTex;
     Texture2D bloomTex;
@@ -548,6 +549,7 @@ void svInit( SceneView** sv, int width, int height )
     (*sv)->lightTex.Load( FileSystem::FileContents( "textures/light.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->goTex.Load( FileSystem::FileContents( "textures/gameobject.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
     (*sv)->audioTex.Load( FileSystem::FileContents( "textures/audio_source.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    (*sv)->particleTex.Load( FileSystem::FileContents( "textures/particle.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     (*sv)->material.SetShader( &(*sv)->standardShader );
     (*sv)->material.SetTexture( &(*sv)->gliderTex, 0 );
@@ -1353,6 +1355,11 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         if (sv->gameObjects[ goIndex ]->GetComponent<AudioSourceComponent>())
         {
             sprite = &sv->audioTex;
+        }
+
+        if (sv->gameObjects[ goIndex ]->GetComponent<ParticleSystemComponent>())
+        {
+            sprite = &sv->particleTex;
         }
 
         if (sv->gameObjects[ goIndex ]->GetComponent<CameraComponent>())
