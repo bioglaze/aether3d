@@ -318,6 +318,10 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     particleSystem = nullptr;
                 }
 
+                static nk_colorf color;
+                nk_color_pick( &ctx, &color, NK_RGB );
+                particleSystem->SetColor( color.r, color.g, color.b );
+                
                 nk_tree_pop( &ctx );
                 nk_spacing( &ctx, 1 );
             }
