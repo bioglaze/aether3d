@@ -786,6 +786,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
         [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
+        [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
         [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
     }
     
