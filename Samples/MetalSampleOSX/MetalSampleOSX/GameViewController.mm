@@ -638,7 +638,7 @@ using namespace ae3d;
     }
     pointLight.GetComponent<ae3d::PointLightComponent>()->SetRadius( 10.2f );
     pointLight.AddComponent<ae3d::TransformComponent>();
-    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -80, 0, -85 ) );
+    pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -70 ) );
 
     // Inits point lights for Forward+
     if (TestForwardPlus)
@@ -700,8 +700,8 @@ using namespace ae3d;
 
     particleGo.SetName( "ParticleSystem" );
     particleGo.AddComponent< ParticleSystemComponent >();
-    particleGo.GetComponent< ParticleSystemComponent>()->SetMaxParticles( 1000 );
-    particleGo.GetComponent< ParticleSystemComponent>()->SetColor( 1.0f, 0.0f, 0.0f );
+    particleGo.GetComponent< ParticleSystemComponent>()->SetMaxParticles( 2000 );
+    //particleGo.GetComponent< ParticleSystemComponent>()->SetColor( 1.0f, 0.0f, 0.0f );
     particleGo.AddComponent< TransformComponent >();
     particleGo.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 0, -70 ) );
     scene.Add( &particleGo );

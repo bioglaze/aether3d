@@ -30,7 +30,7 @@ const int POINT_LIGHT_COUNT = (50 * 40 + 48);
 #define MULTISAMPLE_COUNT 1
 #define MAX_UI_VERTEX_MEMORY (512 * 1024)
 #define MAX_UI_ELEMENT_MEMORY (128 * 1024)
-const bool TestBloom = true;
+const bool TestBloom = false;
 const bool TestSSAO = false;
 
 // *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
@@ -156,6 +156,8 @@ int gTouchCount = 0;
     blurTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex", ae3d::DataType::Float, nullptr );
     blurTex2.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "blurTex2", ae3d::DataType::Float, nullptr );
     bloomTex.CreateUAV( self.view.bounds.size.width, self.view.bounds.size.height, "bloomTex", ae3d::DataType::Float, nullptr );
+    ssaoTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoTex", ae3d::DataType::Float, nullptr );
+    ssaoBlurTex.CreateUAV( self.view.bounds.size.width * 2, self.view.bounds.size.height * 2, "ssaoBlurTex", ae3d::DataType::Float, nullptr );
     
     camera2d.AddComponent<ae3d::CameraComponent>();
     camera2d.GetComponent<ae3d::CameraComponent>()->SetProjection( 0, self.view.bounds.size.width, self.view.bounds.size.height, 0, 0, 1 );
@@ -436,7 +438,29 @@ int gTouchCount = 0;
         
         if (TestSSAO)
         {
-            ae3d::System::Draw( &ssaoTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+            ssaoShader.SetRenderTexture( &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture(), 1 );
+            ssaoShader.SetTexture2D( &noiseTex, 3 );
+            ssaoShader.SetTexture2D( &ssaoTex, 2 );
+            ssaoShader.SetProjectionMatrix( camera3d.GetComponent<ae3d::CameraComponent>()->GetProjection() );
+            ssaoShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "SSAO", 16, 16 );
+            
+            blurShader.SetTexture2D( &ssaoTex, 0 );
+            blurShader.SetTexture2D( &ssaoBlurTex, 1 );
+            blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 1, 0 );
+            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurX", 16, 16 );
+            
+            blurShader.SetTexture2D( &ssaoBlurTex, 0 );
+            blurShader.SetTexture2D( &ssaoTex, 1 );
+            blurShader.SetUniform( ae3d::ComputeShader::UniformName::TilesZW, 0, 1 );
+            blurShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "blurY", 16, 16 );
+
+            composeShader.SetRenderTexture( &cameraTex, 0 );
+            composeShader.SetTexture2D( &ssaoBlurTex, 1 );
+            composeShader.SetTexture2D( &ssaoTex, 2 );
+            composeShader.Dispatch( self.view.bounds.size.width / 8, self.view.bounds.size.height / 8, 1, "Compose", 16, 16 );
+
+            ae3d::System::Draw( &ssaoBlurTex, 0, 0, width, height + 16, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Off );
+            ae3d::System::Draw( &camera2dTex, 0, 0, width, height, width, height, ae3d::Vec4( 1, 1, 1, 1 ), ae3d::System::BlendMode::Alpha );
         }
         else
         {
