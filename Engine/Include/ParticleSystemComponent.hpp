@@ -32,7 +32,13 @@ namespace ae3d
         void Cull( class ComputeShader& cullShader );
 
         void Draw( ComputeShader& drawShader, class RenderTexture& target );
-        
+
+        /// \return True, if enabled
+        bool IsEnabled() const { return isEnabled; }
+
+        /// \param enabled True if the component should be audible, false otherwise.
+        void SetEnabled( bool enabled ) { isEnabled = enabled; }
+
     private:
         friend class GameObject;
 
@@ -52,5 +58,6 @@ namespace ae3d
         float red = 1.0f;
         float green = 1.0f;
         float blue = 1.0f;
+        bool isEnabled = true;
     };
 }

@@ -90,7 +90,7 @@ void ae3d::ParticleSystemComponent::SetMaxParticles( int count )
 
 void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 {
-    if (!ParticleSystemComponent::IsAnyAlive())
+    if (!ParticleSystemComponent::IsAnyAlive() || !isEnabled)
     {
         return;
     }
@@ -117,7 +117,7 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
 
 void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 {
-    if (!ParticleSystemComponent::IsAnyAlive())
+    if (!ParticleSystemComponent::IsAnyAlive() || !isEnabled) 
     {
         return;
     }
@@ -143,7 +143,7 @@ void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )
 
 void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTexture& target )
 {
-    if (!ParticleSystemComponent::IsAnyAlive())
+    if (!ParticleSystemComponent::IsAnyAlive() || !isEnabled)
     {
         return;
     }
@@ -186,4 +186,15 @@ void ae3d::ParticleSystemComponent::Draw( ComputeShader& drawShader, RenderTextu
 #endif
 
     drawShader.End();
+}
+
+std::string GetSerialized( ae3d::ParticleSystemComponent* component )
+{
+    std::string str( "particlesystem\n" );
+    float r, g, b;
+    component->GetColor( r, g, b );
+    str += "color " + std::to_string( r ) + " " + std::to_string( g ) + " " + std::to_string( b ) + "\n";
+    str += "particlesystem_enabled " + std::to_string( (int)component->IsEnabled() ) + "\n\n\n";
+    
+    return str;
 }

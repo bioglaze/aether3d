@@ -57,6 +57,7 @@ std::string GetSerialized( const ae3d::DirectionalLightComponent* component );
 std::string GetSerialized( ae3d::PointLightComponent* component );
 std::string GetSerialized( const ae3d::SpotLightComponent* component );
 std::string GetSerialized( ae3d::TransformComponent* component );
+std::string GetSerialized( ae3d::ParticleSystemComponent* component );
 
 namespace GfxDeviceGlobal
 {
@@ -1075,6 +1076,10 @@ std::string ae3d::Scene::GetSerialized() const
         if (gameObject->GetComponent<PointLightComponent>())
         {
             outSerialized += ::GetSerialized( gameObject->GetComponent<PointLightComponent>() );
+        }
+        if (gameObject->GetComponent<ParticleSystemComponent>())
+        {
+            outSerialized += ::GetSerialized( gameObject->GetComponent<ParticleSystemComponent>() );
         }
     }
     return outSerialized;
