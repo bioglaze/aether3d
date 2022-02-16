@@ -320,7 +320,7 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
                 if (particleSystem)
                 {
-                    static nk_colorf color;
+                    static nk_colorf color = { 1, 1, 1, 1 };
                     nk_color_pick( &ctx, &color, NK_RGB );
                     particleSystem->SetColor( color.r, color.g, color.b );
                 }

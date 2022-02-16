@@ -981,6 +981,7 @@ void svSaveScene( SceneView* sv, char* path )
     sv->scene.Remove( &sv->camera );
     sv->scene.Remove( &sv->selectionCamera );
     sv->scene.Remove( &sv->selectionGO );
+    sv->scene.Remove( &sv->objectIdCamera );
     
     if (sv->gameObjects.count > 0 && sv->gameObjects[ 0 ] != nullptr)
     {
@@ -1002,6 +1003,7 @@ void svSaveScene( SceneView* sv, char* path )
     sv->scene.Add( &sv->camera );
     sv->scene.Add( &sv->selectionCamera );
     sv->scene.Add( &sv->selectionGO );
+    sv->scene.Remove( &sv->objectIdCamera );
 }
 
 ae3d::GameObject* svSelectGameObjectIndex( SceneView* sv, int index )
