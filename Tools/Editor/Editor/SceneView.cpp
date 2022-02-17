@@ -1003,7 +1003,7 @@ void svSaveScene( SceneView* sv, char* path )
     sv->scene.Add( &sv->camera );
     sv->scene.Add( &sv->selectionCamera );
     sv->scene.Add( &sv->selectionGO );
-    sv->scene.Remove( &sv->objectIdCamera );
+    sv->scene.Add( &sv->objectIdCamera );
 }
 
 ae3d::GameObject* svSelectGameObjectIndex( SceneView* sv, int index )

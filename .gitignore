@@ -8,6 +8,7 @@
 *.ilk
 *.suo
 *.db
+*.xcuserstate
 .vs/
 x64/
 xcuserdata/

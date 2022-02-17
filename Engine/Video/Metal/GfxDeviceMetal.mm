@@ -757,10 +757,17 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         NSRange range = { 5, 7 };
         NSUInteger offsets[] = { 0, 0, 0, 0, 0, 0, 0 };
         [renderEncoder setFragmentBuffers:buffers offsets:offsets withRange:range];
+        
+        range = { 0, 5 };
+        [renderEncoder setFragmentTextures:textures withRange:range ];
     }
     else
     {
         [renderEncoder setFragmentBuffer:GetCurrentUniformBuffer() offset:0 atIndex:5];
+        [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
+        [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
+        [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
+        [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
     }
     
     static CullMode cachedCullMode = CullMode::Off;
@@ -775,19 +782,6 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
     {
         cachedTriangleFillMode = fillMode;
         [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
-    }
-    
-    if (isStandard)
-    {
-        NSRange range = { 0, 5 };
-        [renderEncoder setFragmentTextures:textures withRange:range ];
-    }
-    else
-    {
-        [renderEncoder setFragmentTexture:textures[ 0 ] atIndex:0];
-        [renderEncoder setFragmentTexture:textures[ 1 ] atIndex:1];
-        [renderEncoder setFragmentTexture:textures[ 3 ] atIndex:3];
-        [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
     }
     
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
