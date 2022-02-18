@@ -182,8 +182,8 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
         if (jl < numSpotLights)
         {
             float4 center = spotLightBufferCenterAndRadius[ jl ];
-            float radius = 20.0;
-            //float radius = center.w;
+
+            float radius = center.w;
             center.xyz = mul( localToView, float4( center.xyz, 1 ) ).xyz;
 
             // test if sphere is intersecting or inside frustum

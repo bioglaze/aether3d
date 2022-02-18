@@ -37,7 +37,7 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = false;
+constexpr bool TestForwardPlus = true;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
@@ -385,7 +385,7 @@ int main()
     GameObject spotLight;
     spotLight.AddComponent<SpotLightComponent>();
     spotLight.GetComponent<SpotLightComponent>()->SetCastShadow( TestShadowsSpot, 1024 );
-    spotLight.GetComponent<SpotLightComponent>()->SetRadius( 2 );
+    spotLight.GetComponent<SpotLightComponent>()->SetRadius( 40 );
     spotLight.GetComponent<SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.GetComponent<SpotLightComponent>()->SetColor( { 1, 0.5f, 0.5f } );
     spotLight.AddComponent<TransformComponent>();
