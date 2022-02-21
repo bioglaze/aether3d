@@ -35,7 +35,7 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-const bool TestForwardPlus = false;
+const bool TestForwardPlus = true;
 const bool TestBloom = false;
 const bool TestSSAO = false;
 const bool TestShadowsDir = false;
@@ -625,7 +625,7 @@ using namespace ae3d;
         spotLight.GetComponent<ae3d::SpotLightComponent>()->SetCastShadow( true, 1024 );
     }
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetColor( Vec3( 1, 0, 0 ) );
-    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetRadius( 2 );
+    spotLight.GetComponent<ae3d::SpotLightComponent>()->SetRadius( 40 );
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.AddComponent<ae3d::TransformComponent>();
     //spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );

@@ -170,7 +170,7 @@ kernel void light_culler(texture2d<float, access::read> depthNormalsTexture [[te
         if (il < numSpotLights)
         {
             float4 center = spotLightBufferCenterAndRadius[ il ];
-            float radius = center.w * 10.0f; // FIXME: Multiply was added, but more clever culling should be done instead.
+            float radius = center.w;
             center.xyz = (uniforms.localToView * float4( center.xyz, 1.0f )).xyz;
 #if USE_MINMAX_Z
             if (-center.z + minZ < radius && center.z - maxZ < radius)
