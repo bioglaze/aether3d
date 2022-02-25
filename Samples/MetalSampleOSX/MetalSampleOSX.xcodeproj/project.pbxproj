@@ -59,6 +59,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AB0A2B7E27C96C6400D3D25D /* DecalRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DecalRendererComponent.hpp; path = ../../Engine/Include/DecalRendererComponent.hpp; sourceTree = "<group>"; };
 		AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */ = {isa = PBXFileReference; lastKnownFileType = file; name = human_anim_test2.ae3d; path = ../../../../aether3d_build/Samples/human_anim_test2.ae3d; sourceTree = "<group>"; };
 		AB2BB13F2160FA8100454B1E /* Bloom.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Bloom.metal; path = ../../../Engine/Assets/Bloom.metal; sourceTree = "<group>"; };
 		AB2CA8241C1332A900D4D7C4 /* libAether3D_OSX_Metal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAether3D_OSX_Metal.a; path = ../../../aether3d_build/libAether3D_OSX_Metal.a; sourceTree = "<group>"; };
@@ -259,6 +260,7 @@
 				ABE04FA51C1217A40025C436 /* AudioSourceComponent.hpp */,
 				ABE04FA61C1217A40025C436 /* CameraComponent.hpp */,
 				AB3616691D945400001149E0 /* ComputeShader.hpp */,
+				AB0A2B7E27C96C6400D3D25D /* DecalRendererComponent.hpp */,
 				ABE04FA71C1217A40025C436 /* DirectionalLightComponent.hpp */,
 				ABE04FA81C1217A40025C436 /* FileSystem.hpp */,
 				ABE04FA91C1217A40025C436 /* Font.hpp */,

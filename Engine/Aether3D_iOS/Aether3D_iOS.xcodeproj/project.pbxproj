@@ -57,6 +57,8 @@
 		449A595F1B451E7D00A7FFE8 /* SubMesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */; };
 		44E5FC991B399E6C009AC088 /* RendererCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC971B399E6C009AC088 /* RendererCommon.cpp */; };
 		44E5FC9A1B399E6C009AC088 /* TextureCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44E5FC981B399E6C009AC088 /* TextureCommon.cpp */; };
+		AB0A2B8027C96CC900D3D25D /* DecalRendererComponent.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB0A2B7F27C96CC900D3D25D /* DecalRendererComponent.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		AB0A2B8227C96CDD00D3D25D /* DecalRendererComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB0A2B8127C96CDD00D3D25D /* DecalRendererComponent.cpp */; };
 		AB190E321B57DE73005ECE49 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB190E311B57DE73005ECE49 /* Material.cpp */; };
 		AB190E341B57DE85005ECE49 /* Material.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB190E331B57DE85005ECE49 /* Material.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB29D44A1D773E6800E998FC /* DDSLoader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AB29D4491D773E6800E998FC /* DDSLoader.hpp */; };
@@ -145,6 +147,8 @@
 		449A595E1B451E7D00A7FFE8 /* SubMesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SubMesh.hpp; path = ../../Core/SubMesh.hpp; sourceTree = "<group>"; };
 		44E5FC971B399E6C009AC088 /* RendererCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RendererCommon.cpp; path = ../../Video/RendererCommon.cpp; sourceTree = "<group>"; };
 		44E5FC981B399E6C009AC088 /* TextureCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCommon.cpp; path = ../../Video/TextureCommon.cpp; sourceTree = "<group>"; };
+		AB0A2B7F27C96CC900D3D25D /* DecalRendererComponent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DecalRendererComponent.hpp; path = ../../Include/DecalRendererComponent.hpp; sourceTree = "<group>"; };
+		AB0A2B8127C96CDD00D3D25D /* DecalRendererComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DecalRendererComponent.cpp; path = ../../Components/DecalRendererComponent.cpp; sourceTree = "<group>"; };
 		AB190E311B57DE73005ECE49 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Material.cpp; path = ../../Video/Material.cpp; sourceTree = "<group>"; };
 		AB190E331B57DE85005ECE49 /* Material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Material.hpp; path = ../../Include/Material.hpp; sourceTree = "<group>"; };
 		AB29D4491D773E6800E998FC /* DDSLoader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DDSLoader.hpp; path = ../../Video/DDSLoader.hpp; sourceTree = "<group>"; };
@@ -239,6 +243,7 @@
 				4449E8431B14B423009A869C /* CameraComponent.hpp */,
 				AB921DB21CC21B34008F5750 /* ComputeShader.hpp */,
 				AB29D4491D773E6800E998FC /* DDSLoader.hpp */,
+				AB0A2B7F27C96CC900D3D25D /* DecalRendererComponent.hpp */,
 				ABB79F991BA9B7BC002A1B5F /* DirectionalLightComponent.hpp */,
 				4449E8441B14B423009A869C /* FileSystem.hpp */,
 				4449E8451B14B423009A869C /* Font.hpp */,
@@ -297,6 +302,7 @@
 			isa = PBXGroup;
 			children = (
 				4449E8791B14B46C009A869C /* AudioSourceComponent.cpp */,
+				AB0A2B8127C96CDD00D3D25D /* DecalRendererComponent.cpp */,
 				ABB79F971BA9B7A5002A1B5F /* DirectionalLightComponent.cpp */,
 				4449E87A1B14B46C009A869C /* CameraComponent.cpp */,
 				4449E87B1B14B46C009A869C /* GameObject.cpp */,
@@ -374,6 +380,7 @@
 				AB3016D21D831DBC00832A69 /* LightTiler.hpp in Headers */,
 				AB521D111BC045BC004CDF06 /* TextureCube.hpp in Headers */,
 				ABF341E81B1A277B0017797C /* TextureBase.hpp in Headers */,
+				AB0A2B8027C96CC900D3D25D /* DecalRendererComponent.hpp in Headers */,
 				4449E8601B14B423009A869C /* Texture2D.hpp in Headers */,
 				4449E85E1B14B423009A869C /* System.hpp in Headers */,
 				AB29D44A1D773E6800E998FC /* DDSLoader.hpp in Headers */,
@@ -495,6 +502,7 @@
 				4449E8801B14B46C009A869C /* CameraComponent.cpp in Sources */,
 				AB539BB126C2ECB7001391A2 /* ParticleSystemComponent.cpp in Sources */,
 				4449E8991B14B4B5009A869C /* Texture2DMetal.mm in Sources */,
+				AB0A2B8227C96CDD00D3D25D /* DecalRendererComponent.cpp in Sources */,
 				4449E88B1B14B48E009A869C /* stb_vorbis.c in Sources */,
 				ABB79F981BA9B7A5002A1B5F /* DirectionalLightComponent.cpp in Sources */,
 				AB61DA551DAD633F0068A5FE /* MathUtil.cpp in Sources */,

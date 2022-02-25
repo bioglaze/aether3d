@@ -10,6 +10,7 @@
 #include "AudioSourceComponent.hpp"
 #include "AudioSystem.hpp"
 #include "CameraComponent.hpp"
+#include "DecalRendererComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "Frustum.hpp"
@@ -58,6 +59,7 @@ std::string GetSerialized( ae3d::PointLightComponent* component );
 std::string GetSerialized( const ae3d::SpotLightComponent* component );
 std::string GetSerialized( ae3d::TransformComponent* component );
 std::string GetSerialized( ae3d::ParticleSystemComponent* component );
+std::string GetSerialized( ae3d::DecalRendererComponent* component );
 
 namespace GfxDeviceGlobal
 {
@@ -1080,6 +1082,10 @@ std::string ae3d::Scene::GetSerialized() const
         if (gameObject->GetComponent<ParticleSystemComponent>())
         {
             outSerialized += ::GetSerialized( gameObject->GetComponent<ParticleSystemComponent>() );
+        }
+        if (gameObject->GetComponent<DecalRendererComponent>())
+        {
+            outSerialized += ::GetSerialized( gameObject->GetComponent<DecalRendererComponent>() );
         }
     }
     return outSerialized;

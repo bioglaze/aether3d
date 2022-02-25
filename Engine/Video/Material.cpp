@@ -48,8 +48,6 @@ void ae3d::Material::Apply()
     if (sTexRT)
     {
 #if RENDERER_METAL
-        int texUnit = 1;
-        
         if (sTexRT->IsCube())
         {
             shader->SetRenderTexture( sTexRT, 2 );

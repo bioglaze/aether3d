@@ -4,6 +4,7 @@
 #include "AudioSourceComponent.hpp"
 #include "AudioClip.hpp"
 #include "CameraComponent.hpp"
+#include "DecalRendererComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "GameObject.hpp"
@@ -236,7 +237,8 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
         DirectionalLightComponent* dirLight = gameObject ? gameObject->GetComponent< DirectionalLightComponent >() : nullptr;
         ParticleSystemComponent* particleSystem = gameObject ? gameObject->GetComponent< ParticleSystemComponent >() : nullptr;
         TextRendererComponent* textRenderer = gameObject ? gameObject->GetComponent< TextRendererComponent >() : nullptr;
-
+        DecalRendererComponent* decalRenderer = gameObject ? gameObject->GetComponent< DecalRendererComponent >() : nullptr;
+        
         if (gameObject != nullptr && transform != nullptr)
         {
             nk_label( &ctx, "Position", NK_TEXT_LEFT );
