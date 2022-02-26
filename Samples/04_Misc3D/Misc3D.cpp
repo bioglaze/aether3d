@@ -6,6 +6,7 @@
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
 #include "ComputeShader.hpp"
+#include "DecalRendererComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "FileSystem.hpp"
 #include "Font.hpp"
@@ -37,7 +38,7 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = true;
+constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples

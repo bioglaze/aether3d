@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Quaternion.hpp"
+
 namespace ae3d
 {
     class DecalRendererComponent
@@ -23,6 +25,12 @@ namespace ae3d
         /// \param theTexture Texture that's projected to the decal's area.
         void SetTexture( Texture2D* theTexture ) { texture = theTexture; }
         
+        ///  \return Orientation
+        Quaternion GetOrientation() const { return orientation; }
+
+        ///  \param q Orientation
+        void SetOrientation( struct Quaternion& q ) { orientation = q; }
+
     private:
         friend class GameObject;
         friend class Scene;
@@ -38,6 +46,7 @@ namespace ae3d
                 
         GameObject* gameObject = nullptr;
         Texture2D* texture = nullptr;
+        Quaternion orientation;
         bool isEnabled = true;
     };
 }
