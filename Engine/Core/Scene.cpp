@@ -1200,6 +1200,48 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             meshRenderer->SetEnabled( enabled != 0 );
         }
+        else if (token == "particlesystem_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found \"particlesystem_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto particleSystem = outGameObjects.back().GetComponent< ParticleSystemComponent >();
+
+            if ( particleSystem == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found \"particlesystem_enabled\" but the game object doesn't have a particle system component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            particleSystem->SetEnabled( enabled != 0 );
+        }
+        else if (token == "decalrenderer_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found \"decalrenderer_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto decalRenderer = outGameObjects.back().GetComponent< DecalRendererComponent >();
+
+            if (decalRenderer == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found \"decalrenderer_enabled\" but the game object doesn't have a decal renderer component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            decalRenderer->SetEnabled( enabled != 0 );
+        }
         else if (token == "transform_enabled")
         {
             if (outGameObjects.empty())
@@ -1258,6 +1300,30 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             lineStream >> shadowStr;
             lineStream >> castsShadow;
             outGameObjects.back().GetComponent< DirectionalLightComponent >()->SetCastShadow( castsShadow != 0, 512 );
+        }
+        else if (token == "particlesystem")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found particlesystem but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+            
+            outGameObjects.back().AddComponent< ParticleSystemComponent >();
+
+            float r, g, b;
+            lineStream >> r >> g >> b;
+            outGameObjects.back().GetComponent< ParticleSystemComponent >()->SetColor( r, g, b );
+        }
+        else if (token == "decalrenderer")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found decalrenderer but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+            
+            outGameObjects.back().AddComponent< DecalRendererComponent >();
         }
         else if (token == "spotlight")
         {
