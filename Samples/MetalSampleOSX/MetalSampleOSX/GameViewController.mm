@@ -15,6 +15,7 @@
 #import "AudioClip.hpp"
 #import "CameraComponent.hpp"
 #import "ComputeShader.hpp"
+#import "DecalRendererComponent.hpp"
 #import "DirectionalLightComponent.hpp"
 #import "Font.hpp"
 #import "FileSystem.hpp"
@@ -235,6 +236,7 @@ using namespace ae3d;
     GameObject audioGo;
     GameObject audioContainer;
     GameObject particleGo;
+    GameObject decalGo;
     AudioClip audioClip;
 
     Scene scene;
@@ -404,7 +406,7 @@ using namespace ae3d;
     camera2d.AddComponent<ae3d::TransformComponent>();
 
     const float aspect = _view.bounds.size.width / (float)_view.bounds.size.height;
-
+    
     camera3d.SetName( "Camera3D" );
     camera3d.AddComponent<ae3d::CameraComponent>();
     camera3d.GetComponent<ae3d::CameraComponent>()->SetProjection( 45, aspect, 1, 200 );
@@ -435,6 +437,13 @@ using namespace ae3d;
 
     playerTex.Load( ae3d::FileSystem::FileContents( "textures/player.png" ), ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, ae3d::Mipmaps::Generate, ae3d::ColorSpace::SRGB, ae3d::Anisotropy::k1 );
 
+    decalGo.SetName( "Decal" );
+    decalGo.AddComponent< ae3d::DecalRendererComponent >();
+    decalGo.GetComponent< ae3d::DecalRendererComponent >()->SetTexture( &gliderTex );
+    decalGo.AddComponent< ae3d::TransformComponent >();
+    decalGo.GetComponent< ae3d::TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 0, -70 ) );
+    scene.Add( &decalGo );
+    
     skyTex.Load( ae3d::FileSystem::FileContents( "left.jpg" ), ae3d::FileSystem::FileContents( "right.jpg" ),
                 ae3d::FileSystem::FileContents( "bottom.jpg" ), ae3d::FileSystem::FileContents( "top.jpg" ),
                 ae3d::FileSystem::FileContents( "front.jpg" ), ae3d::FileSystem::FileContents( "back.jpg" ),
