@@ -277,6 +277,12 @@ int main()
     childCube.GetComponent< TransformComponent >()->SetLocalPosition( { 3, 0, 0 } );
     childCube.GetComponent< TransformComponent >()->SetParent( rotatingCube.GetComponent< TransformComponent >() );
 
+    GameObject decalGo;
+    decalGo.AddComponent< TransformComponent >();
+    decalGo.GetComponent< TransformComponent >()->SetLocalPosition( { 3, 0, 0 } );
+    decalGo.AddComponent< DecalRendererComponent >();
+    decalGo.GetComponent< DecalRendererComponent >()->SetTexture( &fontTex );
+
     Mesh cubeMesh2;
     cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
     
@@ -623,6 +629,7 @@ int main()
     particleGo.GetComponent< TransformComponent >()->SetLocalPosition( { 20, 40, 0 } );
 
     scene.Add( &particleGo );
+    scene.Add( &decalGo );
     
     scene.SetSkybox( &skybox );
     scene.Add( &camera );
