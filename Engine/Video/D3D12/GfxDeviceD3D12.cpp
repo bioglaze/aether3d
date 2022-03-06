@@ -1090,6 +1090,16 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
         hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
         AE3D_CHECK_D3D( hr, "Infoqueue failed" );
         GfxDeviceGlobal::infoQueue->SetBreakOnSeverity( D3D12_MESSAGE_SEVERITY_ERROR, TRUE );
+
+        ID3D12DebugDevice2* debugDevice = nullptr;
+        dhr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &debugDevice ) );
+        
+        if (dhr == S_OK)
+        {
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE param = D3D12_DEBUG_DEVICE_PARAMETER_FEATURE_FLAGS;
+            UINT flags = D3D12_DEBUG_FEATURE_ALLOW_BEHAVIOR_CHANGING_DEBUG_AIDS;
+            debugDevice->SetDebugParameter( param, &flags, sizeof( D3D12_DEBUG_FEATURE ) );
+        }
     }
 
     hr = GfxDeviceGlobal::device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS( &GfxDeviceGlobal::commandListAllocator ) );

@@ -572,7 +572,7 @@ int main()
     RenderTexture rtTex;
     const auto dataType = camera2d.GetComponent<CameraComponent>()->GetTargetTexture() != nullptr ? ae3d::DataType::Float : ae3d::DataType::UByte;
     rtTex.Create2D( 512, 512, dataType, TextureWrap::Clamp, TextureFilter::Linear, "rtTex", false, ae3d::RenderTexture::UavFlag::Disabled );
-    
+
     GameObject renderTextureContainer;
     renderTextureContainer.SetName( "renderTextureContainer" );
     renderTextureContainer.AddComponent<SpriteRendererComponent>();
