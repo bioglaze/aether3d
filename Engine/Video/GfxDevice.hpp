@@ -41,6 +41,7 @@ struct PerObjectUboStruct
     int particleCount;
     float timeStamp; // In seconds.
     float roughness;
+    float alphaThreshold;
 };
 
 namespace ae3d

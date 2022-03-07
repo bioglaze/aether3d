@@ -82,10 +82,11 @@ namespace ae3d
         /// \param shadowProjection Shadow camera projection matrix.
         /// \param overrideShader Override shader. Used for shadow pass.
         /// \param overrideSkinShader Override shader for skinned meshes. Used for shadow pass.
+        /// \param overrideAlphaTestShader Override shader that does alpha testing. Used for shadow pass.
         /// \param renderType Renderer type.
         void Render( const struct Matrix44& localToView, const Matrix44& localToClip, const Matrix44& localToWorld,
                      const Matrix44& shadowView, const Matrix44& shadowProjection, class Shader* overrideShader,
-                     Shader* overrideSkinShader, RenderType renderType );
+                     Shader* overrideSkinShader, Shader* overrideAlphaTestShader, RenderType renderType );
 
         Mesh* mesh = nullptr;
         Array< Material* > materials;

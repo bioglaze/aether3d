@@ -69,6 +69,20 @@ namespace ae3d
         /// \param slot Slot in the shader.
         void SetRenderTexture( RenderTexture* renderTexture, int slot );
         
+        /// \return Alpha threshold. Values below it are discarded.
+        float GetAlphaThreshold() const { return alphaThreshold; }
+
+        /// \return True, if the mesh is alpha tested.
+        bool IsAlphaTested() const { return alphaTest; }
+
+        /// \param enable Enable alpha testing. Currently only used for shadow rendering!
+        /// \param threshold Alpha threshold.
+        void SetAlphaTest( bool enable, float threshold )
+        {
+            alphaTest = enable;
+            alphaThreshold = threshold;
+        }
+
   private:
         static RenderTexture* sTexRT;
 
@@ -83,6 +97,8 @@ namespace ae3d
         float depthUnits = 0;
         float f0 = 0.5f;
         float roughness = 0.5f;
+        float alphaThreshold = 0.5f;
+        bool alphaTest = false;
         bool cullBackFaces = true;
     };
 }

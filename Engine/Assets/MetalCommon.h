@@ -31,6 +31,7 @@ struct Uniforms
     int particleCount;
     float timeStamp; // In seconds.
     float roughness;
+    float alphaThreshold;
 };
 
 static float linstep( float low, float high, float v )

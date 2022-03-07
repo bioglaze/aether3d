@@ -163,7 +163,7 @@ void ae3d::MeshRendererComponent::ApplySkin( unsigned subMeshIndex )
 
 void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Matrix44& localToClip, const Matrix44& localToWorld,
                                           const Matrix44& shadowView, const Matrix44& shadowProjection, Shader* overrideShader,
-                                          Shader* overrideSkinShader, RenderType renderType )
+                                          Shader* overrideSkinShader, Shader* overrideAlphaTestShader, RenderType renderType )
 {
     if (isCulled || !mesh || !isEnabled)
     {
@@ -197,12 +197,19 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
             shader = overrideSkinShader;
         }
         
+        if (overrideAlphaTestShader)
+        {
+            shader = overrideAlphaTestShader;
+        }
+
         GfxDevice::CullMode cullMode = GfxDevice::CullMode::Back;
         GfxDevice::BlendMode blendMode = GfxDevice::BlendMode::Off;
 
 #if AE3D_OPENVR
         GfxDeviceGlobal::perObjectUboStruct.isVR = 1;
 #endif
+
+        GfxDeviceGlobal::perObjectUboStruct.alphaThreshold = materials[ subMeshIndex ]->GetAlphaThreshold();
 
         if (overrideShader)
         {

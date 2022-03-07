@@ -45,6 +45,7 @@ cbuffer cbPerFrame : register(b0)
     int particleCount;
     float timeStamp; // In seconds
     float roughness;
+    float alphaThreshold;
 };
 Buffer<float4> pointLightBufferCenterAndRadius : register(t5);
 RWBuffer<uint> perTileLightIndexBuffer : register(u0);
