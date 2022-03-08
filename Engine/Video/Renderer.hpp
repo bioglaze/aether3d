@@ -28,6 +28,7 @@ namespace ae3d
         Shader skyboxShader;
         Shader momentsShader;
         Shader momentsSkinShader;
+        Shader momentsAlphaTestShader;
         Shader depthNormalsShader;
         Shader depthNormalsSkinShader;
         Shader uiShader;

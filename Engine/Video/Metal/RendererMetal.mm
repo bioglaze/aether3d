@@ -15,6 +15,7 @@ void ae3d::BuiltinShaders::Load()
     skyboxShader.LoadFromLibrary( "skybox_vertex", "skybox_fragment" );
     momentsShader.LoadFromLibrary( "moments_vertex", "moments_fragment" );
     momentsSkinShader.LoadFromLibrary( "moments_skin_vertex", "moments_fragment" );
+    momentsAlphaTestShader.LoadFromLibrary( "moments_vertex", "moments_alphatest_fragment" );
     depthNormalsShader.LoadFromLibrary( "depthnormals_vertex", "depthnormals_fragment" );
     depthNormalsSkinShader.LoadFromLibrary( "depthnormals_skin_vertex", "depthnormals_fragment" );
     lightCullShader.Load( "light_culler", FileSystem::FileContents(""), FileSystem::FileContents("") );

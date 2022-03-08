@@ -73,3 +73,23 @@ fragment float4 moments_fragment( ColorInOut in [[stage_in]] )
 
     return float4( moment1, moment2, 0.0, 0.0 );
 }
+
+constexpr sampler s( coord::normalized, address::repeat, filter::linear );
+
+fragment float4 moments_alphatest_fragment( ColorInOut in [[stage_in]],
+                                            constant Uniforms& uniforms [[ buffer(5) ]],
+                                            texture2d<float, access::sample> texture [[texture(0)]])
+{
+    float linearDepth = in.position.z;
+
+    float dx = dfdx( linearDepth );
+    float dy = dfdy( linearDepth );
+    
+    float moment1 = linearDepth;
+    // Compute second moment over the pixel extents.
+    float moment2 = linearDepth * linearDepth + 0.25f * (dx * dx + dy * dy);
+
+    //float alphaTest = texture.sample( s, in.texCoords ) ).r;
+
+    return float4( moment1, moment2, 0.0, 0.0 );
+}
