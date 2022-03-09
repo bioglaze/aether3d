@@ -73,13 +73,13 @@ namespace ae3d
         float GetAlphaThreshold() const { return alphaThreshold; }
 
         /// \return True, if the mesh is alpha tested.
-        bool IsAlphaTested() const { return alphaTest; }
+        bool IsAlphaTested() const { return alphaTest != nullptr; }
 
-        /// \param enable Enable alpha testing. Currently only used for shadow rendering!
+        /// \param texture If not null, enable alpha testing. Currently only used for shadow rendering!
         /// \param threshold Alpha threshold.
-        void SetAlphaTest( bool enable, float threshold )
+        void SetAlphaTest( Texture2D* texture, float threshold )
         {
-            alphaTest = enable;
+            alphaTest = texture;
             alphaThreshold = threshold;
         }
 
@@ -98,7 +98,7 @@ namespace ae3d
         float f0 = 0.5f;
         float roughness = 0.5f;
         float alphaThreshold = 0.5f;
-        bool alphaTest = false;
+        Texture2D* alphaTest = nullptr;
         bool cullBackFaces = true;
     };
 }

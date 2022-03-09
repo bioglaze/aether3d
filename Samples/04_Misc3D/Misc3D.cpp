@@ -35,7 +35,7 @@
 constexpr bool TestMSAA = false;
 constexpr bool TestRenderTexture2D = false;
 constexpr bool TestRenderTextureCube = false;
-constexpr bool TestShadowsDir = false;
+constexpr bool TestShadowsDir = true;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
@@ -362,6 +362,7 @@ int main()
     material.SetShader( &shader );
     material.SetTexture( &gliderTex, 0 );
     material.SetBackFaceCulling( true );
+    material.SetAlphaTest( &gliderTex, 0.5f );
 
     Material materialSkin;
     materialSkin.SetShader( &shaderSkin );

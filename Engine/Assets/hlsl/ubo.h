@@ -97,6 +97,7 @@ RWBuffer<uint> perTileParticleIndexBuffer : register(u3);
     int particleCount;
     float timeStamp; // In seconds.
     float roughness;
+    float alphaThreshold;
 };
 [[vk::binding( 8 )]] Buffer<float4> pointLightBufferCenterAndRadius;
 [[vk::binding( 9 )]] RWBuffer<uint> perTileLightIndexBuffer;

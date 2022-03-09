@@ -6,6 +6,7 @@ SET COMPILER=dxc.exe
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T vs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\depthnormals_skin_vert.obj hlsl\depthnormals_skin_vert.hlsl
 
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T ps_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\moments_frag.obj hlsl\moments_frag.hlsl
+%COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T ps_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\moments_alphatest_frag.obj hlsl\moments_alphatest_frag.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T vs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\moments_vert.obj hlsl\moments_vert.hlsl
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T vs_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\moments_skin_vert.obj hlsl\moments_skin_vert.hlsl
 

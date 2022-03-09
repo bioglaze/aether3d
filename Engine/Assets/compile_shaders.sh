@@ -8,6 +8,7 @@ dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T vs_6_0 hlsl/unlit_skin_
 dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T vs_6_0 hlsl/moments_vert.hlsl -Fo ../../../aether3d_build/Samples/shaders/moments_vert.spv
 dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T vs_6_0 hlsl/moments_skin_vert.hlsl -Fo ../../../aether3d_build/Samples/shaders/moments_skin_vert.spv
 dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T ps_6_0 hlsl/moments_frag.hlsl -Fo ../../../aether3d_build/Samples/shaders/moments_frag.spv
+dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T ps_6_0 hlsl/moments_alphatest_frag.hlsl -Fo ../../../aether3d_build/Samples/shaders/moments_alphatest_frag.spv
 dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T vs_6_0 hlsl/skybox_vert.hlsl -Fo ../../../aether3d_build/Samples/shaders/skybox_vert.spv
 dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T ps_6_0 hlsl/skybox_frag.hlsl -Fo ../../../aether3d_build/Samples/shaders/skybox_frag.spv
 dxc -DVULKAN -Ges -spirv -E main -all-resources-bound -T vs_6_0 hlsl/depthnormals_vert.hlsl -Fo ../../../aether3d_build/Samples/shaders/depthnormals_vert.spv

@@ -1012,7 +1012,7 @@ void ae3d::Scene::RenderShadowsWithCamera( GameObject* cameraGo, int cubeMapFace
         
         meshRenderer->Cull( frustum, meshLocalToWorld );
         meshRenderer->Render( localToView, localToClip, meshLocalToWorld, SceneGlobal::shadowCameraViewMatrix, SceneGlobal::shadowCameraProjectionMatrix, &renderer.builtinShaders.momentsShader,
-                             &renderer.builtinShaders.momentsSkinShader, nullptr, MeshRendererComponent::RenderType::Opaque );
+                             &renderer.builtinShaders.momentsSkinShader, &renderer.builtinShaders.momentsAlphaTestShader, MeshRendererComponent::RenderType::Opaque );
     }
 
     GfxDevice::PopGroupMarker();

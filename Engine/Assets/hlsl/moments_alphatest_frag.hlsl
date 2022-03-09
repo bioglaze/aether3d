@@ -1,3 +1,5 @@
+#include "ubo.h"
+
 struct VSOutput
 {
     float4 pos : SV_Position;
@@ -14,5 +16,7 @@ float4 main( VSOutput vsOut ) : SV_Target
     float moment1 = linearDepth;
     float moment2 = linearDepth * linearDepth + 0.25f * (dx * dx + dy * dy);
     
-    return float4( moment1, moment2, 0.0f, 1.0f );
+    float alphaTest = tex.Sample( sLinear, vsOut.uv ).r;
+
+    return alphaTest > alphaThreshold ? float4( moment1, moment2, 0.0f, 1.0f ) : float4( 1, 1, 0, 0 );
 }

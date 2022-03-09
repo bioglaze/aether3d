@@ -197,7 +197,7 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
             shader = overrideSkinShader;
         }
         
-        if (overrideAlphaTestShader)
+        if (overrideAlphaTestShader && materials[ subMeshIndex ]->IsAlphaTested())
         {
             shader = overrideAlphaTestShader;
         }
@@ -213,7 +213,8 @@ void ae3d::MeshRendererComponent::Render( const Matrix44& localToView, const Mat
 
         if (overrideShader)
         {
-            shader->Use();
+            materials[ subMeshIndex ]->Apply();
+
             GfxDeviceGlobal::perObjectUboStruct.localToClip = localToClip;
             GfxDeviceGlobal::perObjectUboStruct.localToView = localToView;
             ApplySkin( subMeshIndex );
