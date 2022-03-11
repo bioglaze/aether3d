@@ -32,6 +32,11 @@ void ae3d::Material::Apply()
         shader->SetTexture( tex2dSlots[ slot ], slot );
     }
 
+    if (alphaTest)
+    {
+        shader->SetTexture( alphaTest, 0 );
+    }
+    
     for (int slot = 0; slot < TEXTURE_SLOT_COUNT; ++slot)
     {
         if (texCubeSlots[ slot ])
