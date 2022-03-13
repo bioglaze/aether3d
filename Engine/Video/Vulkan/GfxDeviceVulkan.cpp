@@ -990,6 +990,7 @@ namespace ae3d
         AE3D_CHECK_VULKAN( result, "device" );
 
         vkGetPhysicalDeviceMemoryProperties( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::deviceMemoryProperties );
+
         vkGetDeviceQueue( GfxDeviceGlobal::device, graphicsQueueIndex, 0, &GfxDeviceGlobal::graphicsQueue );
 
         const VkFormat depthFormats[ 4 ] = { VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D16_UNORM_S8_UINT, VK_FORMAT_D16_UNORM };
@@ -1967,8 +1968,23 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
 {
-    // TODO: Use VK_EXT_memory_budget
-    outUsedMBytes = 0;
+    VkPhysicalDeviceMemoryBudgetPropertiesEXT propExt = {};
+    propExt.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
+
+    VkPhysicalDeviceMemoryProperties2 deviceMemoryProperties2 = {};
+    deviceMemoryProperties2 = {};
+    deviceMemoryProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
+    deviceMemoryProperties2.pNext = &propExt;
+    vkGetPhysicalDeviceMemoryProperties2( GfxDeviceGlobal::physicalDevice, &deviceMemoryProperties2 );
+
+    size_t usageSum = 0;
+
+    for (size_t i = 0; i < GfxDeviceGlobal::deviceMemoryProperties.memoryHeapCount; ++i)
+    {
+        usageSum += propExt.heapUsage[ i ];
+    }
+
+    outUsedMBytes = usageSum;
     outBudgetMBytes = 0;
 }
 
