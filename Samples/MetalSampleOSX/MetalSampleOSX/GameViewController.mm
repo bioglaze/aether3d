@@ -39,7 +39,7 @@
 const bool TestForwardPlus = true;
 const bool TestBloom = false;
 const bool TestSSAO = false;
-const bool TestShadowsDir = false;
+const bool TestShadowsDir = true;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
 const bool TestRenderTexture2D = false;
@@ -504,6 +504,7 @@ using namespace ae3d;
     
     cubeMaterial.SetShader( &shader );
     cubeMaterial.SetTexture( &gliderTex, 0 );
+    cubeMaterial.SetAlphaTest( &gliderTex, 0.5f );
     //cubeMaterial.SetRenderTexture( "textureMap", &camera3d.GetComponent<ae3d::CameraComponent>()->GetDepthNormalsTexture() );
 
     skinMaterial.SetShader( &skinShader );
@@ -546,7 +547,7 @@ using namespace ae3d;
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     rotatingCube.AddComponent<ae3d::TransformComponent>();
-    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, 0 ) );
+    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -17, -80 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
 
     wireframeGo.AddComponent<ae3d::MeshRendererComponent>();

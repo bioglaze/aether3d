@@ -8,6 +8,7 @@ using namespace metal;
 struct Vertex
 {
     float3 position [[attribute(0)]];
+    float2 texcoord [[attribute(1)]];
 };
 
 struct VertexSkin
@@ -20,6 +21,7 @@ struct VertexSkin
 struct ColorInOut
 {
     float4 position [[position]];
+    float2 texCoords;
 };
 
 vertex ColorInOut moments_skin_vertex( VertexSkin vert [[stage_in]],
@@ -51,7 +53,8 @@ vertex ColorInOut moments_vertex(Vertex vert [[stage_in]],
 
     float4 in_position = float4( vert.position, 1.0 );
     out.position = uniforms.localToClip * in_position;
-
+    out.texCoords = vert.texcoord;
+    
     if (uniforms.lightType == 2)
     {
         out.position.z = out.position.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
@@ -89,7 +92,7 @@ fragment float4 moments_alphatest_fragment( ColorInOut in [[stage_in]],
     // Compute second moment over the pixel extents.
     float moment2 = linearDepth * linearDepth + 0.25f * (dx * dx + dy * dy);
 
-    //float alphaTest = texture.sample( s, in.texCoords ) ).r;
+    float alphaTest = texture.sample( s, in.texCoords ).r;
 
-    return float4( moment1, moment2, 0.0, 0.0 );
+    return alphaTest > uniforms.alphaThreshold ? float4( moment1, moment2, 0.0, 0.0 ) : float4( 1, 1, 0, 0 );
 }
