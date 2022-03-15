@@ -3,6 +3,7 @@
 #include "GameObject.hpp"
 #include "AudioSourceComponent.hpp"
 #include "CameraComponent.hpp"
+#include "DecalRendererComponent.hpp"
 #include "DirectionalLightComponent.hpp"
 #include "LineRendererComponent.hpp"
 #include "MeshRendererComponent.hpp"
@@ -118,6 +119,13 @@ GameObject& ae3d::GameObject::operator=( const GameObject& go )
         AddComponent< ParticleSystemComponent >();
         *GetComponent< ParticleSystemComponent >() = *go.GetComponent< ParticleSystemComponent >();
         GetComponent< ParticleSystemComponent >()->gameObject = this;
+    }
+
+    if (go.GetComponent< DecalRendererComponent >())
+    {
+        AddComponent< DecalRendererComponent >();
+        *GetComponent< DecalRendererComponent >() = *go.GetComponent< DecalRendererComponent >();
+        GetComponent< DecalRendererComponent >()->gameObject = this;
     }
 
     return *this;
