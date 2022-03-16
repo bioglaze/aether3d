@@ -1,6 +1,7 @@
 struct VSOutput
 {
     float4 pos : SV_Position;
+    float2 uv : TEXCOORD;
 };
 
 #include "ubo.h"
@@ -13,6 +14,7 @@ VSOutput main( float3 pos : POSITION, float2 uv : TEXCOORD, float3 nor : NORMAL,
     position2 += mul( boneMatrices[ boneIndex.z ], float4( pos, 1.0f ) ) * boneWeights.z;
     position2 += mul( boneMatrices[ boneIndex.w ], float4( pos, 1.0f ) ) * boneWeights.w;
     vsOut.pos = mul( localToClip, position2 );
+    vsOut.uv = uv;
 
 #if !VULKAN
     vsOut.pos.y = -vsOut.pos.y;
