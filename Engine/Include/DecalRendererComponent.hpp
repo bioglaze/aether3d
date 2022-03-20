@@ -4,6 +4,7 @@
 
 namespace ae3d
 {
+    // Not used yet, does nothing!
     class DecalRendererComponent
     {
     public:
