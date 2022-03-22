@@ -326,9 +326,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                     nk_color_pick( &ctx, &color, NK_RGB );
                     particleSystem->SetColor( color.r, color.g, color.b );
 
-                    static int maxParticles = 10000;
+                    static int maxParticles = 8000;
                     nk_label( &ctx, "Max particles:", NK_TEXT_LEFT );
-                    nk_slider_int( &ctx, 0, &maxParticles, 10000, 10 );
+                    nk_slider_int( &ctx, 0, &maxParticles, 8000, 10 );
                     particleSystem->SetMaxParticles( maxParticles );
                 }
                 
