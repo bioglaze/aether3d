@@ -39,7 +39,7 @@
 const bool TestForwardPlus = true;
 const bool TestBloom = false;
 const bool TestSSAO = false;
-const bool TestShadowsDir = true;
+const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
 const bool TestRenderTexture2D = false;
@@ -344,7 +344,7 @@ using namespace ae3d;
     //audioContainer.GetComponent<AudioSourceComponent>()->Play();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
