@@ -103,7 +103,8 @@ struct SceneView
     Texture2D outlineTex;
     Matrix44 lineProjection;
     int gridLineHandle = 0;
-    int lightLineHandle = 0;
+    int spotLightLineHandle = 0;
+    int dirLightLineHandle = 0;
     int selectedGOIndex = 0;
     Material gizmoHighlightMaterial;
     Material selectionHighlightMaterial;
@@ -590,7 +591,8 @@ void svInit( SceneView** sv, int width, int height )
     }
 
     (*sv)->gridLineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
-    (*sv)->lightLineHandle = CreateConeLines();
+    (*sv)->spotLightLineHandle = CreateConeLines();
+    (*sv)->dirLightLineHandle = CreateConeLines(); // TODO: Use some other visualization.
     
     (*sv)->camera.GetComponent< LineRendererComponent >()->SetLineHandle( (*sv)->gridLineHandle );
 
@@ -1398,7 +1400,7 @@ void svDrawSprites( SceneView* sv, unsigned screenWidth, unsigned screenHeight )
         transform->UpdateLocalAndGlobalMatrix();
         ae3d::Matrix44 viewMat = camera->GetView();
         ae3d::Matrix44::Multiply( transform->GetLocalMatrix(), viewMat, viewMat );
-        ae3d::System::DrawLines( sv->lightLineHandle, viewMat, camera->GetProjection(), (int)(screenWidth * screenScale), (int)(screenHeight * screenScale) );
+        ae3d::System::DrawLines( spotLight ? sv->spotLightLineHandle : sv->dirLightLineHandle, viewMat, camera->GetProjection(), (int)(screenWidth * screenScale), (int)(screenHeight * screenScale) );
         transform->SetLocalScale( oldScale );
         transform->UpdateLocalAndGlobalMatrix();
     }
