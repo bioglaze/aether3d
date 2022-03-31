@@ -439,6 +439,19 @@ static int CreateConeLines()
     return ae3d::System::CreateLineBuffer( lines.data(), (int)lines.size(), ae3d::Vec3( 1, 1, 1 ) );
 }
 
+static int CreateDirectionalLines()
+{
+    std::vector< ae3d::Vec3 > lines;
+
+    for (int i = -2; i < 2; ++i)
+    {
+        lines.push_back( ae3d::Vec3( i / 2.0f, 0, 0 ) );
+        lines.push_back( ae3d::Vec3( i / 2.0f, -4, 0 ) );
+    }
+
+    return ae3d::System::CreateLineBuffer( lines.data(), (int)lines.size(), ae3d::Vec3( 1, 1, 1 ) );
+}
+
 void svInit( SceneView** sv, int width, int height )
 {
     *sv = new SceneView();
@@ -592,7 +605,7 @@ void svInit( SceneView** sv, int width, int height )
 
     (*sv)->gridLineHandle = System::CreateLineBuffer( lines, LineCount, Vec3( 1, 1, 1 ) );
     (*sv)->spotLightLineHandle = CreateConeLines();
-    (*sv)->dirLightLineHandle = CreateConeLines(); // TODO: Use some other visualization.
+    (*sv)->dirLightLineHandle = CreateDirectionalLines();
     
     (*sv)->camera.GetComponent< LineRendererComponent >()->SetLineHandle( (*sv)->gridLineHandle );
 
