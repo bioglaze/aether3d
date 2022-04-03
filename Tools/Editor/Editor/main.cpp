@@ -159,6 +159,11 @@ int main()
                         break;
                     case KeyCode::A:
                         moveDir.x = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                        if (event.keyModifier == KeyModifier::Shift)
+                        {
+                            moveDir.x *= 2;
+                        }
+
                         break;
                     case KeyCode::D:
                         if (event.keyModifier == KeyModifier::Control)
@@ -168,13 +173,25 @@ int main()
                         else
                         {
                             moveDir.x = event.type == WindowEventType::KeyDown ? velocity : 0;
+                            if (event.keyModifier == KeyModifier::Shift)
+                            {
+                                moveDir.x *= 2;
+                            }
                         }
                         break;
                     case KeyCode::W:
                         moveDir.z = event.type == WindowEventType::KeyDown ? -velocity : 0;
+                        if (event.keyModifier == KeyModifier::Shift)
+                        {
+                            moveDir.z *= 2;
+                        }
                         break;
                     case KeyCode::S:
                         moveDir.z = event.type == WindowEventType::KeyDown ? velocity : 0;
+                        if (event.keyModifier == KeyModifier::Shift)
+                        {
+                            moveDir.z *= 2;
+                        }
                         break;
                     case KeyCode::F:
                         svFocusOnSelected( sceneView );
