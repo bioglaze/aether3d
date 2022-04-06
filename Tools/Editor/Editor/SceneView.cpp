@@ -980,6 +980,7 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
     
     sv->gameObjects.Allocate( 1 );
     sv->gameObjects[ 0 ] = gizmo;
+    sv->selectedGOIndex = 0;
 
     for (auto& go : gos)
     {
