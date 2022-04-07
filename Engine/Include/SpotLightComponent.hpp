@@ -38,7 +38,10 @@ namespace ae3d
         
         /// \return Radius for light culler.
         float GetRadius() const { return radius; }
-        
+
+        /// \return Radius for light culler.
+        float& GetRadius() { return radius; }
+
         /// \return Shadow map
         RenderTexture* GetShadowMap() { return &shadowMap; }
 

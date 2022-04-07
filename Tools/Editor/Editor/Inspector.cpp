@@ -519,6 +519,9 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
 
                     float& coneAngleDegrees = spotLight->GetConeAngle();
                     nk_property_float( &ctx, "#Cone angle:", -180.0f, &coneAngleDegrees, 180.0f, 45, 1 );
+
+                    float& radius = spotLight->GetRadius();
+                    nk_property_float( &ctx, "#Radius", 10.0f, &radius, 200.0f, 1, 1 );
                 }
                 
                 nk_tree_pop( &ctx );
