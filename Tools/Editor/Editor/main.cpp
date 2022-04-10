@@ -112,6 +112,9 @@ int main()
     int lastMouseY = 0;
     int deltaX = 0;
     int deltaY = 0;
+    int startMouseX = 0;
+    int startMouseY = 0;
+    
     bool isRightMouseDown = false;
     bool isMiddleMouseDown = false;
 
@@ -299,13 +302,16 @@ int main()
                 lastMouseY = y;
                 mouseMoveHandled = true;
                 inspector.HandleMouseMotion( x, y );
+                const bool snapToGrid = event.keyModifier == ae3d::KeyModifier::Control;
                 svHandleMouseMotion( sceneView, deltaX, deltaY );
             }
             else if (event.type == WindowEventType::Mouse1Down)
             {
                 x = event.mouseX;
                 y = height - event.mouseY;
-
+                startMouseX = x;
+                startMouseY = y;
+                
                 const bool clickedOnInspector = x < inspectorWidth;
 
                 if (clickedOnInspector)
@@ -324,6 +330,9 @@ int main()
                 x = event.mouseX;
                 y = height - event.mouseY;
 
+                startMouseX = 0;
+                startMouseY = 0;
+                
                 svHandleLeftMouseUp( sceneView );
 
                 const bool clickedOnInspector = x < 450;
