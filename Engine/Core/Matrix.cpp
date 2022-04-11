@@ -247,6 +247,21 @@ void Matrix44::MakeIdentity()
     m[ 15 ] = 1;
 }
 
+void Matrix44::MakeProjection2( float fovDegrees, float aspect, float nearDepth, float farDepth )
+{
+    const float f = 1.0f / tanf( (0.5f * fovDegrees) * (float)M_PI / 180.0f );
+
+    const float proj[] =
+    {
+        f / aspect, 0, 0,  0,
+        0, -f, 0,  0,
+        0, 0, farDepth / (nearDepth - farDepth), -1,
+        0, 0, (nearDepth * farDepth) / (nearDepth - farDepth),  0
+    };
+
+    InitFrom( &proj[ 0 ] );
+}
+
 #if RENDERER_VULKAN
 void Matrix44::MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth )
 {

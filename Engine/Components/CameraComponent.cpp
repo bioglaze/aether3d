@@ -64,6 +64,15 @@ void ae3d::CameraComponent::SetProjection( float aFovDegrees, float aAspect, flo
     viewToClip.MakeProjection( fovDegrees, aspect, aNear, aFar );
 }
 
+void ae3d::CameraComponent::SetProjection2( float aFovDegrees, float aAspect, float aNear, float aFar )
+{
+    nearp = aNear;
+    farp = aFar;
+    fovDegrees = aFovDegrees;
+    aspect = aAspect;
+    viewToClip.MakeProjection2( fovDegrees, aspect, aNear, aFar );
+}
+
 void ae3d::CameraComponent::SetProjection( const Matrix44& proj )
 {
     viewToClip = proj;

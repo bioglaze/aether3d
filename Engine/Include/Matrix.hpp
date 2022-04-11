@@ -138,6 +138,8 @@ namespace ae3d
          */
         void MakeProjection( float fovDegrees, float aspect, float nearDepth, float farDepth );
         
+        void MakeProjection2( float fovDegrees, float aspect, float nearDepth, float farDepth );
+        
         /**
          Sets orthographic projection.
          

@@ -15,7 +15,7 @@ VSOutput main( float3 pos : POSITION, float2 uv : TEXCOORD, float3 normal : NORM
     vsOut.pos.y = -vsOut.pos.y;
 #endif
     
-    if (lightType == 2)
+    if (lightType == 2) // Directional light.
     {
         vsOut.pos.z = vsOut.pos.z * 0.5f + 0.5f; // -1..1 to 0..1 conversion
     }

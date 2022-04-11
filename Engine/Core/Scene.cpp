@@ -98,7 +98,7 @@ void SetupCameraForSpotShadowCasting( const Vec3& lightPosition, const Vec3& lig
 {
     outCameraTransform.LookAt( lightPosition, lightPosition - lightDirection * 200, Vec3( 0, 1, 0 ) );
     outCamera.SetProjectionType( ae3d::CameraComponent::ProjectionType::Perspective );
-    outCamera.SetProjection( coneAngleDegrees, 1, 0.1f, 200 );
+    outCamera.SetProjection2( coneAngleDegrees, 1, 0.1f, 200 );
 }
 
 void SetupCameraForDirectionalShadowCasting( const Vec3& lightDirection, const Frustum& eyeFrustum, const Vec3& sceneAABBmin, const Vec3& sceneAABBmax,

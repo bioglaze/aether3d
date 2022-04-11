@@ -72,7 +72,9 @@ namespace ae3d
          \param far Far plane distance.
          */
         void SetProjection( float fovDegrees, float aspect, float near, float far );
-
+        
+        void SetProjection2( float fovDegrees, float aspect, float near, float far );
+        
         /// \param proj Projection matrix.
         void SetProjection( const Matrix44& proj );
 
