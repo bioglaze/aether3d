@@ -1136,9 +1136,6 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         if (token == "gameobject")
         {
             outGameObjects.push_back( GameObject() );
-            std::string name;
-            lineStream >> name;
-            outGameObjects.back().SetName( name.c_str() );
         }
         else if (token.empty())
         {
@@ -1153,6 +1150,8 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             std::string name;
             std::getline( lineStream, name );
+            name = name.substr( 1, name.length() );
+
             outGameObjects.back().SetName( name.c_str() );
         }
         else if (token == "layer")
