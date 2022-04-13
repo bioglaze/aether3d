@@ -35,14 +35,14 @@
 constexpr bool TestMSAA = false;
 constexpr bool TestRenderTexture2D = false;
 constexpr bool TestRenderTextureCube = false;
-constexpr bool TestShadowsDir = true;
+constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-constexpr bool TestSponza = true;
+constexpr bool TestSponza = false;
 
 using namespace ae3d;
 
