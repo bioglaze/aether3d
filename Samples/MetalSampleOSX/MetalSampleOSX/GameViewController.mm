@@ -344,7 +344,7 @@ using namespace ae3d;
     //audioContainer.GetComponent<AudioSourceComponent>()->Play();
 
     // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -639,7 +639,7 @@ using namespace ae3d;
     spotLight.GetComponent<ae3d::SpotLightComponent>()->SetConeAngle( 30 );
     spotLight.AddComponent<ae3d::TransformComponent>();
     //spotLight.GetComponent<TransformComponent>()->LookAt( { 0, -2, -80 }, { 0, -1, 0 }, { 0, 1, 0 } );
-    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -70 }, { 0, 0, 1 }, { 0, 1, 0 } );
+    spotLight.GetComponent<TransformComponent>()->LookAt( { 0, 0, -95 }, { 0, 0, -195 }, { 0, 1, 0 } );
 
     pointLight.AddComponent<ae3d::PointLightComponent>();
     if (TestShadowsPoint)
