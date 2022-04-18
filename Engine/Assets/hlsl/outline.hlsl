@@ -1,7 +1,5 @@
 #include "ubo.h"
 
-groupshared uint helper[ 128 ];
-
 [numthreads( 8, 8, 1 )]
 void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThreadID, uint3 groupIdx : SV_GroupID )
 {
@@ -19,5 +17,11 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float a = dot( float4( id2 != idCenter ), avg_scalar );
     a += dot( float4( id3 != idCenter ), avg_scalar );
 
+    // Removes a bright line that should not be there.
+    if (globalIdx.y < 8)
+    {
+        a = 0;
+    }
+    
     rwTexture[ globalIdx.xy ] = a;
 }
