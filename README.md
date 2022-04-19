@@ -9,6 +9,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
   - Windows, macOS, iOS and Linux support.
   - Vulkan, D3D12 and Metal renderers.
   - Physically-based rendering.
+  - Particle System
   - Forward+ light culling.
   - Component-based game object system.
   - VR support in Vulkan backend. Tested on HTC Vive.
@@ -30,7 +31,6 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # Planned Features
 
-  - Particles
   - Tone mapping
   - DoF
   - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
@@ -67,12 +67,12 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # API documentation
 
-[link](http://twiren.kapsi.fi/doc_v0.8.6/html/)
+[link](http://twiren.kapsi.fi/doc_v0.8.7/html/)
 
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
-  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.8.6.zip) and extract it into aether3d_build/Samples after building.
+  - Grab the [sample asset archive](http://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 
