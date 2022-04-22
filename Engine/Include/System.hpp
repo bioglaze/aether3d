@@ -9,7 +9,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.8.6 Documentation
+   \mainpage Aether3D Game Engine v0.8.7 Documentation
 
    \section Introduction
 
@@ -28,6 +28,7 @@
    <li>Custom mesh format, converters included for .obj, .fbx and Blender.</li>
    <li>Shadow mapping from a directional or spot light</li>
    <li>VR support. Tested on HTC Vive.</li>
+   <li>Particle System.</li>
    <li>SSAO</li>
    <li>Bloom</li>
    <li>SIMD optimized math routines on desktop and iOS.</li>
@@ -46,7 +47,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.8.6.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    
