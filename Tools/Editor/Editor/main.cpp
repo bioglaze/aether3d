@@ -488,7 +488,7 @@ int main()
             }
             
             fgets( path, 1024, f );
-            fclose( f );
+            pclose( f );
             if (strlen( path ) > 0)
             {
                 path[ strlen( path ) - 1 ] = 0;
