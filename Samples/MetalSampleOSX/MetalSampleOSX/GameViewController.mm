@@ -1,5 +1,5 @@
 // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-// Assets can be downloaded from http://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip
+// Assets can be downloaded from https://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"

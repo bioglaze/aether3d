@@ -47,7 +47,7 @@
 
    \section Compilation
 
-   Grab the <a href="http://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="https://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    
