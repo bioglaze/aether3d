@@ -343,8 +343,8 @@ using namespace ae3d;
     audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     //audioContainer.GetComponent<AudioSourceComponent>()->Play();
 
-    // Sponza can be downloaded from http://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 1
+    // Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
+#if 0
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
