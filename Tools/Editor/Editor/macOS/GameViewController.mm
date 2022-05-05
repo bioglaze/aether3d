@@ -367,8 +367,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
         if (clickedOnInspector)
         {
-            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
-            //inspector.HandleMouseMotion( inputEvent.x * 2, inputEvent.y * 2 );
+            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
         }
         else
         {
@@ -382,7 +381,7 @@ const int MAX_ELEMENT_MEMORY = 128 * 1024;
 
         if (clickedOnInspector)
         {
-            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 1 );
+            inspector.HandleLeftMouseClick( inputEvent.x * 2, inputEvent.y * 2, 0 );
         }
     }
     //printf("inputEvent.key: %d\n", inputEvent.key);
