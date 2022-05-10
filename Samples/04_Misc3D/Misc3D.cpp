@@ -38,11 +38,11 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = false;
+constexpr bool TestForwardPlus = true;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-constexpr bool TestSponza = false;
+constexpr bool TestSponza = true;
 
 using namespace ae3d;
 
@@ -72,6 +72,112 @@ int Random100()
 
 Scene scene;
 GameObject camera;
+Shader shader;
+Shader shaderSkin;
+ComputeShader blurShader;
+ComputeShader downsampleAndThresholdShader;
+ComputeShader ssaoShader;
+ComputeShader composeShader;
+Shader shaderCubeMap;
+Shader standardShader;
+Shader standardShadowShader;
+Shader standardShadowPointShader;
+Shader standardSkinShader;
+Shader standardSkinShadowShader;
+
+RenderTexture cubeRT;
+RenderTexture cameraTex;
+Texture2D bloomTex;
+Texture2D ssaoBlurTex;
+Texture2D blurTex;
+Texture2D blurTex2;
+Texture2D ssaoTex;
+Texture2D noiseTex;
+RenderTexture resolvedTex;
+RenderTexture camera2dTex;
+
+void InitShaders()
+{
+    shader.Load( "unlitVert", "unlitFrag",
+        FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
+        FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
+
+    shaderSkin.Load( "unlitVert", "unlitFrag",
+        FileSystem::FileContents( "shaders/unlit_skin_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
+        FileSystem::FileContents( "shaders/unlit_skin_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
+
+    blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
+
+    downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
+
+    ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
+
+    composeShader.Load( "compose", FileSystem::FileContents( "shaders/compose.obj" ), FileSystem::FileContents( "shaders/compose.spv" ) );
+
+    shaderCubeMap.Load( "unlitVert", "unlitFrag",
+        FileSystem::FileContents( "shaders/unlit_cube_vert.obj" ), FileSystem::FileContents( "shaders/unlit_cube_frag.obj" ),
+        FileSystem::FileContents( "shaders/unlit_cube_vert.spv" ), FileSystem::FileContents( "shaders/unlit_cube_frag.spv" ) );
+
+    standardShader.Load( "standard_vertex", "standard_fragment",
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
+
+    standardShadowShader.Load( "standard_vertex", "standard_fragment_shadow",
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.spv" ) );
+
+    standardShadowPointShader.Load( "standard_vertex", "standard_fragment_shadow_point",
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow_point.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow_point.spv" ) );
+
+    standardSkinShader.Load( "standard_skin_vertex", "standard_fragment",
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
+
+    standardSkinShadowShader.Load( "standard_skin_vertex", "standard_fragment",
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
+        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
+}
+
+void InitRenderTextures( int width, int height )
+{
+    // FIXME: UAV can't be enabled on MSAA textures (at least on D3D12), so should only enable it on the resolved texture.
+    cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA, ae3d::RenderTexture::UavFlag::Enabled );
+
+    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte, nullptr );
+
+    ssaoBlurTex.CreateUAV( width, height, "ssaoBlurTex", DataType::UByte, nullptr );
+
+    blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte, nullptr );
+
+    blurTex2.CreateUAV( width / 2, height / 2, "blurTex2", DataType::UByte, nullptr );
+
+
+    constexpr int noiseDim = 64;
+    Vec4 noiseData[ noiseDim * noiseDim ];
+
+    for (int i = 0; i < noiseDim * noiseDim; ++i)
+    {
+        Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 ).Normalized();
+        dir.x = abs( dir.x ) * 2 - 1;
+        dir.y = abs( dir.y ) * 2 - 1;
+        noiseData[ i ].x = dir.x;
+        noiseData[ i ].y = dir.y;
+        noiseData[ i ].z = 0;
+        noiseData[ i ].w = 0;
+    }
+
+    noiseTex.CreateUAV( noiseDim, noiseDim, "noiseData", DataType::Float, noiseData );
+    noiseTex.SetLayout( TextureLayout::ShaderRead );
+
+    resolvedTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false, ae3d::RenderTexture::UavFlag::Disabled );
+
+    camera2dTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false, ae3d::RenderTexture::UavFlag::Disabled );
+
+    cubeRT.CreateCube( 512, ae3d::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
+
+    ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte, nullptr );
+}
 
 void sceneRenderFunc( int eye )
 {
@@ -128,46 +234,7 @@ int main()
     VR::GetIdealWindowSize( width, height );
 #endif
 
-    RenderTexture cameraTex;
-    // FIXME: UAV can't be enabled on MSAA textures (at least on D3D12), so should only enable it on the resolved texture.
-    cameraTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "cameraTex", TestMSAA, ae3d::RenderTexture::UavFlag::Enabled );
-
-    Texture2D bloomTex;
-    bloomTex.CreateUAV( width / 2, height / 2, "bloomTex", DataType::UByte, nullptr );
-
-    Texture2D ssaoBlurTex;
-    ssaoBlurTex.CreateUAV( width, height, "ssaoBlurTex", DataType::UByte, nullptr );
-
-    Texture2D blurTex;
-    blurTex.CreateUAV( width / 2, height / 2, "blurTex", DataType::UByte, nullptr );
-
-    Texture2D blurTex2;
-    blurTex2.CreateUAV( width / 2, height / 2, "blurTex2", DataType::UByte, nullptr );
-
-    Texture2D noiseTex;
-
-    constexpr int noiseDim = 64;
-    Vec4 noiseData[ noiseDim * noiseDim ];
-
-    for (int i = 0; i < noiseDim * noiseDim; ++i)
-    {
-        Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 ).Normalized();
-        dir.x = abs(dir.x) * 2 - 1;
-        dir.y = abs(dir.y) * 2 - 1;
-        noiseData[ i ].x = dir.x;
-        noiseData[ i ].y = dir.y;
-        noiseData[ i ].z = 0;
-        noiseData[ i ].w = 0;
-    }
-
-    noiseTex.CreateUAV( noiseDim, noiseDim, "noiseData", DataType::Float, noiseData );
-    noiseTex.SetLayout( TextureLayout::ShaderRead );
-    
-    RenderTexture resolvedTex;
-    resolvedTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "resolve", false, ae3d::RenderTexture::UavFlag::Disabled );
-        
-    RenderTexture camera2dTex;
-    camera2dTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false, ae3d::RenderTexture::UavFlag::Disabled );
+    InitRenderTextures( width, height );
 
     camera.AddComponent<CameraComponent>();
     camera.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
@@ -184,13 +251,10 @@ int main()
     camera.GetComponent<TransformComponent>()->LookAt( { 0, 0, -80 }, { 0, 0, 100 }, { 0, 1, 0 } );
     camera.SetName( "camera" );
 
-    RenderTexture cubeRT;
     GameObject cameraCubeRT;
     
     if (TestRenderTextureCube)
     {
-        cubeRT.CreateCube( 512, ae3d::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
-
         cameraCubeRT.AddComponent<CameraComponent>();
         cameraCubeRT.GetComponent<CameraComponent>()->SetClearColor( Vec3( 0, 0, 0 ) );
         cameraCubeRT.GetComponent<CameraComponent>()->SetProjectionType( CameraComponent::ProjectionType::Perspective );
@@ -311,35 +375,7 @@ int main()
     animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 90, 0 } ) );
     animatedGo.SetName( "animatedGo" );
 
-    Shader shader;
-    shader.Load( "unlitVert", "unlitFrag",
-                 FileSystem::FileContents( "shaders/unlit_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
-                 FileSystem::FileContents( "shaders/unlit_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
-
-    Shader shaderSkin;
-    shaderSkin.Load( "unlitVert", "unlitFrag",
-                FileSystem::FileContents( "shaders/unlit_skin_vert.obj" ), FileSystem::FileContents( "shaders/unlit_frag.obj" ),
-                FileSystem::FileContents( "shaders/unlit_skin_vert.spv" ), FileSystem::FileContents( "shaders/unlit_frag.spv" ) );
-
-    ComputeShader blurShader;
-    blurShader.Load( "blur", FileSystem::FileContents( "shaders/Blur.obj" ), FileSystem::FileContents( "shaders/Blur.spv" ) );
-
-    ComputeShader downsampleAndThresholdShader;
-    downsampleAndThresholdShader.Load( "downsampleAndThreshold", FileSystem::FileContents( "shaders/Bloom.obj" ), FileSystem::FileContents( "shaders/Bloom.spv" ) );
-
-    ComputeShader ssaoShader;
-    ssaoShader.Load( "ssao", FileSystem::FileContents( "shaders/ssao.obj" ), FileSystem::FileContents( "shaders/ssao.spv" ) );
-
-    ComputeShader composeShader;
-    composeShader.Load( "compose", FileSystem::FileContents( "shaders/compose.obj" ), FileSystem::FileContents( "shaders/compose.spv" ) );
-
-    Shader shaderCubeMap;
-    shaderCubeMap.Load( "unlitVert", "unlitFrag",
-                        FileSystem::FileContents( "shaders/unlit_cube_vert.obj" ), FileSystem::FileContents( "shaders/unlit_cube_frag.obj" ),
-                        FileSystem::FileContents( "shaders/unlit_cube_vert.spv" ), FileSystem::FileContents( "shaders/unlit_cube_frag.spv" ) );
-
-    Texture2D ssaoTex;
-    ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte, nullptr );
+    InitShaders();
     
     Texture2D gliderTex;
     gliderTex.Load( FileSystem::FileContents( "textures/glider.png" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
@@ -429,31 +465,6 @@ int main()
 
         rtCube.GetComponent< MeshRendererComponent >()->SetMaterial( &materialCubeRT, 0 );
     }
-
-    Shader standardShader;
-    standardShader.Load( "standard_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
-        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
-
-    Shader standardShadowShader;
-    standardShadowShader.Load( "standard_vertex", "standard_fragment_shadow",
-        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.obj" ),
-        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow.spv" ) );
-
-    Shader standardShadowPointShader;
-    standardShadowPointShader.Load( "standard_vertex", "standard_fragment_shadow_point",
-        ae3d::FileSystem::FileContents( "shaders/Standard_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow_point.obj" ),
-        ae3d::FileSystem::FileContents( "shaders/Standard_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag_shadow_point.spv" ) );
-
-    Shader standardSkinShader;
-    standardSkinShader.Load( "standard_skin_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
-        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
-
-    Shader standardSkinShadowShader;
-    standardSkinShadowShader.Load( "standard_skin_vertex", "standard_fragment",
-        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.obj" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.obj" ),
-        ae3d::FileSystem::FileContents( "shaders/Standard_skin_vert.spv" ), ae3d::FileSystem::FileContents( "shaders/Standard_frag.spv" ) );
 
     Material standardMaterial;
     standardMaterial.SetShader( &standardShader );
