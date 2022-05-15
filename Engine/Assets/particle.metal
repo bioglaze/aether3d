@@ -33,7 +33,7 @@ kernel void particle_simulation(
     float2 uv = (float2)gid.xy;
     float x = rand_1_05( uv );
     float4 position = float4( x * 8 * sin( gid.x * 20 + uniforms.timeStamp ), gid.x % 20, x * 8 * cos( gid.x * 20 + uniforms.timeStamp ), 1 );
-    //position = uniforms.localToWorld * position;
+    position = uniforms.localToWorld * position;
     
     float4 clipPos = uniforms.viewToClip * position;
     clipPos.y = - clipPos.y;
