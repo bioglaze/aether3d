@@ -712,9 +712,9 @@ void Mesh::SolveVertexNormals()
             face[ faceInd ].vnInd[ 1 ] = face[ faceInd ].vInd[ 1 ];
             face[ faceInd ].vnInd[ 2 ] = face[ faceInd ].vInd[ 2 ];
 
-            const unsigned short& faceA = face[ faceInd ].vInd[ 0 ];
-            const unsigned short& faceB = face[ faceInd ].vInd[ 1 ];
-            const unsigned short& faceC = face[ faceInd ].vInd[ 2 ];
+            const unsigned int& faceA = face[ faceInd ].vInd[ 0 ];
+            const unsigned int& faceB = face[ faceInd ].vInd[ 1 ];
+            const unsigned int& faceC = face[ faceInd ].vInd[ 2 ];
 
             const ae3d::Vec3 va = vertex[ faceA ];
             ae3d::Vec3 vb = vertex[ faceB ] - va;
