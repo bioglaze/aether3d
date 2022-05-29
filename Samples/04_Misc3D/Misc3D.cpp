@@ -38,7 +38,7 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = true;
+constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
@@ -174,8 +174,11 @@ void InitRenderTextures( int width, int height )
 
     camera2dTex.Create2D( width, height, ae3d::DataType::Float, TextureWrap::Clamp, TextureFilter::Linear, "camera2dTex", false, ae3d::RenderTexture::UavFlag::Disabled );
 
-    cubeRT.CreateCube( 512, ae3d::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
-
+    if (TestRenderTextureCube)
+    {
+        cubeRT.CreateCube( 512, ae3d::DataType::UByte, ae3d::TextureWrap::Repeat, ae3d::TextureFilter::Linear, "cubeRT" );
+    }
+    
     ssaoTex.CreateUAV( width, height, "ssaoTex", DataType::UByte, nullptr );
 }
 
