@@ -353,6 +353,8 @@ void ae3d::Scene::RenderRTCameras( std::vector< GameObject* >& rtCameras )
                     
                     if (particleSystem)
                     {
+                        GfxDeviceGlobal::perObjectUboStruct.localToWorld = go->GetComponent< TransformComponent >()->GetLocalMatrix();
+                        
                         particleSystem->Simulate( renderer.builtinShaders.particleSimulationShader );
                         particleSystem->Cull( renderer.builtinShaders.particleCullShader );
                     }
