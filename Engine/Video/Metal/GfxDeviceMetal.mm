@@ -629,7 +629,12 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
             vertexDesc.attributes[3].format = MTLVertexFormatFloat3;
             vertexDesc.attributes[3].bufferIndex = 0;
             vertexDesc.attributes[3].offset = 4 * 5;
-            
+
+            // Tangent
+            vertexDesc.attributes[4].format = MTLVertexFormatFloat4;
+            vertexDesc.attributes[4].bufferIndex = 1;
+            vertexDesc.attributes[4].offset = 0;
+
             vertexDesc.layouts[0].stride = sizeof( ae3d::VertexBuffer::VertexPTN );
             vertexDesc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
 
