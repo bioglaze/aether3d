@@ -1,4 +1,3 @@
-REM SET COMPILER="C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\fxc"
 SET COMPILER=dxc.exe
 
 %COMPILER% /nologo /all_resources_bound /Ges /WX /O3 -Qembed_debug /Zi /T ps_6_0 /Fo ..\..\..\aether3d_build\Samples\shaders\depthnormals_frag.obj hlsl\depthnormals_frag.hlsl
