@@ -63,7 +63,7 @@ static float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, 
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
 
     float delta = depth - moments.x;
-    float p = smoothstep( depth - 0.02f, depth, moments.x );
+    float p = smoothstep( depth - 0.001f, depth, moments.x ); // modifying - 0.001f controls intensity.
     float pMax = linstep( 0.2f, 1.0f, variance / (variance + delta * delta) );
     
     return clamp( max( p, pMax ), 0.0f, 1.0f );
