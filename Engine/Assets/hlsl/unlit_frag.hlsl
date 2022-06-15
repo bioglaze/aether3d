@@ -33,7 +33,7 @@ float VSM( float depth, float4 projCoord )
     float variance = max( moments.y - moments.x * moments.x, -0.001f );
 
     float delta = depth - moments.x;
-    float p = smoothstep( depth - 0.02f, depth, moments.x );
+    float p = smoothstep( depth - 0.01f, depth, moments.x );
     float pMax = linstep( minAmbient, 1.0f, variance / (variance + delta * delta) );
 
     return saturate( max( p, pMax ) );
