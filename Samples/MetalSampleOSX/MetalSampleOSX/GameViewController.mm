@@ -38,7 +38,7 @@
 
 const bool TestForwardPlus = false;
 const bool TestBloom = false;
-const bool TestSSAO = false;
+const bool TestSSAO = true;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
@@ -344,7 +344,7 @@ using namespace ae3d;
     //audioContainer.GetComponent<AudioSourceComponent>()->Play();
 
     // Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-#if 0
+#if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
 
@@ -381,7 +381,10 @@ using namespace ae3d;
 
     for (int i = 0; i < noiseDim * noiseDim; ++i)
     {
-        Vec3 dir = Vec3( (Random100() / 100.0f) * 2 - 1, (Random100() / 100.0f) * 2 - 1, 0 ).Normalized();
+        Vec3 dir = Vec3( (Random100() / 100.0f), (Random100() / 100.0f), 0 ).Normalized();
+        dir.x = abs( dir.x ) * 2 - 1;
+        dir.y = abs( dir.y ) * 2 - 1;
+
         noiseData[ i ].x = dir.x;
         noiseData[ i ].y = dir.y;
         noiseData[ i ].z = 0;
@@ -547,7 +550,7 @@ using namespace ae3d;
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMesh( &cubeMesh );
     rotatingCube.GetComponent<ae3d::MeshRendererComponent>()->SetMaterial( &cubeMaterial, 0 );
     rotatingCube.AddComponent<ae3d::TransformComponent>();
-    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, -17, -80 ) );
+    rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( 0, 0, -115 ) );
     rotatingCube.GetComponent<ae3d::TransformComponent>()->SetLocalScale( 1 );
 
     wireframeGo.AddComponent<ae3d::MeshRendererComponent>();
@@ -713,7 +716,7 @@ using namespace ae3d;
     particleGo.GetComponent< ParticleSystemComponent>()->SetMaxParticles( 2000 );
     //particleGo.GetComponent< ParticleSystemComponent>()->SetColor( 1.0f, 0.0f, 0.0f );
     particleGo.AddComponent< TransformComponent >();
-    particleGo.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 0, 0, -70 ) );
+    particleGo.GetComponent< TransformComponent >()->SetLocalPosition( ae3d::Vec3( 20, 0, 0 ) );
     scene.Add( &particleGo );
     
     //scene.Add( &cubePTN2 );
@@ -1100,7 +1103,7 @@ using namespace ae3d;
     camera3d.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
     camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
     camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
-
+    
     if (TestForwardPlus)
     {
         static float y = -14;
