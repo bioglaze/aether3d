@@ -10,11 +10,13 @@ using namespace metal;
 #define PARTICLE_INDEX_BUFFER_SENTINEL 0x7fffffff
 #define NUM_THREADS_PER_TILE (TILE_RES * TILE_RES)
 
+// Must match Renderer.hpp.
 struct Particle
 {
     float4 positionAndSize;
     float4 color;
     float4 clipPosition;
+    float4 lifeTimeSecs;
 };
 
 float rand_1_05( float2 uv )
@@ -45,6 +47,7 @@ kernel void particle_simulation(
     particleBufferOut[ gid.x ].positionAndSize.w = 5;
     particleBufferOut[ gid.x ].color = uniforms.particleColor;
     particleBufferOut[ gid.x ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, clipPos.w );
+    particleBufferOut[ gid.x ].lifeTimeSecs = float4( 0, 0, 0, 0 );
 }
 
 uint GetNumTilesX( uint windowWidth )

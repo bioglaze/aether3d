@@ -16,6 +16,7 @@ namespace ae3d
         ae3d::Vec4 positionAndSize;
         ae3d::Vec4 color;
         ae3d::Vec4 clipPosition;
+        ae3d::Vec4 lifeTimeSecs; // Stored in .x component.
     };
 
     struct BuiltinShaders

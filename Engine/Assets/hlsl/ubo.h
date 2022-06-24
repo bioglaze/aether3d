@@ -1,9 +1,10 @@
-// Must be kept in sync with ParticleSystemComponent.cpp
+// Must be kept in sync with Renderer.hpp
 struct Particle
 {
     float4 positionAndSize;
     float4 color;
     float4 clipPosition; // Screen-space position.
+    float4 lifeTimeSecs;
 };
 
 #if !VULKAN
