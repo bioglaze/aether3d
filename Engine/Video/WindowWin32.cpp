@@ -74,19 +74,19 @@ static void InitKeyMap()
         WindowGlobal::keyMap[ keyIndex ] = ae3d::KeyCode::Empty;
     }
 
-    WindowGlobal::keyMap[ 33 ] = ae3d::KeyCode::PageUp;
-    WindowGlobal::keyMap[ 34 ] = ae3d::KeyCode::PageDown;
-    WindowGlobal::keyMap[ 13 ] = ae3d::KeyCode::Enter;
-    WindowGlobal::keyMap[ 37 ] = ae3d::KeyCode::Left;
-    WindowGlobal::keyMap[ 38 ] = ae3d::KeyCode::Up;
-    WindowGlobal::keyMap[ 39 ] = ae3d::KeyCode::Right;
-    WindowGlobal::keyMap[ 40 ] = ae3d::KeyCode::Down;
-    WindowGlobal::keyMap[ 27 ] = ae3d::KeyCode::Escape;
-    WindowGlobal::keyMap[ 32 ] = ae3d::KeyCode::Space;
-    WindowGlobal::keyMap[ 46 ] = ae3d::KeyCode::Delete;
-    WindowGlobal::keyMap[ 8 ] = ae3d::KeyCode::Backspace;
-    WindowGlobal::keyMap[ 189 ] = ae3d::KeyCode::Minus;
-    WindowGlobal::keyMap[ 187 ] = ae3d::KeyCode::Plus;
+    WindowGlobal::keyMap[ VK_PRIOR ] = ae3d::KeyCode::PageUp;
+    WindowGlobal::keyMap[ VK_NEXT ] = ae3d::KeyCode::PageDown;
+    WindowGlobal::keyMap[ VK_RETURN ] = ae3d::KeyCode::Enter;
+    WindowGlobal::keyMap[ VK_LEFT ] = ae3d::KeyCode::Left;
+    WindowGlobal::keyMap[ VK_UP ] = ae3d::KeyCode::Up;
+    WindowGlobal::keyMap[ VK_RIGHT ] = ae3d::KeyCode::Right;
+    WindowGlobal::keyMap[ VK_DOWN ] = ae3d::KeyCode::Down;
+    WindowGlobal::keyMap[ VK_ESCAPE ] = ae3d::KeyCode::Escape;
+    WindowGlobal::keyMap[ VK_SPACE ] = ae3d::KeyCode::Space;
+    WindowGlobal::keyMap[ VK_DELETE ] = ae3d::KeyCode::Delete;
+    WindowGlobal::keyMap[ VK_BACK ] = ae3d::KeyCode::Backspace;
+    WindowGlobal::keyMap[ VK_OEM_MINUS ] = ae3d::KeyCode::Minus;
+    WindowGlobal::keyMap[ VK_OEM_PLUS ] = ae3d::KeyCode::Plus;
 
     WindowGlobal::keyMap[ 65 ] = ae3d::KeyCode::A;
     WindowGlobal::keyMap[ 66 ] = ae3d::KeyCode::B;
@@ -126,9 +126,9 @@ static void InitKeyMap()
     WindowGlobal::keyMap[ 56 ] = ae3d::KeyCode::N8;
     WindowGlobal::keyMap[ 57 ] = ae3d::KeyCode::N9;
         
-    WindowGlobal::keyMap[ 190 ] = ae3d::KeyCode::Dot;
-    WindowGlobal::keyMap[ 36 ] = ae3d::KeyCode::Home;
-    WindowGlobal::keyMap[ 35 ] = ae3d::KeyCode::End;
+    WindowGlobal::keyMap[ VK_OEM_PERIOD ] = ae3d::KeyCode::Dot;
+    WindowGlobal::keyMap[ VK_HOME ] = ae3d::KeyCode::Home;
+    WindowGlobal::keyMap[ VK_END ] = ae3d::KeyCode::End;
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
