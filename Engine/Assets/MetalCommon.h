@@ -29,6 +29,7 @@ struct Uniforms
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
     float4 particleColor;
     int particleCount;
+    int particleReset; // If 1, particle is reset. 0 otherwise.
     float timeStamp; // In seconds.
     float roughness;
     float alphaThreshold;

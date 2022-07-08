@@ -373,7 +373,8 @@ void ae3d::GfxDevice::InitMetal( id <MTLDevice> metalDevice, MTKView* aView, int
     GfxDeviceGlobal::perObjectUboStruct.kernelSize = 16;
     GfxDeviceGlobal::perObjectUboStruct.windowWidth = aView.bounds.size.width * 2;
     GfxDeviceGlobal::perObjectUboStruct.windowHeight = aView.bounds.size.height * 2;
-
+    GfxDeviceGlobal::perObjectUboStruct.particleReset = 1;
+    
     device = metalDevice;
 
     commandQueue = [device newCommandQueue];

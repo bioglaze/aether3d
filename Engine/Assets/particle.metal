@@ -47,7 +47,11 @@ kernel void particle_simulation(
     particleBufferOut[ gid.x ].positionAndSize.w = 5;
     particleBufferOut[ gid.x ].color = uniforms.particleColor;
     particleBufferOut[ gid.x ].clipPosition = float4( windowCoords.x, windowCoords.y, clipPos.z, clipPos.w );
-    particleBufferOut[ gid.x ].lifeTimeSecs = float4( 0, 0, 0, 0 );
+    
+    if (uniforms.particleReset == 1)
+    {
+        particleBufferOut[ gid.x ].lifeTimeSecs = float4( 0, 0, 0, 0 );
+    }
 }
 
 uint GetNumTilesX( uint windowWidth )

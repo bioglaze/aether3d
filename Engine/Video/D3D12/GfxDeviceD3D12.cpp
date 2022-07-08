@@ -1179,6 +1179,7 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
 
     renderer.GenerateSSAOKernel( 16, GfxDeviceGlobal::perObjectUboStruct.kernelOffsets );
     GfxDeviceGlobal::perObjectUboStruct.kernelSize = 16;
+    GfxDeviceGlobal::perObjectUboStruct.particleReset = 1;
 }
 
 void ae3d::GfxDevice::DrawUI( int scX, int scY, int scWidth, int scHeight, int elemCount, int offset )

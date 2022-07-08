@@ -39,6 +39,7 @@ struct PerObjectUboStruct
     ae3d::Vec4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
     ae3d::Vec4 particleColor;
     int particleCount;
+    int particleReset;
     float timeStamp; // In seconds.
     float roughness;
     float alphaThreshold;

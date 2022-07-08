@@ -38,7 +38,7 @@
 
 const bool TestForwardPlus = false;
 const bool TestBloom = false;
-const bool TestSSAO = true;
+const bool TestSSAO = false;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
