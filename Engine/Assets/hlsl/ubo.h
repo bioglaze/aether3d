@@ -97,6 +97,7 @@ RWBuffer<uint> perTileParticleIndexBuffer : register(u3);
     float4 cameraParams; // .x: fov (radians), .y: aspect, .z: near, .w: far
     float4 particleColor;
     int particleCount;
+    int particleReset;
     float timeStamp; // In seconds.
     float roughness;
     float alphaThreshold;
