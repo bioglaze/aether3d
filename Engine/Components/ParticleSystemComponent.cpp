@@ -113,6 +113,8 @@ void ae3d::ParticleSystemComponent::Simulate( ComputeShader& simulationShader )
     simulationShader.Dispatch( GfxDeviceGlobal::perObjectUboStruct.particleCount / 64, 1, 1, "Particle Simulation" );
 #endif
     simulationShader.End();
+
+    GfxDeviceGlobal::perObjectUboStruct.particleReset = 0;
 }
 
 void ae3d::ParticleSystemComponent::Cull( ComputeShader& cullShader )

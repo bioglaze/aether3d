@@ -23,9 +23,9 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
 
     if (particleReset == 1)
     {
-        particles[ i ].lifeTimeSecs = float4( 0, 0, 0, 0 );
+        particles[ i ].lifeTimeSecs = float4( timeStamp, 0, 0, 0 );
     }
-    
+        
     particles[ i ].positionAndSize = position;
     particles[ i ].positionAndSize.w = 5;
     particles[ i ].color = particleColor;
