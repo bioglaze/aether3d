@@ -315,12 +315,18 @@ using namespace ae3d;
     Texture2D nkFontTexture;
     nk_buffer cmds;
 #endif
+    
+    std::chrono::time_point< std::chrono::steady_clock > startTime;
+    size_t frame;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    startTime = std::chrono::steady_clock::now();
+    frame = 0;
+    
     _view = (MTKView *)self.view;
     _view.delegate = self;
     _view.device = MTLCreateSystemDefaultDevice();
@@ -1068,6 +1074,16 @@ using namespace ae3d;
 #endif
         scene.EndFrame();
         ae3d::System::EndFrame();
+        
+        if (frame == 0)
+        {
+            auto tEnd = std::chrono::steady_clock::now();
+            auto tDiff = std::chrono::duration< double, std::milli >( tEnd - startTime ).count();
+            float timeToFirstPresent = static_cast< float >( tDiff );
+            ae3d::System::Print( "Time to first present: %.0f ms\n", timeToFirstPresent );
+        }
+        
+        ++frame;
     }
 }
 
