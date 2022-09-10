@@ -44,6 +44,7 @@ const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
 const bool TestRenderTexture2D = false;
 const bool TestRenderTextureCube = false;
+const bool TestFPSMovement = true;
 //#define TEST_NUKLEAR_UI
 
 const int POINT_LIGHT_COUNT = 50 * 40;
@@ -1116,9 +1117,17 @@ using namespace ae3d;
 
     pointLight.GetComponent<ae3d::TransformComponent>()->SetLocalPosition( ae3d::Vec3( -9.8f, 0, -85 ) );
 
-    camera3d.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
-    camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
-    camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+    if (TestFPSMovement)
+    {
+        camera3d.GetComponent<TransformComponent>()->MoveForwardXZ( moveDir.z );
+        camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+    }
+    else
+    {
+        camera3d.GetComponent<TransformComponent>()->MoveUp( moveDir.y );
+        camera3d.GetComponent<TransformComponent>()->MoveForward( moveDir.z );
+        camera3d.GetComponent<TransformComponent>()->MoveRight( moveDir.x );
+    }
     
     if (TestForwardPlus)
     {

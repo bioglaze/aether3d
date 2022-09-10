@@ -57,6 +57,16 @@ void ae3d::TransformComponent::MoveForward( float amount )
     }
 }
 
+void ae3d::TransformComponent::MoveForwardXZ( float amount )
+{
+    if (!IsAlmost( amount, 0 ))
+    {
+        float y = localPosition.y;
+        localPosition += localRotation * Vec3( 0, 0, amount );
+        localPosition.y = y;
+    }
+}
+
 void ae3d::TransformComponent::MoveRight( float amount )
 {
     if (!IsAlmost( amount, 0 ))

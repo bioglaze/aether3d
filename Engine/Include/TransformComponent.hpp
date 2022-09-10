@@ -55,6 +55,9 @@ namespace ae3d
         void MoveForward( float amount );
 
         /// \param amount Amount.
+        void MoveForwardXZ( float amount );
+
+        /// \param amount Amount.
         void MoveUp( float amount );
 
         /// \param axis Axis to rotate about.
