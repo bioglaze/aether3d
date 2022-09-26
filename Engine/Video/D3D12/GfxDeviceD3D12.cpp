@@ -231,6 +231,58 @@ namespace GfxDeviceGlobal
     ID3D12Resource* particleTileBuffer;
 }
 
+const char* GpuAllocationType( D3D12_DRED_ALLOCATION_TYPE type )
+{
+    if (type == D3D12_DRED_ALLOCATION_TYPE_RESOURCE) return "RESOURCE";
+    if (type == D3D12_DRED_ALLOCATION_TYPE_DESCRIPTOR_HEAP) return "DESCRIPTOR HEAP";
+    if (type == D3D12_DRED_ALLOCATION_TYPE_COMMAND_QUEUE) return "COMMAND QUEUE";
+    if (type == D3D12_DRED_ALLOCATION_TYPE_COMMAND_LIST) return "COMMAND LIST";
+    if (type == D3D12_DRED_ALLOCATION_TYPE_COMMAND_ALLOCATOR) return "COMMAND ALLOCATOR";
+    if (type == D3D12_DRED_ALLOCATION_TYPE_HEAP) return "HEAP";
+    return "UNKNOWN";
+}
+
+void GpuCrashHandler()
+{
+    ID3D12DeviceRemovedExtendedData1* dred;
+    HRESULT hr = GfxDeviceGlobal::device->QueryInterface( &dred );
+    
+    if (hr == S_OK)
+    {
+        D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 output;
+        hr = dred->GetAutoBreadcrumbsOutput1( &output );
+
+        if (hr == S_OK && output.pHeadAutoBreadcrumbNode)
+        {
+            ae3d::System::Print( "BreadcrumbContextsCount: %u\n", output.pHeadAutoBreadcrumbNode->BreadcrumbContextsCount );
+            ae3d::System::Print( "BreadcrumbCount: %u\n", output.pHeadAutoBreadcrumbNode->BreadcrumbCount );
+            ae3d::System::Print( "Command Queue: %s\n", output.pHeadAutoBreadcrumbNode->pCommandQueueDebugNameA );
+            ae3d::System::Print( "Command List: %s\n", output.pHeadAutoBreadcrumbNode->pCommandListDebugNameA );
+        }
+
+        D3D12_DRED_PAGE_FAULT_OUTPUT1 pageFaultOutput;
+        hr = dred->GetPageFaultAllocationOutput1( &pageFaultOutput );
+
+        if (hr == S_OK)
+        {
+            ae3d::System::Print( "Page Fault, VA: %lu\n", pageFaultOutput.PageFaultVA );
+
+            const D3D12_DRED_ALLOCATION_NODE1* freedNode = pageFaultOutput.pHeadRecentFreedAllocationNode;
+            
+            if (freedNode != nullptr)
+            {
+                ae3d::System::Print( "Recently freed resources:\n" );
+            }
+
+            while (freedNode != nullptr)
+            {
+                ae3d::System::Print( "%s: %s\n", GpuAllocationType( freedNode->AllocationType ), freedNode->ObjectNameA );
+
+            }
+        }
+    }
+}
+
 void ClearPSOCache()
 {
     GfxDeviceGlobal::psoCache.clear();
@@ -1049,11 +1101,12 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
 #endif
         debugController->Release();
 
-        ID3D12DeviceRemovedExtendedDataSettings* dredSettings = nullptr;
+        ID3D12DeviceRemovedExtendedDataSettings1* dredSettings;
         dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &dredSettings ) );
         if (dhr == S_OK)
         {
             dredSettings->SetAutoBreadcrumbsEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
+            dredSettings->SetBreadcrumbContextEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
             dredSettings->SetPageFaultEnablement( D3D12_DRED_ENABLEMENT_FORCED_ON );
         }
     }
@@ -1632,13 +1685,7 @@ void ae3d::GfxDevice::Present()
     {
         if (hr == DXGI_ERROR_DEVICE_REMOVED)
         {
-            ID3D12DeviceRemovedExtendedData* dred = nullptr;
-            hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &dred ) );
-            D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT dredAutoBreadcrumbsOutput;
-            D3D12_DRED_PAGE_FAULT_OUTPUT dredPageFaultOutput;
-            hr = dred->GetAutoBreadcrumbsOutput( &dredAutoBreadcrumbsOutput );
-            hr = dred->GetPageFaultAllocationOutput( &dredPageFaultOutput );
-            System::Print( "DRED output: Command list: %s, command queue: %s\n", dredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode->pCommandListDebugNameA, dredAutoBreadcrumbsOutput.pHeadAutoBreadcrumbNode->pCommandQueueDebugNameA );
+            GpuCrashHandler();
 
             ae3d::System::Assert( false, "Present failed. Reason: device removed." );
         }
@@ -1659,6 +1706,10 @@ void ae3d::GfxDevice::Present()
     WaitForPreviousFrame();
 
     hr = GfxDeviceGlobal::commandListAllocator->Reset();
+    if (hr == DXGI_ERROR_DEVICE_REMOVED)
+    {
+        GpuCrashHandler();
+    }
     AE3D_CHECK_D3D( hr, "commandListAllocator Reset" );
 
     GfxDeviceGlobal::currentRenderTarget = nullptr;
