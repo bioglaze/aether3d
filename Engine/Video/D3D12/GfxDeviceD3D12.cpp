@@ -242,6 +242,29 @@ const char* GpuAllocationType( D3D12_DRED_ALLOCATION_TYPE type )
     return "UNKNOWN";
 }
 
+const char* BreadcrumbOpToString( D3D12_AUTO_BREADCRUMB_OP op )
+{
+    if (op == D3D12_AUTO_BREADCRUMB_OP_SETMARKER) return "SETMARKER";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_BEGINEVENT) return "BEGINEVENT";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_ENDEVENT) return "ENDEVENT";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_DRAWINSTANCED) return "DRAWINSTANCED";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_DRAWINDEXEDINSTANCED) return "DRAWINDEXEDINSTANCED";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_EXECUTEINDIRECT) return "EXECUTEINDIRECT";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_DISPATCH) return "DISPATCH";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_COPYBUFFERREGION) return "COPYBUFFERREGION";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_COPYTEXTUREREGION) return "COPYTEXTUREREGION";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_COPYRESOURCE) return "COPYRESOURCE";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_RESOLVESUBRESOURCE) return "RESOLVESUBRESOURCE";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_CLEARRENDERTARGETVIEW) return "CLEARRENDERTARGETVIEW";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_CLEARUNORDEREDACCESSVIEW) return "CLEARUNORDEREDACCESSVIEW";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_CLEARDEPTHSTENCILVIEW) return "CLEARDEPTHSTENCILVIEW";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_RESOURCEBARRIER) return "RESOURCEBARRIER";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_PRESENT) return "PRESENT";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_RESOLVEQUERYDATA) return "RESOLVEQUERYDATA";
+    if (op == D3D12_AUTO_BREADCRUMB_OP_DISPATCHMESH) return "DISPATCHMESH";
+    return "UNKNOWN";
+}
+
 void GpuCrashHandler()
 {
     ID3D12DeviceRemovedExtendedData1* dred;
@@ -258,6 +281,20 @@ void GpuCrashHandler()
             ae3d::System::Print( "BreadcrumbCount: %u\n", output.pHeadAutoBreadcrumbNode->BreadcrumbCount );
             ae3d::System::Print( "Command Queue: %s\n", output.pHeadAutoBreadcrumbNode->pCommandQueueDebugNameA );
             ae3d::System::Print( "Command List: %s\n", output.pHeadAutoBreadcrumbNode->pCommandListDebugNameA );
+
+            const D3D12_AUTO_BREADCRUMB_NODE1* node = output.pHeadAutoBreadcrumbNode->pNext;
+            
+            while (node != nullptr)
+            {
+                ae3d::System::Print( "Command history:\n" );
+
+                for (unsigned i = 0; i < output.pHeadAutoBreadcrumbNode->BreadcrumbCount; ++i)
+                {
+                    ae3d::System::Print( "Command: %s\n", BreadcrumbOpToString( output.pHeadAutoBreadcrumbNode->pCommandHistory[ i ] ));
+                }
+
+                node = node->pNext;
+            }
         }
 
         D3D12_DRED_PAGE_FAULT_OUTPUT1 pageFaultOutput;
@@ -399,13 +436,20 @@ void WaitForPreviousFrame()
     ++GfxDeviceGlobal::fenceValue;
     Statistics::IncFenceCalls();
 
-    if (GfxDeviceGlobal::fence->GetCompletedValue() < fenceValue)
+    const UINT64 completedValue = GfxDeviceGlobal::fence->GetCompletedValue();
+
+    if (completedValue < fenceValue)
     {
         hr = GfxDeviceGlobal::fence->SetEventOnCompletion( fenceValue, GfxDeviceGlobal::fenceEvent );
         AE3D_CHECK_D3D( hr, "fence event" );
         Statistics::BeginWaitForPreviousFrameProfiling();
-        WaitForSingleObject( GfxDeviceGlobal::fenceEvent, INFINITE );
+        const DWORD res = WaitForSingleObject( GfxDeviceGlobal::fenceEvent, INFINITE );
+        ae3d::System::Assert( res != WAIT_FAILED, "WaitForPreviousFrame failed!" );
         Statistics::EndWaitForPreviousFrameProfiling();
+    }
+    else if (completedValue == UINT64_MAX)
+    {
+        GpuCrashHandler();
     }
 }
 
