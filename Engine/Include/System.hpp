@@ -4,7 +4,7 @@
 #import <MetalKit/MetalKit.h>
 #endif
 
-#if !defined( RENDERER_D3D12 ) && !defined( RENDERER_VULKAN ) && !defined( RENDERER_METAL ) && !defined( RENDERER_NULL )
+#if !defined( RENDERER_D3D12 ) && !defined( RENDERER_VULKAN ) && !defined( RENDERER_METAL )
 #error No renderer defined
 #endif
 
