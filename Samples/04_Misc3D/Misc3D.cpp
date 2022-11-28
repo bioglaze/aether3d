@@ -96,6 +96,99 @@ Texture2D noiseTex;
 RenderTexture resolvedTex;
 RenderTexture camera2dTex;
 
+void RenderSSAO( int width, int height, int postHeight )
+{
+#if RENDERER_D3D12
+    ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
+    camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().SetLayout( TextureLayout::General );
+    ssaoShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
+    ssaoShader.SetSRV( 1, camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetGpuResource()->resource, *camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetSRVDesc() );
+    ssaoShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
+    ssaoShader.SetTexture2D( &noiseTex, 2 );
+#else
+    ssaoTex.SetLayout( TextureLayout::General );
+    ssaoShader.SetRenderTexture( &cameraTex, 0 );
+    ssaoShader.SetRenderTexture( &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
+    ssaoShader.SetTexture2D( &noiseTex, 2 );
+    ssaoShader.SetTexture2D( &ssaoTex, 14 );
+#endif
+    ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
+    ssaoShader.Begin();
+    ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
+    ssaoShader.End();
+    ssaoTex.SetLayout( TextureLayout::ShaderRead );
+
+    ssaoBlurTex.SetLayout( TextureLayout::General );
+
+    bool blur = true;
+#if RENDERER_D3D12
+    blur = false;
+#endif
+    if (blur)
+    {
+        blurShader.SetTexture2D( &ssaoTex, 0 );
+#if RENDERER_D3D12
+        ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
+        blurShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
+#else
+        blurShader.SetTexture2D( &ssaoBlurTex, 14 );
+#endif
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
+        blurShader.Begin();
+        blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+        blurShader.End();
+
+        blurShader.Begin();
+
+        ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
+
+        blurShader.SetTexture2D( &ssaoBlurTex, 0 );
+        ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
+#if RENDERER_D3D12
+        blurShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
+#else
+        blurShader.SetTexture2D( &ssaoTex, 14 );
+#endif
+        blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
+        blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
+        blurShader.End();
+
+        ssaoTex.SetLayout( TextureLayout::ShaderRead );
+        ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
+    }
+    composeShader.Begin();
+#if RENDERER_D3D12
+    ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
+    cameraTex.SetLayout( TextureLayout::ShaderRead );
+    composeShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
+    composeShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
+#else
+    composeShader.SetTexture2D( &ssaoBlurTex, 14 );
+#endif
+    if (TestMSAA)
+    {
+        composeShader.SetRenderTexture( &resolvedTex, 0 );
+    }
+    else
+    {
+        composeShader.SetRenderTexture( &cameraTex, 0 );
+    }
+
+    composeShader.SetTexture2D( &ssaoTex, 2 );
+    composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
+    composeShader.End();
+    ssaoBlurTex.SetLayout( TextureLayout::UAVBarrier );
+    ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
+
+    System::Draw( &ssaoBlurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
+            
+    // FIXME: This should also work with MSAA. Currently the texture layout is wrong on Vulkan.
+    if (!TestMSAA)
+    {
+        System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
+    }
+}
+
 void InitShaders()
 {
     shader.Load( "unlitVert", "unlitFrag",
@@ -1129,95 +1222,7 @@ int main()
 
         if (TestSSAO && ssao)
         {
-#if RENDERER_D3D12
-            ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
-            camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().SetLayout( TextureLayout::General );
-            ssaoShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
-            ssaoShader.SetSRV( 1, camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetGpuResource()->resource, *camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture().GetSRVDesc() );
-            ssaoShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
-            ssaoShader.SetTexture2D( &noiseTex, 2 );
-#else
-            ssaoTex.SetLayout( TextureLayout::General );
-            ssaoShader.SetRenderTexture( &cameraTex, 0 );
-            ssaoShader.SetRenderTexture( &camera.GetComponent<CameraComponent>()->GetDepthNormalsTexture(), 1 );
-            ssaoShader.SetTexture2D( &noiseTex, 2 );
-            ssaoShader.SetTexture2D( &ssaoTex, 14 );
-#endif
-            ssaoShader.SetProjectionMatrix( camera.GetComponent<CameraComponent>()->GetProjection() );
-            ssaoShader.Begin();
-            ssaoShader.Dispatch( width / 8, height / 8, 1, "SSAO" );
-            ssaoShader.End();
-            ssaoTex.SetLayout( TextureLayout::ShaderRead );
-
-            ssaoBlurTex.SetLayout( TextureLayout::General );
-
-            bool blur = true;
-#if RENDERER_D3D12
-            blur = false;
-#endif
-            if (blur)
-            {
-                blurShader.SetTexture2D( &ssaoTex, 0 );
-#if RENDERER_D3D12
-                ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
-                blurShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
-#else
-                blurShader.SetTexture2D( &ssaoBlurTex, 14 );
-#endif
-                blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 1, 0 );
-                blurShader.Begin();
-                blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
-                blurShader.End();
-
-                blurShader.Begin();
-
-                ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
-
-                blurShader.SetTexture2D( &ssaoBlurTex, 0 );
-                ssaoTex.SetLayout( TextureLayout::ShaderReadWrite );
-#if RENDERER_D3D12
-                blurShader.SetUAV( 1, ssaoTex.GetGpuResource()->resource, *ssaoTex.GetUAVDesc() );
-#else
-                blurShader.SetTexture2D( &ssaoTex, 14 );
-#endif
-                blurShader.SetUniform( ComputeShader::UniformName::TilesZW, 0, 1 );
-                blurShader.Dispatch( width / 8, height / 8, 1, "blur" );
-                blurShader.End();
-
-                ssaoTex.SetLayout( TextureLayout::ShaderRead );
-                ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
-            }
-            composeShader.Begin();
-#if RENDERER_D3D12
-            ssaoBlurTex.SetLayout( TextureLayout::ShaderReadWrite );
-            cameraTex.SetLayout( TextureLayout::ShaderRead );
-            composeShader.SetUAV( 1, ssaoBlurTex.GetGpuResource()->resource, *ssaoBlurTex.GetUAVDesc() );
-            composeShader.SetSRV( 0, cameraTex.GetGpuResource()->resource, *cameraTex.GetSRVDesc() );
-#else
-            composeShader.SetTexture2D( &ssaoBlurTex, 14 );
-#endif
-            if (TestMSAA)
-            {
-                composeShader.SetRenderTexture( &resolvedTex, 0 );
-            }
-            else
-            {
-                composeShader.SetRenderTexture( &cameraTex, 0 );
-            }
-
-            composeShader.SetTexture2D( &ssaoTex, 2 );
-            composeShader.Dispatch( width / 8, height / 8, 1, "Compose" );
-            composeShader.End();
-            ssaoBlurTex.SetLayout( TextureLayout::UAVBarrier );
-            ssaoBlurTex.SetLayout( TextureLayout::ShaderRead );
-
-            System::Draw( &ssaoBlurTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Off );
-            
-            // FIXME: This should also work with MSAA. Currently the texture layout is wrong on Vulkan.
-            if (!TestMSAA)
-            {
-                System::Draw( &camera2dTex, 0, 0, width, postHeight, width, postHeight, Vec4( 1, 1, 1, 1 ), System::BlendMode::Alpha );
-            }
+            RenderSSAO( width, height, postHeight );
         }
 
         scene.EndFrame();
