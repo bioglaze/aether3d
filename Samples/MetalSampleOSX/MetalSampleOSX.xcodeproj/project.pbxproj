@@ -45,6 +45,7 @@
 		ABE04FC61C1217F00025C436 /* Skybox.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC11C1217F00025C436 /* Skybox.metal */; };
 		ABE04FC71C1217F00025C436 /* SpriteShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC21C1217F00025C436 /* SpriteShader.metal */; };
 		ABE04FC81C1217F00025C436 /* Unlit.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABE04FC31C1217F00025C436 /* Unlit.metal */; };
+		ABFC140B2961A202009C9A84 /* Decal.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFC140A2961A202009C9A84 /* Decal.metal */; };
 		ABFD71AC1D81E55B003770D4 /* LightCuller.metal in Sources */ = {isa = PBXBuildFile; fileRef = ABFD71AB1D81E55B003770D4 /* LightCuller.metal */; };
 /* End PBXBuildFile section */
 
@@ -136,6 +137,7 @@
 		ABE04FC11C1217F00025C436 /* Skybox.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Skybox.metal; path = ../../../Engine/Assets/Skybox.metal; sourceTree = "<group>"; };
 		ABE04FC21C1217F00025C436 /* SpriteShader.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = SpriteShader.metal; path = ../../../Engine/Assets/SpriteShader.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 		ABE04FC31C1217F00025C436 /* Unlit.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Unlit.metal; path = ../../../Engine/Assets/Unlit.metal; sourceTree = "<group>"; };
+		ABFC140A2961A202009C9A84 /* Decal.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Decal.metal; path = ../../../Engine/Assets/Decal.metal; sourceTree = "<group>"; };
 		ABFD71AB1D81E55B003770D4 /* LightCuller.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = LightCuller.metal; path = ../../../Engine/Assets/LightCuller.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 /* End PBXFileReference section */
 
@@ -208,10 +210,7 @@
 		ABE04F811C1216A80025C436 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				AB5F5B7726CE93D400177557 /* particle.metal */,
-				AB93F880266E4FF300DF3C86 /* outline.metal */,
 				ABAB408C26174EFB00BFE12C /* sine340.wav */,
-				AB5DB100251630020050A421 /* SSAO.metal */,
 				AB5C3EBD24D1550000B17AF7 /* example.ogg */,
 				ABC1CC7D2067CE6E003D0A2D /* atlas_cegui.xml */,
 				AB1C9A131F0A607200948D46 /* human_anim_test2.ae3d */,
@@ -228,14 +227,18 @@
 				AB2CA8261C134ADE00D4D7C4 /* textured_cube.ae3d */,
 				ABCD9C6A1C131DA300B94BD0 /* font_txt.fnt */,
 				AB2BB13F2160FA8100454B1E /* Bloom.metal */,
+				ABFC140A2961A202009C9A84 /* Decal.metal */,
 				AB7839E31C70CA950065EF51 /* DepthNormals.metal */,
 				ABFD71AB1D81E55B003770D4 /* LightCuller.metal */,
 				AB657724200FD3BD0089CB54 /* MetalCommon.h */,
 				ABE04FBF1C1217F00025C436 /* Moments.metal */,
+				AB93F880266E4FF300DF3C86 /* outline.metal */,
+				AB5F5B7726CE93D400177557 /* particle.metal */,
 				ABE04FC01C1217F00025C436 /* SDF.metal */,
 				ABE04FC11C1217F00025C436 /* Skybox.metal */,
 				ABE04FC21C1217F00025C436 /* SpriteShader.metal */,
 				AB4ADC291D8EB2800032CBDD /* Standard.metal */,
+				AB5DB100251630020050A421 /* SSAO.metal */,
 				AB9330F01F744513004E4640 /* UnlitSkin.metal */,
 				ABE04FC31C1217F00025C436 /* Unlit.metal */,
 				ABE04F821C1216A80025C436 /* main.m */,
@@ -414,6 +417,7 @@
 				ABE04F831C1216A80025C436 /* main.m in Sources */,
 				ABE04FC41C1217F00025C436 /* Moments.metal in Sources */,
 				AB4ADC2A1D8EB2800032CBDD /* Standard.metal in Sources */,
+				ABFC140B2961A202009C9A84 /* Decal.metal in Sources */,
 				ABE04F861C1216A80025C436 /* GameViewController.mm in Sources */,
 				AB5F5B7826CE93D400177557 /* particle.metal in Sources */,
 				ABE04FC71C1217F00025C436 /* SpriteShader.metal in Sources */,
