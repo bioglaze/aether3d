@@ -1,7 +1,7 @@
 bl_info = {
     'name': 'Export Aether3D model format (.ae3d)',
     'author': 'Timo Wiren',
-    'version': (0,6),
+    'version': (0,7),
     'blender': (2, 80, 0),
     'location': 'File > Export > Aether3D',
     'description': 'Exports selected meshes to the Aether3D Engine format (.ae3d)',
@@ -27,7 +27,7 @@ from bpy.props import (
         EnumProperty,
         )
 
-from bpy_extras.io_utils import axis_conversion;
+from bpy_extras.io_utils import axis_conversion, ExportHelper;
 
 class Vertex:
     co = mathutils.Vector()
@@ -98,14 +98,14 @@ class OBJ:
     UVL = 'u'  # active uv-layer
 
 
-class Aether3DExporter( bpy.types.Operator ):
+class Aether3DExporter( bpy.types.Operator, ExportHelper ):
     """Export to the Aether3D model format (.ae3d)"""
     
     bl_idname = "export.aether3d"
     bl_description = "Exports selected meshes into Aether3D .ae3d format."
     bl_label = "Export Aether3D"
     
-    filepath = bpy.props.StringProperty()
+    filename_ext = ".ae3d"
     meshes = list()
     aabbMin = [ 99999999.0, 99999999.0, 99999999.0 ]
     aabbMax = [-99999999.0,-99999999.0,-99999999.0 ]
@@ -643,9 +643,8 @@ class Aether3DExporter( bpy.types.Operator ):
 
 
     def execute( self, context ):
-        FilePath = self.properties.filepath
-        if not FilePath.lower().endswith( ".ae3d" ):
-            FilePath += ".ae3d"
+        FilePath = self.filepath
+        FilePath = bpy.path.ensure_ext( FilePath, self.filename_ext )
 
         self.readMeshes( context )
         self.generateAABB()
