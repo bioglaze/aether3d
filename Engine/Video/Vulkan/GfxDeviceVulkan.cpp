@@ -972,6 +972,7 @@ namespace ae3d
         enabledFeatures.fragmentStoresAndAtomics = GfxDeviceGlobal::deviceFeatures.fragmentStoresAndAtomics;
         enabledFeatures.vertexPipelineStoresAndAtomics = GfxDeviceGlobal::deviceFeatures.vertexPipelineStoresAndAtomics;
         enabledFeatures.shaderStorageImageMultisample = GfxDeviceGlobal::deviceFeatures.shaderStorageImageMultisample;
+        enabledFeatures.shaderStorageImageReadWithoutFormat = GfxDeviceGlobal::deviceFeatures.shaderStorageImageReadWithoutFormat;
         
         if (debug::enabled)
         {
