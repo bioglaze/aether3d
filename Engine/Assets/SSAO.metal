@@ -63,7 +63,7 @@ uint2 ThreadGroupTilingX(
     const uint Number_of_perfect_tiles = dipatchGridDim.x / maxTileWidth;
 
     // Total number of CTAs present in the perfect tiles
-    const uint Total_CTAs_in_all_perfect_tiles = Number_of_perfect_tiles * maxTileWidth * dipatchGridDim.y - 1;
+    const uint Total_CTAs_in_all_perfect_tiles = Number_of_perfect_tiles * maxTileWidth * dipatchGridDim.y;
     const uint vThreadGroupIDFlattened = dipatchGridDim.x * groupId.y + groupId.x;
 
     // Tile_ID_of_current_CTA : current CTA to TILE-ID mapping.
@@ -72,7 +72,7 @@ uint2 ThreadGroupTilingX(
     uint Local_CTA_ID_y_within_current_tile;
     uint Local_CTA_ID_x_within_current_tile;
 
-    if (Total_CTAs_in_all_perfect_tiles < vThreadGroupIDFlattened)
+    if (Total_CTAs_in_all_perfect_tiles <= vThreadGroupIDFlattened)
     {
         // Path taken only if the last tile has imperfect dimensions and CTAs from the last tile are launched.
         uint X_dimension_of_last_tile = dipatchGridDim.x % maxTileWidth;
