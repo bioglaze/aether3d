@@ -627,7 +627,7 @@ namespace ae3d
         
         std::uint32_t queueCount;
         vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, nullptr );
-        System::Assert( queueCount >= 1 && queueCount < 5, "None or more queues than buffers have elements! Increase element count." );
+        System::Assert( queueCount >= 1 && queueCount <= 5, "None or more queues than buffers have elements! Increase element count." );
 
         VkQueueFamilyProperties queueProps[ 5 ];
         vkGetPhysicalDeviceQueueFamilyProperties( GfxDeviceGlobal::physicalDevice, &queueCount, &queueProps[ 0 ] );
