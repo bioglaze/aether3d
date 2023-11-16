@@ -39,7 +39,7 @@ constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
 constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = true;
+constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 constexpr bool TestSponza = true;
@@ -505,7 +505,7 @@ int main()
 #else
     int postHeight = height;
 #endif
-
+    
     Window::SetTitle( "Misc3D" );
     VR::Init();
     System::LoadBuiltinAssets();

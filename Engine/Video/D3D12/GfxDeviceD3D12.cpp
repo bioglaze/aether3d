@@ -5,14 +5,8 @@
 #include <dxgi1_4.h>
 #define D3DX12_NO_STATE_OBJECT_HELPERS
 #include <d3dx12.h>
-#define USE_RGP_MARKERS 0
-#if USE_RGP_MARKERS
-#define _PIX3_H_
-#include <AmdDxExt/AmdPix3.h>
-#else
 #define USE_PIX
 #include <WinPixEventRuntime/pix3.h>
-#endif
 #include <vector>
 #include <string>
 #include <sstream>
