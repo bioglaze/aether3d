@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <algorithm>
 #include <map>
 #include <string>
