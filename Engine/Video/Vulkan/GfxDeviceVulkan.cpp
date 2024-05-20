@@ -158,6 +158,7 @@ namespace GfxDeviceGlobal
     ae3d::VertexBuffer::Face uiFaces[ UI_FACE_COUNT ];
     std::vector< ae3d::VertexBuffer > lineBuffers;
     VkPipeline cachedPSO;
+    bool supportsMemoryBudget = false;
 }
 
 namespace ae3d
@@ -948,7 +949,6 @@ namespace ae3d
 
         std::vector< const char* > deviceExtensions;
         deviceExtensions.push_back( VK_KHR_SWAPCHAIN_EXTENSION_NAME );
-        deviceExtensions.push_back( VK_EXT_MEMORY_BUDGET_EXTENSION_NAME );
 
         std::uint32_t deviceExtensionCount;
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, nullptr );
@@ -956,6 +956,15 @@ namespace ae3d
         availableDeviceExtensions.Allocate( deviceExtensionCount );
         
         vkEnumerateDeviceExtensionProperties( GfxDeviceGlobal::physicalDevice, nullptr, &deviceExtensionCount, availableDeviceExtensions.elements );
+
+        for (uint32_t i = 0; i < deviceExtensionCount; ++i)
+        {
+            if (strstr( availableDeviceExtensions.elements[ i ].extensionName, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME ))
+            {
+                deviceExtensions.push_back( VK_EXT_MEMORY_BUDGET_EXTENSION_NAME );
+                GfxDeviceGlobal::supportsMemoryBudget = true;
+            }
+        }
 
         debug::hasMarker = true;
 
@@ -1970,24 +1979,32 @@ void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )
 
 void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outBudgetMBytes )
 {
-    VkPhysicalDeviceMemoryBudgetPropertiesEXT propExt = {};
-    propExt.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
-
-    VkPhysicalDeviceMemoryProperties2 deviceMemoryProperties2 = {};
-    deviceMemoryProperties2 = {};
-    deviceMemoryProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
-    deviceMemoryProperties2.pNext = &propExt;
-    vkGetPhysicalDeviceMemoryProperties2( GfxDeviceGlobal::physicalDevice, &deviceMemoryProperties2 );
-
-    size_t usageSum = 0;
-
-    for (size_t i = 0; i < GfxDeviceGlobal::deviceMemoryProperties.memoryHeapCount; ++i)
+    if (GfxDeviceGlobal::supportsMemoryBudget)
     {
-        usageSum += propExt.heapUsage[ i ];
-    }
+        VkPhysicalDeviceMemoryBudgetPropertiesEXT propExt = {};
+        propExt.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
 
-    outUsedMBytes = (unsigned int)usageSum;
-    outBudgetMBytes = 0;
+        VkPhysicalDeviceMemoryProperties2 deviceMemoryProperties2 = {};
+        deviceMemoryProperties2 = {};
+        deviceMemoryProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
+        deviceMemoryProperties2.pNext = &propExt;
+        vkGetPhysicalDeviceMemoryProperties2( GfxDeviceGlobal::physicalDevice, &deviceMemoryProperties2 );
+
+        size_t usageSum = 0;
+
+        for (size_t i = 0; i < GfxDeviceGlobal::deviceMemoryProperties.memoryHeapCount; ++i)
+        {
+            usageSum += propExt.heapUsage[ i ];
+        }
+
+        outUsedMBytes = (unsigned int)usageSum;
+        outBudgetMBytes = 0;
+    }
+    else
+    {
+        outUsedMBytes = 0;
+        outBudgetMBytes = 0;
+    }
 }
 
 void ae3d::GfxDevice::ClearScreen( unsigned /*clearFlags*/ )
