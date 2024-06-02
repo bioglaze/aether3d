@@ -1,6 +1,6 @@
 # Aether3D Game Engine
 
-Author: [Timo Wirén](http://twiren.kapsi.fi)
+Author: [Timo Wirén](https://twiren.kapsi.fi)
 
 ![Screenshot](/Engine/Assets/sample.jpg)
 
@@ -33,7 +33,7 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
   - Tone mapping
   - DoF
-  - Most of the features in my [previous engine](http://twiren.kapsi.fi/aether3d.html)
+  - Most of the features in my [previous engine](https://twiren.kapsi.fi/aether3d.html)
 
 # Sample Code
 
@@ -108,9 +108,10 @@ Author: [Timo Wirén](http://twiren.kapsi.fi)
 
 # Tested GPUs
   - AMD Radeon R9 Nano on Ubuntu 20.04 and Windows 10
-  - NVIDIA GTX 750M on MacBook Pro 2013 and macOS Catalina
-  - NVIDIA GTX 1080 on Windows 10
-  - NVIDIA RTX 2060 on Windows 10
+  - NVIDIA GeForce GTX 780 on Windows 10 and Debian 12
+  - NVIDIA GeForce GTX 750M on MacBook Pro 2013 and macOS Catalina
+  - NVIDIA GeForce GTX 1080 on Windows 10
+  - NVIDIA GeForce RTX 2060 on Windows 10
   - Intel Skylake HD530 on Ubuntu 18.04
 
 # Running Tests

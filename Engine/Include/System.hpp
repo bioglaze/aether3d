@@ -9,7 +9,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.8.7 Documentation
+   \mainpage Aether3D Game Engine v0.8.8 Documentation
 
    \section Introduction
 
