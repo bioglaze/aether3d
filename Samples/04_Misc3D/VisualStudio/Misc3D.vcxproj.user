@@ -47,6 +47,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan|x64'">
     <LocalDebuggerWorkingDirectory>$(TargetDir)\Samples</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerEnvironment>
+    </LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Vulkan OpenVR|x64'">
     <LocalDebuggerWorkingDirectory>$(TargetDir)\Samples</LocalDebuggerWorkingDirectory>

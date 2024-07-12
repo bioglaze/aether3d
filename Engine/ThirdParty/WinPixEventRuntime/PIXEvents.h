@@ -929,7 +929,7 @@ namespace PIXEventsDetail
         UINT64* destination = nullptr;
 #ifdef PIX_CONTEXT_EMIT_CPU_EVENTS
 #ifdef PIX_AMD_EXT
-        RgpPIXEndEventOnContextCpu( context );
+        RgpPIXEndEventOnContextCpu( destination, context );
 #else
         destination = PIXEndEventOnContextCpu( context );
 #endif

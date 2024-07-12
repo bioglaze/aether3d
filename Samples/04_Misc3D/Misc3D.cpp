@@ -42,7 +42,7 @@ constexpr bool TestForwardPlus = false;
 constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 // Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
-constexpr bool TestSponza = false;
+constexpr bool TestSponza = true;
 
 using namespace ae3d;
 

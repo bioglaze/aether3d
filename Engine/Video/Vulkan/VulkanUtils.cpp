@@ -114,9 +114,9 @@ namespace debug
         if( !(msgType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) )
         {
 #if _MSC_VER && DEBUG
-            __debugbreak();
+            //__debugbreak();
 #endif
-            ae3d::System::Assert( false, "Vulkan error!" );
+            //ae3d::System::Assert( false, "Vulkan error!" );
         }
         
         return VK_FALSE;

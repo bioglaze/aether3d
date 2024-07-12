@@ -43,7 +43,7 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     config.vertex_layout = vertex_layout;
     config.vertex_size = sizeof( VertexPTC );
     config.vertex_alignment = NK_ALIGNOF( VertexPTC );
-    config.null = nullTexture;
+    config.tex_null = nullTexture;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;
     config.arc_segment_count = 22;
