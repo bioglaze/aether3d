@@ -163,7 +163,7 @@ CollisionTest colTest = CollisionTest::Triangles;
 
 static float Min2( float a, float b )
 {
-    return a < b ? b : a;
+    return a < b ? a : b;
 }
 
 static float Max2( float a, float b )
