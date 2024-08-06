@@ -1361,7 +1361,7 @@ void ae3d::GfxDevice::PushGroupMarker( const char* name )
     LPWSTR ptr = wtext;
     RgpPushMarker( GfxDeviceGlobal::graphicsCommandList, ptr );
 #else
-    PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, 0, name );
+    PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, PIX_COLOR_DEFAULT, name);
 #endif
 }
 
