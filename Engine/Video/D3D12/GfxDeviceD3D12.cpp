@@ -1540,6 +1540,21 @@ void ae3d::GfxDevice::SetScissor( int scissor[ 4 ] )
     rect.right = scissor[ 2 ];
     rect.top = scissor[ 1 ];
     rect.bottom = scissor[ 3 ];
+    
+    if (rect.bottom < rect.top)
+    {
+        LONG temp = rect.top;
+        rect.top = rect.bottom;
+        rect.bottom = temp;
+    }
+
+    if (rect.right < rect.left)
+    {
+        LONG temp = rect.left;
+        rect.left = rect.right;
+        rect.right = temp;
+    }
+
     GfxDeviceGlobal::graphicsCommandList->RSSetScissorRects( 1, &rect );
 }
 
