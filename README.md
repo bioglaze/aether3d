@@ -72,7 +72,7 @@ Author: [Timo Wirén](https://twiren.kapsi.fi)
 # Build
 
   - After building build artifacts can be found in aether3d_build next to aether3d.
-  - Grab the [sample asset archive](https://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip) and extract it into aether3d_build/Samples after building.
+  - Grab the [sample asset archive](https://twiren.kapsi.fi/files/aether3d_sample_v0.8.8.zip) and extract it into aether3d_build/Samples after building.
 
 ## Windows
 
