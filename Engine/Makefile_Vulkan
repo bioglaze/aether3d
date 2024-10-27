@@ -11,6 +11,18 @@ GCCWARNINGS := -g -Wall -pedantic -Wextra -Wshadow -Wcast-align -Wcast-qual -Wct
  -Wshadow -Wredundant-decls -Wsign-promo -Wstrict-null-sentinel -Wtrampolines \
  -Wvector-operation-performance -Wuseless-cast -Wformat=2
 
+ARCH := $(shell uname -m)
+
+ifeq ($(ARCH), aarch64)
+SIMD := -DSIMD_NEON
+else
+ifeq ($(ARCH), arm64)
+SIMD := -DSIMD_NEON
+else
+SIMD := -DSIMD_SSE3
+endif
+endif
+
 NEW_GCC_WARNINGS := -Wduplicated-cond -Wduplicated-branches -Wrestrict
 
 CLANGWARNINGS := -Wall -Wextra -ansi -pedantic
@@ -25,7 +37,7 @@ WARNINGS := $(GCCWARNINGS)
 endif
 
 ifeq ($(UNAME), Linux)
-DEFINES := -msse3 -DSIMD_SSE3 -DDEBUG -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
+DEFINES := $(SIMD) -DDEBUG -DRENDERER_VULKAN -DVK_USE_PLATFORM_XCB_KHR
 endif
 
 ifeq ($(OS),Windows_NT)
