@@ -405,8 +405,6 @@ int main()
             }
         }
 
-        moveDir += gamepadMoveDir;
-        
         inspector.EndInput();
         svHighlightGizmo( sceneView, x, y, width, height );
 
@@ -423,7 +421,8 @@ int main()
         
         Inspector::Command inspectorCommand{};
 
-        svMoveCamera( sceneView, moveDir );
+        svMoveCamera( sceneView, moveDir + gamepadMoveDir );
+        gamepadMoveDir = Vec3( 0, 0, 0 );
 
         if (event.type == WindowEventType::MouseWheelScrollDown || event.type == WindowEventType::MouseWheelScrollUp)
         {
