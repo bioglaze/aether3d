@@ -1,11 +1,6 @@
-/*==========================================================================;
- *
- *  Copyright (C) Microsoft Corporation.  All Rights Reserved.
- *
- *  File:       pix3.h
- *  Content:    PIX include file
- *
- ****************************************************************************/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 #pragma once
 
 #ifndef _PIX3_H_
@@ -78,7 +73,9 @@ union PIXCaptureParameters
         BOOL CaptureVirtualAllocEvents;
         BOOL CaptureHeapAllocEvents;
         BOOL CaptureXMemEvents; // Xbox only
-        BOOL CapturePixMemEvents; // Xbox only
+        BOOL CapturePixMemEvents;
+        BOOL CapturePageFaultEvents;
+        BOOL CaptureVideoFrames; // Xbox only
     } TimingCaptureParameters;
 
     struct GpuTraceParameters // Xbox Series and newer only

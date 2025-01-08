@@ -545,7 +545,11 @@ namespace PIXEventsDetail
         UINT8 eventSize = 0u;
 
 #ifdef PIX_CONTEXT_EMIT_CPU_EVENTS
-        PIXBeginEventOnContextCpu(destination, eventSize, context, color, formatString, args...);
+#ifdef PIX_AMD_EXT
+        RgpPIXBeginEventOnContextCpu(destination, eventSize, context, color, formatString, args...);
+#else
+        PIXBeginEventOnContextCpu( destination, eventSize, context, color, formatString, args... );
+#endif
 #endif
 
 #ifdef PIX_USE_GPU_MARKERS_V2

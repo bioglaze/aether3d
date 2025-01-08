@@ -1355,23 +1355,12 @@ void* ae3d::GfxDevice::GetCurrentConstantBuffer()
 
 void ae3d::GfxDevice::PushGroupMarker( const char* name )
 {
-#if USE_RGP_MARKERS
-    wchar_t wtext[ 20 ];
-    mbstowcs( wtext, name, strlen( name ) + 1 );
-    LPWSTR ptr = wtext;
-    RgpPushMarker( GfxDeviceGlobal::graphicsCommandList, ptr );
-#else
-    PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, PIX_COLOR_DEFAULT, name);
-#endif
+    PIXBeginEvent( GfxDeviceGlobal::graphicsCommandList, PIX_COLOR_DEFAULT, name );
 }
 
 void ae3d::GfxDevice::PopGroupMarker()
 {
-#if USE_RGP_MARKERS
-    RgpPopMarker( GfxDeviceGlobal::graphicsCommandList );
-#else
     PIXEndEvent( GfxDeviceGlobal::graphicsCommandList );
-#endif
 }
 
 void ae3d::GfxDevice::DrawLines( int handle, Shader& shader )

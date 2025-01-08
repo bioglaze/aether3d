@@ -1,13 +1,8 @@
-/*==========================================================================;
-*
-*  Copyright (C) Microsoft Corporation.  All Rights Reserved.
-*
-*  File:       PIXEventsLegacy.h
-*  Content:    PIX include file.
-*              Don't include this file directly - use pix3.h.
-*              This file encodes PIX events in the legacy PIX event format.
-*
-****************************************************************************/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+// Don't include this file directly - use pix3.h
+// This file encodes PIX events in the legacy PIX event format.
 
 #ifndef _PIXEventsLegacy_H_
 #define _PIXEventsLegacy_H_
