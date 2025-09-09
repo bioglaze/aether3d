@@ -19,7 +19,7 @@ else
 ifeq ($(ARCH), arm64)
 SIMD := -DSIMD_NEON
 else
-SIMD := -DSIMD_SSE3
+SIMD := -DSIMD_SSE3 -msse3
 endif
 endif
 

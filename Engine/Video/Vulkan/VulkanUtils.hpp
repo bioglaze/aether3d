@@ -2,6 +2,7 @@
 #define VULKAN_UTILS
 
 #include <vulkan/vulkan.h>
+#include <cstdint>
 
 namespace ae3d
 {
