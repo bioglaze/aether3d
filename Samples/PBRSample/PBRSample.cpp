@@ -282,8 +282,8 @@ int main()
     Texture2D albedoTex;
     albedoTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_albedo.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
-    Texture2D albedoTex2;
-    albedoTex2.Load( FileSystem::FileContents( "textures/asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
+    Texture2D asphaltTex;
+    asphaltTex.Load( FileSystem::FileContents( "textures/asphalt.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
     Texture2D normalTex;
     normalTex.Load( FileSystem::FileContents( "DamagedHelmet/Default_normal.jpg" ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::Linear, Anisotropy::k1 );
@@ -339,7 +339,7 @@ int main()
     for (int i = 0; i < 5; ++i)
     {
         sphereMaterials[ i ].SetShader( &standardShader );
-        sphereMaterials[ i ].SetTexture( &albedoTex2, 0 );
+        sphereMaterials[ i ].SetTexture( &asphaltTex, 0 );
         sphereMaterials[ i ].SetTexture( &normalTex, 1 );
         sphereMaterials[ i ].SetBackFaceCulling( true );
         sphereMaterials[ i ].SetF0( 1.0f / (i+1) );
@@ -545,7 +545,7 @@ int main()
 
         static float f0 = 0.6f;
 
-        if (nk_begin( &ctx, "Demo", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
+        if (nk_begin( &ctx, "Settings", nk_rect( 0, 50, 300, 400 ), NK_WINDOW_BORDER | NK_WINDOW_TITLE ))
         {
             nk_layout_row_static( &ctx, 30, 80, 1 );
 
@@ -563,9 +563,28 @@ int main()
 
             nk_property_float( &ctx, "#X:", -1024.0f, &pos, 1024.0f, 1, 1 );
 
-            static const char *weapons[] = { "Fist", "Pistol", "Shotgun" };
-            static int current_weapon = 0;
-            current_weapon = nk_combo( &ctx, weapons, 3, current_weapon, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
+            static const char *textures[] = { "Asphalt", "Font", "White" };
+            static int currentTexture = 0;
+            currentTexture = nk_combo( &ctx, textures, 3, currentTexture, 25, nk_vec2( nk_widget_width( &ctx ), 200 ) );
+
+            for (int i = 0; i < 5; ++i)
+            {
+                if (currentTexture == 0)
+                {
+                    sphereMaterials[ i ].SetTexture( &asphaltTex, 0 );
+                }
+                else if (currentTexture == 1)
+                {
+                    sphereMaterials[ i ].SetTexture( &fontTex, 0 );
+                }
+                else if (currentTexture == 2)
+                {
+                    sphereMaterials[ i ].SetTexture( &whiteTex, 0 );
+                }
+                sphereMaterials[ i ].SetTexture( &normalTex, 1 );
+                sphereMaterials[ i ].SetBackFaceCulling( true );
+                sphereMaterials[ i ].SetF0( 1.0f / (i + 1) );
+            }
 
             nk_layout_row_begin( &ctx, NK_STATIC, 30, 2 );
             {
