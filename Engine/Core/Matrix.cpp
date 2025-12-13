@@ -137,7 +137,7 @@ void Matrix44::Invert( const Matrix44& matrix, Matrix44& out )
 }
 
 #ifndef SIMD_SSE3
-#if !(RENDERER_METAL && !(__i386__))
+#if !(__i386__)
 void Matrix44::Multiply( const Matrix44& a, const Matrix44& b, Matrix44& out )
 {
     float tmp[ 16 ];
