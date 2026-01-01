@@ -30,7 +30,7 @@
 #include "VR.hpp"
 #include "Window.hpp"
 
-// Assets for this sample (extract into aether3d_build/Samples): https://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip
+// Assets for this sample (extract into aether3d_build/Samples): https://twiren.kapsi.fi/files/aether3d_sample_v0.8.9.zip
 
 constexpr bool TestMSAA = false;
 constexpr bool TestRenderTexture2D = false;
@@ -38,10 +38,9 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = false;
-constexpr bool TestBloom = false;
+constexpr bool TestForwardPlus = true;
+constexpr bool TestBloom = true;
 constexpr bool TestSSAO = false;
-// Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 constexpr bool TestSponza = true;
 
 using namespace ae3d;
