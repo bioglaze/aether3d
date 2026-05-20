@@ -544,15 +544,20 @@ namespace ae3d
         AE3D_CHECK_VULKAN( err, "vkBeginCommandBuffer" );
 
         SetImageLayout( GfxDeviceGlobal::postPresentCmdBuffer, GfxDeviceGlobal::swapchainBuffers[ GfxDeviceGlobal::currentBuffer ].image, VK_IMAGE_ASPECT_COLOR_BIT,
-                        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
+            VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 0, 1 );
 
         err = vkEndCommandBuffer( GfxDeviceGlobal::postPresentCmdBuffer );
         AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );
+
+        VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
         VkSubmitInfo submitPostInfo = {};
         submitPostInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitPostInfo.commandBufferCount = 1;
         submitPostInfo.pCommandBuffers = &GfxDeviceGlobal::postPresentCmdBuffer;
+        submitPostInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
+        submitPostInfo.waitSemaphoreCount = 1;
+        submitPostInfo.pWaitDstStageMask = &pipelineStages;
 
         err = vkQueueSubmit( GfxDeviceGlobal::graphicsQueue, 1, &submitPostInfo, VK_NULL_HANDLE );
         AE3D_CHECK_VULKAN( err, "vkQueueSubmit" );
@@ -858,11 +863,11 @@ namespace ae3d
             err = vkCreateImageView( GfxDeviceGlobal::device, &colorAttachmentView, nullptr, &GfxDeviceGlobal::swapchainBuffers[ i ].view );
             AE3D_CHECK_VULKAN( err, "vkCreateImageView" );
 
-            SetImageLayout(
+            /*SetImageLayout(
             GfxDeviceGlobal::setupCmdBuffer,
             GfxDeviceGlobal::swapchainBuffers[ i ].image,
             VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 0, 1 );
+            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 0, 1 );*/
         }
     }
 
@@ -2246,13 +2251,8 @@ void ae3d::GfxDevice::Present()
 #if AE3D_OPENVR
     VR::SubmitFrame();
 #else
-    VkPipelineStageFlags pipelineStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pWaitDstStageMask = &pipelineStages;
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &GfxDeviceGlobal::presentCompleteSemaphore;
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &GfxDeviceGlobal::renderCompleteSemaphore;
     submitInfo.commandBufferCount = 1;

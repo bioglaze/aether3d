@@ -74,6 +74,9 @@ namespace debug
         if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
         {
             ae3d::System::Print( "ERROR: %s\n", callbackData->pMessage );
+#if _MSC_VER && DEBUG
+            __debugbreak();
+#endif
         }
         else if (msgSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
         {
