@@ -9,7 +9,7 @@
 #endif
 
 /**
-   \mainpage Aether3D Game Engine v0.8.8 Documentation
+   \mainpage Aether3D Game Engine v0.8.9 Documentation
 
    \section Introduction
 
@@ -47,7 +47,7 @@
 
    \section Compilation
 
-   Grab the <a href="https://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
+   Grab the <a href="https://twiren.kapsi.fi/files/aether3d_sample_v0.8.9.zip">sample asset archive</a> and extract it into aether3d_build/Samples after building.
 
    \subsection win1 Windows/Visual Studio
    

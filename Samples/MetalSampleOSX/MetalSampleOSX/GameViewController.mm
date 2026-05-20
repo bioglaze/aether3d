@@ -1,5 +1,5 @@
 // This sample's assets are referenced from aether3d_build/Samples. Make sure that they exist.
-// Assets can be downloaded from https://twiren.kapsi.fi/files/aether3d_sample_v0.8.7.zip
+// Assets can be downloaded from https://twiren.kapsi.fi/files/aether3d_sample_v0.8.9.zip
 // If you didn't download a release of Aether3D, some referenced assets could be missing,
 // just remove the references to build.
 #import "GameViewController.h"
@@ -350,7 +350,6 @@ using namespace ae3d;
     audioContainer.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     //audioContainer.GetComponent<AudioSourceComponent>()->Play();
 
-    // Sponza can be downloaded from https://twiren.kapsi.fi/files/aether3d_sponza.zip and extracted into aether3d_build/Samples
 #if 1
     auto res = scene.Deserialize( FileSystem::FileContents( "sponza.scene" ), sponzaGameObjects, sponzaTextureNameToTexture,
                                  sponzaMaterialNameToMaterial, sponzaMeshes );
