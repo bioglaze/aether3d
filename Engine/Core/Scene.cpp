@@ -1222,6 +1222,48 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             particleSystem->SetEnabled( enabled != 0 );
         }
+        else if (token == "spriterenderer_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found \"spriterenderer_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto spriteRenderer = outGameObjects.back().GetComponent< SpriteRendererComponent >();
+
+            if (spriteRenderer == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found \"spriterenderer_enabled\" but the game object doesn't have a sprite renderer component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            spriteRenderer->SetEnabled( enabled != 0 );
+        }
+        else if (token == "textrenderer_enabled")
+        {
+            if (outGameObjects.empty())
+            {
+                System::Print( "Failed to parse %s at line %d: found \"textrenderer_enabled\" but there are no game objects defined before this line.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            int enabled;
+            lineStream >> enabled;
+
+            auto textRenderer = outGameObjects.back().GetComponent< TextRendererComponent >();
+
+            if (textRenderer == nullptr)
+            {
+                System::Print( "Failed to parse %s at line %d: found \"textrenderer_enabled\" but the game object doesn't have a text renderer component.\n", serialized.path.c_str(), lineNo );
+                return DeserializeResult::ParseError;
+            }
+
+            textRenderer->SetEnabled( enabled != 0 );
+        }
         else if (token == "decalrenderer_enabled")
         {
             if (outGameObjects.empty())

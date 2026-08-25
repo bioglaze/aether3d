@@ -155,7 +155,7 @@ std::string GetSerialized( const ae3d::TextRendererComponent* component )
     outStream << "textrenderer\n";
     const auto& color = component->GetColor();
     outStream << "color " << color.x << " " << color.y << " " << color.z << " " << color.w << "\n";
-    outStream << "enabled" << component->IsEnabled() << "\n";
+    outStream << "textrenderer_enabled " << (component->IsEnabled() ? "1" : "0") << "\n";
     outStream << "text " << std::string( component->GetText() ) << "\n\n";
 
     return outStream.str();

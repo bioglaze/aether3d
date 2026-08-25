@@ -267,7 +267,7 @@ std::string ae3d::SpriteRendererComponent::GetSerialized() const
 {
     std::stringstream outStream;
     outStream << "spriterenderer\n";
-    outStream << "enabled" << isEnabled << "\n";
+    outStream << "spriterenderer_enabled " << (isEnabled ? "1" : "0") << "\n";
     
     for (std::size_t spriteIndex = 0; spriteIndex < m().spriteInfos.size(); ++spriteIndex)
     {
