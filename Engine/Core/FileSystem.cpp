@@ -122,7 +122,7 @@ void ae3d::FileSystem::LoadPakFile( const char* path )
     }
 
     unsigned entryCount = 0;
-    std::ifstream ifs( path );
+    std::ifstream ifs( path, std::ifstream::binary );
     if (!ifs.is_open())
     {
         System::Print( "LoadPakFile: Could not open %s\n", path );
