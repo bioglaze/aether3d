@@ -30,7 +30,7 @@ CLANGWARNINGS := -Wall -Wextra -ansi -pedantic
 SANITIZERS := -fsanitize=address,undefined
 
 ifeq ($(COMPILER), clang)
-WARNINGS := $(CLANGWARNGING)
+WARNINGS := $(CLANGWARNINGS)
 endif
 ifeq ($(COMPILER), g++)
 WARNINGS := $(GCCWARNINGS)
