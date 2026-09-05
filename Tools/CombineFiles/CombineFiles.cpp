@@ -75,7 +75,7 @@ int main( int argCount, char* args[] )
         ofs.write( (char*)path, MaxPathLength );
         ofs.write( (char*)&file.dataSize, 4 );
         std::vector< unsigned char > data;
-        std::ifstream ifs( file.path );
+        std::ifstream ifs( file.path, std::ifstream::binary );
         data.assign( std::istreambuf_iterator< char >( ifs ), std::istreambuf_iterator< char >() );
         ofs.write( (char*)data.data(), data.size() );
     }
