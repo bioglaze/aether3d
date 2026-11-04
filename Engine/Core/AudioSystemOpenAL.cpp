@@ -105,6 +105,7 @@ void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
 
     info.lengthInSeconds = stb_vorbis_stream_length_in_seconds( vorbis );
 
+    free( decoded );
     CheckOpenALError("Loading ogg");
 }
 
@@ -120,8 +121,8 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
     WAVE wav = {};
     
     ifs.read( (char*)&wav.chunkID[ 0 ], 4 );
-    if (wav.chunkID[0] != 'R' && wav.chunkID[1] != 'I' &&
-        wav.chunkID[2] != 'F' && wav.chunkID[3] != 'F')
+    if (wav.chunkID[0] != 'R' || wav.chunkID[1] != 'I' ||
+        wav.chunkID[2] != 'F' || wav.chunkID[3] != 'F')
     {
         ae3d::System::Print( "LoadWav: %s is not a valid .wav file!\n", clipData.path.c_str() );
         return;
@@ -130,16 +131,16 @@ void LoadWav( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
     ifs.read( (char*)&wav.chunkSize, 4 );
     
     ifs.read( (char*)&wav.format[ 0 ], 4 );
-    if (wav.format[0] != 'W' && wav.format[1] != 'A' &&
-        wav.format[2] != 'V' && wav.format[3] != 'E')
+    if (wav.format[0] != 'W' || wav.format[1] != 'A' ||
+        wav.format[2] != 'V' || wav.format[3] != 'E')
     {
         ae3d::System::Print( "%s is not a valid .wav file!\n", clipData.path.c_str() );
         return;
     }
     
     ifs.read( (char*)&wav.subchunk1ID, 4 );
-    if (wav.subchunk1ID[0] != 'f' && wav.subchunk1ID[1] != 'm' &&
-        wav.subchunk1ID[2] != 't' && wav.subchunk1ID[3] != ' ')
+    if (wav.subchunk1ID[0] != 'f' || wav.subchunk1ID[1] != 'm' ||
+        wav.subchunk1ID[2] != 't' || wav.subchunk1ID[3] != ' ')
     {
         ae3d::System::Print( "%s is not a valid .wav file!\n", clipData.path.c_str() );
         return;
@@ -302,7 +303,7 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     {
         if (AudioGlobal::clips[ i ].path == clipData.path)
         {
-            return i;
+            return i + 1;
         }
     }
     
@@ -319,8 +320,6 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     alGenBuffers( 1, &info.bufID );
     alGenSources( 1, &info.srcID );
 
-    AudioGlobal::clips.Add( info );
-
     const std::string extension = clipData.path.substr( clipData.path.length() - 3, clipData.path.length() );
     
     if (extension == "wav" || extension == "WAV")
@@ -333,9 +332,11 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     }
     else
     {
-        System::Print( "Unsupported audio file extension in %d. Must be .wav or .ogg.\n", clipData.path.c_str() );
+        System::Print( "Unsupported audio file extension in %s. Must be .wav or .ogg.\n", clipData.path.c_str() );
     }
     
+    AudioGlobal::clips.Add( info );
+
     alListener3f( AL_POSITION, 0.0f, 0.0f, 0.0f );
     alSource3f( info.srcID, AL_POSITION, 0.0f, 0.0f, 0.0f );
     alSourcei( info.srcID, AL_BUFFER, info.bufID );
