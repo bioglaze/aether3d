@@ -176,7 +176,7 @@ void ae3d::Mesh::GetSubMeshFlattenedTriangles( unsigned subMeshIndex, Array< Vec
     
     auto& subMesh = m().subMeshes[ subMeshIndex ];
     const int faceCount = subMesh.vertexBuffer.GetFaceCount();
-    outTriangles.Allocate( faceCount * 3 );
+    outTriangles.Allocate( faceCount );
     
     if (!subMesh.verticesPTNTC.empty())
     {

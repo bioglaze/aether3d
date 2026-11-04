@@ -55,6 +55,6 @@ void Matrix44::TransformPoint( const Vec4& vec, const Matrix44& mat, Vec4* out )
     __m128 sum_01 = _mm_hadd_ps( r1, r2 );
     __m128 sum_23 = _mm_hadd_ps( r3, r4 );
     __m128 result = _mm_hadd_ps( sum_01, sum_23 );
-    _mm_store_ps( &out->x, result );
+    _mm_storeu_ps( &out->x, result );
 }
 #endif

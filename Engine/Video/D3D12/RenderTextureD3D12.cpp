@@ -123,7 +123,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         descDepth.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
         descDepth.Width = width;
         descDepth.Height = height;
-        descDepth.DepthOrArraySize = isMultisampled ? 4 : 1;
+        descDepth.DepthOrArraySize = 1;
         descDepth.MipLevels = 1;
         descDepth.Format = depthFormat;
         descDepth.SampleDesc.Count = isMultisampled ? 4 : 1;
@@ -173,7 +173,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         uav = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
         uavDesc.Format = dxgiFormat;
-        uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        uavDesc.ViewDimension = isMultisampled ? D3D12_UAV_DIMENSION_TEXTURE2DMS : D3D12_UAV_DIMENSION_TEXTURE2D;
         uavDesc.Texture2D.MipSlice = 0;
         uavDesc.Texture2D.PlaneSlice = 0;
 
@@ -185,7 +185,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
         uavDepth = DescriptorHeapManager::AllocateDescriptor( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV );
 
         uavDescDepth.Format = depthFormat;
-        uavDescDepth.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+        uavDescDepth.ViewDimension = isMultisampled ? D3D12_UAV_DIMENSION_TEXTURE2DMS : D3D12_UAV_DIMENSION_TEXTURE2D;
         uavDescDepth.Texture2D.MipSlice = 0;
         uavDescDepth.Texture2D.PlaneSlice = 0;
 
