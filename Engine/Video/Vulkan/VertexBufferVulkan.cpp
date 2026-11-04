@@ -392,7 +392,7 @@ void ae3d::VertexBuffer::UpdateDynamic( const Face* faces, int faceCount, const 
 
     std::memcpy( stagingBuffers.indices.mappedData, faces, faceCount * 3 * 2 );
 
-    for (unsigned vertexInd = 0; vertexInd < verticesPTNTC.count; ++vertexInd)
+    for (unsigned vertexInd = 0; vertexInd < vertexCount; ++vertexInd)
     {
         verticesPTNTC[ vertexInd ].position = vertices[ vertexInd ].position;
         verticesPTNTC[ vertexInd ].u = vertices[ vertexInd ].u;

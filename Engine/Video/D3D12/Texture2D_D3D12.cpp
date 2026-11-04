@@ -409,7 +409,7 @@ int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool 
     }
     else if (format == DXGI_FORMAT_R32G32B32A32_FLOAT)
     {
-        bytesPerPixel = 4 * 3;
+        bytesPerPixel = 4 * 4;
     }
     else if (format == DXGI_FORMAT_BC1_UNORM || format == DXGI_FORMAT_BC1_UNORM_SRGB)
     {
@@ -440,7 +440,7 @@ int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool 
         ae3d::System::Assert( false, "Unhandled DDS format!" );
     }
 
-    return (int)(width * height * bytesPerPixel * (hasMips ? 1.0f : 1.33333f));
+    return (int)(width * height * bytesPerPixel * (hasMips ? 1.33333f : 1.0f));
 }
 
 void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, TextureWrap aWrap, TextureFilter aFilter, Mipmaps aMipmaps, ColorSpace aColorSpace, Anisotropy aAnisotropy )

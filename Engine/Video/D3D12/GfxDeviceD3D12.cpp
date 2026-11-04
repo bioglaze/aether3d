@@ -296,7 +296,7 @@ void GpuCrashHandler()
 
         if (hr == S_OK)
         {
-            ae3d::System::Print( "Page Fault, VA: %lu\n", pageFaultOutput.PageFaultVA );
+            ae3d::System::Print( "Page Fault, VA: %llu\n", pageFaultOutput.PageFaultVA );
 
             const D3D12_DRED_ALLOCATION_NODE1* freedNode = pageFaultOutput.pHeadRecentFreedAllocationNode;
             
@@ -308,7 +308,7 @@ void GpuCrashHandler()
             while (freedNode != nullptr)
             {
                 ae3d::System::Print( "%s: %s\n", GpuAllocationType( freedNode->AllocationType ), freedNode->ObjectNameA );
-
+                freedNode = freedNode->pNext;
             }
         }
     }
@@ -716,13 +716,13 @@ std::uint64_t GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::S
 {
     std::uint64_t outResult = (unsigned)vertexFormat;
     outResult += (ptrdiff_t)&shader;
-    outResult += (unsigned)blendMode;
-    outResult += ((unsigned)depthFunc) * 4;
-    outResult += ((unsigned)cullMode) * 16;
-    outResult += ((unsigned)fillMode) * 32;
-    outResult += ((unsigned)rtvFormat) * 64;
-    outResult += sampleCount * 128;
-    outResult += ((unsigned)topology) * 256;
+    outResult += (unsigned)blendMode * 8;
+    outResult += ((unsigned)depthFunc) * 16;
+    outResult += ((unsigned)cullMode) * 64;
+    outResult += ((unsigned)fillMode) * 128;
+    outResult += ((unsigned)rtvFormat) * 256;
+    outResult += sampleCount * 512;
+    outResult += ((unsigned)topology) * 1024;
 
     return outResult;
 }
@@ -1216,7 +1216,7 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     GfxDeviceGlobal::fence->Signal( 0 );
 
     GfxDeviceGlobal::fenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
-    ae3d::System::Assert( GfxDeviceGlobal::fenceEvent != INVALID_HANDLE_VALUE, "Invalid fence event value!" );
+    ae3d::System::Assert( GfxDeviceGlobal::fenceEvent != nullptr, "Invalid fence event value!" );
 
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc1 = {};
     swapChainDesc1.BufferCount = 2;

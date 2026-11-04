@@ -423,7 +423,7 @@ namespace ae3d
         wc.lpfnWndProc = WindowProc;
         wc.hInstance = hInstance;
         wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-        wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+        wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wc.lpszClassName = "WindowClass1";
 
         wc.hIcon = static_cast< HICON >(LoadImage(nullptr,
