@@ -101,7 +101,7 @@ void LoadOgg( const ae3d::FileSystem::FileContentsData& clipData, ClipInfo& info
     
     const ALenum format = vinfo.channels == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
     
-    alBufferData( info.bufID, format, &decoded[0], len, vinfo.sample_rate );
+    alBufferData( info.bufID, format, &decoded[0], len * vinfo.channels * 2, vinfo.sample_rate );
 
     info.lengthInSeconds = stb_vorbis_stream_length_in_seconds( vorbis );
 
