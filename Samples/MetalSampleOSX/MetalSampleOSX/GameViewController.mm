@@ -36,13 +36,13 @@
 #import "TransformComponent.hpp"
 #import "Window.hpp"
 
-const bool TestForwardPlus = false;
+const bool TestForwardPlus = true;
 const bool TestBloom = false;
 const bool TestSSAO = false;
 const bool TestShadowsDir = false;
 const bool TestShadowsSpot = false;
 const bool TestShadowsPoint = false;
-const bool TestRenderTexture2D = false;
+const bool TestRenderTexture2D = true;
 const bool TestRenderTextureCube = false;
 const bool TestFPSMovement = true;
 //#define TEST_NUKLEAR_UI
@@ -122,7 +122,6 @@ void DrawNuklear( nk_context* ctx, nk_buffer* uiCommands, int width, int height 
     config.vertex_layout = vertex_layout;
     config.vertex_size = sizeof( VertexPTC );
     config.vertex_alignment = NK_ALIGNOF( VertexPTC );
-    config.null = nullTexture;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;
     config.arc_segment_count = 22;
