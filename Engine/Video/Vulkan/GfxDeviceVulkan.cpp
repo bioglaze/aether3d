@@ -2002,7 +2002,7 @@ void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outB
             usageSum += propExt.heapUsage[ i ];
         }
 
-        outUsedMBytes = (unsigned int)usageSum;
+        outUsedMBytes = (unsigned int)usageSum / (1024 * 1024);
         outBudgetMBytes = 0;
     }
     else

@@ -179,7 +179,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
     Statistics::IncAllocCalls();
     Statistics::IncTotalAllocCalls();
     Texture2DGlobal::memoryToReleaseAtExit.push_back( deviceMemory );
-	debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )deviceMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "tex2d dds memory" );
+	debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )deviceMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "tex2d memory" );
 
     err = vkBindImageMemory( GfxDeviceGlobal::device, image, deviceMemory, 0 );
     AE3D_CHECK_VULKAN( err, "vkBindImageMemory" );
@@ -217,7 +217,7 @@ void ae3d::Texture2D::CreateVulkanObjects( const DDSLoader::Output& mipChain, Vk
 
 		err = vkAllocateMemory( GfxDeviceGlobal::device, &memAllocInfo, nullptr, &stagingMemory[ mipIndex ] );
 		AE3D_CHECK_VULKAN( err, "vkAllocateMemory" );
-		debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )deviceMemory, VK_OBJECT_TYPE_DEVICE_MEMORY, "tex2d memory" );
+		debug::SetObjectName( GfxDeviceGlobal::device, ( std::uint64_t )stagingMemory[ mipIndex ], VK_OBJECT_TYPE_DEVICE_MEMORY, "tex2d staging memory" );
 
         err = vkBindBufferMemory( GfxDeviceGlobal::device, stagingBuffers[ mipIndex ], stagingMemory[ mipIndex ], 0 );
         AE3D_CHECK_VULKAN( err, "vkBindBufferMemory staging" );
@@ -757,7 +757,7 @@ void ae3d::Texture2D::LoadDDS( const char* aPath )
     DDSLoader::Output ddsOutput;
     auto fileContents = FileSystem::FileContents( aPath );
 #if VK_USE_PLATFORM_ANDROID_KHR
-    const DDSLoader::LoadResult loadResult = DDSLoader::LoaddResult::FileNotFound;
+    const DDSLoader::LoadResult loadResult = DDSLoader::LoadResult::FileNotFound;
 #else
     const DDSLoader::LoadResult loadResult = DDSLoader::Load( fileContents, width, height, opaque, ddsOutput );
 #endif
@@ -859,7 +859,7 @@ void ae3d::Texture2D::LoadSTB( const FileSystem::FileContentsData& fileContents 
 
 void ae3d::Texture2D::SetLayouts( Texture2D* textures[], TextureLayout layouts[], int count )
 {
-    System::Assert( count < 5, "Barrier count too high! Increase barrier count in Texture2D::SetLayouts" );
+    System::Assert( count <= 5, "Barrier count too high! Increase barrier count in Texture2D::SetLayouts" );
 
     VkImageMemoryBarrier barriers[ 5 ];
     VkPipelineStageFlags srcStageFlags{};
