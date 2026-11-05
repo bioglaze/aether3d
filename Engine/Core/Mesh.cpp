@@ -393,9 +393,9 @@ ae3d::Mesh::LoadResult ae3d::Mesh::Load( const FileSystem::FileContentsData& mes
                 int jointNameLength;
                 is.read( (char*)&jointNameLength, sizeof( int ) );
                 
-                if (jointNameLength > 128)
+                if (jointNameLength >= 0 && jointNameLength >= 128)
                 {
-                    System::Print( "Mesh %s has a joint with too long name, max is 128.\n", meshData.path.c_str() );
+                    System::Print( "Mesh %s has a joint with too long name, max is 127.\n", meshData.path.c_str() );
                     return LoadResult::Corrupted;
                 }
 

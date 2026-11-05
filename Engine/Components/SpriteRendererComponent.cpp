@@ -214,7 +214,7 @@ unsigned ae3d::SpriteRendererComponent::New()
 
 ae3d::SpriteInfo ae3d::SpriteRendererComponent::GetSpriteInfo( int index ) const
 {
-    if (index > 0 && index < static_cast< int >( m().spriteInfos.size() ))
+    if (index >= 0 && index < static_cast< int >( m().spriteInfos.size() ))
     {
         return m().spriteInfos[ index ];
     }

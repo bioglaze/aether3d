@@ -475,7 +475,7 @@ void ae3d::Scene::RenderShadowMaps( std::vector< GameObject* >& cameras )
                     {
                         lightTransform->LookAt( lightTransform->GetLocalPosition(), lightTransform->GetLocalPosition() + directions[ cubeMapFace ], ups[ cubeMapFace ] );
                         lightTransform->UpdateLocalAndGlobalMatrix();
-                        SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), 45, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
+                        SetupCameraForSpotShadowCasting( lightTransform->GetWorldPosition(), lightTransform->GetViewDirection(), 90, *SceneGlobal::shadowCamera.GetComponent< CameraComponent >(), *SceneGlobal::shadowCamera.GetComponent< TransformComponent >() );
                         SceneGlobal::shadowCamera.GetComponent< TransformComponent >()->UpdateLocalAndGlobalMatrix();
                         RenderShadowsWithCamera( &SceneGlobal::shadowCamera, cubeMapFace );
                     }
@@ -911,7 +911,7 @@ void ae3d::Scene::RenderDepthAndNormals( CameraComponent* camera, const Matrix44
     
     GfxDevice::SetRenderTarget( nullptr, 0 );
 #if RENDERER_VULKAN
-    EndOffscreen( 0, camera->GetTargetTexture() );
+    EndOffscreen( 0, &camera->GetDepthNormalsTexture() );
 #endif
 }
 
@@ -1497,9 +1497,9 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
                 return DeserializeResult::ParseError;
             }
 
-            float x, y, width, height, nearp, farp;
-            lineStream >> x >> y >> width >> height >> nearp >> farp;
-            outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( x, y, width, height, nearp, farp );
+            float x, y, top, bottom, nearp, farp;
+            lineStream >> x >> y >> top >> bottom >> nearp >> farp;
+            outGameObjects.back().GetComponent< CameraComponent >()->SetProjection( x, y, bottom, top, nearp, farp );
         }
         else if (token == "persp")
         {
@@ -1687,7 +1687,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             outTexture2Ds[ spritePath ] = new Texture2D();
             outTexture2Ds[ spritePath ]->Load( FileSystem::FileContents( spritePath.c_str() ), TextureWrap::Repeat, TextureFilter::Linear, Mipmaps::Generate, ColorSpace::SRGB, Anisotropy::k1 );
 
-            outGameObjects.back().GetComponent< SpriteRendererComponent >()->SetTexture( outTexture2Ds[ spritePath ], Vec3( x, y, 0 ), Vec3( x, y, 1 ), Vec4( 1, 1, 1, 1 ) );
+            outGameObjects.back().GetComponent< SpriteRendererComponent >()->SetTexture( outTexture2Ds[ spritePath ], Vec3( x, y, 0 ), Vec3( width, height, 1 ), Vec4( 1, 1, 1, 1 ) );
         }
         else if (token == "position")
         {
@@ -1873,7 +1873,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
 
             outGameObjects.back().AddComponent< AudioSourceComponent >();
         }
-        else if (token == "coneangle")
+        else if (token == "coneAngle")
         {
             float coneAngleDegrees;
             lineStream >> coneAngleDegrees;
@@ -1884,7 +1884,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
             }
             else
             {
-                System::Print( "Found 'coneangle' at line %d but no spotlight is defined before this line.\n", lineNo );
+                System::Print( "Found 'coneAngle' at line %d but no spotlight is defined before this line.\n", lineNo );
             }
         }
         else if (token == "radius")
@@ -1932,7 +1932,7 @@ ae3d::Scene::DeserializeResult ae3d::Scene::Deserialize( const FileSystem::FileC
         {
             if (currentMaterialName.empty())
             {
-                System::Print( "Failed to parse %s at line %d: found 'metal_shaders' but there are no materials defined before this line.\n", serialized.path.c_str(), lineNo );
+                System::Print( "Failed to parse %s at line %d: found 'shaders' but there are no materials defined before this line.\n", serialized.path.c_str(), lineNo );
                 return DeserializeResult::ParseError;
             }
             
