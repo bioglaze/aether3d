@@ -169,7 +169,7 @@ int main()
 
                         break;
                     case KeyCode::D:
-                        if (event.keyModifier == KeyModifier::Control)
+                        if (event.keyModifier == KeyModifier::Control && event.type == WindowEventType::KeyDown)
                         {
                             svDuplicateGameObject( sceneView );
                         }
@@ -335,7 +335,7 @@ int main()
                 
                 svHandleLeftMouseUp( sceneView );
 
-                const bool clickedOnInspector = x < 450;
+                const bool clickedOnInspector = x < inspectorWidth;
 
                 if (clickedOnInspector)
                 {
@@ -374,6 +374,9 @@ int main()
             }
             else if (event.type == WindowEventType::MouseMiddleDown)
             {
+                x = event.mouseX;
+                y = height - event.mouseY;
+
                 const bool clickedOnInspector = x < inspectorWidth;
 
                 isMiddleMouseDown = !clickedOnInspector;

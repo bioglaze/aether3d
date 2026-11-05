@@ -600,10 +600,10 @@ void Inspector::Render( unsigned width, unsigned height, GameObject* gameObject,
                 nk_tree_pop( &ctx );
             }
         }
-        
-        DrawNuklear( width, height );
-
+     
         nk_end( &ctx );
+
+        DrawNuklear( width, height );
     }
 }
 

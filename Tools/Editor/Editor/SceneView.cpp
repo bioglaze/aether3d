@@ -658,20 +658,23 @@ void svDuplicateGameObject( SceneView* sv )
     if (sv->selectedGameObjects.count > 0 && sv->selectedGameObjects[ 0 ])
     {
         sv->gameObjects.Add( new GameObject() );
-        sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( "GameObject" );
+        sv->gameObjects[ sv->gameObjects.count - 1 ]->SetName( sv->selectedGameObjects[ 0 ]->GetName() );
         sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< TransformComponent >();
         sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< TransformComponent >()->SetLocalPosition( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalPosition() );
         sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< TransformComponent >()->SetLocalRotation( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalRotation() );
         sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< TransformComponent >()->SetLocalScale( sv->selectedGameObjects[ 0 ]->GetComponent< TransformComponent >()->GetLocalScale() );
-
+        
         if (sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >())
         {
             sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< MeshRendererComponent >();
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMesh( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMesh() );
 
-            for (unsigned i = 0; i < sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount(); ++i)
+            if (sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->GetMesh())
             {
-                sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMaterial( i ), i );
+                for (unsigned i = 0; i < sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->GetMesh()->GetSubMeshCount(); ++i)
+                {
+                    sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< MeshRendererComponent >()->SetMaterial( sv->selectedGameObjects[ 0 ]->GetComponent< MeshRendererComponent >()->GetMaterial( i ), i );
+                }
             }
         }
 
@@ -688,13 +691,15 @@ void svDuplicateGameObject( SceneView* sv )
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< SpotLightComponent >()->SetColor( sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >()->GetColor() );
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< SpotLightComponent >()->SetCastShadow( sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >()->CastsShadow(), 2048 );
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< SpotLightComponent >()->SetConeAngle( sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >()->GetConeAngle() );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< SpotLightComponent >()->SetRadius( sv->selectedGameObjects[ 0 ]->GetComponent< SpotLightComponent >()->GetRadius() );
         }
 
         if (sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >())
         {
             sv->gameObjects[ sv->gameObjects.count - 1 ]->AddComponent< PointLightComponent >();
             sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetColor( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->GetColor() );
-            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetCastShadow( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->CastsShadow(), 2048 );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetCastShadow( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->CastsShadow(), 1024 );
+            sv->gameObjects[ sv->gameObjects.count - 1 ]->GetComponent< PointLightComponent >()->SetRadius( sv->selectedGameObjects[ 0 ]->GetComponent< PointLightComponent >()->GetRadius() );
         }
 
         if (sv->selectedGameObjects[ 0 ]->GetComponent< AudioSourceComponent >())
