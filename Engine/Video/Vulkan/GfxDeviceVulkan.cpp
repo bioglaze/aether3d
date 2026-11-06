@@ -914,10 +914,15 @@ namespace ae3d
         {
             System::Print( "Your system doesn't have Vulkan capable GPU.\n" );
         }
+        
+        VkPhysicalDevice gpus[ 8 ];
+        gpuCount = gpuCount < 8 ? gpuCount : 8;
 
-        result = vkEnumeratePhysicalDevices( GfxDeviceGlobal::instance, &gpuCount, &GfxDeviceGlobal::physicalDevice );
+        result = vkEnumeratePhysicalDevices( GfxDeviceGlobal::instance, &gpuCount, gpus );
         AE3D_CHECK_VULKAN( result, "vkEnumeratePhysicalDevices" );
 
+        GfxDeviceGlobal::physicalDevice = gpus[ 0 ];
+        
         vkGetPhysicalDeviceProperties( GfxDeviceGlobal::physicalDevice, &GfxDeviceGlobal::properties );
         
         // Finds graphics queue.
