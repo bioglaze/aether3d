@@ -520,6 +520,10 @@ id <MTLRenderPipelineState> GetPSO( ae3d::Shader& shader, ae3d::GfxDevice::Blend
         {
             format = MTLPixelFormatRGBA16Float;
         }
+        else if (pixelFormat == ae3d::DataType::R32F)
+        {
+            format = MTLPixelFormatR32Float;
+        }
 
         pipelineStateDescriptor.colorAttachments[0].pixelFormat = format;
         pipelineStateDescriptor.colorAttachments[0].blendingEnabled = blendMode != ae3d::GfxDevice::BlendMode::Off;
@@ -776,19 +780,9 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startIndex, int endI
         [renderEncoder setFragmentTexture:textures[ 4 ] atIndex:4];
     }
     
-    static CullMode cachedCullMode = CullMode::Off;
-    if (cullMode != cachedCullMode)
-    {
-        cachedCullMode = cullMode;
-        [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
-    }
+    [renderEncoder setCullMode:(cullMode == CullMode::Back) ? MTLCullModeBack : MTLCullModeNone];
     
-    static FillMode cachedTriangleFillMode = FillMode::Solid;
-    if (fillMode != cachedTriangleFillMode)
-    {
-        cachedTriangleFillMode = fillMode;
-        [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
-    }
+    [renderEncoder setTriangleFillMode:(fillMode == FillMode::Solid ? MTLTriangleFillMode::MTLTriangleFillModeFill : MTLTriangleFillMode::MTLTriangleFillModeLines)];
     
     if (depthFunc == DepthFunc::LessOrEqualWriteOff)
     {

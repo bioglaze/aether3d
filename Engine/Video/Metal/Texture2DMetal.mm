@@ -133,8 +133,8 @@ void GetASTCBlockDimension( MTLPixelFormat pixelFormat, unsigned& outBlockWidth,
             break;
         case MTLPixelFormatASTC_5x4_LDR:
         case MTLPixelFormatASTC_5x4_sRGB:
-            outBlockHeight = 5;
-            outBlockWidth = 4;
+            outBlockHeight = 4;
+            outBlockWidth = 5;
             break;
         case MTLPixelFormatASTC_5x5_LDR:
         case MTLPixelFormatASTC_5x5_sRGB:
@@ -143,8 +143,8 @@ void GetASTCBlockDimension( MTLPixelFormat pixelFormat, unsigned& outBlockWidth,
             break;
         case MTLPixelFormatASTC_6x5_LDR:
         case MTLPixelFormatASTC_6x5_sRGB:
-            outBlockHeight = 6;
-            outBlockWidth = 5;
+            outBlockHeight = 5;
+            outBlockWidth = 6;
             break;
         case MTLPixelFormatASTC_6x6_LDR:
         case MTLPixelFormatASTC_6x6_sRGB:
@@ -153,13 +153,13 @@ void GetASTCBlockDimension( MTLPixelFormat pixelFormat, unsigned& outBlockWidth,
             break;
         case MTLPixelFormatASTC_8x5_LDR:
         case MTLPixelFormatASTC_8x5_sRGB:
-            outBlockHeight = 8;
-            outBlockWidth = 5;
+            outBlockHeight = 5;
+            outBlockWidth = 8;
             break;
         case MTLPixelFormatASTC_8x6_LDR:
         case MTLPixelFormatASTC_8x6_sRGB:
-            outBlockHeight = 8;
-            outBlockWidth = 6;
+            outBlockHeight = 6;
+            outBlockWidth = 8;
             break;
         case MTLPixelFormatASTC_8x8_LDR:
         case MTLPixelFormatASTC_8x8_sRGB:
@@ -168,18 +168,18 @@ void GetASTCBlockDimension( MTLPixelFormat pixelFormat, unsigned& outBlockWidth,
             break;
         case MTLPixelFormatASTC_10x5_LDR:
         case MTLPixelFormatASTC_10x5_sRGB:
-            outBlockHeight = 10;
-            outBlockWidth = 5;
+            outBlockHeight = 5;
+            outBlockWidth = 10;
             break;
         case MTLPixelFormatASTC_10x6_LDR:
         case MTLPixelFormatASTC_10x6_sRGB:
-            outBlockHeight = 10;
-            outBlockWidth = 6;
+            outBlockHeight = 6;
+            outBlockWidth = 10;
             break;
         case MTLPixelFormatASTC_10x8_LDR:
         case MTLPixelFormatASTC_10x8_sRGB:
-            outBlockHeight = 10;
-            outBlockWidth = 8;
+            outBlockHeight = 8;
+            outBlockWidth = 10;
             break;
         case MTLPixelFormatASTC_10x10_LDR:
         case MTLPixelFormatASTC_10x10_sRGB:
@@ -188,8 +188,8 @@ void GetASTCBlockDimension( MTLPixelFormat pixelFormat, unsigned& outBlockWidth,
             break;
         case MTLPixelFormatASTC_12x10_LDR:
         case MTLPixelFormatASTC_12x10_sRGB:
-            outBlockHeight = 12;
-            outBlockWidth = 10;
+            outBlockHeight = 10;
+            outBlockWidth = 12;
             break;
         case MTLPixelFormatASTC_12x12_LDR:
         case MTLPixelFormatASTC_12x12_sRGB:
@@ -646,8 +646,6 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         
         unsigned blockWidth, blockHeight;
         GetASTCBlockDimension( pixelFormat, blockWidth, blockHeight );
-        const unsigned blockSize = 16;
-        int multiplier = (blockSize / blockWidth);
 
         mipLevelCount = 1;
         MTLTextureDescriptor* descriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
@@ -670,7 +668,10 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
         MTLRegion region = MTLRegionMake2D( 0, 0, width, height );
         unsigned offset = sizeof( KTXHeader ) + ktxHeader->keyValueDataLength + 4;
 
-        [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&fileContents.data[ offset ] bytesPerRow:width * multiplier];
+        const unsigned blockSize = 16;
+        int bPerRow = ceil(width / blockWidth) * blockSize;
+
+        [metalTexture replaceRegion:region mipmapLevel:0 withBytes:&fileContents.data[ offset ] bytesPerRow:bPerRow];
 #else
      ae3d::System::Print( ".astc loading not supported on macOS. Tried to load %s\n", fileContents.path.c_str() );
 #endif
@@ -943,21 +944,21 @@ void ae3d::Texture2D::LoadPVRv3( const char* path )
     
     MTLPixelFormat pixelFormat = MTLPixelFormatPVRTC_RGBA_2BPP;
     
-    if (rgb2bpp)
+    if (header->pixelFormat == rgb2bpp)
     {
-        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGB_2BPP_sRGB : MTLPixelFormatPVRTC_RGB_2BPP;
+        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGB_2BPP : MTLPixelFormatPVRTC_RGB_2BPP_sRGB;
     }
-    else if (rgba2bpp)
+    else if (header->pixelFormat == rgba2bpp)
     {
-        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGBA_2BPP_sRGB : MTLPixelFormatPVRTC_RGBA_2BPP;
+        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGBA_2BPP : MTLPixelFormatPVRTC_RGBA_2BPP_sRGB;
     }
-    else if (rgb4bpp)
+    else if (header->pixelFormat == rgb4bpp)
     {
-        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGB_4BPP_sRGB : MTLPixelFormatPVRTC_RGB_4BPP;
+        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGB_4BPP : MTLPixelFormatPVRTC_RGB_4BPP_sRGB;
     }
-    else if (rgba4bpp)
+    else if (header->pixelFormat == rgba4bpp)
     {
-        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGBA_4BPP_sRGB : MTLPixelFormatPVRTC_RGBA_4BPP_sRGB;
+        pixelFormat = isLinear ? MTLPixelFormatPVRTC_RGBA_4BPP : MTLPixelFormatPVRTC_RGBA_4BPP_sRGB;
     }
     else
     {
