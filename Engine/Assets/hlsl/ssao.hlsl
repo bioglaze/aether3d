@@ -11,6 +11,10 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
 
         // project sample position:
         float4 offset = mul( viewToClip, float4( samplePosVS, 1.0f ) );
+        if (offset.w <= 1e-5f) // Sample is behind camera
+        {
+            //continue;
+        }
         offset.xy /= offset.w; // only need xy
         offset.xy = offset.xy * 0.5f + 0.5f; // scale/bias to texcoords
 #if !VULKAN
@@ -18,14 +22,19 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
 #else
         offset.y = 1 - offset.y;
 #endif
+        int2 texel = int2( offset.xy * depthTexDim );
+        if (any( texel < 0 ) || any( texel >= int2( depthTexDim ) ) )
+        {
+            continue;
+        }
         float sampleDepth = -normalTex.Load( int3( offset.xy * depthTexDim, 0 ) ).r;
 
         float diff = abs( originPosVS.z - sampleDepth );
-        if (diff < 0.0001f)
+        /*if (diff < 0.0001f)
         {
-            occlusion += sampleDepth < samplePosVS.z ? 1.0f : 0.0f;
+            occlusion += (sampleDepth < (samplePosVS.z - 0.025f) ? 1.0f : 0.0f) * rangeCheck;
             continue;
-        }
+        }*/
         
         float rangeCheck = smoothstep( 0.0f, 1.0f, radius / diff );
         occlusion += (sampleDepth < (samplePosVS.z - 0.025f) ? 1.0f : 0.0f) * rangeCheck;
@@ -33,7 +42,7 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
 
     occlusion = 1.0f - (occlusion / float( kernelSize ));
     float uPower = 1.8f;
-    //return pow( abs( occlusion ), uPower );
+
     return pow( max( abs( occlusion ), 0.3f ), uPower );
 }
 
@@ -60,12 +69,33 @@ void CSMain( uint3 globalIdx : SV_DispatchThreadID, uint3 localIdx : SV_GroupThr
     float3 originPosVS = viewDirection * originDepth;
 
     // get view space normal:
-    float3 normal = -normalize( normalTex.Load( int3( globalIdx.xy, 0 ) ).gba );
+    float3 normalSample = normalTex.Load( int3( globalIdx.xy, 0 ) ).gba;
+    // protect against zero-length normal (pixels without geometry in the depthnormals texture, for example sky)
+
+    if (dot( normalSample, normalSample ) < 1e-8f)
+    {
+        rwTexture[ globalIdx.xy ] = 1.0f;
+        return;
+    }
+    
+    float3 normal = -normalize( normalSample );
 
     // construct kernel basis matrix:
-    float3 rvec = normalize( specularTex.Load( int3( globalIdx.x % noiseWidth, globalIdx.y % noiseHeight, 0 ) ).rgb );
-    //float3 rvec = normalize( specularTex.Sample( sampler1, noiseTexCoords ).rgb );
-    float3 tangent = normalize( rvec - normal * dot( rvec, normal ) );
+    float3 rvec = specularTex.Load( int3( globalIdx.x % noiseWidth, globalIdx.y % noiseHeight, 0 ) ).rgb;
+    float rvecLen = length( rvec );
+    rvec = rvecLen > 1e-5f ? rvec / rvecLen : float3( 1, 0, 0 );
+    
+    float3 tangent = rvec - normal * dot( rvec, normal );
+    float tangentLen = length( tangent );
+    if (tangentLen < 1e-4f)
+    {
+        tangent = normalize( cross( normal, abs( normal.z ) < 0.999f ? float3( 0, 0, 1 ) : float3( 0, 1, 0 ) ) );
+    }
+    else
+    {
+        tangent /= tangentLen;
+    }
+    
     float3 bitangent = cross( tangent, normal );
     float3x3 tangentToView = transpose( float3x3( tangent, bitangent, normal ) );
 
