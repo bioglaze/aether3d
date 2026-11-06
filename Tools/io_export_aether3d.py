@@ -1,7 +1,7 @@
 bl_info = {
     'name': 'Export Aether3D model format (.ae3d)',
     'author': 'Timo Wiren',
-    'version': (0,7),
+    'version': (0,8),
     'blender': (2, 80, 0),
     'location': 'File > Export > Aether3D',
     'description': 'Exports selected meshes to the Aether3D Engine format (.ae3d)',
@@ -13,11 +13,9 @@ bl_info = {
 import bpy
 import bpy.props
 import bpy.utils
-import ctypes
 import math
 import mathutils
 import os
-import sys
 import struct
 from bpy.props import (
         BoolProperty,
@@ -117,6 +115,9 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
             )
 
     def generateAABB( self ):
+        self.aabbMin = [ 99999999.0, 99999999.0, 99999999.0 ]
+        self.aabbMax = [-99999999.0,-99999999.0,-99999999.0 ]
+        
         for m in self.meshes:
             if self.aabbMin[0] > m.aabbMin[0]:
                 self.aabbMin[0] = m.aabbMin[0]
@@ -161,10 +162,10 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
         
         # normal
         if face.use_smooth:
-            if mesh.use_auto_smooth:
-                no = self.get_autosmooth_normal( mesh, face, face.vertices[ face_vi ] )
-            else:
-                no = mesh.vertices[ face.vertices[ face_vi ] ].normal
+            #if mesh.use_auto_smooth:
+            #    no = self.get_autosmooth_normal( mesh, face, face.vertices[ face_vi ] )
+            #else:
+            no = mesh.vertices[ face.vertices[ face_vi ] ].normal
         else:
                 no = face.normal
 
@@ -186,7 +187,6 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                     if region.type == region_type:
                         override = {'area': area, 'region': region}
                         return override
-        #error message if the area or region wasn't found
         raise RuntimeError("Wasn't able to find", region_type," in area ", area_type, "\n Make sure it's open while executing script.")
 
     
@@ -198,7 +198,8 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
         object = {}
         
         if len( objects ) == 0:
-            self.report({'WARNING'}, "No meshes selected!")
+            raise RuntimeError( "No meshes selected!" )
+            #self.report({'WARNING'}, "No meshes selected!")
 
         override = self.get_override( 'VIEW_3D', 'WINDOW' )
 
@@ -277,9 +278,9 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                             round(q.y, digits),
                             round(q.z, digits),
                             round(q.w, digits)), 0, -2])])
-                armoffs = len( bones )
-                mesh.jointCount = armoffs
-                print("armoffs: ", armoffs)
+                armOffs = len( bones )
+                mesh.jointCount = armOffs
+                print("armOffs: ", armOffs)
 
             for uvt in obj.data.uv_layers:
                 if uvt.active_render:
@@ -310,7 +311,7 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
 
                             skin.append([ni, round(g.weight, 2)])
                             w = w + round(g.weight, 2)
-                            print("group name " + n + ", weight: " + str( w ) )
+                            #print("group name " + n + ", weight: " + str( w ) )
                             
                         if w != 1.0:
                             for g,s in enumerate( skin ):
@@ -616,12 +617,8 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                 f.write( mesh.boneNames[ i ].encode() )
 
                 # Writes animation length
-                nAnim = struct.pack( 'i', 0 )
-                f.write( nAnim )
-
-                # TODO write animation transforms.
-                outFrameCount = struct.pack( 'i', mesh.frameCount )
-                f.write( outFrameCount )
+                frameCount = struct.pack( 'i', mesh.frameCount )
+                f.write( frameCount )
 
                 for frame in range( 0, mesh.frameCount ):
                     mat = mathutils.Matrix()
