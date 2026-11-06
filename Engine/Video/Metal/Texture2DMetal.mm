@@ -268,7 +268,7 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         defaultTexture.metalTexture.label = stagingTexture.label;
         
         const int components = 4;
-        int data[ 128 * 128 * components ] = { 0xFFC0CB };
+        uint8_t data[ 128 * 128 * components ] = { 0xFF };
         
         MTLRegion region = MTLRegionMake2D(0, 0, defaultTexture.width, defaultTexture.height);
         const int bytesPerRow = components * defaultTexture.width;
@@ -410,7 +410,7 @@ void ae3d::Texture2D::LoadFromData( const void* imageData, int aWidth, int aHeig
     [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixelFormat
                                                        width:width
                                                       height:height
-                                                   mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
+                                                   mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageShaderRead;
     id<MTLTexture> stagingTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor];
     stagingTexture.label = debugNameStr;
@@ -478,7 +478,7 @@ void ae3d::Texture2D::Load( const FileSystem::FileContentsData& fileContents, Te
     
     const bool isPVR = fileContents.path.find( ".pvr" ) != std::string::npos || fileContents.path.find( ".PVR" ) != std::string::npos;
     const bool isDDS = fileContents.path.find( ".dds" ) != std::string::npos || fileContents.path.find( ".DDS" ) != std::string::npos;
-    const bool isASTC = fileContents.path.find( ".ktx" ) != std::string::npos || fileContents.path.find( ".ktx" ) != std::string::npos;
+    const bool isASTC = fileContents.path.find( ".ktx" ) != std::string::npos || fileContents.path.find( ".KTX" ) != std::string::npos;
 
     if (HasStbExtension( fileContents.path ))
     {

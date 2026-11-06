@@ -6,10 +6,11 @@ void* ae3d::RenderTexture::Map()
 {
     // TODO: Fix region.
     // TODO: CPU-readable texture should probably set allowGPUOptimizedContents to false.
-    MTLRegion region = {};
+    /*MTLRegion region = {};
     void* bytes;
-    [metalTexture getBytes:&bytes bytesPerRow:width * height * 4 fromRegion:region mipmapLevel:0];
-    return bytes;
+    [metalTexture getBytes:bytes bytesPerRow:width * bytesPerPixel fromRegion:region mipmapLevel:0];
+    return bytes;*/
+    return nullptr;
 }
 
 void ae3d::RenderTexture::Unmap()
@@ -21,7 +22,7 @@ void ae3d::RenderTexture::MakeCpuReadable( const char* debugName )
 {
     if (metalTexture == nil)
     {
-        System::Print("Can't call MakeCpuReadable before creating the texture!\n");
+        System::Print( "Can't call MakeCpuReadable before creating the texture!\n" );
         System::Assert( false, "Create the texture first!" );
         return;
     }
@@ -73,7 +74,7 @@ void ae3d::RenderTexture::MakeCpuReadable( const char* debugName )
     metalTexture.label = label;
 }
 
-void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool /* isMultisampled */, RenderTexture::UavFlag aUavFlag )
+void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType, TextureWrap aWrap, TextureFilter aFilter, const char* debugName, bool isMultisampled, RenderTexture::UavFlag aUavFlag )
 {
     if (aWidth <= 0 || aHeight <= 0)
     {
@@ -116,6 +117,7 @@ void ae3d::RenderTexture::Create2D( int aWidth, int aHeight, DataType aDataType,
                                                       height:height
                                                    mipmapped:NO];
     textureDescriptor.usage = MTLTextureUsageRenderTarget | MTLTextureUsageShaderRead;
+    //textureDescriptor.sampleCount = isMultisampled ? 4 : 1;
     
     if (uavFlag == RenderTexture::UavFlag::Enabled || uavFlag == RenderTexture::UavFlag::EnabledAlsoDepth)
     {

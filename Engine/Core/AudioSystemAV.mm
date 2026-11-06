@@ -64,14 +64,14 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
     {
         if (AudioGlobal::clips[ i ].path == clipData.path)
         {
-            return i;
+            return i + 1;
         }
     }
     
     if (!clipData.isLoaded)
     {
         System::Print( "AudioSystem: File data %s not loaded!\n", clipData.path.c_str() );
-        return 0;
+        return 1;
     }
 
     const unsigned clipId = AudioGlobal::clips.count + 1;
@@ -100,9 +100,7 @@ unsigned ae3d::AudioSystem::GetClipIdForData( const FileSystem::FileContentsData
         const stb_vorbis_info vinfo = stb_vorbis_get_info( vorbis );
         AVAudioFormat* format = [ [AVAudioFormat alloc] initStandardFormatWithSampleRate:vinfo.sample_rate channels:vinfo.channels];
 
-        // TODO: Fix frameCapacity and memcpy sizes!
-
-        AudioGlobal::clips[ clipId - 1 ].buffer = [ [AVAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:vinfo.max_frame_size];
+        AudioGlobal::clips[ clipId - 1 ].buffer = [ [AVAudioPCMBuffer alloc] initWithPCMFormat:format frameCapacity:len];
         
         int16_t* bufferPointer16 = (int16_t *)[AudioGlobal::clips[ clipId - 1 ].buffer int16ChannelData];
         int32_t* bufferPointer32 = (int32_t *)[AudioGlobal::clips[ clipId - 1 ].buffer int32ChannelData];
