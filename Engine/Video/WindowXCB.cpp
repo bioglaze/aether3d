@@ -66,7 +66,7 @@ namespace WindowGlobal
     bool isWayland = false;
     bool isOpen = false;
     const int eventStackSize = 15;
-    ae3d::WindowEvent eventStack[eventStackSize];
+    ae3d::WindowEvent eventStack[ eventStackSize ];
     int eventIndex = -1;
     int presentInterval = 1;
 
@@ -75,6 +75,7 @@ namespace WindowGlobal
         if (eventIndex < eventStackSize - 1)
         {
             ++eventIndex;
+            WindowGlobal::eventStack[ WindowGlobal::eventIndex ] = {};
         }
     }
     
@@ -234,7 +235,8 @@ void LoadAtoms()
 static int CreateWindowAndContext( Display* display, xcb_connection_t* connection, xcb_screen_t* screen, int width, int height, ae3d::WindowCreateFlags flags )
 {
     WindowGlobal::presentInterval = (flags & ae3d::WindowCreateFlags::No_vsync) ? 0 : 1;
-    WindowGlobal::isWayland = strstr( getenv( "XDG_SESSION_TYPE" ), "wayland" ) != 0;
+    char* sessionType = getenv( "XDG_SESSION_TYPE" );
+    WindowGlobal::isWayland = sessionType ? (strstr( sessionType, "wayland" ) != 0) : false;
     
     int visualID = screen->root_visual;
     
@@ -414,7 +416,7 @@ void ae3d::Window::PumpEvents()
         
         switch (response_type)
         {
-            case 5: // XCB_EVENT_MASK_BUTTON_RELEASE doesn't work for some reason
+            case XCB_BUTTON_RELEASE:
             {
                 const xcb_button_release_event_t* be = (xcb_button_release_event_t*)event;
 
@@ -450,7 +452,7 @@ void ae3d::Window::PumpEvents()
 
                 break;
             }
-            case XCB_EVENT_MASK_BUTTON_PRESS:
+            case XCB_BUTTON_PRESS:
             {
                 const xcb_query_pointer_reply_t* pointer = xcb_query_pointer_reply( WindowGlobal::connection, xcb_query_pointer(WindowGlobal::connection, XDefaultRootWindow(WindowGlobal::display)), nullptr );
                 const bool newb1 = (pointer->mask & XCB_BUTTON_MASK_1) != 0;

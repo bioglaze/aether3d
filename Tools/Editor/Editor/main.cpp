@@ -302,7 +302,7 @@ int main()
                 lastMouseY = y;
                 mouseMoveHandled = true;
                 inspector.HandleMouseMotion( x, y );
-                const bool snapToGrid = event.keyModifier == ae3d::KeyModifier::Control;
+                //const bool snapToGrid = event.keyModifier == ae3d::KeyModifier::Control;
                 svHandleMouseMotion( sceneView, deltaX, deltaY );
             }
             else if (event.type == WindowEventType::Mouse1Down)

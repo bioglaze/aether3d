@@ -1288,6 +1288,7 @@ void svDeleteGameObject( SceneView* sv )
         sv->scene.Remove( sv->gameObjects[ 0 ] );
         delete sv->gameObjects[ sv->selectedGOIndex ];
         sv->gameObjects.Remove( sv->selectedGOIndex );
+        sv->selectedGOIndex = 0;
     }
 }
 
