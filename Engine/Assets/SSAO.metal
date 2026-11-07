@@ -20,7 +20,7 @@ float ssaoInternal( float3x3 kernelBasis, float3 originPos, float radius, consta
         offset.xy /= offset.w; // only need xy
         offset.xy = offset.xy * 0.5f + 0.5f; // scale/bias to texcoords
 
-        int depthWidth = uniforms.windowWidth, depthHeight = uniforms.windowHeight;
+        int depthWidth = depthNormalsTexture.get_width(), depthHeight = depthNormalsTexture.get_height();
         float sampleDepth = -depthNormalsTexture.read( uint2( offset.xy * float2( depthWidth, depthHeight ) ), 0 ).r;
 
         const float diff = abs( originPos.z - sampleDepth );
@@ -129,10 +129,10 @@ kernel void ssao(
     ushort2 gid = (ushort2)ThreadGroupTilingX( uint2( uniforms.windowWidth / 16, uniforms.windowHeight / 16 ), uint2( 16, 16 ), 8, (uint2)tid, (uint2)dtid );
     //ushort2 gid = globalIdx.xy;
     
-    float depthWidth = uniforms.windowWidth;
-    float depthHeight = uniforms.windowHeight;
+    float depthWidth = depthNormalsTexture.get_width();
+    float depthHeight = depthNormalsTexture.get_height();
 
-    float2 uv = float2( gid ) / float2( depthWidth, depthHeight );
+    float2 uv = (float2( gid ) + 0.5) / float2( depthWidth, depthHeight );
     // get view space origin:
     float originDepth = -depthNormalsTexture.read( uint2( gid ), 0 ).r;
     float uTanHalfFov = tan( uniforms.cameraParams.x * 0.5f );
