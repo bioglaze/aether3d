@@ -34,6 +34,8 @@ class Vertex:
     tangent = mathutils.Vector( [ 0.0, 0.0, 0.0, 0.0 ] )
     bitangent = mathutils.Vector()
     color = mathutils.Vector()
+    weights = [ 1.0, 0.0, 0.0, 0.0 ]
+    bones = [ 0, 0, 0, 0 ]
 
 def uniquelist( l, e ):
     try:
@@ -176,8 +178,35 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
         outVertex.normal = no
         outVertex.color = color
         outVertex.tangent = (1.0, 0.0, 0.0, 1.0)
+        outVertex.weights = [ 1.0, 0.0, 0.0, 0.0 ]
+        outVertex.bones = [ 0, 0, 0, 0 ]
 
         return outVertex
+
+
+    def get_ordered_bones( self, armature ):
+        """Returns the armature's bones in hierarchy order (parents before children)."""
+        result = []
+        visited = set()
+
+        def add_bone( bone ):
+            if bone.name in visited:
+                return
+            visited.add( bone.name )
+            result.append( bone )
+
+            for child in bone.children:
+                add_bone( child )
+
+        for bone in armature.data.bones:
+            if bone.parent is None:
+                add_bone( bone )
+
+        # Catch bones that are not reachable from a root (shouldn't happen, but be safe).
+        for bone in armature.data.bones:
+            add_bone( bone )
+
+        return result
             
 
     def get_override(self, area_type, region_type):
@@ -203,10 +232,8 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
 
         override = self.get_override( 'VIEW_3D', 'WINDOW' )
 
-        # FIXME: This should be read from the export property.
-        exportSkeleton = True
-        actions = []
-        bones = []
+        exportSkeleton = self.exportSkeleton
+        global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
 
         for obj in objects:
             if obj.type == "ARMATURE":
@@ -216,8 +243,6 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
             mesh.vertices = []
             mesh.faces = []
             mesh.name = obj.name
-
-            global_matrix = axis_conversion( to_forward='Z', to_up='Y' ).to_4x4()
 
             obj.data.transform( global_matrix @ obj.matrix_world )
 
@@ -230,57 +255,39 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
             
             object[ OBJ.UVL ] = None
 
-            armatures = [Object for Object in context.selected_objects if Object.type in ("ARMATURE")]
-            armOffs = 0
-            boneNames = []
-            verts = []
+            armatures = [ Object for Object in context.selected_objects if Object.type in ("ARMATURE") ] if exportSkeleton else []
+            boneIndices = {}
 
             mesh.jointCount = 0
             mesh.boneNames = []
+            mesh.jointParents = []
             mesh.invBindPoseMatrices = []
+            mesh.jointArmatures = []
+            mesh.animTransforms = []
             mesh.frameCount = 0
             
             for armature in armatures:
-                for bone in armature.data.bones:
-                    print( "bone " + bone.name )
+                armBoneIndices = {}
+
+                for bone in self.get_ordered_bones( armature ):
+                    jointIndex = len( mesh.boneNames )
+                    armBoneIndices[ bone.name ] = jointIndex
+                    boneIndices.setdefault( bone.name, jointIndex )
                     mesh.boneNames.append( bone.name )
-                    m = global_matrix @ bone.matrix_local
-                    a = -1
-                
-                    if bone.parent:
-                        for j, p in enumerate( armature.data.bones ):
-                            if p == bone.parent:
-                                a = j + armOffs
-                                break;
-                        pos = global_matrix @ bone.parent.matrix_local
-                        m = pos.inverted() @ m
-                    pos = m.to_translation()
-                    q = m.to_quaternion()
-                    q.normalize()
-                    mesh.invBindPoseMatrices.append( m )
 
-                    # n = safestr(b.name)
-                    try:
-                        boneNames.index( n )
-                        print( "bone name not unique: " + bone.name )
-                        break
-                    except:
-                        pass
+                    if bone.parent and bone.parent.name in armBoneIndices:
+                        mesh.jointParents.append( armBoneIndices[ bone.parent.name ] )
+                    else:
+                        mesh.jointParents.append( -1 )
 
-                    digits = 4
-                    bones.append([ a, uniquelist( boneNames, bone.name ),
-                        uniquelist(verts, [vert(
-                            round( pos[0], digits),
-                            round( pos[1], digits),
-                            round( pos[2], digits), 1.0), 0, -1]),
-                        uniquelist(verts, [vert(
-                            round(q.x, digits),
-                            round(q.y, digits),
-                            round(q.z, digits),
-                            round(q.w, digits)), 0, -2])])
-                armOffs = len( bones )
-                mesh.jointCount = armOffs
-                print("armOffs: ", armOffs)
+                    # Vertices are baked into world space above, so the bind matrix
+                    # is the inverse of the bone's global rest transform.
+                    bindMatrix = global_matrix @ armature.matrix_world @ bone.matrix_local
+                    mesh.invBindPoseMatrices.append( bindMatrix.inverted() )
+                    mesh.jointArmatures.append( ( armature, bone.name ) )
+
+                mesh.jointCount = len( mesh.boneNames )
+                print( "joints: ", mesh.jointCount )
 
             for uvt in obj.data.uv_layers:
                 if uvt.active_render:
@@ -302,40 +309,31 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                     v = obj.data.vertices[ face.vertices[ vertex_id ] ]
                     
                     if len( vg ) > 0 and len( v.groups ) > 0:
-                        skin = []
-                        w = 0.0
+                        influences = []
 
                         for g in v.groups:
-                            n = vg[ g.group ].name;
-                            ni = boneNames.index( n )
+                            if g.weight <= 0.0:
+                                continue
 
-                            skin.append([ni, round(g.weight, 2)])
-                            w = w + round(g.weight, 2)
-                            #print("group name " + n + ", weight: " + str( w ) )
-                            
-                        if w != 1.0:
-                            for g,s in enumerate( skin ):
-                                skin[ g ][ 1 ] = round( skin[ g ][ 1 ] / w, 2)
-                        #s = uniquelist( skins, skin )
+                            groupName = vg[ g.group ].name
+                            ni = boneIndices.get( groupName )
+
+                            if ni is not None:
+                                influences.append( [ ni, g.weight ] )
+
+                        # The engine vertex format supports four bone influences.
+                        influences.sort( key = lambda influence: influence[ 1 ], reverse = True )
+                        influences = influences[ : 4 ]
+                        total = sum( influence[ 1 ] for influence in influences )
+
+                        if total > 0.0:
+                            for g, influence in enumerate( influences ):
+                                vertex_pnt.weights[ g ] = influence[ 1 ] / total
+                                vertex_pnt.bones[ g ] = influence[ 0 ]
 
                 tri = [ f * 3 + 0, f * 3 + 1, f * 3 + 2 ]
                 mesh.faces.append( tri )
                 f = f + 1
-                
-                ## check for and export a second triangle
-                if len(face.vertices) == 4:
-                    for vertex_id in (0, 2, 3):
-                        vertex_pnt = self.get_vertex_pnt(object, obj.data, face, vertex_id)
-                        mesh.vertices.append( vertex_pnt )
-
-                        v = obj.data.vertices[ face.vertices[ vertex_id ] ]
-                    
-                        if len( vg ) > 0 and len( v.groups ) > 0:
-                            print("second triangle todo: read skin weights")
-
-                    tri = [ f * 3 + 0, f * 3 + 1, f * 3 + 2 ]
-                    mesh.faces.append( tri )
-                    f = f + 1
 
             u = 0
 
@@ -363,70 +361,34 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                 raise RuntimeError( "Mesh", obj.data.name, " has over 65535 vertices, not supported!" )
 
         orig_frame = context.scene.frame_current
-        #mpf = 1000.0/use_fps # msec per frame
-        acts = []
-        if len(context.scene.timeline_markers) > 0:
-            print( "has animation, markers " + str( len(context.scene.timeline_markers ) ))
-        else:
-            print( "frame_start: " + str( context.scene.frame_start ) + ", " + str( context.scene.frame_end ) )
-            acts.append( ["Anim", context.scene.frame_start, context.scene.frame_end] )
-            nf = context.scene.frame_end - context.scene.frame_start
-            
-        for a in acts:
-            lf = 0
-            frames = []
-            lastpose = []
-            fi_m = 0
-            
-            for b in bones:
-                lastpose.append( [b[ 2 ], b[ 3 ] ])
-            for frame in range( a[ 1 ], a[ 2 ] + 1 ):
+        skinnedMeshes = [ m for m in self.meshes if m.jointCount > 0 ]
+
+        if len( skinnedMeshes ) > 0:
+            frame_start = context.scene.frame_start
+            frame_end = context.scene.frame_end
+            print( "frame_start: " + str( frame_start ) + ", frame_end: " + str( frame_end ) )
+
+            for mesh in skinnedMeshes:
+                mesh.animTransforms = [ [] for _ in range( mesh.jointCount ) ]
+
+            for frame in range( frame_start, frame_end + 1 ):
                 context.scene.frame_set( frame, subframe = 0.0 )
-                changed = []
-                for ob_main in objects:
-                    #print( "ob_main.type: " + ob_main.type )
-                    if ob_main.type != "ARMATURE":
-                        continue
-                    for i, b in enumerate( ob_main.pose.bones ):
-                        #print("exporting bone for frame " + str( frame ))
-                        m = global_matrix @ b.matrix
-                        if b.parent:
-                            p = global_matrix @ b.parent.matrix
-                            m = p.inverted() @ m
-                            p = m.to_translation()
-                            q = m.to_quaternion()
-                            q.normalize()
 
-                            pos = uniquelist( verts, [vert(
-                                round( p[ 0] , digits ),
-                                round( p[ 1 ], digits ),
-                                round( p[ 2 ], digits ), 1.0 ), 0, -1 ] )
-                            ori = uniquelist( verts, [vert(
-                                round( q.x, digits ),
-                                round( q.y, digits ),
-                                round( q.z, digits ),
-                                round( q.w, digits ) ), 0, -2] )
-                            if lastpose[ i ][ 0 ] != pos or lastpose[ i ][ 1 ] != ori:
-                                changed.append( [i, pos, ori] )
-                                lastpose[ i ][ 0 ] = pos
-                                lastpose[ i ][ 1 ] = ori
-                    # do we have changed bones on this frame?
-                    if len( changed ) > 0:
-                        if len( frames ) < 1:
-                            a[ 1 ] = frame
-                        mpf = 1000.0 / 24
-                        frames.append( [int( (frame - a[ 1 ]) * mpf ), changed] )
-                        lf = frame
-                        if len( changed ) > fi_m:
-                            fi_m = len( changed )
-                # if the action has at least one frame, save it
-                #print( "frames: " + str( len( frames ) ) )
-                mesh.frameCount = len( frames )
-                if len( frames ) > 0:
-                    actions.append( [uniquelist( boneNames, a[ 0 ] ), int(( lf - a[ 1 ] + 1) * mpf), frames] )
-            context.scene.frame_set( orig_frame, subframe=0.0 )
+                for mesh in skinnedMeshes:
+                    for jointIndex, ( armature, boneName ) in enumerate( mesh.jointArmatures ):
+                        poseBone = armature.pose.bones.get( boneName )
 
-                            
+                        if poseBone is None:
+                            continue
+
+                        poseMatrix = global_matrix @ armature.matrix_world @ poseBone.matrix
+                        mesh.animTransforms[ jointIndex ].append( poseMatrix )
+
+            for mesh in skinnedMeshes:
+                mesh.frameCount = frame_end - frame_start + 1
+
+            context.scene.frame_set( orig_frame, subframe = 0.0 )
+            
     def writeFile( self, context, FilePath ):
         """Writes selected meshes to .ae3d file."""
 
@@ -543,28 +505,16 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                 component = struct.pack( 'f', v.color[ 3 ] )
                 f.write( component )
 
-                # TODO Write proper weights and bone indices.
-                
                 if vertexFormat == 2:
                     # Writes weights.
-                    component = struct.pack( 'f', 1 )
-                    f.write( component )
-                    component = struct.pack( 'f', 0 )
-                    f.write( component )
-                    component = struct.pack( 'f', 0 )
-                    f.write( component )
-                    component = struct.pack( 'f', 0 )
-                    f.write( component )
+                    for weight in v.weights:
+                        component = struct.pack( 'f', weight )
+                        f.write( component )
 
                     # Writes bones.
-                    component = struct.pack( 'i', 0 )
-                    f.write( component )
-                    component = struct.pack( 'i', 0 )
-                    f.write( component )
-                    component = struct.pack( 'i', 0 )
-                    f.write( component )
-                    component = struct.pack( 'i', 0 )
-                    f.write( component )
+                    for bone in v.bones:
+                        component = struct.pack( 'i', int( bone ) )
+                        f.write( component )
 
             # Writes # of faces.
             nFaces = struct.pack( 'H', int( len( mesh.faces ) ) )
@@ -606,7 +556,7 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                     component = struct.pack( 'f', mesh.invBindPoseMatrices[ i ][ j ][ 3 ] )
                     f.write( component )
 
-                parentIndex = struct.pack( 'i', 0 )
+                parentIndex = struct.pack( 'i', mesh.jointParents[ i ] )
                 f.write( parentIndex )
                 
                 # Writes joint name length.
@@ -616,12 +566,12 @@ class Aether3DExporter( bpy.types.Operator, ExportHelper ):
                 # Writes name.
                 f.write( mesh.boneNames[ i ].encode() )
 
-                # Writes animation length
-                frameCount = struct.pack( 'i', mesh.frameCount )
+                # Writes animation length and per-frame transformation matrices.
+                animTransforms = mesh.animTransforms[ i ] if i < len( mesh.animTransforms ) else []
+                frameCount = struct.pack( 'i', len( animTransforms ) )
                 f.write( frameCount )
 
-                for frame in range( 0, mesh.frameCount ):
-                    mat = mathutils.Matrix()
+                for mat in animTransforms:
                     for r in range( 0, 4 ):
                         component = struct.pack( 'f', mat[ r ][ 0 ] )
                         f.write( component )
