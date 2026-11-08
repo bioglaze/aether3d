@@ -253,9 +253,25 @@ void ae3d::Scene::RenderDepthAndNormalsForAllCameras( std::vector< GameObject* >
             }
 
             auto cameraTransform = camera->GetComponent< TransformComponent >();
-            // TODO: world position
-            Vec3 position = cameraTransform ? cameraTransform->GetLocalPosition() : Vec3( 0, 0, 0 );
-            const Matrix44& view = cameraComponent->GetView();
+
+            float fovDegrees;
+            Vec3 position;
+            Matrix44 view;
+            // TODO: Maybe add a VR flag into camera to select between HMD and normal pose.
+#if defined( AE3D_OPENVR )
+            view = cameraGo->GetComponent< TransformComponent >()->GetVrView();
+            position = Global::vrEyePosition;
+            fovDegrees = GetVRFov();
+#else
+            position = cameraTransform ? cameraTransform->GetWorldPosition() : Vec3( 0, 0, 0 );
+            fovDegrees = cameraComponent->GetFovDegrees();
+            cameraTransform->GetWorldRotation().GetMatrix( view );
+            Matrix44 translation;
+            translation.SetTranslation( -cameraTransform->GetWorldPosition() );
+            Matrix44::Multiply( translation, view, view );
+            cameraComponent->SetView( view );
+#endif
+            
             const Vec3 viewDir = Vec3( view.m[ 2 ], view.m[ 6 ], view.m[ 10 ] ).Normalized();
             frustum.Update( position, viewDir );
 

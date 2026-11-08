@@ -38,8 +38,8 @@ constexpr bool TestRenderTextureCube = false;
 constexpr bool TestShadowsDir = false;
 constexpr bool TestShadowsSpot = false;
 constexpr bool TestShadowsPoint = false;
-constexpr bool TestForwardPlus = true;
-constexpr bool TestBloom = true;
+constexpr bool TestForwardPlus = false;
+constexpr bool TestBloom = false;
 constexpr bool TestSSAO = false;
 constexpr bool TestSponza = true;
 
@@ -629,7 +629,7 @@ int main()
     decalGo.GetComponent< DecalRendererComponent >()->SetTexture( &fontTex );
 
     Mesh cubeMesh2;
-    cubeMesh2.Load( FileSystem::FileContents( "textured_cube.ae3d" ) );
+    cubeMesh2.Load( FileSystem::FileContents( "kuutio.ae3d" ) );
     
     Mesh cubeMeshPTN; // Position-texcoord-normal
     cubeMeshPTN.Load( FileSystem::FileContents( "pnt_quads_2_meshes.ae3d" ) );
@@ -652,7 +652,13 @@ int main()
     animatedGo.GetComponent< MeshRendererComponent >()->SetMesh( &animatedMesh );
     animatedGo.AddComponent< TransformComponent >();
     animatedGo.GetComponent< TransformComponent >()->SetLocalPosition( { 13, -14, -80 } );
+
+    // The mesh was exported using old Blender exporter where this scale makes sense.
     animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.0075f );
+
+    // The fixed Blender exporter introduced in v0.8.10 scales skinning stuff more like this.
+    //animatedGo.GetComponent< TransformComponent >()->SetLocalScale( 0.75f );
+
     animatedGo.GetComponent< TransformComponent >()->SetLocalRotation( Quaternion::FromEuler( { 180, 90, 0 } ) );
     animatedGo.SetName( "animatedGo" );
 
@@ -962,12 +968,12 @@ int main()
 	scene.Add( &transCube1 );
     
     AudioClip audioClip;
-    audioClip.Load( FileSystem::FileContents( "sine340.wav" ) );
+    audioClip.Load( FileSystem::FileContents( "skuzi.ogg" ) );
     
     cube.AddComponent<AudioSourceComponent>();
     cube.GetComponent<AudioSourceComponent>()->SetClipId( audioClip.GetId() );
     cube.GetComponent<AudioSourceComponent>()->Set3D( true );
-    //cube.GetComponent<AudioSourceComponent>()->Play();
+    cube.GetComponent<AudioSourceComponent>()->Play();
 
     bool quit = false;
     
