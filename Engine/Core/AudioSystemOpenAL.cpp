@@ -354,7 +354,7 @@ float ae3d::AudioSystem::GetClipLengthForId( unsigned handle )
 
 void ae3d::AudioSystem::Play( unsigned clipId, bool isLooping )
 {
-    if (clipId >= AudioGlobal::clips.count + 1)
+    if (clipId >= AudioGlobal::clips.count + 1 || clipId == 0)
     {
         return;
     }
