@@ -77,6 +77,10 @@ namespace WindowGlobal
             ++eventIndex;
             WindowGlobal::eventStack[ WindowGlobal::eventIndex ] = {};
         }
+        else
+        {
+            printf( "Event queue is full!\n" );
+        }
     }
     
     Display* display = nullptr;
@@ -158,6 +162,12 @@ namespace WindowGlobal
 void PlatformInitGamePad()
 {
     DIR* dir = opendir( "/dev/input" );
+    if (!dir)
+    {
+        printf( "Could not open /dev/input, gamepad not available!\n" );
+        return;
+    }
+    
     dirent* result = readdir( dir );
 
     while (result != nullptr)
@@ -227,6 +237,18 @@ void LoadAtoms()
     xcb_flush( WindowGlobal::connection );
     xcb_intern_atom_reply_t* wm_delete_window_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_delete_window_cookie, nullptr );
     xcb_intern_atom_reply_t* wm_protocols_cookie_reply = xcb_intern_atom_reply( WindowGlobal::connection, wm_protocols_cookie, nullptr );
+
+    if (!wm_delete_window_cookie_reply)
+    {
+        printf( "wm_delete_window_cookie_reply is null!\n" );
+        exit( 1 );
+    }
+
+    if (!wm_protocols_cookie_reply)
+    {
+        printf( "wm_protocols_cookie_reply is null!\n" );
+        exit( 1 );
+    }
 
     WindowGlobal::wm_protocols = wm_protocols_cookie_reply->atom;
     WindowGlobal::wm_delete_window = wm_delete_window_cookie_reply->atom;
@@ -335,7 +357,6 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
     const int default_screen = DefaultScreen( WindowGlobal::display );
 
     WindowGlobal::connection = XGetXCBConnection( WindowGlobal::display );
-    LoadAtoms();
 
     if (!WindowGlobal::connection)
     {
@@ -343,7 +364,9 @@ void ae3d::Window::Create( int width, int height, WindowCreateFlags flags )
         printf( "Can't get xcb connection from display\n" );
         return;
     }
-    
+
+    LoadAtoms();
+
     XSetEventQueueOwner( WindowGlobal::display, XCBOwnsEventQueue );
 
     xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator( xcb_get_setup( WindowGlobal::connection ) );
@@ -501,12 +524,14 @@ void ae3d::Window::PumpEvents()
                 const auto type = isDown ? ae3d::WindowEventType::KeyDown : ae3d::WindowEventType::KeyUp;
                 WindowGlobal::IncEventIndex();
                 WindowGlobal::eventStack[ WindowGlobal::eventIndex ].type = type;
+                WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = KeyModifier::Empty;
 
-                if (e->state == 1)
+                // FIXME: This only allows one modifier at a time
+                if (e->state & XCB_MOD_MASK_SHIFT)
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = KeyModifier::Shift;
                 }
-                else if (e->state == 4)
+                else if (e->state & XCB_MOD_MASK_CONTROL)
                 {
                     WindowGlobal::eventStack[ WindowGlobal::eventIndex ].keyModifier = KeyModifier::Control;
                 }
