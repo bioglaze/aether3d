@@ -1962,7 +1962,7 @@ void ae3d::GfxDevice::BeginRenderPass()
 
 void ae3d::GfxDevice::EndRenderPass()
 {
-    vkCmdEndRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
+    vkCmdEndRenderPass( GfxDeviceGlobal::currentCmdBuffer );
 }
 
 void ae3d::GfxDevice::EndCommandBuffer()
@@ -1973,7 +1973,7 @@ void ae3d::GfxDevice::EndCommandBuffer()
 
 void ae3d::GfxDevice::EndRenderPassAndCommandBuffer()
 {
-    vkCmdEndRenderPass( GfxDeviceGlobal::drawCmdBuffers[ GfxDeviceGlobal::currentBuffer ] );
+    vkCmdEndRenderPass( GfxDeviceGlobal::currentCmdBuffer );
 
     VkResult err = vkEndCommandBuffer( GfxDeviceGlobal::currentCmdBuffer );
     AE3D_CHECK_VULKAN( err, "vkEndCommandBuffer" );

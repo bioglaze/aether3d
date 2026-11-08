@@ -160,7 +160,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     const std::string paths[] = { posX.path, negX.path, negY.path, posY.path, negZ.path, posZ.path };
     const std::vector< unsigned char >* datas[] = { &posX.data, &negX.data, &negY.data, &posY.data, &negZ.data, &posZ.data };
 
-    VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
+    VkFormat format = colorSpace == ColorSpace::SRGB ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
     VkBuffer buffers[ 6 ] = {};
     VkDeviceMemory deviceMemories[ 6 ];
 
