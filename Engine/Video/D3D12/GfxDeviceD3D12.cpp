@@ -1780,6 +1780,8 @@ void ae3d::GfxDevice::Present()
     }
 
     GfxDeviceGlobal::timerQuery.queryBuffer->Unmap( 0, nullptr );
+
+    ++GfxDeviceGlobal::frameIndex;
 }
 
 void ae3d::GfxDevice::SetClearColor( float red, float green, float blue )

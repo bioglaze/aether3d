@@ -510,7 +510,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
                 const std::int32_t mipHeight = MathUtil::Max( height >> mipLevel, 1 );
 
                 const VkDeviceSize bc1BlockSize = opaque ? 8 : 16;
-                VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * (format == VK_FORMAT_BC5_UNORM_BLOCK ? 16 : bc1BlockSize);
+                VkDeviceSize imageSize = (mipWidth / 4) * (mipHeight / 4) * ((format == VK_FORMAT_BC5_UNORM_BLOCK || format == VK_FORMAT_BC5_SNORM_BLOCK) ? 16 : bc1BlockSize);
 
                 // FIXME: This is a hack, figure out proper fix.
                 if (imageSize == 0)
@@ -574,14 +574,14 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
 
                 VkImageBlit imageBlit = {};
                 imageBlit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                imageBlit.srcSubresource.baseArrayLayer = 0;
+                imageBlit.srcSubresource.baseArrayLayer = face;
                 imageBlit.srcSubresource.layerCount = 1;
                 imageBlit.srcSubresource.mipLevel = 0;
                 imageBlit.srcOffsets[ 0 ] = { 0, 0, 0 };
                 imageBlit.srcOffsets[ 1 ] = { width, height, 1 };
 
                 imageBlit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                imageBlit.dstSubresource.baseArrayLayer = 0;
+                imageBlit.dstSubresource.baseArrayLayer = face;
                 imageBlit.dstSubresource.layerCount = 1;
                 imageBlit.dstSubresource.mipLevel = mipLevel;
                 imageBlit.dstOffsets[ 0 ] = { 0, 0, 0 };
@@ -623,7 +623,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 6;
-    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.levelCount = mipLevelCount;
     viewInfo.image = image;
     err = vkCreateImageView( GfxDeviceGlobal::device, &viewInfo, nullptr, &view );
     AE3D_CHECK_VULKAN( err, "vkCreateImageView in TextureCube" );
