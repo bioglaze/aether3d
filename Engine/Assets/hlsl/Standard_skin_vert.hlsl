@@ -39,7 +39,8 @@ PS_INPUT main( VS_INPUT input )
     output.positionWS_v = float4( mul( localToWorld, position ).xyz, input.uv.y );
     output.normalVS = mul( localToView, normal ).xyz;
     output.tangentVS = mul( localToView, float4( tangent.xyz, 0 ) ).xyz;
-    float3 ct = cross( normal.xyz, tangent.xyz ) * input.tangent.w;
+    output.projCoord = mul(localToShadowClip, float4(input.pos, 1.0));
+    float3 ct = cross(input.tangent.xyz, input.normal) * input.tangent.w;
     output.bitangentVS.xyz = mul( localToView, float4( ct, 0 ) ).xyz;
 
     return output;
