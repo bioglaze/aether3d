@@ -139,7 +139,7 @@ vertex StandardColorInOut standard_skin_vertex( StandardVertexSkin vert [[stage_
     
     out.tangentVS_u.xyz = (uniforms.localToView * float4( skinnedTangent.xyz, 0 )).xyz;
     out.tangentVS_u.w = vert.texcoord.x;
-    float3 ct = cross( skinnedNormal.xyz, skinnedTangent.xyz ) * vert.tangent.w;
+    float3 ct = cross( skinnedTangent.xyz, skinnedNormal.xyz ) * vert.tangent.w;
     out.bitangentVS_v.xyz = normalize( uniforms.localToView * float4( ct, 0 ) ).xyz;
     out.bitangentVS_v.w = vert.texcoord.y;
     out.normalVS = (uniforms.localToView * skinnedNormal).xyz;
@@ -270,7 +270,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 surfaceToDirectionalLightVS = uniforms.lightDirection.xyz;
 
     const float3 N = normalize( normalVS );
-    const float3 V = normalize( in.positionVS.xyz );
+    const float3 V = -normalize( in.positionVS.xyz );
     const float3 L = normalize( -surfaceToDirectionalLightVS );
     const float3 H = normalize( L + V );
 

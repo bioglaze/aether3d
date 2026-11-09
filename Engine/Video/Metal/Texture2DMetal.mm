@@ -245,8 +245,8 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
 {
     if (defaultTexture.GetWidth() == 0 && GfxDevice::GetMetalDevice() != nullptr)
     {
-        defaultTexture.width = 128;
-        defaultTexture.height = 128;
+        defaultTexture.width = 32;
+        defaultTexture.height = 32;
         defaultTexture.opaque = false;
         
         MTLTextureDescriptor* textureDescriptor =
@@ -268,7 +268,12 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         defaultTexture.metalTexture.label = stagingTexture.label;
         
         const int components = 4;
-        uint8_t data[ 128 * 128 * components ] = { 0xFF };
+        uint8_t data[ 32 * 32 * components ];
+                
+        for (int i = 0; i < 32 * 32 * components; ++i)
+        {
+            data[ i ] = 0xFF;
+        }
         
         MTLRegion region = MTLRegionMake2D(0, 0, defaultTexture.width, defaultTexture.height);
         const int bytesPerRow = components * defaultTexture.width;
@@ -367,7 +372,7 @@ void ae3d::Texture2D::CreateUAV( int aWidth, int aHeight, const char* debugName,
                                                            width:width
                                                           height:height
                                                        mipmapped:(mipmaps == Mipmaps::None ? NO : YES)];
-        textureDescriptor2.usage = MTLTextureUsageShaderRead;
+        textureDescriptor2.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
         textureDescriptor2.storageMode = MTLStorageModePrivate;
         metalTexture = [GfxDevice::GetMetalDevice() newTextureWithDescriptor:textureDescriptor2];
         metalTexture.label = stagingTexture.label;

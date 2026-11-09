@@ -61,7 +61,7 @@ static float VSM( texture2d<float, access::sample> shadowMap, float4 projCoord, 
 
     float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
     
-    float variance = max( moments.y - moments.x * moments.x, -0.001f );
+    float variance = max( moments.y - moments.x * moments.x, 1e-5f );
 
     float delta = depth - moments.x;
     float p = smoothstep( depth - 0.001f, depth, moments.x ); // modifying - 0.001f controls intensity.
@@ -77,7 +77,7 @@ static float VSMPoint( texturecube<float, access::sample> shadowMap, float4 proj
     
     float2 moments = shadowMap.sample( shadowSampler, uv ).rg;
     
-    float variance = max( moments.y - moments.x * moments.x, -0.001f );
+    float variance = max( moments.y - moments.x * moments.x, 1e-5f );
 
     float delta = depth - moments.x;
     float p = smoothstep( depth - 0.02f, depth, moments.x );
