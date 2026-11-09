@@ -125,11 +125,12 @@ float VSM( float depth, float4 projCoord )
     float2 moments = shadowTex.SampleLevel( sLinear, uv, 0 ).rg;
 #endif
     
-    float variance = max( moments.y - moments.x * moments.x, -0.001f );
+    float variance = max( moments.y - moments.x * moments.x, 1e-5f );
 
     float delta = depth - moments.x;
     float p = smoothstep( depth - 0.02f, depth, moments.x );
-    float pMax = linstep( minAmbient, 1.0f, variance / (variance + delta * delta) );
+    float lightBleedingThreshold = 0.2f;
+    float pMax = linstep( lightBleedingThreshold, 1.0f, variance / (variance + delta * delta) );
 
     return saturate( max( p, pMax ) );
 }
@@ -149,11 +150,11 @@ float4 main( PS_INPUT input ) : SV_Target
     const float3 surfaceToLightVS = lightDirection.xyz;
 
     const float3 N = normalize( normalVS );
-    const float3 V = normalize( input.positionVS_u.xyz );
+    const float3 V = -normalize( input.positionVS_u.xyz );
     const float3 L = -lightDirection.xyz;
     const float3 H = normalize( L + V );
 
-    const float dotNV = abs( dot( N, V ) ) + 1e-5f;
+    const float dotNV = dot(N, V) + 1e-5f;
     const float dotNL = saturate( dot( N, -surfaceToLightVS ) );
     const float dotLH = saturate( dot( L, H ) );
     const float dotNH = saturate( dot( N, H ) );
@@ -206,7 +207,7 @@ float4 main( PS_INPUT input ) : SV_Target
         
         if (lightDistance < radius)
         {
-            const float attenuation = pointLightAttenuation( length( vecToLightWS ), 1.0f / radius );
+            const float attenuation = getSquareFalloffAttenuation(vecToLightWS, 1.0f / radius);
             const float3 color = Fd + Fr;
             accumDiffuseAndSpecular.rgb += (color * pointLightColors[ lightIndex ].rgb) * attenuation * dotNL;
         }
