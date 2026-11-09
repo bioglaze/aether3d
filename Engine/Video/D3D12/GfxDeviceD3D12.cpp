@@ -1566,8 +1566,8 @@ void ae3d::GfxDevice::GetGpuMemoryUsage( unsigned& outUsedMBytes, unsigned& outB
     DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo;
     GfxDeviceGlobal::adapter->QueryVideoMemoryInfo( 0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo );
 
-    outUsedMBytes = (unsigned)videoMemoryInfo.CurrentUsage / (1024 * 1024);
-    outBudgetMBytes = (unsigned)videoMemoryInfo.Budget / (1024 * 1024);
+    outUsedMBytes = (unsigned)(videoMemoryInfo.CurrentUsage / (1024 * 1024));
+    outBudgetMBytes = (unsigned)(videoMemoryInfo.Budget / (1024 * 1024));
 }
 
 void ae3d::GfxDevice::ReleaseGPUObjects()
@@ -1600,6 +1600,8 @@ void ae3d::GfxDevice::ReleaseGPUObjects()
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::fence );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::graphicsCommandList );
     AE3D_SAFE_RELEASE( GfxDeviceGlobal::commandQueue );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::particleBuffer );
+    AE3D_SAFE_RELEASE( GfxDeviceGlobal::particleTileBuffer );
 
     for (int i = 0; i < GfxDevice::computeHeapCount; ++i)
     {

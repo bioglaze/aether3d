@@ -93,7 +93,7 @@ void ae3d::TextureCube::Load( const FileSystem::FileContentsData& negX, const Fi
     colorSpace = aColorSpace;
     path = negX.path;
     isCube = true;
-    dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+    dxgiFormat = aColorSpace == ColorSpace::Linear ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     int bytesPerPixel = 2;
 
     // Gets dimension

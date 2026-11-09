@@ -411,9 +411,13 @@ int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool 
     {
         bytesPerPixel = 4 * 4;
     }
+    else if (format == DXGI_FORMAT_R16G16B16A16_FLOAT)
+    {
+        bytesPerPixel = 4 * 2;
+    }
     else if (format == DXGI_FORMAT_BC1_UNORM || format == DXGI_FORMAT_BC1_UNORM_SRGB)
     {
-        bytesPerPixel = 2;
+        bytesPerPixel = 1; // FIXME: this should be 0.5, but would need bytesPerPixel to be a float
     }
     else if (format == DXGI_FORMAT_BC2_UNORM || format == DXGI_FORMAT_BC2_UNORM_SRGB)
     {
@@ -434,6 +438,10 @@ int GetTextureMemoryUsageBytes( int width, int height, DXGI_FORMAT format, bool 
     else if (format == DXGI_FORMAT_R32G32_FLOAT)
     {
         bytesPerPixel = 4 * 2; // TODO: verify
+    }
+    else if (format == DXGI_FORMAT_R32_FLOAT)
+    {
+        bytesPerPixel = 4;
     }
     else
     {
