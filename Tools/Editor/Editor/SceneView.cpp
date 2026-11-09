@@ -909,6 +909,8 @@ void svBeginRender( SceneView* sv, SSAO ssao, Bloom bloom, float bloomThreshold,
     sv->objectIdCamera.GetComponent< TransformComponent >()->SetLocalPosition( sv->camera.GetComponent< TransformComponent >()->GetLocalPosition() );
     sv->objectIdCamera.GetComponent< TransformComponent >()->SetLocalRotation( sv->camera.GetComponent< TransformComponent >()->GetLocalRotation() );
 
+    UpdateSelectionHighlight( sv );
+
     sv->scene.Render();
 
     if (ssao == SSAO::Enabled)
@@ -1127,8 +1129,6 @@ void svUpdate( SceneView* sceneView )
     {
         sceneView->gameObjects[ 0 ]->GetComponent< TransformComponent >()->SetLocalPosition( sceneView->selectedGameObjects[ 0 ]->GetComponent<TransformComponent>()->GetLocalPosition() );
     }
-
-    UpdateSelectionHighlight( sceneView );
 }
 
 void svHighlightGizmo( SceneView* sv, int screenX, int screenY, int width, int height )
