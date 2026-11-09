@@ -147,7 +147,7 @@ float4 main( PS_INPUT input ) : SV_Target
     const float3 normalVS = tangentSpaceTransform( input.tangentVS, input.bitangentVS, input.normalVS, normalTS.xyz );
 
     float3 accumDiffuseAndSpecular = lightColor.rgb;
-    const float3 surfaceToLightVS = lightDirection.xyz;
+    const float3 lightDirectionVS = lightDirection.xyz;
 
     const float3 N = normalize( normalVS );
     const float3 V = -normalize( input.positionVS_u.xyz );
@@ -155,7 +155,7 @@ float4 main( PS_INPUT input ) : SV_Target
     const float3 H = normalize( L + V );
 
     const float dotNV = dot(N, V) + 1e-5f;
-    const float dotNL = saturate( dot( N, -surfaceToLightVS ) );
+    const float dotNL = saturate(dot(N, -lightDirectionVS));
     const float dotLH = saturate( dot( L, H ) );
     const float dotNH = saturate( dot( N, H ) );
 
@@ -208,8 +208,9 @@ float4 main( PS_INPUT input ) : SV_Target
         if (lightDistance < radius)
         {
             const float attenuation = getSquareFalloffAttenuation(vecToLightWS, 1.0f / radius);
-            const float3 color = Fd + Fr;
-            accumDiffuseAndSpecular.rgb += (color * pointLightColors[ lightIndex ].rgb) * attenuation * dotNL;
+            //const float3 color = Fd + Fr;
+            //accumDiffuseAndSpecular.rgb += (color * pointLightColors[ lightIndex ].rgb) * attenuation * dotNL;
+            accumDiffuseAndSpecular.rgb += attenuation * pointLightColors[lightIndex].rgb * Fd * (1.0f - F) + Fr;
         }
     }
 
@@ -232,7 +233,7 @@ float4 main( PS_INPUT input ) : SV_Target
         const float spotAngle = dot( -spotLightDir.xyz, vecToLight );
         const float cosineOfConeAngle = abs( spotParams.w );
 
-        const float3 vecToLightVS = (mul( localToView, float4( vecToLight, 1.0f ) ) ).xyz;
+        const float3 vecToLightVS = (mul( localToView, float4( vecToLight, 0.0f ) ) ).xyz;
         const float3 lightDirVS = normalize( vecToLightVS );
 
         const float3 L = normalize( vecToLightVS );
