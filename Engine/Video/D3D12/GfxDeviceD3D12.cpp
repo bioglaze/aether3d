@@ -143,9 +143,29 @@ struct TimerQuery
     std::uint64_t frequency = 0;
 };
 
+struct PSOKey
+{
+    const ae3d::Shader* shader;
+    ae3d::VertexBuffer::VertexFormat vertexFormat;
+    ae3d::GfxDevice::BlendMode blendMode;
+    ae3d::GfxDevice::DepthFunc depthFunc;
+    ae3d::GfxDevice::CullMode cullMode;
+    ae3d::GfxDevice::FillMode fillMode;
+    DXGI_FORMAT rtvFormat;
+    int sampleCount;
+    ae3d::GfxDevice::PrimitiveTopology topology;
+
+    bool operator==( const PSOKey& o ) const
+    {
+        return shader == o.shader && vertexFormat == o.vertexFormat && blendMode == o.blendMode &&
+            depthFunc == o.depthFunc && cullMode == o.cullMode && fillMode == o.fillMode &&
+            rtvFormat == o.rtvFormat && sampleCount == o.sampleCount && topology == o.topology;
+    }
+};
+
 struct PSOEntry
 {
-	std::uint64_t hash;
+    PSOKey key;
 	ID3D12PipelineState* pso;
 };
 
@@ -711,22 +731,6 @@ void CreateRootSignature()
     }
 }
 
-std::uint64_t GetPSOHash( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode,
-                     ae3d::GfxDevice::DepthFunc depthFunc, ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
-{
-    std::uint64_t outResult = (unsigned)vertexFormat;
-    outResult += (ptrdiff_t)&shader;
-    outResult += (unsigned)blendMode * 8;
-    outResult += ((unsigned)depthFunc) * 16;
-    outResult += ((unsigned)cullMode) * 64;
-    outResult += ((unsigned)fillMode) * 128;
-    outResult += ((unsigned)rtvFormat) * 256;
-    outResult += sampleCount * 512;
-    outResult += ((unsigned)topology) * 1024;
-
-    return outResult;
-}
-
 void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& shader, ae3d::GfxDevice::BlendMode blendMode, ae3d::GfxDevice::DepthFunc depthFunc,
                 ae3d::GfxDevice::CullMode cullMode, ae3d::GfxDevice::FillMode fillMode, DXGI_FORMAT rtvFormat, int sampleCount, ae3d::GfxDevice::PrimitiveTopology topology )
 {
@@ -914,8 +918,18 @@ void CreatePSO( ae3d::VertexBuffer::VertexFormat vertexFormat, ae3d::Shader& sha
     AE3D_CHECK_D3D( hr, "Failed to create PSO" );
     pso->SetName( L"PSO Graphics" );
 
-    const std::uint64_t hash = GetPSOHash( vertexFormat, shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount, topology );
-    GfxDeviceGlobal::psoCache.push_back( { hash, pso } );
+    PSOKey key{};
+    key.vertexFormat = vertexFormat;
+    key.shader = &shader;
+    key.blendMode = blendMode;
+    key.depthFunc = depthFunc;
+    key.cullMode = cullMode;
+    key.fillMode = fillMode;
+    key.rtvFormat = rtvFormat;
+    key.sampleCount = sampleCount;
+    key.topology = topology;
+
+    GfxDeviceGlobal::psoCache.push_back( { key, pso } );
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE GetSampler( ae3d::Mipmaps /*mipmaps*/, ae3d::TextureWrap wrap, ae3d::TextureFilter filter, ae3d::Anisotropy anisotropy )
@@ -1045,6 +1059,7 @@ void CreateParticleBuffer()
     if (FAILED( hr ))
     {
         ae3d::System::Assert( false, "Unable to create particle tile buffer!" );
+        return;
     }
 
     GfxDeviceGlobal::particleTileBuffer->SetName( L"Particle Tile Buffer" );
@@ -1125,8 +1140,11 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
 
     ID3D12Debug* debugController;
     HRESULT dhr = D3D12GetDebugInterface( IID_PPV_ARGS( &debugController ) );
+    bool hasDebugLayer = false;
+
     if (dhr == S_OK && apiValidation)
     {
+        hasDebugLayer = true;
         debugController->EnableDebugLayer();
 #if 0
         ID3D12Debug1* debugController1;
@@ -1176,7 +1194,7 @@ void ae3d::CreateRenderer( int samples, bool apiValidation )
     AE3D_CHECK_D3D( hr, "Failed to create D3D12 device with feature level 11.0" );
     GfxDeviceGlobal::device->SetName( L"D3D12 device" );
 
-    if (apiValidation)
+    if (apiValidation && hasDebugLayer)
     {
         hr = GfxDeviceGlobal::device->QueryInterface( IID_PPV_ARGS( &GfxDeviceGlobal::infoQueue ) );
         AE3D_CHECK_D3D( hr, "Infoqueue failed" );
@@ -1386,23 +1404,33 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     }
 
     const int sampleCount = GfxDeviceGlobal::currentRenderTarget ? GfxDeviceGlobal::currentRenderTarget->GetSampleCount() : GfxDeviceGlobal::sampleCount;
-    const std::uint64_t psoHash = GetPSOHash( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount, topology );
-    bool foundHash = false;
-    size_t hashIndex = 0;
+    PSOKey key{};
+    key.vertexFormat = vertexBuffer.GetVertexFormat();
+    key.shader = &shader;
+    key.blendMode = blendMode;
+    key.depthFunc = depthFunc;
+    key.cullMode = cullMode;
+    key.fillMode = fillMode;
+    key.rtvFormat = rtvFormat;
+    key.sampleCount = sampleCount;
+    key.topology = topology;
+
+    bool foundKey = false;
+    size_t keyIndex = 0;
 
     for (std::size_t psoIndex = 0; psoIndex < GfxDeviceGlobal::psoCache.size(); ++psoIndex)
     {
-        if (GfxDeviceGlobal::psoCache[ psoIndex ].hash == psoHash)
+        if (GfxDeviceGlobal::psoCache[ psoIndex ].key == key)
         {
-            foundHash = true;
-            hashIndex = psoIndex;
+            foundKey = true;
+            keyIndex = psoIndex;
         }
     }
 
-    if (!foundHash)
+    if (!foundKey)
     {
         CreatePSO( vertexBuffer.GetVertexFormat(), shader, blendMode, depthFunc, cullMode, fillMode, rtvFormat, sampleCount, topology );
-        hashIndex = GfxDeviceGlobal::psoCache.size() - 1;
+        keyIndex = GfxDeviceGlobal::psoCache.size() - 1;
     }
 
     const unsigned index = (GfxDeviceGlobal::currentConstantBufferIndex * RESOURCE_BINDING_COUNT) % GfxDeviceGlobal::constantBuffers.size();
@@ -1484,7 +1512,7 @@ void ae3d::GfxDevice::Draw( VertexBuffer& vertexBuffer, int startFace, int endFa
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 0, DescriptorHeapManager::GetCbvSrvUavGpuHandle( index ) );
     GfxDeviceGlobal::graphicsCommandList->SetGraphicsRootDescriptorTable( 1, samplerHandle );
 
-    ID3D12PipelineState* pso = GfxDeviceGlobal::psoCache[ hashIndex ].pso;
+    ID3D12PipelineState* pso = GfxDeviceGlobal::psoCache[ keyIndex ].pso;
 
     if (GfxDeviceGlobal::cachedPSO != pso)
     {
@@ -1766,7 +1794,7 @@ void ae3d::GfxDevice::Present()
     AE3D_CHECK_D3D( hr, "Failed to get timer query frequency" );
 
     std::uint64_t* queryData = nullptr;
-    D3D12_RANGE range = { 0, GfxDeviceGlobal::timerQuery.MaxNumTimers };
+    D3D12_RANGE range = { 0, GfxDeviceGlobal::timerQuery.MaxNumTimers * sizeof( std::uint64_t ) };
     hr = GfxDeviceGlobal::timerQuery.queryBuffer->Map( 0, &range, (void**)&queryData );
     
     if (FAILED( hr ))

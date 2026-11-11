@@ -151,6 +151,11 @@ void ae3d::Texture2D::SetLayouts( Texture2D* texture2ds[], TextureLayout layouts
 {
     ae3d::System::Assert( count < 5, "Count too large!" );
 
+    if (count == 0)
+    {
+        return;
+    }
+
     int realCount = 0;
     D3D12_RESOURCE_BARRIER barriers[ 5 ] = {};
 
@@ -224,17 +229,15 @@ ae3d::Texture2D* ae3d::Texture2D::GetDefaultTexture()
         Texture2DGlobal::textures.push_back( Texture2DGlobal::defaultTexture.gpuResource.resource );
 
         const int bytesPerPixel = 4;
-        std::vector< std::uint8_t > data( Texture2DGlobal::defaultTexture.width * Texture2DGlobal::defaultTexture.height * bytesPerPixel );
-        for (std::size_t i = 0; i < data.size() / 4; ++i)
+        std::uint8_t data[ 32 * 32 * bytesPerPixel ];
+
+        for (int i = 0; i < 32 * 32 * bytesPerPixel; ++i)
         {
-            data[ i * 4 + 0 ] = 255;
-            data[ i * 4 + 1 ] = 0;
-            data[ i * 4 + 2 ] = 255;
-            data[ i * 4 + 3 ] = 255;
+            data[ i ] = 0xFF;
         }
 
         D3D12_SUBRESOURCE_DATA texResource = {};
-        texResource.pData = data.data();
+        texResource.pData = data;
         texResource.RowPitch = Texture2DGlobal::defaultTexture.width * bytesPerPixel;
         texResource.SlicePitch = texResource.RowPitch * Texture2DGlobal::defaultTexture.height;
         InitializeTexture( Texture2DGlobal::defaultTexture.gpuResource, &texResource, 1 );
