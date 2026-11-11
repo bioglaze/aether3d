@@ -744,9 +744,12 @@ static void RenderSSAO( SceneView* sv )
 #if RENDERER_VULKAN
     sv->ssaoShader.SetTexture2D( &sv->noiseTex, 2 );
     sv->ssaoShader.SetTexture2D( &sv->ssaoTex, 14 );
-#else
+#elif RENDERER_METAL
     sv->ssaoShader.SetTexture2D( &sv->noiseTex, 3 );
     sv->ssaoShader.SetTexture2D( &sv->ssaoTex, 2 );
+#elif RENDERER_D3D12
+    sv->ssaoShader.SetTexture2D( &sv->noiseTex, 2 );
+    sv->ssaoShader.SetUAV( 1, sv->ssaoTex.GetGpuResource()->resource, *sv->ssaoTex.GetUAVDesc() );
 #endif
     sv->ssaoShader.Begin();
 #if RENDERER_METAL
