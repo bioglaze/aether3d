@@ -198,6 +198,12 @@ void ae3d::TransformComponent::SetVrView( const Matrix44& view )
 void ae3d::TransformComponent::SetParent( TransformComponent* aParent )
 {
     const TransformComponent* testComponent = aParent;
+
+    if (!aParent)
+    {
+        parent = -1;
+        return;
+    }
     
     // Disallows cycles.
     while (testComponent != nullptr)
