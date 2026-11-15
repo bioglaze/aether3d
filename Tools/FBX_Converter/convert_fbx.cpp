@@ -393,10 +393,10 @@ void ImportMeshNodes( FbxNode* node )
                 gMeshes.back().tcoord.push_back( uv[ j ] );
                 gMeshes.back().nonInterleavedTangents.push_back( tangent[ j ] );
 
-                face.vInd[ j ] = (unsigned short)vertexIndex;
-                face.vnInd[ j ] = (unsigned short)vertexCounter;
-                face.uvInd[ j ] = (unsigned short)vertexCounter;
-                face.tInd[ j ] = (unsigned short)vertexCounter;
+                face.vInd[ j ] = vertexIndex;
+                face.vnInd[ j ] = vertexCounter;
+                face.uvInd[ j ] = vertexCounter;
+                face.tInd[ j ] = vertexCounter;
                 ++vertexCounter;
             }
             
@@ -677,7 +677,7 @@ int main( int paramCount, char** params )
         return 0;
     }
 
-    // Creates a new file name by replacing 'obj' with 'ae3d'.
+    // Creates a new file name by replacing 'fbx' with 'ae3d'.
     std::string outFile = std::string( params[ 1 ] );
     outFile = outFile.substr( 0, outFile.length() - 3 );
     outFile.append( "ae3d" );
