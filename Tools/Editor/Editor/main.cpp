@@ -71,6 +71,12 @@ void GetOpenPath( char* path, const char* extension )
     {
         f = popen( "zenity --file-selection --title \"Load .scene or .ae3d file\"", "r" );
     }
+
+    if (!f)
+    {
+        System::Print( "Could not open file.\n" );
+        return;
+    }
     
     fgets( path, 1024, f );
     
@@ -78,6 +84,8 @@ void GetOpenPath( char* path, const char* extension )
     {
         path[ strlen( path ) - 1 ] = 0;
     }
+
+    pclose( f );
 }
 #endif
 
