@@ -113,12 +113,14 @@ void ae3d::TransformComponent::UpdateLocalAndGlobalMatrix()
 
     Matrix44 transform = localMatrix;
     Quaternion worldRotation = localRotation;
-        
-    while (parent != -1)
+
+    int loopParent = parent;
+
+    while (loopParent != -1)
     {
-        Matrix44::Multiply( transform, transformComponents[ parent ].GetLocalMatrix(), transform );
-        worldRotation = worldRotation * transformComponents[ parent ].localRotation;
-        parent = transformComponents[ parent ].parent;
+        Matrix44::Multiply( transform, transformComponents[ loopParent ].GetLocalMatrix(), transform );
+        worldRotation = worldRotation * transformComponents[ loopParent ].localRotation;
+        loopParent = transformComponents[ loopParent ].parent;
     }
 
     localToWorldMatrix = transform;
