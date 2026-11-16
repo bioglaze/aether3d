@@ -274,7 +274,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
     const float3 L = normalize( -surfaceToDirectionalLightVS );
     const float3 H = normalize( L + V );
 
-    const half4 cubeReflection = half4( cubeMap.sample( sampler0, N.xyz ) );
+    //const half4 cubeReflection = half4( cubeMap.sample( sampler0, N.xyz ) );
     
     const float dotNV = abs( dot( N, V ) ) + 1e-5f;
     const float dotNL = saturate( dot( N, -surfaceToDirectionalLightVS ) );
@@ -299,7 +299,6 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
 
     float4 outColor = float4( (uniforms.lightColor.rgb * color) * dotNL, 1 );
     
-    
     while (nextLightIndex != LIGHT_INDEX_BUFFER_SENTINEL)
     {
         const int lightIndex = nextLightIndex;
@@ -314,7 +313,7 @@ fragment half4 standard_fragment( StandardColorInOut in [[stage_in]],
         if (lightDistance < radius)
         {
             const float3 vecToLightVS = (uniforms.localToView * float4( vecToLightWS, 0 )).xyz;
-            const float3 L = normalize( -vecToLightVS );
+            const float3 L = normalize( vecToLightVS );
             const float3 H = normalize( L + V );
             
             const float dotNL = saturate( dot( N, -L ) );

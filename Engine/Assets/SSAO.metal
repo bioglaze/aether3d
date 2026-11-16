@@ -36,7 +36,7 @@ float ssaoInternal( float3x3 kernelBasis, float3 originPos, float radius, consta
 
     occlusion = 1.0f - (occlusion / float( uniforms.kernelSize ));
     float uPower = 1.8f;
-    return pow( abs( occlusion ), uPower );
+    return pow( occlusion, uPower );
 }
 
 // Normally argument "dipatchGridDim" is parsed through a constant buffer. However, if for some reason it is a
@@ -76,7 +76,7 @@ uint2 ThreadGroupTilingX(
     {
         // Path taken only if the last tile has imperfect dimensions and CTAs from the last tile are launched.
         uint X_dimension_of_last_tile = dipatchGridDim.x % maxTileWidth;
-    #ifdef DXC_STATIC_DISPATCH_GRID_DIM
+    #if DXC_STATIC_DISPATCH_GRID_DIM
         X_dimension_of_last_tile = max(1U, X_dimension_of_last_tile);
     #endif
         Local_CTA_ID_y_within_current_tile = Local_CTA_ID_within_current_tile / X_dimension_of_last_tile;
@@ -146,7 +146,7 @@ kernel void ssao(
     float3 normal = -normalize( depthNormalsTexture.read( uint2( gid ), 0 ).gba );
     
     // construct kernel basis matrix:
-    float3 rvec = normalize( float3( noiseTexture.read( uint2( globalIdx.x % 64, globalIdx.y % 64 ), 0 ).rg, 0 ) );
+    float3 rvec = normalize( float3( noiseTexture.read( uint2( gid.x % 64, gid.y % 64 ), 0 ).rg, 0 ) );
     float3 tangent = normalize( rvec - normal * dot( rvec, normal ) );
     float3 bitangent = cross( tangent, normal );
     float3x3 kernelBasis = float3x3( tangent, bitangent, normal );
