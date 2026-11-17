@@ -208,11 +208,11 @@ float IntersectRayAABB( const Vec3& origin, const Vec3& target, const Vec3& min,
 
 float IntersectRayTriangles( const Vec3& origin, const Vec3& target, const Vec3* vertices, unsigned vertexCount )
 {
-    for (unsigned ve = 0; ve < vertexCount / 3; ve += 3)
+    for (unsigned ve = 0; ve < vertexCount; ve += 3)
     {
-        const Vec3& v0 = vertices[ ve * 3 + 0 ];
-        const Vec3& v1 = vertices[ ve * 3 + 1 ];
-        const Vec3& v2 = vertices[ ve * 3 + 2 ];
+        const Vec3& v0 = vertices[ ve + 0 ];
+        const Vec3& v1 = vertices[ ve + 1 ];
+        const Vec3& v2 = vertices[ ve + 2 ];
 
         const Vec3 e1 = v1 - v0;
         const Vec3 e2 = v2 - v0;
@@ -968,8 +968,9 @@ void svLoadScene( SceneView* sv, const ae3d::FileSystem::FileContentsData& conte
     {
         return;
     }
-    
+
     gos.clear();
+
     std::map< std::string, class Texture2D* > texture2Ds;
     std::map< std::string, class Material* > materials;
     Array< class Mesh* > meshes;
