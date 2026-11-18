@@ -4,6 +4,8 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
 {
     float occlusion = 0.0f;
 
+    float samplesTaken = 0.0f;
+    
     for (int i = 0; i < kernelSize; ++i)
     {
         float3 samplePosVS = mul( tangentToView, kernelOffsets[ i ].xyz );
@@ -30,20 +32,17 @@ float ssao( float3x3 tangentToView, float3 originPosVS, float radius, int kernel
         float sampleDepth = -normalTex.Load( int3( offset.xy * depthTexDim, 0 ) ).r;
 
         float diff = abs( originPosVS.z - sampleDepth );
-        /*if (diff < 0.0001f)
-        {
-            occlusion += (sampleDepth < (samplePosVS.z - 0.025f) ? 1.0f : 0.0f) * rangeCheck;
-            continue;
-        }*/
-        
+        diff = max( diff, 1e-4 );
+
         float rangeCheck = smoothstep( 0.0f, 1.0f, radius / diff );
         occlusion += (sampleDepth < (samplePosVS.z - 0.025f) ? 1.0f : 0.0f) * rangeCheck;
+        ++samplesTaken;
     }
 
-    occlusion = 1.0f - (occlusion / float( kernelSize ));
+    occlusion = 1.0f - (occlusion / float( samplesTaken ));
     float uPower = 1.8f;
 
-    return pow( max( abs( occlusion ), 0.3f ), uPower );
+    return pow( max( occlusion, 0.3f ), uPower );
 }
 
 [numthreads( 8, 8, 1 )]
