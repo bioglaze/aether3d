@@ -174,7 +174,7 @@ void CreateDistanceMap( unsigned char* imageData, int width, int height )
 
 void WriteScaledMapIntoTGAFile( const char* path, int width, int height )
 {
-    std::ofstream ofs( path );
+    std::ofstream ofs( path, std::ios::out | std::ios::binary );
     
     uint8_t idLen = 0;
     ofs.write( (char*) &idLen, 1 );
@@ -242,7 +242,7 @@ int main( int argCount, char* args[] )
 
     CreateDistanceMap( imageData, width, height );
     ScaleDistanceMap( width, height, 4 );
-    WriteScaledMapIntoTGAFile( "sdf.tga", scaledWidth, scaledHeight );
+    WriteScaledMapIntoTGAFile( args[ 2 ], scaledWidth, scaledHeight );
 
     stbi_image_free( imageData );
     return 0;
