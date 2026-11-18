@@ -144,7 +144,7 @@ float4 main( PS_INPUT input ) : SV_Target
     uint index = maxNumLightsPerTile * tileIndex;
     uint nextLightIndex = perTileLightIndexBuffer[ index ];
 
-    const float3 normalVS = tangentSpaceTransform( input.tangentVS, input.bitangentVS, input.normalVS, normalTS.xyz );
+    const float3 normalVS = tangentSpaceTransform(normalize(input.tangentVS), normalize(input.bitangentVS), normalize(input.normalVS), normalTS.xyz);
 
     float3 accumDiffuseAndSpecular = lightColor.rgb;
     const float3 lightDirectionVS = lightDirection.xyz;
@@ -154,7 +154,7 @@ float4 main( PS_INPUT input ) : SV_Target
     const float3 L = -lightDirection.xyz;
     const float3 H = normalize( L + V );
 
-    const float dotNV = dot(N, V) + 1e-5f;
+    const float dotNV = abs(dot(N, V)) + 1e-5f;
     const float dotNL = saturate(dot(N, -lightDirectionVS));
     const float dotLH = saturate( dot( L, H ) );
     const float dotNH = saturate( dot( N, H ) );
@@ -209,8 +209,7 @@ float4 main( PS_INPUT input ) : SV_Target
         {
             const float attenuation = getSquareFalloffAttenuation(vecToLightWS, 1.0f / radius);
             //const float3 color = Fd + Fr;
-            //accumDiffuseAndSpecular.rgb += (color * pointLightColors[ lightIndex ].rgb) * attenuation * dotNL;
-            accumDiffuseAndSpecular.rgb += attenuation * pointLightColors[lightIndex].rgb * Fd * (1.0f - F) + Fr;
+            accumDiffuseAndSpecular.rgb += attenuation * pointLightColors[lightIndex].rgb * Fd * (1.0f - F) * dotNL + Fr * attenuation * dotNL;
         }
     }
 
@@ -231,7 +230,7 @@ float4 main( PS_INPUT input ) : SV_Target
 
         const float3 vecToLight = normalize( centerAndRadius.xyz - input.positionWS_v.xyz );
         const float spotAngle = dot( -spotLightDir.xyz, vecToLight );
-        const float cosineOfConeAngle = abs( spotParams.w );
+        const float cosineOfConeAngle = spotParams.w;
 
         const float3 vecToLightVS = (mul( localToView, float4( vecToLight, 0.0f ) ) ).xyz;
         const float3 lightDirVS = normalize( vecToLightVS );
@@ -266,14 +265,14 @@ float4 main( PS_INPUT input ) : SV_Target
         accumDiffuseAndSpecular.rgb += ((shadedColor * color) * attenuation * dotNL);
     }
     
-    accumDiffuseAndSpecular.rgb = max( float3( minAmbient, minAmbient, minAmbient ), accumDiffuseAndSpecular.rgb );
-    //accumDiffuseAndSpecular.rgb += texCube.Sample( sLinear, N ).rgb;
-
 #if defined( ENABLE_SHADOWS ) || defined( ENABLE_SHADOWS_POINT )
     float depth = input.projCoord.z / input.projCoord.w;
     float shadow = max( minAmbient, VSM( depth, input.projCoord ) );
     accumDiffuseAndSpecular.rgb *= shadow;
 #endif
+
+    accumDiffuseAndSpecular.rgb = max(float3(minAmbient, minAmbient, minAmbient), accumDiffuseAndSpecular.rgb);
+    //accumDiffuseAndSpecular.rgb += texCube.Sample( sLinear, N ).rgb;
 
     //return float4(accumDiffuseAndSpecular, 1 );
 #ifdef DEBUG_LIGHT_COUNT
